@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply text-sm;
+    @apply text-slate-900;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+}

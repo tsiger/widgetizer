@@ -1,0 +1,15 @@
+node_modules
+dist
+data
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+.shopify
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.development
+.env.test

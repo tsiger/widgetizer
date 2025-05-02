@@ -1,0 +1,57 @@
+{
+  "name": "Main Navigation",
+  "description": "Primary navigation menu for the header",
+  "items": [
+    {
+      "label": "Home",
+      "link": "/",
+      "items": []
+    },
+    {
+      "label": "About",
+      "link": "/about",
+      "items": [
+        {
+          "label": "Our Story",
+          "link": "/about/story",
+          "items": []
+        },
+        {
+          "label": "Team",
+          "link": "/about/team",
+          "items": []
+        }
+      ]
+    },
+    {
+      "label": "Services",
+      "link": "/services",
+      "items": [
+        {
+          "label": "Web Design",
+          "link": "/services/web-design",
+          "items": [
+            {
+              "label": "UI Design",
+              "link": "/services/web-design/ui"
+            },
+            {
+              "label": "UX Design",
+              "link": "/services/web-design/ux"
+            }
+          ]
+        },
+        {
+          "label": "Development",
+          "link": "/services/development",
+          "items": []
+        }
+      ]
+    },
+    {
+      "label": "Contact",
+      "link": "/contact",
+      "items": []
+    }
+  ]
+}

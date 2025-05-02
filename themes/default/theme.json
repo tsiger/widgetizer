@@ -1,0 +1,65 @@
+{
+  "name": "Default Theme",
+  "version": "1.0.1",
+  "description": "A clean, minimal default theme",
+  "author": "Widgetizer",
+  "widgets": 15,
+  "settings": {
+    "global": {
+      "colors": [
+        {
+          "id": "background",
+          "label": "Background Color",
+          "default": "#FFFFFF",
+          "type": "color",
+          "outputAsCssVar": true
+        },
+        {
+          "id": "text",
+          "label": "Text Color",
+          "default": "#1E293B",
+          "type": "color"
+        },
+        {
+          "id": "accent",
+          "label": "Accent Color",
+          "default": "#FF4088",
+          "type": "color"
+        }
+      ],
+      "typography": [
+        {
+          "id": "heading_font",
+          "label": "Heading Font",
+          "default": "Inter",
+          "type": "font_picker",
+          "value": {
+            "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+            "weight": 700
+          },
+          "outputAsCssVar": true
+        },
+        {
+          "id": "body_font",
+          "label": "Body Font",
+          "default": "Inter",
+          "type": "font_picker",
+          "value": {
+            "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+            "weight": 400
+          },
+          "outputAsCssVar": true
+        }
+      ],
+      "layout": [
+        {
+          "id": "show_header",
+          "label": "Show Header",
+          "default": true,
+          "type": "checkbox",
+          "value": true
+        }
+      ]
+    }
+  }
+}

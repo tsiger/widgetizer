@@ -1,0 +1,115 @@
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
+
+import PageLayout from "../components/layout/PageLayout";
+import ProjectForm from "../components/projects/ProjectForm.jsx";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+
+import useToastStore from "../stores/toastStore";
+import { updateProject, getAllProjects } from "../utils/projectManager";
+import useProjectStore from "../stores/projectStore";
+
+export default function ProjectsEdit() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [project, setProject] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [showSuccessActions, setShowSuccessActions] = useState(false);
+
+  const showToast = useToastStore((state) => state.showToast);
+  const fetchActiveProject = useProjectStore((state) => state.fetchActiveProject);
+  const activeProject = useProjectStore((state) => state.activeProject);
+
+  useEffect(() => {
+    loadProject();
+  }, [id]);
+
+  const loadProject = async () => {
+    try {
+      const projects = await getAllProjects();
+      const project = projects.find((p) => p.id === id);
+      if (!project) {
+        showToast("Project not found", "error");
+        return;
+      }
+      setProject(project);
+    } catch (err) {
+      showToast(err.message || "Failed to load project", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (formData) => {
+    setIsSubmitting(true);
+
+    try {
+      const updatedProject = await updateProject(id, {
+        ...formData,
+        theme: project.theme,
+      });
+      setProject(updatedProject);
+
+      if (activeProject && activeProject.id === id) {
+        await fetchActiveProject();
+      }
+
+      showToast(`Project "${formData.name}" was updated successfully!`, "success");
+      setShowSuccessActions(true);
+      return false;
+    } catch (err) {
+      showToast(err.message || "Failed to update project", "error");
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading)
+    return (
+      <PageLayout title="Edit project">
+        <LoadingSpinner message="Loading project..." />
+      </PageLayout>
+    );
+
+  if (!project) return <PageLayout title="Edit Project">Project not found</PageLayout>;
+
+  if (!activeProject) {
+    showToast("Please select or create a project to manage your projects", "error");
+    return (
+      <PageLayout title="Edit project">
+        <div className="p-8 text-center">
+          <h2 className="text-xl font-semibold mb-2">No Active Project</h2>
+          <p className="text-slate-600 mb-4">Please select or create a project to manage your projects.</p>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  return (
+    <PageLayout title="Edit project">
+      {showSuccessActions && (
+        <div className="mb-4 flex flex-wrap gap-3">
+          <button
+            onClick={() => navigate("/projects")}
+            className="pl-3 pr-4 py-2 border-2 border-slate-300 rounded-sm hover:bg-slate-50 flex items-center gap-1"
+          >
+            <ChevronLeft size={18} /> Back to Projects List
+          </button>
+        </div>
+      )}
+
+      {project && (
+        <ProjectForm
+          initialData={project}
+          onSubmit={handleSubmit}
+          isSubmitting={isSubmitting}
+          submitLabel="Save Changes"
+          onCancel={() => navigate("/projects")}
+        />
+      )}
+    </PageLayout>
+  );
+}

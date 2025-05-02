@@ -1,0 +1,221 @@
+<header
+    class="site-header"
+    data-widget-id="{{ widget.id }}"
+    data-widget-type="header"
+>
+    <style>
+        #{{ widget.id }}.site-header__container {
+            padding: {{ widget.settings.headerPadding }}px;
+            background-color: {{ widget.settings.headerBackgroundColor }};
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #{{ widget.id }} .site-header__branding {
+            flex: 0 0 auto;
+        }
+
+        #{{ widget.id }} .site-header__title {
+            margin: 0;
+            font-size: {{ widget.settings.headerTitleSize }}px;
+            color: {{ widget.settings.headerTitleColor }};
+        }
+
+        #{{ widget.id }} .site-header__tagline {
+            color: {{ widget.settings.headerTaglineColor }};
+            margin-top: 0.5rem;
+        }
+
+        /* Menu styles */
+        #{{ widget.id }} .site-header__menu {
+            flex: 0 0 auto;
+        }
+
+        #{{ widget.id }} .site-header__nav-list {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #{{ widget.id }} .site-header__nav-item {
+            position: relative;
+            margin-left: 1.5rem;
+        }
+
+        #{{ widget.id }} .site-header__nav-item::after {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 100%;
+            bottom: -20px;
+            left: 0;
+        }
+
+        #{{ widget.id }} .site-header__nav-link {
+            color: {{ widget.settings.headerTitleColor }};
+            text-decoration: none;
+            padding: 0.5rem 0;
+            display: block;
+            transition: color 0.2s ease;
+        }
+
+        #{{ widget.id }} .site-header__nav-link:hover {
+            color: #0066cc;
+        }
+
+        #{{ widget.id }} .site-header__nav-item--has-submenu > .site-header__nav-link::after {
+            content: "⌵";
+            display: inline-block;
+            margin-left: 0.4em;
+            font-size: 0.8em;
+            position: relative;
+            top: -1px;
+            transition: transform 0.2s ease;
+        }
+
+        #{{ widget.id }} .site-header__nav-item--has-submenu:hover > .site-header__nav-link::after {
+            transform: rotate(180deg);
+        }
+
+        #{{ widget.id }} .site-header__nav-submenu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 6px;
+            list-style: none;
+            padding: 8px 0;
+            z-index: 100;
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        #{{ widget.id }} .site-header__nav-submenu::before {
+            content: "";
+            position: absolute;
+            top: -6px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            transform: rotate(45deg);
+            box-shadow: -2px -2px 5px rgba(0,0,0,0.05);
+        }
+
+        #{{ widget.id }} .site-header__nav-item:hover > .site-header__nav-submenu {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #{{ widget.id }} .site-header__nav-submenu .site-header__nav-link {
+            padding: 8px 16px;
+            color: #333;
+        }
+
+        #{{ widget.id }} .site-header__nav-submenu .site-header__nav-link:hover {
+            background: #f7f9fc;
+        }
+    </style>
+
+    <div id="{{ widget.id }}" class="site-header__container">
+        <div class="site-header__branding">
+            <h1 class="site-header__title" data-setting="headerTitle">
+                {{ widget.settings.headerTitle }}
+            </h1>
+            <div class="site-header__tagline" data-setting="headerTagline">
+                {{ widget.settings.headerTagline }}
+            </div>
+        </div>
+        {% if widget.settings.headerNavigation %}
+            <div class="site-header__menu">
+                {% render 'menu',
+                    menu: widget.settings.headerNavigation,
+                    class_menu: 'site-header__nav',
+                    class_list: 'site-header__nav-list',
+                    class_item: 'site-header__nav-item',
+                    class_link: 'site-header__nav-link',
+                    class_submenu: 'site-header__nav-submenu',
+                    class_has_submenu: 'site-header__nav-item--has-submenu'
+                %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script type="application/json" data-widget-schema>
+        {
+            "type": "header",
+            "displayName": "Site Header",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "headerTitle",
+                    "label": "Site Title",
+                    "description": "Main site title",
+                    "default": "LiquidJS Riders"
+                },
+                {
+                    "type": "text",
+                    "id": "headerTagline",
+                    "label": "Tagline",
+                    "description": "Site tagline or description",
+                    "default": "Liquid tagline"
+                },
+                {
+                    "type": "menu",
+                    "id": "headerNavigation",
+                    "label": "Navigation Menu",
+                    "description": "Select the menu to display in this location",
+                    "default": ""
+                },
+                {
+                    "type": "color",
+                    "id": "headerBackgroundColor",
+                    "label": "Background Color",
+                    "description": "Header background color",
+                    "default": "#f8f9fa"
+                },
+                {
+                    "type": "color",
+                    "id": "headerTitleColor",
+                    "label": "Title Color",
+                    "description": "Color of the site title",
+                    "default": "#333333"
+                },
+                {
+                    "type": "color",
+                    "id": "headerTaglineColor",
+                    "label": "Tagline Color",
+                    "description": "Color of the tagline text",
+                    "default": "#666666"
+                },
+                {
+                    "type": "range",
+                    "id": "headerTitleSize",
+                    "label": "Title Size",
+                    "description": "Size of the title in pixels",
+                    "default": 32,
+                    "min": 16,
+                    "max": 72,
+                    "step": 1
+                },
+                {
+                    "type": "range",
+                    "id": "headerPadding",
+                    "label": "Padding",
+                    "description": "Padding around the header content",
+                    "default": 32,
+                    "min": 0,
+                    "max": 100,
+                    "step": 4
+                }
+            ]
+        }
+    </script>
+</header>

@@ -1,0 +1,68 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+Make sure to use any of these routes first before creating new ones.
+The main routes file is [index.js](mdc:server/index.js) that imports from the following:
+
+[media.js](mdc:server/routes/media.js)
+[menus.js](mdc:server/routes/menus.js)
+[pages.js](mdc:server/routes/pages.js)
+[preview.js](mdc:server/routes/preview.js)
+[projects.js](mdc:server/routes/projects.js)
+[publish.js](mdc:server/routes/publish.js)
+[themes.js](mdc:server/routes/themes.js)
+
+# Projects API Routes
+GET    /api/projects                  # Get all projects
+GET    /api/projects/active           # Get the active project
+POST   /api/projects                  # Create a new project
+PUT    /api/projects/active/:id       # Set the active project
+PUT    /api/projects/:id              # Update a project by ID
+DELETE /api/projects/:id              # Delete a project by ID
+GET    /api/projects/:projectId/widgets # Get widgets for a specific project
+
+# Themes API Routes
+GET    /api/themes                    # Get all themes
+GET    /api/themes/:id                # Get a specific theme by ID
+GET    /api/themes/:id/widgets        # Get widgets for a specific theme
+GET    /api/themes/:id/templates      # Get templates for a specific theme
+GET    /api/themes/project/:projectId # Get theme settings for a specific project
+POST   /api/themes/project/:projectId # Save theme settings for a specific project
+
+# Pages API Routes
+GET    /api/pages                     # Get all pages
+GET    /api/pages/:id                 # Get a specific page by ID
+POST   /api/pages                     # Create a new page
+PUT    /api/pages/:id                 # Update a page by ID
+DELETE /api/pages/:id                 # Delete a page by ID
+POST   /api/pages/:id/duplicate       # Duplicate a page by ID
+POST   /api/pages/:id/content         # Save page content by ID
+
+# Menus API Routes
+GET    /api/menus                     # Get all menus
+GET    /api/menus/:slug               # Get a menu by slug
+POST   /api/menus                     # Create a new menu
+PUT    /api/menus/:slug               # Update a menu by slug
+DELETE /api/menus/:slug               # Delete a menu by slug
+
+# Media API Routes
+GET    /api/media/projects/:projectId/media              				# Get all media for a project
+POST   /api/media/projects/:projectId/media              				# Upload media file(s) to a project
+PUT    /api/media/projects/:projectId/media/:fileId/metadata 		# Update metadata for a specific media file
+DELETE /api/media/projects/:projectId/media/:fileId      				# Delete a specific media file
+POST   /api/media/projects/:projectId/media/bulk-delete  				# Bulk delete multiple media files
+GET    /api/media/projects/:projectId/media/:fileId      				# Serve a specific media file by ID
+GET    /api/media/projects/:projectId/uploads/images/:filename 	# Serve a specific media file by filename
+
+# Preview API Routes
+POST   /api/preview                   										# Generate a full page preview
+POST   /api/preview/widget            										# Render a single widget for preview
+GET    /api/preview/global-widgets    										# Get global widgets for preview
+POST   /api/preview/global-widgets/:type 									# Save a global widget for preview
+GET    /api/preview/assets/:projectId/:folder/:filename 	# Serve an asset file for preview
+
+# Publish API Routes
+POST   /api/publish/:projectId        # Trigger the publishing process for a project

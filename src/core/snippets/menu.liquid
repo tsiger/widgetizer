@@ -1,0 +1,49 @@
+{%- comment -%}
+Menu Snippet
+Params:
+  menu: Menu object containing items array
+  class_menu: Classes for the nav element
+  class_list: Classes for ul elements
+  class_item: Classes for li elements
+  class_link: Classes for a elements
+  class_submenu: Classes for submenu ul elements
+  class_has_submenu: Classes for items with submenus
+{%- endcomment -%}
+
+{%- if menu.items.size > 0 -%}
+  <nav class="{{ class_menu }}">
+    <ul class="{{ class_list }}">
+      {%- for item in menu.items -%}
+        <li class="{{ class_item }} {% if item.items.size > 0 %}{{ class_has_submenu }}{% endif %}">
+          <a href="{{ item.link }}" class="{{ class_link }}">
+            {{ item.label }}
+          </a>
+
+          {%- if item.items.size > 0 -%}
+            <ul class="{{ class_submenu }}">
+              {%- for subitem in item.items -%}
+                <li class="{{ class_item }} {% if subitem.items.size > 0 %}{{ class_has_submenu }}{% endif %}">
+                  <a href="{{ subitem.link }}" class="{{ class_link }}">
+                    {{ subitem.label }}
+                  </a>
+
+                  {%- if subitem.items.size > 0 -%}
+                    <ul class="{{ class_submenu }}">
+                      {%- for subsubitem in subitem.items -%}
+                        <li class="{{ class_item }}">
+                          <a href="{{ subsubitem.link }}" class="{{ class_link }}">
+                            {{ subsubitem.label }}
+                          </a>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+{%- endif -%}

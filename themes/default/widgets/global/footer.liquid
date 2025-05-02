@@ -1,0 +1,100 @@
+<footer
+    class="site-footer"
+    data-widget-id="{{ widget.id }}"
+    data-widget-type="footer"
+>
+    <style>
+        #{{ widget.id }}.site-footer__container {
+            padding: {{ widget.settings.footerPadding }}px;
+            background-color: {{ widget.settings.footerBackgroundColor }};
+            text-align: {{ widget.settings.footerAlignment }};
+        }
+
+        #{{ widget.id }} .site-footer__copyright {
+            color: {{ widget.settings.footerTextColor }};
+            margin-bottom: 0.5rem;
+            text-align: {{ widget.settings.footerAlignment }};
+        }
+
+        #{{ widget.id }} .site-footer__credits {
+            color: {{ widget.settings.footerCreditsColor }};
+            font-size: 0.875rem;
+            text-align: {{ widget.settings.footerAlignment }};
+        }
+    </style>
+
+    <div id="{{ widget.id }}" class="site-footer__container">
+        <div class="site-footer__copyright" data-setting="footerCopyright">
+            {{ widget.settings.footerCopyright }}
+        </div>
+        <div class="site-footer__credits" data-setting="footerCredits">
+            {{ widget.settings.footerCredits }}
+        </div>
+    </div>
+
+    <script type="application/json" data-widget-schema>
+        {
+            "type": "footer",
+            "displayName": "Site Footer",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "footerCopyright",
+                    "label": "Copyright Text",
+                    "description": "Copyright notice text",
+                    "default": "Widgetizer FTW."
+                },
+                {
+                    "type": "text",
+                    "id": "footerCredits",
+                    "label": "Credits",
+                    "description": "Additional credits or links",
+                    "default": "Powered by LiquidJS"
+                },
+                {
+                    "type": "color",
+                    "id": "footerBackgroundColor",
+                    "label": "Background Color",
+                    "description": "Footer background color",
+                    "default": "#ffffff"
+                },
+                {
+                    "type": "color",
+                    "id": "footerTextColor",
+                    "label": "Text Color",
+                    "description": "Color of the copyright text",
+                    "default": "#000000"
+                },
+                {
+                    "type": "color",
+                    "id": "footerCreditsColor",
+                    "label": "Credits Color",
+                    "description": "Color of the credits text",
+                    "default": "#999999"
+                },
+                {
+                    "type": "range",
+                    "id": "footerPadding",
+                    "label": "Padding",
+                    "description": "Padding around the footer content",
+                    "default": 20,
+                    "min": 0,
+                    "max": 100,
+                    "step": 4
+                },
+                {
+                    "type": "select",
+                    "id": "footerAlignment",
+                    "label": "Text Alignment",
+                    "description": "Alignment of the footer text",
+                    "default": "center",
+                    "options": [
+                        { "value": "left", "label": "Left" },
+                        { "value": "center", "label": "Center" },
+                        { "value": "right", "label": "Right" }
+                    ]
+                }
+            ]
+        }
+    </script>
+</footer>
