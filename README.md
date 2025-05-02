@@ -1,4 +1,4 @@
-# Widgetizer React
+# Widgetizer
 
 A dead simple static website builder for the rest of us.
 
