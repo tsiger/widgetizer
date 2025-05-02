@@ -1,4 +1,4 @@
 {
-	"ignore": ["data/*", "data/**/*"],
-	"watch": ["src/", "server/"]
+  "ignore": ["data/*", "data/**/*"],
+  "watch": ["src/", "server/"]
 }
