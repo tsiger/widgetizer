@@ -1,6 +1,13 @@
 node_modules
 dist
-data
+# Ignore the entire data folder
+data/*
+# But include the projects directory structure
+!data/projects/
+# Ignore everything in the projects folder
+data/projects/*
+# But include the projects.json file specifically
+!data/projects/projects.json
 .vscode/*
 !.vscode/extensions.json
 .idea
