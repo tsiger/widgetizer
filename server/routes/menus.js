@@ -6,16 +6,16 @@ const router = express.Router();
 // Get all menus
 router.get("/", menuController.getAllMenus);
 
-// Get a menu by slug
-router.get("/:slug", menuController.getMenu);
+// Get a menu by id
+router.get("/:id", menuController.getMenu);
 
 // Create a new menu
 router.post("/", menuController.createMenu);
 
-// Update a menu by slug
-router.put("/:slug", menuController.updateMenu);
+// Update a menu by id
+router.put("/:id", menuController.updateMenu);
 
-// Delete a menu by slug
-router.delete("/:slug", menuController.deleteMenu);
+// Delete a menu by id
+router.delete("/:id", menuController.deleteMenu);
 
 export default router;

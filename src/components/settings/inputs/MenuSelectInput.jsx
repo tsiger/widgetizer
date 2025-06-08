@@ -37,7 +37,7 @@ export default function MenuSelectInput({ id, label, value = "", onChange, descr
         >
           <option value="">Select a menu...</option>
           {menus.map((menu) => (
-            <option key={menu.id} value={menu.slug}>
+            <option key={menu.id} value={menu.id}>
               {menu.name}
             </option>
           ))}

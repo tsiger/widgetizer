@@ -36,8 +36,8 @@ function App() {
           <Route path="page-editor" element={<PageEditor />} />
           <Route path="menus" element={<Menus />} />
           <Route path="menus/add" element={<MenusAdd />} />
-          <Route path="menus/edit/:slug" element={<MenusEdit />} />
-          <Route path="menus/:slug/structure" element={<MenuStructure />} />
+          <Route path="menus/edit/:id" element={<MenusEdit />} />
+          <Route path="menus/:id/structure" element={<MenuStructure />} />
           <Route path="media" element={<Media />} />
           <Route path="settings" element={<Settings />} />
           <Route path="starter-kits" element={<StarterKits />} />

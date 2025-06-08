@@ -4,7 +4,7 @@ import useToastStore from "../../stores/toastStore";
 import Button from "../ui/Button";
 
 export default function MenuForm({
-  initialData = { name: "", description: "", slug: "" },
+  initialData = { name: "", description: "" },
   onSubmit,
   isSubmitting = false,
   submitLabel = "Save",
@@ -36,8 +36,8 @@ export default function MenuForm({
     }
   }, [initialData]);
 
-  const formatSlug = (value) => {
-    return slugify(value, {
+  const generateId = (name) => {
+    return slugify(name, {
       lower: true,
       strict: true,
       trim: true,
@@ -52,15 +52,10 @@ export default function MenuForm({
       return;
     }
 
-    if (!formData.slug.trim()) {
-      showToast("Slug is required", "error");
-      return;
-    }
-
     try {
       const result = await onSubmit({
         ...formData,
-        slug: formatSlug(formData.slug),
+        id: generateId(formData.name),
       });
 
       return result;
@@ -72,17 +67,7 @@ export default function MenuForm({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setFormData((prev) => {
-      const updates = { [name]: value };
-
-      // Auto-generate slug only when creating new menu and editing the name
-      if (isNew && name === "name") {
-        updates.slug = formatSlug(value);
-      }
-
-      return { ...prev, ...updates };
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -99,22 +84,6 @@ export default function MenuForm({
           onChange={handleChange}
           className="w-full px-3 py-2 border border-slate-300 rounded-sm"
           placeholder="Enter menu title"
-          required
-        />
-      </div>
-
-      <div>
-        <label htmlFor="slug" className="block font-medium mb-1">
-          Slug
-        </label>
-        <input
-          type="text"
-          id="slug"
-          name="slug"
-          value={formData.slug}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-slate-300 rounded-sm"
-          placeholder="Enter slug"
           required
         />
       </div>

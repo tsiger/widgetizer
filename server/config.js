@@ -21,7 +21,7 @@ export const getPagePath = (projectId, pageId) => path.join(getProjectPagesDir(p
 
 // Project Menu paths
 export const getProjectMenusDir = (projectId) => path.join(getProjectDir(projectId), "menus");
-export const getMenuPath = (projectId, menuSlug) => path.join(getProjectMenusDir(projectId), `${menuSlug}.json`);
+export const getMenuPath = (projectId, menuId) => path.join(getProjectMenusDir(projectId), `${menuId}.json`);
 
 // Project theme paths
 export const getProjectThemeDir = (projectId) => path.join(getProjectDir(projectId), "theme");

@@ -14,7 +14,7 @@ import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
 
 export default function MenuStructure() {
-  const { slug } = useParams();
+  const { id } = useParams();
   const [menu, setMenu] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -71,7 +71,7 @@ export default function MenuStructure() {
     async function loadMenu() {
       try {
         setLoading(true);
-        const data = await getMenu(slug);
+        const data = await getMenu(id);
         setMenu(data);
       } catch (err) {
         showToast(err.message || "Failed to load menu", "error");
@@ -81,14 +81,14 @@ export default function MenuStructure() {
     }
 
     loadMenu();
-  }, [slug, showToast]);
+  }, [id, showToast]);
 
   // Save menu
   const handleSave = async () => {
     try {
       setSaving(true);
       // Get the updated menu data from the API response
-      const savedMenu = await updateMenu(menu.slug, menu);
+      const savedMenu = await updateMenu(menu.id, menu);
       // Update the local state with the saved data (including new timestamp)
       setMenu(savedMenu);
       showToast("Menu saved successfully", "success");

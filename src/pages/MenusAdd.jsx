@@ -57,7 +57,7 @@ export default function MenusAdd() {
           {lastCreatedMenu && (
             <Button
               variant="secondary"
-              onClick={() => navigate(`/menus/${lastCreatedMenu.slug}/structure`)}
+              onClick={() => navigate(`/menus/${lastCreatedMenu.id}/structure`)}
               icon={<Pencil size={18} />}
             >
               Edit this menu

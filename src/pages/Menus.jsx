@@ -43,8 +43,8 @@ export default function Menus() {
 
   const handleDelete = async (data) => {
     try {
-      await deleteMenu(data.slug);
-      setMenus(menus.filter((menu) => menu.slug !== data.slug));
+      await deleteMenu(data.id);
+      setMenus(menus.filter((menu) => menu.id !== data.id));
       showToast(`Menu "${data.name}" was deleted successfully`, "success");
     } catch (err) {
       showToast("Failed to delete menu", "error");
@@ -53,14 +53,14 @@ export default function Menus() {
 
   const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDelete);
 
-  const openDeleteConfirmation = (slug, name) => {
+  const openDeleteConfirmation = (id, name) => {
     openModal({
       title: "Delete Menu",
       message: `Are you sure you want to delete "${name}"? This action cannot be undone.`,
       confirmText: "Delete",
       cancelText: "Cancel",
       variant: "danger",
-      data: { slug, name },
+      data: { id, name },
     });
   };
 
@@ -106,7 +106,7 @@ export default function Menus() {
                 <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                   <Tooltip content="Edit menu structure">
                     <IconButton
-                      onClick={() => navigate(`/menus/${menu.slug}/structure`)}
+                      onClick={() => navigate(`/menus/${menu.id}/structure`)}
                       variant="neutral"
                       size="sm"
                       title="Edit Menu Structure"
@@ -116,7 +116,7 @@ export default function Menus() {
                   </Tooltip>
                   <Tooltip content="Edit menu settings">
                     <IconButton
-                      onClick={() => navigate(`/menus/edit/${menu.slug}`)}
+                      onClick={() => navigate(`/menus/edit/${menu.id}`)}
                       variant="neutral"
                       size="sm"
                       title="Edit Menu Settings"
@@ -126,7 +126,7 @@ export default function Menus() {
                   </Tooltip>
                   <Tooltip content="Delete menu">
                     <IconButton
-                      onClick={() => openDeleteConfirmation(menu.slug, menu.name)}
+                      onClick={() => openDeleteConfirmation(menu.id, menu.name)}
                       variant="danger"
                       size="sm"
                       title="Delete Menu"

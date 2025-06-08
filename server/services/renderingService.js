@@ -5,6 +5,7 @@ import { getProjectDir } from "../config.js";
 // TODO: Controllers shouldn't ideally be imported into services.
 // We might need to move readProjectsFile/readMediaFile to utils or their own services later.
 import { readMediaFile } from "../controllers/mediaController.js";
+import { getMenuById } from "../controllers/menuController.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { ThemeSettingsTag } from "../../src/core/tags/themeSettings.js";
@@ -171,14 +172,9 @@ async function renderWidget(projectId, widgetId, widgetData, rawThemeSettings, r
         if (key.toLowerCase().includes("navigation")) {
           try {
             if (value) {
-              const menuPath = path.join(projectDir, "menus", `${value}.json`);
-              try {
-                const menuData = await fs.readFile(menuPath, "utf8");
-                enhancedSettings[key] = JSON.parse(menuData);
-              } catch (fileErr) {
-                console.warn(`Menu file not found: ${menuPath}. Using empty menu.`);
-                enhancedSettings[key] = { items: [] };
-              }
+              // Use getMenuById instead of direct file access
+              const menuData = await getMenuById(projectDir, value);
+              enhancedSettings[key] = menuData || { items: [] };
             } else {
               enhancedSettings[key] = { items: [] }; // Ensure empty menu if no value set
             }
