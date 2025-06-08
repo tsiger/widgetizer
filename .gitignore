@@ -4,10 +4,8 @@ dist
 data/*
 # But include the projects directory structure
 !data/projects/
-# Ignore everything in the projects folder
+# Ignore everything in the projects folder including projects.json (created automatically)
 data/projects/*
-# But include the projects.json file specifically
-!data/projects/projects.json
 .vscode/*
 !.vscode/extensions.json
 .idea
