@@ -138,19 +138,17 @@ export async function createProject(req, res) {
             const templateContent = await fs.readFile(sourcePath, "utf8");
             const templatePage = JSON.parse(templateContent);
 
-            // Use the filename (without extension) as the base for the slug
-            // For nested files, the slug might need adjustment depending on desired URL structure,
-            // but for now, we'll use the simple filename. Consider adjusting if needed.
-            const baseSlug = path.basename(entry.name, ".json");
+            // Use the template's slug or fallback to filename
+            const templateSlug = templatePage.slug || path.basename(entry.name, ".json");
 
             // Create initialized page
             const initializedPage = {
               ...templatePage,
-              // Only add metadata for non-global widgets
+              // Only add metadata for non-global widgets (pages become editable templates)
               ...(templatePage.type !== "header" && templatePage.type !== "footer"
                 ? {
                     id: path.relative(themeTemplatesDir, sourcePath).replace(/\\/g, "/").replace(".json", ""),
-                    slug: baseSlug,
+                    slug: templateSlug,
                     created: new Date().toISOString(),
                     updated: new Date().toISOString(),
                   }

@@ -346,7 +346,15 @@ export async function createPage(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const slug = await generateUniqueSlug(pageData.name, activeProject.id);
+    // Use submitted slug if provided, otherwise generate from name
+    let slug;
+    if (pageData.slug && pageData.slug.trim()) {
+      // User provided a slug, ensure it's unique
+      slug = await ensureUniqueSlug(pageData.slug, activeProject.id);
+    } else {
+      // No slug provided, generate from name
+      slug = await generateUniqueSlug(pageData.name, activeProject.id);
+    }
 
     const newPage = {
       ...pageData, // Include all submitted data (name, seo, etc.)
