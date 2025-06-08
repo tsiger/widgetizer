@@ -338,7 +338,7 @@ export async function deletePage(req, res) {
  */
 export async function createPage(req, res) {
   try {
-    const { name } = req.body;
+    const pageData = req.body; // Get all data including SEO
     const { projects, activeProjectId } = await readProjectsFile();
     const activeProject = projects.find((p) => p.id === activeProjectId);
 
@@ -346,11 +346,11 @@ export async function createPage(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const slug = await generateUniqueSlug(name, activeProject.id);
+    const slug = await generateUniqueSlug(pageData.name, activeProject.id);
 
     const newPage = {
+      ...pageData, // Include all submitted data (name, seo, etc.)
       id: slug,
-      name,
       slug,
       widgets: {},
       created: new Date().toISOString(),
@@ -375,8 +375,7 @@ export async function createPage(req, res) {
  */
 export async function savePageContent(req, res) {
   const { id } = req.params;
-  // Extract widgetsOrder as well
-  const { name, slug, widgets, widgetsOrder } = req.body;
+  const pageData = req.body; // Get all data including SEO
   const { projects, activeProjectId } = await readProjectsFile();
 
   if (!activeProjectId) {
@@ -385,7 +384,7 @@ export async function savePageContent(req, res) {
 
   try {
     // Validate essential data
-    if (!slug || !name || !widgets) {
+    if (!pageData.slug || !pageData.name || !pageData.widgets) {
       return res.status(400).json({ error: "Missing required page data (slug, name, widgets)." });
     }
 
@@ -406,24 +405,21 @@ export async function savePageContent(req, res) {
       }
     }
 
-    // Combine existing data with new content
+    // Combine existing data with new content, preserving all fields including SEO
     const updatedPageData = {
-      ...existingData,
-      id: slug, // Use slug from request body as the ID
-      name,
-      slug,
-      widgets,
-      widgetsOrder: widgetsOrder || [],
-      created: existingData.created,
-      updated: new Date().toISOString(),
+      ...existingData, // Start with existing data
+      ...pageData, // Override with new data (including SEO)
+      id: pageData.slug, // Use slug from request body as the ID
+      created: existingData.created, // Always preserve original creation date
+      updated: new Date().toISOString(), // Set new update timestamp
     };
 
     // Write file
-    const newPagePath = getPagePath(activeProjectId, slug);
+    const newPagePath = getPagePath(activeProjectId, pageData.slug);
     await fs.outputFile(newPagePath, JSON.stringify(updatedPageData, null, 2));
 
     // If the original slug (id) is different from the new slug, delete the old file
-    if (id !== slug) {
+    if (id !== pageData.slug) {
       try {
         const oldPath = getPagePath(activeProjectId, id);
         if (await fs.pathExists(oldPath)) {

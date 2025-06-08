@@ -11,6 +11,7 @@ import { ThemeSettingsTag } from "../../src/core/tags/themeSettings.js";
 import { AssetTag } from "../../src/core/tags/assetTag.js";
 import { FontsPreconnectTag } from "../../src/core/tags/FontsPreconnectTag.js";
 import { FontsStylesheetTag } from "../../src/core/tags/FontsStylesheetTag.js";
+import { SeoTag } from "../../src/core/tags/SeoTag.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 
 // Get the directory path of the current module
@@ -33,6 +34,7 @@ engine.registerTag("theme_settings", ThemeSettingsTag);
 engine.registerTag("asset", AssetTag);
 engine.registerTag("fonts_preconnect", FontsPreconnectTag);
 engine.registerTag("fonts_stylesheet", FontsStylesheetTag);
+engine.registerTag("seo", SeoTag);
 
 /**
  * Creates base render context with common properties
@@ -249,7 +251,6 @@ async function renderPageLayout(projectId, pageContent, pageData, rawThemeSettin
       content: pageContent,
       page: pageData,
       body_class: pageData?.slug || "",
-      page_title: pageData?.name || "Untitled Page",
     };
 
     // 4. Render the layout

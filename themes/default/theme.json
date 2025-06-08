@@ -6,6 +6,21 @@
   "widgets": 15,
   "settings": {
     "global": {
+      "cards": [
+        {
+          "id": "card_background",
+          "label": "Card Background Color",
+          "default": "#FFFFFF",
+          "type": "color",
+          "outputAsCssVar": true
+        },
+        {
+          "id": "card_text",
+          "label": "Card Text Color",
+          "default": "Hello world",
+          "type": "text"
+        }
+      ],
       "colors": [
         {
           "id": "background",
