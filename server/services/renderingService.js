@@ -9,8 +9,8 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { ThemeSettingsTag } from "../../src/core/tags/themeSettings.js";
 import { AssetTag } from "../../src/core/tags/assetTag.js";
-import { GoogleFontsPreconnectTag } from "../../src/core/tags/GoogleFontsPreconnectTag.js";
-import { GoogleFontsStylesheetTag } from "../../src/core/tags/GoogleFontsStylesheetTag.js";
+import { FontsPreconnectTag } from "../../src/core/tags/FontsPreconnectTag.js";
+import { FontsStylesheetTag } from "../../src/core/tags/FontsStylesheetTag.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 
 // Get the directory path of the current module
@@ -31,8 +31,8 @@ const engine = new Liquid({
 // Register custom tags once
 engine.registerTag("theme_settings", ThemeSettingsTag);
 engine.registerTag("asset", AssetTag);
-engine.registerTag("google_fonts_preconnect", GoogleFontsPreconnectTag);
-engine.registerTag("google_fonts_stylesheet", GoogleFontsStylesheetTag);
+engine.registerTag("fonts_preconnect", FontsPreconnectTag);
+engine.registerTag("fonts_stylesheet", FontsStylesheetTag);
 
 /**
  * Creates base render context with common properties
