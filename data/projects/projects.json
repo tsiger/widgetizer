@@ -1,13 +1,4 @@
 {
-  "projects": [
-    {
-      "id": "menus",
-      "name": "Menus",
-      "description": "",
-      "theme": "default",
-      "created": "2025-06-08T14:09:02.014Z",
-      "updated": "2025-06-08T14:09:02.014Z"
-    }
-  ],
-  "activeProjectId": "menus"
+  "projects": [],
+  "activeProjectId": ""
 }
