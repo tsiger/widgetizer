@@ -1,22 +1,20 @@
+import Button from "../ui/Button";
+
 export default function PageLayout({ title, description, children, buttonProps }) {
   return (
     <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl tracking-tight font-bold">{title}</h1>
-          {description && <p className="text-gray-600">{description}</p>}
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{title}</h1>
+          {description && <p className="text-gray-700 mt-1">{description}</p>}
         </div>
         {buttonProps && (
-          <button
-            className="px-4 py-2 bg-pink-600 text-white rounded-sm hover:bg-pink-700 transition-colors inline-flex items-center gap-2"
-            {...buttonProps}
-          >
-            {buttonProps.icon && buttonProps.icon}
+          <Button variant="primary" icon={buttonProps.icon} {...buttonProps}>
             {buttonProps.children}
-          </button>
+          </Button>
         )}
       </div>
-      <div className="bg-white rounded-lg shadow-lg shadow-slate-200 p-4">{children}</div>
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">{children}</div>
     </div>
   );
 }

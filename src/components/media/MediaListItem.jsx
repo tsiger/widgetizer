@@ -1,4 +1,5 @@
 import Tooltip from "../../components/ui/Tooltip";
+import { IconButton } from "../ui/Button";
 import { Image, Search, Trash2, Check, Edit2 } from "lucide-react";
 import { API_URL } from "../../config";
 
@@ -21,7 +22,7 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
       } hover:bg-slate-50 transition-colors duration-150 group`}
     >
       <td className="p-2">
-        <button onClick={onSelect} className="p-1">
+        <IconButton onClick={onSelect} variant="neutral" size="sm">
           {isSelected ? (
             <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
               <Check size={12} />
@@ -29,7 +30,7 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
           ) : (
             <div className="w-4 h-4 border border-slate-400 rounded-sm"></div>
           )}
-        </button>
+        </IconButton>
       </td>
       <td className="p-2">
         <div className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center">
@@ -53,19 +54,19 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
       <td className="p-2">
         <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           <Tooltip content="View">
-            <button onClick={onView} className="p-2 hover:bg-slate-100 rounded-sm text-slate-600 cursor-pointer">
+            <IconButton onClick={onView} variant="neutral" size="sm">
               <Search size={18} />
-            </button>
+            </IconButton>
           </Tooltip>
           <Tooltip content="Edit metadata">
-            <button onClick={onEdit} className="p-2 hover:bg-slate-100 rounded-sm text-slate-600 cursor-pointer">
+            <IconButton onClick={onEdit} variant="neutral" size="sm">
               <Edit2 size={18} />
-            </button>
+            </IconButton>
           </Tooltip>
           <Tooltip content="Delete">
-            <button onClick={onDelete} className="p-2 hover:bg-slate-100 rounded-sm text-red-600 cursor-pointer">
+            <IconButton onClick={onDelete} variant="danger" size="sm">
               <Trash2 size={18} />
-            </button>
+            </IconButton>
           </Tooltip>
         </div>
       </td>

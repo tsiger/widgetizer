@@ -4,6 +4,7 @@ import { API_URL } from "../config";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import EmptyState from "../components/ui/EmptyState";
 import MediaToolbar from "../components/media/MediaToolbar";
 import MediaUploader from "../components/media/MediaUploader";
 import MediaGrid from "../components/media/MediaGrid";
@@ -353,10 +354,11 @@ export default function Media() {
       )}
 
       {files.length === 0 && !uploading && (
-        <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-sm mt-4">
-          <h3 className="font-medium mb-1">No media files yet</h3>
-          <p className="text-slate-500">Upload some files using the uploader above.</p>
-        </div>
+        <EmptyState
+          title="No media files yet"
+          description="Upload some files using the uploader above."
+          className="mt-4"
+        />
       )}
 
       <ConfirmationModal

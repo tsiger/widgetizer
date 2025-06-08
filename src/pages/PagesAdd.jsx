@@ -4,6 +4,7 @@ import { AlertCircle, ChevronLeft, Pencil } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import PageForm from "../components/pages/PageForm";
+import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
 import { createPage } from "../utils/pageManager";
 import useProjectStore from "../stores/projectStore";
@@ -51,19 +52,17 @@ export default function PagesAdd() {
     <PageLayout title="New page">
       {lastCreatedPage && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <button
-            onClick={() => navigate("/pages")}
-            className="pl-3 pr-4 py-2 border-2 border-slate-300 rounded-sm hover:bg-slate-50 flex items-center gap-1"
-          >
-            <ChevronLeft size={18} /> Go to Pages List
-          </button>
+          <Button variant="secondary" onClick={() => navigate("/pages")} icon={<ChevronLeft size={18} />}>
+            Go to Pages List
+          </Button>
           {lastCreatedPage && (
-            <button
+            <Button
+              variant="secondary"
               onClick={() => navigate(`/pages/${lastCreatedPage.slug}/edit`)}
-              className="pl-3 pr-4 py-2 border-2 border-slate-300 rounded-sm hover:bg-slate-50 flex items-center gap-1  "
+              icon={<Pencil size={18} />}
             >
-              <Pencil size={18} /> Edit This Page
-            </button>
+              Edit This Page
+            </Button>
           )}
         </div>
       )}

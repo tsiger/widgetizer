@@ -5,6 +5,8 @@ import { Menu, Trash2, Pencil, List, AlertCircle, CirclePlus } from "lucide-reac
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Tooltip from "../components/ui/Tooltip";
+import Table from "../components/ui/Table";
+import { IconButton } from "../components/ui/Button";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import useConfirmationModal from "../hooks/useConfirmationModal";
 
@@ -92,65 +94,51 @@ export default function Menus() {
       }}
     >
       <div>
-        <table className="w-full">
-          <thead>
-            <tr className="border-b-2 border-slate-200">
-              <th className="text-left py-3 px-4">Title</th>
-              <th className="text-left py-3 px-4">Description</th>
-              <th className="text-right py-3 px-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {menus.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="text-center py-8 text-slate-500">
-                  No menus yet. Create your first menu!
-                </td>
-              </tr>
-            ) : (
-              menus.map((menu) => (
-                <tr
-                  key={menu.slug}
-                  className="border-b border-slate-200 hover:bg-slate-50 transition-colors duration-150 group"
-                >
-                  <td className="py-3 px-4 font-semibold">{menu.name}</td>
-                  <td className="py-3 px-4 text-slate-600">{menu.description}</td>
-                  <td className="py-3 px-4 text-right">
-                    <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                      <Tooltip content="Edit menu structure">
-                        <button
-                          onClick={() => navigate(`/menus/${menu.slug}/structure`)}
-                          className="p-2 hover:bg-slate-100 rounded-sm text-slate-600 cursor-pointer"
-                          title="Edit Menu Structure"
-                        >
-                          <Menu size={18} />
-                        </button>
-                      </Tooltip>
-                      <Tooltip content="Edit menu settings">
-                        <button
-                          onClick={() => navigate(`/menus/edit/${menu.slug}`)}
-                          className="p-2 hover:bg-slate-100 rounded-sm text-slate-600 cursor-pointer"
-                          title="Edit Menu Settings"
-                        >
-                          <Pencil size={18} />
-                        </button>
-                      </Tooltip>
-                      <Tooltip content="Delete menu">
-                        <button
-                          onClick={() => openDeleteConfirmation(menu.slug, menu.name)}
-                          className="p-2 hover:bg-slate-100 rounded-sm text-red-600 cursor-pointer"
-                          title="Delete Menu"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </Tooltip>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <Table
+          headers={["Title", "Description", "Actions"]}
+          data={menus}
+          emptyMessage="No menus yet. Create your first menu!"
+          renderRow={(menu) => (
+            <>
+              <td className="py-3 px-4 font-semibold">{menu.name}</td>
+              <td className="py-3 px-4 text-slate-600">{menu.description}</td>
+              <td className="py-3 px-4 text-right">
+                <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                  <Tooltip content="Edit menu structure">
+                    <IconButton
+                      onClick={() => navigate(`/menus/${menu.slug}/structure`)}
+                      variant="neutral"
+                      size="sm"
+                      title="Edit Menu Structure"
+                    >
+                      <Menu size={18} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip content="Edit menu settings">
+                    <IconButton
+                      onClick={() => navigate(`/menus/edit/${menu.slug}`)}
+                      variant="neutral"
+                      size="sm"
+                      title="Edit Menu Settings"
+                    >
+                      <Pencil size={18} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip content="Delete menu">
+                    <IconButton
+                      onClick={() => openDeleteConfirmation(menu.slug, menu.name)}
+                      variant="danger"
+                      size="sm"
+                      title="Delete Menu"
+                    >
+                      <Trash2 size={18} />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+              </td>
+            </>
+          )}
+        />
       </div>
 
       <ConfirmationModal

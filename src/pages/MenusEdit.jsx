@@ -5,6 +5,7 @@ import { AlertCircle, ChevronLeft } from "lucide-react";
 import PageLayout from "../components/layout/PageLayout";
 import MenuForm from "../components/menus/MenuForm";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import Button from "../components/ui/Button";
 
 import useToastStore from "../stores/toastStore";
 import { getMenu, updateMenu } from "../utils/menuManager";
@@ -84,12 +85,9 @@ export default function MenusEdit() {
     <PageLayout title="Edit menu">
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <button
-            onClick={() => navigate("/menus")}
-            className="pl-3 pr-4 py-2 border-2 border-slate-300 rounded-sm hover:bg-slate-50 flex items-center gap-1"
-          >
-            <ChevronLeft size={18} /> Back to menus list
-          </button>
+          <Button variant="secondary" onClick={() => navigate("/menus")} icon={<ChevronLeft size={18} />}>
+            Back to menus list
+          </Button>
         </div>
       )}
 

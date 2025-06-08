@@ -1,4 +1,5 @@
 import MediaListItem from "./MediaListItem";
+import { IconButton } from "../ui/Button";
 import { Check } from "lucide-react";
 
 export default function MediaList({
@@ -17,7 +18,7 @@ export default function MediaList({
         <thead>
           <tr className="bg-slate-100">
             <th className="p-2 text-left">
-              <button onClick={onSelectAll} className="p-1">
+              <IconButton onClick={onSelectAll} variant="neutral" size="sm">
                 {selectedFiles.length === files.length && files.length > 0 ? (
                   <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
                     <Check size={12} />
@@ -25,7 +26,7 @@ export default function MediaList({
                 ) : (
                   <div className="w-4 h-4 border border-slate-400 rounded-sm"></div>
                 )}
-              </button>
+              </IconButton>
             </th>
             <th className="p-2 text-left">Preview</th>
             <th className="p-2 text-left">Filename</th>

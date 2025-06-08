@@ -4,6 +4,7 @@ import { AlertCircle, ChevronLeft, Pencil } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import MenuForm from "../components/menus/MenuForm";
+import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
 import { createMenu } from "../utils/menuManager";
 import useProjectStore from "../stores/projectStore";
@@ -50,19 +51,17 @@ export default function MenusAdd() {
     <PageLayout title="Add menu">
       {lastCreatedMenu && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <button
-            onClick={() => navigate("/menus")}
-            className="pl-3 pr-4 py-2 border-2 border-slate-300 rounded-sm hover:bg-slate-50 flex items-center gap-1"
-          >
-            <ChevronLeft size={18} /> Go to menus list
-          </button>
+          <Button variant="secondary" onClick={() => navigate("/menus")} icon={<ChevronLeft size={18} />}>
+            Go to menus list
+          </Button>
           {lastCreatedMenu && (
-            <button
+            <Button
+              variant="secondary"
               onClick={() => navigate(`/menus/${lastCreatedMenu.slug}/structure`)}
-              className="pl-3 pr-4 py-2 border-2 border-slate-300 rounded-sm hover:bg-slate-50 flex items-center gap-1"
+              icon={<Pencil size={18} />}
             >
-              <Pencil size={18} /> Edit this menu
-            </button>
+              Edit this menu
+            </Button>
           )}
         </div>
       )}

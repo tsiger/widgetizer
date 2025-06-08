@@ -2,11 +2,14 @@
 
 @layer base {
   body {
-    @apply text-sm;
-    @apply text-slate-900;
+    @apply text-sm font-sans text-gray-900 bg-gray-50;
   }
 
   button {
     @apply cursor-pointer;
+  }
+
+  *:focus-visible {
+    @apply outline-none ring-2 ring-pink-500 ring-offset-2;
   }
 }

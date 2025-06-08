@@ -3,6 +3,7 @@ import PageLayout from "../components/layout/PageLayout.jsx";
 import SettingsField from "../components/settings/SettingsField.jsx";
 import TextInput from "../components/settings/inputs/TextInput.jsx";
 import LoadingSpinner from "../components/ui/LoadingSpinner.jsx";
+import Button from "../components/ui/Button.jsx";
 import useToastStore from "../stores/toastStore.js";
 import { getAppSettings, saveAppSettings } from "../utils/appSettingsManager.js";
 
@@ -99,13 +100,9 @@ export default function AppSettings() {
         </SettingsField>
 
         <div className="pt-4 border-t border-slate-200">
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="px-4 py-2 text-sm font-medium text-white bg-pink-600 border border-transparent rounded-sm hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          <Button onClick={handleSave} disabled={isSaving} variant="primary">
             {isSaving ? "Saving..." : "Save Settings"}
-          </button>
+          </Button>
         </div>
       </div>
     </PageLayout>

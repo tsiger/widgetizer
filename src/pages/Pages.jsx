@@ -5,6 +5,8 @@ import { Pencil, Trash2, Palette, AlertCircle, CirclePlus, Copy } from "lucide-r
 import PageLayout from "../components/layout/PageLayout";
 import Tooltip from "../components/ui/Tooltip";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import Table from "../components/ui/Table";
+import { IconButton } from "../components/ui/Button";
 
 import { getAllPages, deletePage, duplicatePage } from "../utils/pageManager";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
@@ -103,77 +105,54 @@ export default function Pages() {
       }}
     >
       <div>
-        <table className="w-full">
-          {pages.length > 0 && (
-            <thead>
-              <tr className="border-b-2 border-slate-200">
-                <th className="text-left py-3 px-4">Title</th>
-                <th className="text-left py-3 px-4">Filename</th>
-                <th className="text-right py-3 px-4">Actions</th>
-              </tr>
-            </thead>
+        <Table
+          headers={["Title", "Filename", "Actions"]}
+          data={pages}
+          emptyMessage={
+            <>
+              No pages yet.{" "}
+              <Link to="/pages/add" className="text-pink-600 hover:text-pink-700 font-medium">
+                Create your first page!
+              </Link>
+            </>
+          }
+          renderRow={(page) => (
+            <>
+              <td className="py-3 px-4 font-semibold">{page.name}</td>
+              <td className="py-3 px-4 text-slate-600">/{page.slug}.html</td>
+              <td className="py-3 px-4 text-right">
+                <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                  <div className="flex gap-2 pr-2 border-r border-slate-200">
+                    <Tooltip content="Design page">
+                      <IconButton
+                        onClick={() => navigate(`/page-editor?pageId=${page.id}`)}
+                        variant="neutral"
+                        size="sm"
+                      >
+                        <Palette size={18} />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
+                  <Tooltip content="Duplicate page">
+                    <IconButton onClick={() => handleDuplicate(page.id)} variant="neutral" size="sm">
+                      <Copy size={18} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip content="Edit page">
+                    <IconButton onClick={() => navigate(`/pages/${page.id}/edit`)} variant="neutral" size="sm">
+                      <Pencil size={18} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip content="Delete page">
+                    <IconButton onClick={() => openDeleteConfirmation(page.id, page.name)} variant="danger" size="sm">
+                      <Trash2 size={18} />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+              </td>
+            </>
           )}
-          <tbody>
-            {pages.length === 0 ? (
-              <tr>
-                <td colSpan="3" className="text-center py-8 text-slate-500">
-                  No pages yet.{" "}
-                  <Link to="/pages/add" className="text-pink-500 hover:text-pink-600">
-                    Create your first page!
-                  </Link>
-                </td>
-              </tr>
-            ) : (
-              pages.map((page) => (
-                <tr
-                  key={page.id}
-                  className="border-b border-slate-200 hover:bg-slate-50 transition-colors duration-150 group"
-                >
-                  <td className="py-3 px-4 font-semibold">{page.name}</td>
-                  <td className="py-3 px-4 text-slate-600">/{page.slug}.html</td>
-                  <td className="py-3 px-4 text-right">
-                    <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                      <div className="flex gap-2 pr-2 border-r border-slate-200">
-                        <Tooltip content="Design page">
-                          <button
-                            onClick={() => navigate(`/page-editor?pageId=${page.id}`)}
-                            className="p-2 hover:bg-slate-100 rounded-sm text-slate-600"
-                          >
-                            <Palette size={18} />
-                          </button>
-                        </Tooltip>
-                      </div>
-                      <Tooltip content="Duplicate page">
-                        <button
-                          onClick={() => handleDuplicate(page.id)}
-                          className="p-2 hover:bg-slate-100 rounded-sm text-slate-600"
-                        >
-                          <Copy size={18} />
-                        </button>
-                      </Tooltip>
-                      <Tooltip content="Edit page">
-                        <button
-                          onClick={() => navigate(`/pages/${page.id}/edit`)}
-                          className="p-2 hover:bg-slate-100 rounded-sm text-slate-600"
-                        >
-                          <Pencil size={18} />
-                        </button>
-                      </Tooltip>
-                      <Tooltip content="Delete page">
-                        <button
-                          onClick={() => openDeleteConfirmation(page.id, page.name)}
-                          className="p-2 hover:bg-slate-100 rounded-sm text-red-600"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </Tooltip>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        />
       </div>
 
       <ConfirmationModal

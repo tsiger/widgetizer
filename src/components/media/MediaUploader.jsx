@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import Button from "../ui/Button";
 
 export default function MediaUploader({ onUpload, uploading, uploadProgress = {} }) {
   const onDrop = useCallback(
@@ -29,9 +30,7 @@ export default function MediaUploader({ onUpload, uploading, uploadProgress = {}
         <p className="text-slate-500 mb-2">
           {isDragActive ? "Drop the files here..." : "Drag and drop image files here or"}
         </p>
-        <button className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-sm">
-          Select Files
-        </button>
+        <Button variant="primary">Select Files</Button>
         <p className="text-xs text-slate-500 mt-2">Supported formats: JPG, PNG, GIF, WebP, SVG</p>
       </div>
 

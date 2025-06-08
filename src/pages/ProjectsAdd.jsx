@@ -4,6 +4,7 @@ import { ChevronLeft, Pencil } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import ProjectForm from "../components/projects/ProjectForm.jsx";
+import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
 import { createProject, setActiveProject, getActiveProject } from "../utils/projectManager";
 import useProjectStore from "../stores/projectStore";
@@ -51,19 +52,17 @@ export default function ProjectsAdd() {
     <PageLayout title="Add project">
       {lastCreatedProject && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <button
-            onClick={() => navigate("/projects")}
-            className="pl-3 pr-4 py-2 border-2 border-slate-300 rounded-sm hover:bg-slate-50 flex items-center gap-1"
-          >
-            <ChevronLeft size={18} /> Go to Projects List
-          </button>
+          <Button variant="secondary" onClick={() => navigate("/projects")} icon={<ChevronLeft size={18} />}>
+            Go to Projects List
+          </Button>
           {lastCreatedProject && (
-            <button
+            <Button
+              variant="secondary"
               onClick={() => navigate(`/projects/edit/${lastCreatedProject.slug}`)}
-              className="pl-3 pr-4 py-2 border-2 border-slate-300 rounded-sm hover:bg-slate-50 flex items-center gap-1"
+              icon={<Pencil size={18} />}
             >
-              <Pencil size={18} /> Edit This Project
-            </button>
+              Edit This Project
+            </Button>
           )}
         </div>
       )}

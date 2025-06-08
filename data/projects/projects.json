@@ -1,4 +1,14 @@
 {
-  "projects": [],
-  "activeProjectId": ""
+  "projects": [
+    {
+      "id": "project-2",
+      "slug": "project-2",
+      "name": "Project 2",
+      "description": "",
+      "theme": "default",
+      "created": "2025-06-08T12:46:53.058Z",
+      "updated": "2025-06-08T12:46:53.058Z"
+    }
+  ],
+  "activeProjectId": "project-2"
 }

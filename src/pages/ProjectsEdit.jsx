@@ -5,6 +5,7 @@ import { ChevronLeft } from "lucide-react";
 import PageLayout from "../components/layout/PageLayout";
 import ProjectForm from "../components/projects/ProjectForm.jsx";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import Button from "../components/ui/Button";
 
 import useToastStore from "../stores/toastStore";
 import { updateProject, getAllProjects } from "../utils/projectManager";
@@ -92,12 +93,9 @@ export default function ProjectsEdit() {
     <PageLayout title="Edit project">
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <button
-            onClick={() => navigate("/projects")}
-            className="pl-3 pr-4 py-2 border-2 border-slate-300 rounded-sm hover:bg-slate-50 flex items-center gap-1"
-          >
-            <ChevronLeft size={18} /> Back to Projects List
-          </button>
+          <Button variant="secondary" onClick={() => navigate("/projects")} icon={<ChevronLeft size={18} />}>
+            Back to Projects List
+          </Button>
         </div>
       )}
 
