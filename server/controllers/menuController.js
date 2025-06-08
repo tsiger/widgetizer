@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
-import { v4 as uuidv4 } from "uuid";
+import slugify from "slugify";
 import { getProjectMenusDir, getMenuPath } from "../config.js";
 import { readProjectsFile } from "./projectController.js";
 
@@ -35,10 +35,32 @@ export async function getAllMenus(req, res) {
   }
 }
 
+// Helper function to generate unique menu ID
+async function generateUniqueMenuId(projectId, baseName) {
+  const generateId = (name) => {
+    return slugify(name, {
+      lower: true,
+      strict: true,
+      trim: true,
+    });
+  };
+
+  let id = generateId(baseName);
+  let counter = 1;
+
+  // Check if the ID already exists
+  while (await fs.pathExists(getMenuPath(projectId, id))) {
+    id = generateId(`${baseName} ${counter}`);
+    counter++;
+  }
+
+  return id;
+}
+
 // Create a new menu
 export async function createMenu(req, res) {
   try {
-    const { name, description, slug } = req.body;
+    const { name, description, id: requestedId } = req.body;
     const { projects, activeProjectId } = await readProjectsFile();
     const activeProject = projects.find((p) => p.id === activeProjectId);
 
@@ -49,16 +71,18 @@ export async function createMenu(req, res) {
     const menusDir = getProjectMenusDir(activeProject.id);
     await fs.ensureDir(menusDir);
 
-    const menuPath = getMenuPath(activeProject.id, slug);
+    // Generate unique ID from name (or use requested ID if provided)
+    const menuId = requestedId || (await generateUniqueMenuId(activeProject.id, name));
+
+    const menuPath = getMenuPath(activeProject.id, menuId);
     if (await fs.pathExists(menuPath)) {
-      return res.status(400).json({ error: "A menu with this slug already exists" });
+      return res.status(400).json({ error: "A menu with this name already exists" });
     }
 
     const newMenu = {
-      id: uuidv4(),
+      id: menuId,
       name,
       description,
-      slug,
       items: [],
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
@@ -76,14 +100,14 @@ export async function createMenu(req, res) {
 // Delete a menu
 export async function deleteMenu(req, res) {
   try {
-    const { slug } = req.params;
+    const { id } = req.params;
     const { activeProjectId } = await readProjectsFile();
 
     if (!activeProjectId) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const menuPath = getMenuPath(activeProjectId, slug);
+    const menuPath = getMenuPath(activeProjectId, id);
     await fs.remove(menuPath);
     res.json({ success: true });
   } catch (error) {
@@ -92,17 +116,17 @@ export async function deleteMenu(req, res) {
   }
 }
 
-// Get a menu by slug
+// Get a menu by id
 export async function getMenu(req, res) {
   try {
-    const { slug } = req.params;
+    const { id } = req.params;
     const { activeProjectId } = await readProjectsFile();
 
     if (!activeProjectId) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const menuPath = getMenuPath(activeProjectId, slug);
+    const menuPath = getMenuPath(activeProjectId, id);
     if (!(await fs.pathExists(menuPath))) {
       return res.status(404).json({ error: "Menu not found" });
     }
@@ -118,9 +142,8 @@ export async function getMenu(req, res) {
 // Update a menu
 export async function updateMenu(req, res) {
   try {
-    const oldSlug = req.params.slug;
+    const currentMenuId = req.params.id;
     const menuData = req.body;
-    const newSlug = menuData.slug;
 
     const { activeProjectId } = await readProjectsFile();
 
@@ -128,27 +151,51 @@ export async function updateMenu(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const oldPath = getMenuPath(activeProjectId, oldSlug);
-    const newPath = getMenuPath(activeProjectId, newSlug);
+    const currentMenuPath = getMenuPath(activeProjectId, currentMenuId);
 
-    if (oldSlug !== newSlug && (await fs.pathExists(newPath))) {
-      return res.status(400).json({
-        error: `A menu with the slug \"${newSlug}\" already exists.`,
-      });
+    // Check if current menu exists
+    if (!(await fs.pathExists(currentMenuPath))) {
+      return res.status(404).json({ error: "Menu not found" });
+    }
+
+    // For updates, we'll keep the same ID unless the user explicitly changed the name
+    // and we need to generate a new ID
+    let finalMenuId = currentMenuId;
+    let finalMenuPath = currentMenuPath;
+
+    // If name changed and it would result in a different ID, we might need to rename
+    const expectedIdFromName = slugify(menuData.name, {
+      lower: true,
+      strict: true,
+      trim: true,
+    });
+
+    // Only rename if the expected ID is different from current AND the new path doesn't exist
+    if (expectedIdFromName !== currentMenuId) {
+      const newMenuPath = getMenuPath(activeProjectId, expectedIdFromName);
+
+      if (!(await fs.pathExists(newMenuPath))) {
+        // Safe to rename
+        finalMenuId = expectedIdFromName;
+        finalMenuPath = newMenuPath;
+      }
+      // If new path exists, keep the current ID (avoid conflicts)
     }
 
     const dataToSave = {
       ...menuData,
+      id: finalMenuId,
       updated: new Date().toISOString(),
     };
 
-    await fs.outputFile(newPath, JSON.stringify(dataToSave, null, 2));
+    await fs.outputFile(finalMenuPath, JSON.stringify(dataToSave, null, 2));
 
-    if (oldSlug !== newSlug && (await fs.pathExists(oldPath))) {
+    // If we renamed the file, delete the old one
+    if (finalMenuPath !== currentMenuPath) {
       try {
-        await fs.remove(oldPath);
+        await fs.remove(currentMenuPath);
       } catch (unlinkError) {
-        console.warn(`Failed to delete old menu file ${oldPath}: ${unlinkError.message}`);
+        console.warn(`Failed to delete old menu file ${currentMenuPath}: ${unlinkError.message}`);
       }
     }
 
@@ -159,14 +206,14 @@ export async function updateMenu(req, res) {
   }
 }
 
-// Get a menu by slug
-export async function getMenuBySlug(projectIdOrDir, slug) {
-  if (!slug) {
+// Get a menu by id (for rendering service)
+export async function getMenuById(projectIdOrDir, menuId) {
+  if (!menuId) {
     return null;
   }
 
   try {
-    const menuPath = path.join(projectIdOrDir, "menus", `${slug}.json`);
+    const menuPath = path.join(projectIdOrDir, "menus", `${menuId}.json`);
 
     if (!(await fs.pathExists(menuPath))) {
       return { items: [] };
@@ -175,7 +222,7 @@ export async function getMenuBySlug(projectIdOrDir, slug) {
     const menuData = await fs.readFile(menuPath, "utf8");
     return JSON.parse(menuData);
   } catch (error) {
-    console.error(`Error reading menu by slug (${slug}):`, error);
+    console.error(`Error reading menu by id (${menuId}):`, error);
     return { items: [] };
   }
 }

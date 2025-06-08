@@ -47,11 +47,11 @@ POST   /api/pages/:id/duplicate       													# Duplicate a page by ID
 POST   /api/pages/:id/content         													# Save page content by ID
 
 # Menus API Routes
-GET    /api/menus                     													# Get all menus
-GET    /api/menus/:slug               													# Get a menu by slug
-POST   /api/menus                     													# Create a new menu
-PUT    /api/menus/:slug               													# Update a menu by slug
-DELETE /api/menus/:slug               													# Delete a menu by slug
+GET    /api/menus                 													# Get all menus
+POST   /api/menus                 													# Create a new menu
+GET    /api/menus/:id               													# Get a menu by id
+PUT    /api/menus/:id               													# Update a menu by id
+DELETE /api/menus/:id               													# Delete a menu by id
 
 # Media API Routes
 GET    /api/media/projects/:projectId/media              				# Get all media for a project

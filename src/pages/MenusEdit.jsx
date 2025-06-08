@@ -12,7 +12,7 @@ import { getMenu, updateMenu } from "../utils/menuManager";
 import useProjectStore from "../stores/projectStore";
 
 export default function MenusEdit() {
-  const { slug } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [menu, setMenu] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,11 +24,11 @@ export default function MenusEdit() {
 
   useEffect(() => {
     loadMenu();
-  }, [slug]);
+  }, [id]);
 
   const loadMenu = async () => {
     try {
-      const menuData = await getMenu(slug);
+      const menuData = await getMenu(id);
       setMenu(menuData);
       setLoading(false);
     } catch (err) {
@@ -41,7 +41,7 @@ export default function MenusEdit() {
     setIsSubmitting(true);
 
     try {
-      const updatedMenu = await updateMenu(slug, {
+      const updatedMenu = await updateMenu(id, {
         ...menu,
         ...formData,
         updated: new Date().toISOString(),

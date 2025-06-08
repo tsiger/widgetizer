@@ -189,7 +189,6 @@ export async function createProject(req, res) {
               const enrichedMenu = {
                 ...menu,
                 id: menuSlug,
-                slug: menuSlug,
                 created: new Date().toISOString(),
                 updated: new Date().toISOString(),
               };

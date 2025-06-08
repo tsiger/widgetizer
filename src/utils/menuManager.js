@@ -30,8 +30,8 @@ export async function createMenu(menuData) {
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || "Failed to create menu");
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to create menu");
     }
 
     return await response.json();
@@ -42,11 +42,11 @@ export async function createMenu(menuData) {
 }
 
 /**
- * Delete a menu by slug
+ * Delete a menu by id
  */
-export async function deleteMenu(slug) {
+export async function deleteMenu(id) {
   try {
-    const response = await fetch(API_URL(`/api/menus/${slug}`), {
+    const response = await fetch(API_URL(`/api/menus/${id}`), {
       method: "DELETE",
     });
 
@@ -62,11 +62,11 @@ export async function deleteMenu(slug) {
 }
 
 /**
- * Get a menu by slug
+ * Get a menu by id
  */
-export async function getMenu(slug) {
+export async function getMenu(id) {
   try {
-    const response = await fetch(API_URL(`/api/menus/${slug}`));
+    const response = await fetch(API_URL(`/api/menus/${id}`));
     if (!response.ok) {
       throw new Error("Failed to fetch menu");
     }
@@ -78,11 +78,11 @@ export async function getMenu(slug) {
 }
 
 /**
- * Update a menu by slug
+ * Update a menu by id
  */
-export async function updateMenu(slug, menuData) {
+export async function updateMenu(id, menuData) {
   try {
-    const response = await fetch(API_URL(`/api/menus/${slug}`), {
+    const response = await fetch(API_URL(`/api/menus/${id}`), {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
