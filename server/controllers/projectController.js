@@ -41,18 +41,17 @@ async function writeProjectsFile(data) {
   await fs.outputFile(projectsFilePath, JSON.stringify(data, null, 2));
 }
 
-// Generate a unique slug for a project
-async function generateUniqueProjectSlug(name, projects) {
-  let slug = slugify(name, { lower: true, strict: true });
-  let uniqueSlug = slug;
+// Helper function to generate a unique project ID based on name
+async function generateUniqueProjectId(name, projects) {
+  let baseId = slugify(name, { lower: true, strict: true });
+  if (!baseId) baseId = "project";
+  let uniqueId = baseId;
   let counter = 1;
-
-  while (projects.some((p) => p.slug === uniqueSlug)) {
-    uniqueSlug = `${slug}-${counter}`;
+  while (projects.some((p) => p.id === uniqueId)) {
+    uniqueId = `${baseId}-${counter}`;
     counter++;
   }
-
-  return uniqueSlug;
+  return uniqueId;
 }
 
 // Get all projects
@@ -88,11 +87,18 @@ export async function createProject(req, res) {
     const { name, description, theme } = req.body;
     const data = await readProjectsFile();
 
-    const slug = await generateUniqueProjectSlug(name, data.projects);
+    // Check for duplicate project names
+    const duplicateName = data.projects.find((p) => p.name.toLowerCase() === name.trim().toLowerCase());
+    if (duplicateName) {
+      return res
+        .status(400)
+        .json({ error: `A project named "${name}" already exists. Please choose a different name.` });
+    }
+
+    const id = await generateUniqueProjectId(name, data.projects);
 
     const newProject = {
-      id: slug,
-      slug,
+      id,
       name,
       description,
       theme,
@@ -100,7 +106,7 @@ export async function createProject(req, res) {
       updated: new Date().toISOString(),
     };
 
-    const projectDir = getProjectDir(slug);
+    const projectDir = getProjectDir(id);
     await fs.ensureDir(projectDir);
 
     if (!theme) {
@@ -112,7 +118,7 @@ export async function createProject(req, res) {
       await themeController.copyThemeToProject(theme, projectDir, ["templates"]);
 
       // Then handle templates separately, recursively
-      const pagesDir = getProjectPagesDir(slug);
+      const pagesDir = getProjectPagesDir(id);
       const themeTemplatesDir = getThemeTemplatesDir(theme);
 
       // Helper function to recursively find and process templates
@@ -161,7 +167,7 @@ export async function createProject(req, res) {
       await processTemplatesRecursive(themeTemplatesDir, pagesDir);
 
       const themeMenusDir = path.join(getThemeDir(theme), "menus");
-      const projectMenusDir = getProjectMenusDir(slug);
+      const projectMenusDir = getProjectMenusDir(id);
       try {
         // Check if theme has menus directory
         if (await fs.pathExists(themeMenusDir)) {
@@ -249,19 +255,71 @@ export async function updateProject(req, res) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    // Only update allowed fields
-    data.projects[projectIndex] = {
-      ...data.projects[projectIndex],
-      name: updates.name || data.projects[projectIndex].name,
-      description: updates.description || data.projects[projectIndex].description,
+    const currentProject = data.projects[projectIndex];
+
+    // Check for duplicate project names (excluding current project)
+    if (updates.name && updates.name.trim() !== currentProject.name) {
+      const duplicateName = data.projects.find(
+        (p) => p.id !== id && p.name.toLowerCase() === updates.name.trim().toLowerCase(),
+      );
+      if (duplicateName) {
+        return res
+          .status(400)
+          .json({ error: `A project named "${updates.name}" already exists. Please choose a different name.` });
+      }
+    }
+
+    let updatedProject = { ...currentProject };
+    let newProjectId = id; // Default to keeping the same ID
+
+    // Check if the name is being updated and if it's different
+    if (updates.name && updates.name.trim() !== currentProject.name) {
+      // Generate a new ID based on the new name
+      const potentialNewId = await generateUniqueProjectId(
+        updates.name,
+        data.projects.filter((p) => p.id !== id),
+      );
+
+      // Only rename if the new ID would be different from current ID
+      if (potentialNewId !== id) {
+        const oldDir = getProjectDir(id);
+        const newDir = getProjectDir(potentialNewId);
+
+        try {
+          // Rename the project directory
+          await fs.rename(oldDir, newDir);
+          newProjectId = potentialNewId;
+
+          // Update activeProjectId if this project is currently active
+          if (data.activeProjectId === id) {
+            data.activeProjectId = newProjectId;
+          }
+
+          console.log(`Project directory renamed: ${id} → ${newProjectId}`);
+        } catch (renameError) {
+          console.error(`Failed to rename project directory from ${id} to ${potentialNewId}:`, renameError);
+          throw new Error(`Failed to rename project directory: ${renameError.message}`);
+        }
+      }
+    }
+
+    // Update the project data
+    updatedProject = {
+      ...updatedProject,
+      id: newProjectId,
+      name: updates.name || updatedProject.name,
+      description: updates.description !== undefined ? updates.description : updatedProject.description,
       updated: new Date().toISOString(),
     };
 
+    // Replace the project in the array
+    data.projects[projectIndex] = updatedProject;
+
     await writeProjectsFile(data);
-    res.json(data.projects[projectIndex]);
+    res.json(updatedProject);
   } catch (error) {
     console.error("Error updating project:", error);
-    res.status(500).json({ error: "Failed to update project" });
+    res.status(500).json({ error: error.message || "Failed to update project" });
   }
 }
 
@@ -291,6 +349,79 @@ export async function deleteProject(req, res) {
   } catch (error) {
     console.error("Error deleting project:", error);
     res.status(500).json({ error: "Failed to delete project" });
+  }
+}
+
+// Duplicate a project
+export async function duplicateProject(req, res) {
+  try {
+    const originalProjectId = req.params.id;
+    const data = await readProjectsFile();
+
+    // Find the original project
+    const originalProject = data.projects.find((p) => p.id === originalProjectId);
+    if (!originalProject) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    // Determine base name for copying (similar to page duplication logic)
+    let baseName = originalProject.name;
+    if (baseName.match(/^Copy( \d+)? of /)) {
+      baseName = baseName.replace(/^Copy( \d+)? of /, "");
+    }
+
+    // Find the highest copy number for this base name
+    let copyNumber = 0;
+    const copyRegex = new RegExp(`^Copy( (\\d+))? of ${baseName}$`);
+    data.projects.forEach((project) => {
+      const match = project.name.match(copyRegex);
+      if (match) {
+        const num = match[2] ? parseInt(match[2]) : 1;
+        copyNumber = Math.max(copyNumber, num);
+      }
+    });
+
+    // Generate the new name and slug
+    const newName = copyNumber === 0 ? `Copy of ${baseName}` : `Copy ${copyNumber + 1} of ${baseName}`;
+    const newId = await generateUniqueProjectId(newName, data.projects);
+
+    // Create the new project metadata
+    const newProject = {
+      ...originalProject,
+      id: newId,
+      name: newName,
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+    };
+
+    // Copy the entire project directory
+    const originalDir = getProjectDir(originalProjectId);
+    const newDir = getProjectDir(newId);
+
+    try {
+      await fs.copy(originalDir, newDir);
+
+      // Update any internal references that might contain the old project ID
+      // For now, most references are relative, so this might not be needed
+      // But we could add logic here to update media.json paths if needed
+    } catch (copyError) {
+      // If copy fails, clean up and throw error
+      try {
+        await fs.remove(newDir);
+      } catch (cleanupError) {
+        console.warn(`Failed to cleanup after copy error: ${cleanupError.message}`);
+      }
+      throw new Error(`Failed to copy project files: ${copyError.message}`);
+    }
+
+    // Add the new project to the list
+    data.projects.push(newProject);
+    await writeProjectsFile(data);
+
+    res.status(201).json(newProject);
+  } catch (error) {
+    console.error("Error duplicating project:", error);
+    res.status(500).json({ error: error.message || "Failed to duplicate project" });
   }
 }
 

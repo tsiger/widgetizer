@@ -44,11 +44,15 @@ export async function createProject(projectData) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to create project");
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to create project");
     }
 
     return await response.json();
   } catch (error) {
+    if (error.message && !error.message.includes("Failed to fetch")) {
+      throw error; // Re-throw with original message if it's our custom error
+    }
     throw new Error("Failed to create project");
   }
 }
@@ -83,11 +87,17 @@ export async function updateProject(projectId, updates) {
       },
       body: JSON.stringify(updates),
     });
+
     if (!response.ok) {
-      throw new Error("Failed to update project");
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to update project");
     }
+
     return await response.json();
   } catch (error) {
+    if (error.message && !error.message.includes("Failed to fetch")) {
+      throw error; // Re-throw with original message if it's our custom error
+    }
     throw new Error("Failed to update project");
   }
 }
@@ -106,5 +116,29 @@ export async function deleteProject(projectId) {
     return await response.json();
   } catch (error) {
     throw new Error("Failed to delete project");
+  }
+}
+
+/**
+ * Duplicate a project
+ */
+export async function duplicateProject(projectId) {
+  try {
+    const response = await fetch(API_URL(`/api/projects/${projectId}/duplicate`), {
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to duplicate project");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error duplicating project:", error);
+    if (error.message && !error.message.includes("Failed to fetch")) {
+      throw error; // Re-throw with original message if it's our custom error
+    }
+    throw new Error("Failed to duplicate project");
   }
 }

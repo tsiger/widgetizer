@@ -21,6 +21,9 @@ router.put("/:id", projectController.updateProject);
 // DELETE /api/projects/:id - Delete a project
 router.delete("/:id", projectController.deleteProject);
 
+// POST /api/projects/:id/duplicate - Duplicate a project
+router.post("/:id/duplicate", projectController.duplicateProject);
+
 // GET /api/projects/:projectId/widgets - Get project widgets
 router.get("/:projectId/widgets", projectController.getProjectWidgets);
 

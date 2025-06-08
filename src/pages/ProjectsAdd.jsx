@@ -58,7 +58,7 @@ export default function ProjectsAdd() {
           {lastCreatedProject && (
             <Button
               variant="secondary"
-              onClick={() => navigate(`/projects/edit/${lastCreatedProject.slug}`)}
+              onClick={() => navigate(`/projects/edit/${lastCreatedProject.id}`)}
               icon={<Pencil size={18} />}
             >
               Edit This Project

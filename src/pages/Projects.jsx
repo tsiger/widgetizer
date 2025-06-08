@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Star, Pencil, AlertCircle, CirclePlus } from "lucide-react";
+import { Trash2, Star, Pencil, AlertCircle, CirclePlus, Copy } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import Tooltip from "../components/ui/Tooltip";
@@ -11,7 +11,12 @@ import { IconButton } from "../components/ui/Button";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
-import { getAllProjects, deleteProject, setActiveProject as setActiveProjectInBackend } from "../utils/projectManager";
+import {
+  getAllProjects,
+  deleteProject,
+  duplicateProject,
+  setActiveProject as setActiveProjectInBackend,
+} from "../utils/projectManager";
 
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import useConfirmationModal from "../hooks/useConfirmationModal";
@@ -88,6 +93,16 @@ export default function Projects() {
       }
     } catch (err) {
       showToast("Failed to set active project", "error");
+    }
+  };
+
+  const handleDuplicate = async (projectId) => {
+    try {
+      const newProject = await duplicateProject(projectId);
+      await loadProjects(); // Reload the list to show the new project
+      showToast(`Project duplicated successfully`, "success");
+    } catch (error) {
+      showToast("Failed to duplicate project", "error");
     }
   };
 
@@ -177,6 +192,11 @@ export default function Projects() {
                   <Tooltip content="Edit project">
                     <IconButton onClick={() => navigate(`/projects/edit/${project.id}`)} variant="neutral" size="sm">
                       <Pencil size={18} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip content="Duplicate project">
+                    <IconButton onClick={() => handleDuplicate(project.id)} variant="neutral" size="sm">
+                      <Copy size={18} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip
