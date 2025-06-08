@@ -39,23 +39,39 @@ export default function Dashboard() {
     );
   }
 
+  // First-time user experience when no projects exist
+  const isFirstTimeUser = projectCount === 0;
+
   return (
     <PageLayout title="Dashboard">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card variant="feature">
           <p className="text-xs uppercase font-semibold mb-4 text-gray-500">Number of projects</p>
           <h2 className="text-2xl font-semibold tracking-tight text-gray-900">{projectCount}</h2>
-          <p className="text-gray-600">Projects</p>
+          <p className="text-gray-600">{isFirstTimeUser ? "Ready to create your first project!" : "Projects"}</p>
         </Card>
 
         <Card variant="feature">
-          <p className="text-xs uppercase font-semibold mb-4 text-gray-500">Active project</p>
+          <p className="text-xs uppercase font-semibold mb-4 text-gray-500">
+            {isFirstTimeUser ? "Get started" : "Active project"}
+          </p>
           <h2 className="text-2xl font-semibold tracking-tight text-gray-900">
-            {activeProject?.name || "No active project"}
+            {isFirstTimeUser ? "Create your first project" : activeProject?.name || "No active project"}
           </h2>
-          {activeProject && (
+          {isFirstTimeUser ? (
+            <Link
+              to="/projects/add"
+              className="inline-flex items-center px-4 py-2 mt-3 text-sm font-medium text-white bg-pink-600 border border-transparent rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
+            >
+              Create Project →
+            </Link>
+          ) : activeProject ? (
             <Link to="/pages" className="text-pink-600 hover:text-pink-700 font-medium">
               Let's get at it! →
+            </Link>
+          ) : (
+            <Link to="/projects/add" className="text-pink-600 hover:text-pink-700 font-medium">
+              Create a project →
             </Link>
           )}
         </Card>
