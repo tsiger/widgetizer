@@ -249,6 +249,7 @@ async function renderPageLayout(projectId, pageContent, pageData, rawThemeSettin
       content: pageContent,
       page: pageData,
       body_class: pageData?.slug || "",
+      page_title: pageData?.name || "Untitled Page",
     };
 
     // 4. Render the layout
