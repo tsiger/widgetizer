@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { API_URL } from "../../config";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import Button from "../ui/Button";
 import slugify from "slugify";
 import useToastStore from "../../stores/toastStore";
 
@@ -167,21 +168,13 @@ export default function ProjectForm({
       </div>
 
       <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="px-4 py-2 bg-pink-600 text-white rounded-sm hover:bg-pink-700 disabled:bg-pink-400"
-        >
+        <Button type="submit" disabled={isSubmitting} variant="primary">
           {isSubmitting ? "Saving..." : submitLabel}
-        </button>
+        </Button>
         {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 border border-slate-300 rounded-sm hover:bg-slate-50"
-          >
+          <Button type="button" onClick={onCancel} variant="secondary">
             Cancel
-          </button>
+          </Button>
         )}
       </div>
     </form>

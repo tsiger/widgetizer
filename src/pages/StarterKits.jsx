@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import EmptyState from "../components/ui/EmptyState";
+import Badge from "../components/ui/Badge";
 import { UploadCloud } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 
@@ -137,11 +139,6 @@ export default function StarterKits() {
                 className="relative bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
               >
                 <div className="aspect-video bg-slate-100 relative overflow-hidden">
-                  {isActiveTheme && (
-                    <div className="px-3 py-1 bg-pink-600 text-white text-xs rounded-sm absolute top-2 right-2">
-                      Active
-                    </div>
-                  )}
                   <img
                     src={getThemeScreenshotUrl(theme.id)}
                     alt={`${theme.name} preview`}
@@ -154,21 +151,27 @@ export default function StarterKits() {
                       <h3 className="text-base font-semibold">{theme.name}</h3>
                       <div className="text-xs text-slate-500">Version {theme.version}</div>
                     </div>
-                    <span className="px-2 py-1 text-xs bg-slate-100 rounded-full">{theme.widgets} widgets</span>
+                    <Badge variant="neutral">{theme.widgets} widgets</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-slate-500">By {theme.author || "Unknown"}</span>
                   </div>
                 </div>
+
+                {isActiveTheme && (
+                  <Badge variant="pink" className="absolute top-2 right-2">
+                    Active
+                  </Badge>
+                )}
               </div>
             );
           })}
         </div>
       ) : (
-        <div className="text-center py-12 bg-slate-50 border border-dashed border-slate-200 rounded-lg">
-          <h3 className="text-lg font-medium text-slate-700 mb-2">No starter kits available</h3>
-          <p className="text-slate-500 mb-4">Upload a starter kit using the area above to get started</p>
-        </div>
+        <EmptyState
+          title="No starter kits available"
+          description="Upload a starter kit using the area above to get started"
+        />
       )}
     </PageLayout>
   );

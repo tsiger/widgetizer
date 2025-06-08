@@ -5,6 +5,9 @@ import { Trash2, Star, Pencil, AlertCircle, CirclePlus } from "lucide-react";
 import PageLayout from "../components/layout/PageLayout";
 import Tooltip from "../components/ui/Tooltip";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import Table from "../components/ui/Table";
+import Badge from "../components/ui/Badge";
+import { IconButton } from "../components/ui/Button";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
@@ -125,103 +128,78 @@ export default function Projects() {
       }}
     >
       <div>
-        <table className="w-full">
-          <thead>
-            <tr className="border-b-2 border-slate-200">
-              <th className="text-left py-3 px-4">Title</th>
-              <th className="text-left py-3 px-4">Created</th>
-              <th className="text-left py-3 px-4">Updated</th>
-              <th className="text-right py-3 px-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="text-center py-8 text-slate-500">
-                  No projects yet. Create your first project!
-                </td>
-              </tr>
-            ) : (
-              projects.map((project) => (
-                <tr
-                  key={project.id}
-                  className="border-b border-slate-200 hover:bg-slate-50 transition-colors duration-150 group"
-                >
-                  <td className="py-3 px-4">
-                    {activeProject && project.id === activeProject.id && (
-                      <span className="mr-2 text-xs bg-pink-100 text-pink-600 border border-pink-200 px-2 py-1 rounded-full">
-                        Active
-                      </span>
-                    )}
-                    {project.name}
-                  </td>
-                  <td className="py-3 px-4">{new Date(project.created).toLocaleDateString()}</td>
-                  <td className="py-3 px-4">{new Date(project.updated).toLocaleDateString()}</td>
-                  <td className="py-3 px-4 text-right">
-                    <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                      <Tooltip
-                        content={
+        <Table
+          headers={["Title", "Created", "Updated", "Actions"]}
+          data={projects}
+          emptyMessage="No projects yet. Create your first project!"
+          renderRow={(project) => (
+            <>
+              <td className="py-3 px-4">
+                {activeProject && project.id === activeProject.id && (
+                  <Badge variant="pink" className="mr-2">
+                    Active
+                  </Badge>
+                )}
+                {project.name}
+              </td>
+              <td className="py-3 px-4">{new Date(project.created).toLocaleDateString()}</td>
+              <td className="py-3 px-4">{new Date(project.updated).toLocaleDateString()}</td>
+              <td className="py-3 px-4 text-right">
+                <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                  <Tooltip
+                    content={
+                      activeProject && project.id === activeProject.id
+                        ? "Current active project"
+                        : "Set as active project"
+                    }
+                  >
+                    <IconButton
+                      onClick={() => handleSetActive(project.id)}
+                      variant="neutral"
+                      size="sm"
+                      disabled={activeProject && project.id === activeProject.id}
+                      title={
+                        activeProject && project.id === activeProject.id
+                          ? "Current active project"
+                          : "Set as active project"
+                      }
+                    >
+                      <Star
+                        size={18}
+                        className={
                           activeProject && project.id === activeProject.id
-                            ? "Current active project"
-                            : "Set as active project"
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-slate-400 hover:text-yellow-400"
                         }
-                      >
-                        <button
-                          onClick={() => handleSetActive(project.id)}
-                          className={`p-2 hover:bg-slate-100 rounded-sm ${
-                            activeProject && project.id === activeProject.id ? "cursor-default" : "cursor-pointer"
-                          }`}
-                          title={
-                            activeProject && project.id === activeProject.id
-                              ? "Current active project"
-                              : "Set as active project"
-                          }
-                          disabled={activeProject && project.id === activeProject.id}
-                        >
-                          <Star
-                            size={18}
-                            className={
-                              activeProject && project.id === activeProject.id
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "text-slate-400 hover:text-yellow-400"
-                            }
-                          />
-                        </button>
-                      </Tooltip>
-                      <Tooltip content="Edit project">
-                        <button
-                          onClick={() => navigate(`/projects/edit/${project.id}`)}
-                          className="p-2 hover:bg-slate-100 rounded-sm text-slate-600 cursor-pointer"
-                        >
-                          <Pencil size={18} />
-                        </button>
-                      </Tooltip>
-                      <Tooltip
-                        content={
-                          activeProject && project.id === activeProject.id
-                            ? "Cannot delete active project"
-                            : "Delete project"
-                        }
-                      >
-                        <button
-                          onClick={() => openDeleteConfirmation(project.id, project.name)}
-                          className={`p-2 hover:bg-slate-100 rounded-sm ${
-                            activeProject && project.id === activeProject.id
-                              ? "text-slate-400 cursor-not-allowed"
-                              : "text-red-600 cursor-pointer"
-                          }`}
-                          disabled={activeProject && project.id === activeProject.id}
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </Tooltip>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                      />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip content="Edit project">
+                    <IconButton onClick={() => navigate(`/projects/edit/${project.id}`)} variant="neutral" size="sm">
+                      <Pencil size={18} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip
+                    content={
+                      activeProject && project.id === activeProject.id
+                        ? "Cannot delete active project"
+                        : "Delete project"
+                    }
+                  >
+                    <IconButton
+                      onClick={() => openDeleteConfirmation(project.id, project.name)}
+                      variant={activeProject && project.id === activeProject.id ? "neutral" : "danger"}
+                      size="sm"
+                      disabled={activeProject && project.id === activeProject.id}
+                    >
+                      <Trash2 size={18} />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+              </td>
+            </>
+          )}
+        />
       </div>
 
       <ConfirmationModal

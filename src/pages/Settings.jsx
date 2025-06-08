@@ -4,6 +4,7 @@ import { AlertCircle } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import Button from "../components/ui/Button";
 import { SettingsPanel } from "../components/settings";
 
 import useProjectStore from "../stores/projectStore";
@@ -135,13 +136,9 @@ export default function Settings() {
 
         {/* Save button */}
         <div className="mt-6 flex justify-end">
-          <button
-            onClick={handleSave}
-            disabled={loading || !themeData}
-            className="px-4 py-2 bg-pink-600 text-white rounded-sm hover:bg-pink-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
-          >
+          <Button onClick={handleSave} disabled={loading || !themeData} variant="primary">
             Save Settings
-          </button>
+          </Button>
         </div>
       </>
     </PageLayout>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PageLayout from "../components/layout/PageLayout";
+import Button from "../components/ui/Button";
 import { getActiveProject } from "../utils/projectManager";
 import { publishProjectAPI } from "../utils/publishManager";
 import useToastStore from "../stores/toastStore";
@@ -51,9 +52,6 @@ export default function PublishSite() {
     }
   };
 
-  const buttonClasses =
-    "px-4 py-2 bg-pink-600 text-white rounded-sm hover:bg-pink-700 disabled:bg-slate-400 disabled:cursor-not-allowed flex items-center justify-center";
-
   return (
     <PageLayout title={`Publish Site: ${activeProject?.name || "..."}`}>
       <div className="space-y-4 bg-white p-6 rounded-sm border border-slate-200 shadow-sm">
@@ -63,15 +61,14 @@ export default function PublishSite() {
           <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded">data/publish</code> directory.
         </p>
 
-        <button onClick={handlePublish} disabled={isPublishing || !activeProject} className={buttonClasses}>
-          {isPublishing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Publishing...
-            </>
-          ) : (
-            "Publish Project"
-          )}
-        </button>
+        <Button
+          onClick={handlePublish}
+          disabled={isPublishing || !activeProject}
+          variant="primary"
+          icon={isPublishing ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+        >
+          {isPublishing ? "Publishing..." : "Publish Project"}
+        </Button>
 
         {lastOutputDir && (
           <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-sm">

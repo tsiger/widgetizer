@@ -5,6 +5,7 @@ import { ChevronLeft } from "lucide-react";
 import PageLayout from "../components/layout/PageLayout";
 import PageForm from "../components/pages/PageForm";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import Button from "../components/ui/Button";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
@@ -95,12 +96,9 @@ export default function PagesEdit() {
     <PageLayout title="Edit page">
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <button
-            onClick={() => navigate("/pages")}
-            className="pl-3 pr-4 py-2 border-2 border-slate-300 rounded-sm hover:bg-slate-50 flex items-center gap-1"
-          >
-            <ChevronLeft size={18} /> Back to pages list
-          </button>
+          <Button variant="secondary" onClick={() => navigate("/pages")} icon={<ChevronLeft size={18} />}>
+            Back to pages list
+          </Button>
         </div>
       )}
 

@@ -1,4 +1,6 @@
 import { Grid, List, Search, Trash2 } from "lucide-react";
+import { IconButton } from "../ui/Button";
+import Button from "../ui/Button";
 
 export default function MediaToolbar({
   viewMode,
@@ -11,27 +13,33 @@ export default function MediaToolbar({
   return (
     <div className="mt-4 flex flex-wrap justify-between mb-4 items-center">
       <div className="flex items-center mb-2 sm:mb-0">
-        <button
-          className={`p-2 rounded ${viewMode === "grid" ? "bg-slate-200" : ""}`}
+        <IconButton
+          variant={viewMode === "grid" ? "primary" : "neutral"}
           onClick={() => onViewModeChange("grid")}
           title="Grid View"
         >
           <Grid size={20} />
-        </button>
-        <button
-          className={`p-2 rounded ${viewMode === "list" ? "bg-slate-200" : ""}`}
+        </IconButton>
+        <IconButton
+          variant={viewMode === "list" ? "primary" : "neutral"}
           onClick={() => onViewModeChange("list")}
           title="List View"
         >
           <List size={20} />
-        </button>
+        </IconButton>
 
         {selectedFiles.length > 0 && (
           <div className="ml-4 flex items-center">
             <span className="text-sm text-slate-600 mr-2">{selectedFiles.length} selected</span>
-            <button onClick={onBulkDelete} className="p-2 text-red-500 hover:bg-red-50 rounded" title="Delete Selected">
-              <Trash2 size={18} />
-            </button>
+            <Button
+              onClick={onBulkDelete}
+              variant="danger"
+              size="sm"
+              icon={<Trash2 size={18} />}
+              title="Delete Selected"
+            >
+              Delete
+            </Button>
           </div>
         )}
       </div>
@@ -41,7 +49,7 @@ export default function MediaToolbar({
         <input
           type="text"
           placeholder="Search media..."
-          className="pl-10 pr-4 py-2 border border-slate-300 rounded-sm"
+          className="pl-10 pr-4 py-2 border border-slate-300 rounded-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
         />
