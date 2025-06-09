@@ -44,30 +44,30 @@ export default function EditorTopBar({
   const hasMultiplePages = pages.length > 1;
 
   return (
-    <div className="bg-slate-800 p-2 flex justify-between items-center">
+    <div className="bg-white text-slate-900 border-b border-slate-200 p-2 flex justify-between items-center">
       <div className="relative">
         {hasMultiplePages ? (
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="text-white font-medium px-4 py-2 rounded-sm hover:bg-slate-700 flex items-center gap-2"
+            className="font-medium px-4 py-2 rounded-sm hover:bg-slate-100 flex items-center gap-2"
           >
             {pageName} {hasUnsavedChanges && <span className="text-amber-400">*</span>}
             <ChevronDown size={16} className={`transform transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
           </button>
         ) : (
-          <div className="text-white font-medium px-4 py-2">
+          <div className="font-medium px-4 py-2">
             {pageName} {hasUnsavedChanges && <span className="text-amber-400">*</span>}
           </div>
         )}
 
         {isDropdownOpen && hasMultiplePages && (
-          <div className="absolute top-full left-0 mt-1 w-64 max-h-96 overflow-y-auto bg-slate-800 border border-slate-700 rounded-sm shadow-lg z-50">
+          <div className="absolute top-full left-0 mt-1 w-64 max-h-96 overflow-y-auto bg-white border border-slate-200 rounded-md shadow-lg z-50">
             {pages.map((page) => (
               <button
                 key={page.id}
                 onClick={() => handlePageChange(page.id)}
-                className={`w-full px-4 py-2 text-left hover:bg-slate-700 ${
-                  page.id === pageId ? "bg-slate-700 text-white" : "text-slate-300"
+                className={`w-full px-4 py-2 text-left ${
+                  page.id === pageId ? "bg-pink-600 text-white hover:bg-pink-700" : "text-slate-800 hover:bg-slate-100"
                 }`}
               >
                 {page.name}
@@ -77,18 +77,22 @@ export default function EditorTopBar({
         )}
       </div>
 
-      <div className="flex gap-1 p-1 bg-slate-700 rounded-md">
+      <div className="flex gap-1 p-1 bg-slate-200 rounded-md">
         <button
           onClick={() => onPreviewModeChange && onPreviewModeChange("desktop")}
           title="Desktop View"
-          className={`p-1.5 rounded ${previewMode === "desktop" ? "bg-slate-600 text-white" : "text-slate-400 hover:text-white"}`}
+          className={`p-1.5 rounded ${
+            previewMode === "desktop" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
+          }`}
         >
           <Monitor size={18} />
         </button>
         <button
           onClick={() => onPreviewModeChange && onPreviewModeChange("mobile")}
           title="Mobile View"
-          className={`p-1.5 rounded ${previewMode === "mobile" ? "bg-slate-600 text-white" : "text-slate-400 hover:text-white"}`}
+          className={`p-1.5 rounded ${
+            previewMode === "mobile" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
+          }`}
         >
           <Smartphone size={18} />
         </button>
@@ -96,20 +100,20 @@ export default function EditorTopBar({
 
       <div className="flex items-center gap-4">
         {isAutoSaving && (
-          <div className="flex items-center gap-2 text-slate-400 text-sm">
+          <div className="flex items-center gap-2 text-slate-500 text-sm">
             <Clock size={14} className="animate-spin" />
             Auto-saving...
           </div>
         )}
         {lastSaved && !isAutoSaving && !isSaving && (
-          <div className="text-slate-400 text-sm">Last saved: {lastSaved.toLocaleTimeString()}</div>
+          <div className="text-slate-500 text-sm">Last saved: {lastSaved.toLocaleTimeString()}</div>
         )}
 
         <Link
           to={`/preview/${pageId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm bg-slate-600 hover:bg-slate-500 text-white"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm bg-slate-200 hover:bg-slate-300 text-slate-800"
         >
           <Eye size={18} />
           Preview
@@ -121,7 +125,7 @@ export default function EditorTopBar({
           className={`flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm ${
             hasUnsavedChanges && !isSaving && !isAutoSaving
               ? "bg-pink-600 hover:bg-pink-700 text-white"
-              : "bg-slate-700 text-slate-400 cursor-not-allowed"
+              : "bg-slate-200 text-slate-500 cursor-not-allowed"
           }`}
         >
           <Save size={18} />

@@ -21,8 +21,8 @@ export default function Sidebar() {
 
   return (
     <div className="w-[72px] md:w-48 bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto">
-      <div className="pb-2 px-2 md:p-4 grow">
-        <div className="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-6">
+      <div className="pb-2 px-2 md:px-4 grow">
+        <div className="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-4">
           <img src="/widgetizer_logo.svg" alt="Widgetizer" className="hidden md:block w-40" />
           <img src="/widgetizer_symbol.svg" alt="Widgetizer" className="md:hidden w-12 h-12 mx-auto" />
         </div>
