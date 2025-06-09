@@ -12,10 +12,8 @@ import Media from "./pages/Media";
 import Settings from "./pages/Settings";
 import StarterKits from "./pages/StarterKits";
 import ExportSite from "./pages/ExportSite";
-import PublishSite from "./pages/PublishSite";
 import AppSettings from "./pages/AppSettings";
 import PageEditor from "./pages/PageEditor";
-import GenerateSite from "./pages/GenerateSite";
 import ProjectsAdd from "./pages/ProjectsAdd";
 import ProjectsEdit from "./pages/ProjectsEdit";
 import MenuStructure from "./pages/MenuStructure";
@@ -42,8 +40,6 @@ function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="starter-kits" element={<StarterKits />} />
           <Route path="export-site" element={<ExportSite />} />
-          <Route path="publish-site" element={<PublishSite />} />
-          <Route path="generate-site" element={<GenerateSite />} />
           <Route path="app-settings" element={<AppSettings />} />
         </Route>
       </Routes>

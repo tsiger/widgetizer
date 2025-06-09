@@ -1,14 +1,14 @@
 import { API_URL } from "../config";
 
 /**
- * Calls the backend API to trigger the publishing process for a project.
+ * Calls the backend API to trigger the exporting process for a project.
  */
-export async function publishProjectAPI(projectId) {
+export async function exportProjectAPI(projectId) {
   if (!projectId) {
-    throw new Error("Project ID is required to publish.");
+    throw new Error("Project ID is required to export.");
   }
 
-  const response = await fetch(API_URL(`/api/publish/${projectId}`), {
+  const response = await fetch(API_URL(`/api/export/${projectId}`), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -20,7 +20,7 @@ export async function publishProjectAPI(projectId) {
 
   if (!response.ok) {
     const errorMessage = result?.message || `HTTP error! status: ${response.status}`;
-    console.error("Publish API Error:", result);
+    console.error("Export API Error:", result);
     throw new Error(errorMessage);
   }
 

@@ -6,8 +6,8 @@ import { renderWidget, renderPageLayout } from "../services/renderingService.js"
 import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
 
-// Main function to handle the publish request
-export async function publishProject(req, res) {
+// Main function to handle the export request
+export async function exportProject(req, res) {
   const { projectId } = req.params;
 
   try {
@@ -17,7 +17,7 @@ export async function publishProject(req, res) {
 
     const projectDir = getProjectDir(projectId);
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-"); // Create a safe timestamp
-    const outputBaseDir = PUBLISH_DIR; // Base directory for all publishes
+    const outputBaseDir = PUBLISH_DIR; // Base directory for all exports
     const outputDir = path.join(outputBaseDir, `${projectId}-${timestamp}`);
     const outputAssetsDir = path.join(outputDir, "assets");
     const outputUploadsDir = path.join(outputDir, "uploads"); // Define uploads base in output
@@ -39,7 +39,7 @@ export async function publishProject(req, res) {
 
     // Handle case where no pages are found (except for theme files etc)
     if (pagesDataArray.length === 0) {
-      console.warn(`No publishable pages found for project ${projectId}. Only copying assets/images.`); // Updated log message
+      console.warn(`No exportable pages found for project ${projectId}. Only copying assets/images.`); // Updated log message
       // Proceed to asset copying, but maybe indicate this in the response?
     }
 
@@ -156,25 +156,25 @@ export async function publishProject(req, res) {
     }
     // --- End Copy ---
 
-    res.json({ success: true, message: "Project published successfully", outputDir: outputDir });
+    res.json({ success: true, message: "Project exported successfully", outputDir: outputDir });
   } catch (error) {
     // Send specific error if theme read failed
     if (error.message.includes("Theme settings file not found")) {
       return res.status(404).json({
-        error: "Failed to publish: Theme settings not found",
+        error: "Failed to export: Theme settings not found",
         message: error.message,
       });
     }
     // Add specific handling for page listing errors if the helper throws them
     if (error.message.includes("Failed to list pages data")) {
       return res.status(500).json({
-        error: "Failed to publish: Could not read project pages",
+        error: "Failed to export: Could not read project pages",
         message: error.message,
       });
     }
     // General error
     res.status(500).json({
-      error: "Failed to publish project",
+      error: "Failed to export project",
       message: error.message,
       stack: process.env.NODE_ENV !== "production" ? error.stack : undefined,
     });

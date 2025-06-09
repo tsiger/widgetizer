@@ -10,6 +10,7 @@ All setting types share the following common properties:
 - `label` (string, required): A human-readable label displayed in the UI. While the renderer can fall back to the `id`, it's strongly recommended to always provide a clean label.
 - `description` (string, optional): Help text displayed below the input to guide the user.
 - `default` (any, optional): The default value for the setting if none is provided.
+- `outputAsCssVar` (boolean, optional): If set to `true`, the setting's value will be output as a CSS custom property (variable) in the page's `<head>`. This is the primary way to link theme settings to your theme's CSS.
 
 ---
 
@@ -66,7 +67,8 @@ A color picker with a hex input field and a pop-over color swatch.
   "type": "color",
   "label": "Accent Color",
   "default": "#ec4899",
-  "description": "The primary color for buttons and links."
+  "description": "The primary color for buttons and links.",
+  "outputAsCssVar": true
 }
 ```
 
@@ -103,7 +105,8 @@ A slider for selecting a number within a defined range.
   "max": 24,
   "step": 1,
   "unit": "px",
-  "description": "The default font size for body text."
+  "description": "The default font size for body text.",
+  "outputAsCssVar": true
 }
 ```
 
@@ -145,7 +148,7 @@ A set of radio buttons for selecting a single option from a list. The `options` 
 
 ### Font Picker
 
-A specialized input with two dropdowns for selecting a font family and its corresponding weight. The value is an object containing `stack` and `weight`.
+A specialized input with two dropdowns for selecting a font family and its corresponding weight. The value is an object containing `stack` and `weight`. **Note:** This type automatically outputs CSS variables for `-family` and `-weight` and does not require the `outputAsCssVar` flag.
 
 ```json
 {

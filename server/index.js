@@ -14,7 +14,7 @@ import pagesRoutes from "./routes/pages.js";
 import menusRoutes from "./routes/menus.js";
 import mediaRoutes from "./routes/media.js";
 import previewRoutes from "./routes/preview.js";
-import publishRoutes from "./routes/publish.js";
+import exportRoutes from "./routes/export.js";
 import appSettingsRoutes from "./routes/appSettings.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -29,7 +29,7 @@ app.use("/api/pages", pagesRoutes);
 app.use("/api/menus", menusRoutes);
 app.use("/api/media", mediaRoutes);
 app.use("/api/preview", previewRoutes);
-app.use("/api/publish", publishRoutes);
+app.use("/api/export", exportRoutes);
 app.use("/api/settings", appSettingsRoutes);
 
 // Serve static files from the themes directory

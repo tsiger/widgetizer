@@ -1,18 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import {
-  Home,
-  Folder,
-  File,
-  Menu,
-  Image,
-  Settings,
-  Palette,
-  Download,
-  Rocket,
-  SlidersHorizontal,
-  FilePen,
-  WandSparkles,
-} from "lucide-react";
+import { Home, Folder, File, Menu, Image, Settings, Palette, Rocket, SlidersHorizontal } from "lucide-react";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -111,37 +98,11 @@ export default function Sidebar() {
         <h3 className="text-slate-500 mb-2 ml-2 hidden md:block">Tools</h3>
         <ul className="space-y-2 md:space-y-1">
           <li>
-            <Link to="/publish-site" className={linkClass("/publish-site")}>
-              <div className={iconClass("/publish-site")}>
-                <Rocket size={20} />
-              </div>
-              <span className="hidden md:inline ml-1 text-sm">Publish site</span>
-            </Link>
-          </li>
-          <li>
             <Link to="/export-site" className={linkClass("/export-site")}>
               <div className={iconClass("/export-site")}>
-                <Download size={20} />
+                <Rocket size={20} />
               </div>
-              <span className="hidden md:inline ml-1 text-sm">
-                Export site
-                <span className="bg-slate-700 border border-slate-600 text-white text-xs px-1 rounded-xs relative left-2">
-                  Pro
-                </span>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/generate-site" className={linkClass("/generate-site")}>
-              <div className={iconClass("/generate-site")}>
-                <WandSparkles size={20} />
-              </div>
-              <span className="hidden md:inline ml-1 text-sm">
-                Generate site
-                <span className="bg-slate-700 border border-slate-600 text-white text-xs px-1 rounded-xs relative left-2">
-                  Pro
-                </span>
-              </span>
+              <span className="hidden md:inline ml-1 text-sm">Export site</span>
             </Link>
           </li>
         </ul>
