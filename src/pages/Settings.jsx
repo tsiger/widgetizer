@@ -122,7 +122,7 @@ export default function Settings() {
     <PageLayout title="Theme settings">
       <>
         {/* Settings panel container */}
-        <div className="bg-white rounded-md shadow-sm">
+        <div className="bg-white rounded-md border border-t-0 border-slate-200">
           {themeData ? (
             <SettingsPanel
               schema={themeData.settings.global}

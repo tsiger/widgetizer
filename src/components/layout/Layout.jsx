@@ -1,5 +1,4 @@
 import Sidebar from "./Sidebar";
-import Toolbar from "./Toolbar";
 import Footer from "./Footer";
 import Content from "./Content";
 import { Outlet, useLocation } from "react-router-dom";

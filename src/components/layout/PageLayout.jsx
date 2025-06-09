@@ -14,7 +14,7 @@ export default function PageLayout({ title, description, children, buttonProps }
           </Button>
         )}
       </div>
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">{children}</div>
+      <div className="bg-white rounded-xl border border-gray-200 p-4">{children}</div>
     </div>
   );
 }
