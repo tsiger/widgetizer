@@ -3,6 +3,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import SortableBlockItem from "../blocks/SortableBlockItem";
+import BlockInsertionZone from "../blocks/BlockInsertionZone";
 
 export default function WidgetItem({
   widgetId,
@@ -102,7 +103,7 @@ export default function WidgetItem({
 
       {hasBlocks && (
         <div className="border-t border-slate-100">
-          <div className="p-2 space-y-1">
+          <div className="p-2">
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -110,39 +111,60 @@ export default function WidgetItem({
               modifiers={[restrictToVerticalAxis]}
             >
               <SortableContext items={blockOrder} strategy={verticalListSortingStrategy}>
-                {blockOrder.map((blockId) => {
-                  const block = blocks[blockId];
-                  if (!block) return null;
-
-                  const blockSchema = widgetSchema.blocks.find((schema) => schema.type === block.type);
-
-                  return (
-                    <SortableBlockItem
-                      key={blockId}
+                <div className="space-y-1">
+                  {blockOrder.length > 0 && (
+                    <BlockInsertionZone
                       widgetId={widgetId}
-                      blockId={blockId}
-                      block={block}
-                      blockSchema={blockSchema}
-                      isSelected={blockId === selectedBlockId && isSelected}
-                      onBlockSelect={(clickedBlockId) => {
-                        if (onWidgetSelect) onWidgetSelect(widgetId);
-                        if (onBlockSelect) onBlockSelect(clickedBlockId);
-                      }}
+                      position={0}
+                      onAddClick={(widgetId, position) => onAddBlockClick(widgetId, position)}
                     />
-                  );
-                })}
+                  )}
+
+                  {blockOrder.map((blockId, index) => {
+                    const block = blocks[blockId];
+                    if (!block) return null;
+
+                    const blockSchema = widgetSchema.blocks.find((schema) => schema.type === block.type);
+
+                    return (
+                      <div key={blockId}>
+                        <SortableBlockItem
+                          widgetId={widgetId}
+                          blockId={blockId}
+                          block={block}
+                          blockSchema={blockSchema}
+                          isSelected={blockId === selectedBlockId && isSelected}
+                          onBlockSelect={(clickedBlockId) => {
+                            if (onWidgetSelect) onWidgetSelect(widgetId);
+                            if (onBlockSelect) onBlockSelect(clickedBlockId);
+                          }}
+                        />
+                        <BlockInsertionZone
+                          widgetId={widgetId}
+                          position={index + 1}
+                          onAddClick={(widgetId, position) => onAddBlockClick(widgetId, position)}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </SortableContext>
             </DndContext>
 
-            <button
-              className="w-full text-xs p-1 bg-slate-200 text-slate-700 hover:bg-slate-700 hover:text-slate-100 rounded"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAddBlockClick(widgetId);
-              }}
-            >
-              Add block
-            </button>
+            {blockOrder.length === 0 && (
+              <div className="text-center py-4">
+                <p className="text-xs text-slate-500 mb-2">No blocks added yet</p>
+                <button
+                  className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddBlockClick(widgetId, 0);
+                  }}
+                >
+                  Add Block
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
