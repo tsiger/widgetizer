@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Save, Clock, ChevronDown, Monitor, Smartphone } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Save, Clock, ChevronDown, Monitor, Smartphone, Eye } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 import { getAllPages } from "../../utils/pageManager";
 
 export default function EditorTopBar({
@@ -104,6 +104,16 @@ export default function EditorTopBar({
         {lastSaved && !isAutoSaving && !isSaving && (
           <div className="text-slate-400 text-sm">Last saved: {lastSaved.toLocaleTimeString()}</div>
         )}
+
+        <Link
+          to={`/preview/${pageId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm bg-slate-600 hover:bg-slate-500 text-white"
+        >
+          <Eye size={18} />
+          Preview
+        </Link>
 
         <button
           onClick={onSave}

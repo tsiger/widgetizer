@@ -14,6 +14,7 @@ import StarterKits from "./pages/StarterKits";
 import ExportSite from "./pages/ExportSite";
 import AppSettings from "./pages/AppSettings";
 import PageEditor from "./pages/PageEditor";
+import PagePreview from "./pages/PagePreview";
 import ProjectsAdd from "./pages/ProjectsAdd";
 import ProjectsEdit from "./pages/ProjectsEdit";
 import MenuStructure from "./pages/MenuStructure";
@@ -42,6 +43,7 @@ function App() {
           <Route path="export-site" element={<ExportSite />} />
           <Route path="app-settings" element={<AppSettings />} />
         </Route>
+        <Route path="/preview/:pageId" element={<PagePreview />} />
       </Routes>
       <ToastContainer />
     </Router>
