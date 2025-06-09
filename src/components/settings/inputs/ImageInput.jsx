@@ -1,18 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import { uploadProjectMedia, getProjectMedia } from "../../../utils/mediaManager";
 import { API_URL } from "../../../config";
-import SettingsField from "../SettingsField";
 import useProjectStore from "../../../stores/projectStore";
 import useToastStore from "../../../stores/toastStore";
-import { X, Edit } from "lucide-react";
+import { X, Edit, UploadCloud, FolderOpen } from "lucide-react";
 import MediaDrawer from "../../../components/media/MediaDrawer";
 import MediaSelectorDrawer from "../../../components/media/MediaSelectorDrawer";
+import Button from "../../ui/Button";
 
-export default function ImageInput({ id, label, value = "", onChange, description, error }) {
+export default function ImageInput({ id, value = "", onChange }) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
   const activeProject = useProjectStore((state) => state.activeProject);
-  const activePage = useProjectStore((state) => state.activePage);
   const showToast = useToastStore((state) => state.showToast);
 
   // State for the media drawers
@@ -21,212 +20,137 @@ export default function ImageInput({ id, label, value = "", onChange, descriptio
   const [currentImageFile, setCurrentImageFile] = useState(null);
   const [isSavingMetadata, setIsSavingMetadata] = useState(false);
 
-  // Track previous value for usage tracking (if enabled later)
-  const prevValueRef = useRef(value);
-
   // Get the current image metadata when value changes
   useEffect(() => {
     if (value && activeProject) {
-      // Extract the image filename from the path
       const filename = value.split("/").pop();
-
-      // Fetch metadata for this image if needed
       const fetchImageData = async () => {
         try {
           const mediaData = await getProjectMedia(activeProject.id);
           const imageFile = mediaData.files.find((file) => file.path.includes(filename));
-          if (imageFile) {
-            setCurrentImageFile(imageFile);
-          }
+          setCurrentImageFile(imageFile || null);
         } catch (error) {
           console.error("Error fetching image metadata:", error);
+          setCurrentImageFile(null);
         }
       };
-
       fetchImageData();
     } else {
       setCurrentImageFile(null);
     }
-    prevValueRef.current = value; // Update previous value ref
   }, [value, activeProject]);
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
-    if (!file) return;
-    if (!activeProject) {
-      showToast("No active project selected.", "error");
-      return;
-    }
+    if (!file || !activeProject) return;
 
     setUploading(true);
     try {
       const result = await uploadProjectMedia(activeProject.id, [file]);
+      const { processedFiles, rejectedFiles, error } = result;
 
-      const processed = result.processedFiles || [];
-      const rejected = result.rejectedFiles || [];
-
-      console.log("ImageInput Upload Result:", result);
-
-      if (processed.length > 0) {
-        const uploadedFile = processed[0];
-        onChange(uploadedFile.path);
-        setCurrentImageFile(uploadedFile);
+      if (processedFiles?.length > 0) {
+        onChange(processedFiles[0].path);
         showToast("Image uploaded successfully.", "success");
-      } else if (rejected.length > 0) {
-        const rejectionReason = rejected[0].reason || "Image rejected by server.";
-        showToast(rejectionReason, "error");
-        console.error("Rejected file:", rejected[0]);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-      } else if (result.status >= 400 && result.error) {
-        showToast(result.error, "error");
-        console.error("Upload Error from Backend:", result);
-      } else if (result.status >= 400) {
-        showToast("Upload failed with an unknown server error.", "error");
-        console.error("Unknown Upload Error:", result);
+      } else if (rejectedFiles?.length > 0) {
+        showToast(rejectedFiles[0].reason || "Image rejected by server.", "error");
+      } else if (error) {
+        showToast(error, "error");
       } else {
         showToast("Upload failed unexpectedly.", "error");
-        console.error("Unexpected Upload Result structure:", result);
       }
-    } catch (error) {
-      showToast(error?.message || "Upload failed due to a network or client error.", "error");
-      console.error("Upload Client/Network Error:", error);
+    } catch (err) {
+      showToast(err?.message || "Upload failed.", "error");
     } finally {
       setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
-  const handleRemove = () => {
-    onChange("");
-    setCurrentImageFile(null);
-  };
-
-  const handleEditMetadata = () => {
-    if (currentImageFile) {
-      setMetadataDrawerVisible(true);
-    }
-  };
-
-  const handleCloseMetadataDrawer = () => {
-    setMetadataDrawerVisible(false);
-  };
+  const handleRemove = () => onChange("");
+  const handleEditMetadata = () => setMetadataDrawerVisible(true);
+  const handleOpenMediaSelector = () => setSelectorDrawerVisible(true);
 
   const handleSaveMetadata = async (fileId, metadata) => {
     setIsSavingMetadata(true);
     try {
       const response = await fetch(API_URL(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata`), {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(metadata),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update metadata");
-      }
+      if (!response.ok) throw new Error("Failed to update metadata");
 
       const updatedFileData = await response.json();
-      setCurrentImageFile((prev) => ({
-        ...prev,
-        metadata: updatedFileData.file.metadata,
-      }));
-
+      setCurrentImageFile((prev) => ({ ...prev, metadata: updatedFileData.file.metadata }));
       setMetadataDrawerVisible(false);
       showToast("Metadata updated.", "success");
-    } catch (error) {
-      console.error("Error updating metadata:", error);
-      showToast(error.message || "Failed to save metadata", "error");
+    } catch (err) {
+      showToast(err.message || "Failed to save metadata", "error");
     } finally {
       setIsSavingMetadata(false);
     }
   };
 
-  const handleOpenMediaSelector = () => {
-    setSelectorDrawerVisible(true);
-  };
-
-  const handleCloseMediaSelector = () => {
-    setSelectorDrawerVisible(false);
-  };
-
   const handleSelectMedia = (selectedFile) => {
     if (selectedFile) {
       onChange(selectedFile.path);
-      setCurrentImageFile(selectedFile);
       setSelectorDrawerVisible(false);
     }
   };
 
   return (
-    <SettingsField id={id} label={label} description={description} error={error}>
-      <div className="space-y-2">
-        {value && currentImageFile && (
-          <div className="relative w-full h-32 bg-slate-100 rounded flex items-center justify-center group">
-            <img
-              src={API_URL(`/api/media/projects/${activeProject.id}${currentImageFile.path}`)}
-              alt={currentImageFile.metadata?.alt || ""}
-              className="max-w-full max-h-full object-contain"
-            />
-            <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={handleEditMetadata}
-                className="p-1 bg-white rounded-full shadow hover:bg-blue-50"
-                title="Edit image metadata"
-                disabled={!currentImageFile}
-              >
-                <Edit size={16} className="text-blue-500" />
-              </button>
-              <button
-                onClick={handleRemove}
-                className="p-1 bg-white rounded-full shadow hover:bg-red-50"
-                title="Remove image"
-              >
-                <X size={16} className="text-red-500" />
-              </button>
-            </div>
+    <div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        id={id}
+        accept="image/*"
+        onChange={handleFileChange}
+        disabled={uploading}
+        className="hidden"
+      />
+      {value && currentImageFile ? (
+        <div className="relative w-full aspect-video bg-slate-100 rounded-md flex items-center justify-center group overflow-hidden">
+          <img
+            src={API_URL(`/api/media/projects/${activeProject.id}${currentImageFile.path}`)}
+            alt={currentImageFile.metadata?.alt || "Preview"}
+            className="max-w-full max-h-full object-contain"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button variant="icon" size="sm" onClick={handleEditMetadata} title="Edit metadata">
+              <Edit size={16} />
+            </Button>
+            <Button variant="icon" size="sm" onClick={handleRemove} title="Remove image">
+              <X size={16} />
+            </Button>
           </div>
-        )}
-        {value && !currentImageFile && !uploading && (
-          <div className="w-full h-32 bg-slate-100 rounded flex items-center justify-center text-slate-400 text-xs">
-            Loading image data...
-          </div>
-        )}
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          id={id}
-          accept="image/*"
-          onChange={handleFileChange}
-          disabled={uploading}
-          className="hidden"
-        />
-
-        <div className="flex space-x-2">
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="flex-1 px-3 py-2 border border-slate-300 rounded-sm text-sm hover:bg-slate-50"
-          >
-            {uploading ? "Uploading..." : value ? "Replace Image" : "Upload Image"}
-          </button>
-
-          <button
-            onClick={handleOpenMediaSelector}
-            disabled={uploading}
-            className="flex-1 px-3 py-2 border border-slate-300 rounded-sm text-sm hover:bg-slate-50"
-          >
-            Browse Media
-          </button>
         </div>
+      ) : (
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          className="w-full aspect-video bg-slate-50 rounded-md border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors"
+        >
+          <UploadCloud size={32} />
+          <p className="mt-2 text-sm font-semibold">Click to upload</p>
+          <p className="text-xs">PNG, JPG, GIF up to 10MB</p>
+        </div>
+      )}
+
+      <div className="flex items-center gap-2 mt-2">
+        <Button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="flex-1">
+          {uploading ? "Uploading..." : value ? "Replace" : "Upload"}
+        </Button>
+        <Button onClick={handleOpenMediaSelector} disabled={uploading} variant="secondary" className="flex-1">
+          Browse
+        </Button>
       </div>
 
       {metadataDrawerVisible && currentImageFile && (
         <MediaDrawer
           visible={metadataDrawerVisible}
-          onClose={handleCloseMetadataDrawer}
+          onClose={() => setMetadataDrawerVisible(false)}
           selectedFile={currentImageFile}
           onSave={handleSaveMetadata}
           loading={isSavingMetadata}
@@ -237,11 +161,11 @@ export default function ImageInput({ id, label, value = "", onChange, descriptio
       {selectorDrawerVisible && (
         <MediaSelectorDrawer
           visible={selectorDrawerVisible}
-          onClose={handleCloseMediaSelector}
+          onClose={() => setSelectorDrawerVisible(false)}
           onSelect={handleSelectMedia}
           activeProject={activeProject}
         />
       )}
-    </SettingsField>
+    </div>
   );
 }

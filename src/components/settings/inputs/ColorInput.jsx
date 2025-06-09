@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { HexColorPicker, HexColorInput } from "react-colorful";
-import SettingsField from "../SettingsField";
+import { HexColorPicker } from "react-colorful";
 
 /**
  * ColorInput component
  * Renders a color picker with hex input and popover
  */
-export default function ColorInput({ id, label, value = "#000000", onChange, description, error }) {
+export default function ColorInput({ id, value = "#000000", onChange }) {
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef(null);
 
@@ -21,33 +20,42 @@ export default function ColorInput({ id, label, value = "#000000", onChange, des
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleColorChange = (newValue) => {
+    if (newValue.startsWith("#")) {
+      onChange(newValue);
+    } else {
+      onChange(`#${newValue}`);
+    }
+  };
+
   return (
-    <SettingsField id={id} label={label} description={description} error={error}>
-      <div className="relative" ref={popoverRef}>
-        <div className="flex items-center">
-          <button
-            type="button"
-            onClick={() => setIsOpen(!isOpen)}
-            className="w-7.5 h-7.5 rounded border border-slate-300"
-            style={{ backgroundColor: value }}
-          />
+    <div className="relative" ref={popoverRef}>
+      <div className="flex items-center gap-2">
+        <button
+          id={id}
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-8 h-8 rounded-md border border-slate-300 shrink-0"
+          style={{ backgroundColor: value }}
+        />
+        <div className="relative w-full">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">#</span>
           <input
             type="text"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="ml-2 px-3 py-1 border border-slate-300 rounded-sm text-sm w-32"
+            value={value.startsWith("#") ? value.substring(1) : value}
+            onChange={(e) => handleColorChange(e.target.value)}
+            className="form-input pl-7"
           />
         </div>
-
-        {isOpen && (
-          <div className="absolute z-10 mt-2">
-            <div className="bg-white rounded-lg shadow-lg p-4 border border-slate-200">
-              <HexColorPicker color={value} onChange={onChange} />
-              <HexColorInput color={value} onChange={onChange} />
-            </div>
-          </div>
-        )}
       </div>
-    </SettingsField>
+
+      {isOpen && (
+        <div className="absolute z-10 mt-2 right-0">
+          <div className="bg-white rounded-lg shadow-lg p-3 border border-slate-200">
+            <HexColorPicker color={value} onChange={onChange} />
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

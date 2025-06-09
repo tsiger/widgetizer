@@ -1,17 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-import {
-  TextInput,
-  TextareaInput,
-  ColorInput,
-  RangeInput,
-  SelectInput,
-  CheckboxInput,
-  RadioInput,
-  FontPickerInput,
-  MenuSelectInput,
-  ImageInput,
-  SettingsField,
-} from "../settings";
+import { SettingsRenderer } from "../settings";
 
 export default function SettingsPanel({
   selectedWidget,
@@ -41,47 +29,17 @@ export default function SettingsPanel({
     );
   }
 
-  // Render the appropriate input component based on setting type
-  const renderInput = (setting, value, onChange) => {
-    const { type, id, options, min, max, step, label, description } = setting;
-
-    switch (type) {
-      case "text":
-        return <TextInput value={value || ""} onChange={(e) => onChange(id, e)} />;
-      case "textarea":
-        return <TextareaInput value={value || ""} onChange={(e) => onChange(id, e)} />;
-      case "color":
-        return <ColorInput value={value || ""} onChange={(color) => onChange(id, color)} />;
-      case "range":
-        return <RangeInput value={value || 0} min={min} max={max} step={step} onChange={(val) => onChange(id, val)} />;
-      case "select":
-        return <SelectInput value={value || ""} options={options} onChange={(val) => onChange(id, val)} />;
-      case "checkbox":
-        return (
-          <CheckboxInput
-            id={id}
-            label={label}
-            description={description}
-            value={!!value}
-            onChange={(checked) => onChange(id, checked)}
-          />
-        );
-      case "radio":
-        return <RadioInput value={value || ""} options={options} onChange={(val) => onChange(id, val)} />;
-      case "font_picker":
-        return <FontPickerInput value={value} onChange={(fontObject) => onChange(id, fontObject)} />;
-      case "image":
-        return <ImageInput value={value || ""} onChange={(val) => onChange(id, val)} />;
-      case "menu":
-        return <MenuSelectInput value={value || ""} onChange={(val) => onChange(id, val)} />;
-      default:
-        return <div>Unsupported setting type: {type}</div>;
+  const handleSettingChange = (settingId, value) => {
+    if (selectedBlockId) {
+      onBlockSettingChange(selectedWidgetId, selectedBlockId, settingId, value);
+    } else {
+      onSettingChange(selectedWidgetId, settingId, value);
     }
   };
 
   return (
     <div className="w-72 bg-white border-l border-slate-200 flex flex-col h-full">
-      <div className="p-3 flex-1 overflow-y-auto">
+      <div className="p-4 flex-1 overflow-y-auto">
         <div className="font-bold mb-4 sticky top-0 bg-white pb-2 border-b border-slate-100 z-10">
           {selectedBlockId ? (
             <div className="flex items-center gap-2">
@@ -96,23 +54,14 @@ export default function SettingsPanel({
         </div>
 
         <div className="space-y-6">
-          {settings?.map((setting) => {
-            const value = currentValues?.[setting.id] !== undefined ? currentValues[setting.id] : setting.default;
-
-            return (
-              <div key={setting.id}>
-                <SettingsField label={setting.label} description={setting.description} type={setting.type}>
-                  {renderInput(setting, value, (settingId, value) => {
-                    if (selectedBlockId) {
-                      onBlockSettingChange(selectedWidgetId, selectedBlockId, settingId, value);
-                    } else {
-                      onSettingChange(selectedWidgetId, settingId, value);
-                    }
-                  })}
-                </SettingsField>
-              </div>
-            );
-          })}
+          {settings?.map((setting) => (
+            <SettingsRenderer
+              key={setting.id}
+              setting={setting}
+              value={currentValues?.[setting.id]}
+              onChange={handleSettingChange}
+            />
+          ))}
         </div>
       </div>
     </div>

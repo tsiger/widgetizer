@@ -6,9 +6,17 @@ import SettingsRenderer from "./SettingsRenderer";
  */
 export default function SettingsGroup({ title, settings = [], values = {}, onChange, errors = {} }) {
   return (
-    <div className="mb-6">
-      {title && <h3 className="text-lg font-medium text-slate-800 mb-4">{title}</h3>}
-      <SettingsRenderer settings={settings} values={values} onChange={onChange} errors={errors} />
+    <div className="space-y-6">
+      {title && <h3 className="text-lg font-medium text-slate-800">{title}</h3>}
+      {settings.map((setting) => (
+        <SettingsRenderer
+          key={setting.id}
+          setting={setting}
+          value={values[setting.id]}
+          onChange={onChange}
+          error={errors[setting.id]}
+        />
+      ))}
     </div>
   );
 }

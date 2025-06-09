@@ -4,10 +4,14 @@ import { forwardRef } from "react";
  * Form field wrapper component that provides consistent layout,
  * labels, error states, and help text
  */
-export default function FormField({ label, error, help, required = false, className = "", children, ...props }) {
+export default function FormField({ id, label, error, help, required = false, className = "", children, ...props }) {
   return (
     <div className={`form-field ${className}`} {...props}>
-      {label && <label className={`form-label ${required ? "form-label-required" : ""}`}>{label}</label>}
+      {label && (
+        <label htmlFor={id} className={`form-label ${required ? "form-label-required" : ""}`}>
+          {label}
+        </label>
+      )}
       {children}
       {error && (
         <p className="form-error" role="alert">
