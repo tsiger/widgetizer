@@ -11,6 +11,9 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
 - **Location**: Uploaded files are physically stored on the server's filesystem at `/data/projects/<projectId>/uploads/images/`.
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
 - **Thumbnails**: For image files (excluding SVGs), the system automatically generates a small thumbnail to ensure fast previews in the UI. These are stored alongside the originals with a `thumb_` prefix (e.g., `thumb_my-awesome-picture.jpg`).
+- **Location**: Uploaded files are stored in `/data/projects/<projectId>/uploads/images/`.
+- **File Naming**: Original filenames are "slugified" for web safety (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). A counter is appended if the name exists (e.g., `my-awesome-picture-1.jpg`).
+- **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). This means you can upload a large image, and the system will handle the optimization. The generated sizes are stored alongside the original with prefixes (e.g., `thumb_`, `small_`, `medium_`, `large_`).
 
 ### Metadata Storage
 
@@ -36,7 +39,13 @@ All metadata for the files in a project's media library is stored in a single JS
       },
       "width": 1920,
       "height": 1080,
-      "thumbnail": "/uploads/images/thumb_my-awesome-picture.jpg"
+      "thumbnail": "/uploads/images/thumb_my-awesome-picture.jpg",
+      "sizes": {
+        "thumb": { "path": "/uploads/images/thumb_my-awesome-picture.jpg", "width": 150, "height": 113 },
+        "small": { "path": "/uploads/images/small_my-awesome-picture.jpg", "width": 480, "height": 360 },
+        "medium": { "path": "/uploads/images/medium_my-awesome-picture.jpg", "width": 1024, "height": 768 },
+        "large": { "path": "/uploads/images/large_my-awesome-picture.jpg", "width": 1920, "height": 1440 }
+      }
     }
   ]
 }
@@ -99,14 +108,16 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
   1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (`/data/projects/<projectId>/uploads/images/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (e.g., `image/jpeg`).
   2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the `media.maxFileSizeMB` setting.
   3.  For each valid file, it generates a unique ID (`uuidv4`).
-  4.  If the file is an image, it uses the `sharp` library to read its dimensions (`width`, `height`) and generate a thumbnail.
-  5.  It creates a new metadata object for the file and adds it to the `files` array in `media.json`.
+  4.  If the file is an image (not an SVG), it uses the `sharp` library to:
+      - Read the original `width` and `height`.
+      - Generate multiple optimized sizes (`thumb`, `small`, `medium`, `large`).
+  5.  It creates a new metadata object for the file—including a `sizes` object containing the paths and dimensions for each new variant—and adds it to the `files` array in `media.json`.
   6.  Files that are too large or have the wrong type are rejected and immediately deleted from the server.
   7.  It returns a JSON response to the client with arrays of successfully processed and rejected files.
 - **Deletion Logic (`deleteProjectMedia`, `bulkDeleteProjectMedia`)**:
   1.  The controller reads `media.json`.
   2.  It finds the file entry (or entries) by ID.
-  3.  It uses `fs.remove` to delete the physical file(s) and their corresponding thumbnail(s) from the filesystem.
+  3.  It uses `fs.remove` to delete the original physical file and **all** of its generated sizes from the filesystem.
   4.  It removes the metadata object(s) from the `files` array.
   5.  It overwrites `media.json` with the updated data.
 - **Metadata Update (`updateMediaMetadata`)**:

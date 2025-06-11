@@ -68,19 +68,7 @@
 		{% endif %}
 
 		{% if widget.settings.widgetImage != blank %}
-			{% assign widgetImageFilename = widget.settings.widgetImage | split: '/' | last %}
-			{% assign widgetImageData = mediaMetadata[widgetImageFilename] %}
-			<img
-				src="{{ imagePath }}/{{ widgetImageFilename }}"
-				class="basic-text__widget-image"
-
-				{% if widgetImageData %}
-					alt="{{ widgetImageData.alt }}"
-					title="{{ widgetImageData.title }}"
-					width="{{ widgetImageData.width }}"
-					height="{{ widgetImageData.height }}"
-				{% endif %}
-			>
+			{{ widget.settings.widgetImage | image: size: 'medium', class: 'basic-text__widget-image' }}
 		{% endif %}
 
 		{% if widget.settings.heading != blank %}
@@ -111,18 +99,7 @@
 							<h4>Content Block Type</h4>
 							<h3 class="basic-text__block-title">{{ block.settings.title }}</h3>
 							{% if block.settings.blockImage != blank %}
-								{% assign blockImageFilename = block.settings.blockImage | split: '/' | last %}
-								{% assign blockImageData = mediaMetadata[blockImageFilename] %}
-								<img
-									src="{{ imagePath }}/{{ blockImageFilename }}"
-									class="basic-text__block-image"
-									{% if blockImageData %}
-										alt="{{ blockImageData.alt }}"
-										title="{{ blockImageData.title }}"
-										width="{{ blockImageData.width }}"
-										height="{{ blockImageData.height }}"
-									{% endif %}
-								>
+								{{ block.settings.blockImage | image: size: 'small', class: 'basic-text__block-image' }}
 							{% endif %}
 							<div class="basic-text__block-content">
 								{{ block.settings.content }}
@@ -133,13 +110,7 @@
 							<h4>Other Block Type</h4>
 							<h3 class="basic-text__block-title" style="font-style: italic;">{{ block.settings.title }}</h3>
 							{% if block.settings.blockImage != blank %}
-								{% assign blockImageFilename = block.settings.blockImage | split: '/' | last %}
-								{% assign blockImageData = mediaMetadata[blockImageFilename] %}
-								<img
-									src="{{ imagePath }}/{{ blockImageFilename }}"
-									class="basic-text__block-image small-image"
-									{% if blockImageData %} alt="{{ blockImageData.alt }}" title="{{ blockImageData.title }}" width="{{ blockImageData.width | divided_by: 2 }}" height="{{ blockImageData.height | divided_by: 2 }}" {% endif %}
-								>
+								{{ block.settings.blockImage | image: size: 'small', class: 'basic-text__block-image small-image' }}
 							{% endif %}
 
 						{% else %}

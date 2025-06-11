@@ -143,7 +143,41 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 - `{{ content }}`: The insertion point for page content
 - `{{ body_class }}`: Dynamic CSS classes for the body element
 
-## 4. Widgets
+## 4. Liquid Filters
+
+Widgetizer provides powerful Liquid filters to simplify common tasks.
+
+### `image`
+
+The `image` filter is the recommended way to render images in your theme. It automatically handles generating the correct `src` for different image sizes, adds important attributes like `width`, `height`, and `alt`, and enables lazy loading by default.
+
+It takes the image filename (or path) as input and an optional object of parameters.
+
+#### Basic Usage
+
+```liquid
+{{ widget.settings.myImage | image }}
+```
+
+This will render a medium-sized, lazy-loaded `<img>` tag with the alt text from the media library.
+
+#### Advanced Usage with Options
+
+```liquid
+{{ widget.settings.myImage | image: size: 'large', class: 'hero-image', lazy: false, alt: 'Custom alt text' }}
+```
+
+#### Available Options
+
+| Option | Type | Default | Description |
+| :-- | :-- | :-- | :-- |
+| `size` | String | `'medium'` | Specifies which image size to render. Available sizes are `thumb`, `small`, `medium`, `large`. If the size doesn't exist for an image, it gracefully falls back to the original uploaded file. |
+| `class` | String | `''` | Adds a CSS class to the `<img>` tag. |
+| `lazy` | Boolean | `true` | If true, adds the `loading="lazy"` attribute to the `<img>` tag for better performance. |
+| `alt` | String | (from media) | Overrides the alt text defined in the media library. If not provided, the value from the media library is used. |
+| `title` | String | (from media) | Overrides the title text defined in the media library. If not provided, the value from the media library is used. The attribute is omitted if no title is set in the options or in the media library. |
+
+## 5. Widgets
 
 Widgets are reusable components that can be added to pages. Each widget is a self-contained Liquid template with embedded configuration schema.
 
@@ -218,7 +252,7 @@ Global widgets are special widgets that appear on every page of the website. Cur
 
 **Important:** Currently, header and footer are the only supported global widget types. Each global widget requires both a Liquid template in `widgets/global/` and a corresponding JSON configuration in `templates/global/`.
 
-## 5. Templates
+## 6. Templates
 
 Templates define the structure and default content for different page types.
 
@@ -264,7 +298,7 @@ Global templates define default instances of global widgets:
 }
 ```
 
-## 6. Navigation Menus
+## 7. Navigation Menus
 
 Menus are defined as JSON files in the `/menus/` directory and support nested navigation.
 
@@ -328,7 +362,7 @@ Use the `{% render 'menu' %}` tag with custom CSS classes to render navigation m
 
 The menu snippet automatically adds the `class_has_submenu` class to items that have child items, allowing you to style dropdown indicators and submenu behaviors.
 
-## 7. Assets Management
+## 8. Assets Management
 
 ### CSS Files
 
@@ -370,7 +404,7 @@ When exporting a project to static HTML:
 - **Uploaded Images**: All images from `/uploads/images/` are copied to maintain relative paths
 - **Path Optimization**: Asset paths are converted to relative URLs for optimal static hosting
 
-## 8. Advanced Features
+## 9. Advanced Features
 
 ### Responsive Design
 
@@ -410,7 +444,7 @@ Automatic font loading and optimization:
 - `{% fonts_stylesheet %}`: Optimized font CSS inclusion
 - Support for Google Fonts, Adobe Fonts, and custom fonts
 
-## 9. Best Practices
+## 10. Best Practices
 
 ### Performance
 
@@ -441,7 +475,7 @@ Automatic font loading and optimization:
 - Use descriptive labels and help text
 - Consider mobile-first responsive design
 
-## 10. Theme Development Workflow
+## 11. Theme Development Workflow
 
 1. **Setup**: Create the basic theme structure and `theme.json`
 2. **Layout**: Build the main `layout.liquid` template

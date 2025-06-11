@@ -13,6 +13,7 @@ import { AssetTag } from "../../src/core/tags/assetTag.js";
 import { FontsPreconnectTag } from "../../src/core/tags/FontsPreconnectTag.js";
 import { FontsStylesheetTag } from "../../src/core/tags/FontsStylesheetTag.js";
 import { SeoTag } from "../../src/core/tags/SeoTag.js";
+import { registerImageFilter } from "../../src/core/filters/imageFilter.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 
 // Get the directory path of the current module
@@ -37,6 +38,9 @@ engine.registerTag("fonts_preconnect", FontsPreconnectTag);
 engine.registerTag("fonts_stylesheet", FontsStylesheetTag);
 engine.registerTag("seo", SeoTag);
 
+// Register custom filters
+registerImageFilter(engine);
+
 /**
  * Creates base render context with common properties
  */
@@ -59,19 +63,14 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   const imageBasePath =
     renderMode === "publish" ? "uploads/images" : `${apiUrl}/api/media/projects/${projectId}/uploads/images`;
 
-  // Load media metadata
-  let mediaMetadata = {};
+  // Load media metadata and create a useful map
+  let mediaFiles = {};
   try {
     const mediaData = await readMediaFile(projectId);
     if (mediaData && Array.isArray(mediaData.files)) {
       mediaData.files.forEach((file) => {
         if (file.filename) {
-          mediaMetadata[file.filename] = {
-            width: file.width,
-            height: file.height,
-            alt: file.metadata?.alt || "",
-            title: file.metadata?.title || "",
-          };
+          mediaFiles[file.filename] = file;
         }
       });
     }
@@ -82,7 +81,7 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   // Return the base context
   return {
     theme: processedThemeSettings,
-    mediaMetadata,
+    mediaFiles,
     globals: {
       projectId,
       apiUrl,
@@ -253,8 +252,8 @@ async function renderPageLayout(projectId, pageContent, pageData, rawThemeSettin
     const renderedHtml = await engine.parseAndRender(layoutTemplate, renderContext, { globals: renderContext.globals });
     return renderedHtml;
   } catch (error) {
-    console.error(`Error rendering page layout (Project: ${projectId}):`, error);
-    return `<html><body><h1>Error rendering layout</h1><pre>${error.message}\n${error.stack}</pre></body></html>`;
+    console.error(`Error rendering page layout for project ${projectId}:`, error);
+    return `<html><body><h1>Error rendering page</h1><pre>${error.message}</pre></body></html>`;
   }
 }
 

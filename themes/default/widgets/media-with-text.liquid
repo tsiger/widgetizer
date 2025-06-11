@@ -75,22 +75,10 @@
 		class="media-with-text__container media-with-text__container--image-{{ widget.settings.imagePosition | default: 'left' }}"
 	>
 		<div class="media-with-text__image-area">
-			{% comment %} Placeholder for image - Add image setting later {% endcomment %}
 			{% if widget.settings.widgetImage != blank %}
-				{% assign widgetImageFilename = widget.settings.widgetImage | split: '/' | last %}
-				{% assign widgetImageData = mediaMetadata[widgetImageFilename] %}
-				<img
-					src="{{ imagePath }}/{{ widgetImageFilename }}"
-					class="media-with-text__image"
-					{% if widgetImageData %}
-						alt="{{ widgetImageData.alt | default: 'Media image' }}"
-						title="{{ widgetImageData.title }}"
-						width="{{ widgetImageData.width }}"
-						height="{{ widgetImageData.height }}"
-					{% endif %}
-				>
+				{{ widget.settings.widgetImage | image: size: 'large', class: 'media-with-text__image' }}
 			{% else %}
-				<img src="https://placehold.co/600x400?text=Hello+World" alt="Placeholder Image" class="media-with-text__image">
+				<img src="https://placehold.co/600x400?text=Select+an+Image" alt="Placeholder Image" class="media-with-text__image">
 			{% endif %}
 		</div>
 

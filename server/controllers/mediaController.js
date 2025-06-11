@@ -8,7 +8,13 @@ import slugify from "slugify";
 import { getProjectDir, getProjectImagesDir, getProjectMediaJsonPath, getImagePath } from "../config.js";
 import { getSetting } from "./appSettingsController.js";
 
-const THUMBNAIL_SIZE = 200;
+const IMAGE_SIZES = {
+  thumb: { width: 150, quality: 90 },
+  small: { width: 480, quality: 85 },
+  medium: { width: 1024, quality: 85 },
+  large: { width: 1920, quality: 85 },
+};
+
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
 
 // Decode the filename TODO: Where should things like this live?
@@ -168,23 +174,39 @@ export async function uploadProjectMedia(req, res) {
         uploaded: new Date().toISOString(),
         path: `/uploads/images/${file.filename}`,
         metadata: { alt: "", title: "" },
+        sizes: {}, // Initialize sizes object
         // usedIn: [] // If using the previous usedIn tracking
       };
 
       // Process image files (thumbnails, dimensions etc.)
       if (file.mimetype !== "image/svg+xml") {
         try {
-          const imgMetadata = await sharp(file.path).metadata();
+          const image = sharp(file.path);
+          const imgMetadata = await image.metadata();
           fileInfo.width = imgMetadata.width;
           fileInfo.height = imgMetadata.height;
 
-          // Generate thumbnail
-          const thumbnailFilename = `thumb_${file.filename}`;
-          const thumbnailPath = path.join(path.dirname(file.path), thumbnailFilename);
-          await sharp(file.path)
-            .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, { fit: "inside", withoutEnlargement: true })
-            .toFile(thumbnailPath);
-          fileInfo.thumbnail = `/uploads/images/${thumbnailFilename}`;
+          // Generate different sizes
+          for (const [name, config] of Object.entries(IMAGE_SIZES)) {
+            const sizeFilename = `${name}_${file.filename}`;
+            const sizeFilePath = path.join(path.dirname(file.path), sizeFilename);
+            const resized = await image
+              .clone() // Clone from the original sharp instance
+              .resize(config.width, null, { fit: "inside", withoutEnlargement: true })
+              .jpeg({ quality: config.quality })
+              .toFile(sizeFilePath);
+
+            fileInfo.sizes[name] = {
+              path: `/uploads/images/${sizeFilename}`,
+              width: resized.width,
+              height: resized.height,
+            };
+          }
+
+          // For consistency, alias the 'thumb' size to the top-level 'thumbnail' property
+          if (fileInfo.sizes.thumb) {
+            fileInfo.thumbnail = fileInfo.sizes.thumb.path;
+          }
         } catch (err) {
           console.error(`Error processing image ${file.filename}:`, err);
           fileInfo.processingError = err.message;
@@ -275,22 +297,38 @@ export async function deleteProjectMedia(req, res) {
 
     const fileToDelete = mediaData.files[fileIndex];
 
-    // Delete the actual file
-    const filePath = getImagePath(projectId, fileToDelete.filename);
-    await fs.unlink(filePath);
+    // Remove the physical files from storage
+    const imagesDir = getProjectImagesDir(projectId);
 
-    // Delete thumbnail if it exists
-    if (fileToDelete.thumbnail) {
-      const thumbnailPath = getImagePath(projectId, path.basename(fileToDelete.thumbnail));
-      try {
-        await fs.unlink(thumbnailPath);
-      } catch (err) {
-        // Ignore errors if thumbnail doesn't exist
-        console.warn(`Thumbnail not found for deletion: ${thumbnailPath}`);
+    // 1. Delete the original file
+    const originalFilePath = path.join(imagesDir, fileToDelete.filename);
+    try {
+      if (await fs.pathExists(originalFilePath)) {
+        await fs.unlink(originalFilePath);
+      }
+    } catch (err) {
+      console.warn(`Could not delete original file ${originalFilePath}: ${err.message}`);
+    }
+
+    // 2. Delete all generated sizes
+    if (fileToDelete.sizes) {
+      for (const sizeName in fileToDelete.sizes) {
+        const size = fileToDelete.sizes[sizeName];
+        if (size && size.path) {
+          const sizeFilename = path.basename(size.path);
+          const sizeFilePath = path.join(imagesDir, sizeFilename);
+          try {
+            if (await fs.pathExists(sizeFilePath)) {
+              await fs.unlink(sizeFilePath);
+            }
+          } catch (err) {
+            console.warn(`Could not delete sized file ${sizeFilePath}: ${err.message}`);
+          }
+        }
       }
     }
 
-    // Remove from metadata
+    // Remove metadata entry
     mediaData.files.splice(fileIndex, 1);
     await writeMediaFile(projectId, mediaData);
 
@@ -364,68 +402,70 @@ export async function serveProjectMedia(req, res) {
 export async function bulkDeleteProjectMedia(req, res) {
   try {
     const { projectId } = req.params;
-    const { fileIds } = req.body;
+    const { fileIds } = req.body; // Expect an array of file IDs
 
     if (!Array.isArray(fileIds) || fileIds.length === 0) {
-      return res.status(400).json({ error: "No files specified for deletion" });
+      return res.status(400).json({ error: "fileIds must be a non-empty array" });
     }
 
-    // Read media metadata once
     const mediaData = await readMediaFile(projectId);
+    const imagesDir = getProjectImagesDir(projectId);
+    const filesToDelete = [];
+    const remainingFiles = [];
 
-    // Track successfully deleted files
-    const deletedFiles = [];
-    const errors = [];
+    // Separate files to delete from files to keep
+    mediaData.files.forEach((file) => {
+      if (fileIds.includes(file.id)) {
+        filesToDelete.push(file);
+      } else {
+        remainingFiles.push(file);
+      }
+    });
 
-    // Process each file
-    for (const fileId of fileIds) {
+    if (filesToDelete.length === 0) {
+      return res.status(404).json({ error: "No matching files found to delete" });
+    }
+
+    // Asynchronously delete all associated physical files
+    const deletePromises = filesToDelete.map(async (file) => {
+      // 1. Delete the original file
+      const originalFilePath = path.join(imagesDir, file.filename);
       try {
-        // Find the file to delete
-        const fileIndex = mediaData.files.findIndex((file) => file.id === fileId);
-        if (fileIndex === -1) continue; // Skip if not found
-
-        const fileToDelete = mediaData.files[fileIndex];
-
-        // Delete the actual file
-        const filePath = getImagePath(projectId, fileToDelete.filename);
-        await fs.unlink(filePath);
-
-        // Delete thumbnail if it exists
-        if (fileToDelete.thumbnail) {
-          const thumbnailPath = getImagePath(projectId, path.basename(fileToDelete.thumbnail));
-          try {
-            await fs.unlink(thumbnailPath);
-          } catch (err) {
-            // Ignore errors if thumbnail doesn't exist
-            console.warn(`Thumbnail not found for deletion: ${thumbnailPath}`);
+        if (await fs.pathExists(originalFilePath)) await fs.unlink(originalFilePath);
+      } catch (err) {
+        console.warn(`Could not delete original file ${originalFilePath}: ${err.message}`);
+      }
+      // 2. Delete all generated sizes
+      if (file.sizes) {
+        for (const sizeName in file.sizes) {
+          const size = file.sizes[sizeName];
+          if (size && size.path) {
+            const sizeFilename = path.basename(size.path);
+            const sizeFilePath = path.join(imagesDir, sizeFilename);
+            try {
+              if (await fs.pathExists(sizeFilePath)) await fs.unlink(sizeFilePath);
+            } catch (err) {
+              console.warn(`Could not delete sized file ${sizeFilePath}: ${err.message}`);
+            }
           }
         }
-
-        // Mark for removal from metadata
-        deletedFiles.push(fileIndex);
-      } catch (error) {
-        errors.push({ fileId, error: error.message });
       }
-    }
+    });
 
-    // Remove all successfully deleted files from metadata
-    // Remove from highest index to lowest to maintain correct indices
-    deletedFiles
-      .sort((a, b) => b - a)
-      .forEach((index) => {
-        mediaData.files.splice(index, 1);
-      });
+    await Promise.all(deletePromises);
 
-    // Save updated metadata
+    // Update the media.json with the remaining files
+    mediaData.files = remainingFiles;
     await writeMediaFile(projectId, mediaData);
 
-    res.json({
-      message: "Bulk delete completed",
-      deletedCount: deletedFiles.length,
-      errors: errors.length > 0 ? errors : undefined,
+    res.status(200).json({
+      message: `${filesToDelete.length} files have been deleted.`,
     });
   } catch (error) {
-    console.error("Error in bulk delete:", error);
-    res.status(500).json({ error: "Failed to delete files" });
+    console.error("Error during bulk media deletion:", error);
+    res.status(500).json({
+      error: "Failed to delete files.",
+      details: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    });
   }
 }
