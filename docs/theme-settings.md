@@ -188,3 +188,27 @@ A dropdown that is automatically populated with all available menus created in t
   "description": "Select the menu to display in the header."
 }
 ```
+
+### Link
+
+A compound control for creating links. This is useful for buttons, banners, or any call-to-action element. It allows the user to select an internal page or specify a custom URL. The value is an object containing the link's `href`, `text`, and `target`.
+
+- **`href`** (string): The URL for the link. This can be a relative path to an internal page or an absolute URL.
+- **`text`** (string): The display text for the link (e.g., "Learn More").
+- **`target`** (string): The link target, either `_self` to open in the same tab or `_blank` to open in a new tab.
+
+The UI for this setting type provides a choice between selecting from a list of existing pages or entering a custom URL, along with inputs for the link text and a toggle for the target.
+
+```json
+{
+  "id": "hero_button_link",
+  "type": "link",
+  "label": "Hero Button Link",
+  "default": {
+    "href": "#",
+    "text": "Click Here",
+    "target": "_self"
+  },
+  "description": "The primary call-to-action link in the hero section."
+}
+```
