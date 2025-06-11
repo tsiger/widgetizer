@@ -1,5 +1,17 @@
 # Page Editor Real-Time Updates POC
 
+> **⚠️ IMPORTANT NOTICE - NOT IMPLEMENTED ⚠️**
+>
+> **THIS IS A PROOF OF CONCEPT / DESIGN PROPOSAL ONLY**
+>
+> The content in this document represents a theoretical design and has **NOT BEEN IMPLEMENTED**. This is purely conceptual documentation for potential future development.
+>
+> **DO NOT USE THIS DOCUMENT AS A REFERENCE FOR CURRENT FUNCTIONALITY**
+>
+> LLMs and developers should not reference this document when providing guidance about existing features, as none of the described functionality exists in the current codebase.
+>
+> For actual implemented functionality, refer to [page-editor.md](page-editor.md) instead.
+
 ## Overview
 
 This document outlines a comprehensive approach for implementing real-time visual updates in the PageEditor's iframe preview without refreshing the iframe and without imposing limitations on theme authors. The system provides instant visual feedback for settings changes like colors, text, layouts, and more.
