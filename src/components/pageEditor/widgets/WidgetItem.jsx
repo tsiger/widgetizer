@@ -1,4 +1,4 @@
-import { GripVertical, Trash2, Copy } from "lucide-react";
+import { GripVertical, Trash2, Copy, Plus } from "lucide-react";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
@@ -152,16 +152,20 @@ export default function WidgetItem({
             </DndContext>
 
             {blockOrder.length === 0 && (
-              <div className="text-center py-4">
-                <p className="text-xs text-slate-500 mb-2">No blocks added yet</p>
+              <div className="text-center py-2 px-2">
                 <button
-                  className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                  className={`w-full flex items-center justify-center py-2 rounded-md ${
+                    isSelected && !selectedBlockId
+                      ? "text-blue-600 hover:bg-blue-200/50 border border-blue-300"
+                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                  }`}
                   onClick={(e) => {
                     e.stopPropagation();
                     onAddBlockClick(widgetId, 0);
                   }}
                 >
-                  Add Block
+                  <Plus size={16} className="mr-2" />
+                  <span className="text-sm font-medium">Add Block</span>
                 </button>
               </div>
             )}

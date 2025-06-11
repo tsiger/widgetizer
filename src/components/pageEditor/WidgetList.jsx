@@ -15,6 +15,7 @@ import {
 } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { useState } from "react";
+import { Plus } from "lucide-react";
 import WidgetInsertionZone from "./WidgetInsertionZone";
 import SortableWidgetItem from "./widgets/SortableWidgetItem";
 import FixedWidgetItem from "./widgets/FixedWidgetItem";
@@ -200,12 +201,12 @@ export default function WidgetList({
           </WidgetSection>
         ) : (
           <div className="text-center py-8 px-4 border border-dashed border-slate-300 rounded-md">
-            <p className="text-xs text-slate-500 mb-2">No content widgets added yet</p>
             <button
               onClick={() => onAddWidgetClick(0)}
-              className="px-3 py-1.5 bg-pink-600 text-white text-sm rounded-sm hover:bg-pink-700"
+              className="flex items-center justify-center w-full text-slate-500 hover:text-slate-700 hover:bg-slate-100 py-2 rounded-md"
             >
-              Add Widget
+              <Plus size={16} className="mr-2" />
+              <span className="text-sm font-medium">Add Widget</span>
             </button>
           </div>
         )}
