@@ -9,6 +9,7 @@ import {
   FontPickerInput,
   MenuSelectInput,
   ImageInput,
+  LinkInput,
 } from "./inputs";
 import SettingsField from "./SettingsField";
 
@@ -73,6 +74,8 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
         return <MenuSelectInput {...inputProps} />;
       case "image":
         return <ImageInput {...inputProps} />;
+      case "link":
+        return <LinkInput {...inputProps} />;
       default:
         return <div>Unsupported setting type: {type}</div>;
     }
