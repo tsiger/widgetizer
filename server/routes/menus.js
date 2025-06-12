@@ -15,6 +15,9 @@ router.post("/", menuController.createMenu);
 // Update a menu by id
 router.put("/:id", menuController.updateMenu);
 
+// Duplicate a menu by id
+router.post("/:id/duplicate", menuController.duplicateMenu);
+
 // Delete a menu by id
 router.delete("/:id", menuController.deleteMenu);
 

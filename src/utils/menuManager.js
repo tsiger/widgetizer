@@ -100,3 +100,27 @@ export async function updateMenu(id, menuData) {
     throw error;
   }
 }
+
+/**
+ * Duplicate a menu by id
+ */
+export async function duplicateMenu(id) {
+  try {
+    const response = await fetch(API_URL(`/api/menus/${id}/duplicate`), {
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to duplicate menu");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error duplicating menu:", error);
+    if (error.message && !error.message.includes("Failed to fetch")) {
+      throw error; // Re-throw with original message if it's our custom error
+    }
+    throw new Error("Failed to duplicate menu");
+  }
+}
