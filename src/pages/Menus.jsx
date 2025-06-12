@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, Trash2, Pencil, List, AlertCircle, CirclePlus } from "lucide-react";
+import { Menu, Trash2, Pencil, List, AlertCircle, CirclePlus, Copy } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -10,7 +10,7 @@ import { IconButton } from "../components/ui/Button";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import useConfirmationModal from "../hooks/useConfirmationModal";
 
-import { getAllMenus, deleteMenu } from "../utils/menuManager";
+import { getAllMenus, deleteMenu, duplicateMenu } from "../utils/menuManager";
 
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
@@ -48,6 +48,16 @@ export default function Menus() {
       showToast(`Menu "${data.name}" was deleted successfully`, "success");
     } catch (err) {
       showToast("Failed to delete menu", "error");
+    }
+  };
+
+  const handleDuplicate = async (menuId) => {
+    try {
+      const newMenu = await duplicateMenu(menuId);
+      setMenus([...menus, newMenu]);
+      showToast("Menu duplicated successfully", "success");
+    } catch (error) {
+      showToast("Failed to duplicate menu", "error");
     }
   };
 
@@ -122,6 +132,16 @@ export default function Menus() {
                       title="Edit Menu Settings"
                     >
                       <Pencil size={18} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip content="Duplicate menu">
+                    <IconButton
+                      onClick={() => handleDuplicate(menu.id)}
+                      variant="neutral"
+                      size="sm"
+                      title="Duplicate Menu"
+                    >
+                      <Copy size={18} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip content="Delete menu">

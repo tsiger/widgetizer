@@ -226,3 +226,68 @@ export async function getMenuById(projectIdOrDir, menuId) {
     return { items: [] };
   }
 }
+
+// Helper function to generate unique menu item IDs recursively
+function generateNewMenuItemIds(items) {
+  if (!Array.isArray(items)) return items;
+
+  return items.map((item) => {
+    const newItem = {
+      ...item,
+      id: `item_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    };
+
+    // Recursively handle nested items
+    if (item.items && Array.isArray(item.items)) {
+      newItem.items = generateNewMenuItemIds(item.items);
+    }
+
+    return newItem;
+  });
+}
+
+// Duplicate a menu
+export async function duplicateMenu(req, res) {
+  try {
+    const { id } = req.params;
+    const { activeProjectId } = await readProjectsFile();
+
+    if (!activeProjectId) {
+      return res.status(404).json({ error: "No active project found" });
+    }
+
+    const originalMenuPath = getMenuPath(activeProjectId, id);
+
+    // Check if original menu exists
+    if (!(await fs.pathExists(originalMenuPath))) {
+      return res.status(404).json({ error: "Menu not found" });
+    }
+
+    // Read the original menu
+    const originalMenuData = await fs.readFile(originalMenuPath, "utf8");
+    const originalMenu = JSON.parse(originalMenuData);
+
+    // Generate new unique name and ID
+    const baseName = `Copy of ${originalMenu.name}`;
+    const newMenuId = await generateUniqueMenuId(activeProjectId, baseName);
+
+    // Create the duplicated menu with new data
+    const duplicatedMenu = {
+      ...JSON.parse(JSON.stringify(originalMenu)), // Deep clone
+      id: newMenuId,
+      name: baseName,
+      items: generateNewMenuItemIds(originalMenu.items), // Generate new IDs for all items
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+    };
+
+    // Save the new menu
+    const newMenuPath = getMenuPath(activeProjectId, newMenuId);
+    await fs.outputFile(newMenuPath, JSON.stringify(duplicatedMenu, null, 2));
+
+    res.status(201).json(duplicatedMenu);
+  } catch (error) {
+    console.error("Error duplicating menu:", error);
+    res.status(500).json({ error: "Failed to duplicate menu" });
+  }
+}

@@ -57,7 +57,7 @@ The frontend for menu management is split across several React components, provi
 
 ### Key Components
 
-- `src/pages/Menus.jsx`: Displays a list of all created menus for the active project. From here, a user can navigate to add, edit, or delete a menu.
+- `src/pages/Menus.jsx`: Displays a list of all created menus for the active project. From here, a user can navigate to add, edit, duplicate, or delete a menu. The duplicate feature creates a complete copy of the menu with all nested items.
 - `src/pages/MenusAdd.jsx`: A page containing a form (`MenuForm.jsx`) to create a new menu by providing a name and description.
 - `src/pages/MenusEdit.jsx`: A page containing a form (`MenuForm.jsx`) to update an existing menu's name and description.
 - `src/pages/MenuStructure.jsx`: The core of the menu editing experience. It uses the `MenuEditor.jsx` component to provide a drag-and-drop interface for adding, editing, reordering, and nesting menu items.
@@ -70,6 +70,7 @@ This utility file handles all communication with the backend API endpoints for m
 - `getMenu(id)`: Fetches a single menu by its ID.
 - `createMenu(menuData)`: Creates a new menu file.
 - `updateMenu(id, menuData)`: Updates an entire menu object. This is used for both saving settings and the complex nested structure from the `MenuStructure` page.
+- `duplicateMenu(id)`: Creates a copy of an existing menu with a new unique ID and name.
 - `deleteMenu(id)`: Deletes a menu file.
 
 ## 3. Backend Implementation
@@ -80,13 +81,14 @@ The backend consists of an Express router and a controller that performs the fil
 
 This router maps HTTP requests to the appropriate controller functions.
 
-| Method   | Endpoint         | Controller Function | Description                          |
-| -------- | ---------------- | ------------------- | ------------------------------------ |
-| `GET`    | `/api/menus`     | `getAllMenus`       | Get all menus for the active project |
-| `GET`    | `/api/menus/:id` | `getMenu`           | Get a single menu by ID              |
-| `POST`   | `/api/menus`     | `createMenu`        | Create a new menu                    |
-| `PUT`    | `/api/menus/:id` | `updateMenu`        | Update an existing menu              |
-| `DELETE` | `/api/menus/:id` | `deleteMenu`        | Delete a menu                        |
+| Method   | Endpoint                   | Controller Function | Description                          |
+| -------- | -------------------------- | ------------------- | ------------------------------------ |
+| `GET`    | `/api/menus`               | `getAllMenus`       | Get all menus for the active project |
+| `GET`    | `/api/menus/:id`           | `getMenu`           | Get a single menu by ID              |
+| `POST`   | `/api/menus`               | `createMenu`        | Create a new menu                    |
+| `PUT`    | `/api/menus/:id`           | `updateMenu`        | Update an existing menu              |
+| `POST`   | `/api/menus/:id/duplicate` | `duplicateMenu`     | Create a copy of an existing menu    |
+| `DELETE` | `/api/menus/:id`           | `deleteMenu`        | Delete a menu                        |
 
 ### Controller Logic (`server/controllers/menuController.js`)
 
@@ -97,4 +99,10 @@ The controller handles the logic for interacting with the menu JSON files on the
 - **CRUD Logic**:
   - `createMenu`: Creates a new JSON file with a basic menu structure.
   - `updateMenu`: Overwrites an existing menu file with the new data sent from the client. This is used to save both simple changes (like the name) and complex structural changes to the `items` array.
+  - `duplicateMenu`: Creates a complete copy of an existing menu with:
+    - **New unique ID**: Generated using the existing `generateUniqueMenuId()` helper
+    - **New name**: Follows the pattern "Copy of {original-name}"
+    - **Deep cloning**: All menu data is completely duplicated
+    - **Unique item IDs**: All nested menu items get new unique IDs to prevent conflicts
+    - **Fresh timestamps**: New `created` and `updated` timestamps
   - `deleteMenu`: Removes the corresponding menu file from the `menus` directory.
