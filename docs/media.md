@@ -10,10 +10,22 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
 
 - **Location**: Uploaded files are physically stored on the server's filesystem at `/data/projects/<projectId>/uploads/images/`.
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
-- **Thumbnails**: For image files (excluding SVGs), the system automatically generates a small thumbnail to ensure fast previews in the UI. These are stored alongside the originals with a `thumb_` prefix (e.g., `thumb_my-awesome-picture.jpg`).
-- **Location**: Uploaded files are stored in `/data/projects/<projectId>/uploads/images/`.
-- **File Naming**: Original filenames are "slugified" for web safety (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). A counter is appended if the name exists (e.g., `my-awesome-picture-1.jpg`).
-- **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). This means you can upload a large image, and the system will handle the optimization. The generated sizes are stored alongside the original with prefixes (e.g., `thumb_`, `small_`, `medium_`, `large_`).
+- **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original with prefixes (e.g., `thumb_`, `small_`, `medium_`, `large_`).
+
+### Image Processing Configuration
+
+The system's image processing behavior is controlled through **App Settings**, making it fully customizable:
+
+- **Quality Setting**: A single quality value (1-100) applies to all generated image sizes, allowing administrators to balance file size vs. image quality.
+- **Size Configuration**: Each image size can be individually:
+  - **Enabled/Disabled**: Toggle specific sizes on or off
+  - **Width Customized**: Set custom maximum widths for each size
+- **Default Sizes**:
+  - `thumb`: 150px width (for previews)
+  - `small`: 480px width
+  - `medium`: 1024px width
+  - `large`: 1920px width
+- **Fallback Behavior**: If the `thumb` size is disabled, the system automatically uses the first available enabled size (or original image) for thumbnail previews.
 
 ### Metadata Storage
 
@@ -43,13 +55,15 @@ All metadata for the files in a project's media library is stored in a single JS
       "sizes": {
         "thumb": { "path": "/uploads/images/thumb_my-awesome-picture.jpg", "width": 150, "height": 113 },
         "small": { "path": "/uploads/images/small_my-awesome-picture.jpg", "width": 480, "height": 360 },
-        "medium": { "path": "/uploads/images/medium_my-awesome-picture.jpg", "width": 1024, "height": 768 },
-        "large": { "path": "/uploads/images/large_my-awesome-picture.jpg", "width": 1920, "height": 1440 }
+        "medium": { "path": "/uploads/images/medium_my-awesome-picture.jpg", "width": 1024, "height": 768 }
+        // Note: "large" size omitted if disabled in settings
       }
     }
   ]
 }
 ```
+
+_Note: The `sizes` object only contains entries for enabled image sizes. Disabled sizes are not generated or stored._
 
 ## 2. Frontend Implementation (`src/pages/Media.jsx`)
 
@@ -104,16 +118,28 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 
 ### Controller Logic (`server/controllers/mediaController.js`)
 
+- **Dynamic Image Processing Settings**: The system loads image processing configuration dynamically from App Settings:
+  ```javascript
+  // Loads quality and enabled sizes from app settings
+  const imageProcessingSettings = await getImageProcessingSettings();
+  // Returns only enabled sizes with their width and quality settings
+  ```
 - **File Upload (`multer` + `uploadProjectMedia`)**:
   1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (`/data/projects/<projectId>/uploads/images/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (e.g., `image/jpeg`).
   2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the `media.maxFileSizeMB` setting.
   3.  For each valid file, it generates a unique ID (`uuidv4`).
   4.  If the file is an image (not an SVG), it uses the `sharp` library to:
       - Read the original `width` and `height`.
-      - Generate multiple optimized sizes (`thumb`, `small`, `medium`, `large`).
-  5.  It creates a new metadata object for the file—including a `sizes` object containing the paths and dimensions for each new variant—and adds it to the `files` array in `media.json`.
-  6.  Files that are too large or have the wrong type are rejected and immediately deleted from the server.
-  7.  It returns a JSON response to the client with arrays of successfully processed and rejected files.
+      - **Dynamically load** the current image processing settings from App Settings
+      - Generate **only the enabled** image sizes with the configured quality setting
+      - Apply the configured maximum widths for each enabled size
+  5.  It creates a new metadata object for the file—including a `sizes` object containing the paths and dimensions for each generated variant—and adds it to the `files` array in `media.json`.
+  6.  **Thumbnail Assignment**: The system ensures there's always a thumbnail for previews:
+      - If `thumb` size is enabled: uses the thumb image
+      - If `thumb` is disabled: uses the first available enabled size
+      - If no sizes are enabled: uses the original image
+  7.  Files that are too large or have the wrong type are rejected and immediately deleted from the server.
+  8.  It returns a JSON response to the client with arrays of successfully processed and rejected files.
 - **Deletion Logic (`deleteProjectMedia`, `bulkDeleteProjectMedia`)**:
   1.  The controller reads `media.json`.
   2.  It finds the file entry (or entries) by ID.
