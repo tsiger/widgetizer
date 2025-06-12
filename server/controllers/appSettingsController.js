@@ -13,6 +13,15 @@ const settingsFilePath = path.join(__dirname, "../../data/appSettings.json");
 const defaultSettings = {
   media: {
     maxFileSizeMB: 5,
+    imageProcessing: {
+      quality: 85, // Single quality setting for all sizes (1-100)
+      sizes: {
+        thumb: { width: 150, enabled: true },
+        small: { width: 480, enabled: true },
+        medium: { width: 1024, enabled: true },
+        large: { width: 1920, enabled: true },
+      },
+    },
   },
 };
 
@@ -87,6 +96,43 @@ export async function updateAppSettings(req, res) {
     } else if (!newSettings.media) {
       // Ensure media object exists if body only contained other keys
       newSettings.media = defaultSettings.media;
+    }
+
+    // Validation for imageProcessing settings
+    if (newSettings.media && newSettings.media.imageProcessing) {
+      const imgProcessing = newSettings.media.imageProcessing;
+
+      // Validate quality (1-100)
+      if (typeof imgProcessing.quality !== "undefined") {
+        const quality = parseInt(imgProcessing.quality, 10);
+        if (isNaN(quality) || quality < 1 || quality > 100) {
+          return res.status(400).json({ error: "Invalid image quality. Must be between 1-100." });
+        }
+        imgProcessing.quality = quality;
+      }
+
+      // Validate sizes
+      if (imgProcessing.sizes && typeof imgProcessing.sizes === "object") {
+        for (const [sizeName, sizeConfig] of Object.entries(imgProcessing.sizes)) {
+          if (sizeConfig && typeof sizeConfig === "object") {
+            // Validate width
+            if (typeof sizeConfig.width !== "undefined") {
+              const width = parseInt(sizeConfig.width, 10);
+              if (isNaN(width) || width <= 0) {
+                return res
+                  .status(400)
+                  .json({ error: `Invalid width for size '${sizeName}'. Must be a positive number.` });
+              }
+              sizeConfig.width = width;
+            }
+
+            // Validate enabled flag
+            if (typeof sizeConfig.enabled !== "undefined" && typeof sizeConfig.enabled !== "boolean") {
+              return res.status(400).json({ error: `Invalid enabled flag for size '${sizeName}'. Must be boolean.` });
+            }
+          }
+        }
+      }
     }
 
     await writeAppSettingsFile(newSettings);

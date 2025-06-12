@@ -8,12 +8,27 @@ import slugify from "slugify";
 import { getProjectDir, getProjectImagesDir, getProjectMediaJsonPath, getImagePath } from "../config.js";
 import { getSetting } from "./appSettingsController.js";
 
-const IMAGE_SIZES = {
-  thumb: { width: 150, quality: 90 },
-  small: { width: 480, quality: 85 },
-  medium: { width: 1024, quality: 85 },
-  large: { width: 1920, quality: 85 },
-};
+// Get image processing settings from app settings
+async function getImageProcessingSettings() {
+  const quality = (await getSetting("media.imageProcessing.quality")) || 85;
+  const sizesConfig = (await getSetting("media.imageProcessing.sizes")) || {
+    thumb: { width: 150, enabled: true },
+    small: { width: 480, enabled: true },
+    medium: { width: 1024, enabled: true },
+    large: { width: 1920, enabled: true },
+  };
+
+  // Filter out disabled sizes and format for processing
+  const enabledSizes = {};
+  for (const [name, config] of Object.entries(sizesConfig)) {
+    if (config.enabled !== false) {
+      // enabled by default if not specified
+      enabledSizes[name] = { width: config.width, quality };
+    }
+  }
+
+  return enabledSizes;
+}
 
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
 
@@ -187,7 +202,8 @@ export async function uploadProjectMedia(req, res) {
           fileInfo.height = imgMetadata.height;
 
           // Generate different sizes
-          for (const [name, config] of Object.entries(IMAGE_SIZES)) {
+          const imageProcessingSettings = await getImageProcessingSettings();
+          for (const [name, config] of Object.entries(imageProcessingSettings)) {
             const sizeFilename = `${name}_${file.filename}`;
             const sizeFilePath = path.join(path.dirname(file.path), sizeFilename);
             const resized = await image
@@ -206,6 +222,15 @@ export async function uploadProjectMedia(req, res) {
           // For consistency, alias the 'thumb' size to the top-level 'thumbnail' property
           if (fileInfo.sizes.thumb) {
             fileInfo.thumbnail = fileInfo.sizes.thumb.path;
+          } else {
+            // If thumb is disabled, use the first available size or original image as fallback
+            const enabledSizes = Object.keys(fileInfo.sizes);
+            if (enabledSizes.length > 0) {
+              fileInfo.thumbnail = fileInfo.sizes[enabledSizes[0]].path;
+            } else {
+              // No sizes generated (all disabled), use original
+              fileInfo.thumbnail = fileInfo.path;
+            }
           }
         } catch (err) {
           console.error(`Error processing image ${file.filename}:`, err);
