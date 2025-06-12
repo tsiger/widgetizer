@@ -161,34 +161,36 @@ export default function Projects() {
               <td className="py-3 px-4">{new Date(project.updated).toLocaleDateString()}</td>
               <td className="py-3 px-4 text-right">
                 <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                  <Tooltip
-                    content={
-                      activeProject && project.id === activeProject.id
-                        ? "Current active project"
-                        : "Set as active project"
-                    }
-                  >
-                    <IconButton
-                      onClick={() => handleSetActive(project.id)}
-                      variant="neutral"
-                      size="sm"
-                      disabled={activeProject && project.id === activeProject.id}
-                      title={
+                  <div className="flex gap-2 pr-2 border-r border-slate-200">
+                    <Tooltip
+                      content={
                         activeProject && project.id === activeProject.id
                           ? "Current active project"
                           : "Set as active project"
                       }
                     >
-                      <Star
-                        size={18}
-                        className={
+                      <IconButton
+                        onClick={() => handleSetActive(project.id)}
+                        variant="neutral"
+                        size="sm"
+                        disabled={activeProject && project.id === activeProject.id}
+                        title={
                           activeProject && project.id === activeProject.id
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-slate-400 hover:text-yellow-400"
+                            ? "Current active project"
+                            : "Set as active project"
                         }
-                      />
-                    </IconButton>
-                  </Tooltip>
+                      >
+                        <Star
+                          size={18}
+                          className={
+                            activeProject && project.id === activeProject.id
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-slate-400 hover:text-yellow-400"
+                          }
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
                   <Tooltip content="Edit project">
                     <IconButton onClick={() => navigate(`/projects/edit/${project.id}`)} variant="neutral" size="sm">
                       <Pencil size={18} />

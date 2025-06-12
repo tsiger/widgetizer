@@ -84,7 +84,7 @@ const ThemeUploader = ({ onUploadSuccess }) => {
   );
 };
 
-export default function StarterKits() {
+export default function Themes() {
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -117,14 +117,14 @@ export default function StarterKits() {
 
   if (loading) {
     return (
-      <PageLayout title="Starter kits">
-        <LoadingSpinner message="Loading starter kits..." />
+      <PageLayout title="Themes">
+        <LoadingSpinner message="Loading themes..." />
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout title="Starter kits" description="Manage and customize your starter kits.">
+    <PageLayout title="Themes" description="Manage and customize your themes.">
       <ThemeUploader onUploadSuccess={handleUploadSuccess} />
 
       {themes.length > 0 ? (
@@ -168,10 +168,7 @@ export default function StarterKits() {
           })}
         </div>
       ) : (
-        <EmptyState
-          title="No starter kits available"
-          description="Upload a starter kit using the area above to get started"
-        />
+        <EmptyState title="No themes available" description="Upload a theme using the area above to get started" />
       )}
     </PageLayout>
   );

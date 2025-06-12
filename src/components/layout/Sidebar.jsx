@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Folder, File, Menu, Image, Settings, Palette, Rocket, SlidersHorizontal } from "lucide-react";
+import { Home, Folder, File, Menu, Image, Settings, Palette, Rocket, SlidersHorizontal, Layers } from "lucide-react";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -86,11 +86,11 @@ export default function Sidebar() {
           <h3 className="text-slate-500 mb-2 ml-2 hidden md:block">Appearance</h3>
           <ul className="space-y-2 md:space-y-1">
             <li>
-              <Link to="/starter-kits" className={linkClass("/starter-kits")}>
-                <div className={iconClass("/starter-kits")}>
-                  <Palette size={20} />
+              <Link to="/themes" className={linkClass("/themes")}>
+                <div className={iconClass("/themes")}>
+                  <Layers size={18} />
                 </div>
-                <span className="hidden md:inline ml-1 text-sm">Starter kits</span>
+                <span className="hidden md:inline ml-1 text-sm">Themes</span>
               </Link>
             </li>
           </ul>

@@ -1,0 +1,75 @@
+# Themes
+
+This document explains the "Themes" management page, which is the user interface for viewing and uploading themes. In the application's architecture, a "Theme" is the core concept for styling and layout.
+
+## 1. Overview
+
+Themes are structured directories that define the layout, styles, and functionality of the application. Each theme contains:
+
+- `theme.json`: Theme metadata and configuration.
+- `screenshot.png`: A preview image of the theme, displayed on the card in the Themes UI.
+
+## 2. Frontend Implementation (`src/pages/Themes.jsx`)
+
+The frontend component provides a clean interface for theme management.
+
+### Key Features
+
+- **Theme Grid**: Displays all available themes in a responsive grid layout.
+- **Upload Functionality**: Drag-and-drop interface for uploading new theme ZIP files.
+- **Active Theme Indicator**: Visual indication of which theme is currently active for the project.
+
+### Displaying Themes
+
+The component fetches themes on mount and displays them as cards. Each card shows:
+
+- Theme screenshot
+- Theme name and version
+- Author information
+- Widget count
+- Active status (if applicable)
+
+### Upload Process
+
+When a user uploads a ZIP file:
+
+1. The file is validated on the client side
+2. Uploaded via `uploadThemeZip()` utility function
+3. Server processes and extracts the theme
+4. Local state updates to show the new theme immediately
+5. Success/error feedback via toast notifications
+
+The upload uses `react-dropzone` for a modern drag-and-drop experience with visual feedback during the upload process.
+
+### State Management
+
+The component manages local state for:
+
+- `themes`: Array of available themes
+- `loading`: Loading state for initial theme fetch
+- Upload status and progress
+
+The `handleUploadSuccess` callback allows the uploader component to update the themes list without requiring a full page refresh. This function, located in the parent `Themes` component, adds the new theme to the `themes` array in the state. This allows the UI to update instantly without needing to re-fetch the entire list.
+
+## 3. Backend Implementation
+
+The backend handles the logic for listing the themes and processing uploads.
+
+### API Routes (`server/routes/themes.js`)
+
+| Method | Endpoint | Middleware | Controller Function | Description |
+| --- | --- | --- | --- | --- |
+| `GET` | `/api/themes` |  | `getAllThemes` | Gets metadata for all installed themes. |
+| `POST` | `/api/themes/upload` | `upload.single("themeZip")` | `uploadTheme` | Handles the upload and extraction of a new theme zip. |
+
+### Controller Logic (`server/controllers/themeController.js`)
+
+- `getAllThemes`: This function reads the names of all the directories inside the main `/themes/` folder. It then reads the `theme.json` file from each directory, extracts the necessary metadata, and returns an array of theme objects.
+- `uploadTheme`: This function performs the complex process of installing a new theme:
+  1.  **Reception**: The `multer` middleware first receives the uploaded file and holds it in memory as a buffer.
+  2.  **Validation**: The controller uses the `adm-zip` library to inspect the zip file _without_ extracting it to disk first. It performs several critical checks:
+      - It rejects empty zip files.
+      - It ensures the zip file contains a single root directory (e.g., `my-cool-theme/`). It will reject zips that have files like `theme.json` at the top level instead of inside a folder.
+      - It checks if a theme directory with the same name already exists in `/themes/` to prevent overwriting an existing theme.
+  3.  **Extraction**: If all validation checks pass, the controller extracts the contents of the zip file's root folder into a new directory within `/themes/`.
+  4.  **Response**: It sends a success response to the client, including the `theme.json` data of the newly installed theme so the frontend can update its state.

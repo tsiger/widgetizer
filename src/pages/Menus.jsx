@@ -114,14 +114,26 @@ export default function Menus() {
               <td className="py-3 px-4 text-slate-600">{menu.description}</td>
               <td className="py-3 px-4 text-right">
                 <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                  <Tooltip content="Edit menu structure">
+                  <div className="flex gap-2 pr-2 border-r border-slate-200">
+                    <Tooltip content="Edit menu structure">
+                      <IconButton
+                        onClick={() => navigate(`/menus/${menu.id}/structure`)}
+                        variant="neutral"
+                        size="sm"
+                        title="Edit Menu Structure"
+                      >
+                        <Menu size={18} />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
+                  <Tooltip content="Duplicate menu">
                     <IconButton
-                      onClick={() => navigate(`/menus/${menu.id}/structure`)}
+                      onClick={() => handleDuplicate(menu.id)}
                       variant="neutral"
                       size="sm"
-                      title="Edit Menu Structure"
+                      title="Duplicate Menu"
                     >
-                      <Menu size={18} />
+                      <Copy size={18} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip content="Edit menu settings">
@@ -132,16 +144,6 @@ export default function Menus() {
                       title="Edit Menu Settings"
                     >
                       <Pencil size={18} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip content="Duplicate menu">
-                    <IconButton
-                      onClick={() => handleDuplicate(menu.id)}
-                      variant="neutral"
-                      size="sm"
-                      title="Duplicate Menu"
-                    >
-                      <Copy size={18} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip content="Delete menu">

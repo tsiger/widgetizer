@@ -116,9 +116,9 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## 🛠️ Theme & Content Distribution
 
-### **[starter-kits.md](starter-kits.md)** - Theme Management Interface
+### **[themes.md](themes.md)** - Theme Management Interface
 
-**Purpose**: User interface for viewing and uploading themes (starter kits) **When to use**:
+**Purpose**: User interface for viewing and uploading themes **When to use**:
 
 - Understanding theme upload and installation
 - Working with theme preview cards
@@ -177,7 +177,7 @@ Primary docs: `theming.md`, `projects.md` Secondary: All other documents for com
 
 ### **Content Managers/Users**
 
-Primary docs: `starter-kits.md`, `page-editor.md` Secondary: `media.md`, `menus.md`
+Primary docs: `themes.md`, `page-editor.md` Secondary: `media.md`, `menus.md`
 
 ---
 
