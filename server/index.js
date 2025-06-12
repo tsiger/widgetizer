@@ -16,6 +16,7 @@ import mediaRoutes from "./routes/media.js";
 import previewRoutes from "./routes/preview.js";
 import exportRoutes from "./routes/export.js";
 import appSettingsRoutes from "./routes/appSettings.js";
+import coreWidgetsRoutes from "./routes/coreWidgets.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -31,6 +32,7 @@ app.use("/api/media", mediaRoutes);
 app.use("/api/preview", previewRoutes);
 app.use("/api/export", exportRoutes);
 app.use("/api/settings", appSettingsRoutes);
+app.use("/api/core-widgets", coreWidgetsRoutes);
 
 // Serve static files from the themes directory
 app.use("/themes", express.static(path.join(__dirname, "../themes")));

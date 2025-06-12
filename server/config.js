@@ -4,6 +4,7 @@ import path from "path";
 export const DATA_DIR = path.join(process.cwd(), "data");
 export const THEMES_DIR = path.join(process.cwd(), "themes");
 export const PUBLISH_DIR = path.join(DATA_DIR, "publish");
+export const CORE_WIDGETS_DIR = path.join(process.cwd(), "src", "core", "widgets");
 
 // Theme paths
 export const getThemeDir = (themeId) => path.join(THEMES_DIR, themeId);

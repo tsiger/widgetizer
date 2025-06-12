@@ -1,7 +1,7 @@
 import { Liquid } from "liquidjs";
 import fs from "fs/promises";
 import path from "path";
-import { getProjectDir } from "../config.js";
+import { getProjectDir, CORE_WIDGETS_DIR } from "../config.js";
 // TODO: Controllers shouldn't ideally be imported into services.
 // We might need to move readProjectsFile/readMediaFile to utils or their own services later.
 import { readMediaFile } from "../controllers/mediaController.js";
@@ -100,11 +100,19 @@ async function renderWidget(projectId, widgetId, widgetData, rawThemeSettings, r
     const { type, settings = {}, blocks = {}, blocksOrder = [] } = widgetData;
     const projectDir = getProjectDir(projectId);
 
+    // Determine if this is a core widget (prefixed with "core-")
+    const isCoreWidget = type.startsWith("core-");
+
     // Determine the correct path based on widget type
     let widgetPath;
-    if (type === "header" || type === "footer") {
+    if (isCoreWidget) {
+      // Core widget path
+      widgetPath = path.join(CORE_WIDGETS_DIR, `${type}.liquid`);
+    } else if (type === "header" || type === "footer") {
+      // Global theme widget
       widgetPath = path.join(projectDir, "widgets", "global", `${type}.liquid`);
     } else {
+      // Regular theme widget
       widgetPath = path.join(projectDir, "widgets", `${type}.liquid`);
     }
 

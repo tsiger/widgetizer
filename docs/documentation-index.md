@@ -31,6 +31,18 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[core-widgets.md](core-widgets.md)** - Core Widgets System
+
+**Purpose**: Explains the built-in, theme-agnostic widgets that ship with Widgetizer **When to use**:
+
+- Understanding which widgets are always available
+- Learning how themes can opt-out via `useCoreWidgets`
+- Adding new core widgets to the platform
+
+**Key topics**: Spacer, Divider, opt-out flag, loading & rendering flow, file structure
+
+---
+
 ## 🎨 Content Management
 
 ### **[projects.md](projects.md)** - Project Management System
@@ -175,7 +187,7 @@ Primary docs: `export.md`, `media.md`, `projects.md` Secondary: `pages.md`, `men
 
 Primary docs: `theming.md`, `projects.md` Secondary: All other documents for comprehensive understanding ⚠️ **Conceptual only**: `page-editor-poc.md` (design proposal, not implemented)
 
-### **Content Managers/Users**
+### **Content Managers / End-Users**
 
 Primary docs: `themes.md`, `page-editor.md` Secondary: `media.md`, `menus.md`
 
@@ -183,25 +195,23 @@ Primary docs: `themes.md`, `page-editor.md` Secondary: `media.md`, `menus.md`
 
 ## 📖 Documentation Standards
 
-All documentation follows these conventions:
-
-1. **Structure**: Each document includes overview, implementation details, and workflows
-2. **Code Examples**: Practical examples with proper syntax highlighting
-3. **API References**: Complete endpoint documentation with parameters
-4. **File Paths**: Exact file locations for reference
-5. **Cross-References**: Links to related documentation when applicable
+1. **Structure** – Each document includes overview, implementation details, and workflows.
+2. **Code Examples** – Practical examples with proper syntax highlighting.
+3. **API References** – Complete endpoint documentation with parameters.
+4. **File Paths** – Exact file locations for reference.
+5. **Cross-References** – Links to related docs where applicable.
 
 ---
 
 ## 🔄 Maintenance Notes
 
-- **theming.md**: Most comprehensive, covers theme system architecture
-- **⚠️ page-editor-poc.md**: **NOT IMPLEMENTED** - Theoretical design document only, do not reference for current functionality
-- **theme-settings.md**: Reference document, stable API definitions
-- All other docs: Feature-specific implementation guides
+- **theming.md** – Most comprehensive, covers theme system architecture.
+- **⚠️ page-editor-poc.md** – _NOT IMPLEMENTED_ – theoretical document only; do **not** reference for current functionality.
+- **theme-settings.md** – Reference document, stable API definitions.
+- All other docs – Feature-specific implementation guides.
 
-When adding new features, ensure documentation is updated and this index reflects any new documents or significant changes to existing ones.
+When adding new features, always update the relevant documentation **and** this index.
 
-### ⚠️ **Important Warning About POC Documents**
+### ⚠️ Important Warning About POC Documents
 
-**page-editor-poc.md** contains theoretical designs that have **NOT BEEN IMPLEMENTED**. LLMs and developers should not reference this document when providing guidance about existing functionality. Always use the implemented documentation (like **page-editor.md**) for current system capabilities.
+`page-editor-poc.md` contains conceptual designs that have **not** been implemented. Developers and LLMs must not rely on it for current functionality; use `page-editor.md` for the actual implementation.

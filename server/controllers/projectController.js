@@ -430,6 +430,22 @@ export async function getProjectWidgets(req, res) {
     const widgetsBaseDir = path.join(projectRootDir, "widgets");
     const globalWidgetsDir = path.join(widgetsBaseDir, "global");
 
+    // Import core widgets controller
+    const { getCoreWidgets } = await import("./coreWidgetsController.js");
+
+    // Check if theme opts out of core widgets
+    let includeCoreWidgets = true;
+    try {
+      const themeJsonPath = path.join(projectRootDir, "theme.json");
+      const themeJson = JSON.parse(await fs.readFile(themeJsonPath, "utf8"));
+      if (themeJson.useCoreWidgets === false) {
+        includeCoreWidgets = false;
+      }
+    } catch (err) {
+      // If there's an error reading theme.json, default to including core widgets
+      console.warn(`Could not read theme.json for project ${projectId}, defaulting to include core widgets:`, err);
+    }
+
     // Helper function to process a single widget file
     async function processWidgetFile(filePath) {
       try {
@@ -457,6 +473,16 @@ export async function getProjectWidgets(req, res) {
     }
 
     let allSchemas = [];
+
+    // First, get core widgets if not opted out
+    if (includeCoreWidgets) {
+      try {
+        const coreWidgets = await getCoreWidgets();
+        allSchemas = allSchemas.concat(coreWidgets);
+      } catch (err) {
+        console.error("Error loading core widgets:", err);
+      }
+    }
 
     // Process top-level widgets
     try {
