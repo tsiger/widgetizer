@@ -10,23 +10,44 @@
   }
 
   *:focus-visible {
-    @apply outline-none ring-2 ring-pink-500 ring-offset-2;
+    @apply outline-none ring-2 ring-pink-500 ring-offset-0;
   }
 }
 
 @layer components {
+  /* === FORM LABELS === */
   .form-label {
     @apply block text-sm font-medium text-slate-700 mb-1;
   }
 
+  .form-label-required::after {
+    @apply text-red-500 ml-1;
+    content: "*";
+  }
+
+  .form-label-optional {
+    @apply block text-sm font-normal text-slate-600 mb-1;
+  }
+
+  .form-label-large {
+    @apply block text-base font-semibold text-slate-800 mb-2;
+  }
+
+  /* === FORM INPUTS === */
   .form-input,
   .form-textarea,
   .form-select {
     @apply w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400;
     @apply focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500;
     @apply disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none;
-    @apply invalid:border-pink-500 invalid:text-pink-600;
-    @apply focus:invalid:border-pink-500 focus:invalid:ring-pink-500;
+  }
+
+  /* Error state class that can be controlled by JavaScript */
+  .form-input-error,
+  .form-textarea-error,
+  .form-select-error {
+    @apply border-pink-500 text-pink-600;
+    @apply focus:border-pink-500 focus:ring-pink-500;
   }
 
   .form-textarea {
@@ -38,11 +59,72 @@
     @apply pr-10;
   }
 
-  .form-help {
-    @apply mt-1 text-xs text-slate-500;
+  /* === FORM DESCRIPTIONS & HELP TEXT === */
+  .form-description {
+    @apply text-xs text-slate-500 mt-1;
   }
 
+  .form-description-emphasis {
+    @apply text-xs text-slate-600 mt-1 font-medium;
+  }
+
+  .form-help {
+    @apply text-xs text-slate-500 mt-1;
+  }
+
+  .form-hint {
+    @apply text-xs text-slate-400 mt-1 italic;
+  }
+
+  /* === FORM FEEDBACK === */
   .form-error {
-    @apply mt-1 text-xs text-pink-600;
+    @apply text-xs text-pink-600 mt-1;
+  }
+
+  .form-warning {
+    @apply text-xs text-amber-600 mt-1;
+  }
+
+  .form-success {
+    @apply text-xs text-green-600 mt-1;
+  }
+
+  /* === FORM SECTIONS === */
+  .form-section {
+    @apply space-y-4;
+  }
+
+  .form-section-title {
+    @apply text-lg font-medium text-slate-800 border-b border-slate-200 pb-2 mb-4;
+  }
+
+  .form-section-subtitle {
+    @apply text-base font-medium text-slate-700 mb-3;
+  }
+
+  /* === FORM FIELD WRAPPER === */
+  .form-field {
+    @apply space-y-1;
+  }
+
+  .form-field-inline {
+    @apply flex items-center gap-2;
+  }
+
+  .form-field-group {
+    @apply space-y-3;
+  }
+
+  /* === FORM LAYOUT === */
+  .form-container {
+    @apply max-w-xl space-y-6;
+  }
+
+  .form-actions {
+    @apply flex gap-2 pt-4;
+  }
+
+  .form-actions-separated {
+    @apply flex gap-2 pt-4 border-t border-slate-200;
   }
 }

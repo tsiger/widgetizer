@@ -122,11 +122,11 @@ export default function PageForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl space-y-6">
+    <form onSubmit={handleSubmit} className="form-container">
       {/* Main Page Data */}
-      <div className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block font-medium mb-1">
+      <div className="form-section">
+        <div className="form-field">
+          <label htmlFor="name" className="form-label">
             Title
           </label>
           <input
@@ -135,14 +135,13 @@ export default function PageForm({
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-slate-300 rounded-sm"
-            placeholder="Enter page title"
+            className="form-input"
             required
           />
         </div>
 
-        <div>
-          <label htmlFor="slug" className="block font-medium mb-1">
+        <div className="form-field">
+          <label htmlFor="slug" className="form-label">
             Filename
           </label>
           <div className="flex items-center">
@@ -154,8 +153,7 @@ export default function PageForm({
               value={formData.slug}
               onChange={handleChange}
               onBlur={handleBlur}
-              className="flex-1 px-3 py-2 border border-slate-300 rounded-sm"
-              placeholder="filename"
+              className="form-input flex-1"
               required
             />
             <span className="text-slate-500 ml-1">.html</span>
@@ -164,11 +162,11 @@ export default function PageForm({
       </div>
 
       {/* SEO Fields */}
-      <div className="space-y-4 pt-4 border-t border-slate-200">
-        <h3 className="text-lg font-medium text-slate-800">SEO Settings</h3>
+      <div className="form-section">
+        <h3 className="form-section-title">SEO Settings</h3>
 
-        <div>
-          <label htmlFor="seo-description" className="block font-medium mb-1">
+        <div className="form-field">
+          <label htmlFor="seo-description" className="form-label">
             Meta Description
           </label>
           <textarea
@@ -177,16 +175,15 @@ export default function PageForm({
             value={formData.seo.description}
             onChange={handleSeoChange}
             rows={3}
-            className="w-full px-3 py-2 border border-slate-300 rounded-sm"
-            placeholder="Brief description of this page for search engines and social media"
+            className="form-textarea"
           />
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="form-description">
             Used for search results and social media previews. Recommended: 150-160 characters.
           </p>
         </div>
 
-        <div>
-          <label htmlFor="seo-og-title" className="block font-medium mb-1">
+        <div className="form-field">
+          <label htmlFor="seo-og-title" className="form-label-optional">
             Social Media Title
           </label>
           <input
@@ -195,16 +192,15 @@ export default function PageForm({
             name="og_title"
             value={formData.seo.og_title}
             onChange={handleSeoChange}
-            className="w-full px-3 py-2 border border-slate-300 rounded-sm"
-            placeholder="Optional: Custom title for social media sharing"
+            className="form-input"
           />
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="form-description">
             Leave blank to use the page title. Used when sharing on Facebook, Twitter, etc.
           </p>
         </div>
 
-        <div>
-          <label htmlFor="seo-og-image" className="block font-medium mb-1">
+        <div className="form-field">
+          <label htmlFor="seo-og-image" className="form-label-optional">
             Social Media Image
           </label>
           <input
@@ -213,16 +209,13 @@ export default function PageForm({
             name="og_image"
             value={formData.seo.og_image}
             onChange={handleSeoChange}
-            className="w-full px-3 py-2 border border-slate-300 rounded-sm"
-            placeholder="uploads/images/social-image.jpg"
+            className="form-input"
           />
-          <p className="text-sm text-slate-500 mt-1">
-            Image path for social media previews. Recommended: 1200x630 pixels.
-          </p>
+          <p className="form-description">Image path for social media previews. Recommended: 1200x630 pixels.</p>
         </div>
 
-        <div>
-          <label htmlFor="seo-canonical-url" className="block font-medium mb-1">
+        <div className="form-field">
+          <label htmlFor="seo-canonical-url" className="form-label-optional">
             Canonical URL
           </label>
           <input
@@ -231,16 +224,15 @@ export default function PageForm({
             name="canonical_url"
             value={formData.seo.canonical_url}
             onChange={handleSeoChange}
-            className="w-full px-3 py-2 border border-slate-300 rounded-sm"
-            placeholder="https://example.com/canonical-page"
+            className="form-input"
           />
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="form-description">
             Optional: Use if this page content exists at another URL to prevent duplicate content issues.
           </p>
         </div>
 
-        <div>
-          <label htmlFor="seo-robots" className="block font-medium mb-1">
+        <div className="form-field">
+          <label htmlFor="seo-robots" className="form-label">
             Search Engine Instructions
           </label>
           <select
@@ -248,20 +240,18 @@ export default function PageForm({
             name="robots"
             value={formData.seo.robots}
             onChange={handleSeoChange}
-            className="w-full px-3 py-2 border border-slate-300 rounded-sm"
+            className="form-select"
           >
             <option value="index,follow">Index and Follow (Default)</option>
             <option value="noindex,follow">Don't Index, but Follow Links</option>
             <option value="index,nofollow">Index, but Don't Follow Links</option>
             <option value="noindex,nofollow">Don't Index or Follow Links</option>
           </select>
-          <p className="text-sm text-slate-500 mt-1">
-            Controls how search engines index this page and follow its links.
-          </p>
+          <p className="form-description">Controls how search engines index this page and follow its links.</p>
         </div>
       </div>
 
-      <div className="flex gap-2 pt-4">
+      <div className="form-actions-separated">
         <Button type="submit" disabled={isSubmitting} variant="primary">
           {isSubmitting ? "Saving..." : submitLabel}
         </Button>

@@ -108,66 +108,66 @@ export default function ProjectForm({
   if (loading) return <LoadingSpinner message="Un momento por favor..." />;
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl">
-      <div className="mb-4">
-        <label htmlFor="name" className="block font-semibold mb-1">
-          Title
-        </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-slate-300 rounded-sm"
-          required
-        />
+    <form onSubmit={handleSubmit} className="form-container">
+      <div className="form-section">
+        <div className="form-field">
+          <label htmlFor="name" className="form-label">
+            Title
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="form-input"
+            required
+          />
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="description" className="form-label-optional">
+            Description
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows="4"
+            className="form-textarea"
+          />
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="theme" className="form-label">
+            Theme
+          </label>
+          <select
+            id="theme"
+            name="theme"
+            value={formData.theme}
+            onChange={handleChange}
+            className={`form-select ${!isNew ? "bg-slate-100 cursor-not-allowed" : ""}`}
+            required={isNew}
+            disabled={!isNew}
+          >
+            <option value="">Select a theme</option>
+            {themes.map((theme) => (
+              <option key={theme.id} value={theme.id}>
+                {theme.name}
+              </option>
+            ))}
+          </select>
+          {!isNew && (
+            <p className="form-description">
+              Theme can only be selected when creating a new project. To change the theme, please create a new project.
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="mb-4">
-        <label htmlFor="description" className="block font-semibold mb-1">
-          Description
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          rows="4"
-          className="w-full px-3 py-2 border border-slate-300 rounded-sm"
-        />
-      </div>
-
-      <div className="mb-4">
-        <label htmlFor="theme" className="block font-semibold mb-1">
-          Theme
-        </label>
-        <select
-          id="theme"
-          name="theme"
-          value={formData.theme}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border border-slate-300 rounded-sm ${
-            !isNew ? "bg-slate-100 cursor-not-allowed" : ""
-          }`}
-          required={isNew}
-          disabled={!isNew}
-        >
-          <option value="">Select a theme</option>
-          {themes.map((theme) => (
-            <option key={theme.id} value={theme.id}>
-              {theme.name}
-            </option>
-          ))}
-        </select>
-        {!isNew && (
-          <p className="mt-1 text-sm text-slate-600">
-            Theme can only be selected when creating a new project. To change the theme, please create a new project.
-          </p>
-        )}
-      </div>
-
-      <div className="flex gap-2">
+      <div className="form-actions">
         <Button type="submit" disabled={isSubmitting} variant="primary">
           {isSubmitting ? "Saving..." : submitLabel}
         </Button>

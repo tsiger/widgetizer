@@ -101,8 +101,8 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
             </div>
           )}
 
-          <div>
-            <label htmlFor="alt" className="block text-sm font-medium text-slate-700 mb-1">
+          <div className="form-field">
+            <label htmlFor="alt" className="form-label">
               Alt Text (Required)
             </label>
             <input
@@ -111,16 +111,15 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
               name="alt"
               value={formData.alt}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent placeholder-slate-400"
-              placeholder="Describe the image for accessibility"
+              className="form-input"
               required
               aria-required="true"
             />
-            <p className="text-xs text-slate-500 mt-1">Describes the image for screen readers.</p>
+            <p className="form-description">Describes the image for screen readers.</p>
           </div>
 
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-1">
+          <div className="form-field">
+            <label htmlFor="title" className="form-label-optional">
               Title
             </label>
             <input
@@ -129,13 +128,12 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
               name="title"
               value={formData.title}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent placeholder-slate-400"
-              placeholder="Optional image title"
+              className="form-input"
             />
-            <p className="text-xs text-slate-500 mt-1">Sets the title attribute (often shown on hover).</p>
+            <p className="form-description">Sets the title attribute (often shown on hover).</p>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+          <div className="form-actions-separated">
             <button
               type="button"
               onClick={onClose}

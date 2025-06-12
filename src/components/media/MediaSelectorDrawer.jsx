@@ -93,7 +93,7 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search media files..."
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              className="form-input pl-10"
             />
             <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
           </div>

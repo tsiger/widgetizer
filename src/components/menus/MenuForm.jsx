@@ -71,39 +71,39 @@ export default function MenuForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl space-y-4">
-      <div>
-        <label htmlFor="name" className="block font-medium mb-1">
-          Title
-        </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-slate-300 rounded-sm"
-          placeholder="Enter menu title"
-          required
-        />
+    <form onSubmit={handleSubmit} className="form-container">
+      <div className="form-section">
+        <div className="form-field">
+          <label htmlFor="name" className="form-label">
+            Title
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="form-input"
+            required
+          />
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="description" className="form-label-optional">
+            Description
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            className="form-textarea"
+            rows={3}
+          />
+        </div>
       </div>
 
-      <div>
-        <label htmlFor="description" className="block font-medium mb-1">
-          Description
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-slate-300 rounded-sm"
-          placeholder="Enter menu description"
-          rows={3}
-        />
-      </div>
-
-      <div className="flex gap-2">
+      <div className="form-actions">
         <Button type="submit" disabled={isSubmitting} variant="primary">
           {isSubmitting ? "Saving..." : submitLabel}
         </Button>

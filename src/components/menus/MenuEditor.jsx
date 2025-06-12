@@ -141,7 +141,7 @@ const SortableItem = memo(function SortableItem({
           onChange={handleLabelChange}
           onMouseDown={handleInputMouseDown}
           onClick={(e) => e.stopPropagation()}
-          className="flex-grow px-2 py-1 border border-slate-200 rounded"
+          className="form-input flex-grow"
           placeholder="Menu item label"
         />
 
@@ -153,7 +153,7 @@ const SortableItem = memo(function SortableItem({
             onChange={handleLinkChange}
             onMouseDown={handleInputMouseDown}
             onClick={(e) => e.stopPropagation()}
-            className="w-32 outline-none"
+            className="form-input w-32"
             placeholder="/page-url"
           />
         </div>
