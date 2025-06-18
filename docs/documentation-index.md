@@ -84,32 +84,6 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[Codex-PageEditor.md](Codex-PageEditor.md)** - Editor Internals & Improvements
-
-**Purpose**: Deep technical dive into the page editor and potential optimizations **When to use**:
-
-- Understanding the rendering flow in depth
-- Evaluating current limitations
-- Planning future performance work
-
-**Key topics**: Preview iframe lifecycle, LiquidJS dependencies, DOM patch strategies, offline mode considerations
-
----
-
-### **[page-editor-poc.md](page-editor-poc.md)** - Real-Time Updates POC ⚠️ **NOT IMPLEMENTED**
-
-**Purpose**: ⚠️ **THEORETICAL DESIGN ONLY** - Technical design proposal for implementing real-time visual updates in the page editor **⚠️ WARNING**: This document describes functionality that **HAS NOT BEEN IMPLEMENTED**. Do not reference for current system capabilities.
-
-**When to use**:
-
-- **DO NOT USE** for understanding current functionality
-- Reference only for potential future development planning
-- Understanding theoretical approaches to real-time updates
-
-**Key topics**: ⚠️ **CONCEPTUAL ONLY** - PostMessage communication, DOM updates, setting classification, update strategies
-
----
-
 ## 🗂️ Content Organization
 
 ### **[menus.md](menus.md)** - Navigation Menu System
