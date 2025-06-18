@@ -228,6 +228,11 @@ async function renderWidget(projectId, widgetId, widgetData, rawThemeSettings, r
   }
 }
 
+// Render only a widget fragment (currently same as renderWidget)
+async function renderWidgetFragment(projectId, widgetId, widgetData, rawThemeSettings) {
+  return renderWidget(projectId, widgetId, widgetData, rawThemeSettings, 'preview');
+}
+
 /**
  * Renders a page layout with content
  */
@@ -268,6 +273,7 @@ async function renderPageLayout(projectId, pageContent, pageData, rawThemeSettin
 // Export the necessary functions
 export {
   renderWidget,
+  renderWidgetFragment,
   renderPageLayout,
   // Export the engine instance if needed elsewhere (e.g., for direct parsing)
   // engine

@@ -2,6 +2,7 @@ import express from "express";
 import {
   generatePreview,
   renderSingleWidget,
+  renderWidgetFragment,
   getGlobalWidgets,
   saveGlobalWidget,
   serveAsset,
@@ -14,6 +15,9 @@ router.post("/", generatePreview);
 
 // POST /api/preview/widget - Render a single widget
 router.post("/widget", renderSingleWidget);
+
+// POST /api/preview/widget-fragment - Render a widget fragment
+router.post("/widget-fragment", renderWidgetFragment);
 
 // GET /api/preview/global-widgets - Get all global widgets
 router.get("/global-widgets", getGlobalWidgets);

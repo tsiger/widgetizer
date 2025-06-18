@@ -73,6 +73,33 @@ function highlightWidget(widgetId, blockId) {
   }
 }
 
+// Apply a simple style update
+function patchStyle(selector, property, value) {
+  document.querySelectorAll(selector).forEach((el) => {
+    el.style[property] = value;
+  });
+}
+
+// Apply a text content update
+function patchText(selector, content) {
+  document.querySelectorAll(selector).forEach((el) => {
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      el.value = content;
+    } else {
+      el.textContent = content;
+    }
+  });
+}
+
+// Update class list
+function patchClass(selector, className, action = 'add') {
+  document.querySelectorAll(selector).forEach((el) => {
+    if (action === 'add') el.classList.add(className);
+    else if (action === 'remove') el.classList.remove(className);
+    else if (action === 'toggle') el.classList.toggle(className);
+  });
+}
+
 // Message handler
 function handleMessage(event) {
   const { type, payload } = event.data;
@@ -83,6 +110,15 @@ function handleMessage(event) {
       break;
     case "HIGHLIGHT_WIDGET":
       highlightWidget(payload.widgetId, payload.blockId);
+      break;
+    case "PATCH_STYLE":
+      patchStyle(payload.selector, payload.property, payload.value);
+      break;
+    case "PATCH_TEXT":
+      patchText(payload.selector, payload.content);
+      break;
+    case "PATCH_CLASS":
+      patchClass(payload.selector, payload.className, payload.action);
       break;
     default:
       console.warn("Preview Runtime: Unknown message type:", type);
@@ -100,6 +136,9 @@ window.PreviewRuntime = {
   initializeRuntime,
   updateCssVariables,
   highlightWidget,
+  patchStyle,
+  patchText,
+  patchClass,
 };
 
 // Auto-initialize when the script loads

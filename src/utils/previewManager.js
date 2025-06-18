@@ -1,5 +1,6 @@
 import { API_URL } from "../config";
 import useProjectStore from "../stores/projectStore";
+import { patchStyle, patchText, patchClass } from "./clientPatcher";
 
 /**
  * Fetch a preview of the page from the server
@@ -54,6 +55,29 @@ export async function fetchRenderedWidget(widgetId, widget, themeSettings) {
     return await response.text();
   } catch (error) {
     console.error("Widget rendering error:", error);
+    throw error;
+  }
+}
+
+// Fetch an incremental fragment for a widget
+export async function fetchWidgetFragment(widgetId, widget, themeSettings) {
+  try {
+    const response = await fetch(API_URL("/api/preview/widget-fragment"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ widgetId, widget, themeSettings }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to fetch widget fragment");
+    }
+
+    return await response.text();
+  } catch (error) {
+    console.error("Widget fragment fetch error:", error);
     throw error;
   }
 }
@@ -180,12 +204,44 @@ export function highlightWidget(iframe, widgetId, blockId) {
 export function updateWidgetSetting(iframe, widgetId, settingId, value) {
   if (!iframe || !iframe.contentWindow) return false;
 
-  // Use the runtime to update the widget setting
-  if (iframe.contentWindow.PreviewRuntime) {
-    return iframe.contentWindow.PreviewRuntime.updateWidgetSetting(widgetId, settingId, value);
+  const baseSelector = `[data-widget-id="${widgetId}"]`;
+  const settingSelector = `${baseSelector} [data-setting='${settingId}']`;
+
+  if (typeof value === 'string' && value.startsWith('#')) {
+    patchStyle(iframe, settingSelector, 'color', value);
+    return true;
   }
 
-  return false;
+  if (settingId.toLowerCase().includes('background')) {
+    patchStyle(iframe, baseSelector, 'background-color', value);
+    return true;
+  }
+
+  if (settingId.toLowerCase().includes('alignment')) {
+    patchClass(iframe, `${baseSelector} .text-align`, `text-${value}`, 'toggle');
+    return true;
+  }
+
+  patchText(iframe, settingSelector, value);
+  return true;
+}
+
+// Apply a direct patch using explicit info
+export function applyPatch(iframe, patch) {
+  const { type, selector, property, value, className, action } = patch;
+  switch (type) {
+    case 'style':
+      patchStyle(iframe, selector, property, value);
+      break;
+    case 'text':
+      patchText(iframe, selector, value);
+      break;
+    case 'class':
+      patchClass(iframe, selector, className, action);
+      break;
+    default:
+      console.warn('Unknown patch type', type);
+  }
 }
 
 /**

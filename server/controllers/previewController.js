@@ -4,7 +4,7 @@ import { getProjectDir } from "../config.js";
 import { readProjectsFile } from "./projectController.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { renderWidget, renderPageLayout } from "../services/renderingService.js";
+import { renderWidget, renderPageLayout, renderWidgetFragment as renderWidgetFragmentService } from "../services/renderingService.js";
 
 // Get the directory path of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -92,6 +92,32 @@ export async function renderSingleWidget(req, res) {
       message: error.message,
       stack: process.env.NODE_ENV !== "production" ? error.stack : undefined,
     });
+  }
+}
+
+// Return a widget fragment (used for incremental rendering)
+export async function renderWidgetFragment(req, res) {
+  try {
+    const { widgetId, widget, themeSettings: rawThemeSettings } = req.body;
+
+    const projectsData = await readProjectsFile();
+    const activeProjectId = projectsData.activeProjectId;
+
+    if (!activeProjectId) {
+      return res.status(404).json({ error: "No active project found" });
+    }
+
+    const fragment = await renderWidgetFragmentService(
+      activeProjectId,
+      widgetId,
+      widget,
+      rawThemeSettings || {},
+    );
+
+    res.send(fragment);
+  } catch (error) {
+    console.error("Widget fragment error:", error);
+    res.status(500).json({ error: "Failed to render fragment" });
   }
 }
 
