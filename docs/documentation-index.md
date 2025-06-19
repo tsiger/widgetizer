@@ -127,16 +127,17 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[export.md](export.md)** - Static Site Export
+### **[export.md](export.md)** - Static Site Export & Version Management
 
-**Purpose**: Exporting projects to static HTML websites **When to use**:
+**Purpose**: Exporting projects to static HTML websites with comprehensive version control **When to use**:
 
-- Understanding the export process
+- Understanding the export process and version management
 - Working with static site generation
-- Implementing export functionality
+- Implementing export functionality and history tracking
+- Managing export versions and storage limits
 - Troubleshooting export issues
 
-**Key topics**: Export workflow, asset copying, HTML generation, path optimization
+**Key topics**: Export workflow, version control system, asset copying, HTML generation, export history API, ZIP downloads, automatic cleanup, smart file detection
 
 ---
 

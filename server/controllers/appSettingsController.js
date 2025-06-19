@@ -24,6 +24,9 @@ const defaultSettings = {
       },
     },
   },
+  export: {
+    maxVersionsToKeep: 10, // Maximum number of export versions to keep per project
+  },
 };
 
 /**

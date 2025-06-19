@@ -29,7 +29,7 @@ export default function ConfirmationModal({
         </div>
 
         <div className="p-4">
-          <p className="text-slate-600">{message}</p>
+          <div className="text-slate-600 whitespace-pre-line">{message}</div>
         </div>
 
         <div className="p-4 bg-slate-50 flex justify-end gap-2">

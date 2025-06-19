@@ -106,6 +106,10 @@ export default function AppSettings() {
             sizes: completeSizes,
           },
         },
+        export: {
+          ...settings.export,
+          maxVersionsToKeep: parseInt(settings.export?.maxVersionsToKeep || "10", 10) || 10,
+        },
       };
 
       const result = await saveAppSettings(settingsToSave);
@@ -255,6 +259,27 @@ export default function AppSettings() {
                 ));
               })()}
             </div>
+          </SettingsField>
+        </div>
+
+        {/* Export Settings */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-slate-900 border-b border-slate-200 pb-2">Export Management</h3>
+
+          <SettingsField
+            id="maxVersionsToKeep"
+            label="Max Export Versions to Keep"
+            description="Maximum number of export versions to keep per project. When this limit is exceeded, the oldest exports are automatically deleted to save storage space."
+          >
+            <TextInput
+              type="number"
+              id="maxVersionsToKeep"
+              name="export.maxVersionsToKeep"
+              value={settings.export?.maxVersionsToKeep || "10"}
+              onChange={(newValue) => handleInputChange(newValue, "export.maxVersionsToKeep")}
+              min="1"
+              max="50"
+            />
           </SettingsField>
         </div>
 

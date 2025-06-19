@@ -71,8 +71,8 @@ export default function Projects() {
 
     openModal({
       title: "Delete Project",
-      message: `Are you sure you want to delete "${name}"? This action cannot be undone.`,
-      confirmText: "Delete",
+      message: `Are you sure you want to delete "${name}"?\n\nThis will permanently delete:\n• All project files and pages\n• All uploaded media\n• All exported versions\n• All project settings\n\nThis action cannot be undone.`,
+      confirmText: "Delete Project",
       cancelText: "Cancel",
       variant: "danger",
       data: { projectId: id, projectName: name },

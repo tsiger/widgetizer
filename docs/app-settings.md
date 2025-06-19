@@ -25,6 +25,15 @@ The `AppSettings` page is responsible for managing global configurations that ap
   - **Large** (default: 1920px) - High-resolution displays
   - Each size can be **enabled/disabled** and have its **width customized**
 
+### Export Management Settings
+
+#### Version Control
+
+- **Maximum Export Versions to Keep**: Controls how many export versions are retained per project (default: 10)
+  - When this limit is exceeded, the oldest exports are automatically deleted to save storage space
+  - Range: 1-50 versions
+  - Applies to all projects globally
+
 ## Component Breakdown
 
 - **`PageLayout`**: Provides the standard page structure with a title.
@@ -60,6 +69,7 @@ The `AppSettings` component follows a straightforward pattern for managing its d
     - Quality is parsed and validated (1-100 range)
     - All image sizes have both `width` and `enabled` properties
     - Missing configurations are merged with defaults
+  - **Export Management**: Validates and ensures `maxVersionsToKeep` is parsed into an integer (1-50 range)
 - It then calls `saveAppSettings` from the `appSettingsManager.js` to send the entire updated settings object to the backend for persistence.
 - Finally, it uses the global `useToastStore` to provide immediate visual feedback to the user, indicating whether the save was successful or failed.
 

@@ -331,6 +331,8 @@ export async function deleteProject(req, res) {
       return res.status(404).json({ error: "Project not found" });
     }
 
+    const projectName = data.projects[projectIndex].name;
+
     data.projects.splice(projectIndex, 1);
     if (data.activeProjectId === id) {
       data.activeProjectId = data.projects[0]?.id || null;
@@ -338,11 +340,24 @@ export async function deleteProject(req, res) {
 
     await writeProjectsFile(data);
 
-    // Delete project directory using slug
+    // Delete project directory
     const projectDir = getProjectDir(id);
     await fs.remove(projectDir);
 
-    res.json({ success: true });
+    // Clean up all exports for this project
+    try {
+      const { cleanupProjectExports } = await import("./exportController.js");
+      const cleanupResult = await cleanupProjectExports(id);
+      console.log(`Export cleanup completed for project ${id}:`, cleanupResult);
+    } catch (exportCleanupError) {
+      console.warn(`Failed to clean up exports for project ${id}:`, exportCleanupError);
+      // Don't fail the project deletion if export cleanup fails
+    }
+
+    res.json({
+      success: true,
+      message: `Project "${projectName}" and all associated files have been deleted successfully`,
+    });
   } catch (error) {
     console.error("Error deleting project:", error);
     res.status(500).json({ error: "Failed to delete project" });
