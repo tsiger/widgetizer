@@ -55,6 +55,7 @@ All metadata for the files in a project's media library is stored in a single JS
       "width": 1920,
       "height": 1080,
       "thumbnail": "/uploads/images/thumb_my-awesome-picture.jpg",
+      "usedIn": ["about-us", "home"],
       "sizes": {
         "thumb": { "path": "/uploads/images/thumb_my-awesome-picture.jpg", "width": 150, "height": 113 },
         "small": { "path": "/uploads/images/small_my-awesome-picture.jpg", "width": 480, "height": 360 },
@@ -74,7 +75,8 @@ All metadata for the files in a project's media library is stored in a single JS
         "alt": "Hero background video showing product in action",
         "title": "Product Demo Video"
       },
-      "thumbnail": null
+      "thumbnail": null,
+      "usedIn": []
     }
     }
   ]
@@ -82,6 +84,18 @@ All metadata for the files in a project's media library is stored in a single JS
 ```
 
 _Note: The `sizes` object only contains entries for enabled image sizes. Disabled sizes are not generated or stored._
+
+### Usage Tracking
+
+The media library automatically tracks which pages are using each media file to prevent accidental deletion of images that are currently in use.
+
+- **`usedIn` Array**: Each file object contains a `usedIn` array with the slugs of pages that reference this file
+- **Automatic Updates**: Usage tracking is updated automatically when:
+  - Pages are saved or updated (scans widget and block settings for `/uploads/images/` paths)
+  - Pages are deleted (removes the page slug from all media files)
+  - Page slugs are changed (removes old slug, adds new slug to relevant files)
+- **Delete Protection**: Files with a non-empty `usedIn` array cannot be deleted
+- **Manual Refresh**: Users can manually refresh usage tracking to recalculate all relationships
 
 ### Video Support
 
@@ -120,8 +134,9 @@ The frontend is a single, powerful component that provides a complete interface 
   - **View Toggle**: Buttons to switch between `MediaGrid` and `MediaList` views. The user's preference is saved in `localStorage`.
   - **Search Bar**: Filters the displayed files by their original filename in real-time.
   - **Bulk Actions**: A "Delete Selected" button that becomes active when one or more files are selected.
-- `MediaGrid`: The default view, showing files as a responsive grid of thumbnail cards.
-- `MediaList`: An alternative table-based view showing more file details at a glance. It includes a "Select All" checkbox.
+  - **Refresh Usage**: A button to manually refresh usage tracking for all media files.
+- `MediaGrid`: The default view, showing files as a responsive grid of thumbnail cards. Files in use display blue badges indicating the number of pages using them.
+- `MediaList`: An alternative table-based view showing more file details at a glance. It includes a "Select All" checkbox and a "Usage" column showing which pages use each file.
 - `MediaDrawer`: A slide-out panel that appears when a user clicks the "Edit" icon on a file. It contains a form to update the file's `alt` text and `title`.
 - `ConfirmationModal`: A dialog that prompts the user for confirmation before deleting a single file or a selection of multiple files.
 
@@ -139,6 +154,7 @@ The frontend is a single, powerful component that provides a complete interface 
   - When a user confirms deletion, the `handleDelete` function is called.
   - It checks if it's a bulk delete or single file delete.
   - It calls either `deleteMultipleMedia` or `deleteProjectMedia` from the `mediaManager`.
+  - **Usage Protection**: If files are currently in use, the backend returns an error and deletion is prevented.
   - On a successful response from the server, it removes the corresponding file(s) from the local `files` state to instantly update the UI.
 - **Metadata Editing (`handleSaveMetadata`)**:
   1.  The user edits the `alt` text or `title` in the `MediaDrawer` and clicks "Save".
@@ -155,9 +171,11 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 | --- | --- | --- | --- | --- |
 | `GET` | `/api/media/projects/:projectId/media` |  | `getProjectMedia` | Reads and returns the `media.json`. |
 | `POST` | `/api/media/projects/:projectId/media` | `upload.array("files")` | `uploadProjectMedia` | Handles file uploads. |
-| `DELETE` | `/api/media/projects/:projectId/media/:fileId` |  | `deleteProjectMedia` | Deletes a single file and its metadata. |
-| `POST` | `/api/media/projects/:projectId/media/bulk-delete` |  | `bulkDeleteProjectMedia` | Deletes multiple files and their metadata. |
+| `DELETE` | `/api/media/projects/:projectId/media/:fileId` |  | `deleteProjectMedia` | Deletes a single file and its metadata. Prevents deletion if file is in use. |
+| `POST` | `/api/media/projects/:projectId/media/bulk-delete` |  | `bulkDeleteProjectMedia` | Deletes multiple files and their metadata. Prevents deletion if any files are in use. |
 | `PUT` | `/api/media/projects/:projectId/media/:fileId/metadata` |  | `updateMediaMetadata` | Updates the metadata for a single file. |
+| `GET` | `/api/media/projects/:projectId/media/:fileId/usage` |  | `getMediaFileUsage` | Returns usage information for a specific media file. |
+| `POST` | `/api/media/projects/:projectId/refresh-usage` |  | `refreshMediaUsage` | Manually refreshes usage tracking for all media files in the project. |
 | `GET` | `/api/media/projects/:projectId/uploads/images/:filename` |  | `serveProjectMedia` | Serves a physical file for viewing. |
 
 ### Controller Logic (`server/controllers/mediaController.js`)
@@ -188,11 +206,27 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 - **Deletion Logic (`deleteProjectMedia`, `bulkDeleteProjectMedia`)**:
   1.  The controller reads `media.json`.
   2.  It finds the file entry (or entries) by ID.
-  3.  It uses `fs.remove` to delete the original physical file and **all** of its generated sizes from the filesystem.
-  4.  It removes the metadata object(s) from the `files` array.
-  5.  It overwrites `media.json` with the updated data.
+  3.  **Usage Check**: It verifies that the file(s) are not currently in use by checking the `usedIn` array. If any files are in use, deletion is prevented with an error response.
+  4.  It uses `fs.remove` to delete the original physical file and **all** of its generated sizes from the filesystem.
+  5.  It removes the metadata object(s) from the `files` array.
+  6.  It overwrites `media.json` with the updated data.
 - **Metadata Update (`updateMediaMetadata`)**:
   1.  The controller reads `media.json`.
   2.  It finds the file to update in the `files` array by its `fileId`.
   3.  It updates the `alt` and `title` properties within the `metadata` object for that file.
   4.  It overwrites `media.json` with the updated data and returns the updated file object.
+
+### Usage Tracking Service (`server/services/mediaUsageService.js`)
+
+The media usage tracking is handled by a dedicated service that provides automated tracking of which pages use which media files:
+
+- **`updatePageMediaUsage(projectId, pageId, pageData)`**: Scans a page's content for image references and updates the `usedIn` arrays in `media.json`. First removes the page from all existing `usedIn` arrays, then adds it to files that are actually referenced.
+- **`removePageFromMediaUsage(projectId, pageId)`**: Removes a page from all media files' `usedIn` arrays when the page is deleted.
+- **`getMediaUsage(projectId, fileId)`**: Returns usage information for a specific media file, including which pages use it.
+- **`refreshAllMediaUsage(projectId)`**: Scans all pages in a project and rebuilds the complete usage tracking data.
+
+**Integration with Page Operations:**
+
+- **Page Save/Update**: Automatically triggers usage tracking updates
+- **Page Delete**: Automatically removes page from all media usage arrays
+- **Slug Changes**: Removes old slug and adds new slug to relevant media files

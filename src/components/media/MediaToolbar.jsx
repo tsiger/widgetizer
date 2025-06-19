@@ -1,4 +1,4 @@
-import { Grid, List, Search, Trash2 } from "lucide-react";
+import { Grid, List, Search, Trash2, RefreshCw } from "lucide-react";
 import { IconButton } from "../ui/Button";
 import Button from "../ui/Button";
 
@@ -9,6 +9,7 @@ export default function MediaToolbar({
   onSearchChange,
   selectedFiles,
   onBulkDelete,
+  onRefreshUsage,
 }) {
   return (
     <div className="mt-4 flex flex-wrap justify-between mb-4 items-center">
@@ -28,20 +29,32 @@ export default function MediaToolbar({
           <List size={20} />
         </IconButton>
 
-        {selectedFiles.length > 0 && (
-          <div className="ml-4 flex items-center">
-            <span className="text-sm text-slate-600 mr-2">{selectedFiles.length} selected</span>
-            <Button
-              onClick={onBulkDelete}
-              variant="danger"
-              size="sm"
-              icon={<Trash2 size={18} />}
-              title="Delete Selected"
-            >
-              Delete
-            </Button>
-          </div>
-        )}
+        <div className="ml-4 flex items-center space-x-2">
+          {selectedFiles.length > 0 && (
+            <>
+              <span className="text-sm text-slate-600">{selectedFiles.length} selected</span>
+              <Button
+                onClick={onBulkDelete}
+                variant="danger"
+                size="sm"
+                icon={<Trash2 size={18} />}
+                title="Delete Selected"
+              >
+                Delete
+              </Button>
+            </>
+          )}
+
+          <Button
+            onClick={onRefreshUsage}
+            variant="neutral"
+            size="sm"
+            icon={<RefreshCw size={18} />}
+            title="Refresh Usage Tracking"
+          >
+            Refresh Usage
+          </Button>
+        </div>
       </div>
 
       <div className="relative">

@@ -96,6 +96,38 @@ export async function deleteMultipleMedia(projectId, fileIds) {
 }
 
 /**
+ * Get usage information for a media file
+ */
+export async function getMediaFileUsage(projectId, fileId) {
+  try {
+    const response = await fetch(API_URL(`/api/media/projects/${projectId}/media/${fileId}/usage`));
+    if (!response.ok) {
+      throw new Error("Failed to get media usage");
+    }
+    return await response.json();
+  } catch (error) {
+    throw new Error("Failed to get media usage");
+  }
+}
+
+/**
+ * Refresh media usage tracking
+ */
+export async function refreshMediaUsage(projectId) {
+  try {
+    const response = await fetch(API_URL(`/api/media/projects/${projectId}/refresh-usage`), {
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to refresh media usage");
+    }
+    return await response.json();
+  } catch (error) {
+    throw new Error("Failed to refresh media usage");
+  }
+}
+
+/**
  * Get the URL for a media file
  */
 export function getMediaUrl(projectId, fileId, type = "original") {

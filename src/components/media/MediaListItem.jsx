@@ -52,6 +52,18 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
       <td className="p-2">{file.width && file.height ? `${file.width}×${file.height}` : "-"}</td>
       <td className="p-2">{formatDate(file.uploaded)}</td>
       <td className="p-2">
+        {file.usedIn && file.usedIn.length > 0 ? (
+          <div
+            className="inline-flex items-center bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
+            title={`Used in: ${file.usedIn.join(", ")}`}
+          >
+            {file.usedIn.length} page{file.usedIn.length > 1 ? "s" : ""}
+          </div>
+        ) : (
+          <span className="text-slate-400 text-xs">Unused</span>
+        )}
+      </td>
+      <td className="p-2">
         <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           <Tooltip content="View">
             <IconButton onClick={onView} variant="neutral" size="sm">

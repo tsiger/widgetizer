@@ -81,5 +81,6 @@ This is the core of the backend logic. The controller functions interact with th
   2.  It sanitizes the incoming page `name` to generate a URL-friendly `slug` (e.g., "My New Page" becomes "my-new-page").
   3.  It checks for slug uniqueness within the project's `pages` directory to prevent filename collisions. If a slug already exists, it appends a number (e.g., `my-new-page-1`).
   4.  It writes the complete page data to the corresponding `.json` file.
-- **Delete Operation**: The controller finds the correct file by its slug and deletes it from the filesystem.
-- **Duplicate Operation**: The controller reads the source page's data, generates a new unique slug (e.g., by appending `-copy`), updates the `name` and `slug` fields in the data, and writes it to a new file.
+  5.  **Media Usage Tracking**: Updates media file usage tracking to reflect which images are used by this page.
+- **Delete Operation**: The controller finds the correct file by its slug and deletes it from the filesystem. Also removes the page from all media usage tracking.
+- **Duplicate Operation**: The controller reads the source page's data, generates a new unique slug (e.g., by appending `-copy`), updates the `name` and `slug` fields in the data, and writes it to a new file. Updates media usage tracking for the duplicated page.

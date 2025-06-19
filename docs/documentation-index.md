@@ -107,8 +107,9 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Understanding media storage and metadata
 - Working with image processing and thumbnails
 - Managing media library interfaces
+- Understanding usage tracking and deletion protection
 
-**Key topics**: File storage, metadata management, upload workflows, thumbnail generation, bulk operations
+**Key topics**: File storage, metadata management, upload workflows, thumbnail generation, bulk operations, usage tracking, deletion protection
 
 ---
 

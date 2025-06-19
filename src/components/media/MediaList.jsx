@@ -33,6 +33,7 @@ export default function MediaList({
             <th className="p-2 text-left">Size</th>
             <th className="p-2 text-left">Dimensions</th>
             <th className="p-2 text-left">Uploaded</th>
+            <th className="p-2 text-left">Usage</th>
             <th className="p-2 text-left">Actions</th>
           </tr>
         </thead>

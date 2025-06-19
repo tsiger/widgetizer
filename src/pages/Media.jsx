@@ -13,7 +13,13 @@ import MediaDrawer from "../components/media/MediaDrawer";
 
 import useConfirmationModal from "../hooks/useConfirmationModal";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
-import { getProjectMedia, uploadProjectMedia, deleteProjectMedia, deleteMultipleMedia } from "../utils/mediaManager";
+import {
+  getProjectMedia,
+  uploadProjectMedia,
+  deleteProjectMedia,
+  deleteMultipleMedia,
+  refreshMediaUsage,
+} from "../utils/mediaManager";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
@@ -53,7 +59,12 @@ export default function Media() {
         showToast(`File "${data.fileName}" deleted successfully`, "success");
       }
     } catch (error) {
-      showToast(`Failed to delete ${data.isBulkDelete ? "files" : "file"}`, "error");
+      // Check if error is related to files being in use
+      if (error.message && error.message.includes("currently in use")) {
+        showToast(`Cannot delete ${data.isBulkDelete ? "files" : "file"} - currently in use by pages`, "error");
+      } else {
+        showToast(`Failed to delete ${data.isBulkDelete ? "files" : "file"}`, "error");
+      }
     }
   };
 
@@ -87,6 +98,18 @@ export default function Media() {
       showToast("Failed to load media files", "error");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRefreshUsage = async () => {
+    if (!activeProject) return;
+
+    try {
+      await refreshMediaUsage(activeProject.id);
+      await loadMediaFiles(); // Reload to get updated usage data
+      showToast("Media usage tracking refreshed", "success");
+    } catch (error) {
+      showToast("Failed to refresh media usage tracking", "error");
     }
   };
 
@@ -325,6 +348,7 @@ export default function Media() {
             onSearchChange={setSearchTerm}
             selectedFiles={selectedFiles}
             onBulkDelete={openBulkDeleteConfirmation}
+            onRefreshUsage={handleRefreshUsage}
           />
 
           {viewMode === "grid" ? (
