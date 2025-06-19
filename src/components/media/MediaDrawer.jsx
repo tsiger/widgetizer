@@ -63,10 +63,14 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
 
   if (!visible) return null;
 
-  // Construct the full image URL for preview
-  const imagePath = selectedFile?.path?.startsWith("/") ? selectedFile.path : `/${selectedFile?.path}`;
-  const imageUrl =
-    selectedFile?.path && activeProject?.id ? API_URL(`/api/media/projects/${activeProject.id}${imagePath}`) : null;
+  // Construct the full file URL for preview using ID-based route
+  const fileUrl =
+    selectedFile?.id && activeProject?.id
+      ? API_URL(`/api/media/projects/${activeProject.id}/media/${selectedFile.id}`)
+      : null;
+
+  // Determine if the file is a video
+  const isVideo = selectedFile?.type?.startsWith("video/");
 
   return (
     <div
@@ -83,7 +87,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
       >
         <div className="flex items-center justify-between p-4 border-b border-slate-200">
           <h2 id="media-drawer-title" className="text-lg font-medium text-slate-800">
-            Edit Image Metadata
+            Edit {isVideo ? "Video" : "Image"} Metadata
           </h2>
           <button
             onClick={onClose}
@@ -95,9 +99,20 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {imageUrl && (
+          {fileUrl && (
             <div className="mb-4 p-2 border border-slate-200 rounded-sm bg-slate-50 flex items-center justify-center">
-              <img src={imageUrl} alt="Preview" className="max-h-40 max-w-full object-contain rounded-sm" />
+              {isVideo ? (
+                <video
+                  src={fileUrl}
+                  className="max-h-40 max-w-full object-contain rounded-sm"
+                  controls
+                  preload="metadata"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <img src={fileUrl} alt="Preview" className="max-h-40 max-w-full object-contain rounded-sm" />
+              )}
             </div>
           )}
 
@@ -115,7 +130,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
               required
               aria-required="true"
             />
-            <p className="form-description">Describes the image for screen readers.</p>
+            <p className="form-description">Describes the {isVideo ? "video content" : "image"} for screen readers.</p>
           </div>
 
           <div className="form-field">
