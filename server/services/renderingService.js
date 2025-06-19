@@ -14,6 +14,7 @@ import { FontsPreconnectTag } from "../../src/core/tags/FontsPreconnectTag.js";
 import { FontsStylesheetTag } from "../../src/core/tags/FontsStylesheetTag.js";
 import { SeoTag } from "../../src/core/tags/SeoTag.js";
 import { registerImageFilter } from "../../src/core/filters/imageFilter.js";
+import { registerVideoFilter } from "../../src/core/filters/videoFilter.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 
 // Get the directory path of the current module
@@ -40,6 +41,7 @@ engine.registerTag("seo", SeoTag);
 
 // Register custom filters
 registerImageFilter(engine);
+registerVideoFilter(engine);
 
 /**
  * Creates base render context with common properties

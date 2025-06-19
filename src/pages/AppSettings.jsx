@@ -99,7 +99,8 @@ export default function AppSettings() {
         ...settings,
         media: {
           ...settings.media,
-          maxFileSizeMB: parseInt(settings.media?.maxFileSizeMB || "1", 10) || 1,
+          maxFileSizeMB: parseInt(settings.media?.maxFileSizeMB || "5", 10) || 5,
+          maxVideoSizeMB: parseInt(settings.media?.maxVideoSizeMB || "50", 10) || 50,
           imageProcessing: {
             quality: parseInt(settings.media?.imageProcessing?.quality || "85", 10) || 85,
             sizes: completeSizes,
@@ -138,8 +139,8 @@ export default function AppSettings() {
       <div className="space-y-6 bg-white p-6 border border-slate-200 rounded-sm">
         <SettingsField
           id="maxFileSize"
-          label="Max Upload File Size (MB)"
-          description="Set the maximum size for individual file uploads across all projects."
+          label="Max Image Upload Size (MB)"
+          description="Set the maximum size for individual image uploads across all projects."
         >
           <TextInput
             type="number"
@@ -147,6 +148,21 @@ export default function AppSettings() {
             name="media.maxFileSizeMB"
             value={settings.media?.maxFileSizeMB || ""}
             onChange={(newValue) => handleInputChange(newValue, "media.maxFileSizeMB")}
+            min="1"
+          />
+        </SettingsField>
+
+        <SettingsField
+          id="maxVideoSize"
+          label="Max Video Upload Size (MB)"
+          description="Set the maximum size for individual video uploads across all projects."
+        >
+          <TextInput
+            type="number"
+            id="maxVideoSize"
+            name="media.maxVideoSizeMB"
+            value={settings.media?.maxVideoSizeMB || ""}
+            onChange={(newValue) => handleInputChange(newValue, "media.maxVideoSizeMB")}
             min="1"
           />
         </SettingsField>

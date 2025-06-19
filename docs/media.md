@@ -8,9 +8,12 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
 
 ### Physical File Storage
 
-- **Location**: Uploaded files are physically stored on the server's filesystem at `/data/projects/<projectId>/uploads/images/`.
+- **Location**: Uploaded files are physically stored on the server's filesystem:
+  - **Images**: `/data/projects/<projectId>/uploads/images/`
+  - **Videos**: `/data/projects/<projectId>/uploads/videos/`
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
 - **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original with prefixes (e.g., `thumb_`, `small_`, `medium_`, `large_`).
+- **Video Processing**: Videos are stored without any processing - no thumbnail generation or metadata extraction. This keeps the upload process simple and fast.
 
 ### Image Processing Configuration
 
@@ -58,12 +61,53 @@ All metadata for the files in a project's media library is stored in a single JS
         "medium": { "path": "/uploads/images/medium_my-awesome-picture.jpg", "width": 1024, "height": 768 }
         // Note: "large" size omitted if disabled in settings
       }
+    },
+    {
+      "id": "v4e3b2c1-f6a5-4b9e-8d7c-6f5e4d3c2b1a",
+      "filename": "hero-video.mp4",
+      "originalName": "Hero Video.mp4",
+      "type": "video/mp4",
+      "size": 15728640,
+      "uploaded": "2023-10-29T11:00:00.000Z",
+      "path": "/uploads/videos/hero-video.mp4",
+      "metadata": {
+        "alt": "Hero background video showing product in action",
+        "title": "Product Demo Video"
+      },
+      "thumbnail": null
+    }
     }
   ]
 }
 ```
 
 _Note: The `sizes` object only contains entries for enabled image sizes. Disabled sizes are not generated or stored._
+
+### Video Support
+
+The media library supports video uploads alongside images with the following features:
+
+**Supported Video Formats:**
+
+- MP4 (recommended for best browser compatibility)
+- WebM
+- OGG
+- AVI
+- MOV
+
+**Video Processing:**
+
+- **No Processing**: Videos are uploaded and stored as-is without any processing
+- **No Thumbnails**: Videos do not generate thumbnail images
+- **No Metadata Extraction**: Video dimensions and duration are not extracted
+- **Simple Storage**: Videos maintain their original quality and file size
+- **Separate Directory**: Videos are stored in `/uploads/videos/` directory
+- **Size Limits**: Videos have separate size limits from images (configurable in App Settings)
+
+**Video-Specific Metadata:**
+
+- `thumbnail`: Always `null` for videos (no thumbnails generated)
+- No additional metadata is extracted or stored for videos
 
 ## 2. Frontend Implementation (`src/pages/Media.jsx`)
 
@@ -125,21 +169,22 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
   // Returns only enabled sizes with their width and quality settings
   ```
 - **File Upload (`multer` + `uploadProjectMedia`)**:
-  1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (`/data/projects/<projectId>/uploads/images/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (e.g., `image/jpeg`).
-  2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the `media.maxFileSizeMB` setting.
+  1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (images: `/data/projects/<projectId>/uploads/images/`, videos: `/data/projects/<projectId>/uploads/videos/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type.
+  2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the appropriate size limit (`media.maxFileSizeMB` for images, `media.maxVideoSizeMB` for videos).
   3.  For each valid file, it generates a unique ID (`uuidv4`).
   4.  If the file is an image (not an SVG), it uses the `sharp` library to:
       - Read the original `width` and `height`.
       - **Dynamically load** the current image processing settings from App Settings
       - Generate **only the enabled** image sizes with the configured quality setting
       - Apply the configured maximum widths for each enabled size
-  5.  It creates a new metadata object for the file—including a `sizes` object containing the paths and dimensions for each generated variant—and adds it to the `files` array in `media.json`.
-  6.  **Thumbnail Assignment**: The system ensures there's always a thumbnail for previews:
+  5.  If the file is a video, no processing is performed - it's simply stored as-is.
+  6.  It creates a new metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants (images only)—and adds it to the `files` array in `media.json`.
+  7.  **Thumbnail Assignment**: The system ensures there's always a thumbnail for previews:
       - If `thumb` size is enabled: uses the thumb image
       - If `thumb` is disabled: uses the first available enabled size
       - If no sizes are enabled: uses the original image
-  7.  Files that are too large or have the wrong type are rejected and immediately deleted from the server.
-  8.  It returns a JSON response to the client with arrays of successfully processed and rejected files.
+  8.  Files that are too large or have the wrong type are rejected and immediately deleted from the server.
+  9.  It returns a JSON response to the client with arrays of successfully processed and rejected files.
 - **Deletion Logic (`deleteProjectMedia`, `bulkDeleteProjectMedia`)**:
   1.  The controller reads `media.json`.
   2.  It finds the file entry (or entries) by ID.

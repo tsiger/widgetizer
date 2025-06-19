@@ -176,6 +176,20 @@ An image uploader that includes a preview, the ability to replace the image, and
 }
 ```
 
+### Video
+
+A video uploader that includes a preview with thumbnail, the ability to replace the video, and a button to browse the media library. The value is the URL path to the video file.
+
+```json
+{
+  "id": "hero_video",
+  "type": "video",
+  "label": "Hero Background Video",
+  "default": "/default-video.mp4",
+  "description": "Upload a background video for the hero section."
+}
+```
+
 ### Menu
 
 A dropdown that is automatically populated with all available menus created in the system. The value is the ID of the selected menu.

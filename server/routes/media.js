@@ -36,4 +36,11 @@ router.get("/projects/:projectId/uploads/images/:filename", (req, res) => {
   serveProjectMedia(req, res);
 });
 
+// Serve media files directly from uploads/videos
+router.get("/projects/:projectId/uploads/videos/:filename", (req, res) => {
+  const { projectId, filename } = req.params;
+  req.params.filename = filename;
+  serveProjectMedia(req, res);
+});
+
 export default router;

@@ -10,7 +10,8 @@ The `AppSettings` page is responsible for managing global configurations that ap
 
 #### File Upload Limits
 
-- **Maximum File Size**: Controls the size limit for individual file uploads across all projects
+- **Maximum Image File Size**: Controls the size limit for individual image uploads across all projects
+- **Maximum Video File Size**: Controls the size limit for individual video uploads across all projects (separate from image limit)
 
 #### Image Processing Configuration
 
@@ -54,7 +55,7 @@ The `AppSettings` component follows a straightforward pattern for managing its d
 
 - When the user clicks "Save Settings", the `handleSave` function is triggered.
 - Before sending the data, it performs comprehensive data transformation and validation:
-  - Ensures the `maxFileSizeMB` is parsed into an integer
+  - Ensures both `maxFileSizeMB` and `maxVideoSizeMB` are parsed into integers
   - **Image Processing**: Validates and ensures complete configuration objects:
     - Quality is parsed and validated (1-100 range)
     - All image sizes have both `width` and `enabled` properties
@@ -68,12 +69,14 @@ Unlike theme settings, which are primarily consumed by the frontend via a global
 
 ### File Upload Size Validation
 
-The `maxFileSizeMB` setting demonstrates server-side enforcement:
+The file size settings demonstrate server-side enforcement:
 
-1.  When a user uploads a file through the Media Manager, the file is sent directly to the server.
-2.  The backend route (`/api/media/projects/:projectId/media`) receives the file.
-3.  Before processing the upload, the server-side controller (`mediaController.js`) reads the `maxFileSizeMB` value directly from the application's settings file.
-4.  It compares the uploaded file's size against this value. If the file is too large, the server rejects it and sends an error message back to the client.
+1.  When a user uploads files through the Media Manager, the files are sent directly to the server.
+2.  The backend route (`/api/media/projects/:projectId/media`) receives the files.
+3.  Before processing the upload, the server-side controller (`mediaController.js`) reads the appropriate size limit directly from the application's settings file:
+    - `maxFileSizeMB` for images
+    - `maxVideoSizeMB` for videos
+4.  It compares each uploaded file's size against the appropriate limit. If a file is too large, the server rejects it and sends an error message back to the client.
 
 ### Image Processing Configuration
 

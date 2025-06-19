@@ -33,7 +33,9 @@ export const getProjectThemeWidgetsDir = (projectId) => path.join(getProjectThem
 // Project Media paths
 export const getProjectUploadsDir = (projectId) => path.join(getProjectDir(projectId), "uploads");
 export const getProjectImagesDir = (projectId) => path.join(getProjectUploadsDir(projectId), "images");
+export const getProjectVideosDir = (projectId) => path.join(getProjectUploadsDir(projectId), "videos");
 export const getProjectThumbnailsDir = (projectId) => path.join(getProjectUploadsDir(projectId), "thumbnails");
 export const getProjectMediaJsonPath = (projectId) => path.join(getProjectUploadsDir(projectId), "media.json");
 export const getImagePath = (projectId, filename) => path.join(getProjectImagesDir(projectId), filename);
+export const getVideoPath = (projectId, filename) => path.join(getProjectVideosDir(projectId), filename);
 export const getThumbnailPath = (projectId, filename) => path.join(getProjectThumbnailsDir(projectId), filename);
