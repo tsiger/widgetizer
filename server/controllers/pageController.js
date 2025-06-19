@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import slugify from "slugify";
 import { getProjectsFilePath, getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
 import path from "path";
+import { updatePageMediaUsage, removePageFromMediaUsage } from "../services/mediaUsageService.js";
 
 async function readProjectsFile() {
   const projectsPath = getProjectsFilePath();
@@ -269,6 +270,19 @@ export async function updatePage(req, res) {
       }
     }
 
+    // Update media usage tracking
+    try {
+      // If slug changed, remove the old slug first
+      if (oldSlug !== finalNewSlug) {
+        await removePageFromMediaUsage(activeProject.id, oldSlug);
+      }
+      // Then update with the new slug (or refresh if slug didn't change)
+      await updatePageMediaUsage(activeProject.id, finalNewSlug, finalUpdatedPageData);
+    } catch (usageError) {
+      console.warn(`Failed to update media usage tracking for page ${finalNewSlug}:`, usageError);
+      // Don't fail the request if usage tracking fails
+    }
+
     res.json({ success: true, data: finalUpdatedPageData });
   } catch (error) {
     console.error("Error updating page:", error);
@@ -325,6 +339,14 @@ export async function deletePage(req, res) {
 
     // Delete the page file
     await fs.remove(pagePath);
+
+    // Remove the page from media usage tracking
+    try {
+      await removePageFromMediaUsage(activeProject.id, pageId);
+    } catch (usageError) {
+      console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
+      // Don't fail the request if usage tracking fails
+    }
 
     res.json({ success: true });
   } catch (error) {
@@ -438,6 +460,19 @@ export async function savePageContent(req, res) {
       }
     }
 
+    // Update media usage tracking
+    try {
+      // If slug changed, remove the old slug first
+      if (id !== pageData.slug) {
+        await removePageFromMediaUsage(activeProjectId, id);
+      }
+      // Then update with the new slug
+      await updatePageMediaUsage(activeProjectId, pageData.slug, updatedPageData);
+    } catch (usageError) {
+      console.warn(`Failed to update media usage tracking for page ${pageData.slug}:`, usageError);
+      // Don't fail the request if usage tracking fails
+    }
+
     res.json({ success: true, message: "Page saved successfully" });
   } catch (error) {
     console.error(`Error saving page content for ${id}:`, error);
@@ -510,6 +545,14 @@ export async function duplicatePage(req, res) {
     // Save the new page
     const newPagePath = getPagePath(activeProject.id, newSlug);
     await fs.outputFile(newPagePath, JSON.stringify(newPage, null, 2));
+
+    // Update media usage tracking for the new page
+    try {
+      await updatePageMediaUsage(activeProject.id, newSlug, newPage);
+    } catch (usageError) {
+      console.warn(`Failed to update media usage tracking for duplicated page ${newSlug}:`, usageError);
+      // Don't fail the request if usage tracking fails
+    }
 
     res.status(201).json(newPage);
   } catch (error) {

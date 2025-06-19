@@ -7,6 +7,8 @@ import {
   upload,
   bulkDeleteProjectMedia,
   updateMediaMetadata,
+  getMediaFileUsage,
+  refreshMediaUsage,
 } from "../controllers/mediaController.js";
 
 const router = express.Router();
@@ -25,6 +27,12 @@ router.delete("/projects/:projectId/media/:fileId", deleteProjectMedia);
 
 // Bulk delete media files
 router.post("/projects/:projectId/media/bulk-delete", bulkDeleteProjectMedia);
+
+// Get media file usage
+router.get("/projects/:projectId/media/:fileId/usage", getMediaFileUsage);
+
+// Refresh media usage tracking
+router.post("/projects/:projectId/refresh-usage", refreshMediaUsage);
 
 // Serve a media file by ID
 router.get("/projects/:projectId/media/:fileId", serveProjectMedia);

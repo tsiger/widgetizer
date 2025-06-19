@@ -14,6 +14,7 @@ import {
   getVideoPath,
 } from "../config.js";
 import { getSetting } from "./appSettingsController.js";
+import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
 
 // Get image processing settings from app settings
 async function getImageProcessingSettings() {
@@ -387,6 +388,15 @@ export async function deleteProjectMedia(req, res) {
 
     const fileToDelete = mediaData.files[fileIndex];
 
+    // Check if file is currently in use
+    if (fileToDelete.usedIn && fileToDelete.usedIn.length > 0) {
+      return res.status(400).json({
+        error: "Cannot delete file that is currently in use",
+        usedIn: fileToDelete.usedIn,
+        filename: fileToDelete.filename,
+      });
+    }
+
     // Remove the physical files from storage
     let fileDir;
     if (fileToDelete.type && fileToDelete.type.startsWith("video/")) {
@@ -521,13 +531,31 @@ export async function bulkDeleteProjectMedia(req, res) {
     const remainingFiles = [];
 
     // Separate files to delete from files to keep
+    const filesInUse = [];
     mediaData.files.forEach((file) => {
       if (fileIds.includes(file.id)) {
-        filesToDelete.push(file);
+        // Check if file is in use before adding to delete list
+        if (file.usedIn && file.usedIn.length > 0) {
+          filesInUse.push({
+            id: file.id,
+            filename: file.filename,
+            usedIn: file.usedIn,
+          });
+        } else {
+          filesToDelete.push(file);
+        }
       } else {
         remainingFiles.push(file);
       }
     });
+
+    // If any files are in use, return error
+    if (filesInUse.length > 0) {
+      return res.status(400).json({
+        error: "Cannot delete files that are currently in use",
+        filesInUse: filesInUse,
+      });
+    }
 
     if (filesToDelete.length === 0) {
       return res.status(404).json({ error: "No matching files found to delete" });
@@ -581,5 +609,33 @@ export async function bulkDeleteProjectMedia(req, res) {
       error: "Failed to delete files.",
       details: process.env.NODE_ENV === "development" ? error.stack : undefined,
     });
+  }
+}
+
+// Get usage information for a specific media file
+export async function getMediaFileUsage(req, res) {
+  try {
+    const { projectId, fileId } = req.params;
+    const usage = await getMediaUsage(projectId, fileId);
+    res.json(usage);
+  } catch (error) {
+    console.error("Error getting media usage:", error);
+    if (error.message === "File not found") {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "Failed to get media usage" });
+    }
+  }
+}
+
+// Refresh media usage tracking for all pages in a project
+export async function refreshMediaUsage(req, res) {
+  try {
+    const { projectId } = req.params;
+    const result = await refreshAllMediaUsage(projectId);
+    res.json(result);
+  } catch (error) {
+    console.error("Error refreshing media usage:", error);
+    res.status(500).json({ error: "Failed to refresh media usage" });
   }
 }
