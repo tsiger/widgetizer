@@ -206,11 +206,30 @@ export async function uploadProjectMedia(req, res) {
           for (const [name, config] of Object.entries(imageProcessingSettings)) {
             const sizeFilename = `${name}_${file.filename}`;
             const sizeFilePath = path.join(path.dirname(file.path), sizeFilename);
-            const resized = await image
+
+            // Create a resized image instance
+            let resizedImage = image
               .clone() // Clone from the original sharp instance
-              .resize(config.width, null, { fit: "inside", withoutEnlargement: true })
-              .jpeg({ quality: config.quality })
-              .toFile(sizeFilePath);
+              .resize(config.width, null, { fit: "inside", withoutEnlargement: true });
+
+            // Apply appropriate format based on original file type to preserve transparency
+            switch (file.mimetype) {
+              case "image/png":
+                resizedImage = resizedImage.png({ quality: config.quality });
+                break;
+              case "image/gif":
+                resizedImage = resizedImage.gif();
+                break;
+              case "image/webp":
+                resizedImage = resizedImage.webp({ quality: config.quality });
+                break;
+              case "image/jpeg":
+              default:
+                resizedImage = resizedImage.jpeg({ quality: config.quality });
+                break;
+            }
+
+            const resized = await resizedImage.toFile(sizeFilePath);
 
             fileInfo.sizes[name] = {
               path: `/uploads/images/${sizeFilename}`,
