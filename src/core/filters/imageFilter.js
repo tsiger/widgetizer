@@ -1,7 +1,7 @@
 import path from "path";
 
 function registerImageFilter(engine) {
-  engine.registerFilter("image", function (input, options) {
+  engine.registerFilter("image", function (input, ...args) {
     // Handle blank input gracefully
     if (!input || typeof input !== "string") {
       return "";
@@ -16,14 +16,21 @@ function registerImageFilter(engine) {
       return `<!-- Image filter error: media file "${filename}" not found in media.json -->`;
     }
 
-    // Sensible defaults for options
+    // Parse arguments - LiquidJS passes them as individual parameters
+    // Usage: {{ image | image: 'small' }} or {{ image | image: 'large', 'hero-class', false }}
+    const size = args[0] || "medium";
+    const cssClass = args[1] || "";
+    const lazy = args[2] !== false; // Default to true unless explicitly false
+    const altOverride = args[3] || "";
+    const titleOverride = args[4] || "";
+
+    // Build final options
     const opts = {
-      size: "medium",
-      lazy: true,
-      class: "",
-      alt: mediaFile.metadata?.alt || "",
-      title: mediaFile.metadata?.title || "",
-      ...options,
+      size: size,
+      lazy: lazy,
+      class: cssClass,
+      alt: altOverride || mediaFile.metadata?.alt || "",
+      title: titleOverride || mediaFile.metadata?.title || "",
     };
 
     // Find the requested size, or fallback gracefully

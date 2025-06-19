@@ -76,7 +76,7 @@
 	>
 		<div class="media-with-text__image-area">
 			{% if widget.settings.widgetImage != blank %}
-				{{ widget.settings.widgetImage | image: size: 'large', class: 'media-with-text__image' }}
+				{{ widget.settings.widgetImage | image: 'large', 'media-with-text__image' }}
 			{% else %}
 				<img src="https://placehold.co/600x400?text=Select+an+Image" alt="Placeholder Image" class="media-with-text__image">
 			{% endif %}

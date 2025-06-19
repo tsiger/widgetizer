@@ -13,6 +13,7 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
   - **Videos**: `/data/projects/<projectId>/uploads/videos/`
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
 - **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original with prefixes (e.g., `thumb_`, `small_`, `medium_`, `large_`).
+- **Smart Size Generation**: The system only creates image sizes that are meaningfully smaller than the original. If an image is 800px wide and the "large" size is configured for 1920px, no "large" size will be generated since it would be identical to a smaller size. The image filter automatically falls back to the best available size or original image.
 - **Video Processing**: Videos are stored without any processing - no thumbnail generation or metadata extraction. This keeps the upload process simple and fast.
 
 ### Image Processing Configuration
@@ -195,6 +196,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
       - **Dynamically load** the current image processing settings from App Settings
       - Generate **only the enabled** image sizes with the configured quality setting
       - Apply the configured maximum widths for each enabled size
+      - **Skip sizes larger than original**: Only creates sizes that are smaller than the original image dimensions to avoid storage waste
   5.  If the file is a video, no processing is performed - it's simply stored as-is.
   6.  It creates a new metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants (images only)—and adds it to the `files` array in `media.json`.
   7.  **Thumbnail Assignment**: The system ensures there's always a thumbnail for previews:

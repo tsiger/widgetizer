@@ -244,6 +244,14 @@ export async function uploadProjectMedia(req, res) {
           // Generate different sizes
           const imageProcessingSettings = await getImageProcessingSettings();
           for (const [name, config] of Object.entries(imageProcessingSettings)) {
+            // Skip creating sizes that would be same as or larger than original
+            if (config.width >= imgMetadata.width) {
+              console.log(
+                `Skipping ${name} size (${config.width}px) for ${file.filename} - original is only ${imgMetadata.width}px`,
+              );
+              continue;
+            }
+
             const sizeFilename = `${name}_${file.filename}`;
             const sizeFilePath = path.join(path.dirname(file.path), sizeFilename);
 

@@ -151,7 +151,7 @@ Widgetizer provides powerful Liquid filters to simplify common tasks.
 
 The `image` filter is the recommended way to render images in your theme. It automatically handles generating the correct `src` for different image sizes, adds important attributes like `width`, `height`, and `alt`, and enables lazy loading by default.
 
-It takes the image filename (or path) as input and an optional object of parameters.
+It takes the image filename (or path) as input and optional positional parameters.
 
 #### Basic Usage
 
@@ -161,21 +161,43 @@ It takes the image filename (or path) as input and an optional object of paramet
 
 This will render a medium-sized, lazy-loaded `<img>` tag with the alt text from the media library.
 
-#### Advanced Usage with Options
+#### Advanced Usage with Parameters
 
 ```liquid
-{{ widget.settings.myImage | image: size: 'large', class: 'hero-image', lazy: false, alt: 'Custom alt text' }}
+{{ widget.settings.myImage | image: 'large', 'hero-image', false, 'Custom alt text' }}
 ```
 
-#### Available Options
+#### Parameter Order
 
-| Option | Type | Default | Description |
-| :-- | :-- | :-- | :-- |
-| `size` | String | `'medium'` | Specifies which image size to render. Available sizes are `thumb`, `small`, `medium`, `large`. If the size doesn't exist for an image, it gracefully falls back to the original uploaded file. |
-| `class` | String | `''` | Adds a CSS class to the `<img>` tag. |
-| `lazy` | Boolean | `true` | If true, adds the `loading="lazy"` attribute to the `<img>` tag for better performance. |
-| `alt` | String | (from media) | Overrides the alt text defined in the media library. If not provided, the value from the media library is used. |
-| `title` | String | (from media) | Overrides the title text defined in the media library. If not provided, the value from the media library is used. The attribute is omitted if no title is set in the options or in the media library. |
+The image filter accepts up to 5 positional parameters in this order:
+
+| Position | Parameter | Type | Default | Description |
+| :-- | :-- | :-- | :-- | :-- |
+| 1 | `size` | String | `'medium'` | Image size to render: `'thumb'`, `'small'`, `'medium'`, `'large'`. Falls back to original if size doesn't exist. |
+| 2 | `class` | String | `''` | CSS class to add to the `<img>` tag. |
+| 3 | `lazy` | Boolean | `true` | Whether to add `loading="lazy"` attribute for performance. |
+| 4 | `alt` | String | (from media) | Override alt text from media library. |
+| 5 | `title` | String | (from media) | Override title text from media library. |
+
+#### Usage Examples
+
+```liquid
+<!-- Different sizes -->
+{{ widget.settings.heroImage | image: 'large' }}
+{{ widget.settings.thumbnail | image: 'thumb' }}
+
+<!-- With CSS class -->
+{{ widget.settings.productImage | image: 'medium', 'product-photo' }}
+
+<!-- Disable lazy loading -->
+{{ widget.settings.heroImage | image: 'large', 'hero-image', false }}
+
+<!-- Custom alt text -->
+{{ widget.settings.photo | image: 'medium', '', true, 'Custom description' }}
+
+<!-- All parameters -->
+{{ widget.settings.banner | image: 'large', 'banner-img', false, 'Banner image', 'Promotional banner' }}
+```
 
 ### `video`
 
