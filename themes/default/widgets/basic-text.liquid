@@ -70,7 +70,7 @@
 		{% endif %}
 
 		{% if widget.settings.widgetImage != blank %}
-			{{ widget.settings.widgetImage | image: size: 'medium', class: 'basic-text__widget-image' }}
+			{{ widget.settings.widgetImage | image: 'medium', 'basic-text__widget-image' }}
 		{% endif %}
 
 		{% if widget.settings.heading != blank %}
@@ -101,7 +101,7 @@
 							<h4>Content Block Type</h4>
 							<h3 class="basic-text__block-title">{{ block.settings.title }}</h3>
 							{% if block.settings.blockImage != blank %}
-								{{ block.settings.blockImage | image: size: 'small', class: 'basic-text__block-image' }}
+								{{ block.settings.blockImage | image: 'small', 'basic-text__block-image' }}
 							{% endif %}
 							<div class="basic-text__block-content">
 								{{ block.settings.content }}
@@ -112,7 +112,7 @@
 							<h4>Other Block Type</h4>
 							<h3 class="basic-text__block-title" style="font-style: italic;">{{ block.settings.title }}</h3>
 							{% if block.settings.blockImage != blank %}
-								{{ block.settings.blockImage | image: size: 'small', class: 'basic-text__block-image small-image' }}
+								{{ block.settings.blockImage | image: 'small', 'basic-text__block-image small-image' }}
 							{% endif %}
 
 						{% else %}
