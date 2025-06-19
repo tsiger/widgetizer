@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { X, Search } from "lucide-react";
+import { X, Search, Play } from "lucide-react";
 import { API_URL } from "../../config";
 import { getProjectMedia } from "../../utils/mediaManager";
 import LoadingSpinner from "../ui/LoadingSpinner";
 
-export default function MediaSelectorDrawer({ visible, onClose, onSelect, activeProject }) {
+export default function MediaSelectorDrawer({ visible, onClose, onSelect, activeProject, filterType = "all" }) {
   const [mediaFiles, setMediaFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -43,8 +43,20 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
     }
   };
 
-  // Filter files based on search term
-  const filteredFiles = mediaFiles.filter((file) => file.originalName.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Filter files based on search term and type
+  const filteredFiles = mediaFiles.filter((file) => {
+    const matchesSearch = file.originalName.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (filterType === "all") {
+      return matchesSearch;
+    } else if (filterType === "image") {
+      return matchesSearch && file.type && file.type.startsWith("image/");
+    } else if (filterType === "video") {
+      return matchesSearch && file.type && file.type.startsWith("video/");
+    }
+
+    return matchesSearch;
+  });
 
   // Handle Escape key press to close the drawer
   useEffect(() => {
@@ -117,11 +129,18 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
                   onClick={() => onSelect(file)}
                 >
                   <div className="aspect-square relative bg-slate-100 flex items-center justify-center">
-                    <img
-                      src={API_URL(`/api/media/projects/${activeProject.id}${file.path}`)}
-                      alt={file.metadata?.alt || ""}
-                      className="max-w-full max-h-full object-contain"
-                    />
+                    {file.type && file.type.startsWith("video/") ? (
+                      <div className="flex flex-col items-center justify-center text-slate-500 p-2">
+                        <Play size={32} />
+                        <p className="text-xs text-center mt-1 font-medium truncate max-w-full">Video</p>
+                      </div>
+                    ) : (
+                      <img
+                        src={API_URL(`/api/media/projects/${activeProject.id}${file.thumbnail || file.path}`)}
+                        alt={file.metadata?.alt || ""}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    )}
                   </div>
                   <div className="p-2">
                     <p className="text-xs truncate" title={file.originalName}>

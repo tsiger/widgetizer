@@ -15,6 +15,7 @@ export default function MediaUploader({ onUpload, uploading, uploadProgress = {}
     onDrop,
     accept: {
       "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp", ".svg"],
+      "video/*": [".mp4", ".webm", ".mov", ".avi", ".mkv"],
     },
   });
 
@@ -28,10 +29,14 @@ export default function MediaUploader({ onUpload, uploading, uploadProgress = {}
       >
         <input {...getInputProps()} />
         <p className="text-slate-500 mb-2">
-          {isDragActive ? "Drop the files here..." : "Drag and drop image files here or"}
+          {isDragActive ? "Drop the files here..." : "Drag and drop images and videos here or"}
         </p>
         <Button variant="primary">Select Files</Button>
-        <p className="text-xs text-slate-500 mt-2">Supported formats: JPG, PNG, GIF, WebP, SVG</p>
+        <p className="text-xs text-slate-500 mt-2">
+          Images: JPG, PNG, GIF, WebP, SVG
+          <br />
+          Videos: MP4, WebM, MOV, AVI, MKV
+        </p>
       </div>
 
       {uploading && Object.keys(uploadProgress).length > 0 && (

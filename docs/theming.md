@@ -177,6 +177,40 @@ This will render a medium-sized, lazy-loaded `<img>` tag with the alt text from 
 | `alt` | String | (from media) | Overrides the alt text defined in the media library. If not provided, the value from the media library is used. |
 | `title` | String | (from media) | Overrides the title text defined in the media library. If not provided, the value from the media library is used. The attribute is omitted if no title is set in the options or in the media library. |
 
+### `video`
+
+The `video` filter renders HTML5 video elements with proper attributes and fallbacks. Since videos don't have auto-generated thumbnails or extracted metadata, the filter provides a simple way to embed videos with customizable options.
+
+It takes the video filename (or path) as input and an optional object of parameters.
+
+#### Basic Usage
+
+```liquid
+{{ widget.settings.heroVideo | video }}
+```
+
+This will render a video element with controls enabled and metadata preloading.
+
+#### Advanced Usage with Options
+
+```liquid
+{{ widget.settings.heroVideo | video: controls: false, autoplay: true, muted: true, loop: true, class: 'hero-video' }}
+```
+
+#### Available Options
+
+| Option | Type | Default | Description |
+| :-- | :-- | :-- | :-- |
+| `controls` | Boolean | `true` | Show video controls (play, pause, volume, etc.). |
+| `autoplay` | Boolean | `false` | Auto-play video on load. Note: most browsers require `muted: true` for autoplay to work. |
+| `muted` | Boolean | `false` | Mute video by default. Required for autoplay in most browsers. |
+| `loop` | Boolean | `false` | Loop video playback continuously. |
+| `preload` | String | `'metadata'` | Preload behavior. Options: `'none'`, `'metadata'`, `'auto'`. |
+| `class` | String | `''` | Adds a CSS class to the `<video>` tag. |
+| `width` | Number | `null` | Override the video width. No default width is set. |
+| `height` | Number | `null` | Override the video height. No default height is set. |
+| `poster` | String | `''` | Override the poster image. No poster is provided by default since videos don't generate thumbnails. |
+
 ## 5. Widgets
 
 Widgets are reusable components that can be added to pages. Each widget is a self-contained Liquid template with embedded configuration schema.

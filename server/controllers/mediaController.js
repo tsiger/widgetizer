@@ -5,7 +5,14 @@ import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import sharp from "sharp";
 import slugify from "slugify";
-import { getProjectDir, getProjectImagesDir, getProjectMediaJsonPath, getImagePath } from "../config.js";
+import {
+  getProjectDir,
+  getProjectImagesDir,
+  getProjectVideosDir,
+  getProjectMediaJsonPath,
+  getImagePath,
+  getVideoPath,
+} from "../config.js";
 import { getSetting } from "./appSettingsController.js";
 
 // Get image processing settings from app settings
@@ -30,7 +37,18 @@ async function getImageProcessingSettings() {
   return enabledSizes;
 }
 
-const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
+const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+  "video/mp4",
+  "video/webm",
+  "video/ogg",
+  "video/avi",
+  "video/mov",
+];
 
 // Decode the filename TODO: Where should things like this live?
 function decodeFileName(filename) {
@@ -72,9 +90,16 @@ const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
     try {
       const { projectId } = req.params;
-      const imagesDir = getProjectImagesDir(projectId);
-      await fs.ensureDir(imagesDir);
-      cb(null, imagesDir);
+      let targetDir;
+
+      if (file.mimetype.startsWith("video/")) {
+        targetDir = getProjectVideosDir(projectId);
+      } else {
+        targetDir = getProjectImagesDir(projectId);
+      }
+
+      await fs.ensureDir(targetDir);
+      cb(null, targetDir);
     } catch (error) {
       cb(error);
     }
@@ -86,10 +111,17 @@ const storage = multer.diskStorage({
       const nameWithoutExt = path.basename(decodedName, extension);
       let cleanName = slugify(nameWithoutExt, { lower: true, strict: true, trim: true });
       const { projectId } = req.params;
-      const imagesDir = getProjectImagesDir(projectId);
+
+      let targetDir;
+      if (file.mimetype.startsWith("video/")) {
+        targetDir = getProjectVideosDir(projectId);
+      } else {
+        targetDir = getProjectImagesDir(projectId);
+      }
+
       let finalName = `${cleanName}${extension}`;
       let counter = 1;
-      while (await fs.pathExists(path.join(imagesDir, finalName))) {
+      while (await fs.pathExists(path.join(targetDir, finalName))) {
         finalName = `${cleanName}-${counter}${extension}`;
         counter++;
       }
@@ -105,7 +137,7 @@ const fileFilter = (req, file, cb) => {
   if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Only images are allowed."), false);
+    cb(new Error("Invalid file type. Only images and videos are allowed."), false);
   }
 };
 
@@ -151,9 +183,9 @@ export async function uploadProjectMedia(req, res) {
       return res.status(400).json({ error: "No valid files uploaded or received." });
     }
 
-    // Get the dynamic file size limit *now*
-    const maxFileSizeMB = await getSetting("media.maxFileSizeMB");
-    const maxSizeBytes = (maxFileSizeMB || 1) * 1024 * 1024; // Default 1MB
+    // Get the dynamic file size limits
+    const maxImageSizeMB = await getSetting("media.maxFileSizeMB");
+    const maxVideoSizeMB = await getSetting("media.maxVideoSizeMB");
 
     const mediaData = await readMediaFile(projectId);
     const processedFiles = [];
@@ -161,12 +193,17 @@ export async function uploadProjectMedia(req, res) {
 
     // Process each uploaded file
     for (const file of files) {
-      // Check file size against the dynamic limit
+      // Check file size against the appropriate limit
+      const isVideo = file.mimetype.startsWith("video/");
+      const maxSizeMB = isVideo ? maxVideoSizeMB || 50 : maxImageSizeMB || 5;
+      const maxSizeBytes = maxSizeMB * 1024 * 1024;
+
       if (file.size > maxSizeBytes) {
         // File exceeds limit, reject it and delete temp file
+        const fileType = isVideo ? "video" : "image";
         rejectedFiles.push({
           originalName: file.originalname,
-          reason: `File size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds limit of ${maxFileSizeMB}MB.`,
+          reason: `${fileType} size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds limit of ${maxSizeMB}MB.`,
           sizeBytes: file.size,
         });
         // Attempt to delete the oversized file multer saved
@@ -180,6 +217,8 @@ export async function uploadProjectMedia(req, res) {
 
       // --- File is within size limit, proceed with processing ---
       const fileId = uuidv4();
+      const uploadPath = isVideo ? `/uploads/videos/${file.filename}` : `/uploads/images/${file.filename}`;
+
       const fileInfo = {
         id: fileId,
         filename: file.filename,
@@ -187,14 +226,14 @@ export async function uploadProjectMedia(req, res) {
         type: file.mimetype,
         size: file.size,
         uploaded: new Date().toISOString(),
-        path: `/uploads/images/${file.filename}`,
+        path: uploadPath,
         metadata: { alt: "", title: "" },
         sizes: {}, // Initialize sizes object
         // usedIn: [] // If using the previous usedIn tracking
       };
 
       // Process image files (thumbnails, dimensions etc.)
-      if (file.mimetype !== "image/svg+xml") {
+      if (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") {
         try {
           const image = sharp(file.path);
           const imgMetadata = await image.metadata();
@@ -256,6 +295,13 @@ export async function uploadProjectMedia(req, res) {
           fileInfo.processingError = err.message;
           // Consider if processing error should reject the file
         }
+      }
+
+      // Process video files (basic metadata only)
+      if (file.mimetype.startsWith("video/")) {
+        // For videos, we don't generate thumbnails or extract metadata
+        // Just set some basic properties
+        fileInfo.thumbnail = null; // No thumbnail for videos
       }
 
       mediaData.files.push(fileInfo);
@@ -342,10 +388,15 @@ export async function deleteProjectMedia(req, res) {
     const fileToDelete = mediaData.files[fileIndex];
 
     // Remove the physical files from storage
-    const imagesDir = getProjectImagesDir(projectId);
+    let fileDir;
+    if (fileToDelete.type && fileToDelete.type.startsWith("video/")) {
+      fileDir = getProjectVideosDir(projectId);
+    } else {
+      fileDir = getProjectImagesDir(projectId);
+    }
 
     // 1. Delete the original file
-    const originalFilePath = path.join(imagesDir, fileToDelete.filename);
+    const originalFilePath = path.join(fileDir, fileToDelete.filename);
     try {
       if (await fs.pathExists(originalFilePath)) {
         await fs.unlink(originalFilePath);
@@ -354,13 +405,13 @@ export async function deleteProjectMedia(req, res) {
       console.warn(`Could not delete original file ${originalFilePath}: ${err.message}`);
     }
 
-    // 2. Delete all generated sizes
+    // 2. Delete all generated sizes (for images)
     if (fileToDelete.sizes) {
       for (const sizeName in fileToDelete.sizes) {
         const size = fileToDelete.sizes[sizeName];
         if (size && size.path) {
           const sizeFilename = path.basename(size.path);
-          const sizeFilePath = path.join(imagesDir, sizeFilename);
+          const sizeFilePath = path.join(getProjectImagesDir(projectId), sizeFilename);
           try {
             if (await fs.pathExists(sizeFilePath)) {
               await fs.unlink(sizeFilePath);
@@ -392,7 +443,15 @@ export async function serveProjectMedia(req, res) {
 
     // If we have a filename directly, use it
     if (filename) {
-      filePath = getImagePath(projectId, filename);
+      // Determine file type by extension to choose correct directory
+      const ext = path.extname(filename).toLowerCase();
+      const videoExtensions = [".mp4", ".webm", ".ogg", ".avi", ".mov"];
+
+      if (videoExtensions.includes(ext)) {
+        filePath = getVideoPath(projectId, filename);
+      } else {
+        filePath = getImagePath(projectId, filename);
+      }
     }
     // Otherwise, look up the file by ID
     else if (fileId) {
@@ -428,6 +487,11 @@ export async function serveProjectMedia(req, res) {
       ".gif": "image/gif",
       ".webp": "image/webp",
       ".svg": "image/svg+xml",
+      ".mp4": "video/mp4",
+      ".webm": "video/webm",
+      ".ogg": "video/ogg",
+      ".avi": "video/avi",
+      ".mov": "video/mov",
     };
 
     const contentType = contentTypes[ext] || "application/octet-stream";
@@ -453,7 +517,6 @@ export async function bulkDeleteProjectMedia(req, res) {
     }
 
     const mediaData = await readMediaFile(projectId);
-    const imagesDir = getProjectImagesDir(projectId);
     const filesToDelete = [];
     const remainingFiles = [];
 
@@ -473,19 +536,26 @@ export async function bulkDeleteProjectMedia(req, res) {
     // Asynchronously delete all associated physical files
     const deletePromises = filesToDelete.map(async (file) => {
       // 1. Delete the original file
-      const originalFilePath = path.join(imagesDir, file.filename);
+      let fileDir;
+      if (file.type && file.type.startsWith("video/")) {
+        fileDir = getProjectVideosDir(projectId);
+      } else {
+        fileDir = getProjectImagesDir(projectId);
+      }
+
+      const originalFilePath = path.join(fileDir, file.filename);
       try {
         if (await fs.pathExists(originalFilePath)) await fs.unlink(originalFilePath);
       } catch (err) {
         console.warn(`Could not delete original file ${originalFilePath}: ${err.message}`);
       }
-      // 2. Delete all generated sizes
+      // 2. Delete all generated sizes (for images)
       if (file.sizes) {
         for (const sizeName in file.sizes) {
           const size = file.sizes[sizeName];
           if (size && size.path) {
             const sizeFilename = path.basename(size.path);
-            const sizeFilePath = path.join(imagesDir, sizeFilename);
+            const sizeFilePath = path.join(getProjectImagesDir(projectId), sizeFilename);
             try {
               if (await fs.pathExists(sizeFilePath)) await fs.unlink(sizeFilePath);
             } catch (err) {

@@ -286,11 +286,10 @@ export default function Media() {
     }
   };
 
-  // Existing handler for file view - unchanged
+  // Handler for file view - uses file ID for reliable access to both images and videos
   const handleFileView = (file) => {
-    // Add /api/media prefix and remove the file.path prefix if it exists
-    const imagePath = file.path.startsWith("/") ? file.path : `/${file.path}`;
-    window.open(API_URL(`/api/media/projects/${activeProject.id}${imagePath}`), "_blank");
+    // Use the ID-based route which works for both images and videos
+    window.open(API_URL(`/api/media/projects/${activeProject.id}/media/${file.id}`), "_blank");
   };
 
   if (!activeProject) {

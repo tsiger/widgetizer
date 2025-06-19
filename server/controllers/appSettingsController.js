@@ -13,6 +13,7 @@ const settingsFilePath = path.join(__dirname, "../../data/appSettings.json");
 const defaultSettings = {
   media: {
     maxFileSizeMB: 5,
+    maxVideoSizeMB: 50, // Separate size limit for videos
     imageProcessing: {
       quality: 85, // Single quality setting for all sizes (1-100)
       sizes: {
