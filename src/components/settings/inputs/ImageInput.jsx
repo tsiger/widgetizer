@@ -94,9 +94,11 @@ export default function ImageInput({ id, value = "", onChange }) {
   };
 
   const handleSelectMedia = (selectedFile) => {
-    if (selectedFile) {
+    if (selectedFile && selectedFile.type && selectedFile.type.startsWith("image/")) {
       onChange(selectedFile.path);
       setSelectorDrawerVisible(false);
+    } else {
+      showToast("Please select an image file.", "error");
     }
   };
 
@@ -164,6 +166,7 @@ export default function ImageInput({ id, value = "", onChange }) {
           onClose={() => setSelectorDrawerVisible(false)}
           onSelect={handleSelectMedia}
           activeProject={activeProject}
+          filterType="image" // Filter to only show images
         />
       )}
     </div>
