@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react";
-import { API_URL } from "../config";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -10,312 +8,38 @@ import MediaUploader from "../components/media/MediaUploader";
 import MediaGrid from "../components/media/MediaGrid";
 import MediaList from "../components/media/MediaList";
 import MediaDrawer from "../components/media/MediaDrawer";
-
-import useConfirmationModal from "../hooks/useConfirmationModal";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
-import {
-  getProjectMedia,
-  uploadProjectMedia,
-  deleteProjectMedia,
-  deleteMultipleMedia,
-  refreshMediaUsage,
-} from "../utils/mediaManager";
 
-import useProjectStore from "../stores/projectStore";
-import useToastStore from "../stores/toastStore";
+import useMediaState from "../hooks/useMediaState";
+import useMediaUpload from "../hooks/useMediaUpload";
+import useMediaSelection from "../hooks/useMediaSelection";
+import useMediaMetadata from "../hooks/useMediaMetadata";
 
 export default function Media() {
-  const [files, setFiles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState(() => {
-    return localStorage.getItem("mediaViewMode") || "grid";
+  // Use our custom hooks to manage different aspects of media functionality
+  const mediaState = useMediaState();
+
+  const mediaUpload = useMediaUpload({
+    activeProject: mediaState.activeProject,
+    showToast: mediaState.showToast,
+    setFiles: mediaState.setFiles,
   });
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFiles, setSelectedFiles] = useState([]);
 
-  // State for the drawer
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [selectedFileForEdit, setSelectedFileForEdit] = useState(null);
-  const [isSavingMetadata, setIsSavingMetadata] = useState(false);
+  const mediaSelection = useMediaSelection({
+    activeProject: mediaState.activeProject,
+    showToast: mediaState.showToast,
+    setFiles: mediaState.setFiles,
+    filteredFiles: mediaState.filteredFiles,
+  });
 
-  // Get active project from the store
-  const activeProject = useProjectStore((state) => state.activeProject);
-  const showToast = useToastStore((state) => state.showToast);
+  const mediaMetadata = useMediaMetadata({
+    activeProject: mediaState.activeProject,
+    showToast: mediaState.showToast,
+    setFiles: mediaState.setFiles,
+  });
 
-  // Handle confirmation actions
-  const handleDelete = async (data) => {
-    try {
-      if (data.isBulkDelete) {
-        await deleteMultipleMedia(activeProject.id, selectedFiles);
-        setFiles((prev) => prev.filter((file) => !selectedFiles.includes(file.id)));
-        setSelectedFiles([]);
-        showToast(`Successfully deleted ${selectedFiles.length} files`, "success");
-      } else {
-        await deleteProjectMedia(activeProject.id, data.fileId);
-        setFiles((prev) => prev.filter((file) => file.id !== data.fileId));
-        setSelectedFiles((prev) => prev.filter((id) => id !== data.fileId));
-        showToast(`File "${data.fileName}" deleted successfully`, "success");
-      }
-    } catch (error) {
-      // Check if error is related to files being in use
-      if (error.message && error.message.includes("currently in use")) {
-        showToast(`Cannot delete ${data.isBulkDelete ? "files" : "file"} - currently in use by pages`, "error");
-      } else {
-        showToast(`Failed to delete ${data.isBulkDelete ? "files" : "file"}`, "error");
-      }
-    }
-  };
-
-  const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDelete);
-
-  // Load media files when active project changes
-  useEffect(() => {
-    if (activeProject) {
-      loadMediaFiles();
-    }
-  }, [activeProject]);
-
-  // Update localStorage when viewMode changes
-  useEffect(() => {
-    localStorage.setItem("mediaViewMode", viewMode);
-  }, [viewMode]);
-
-  const loadMediaFiles = async () => {
-    if (!activeProject) return;
-    setLoading(true);
-
-    try {
-      const data = await getProjectMedia(activeProject.id);
-      // Ensure all files have a metadata object
-      const filesWithMetadata = (data.files || []).map((file) => ({
-        ...file,
-        metadata: file.metadata || { alt: "", title: "" },
-      }));
-      setFiles(filesWithMetadata);
-    } catch (error) {
-      showToast("Failed to load media files", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRefreshUsage = async () => {
-    if (!activeProject) return;
-
-    try {
-      await refreshMediaUsage(activeProject.id);
-      await loadMediaFiles(); // Reload to get updated usage data
-      showToast("Media usage tracking refreshed", "success");
-    } catch (error) {
-      showToast("Failed to refresh media usage tracking", "error");
-    }
-  };
-
-  const handleUpload = async (acceptedFiles) => {
-    if (!activeProject) {
-      showToast("No active project selected. Please select a project first.", "error");
-      return;
-    }
-
-    setUploading(true);
-    acceptedFiles.forEach((file) => {
-      setUploadProgress((prev) => ({ ...prev, [file.name]: 0 }));
-    });
-
-    try {
-      const result = await uploadProjectMedia(activeProject.id, acceptedFiles, (progress) => {
-        acceptedFiles.forEach((file) => {
-          setUploadProgress((prev) => ({ ...prev, [file.name]: progress }));
-        });
-      });
-
-      const processed = result.processedFiles || [];
-      const rejected = result.rejectedFiles || [];
-
-      console.log("Upload Result:", result);
-      console.log("Processed Files:", processed);
-      console.log("Rejected Files:", rejected);
-
-      // Update state ONLY with successfully processed files from this batch
-      if (processed.length > 0) {
-        const newFilesWithMetadata = processed.map((file) => ({
-          ...file,
-          metadata: file.metadata || { alt: "", title: "" },
-        }));
-        console.log("Files state BEFORE direct update:", files);
-        const updatedFiles = [...files, ...newFilesWithMetadata];
-        console.log("Calculated updated files array:", updatedFiles);
-        setFiles(updatedFiles);
-      } else {
-        console.log("No files processed successfully in this batch.");
-      }
-
-      // --- Toast Logic with Robust Unique IDs ---
-      const uniqueTimestamp = Date.now(); // Capture timestamp once for the batch
-
-      if (processed.length > 0 && rejected.length === 0) {
-        // All successful
-        showToast(`Successfully uploaded ${processed.length} file(s).`, "success", {
-          id: `success-${uniqueTimestamp}-${Math.random().toString(36).substring(2, 9)}`,
-        });
-      } else if (processed.length > 0 && rejected.length > 0) {
-        // Partial success - Summary Toast
-        showToast(`Uploaded ${processed.length} file(s). ${rejected.length} file(s) rejected.`, "warning", {
-          duration: 5000,
-          id: `summary-partial-${uniqueTimestamp}`, // Unique ID for summary
-        });
-        // Individual Rejection Toasts
-        rejected.forEach((rf, index) =>
-          showToast(`${rf.originalName}: ${rf.reason}`, "error", {
-            duration: 7000,
-            // ID combines filename, timestamp, and index for uniqueness within the batch
-            id: `reject-${uniqueTimestamp}-${index}-${rf.originalName}`,
-          }),
-        );
-        console.warn("Rejected files details:", rejected);
-      } else if (processed.length === 0 && rejected.length > 0) {
-        // All rejected - Summary Toast
-        showToast(`Upload failed. ${rejected.length} file(s) rejected.`, "error", {
-          duration: 5000,
-          id: `summary-rejected-${uniqueTimestamp}`, // Unique ID for summary
-        });
-        // Individual Rejection Toasts
-        rejected.forEach((rf, index) =>
-          showToast(`${rf.originalName}: ${rf.reason}`, "error", {
-            duration: 7000,
-            // ID combines filename, timestamp, and index for uniqueness within the batch
-            id: `reject-${uniqueTimestamp}-${index}-${rf.originalName}`,
-          }),
-        );
-        console.error("Rejected files details:", rejected);
-      } else if (result.status >= 400 && result.error) {
-        // Other backend errors
-        showToast(result.error, "error", {
-          id: `error-backend-${uniqueTimestamp}-${Math.random().toString(36).substring(2, 9)}`,
-        });
-        console.error("Upload Error from Backend:", result);
-      } else if (result.status >= 400) {
-        // Unknown server error
-        showToast("Upload failed with an unknown server error.", "error", {
-          id: `error-unknown-${uniqueTimestamp}-${Math.random().toString(36).substring(2, 9)}`,
-        });
-        console.error("Unknown Upload Error:", result);
-      }
-      // --- End Toast Logic ---
-    } catch (error) {
-      // Catch network errors or errors from mediaManager itself
-      const uniqueTimestamp = Date.now();
-      showToast(error?.message || "Failed to upload files due to a network or client error.", "error", {
-        id: `error-client-${uniqueTimestamp}-${Math.random().toString(36).substring(2, 9)}`,
-      });
-      console.error("Upload Client/Network Error:", error);
-    } finally {
-      setUploading(false);
-      setUploadProgress({});
-    }
-  };
-
-  const handleFileSelect = (fileId) => {
-    setSelectedFiles((prev) => {
-      if (prev.includes(fileId)) {
-        return prev.filter((id) => id !== fileId);
-      }
-      return [...prev, fileId];
-    });
-  };
-
-  const handleSelectAll = () => {
-    if (selectedFiles.length === filteredFiles.length) {
-      setSelectedFiles([]);
-    } else {
-      setSelectedFiles(filteredFiles.map((file) => file.id));
-    }
-  };
-
-  const openDeleteConfirmation = (fileId, fileName) => {
-    openModal({
-      title: "Delete File",
-      message: `Are you sure you want to delete "${fileName}"? This action cannot be undone.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
-      variant: "danger",
-      data: { fileId, fileName, isBulkDelete: false },
-    });
-  };
-
-  const openBulkDeleteConfirmation = () => {
-    if (selectedFiles.length === 0) return;
-
-    openModal({
-      title: "Delete Files",
-      message: `Are you sure you want to delete ${selectedFiles.length} selected file(s)? This action cannot be undone.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
-      variant: "danger",
-      data: { isBulkDelete: true },
-    });
-  };
-
-  // Filter files based on search term
-  const filteredFiles = files.filter((file) => file.originalName.toLowerCase().includes(searchTerm.toLowerCase()));
-
-  // Handler to open the drawer
-  const handleEditMetadata = (file) => {
-    setSelectedFileForEdit(file);
-    setDrawerVisible(true);
-  };
-
-  // Handler to close the drawer
-  const handleCloseDrawer = () => {
-    setDrawerVisible(false);
-    setSelectedFileForEdit(null);
-  };
-
-  // Handler to save metadata changes
-  const handleSaveMetadata = async (fileId, metadata) => {
-    if (!activeProject || !fileId) return;
-
-    setIsSavingMetadata(true);
-    try {
-      const response = await fetch(API_URL(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata`), {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(metadata),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update metadata");
-      }
-
-      const updatedFileData = await response.json();
-
-      // Update the file in the local state
-      setFiles((prevFiles) =>
-        prevFiles.map((file) => (file.id === fileId ? { ...file, metadata: updatedFileData.file.metadata } : file)),
-      );
-
-      showToast("Metadata updated successfully", "success");
-      handleCloseDrawer(); // Close drawer on successful save
-    } catch (error) {
-      console.error("Error updating metadata:", error);
-      showToast(error.message || "Failed to update metadata", "error");
-    } finally {
-      setIsSavingMetadata(false);
-    }
-  };
-
-  // Handler for file view - uses file ID for reliable access to both images and videos
-  const handleFileView = (file) => {
-    // Use the ID-based route which works for both images and videos
-    window.open(API_URL(`/api/media/projects/${activeProject.id}/media/${file.id}`), "_blank");
-  };
-
-  if (!activeProject) {
+  // Early returns for various states
+  if (!mediaState.activeProject) {
     return (
       <PageLayout title="Media">
         <div className="p-8 text-center">
@@ -327,7 +51,7 @@ export default function Media() {
     );
   }
 
-  if (loading) {
+  if (mediaState.loading) {
     return (
       <PageLayout title="Media">
         <LoadingSpinner message="Loading media files..." />
@@ -337,46 +61,50 @@ export default function Media() {
 
   return (
     <PageLayout title="Media">
-      <MediaUploader onUpload={handleUpload} uploading={uploading} uploadProgress={uploadProgress} />
+      <MediaUploader
+        onUpload={mediaUpload.handleUpload}
+        uploading={mediaUpload.uploading}
+        uploadProgress={mediaUpload.uploadProgress}
+      />
 
-      {files.length > 0 && (
+      {mediaState.files.length > 0 && (
         <>
           <MediaToolbar
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            selectedFiles={selectedFiles}
-            onBulkDelete={openBulkDeleteConfirmation}
-            onRefreshUsage={handleRefreshUsage}
+            viewMode={mediaState.viewMode}
+            onViewModeChange={mediaState.setViewMode}
+            searchTerm={mediaState.searchTerm}
+            onSearchChange={mediaState.setSearchTerm}
+            selectedFiles={mediaSelection.selectedFiles}
+            onBulkDelete={mediaSelection.openBulkDeleteConfirmation}
+            onRefreshUsage={mediaState.handleRefreshUsage}
           />
 
-          {viewMode === "grid" ? (
+          {mediaState.viewMode === "grid" ? (
             <MediaGrid
-              files={filteredFiles}
-              selectedFiles={selectedFiles}
-              onFileSelect={handleFileSelect}
-              onFileDelete={openDeleteConfirmation}
-              onFileView={handleFileView}
-              onFileEdit={handleEditMetadata}
-              activeProject={activeProject}
+              files={mediaState.filteredFiles}
+              selectedFiles={mediaSelection.selectedFiles}
+              onFileSelect={mediaSelection.handleFileSelect}
+              onFileDelete={mediaSelection.openDeleteConfirmation}
+              onFileView={mediaMetadata.handleFileView}
+              onFileEdit={mediaMetadata.handleEditMetadata}
+              activeProject={mediaState.activeProject}
             />
           ) : (
             <MediaList
-              files={filteredFiles}
-              selectedFiles={selectedFiles}
-              onFileSelect={handleFileSelect}
-              onSelectAll={handleSelectAll}
-              onFileDelete={openDeleteConfirmation}
-              onFileView={handleFileView}
-              onFileEdit={handleEditMetadata}
-              activeProject={activeProject}
+              files={mediaState.filteredFiles}
+              selectedFiles={mediaSelection.selectedFiles}
+              onFileSelect={mediaSelection.handleFileSelect}
+              onSelectAll={mediaSelection.handleSelectAll}
+              onFileDelete={mediaSelection.openDeleteConfirmation}
+              onFileView={mediaMetadata.handleFileView}
+              onFileEdit={mediaMetadata.handleEditMetadata}
+              activeProject={mediaState.activeProject}
             />
           )}
         </>
       )}
 
-      {files.length === 0 && !uploading && (
+      {mediaState.files.length === 0 && !mediaUpload.uploading && (
         <EmptyState
           title="No media files yet"
           description="Upload some files using the uploader above."
@@ -385,24 +113,23 @@ export default function Media() {
       )}
 
       <ConfirmationModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        onConfirm={handleConfirm}
-        title={modalState.title}
-        message={modalState.message}
-        confirmText={modalState.confirmText}
-        cancelText={modalState.cancelText}
-        variant={modalState.variant}
+        isOpen={mediaSelection.modalState.isOpen}
+        onClose={mediaSelection.closeModal}
+        onConfirm={mediaSelection.handleConfirm}
+        title={mediaSelection.modalState.title}
+        message={mediaSelection.modalState.message}
+        confirmText={mediaSelection.modalState.confirmText}
+        cancelText={mediaSelection.modalState.cancelText}
+        variant={mediaSelection.modalState.variant}
       />
 
-      {/* Render the drawer */}
       <MediaDrawer
-        visible={drawerVisible}
-        onClose={handleCloseDrawer}
-        selectedFile={selectedFileForEdit}
-        onSave={handleSaveMetadata}
-        loading={isSavingMetadata}
-        activeProject={activeProject}
+        visible={mediaMetadata.drawerVisible}
+        onClose={mediaMetadata.handleCloseDrawer}
+        selectedFile={mediaMetadata.selectedFileForEdit}
+        onSave={mediaMetadata.handleSaveMetadata}
+        loading={mediaMetadata.isSavingMetadata}
+        activeProject={mediaState.activeProject}
       />
     </PageLayout>
   );
