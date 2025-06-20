@@ -111,7 +111,8 @@ export default function ExportSite() {
 
   const handleViewExport = async (exportRecord) => {
     try {
-      const exportPath = exportRecord.outputDir.split("/").pop(); // Get just the directory name
+      // Extract just the directory name - handle both Windows and Unix paths
+      const exportPath = exportRecord.outputDir.split(/[/\\]/).pop();
 
       // Smart detection of entry file
       const result = await getExportEntryFile(exportPath);
@@ -121,8 +122,8 @@ export default function ExportSite() {
       window.open(viewUrl, "_blank");
     } catch (error) {
       console.error("Error getting entry file:", error);
-      // Fallback to index.html
-      const exportPath = exportRecord.outputDir.split("/").pop();
+      // Fallback to index.html - handle both Windows and Unix paths
+      const exportPath = exportRecord.outputDir.split(/[/\\]/).pop();
       const viewUrl = API_URL(`/api/export/view/${exportPath}/index.html`);
       window.open(viewUrl, "_blank");
     }
@@ -130,7 +131,8 @@ export default function ExportSite() {
 
   const handleDownloadExport = (exportRecord) => {
     try {
-      const exportPath = exportRecord.outputDir.split("/").pop(); // Get just the directory name
+      // Extract just the directory name - handle both Windows and Unix paths
+      const exportPath = exportRecord.outputDir.split(/[/\\]/).pop();
       downloadExportZip(exportPath);
       showToast(`Download started for version ${exportRecord.version}`, "success");
     } catch (error) {
