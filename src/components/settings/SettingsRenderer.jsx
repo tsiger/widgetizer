@@ -1,3 +1,4 @@
+import React from "react";
 import {
   TextInput,
   TextareaInput,
@@ -56,6 +57,8 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
     switch (type) {
       case "text":
         return <TextInput {...inputProps} />;
+      case "number":
+        return <TextInput {...inputProps} type="number" />;
       case "textarea":
         return <TextareaInput {...inputProps} />;
       case "color":
