@@ -126,41 +126,85 @@ The media library supports video uploads alongside images with the following fea
 
 ## 2. Frontend Implementation (`src/pages/Media.jsx`)
 
-The frontend is a single, powerful component that provides a complete interface for all media operations.
+The Media page has been **refactored** into a clean, modular architecture with the main component acting as an orchestrator for several specialized hooks and UI components.
+
+### Architecture Overview
+
+The `Media.jsx` component (reduced from ~410 lines to ~137 lines) now uses a **hook-based architecture** that separates concerns:
+
+- **`useMediaState`**: Core state management and data loading
+- **`useMediaUpload`**: File upload logic with progress tracking
+- **`useMediaSelection`**: File selection and deletion workflows
+- **`useMediaMetadata`**: Metadata editing and drawer management
+
+This architecture provides better **maintainability**, **testability**, and **code reuse** while keeping the main component focused on UI orchestration.
+
+### Custom Hooks
+
+#### `useMediaState` Hook (`src/hooks/useMediaState.js`)
+
+Manages core media state and data loading:
+
+- **State Management**: Files list, loading states, view mode, search filtering
+- **Data Loading**: Fetches project media on mount using `getProjectMedia`
+- **View Persistence**: Saves view mode preference to localStorage
+- **Search Filtering**: Real-time filename filtering
+- **Usage Refresh**: Manual usage tracking refresh functionality
+
+#### `useMediaUpload` Hook (`src/hooks/useMediaUpload.js`)
+
+Handles all file upload operations:
+
+- **Upload Progress**: Real-time progress tracking using XMLHttpRequest
+- **Multi-file Processing**: Handles multiple file uploads simultaneously
+- **Error Handling**: Detailed error reporting for rejected files
+- **State Updates**: Updates parent files state with successful uploads
+- **Toast Notifications**: Success, warning, and error feedback
+
+#### `useMediaSelection` Hook (`src/hooks/useMediaSelection.js`)
+
+Manages file selection and deletion workflows:
+
+- **Selection State**: Tracks selected files array
+- **Bulk Operations**: Select all/none functionality with filtering support
+- **Deletion Logic**: Single and bulk file deletion with usage protection
+- **Modal Management**: Confirmation dialog state and messaging
+- **Usage Validation**: Prevents deletion of files currently in use
+
+#### `useMediaMetadata` Hook (`src/hooks/useMediaMetadata.js`)
+
+Handles metadata editing and drawer functionality:
+
+- **Drawer Management**: Controls metadata editing drawer visibility
+- **File Selection**: Manages which file is being edited
+- **Metadata Updates**: Saves alt text and title changes via API
+- **Loading States**: Tracks save operations in progress
+- **State Synchronization**: Updates parent files state after successful saves
 
 ### Core UI Components
 
-- `MediaUploader`: A drag-and-drop zone for uploading files. It displays a progress bar for each file during the upload process.
-- `MediaToolbar`: Appears once files are present. It contains:
-  - **View Toggle**: Buttons to switch between `MediaGrid` and `MediaList` views. The user's preference is saved in `localStorage`.
-  - **Search Bar**: Filters the displayed files by their original filename in real-time.
-  - **Bulk Actions**: A "Delete Selected" button that becomes active when one or more files are selected.
-  - **Refresh Usage**: A button to manually refresh usage tracking for all media files.
-- `MediaGrid`: The default view, showing files as a responsive grid of thumbnail cards. Files in use display blue badges indicating the number of pages using them.
-- `MediaList`: An alternative table-based view showing more file details at a glance. It includes a "Select All" checkbox and a "Usage" column showing which pages use each file.
-- `MediaDrawer`: A slide-out panel that appears when a user clicks the "Edit" icon on a file. It contains a form to update the file's `alt` text and `title`.
-- `ConfirmationModal`: A dialog that prompts the user for confirmation before deleting a single file or a selection of multiple files.
+- `MediaUploader`: Drag-and-drop zone with real-time upload progress display
+- `MediaToolbar`: Contains view toggle, search bar, bulk actions, and usage refresh
+- `MediaGrid`: Responsive grid view with thumbnail cards and usage badges
+- `MediaList`: Table view with detailed file information and select-all functionality
+- `MediaDrawer`: Slide-out panel for editing file metadata (alt text and title)
+- `ConfirmationModal`: Deletion confirmation dialog with usage warnings
 
 ### Key Workflows & Logic
 
-- **Loading**: When the component mounts, it calls `getProjectMedia` from the `mediaManager` to fetch the `media.json` for the active project and populates the `files` state.
-- **Uploading (`handleUpload`)**:
-  1.  Files dropped onto the uploader are passed to `uploadProjectMedia`. This function uses `XMLHttpRequest` instead of `fetch` to get access to the `onprogress` event, allowing it to update the UI with the upload progress in real time.
-  2.  The backend processes the files (see backend section).
-  3.  The frontend receives a response containing `processedFiles` and `rejectedFiles` arrays.
-  4.  It shows detailed toast notifications: a success message for good uploads, a warning for partial uploads, and detailed error messages for each rejected file.
-  5.  The local `files` state is updated with the `processedFiles` returned from the server.
-- **File Selection**: A `selectedFiles` state array tracks the IDs of selected files. Clicking a file toggles its ID in the array. The "Select All" function either populates this array with all currently filtered file IDs or clears it.
-- **Deletion (`handleDelete`)**:
-  - When a user confirms deletion, the `handleDelete` function is called.
-  - It checks if it's a bulk delete or single file delete.
-  - It calls either `deleteMultipleMedia` or `deleteProjectMedia` from the `mediaManager`.
-  - **Usage Protection**: If files are currently in use, the backend returns an error and deletion is prevented.
-  - On a successful response from the server, it removes the corresponding file(s) from the local `files` state to instantly update the UI.
-- **Metadata Editing (`handleSaveMetadata`)**:
-  1.  The user edits the `alt` text or `title` in the `MediaDrawer` and clicks "Save".
-  2.  The `handleSaveMetadata` function sends a `PUT` request to the `/api/media/projects/:projectId/media/:fileId/metadata` endpoint with the new data.
-  3.  On success, it updates the metadata for the specific file in the local `files` state and closes the drawer.
+- **Loading**: `useMediaState` loads project media on mount and manages loading states
+- **Uploading**: `useMediaUpload` handles file processing with progress tracking and detailed error reporting
+- **File Selection**: `useMediaSelection` manages multi-file selection with bulk operations support
+- **Deletion**: `useMediaSelection` provides usage-aware deletion with confirmation dialogs
+- **Metadata Editing**: `useMediaMetadata` handles the complete edit workflow from drawer opening to saving changes
+
+### Benefits of Refactored Architecture
+
+- **Separation of Concerns**: Each hook handles a specific aspect of media functionality
+- **Reusability**: Hooks can be easily tested and potentially reused in other components
+- **Maintainability**: Smaller, focused code units are easier to understand and modify
+- **Testability**: Individual hooks can be unit tested independently
+- **Reduced Complexity**: Main component focuses on UI orchestration rather than business logic
 
 ## 3. Backend Implementation
 

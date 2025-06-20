@@ -4,6 +4,8 @@
 
 The `AppSettings` page is responsible for managing global configurations that apply across the entire application, rather than to a specific project. These are system-level settings that control the application's behavior. Key examples include setting the maximum file upload size for the media manager and configuring image processing settings.
 
+The App Settings system has been **refactored** to use a clean, modular architecture with dedicated components that are completely isolated from the theme settings system.
+
 ## Current Settings
 
 ### Media Settings
@@ -34,44 +36,85 @@ The `AppSettings` page is responsible for managing global configurations that ap
   - Range: 1-50 versions
   - Applies to all projects globally
 
-## Component Breakdown
+## Architecture Overview
 
-- **`PageLayout`**: Provides the standard page structure with a title.
-- **`SettingsField`**: A reusable wrapper component that groups a label, a description, and an input field into a single, organized row.
-- **`TextInput`**: Input component used for numeric and text settings.
-- **Checkbox Inputs**: Used for enabling/disabling image sizes.
-- **`LoadingSpinner`**: Displayed while the initial settings are fetched from the server.
-- **`Button`**: The "Save Settings" button to persist changes.
+The App Settings system uses a **schema-driven architecture** that is completely isolated from theme settings, providing better maintainability and extensibility.
 
-## Data Flow and State Management
+### Core Components
 
-The `AppSettings` component follows a straightforward pattern for managing its data.
+#### `AppSettings.jsx` (Main Page)
 
-### 1. Fetching Settings
+The main page component (reduced to ~56 lines) acts as an orchestrator:
 
-- When the component mounts, a `useEffect` hook calls the `fetchSettings` function.
-- `fetchSettings` uses the `getAppSettings` utility from `appSettingsManager.js` to retrieve the current application settings from the backend API.
-- The fetched settings object is stored in the component's local state using `useState`.
+- **Layout Management**: Uses `PageLayout` for consistent page structure
+- **Loading States**: Displays loading spinners and error states
+- **Hook Integration**: Uses `useAppSettings` hook for all data management
+- **Save/Cancel Actions**: Provides save and cancel buttons with change tracking
 
-### 2. Updating Settings
+#### `AppSettingsPanel.jsx` (`src/components/settings/AppSettingsPanel.jsx`)
 
-- The component uses a generic `handleInputChange` function to manage state updates for potentially nested setting objects.
-- It takes the new `value` and a `name` string (e.g., `"media.maxFileSizeMB"` or `"media.imageProcessing.quality"`), which it splits to traverse the state object and update the correct property without mutating the original state directly.
-- **Image Size Configuration**: A specialized `handleSizeToggle` function manages enabling/disabling image sizes while preserving width values.
-- This makes it easy to add new, nested settings in the future without needing to write new state update logic.
+A dedicated component for rendering app settings:
 
-### 3. Saving Settings
+- **Schema-Driven Rendering**: Works directly with JSON schema format
+- **Tab Management**: Automatic tab generation from schema configuration
+- **Group Organization**: Supports setting groups with visual separators
+- **Vertical Tabs**: Consistent UI with theme settings but isolated architecture
+- **Native Schema Support**: No conversion logic - works directly with app settings format
 
-- When the user clicks "Save Settings", the `handleSave` function is triggered.
-- Before sending the data, it performs comprehensive data transformation and validation:
-  - Ensures both `maxFileSizeMB` and `maxVideoSizeMB` are parsed into integers
-  - **Image Processing**: Validates and ensures complete configuration objects:
-    - Quality is parsed and validated (1-100 range)
-    - All image sizes have both `width` and `enabled` properties
-    - Missing configurations are merged with defaults
-  - **Export Management**: Validates and ensures `maxVersionsToKeep` is parsed into an integer (1-50 range)
-- It then calls `saveAppSettings` from the `appSettingsManager.js` to send the entire updated settings object to the backend for persistence.
-- Finally, it uses the global `useToastStore` to provide immediate visual feedback to the user, indicating whether the save was successful or failed.
+#### `useAppSettings.js` Hook (`src/hooks/useAppSettings.js`)
+
+Centralized state management for app settings:
+
+- **State Management**: Settings data, loading states, and change tracking
+- **Schema Integration**: Loads and merges with JSON schema defaults
+- **Nested Object Support**: Handles dot-notation paths (e.g., `"media.maxFileSizeMB"`)
+- **Data Validation**: Type conversion and validation before saving
+- **Save/Cancel Logic**: Complete workflow management with undo functionality
+
+### Schema-Driven Configuration
+
+The system uses **JSON Schema** files (`src/config/appSettings.schema.json`) to define:
+
+- **Setting Structure**: Types, labels, descriptions, and validation rules
+- **Tab Organization**: Automatic grouping into tabs (media, export, etc.)
+- **Group Headers**: Visual organization within tabs
+- **Default Values**: Fallback values for new installations
+- **Input Types**: Supports text, number, checkbox, range, select, and more
+
+### Data Flow and State Management
+
+#### 1. Schema Loading and Defaults
+
+- `useAppSettings` loads the JSON schema on component mount
+- Merges loaded settings with schema defaults using dot-notation paths
+- Provides fallback values for missing or undefined settings
+
+#### 2. Settings Rendering
+
+- `AppSettingsPanel` processes the schema to organize settings by tabs
+- Automatically generates group headers and setting inputs
+- Uses `SettingsRenderer` for consistent input rendering across the application
+
+#### 3. Change Management
+
+- All changes are tracked in state with automatic change detection
+- Supports nested object updates using dot-notation (e.g., `"media.imageProcessing.quality"`)
+- Provides real-time feedback on unsaved changes
+
+#### 4. Save Validation and Processing
+
+- Pre-save validation ensures data types match schema requirements
+- Automatic type conversion (strings to numbers, etc.)
+- Comprehensive error handling with user feedback via toast notifications
+
+### Benefits of Refactored Architecture
+
+- **Complete Isolation**: No coupling with theme settings system
+- **Schema-Driven**: Easy to add new settings by updating JSON schema
+- **Maintainability**: Clean separation of concerns across components
+- **Extensibility**: New setting types can be added without architecture changes
+- **Consistency**: Same UI components as theme settings but isolated implementation
+- **Type Safety**: Schema validation prevents configuration errors
 
 ## How App Settings Are Used
 

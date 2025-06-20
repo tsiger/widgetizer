@@ -6,33 +6,78 @@ The export system includes automatic version management, with configurable reten
 
 ## 1. Frontend Implementation (`src/pages/ExportSite.jsx`)
 
-The export interface provides comprehensive export management with version control and history tracking.
+The export interface has been **refactored** into a modular architecture with the main component acting as an orchestrator for specialized components and hooks.
 
-### Export Creation Section
+### Architecture Overview
 
-- **UI**: Clean interface with project name and "Export Project" button. During export, the button shows a loading state.
-- **Triggering the Export**:
-  1.  When the user clicks the button, the `handleExport` function is called.
-  2.  This function calls `exportProjectAPI(activeProject.id)` from `src/utils/exportManager.js`.
-  3.  This manager sends a `POST` request to the `/api/export/:projectId` endpoint.
-- **Feedback**: After the backend process completes, the frontend receives a response.
-  - On success, a toast notification shows the version number, and the new export appears in the export history table.
-  - On failure, an error toast is displayed with a message from the server.
-  - Success notification includes creation timestamp and version number.
+The `ExportSite.jsx` component (reduced from ~300 lines to ~40 lines) now uses a **component-based architecture** that separates concerns:
 
-### Export History Section
+- **`useExportState`**: Centralized state management and data loading
+- **`ExportCreator`**: Export creation interface and workflow
+- **`ExportHistoryTable`**: Export history display and management
 
-- **Dynamic Display**: Shows all available export versions (up to the user's configured limit from App Settings).
-- **Version Information**: Each export displays:
-  - Version number (v1, v2, v3, etc.)
-  - Creation date and time
-  - Export status (success/failed)
-  - Available actions
+This architecture provides better **maintainability**, **reusability**, and **separation of concerns** while keeping the main component focused on layout orchestration.
+
+### Custom Hook
+
+#### `useExportState` Hook (`src/hooks/useExportState.js`)
+
+Manages all export-related state and data loading:
+
+- **Project State**: Active project information and validation
+- **Export History**: Loading and managing export version history
+- **State Management**: Last export tracking and history updates
+- **Settings Integration**: Max versions configuration from app settings
+- **Data Loading**: Centralized data fetching and error handling
+
+### Specialized Components
+
+#### `ExportCreator` Component (`src/components/export/ExportCreator.jsx`)
+
+Handles the export creation workflow:
+
+- **Clean Interface**: Project name display and export button
+- **Export Processing**: Handles export API calls with loading states
+- **Progress Feedback**: Loading states and success/error notifications
+- **Version Management**: Updates export history after successful exports
+- **Error Handling**: Comprehensive error reporting and user feedback
+
+#### `ExportHistoryTable` Component (`src/components/export/ExportHistoryTable.jsx`)
+
+Manages export history display and actions:
+
+- **Dynamic Display**: Shows all available export versions with configurable limits
+- **Version Information**: Version numbers, timestamps, and status display
+- **Export Actions**: View, download, and delete operations with confirmation dialogs
+- **Settings Integration**: Displays current retention settings from app configuration
+- **Smart File Detection**: Automatic entry point detection for export viewing
+
+### Export Creation Workflow
+
+- **UI**: Clean interface with project name and "Export Project" button with loading states
+- **Export Triggering**:
+  1. User clicks export button in `ExportCreator`
+  2. Component calls `exportProjectAPI(activeProject.id)` from `exportManager`
+  3. Manager sends `POST` request to `/api/export/:projectId` endpoint
+- **Feedback**: Success/error notifications with version information and automatic history refresh
+
+### Export History Management
+
+- **Dynamic Display**: Shows export versions up to user-configured limits
+- **Version Information**: Version numbers (v1, v2, v3), timestamps, and status
 - **Export Actions**:
-  - **View**: Opens the exported site in a new browser tab with smart file detection (prefers `index.html`, falls back to first available HTML file)
-  - **Download**: Downloads the complete export as a ZIP file
-  - **Delete**: Removes the export with confirmation dialog
-- **Settings Integration**: Header displays current retention setting ("Keeping latest N versions") from App Settings.
+  - **View**: Opens exported site with smart file detection (index.html → home.html → first HTML file)
+  - **Download**: Downloads complete export as ZIP file
+  - **Delete**: Removes exports with confirmation dialogs
+- **Settings Integration**: Real-time display of retention settings from app configuration
+
+### Benefits of Refactored Architecture
+
+- **Separation of Concerns**: Each component handles a specific aspect of export functionality
+- **Reusability**: Components can be easily reused or extended for different export workflows
+- **Maintainability**: Smaller, focused components are easier to understand and modify
+- **Testability**: Individual components can be unit tested independently
+- **Reduced Complexity**: Main component focuses on layout orchestration rather than business logic
 
 ## 2. Backend Implementation
 

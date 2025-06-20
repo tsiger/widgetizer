@@ -2,6 +2,14 @@
 
 This document serves as a comprehensive index to all documentation in the Widgetizer project. Use this guide to quickly find the appropriate documentation for your needs, whether you're developing, troubleshooting, or understanding system architecture.
 
+## 🚀 Recent Updates (2024)
+
+**Major Component Refactoring** - The following core components have been refactored for better maintainability and architecture:
+
+- **[Media Library](media.md)** - Refactored from ~410 lines to ~137 lines using specialized hooks (`useMediaState`, `useMediaUpload`, `useMediaSelection`, `useMediaMetadata`)
+- **[Export System](export.md)** - Modularized from ~300 lines to ~40 lines with dedicated components (`useExportState`, `ExportCreator`, `ExportHistoryTable`)
+- **[App Settings](app-settings.md)** - Completely isolated architecture with `AppSettingsPanel` and schema-driven configuration system
+
 ## 📚 Core System Documentation
 
 ### **[theming.md](theming.md)** - Theme Development & Structure
