@@ -4,7 +4,8 @@ import { getExportEntryFile, downloadExportZip, deleteExportAPI } from "../../ut
 import useToastStore from "../../stores/toastStore";
 import useConfirmationModal from "../../hooks/useConfirmationModal";
 import ConfirmationModal from "../ui/ConfirmationModal";
-import { Loader2, ExternalLink, Trash2, Calendar, Download } from "lucide-react";
+import Table from "../ui/Table";
+import { Loader2, ExternalLink, Trash2, Calendar, Download, Package } from "lucide-react";
 import { API_URL } from "../../config";
 
 export default function ExportHistoryTable({
@@ -96,88 +97,73 @@ export default function ExportHistoryTable({
             <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
             <span className="ml-2 text-slate-600">Loading export history...</span>
           </div>
-        ) : exportHistory.length > 0 ? (
-          <div className="overflow-hidden rounded-sm border border-slate-200">
-            <table className="min-w-full divide-y divide-slate-200">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Version
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Created
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-slate-200">
-                {exportHistory.map((exportRecord) => (
-                  <tr key={exportRecord.version} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-slate-900">v{exportRecord.version}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-slate-600">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        {formatDate(exportRecord.timestamp)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          exportRecord.status === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {exportRecord.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
-                        {exportRecord.status === "success" && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleViewExport(exportRecord)}
-                              icon={<ExternalLink className="h-4 w-4" />}
-                            >
-                              View
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDownloadExport(exportRecord)}
-                              icon={<Download className="h-4 w-4" />}
-                            >
-                              Download
-                            </Button>
-                          </>
-                        )}
+        ) : (
+          <Table
+            headers={["Version", "Created", "Status", "Actions"]}
+            data={exportHistory}
+            emptyMessage={
+              <div className="text-center py-4">
+                <Package className="mx-auto mb-2 text-slate-400" size={32} />
+                <div className="font-medium">No exports yet</div>
+                <div className="text-sm text-slate-500">Create your first export above!</div>
+              </div>
+            }
+            renderRow={(exportRecord) => (
+              <>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <span className="text-sm font-medium text-slate-900">v{exportRecord.version}</span>
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <div className="flex items-center text-sm text-slate-600">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    {formatDate(exportRecord.timestamp)}
+                  </div>
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      exportRecord.status === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {exportRecord.status}
+                  </span>
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div className="flex items-center justify-end space-x-2">
+                    {exportRecord.status === "success" && (
+                      <>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => openDeleteConfirmation(exportRecord)}
-                          icon={<Trash2 className="h-4 w-4" />}
-                          className="text-red-600 hover:text-red-700"
+                          onClick={() => handleViewExport(exportRecord)}
+                          icon={<ExternalLink className="h-4 w-4" />}
                         >
-                          Delete
+                          View
                         </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="text-center py-8 text-slate-500">
-            <p>No exports yet. Create your first export above!</p>
-          </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDownloadExport(exportRecord)}
+                          icon={<Download className="h-4 w-4" />}
+                        >
+                          Download
+                        </Button>
+                      </>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openDeleteConfirmation(exportRecord)}
+                      icon={<Trash2 className="h-4 w-4" />}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </td>
+              </>
+            )}
+          />
         )}
       </div>
 
