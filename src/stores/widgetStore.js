@@ -8,6 +8,7 @@ const useWidgetStore = create((set, get) => ({
   schemas: {},
   selectedWidgetId: null,
   selectedBlockId: null,
+  selectedGlobalWidgetId: null,
   loading: false,
   error: null,
 
@@ -31,11 +32,20 @@ const useWidgetStore = create((set, get) => ({
     set({
       selectedWidgetId: id,
       selectedBlockId: null,
+      selectedGlobalWidgetId: null,
     });
   },
 
   setSelectedBlockId: (blockId) => {
     set({ selectedBlockId: blockId });
+  },
+
+  setSelectedGlobalWidgetId: (id) => {
+    set({
+      selectedGlobalWidgetId: id,
+      selectedWidgetId: null,
+      selectedBlockId: null,
+    });
   },
 
   generateWidgetId: () => {
@@ -66,37 +76,15 @@ const useWidgetStore = create((set, get) => ({
       blocksOrder: [],
     };
 
-    // Get the current order, preserving header/footer
     const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
+    const newWidgetsOrder = [...currentOrder];
 
-    // Find the header and footer indices
-    const headerIndex = currentOrder.findIndex((id) => page.widgets[id]?.type === "header");
-    const footerIndex = currentOrder.findIndex((id) => page.widgets[id]?.type === "footer");
-
-    // Get the content widgets (excluding header/footer)
-    const contentWidgets = currentOrder.filter(
-      (id) => page.widgets[id]?.type !== "header" && page.widgets[id]?.type !== "footer",
-    );
-
-    // Calculate the actual insertion index
-    let actualInsertIndex;
-    if (position >= contentWidgets.length) {
-      // Insert at the end (before footer)
-      actualInsertIndex = footerIndex !== -1 ? footerIndex : currentOrder.length;
+    if (position >= newWidgetsOrder.length) {
+      newWidgetsOrder.push(newWidgetId);
     } else {
-      // Insert at the specified position among content widgets
-      const targetWidgetId = contentWidgets[position];
-      actualInsertIndex = currentOrder.indexOf(targetWidgetId);
+      newWidgetsOrder.splice(position, 0, newWidgetId);
     }
 
-    // Create the new order by inserting the new widget
-    const newWidgetsOrder = [
-      ...currentOrder.slice(0, actualInsertIndex),
-      newWidgetId,
-      ...currentOrder.slice(actualInsertIndex),
-    ];
-
-    // Update the page state
     pageStore.setPage({
       ...page,
       widgets: {
@@ -107,7 +95,6 @@ const useWidgetStore = create((set, get) => ({
     });
 
     set({ selectedWidgetId: newWidgetId });
-    // Mark structure as modified for auto-save
     useAutoSave.getState().setStructureModified(true);
     return newWidgetId;
   },
@@ -120,11 +107,9 @@ const useWidgetStore = create((set, get) => ({
 
     const originalWidget = page.widgets[widgetId];
 
-    // Generate new IDs for blocks
     const newBlocks = {};
     const newBlocksOrder = [];
 
-    // Duplicate blocks with new IDs
     if (originalWidget.blocks) {
       originalWidget.blocksOrder?.forEach((oldBlockId) => {
         const newBlockId = `block_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
@@ -133,7 +118,6 @@ const useWidgetStore = create((set, get) => ({
       });
     }
 
-    // Create new widget with new ID
     const newWidgetId = get().generateWidgetId();
     const newWidget = {
       ...JSON.parse(JSON.stringify(originalWidget)),
@@ -141,29 +125,24 @@ const useWidgetStore = create((set, get) => ({
       blocksOrder: newBlocksOrder,
     };
 
-    // Find the position of the original widget in the order
-    const currentOrder =
-      page.widgetsOrder || Object.keys(page.widgets).filter((id) => id !== "header_widget" && id !== "footer_widget");
+    const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
     const originalIndex = currentOrder.indexOf(widgetId);
 
-    // Create the new order by inserting the new ID after the original
     const newWidgetsOrder = [
       ...currentOrder.slice(0, originalIndex + 1),
       newWidgetId,
       ...currentOrder.slice(originalIndex + 1),
     ];
 
-    // Update the page state
     pageStore.setPage({
       ...page,
       widgets: {
         ...page.widgets,
         [newWidgetId]: newWidget,
       },
-      widgetsOrder: newWidgetsOrder, // Set the new top-level order array
+      widgetsOrder: newWidgetsOrder,
     });
 
-    // Mark structure as modified for auto-save
     useAutoSave.getState().setStructureModified(true);
 
     set({ selectedWidgetId: newWidgetId });
@@ -179,22 +158,17 @@ const useWidgetStore = create((set, get) => ({
 
     const { [widgetId]: deletedWidget, ...remainingWidgets } = page.widgets;
 
-    // Calculate the new widgetsOrder by filtering out the deleted ID
-    const currentOrder =
-      page.widgetsOrder || Object.keys(page.widgets).filter((id) => id !== "header_widget" && id !== "footer_widget");
+    const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
     const newWidgetsOrder = currentOrder.filter((id) => id !== widgetId);
 
-    // Update the page state
     pageStore.setPage({
       ...page,
       widgets: remainingWidgets,
-      widgetsOrder: newWidgetsOrder, // Set the new top-level order array
+      widgetsOrder: newWidgetsOrder,
     });
 
-    // Mark structure as modified for auto-save
     useAutoSave.getState().setStructureModified(true);
 
-    // Update selection if the deleted widget was selected
     if (selectedWidgetId === widgetId) {
       const widgetIds = Object.keys(remainingWidgets);
       if (widgetIds.length > 0) {
@@ -224,13 +198,30 @@ const useWidgetStore = create((set, get) => ({
     pageStore.setPage(updatedPage);
   },
 
+  updateGlobalWidgetSettings: (widgetType, settingId, value) => {
+    const pageStore = usePageStore.getState();
+
+    if (widgetType !== "header" && widgetType !== "footer") return;
+
+    const { globalWidgets } = pageStore;
+    const currentWidget = globalWidgets[widgetType];
+
+    if (!currentWidget) return;
+
+    const updatedSettings = {
+      ...currentWidget.settings,
+      [settingId]: value,
+    };
+
+    pageStore.updateGlobalWidget(widgetType, { settings: updatedSettings });
+  },
+
   reorderWidgets: (newOrder) => {
     const pageStore = usePageStore.getState();
     const { page } = pageStore;
 
     if (!page) return;
 
-    // Create the reordered widgets object
     const reorderedWidgets = {};
     newOrder.forEach((widgetId) => {
       if (page.widgets[widgetId]) {
@@ -238,15 +229,12 @@ const useWidgetStore = create((set, get) => ({
       }
     });
 
-    // Update the page state with the reordered widgets object
-    // and the new widgetsOrder array
     pageStore.setPage({
       ...page,
-      widgets: reorderedWidgets, // Use the reordered widgets object
-      widgetsOrder: newOrder, // Set the new order array
+      widgets: reorderedWidgets,
+      widgetsOrder: newOrder,
     });
 
-    // Mark structure as modified for auto-save
     useAutoSave.getState().setStructureModified(true);
   },
 
@@ -263,10 +251,8 @@ const useWidgetStore = create((set, get) => ({
 
     if (!blockSchema) return null;
 
-    // Generate block ID
     const blockId = `block_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-    // Create default settings for the block
     const defaultSettings = {};
     if (Array.isArray(blockSchema.settings)) {
       blockSchema.settings.forEach((setting) => {
@@ -274,23 +260,20 @@ const useWidgetStore = create((set, get) => ({
       });
     }
 
-    // Create new block
     const newBlock = {
       type: blockType,
       settings: defaultSettings,
     };
 
-    // Update widget with new block
     const updatedWidget = {
       ...widget,
       blocks: {
         ...(widget.blocks || {}),
         [blockId]: newBlock,
       },
-      blocksOrder: [...(widget.blocksOrder || []), blockId], // Ensure blocksOrder is initialized
+      blocksOrder: [...(widget.blocksOrder || []), blockId],
     };
 
-    // Update page
     const updatedPage = {
       ...page,
       widgets: {
@@ -407,14 +390,11 @@ const useWidgetStore = create((set, get) => ({
     const originalBlock = widget.blocks[blockId];
     const newBlockId = `block_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-    // Create a deep copy of the block
     const newBlock = JSON.parse(JSON.stringify(originalBlock));
 
-    // Find the position of the original block
     const blockIndex = widget.blocksOrder.indexOf(blockId);
     const newBlocksOrder = [...(widget.blocksOrder || [])];
 
-    // Insert new block after the original
     if (blockIndex !== -1) {
       newBlocksOrder.splice(blockIndex + 1, 0, newBlockId);
     } else {

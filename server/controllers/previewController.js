@@ -31,8 +31,26 @@ export async function generatePreview(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    // Render each widget using the renderWidget service function
     let content = "";
+
+    // NEW: Render header widget first (if it exists)
+    if (pageData.globalWidgets?.header) {
+      try {
+        const headerHtml = await renderWidget(
+          activeProjectId,
+          "header",
+          pageData.globalWidgets.header,
+          rawThemeSettings,
+          "preview",
+        );
+        content += headerHtml;
+      } catch (error) {
+        console.error("Error rendering header widget:", error);
+        // Continue without header rather than failing completely
+      }
+    }
+
+    // Render page widgets in the middle
     if (pageData.widgets) {
       const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets);
       const widgetPromises = widgetOrder.map(async (widgetId) => {
@@ -47,12 +65,29 @@ export async function generatePreview(req, res) {
 
       // Filter out any null results from missing widgets before joining
       const renderedWidgets = (await Promise.all(widgetPromises)).filter((html) => html !== null);
-      content = renderedWidgets.join(""); // Join the HTML strings directly
+      content += renderedWidgets.join(""); // Join the HTML strings directly
+    }
+
+    // NEW: Render footer widget last (if it exists)
+    if (pageData.globalWidgets?.footer) {
+      try {
+        const footerHtml = await renderWidget(
+          activeProjectId,
+          "footer",
+          pageData.globalWidgets.footer,
+          rawThemeSettings,
+          "preview",
+        );
+        content += footerHtml;
+      } catch (error) {
+        console.error("Error rendering footer widget:", error);
+        // Continue without footer rather than failing completely
+      }
     }
 
     let renderedHtml = await renderPageLayout(
       activeProjectId,
-      content, // Pass the assembled widget HTML
+      content, // Pass the assembled widget HTML (header + page widgets + footer)
       pageData, // Pass the full page data
       rawThemeSettings, // Pass the raw theme settings
       "preview", // Render mode

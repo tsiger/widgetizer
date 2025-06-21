@@ -6,60 +6,49 @@ const usePageStore = create((set, get) => ({
   // State
   page: null,
   originalPage: null,
+  globalWidgets: { header: null, footer: null },
   loading: true,
   error: null,
 
   // Actions
   loadPage: async (pageId) => {
     if (!pageId) {
-      set({ loading: false, error: null, page: null, originalPage: null });
+      set({
+        loading: false,
+        error: null,
+        page: null,
+        originalPage: null,
+        globalWidgets: { header: null, footer: null },
+      });
       return;
     }
 
     set({ loading: true, error: null });
 
     try {
-      // Load page data
+      // Load page data (clean, no global widgets mixed in)
       const pageData = await getPage(pageId);
 
-      // Load global widgets
-      const globalWidgets = await getGlobalWidgets();
-
-      // Generate IDs for global widgets
-      const headerWidgetId = "header_widget";
-      const footerWidgetId = "footer_widget";
-
-      // Create a new ordered widgets object starting with header
-      const enhancedWidgets = {};
-
-      // Always add header widget first
-      enhancedWidgets[headerWidgetId] = {
-        type: "header",
-        settings: globalWidgets.header?.settings || {},
-      };
-
-      // Add all regular page widgets in the middle
+      // Filter out any header/footer widgets that might exist in page data
+      // (defensive programming - they shouldn't be there, but just in case)
+      const cleanWidgets = {};
       Object.entries(pageData.widgets).forEach(([id, widget]) => {
         if (widget.type !== "header" && widget.type !== "footer") {
-          enhancedWidgets[id] = widget;
+          cleanWidgets[id] = widget;
         }
       });
 
-      // Always add footer widget last
-      enhancedWidgets[footerWidgetId] = {
-        type: "footer",
-        settings: globalWidgets.footer?.settings || {},
+      const cleanPageData = {
+        ...pageData,
+        widgets: cleanWidgets,
       };
 
-      // Update page data with enhanced widgets
-      const enhancedPageData = {
-        ...pageData,
-        widgets: enhancedWidgets,
-      };
+      // Load global widgets separately
+      await get().loadGlobalWidgets();
 
       set({
-        page: enhancedPageData,
-        originalPage: JSON.parse(JSON.stringify(enhancedPageData)),
+        page: cleanPageData,
+        originalPage: JSON.parse(JSON.stringify(cleanPageData)),
         loading: false,
         error: null,
       });
@@ -69,8 +58,59 @@ const usePageStore = create((set, get) => ({
     }
   },
 
+  // NEW: Load global widgets separately
+  loadGlobalWidgets: async () => {
+    try {
+      const globalWidgetsData = await getGlobalWidgets();
+
+      // Transform the data to include widget structure
+      const globalWidgets = {
+        header: globalWidgetsData.header
+          ? {
+              type: "header",
+              settings: globalWidgetsData.header.settings || {},
+              blocks: globalWidgetsData.header.blocks || {},
+              blocksOrder: globalWidgetsData.header.blocksOrder || [],
+            }
+          : null,
+        footer: globalWidgetsData.footer
+          ? {
+              type: "footer",
+              settings: globalWidgetsData.footer.settings || {},
+              blocks: globalWidgetsData.footer.blocks || {},
+              blocksOrder: globalWidgetsData.footer.blocksOrder || [],
+            }
+          : null,
+      };
+
+      set({ globalWidgets });
+    } catch (err) {
+      console.error("Failed to load global widgets:", err);
+      // Don't fail the entire page load if global widgets fail
+      set({ globalWidgets: { header: null, footer: null } });
+    }
+  },
+
   setPage: (page) => {
     set({ page });
+  },
+
+  // NEW: Update global widget settings
+  updateGlobalWidget: (widgetType, updates) => {
+    const { globalWidgets } = get();
+    if (widgetType !== "header" && widgetType !== "footer") return;
+
+    const updatedGlobalWidgets = {
+      ...globalWidgets,
+      [widgetType]: globalWidgets[widgetType]
+        ? {
+            ...globalWidgets[widgetType],
+            ...updates,
+          }
+        : null,
+    };
+
+    set({ globalWidgets: updatedGlobalWidgets });
   },
 
   resetPage: () => {
@@ -81,7 +121,13 @@ const usePageStore = create((set, get) => ({
   },
 
   clearPage: () => {
-    set({ page: null, originalPage: null, loading: false, error: null });
+    set({
+      page: null,
+      originalPage: null,
+      globalWidgets: { header: null, footer: null },
+      loading: false,
+      error: null,
+    });
   },
 
   setOriginalPage: (page) => {

@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { fetchPreview, updateThemeSettings, highlightWidget, updateWidget } from "../../utils/previewManager";
 import useProjectStore from "../../stores/projectStore";
+import usePageStore from "../../stores/pageStore";
 import { API_URL } from "../../config";
 
 export default function PreviewPanel({
   page,
   selectedWidgetId,
   selectedBlockId,
+  selectedGlobalWidgetId,
   widgets,
   widgetSchemas,
   themeSettings,
@@ -19,8 +21,11 @@ export default function PreviewPanel({
   const iframeRef = useRef(null);
   const prevThemeSettingsRef = useRef(null);
   const prevWidgetsRef = useRef(null);
+  const prevGlobalWidgetsRef = useRef(null);
   const widgetSettingsRef = useRef(new Map());
   const activeProject = useProjectStore((state) => state.activeProject);
+
+  const { globalWidgets } = usePageStore();
 
   // Load the initial preview or refresh when widgets structure changes
   useEffect(() => {
@@ -35,6 +40,7 @@ export default function PreviewPanel({
 
     const widgetsOrderChanged = currentWidgetsString !== prevWidgetsString;
 
+    // FIXED: Only reload on structural changes, not settings changes
     // Do a full reload if we haven't loaded yet or if the widgets order changed
     if (!initialLoadComplete || widgetsOrderChanged) {
       async function loadPreview() {
@@ -42,12 +48,20 @@ export default function PreviewPanel({
           setLoading(true);
           setError(null);
 
+          // NEW: Create enhanced page data with global widgets for preview
+          const enhancedPageData = {
+            ...page,
+            // Add global widgets back for server rendering (temporary for preview)
+            globalWidgets: globalWidgets,
+          };
+
           // Fetch the preview HTML from the server
-          const html = await fetchPreview(page, themeSettings);
+          const html = await fetchPreview(enhancedPageData, themeSettings);
           setPreviewHtml(html);
           setInitialLoadComplete(true);
           prevThemeSettingsRef.current = JSON.parse(JSON.stringify(themeSettings));
           prevWidgetsRef.current = JSON.parse(JSON.stringify(widgets));
+          prevGlobalWidgetsRef.current = JSON.parse(JSON.stringify(globalWidgets)); // NEW: Track global widgets
 
           // Reset widget settings cache
           widgetSettingsRef.current = new Map();
@@ -64,7 +78,7 @@ export default function PreviewPanel({
 
       loadPreview();
     }
-  }, [page, widgets, initialLoadComplete]);
+  }, [page, widgets, initialLoadComplete]); // FIXED: Removed globalWidgets from dependencies to prevent full reloads
 
   // Update theme settings without reloading
   useEffect(() => {
@@ -119,17 +133,67 @@ export default function PreviewPanel({
     });
   }, [widgets, initialLoadComplete, themeSettings, selectedBlockId]);
 
-  // Highlight selected widget or block
+  // FIXED: Update global widgets by re-rendering them (individual updates, not full reload)
+  useEffect(() => {
+    if (!initialLoadComplete || !iframeRef.current || !globalWidgets) return;
+
+    const iframe = iframeRef.current;
+    const iframeDoc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
+
+    if (!iframeDoc) {
+      console.log("Iframe document not ready yet, skipping global widget update");
+      return;
+    }
+
+    // Check header widget for changes (only settings, not structural)
+    if (globalWidgets.header && prevGlobalWidgetsRef.current?.header) {
+      const hasHeaderChanges =
+        JSON.stringify(globalWidgets.header.settings) !== JSON.stringify(prevGlobalWidgetsRef.current.header.settings);
+
+      if (hasHeaderChanges) {
+        updateWidget(iframe, "header", globalWidgets.header, selectedBlockId, themeSettings)
+          .then((success) => {
+            if (success && prevGlobalWidgetsRef.current) {
+              prevGlobalWidgetsRef.current.header = JSON.parse(JSON.stringify(globalWidgets.header));
+            }
+          })
+          .catch((error) => console.error("Error updating header widget:", error));
+      }
+    }
+
+    // Check footer widget for changes (only settings, not structural)
+    if (globalWidgets.footer && prevGlobalWidgetsRef.current?.footer) {
+      const hasFooterChanges =
+        JSON.stringify(globalWidgets.footer.settings) !== JSON.stringify(prevGlobalWidgetsRef.current.footer.settings);
+
+      if (hasFooterChanges) {
+        updateWidget(iframe, "footer", globalWidgets.footer, selectedBlockId, themeSettings)
+          .then((success) => {
+            if (success && prevGlobalWidgetsRef.current) {
+              prevGlobalWidgetsRef.current.footer = JSON.parse(JSON.stringify(globalWidgets.footer));
+            }
+          })
+          .catch((error) => console.error("Error updating footer widget:", error));
+      }
+    }
+  }, [globalWidgets, initialLoadComplete, themeSettings, selectedBlockId]);
+
+  // Highlight selected widget or block (updated to handle global widgets)
   useEffect(() => {
     if (!initialLoadComplete || !iframeRef.current) return;
 
     // Add a small delay to ensure the DOM is ready after any updates
     const highlightTimer = setTimeout(() => {
-      highlightWidget(iframeRef.current, selectedWidgetId, selectedBlockId);
+      // NEW: Handle global widget highlighting
+      if (selectedGlobalWidgetId) {
+        highlightWidget(iframeRef.current, selectedGlobalWidgetId, selectedBlockId);
+      } else {
+        highlightWidget(iframeRef.current, selectedWidgetId, selectedBlockId);
+      }
     }, 50);
 
     return () => clearTimeout(highlightTimer);
-  }, [selectedWidgetId, selectedBlockId, initialLoadComplete, previewHtml]);
+  }, [selectedWidgetId, selectedBlockId, selectedGlobalWidgetId, initialLoadComplete, previewHtml]); // NEW: Added selectedGlobalWidgetId
 
   // Update iframe content when HTML changes
   useEffect(() => {
@@ -198,8 +262,16 @@ export default function PreviewPanel({
           </div>
         </div>
       )}
+
+      {/* FIXED: Simplified iframe container to prevent double scrollbars */}
       <div
-        className={`transition-all duration-300 ease-in-out m-2 ${previewMode === "mobile" ? "w-[414px]" : "w-full"}`}
+        className={`bg-white shadow-lg transition-all duration-300 ${
+          previewMode === "mobile"
+            ? "w-[375px] h-[667px]"
+            : previewMode === "tablet"
+              ? "w-[768px] h-[1024px]"
+              : "w-full h-full"
+        }`}
       >
         <iframe ref={iframeRef} className="w-full h-full border-0" title="Page Preview" />
       </div>

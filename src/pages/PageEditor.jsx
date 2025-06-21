@@ -31,13 +31,16 @@ export default function PageEditor() {
     schemas: widgetSchemas,
     selectedWidgetId,
     selectedBlockId,
+    selectedGlobalWidgetId,
     setSelectedWidgetId,
     setSelectedBlockId,
+    setSelectedGlobalWidgetId,
     addWidget,
     deleteWidget,
     duplicateWidget,
     reorderWidgets,
     updateWidgetSettings,
+    updateGlobalWidgetSettings,
     updateBlockSettings,
     reorderBlocks,
   } = useWidgetStore();
@@ -109,6 +112,12 @@ export default function PageEditor() {
     useAutoSave.getState().markWidgetModified(widgetId);
   };
 
+  // NEW: Handle global widget settings change
+  const handleGlobalWidgetSettingChange = (widgetType, settingId, value) => {
+    updateGlobalWidgetSettings(widgetType, settingId, value);
+    useAutoSave.getState().markWidgetModified(widgetType);
+  };
+
   // Handle widget reordering
   const handleWidgetsReorder = (newOrder) => {
     reorderWidgets(newOrder);
@@ -129,13 +138,19 @@ export default function PageEditor() {
   // Handle widget selection
   const handleWidgetSelect = (widgetId) => {
     setSelectedWidgetId(widgetId);
-    // Optionally, clear block selection when selecting a widget directly
+    // Clear block selection when selecting a widget directly
     // setSelectedBlockId(null);
+  };
+
+  // NEW: Handle global widget selection
+  const handleGlobalWidgetSelect = (widgetType) => {
+    setSelectedGlobalWidgetId(widgetType);
   };
 
   // Get the selected widget and its schema
   const selectedWidget = selectedWidgetId && page?.widgets[selectedWidgetId];
   const selectedWidgetSchema = selectedWidget ? widgetSchemas[selectedWidget.type] || {} : {};
+
   // Add this handler
   const handleAddBlockClick = (widgetId) => {
     setActiveWidgetId(widgetId);
@@ -203,8 +218,10 @@ export default function PageEditor() {
           widgetSchemas={widgetSchemas}
           selectedWidgetId={selectedWidgetId}
           selectedBlockId={selectedBlockId}
+          selectedGlobalWidgetId={selectedGlobalWidgetId}
           onWidgetSelect={handleWidgetSelect}
           onBlockSelect={handleBlockSelect}
+          onGlobalWidgetSelect={handleGlobalWidgetSelect}
           onWidgetsReorder={handleWidgetsReorder}
           onBlocksReorder={reorderBlocks}
           onDuplicateWidget={(id) => {
@@ -220,6 +237,7 @@ export default function PageEditor() {
           page={page}
           selectedWidgetId={selectedWidgetId}
           selectedBlockId={selectedBlockId}
+          selectedGlobalWidgetId={selectedGlobalWidgetId}
           widgets={page?.widgets}
           widgetSchemas={widgetSchemas}
           themeSettings={themeSettings}
@@ -231,8 +249,11 @@ export default function PageEditor() {
           selectedWidgetSchema={selectedWidgetSchema}
           selectedWidgetId={selectedWidgetId}
           selectedBlockId={selectedBlockId}
+          selectedGlobalWidgetId={selectedGlobalWidgetId}
+          widgetSchemas={widgetSchemas} // NEW: Pass widget schemas for global widget settings
           onSettingChange={handleSettingChange}
           onBlockSettingChange={handleBlockSettingChange}
+          onGlobalWidgetSettingChange={handleGlobalWidgetSettingChange}
           onBackToWidget={() => setSelectedBlockId(null)}
         />
       </div>

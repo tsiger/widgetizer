@@ -40,7 +40,7 @@ const useAutoSave = create((set, get) => ({
   save: async (isAuto = false) => {
     const { modifiedWidgets, structureModified, hasUnsavedChanges } = get();
     const pageStore = usePageStore.getState();
-    const { page } = pageStore;
+    const { page, globalWidgets } = pageStore;
 
     if (!page || !hasUnsavedChanges()) return;
 
@@ -51,24 +51,19 @@ const useAutoSave = create((set, get) => ({
     }
 
     try {
-      const pageToSave = JSON.parse(JSON.stringify(page));
-
-      // Handle global widgets
       const globalWidgetPromises = [];
 
-      if (pageToSave.widgets["header_widget"] && modifiedWidgets.has("header_widget")) {
-        globalWidgetPromises.push(saveGlobalWidget("header", pageToSave.widgets["header_widget"]));
+      if (globalWidgets.header && modifiedWidgets.has("header")) {
+        globalWidgetPromises.push(saveGlobalWidget("header", globalWidgets.header));
       }
-      delete pageToSave.widgets["header_widget"];
 
-      if (pageToSave.widgets["footer_widget"] && modifiedWidgets.has("footer_widget")) {
-        globalWidgetPromises.push(saveGlobalWidget("footer", pageToSave.widgets["footer_widget"]));
+      if (globalWidgets.footer && modifiedWidgets.has("footer")) {
+        globalWidgetPromises.push(saveGlobalWidget("footer", globalWidgets.footer));
       }
-      delete pageToSave.widgets["footer_widget"];
 
       await Promise.all(globalWidgetPromises);
 
-      await savePageContent(page.id, pageToSave);
+      await savePageContent(page.id, page);
 
       set({
         modifiedWidgets: new Set(),
@@ -76,7 +71,6 @@ const useAutoSave = create((set, get) => ({
         lastSaved: new Date(),
       });
 
-      // Update the original page in pageStore
       pageStore.setOriginalPage(page);
     } catch (err) {
       console.error("Failed to save page content:", err);

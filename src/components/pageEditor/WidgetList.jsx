@@ -21,6 +21,7 @@ import SortableWidgetItem from "./widgets/SortableWidgetItem";
 import FixedWidgetItem from "./widgets/FixedWidgetItem";
 import WidgetItem from "./widgets/WidgetItem";
 import WidgetSection from "./widgets/WidgetSection";
+import usePageStore from "../../stores/pageStore";
 
 export default function WidgetList({
   page,
@@ -28,9 +29,11 @@ export default function WidgetList({
   widgetSchemas,
   selectedWidgetId,
   selectedBlockId,
+  selectedGlobalWidgetId,
   modifiedWidgets = new Set(),
   onWidgetSelect,
   onBlockSelect,
+  onGlobalWidgetSelect,
   onWidgetsReorder,
   onBlocksReorder,
   onDeleteWidget,
@@ -40,18 +43,12 @@ export default function WidgetList({
 }) {
   const [activeId, setActiveId] = useState(null);
 
-  // Find header and footer widgets
-  const headerWidget = Object.entries(widgets).find(([_, widget]) => widget.type === "header");
-  const footerWidget = Object.entries(widgets).find(([_, widget]) => widget.type === "footer");
+  const { globalWidgets } = usePageStore();
+  const { header: headerWidget, footer: footerWidget } = globalWidgets;
 
-  // Derive the list of sortable widgets based on page.widgetsOrder
-  const sortableWidgetIds = (page.widgetsOrder || []).filter(
-    (widgetId) => widgets[widgetId] && widgets[widgetId]?.type !== "header" && widgets[widgetId]?.type !== "footer",
-  );
-
-  const sortableWidgets = sortableWidgetIds.map((widgetId) => ({
+  const sortableWidgets = (page.widgetsOrder || []).map((widgetId) => ({
     id: widgetId,
-    ...(widgets[widgetId] || {}), // Get data from widgets object, handle potential missing data
+    ...(widgets[widgetId] || {}),
   }));
 
   const sensors = useSensors(
@@ -67,12 +64,6 @@ export default function WidgetList({
 
   const handleDragStart = (event) => {
     const draggedId = event.active.id;
-
-    // Prevent dragging header and footer
-    if (draggedId === headerWidget?.[0] || draggedId === footerWidget?.[0]) {
-      return;
-    }
-
     setActiveId(draggedId);
 
     if (selectedWidgetId !== draggedId && onWidgetSelect) {
@@ -86,40 +77,17 @@ export default function WidgetList({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      // Get the current widget IDs in order (only sortable widgets)
       const oldWidgetIds = sortableWidgets.map((item) => item.id);
-
-      // Find the indices
       const oldIndex = oldWidgetIds.indexOf(active.id);
       const newIndex = oldWidgetIds.indexOf(over.id);
-
-      // Create the new order
       const newOrder = arrayMove(oldWidgetIds, oldIndex, newIndex);
 
-      // Include header and footer in the proper positions when sending back the order
-      const fullOrder = [];
-
-      // Add header if it exists
-      if (headerWidget) {
-        fullOrder.push(headerWidget[0]);
-      }
-
-      // Add sortable widgets in their new order
-      fullOrder.push(...newOrder);
-
-      // Add footer if it exists
-      if (footerWidget) {
-        fullOrder.push(footerWidget[0]);
-      }
-
-      // Call the handler with the new order
       if (onWidgetsReorder) {
-        onWidgetsReorder(fullOrder);
+        onWidgetsReorder(newOrder);
       }
     }
   };
 
-  // Find the active widget for the overlay
   const activeWidget = activeId ? sortableWidgets.find((item) => item.id === activeId) : null;
   const activeWidgetSchema = activeWidget ? widgetSchemas[activeWidget.type] || {} : {};
 
@@ -129,12 +97,12 @@ export default function WidgetList({
         {headerWidget && (
           <WidgetSection>
             <FixedWidgetItem
-              widgetId={headerWidget[0]}
-              widget={headerWidget[1]}
-              widgetSchema={widgetSchemas[headerWidget[1].type] || {}}
-              isSelected={selectedWidgetId === headerWidget[0]}
-              isModified={modifiedWidgets.has(headerWidget[0])}
-              onWidgetSelect={onWidgetSelect}
+              widgetId="header"
+              widget={headerWidget}
+              widgetSchema={widgetSchemas[headerWidget.type] || {}}
+              isSelected={selectedGlobalWidgetId === "header"}
+              isModified={modifiedWidgets.has("header")}
+              onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("header")}
             />
           </WidgetSection>
         )}
@@ -216,12 +184,12 @@ export default function WidgetList({
         {footerWidget && (
           <WidgetSection>
             <FixedWidgetItem
-              widgetId={footerWidget[0]}
-              widget={footerWidget[1]}
-              widgetSchema={widgetSchemas[footerWidget[1].type] || {}}
-              isSelected={selectedWidgetId === footerWidget[0]}
-              isModified={modifiedWidgets.has(footerWidget[0])}
-              onWidgetSelect={onWidgetSelect}
+              widgetId="footer"
+              widget={footerWidget}
+              widgetSchema={widgetSchemas[footerWidget.type] || {}}
+              isSelected={selectedGlobalWidgetId === "footer"}
+              isModified={modifiedWidgets.has("footer")}
+              onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("footer")}
             />
           </WidgetSection>
         )}
