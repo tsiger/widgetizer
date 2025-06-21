@@ -119,7 +119,13 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
     - The system performs several copy operations to ensure the static site is self-contained:
       - **Theme Assets**: All files from the project's `/assets` directory (e.g., `style.css`, `main.js`) are copied to `/assets` in the output directory.
       - **Widget Assets**: The controller recursively searches the project's `/widgets` directory for any `.css` or `.js` files and copies them into the output `/assets` directory. This ensures that widget-specific styles and scripts are included.
-      - **Uploaded Images**: All images from the project's `/uploads/images` directory are copied to `/uploads/images` in the output directory.
+      - **Optimized Image Copying**: The system uses the media usage tracking to selectively copy only images that are actually used in pages:
+        - **Usage Analysis**: Reads the project's `media.json` file to identify which images have a non-empty `usedIn` array
+        - **Selective Copying**: Only copies images that are referenced in at least one page
+        - **Complete Size Support**: For each used image, copies the original file plus all generated sizes (thumb, small, medium, large)
+        - **Export Optimization**: Logs how many images were copied vs. skipped, often reducing export size significantly
+        - **Fallback Safety**: If media tracking fails, automatically falls back to copying all images to ensure exports never fail
+        - **Directory Structure**: Maintains the original `/uploads/images/` directory structure in the export
 
 8.  **Record Export History**:
 

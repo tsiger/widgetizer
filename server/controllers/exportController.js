@@ -278,16 +278,72 @@ export async function exportProject(req, res) {
       console.error("Error finding or copying widget assets:", findError);
     }
 
-    // --- Copy Images ---
-    const projectImagesDir = path.join(projectDir, "uploads", "images");
+    // --- Copy Only Used Images ---
     try {
-      if (await fs.pathExists(projectImagesDir)) {
-        await fs.copy(projectImagesDir, outputImagesDir);
+      const { readMediaFile } = await import("./mediaController.js");
+      const mediaData = await readMediaFile(projectId);
+
+      if (mediaData && mediaData.files) {
+        const usedImages = mediaData.files.filter(
+          (file) => file.usedIn && file.usedIn.length > 0 && file.path.startsWith("/uploads/images/"),
+        );
+
+        let copiedCount = 0;
+        let skippedCount = 0;
+
+        for (const imageFile of usedImages) {
+          const sourceImagePath = path.join(projectDir, imageFile.path.replace(/^\//, ""));
+          const targetImagePath = path.join(outputDir, imageFile.path.replace(/^\//, ""));
+
+          // Copy original image
+          try {
+            if (await fs.pathExists(sourceImagePath)) {
+              await fs.ensureDir(path.dirname(targetImagePath));
+              await fs.copy(sourceImagePath, targetImagePath);
+              copiedCount++;
+            }
+          } catch (copyError) {
+            console.error(`Error copying image ${imageFile.filename}:`, copyError);
+          }
+
+          // Copy all generated sizes for this image
+          if (imageFile.sizes) {
+            for (const [sizeName, sizeInfo] of Object.entries(imageFile.sizes)) {
+              const sourceSizePath = path.join(projectDir, sizeInfo.path.replace(/^\//, ""));
+              const targetSizePath = path.join(outputDir, sizeInfo.path.replace(/^\//, ""));
+
+              try {
+                if (await fs.pathExists(sourceSizePath)) {
+                  await fs.ensureDir(path.dirname(targetSizePath));
+                  await fs.copy(sourceSizePath, targetSizePath);
+                }
+              } catch (sizeError) {
+                console.error(`Error copying ${sizeName} size for ${imageFile.filename}:`, sizeError);
+              }
+            }
+          }
+        }
+
+        // Count unused images for reporting
+        const allImages = mediaData.files.filter((file) => file.path.startsWith("/uploads/images/"));
+        skippedCount = allImages.length - usedImages.length;
+
+        console.log(`Export optimization: Copied ${copiedCount} used images, skipped ${skippedCount} unused images`);
       } else {
-        console.warn(`Project images directory not found: ${projectImagesDir}`);
+        console.log("No media data found or no images to process");
       }
-    } catch (copyError) {
-      console.error("Error copying images:", copyError);
+    } catch (mediaError) {
+      console.error("Error reading media data for selective export:", mediaError);
+      // Fallback to copying all images if media tracking fails
+      const projectImagesDir = path.join(projectDir, "uploads", "images");
+      try {
+        if (await fs.pathExists(projectImagesDir)) {
+          await fs.copy(projectImagesDir, outputImagesDir);
+          console.log("Fallback: Copied all images due to media tracking error");
+        }
+      } catch (fallbackError) {
+        console.error("Error in fallback image copying:", fallbackError);
+      }
     }
     // --- End Copy ---
 

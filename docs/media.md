@@ -190,6 +190,15 @@ Handles metadata editing and drawer functionality:
 - `MediaDrawer`: Slide-out panel for editing file metadata (alt text and title)
 - `ConfirmationModal`: Deletion confirmation dialog with usage warnings
 
+### UI Improvements
+
+#### Enhanced Empty State
+
+- **Custom Styling**: Replaced generic `EmptyState` component with custom-designed empty state
+- **Visual Icon**: Features an `Image` icon from lucide-react for better visual appeal
+- **Consistent Design**: Matches the styling and layout of other empty states throughout the application
+- **Improved Centering**: Better visual hierarchy and spacing for a more polished appearance
+
 ### Key Workflows & Logic
 
 - **Loading**: `useMediaState` loads project media on mount and manages loading states

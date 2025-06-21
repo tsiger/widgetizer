@@ -70,11 +70,23 @@ This file contains functions that make API calls to the backend:
 
 1.  **Navigation**: From the project list, clicking the "Edit" icon navigates the user to `/projects/edit/:id`.
 2.  **Data Fetching**: `ProjectsEdit.jsx` loads. In its `useEffect` hook, it calls `getAllProjects()` and finds the specific project matching the `id` from the URL parameters to populate the form.
-3.  **Rendering**: The `ProjectForm.jsx` component is rendered with the `initialData` of the project being edited. The "Theme" dropdown is disabled, as it cannot be changed after creation.
-4.  **Submission**: The user modifies the form and clicks "Save Changes".
-5.  **API Call**: The `handleSubmit` function in `ProjectsEdit.jsx` calls `updateProject(id, formData)` to send the updated data to the backend.
-6.  **State Update**: If the edited project is the currently active one, the global store is updated by calling `fetchActiveProject()` to ensure all parts of the application have the latest project name.
-7.  **Feedback**: A success toast is shown, and the user is shown a button to navigate back to the project list.
+3.  **Rendering**: The `ProjectForm.jsx` component is rendered with the `initialData` of the project being edited with several key features:
+    - **Theme Restriction**: The "Theme" dropdown is disabled, as themes cannot be changed after creation to maintain consistency
+    - **Project Folder Display**: Shows the current project folder name (based on the project title) with a note that it updates when the title changes
+    - **Site URL Field**: Allows setting the base URL for the project, used for generating absolute URLs in social media meta tags and SEO
+4.  **Form Features**:
+    - **Live Folder Preview**: The project folder name updates in real-time as the user types the project title
+    - **URL Validation**: The site URL field includes validation to ensure proper URL format
+    - **Conditional Fields**: Theme selection only appears when creating new projects, not when editing existing ones
+5.  **Submission & URL Management**: The user modifies the form and clicks "Save Changes":
+    - **Project Renaming**: If the project title changes, the system automatically generates a new project ID and renames the project directory
+    - **URL Redirection**: When a project is renamed (causing an ID change), the user is automatically redirected to the new URL (`/projects/edit/{newId}`)
+    - **State Synchronization**: Active project state is properly maintained even when project IDs change due to renaming
+6.  **API Call**: The `handleSubmit` function calls `updateProject(id, formData)` using the `projectManager.js` utility functions for consistent API handling.
+7.  **State Updates**:
+    - **Active Project Sync**: If the edited project is currently active, the global store is updated using `getActiveProject()` and `setActiveProject()` to maintain proper state
+    - **Windows Compatibility**: Project directory renaming uses a copy + remove approach for better Windows file system compatibility
+8.  **Feedback**: Success toast notifications show the completion status, and navigation buttons allow returning to the project list.
 
 ---
 

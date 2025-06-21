@@ -43,6 +43,24 @@ The frontend logic for page management is handled by three main React components
 - `src/pages/PagesEdit.jsx`: Contains the form for modifying an existing page's details.
 - `src/components/pages/PageForm.jsx`: A reusable form component used by both `PagesAdd` and `PagesEdit` to capture page details like `Name`, `Slug`, and `Meta Title`.
 
+### Enhanced Form Features
+
+The `PageForm.jsx` component includes several advanced features for comprehensive page management:
+
+#### Social Media Integration
+
+- **Visual Media Selection**: Integrates with `MediaSelectorDrawer` for selecting social media images through a visual interface instead of text input
+- **Image Preview**: Shows a thumbnail preview of the selected social media image with hover controls for changing or removing the image
+- **SEO Optimization**: Selected social media images are automatically used in Open Graph and Twitter Card meta tags with proper absolute URLs
+
+#### SEO & Meta Tags
+
+- **Conditional Meta Tags**: The system generates different meta tag configurations based on whether a social media image is selected:
+  - **With Image**: Uses `summary_large_image` Twitter card type and includes Open Graph image tags
+  - **Without Image**: Uses basic `summary` Twitter card type without image tags
+- **Absolute URL Generation**: Social media image URLs are automatically converted to absolute URLs using the project's configured site URL for proper social sharing
+- **Fallback Handling**: Gracefully handles cases where no site URL is configured, preventing broken meta tags
+
 ### Client-Side API (`src/utils/pageManager.js`)
 
 This file acts as the bridge between the React components and the backend API. It abstracts away the `fetch` calls into a set of clean, async functions.
