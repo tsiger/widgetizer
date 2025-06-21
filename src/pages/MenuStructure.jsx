@@ -5,8 +5,6 @@ import { AlertCircle } from "lucide-react";
 import PageLayout from "../components/layout/PageLayout";
 import MenuEditor from "../components/menus/MenuEditor";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
-import ConfirmationModal from "../components/ui/ConfirmationModal";
-import useConfirmationModal from "../hooks/useConfirmationModal";
 
 import { getMenu, updateMenu } from "../utils/menuManager";
 
@@ -21,9 +19,8 @@ export default function MenuStructure() {
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  // Handle item deletion with confirmation
-  const handleConfirmDelete = (data) => {
-    const { itemToDelete } = data;
+  // Handle item deletion directly (no confirmation)
+  const handleDeleteItem = (itemToDelete) => {
     if (!itemToDelete || !menu) return;
 
     // Function to recursively filter out the item
@@ -59,12 +56,9 @@ export default function MenuStructure() {
     // Update state with the new menu
     setMenu(updatedMenu);
 
-    // Show success message
-    showToast(`Menu item "${itemToDelete.label || "Item"}" deleted`, "success");
+    // Show success message with subtle feedback
+    showToast(`"${itemToDelete.label || "Menu item"}" deleted`, "success");
   };
-
-  // Use our custom confirmation modal hook
-  const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleConfirmDelete);
 
   // Load menu data
   useEffect(() => {
@@ -107,20 +101,6 @@ export default function MenuStructure() {
     }));
   };
 
-  // Open delete confirmation
-  const handleDeleteItem = (itemToDelete) => {
-    openModal({
-      title: "Delete Menu Item",
-      message: `Are you sure you want to delete "${
-        itemToDelete?.label || "this item"
-      }"? This will also remove any child items.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
-      variant: "danger",
-      data: { itemToDelete },
-    });
-  };
-
   if (loading) {
     return (
       <PageLayout title="Edit Menu Structure">
@@ -158,17 +138,6 @@ export default function MenuStructure() {
       }}
     >
       <MenuEditor initialItems={menu.items || []} onChange={handleMenuItemsChange} onDeleteItem={handleDeleteItem} />
-
-      <ConfirmationModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        onConfirm={handleConfirm}
-        title={modalState.title}
-        message={modalState.message}
-        confirmText={modalState.confirmText}
-        cancelText={modalState.cancelText}
-        variant={modalState.variant}
-      />
     </PageLayout>
   );
 }

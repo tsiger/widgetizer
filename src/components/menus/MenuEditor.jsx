@@ -16,9 +16,11 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { ChevronRight, ChevronDown, GripVertical, Plus, Trash2, Link } from "lucide-react";
+import { ChevronRight, ChevronDown, GripVertical, Plus, Trash2 } from "lucide-react";
 import { debounce } from "lodash";
 import { v4 as uuidv4 } from "uuid";
+import Button, { IconButton } from "../ui/Button";
+import Tooltip from "../ui/Tooltip";
 
 // Generate a unique ID
 const generateId = () => `item-${uuidv4()}`;
@@ -128,25 +130,65 @@ const SortableItem = memo(function SortableItem({
     [onEdit, item.id, item],
   );
 
+  // Get background color based on depth for visual hierarchy
+  const getBackgroundColor = useMemo(() => {
+    switch (depth) {
+      case 0:
+        return "bg-slate-200"; // Level 1: Dark gray - clearly visible
+      case 1:
+        return "bg-slate-100"; // Level 2: Medium gray
+      case 2:
+        return "bg-slate-50"; // Level 3: Light gray
+      default:
+        return "bg-white";
+    }
+  }, [depth]);
+
+  const getHoverBackgroundColor = useMemo(() => {
+    switch (depth) {
+      case 0:
+        return "hover:bg-slate-300"; // Level 1: Even darker on hover
+      case 1:
+        return "hover:bg-slate-200"; // Level 2: Darker gray on hover
+      case 2:
+        return "hover:bg-slate-100"; // Level 3: Medium gray on hover
+      default:
+        return "hover:bg-slate-50";
+    }
+  }, [depth]);
+
   return (
     <div ref={setNodeRef} style={style} className={`mb-2 ${isDragging ? "z-50" : ""}`}>
-      <div className="flex items-center p-3 gap-2 border border-slate-200 rounded-md bg-white">
-        <div {...attributes} {...listeners} className="cursor-grab p-1 text-slate-400">
-          <GripVertical size={18} />
+      <div
+        className={`group flex items-center p-3 gap-3 border border-slate-200 rounded-md transition-colors ${getBackgroundColor} ${getHoverBackgroundColor} hover:border-slate-300`}
+      >
+        {/* Left section: Drag handle and expand/collapse */}
+        <div className="flex items-center gap-1">
+          <div {...attributes} {...listeners} className="cursor-grab p-1 text-slate-400 hover:text-slate-600">
+            <GripVertical size={18} />
+          </div>
+
+          {item.items && item.items.length > 0 && (
+            <Tooltip content={isExpanded ? "Collapse" : "Expand"}>
+              <IconButton onClick={handleToggleClick} onMouseDown={handleInputMouseDown} variant="neutral" size="sm">
+                {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+              </IconButton>
+            </Tooltip>
+          )}
         </div>
 
-        <input
-          type="text"
-          value={item.label || ""}
-          onChange={handleLabelChange}
-          onMouseDown={handleInputMouseDown}
-          onClick={(e) => e.stopPropagation()}
-          className="form-input flex-grow"
-          placeholder="Menu item label"
-        />
+        {/* Center section: Inputs */}
+        <div className="flex-1 flex items-center gap-3">
+          <input
+            type="text"
+            value={item.label || ""}
+            onChange={handleLabelChange}
+            onMouseDown={handleInputMouseDown}
+            onClick={(e) => e.stopPropagation()}
+            className="form-input flex-1"
+            placeholder="Menu item label"
+          />
 
-        <div className="flex items-center px-2 py-1 border border-slate-200 rounded">
-          <Link size={14} className="text-slate-400 mr-1" />
           <input
             type="text"
             value={item.link || ""}
@@ -154,40 +196,26 @@ const SortableItem = memo(function SortableItem({
             onMouseDown={handleInputMouseDown}
             onClick={(e) => e.stopPropagation()}
             className="form-input w-32"
-            placeholder="/page-url"
+            placeholder="Link URL"
           />
         </div>
 
-        {depth < 2 && (
-          <button
-            onClick={handleAddChildClick}
-            onMouseDown={handleInputMouseDown}
-            className="p-1 text-slate-500 hover:bg-slate-100 rounded"
-            title="Add child item"
-          >
-            <Plus size={18} />
-          </button>
-        )}
+        {/* Right section: Action buttons (hidden until hover) */}
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {depth < 2 && (
+            <Tooltip content="Add child item">
+              <IconButton onClick={handleAddChildClick} onMouseDown={handleInputMouseDown} variant="primary" size="sm">
+                <Plus size={18} />
+              </IconButton>
+            </Tooltip>
+          )}
 
-        {item.items && item.items.length > 0 && (
-          <button
-            onClick={handleToggleClick}
-            onMouseDown={handleInputMouseDown}
-            className="p-1 text-slate-500 hover:bg-slate-100 rounded"
-            title={isExpanded ? "Collapse" : "Expand"}
-          >
-            {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-          </button>
-        )}
-
-        <button
-          onClick={handleRemoveClick}
-          onMouseDown={handleInputMouseDown}
-          className="p-1 text-red-500 hover:bg-red-50 rounded"
-          title="Remove item"
-        >
-          <Trash2 size={18} />
-        </button>
+          <Tooltip content="Delete item">
+            <IconButton onClick={handleRemoveClick} onMouseDown={handleInputMouseDown} variant="danger" size="sm">
+              <Trash2 size={18} />
+            </IconButton>
+          </Tooltip>
+        </div>
       </div>
 
       {item.items && item.items.length > 0 && isExpanded && (
@@ -578,11 +606,16 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
     if (!activeItem) return null;
 
     return (
-      <div className="flex items-center p-3 gap-2 border border-slate-200 rounded-md bg-white shadow-lg">
-        <div className="cursor-grab p-1 text-slate-400">
-          <GripVertical size={18} />
+      <div className="flex items-center p-3 gap-3 border border-slate-300 rounded-md bg-slate-200 shadow-lg">
+        <div className="flex items-center gap-1">
+          <div className="cursor-grab p-1 text-slate-400">
+            <GripVertical size={18} />
+          </div>
         </div>
-        <span className="flex-grow px-2 py-1">{activeItem.label || "Item"}</span>
+        <div className="flex-1 flex items-center gap-3">
+          <span className="flex-1 px-2 py-1 text-sm font-medium">{activeItem.label || "Item"}</span>
+          <span className="w-32 px-2 py-1 text-xs text-slate-500">{activeItem.link || "/page-url"}</span>
+        </div>
       </div>
     );
   }, [activeItem]);
@@ -600,16 +633,12 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
       onDragEnd={handleDragEnd}
       modifiers={[restrictToVerticalAxis]}
     >
-      <div className="menu-editor p-4 bg-slate-50 rounded-md border border-slate-200">
+      <div className="menu-editor">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">Menu Structure</h3>
-          <button
-            onClick={handleAddButtonClick}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-1"
-          >
-            <Plus size={16} />
+          <Button onClick={handleAddButtonClick} variant="primary" size="sm" icon={<Plus size={16} />}>
             Add Item
-          </button>
+          </Button>
         </div>
 
         <SortableList
@@ -623,8 +652,10 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
         />
 
         {items.length === 0 && (
-          <div className="h-12 border-2 border-dashed rounded-md mb-2 flex items-center justify-center border-slate-200">
-            <p className="text-slate-400">No items yet. Click "Add Item" to create one.</p>
+          <div className="h-20 border-2 border-dashed rounded-md mb-2 flex items-center justify-center border-slate-300 bg-slate-50">
+            <p className="text-slate-500 text-sm">
+              No menu items yet. Click "Add Item" to create your first menu item.
+            </p>
           </div>
         )}
 
