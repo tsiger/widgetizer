@@ -16,6 +16,7 @@ import useAutoSave from "../stores/saveStore";
 import useThemeStore from "../stores/themeStore";
 import useProjectStore from "../stores/projectStore";
 import useConfirmationModal from "../hooks/useConfirmationModal";
+import useNavigationGuard from "../hooks/useNavigationGuard";
 
 export default function PageEditor() {
   const [searchParams] = useSearchParams();
@@ -43,6 +44,9 @@ export default function PageEditor() {
   const { hasUnsavedChanges, isSaving, isAutoSaving, lastSaved, save, startAutoSave, stopAutoSave } = useAutoSave();
   const { settings: themeSettings } = useThemeStore();
   const { activeProject, loading: projectLoading } = useProjectStore();
+
+  // Add navigation guard
+  useNavigationGuard();
 
   // Load initial data
   useEffect(() => {

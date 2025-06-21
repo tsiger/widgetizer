@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Save, Clock, ChevronDown, Monitor, Smartphone, Eye } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { getAllPages } from "../../utils/pageManager";
+import useNavigationGuard from "../../hooks/useNavigationGuard";
 
 export default function EditorTopBar({
   pageName,
@@ -16,7 +17,7 @@ export default function EditorTopBar({
 }) {
   const [pages, setPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const navigate = useNavigate();
+  const { guardedNavigate } = useNavigationGuard();
 
   useEffect(() => {
     const loadPages = async () => {
@@ -31,13 +32,7 @@ export default function EditorTopBar({
   }, []);
 
   const handlePageChange = (pageId) => {
-    if (hasUnsavedChanges) {
-      if (window.confirm("You have unsaved changes. Are you sure you want to leave?")) {
-        navigate(`/page-editor?pageId=${pageId}`);
-      }
-    } else {
-      navigate(`/page-editor?pageId=${pageId}`);
-    }
+    guardedNavigate(`/page-editor?pageId=${pageId}`);
     setIsDropdownOpen(false);
   };
 
