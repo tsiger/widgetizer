@@ -8,7 +8,7 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 
 import useToastStore from "../stores/toastStore";
-import { updateProject, getAllProjects } from "../utils/projectManager";
+import { updateProject, getAllProjects, getActiveProject } from "../utils/projectManager";
 import useProjectStore from "../stores/projectStore";
 
 export default function ProjectsEdit() {
@@ -20,7 +20,7 @@ export default function ProjectsEdit() {
   const [showSuccessActions, setShowSuccessActions] = useState(false);
 
   const showToast = useToastStore((state) => state.showToast);
-  const fetchActiveProject = useProjectStore((state) => state.fetchActiveProject);
+  const setActiveProject = useProjectStore((state) => state.setActiveProject);
   const activeProject = useProjectStore((state) => state.activeProject);
 
   useEffect(() => {
@@ -53,8 +53,22 @@ export default function ProjectsEdit() {
       });
       setProject(updatedProject);
 
+      // Check if the project ID changed (due to name change)
+      if (updatedProject.id !== id) {
+        // If this was the active project, refresh the active project state
+        if (activeProject && activeProject.id === id) {
+          const refreshedActiveProject = await getActiveProject();
+          setActiveProject(refreshedActiveProject);
+        }
+        // Navigate to the new URL with the updated project ID
+        navigate(`/projects/edit/${updatedProject.id}`, { replace: true });
+        showToast(`Project "${formData.name}" was updated successfully and URL was changed.`, "success");
+        return false;
+      }
+
       if (activeProject && activeProject.id === id) {
-        await fetchActiveProject();
+        const refreshedActiveProject = await getActiveProject();
+        setActiveProject(refreshedActiveProject);
       }
 
       showToast(`Project "${formData.name}" was updated successfully!`, "success");

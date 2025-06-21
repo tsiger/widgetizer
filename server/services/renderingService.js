@@ -6,6 +6,7 @@ import { getProjectDir, CORE_WIDGETS_DIR } from "../config.js";
 // We might need to move readProjectsFile/readMediaFile to utils or their own services later.
 import { readMediaFile } from "../controllers/mediaController.js";
 import { getMenuById } from "../controllers/menuController.js";
+import { readProjectsFile } from "../controllers/projectController.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { ThemeSettingsTag } from "../../src/core/tags/themeSettings.js";
@@ -42,6 +43,19 @@ engine.registerTag("seo", SeoTag);
 // Register custom filters
 registerImageFilter(engine);
 registerVideoFilter(engine);
+
+/**
+ * Helper function to get project data by ID
+ */
+async function getProjectData(projectId) {
+  try {
+    const projectsData = await readProjectsFile();
+    return projectsData.projects.find((p) => p.id === projectId) || null;
+  } catch (error) {
+    console.warn(`Could not load project data for ${projectId}: ${error.message}`);
+    return null;
+  }
+}
 
 /**
  * Creates base render context with common properties
@@ -250,11 +264,15 @@ async function renderPageLayout(projectId, pageContent, pageData, rawThemeSettin
     // 2. Create context for layout render
     const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, renderMode);
 
-    // 3. Add page-specific context
+    // 3. Load project data
+    const projectData = await getProjectData(projectId);
+
+    // 4. Add page-specific context
     const renderContext = {
       ...baseContext,
       content: pageContent,
       page: pageData,
+      project: projectData,
       body_class: pageData?.slug || "",
     };
 

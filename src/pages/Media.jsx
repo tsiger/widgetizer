@@ -1,4 +1,4 @@
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Image } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -105,11 +105,11 @@ export default function Media() {
       )}
 
       {mediaState.files.length === 0 && !mediaUpload.uploading && (
-        <EmptyState
-          title="No media files yet"
-          description="Upload some files using the uploader above."
-          className="mt-4"
-        />
+        <div className="p-8 text-center">
+          <Image className="mx-auto mb-4 text-slate-400" size={48} />
+          <h2 className="text-xl font-semibold mb-2">No media files yet</h2>
+          <p className="text-slate-600 mb-4">Upload some files using the uploader above.</p>
+        </div>
       )}
 
       <ConfirmationModal

@@ -47,10 +47,22 @@ async function generateUniqueProjectId(name, projects) {
   if (!baseId) baseId = "project";
   let uniqueId = baseId;
   let counter = 1;
+
+  // Add safety counter to prevent infinite loops
+  let safetyCounter = 0;
+  const maxAttempts = 1000;
+
   while (projects.some((p) => p.id === uniqueId)) {
     uniqueId = `${baseId}-${counter}`;
     counter++;
+    safetyCounter++;
+
+    if (safetyCounter >= maxAttempts) {
+      console.error(`generateUniqueProjectId: Hit safety limit after ${maxAttempts} attempts for name "${name}"`);
+      throw new Error(`Unable to generate unique project ID after ${maxAttempts} attempts`);
+    }
   }
+
   return uniqueId;
 }
 
@@ -84,7 +96,7 @@ export async function getActiveProject(_, res) {
 // Create a new project
 export async function createProject(req, res) {
   try {
-    const { name, description, theme } = req.body;
+    const { name, description, theme, siteUrl } = req.body;
     const data = await readProjectsFile();
 
     // Check for duplicate project names
@@ -102,6 +114,7 @@ export async function createProject(req, res) {
       name,
       description,
       theme,
+      siteUrl: siteUrl || "",
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
@@ -193,14 +206,14 @@ export async function createProject(req, res) {
               // Overwrite the copied file with the enriched version
               await fs.outputFile(projectMenuPath, JSON.stringify(enrichedMenu, null, 2));
             } catch (menuReadError) {
-              console.warn(`Skipping menu enrichment for ${menuFile}: ${menuReadError.message}`);
+              // Silently skip menu enrichment errors
             }
           }
         }
       } catch (themeMenuAccessError) {
         // If theme menus directory doesn't exist, do nothing (no menus to enrich)
         if (themeMenuAccessError.code !== "ENOENT") {
-          console.warn(`Error checking theme menus directory ${themeMenusDir}: ${themeMenuAccessError.message}`);
+          // Silently handle theme menus directory access errors
         }
       }
     } catch (error) {
@@ -283,18 +296,29 @@ export async function updateProject(req, res) {
         const newDir = getProjectDir(potentialNewId);
 
         try {
-          // Rename the project directory
-          await fs.rename(oldDir, newDir);
+          // Use copy + remove instead of rename for better Windows compatibility
+          await fs.copy(oldDir, newDir);
+
+          // Wait a bit to ensure file handles are released
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          await fs.remove(oldDir);
           newProjectId = potentialNewId;
 
           // Update activeProjectId if this project is currently active
           if (data.activeProjectId === id) {
             data.activeProjectId = newProjectId;
           }
-
-          console.log(`Project directory renamed: ${id} → ${newProjectId}`);
         } catch (renameError) {
-          console.error(`Failed to rename project directory from ${id} to ${potentialNewId}:`, renameError);
+          // If copy succeeded but remove failed, try to clean up the new directory
+          try {
+            if (await fs.pathExists(newDir)) {
+              await fs.remove(newDir);
+            }
+          } catch (cleanupError) {
+            console.warn(`Failed to cleanup new directory after error: ${cleanupError.message}`);
+          }
+
           throw new Error(`Failed to rename project directory: ${renameError.message}`);
         }
       }
@@ -306,6 +330,7 @@ export async function updateProject(req, res) {
       id: newProjectId,
       name: updates.name || updatedProject.name,
       description: updates.description !== undefined ? updates.description : updatedProject.description,
+      siteUrl: updates.siteUrl !== undefined ? updates.siteUrl : updatedProject.siteUrl,
       updated: new Date().toISOString(),
     };
 
@@ -347,8 +372,7 @@ export async function deleteProject(req, res) {
     // Clean up all exports for this project
     try {
       const { cleanupProjectExports } = await import("./exportController.js");
-      const cleanupResult = await cleanupProjectExports(id);
-      console.log(`Export cleanup completed for project ${id}:`, cleanupResult);
+      await cleanupProjectExports(id);
     } catch (exportCleanupError) {
       console.warn(`Failed to clean up exports for project ${id}:`, exportCleanupError);
       // Don't fail the project deletion if export cleanup fails
@@ -421,7 +445,7 @@ export async function duplicateProject(req, res) {
       try {
         await fs.remove(newDir);
       } catch (cleanupError) {
-        console.warn(`Failed to cleanup after copy error: ${cleanupError.message}`);
+        // Silently handle cleanup errors
       }
       throw new Error(`Failed to copy project files: ${copyError.message}`);
     }
@@ -458,7 +482,6 @@ export async function getProjectWidgets(req, res) {
       }
     } catch (err) {
       // If there's an error reading theme.json, default to including core widgets
-      console.warn(`Could not read theme.json for project ${projectId}, defaulting to include core widgets:`, err);
     }
 
     // Helper function to process a single widget file
@@ -482,7 +505,7 @@ export async function getProjectWidgets(req, res) {
           return schema;
         }
       } catch (parseError) {
-        console.warn(`Failed to process widget schema from ${filePath}: ${parseError.message}`);
+        // Silently handle widget schema parsing errors
       }
       return null;
     }
@@ -495,7 +518,7 @@ export async function getProjectWidgets(req, res) {
         const coreWidgets = await getCoreWidgets();
         allSchemas = allSchemas.concat(coreWidgets);
       } catch (err) {
-        console.error("Error loading core widgets:", err);
+        // Silently handle core widgets loading errors
       }
     }
 
@@ -509,9 +532,9 @@ export async function getProjectWidgets(req, res) {
       const topLevelSchemas = await Promise.all(topLevelFiles.map(processWidgetFile));
       allSchemas = allSchemas.concat(topLevelSchemas);
     } catch (err) {
-      // Ignore if widgetsBaseDir doesn't exist, but log other errors
+      // Ignore if widgetsBaseDir doesn't exist
       if (err.code !== "ENOENT") {
-        console.error(`Error reading top-level widgets directory ${widgetsBaseDir}:`, err);
+        // Silently handle other directory reading errors
       }
     }
 
@@ -525,9 +548,9 @@ export async function getProjectWidgets(req, res) {
       const globalSchemas = await Promise.all(globalFiles.map(processWidgetFile));
       allSchemas = allSchemas.concat(globalSchemas);
     } catch (err) {
-      // Ignore if globalWidgetsDir doesn't exist, but log other errors
+      // Ignore if globalWidgetsDir doesn't exist
       if (err.code !== "ENOENT") {
-        console.error(`Error reading global widgets directory ${globalWidgetsDir}:`, err);
+        // Silently handle other directory reading errors
       }
     }
 
@@ -537,7 +560,6 @@ export async function getProjectWidgets(req, res) {
     res.json(validSchemas);
   } catch (error) {
     // Broader catch for unexpected errors
-    console.error(`Unexpected error in getProjectWidgets for project ${req.params.projectId}:`, error);
     res.status(500).json({ error: `Failed to get project widgets: ${error.message}` });
   }
 }

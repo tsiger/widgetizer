@@ -6,13 +6,18 @@ import slugify from "slugify";
 import useToastStore from "../../stores/toastStore";
 
 export default function ProjectForm({
-  initialData = { name: "", description: "", theme: "" },
+  initialData = { name: "", description: "", theme: "", siteUrl: "" },
   onSubmit,
   isSubmitting,
   submitLabel = "Save",
   onCancel,
 }) {
-  const [formData, setFormData] = useState(initialData);
+  const [formData, setFormData] = useState({
+    name: initialData.name || "",
+    description: initialData.description || "",
+    theme: initialData.theme || "",
+    siteUrl: initialData.siteUrl || "",
+  });
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const isNew = !initialData.id;
@@ -39,7 +44,12 @@ export default function ProjectForm({
     // Compare with previous initialData, not with current formData
     const currentInitialDataStr = JSON.stringify(initialData);
     if (prevInitialDataRef.current !== currentInitialDataStr) {
-      setFormData(initialData);
+      setFormData({
+        name: initialData.name || "",
+        description: initialData.description || "",
+        theme: initialData.theme || "",
+        siteUrl: initialData.siteUrl || "",
+      });
       prevInitialDataRef.current = currentInitialDataStr;
     }
   }, [initialData]);
@@ -88,7 +98,7 @@ export default function ProjectForm({
 
       // If the parent component signals to reset the form
       if (result === true) {
-        setFormData({ name: "", description: "", theme: "" });
+        setFormData({ name: "", description: "", theme: "", siteUrl: "" });
       }
       return result;
     } catch (err) {
@@ -123,6 +133,12 @@ export default function ProjectForm({
             className="form-input"
             required
           />
+          {!isNew && formData.name && (
+            <p className="form-description">
+              Project folder: <code>{formatSlug(formData.name)}</code>. The folder name updates when you save changes to
+              the title.
+            </p>
+          )}
         </div>
 
         <div className="form-field">
@@ -140,31 +156,45 @@ export default function ProjectForm({
         </div>
 
         <div className="form-field">
-          <label htmlFor="theme" className="form-label">
-            Theme
+          <label htmlFor="siteUrl" className="form-label-optional">
+            Site URL
           </label>
-          <select
-            id="theme"
-            name="theme"
-            value={formData.theme}
+          <input
+            type="url"
+            id="siteUrl"
+            name="siteUrl"
+            value={formData.siteUrl}
             onChange={handleChange}
-            className={`form-select ${!isNew ? "bg-slate-100 cursor-not-allowed" : ""}`}
-            required={isNew}
-            disabled={!isNew}
-          >
-            <option value="">Select a theme</option>
-            {themes.map((theme) => (
-              <option key={theme.id} value={theme.id}>
-                {theme.name}
-              </option>
-            ))}
-          </select>
-          {!isNew && (
-            <p className="form-description">
-              Theme can only be selected when creating a new project. To change the theme, please create a new project.
-            </p>
-          )}
+            className="form-input"
+            placeholder="https://mysite.com"
+          />
+          <p className="form-description">
+            The full URL where this project will be deployed. Used for social media images and canonical URLs.
+          </p>
         </div>
+
+        {isNew && (
+          <div className="form-field">
+            <label htmlFor="theme" className="form-label">
+              Theme
+            </label>
+            <select
+              id="theme"
+              name="theme"
+              value={formData.theme}
+              onChange={handleChange}
+              className="form-select"
+              required
+            >
+              <option value="">Select a theme</option>
+              {themes.map((theme) => (
+                <option key={theme.id} value={theme.id}>
+                  {theme.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <div className="form-actions">

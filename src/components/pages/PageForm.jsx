@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import slugify from "slugify";
 import useToastStore from "../../stores/toastStore";
+import useProjectStore from "../../stores/projectStore";
 import Button from "../ui/Button";
+import MediaSelectorDrawer from "../media/MediaSelectorDrawer";
+import { X, FolderOpen } from "lucide-react";
+import { API_URL } from "../../config";
 
 export default function PageForm({
   initialData = { name: "", slug: "" },
@@ -19,15 +23,17 @@ export default function PageForm({
       og_title: data.seo?.og_title || "",
       og_image: data.seo?.og_image || "",
       og_type: data.seo?.og_type || "website",
-      twitter_card: data.seo?.twitter_card || "summary_large_image",
+      twitter_card: data.seo?.twitter_card || "summary",
       canonical_url: data.seo?.canonical_url || "",
       robots: data.seo?.robots || "index,follow",
     },
   });
 
   const [formData, setFormData] = useState(initializeFormData(initialData));
+  const [mediaSelectorVisible, setMediaSelectorVisible] = useState(false);
   const isNew = !initialData.id;
   const showToast = useToastStore((state) => state.showToast);
+  const activeProject = useProjectStore((state) => state.activeProject);
 
   // Use a ref to track if this is the first render
   const initialRender = useRef(true);
@@ -121,6 +127,31 @@ export default function PageForm({
     }
   };
 
+  const handleSelectMedia = (selectedFile) => {
+    if (selectedFile && selectedFile.type && selectedFile.type.startsWith("image/")) {
+      setFormData((prev) => ({
+        ...prev,
+        seo: {
+          ...prev.seo,
+          og_image: selectedFile.path,
+        },
+      }));
+      setMediaSelectorVisible(false);
+    } else {
+      showToast("Please select an image file.", "error");
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setFormData((prev) => ({
+      ...prev,
+      seo: {
+        ...prev.seo,
+        og_image: "",
+      },
+    }));
+  };
+
   return (
     <form onSubmit={handleSubmit} className="form-container">
       {/* Main Page Data */}
@@ -200,18 +231,34 @@ export default function PageForm({
         </div>
 
         <div className="form-field">
-          <label htmlFor="seo-og-image" className="form-label-optional">
-            Social Media Image
-          </label>
-          <input
-            type="text"
-            id="seo-og-image"
-            name="og_image"
-            value={formData.seo.og_image}
-            onChange={handleSeoChange}
-            className="form-input"
-          />
-          <p className="form-description">Image path for social media previews. Recommended: 1200x630 pixels.</p>
+          <label className="form-label-optional">Social Media Image</label>
+          {formData.seo.og_image ? (
+            <div className="relative w-full max-w-md bg-slate-100 rounded-md overflow-hidden group">
+              <img
+                src={API_URL(`/api/media/projects/${activeProject?.id}${formData.seo.og_image}`)}
+                alt="Social media preview"
+                className="w-full h-32 object-cover"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button variant="icon" size="sm" onClick={() => setMediaSelectorVisible(true)} title="Change image">
+                  <FolderOpen size={16} />
+                </Button>
+                <Button variant="icon" size="sm" onClick={handleRemoveImage} title="Remove image">
+                  <X size={16} />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div
+              onClick={() => setMediaSelectorVisible(true)}
+              className="w-full max-w-md h-32 bg-slate-50 rounded-md border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors"
+            >
+              <FolderOpen size={32} />
+              <p className="mt-2 text-sm font-semibold">Click to select image</p>
+              <p className="text-xs">Recommended: 1200x630 pixels</p>
+            </div>
+          )}
+          <p className="form-description">Image for social media previews when sharing this page.</p>
         </div>
 
         <div className="form-field">
@@ -261,6 +308,16 @@ export default function PageForm({
           </Button>
         )}
       </div>
+
+      {mediaSelectorVisible && activeProject && (
+        <MediaSelectorDrawer
+          visible={mediaSelectorVisible}
+          onClose={() => setMediaSelectorVisible(false)}
+          onSelect={handleSelectMedia}
+          activeProject={activeProject}
+          filterType="image"
+        />
+      )}
     </form>
   );
 }

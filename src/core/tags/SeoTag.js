@@ -11,6 +11,7 @@ export const SeoTag = {
     try {
       const allVars = context.getAll();
       const page = allVars.page;
+      const project = allVars.project;
       const imagePath = allVars.imagePath || "uploads/images";
 
       if (!page) {
@@ -20,6 +21,9 @@ export const SeoTag = {
       // Use page.seo if available, otherwise create defaults
       const seo = page.seo || {};
       const metaTags = [];
+
+      // Check if we have an image for conditional logic
+      const hasImage = seo.og_image && seo.og_image.trim();
 
       // HTML title - use page name
       const title = page.name || "Untitled Page";
@@ -52,20 +56,30 @@ export const SeoTag = {
       const ogType = seo.og_type || "website";
       metaTags.push(`<meta property="og:type" content="${escapeHtml(ogType)}">`);
 
-      // Open Graph image if specified
-      if (seo.og_image && seo.og_image.trim()) {
+      // Open Graph image - only if specified
+      if (hasImage) {
         let ogImageUrl = seo.og_image;
 
-        // If it's a relative path, make it absolute using the image base path
-        if (!ogImageUrl.startsWith("http") && !ogImageUrl.startsWith("/")) {
-          ogImageUrl = `${imagePath}/${ogImageUrl}`;
+        // If it's a relative path, make it absolute using project site URL
+        if (!ogImageUrl.startsWith("http")) {
+          const siteUrl = project?.siteUrl;
+          if (siteUrl) {
+            // Remove trailing slash from siteUrl and leading slash from path
+            const cleanSiteUrl = siteUrl.replace(/\/$/, "");
+            const cleanImagePath = ogImageUrl.startsWith("/") ? ogImageUrl : `/${imagePath}/${ogImageUrl}`;
+            ogImageUrl = `${cleanSiteUrl}${cleanImagePath}`;
+          } else {
+            // Fallback to relative path if no site URL configured
+            ogImageUrl = ogImageUrl.startsWith("/") ? ogImageUrl : `/${imagePath}/${ogImageUrl}`;
+          }
         }
 
         metaTags.push(`<meta property="og:image" content="${escapeHtml(ogImageUrl)}">`);
       }
 
-      // Twitter Card tags
-      const twitterCard = seo.twitter_card || "summary_large_image";
+      // Twitter Card tags - only add if we have an image or use summary card
+      const twitterCard = hasImage ? seo.twitter_card || "summary_large_image" : "summary";
+
       metaTags.push(`<meta name="twitter:card" content="${escapeHtml(twitterCard)}">`);
       metaTags.push(`<meta name="twitter:title" content="${escapeHtml(ogTitle)}">`);
 
@@ -73,13 +87,24 @@ export const SeoTag = {
         metaTags.push(`<meta name="twitter:description" content="${escapeHtml(ogDescription)}">`);
       }
 
-      // Twitter image (use same as og:image)
-      if (seo.og_image && seo.og_image.trim()) {
+      // Twitter image (use same as og:image) - only if image exists
+      if (hasImage) {
         let twitterImageUrl = seo.og_image;
 
-        // If it's a relative path, make it absolute using the image base path
-        if (!twitterImageUrl.startsWith("http") && !twitterImageUrl.startsWith("/")) {
-          twitterImageUrl = `${imagePath}/${twitterImageUrl}`;
+        // If it's a relative path, make it absolute using project site URL
+        if (!twitterImageUrl.startsWith("http")) {
+          const siteUrl = project?.siteUrl;
+          if (siteUrl) {
+            // Remove trailing slash from siteUrl and leading slash from path
+            const cleanSiteUrl = siteUrl.replace(/\/$/, "");
+            const cleanImagePath = twitterImageUrl.startsWith("/")
+              ? twitterImageUrl
+              : `/${imagePath}/${twitterImageUrl}`;
+            twitterImageUrl = `${cleanSiteUrl}${cleanImagePath}`;
+          } else {
+            // Fallback to relative path if no site URL configured
+            twitterImageUrl = twitterImageUrl.startsWith("/") ? twitterImageUrl : `/${imagePath}/${twitterImageUrl}`;
+          }
         }
 
         metaTags.push(`<meta name="twitter:image" content="${escapeHtml(twitterImageUrl)}">`);
