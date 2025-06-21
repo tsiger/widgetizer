@@ -95,10 +95,10 @@ export default function MenuStructure() {
 
   // Handle menu items change
   const handleMenuItemsChange = (newItems) => {
-    setMenu((prevMenu) => ({
-      ...prevMenu,
-      items: [...newItems],
-    }));
+    setMenu((prev) => {
+      if (prev.items === newItems) return prev; // no change → no update
+      return { ...prev, items: newItems };
+    });
   };
 
   if (loading) {
