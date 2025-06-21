@@ -18,6 +18,9 @@ router.put("/:id", pageController.updatePage);
 // Delete a page
 router.delete("/:id", pageController.deletePage);
 
+// Bulk delete pages
+router.post("/bulk-delete", pageController.bulkDeletePages);
+
 // Duplicate a page
 router.post("/:id/duplicate", pageController.duplicatePage);
 

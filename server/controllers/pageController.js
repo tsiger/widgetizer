@@ -356,6 +356,91 @@ export async function deletePage(req, res) {
 }
 
 /**
+ * Bulk delete pages
+ */
+export async function bulkDeletePages(req, res) {
+  try {
+    const { pageIds } = req.body;
+
+    if (!Array.isArray(pageIds) || pageIds.length === 0) {
+      return res.status(400).json({ error: "Page IDs array is required" });
+    }
+
+    const { projects, activeProjectId } = await readProjectsFile();
+    const activeProject = projects.find((p) => p.id === activeProjectId);
+
+    if (!activeProject) {
+      return res.status(404).json({ error: "No active project found" });
+    }
+
+    const results = {
+      deleted: [],
+      notFound: [],
+      errors: [],
+    };
+
+    // Process each page deletion
+    for (const pageId of pageIds) {
+      try {
+        const pagePath = getPagePath(activeProject.id, pageId);
+
+        // Check if file exists before deleting
+        if (!(await fs.pathExists(pagePath))) {
+          results.notFound.push(pageId);
+          continue;
+        }
+
+        // Delete the page file
+        await fs.remove(pagePath);
+
+        // Remove the page from media usage tracking
+        try {
+          await removePageFromMediaUsage(activeProject.id, pageId);
+        } catch (usageError) {
+          console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
+          // Don't fail the deletion if usage tracking fails
+        }
+
+        results.deleted.push(pageId);
+      } catch (error) {
+        console.error(`Error deleting page ${pageId}:`, error);
+        results.errors.push({ pageId, error: error.message });
+      }
+    }
+
+    // Determine response status based on results
+    const hasErrors = results.errors.length > 0 || results.notFound.length > 0;
+    const hasSuccesses = results.deleted.length > 0;
+
+    if (hasSuccesses && !hasErrors) {
+      // All deletions successful
+      res.json({
+        success: true,
+        message: `Successfully deleted ${results.deleted.length} page(s)`,
+        results,
+      });
+    } else if (hasSuccesses && hasErrors) {
+      // Partial success
+      res.status(207).json({
+        success: false,
+        message: `Deleted ${results.deleted.length} page(s), but encountered ${results.errors.length + results.notFound.length} error(s)`,
+        results,
+      });
+    } else {
+      // No successes
+      res.status(400).json({
+        success: false,
+        message: "Failed to delete any pages",
+        results,
+      });
+    }
+  } catch (error) {
+    console.error("Error in bulk delete pages:", error);
+    res.status(500).json({ error: "Failed to bulk delete pages" });
+  }
+}
+
+/**
  * Create a page
  */
 export async function createPage(req, res) {

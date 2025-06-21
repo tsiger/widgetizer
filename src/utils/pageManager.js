@@ -33,6 +33,30 @@ export async function deletePage(pageId) {
 }
 
 /**
+ * Bulk delete pages
+ */
+export async function bulkDeletePages(pageIds) {
+  try {
+    const response = await fetch(API_URL("/api/pages/bulk-delete"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ pageIds }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to bulk delete pages");
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw new Error(`Failed to bulk delete pages: ${error.message}`);
+  }
+}
+
+/**
  * Get a specific page by ID
  */
 export async function getPage(id) {

@@ -8,7 +8,7 @@ export default function useConfirmationModal(onConfirm) {
     confirmText: "Confirm",
     cancelText: "Cancel",
     variant: "danger",
-    data: null, // For storing any relevant data (like IDs, names, etc.)
+    data: null,
   });
 
   const openModal = (options = {}) => {
