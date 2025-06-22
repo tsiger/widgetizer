@@ -11,9 +11,9 @@ export default function Layout() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar guardedNavigate={isPageEditor ? guardedNavigate : undefined} />
+      {!isPageEditor && <Sidebar guardedNavigate={guardedNavigate} />}
 
-      <div className="flex-1 flex flex-col ml-[72px] md:ml-48 relative z-30">
+      <div className={`flex-1 flex flex-col relative z-30 ${!isPageEditor ? "ml-[72px] md:ml-48" : ""}`}>
         <Content>
           <Outlet />
         </Content>

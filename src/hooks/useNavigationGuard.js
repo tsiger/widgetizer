@@ -5,7 +5,7 @@ import useAutoSave from "../stores/saveStore";
 export default function useNavigationGuard() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { hasUnsavedChanges } = useAutoSave();
+  const { hasUnsavedChanges, reset } = useAutoSave();
 
   // Layer 1: Browser navigation (beforeunload) - handles tab closing, URL changes, etc.
   useEffect(() => {
@@ -32,12 +32,15 @@ export default function useNavigationGuard() {
         if (!confirmed) {
           return false;
         }
+
+        // Reset unsaved changes state when user confirms leaving without saving
+        reset();
       }
 
       navigate(to, options);
       return true;
     },
-    [navigate, hasUnsavedChanges],
+    [navigate, hasUnsavedChanges, reset],
   );
 
   // Helper function to check if we have unsaved changes

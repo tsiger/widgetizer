@@ -37,7 +37,7 @@ export default function SettingsPanel({
 
   if (!currentWidget || (!selectedWidgetId && !selectedGlobalWidgetId)) {
     return (
-      <div className="w-72 bg-white border-l border-slate-200">
+      <div className="w-60 bg-white border-l border-slate-200">
         <div className="p-4">
           <p className="text-slate-500 text-center mt-8">Select a widget to edit its settings</p>
         </div>
@@ -62,7 +62,7 @@ export default function SettingsPanel({
         (isGlobalWidget ? (selectedGlobalWidgetId === "header" ? "Header" : "Footer") : "Widget Settings");
 
   return (
-    <div className="w-72 bg-white border-l border-slate-200 flex flex-col h-full">
+    <div className="w-60 bg-white border-l border-slate-200 flex flex-col h-full">
       <div className="p-4 flex-1 overflow-y-auto">
         <div className="font-bold mb-4 sticky top-0 bg-white pb-2 border-b border-slate-100 z-10">
           {selectedBlockId && !isGlobalWidget ? (
