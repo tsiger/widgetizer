@@ -1,0 +1,118 @@
+/* Test Settings Widget Styles */
+
+.test-settings {
+  margin: 2rem 0;
+  position: relative;
+}
+
+.test-settings__container {
+  max-width: 100%;
+  position: relative;
+}
+
+.test-settings__header {
+  font-family: inherit;
+  line-height: 1.2;
+  margin-top: 0;
+}
+
+.test-settings__content {
+  max-width: none;
+}
+
+.test-settings__nav {
+  margin: 1rem 0;
+}
+
+.test-settings__nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.test-settings__nav-item {
+  margin: 0;
+}
+
+.test-settings__nav-link {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.test-settings__nav-link:hover {
+  color: #3b82f6;
+  border-color: #3b82f6;
+  background: #f8fafc;
+}
+
+.test-settings__debug {
+  border: 1px solid #e2e8f0;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+}
+
+.test-settings__debug h4 {
+  margin: 0 0 1rem 0;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #334155;
+}
+
+.test-settings__debug strong {
+  color: #475569;
+  min-width: 120px;
+  display: inline-block;
+}
+
+.test-settings__debug br {
+  margin-bottom: 0.25rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .test-settings__nav-list {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .test-settings__debug {
+    font-size: 0.75rem;
+  }
+
+  .test-settings__debug strong {
+    min-width: 100px;
+  }
+}
+
+/* Animation enhancements */
+.test-settings * {
+  box-sizing: border-box;
+}
+
+.test-settings__link {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.test-settings__link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.test-settings__image {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.test-settings__video {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

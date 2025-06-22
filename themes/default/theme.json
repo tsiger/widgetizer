@@ -23,6 +23,11 @@
       ],
       "colors": [
         {
+          "id": "colors_header",
+          "type": "header",
+          "content": "Color Settings"
+        },
+        {
           "id": "background",
           "label": "Background Color",
           "default": "#FFFFFF",
@@ -44,6 +49,11 @@
       ],
       "typography": [
         {
+          "id": "typography_header",
+          "type": "header",
+          "content": "Typography Settings"
+        },
+        {
           "id": "heading_font",
           "label": "Heading Font",
           "default": "Inter",
@@ -64,15 +74,137 @@
             "weight": 400
           },
           "outputAsCssVar": true
+        },
+        {
+          "id": "base_font_size",
+          "type": "range",
+          "label": "Base Font Size",
+          "default": 16,
+          "min": 12,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "outputAsCssVar": true
         }
       ],
       "layout": [
+        {
+          "id": "layout_header",
+          "type": "header",
+          "content": "Layout Settings"
+        },
         {
           "id": "show_header",
           "label": "Show Header",
           "default": true,
           "type": "checkbox",
           "value": true
+        },
+        {
+          "id": "site_width",
+          "type": "select",
+          "label": "Site Width",
+          "default": "normal",
+          "options": [
+            { "value": "narrow", "label": "Narrow (960px)" },
+            { "value": "normal", "label": "Normal (1200px)" },
+            { "value": "wide", "label": "Wide (1400px)" }
+          ]
+        },
+        {
+          "id": "container_padding",
+          "type": "range",
+          "label": "Container Padding",
+          "default": 20,
+          "min": 0,
+          "max": 60,
+          "step": 5,
+          "unit": "px",
+          "outputAsCssVar": true
+        }
+      ],
+      "content": [
+        {
+          "id": "content_header",
+          "type": "header",
+          "content": "Content Settings"
+        },
+        {
+          "id": "site_title",
+          "type": "text",
+          "label": "Site Title",
+          "default": "My Website",
+          "description": "The main title of your website"
+        },
+        {
+          "id": "site_description",
+          "type": "textarea",
+          "label": "Site Description",
+          "default": "A beautiful website built with Widgetizer",
+          "description": "A brief description of your website"
+        },
+        {
+          "id": "logo_image",
+          "type": "image",
+          "label": "Site Logo",
+          "description": "Upload your site logo"
+        },
+        {
+          "id": "hero_video",
+          "type": "video",
+          "label": "Hero Video",
+          "description": "Optional hero video for the homepage"
+        },
+        {
+          "id": "main_navigation",
+          "type": "menu",
+          "label": "Main Navigation",
+          "default": "main-nav",
+          "description": "Select the main navigation menu"
+        },
+        {
+          "id": "cta_link",
+          "type": "link",
+          "label": "Call-to-Action Link",
+          "description": "Main call-to-action link for the site"
+        }
+      ],
+      "features": [
+        {
+          "id": "features_header",
+          "type": "header",
+          "content": "Feature Settings"
+        },
+        {
+          "id": "enable_animations",
+          "type": "checkbox",
+          "label": "Enable Animations",
+          "default": true,
+          "description": "Enable CSS animations and transitions"
+        },
+        {
+          "id": "theme_style",
+          "type": "radio",
+          "label": "Theme Style",
+          "default": "modern",
+          "options": [
+            { "value": "classic", "label": "Classic" },
+            { "value": "modern", "label": "Modern" },
+            { "value": "minimal", "label": "Minimal" }
+          ],
+          "description": "Choose the overall style of the theme"
+        },
+        {
+          "id": "border_radius",
+          "type": "range",
+          "label": "Border Radius",
+          "default": 8,
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "outputAsCssVar": true,
+          "description": "Global border radius for elements"
         }
       ]
     }

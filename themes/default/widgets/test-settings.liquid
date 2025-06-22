@@ -1,0 +1,382 @@
+<section
+	class="test-settings"
+	data-widget-id="{{ widget.id }}"
+	data-widget-type="test-settings"
+>
+	<style>
+		#{{ widget.id }}.test-settings__container {
+			background-color: {{ widget.settings.background_color }};
+			padding: {{ widget.settings.padding }}px;
+			border-radius: {{ widget.settings.border_radius }}px;
+			font-family: {{ widget.settings.content_font.stack }};
+			font-weight: {{ widget.settings.content_font.weight }};
+		}
+
+		#{{ widget.id }} .test-settings__header {
+			color: {{ widget.settings.heading_color }};
+			font-size: {{ widget.settings.heading_size }}px;
+			text-align: {{ widget.settings.text_alignment }};
+			margin-bottom: 1rem;
+		}
+
+		#{{ widget.id }} .test-settings__content {
+			color: {{ widget.settings.text_color }};
+			line-height: 1.6;
+		}
+
+		#{{ widget.id }} .test-settings__image {
+			max-width: 100%;
+			height: auto;
+			margin: 1rem 0;
+		}
+
+		#{{ widget.id }} .test-settings__video {
+			width: 100%;
+			margin: 1rem 0;
+		}
+
+		#{{ widget.id }} .test-settings__link {
+			display: inline-block;
+			padding: 0.75rem 1.5rem;
+			background: {{ widget.settings.button_color }};
+			color: white;
+			text-decoration: none;
+			border-radius: {{ widget.settings.border_radius }}px;
+			transition: background-color 0.2s;
+		}
+
+		#{{ widget.id }} .test-settings__link:hover {
+			background: {{ widget.settings.button_hover_color }};
+		}
+
+		#{{ widget.id }} .test-settings__debug {
+			margin-top: 2rem;
+			padding: 1rem;
+			background: #f8f9fa;
+			border-radius: 4px;
+			font-size: 0.875rem;
+			color: #666;
+		}
+
+		#{{ widget.id }} .test-settings__debug pre {
+			background: #fff;
+			padding: 0.5rem;
+			border-radius: 3px;
+			overflow-x: auto;
+			margin: 0.5rem 0;
+		}
+
+		{% if widget.settings.enable_animations %}
+		#{{ widget.id }} * {
+			transition: all 0.3s ease;
+		}
+		{% endif %}
+
+		{% if widget.settings.theme_style == 'minimal' %}
+		#{{ widget.id }} {
+			border: 1px solid #eee;
+		}
+		{% elsif widget.settings.theme_style == 'classic' %}
+		#{{ widget.id }} {
+			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+		}
+		{% endif %}
+	</style>
+
+	<div id="{{ widget.id }}" class="test-settings__container">
+		<!-- Header Content -->
+		{% if widget.settings.main_heading != blank %}
+			<h2 class="test-settings__header">
+				{{ widget.settings.main_heading }}
+			</h2>
+		{% endif %}
+
+		<!-- Content Area -->
+		<div class="test-settings__content">
+			{% if widget.settings.description != blank %}
+				<p>{{ widget.settings.description }}</p>
+			{% endif %}
+
+			<!-- Image Display -->
+			{% if widget.settings.show_image and widget.settings.featured_image != blank %}
+				{{ widget.settings.featured_image | image: 'medium', 'test-settings__image' }}
+			{% endif %}
+
+			<!-- Video Display -->
+			{% if widget.settings.show_video and widget.settings.featured_video != blank %}
+				{{ widget.settings.featured_video | video: class: 'test-settings__video' }}
+			{% endif %}
+
+			<!-- Menu Display -->
+			{% if widget.settings.show_navigation and widget.settings.navigation_menu != blank %}
+				<nav>
+					{% render 'menu',
+						menu: widget.settings.navigation_menu,
+						class_menu: 'test-settings__nav',
+						class_list: 'test-settings__nav-list',
+						class_item: 'test-settings__nav-item',
+						class_link: 'test-settings__nav-link'
+					%}
+				</nav>
+			{% endif %}
+
+			<!-- Link Display -->
+			{% if widget.settings.show_cta and widget.settings.cta_link != blank %}
+				<a href="{{ widget.settings.cta_link.url }}" class="test-settings__link"
+				   {% if widget.settings.cta_link.target == '_blank' %}target="_blank"{% endif %}>
+					{{ widget.settings.cta_link.text | default: 'Click Here' }}
+				</a>
+			{% endif %}
+		</div>
+
+		<!-- Debug Information -->
+		{% if widget.settings.show_debug %}
+			<div class="test-settings__debug">
+				<h4>🔧 Setting Values Debug</h4>
+				<div>
+					<strong>Text:</strong> "{{ widget.settings.main_heading }}"<br>
+					<strong>Textarea:</strong> "{{ widget.settings.description | truncate: 50 }}"<br>
+					<strong>Color:</strong> {{ widget.settings.background_color }}<br>
+					<strong>Checkbox:</strong> {{ widget.settings.show_image }}<br>
+					<strong>Range:</strong> {{ widget.settings.padding }}px<br>
+					<strong>Select:</strong> {{ widget.settings.text_alignment }}<br>
+					<strong>Radio:</strong> {{ widget.settings.theme_style }}<br>
+					<strong>Font:</strong> {{ widget.settings.content_font.stack | truncate: 30 }} ({{ widget.settings.content_font.weight }})<br>
+					<strong>Image:</strong> {% if widget.settings.featured_image %}Set{% else %}Not set{% endif %}<br>
+					<strong>Video:</strong> {% if widget.settings.featured_video %}Set{% else %}Not set{% endif %}<br>
+					<strong>Menu:</strong> {{ widget.settings.navigation_menu | default: 'Not selected' }}<br>
+					<strong>Link:</strong> {% if widget.settings.cta_link %}{{ widget.settings.cta_link.url }}{% else %}Not set{% endif %}
+				</div>
+			</div>
+		{% endif %}
+	</div>
+
+	<script type="application/json" data-widget-schema>
+	{
+		"type": "test-settings",
+		"displayName": "Test Settings Widget",
+		"description": "A comprehensive test widget that includes ALL available setting types",
+		"settings": [
+			{
+				"type": "header",
+				"label": "Text & Content Settings"
+			},
+			{
+				"type": "text",
+				"id": "main_heading",
+				"label": "Main Heading",
+				"default": "Settings Test Widget",
+				"description": "Test the text input setting type"
+			},
+			{
+				"type": "textarea",
+				"id": "description",
+				"label": "Description",
+				"default": "This widget tests all available setting types in Widgetizer. Each setting type should render correctly in the settings panel.",
+				"description": "Test the textarea setting type"
+			},
+			{
+				"type": "header",
+				"content": "Visual Settings"
+			},
+			{
+				"type": "color",
+				"id": "background_color",
+				"label": "Background Color",
+				"default": "#ffffff",
+				"description": "Test the color picker setting type"
+			},
+			{
+				"type": "color",
+				"id": "heading_color",
+				"label": "Heading Color",
+				"default": "#1e293b",
+				"description": "Another color picker test"
+			},
+			{
+				"type": "color",
+				"id": "text_color",
+				"label": "Text Color",
+				"default": "#64748b",
+				"description": "Third color picker test"
+			},
+			{
+				"type": "color",
+				"id": "button_color",
+				"label": "Button Color",
+				"default": "#3b82f6",
+				"description": "Button background color"
+			},
+			{
+				"type": "color",
+				"id": "button_hover_color",
+				"label": "Button Hover Color",
+				"default": "#2563eb",
+				"description": "Button hover state color"
+			},
+			{
+				"type": "header",
+				"content": "Boolean & Choice Settings"
+			},
+			{
+				"type": "checkbox",
+				"id": "show_image",
+				"label": "Show Featured Image",
+				"default": false,
+				"description": "Test the checkbox setting type"
+			},
+			{
+				"type": "checkbox",
+				"id": "show_video",
+				"label": "Show Featured Video",
+				"default": false,
+				"description": "Another checkbox test"
+			},
+			{
+				"type": "checkbox",
+				"id": "show_navigation",
+				"label": "Show Navigation Menu",
+				"default": false,
+				"description": "Third checkbox test"
+			},
+			{
+				"type": "checkbox",
+				"id": "show_cta",
+				"label": "Show Call-to-Action",
+				"default": true,
+				"description": "Fourth checkbox test"
+			},
+			{
+				"type": "checkbox",
+				"id": "enable_animations",
+				"label": "Enable Animations",
+				"default": true,
+				"description": "Enable CSS transitions and animations"
+			},
+			{
+				"type": "select",
+				"id": "text_alignment",
+				"label": "Text Alignment",
+				"default": "left",
+				"options": [
+					{ "value": "left", "label": "Left" },
+					{ "value": "center", "label": "Center" },
+					{ "value": "right", "label": "Right" },
+					{ "value": "justify", "label": "Justify" }
+				],
+				"description": "Test the select dropdown setting type"
+			},
+			{
+				"type": "radio",
+				"id": "theme_style",
+				"label": "Widget Style",
+				"default": "modern",
+				"options": [
+					{ "value": "minimal", "label": "Minimal" },
+					{ "value": "modern", "label": "Modern" },
+					{ "value": "classic", "label": "Classic" }
+				],
+				"description": "Test the radio button setting type"
+			},
+			{
+				"type": "header",
+				"content": "Numeric Settings"
+			},
+			{
+				"type": "range",
+				"id": "padding",
+				"label": "Padding",
+				"default": 20,
+				"min": 0,
+				"max": 60,
+				"step": 5,
+				"unit": "px",
+				"description": "Test the range slider setting type"
+			},
+			{
+				"type": "range",
+				"id": "heading_size",
+				"label": "Heading Font Size",
+				"default": 32,
+				"min": 18,
+				"max": 48,
+				"step": 2,
+				"unit": "px",
+				"description": "Another range slider test"
+			},
+			{
+				"type": "range",
+				"id": "border_radius",
+				"label": "Border Radius",
+				"default": 8,
+				"min": 0,
+				"max": 25,
+				"step": 1,
+				"unit": "px",
+				"description": "Third range slider test"
+			},
+			{
+				"type": "header",
+				"content": "Font Settings"
+			},
+			{
+				"type": "font_picker",
+				"id": "content_font",
+				"label": "Content Font",
+				"default": {
+					"stack": "system-ui, sans-serif",
+					"weight": 400
+				},
+				"description": "Test the font picker setting type"
+			},
+			{
+				"type": "header",
+				"content": "Media Settings"
+			},
+			{
+				"type": "image",
+				"id": "featured_image",
+				"label": "Featured Image",
+				"description": "Test the image upload setting type",
+				"condition": "show_image"
+			},
+			{
+				"type": "video",
+				"id": "featured_video",
+				"label": "Featured Video",
+				"description": "Test the video upload setting type",
+				"condition": "show_video"
+			},
+			{
+				"type": "header",
+				"content": "Navigation Settings"
+			},
+			{
+				"type": "menu",
+				"id": "navigation_menu",
+				"label": "Navigation Menu",
+				"description": "Test the menu selector setting type",
+				"condition": "show_navigation"
+			},
+			{
+				"type": "link",
+				"id": "cta_link",
+				"label": "Call-to-Action Link",
+				"description": "Test the link builder setting type",
+				"condition": "show_cta"
+			},
+			{
+				"type": "header",
+				"content": "Developer Options"
+			},
+			{
+				"type": "checkbox",
+				"id": "show_debug",
+				"label": "Show Debug Information",
+				"default": false,
+				"description": "Display all setting values for testing purposes"
+			}
+		]
+	}
+	</script>
+</section>

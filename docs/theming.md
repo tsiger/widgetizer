@@ -2,9 +2,29 @@
 
 This document provides a comprehensive guide to creating and customizing themes in Widgetizer. A theme is a complete package that defines the visual appearance, layout structure, and functionality of a website.
 
-## 1. Theme Structure Overview
+## 1. Introduction & Core Concepts
 
-A theme is organized as a self-contained directory with the following structure:
+### What is a Theme?
+
+A theme in Widgetizer is a self-contained package that defines:
+
+- **Visual Design**: Colors, typography, spacing, and layout
+- **Structure**: HTML templates and page organization
+- **Functionality**: Interactive components and dynamic content
+- **Content Management**: Configurable settings and flexible blocks
+
+### Key Components
+
+- **Layout Template**: The main HTML structure that wraps all content
+- **Widgets**: Reusable content components (text, images, forms, etc.)
+- **Blocks**: Sub-components within widgets for flexible content management
+- **Global Settings**: Theme-wide customization options
+- **Templates**: Pre-defined page structures and widget arrangements
+- **Assets**: CSS, JavaScript, and media files
+
+## 2. Theme Structure & File Organization
+
+A theme is organized as a directory with the following structure:
 
 ```
 /themes/my-theme/
@@ -31,7 +51,7 @@ A theme is organized as a self-contained directory with the following structure:
     └── footer_scripts.js  # Scripts loaded before </body>
 ```
 
-## 2. Theme Manifest (theme.json)
+## 3. Theme Manifest (theme.json)
 
 The `theme.json` file serves as the theme's manifest and defines global settings that can be customized by users.
 
@@ -57,32 +77,90 @@ The `settings.global` object defines customizable options organized into logical
     "global": {
       "colors": [
         {
+          "id": "colors_header",
+          "type": "header",
+          "label": "Color Settings"
+        },
+        {
           "id": "background",
           "label": "Background Color",
           "default": "#FFFFFF",
+          "type": "color",
+          "outputAsCssVar": true
+        },
+        {
+          "id": "accent",
+          "label": "Accent Color",
+          "default": "#0066cc",
           "type": "color",
           "outputAsCssVar": true
         }
       ],
       "typography": [
         {
+          "id": "typography_header",
+          "type": "header",
+          "label": "Typography Settings"
+        },
+        {
           "id": "heading_font",
           "label": "Heading Font",
-          "default": "Inter",
           "type": "font_picker",
-          "value": {
+          "default": {
             "stack": "system-ui, sans-serif",
             "weight": 700
           },
+          "outputAsCssVar": true
+        },
+        {
+          "id": "base_font_size",
+          "type": "range",
+          "label": "Base Font Size",
+          "default": 16,
+          "min": 12,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
           "outputAsCssVar": true
         }
       ],
       "layout": [
         {
+          "id": "layout_header",
+          "type": "header",
+          "label": "Layout Settings"
+        },
+        {
           "id": "show_header",
           "label": "Show Header",
           "default": true,
           "type": "checkbox"
+        },
+        {
+          "id": "site_width",
+          "type": "select",
+          "label": "Site Width",
+          "default": "normal",
+          "options": [
+            { "value": "narrow", "label": "Narrow" },
+            { "value": "normal", "label": "Normal" },
+            { "value": "wide", "label": "Wide" }
+          ]
+        }
+      ],
+      "content": [
+        {
+          "id": "logo_image",
+          "type": "image",
+          "label": "Site Logo",
+          "description": "Upload your site logo"
+        },
+        {
+          "id": "footer_text",
+          "type": "textarea",
+          "label": "Footer Text",
+          "default": "© 2024 My Website",
+          "description": "Text displayed in the footer"
         }
       ]
     }
@@ -90,24 +168,53 @@ The `settings.global` object defines customizable options organized into logical
 }
 ```
 
-**Setting Types:**
+### Available Setting Types
 
-- `color`: Color picker
-- `text`: Text input
-- `checkbox`: Boolean toggle
-- `font_picker`: Font selection with stack and weight
-- `range`: Numeric slider
-- `select`: Dropdown with predefined options
+- `header`: Visual divider to group related settings into sections
+- `text`: Single-line text input. _(Can be used with `outputAsCssVar` if its value is a valid CSS value, like a color or size.)_
+- `textarea`: Multi-line text input field. _(Can be used with `outputAsCssVar` if its value is a valid CSS value.)_
+- `color`: Color picker with hex input and color swatch. _(Ideal for `outputAsCssVar`.)_
+- `checkbox`: Boolean toggle switch. _(Not typically used for direct CSS output, as its value is a boolean.)_
+- `range`: Numeric slider with min/max/step options. _(Ideal for `outputAsCssVar`. The output value is a unitless number, so you may need `calc()` in CSS, e.g., `width: calc(1px _ var(--my-range-var));`)\*
+- `select`: Dropdown menu with predefined options. _(Can be used with `outputAsCssVar` if the `value` of the selected option is a valid CSS value.)_
+- `radio`: Radio buttons for single selection from options. _(Can be used with `outputAsCssVar` if the `value` of the selected option is a valid CSS value.)_
+- `font_picker`: Font family and weight selector with CSS variable output. _(Specially designed for `outputAsCssVar`; it generates multiple variables for font properties, e.g., `--group-id-family` and `--group-id-weight`.)_
+- `image`: Image uploader with preview, browse, and metadata editing. _(Can be used with `outputAsCssVar` to output the image URL, suitable for `background-image: url(var(--my-image-var));`)_
+- `video`: Video uploader with preview and media library integration. _(Value is a path; not typically used for CSS variables.)_
+- `menu`: Dropdown populated with available navigation menus. _(Value is a menu ID; not used for CSS.)_
+- `link`: Link builder for internal pages or custom URLs with text and target options. _(Value is a complex object; not used for CSS.)_
 
-**CSS Variable Output:** When `outputAsCssVar: true` is set, the setting automatically generates CSS custom properties accessible in your styles as `var(--group-id)`. These variables are output by the `{% theme_settings %}` tag in the layout template.
+### CSS Variables & Theme Object Access
+
+**CSS Variable Output:** When `outputAsCssVar: true` is set, the setting automatically generates CSS custom properties accessible in your styles. For this to be effective, the setting's value must be a valid CSS value (e.g., a color, a size like `16px`, or a font stack). The variable is generated by the `{% theme_settings %}` tag and its name is constructed as `--groupName-settingId` (e.g., `var(--colors-background)`).
+
+**Direct Access via Theme Object:** All theme settings are also available as a `theme` object in Liquid templates:
+
+```liquid
+<!-- Access theme settings directly in templates -->
+{% if theme.layout.show_header %}
+  <header>Site header content here</header>
+{% endif %}
+
+<!-- Use theme settings for conditional logic -->
+<div class="container-{{ theme.layout.site_width }}">
+  {{ theme.content.footer_text }}
+</div>
+
+<!-- Access nested settings -->
+{{ theme.colors.background }}
+{{ theme.typography.base_font_size }}px
+```
+
+The `theme` object structure follows your `theme.json` groups and setting IDs: `theme.{group}.{setting_id}`.
 
 For complete details on all available setting types and their properties, see the [Theme & Widget Setting Types documentation](theme-settings.md).
 
-## 3. Layout Template (layout.liquid)
+## 4. Layout Template (layout.liquid)
 
 The `layout.liquid` file defines the main HTML structure that wraps all page content. It's the foundation of every page.
 
-### Essential Liquid Tags
+### Essential Structure
 
 ```liquid
 <!DOCTYPE html>
@@ -133,33 +240,87 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 </html>
 ```
 
-### Key Liquid Tags Explained
+### Key Liquid Tags
 
 - `{% seo %}`: Automatically generates SEO meta tags (title, description, Open Graph, etc.)
 - `{% fonts_preconnect %}`: Creates preconnect links for faster font loading
 - `{% fonts_stylesheet %}`: Includes CSS for selected fonts
 - `{% asset "filename" %}`: Loads and includes assets from the `/assets/` directory
-- `{% theme_settings %}`: Outputs CSS custom properties from global settings as `<style>` tags in the document head. This tag processes all settings with `outputAsCssVar: true` and generates CSS variables in the format `--group-settingId`
+- `{% theme_settings %}`: Outputs CSS custom properties from global settings as `<style>` tags in the document head
 - `{{ content }}`: The insertion point for page content
 - `{{ body_class }}`: Dynamic CSS classes for the body element
 
-## 4. Liquid Filters
+### Available Template Variables (Layout Only)
 
-Widgetizer provides powerful Liquid filters to simplify common tasks.
+The `layout.liquid` template has access to additional objects that individual widgets cannot access:
 
-### `image`
+- `{{ content }}`: Rendered page content (all widgets combined)
+- `{{ body_class }}`: Dynamic CSS classes for the body element
+- `{{ page.* }}`: Current page data
+- `{{ project.* }}`: Project information
+- `{{ theme.* }}`: Global theme settings
+
+#### Page Object (`{{ page.* }}`)
+
+Contains data from the current page's JSON file:
+
+```liquid
+{{ page.id }}          <!-- Page slug/filename -->
+{{ page.name }}        <!-- Display name (e.g., "About Us") -->
+{{ page.slug }}        <!-- URL slug (e.g., "about-us") -->
+{{ page.created }}     <!-- Creation timestamp -->
+{{ page.updated }}     <!-- Last updated timestamp -->
+
+<!-- SEO data -->
+{{ page.seo.description }}    <!-- Meta description -->
+{{ page.seo.og_title }}      <!-- Open Graph title -->
+{{ page.seo.og_image }}      <!-- Social media image path -->
+{{ page.seo.robots }}        <!-- Robots directive -->
+{{ page.seo.canonical_url }} <!-- Canonical URL -->
+```
+
+#### Project Object (`{{ project.* }}`)
+
+Contains data from the main `projects.json` file:
+
+```liquid
+{{ project.id }}          <!-- Project ID -->
+{{ project.name }}        <!-- Project name -->
+{{ project.description }} <!-- Project description -->
+{{ project.theme }}       <!-- Active theme ID -->
+{{ project.siteUrl }}     <!-- Full site URL -->
+{{ project.created }}     <!-- Project creation timestamp -->
+{{ project.updated }}     <!-- Project last updated timestamp -->
+```
+
+**Example usage in `layout.liquid`:**
+
+```liquid
+<!-- Dynamic page title -->
+<title>{{ page.name }} - {{ project.name }}</title>
+
+<!-- SEO meta tags -->
+{% if page.seo.description %}
+  <meta name="description" content="{{ page.seo.description }}">
+{% endif %}
+
+<!-- Canonical URL -->
+<link rel="canonical" href="{{ project.siteUrl }}{{ page.slug }}">
+```
+
+## 5. Liquid Tags & Filters
+
+Widgetizer provides powerful Liquid filters to simplify common tasks in your templates.
+
+### Image Filter
 
 The `image` filter is the recommended way to render images in your theme. It automatically handles generating the correct `src` for different image sizes, adds important attributes like `width`, `height`, and `alt`, and enables lazy loading by default.
-
-It takes the image filename (or path) as input and optional positional parameters.
 
 #### Basic Usage
 
 ```liquid
 {{ widget.settings.myImage | image }}
 ```
-
-This will render a medium-sized, lazy-loaded `<img>` tag with the alt text from the media library.
 
 #### Advanced Usage with Parameters
 
@@ -169,15 +330,13 @@ This will render a medium-sized, lazy-loaded `<img>` tag with the alt text from 
 
 #### Parameter Order
 
-The image filter accepts up to 5 positional parameters in this order:
-
-| Position | Parameter | Type | Default | Description |
-| :-- | :-- | :-- | :-- | :-- |
-| 1 | `size` | String | `'medium'` | Image size to render: `'thumb'`, `'small'`, `'medium'`, `'large'`. Falls back to original if size doesn't exist. |
-| 2 | `class` | String | `''` | CSS class to add to the `<img>` tag. |
-| 3 | `lazy` | Boolean | `true` | Whether to add `loading="lazy"` attribute for performance. |
-| 4 | `alt` | String | (from media) | Override alt text from media library. |
-| 5 | `title` | String | (from media) | Override title text from media library. |
+| Position | Parameter | Type    | Default      | Description                                             |
+| :------- | :-------- | :------ | :----------- | :------------------------------------------------------ |
+| 1        | `size`    | String  | `'medium'`   | Image size: `'thumb'`, `'small'`, `'medium'`, `'large'` |
+| 2        | `class`   | String  | `''`         | CSS class to add to the `<img>` tag                     |
+| 3        | `lazy`    | Boolean | `true`       | Whether to add `loading="lazy"` attribute               |
+| 4        | `alt`     | String  | (from media) | Override alt text from media library                    |
+| 5        | `title`   | String  | (from media) | Override title text from media library                  |
 
 #### Usage Examples
 
@@ -194,16 +353,11 @@ The image filter accepts up to 5 positional parameters in this order:
 
 <!-- Custom alt text -->
 {{ widget.settings.photo | image: 'medium', '', true, 'Custom description' }}
-
-<!-- All parameters -->
-{{ widget.settings.banner | image: 'large', 'banner-img', false, 'Banner image', 'Promotional banner' }}
 ```
 
-### `video`
+### Video Filter
 
-The `video` filter renders HTML5 video elements with proper attributes and fallbacks. Since videos don't have auto-generated thumbnails or extracted metadata, the filter provides a simple way to embed videos with customizable options.
-
-It takes the video filename (or path) as input and an optional object of parameters.
+The `video` filter renders HTML5 video elements with proper attributes and fallbacks.
 
 #### Basic Usage
 
@@ -211,29 +365,23 @@ It takes the video filename (or path) as input and an optional object of paramet
 {{ widget.settings.heroVideo | video }}
 ```
 
-This will render a video element with controls enabled and metadata preloading.
-
-#### Advanced Usage with Options
+#### Advanced Usage with Parameters
 
 ```liquid
-{{ widget.settings.heroVideo | video: controls: false, autoplay: true, muted: true, loop: true, class: 'hero-video' }}
+{{ widget.settings.heroVideo | video: false, true, true, true, 'hero-video' }}
 ```
 
-#### Available Options
+#### Parameter Order
 
-| Option | Type | Default | Description |
-| :-- | :-- | :-- | :-- |
-| `controls` | Boolean | `true` | Show video controls (play, pause, volume, etc.). |
-| `autoplay` | Boolean | `false` | Auto-play video on load. Note: most browsers require `muted: true` for autoplay to work. |
-| `muted` | Boolean | `false` | Mute video by default. Required for autoplay in most browsers. |
-| `loop` | Boolean | `false` | Loop video playback continuously. |
-| `preload` | String | `'metadata'` | Preload behavior. Options: `'none'`, `'metadata'`, `'auto'`. |
-| `class` | String | `''` | Adds a CSS class to the `<video>` tag. |
-| `width` | Number | `null` | Override the video width. No default width is set. |
-| `height` | Number | `null` | Override the video height. No default height is set. |
-| `poster` | String | `''` | Override the poster image. No poster is provided by default since videos don't generate thumbnails. |
+| Position | Parameter  | Type    | Default | Description                                     |
+| :------- | :--------- | :------ | :------ | :---------------------------------------------- |
+| 1        | `controls` | Boolean | `true`  | Show video controls. Pass `false` to hide.      |
+| 2        | `autoplay` | Boolean | `false` | Auto-play video on load. Pass `true` to enable. |
+| 3        | `muted`    | Boolean | `false` | Mute video by default. Pass `true` to enable.   |
+| 4        | `loop`     | Boolean | `false` | Loop video playback. Pass `true` to enable.     |
+| 5        | `class`    | String  | `''`    | CSS class for the `<video>` tag.                |
 
-## 5. Widgets
+## 6. Widgets
 
 Widgets are reusable components that can be added to pages. Each widget is a self-contained Liquid template with embedded configuration schema.
 
@@ -249,8 +397,8 @@ Widgets are reusable components that can be added to pages. Each widget is a sel
     </style>
 
     <div id="{{ widget.id }}" class="widget-content">
-        <h2 data-setting="title">{{ widget.settings.title }}</h2>
-        <p data-setting="content">{{ widget.settings.content }}</p>
+        <h2>{{ widget.settings.title }}</h2>
+        <p>{{ widget.settings.content }}</p>
     </div>
 
     <script type="application/json" data-widget-schema>
@@ -286,12 +434,24 @@ Widgets are reusable components that can be added to pages. Each widget is a sel
 
 - **Scoped Styling**: Use `#{{ widget.id }}` for widget-specific CSS to avoid conflicts
 - **Settings Access**: Access widget settings via `{{ widget.settings.settingId }}`
-- **Data Attributes**: `data-setting="settingId"` enables visual editing
+- **Theme Settings Access**: Access global theme settings via `{{ theme.group.settingId }}`
 - **Embedded Schema**: JSON schema defines the widget's configuration interface
+
+### Available Template Variables (Widget Templates)
+
+Within individual widget templates (`widgets/*.liquid`), you have access to:
+
+- `{{ widget.id }}`: Unique widget instance ID
+- `{{ widget.type }}`: Widget type identifier
+- `{{ widget.settings.* }}`: Widget-specific settings
+- `{{ widget.blocks }}`: Widget's blocks (if applicable)
+- `{{ theme.* }}`: Global theme settings organized by group
+
+**Note:** `page.*` and `project.*` objects are only available in `layout.liquid`, not in individual widget templates.
 
 ### Global Widgets
 
-Global widgets are special widgets that appear on every page of the website. Currently, the system supports two types of global widgets: **header** and **footer**.
+Global widgets are special widgets that appear on every page of the website. Currently, the system supports two types: **header** and **footer**.
 
 #### Header Widget (`widgets/global/header.liquid`)
 
@@ -308,11 +468,267 @@ Global widgets are special widgets that appear on every page of the website. Cur
 
 **Important:** Currently, header and footer are the only supported global widget types. Each global widget requires both a Liquid template in `widgets/global/` and a corresponding JSON configuration in `templates/global/`.
 
-## 6. Templates
+## 7. Widget Blocks System
 
-Templates define the structure and default content for different page types.
+Blocks are sub-components that can be dynamically added to widgets, providing flexible content management within individual widgets. They allow users to build complex layouts by combining different block types within a single widget container.
+
+### How Blocks Work
+
+- **Dynamic Addition**: Users can add multiple blocks of different types to a widget
+- **Reorderable**: Blocks can be reordered through drag-and-drop
+- **Individual Settings**: Each block has its own configuration settings
+- **Schema-Driven**: Block types are defined in the widget's schema
+
+### Block Structure in Widget Templates
+
+```liquid
+<!-- Render all blocks in a widget -->
+{% if widget.blocks != blank %}
+  <div class="widget__blocks">
+    {% for block in widget.blocks %}
+      <div class="widget__block widget__block--{{ block.type }}" data-block-id="{{ block.id }}">
+        {% if block.type == 'heading' %}
+          <h3>{{ block.settings.headingText }}</h3>
+        {% elsif block.type == 'text' %}
+          <p>{{ block.settings.text }}</p>
+        {% elsif block.type == 'button' %}
+          <a href="{{ block.settings.link | default: '#' }}" class="button">
+            {{ block.settings.label | default: 'Click Me' }}
+          </a>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+```
+
+### Defining Blocks in Widget Schema
+
+Blocks are defined in the widget's JSON schema using the `"blocks"` array:
+
+```json
+{
+  "type": "content-widget",
+  "displayName": "Content Widget",
+  "settings": [
+    // Widget settings here
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "displayName": "Heading Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "headingText",
+          "label": "Heading Text",
+          "default": "Your Heading"
+        },
+        {
+          "type": "select",
+          "id": "headingLevel",
+          "label": "Heading Level",
+          "default": "h2",
+          "options": [
+            { "value": "h1", "label": "H1" },
+            { "value": "h2", "label": "H2" },
+            { "value": "h3", "label": "H3" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "displayName": "Text Block",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text Content",
+          "default": "Add your text here..."
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "displayName": "Button Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Button Text",
+          "default": "Click Me"
+        },
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Button Link",
+          "default": "#"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Block Data Structure
+
+Blocks are stored in the widget data as:
+
+```javascript
+{
+  "blocks": {
+    "block_1234567890": {
+      "type": "heading",
+      "settings": {
+        "headingText": "Welcome",
+        "headingLevel": "h2"
+      }
+    },
+    "block_9876543210": {
+      "type": "text",
+      "settings": {
+        "text": "This is some example text content."
+      }
+    }
+  },
+  "blocksOrder": ["block_1234567890", "block_9876543210"]
+}
+```
+
+### Advanced Block Rendering
+
+For more complex block rendering, you can use conditional logic and include additional styling:
+
+```liquid
+{% if widget.blocks != blank %}
+  <div class="widget__blocks">
+    {% for block in widget.blocks %}
+      <div
+        class="widget__block widget__block--{{ block.type }}"
+        data-block-id="{{ block.id }}"
+        data-block-type="{{ block.type }}"
+      >
+        {% case block.type %}
+          {% when 'heading' %}
+            {% assign heading_tag = block.settings.headingLevel | default: 'h2' %}
+            <{{ heading_tag }} class="block-heading">
+              {{ block.settings.headingText | default: 'Default Heading' }}
+            </{{ heading_tag }}>
+
+          {% when 'text' %}
+            <div class="block-text">
+              {{ block.settings.text | default: 'Add your text content...' }}
+            </div>
+
+          {% when 'image' %}
+            {% if block.settings.image != blank %}
+              {{ block.settings.image | image: 'medium', 'block-image' }}
+            {% endif %}
+
+          {% when 'button' %}
+            <a
+              href="{{ block.settings.link | default: '#' }}"
+              class="button button--{{ block.settings.style | default: 'primary' }}"
+              {% if block.settings.openInNewTab %}target="_blank"{% endif %}
+            >
+              {{ block.settings.label | default: 'Button' }}
+            </a>
+
+          {% else %}
+            <div class="block-unknown">
+              <em>Unknown block type: {{ block.type }}</em>
+            </div>
+        {% endcase %}
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="widget__blocks-empty">
+    <p><em>No blocks added yet. Add some content blocks to get started.</em></p>
+  </div>
+{% endif %}
+```
+
+### Block Styling Best Practices
+
+Use scoped CSS with widget IDs to style blocks without conflicts:
+
+```css
+/* Widget-specific block styling */
+#{{ widget.id }} .widget__blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#{{ widget.id }} .widget__block--heading h1,
+#{{ widget.id }} .widget__block--heading h2,
+#{{ widget.id }} .widget__block--heading h3 {
+  margin: 0;
+  color: {{ widget.settings.headingColor | default: '#333' }};
+}
+
+#{{ widget.id }} .widget__block--text {
+  line-height: 1.6;
+  color: {{ widget.settings.textColor | default: '#666' }};
+}
+
+#{{ widget.id }} .widget__block--button .button {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: {{ widget.settings.buttonColor | default: '#007bff' }};
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+#{{ widget.id }} .widget__block--button .button:hover {
+  background: {{ widget.settings.buttonHoverColor | default: '#0056b3' }};
+}
+```
+
+### Common Block Types
+
+**Heading Block**
+
+- Single-line text input for heading text
+- Dropdown for heading level (H1-H6)
+- Optional styling options
+
+**Text Block**
+
+- Textarea for paragraph content
+- Optional formatting options
+- Rich text support (if implemented)
+
+**Image Block**
+
+- Image picker
+- Alt text input
+- Size and alignment options
+
+**Button Block**
+
+- Button text input
+- Link picker (internal pages or external URLs)
+- Style options (primary, secondary, etc.)
+- Target options (same window, new tab)
+
+**Video Block**
+
+- Video picker from media library
+- Autoplay, muted, loop options
+- Poster image override
+
+## 8. Templates
+
+Templates define the structure and default content for different page types, organizing widgets into pre-defined layouts.
 
 ### Page Templates (`templates/*.json`)
+
+Page templates define widget arrangements and default content for different types of pages:
 
 ```json
 {
@@ -342,7 +758,7 @@ Templates define the structure and default content for different page types.
 
 ### Global Templates (`templates/global/*.json`)
 
-Global templates define default instances of global widgets:
+Global templates define default instances of global widgets that appear on every page:
 
 ```json
 {
@@ -354,9 +770,9 @@ Global templates define default instances of global widgets:
 }
 ```
 
-## 7. Navigation Menus
+## 9. Navigation Menus
 
-Menus are defined as JSON files in the `/menus/` directory and support nested navigation.
+Menus are defined as JSON files in the `/menus/` directory and support nested navigation up to 3 levels deep.
 
 ### Menu Structure (`menus/main-nav.json`)
 
@@ -392,7 +808,7 @@ Menus are defined as JSON files in the `/menus/` directory and support nested na
 
 ### Rendering Menus
 
-Use the `{% render 'menu' %}` tag with custom CSS classes to render navigation menus. The menu snippet supports up to 3 levels of nested navigation and provides full control over CSS classes for styling.
+Use the `{% render 'menu' %}` tag with custom CSS classes to render navigation menus:
 
 ```liquid
 {% render 'menu',
@@ -406,7 +822,7 @@ Use the `{% render 'menu' %}` tag with custom CSS classes to render navigation m
 %}
 ```
 
-**Menu Snippet Parameters:**
+### Menu Snippet Parameters
 
 - `menu`: The menu object containing the items array
 - `class_menu`: CSS classes for the `<nav>` element
@@ -414,11 +830,11 @@ Use the `{% render 'menu' %}` tag with custom CSS classes to render navigation m
 - `class_item`: CSS classes for `<li>` elements
 - `class_link`: CSS classes for `<a>` elements
 - `class_submenu`: CSS classes for submenu `<ul>` elements
-- `class_has_submenu`: CSS classes for items that contain submenus
+- `class_has_submenu`: CSS classes for items that have child items, allowing you to style dropdown indicators and submenu behaviors.
 
 The menu snippet automatically adds the `class_has_submenu` class to items that have child items, allowing you to style dropdown indicators and submenu behaviors.
 
-## 8. Assets Management
+## 10. Assets Management
 
 ### CSS Files
 
@@ -442,15 +858,6 @@ Widgets can include their own CSS and JavaScript files placed alongside the widg
 
 These files are automatically discovered and included during the build process.
 
-### Asset Loading
-
-Assets are automatically processed and can include:
-
-- CSS preprocessing
-- JavaScript minification
-- Cache busting
-- CDN integration
-
 ### Assets During Export
 
 When exporting a project to static HTML:
@@ -460,7 +867,7 @@ When exporting a project to static HTML:
 - **Uploaded Images**: All images from `/uploads/images/` are copied to maintain relative paths
 - **Path Optimization**: Asset paths are converted to relative URLs for optimal static hosting
 
-## 9. Advanced Features
+## 11. Advanced Features
 
 ### Responsive Design
 
@@ -472,6 +879,18 @@ Use CSS custom properties from global settings for consistent theming:
   font-family: var(--typography-body_font-family);
   background: var(--colors-background);
 }
+```
+
+Alternatively, access theme settings directly in your Liquid templates:
+
+```liquid
+<div style="
+  background-color: {{ theme.colors.background }};
+  font-size: {{ theme.typography.base_font_size }}px;
+  {% if theme.layout.site_width == 'wide' %}max-width: 1400px;{% endif %}
+">
+  Content here
+</div>
 ```
 
 ### Dynamic Body Classes
@@ -498,49 +917,21 @@ Automatic font loading and optimization:
 
 - `{% fonts_preconnect %}`: DNS prefetching for faster loading
 - `{% fonts_stylesheet %}`: Optimized font CSS inclusion
-- Support for Google Fonts, Adobe Fonts, and custom fonts
+- Support for Google Fonts
 
-## 10. Best Practices
+## 13. Theme Development Workflow
 
-### Performance
+1. **Planning**: Define the theme's purpose, target audience, and key features
+2. **Setup**: Create the basic theme structure and `theme.json` with global settings
+3. **Layout Foundation**: Build the main `layout.liquid` template with proper HTML structure
+4. **Global Components**: Create header and footer widgets that will appear on every page
+5. **Core Widgets**: Develop the main content widgets users will need
+6. **Block System**: Design flexible block types for dynamic content within widgets
+7. **Page Templates**: Define pre-built page structures using your widgets
+8. **Navigation**: Create menu systems and navigation patterns
+9. **Styling**: Add comprehensive CSS for responsive design and visual polish
+10. **Assets**: Optimize and organize static files (CSS, JS, images)
+11. **Testing**: Test across devices, browsers, and different content scenarios
+12. **Documentation**: Document custom features, settings, and usage guidelines
 
-- Use scoped CSS with widget IDs to avoid style conflicts
-- Minimize the number of external font requests
-- Optimize images and use appropriate formats
-- Lazy load non-critical assets
-
-### Accessibility
-
-- Use semantic HTML structure
-- Provide proper heading hierarchy
-- Include alt text for images
-- Ensure sufficient color contrast
-- Support keyboard navigation
-
-### Maintainability
-
-- Use consistent naming conventions
-- Document complex Liquid logic
-- Separate concerns (structure, style, behavior)
-- Test across different screen sizes and devices
-
-### Widget Development
-
-- Make widgets configurable through settings
-- Provide sensible defaults
-- Use descriptive labels and help text
-- Consider mobile-first responsive design
-
-## 11. Theme Development Workflow
-
-1. **Setup**: Create the basic theme structure and `theme.json`
-2. **Layout**: Build the main `layout.liquid` template
-3. **Global Components**: Create header and footer widgets
-4. **Page Templates**: Define basic page structures
-5. **Widgets**: Develop custom widgets for content
-6. **Styling**: Add CSS for responsive design
-7. **Assets**: Optimize and organize static files
-8. **Testing**: Test across devices and browsers
-9. **Documentation**: Document custom features and settings
-
-This theming system provides a powerful and flexible foundation for creating beautiful, functional websites while maintaining consistency and ease of use.
+This theming system provides a powerful and flexible foundation for creating beautiful, functional websites while maintaining consistency and ease of use. The combination of widgets and blocks allows for maximum flexibility while keeping the user interface intuitive and manageable.

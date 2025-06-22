@@ -24,304 +24,229 @@
 			color: {{ widget.settings.textColor }};
 		}
 
-		#{{ widget.id }} .basic-text__blocks {
-			margin-top: 20px;
-			display: grid;
-			grid-template-columns: repeat({{ widget.settings.columnsCount|default: 1 }}, 1fr);
-			gap: {{ widget.settings.blockSpacing|default: 20 }}px;
-		}
-
-		#{{ widget.id }} .basic-text__block {
-			padding: 20px;
-			background: {{ widget.settings.blockBackground|default: '#ffffff' }};
-			border: 1px solid {{ widget.settings.customBorder|default: '#000000' }};
-		}
-
-		#{{ widget.id }} .basic-text__block-title {
-			font-size: 1.25rem;
-			font-weight: bold;
-			margin-bottom: 12px;
-			color: {{ widget.settings.headingColor }};
-		}
-
-		#{{ widget.id }} .basic-text__block-content {
-			color: {{ widget.settings.textColor }};
-			font-size: 1rem;
-			line-height: 1.5;
-		}
-
-		#{{ widget.id }} .basic-text__block-image {
-			width: 100%;
+		#{{ widget.id }} .basic-text__image {
+			max-width: 100%;
 			height: auto;
-			margin-bottom: 12px;
+			margin-bottom: 1rem;
+		}
+
+		#{{ widget.id }} .basic-text__blocks {
+			margin-top: 2rem;
+		}
+
+		#{{ widget.id }} .basic-text__meta {
+			font-size: 0.875rem;
+			color: #666;
+			margin-bottom: 1rem;
+			padding: 1rem;
+			background: #f8f9fa;
+			border-radius: 4px;
+			border-left: 4px solid #007bff;
+		}
+
+		#{{ widget.id }} .basic-text__meta h4 {
+			margin: 0 0 0.5rem 0;
+			color: #333;
+			font-size: 1rem;
+		}
+
+		#{{ widget.id }} .basic-text__meta ul {
+			margin: 0 0 1rem 0;
+			padding-left: 1.5rem;
+		}
+
+		#{{ widget.id }} .basic-text__meta li {
+			margin-bottom: 0.25rem;
+		}
+
+		#{{ widget.id }} .basic-text__meta code {
+			background: #e9ecef;
+			padding: 0.125rem 0.25rem;
+			border-radius: 3px;
+			font-size: 0.8rem;
+		}
+
+		#{{ widget.id }} .basic-text__meta pre {
+			background: #fff;
+			padding: 0.5rem;
+			border-radius: 3px;
+			font-size: 0.7rem;
+			overflow-x: auto;
+			border: 1px solid #dee2e6;
 		}
 	</style>
 
 	<div id="{{ widget.id }}" class="basic-text__container">
-
-		{{ widget.settings.hero_video | video }}
-
-		Show sidebar: {{ theme.layout.show_header }}<br>
-
-		{% if widget.settings.showImage %}
-			true
-		{% else %}
-			false
-		{% endif %}
-
-		{% if widget.settings.widgetImage != blank %}
-			{{ widget.settings.widgetImage | image: 'medium', 'basic-text__widget-image' }}
-		{% endif %}
-
+		<!-- Widget Content -->
 		{% if widget.settings.heading != blank %}
-			<h2 class="basic-text__heading" data-setting="heading">
+			<h2 class="basic-text__heading">
 				{{ widget.settings.heading }}
 			</h2>
 		{% endif %}
 
-		<div class="basic-text__content" data-setting="content">
+		{% if widget.settings.showImage and widget.settings.image != blank %}
+			<div class="basic-text__image-container">
+				{{ widget.settings.image | image: 'medium', 'basic-text__image' }}
+			</div>
+		{% endif %}
+
+		<div class="basic-text__content">
 			{% if widget.settings.content != blank %}
 				{{ widget.settings.content }}
+			{% else %}
+				<p><em>Add some content using the settings panel on the right →</em></p>
 			{% endif %}
 		</div>
 
-		{% if widget.blocks.size > 0 %}
-			<div class="basic-text__blocks">
-				{% for blockId in widget.blocksOrder %}
-					{% assign block = widget.blocks[blockId] %}
-					<div
-						class="basic-text__block"
-						data-block-id="{{ blockId }}"
-						data-block-type="{{ block.type }}"
-						style="background-color: {{ block.settings.customBackground }};"
-					>
+		<!-- Widget Debug Information (if enabled) -->
+		{% if widget.settings.showDebugInfo %}
+			<div class="basic-text__meta">
+				<h4>🔧 Widget Debug Information</h4>
+				<ul>
+					<li><strong>Widget ID:</strong> <code>{{ widget.id }}</code></li>
+					<li><strong>Widget Type:</strong> <code>{{ widget.type }}</code></li>
+					<li><strong>Theme Settings Available:</strong> <code>{{ theme }}</code></li>
+				</ul>
 
-						{% if block.type == 'content-block' %}
+				<h4>🎨 Example Theme Settings Usage</h4>
+				<ul>
+					<li><strong>Colors:</strong> <code>{{ theme.colors.background | default: "Not set" }}</code></li>
+					<li><strong>Typography:</strong> <code>{{ theme.typography.body_font | default: "Not set" }}</code></li>
+					<li><strong>Layout:</strong> <code>{{ theme.layout.site_width | default: "Not set" }}</code></li>
+				</ul>
 
-							<h4>Content Block Type</h4>
-							<h3 class="basic-text__block-title">{{ block.settings.title }}</h3>
-							{% if block.settings.blockImage != blank %}
-								{{ block.settings.blockImage | image: 'small', 'basic-text__block-image' }}
-							{% endif %}
-							<div class="basic-text__block-content">
-								{{ block.settings.content }}
-							</div>
-
-						{% elsif block.type == 'other-block' %}
-
-							<h4>Other Block Type</h4>
-							<h3 class="basic-text__block-title" style="font-style: italic;">{{ block.settings.title }}</h3>
-							{% if block.settings.blockImage != blank %}
-								{{ block.settings.blockImage | image: 'small', 'basic-text__block-image small-image' }}
-							{% endif %}
-
-						{% else %}
-
-							<h4>Unknown Block Type: {{ block.type }}</h4>
-							<p>Cannot render this block type.</p>
-
-						{% endif %}
-
-					</div>
-				{% endfor %}
+				<p><small><strong>Note:</strong> page.* and project.* objects are only available in layout.liquid, not in individual widget templates.</small></p>
 			</div>
-		{% else %}
-			<div style="border: 1px solid blue; padding: 10px;">
-				DEBUG: Inside else branch. No blocks object found or it is empty/falsy.
+		{% endif %}
+
+		<!-- Widget Blocks -->
+		{% if widget.blocks != blank %}
+			<div class="basic-text__blocks">
+				{% for block in widget.blocks %}
+					{% render 'block', block: block %}
+				{% endfor %}
 			</div>
 		{% endif %}
 	</div>
-
 
 	<script type="application/json" data-widget-schema>
 		{
 			"type": "basic-text",
 			"displayName": "Basic Text",
+			"description": "A simple text widget with heading, content, and optional image",
 			"settings": [
 				{
-					"id": "hero_video",
-					"type": "video",
-					"label": "Hero Background Video",
-					"default": "/default-video.mp4",
-					"description": "Upload a background video for the hero section."
-				},
-				{
-					"type": "checkbox",
-					"id": "showImage",
-					"label": "Show Image",
-					"description": "Show the image",
-					"default": true
-				},
-				{
-					"type": "image",
-					"id": "widgetImage",
-					"label": "Image",
-					"description": "Image for the basic text",
-					"default": ""
+					"type": "header",
+					"content": "Content Settings"
 				},
 				{
 					"type": "text",
 					"id": "heading",
 					"label": "Heading",
-					"description": "Main heading text",
-					"default": "Default heading"
+					"description": "Optional heading for this text block",
+					"default": "Welcome"
 				},
 				{
 					"type": "textarea",
 					"id": "content",
 					"label": "Content",
-					"description": "Main paragraph text",
-					"default": "This is a simple text section with a heading and paragraph."
+					"description": "Main text content for this widget",
+					"default": "Add your content here..."
+				},
+				{
+					"type": "header",
+					"content": "Visual Settings"
+				},
+				{
+					"type": "checkbox",
+					"id": "showImage",
+					"label": "Show Image",
+					"description": "Display an image above the text content",
+					"default": false
+				},
+				{
+					"type": "image",
+					"id": "image",
+					"label": "Image",
+					"description": "Select an image to display",
+					"condition": "showImage"
+				},
+				{
+					"type": "range",
+					"id": "headingSize",
+					"label": "Heading Size",
+					"description": "Font size for the heading in pixels",
+					"default": 32,
+					"min": 16,
+					"max": 48,
+					"step": 2
+				},
+				{
+					"type": "select",
+					"id": "textAlignment",
+					"label": "Text Alignment",
+					"description": "How to align the text content",
+					"default": "left",
+					"options": [
+						{
+							"value": "left",
+							"label": "Left"
+						},
+						{
+							"value": "center",
+							"label": "Center"
+						},
+						{
+							"value": "right",
+							"label": "Right"
+						}
+					]
+				},
+				{
+					"type": "header",
+					"content": "Colors & Spacing"
 				},
 				{
 					"type": "color",
 					"id": "backgroundColor",
 					"label": "Background Color",
-					"description": "Background color of the section",
+					"description": "Background color for this widget",
 					"default": "#ffffff"
 				},
 				{
 					"type": "color",
 					"id": "headingColor",
 					"label": "Heading Color",
-					"description": "Color of the heading text",
+					"description": "Color for the heading text",
 					"default": "#333333"
 				},
 				{
 					"type": "color",
 					"id": "textColor",
 					"label": "Text Color",
-					"description": "Color of the main content text",
+					"description": "Color for the main content text",
 					"default": "#666666"
-				},
-				{
-					"type": "range",
-					"id": "headingSize",
-					"label": "Heading Size",
-					"description": "Size of the heading in pixels",
-					"default": 20,
-					"min": 16,
-					"max": 72,
-					"step": 1
 				},
 				{
 					"type": "range",
 					"id": "padding",
 					"label": "Padding",
-					"description": "Padding around the content in pixels",
-					"default": 20,
-					"min": 0,
-					"max": 100,
-					"step": 5
-				},
-				{
-					"type": "range",
-					"id": "columnsCount",
-					"label": "Columns",
-					"description": "Number of columns for blocks",
-					"default": 3,
-					"min": 1,
-					"max": 4,
-					"step": 1
-				},
-				{
-					"type": "range",
-					"id": "blockSpacing",
-					"label": "Block Spacing",
-					"description": "Space between blocks in pixels",
+					"description": "Internal spacing around the widget content",
 					"default": 20,
 					"min": 0,
 					"max": 60,
-					"step": 4
+					"step": 5
 				},
 				{
-					"type": "color",
-					"id": "blockBackground",
-					"label": "Block Background",
-					"description": "Background color for blocks",
-					"default": "#ffffff"
+					"type": "header",
+					"content": "Developer Options"
 				},
 				{
-					"type": "select",
-					"id": "textAlignment",
-					"label": "Text Alignment",
-					"description": "Alignment of the heading text",
-					"default": "left",
-					"options": [
-						{ "value": "left", "label": "Left" },
-						{ "value": "center", "label": "Center" },
-						{ "value": "right", "label": "Right" }
-					]
-				}
-			],
-			"blocks": [
-				{
-					"type": "content-block",
-					"displayName": "Content Block",
-					"settings": [
-						{
-							"type": "image",
-							"id": "blockImage",
-							"label": "Image",
-							"description": "Image for the block",
-							"default": ""
-						},
-						{
-							"type": "text",
-							"id": "title",
-							"label": "Title",
-							"description": "Block title",
-							"default": "Block Title"
-						},
-						{
-							"type": "textarea",
-							"id": "content",
-							"label": "Content",
-							"description": "Block content",
-							"default": "Add your content here"
-						},
-						{
-							"type": "color",
-							"id": "customBackground",
-							"label": "Block Background",
-							"description": "Background color for blocks",
-							"default": "#ffffff"
-						},
-						{
-							"type": "color",
-							"id": "customBorder",
-							"label": "Block Border",
-							"description": "Border color for blocks",
-							"default": "#000000"
-						}
-					]
-				},
-				{
-					"type": "other-block",
-					"displayName": "Other Block",
-					"settings": [
-						{
-							"type": "image",
-							"id": "blockImage",
-							"label": "Image",
-							"description": "Image for the block",
-							"default": ""
-						},
-						{
-							"type": "text",
-							"id": "title",
-							"label": "Title",
-							"description": "Block title",
-							"default": "Block Title"
-						},
-						{
-							"type": "color",
-							"id": "customBackground",
-							"label": "Block Background",
-							"description": "Background color for blocks",
-							"default": "#ffffff"
-						}
-					]
+					"type": "checkbox",
+					"id": "showDebugInfo",
+					"label": "Show Widget Debug Information",
+					"description": "Display widget ID, type, and available template variables (useful for theme development)",
+					"default": false
 				}
 			]
 		}
