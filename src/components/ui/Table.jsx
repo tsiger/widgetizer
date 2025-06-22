@@ -27,7 +27,7 @@ export default function Table({
           ))}
         </tr>
       </thead>
-      <tbody>
+      <tbody className="[&_td]:text-xs [&_td_*]:text-xs">
         {data.length === 0 ? (
           <tr>
             <td colSpan={headers.length} className="text-center py-8 text-slate-500">
@@ -60,7 +60,7 @@ export function TableHead({ className = "", children, ...props }) {
 
 export function TableBody({ className = "", children, ...props }) {
   return (
-    <tbody className={className} {...props}>
+    <tbody className={`[&_td]:text-xs [&_td_*]:text-xs ${className}`} {...props}>
       {children}
     </tbody>
   );
@@ -84,7 +84,7 @@ export function TableHeader({ className = "", children, ...props }) {
 
 export function TableCell({ className = "", children, ...props }) {
   return (
-    <td className={className} {...props}>
+    <td className={`text-xs ${className}`} {...props}>
       {children}
     </td>
   );
@@ -95,7 +95,7 @@ export function TableCell({ className = "", children, ...props }) {
  */
 export function TableActions({ className = "", children, ...props }) {
   return (
-    <td className={`text-end ${className}`} {...props}>
+    <td className={`text-end text-xs ${className}`} {...props}>
       <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
         {children}
       </div>
