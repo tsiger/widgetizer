@@ -1,5 +1,6 @@
 import React from "react";
-import Button from "../ui/Button";
+import { IconButton } from "../ui/Button";
+import Tooltip from "../ui/Tooltip";
 import { getExportEntryFile, downloadExportZip, deleteExportAPI } from "../../utils/exportManager";
 import useToastStore from "../../stores/toastStore";
 import useConfirmationModal from "../../hooks/useConfirmationModal";
@@ -129,37 +130,27 @@ export default function ExportHistoryTable({
                     {exportRecord.status}
                   </span>
                 </td>
-                <td className="py-3 px-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex items-center justify-end space-x-2">
+                <td className="py-3 px-4 whitespace-nowrap text-right">
+                  <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                     {exportRecord.status === "success" && (
                       <>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewExport(exportRecord)}
-                          icon={<ExternalLink className="h-4 w-4" />}
-                        >
-                          View
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDownloadExport(exportRecord)}
-                          icon={<Download className="h-4 w-4" />}
-                        >
-                          Download
-                        </Button>
+                        <Tooltip content="View export">
+                          <IconButton variant="neutral" size="sm" onClick={() => handleViewExport(exportRecord)}>
+                            <ExternalLink size={18} />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip content="Download export">
+                          <IconButton variant="neutral" size="sm" onClick={() => handleDownloadExport(exportRecord)}>
+                            <Download size={18} />
+                          </IconButton>
+                        </Tooltip>
                       </>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openDeleteConfirmation(exportRecord)}
-                      icon={<Trash2 className="h-4 w-4" />}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      Delete
-                    </Button>
+                    <Tooltip content="Delete export">
+                      <IconButton variant="danger" size="sm" onClick={() => openDeleteConfirmation(exportRecord)}>
+                        <Trash2 size={18} />
+                      </IconButton>
+                    </Tooltip>
                   </div>
                 </td>
               </>
