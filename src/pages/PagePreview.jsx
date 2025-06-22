@@ -14,7 +14,7 @@ export default function PagePreview() {
   const iframeRef = useRef(null);
 
   // Get data from stores, mimicking PageEditor
-  const { page, loading: pageLoading, error: pageError, loadPage } = usePageStore();
+  const { page, globalWidgets, loading: pageLoading, error: pageError, loadPage } = usePageStore();
   const { settings: themeSettings, loadSettings } = useThemeStore();
   const { activeProject } = useProjectStore();
 
@@ -30,12 +30,20 @@ export default function PagePreview() {
 
   // Fetch the rendered HTML from the server
   useEffect(() => {
-    if (page && themeSettings) {
+    if (page && themeSettings && globalWidgets) {
       const loadPreviewHtml = async () => {
         try {
           setLoadingHtml(true);
           setHtmlError(null);
-          const html = await fetchPreview(page, themeSettings);
+
+          // Create enhanced page data with global widgets for preview (same as PreviewPanel)
+          const enhancedPageData = {
+            ...page,
+            // Add global widgets back for server rendering
+            globalWidgets: globalWidgets,
+          };
+
+          const html = await fetchPreview(enhancedPageData, themeSettings);
           setPreviewHtml(html);
         } catch (err) {
           setHtmlError(err.message || "Failed to load preview.");
@@ -45,7 +53,7 @@ export default function PagePreview() {
       };
       loadPreviewHtml();
     }
-  }, [page, themeSettings]);
+  }, [page, themeSettings, globalWidgets]);
 
   // Update iframe content when HTML changes
   useEffect(() => {
