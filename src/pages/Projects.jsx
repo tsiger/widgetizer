@@ -11,12 +11,14 @@ import { IconButton } from "../components/ui/Button";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
+import useAppSettings from "../hooks/useAppSettings";
 import {
   getAllProjects,
   deleteProject,
   duplicateProject,
   setActiveProject as setActiveProjectInBackend,
 } from "../utils/projectManager";
+import { formatDate } from "../utils/dateFormatter";
 
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import useConfirmationModal from "../hooks/useConfirmationModal";
@@ -32,6 +34,9 @@ export default function Projects() {
   // Get state from the project store
   const activeProject = useProjectStore((state) => state.activeProject);
   const fetchActiveProject = useProjectStore((state) => state.fetchActiveProject);
+
+  // Get app settings for date formatting
+  const { settings: appSettings } = useAppSettings();
 
   // Handle project deletion with confirmation
   const handleDelete = async (data) => {
@@ -147,80 +152,84 @@ export default function Projects() {
           headers={["Title", "Created", "Updated", "Actions"]}
           data={projects}
           emptyMessage="No projects yet. Create your first project!"
-          renderRow={(project) => (
-            <>
-              <td className="py-3 px-4">
-                {activeProject && project.id === activeProject.id && (
-                  <Badge variant="pink" className="mr-2">
-                    Active
-                  </Badge>
-                )}
-                {project.name}
-              </td>
-              <td className="py-3 px-4">{new Date(project.created).toLocaleDateString()}</td>
-              <td className="py-3 px-4">{new Date(project.updated).toLocaleDateString()}</td>
-              <td className="py-3 px-4 text-right">
-                <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                  <div className="flex gap-2 pr-2 border-r border-slate-200">
-                    <Tooltip
-                      content={
-                        activeProject && project.id === activeProject.id
-                          ? "Current active project"
-                          : "Set as active project"
-                      }
-                    >
-                      <IconButton
-                        onClick={() => handleSetActive(project.id)}
-                        variant="neutral"
-                        size="sm"
-                        disabled={activeProject && project.id === activeProject.id}
-                        title={
+          renderRow={(project) => {
+            const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
+
+            return (
+              <>
+                <td className="py-3 px-4">
+                  {activeProject && project.id === activeProject.id && (
+                    <Badge variant="pink" className="mr-2">
+                      Active
+                    </Badge>
+                  )}
+                  {project.name}
+                </td>
+                <td className="py-3 px-4">{formatDate(project.created, dateFormat)}</td>
+                <td className="py-3 px-4">{formatDate(project.updated, dateFormat)}</td>
+                <td className="py-3 px-4 text-right">
+                  <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                    <div className="flex gap-2 pr-2 border-r border-slate-200">
+                      <Tooltip
+                        content={
                           activeProject && project.id === activeProject.id
                             ? "Current active project"
                             : "Set as active project"
                         }
                       >
-                        <Star
-                          size={18}
-                          className={
+                        <IconButton
+                          onClick={() => handleSetActive(project.id)}
+                          variant="neutral"
+                          size="sm"
+                          disabled={activeProject && project.id === activeProject.id}
+                          title={
                             activeProject && project.id === activeProject.id
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-slate-400 hover:text-yellow-400"
+                              ? "Current active project"
+                              : "Set as active project"
                           }
-                        />
+                        >
+                          <Star
+                            size={18}
+                            className={
+                              activeProject && project.id === activeProject.id
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-slate-400 hover:text-yellow-400"
+                            }
+                          />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                    <Tooltip content="Edit project">
+                      <IconButton onClick={() => navigate(`/projects/edit/${project.id}`)} variant="neutral" size="sm">
+                        <Pencil size={18} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip content="Duplicate project">
+                      <IconButton onClick={() => handleDuplicate(project.id)} variant="neutral" size="sm">
+                        <Copy size={18} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip
+                      content={
+                        activeProject && project.id === activeProject.id
+                          ? "Cannot delete active project"
+                          : "Delete project"
+                      }
+                    >
+                      <IconButton
+                        onClick={() => openDeleteConfirmation(project.id, project.name)}
+                        variant={activeProject && project.id === activeProject.id ? "neutral" : "danger"}
+                        size="sm"
+                        disabled={activeProject && project.id === activeProject.id}
+                      >
+                        <Trash2 size={18} />
                       </IconButton>
                     </Tooltip>
                   </div>
-                  <Tooltip content="Edit project">
-                    <IconButton onClick={() => navigate(`/projects/edit/${project.id}`)} variant="neutral" size="sm">
-                      <Pencil size={18} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip content="Duplicate project">
-                    <IconButton onClick={() => handleDuplicate(project.id)} variant="neutral" size="sm">
-                      <Copy size={18} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip
-                    content={
-                      activeProject && project.id === activeProject.id
-                        ? "Cannot delete active project"
-                        : "Delete project"
-                    }
-                  >
-                    <IconButton
-                      onClick={() => openDeleteConfirmation(project.id, project.name)}
-                      variant={activeProject && project.id === activeProject.id ? "neutral" : "danger"}
-                      size="sm"
-                      disabled={activeProject && project.id === activeProject.id}
-                    >
-                      <Trash2 size={18} />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-              </td>
-            </>
-          )}
+                </td>
+              </>
+            );
+          }}
         />
       </div>
 

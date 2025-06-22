@@ -7,6 +7,8 @@ import ConfirmationModal from "../ui/ConfirmationModal";
 import Table from "../ui/Table";
 import { Loader2, ExternalLink, Trash2, Calendar, Download, Package } from "lucide-react";
 import { API_URL } from "../../config";
+import { formatDate as formatDateUtil } from "../../utils/dateFormatter";
+import useAppSettings from "../../hooks/useAppSettings";
 
 export default function ExportHistoryTable({
   exportHistory,
@@ -16,6 +18,9 @@ export default function ExportHistoryTable({
   setExportHistory,
 }) {
   const showToast = useToastStore((state) => state.showToast);
+
+  // Get app settings for date formatting
+  const { settings: appSettings } = useAppSettings();
 
   // Handle confirmation actions for delete
   const handleDelete = async (data) => {
@@ -31,12 +36,8 @@ export default function ExportHistoryTable({
   const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDelete);
 
   const formatDate = (isoString) => {
-    return new Date(isoString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
+    const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
+    return formatDateUtil(isoString, dateFormat);
   };
 
   const handleViewExport = async (exportRecord) => {

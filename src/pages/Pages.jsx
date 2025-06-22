@@ -6,11 +6,13 @@ import { usePageSelection } from "../hooks/usePageSelection";
 import useConfirmationModal from "../hooks/useConfirmationModal";
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
+import useAppSettings from "../hooks/useAppSettings";
 import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
 import Tooltip from "../components/ui/Tooltip";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import Table from "../components/ui/Table";
+import { formatDate } from "../utils/dateFormatter";
 
 export default function Pages() {
   const navigate = useNavigate();
@@ -20,6 +22,9 @@ export default function Pages() {
   const { selectedPages, togglePageSelection, selectAllPages, clearSelection, isAllSelected } = usePageSelection();
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
+
+  // Get app settings for date formatting
+  const { settings: appSettings } = useAppSettings();
 
   // Handle page deletion with confirmation
   const handleDelete = async (data) => {
@@ -192,7 +197,9 @@ export default function Pages() {
                 )}
               </IconButton>,
               "Name",
-              "Slug",
+              "Filename",
+              "Created",
+              "Updated",
               "Actions",
             ]}
             data={filteredPages}
@@ -209,57 +216,67 @@ export default function Pages() {
                 "No pages available"
               )
             }
-            renderRow={(page) => (
-              <>
-                <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
-                  <IconButton onClick={() => togglePageSelection(page.id)} variant="neutral" size="sm">
-                    {selectedPages.includes(page.id) ? (
-                      <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
-                        <Check size={12} />
+            renderRow={(page) => {
+              const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
+
+              return (
+                <>
+                  <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
+                    <IconButton onClick={() => togglePageSelection(page.id)} variant="neutral" size="sm">
+                      {selectedPages.includes(page.id) ? (
+                        <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
+                          <Check size={12} />
+                        </div>
+                      ) : (
+                        <div className="w-4 h-4 border border-slate-400 rounded-sm"></div>
+                      )}
+                    </IconButton>
+                  </td>
+                  <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
+                    <div className="font-medium text-slate-900">{page.name}</div>
+                  </td>
+                  <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
+                    <div className="text-slate-600 font-mono text-sm">{page.slug}.html</div>
+                  </td>
+                  <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
+                    <div className="text-slate-600 text-sm">{formatDate(page.created, dateFormat)}</div>
+                  </td>
+                  <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
+                    <div className="text-slate-600 text-sm">{formatDate(page.updated, dateFormat)}</div>
+                  </td>
+                  <td className={`py-3 px-4 text-right ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
+                    <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                      <div className="flex gap-2 pr-2 border-r border-slate-200">
+                        <Tooltip content="Design page">
+                          <Link to={`/page-editor?pageId=${page.id}`}>
+                            <IconButton variant="neutral" size="sm">
+                              <Palette size={18} />
+                            </IconButton>
+                          </Link>
+                        </Tooltip>
                       </div>
-                    ) : (
-                      <div className="w-4 h-4 border border-slate-400 rounded-sm"></div>
-                    )}
-                  </IconButton>
-                </td>
-                <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
-                  <div className="font-medium text-slate-900">{page.name}</div>
-                </td>
-                <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
-                  <div className="text-slate-600 font-mono text-sm">{page.slug}</div>
-                </td>
-                <td className={`py-3 px-4 text-right ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
-                  <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                    <div className="flex gap-2 pr-2 border-r border-slate-200">
-                      <Tooltip content="Design page">
-                        <Link to={`/page-editor?pageId=${page.id}`}>
+                      <Tooltip content="Edit page">
+                        <Link to={`/pages/${page.id}/edit`}>
                           <IconButton variant="neutral" size="sm">
-                            <Palette size={18} />
+                            <Pencil size={18} />
                           </IconButton>
                         </Link>
                       </Tooltip>
-                    </div>
-                    <Tooltip content="Edit page">
-                      <Link to={`/pages/${page.id}/edit`}>
-                        <IconButton variant="neutral" size="sm">
-                          <Pencil size={18} />
+                      <Tooltip content="Duplicate page">
+                        <IconButton onClick={() => handleDuplicatePage(page.id)} variant="neutral" size="sm">
+                          <Copy size={18} />
                         </IconButton>
-                      </Link>
-                    </Tooltip>
-                    <Tooltip content="Duplicate page">
-                      <IconButton onClick={() => handleDuplicatePage(page.id)} variant="neutral" size="sm">
-                        <Copy size={18} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip content="Delete page">
-                      <IconButton onClick={() => handleDeletePage(page.id, page.name)} variant="danger" size="sm">
-                        <Trash2 size={18} />
-                      </IconButton>
-                    </Tooltip>
-                  </div>
-                </td>
-              </>
-            )}
+                      </Tooltip>
+                      <Tooltip content="Delete page">
+                        <IconButton onClick={() => handleDeletePage(page.id, page.name)} variant="danger" size="sm">
+                          <Trash2 size={18} />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </td>
+                </>
+              );
+            }}
           />
         </>
       )}

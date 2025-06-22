@@ -2,8 +2,13 @@ import Tooltip from "../../components/ui/Tooltip";
 import { IconButton } from "../ui/Button";
 import { Image, Search, Trash2, Check, Edit2 } from "lucide-react";
 import { API_URL } from "../../config";
+import { formatDate as formatDateUtil } from "../../utils/dateFormatter";
+import useAppSettings from "../../hooks/useAppSettings";
 
 export default function MediaListItem({ file, isSelected, onSelect, onDelete, onView, onEdit, activeProject }) {
+  // Get app settings for date formatting
+  const { settings: appSettings } = useAppSettings();
+
   const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
@@ -11,8 +16,8 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+    const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
+    return formatDateUtil(dateString, dateFormat);
   };
 
   const cellClass = `py-3 px-4 ${isSelected ? "bg-pink-50" : ""}`;
