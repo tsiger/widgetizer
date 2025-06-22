@@ -7,7 +7,15 @@ import { HexColorPicker } from "react-colorful";
  */
 export default function ColorInput({ id, value = "#000000", onChange }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [localColor, setLocalColor] = useState(value);
+  const [isDragging, setIsDragging] = useState(false);
   const popoverRef = useRef(null);
+  const colorPickerRef = useRef(null);
+
+  // Sync local color with prop value when it changes
+  useEffect(() => {
+    setLocalColor(value);
+  }, [value]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -20,12 +28,53 @@ export default function ColorInput({ id, value = "#000000", onChange }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Add mouse/touch event listeners to detect drag end
+  useEffect(() => {
+    const handleMouseUp = () => {
+      if (isDragging) {
+        setIsDragging(false);
+        onChange(localColor);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (isDragging) {
+        setIsDragging(false);
+        onChange(localColor);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("touchend", handleTouchEnd);
+
+      return () => {
+        document.removeEventListener("mouseup", handleMouseUp);
+        document.removeEventListener("touchend", handleTouchEnd);
+      };
+    }
+  }, [isDragging, localColor, onChange, isOpen]);
+
   const handleColorChange = (newValue) => {
     if (newValue.startsWith("#")) {
       onChange(newValue);
     } else {
       onChange(`#${newValue}`);
     }
+  };
+
+  // Handle color picker changes - only update local state while dragging
+  const handleColorPickerChange = (newColor) => {
+    setLocalColor(newColor);
+    if (!isDragging) {
+      // If not dragging (e.g., single click), commit immediately
+      onChange(newColor);
+    }
+  };
+
+  // Handle mouse/touch down on color picker
+  const handleColorPickerMouseDown = () => {
+    setIsDragging(true);
   };
 
   return (
@@ -36,13 +85,13 @@ export default function ColorInput({ id, value = "#000000", onChange }) {
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="w-8 h-8 rounded-md border border-slate-300 shrink-0"
-          style={{ backgroundColor: value }}
+          style={{ backgroundColor: localColor }}
         />
         <div className="relative w-full">
           <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">#</span>
           <input
             type="text"
-            value={value.startsWith("#") ? value.substring(1) : value}
+            value={localColor.startsWith("#") ? localColor.substring(1) : localColor}
             onChange={(e) => handleColorChange(e.target.value)}
             className="form-input pl-7"
           />
@@ -52,7 +101,13 @@ export default function ColorInput({ id, value = "#000000", onChange }) {
       {isOpen && (
         <div className="absolute z-10 mt-2 right-0">
           <div className="bg-white rounded-lg shadow-lg p-3 border border-slate-200">
-            <HexColorPicker color={value} onChange={onChange} />
+            <div
+              ref={colorPickerRef}
+              onMouseDown={handleColorPickerMouseDown}
+              onTouchStart={handleColorPickerMouseDown}
+            >
+              <HexColorPicker color={localColor} onChange={handleColorPickerChange} />
+            </div>
           </div>
         </div>
       )}
