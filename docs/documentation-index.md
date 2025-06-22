@@ -165,6 +165,20 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[hooks.md](hooks.md)** - Custom React Hooks
+
+**Purpose**: Documentation for reusable React hooks used throughout the application **When to use**:
+
+- Understanding confirmation modal patterns
+- Implementing navigation protection
+- Working with selection state management
+- Building media management interfaces
+- Creating consistent user interactions
+
+**Key topics**: useConfirmationModal, useNavigationGuard, usePageSelection, media hooks, export hooks, app settings hooks
+
+---
+
 ## 🎯 Quick Reference by Role
 
 ### **Theme Developers**
@@ -181,7 +195,7 @@ Primary docs: `export.md`, `media.md`, `projects.md` Secondary: `pages.md`, `men
 
 ### **System Architects**
 
-Primary docs: `theming.md`, `projects.md` Secondary: All other documents for comprehensive understanding ⚠️ **Conceptual only**: `page-editor-poc.md` (design proposal, not implemented)
+Primary docs: `theming.md`, `projects.md`, `hooks.md` Secondary: All other documents for comprehensive understanding ⚠️ **Conceptual only**: `page-editor-poc.md` (design proposal, not implemented)
 
 ### **Content Managers / End-Users**
 

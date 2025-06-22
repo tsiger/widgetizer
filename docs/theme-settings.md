@@ -166,6 +166,15 @@ A specialized input with two dropdowns for selecting a font family and its corre
 
 An image uploader that includes a preview, the ability to replace the image, and a button to browse the media library. The value is the URL path to the image.
 
+**Features:**
+
+- **Upload**: Direct file upload with drag-and-drop support
+- **Preview**: Shows thumbnail preview with hover controls
+- **Browse**: Opens `MediaSelectorDrawer` to select from existing images
+- **Metadata Editing**: Edit button opens `MediaDrawer` for alt text and title editing
+- **Replace**: Easy replacement of existing images
+- **File Validation**: Automatic validation of image file types
+
 ```json
 {
   "id": "logo_image",
@@ -178,7 +187,16 @@ An image uploader that includes a preview, the ability to replace the image, and
 
 ### Video
 
-A video uploader that includes a preview with thumbnail, the ability to replace the video, and a button to browse the media library. The value is the URL path to the video file.
+A video uploader that includes a preview with placeholder icon, the ability to replace the video, and a button to browse the media library. The value is the URL path to the video file.
+
+**Features:**
+
+- **Upload**: Direct file upload with support for multiple video formats (MP4, WebM, MOV, AVI, MKV)
+- **Preview**: Shows video icon placeholder with filename and file size
+- **Browse**: Opens `MediaSelectorDrawer` to select from existing videos
+- **Metadata Editing**: Edit button opens `MediaDrawer` for alt text and title editing
+- **Replace**: Easy replacement of existing videos
+- **File Validation**: Automatic validation of video file types and size limits
 
 ```json
 {

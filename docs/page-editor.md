@@ -78,3 +78,73 @@ The editor is designed to save changes automatically, providing a seamless user 
 2.  These functions set an internal `hasUnsavedChanges` flag to `true`, which is reflected in the `EditorTopBar` UI (e.g., the "Save" button becomes enabled).
 3.  The `useAutoSave` hook contains logic (likely a debounced function) that automatically triggers a save to the backend API shortly after changes have been made. The `isAutoSaving` flag is used to show a visual indicator during this process.
 4.  For immediate persistence, the user can also click the "Save" button in the `EditorTopBar`, which directly invokes the `save()` action.
+
+### Navigation Protection (`useNavigationGuard`)
+
+The page editor implements comprehensive navigation protection to prevent users from accidentally losing unsaved changes when attempting to leave the editor.
+
+#### Implementation (`src/hooks/useNavigationGuard.js`)
+
+The `useNavigationGuard` hook provides a two-layer protection system:
+
+**Layer 1: Browser Navigation Protection**
+
+- Listens for the browser's `beforeunload` event
+- Prevents tab closing, URL changes, and browser back/forward navigation when there are unsaved changes
+- Shows the browser's standard "unsaved changes" warning dialog
+
+**Layer 2: Internal Navigation Protection**
+
+- Provides a `guardedNavigate` function that replaces React Router's standard `navigate`
+- Shows a custom confirmation dialog before allowing internal navigation
+- Used in components like `EditorTopBar` for page switching and `Layout` for sidebar navigation
+
+#### Usage in Page Editor
+
+The page editor integrates navigation protection in several ways:
+
+1. **Automatic Setup**: The `PageEditor` component calls `useNavigationGuard()` to activate protection
+2. **Sidebar Integration**: The main `Layout` component passes `guardedNavigate` to the `Sidebar` when on the page editor route
+3. **Page Switching**: The `EditorTopBar` uses `guardedNavigate` for switching between pages in the dropdown
+
+#### Key Features
+
+- **Smart Detection**: Only triggers protection when there are actual unsaved changes
+- **User Choice**: Allows users to choose whether to discard changes or stay on the page
+- **Seamless Integration**: Works with both browser navigation and React Router navigation
+
+### Editing Global Widgets
+
+The page editor supports editing global widgets (header and footer) alongside regular page widgets, providing a unified editing experience.
+
+#### Global Widget Selection
+
+Global widgets appear in the `WidgetList` component as fixed, non-draggable items:
+
+- **Header Widget**: Displayed at the top of the widget list with a "Global Header" label
+- **Footer Widget**: Displayed at the bottom of the widget list with a "Global Footer" label
+- **Visual Distinction**: Global widgets use a different visual styling (grey background) to distinguish them from page widgets
+
+#### Global Widget Settings
+
+When a global widget is selected:
+
+1. **Selection State**: Tracked separately from page widgets using `selectedGlobalWidgetId` in the widget store
+2. **Settings Panel**: The `SettingsPanel` component detects global widget selection and loads the appropriate schema
+3. **Settings Persistence**: Changes to global widget settings are saved using `updateGlobalWidgetSettings()` which updates the global widget data
+4. **Real-time Updates**: Changes are immediately reflected in the preview panel
+
+#### State Management
+
+Global widgets are managed through the `usePageStore`:
+
+- **Loading**: Global widgets are loaded separately from page data using `loadGlobalWidgets()`
+- **Storage**: Global widget data is stored in `pageStore.globalWidgets` object with `header` and `footer` properties
+- **Updates**: Changes trigger `updateGlobalWidget()` which maintains separation from page widget data
+
+#### Key Differences from Page Widgets
+
+- **Persistence**: Global widget changes affect all pages that use the theme
+- **No Reordering**: Global widgets cannot be reordered or moved
+- **Fixed Position**: Header always appears first, footer always appears last
+- **Theme-wide**: Changes apply to the entire project, not just the current page

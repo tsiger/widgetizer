@@ -188,7 +188,38 @@ Handles metadata editing and drawer functionality:
 - `MediaGrid`: Responsive grid view with thumbnail cards and usage badges
 - `MediaList`: Table view with detailed file information and select-all functionality
 - `MediaDrawer`: Slide-out panel for editing file metadata (alt text and title)
+- `MediaSelectorDrawer`: Media browser drawer for selecting existing files in setting inputs
 - `ConfirmationModal`: Deletion confirmation dialog with usage warnings
+
+#### `MediaSelectorDrawer` Component (`src/components/media/MediaSelectorDrawer.jsx`)
+
+A specialized drawer component that allows users to browse and select existing media files from the project library. This component is primarily used within setting input components (like `ImageInput` and `VideoInput`) to provide a "Browse" functionality.
+
+**Key Features:**
+
+- **File Type Filtering**: Supports filtering by file type (`image`, `video`, or `all`)
+- **Search Functionality**: Real-time search through media files by filename
+- **Grid Display**: Responsive grid layout with thumbnail previews
+- **Video Support**: Shows video placeholder icons for video files (since videos don't generate thumbnails)
+- **Click Selection**: Simple click-to-select workflow
+- **Keyboard Navigation**: Escape key support for closing the drawer
+- **Background Scroll Prevention**: Prevents body scrolling when drawer is open
+
+**Usage Context:**
+
+The `MediaSelectorDrawer` is integrated into:
+
+- **`ImageInput`**: Browse for existing images when setting image widget properties
+- **`VideoInput`**: Browse for existing videos when setting video widget properties
+- **`PageForm`**: Select featured images for pages
+
+**Props Interface:**
+
+- `visible`: Boolean to control drawer visibility
+- `onClose`: Function called when drawer should be closed
+- `onSelect`: Function called with selected file object
+- `activeProject`: Current project object for loading media
+- `filterType`: String to filter files (`'image'`, `'video'`, or `'all'`)
 
 ### UI Improvements
 

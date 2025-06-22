@@ -71,6 +71,41 @@ This file acts as the bridge between the React components and the backend API. I
 - `updatePage(id, pageData)`: Sends a `PUT` request to update an existing page file. Handles slug changes by renaming the file on the backend.
 - `deletePage(id)`: Sends a `DELETE` request to remove a page file.
 - `duplicatePage(id)`: Sends a `POST` request to a special endpoint to create a copy of a page.
+- `bulkDeletePages(pageIds)`: Sends a `POST` request to delete multiple pages at once.
+
+### Bulk Operations (`usePageSelection`)
+
+The page management interface supports bulk operations through the `usePageSelection` hook (`src/hooks/usePageSelection.js`), which provides comprehensive multi-page selection functionality.
+
+#### Page Selection State Management
+
+The hook manages selection state for multiple pages:
+
+- **`selectedPages`**: Array of currently selected page IDs
+- **`togglePageSelection(pageId)`**: Adds or removes a page from the selection
+- **`selectAllPages(pageIds)`**: Selects all pages from the provided array
+- **`clearSelection()`**: Clears all selected pages
+- **`isAllSelected(pages)`**: Checks if all visible pages are currently selected
+
+#### Bulk Delete Operations
+
+The page interface supports bulk deletion with comprehensive safety features:
+
+1. **Multi-Selection**: Users can select multiple pages using checkboxes in the page list
+2. **Select All**: Header checkbox allows selecting/deselecting all visible pages at once
+3. **Visual Feedback**: Selected pages are highlighted with a pink background
+4. **Bulk Delete Button**: Appears only when pages are selected, showing the count of selected items
+5. **Confirmation Dialog**: Uses `useConfirmationModal` to confirm bulk deletion with count information
+6. **Automatic Cleanup**: Clears selection after successful bulk deletion
+
+#### Integration with Pages Interface
+
+The `Pages.jsx` component integrates bulk operations seamlessly:
+
+- **Selection UI**: Each row includes a checkbox that integrates with the selection state
+- **Toolbar**: Shows bulk action buttons when items are selected
+- **State Synchronization**: Selection state is preserved during search/filter operations
+- **Error Handling**: Provides user feedback for both successful and failed bulk operations
 
 ## 3. Backend Implementation
 
