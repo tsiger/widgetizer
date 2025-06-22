@@ -35,10 +35,10 @@ export default function BlockItem({
 
   return (
     <div
-      className={`flex items-center gap-2 p-2 rounded-md border group select-none transition-all duration-200 ${
+      className={`flex items-center gap-2 p-1 rounded-sm border group select-none transition-all duration-200 ${
         isSelected
-          ? "border-blue-300 bg-blue-50 shadow-sm ring-1 ring-blue-200"
-          : "border-slate-200 hover:border-slate-300 hover:shadow-sm"
+          ? "border-blue-300 bg-blue-50 ring-2 ring-blue-200"
+          : "border-slate-200 hover:border-slate-300 hover:shadow-"
       } ${isDragging ? "opacity-50" : ""} cursor-pointer`}
       onClick={(e) => {
         e.stopPropagation();

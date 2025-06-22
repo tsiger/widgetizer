@@ -55,16 +55,16 @@ export default function WidgetItem({
 
   return (
     <div
-      className={`rounded-lg border transition-all duration-200 ${
+      className={`rounded-sm border border-1 transition-all duration-200 ${
         isSelected
-          ? "border-pink-300 bg-pink-50 shadow-sm ring-1 ring-pink-200"
+          ? "border-pink-300 bg-white ring-2 ring-pink-200 shadow-lg shadow-pink-100"
           : isModified
             ? "border-amber-400 bg-amber-50"
-            : "border-slate-200 hover:border-slate-300 hover:shadow-sm"
+            : "border-slate-200 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-100"
       } ${isDragging ? "opacity-30" : ""} ${isOverlay ? "shadow-lg" : ""}`}
     >
       <div
-        className="flex items-center gap-2 p-3 cursor-pointer group widget-item"
+        className="flex items-center gap-2 p-1 cursor-pointer group widget-item"
         onClick={(e) => {
           e.stopPropagation();
           onWidgetSelect(widgetId);
