@@ -55,7 +55,7 @@ function highlightWidget(widgetId, blockId) {
 
       // Only scroll to widget if no block is selected
       if (!blockId) {
-        widget.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        widget.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
       }
     }
   }
@@ -68,7 +68,7 @@ function highlightWidget(widgetId, blockId) {
         block.classList.add("block-highlight");
       }
       // Always scroll to block when selected
-      block.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      block.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
     }
   }
 }

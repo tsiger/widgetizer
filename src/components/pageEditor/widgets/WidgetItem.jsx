@@ -21,6 +21,9 @@ export default function WidgetItem({
   selectedBlockId,
   onBlocksReorder,
   onAddBlockClick,
+  isBlockSelectorOpen,
+  activeWidgetId,
+  activeBlockTriggerKey,
 }) {
   const widgetName = widget.settings?.name || widgetSchema.displayName || widget.type;
   const hasBlocks = widgetSchema.blocks && widgetSchema.blocks.length > 0;
@@ -52,34 +55,34 @@ export default function WidgetItem({
 
   return (
     <div
-      className={`rounded-md border transition-all hover:shadow-sm ${
-        isSelected && !selectedBlockId
-          ? "border-blue-300 bg-blue-50"
+      className={`rounded-lg border transition-all duration-200 ${
+        isSelected
+          ? "border-pink-300 bg-pink-50 shadow-sm ring-1 ring-pink-200"
           : isModified
-            ? "border-amber-400"
-            : "border-slate-200 hover:border-slate-300"
+            ? "border-amber-400 bg-amber-50"
+            : "border-slate-200 hover:border-slate-300 hover:shadow-sm"
       } ${isDragging ? "opacity-30" : ""} ${isOverlay ? "shadow-lg" : ""}`}
     >
       <div
-        className="flex items-center gap-1 p-1 cursor-pointer group widget-item"
+        className="flex items-center gap-2 p-3 cursor-pointer group widget-item"
         onClick={(e) => {
           e.stopPropagation();
           onWidgetSelect(widgetId);
         }}
         {...dragHandleProps}
       >
-        <div className="text-slate-400">
+        <div className="text-slate-400 hover:text-slate-600 transition-colors">
           <GripVertical size={16} />
         </div>
-        <div className="flex-grow min-w-0 flex items-center">
-          <span className="font-medium text-xs truncate">{widgetName}</span>
+        <div className="flex-grow min-w-0 flex items-center gap-2">
+          <span className="font-medium text-sm truncate text-slate-700">{widgetName}</span>
           {isModified && !isDragging && (
-            <span className="ml-2 h-2 w-2 rounded-full bg-amber-500" title="Unsaved changes"></span>
+            <div className="h-2 w-2 rounded-full bg-amber-500 ring-2 ring-amber-200" title="Unsaved changes"></div>
           )}
         </div>
-        <div className="flex opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex opacity-0 group-hover:opacity-100 transition-opacity duration-200 gap-1">
           <button
-            className="p-1 text-slate-400 hover:text-blue-600 rounded-md hover:bg-slate-100"
+            className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-white/80 transition-colors"
             title="Duplicate widget"
             onClick={(e) => {
               e.stopPropagation();
@@ -89,7 +92,7 @@ export default function WidgetItem({
             <Copy size={14} />
           </button>
           <button
-            className="p-1 text-slate-400 hover:text-red-600 rounded-md hover:bg-slate-100"
+            className="p-1.5 text-slate-400 hover:text-red-600 rounded-md hover:bg-white/80 transition-colors"
             title="Delete widget"
             onClick={(e) => {
               e.stopPropagation();
@@ -116,7 +119,10 @@ export default function WidgetItem({
                     <BlockInsertionZone
                       widgetId={widgetId}
                       position={0}
-                      onAddClick={(widgetId, position) => onAddBlockClick(widgetId, position)}
+                      onAddClick={(widgetId, triggerRef) => onAddBlockClick(widgetId, triggerRef, 0)}
+                      isBlockSelectorOpen={isBlockSelectorOpen}
+                      activeWidgetId={activeWidgetId}
+                      activeBlockTriggerKey={activeBlockTriggerKey}
                     />
                   )}
 
@@ -142,7 +148,10 @@ export default function WidgetItem({
                         <BlockInsertionZone
                           widgetId={widgetId}
                           position={index + 1}
-                          onAddClick={(widgetId, position) => onAddBlockClick(widgetId, position)}
+                          onAddClick={(widgetId, triggerRef) => onAddBlockClick(widgetId, triggerRef, index + 1)}
+                          isBlockSelectorOpen={isBlockSelectorOpen}
+                          activeWidgetId={activeWidgetId}
+                          activeBlockTriggerKey={activeBlockTriggerKey}
                         />
                       </div>
                     );
@@ -154,14 +163,20 @@ export default function WidgetItem({
             {blockOrder.length === 0 && (
               <div className="text-center py-2 px-2">
                 <button
-                  className={`w-full flex items-center justify-center py-2 rounded-md ${
+                  ref={(ref) => {
+                    if (ref) {
+                      ref.triggerRef = { current: ref };
+                    }
+                  }}
+                  className={`w-full flex items-center justify-center py-2 rounded-md border-2 border-dashed transition-all ${
                     isSelected && !selectedBlockId
-                      ? "text-blue-600 hover:bg-blue-200/50 border border-blue-300"
-                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-100"
-                  }`}
+                      ? "text-blue-600 hover:bg-blue-50 border-blue-300 hover:border-blue-400"
+                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-50 border-slate-300 hover:border-slate-400"
+                  } ${isBlockSelectorOpen && activeBlockTriggerKey === `${widgetId}-add` ? "opacity-100 bg-blue-50 border-blue-400" : ""}`}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onAddBlockClick(widgetId, 0);
+                    const triggerRef = { current: e.currentTarget };
+                    onAddBlockClick(widgetId, triggerRef, "add");
                   }}
                 >
                   <Plus size={16} className="mr-2" />

@@ -40,6 +40,11 @@ export default function WidgetList({
   onDuplicateWidget,
   onAddWidgetClick,
   onAddBlockClick,
+  isWidgetSelectorOpen,
+  activeWidgetTriggerPosition,
+  isBlockSelectorOpen,
+  activeWidgetId,
+  activeBlockTriggerKey,
 }) {
   const [activeId, setActiveId] = useState(null);
 
@@ -120,7 +125,12 @@ export default function WidgetList({
             >
               <SortableContext items={sortableWidgets.map((item) => item.id)} strategy={verticalListSortingStrategy}>
                 <div className="space-y-0">
-                  <WidgetInsertionZone position={0} onAddClick={onAddWidgetClick} />
+                  <WidgetInsertionZone
+                    position={0}
+                    onAddClick={onAddWidgetClick}
+                    isWidgetSelectorOpen={isWidgetSelectorOpen}
+                    activeWidgetTriggerPosition={activeWidgetTriggerPosition}
+                  />
 
                   {sortableWidgets.map((widget, index) => {
                     const widgetId = widget.id;
@@ -142,8 +152,16 @@ export default function WidgetList({
                           onBlockSelect={onBlockSelect}
                           onBlocksReorder={onBlocksReorder}
                           onAddBlockClick={onAddBlockClick}
+                          isBlockSelectorOpen={isBlockSelectorOpen}
+                          activeWidgetId={activeWidgetId}
+                          activeBlockTriggerKey={activeBlockTriggerKey}
                         />
-                        <WidgetInsertionZone position={index + 1} onAddClick={onAddWidgetClick} />
+                        <WidgetInsertionZone
+                          position={index + 1}
+                          onAddClick={onAddWidgetClick}
+                          isWidgetSelectorOpen={isWidgetSelectorOpen}
+                          activeWidgetTriggerPosition={activeWidgetTriggerPosition}
+                        />
                       </div>
                     );
                   })}
@@ -170,7 +188,15 @@ export default function WidgetList({
         ) : (
           <div className="text-center py-8 px-4 border border-dashed border-slate-300 rounded-md">
             <button
-              onClick={() => onAddWidgetClick(0)}
+              ref={(ref) => {
+                if (ref) {
+                  ref.triggerRef = { current: ref };
+                }
+              }}
+              onClick={(e) => {
+                const triggerRef = { current: e.currentTarget };
+                onAddWidgetClick(0, triggerRef);
+              }}
               className="flex items-center justify-center w-full text-slate-500 hover:text-slate-700 hover:bg-slate-100 py-2 rounded-md"
             >
               <Plus size={16} className="mr-2" />

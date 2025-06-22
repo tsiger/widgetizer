@@ -35,34 +35,36 @@ export default function BlockItem({
 
   return (
     <div
-      className={`flex items-center gap-1 p-1 rounded border group select-none ${
-        isSelected ? "border-blue-300 bg-blue-50" : "border-slate-200 hover:border-slate-300"
-      } ${isDragging ? "opacity-50" : ""} cursor-pointer text-xs`}
+      className={`flex items-center gap-2 p-2 rounded-md border group select-none transition-all duration-200 ${
+        isSelected
+          ? "border-blue-300 bg-blue-50 shadow-sm ring-1 ring-blue-200"
+          : "border-slate-200 hover:border-slate-300 hover:shadow-sm"
+      } ${isDragging ? "opacity-50" : ""} cursor-pointer`}
       onClick={(e) => {
         e.stopPropagation();
         onBlockSelect(blockId);
       }}
     >
-      <div className="text-slate-400" {...dragHandleProps}>
+      <div className="text-slate-400 hover:text-slate-600 transition-colors" {...dragHandleProps}>
         <GripVertical size={14} />
       </div>
-      <span className="truncate flex-grow">{blockName}</span>
+      <span className="truncate flex-grow text-sm font-medium text-slate-600">{blockName}</span>
 
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <button
-          className="p-0.5 text-slate-400 hover:text-blue-500 rounded hover:bg-slate-100"
+          className="p-1.5 text-slate-400 hover:text-blue-500 rounded-md hover:bg-white/80 transition-colors"
           onClick={handleDuplicate}
           title="Duplicate block"
         >
-          <Copy size={14} />
+          <Copy size={12} />
         </button>
 
         <button
-          className="p-0.5 text-slate-400 hover:text-red-500 rounded hover:bg-slate-100"
+          className="p-1.5 text-slate-400 hover:text-red-500 rounded-md hover:bg-white/80 transition-colors"
           onClick={handleDelete}
           title="Delete block"
         >
-          <Trash2 size={14} />
+          <Trash2 size={12} />
         </button>
       </div>
     </div>

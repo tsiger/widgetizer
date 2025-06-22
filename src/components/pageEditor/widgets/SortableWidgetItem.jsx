@@ -15,6 +15,9 @@ export default function SortableWidgetItem({
   onBlockSelect,
   onBlocksReorder,
   onAddBlockClick,
+  isBlockSelectorOpen,
+  activeWidgetId,
+  activeBlockTriggerKey,
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: widgetId });
 
@@ -46,6 +49,9 @@ export default function SortableWidgetItem({
         onBlockSelect={onBlockSelect}
         onBlocksReorder={onBlocksReorder}
         onAddBlockClick={onAddBlockClick}
+        isBlockSelectorOpen={isBlockSelectorOpen}
+        activeWidgetId={activeWidgetId}
+        activeBlockTriggerKey={activeBlockTriggerKey}
       />
     </div>
   );

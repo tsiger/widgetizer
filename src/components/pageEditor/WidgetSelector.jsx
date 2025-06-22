@@ -1,24 +1,36 @@
-import { X } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelectWidget, position }) {
-  const drawerRef = useRef(null);
+export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelectWidget, position, triggerRef }) {
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (drawerRef.current && !drawerRef.current.contains(event.target)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        triggerRef?.current &&
+        !triggerRef.current.contains(event.target)
+      ) {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      // Add a small delay to ensure the dropdown is fully rendered
+      const timer = setTimeout(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+      }, 10);
+
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, triggerRef]);
 
   const availableWidgets = Object.values(widgetSchemas).filter(
     (schema) => schema.type !== "header" && schema.type !== "footer",
@@ -26,40 +38,84 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
 
   if (!isOpen) return null;
 
+  // Calculate position relative to trigger
+  let style = {
+    position: "fixed",
+    top: 100,
+    left: 100,
+    zIndex: 1000,
+  };
+
+  if (triggerRef?.current) {
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    const dropdownWidth = 224; // w-56 = 224px
+
+    // Position the dropdown outside the sidebar (sidebar is w-60 = 240px)
+    const sidebarWidth = 240;
+    let leftPosition = sidebarWidth - 24; // Position closer to sidebar edge
+
+    // If it would go off the right edge of the screen, position to the left instead
+    if (leftPosition + dropdownWidth > window.innerWidth) {
+      leftPosition = triggerRect.left - dropdownWidth - 12;
+    }
+
+    // Make sure it doesn't go off the left edge either
+    if (leftPosition < 12) {
+      leftPosition = 12;
+    }
+
+    // For vertical positioning, check if there's enough space below
+    let topPosition = triggerRect.top;
+    const estimatedDropdownHeight = 300; // Generous estimate
+
+    // If dropdown would go off screen, position it above the trigger
+    if (triggerRect.top + estimatedDropdownHeight > window.innerHeight - 20) {
+      topPosition = triggerRect.top - estimatedDropdownHeight - 10;
+    }
+
+    style = {
+      position: "fixed",
+      top: Math.max(12, topPosition), // Don't go above top of screen
+      left: leftPosition,
+      zIndex: 1000,
+    };
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-start">
-      <div className="absolute inset-0 bg-black/20" onClick={onClose}></div>
+    <>
+      {/* Invisible overlay to catch clicks outside dropdown */}
+      <div className="fixed inset-0" style={{ zIndex: 9998 }} onClick={onClose} />
 
       <div
-        ref={drawerRef}
-        className="bg-white w-64 ml-108 h-full shadow-lg transform transition-transform duration-300 ease-in-out z-10 overflow-y-auto"
+        ref={dropdownRef}
+        className="bg-white border-2 border-slate-300 rounded-lg shadow-lg w-56"
+        style={{
+          ...style,
+          position: "fixed", // Force fixed positioning
+          zIndex: 9999, // Higher z-index
+        }}
       >
-        <div className="sticky top-0 bg-slate-50 z-10 border-b border-slate-200">
-          <div className="flex items-center justify-between p-2">
-            <h3 className="font-medium text-slate-800 text-xs">Add Widget</h3>
-            <button onClick={onClose} className="p-2 rounded-sm hover:bg-slate-100 text-slate-500" aria-label="Close">
-              <X size={18} />
-            </button>
-          </div>
+        <div className="px-3 py-2 border-b border-slate-100 bg-slate-50 rounded-t-lg">
+          <h3 className="text-sm font-medium text-slate-700 text-left">Add Widget</h3>
         </div>
 
-        <div className="p-2">
-          <div className="space-y-1">
-            {availableWidgets.map((schema) => (
-              <button
-                key={schema.type}
-                className="w-full flex items-center py-1.5 px-2 border border-slate-200 rounded-md hover:border-pink-500 hover:bg-pink-50 transition-colors text-left"
-                onClick={() => {
-                  onSelectWidget(schema.type, position);
-                  onClose();
-                }}
-              >
-                <span className="text-xs font-medium text-slate-700">{schema.displayName || schema.type}</span>
-              </button>
-            ))}
-          </div>
+        <div className="max-h-64 overflow-y-auto">
+          {availableWidgets.map((schema) => (
+            <button
+              key={schema.type}
+              className="w-full px-3 py-2 text-left hover:bg-slate-50 transition-colors group"
+              onClick={() => {
+                onSelectWidget(schema.type, position);
+                onClose();
+              }}
+            >
+              <div className="text-sm font-medium text-slate-800 group-hover:text-pink-600">
+                {schema.displayName || schema.type}
+              </div>
+            </button>
+          ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }

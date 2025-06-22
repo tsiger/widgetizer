@@ -22,8 +22,13 @@ export default function PageEditor() {
   const [searchParams] = useSearchParams();
   const [isWidgetSelectorOpen, setIsWidgetSelectorOpen] = useState(false);
   const [insertPosition, setInsertPosition] = useState(0);
+  const [widgetTriggerRef, setWidgetTriggerRef] = useState(null);
+  const [activeWidgetTriggerPosition, setActiveWidgetTriggerPosition] = useState(null);
   const [isBlockSelectorOpen, setIsBlockSelectorOpen] = useState(false);
   const [activeWidgetId, setActiveWidgetId] = useState(null);
+  const [blockTriggerRef, setBlockTriggerRef] = useState(null);
+  const [activeBlockTriggerKey, setActiveBlockTriggerKey] = useState(null);
+  const [blockInsertPosition, setBlockInsertPosition] = useState(null);
   const [previewMode, setPreviewMode] = useState("desktop");
 
   const { page, loading, error } = usePageStore();
@@ -101,8 +106,10 @@ export default function PageEditor() {
   };
 
   // Handle opening the widget selector
-  const handleAddWidgetClick = (position) => {
+  const handleAddWidgetClick = (position, triggerRef) => {
     setInsertPosition(position);
+    setWidgetTriggerRef(triggerRef);
+    setActiveWidgetTriggerPosition(position);
     setIsWidgetSelectorOpen(true);
   };
 
@@ -152,8 +159,13 @@ export default function PageEditor() {
   const selectedWidgetSchema = selectedWidget ? widgetSchemas[selectedWidget.type] || {} : {};
 
   // Add this handler
-  const handleAddBlockClick = (widgetId) => {
+  const handleAddBlockClick = (widgetId, triggerRef, position = null) => {
     setActiveWidgetId(widgetId);
+    setBlockTriggerRef(triggerRef);
+    const triggerKey = position !== null ? `${widgetId}-${position}` : `${widgetId}-add`;
+
+    setActiveBlockTriggerKey(triggerKey);
+    setBlockInsertPosition(position);
     setIsBlockSelectorOpen(true);
   };
 
@@ -230,7 +242,12 @@ export default function PageEditor() {
           }}
           onDeleteWidget={handleDeleteWidgetClick}
           onAddWidgetClick={handleAddWidgetClick}
-          onAddBlockClick={handleAddBlockClick}
+          onAddBlockClick={(widgetId, triggerRef, position) => handleAddBlockClick(widgetId, triggerRef, position)}
+          isWidgetSelectorOpen={isWidgetSelectorOpen}
+          activeWidgetTriggerPosition={activeWidgetTriggerPosition}
+          isBlockSelectorOpen={isBlockSelectorOpen}
+          activeWidgetId={activeWidgetId}
+          activeBlockTriggerKey={activeBlockTriggerKey}
         />
 
         <PreviewPanel
@@ -260,13 +277,18 @@ export default function PageEditor() {
 
       <WidgetSelector
         isOpen={isWidgetSelectorOpen}
-        onClose={() => setIsWidgetSelectorOpen(false)}
+        onClose={() => {
+          setIsWidgetSelectorOpen(false);
+          setWidgetTriggerRef(null);
+          setActiveWidgetTriggerPosition(null);
+        }}
         widgetSchemas={widgetSchemas}
         onSelectWidget={(type, position) => {
           addWidget(type, position);
           useAutoSave.getState().setStructureModified(true);
         }}
         position={insertPosition}
+        triggerRef={widgetTriggerRef}
       />
 
       <BlockSelector
@@ -274,16 +296,25 @@ export default function PageEditor() {
         onClose={() => {
           setIsBlockSelectorOpen(false);
           setActiveWidgetId(null);
+          setBlockTriggerRef(null);
+          setActiveBlockTriggerKey(null);
+          setBlockInsertPosition(null);
         }}
         widgetSchema={activeWidgetId ? widgetSchemas[page?.widgets[activeWidgetId]?.type] : null}
         onSelectBlock={(blockType) => {
           if (activeWidgetId) {
-            useWidgetStore.getState().addBlock(activeWidgetId, blockType);
+            const newBlockId = useWidgetStore.getState().addBlock(activeWidgetId, blockType, blockInsertPosition);
             useAutoSave.getState().markWidgetModified(activeWidgetId);
+
+            // Keep the widget selected and select the new block
+            setSelectedWidgetId(activeWidgetId);
+            setSelectedBlockId(newBlockId);
           }
           setIsBlockSelectorOpen(false);
           setActiveWidgetId(null);
+          setBlockInsertPosition(null);
         }}
+        triggerRef={blockTriggerRef}
       />
 
       <ConfirmationModal

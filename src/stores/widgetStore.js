@@ -238,7 +238,7 @@ const useWidgetStore = create((set, get) => ({
     useAutoSave.getState().setStructureModified(true);
   },
 
-  addBlock: (widgetId, blockType) => {
+  addBlock: (widgetId, blockType, position = null) => {
     const pageStore = usePageStore.getState();
     const { page } = pageStore;
     const { schemas } = get();
@@ -265,13 +265,26 @@ const useWidgetStore = create((set, get) => ({
       settings: defaultSettings,
     };
 
+    // Handle positional insertion
+    const currentBlocksOrder = widget.blocksOrder || [];
+    let newBlocksOrder;
+
+    if (position === null || position === "add" || position >= currentBlocksOrder.length) {
+      // Add to the end (default behavior)
+      newBlocksOrder = [...currentBlocksOrder, blockId];
+    } else {
+      // Insert at specific position
+      newBlocksOrder = [...currentBlocksOrder];
+      newBlocksOrder.splice(position, 0, blockId);
+    }
+
     const updatedWidget = {
       ...widget,
       blocks: {
         ...(widget.blocks || {}),
         [blockId]: newBlock,
       },
-      blocksOrder: [...(widget.blocksOrder || []), blockId],
+      blocksOrder: newBlocksOrder,
     };
 
     const updatedPage = {
