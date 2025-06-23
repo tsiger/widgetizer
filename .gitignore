@@ -17,4 +17,4 @@ data/projects/*
 .env.test.local
 .env.production.local
 .env.development
-.env.test
+.env.test"logs/" 

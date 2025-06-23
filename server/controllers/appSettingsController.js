@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import { validationResult } from "express-validator";
 
 // Helper to get the path to the settings file
 // TODO: Fixed path. Maybe add it in config.js?
@@ -78,16 +79,22 @@ export async function getAppSettings(req, res) {
 
 // Controller function to update settings
 export async function updateAppSettings(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
+    const { settings } = req.body;
     const currentSettings = await readAppSettingsFile();
     // Basic validation: Ensure request body is an object
-    if (typeof req.body !== "object" || req.body === null) {
+    if (typeof settings !== "object" || settings === null) {
       return res.status(400).json({ error: "Invalid request body: Expected an object." });
     }
 
     // Merge new settings - simple merge, could be deeper if needed
     // TODO: Add more robust validation/sanitization based on expected structure
-    const newSettings = { ...currentSettings, ...req.body };
+    const newSettings = { ...currentSettings, ...settings };
 
     // Specific validation for maxFileSizeMB
     if (newSettings.media && typeof newSettings.media.maxFileSizeMB !== "number") {

@@ -1,4 +1,5 @@
 import express from "express";
+import { body } from "express-validator";
 import * as appSettingsController from "../controllers/appSettingsController.js";
 
 const router = express.Router();
@@ -7,6 +8,10 @@ const router = express.Router();
 router.get("/", appSettingsController.getAppSettings);
 
 // PUT /api/settings - Update application settings
-router.put("/", appSettingsController.updateAppSettings);
+router.put(
+  "/",
+  [body("settings").isObject().withMessage("Settings must be an object.")],
+  appSettingsController.updateAppSettings,
+);
 
 export default router;

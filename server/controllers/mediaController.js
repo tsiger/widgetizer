@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import sharp from "sharp";
 import slugify from "slugify";
+import { validationResult } from "express-validator";
 import {
   getProjectDir,
   getProjectImagesDir,
@@ -151,6 +152,11 @@ export const upload = multer({
 
 // Get all media files for a project
 export async function getProjectMedia(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { projectId } = req.params;
 
@@ -175,6 +181,11 @@ export async function getProjectMedia(req, res) {
 
 // Upload media files to a project (with dynamic size check inside)
 export async function uploadProjectMedia(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { projectId } = req.params;
     const files = req.files;
@@ -342,6 +353,11 @@ export async function uploadProjectMedia(req, res) {
 
 // Update media metadata
 export async function updateMediaMetadata(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { projectId, fileId } = req.params;
     const { alt, title } = req.body;
@@ -382,6 +398,11 @@ export async function updateMediaMetadata(req, res) {
 
 // Delete a media file
 export async function deleteProjectMedia(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { projectId, fileId } = req.params;
 
@@ -454,6 +475,11 @@ export async function deleteProjectMedia(req, res) {
 
 // Serve a media file
 export async function serveProjectMedia(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { projectId, fileId, filename } = req.params;
 
@@ -526,6 +552,11 @@ export async function serveProjectMedia(req, res) {
 
 // Bulk delete multiple media files from a project
 export async function bulkDeleteProjectMedia(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { projectId } = req.params;
     const { fileIds } = req.body; // Expect an array of file IDs
@@ -622,6 +653,11 @@ export async function bulkDeleteProjectMedia(req, res) {
 
 // Get usage information for a specific media file
 export async function getMediaFileUsage(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { projectId, fileId } = req.params;
     const usage = await getMediaUsage(projectId, fileId);
@@ -638,6 +674,11 @@ export async function getMediaFileUsage(req, res) {
 
 // Refresh media usage tracking for all pages in a project
 export async function refreshMediaUsage(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { projectId } = req.params;
     const result = await refreshAllMediaUsage(projectId);

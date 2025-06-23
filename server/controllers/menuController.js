@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import slugify from "slugify";
+import { validationResult } from "express-validator";
 import { getProjectMenusDir, getMenuPath } from "../config.js";
 import { readProjectsFile } from "./projectController.js";
 
@@ -59,6 +60,11 @@ async function generateUniqueMenuId(projectId, baseName) {
 
 // Create a new menu
 export async function createMenu(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { name, description, id: requestedId } = req.body;
     const { projects, activeProjectId } = await readProjectsFile();
@@ -99,6 +105,11 @@ export async function createMenu(req, res) {
 
 // Delete a menu
 export async function deleteMenu(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { id } = req.params;
     const { activeProjectId } = await readProjectsFile();
@@ -118,6 +129,11 @@ export async function deleteMenu(req, res) {
 
 // Get a menu by id
 export async function getMenu(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { id } = req.params;
     const { activeProjectId } = await readProjectsFile();
@@ -141,6 +157,11 @@ export async function getMenu(req, res) {
 
 // Update a menu
 export async function updateMenu(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const currentMenuId = req.params.id;
     const menuData = req.body;
@@ -248,6 +269,11 @@ function generateNewMenuItemIds(items) {
 
 // Duplicate a menu
 export async function duplicateMenu(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { id } = req.params;
     const { activeProjectId } = await readProjectsFile();

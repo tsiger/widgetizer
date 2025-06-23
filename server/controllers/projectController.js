@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
+import { validationResult } from "express-validator";
 import * as themeController from "./themeController.js";
 import slugify from "slugify";
 import {
@@ -95,6 +96,12 @@ export async function getActiveProject(_, res) {
 
 // Create a new project
 export async function createProject(req, res) {
+  // Validate incoming data
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { name, description, theme, siteUrl } = req.body;
     const data = await readProjectsFile();
@@ -236,6 +243,11 @@ export async function createProject(req, res) {
 
 // Set the active project
 export async function setActiveProject(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { id } = req.params;
     const data = await readProjectsFile();
@@ -255,6 +267,11 @@ export async function setActiveProject(req, res) {
 
 // Update a project
 export async function updateProject(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -347,6 +364,11 @@ export async function updateProject(req, res) {
 
 // Delete a project
 export async function deleteProject(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { id } = req.params;
     const data = await readProjectsFile();
@@ -381,6 +403,7 @@ export async function deleteProject(req, res) {
     res.json({
       success: true,
       message: `Project "${projectName}" and all associated files have been deleted successfully`,
+      activeProjectId: data.activeProjectId,
     });
   } catch (error) {
     console.error("Error deleting project:", error);
@@ -390,6 +413,11 @@ export async function deleteProject(req, res) {
 
 // Duplicate a project
 export async function duplicateProject(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const originalProjectId = req.params.id;
     const data = await readProjectsFile();
@@ -463,6 +491,11 @@ export async function duplicateProject(req, res) {
 
 // Get project widgets
 export async function getProjectWidgets(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { projectId } = req.params;
     const projectRootDir = getProjectDir(projectId);

@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import slugify from "slugify";
+import { validationResult } from "express-validator";
 import { getProjectsFilePath, getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
 import path from "path";
 import { updatePageMediaUsage, removePageFromMediaUsage } from "../services/mediaUsageService.js";
@@ -148,6 +149,11 @@ export async function readGlobalWidgetData(projectId, widgetType) {
  * Get a page by slug
  */
 export async function getPage(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { id } = req.params; // This is the slug
     const { projects, activeProjectId } = await readProjectsFile();
@@ -175,6 +181,11 @@ export async function getPage(req, res) {
  * Update a page
  */
 export async function updatePage(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const oldSlug = req.params.id; // The slug used to identify the file to update
     const pageData = req.body; // Contains potentially new name and slug
@@ -298,6 +309,7 @@ export async function updatePage(req, res) {
  * Get all pages
  */
 export async function getAllPages(req, res) {
+  // No validation needed for this route
   try {
     const { projects, activeProjectId } = await readProjectsFile();
     const activeProject = projects.find((p) => p.id === activeProjectId);
@@ -321,6 +333,11 @@ export async function getAllPages(req, res) {
  * Delete a page
  */
 export async function deletePage(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { projects, activeProjectId } = await readProjectsFile();
     const activeProject = projects.find((p) => p.id === activeProjectId);
@@ -359,84 +376,79 @@ export async function deletePage(req, res) {
  * Bulk delete pages
  */
 export async function bulkDeletePages(req, res) {
-  try {
-    const { pageIds } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-    if (!Array.isArray(pageIds) || pageIds.length === 0) {
-      return res.status(400).json({ error: "Page IDs array is required" });
-    }
+  const { pageIds } = req.body;
+  const { projects, activeProjectId } = await readProjectsFile();
+  const activeProject = projects.find((p) => p.id === activeProjectId);
 
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
+  if (!activeProject) {
+    return res.status(404).json({ error: "No active project found" });
+  }
 
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+  const results = {
+    deleted: [],
+    notFound: [],
+    errors: [],
+  };
 
-    const results = {
-      deleted: [],
-      notFound: [],
-      errors: [],
-    };
+  // Process each page deletion
+  for (const pageId of pageIds) {
+    try {
+      const pagePath = getPagePath(activeProject.id, pageId);
 
-    // Process each page deletion
-    for (const pageId of pageIds) {
-      try {
-        const pagePath = getPagePath(activeProject.id, pageId);
-
-        // Check if file exists before deleting
-        if (!(await fs.pathExists(pagePath))) {
-          results.notFound.push(pageId);
-          continue;
-        }
-
-        // Delete the page file
-        await fs.remove(pagePath);
-
-        // Remove the page from media usage tracking
-        try {
-          await removePageFromMediaUsage(activeProject.id, pageId);
-        } catch (usageError) {
-          console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
-          // Don't fail the deletion if usage tracking fails
-        }
-
-        results.deleted.push(pageId);
-      } catch (error) {
-        console.error(`Error deleting page ${pageId}:`, error);
-        results.errors.push({ pageId, error: error.message });
+      // Check if file exists before deleting
+      if (!(await fs.pathExists(pagePath))) {
+        results.notFound.push(pageId);
+        continue;
       }
-    }
 
-    // Determine response status based on results
-    const hasErrors = results.errors.length > 0 || results.notFound.length > 0;
-    const hasSuccesses = results.deleted.length > 0;
+      // Delete the page file
+      await fs.remove(pagePath);
 
-    if (hasSuccesses && !hasErrors) {
-      // All deletions successful
-      res.json({
-        success: true,
-        message: `Successfully deleted ${results.deleted.length} page(s)`,
-        results,
-      });
-    } else if (hasSuccesses && hasErrors) {
-      // Partial success
-      res.status(207).json({
-        success: false,
-        message: `Deleted ${results.deleted.length} page(s), but encountered ${results.errors.length + results.notFound.length} error(s)`,
-        results,
-      });
-    } else {
-      // No successes
-      res.status(400).json({
-        success: false,
-        message: "Failed to delete any pages",
-        results,
-      });
+      // Remove the page from media usage tracking
+      try {
+        await removePageFromMediaUsage(activeProject.id, pageId);
+      } catch (usageError) {
+        console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
+        // Don't fail the deletion if usage tracking fails
+      }
+
+      results.deleted.push(pageId);
+    } catch (error) {
+      console.error(`Error deleting page ${pageId}:`, error);
+      results.errors.push({ pageId, error: error.message });
     }
-  } catch (error) {
-    console.error("Error in bulk delete pages:", error);
-    res.status(500).json({ error: "Failed to bulk delete pages" });
+  }
+
+  // Determine response status based on results
+  const hasErrors = results.errors.length > 0 || results.notFound.length > 0;
+  const hasSuccesses = results.deleted.length > 0;
+
+  if (hasSuccesses && !hasErrors) {
+    // All deletions successful
+    res.json({
+      success: true,
+      message: `Successfully deleted ${results.deleted.length} page(s)`,
+      results,
+    });
+  } else if (hasSuccesses && hasErrors) {
+    // Partial success
+    res.status(207).json({
+      success: false,
+      message: `Deleted ${results.deleted.length} page(s), but encountered ${results.errors.length + results.notFound.length} error(s)`,
+      results,
+    });
+  } else {
+    // No successes
+    res.status(400).json({
+      success: false,
+      message: "Failed to delete any pages",
+      results,
+    });
   }
 }
 
@@ -444,6 +456,11 @@ export async function bulkDeletePages(req, res) {
  * Create a page
  */
 export async function createPage(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const pageData = req.body; // Get all data including SEO
     const { projects, activeProjectId } = await readProjectsFile();
@@ -489,15 +506,20 @@ export async function createPage(req, res) {
  * Save page content from the page editor
  */
 export async function savePageContent(req, res) {
-  const { id } = req.params;
-  const pageData = req.body; // Get all data including SEO
-  const { projects, activeProjectId } = await readProjectsFile();
-
-  if (!activeProjectId) {
-    return res.status(400).json({ error: "No active project found" });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
 
   try {
+    const { id } = req.params;
+    const pageData = req.body; // Get all data including SEO
+    const { projects, activeProjectId } = await readProjectsFile();
+
+    if (!activeProjectId) {
+      return res.status(400).json({ error: "No active project found" });
+    }
+
     // Validate essential data
     if (!pageData.slug || !pageData.name || !pageData.widgets) {
       return res.status(400).json({ error: "Missing required page data (slug, name, widgets)." });
@@ -570,6 +592,11 @@ export async function savePageContent(req, res) {
  * Creates a copy of the page with a new unique slug and "Copy of" prefix
  */
 export async function duplicatePage(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const originalPageId = req.params.id;
     const { projects, activeProjectId } = await readProjectsFile();
