@@ -5,7 +5,6 @@ import { getAllPages, deletePage, duplicatePage, bulkDeletePages } from "../util
 import { usePageSelection } from "../hooks/usePageSelection";
 import useConfirmationModal from "../hooks/useConfirmationModal";
 import useToastStore from "../stores/toastStore";
-import useProjectStore from "../stores/projectStore";
 import useAppSettings from "../hooks/useAppSettings";
 import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
@@ -21,7 +20,6 @@ export default function Pages() {
   const [searchTerm, setSearchTerm] = useState("");
   const { selectedPages, togglePageSelection, selectAllPages, clearSelection, isAllSelected } = usePageSelection();
   const showToast = useToastStore((state) => state.showToast);
-  const activeProject = useProjectStore((state) => state.activeProject);
 
   // Get app settings for date formatting
   const { settings: appSettings } = useAppSettings();
@@ -115,18 +113,6 @@ export default function Pages() {
       page.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       page.slug.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-
-  if (!activeProject) {
-    return (
-      <PageLayout title="Pages">
-        <div className="p-8 text-center">
-          <AlertCircle className="mx-auto mb-4 text-yellow-500" size={48} />
-          <h2 className="text-xl font-semibold mb-2">No Active Project</h2>
-          <p className="text-slate-600 mb-4">Please select or create a project to manage your pages.</p>
-        </div>
-      </PageLayout>
-    );
-  }
 
   if (loading) {
     return (

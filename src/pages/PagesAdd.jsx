@@ -7,7 +7,6 @@ import PageForm from "../components/pages/PageForm";
 import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
 import { createPage } from "../utils/pageManager";
-import useProjectStore from "../stores/projectStore";
 
 export default function PagesAdd() {
   const navigate = useNavigate();
@@ -16,7 +15,6 @@ export default function PagesAdd() {
   const [formKey, setFormKey] = useState("initial");
 
   const showToast = useToastStore((state) => state.showToast);
-  const activeProject = useProjectStore((state) => state.activeProject);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);
@@ -34,19 +32,6 @@ export default function PagesAdd() {
       setIsSubmitting(false);
     }
   };
-
-  if (!activeProject) {
-    showToast("Please select or create a project to manage your pages", "error");
-    return (
-      <PageLayout title="New page">
-        <div className="p-8 text-center">
-          <AlertCircle className="mx-auto mb-4 text-yellow-500" size={48} />
-          <h2 className="text-xl font-semibold mb-2">No Active Project</h2>
-          <p className="text-slate-600 mb-4">Please select or create a project to manage your pages.</p>
-        </div>
-      </PageLayout>
-    );
-  }
 
   return (
     <PageLayout title="New page">

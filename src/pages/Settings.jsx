@@ -7,7 +7,6 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 import { SettingsPanel } from "../components/settings";
 
-import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
 
 import { getThemeSettings, saveThemeSettings } from "../utils/themeManager";
@@ -16,16 +15,11 @@ export default function Settings() {
   const [themeData, setThemeData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Get active project from the store
-  const activeProject = useProjectStore((state) => state.activeProject);
-
   // Get the showToast function from the toast store
   const showToast = useToastStore((state) => state.showToast);
 
   // Load theme settings
   useEffect(() => {
-    if (!activeProject) return;
-
     const loadThemeSettings = async () => {
       try {
         setLoading(true);
@@ -41,7 +35,7 @@ export default function Settings() {
     };
 
     loadThemeSettings();
-  }, [activeProject, showToast]);
+  }, [showToast]);
 
   /**
    * Converts nested settings structure to a flat object of values
@@ -97,18 +91,6 @@ export default function Settings() {
       showToast("Failed to save theme settings. Please try again.", "error");
     }
   };
-
-  if (!activeProject) {
-    return (
-      <PageLayout title="Settings">
-        <div className="p-8 text-center">
-          <AlertCircle className="mx-auto mb-4 text-yellow-500" size={48} />
-          <h2 className="text-xl font-semibold mb-2">No active project</h2>
-          <p className="text-slate-600 mb-4">Please select or create a project to manage your settings.</p>
-        </div>
-      </PageLayout>
-    );
-  }
 
   if (loading) {
     return (

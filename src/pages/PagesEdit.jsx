@@ -7,7 +7,6 @@ import PageForm from "../components/pages/PageForm";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 
-import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
 import { getPage, updatePage } from "../utils/pageManager";
 
@@ -20,7 +19,6 @@ export default function PagesEdit() {
   const [showSuccessActions, setShowSuccessActions] = useState(false);
 
   const showToast = useToastStore((state) => state.showToast);
-  const activeProject = useProjectStore((state) => state.activeProject);
 
   useEffect(() => {
     loadPage();
@@ -79,18 +77,6 @@ export default function PagesEdit() {
         <LoadingSpinner message="Loading page..." />
       </PageLayout>
     );
-
-  if (!activeProject) {
-    showToast("Please select or create a project to manage your pages", "error");
-    return (
-      <PageLayout title="Edit Page">
-        <div className="p-8 text-center">
-          <h2 className="text-xl font-semibold mb-2">No Active Project</h2>
-          <p className="text-slate-600 mb-4">Please select or create a project to manage your pages.</p>
-        </div>
-      </PageLayout>
-    );
-  }
 
   return (
     <PageLayout title="Edit page">

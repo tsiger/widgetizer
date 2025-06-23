@@ -7,7 +7,6 @@ import MenuForm from "../components/menus/MenuForm";
 import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
 import { createMenu } from "../utils/menuManager";
-import useProjectStore from "../stores/projectStore";
 
 export default function MenusAdd() {
   const navigate = useNavigate();
@@ -16,7 +15,6 @@ export default function MenusAdd() {
   const [formKey, setFormKey] = useState("initial");
 
   const showToast = useToastStore((state) => state.showToast);
-  const activeProject = useProjectStore((state) => state.activeProject);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);
@@ -34,18 +32,6 @@ export default function MenusAdd() {
       setIsSubmitting(false);
     }
   };
-
-  if (!activeProject) {
-    return (
-      <PageLayout title="Add menu">
-        <div className="p-8 text-center">
-          <AlertCircle className="mx-auto mb-4 text-yellow-500" size={48} />
-          <h2 className="text-xl font-semibold mb-2">No Active Project</h2>
-          <p className="text-slate-600 mb-4">Please select or create a project to manage your menus.</p>
-        </div>
-      </PageLayout>
-    );
-  }
 
   return (
     <PageLayout title="Add menu">

@@ -14,7 +14,6 @@ import { getAllMenus, deleteMenu, duplicateMenu } from "../utils/menuManager";
 import { formatDate } from "../utils/dateFormatter";
 
 import useToastStore from "../stores/toastStore";
-import useProjectStore from "../stores/projectStore";
 import useAppSettings from "../hooks/useAppSettings";
 
 export default function Menus() {
@@ -22,7 +21,6 @@ export default function Menus() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const showToast = useToastStore((state) => state.showToast);
-  const activeProject = useProjectStore((state) => state.activeProject);
 
   // Get app settings for date formatting
   const { settings: appSettings } = useAppSettings();
@@ -78,18 +76,6 @@ export default function Menus() {
       data: { id, name },
     });
   };
-
-  if (!activeProject) {
-    return (
-      <PageLayout title="Menus">
-        <div className="p-8 text-center">
-          <AlertCircle className="mx-auto mb-4 text-yellow-500" size={48} />
-          <h2 className="text-xl font-semibold mb-2">No Active Project</h2>
-          <p className="text-slate-600 mb-4">Please select or create a project to manage your menus.</p>
-        </div>
-      </PageLayout>
-    );
-  }
 
   if (loading) {
     return (

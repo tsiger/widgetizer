@@ -9,7 +9,6 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import { getMenu, updateMenu } from "../utils/menuManager";
 
 import useToastStore from "../stores/toastStore";
-import useProjectStore from "../stores/projectStore";
 
 export default function MenuStructure() {
   const { id } = useParams();
@@ -17,7 +16,6 @@ export default function MenuStructure() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
-  const activeProject = useProjectStore((state) => state.activeProject);
 
   // Handle item deletion directly (no confirmation)
   const handleDeleteItem = (itemToDelete) => {
@@ -112,19 +110,6 @@ export default function MenuStructure() {
   if (!menu) {
     showToast("Menu not found", "error");
     return <PageLayout title="Edit Menu Structure">Menu not found</PageLayout>;
-  }
-
-  if (!activeProject) {
-    showToast("Please select or create a project to manage your menus", "error");
-    return (
-      <PageLayout title="Edit menu structure">
-        <div className="p-8 text-center">
-          <AlertCircle className="mx-auto mb-4 text-yellow-500" size={48} />
-          <h2 className="text-xl font-semibold mb-2">No Active Project</h2>
-          <p className="text-slate-600 mb-4">Please select or create a project to manage your menus.</p>
-        </div>
-      </PageLayout>
-    );
   }
 
   return (

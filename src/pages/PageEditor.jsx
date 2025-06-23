@@ -14,7 +14,6 @@ import usePageStore from "../stores/pageStore";
 import useWidgetStore from "../stores/widgetStore";
 import useAutoSave from "../stores/saveStore";
 import useThemeStore from "../stores/themeStore";
-import useProjectStore from "../stores/projectStore";
 import useConfirmationModal from "../hooks/useConfirmationModal";
 import useNavigationGuard from "../hooks/useNavigationGuard";
 
@@ -51,7 +50,6 @@ export default function PageEditor() {
   } = useWidgetStore();
   const { hasUnsavedChanges, isSaving, isAutoSaving, lastSaved, save, startAutoSave, stopAutoSave } = useAutoSave();
   const { settings: themeSettings } = useThemeStore();
-  const { activeProject, loading: projectLoading } = useProjectStore();
 
   // Add navigation guard
   useNavigationGuard();
@@ -59,12 +57,12 @@ export default function PageEditor() {
   // Load initial data
   useEffect(() => {
     const pageId = searchParams.get("pageId");
-    if (pageId && activeProject) {
+    if (pageId) {
       usePageStore.getState().loadPage(pageId);
       useWidgetStore.getState().loadSchemas();
       useThemeStore.getState().loadSettings();
     }
-  }, [searchParams, activeProject]);
+  }, [searchParams]);
 
   // Setup auto-save
   useEffect(() => {
@@ -168,22 +166,6 @@ export default function PageEditor() {
     setBlockInsertPosition(position);
     setIsBlockSelectorOpen(true);
   };
-
-  if (projectLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <LoadingSpinner message="Loading project..." />
-      </div>
-    );
-  }
-
-  if (!activeProject) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p>No active project selected. Please select a project first.</p>
-      </div>
-    );
-  }
 
   if (loading) {
     return (

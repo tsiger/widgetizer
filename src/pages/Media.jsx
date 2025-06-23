@@ -39,18 +39,6 @@ export default function Media() {
   });
 
   // Early returns for various states
-  if (!mediaState.activeProject) {
-    return (
-      <PageLayout title="Media">
-        <div className="p-8 text-center">
-          <AlertCircle className="mx-auto mb-4 text-yellow-500" size={48} />
-          <h2 className="text-xl font-semibold mb-2">No Active Project</h2>
-          <p className="text-slate-600 mb-4">Please select or create a project to manage media files.</p>
-        </div>
-      </PageLayout>
-    );
-  }
-
   if (mediaState.loading) {
     return (
       <PageLayout title="Media">
