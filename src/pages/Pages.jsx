@@ -12,6 +12,7 @@ import Tooltip from "../components/ui/Tooltip";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import Table from "../components/ui/Table";
 import { formatDate } from "../utils/dateFormatter";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 export default function Pages() {
   const navigate = useNavigate();
@@ -117,9 +118,7 @@ export default function Pages() {
   if (loading) {
     return (
       <PageLayout title="Pages">
-        <div className="flex justify-center items-center h-64">
-          <div className="text-slate-600">Loading pages...</div>
-        </div>
+        <LoadingSpinner message="Loading pages..." />
       </PageLayout>
     );
   }
