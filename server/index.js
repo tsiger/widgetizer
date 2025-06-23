@@ -25,24 +25,38 @@ import coreWidgetsRoutes from "./routes/coreWidgets.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
-app.use(helmet());
-
 const isProduction = process.env.NODE_ENV === "production";
-const allowedOrigins = isProduction ? [process.env.PRODUCTION_URL] : ["http://localhost:3000"];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = "The CORS policy for this site does not allow access from the specified Origin.";
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
-  }),
-);
+if (isProduction) {
+  // Only use helmet in production
+  // TODO: Make sure to check thorougly, by default it adds a lot of headers
+  app.use(helmet());
+
+  // In production, use strict CORS
+  const allowedOrigins = [process.env.PRODUCTION_URL];
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+          const msg = "The CORS policy for this site does not allow access from the specified Origin.";
+          return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+      },
+      credentials: true,
+    }),
+  );
+} else {
+  // In development, disable CORS completely
+  app.use(
+    cors({
+      origin: true, // Allow all origins
+      credentials: true,
+    }),
+  );
+}
 
 app.use(express.json());
 
@@ -64,6 +78,17 @@ app.use("/api/media", apiLimiter, mediaRoutes);
 app.use("/api/export", apiLimiter, exportRoutes);
 app.use("/api/settings", apiLimiter, appSettingsRoutes);
 app.use("/api/core-widgets", apiLimiter, coreWidgetsRoutes);
+
+// --- Production-Only Logic ---
+if (process.env.NODE_ENV === "production") {
+  // Serve the static files from the React app
+  app.use(express.static(path.join(__dirname, "../dist")));
+
+  // Handles any requests that don't match the ones above
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../dist/index.html"));
+  });
+}
 
 // Serve static files from the themes directory
 app.use("/themes", express.static(path.join(__dirname, "../themes")));

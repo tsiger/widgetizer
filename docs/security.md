@@ -55,3 +55,18 @@ Sensitive configuration and environment-specific settings are stored in a `.env`
 - **What it is:** All incoming API requests are logged to a file.
 - **Purpose:** This is primarily for development and debugging, allowing developers to monitor API traffic and analyze request patterns.
 - **Implementation:** A custom middleware logs the timestamp, method, and URL of every request to `logs/api-requests.log`. This directory is excluded from version control and development server hot-reloading.
+
+## Area 3: Deployment & Performance
+
+These are the final steps to get your app ready to be served to the world.
+
+- [x] **Generate a Production Build of the Frontend**
+
+  - **What it is:** Running the `npm run build` command for your React app.
+  - **Why it's important:** The Vite development server (`npm run dev`) is not for production. The `build` command creates a super-optimized, minified, and fast version of your React app in a `dist` folder.
+  - **Deep Dive Topic:** Run `npm run build` and explore the `dist` folder it creates to see how Vite packages your application.
+
+- [x] **Configure Express to Serve Production React App**
+  - **What it is:** Configuring your Express server to serve the built React app from the `dist` folder.
+  - **Why it's important:** In production, your Node.js server must serve both your API and the main `index.html` file of your React app.
+  - **Deep Dive Topic:** In `server/index.js`, add `app.use(express.static('dist'))` and a catch-all route `app.get('*', ...)` to send `dist/index.html` for any request that doesn't match an API route. This allows React Router to work correctly.

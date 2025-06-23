@@ -6,6 +6,7 @@ import { getProjectDir, PUBLISH_DIR } from "../config.js";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
 import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
+import { readProjectsFile } from "./projectController.js";
 
 // Export history file path
 const EXPORT_HISTORY_FILE = path.join(PUBLISH_DIR, "export-history.json");
@@ -150,24 +151,72 @@ export async function exportProject(req, res) {
       return res.status(400).json({ error: "Project ID is required" });
     }
 
+    // First, define the project directory path. This is essential.
     const projectDir = getProjectDir(projectId);
+
+    // Now, read the central projects file to get metadata like siteUrl.
+    const projectsData = await readProjectsFile();
+    const projectData = projectsData.projects.find((p) => p.id === projectId);
+
+    if (!projectData) {
+      throw new Error(`Project with ID "${projectId}" not found in projects.json`);
+    }
+    const siteUrl = projectData.siteUrl || "";
+
+    // Continue with defining export version and output directories.
     const version = await getNextVersion(projectId);
-    const outputBaseDir = PUBLISH_DIR; // Base directory for all exports
+    const outputBaseDir = PUBLISH_DIR;
     const outputDir = path.join(outputBaseDir, `${projectId}-v${version}`);
     const outputAssetsDir = path.join(outputDir, "assets");
-    const outputUploadsDir = path.join(outputDir, "uploads"); // Define uploads base in output
-    const outputImagesDir = path.join(outputUploadsDir, "images"); // Define images dir in output
+    const outputUploadsDir = path.join(outputDir, "uploads");
+    const outputImagesDir = path.join(outputUploadsDir, "images");
+    const outputVideosDir = path.join(outputUploadsDir, "videos");
 
     // Ensure output directories exist
     await fs.ensureDir(outputDir);
     await fs.ensureDir(outputAssetsDir);
-    await fs.ensureDir(outputImagesDir); // Ensure uploads/images exists
+    await fs.ensureDir(outputImagesDir);
+    await fs.ensureDir(outputVideosDir);
 
     const rawThemeSettings = await readProjectThemeData(projectId);
 
     // Fetch list of page data using the helper function
-
     const pagesDataArray = await listProjectPagesData(projectId);
+
+    // --- Generate sitemap.xml and robots.txt ---
+    if (siteUrl) {
+      // 1. Generate sitemap.xml
+      const sitemapUrls = pagesDataArray
+        .filter((page) => !page.seo?.robots?.includes("noindex")) // Filter out 'noindex' pages
+        .map((page) => {
+          const pageUrl = new URL(`${page.slug}.html`, siteUrl).href;
+          const lastMod = page.updated || page.gcreated || new Date().toISOString();
+          return `
+  <url>
+    <loc>${pageUrl}</loc>
+    <lastmod>${lastMod.split("T")[0]}</lastmod>
+  </url>`;
+        });
+
+      const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${sitemapUrls.join("")}
+</urlset>`;
+
+      const formattedSitemap = await prettier.format(sitemapContent, { parser: "html" });
+      await fs.writeFile(path.join(outputDir, "sitemap.xml"), formattedSitemap);
+
+      // 2. Generate robots.txt
+      const sitemapUrl = new URL("sitemap.xml", siteUrl).href;
+      const robotsContent = `User-agent: *
+Allow: /
+
+Sitemap: ${sitemapUrl}`;
+
+      await fs.writeFile(path.join(outputDir, "robots.txt"), robotsContent);
+    } else {
+      console.warn(`Project ${projectId} has no siteUrl defined. Skipping sitemap.xml and robots.txt generation.`);
+    }
+    // --- End of new SEO file generation ---
 
     const headerData = await readGlobalWidgetData(projectId, "header");
     const footerData = await readGlobalWidgetData(projectId, "footer");
@@ -346,6 +395,59 @@ export async function exportProject(req, res) {
       }
     }
     // --- End Copy ---
+
+    // --- Copy Only Used Videos ---
+    try {
+      const { readMediaFile } = await import("./mediaController.js");
+      const mediaData = await readMediaFile(projectId);
+
+      if (mediaData && mediaData.files) {
+        const usedVideos = mediaData.files.filter(
+          (file) =>
+            file.type.startsWith("video/") &&
+            file.usedIn &&
+            file.usedIn.length > 0 &&
+            file.path.startsWith("/uploads/videos/"),
+        );
+
+        let copiedCount = 0;
+        let skippedCount = 0;
+
+        for (const videoFile of usedVideos) {
+          const sourceVideoPath = path.join(projectDir, videoFile.path.replace(/^\//, ""));
+          const targetVideoPath = path.join(outputDir, videoFile.path.replace(/^\//, ""));
+
+          try {
+            if (await fs.pathExists(sourceVideoPath)) {
+              await fs.ensureDir(path.dirname(targetVideoPath));
+              await fs.copy(sourceVideoPath, targetVideoPath);
+              copiedCount++;
+            }
+          } catch (copyError) {
+            console.error(`Error copying video ${videoFile.filename}:`, copyError);
+          }
+        }
+
+        const allVideos = mediaData.files.filter((file) => file.type.startsWith("video/"));
+        skippedCount = allVideos.length - usedVideos.length;
+
+        console.log(`Export optimization: Copied ${copiedCount} used videos, skipped ${skippedCount} unused videos`);
+      } else {
+        console.log("No media data found or no videos to process");
+      }
+    } catch (mediaError) {
+      console.error("Error reading media data for video export:", mediaError);
+      // Fallback to copying all videos if media tracking fails
+      const projectVideosDir = path.join(projectDir, "uploads", "videos");
+      try {
+        if (await fs.pathExists(projectVideosDir)) {
+          await fs.copy(projectVideosDir, outputVideosDir);
+          console.log("Fallback: Copied all videos due to media tracking error");
+        }
+      } catch (fallbackError) {
+        console.error("Error in fallback video copying:", fallbackError);
+      }
+    }
 
     // Record this export in history
     const exportRecord = await recordExport(projectId, version, outputDir, "success");
