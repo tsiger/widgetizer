@@ -316,3 +316,7 @@ The media usage tracking is handled by a dedicated service that provides automat
 - **Page Save/Update**: Automatically triggers usage tracking updates
 - **Page Delete**: Automatically removes page from all media usage arrays
 - **Slug Changes**: Removes old slug and adds new slug to relevant media files
+
+## Security Considerations
+
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.

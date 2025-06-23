@@ -146,3 +146,7 @@ The image processing settings directly control how uploaded images are processed
 4.  **Immediate Effect**: Settings changes apply to all new uploads without requiring application restart
 
 This server-side validation and processing ensures that the constraints are always enforced securely, regardless of any frontend logic, while providing administrators full control over image processing behavior and storage requirements.
+
+## Security Considerations
+
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.

@@ -189,3 +189,7 @@ The system automatically manages storage by:
 - Removing the oldest exports when limits are exceeded
 - Cleaning up both file system directories and history records
 - Respecting user-configured retention policies
+
+## Security Considerations
+
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.

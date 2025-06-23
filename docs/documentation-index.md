@@ -51,6 +51,20 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+## 🏛️ Platform Architecture
+
+### **[security.md](security.md)** - Platform Security
+
+**Purpose**: Outlines the core security measures protecting the application, its data, and users. **When to use**:
+
+- Understanding the server's security layers
+- Reviewing protection against common vulnerabilities
+- Configuring the application for a production environment
+
+**Key topics**: Rate Limiting, HTTP Security Headers, CORS Whitelisting, Input Validation, Global Error Handling, Environment Configuration
+
+---
+
 ## 🎨 Content Management
 
 ### **[projects.md](projects.md)** - Project Management System

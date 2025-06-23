@@ -137,3 +137,7 @@ This is the core of the backend logic. The controller functions interact with th
   5.  **Media Usage Tracking**: Updates media file usage tracking to reflect which images are used by this page.
 - **Delete Operation**: The controller finds the correct file by its slug and deletes it from the filesystem. Also removes the page from all media usage tracking.
 - **Duplicate Operation**: The controller reads the source page's data, generates a new unique slug (e.g., by appending `-copy`), updates the `name` and `slug` fields in the data, and writes it to a new file. Updates media usage tracking for the duplicated page.
+
+### Security Considerations
+
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.

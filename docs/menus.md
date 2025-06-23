@@ -106,3 +106,7 @@ The controller handles the logic for interacting with the menu JSON files on the
     - **Unique item IDs**: All nested menu items get new unique IDs to prevent conflicts
     - **Fresh timestamps**: New `created` and `updated` timestamps
   - `deleteMenu`: Removes the corresponding menu file from the `menus` directory.
+
+## Security Considerations
+
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.
