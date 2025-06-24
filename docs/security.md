@@ -20,19 +20,17 @@ These layers are applied automatically to API endpoints and provide a robust bas
   - A stricter, general limit for most API endpoints.
   - A more lenient limit for editor-related endpoints (`/api/projects`, `/api/pages`, etc.) to accommodate their higher request volume during content creation.
 
-### 3. HTTP Security Headers
+### 3. HTTP Security Headers [PENDING]
 
 - **What it is:** A collection of special HTTP headers are sent with every response from the server.
 - **Why it's important:** These headers instruct the browser to enable its built-in security features, providing powerful protection against attacks like clickjacking, MIME-type sniffing, and cross-site scripting.
-- **Implementation:** The `helmet` package is used as a global middleware to set these headers on all responses.
+- **Implementation:** The `helmet` package can be used as a global middleware to set these headers on all responses. _This is not currently implemented._
 
-### 4. Cross-Origin Resource Sharing (CORS) Whitelist
+### 4. Cross-Origin Resource Sharing (CORS) Whitelist [PENDING]
 
-- **What it is:** In a production environment, the server will only accept API requests from a specific, pre-approved domain.
+- **What it is:** In a production environment, the server should only accept API requests from a specific, pre-approved domain.
 - **Why it's important:** Prevents other websites from making unauthorized requests to your API, which could expose user data.
-- **Implementation:** The `cors` package is configured to check the `NODE_ENV` environment variable.
-  - In `production`, it only allows origins specified in the `PRODUCTION_URL` environment variable.
-  - In `development`, it allows requests from `http://localhost:3000` for ease of local development.
+- **Implementation:** The `cors` package can be configured to check the `NODE_ENV` environment variable. _This is not currently implemented._
 
 ### 5. Global Error Handling
 
