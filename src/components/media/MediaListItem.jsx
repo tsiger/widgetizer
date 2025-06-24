@@ -54,8 +54,8 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
           )}
         </div>
       </td>
-      <td className={`${cellClass} max-w-xs truncate`} title={file.filename}>
-        {file.filename}
+      <td className={`${cellClass} max-w-xs truncate`} title={file.metadata?.title || file.filename}>
+        {file.metadata?.title || file.filename}
       </td>
       <td className={cellClass}>{formatFileSize(file.size)}</td>
       <td className={cellClass}>{file.width && file.height ? `${file.width}×${file.height}` : "-"}</td>

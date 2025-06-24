@@ -25,8 +25,8 @@ export default function MediaGridItem({ file, isSelected, onSelect, onDelete, on
           <Image className="text-slate-400" size={48} />
         )}
       </div>
-      <div className="p-2 text-sm truncate" title={file.metadata?.title || file.originalName}>
-        {file.metadata?.title || file.originalName}
+      <div className="p-2 text-sm truncate" title={file.metadata?.title || file.filename}>
+        {file.metadata?.title || file.filename}
       </div>
 
       <div className="absolute top-2 left-2 z-10 flex items-center space-x-1">

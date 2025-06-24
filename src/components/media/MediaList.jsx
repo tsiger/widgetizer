@@ -46,7 +46,7 @@ export default function MediaList({
           file={file}
           isSelected={selectedFiles.includes(file.id)}
           onSelect={() => onFileSelect(file.id)}
-          onDelete={() => onFileDelete(file.id, file.filename)}
+          onDelete={() => onFileDelete(file.id, file.originalName)}
           onView={() => onFileView(file)}
           onEdit={() => onFileEdit(file)}
           activeProject={activeProject}
