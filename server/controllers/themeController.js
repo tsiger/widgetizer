@@ -1,5 +1,4 @@
 import fs from "fs-extra";
-import { createReadStream } from "fs";
 import path from "path";
 import {
   THEMES_DIR,
@@ -8,12 +7,8 @@ import {
   getThemeWidgetsDir,
   getThemeTemplatesDir,
   getProjectDir,
-  getProjectPagesDir,
-  getProjectMenusDir,
   getProjectThemeJsonPath,
 } from "../config.js";
-import { v4 as uuidv4 } from "uuid";
-import multer from "multer";
 
 export async function ensureThemesDirectory() {
   try {
@@ -52,7 +47,7 @@ export async function getAllThemes(_, res) {
 
     const validThemes = themesList.filter((theme) => theme !== null);
     res.json(validThemes);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: "Failed to load themes" });
   }
 }
@@ -64,7 +59,7 @@ export async function getTheme(req, res) {
     const themeJsonPath = getThemeJsonPath(id);
     const themeData = await fs.readFile(themeJsonPath, "utf8");
     res.json(JSON.parse(themeData));
-  } catch (error) {
+  } catch {
     res.status(404).json({ error: "Theme not found" });
   }
 }

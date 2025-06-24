@@ -73,7 +73,7 @@ async function recordExport(projectId, version, outputDir, status = "success") {
     const { getSetting } = await import("./appSettingsController.js");
     const maxVersionsSetting = await getSetting("export.maxVersionsToKeep");
     maxExports = parseInt(maxVersionsSetting || "10", 10) || 10;
-  } catch (error) {
+  } catch {
     console.warn("Could not load app settings for export limit, using default of 10");
   }
 
@@ -87,8 +87,8 @@ async function recordExport(projectId, version, outputDir, status = "success") {
         try {
           await fs.remove(exportToDelete.outputDir);
           console.log(`Cleaned up old export: ${exportToDelete.outputDir}`);
-        } catch (error) {
-          console.warn(`Failed to delete old export directory: ${exportToDelete.outputDir}`, error);
+        } catch {
+          console.warn(`Failed to delete old export directory: ${exportToDelete.outputDir}`);
         }
       }
     }
@@ -254,7 +254,6 @@ Sitemap: ${sitemapUrl}`;
         });
         const renderedWidgets = (await Promise.all(widgetPromises)).filter((html) => html !== null);
         pageWidgetsHtml = renderedWidgets.join("");
-      } else {
       }
 
       // Combine header + page widgets + footer for layout content
@@ -523,7 +522,7 @@ async function findEntryFile(exportDir) {
     }
 
     return "index.html"; // fallback
-  } catch (error) {
+  } catch {
     return "index.html"; // fallback on error
   }
 }
@@ -644,7 +643,7 @@ export async function getExportHistory(req, res) {
       const { getSetting } = await import("./appSettingsController.js");
       const maxVersionsSetting = await getSetting("export.maxVersionsToKeep");
       maxExports = parseInt(maxVersionsSetting || "10", 10) || 10;
-    } catch (error) {
+    } catch {
       console.warn("Could not load app settings for export display limit, using default of 10");
     }
 

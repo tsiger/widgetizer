@@ -10,7 +10,7 @@ export async function getAllProjects() {
       throw new Error("Failed to fetch projects");
     }
     return await response.json();
-  } catch (error) {
+  } catch {
     throw new Error("Failed to get projects");
   }
 }
@@ -25,7 +25,7 @@ export async function getActiveProject() {
       throw new Error("Failed to fetch active project");
     }
     return await response.json();
-  } catch (error) {
+  } catch {
     throw new Error("Failed to get active project");
   }
 }
@@ -70,7 +70,7 @@ export async function setActiveProject(projectId) {
     }
     const result = await response.json();
     return result;
-  } catch (error) {
+  } catch {
     throw new Error("Failed to set active project");
   }
 }
@@ -114,7 +114,7 @@ export async function deleteProject(projectId) {
       throw new Error("Failed to delete project");
     }
     return await response.json();
-  } catch (error) {
+  } catch {
     throw new Error("Failed to delete project");
   }
 }

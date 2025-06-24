@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { AlertCircle } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -27,7 +25,7 @@ export default function Settings() {
         // Load theme data
         const data = await getThemeSettings();
         setThemeData(data);
-      } catch (err) {
+      } catch {
         showToast("Failed to load theme settings. Please try again.", "error");
       } finally {
         setLoading(false);
@@ -87,7 +85,7 @@ export default function Settings() {
     try {
       await saveThemeSettings(themeData);
       showToast("Theme settings saved successfully!", "success");
-    } catch (err) {
+    } catch {
       showToast("Failed to save theme settings. Please try again.", "error");
     }
   };

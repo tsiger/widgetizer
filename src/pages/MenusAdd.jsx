@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertCircle, ChevronLeft, Pencil } from "lucide-react";
+import { ChevronLeft, Pencil } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import MenuForm from "../components/menus/MenuForm";

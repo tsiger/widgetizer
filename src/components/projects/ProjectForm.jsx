@@ -62,7 +62,7 @@ export default function ProjectForm({
       }
       const data = await response.json();
       setThemes(data);
-    } catch (err) {
+    } catch {
       showToast("Failed to load themes", "error");
     } finally {
       setLoading(false);

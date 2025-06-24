@@ -39,7 +39,7 @@ export default function useMediaState() {
         metadata: file.metadata || { alt: "", title: "" },
       }));
       setFiles(filesWithMetadata);
-    } catch (error) {
+    } catch {
       showToast("Failed to load media files", "error");
     } finally {
       setLoading(false);
@@ -53,7 +53,7 @@ export default function useMediaState() {
       await refreshMediaUsage(activeProject.id);
       await loadMediaFiles(); // Reload to get updated usage data
       showToast("Media usage tracking refreshed", "success");
-    } catch (error) {
+    } catch {
       showToast("Failed to refresh media usage tracking", "error");
     }
   };

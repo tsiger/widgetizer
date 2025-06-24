@@ -8,6 +8,7 @@ export default [
   { ignores: ["dist"] },
   {
     files: ["**/*.{js,jsx}"],
+    ignores: ["server/**/*.js"],
     languageOptions: {
       globals: globals.browser,
       parserOptions: {
@@ -29,6 +30,20 @@ export default [
       ...reactHooks.configs.recommended.rules,
       "react/jsx-no-target-blank": "off",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+      "react/prop-types": "off",
+    },
+  },
+  {
+    files: ["server/**/*.js"],
+    languageOptions: {
+      globals: globals.node,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
+    },
+    rules: {
+      ...js.configs.recommended.rules,
     },
   },
 ];

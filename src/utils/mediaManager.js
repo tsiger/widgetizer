@@ -10,7 +10,7 @@ export async function getProjectMedia(projectId) {
       throw new Error("Failed to fetch media files");
     }
     return await response.json();
-  } catch (error) {
+  } catch {
     throw new Error("Failed to get media files");
   }
 }
@@ -67,7 +67,7 @@ export async function deleteProjectMedia(projectId, fileId) {
     }
 
     return await response.json();
-  } catch (error) {
+  } catch {
     throw new Error("Failed to delete file");
   }
 }
@@ -90,7 +90,7 @@ export async function deleteMultipleMedia(projectId, fileIds) {
     }
 
     return await response.json();
-  } catch (error) {
+  } catch {
     throw new Error("Failed to delete files");
   }
 }
@@ -105,7 +105,7 @@ export async function getMediaFileUsage(projectId, fileId) {
       throw new Error("Failed to get media usage");
     }
     return await response.json();
-  } catch (error) {
+  } catch {
     throw new Error("Failed to get media usage");
   }
 }
@@ -122,7 +122,7 @@ export async function refreshMediaUsage(projectId) {
       throw new Error("Failed to refresh media usage");
     }
     return await response.json();
-  } catch (error) {
+  } catch {
     throw new Error("Failed to refresh media usage");
   }
 }

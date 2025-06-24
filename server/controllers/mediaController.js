@@ -56,7 +56,7 @@ const ALLOWED_MIME_TYPES = [
 function decodeFileName(filename) {
   try {
     return decodeURIComponent(escape(filename));
-  } catch (e) {
+  } catch {
     return filename;
   }
 }
@@ -518,7 +518,7 @@ export async function serveProjectMedia(req, res) {
     // Check if file exists
     try {
       await fs.access(filePath);
-    } catch (error) {
+    } catch {
       return res.status(404).json({ error: "File not found" });
     }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, Trash2, Pencil, List, AlertCircle, CirclePlus, Copy } from "lucide-react";
+import { Menu, Trash2, Pencil, CirclePlus, Copy } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -33,7 +33,7 @@ export default function Menus() {
     try {
       const menuData = await getAllMenus();
       setMenus(menuData);
-    } catch (err) {
+    } catch {
       showToast("Failed to load menus", "error");
     } finally {
       setLoading(false);
@@ -49,7 +49,7 @@ export default function Menus() {
       await deleteMenu(data.id);
       setMenus(menus.filter((menu) => menu.id !== data.id));
       showToast(`Menu "${data.name}" was deleted successfully`, "success");
-    } catch (err) {
+    } catch {
       showToast("Failed to delete menu", "error");
     }
   };
@@ -59,7 +59,7 @@ export default function Menus() {
       const newMenu = await duplicateMenu(menuId);
       setMenus([...menus, newMenu]);
       showToast("Menu duplicated successfully", "success");
-    } catch (error) {
+    } catch {
       showToast("Failed to duplicate menu", "error");
     }
   };

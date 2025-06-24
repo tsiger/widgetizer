@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { AlertCircle } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import MenuEditor from "../components/menus/MenuEditor";

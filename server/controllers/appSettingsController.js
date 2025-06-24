@@ -71,7 +71,7 @@ export async function getAppSettings(req, res) {
   try {
     const settings = await readAppSettingsFile();
     res.json(settings);
-  } catch (error) {
+  } catch {
     // Error handling is mostly done in readAppSettingsFile, this is a fallback
     res.status(500).json({ error: "Failed to get application settings." });
   }

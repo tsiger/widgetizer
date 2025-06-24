@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Plus, Palette, Pencil, Trash2, Copy, Search, Check, FileText, CirclePlus, AlertCircle } from "lucide-react";
+import { Palette, Pencil, Trash2, Copy, Search, Check, FileText, CirclePlus } from "lucide-react";
 import { getAllPages, deletePage, duplicatePage, bulkDeletePages } from "../utils/pageManager";
 import { usePageSelection } from "../hooks/usePageSelection";
 import useConfirmationModal from "../hooks/useConfirmationModal";

@@ -1,10 +1,9 @@
 import { useEffect, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useAutoSave from "../stores/saveStore";
 
 export default function useNavigationGuard() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { hasUnsavedChanges, reset } = useAutoSave();
 
   // Layer 1: Browser navigation (beforeunload) - handles tab closing, URL changes, etc.

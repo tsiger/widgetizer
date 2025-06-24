@@ -1,8 +1,7 @@
-import { AlertCircle, Image } from "lucide-react";
+import { Image } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
-import EmptyState from "../components/ui/EmptyState";
 import MediaToolbar from "../components/media/MediaToolbar";
 import MediaUploader from "../components/media/MediaUploader";
 import MediaGrid from "../components/media/MediaGrid";

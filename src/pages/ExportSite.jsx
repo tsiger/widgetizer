@@ -1,4 +1,3 @@
-import React from "react";
 import PageLayout from "../components/layout/PageLayout";
 import ExportCreator from "../components/export/ExportCreator";
 import ExportHistoryTable from "../components/export/ExportHistoryTable";

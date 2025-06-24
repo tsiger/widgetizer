@@ -10,7 +10,7 @@ export async function getAllPages() {
       throw new Error("Failed to fetch pages");
     }
     return await response.json();
-  } catch (error) {
+  } catch {
     throw new Error("Failed to get pages");
   }
 }
@@ -27,7 +27,7 @@ export async function deletePage(pageId) {
       throw new Error("Failed to delete page");
     }
     return await response.json();
-  } catch (error) {
+  } catch {
     throw new Error("Failed to delete page");
   }
 }
