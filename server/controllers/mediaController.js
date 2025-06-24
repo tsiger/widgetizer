@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import sharp from "sharp";
 import slugify from "slugify";
+import DOMPurify from "isomorphic-dompurify";
 import { validationResult } from "express-validator";
 import {
   getProjectDir,
@@ -248,72 +249,42 @@ export async function uploadProjectMedia(req, res) {
       if (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") {
         try {
           const image = sharp(file.path);
-          const imgMetadata = await image.metadata();
-          fileInfo.width = imgMetadata.width;
-          fileInfo.height = imgMetadata.height;
+          const metadata = await image.metadata();
+          fileInfo.width = metadata.width;
+          fileInfo.height = metadata.height;
 
-          // Generate different sizes
-          const imageProcessingSettings = await getImageProcessingSettings();
-          for (const [name, config] of Object.entries(imageProcessingSettings)) {
-            // Skip creating sizes that would be same as or larger than original
-            if (config.width >= imgMetadata.width) {
-              console.log(
-                `Skipping ${name} size (${config.width}px) for ${file.filename} - original is only ${imgMetadata.width}px`,
-              );
-              continue;
-            }
+          const imageSizes = await getImageProcessingSettings();
+          for (const [sizeName, sizeConfig] of Object.entries(imageSizes)) {
+            if (sizeConfig.width >= metadata.width) continue;
 
-            const sizeFilename = `${name}_${file.filename}`;
-            const sizeFilePath = path.join(path.dirname(file.path), sizeFilename);
+            const resizedFilename = `${path.basename(
+              file.filename,
+              path.extname(file.filename),
+            )}-${sizeName}${path.extname(file.filename)}`;
+            const resizedPath = path.join(path.dirname(file.path), resizedFilename);
 
-            // Create a resized image instance
-            let resizedImage = image
-              .clone() // Clone from the original sharp instance
-              .resize(config.width, null, { fit: "inside", withoutEnlargement: true });
+            await image.clone().resize({ width: sizeConfig.width }).toFile(resizedPath);
 
-            // Apply appropriate format based on original file type to preserve transparency
-            switch (file.mimetype) {
-              case "image/png":
-                resizedImage = resizedImage.png({ quality: config.quality });
-                break;
-              case "image/gif":
-                resizedImage = resizedImage.gif();
-                break;
-              case "image/webp":
-                resizedImage = resizedImage.webp({ quality: config.quality });
-                break;
-              case "image/jpeg":
-              default:
-                resizedImage = resizedImage.jpeg({ quality: config.quality });
-                break;
-            }
+            const resizedImageMetadata = await sharp(resizedPath).metadata();
 
-            const resized = await resizedImage.toFile(sizeFilePath);
-
-            fileInfo.sizes[name] = {
-              path: `/uploads/images/${sizeFilename}`,
-              width: resized.width,
-              height: resized.height,
+            fileInfo.sizes[sizeName] = {
+              path: `/uploads/images/${resizedFilename}`,
+              width: resizedImageMetadata.width,
+              height: resizedImageMetadata.height,
             };
           }
-
-          // For consistency, alias the 'thumb' size to the top-level 'thumbnail' property
-          if (fileInfo.sizes.thumb) {
-            fileInfo.thumbnail = fileInfo.sizes.thumb.path;
-          } else {
-            // If thumb is disabled, use the first available size or original image as fallback
-            const enabledSizes = Object.keys(fileInfo.sizes);
-            if (enabledSizes.length > 0) {
-              fileInfo.thumbnail = fileInfo.sizes[enabledSizes[0]].path;
-            } else {
-              // No sizes generated (all disabled), use original
-              fileInfo.thumbnail = fileInfo.path;
-            }
-          }
-        } catch (err) {
-          console.error(`Error processing image ${file.filename}:`, err);
-          fileInfo.processingError = err.message;
-          // Consider if processing error should reject the file
+        } catch (error) {
+          console.error(`Failed to process image ${file.originalname}:`, error);
+          // Decide if you should reject the file or just log the error
+        }
+      } else if (file.mimetype === "image/svg+xml") {
+        try {
+          const svgContent = await fs.readFile(file.path, "utf-8");
+          const sanitizedSvg = DOMPurify.sanitize(svgContent, { USE_PROFILES: { svg: true } });
+          await fs.writeFile(file.path, sanitizedSvg);
+          // You might want to get width/height for SVGs too, but it's more complex
+        } catch (error) {
+          console.error(`Could not sanitize SVG ${file.originalname}:`, error);
         }
       }
 

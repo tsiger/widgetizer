@@ -37,9 +37,15 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
       </td>
       <td className={cellClass}>
         <div className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center">
-          {file.thumbnail ? (
+          {file.type === "image/svg+xml" ? (
             <img
-              src={`${API_URL(`/api/media/projects/${activeProject.id}${file.thumbnail}`)}`}
+              src={API_URL(`/api/media/projects/${activeProject.id}${file.path}`)}
+              alt={file.metadata?.alt || file.originalName}
+              className="w-full h-full object-contain p-1"
+            />
+          ) : file.sizes?.thumb ? (
+            <img
+              src={`${API_URL(`/api/media/projects/${activeProject.id}${file.sizes.thumb.path}`)}`}
               alt={file.metadata?.alt || file.originalName}
               className="w-full h-full object-contain rounded"
             />

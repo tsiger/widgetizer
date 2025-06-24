@@ -1,9 +1,30 @@
 import { useState } from "react";
+import DOMPurify from "dompurify";
 import { uploadProjectMedia } from "../utils/mediaManager";
 
 export default function useMediaUpload({ activeProject, showToast, setFiles }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
+
+  const sanitizeFiles = async (files) => {
+    const sanitizedFiles = await Promise.all(
+      files.map(async (file) => {
+        if (file.type === "image/svg+xml") {
+          try {
+            const fileText = await file.text();
+            const sanitizedSvg = DOMPurify.sanitize(fileText, { USE_PROFILES: { svg: true } });
+            return new File([sanitizedSvg], file.name, { type: file.type });
+          } catch (error) {
+            console.error("Could not sanitize SVG:", error);
+            // Return original file if sanitization fails
+            return file;
+          }
+        }
+        return file;
+      }),
+    );
+    return sanitizedFiles;
+  };
 
   const handleUpload = async (acceptedFiles) => {
     if (!activeProject) {
@@ -12,13 +33,15 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
     }
 
     setUploading(true);
-    acceptedFiles.forEach((file) => {
+    const filesToUpload = await sanitizeFiles(acceptedFiles);
+
+    filesToUpload.forEach((file) => {
       setUploadProgress((prev) => ({ ...prev, [file.name]: 0 }));
     });
 
     try {
-      const result = await uploadProjectMedia(activeProject.id, acceptedFiles, (progress) => {
-        acceptedFiles.forEach((file) => {
+      const result = await uploadProjectMedia(activeProject.id, filesToUpload, (progress) => {
+        filesToUpload.forEach((file) => {
           setUploadProgress((prev) => ({ ...prev, [file.name]: progress }));
         });
       });
