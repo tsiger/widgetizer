@@ -1,5 +1,17 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Folder, File, Menu, Image, Settings, Palette, Rocket, SlidersHorizontal, Layers } from "lucide-react";
+import {
+  Home,
+  Folder,
+  File,
+  Menu,
+  Image,
+  Settings,
+  Palette,
+  Rocket,
+  SlidersHorizontal,
+  Layers,
+  Puzzle,
+} from "lucide-react";
 
 export default function Sidebar({ guardedNavigate }) {
   const location = useLocation();
@@ -106,6 +118,20 @@ export default function Sidebar({ guardedNavigate }) {
                   <Layers size={18} />
                 </div>
                 <span className="hidden md:inline ml-1 text-sm">Themes</span>
+              </NavLink>
+            </li>
+          </ul>
+        </div>
+
+        <div className="border-b border-slate-800 pb-4 mb-4">
+          <h3 className="text-slate-500 mb-2 ml-2 hidden md:block">Extend</h3>
+          <ul className="space-y-2 md:space-y-1">
+            <li>
+              <NavLink to="/plugins" className={linkClass("/plugins")}>
+                <div className={iconClass("/plugins")}>
+                  <Puzzle size={18} />
+                </div>
+                <span className="hidden md:inline ml-1 text-sm">Plugins</span>
               </NavLink>
             </li>
           </ul>

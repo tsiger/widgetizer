@@ -11,6 +11,7 @@ import MenusEdit from "./pages/MenusEdit";
 import Media from "./pages/Media";
 import Settings from "./pages/Settings";
 import Themes from "./pages/Themes";
+import Plugins from "./pages/Plugins";
 import ExportSite from "./pages/ExportSite";
 import AppSettings from "./pages/AppSettings";
 import PageEditor from "./pages/PageEditor";
@@ -43,6 +44,7 @@ function App() {
             <Route path="media" element={<Media />} />
             <Route path="settings" element={<Settings />} />
             <Route path="themes" element={<Themes />} />
+            <Route path="plugins" element={<Plugins />} />
             <Route path="export-site" element={<ExportSite />} />
             <Route path="app-settings" element={<AppSettings />} />
           </Route>
