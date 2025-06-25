@@ -53,7 +53,7 @@ export default function ProjectsEdit() {
       });
       setProject(updatedProject);
 
-      // Check if the project ID changed (due to name change)
+      // Check if the project ID changed (due to slug change)
       if (updatedProject.id !== id) {
         // If this was the active project, refresh the active project state
         if (activeProject && activeProject.id === id) {
@@ -62,10 +62,11 @@ export default function ProjectsEdit() {
         }
         // Navigate to the new URL with the updated project ID
         navigate(`/projects/edit/${updatedProject.id}`, { replace: true });
-        showToast(`Project "${formData.name}" was updated successfully and URL was changed.`, "success");
+        showToast(`Project "${formData.name}" was updated successfully and folder was renamed.`, "success");
         return false;
       }
 
+      // If this was the active project, refresh the active project state
       if (activeProject && activeProject.id === id) {
         const refreshedActiveProject = await getActiveProject();
         setActiveProject(refreshedActiveProject);
