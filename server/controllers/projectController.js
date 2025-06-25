@@ -103,7 +103,7 @@ export async function createProject(req, res) {
   }
 
   try {
-    const { name, description, theme, siteUrl } = req.body;
+    const { name, slug: providedSlug, description, theme, siteUrl } = req.body;
     const data = await readProjectsFile();
 
     // Check for duplicate project names
@@ -114,10 +114,30 @@ export async function createProject(req, res) {
         .json({ error: `A project named "${name}" already exists. Please choose a different name.` });
     }
 
-    const id = await generateUniqueProjectId(name, data.projects);
+    // Use provided slug or generate one from name
+    let slug;
+    if (providedSlug && providedSlug.trim()) {
+      slug = providedSlug.trim();
+      // Validate slug format
+      const slugPattern = /^[a-z0-9-]+$/;
+      if (!slugPattern.test(slug)) {
+        return res.status(400).json({ error: "Slug can only contain lowercase letters, numbers, and hyphens" });
+      }
+      // Check for duplicate slugs
+      const duplicateSlug = data.projects.find((p) => p.slug === slug || p.id === slug);
+      if (duplicateSlug) {
+        return res
+          .status(400)
+          .json({ error: `A project with slug "${slug}" already exists. Please choose a different slug.` });
+      }
+    } else {
+      // Generate slug from name if not provided
+      slug = await generateUniqueProjectId(name, data.projects);
+    }
 
     const newProject = {
-      id,
+      id: slug, // Keep id same as slug for backward compatibility
+      slug, // Permanent folder identifier
       name,
       description,
       theme,
@@ -126,7 +146,8 @@ export async function createProject(req, res) {
       updated: new Date().toISOString(),
     };
 
-    const projectDir = getProjectDir(id);
+    // Use the permanent slug for directory creation
+    const projectDir = getProjectDir(slug);
     await fs.ensureDir(projectDir);
 
     if (!theme) {
@@ -138,7 +159,7 @@ export async function createProject(req, res) {
       await themeController.copyThemeToProject(theme, projectDir, ["templates"]);
 
       // Then handle templates separately, recursively
-      const pagesDir = getProjectPagesDir(id);
+      const pagesDir = getProjectPagesDir(slug);
       const themeTemplatesDir = getThemeTemplatesDir(theme);
 
       // Helper function to recursively find and process templates
@@ -185,7 +206,7 @@ export async function createProject(req, res) {
       await processTemplatesRecursive(themeTemplatesDir, pagesDir);
 
       const themeMenusDir = path.join(getThemeDir(theme), "menus");
-      const projectMenusDir = getProjectMenusDir(id);
+      const projectMenusDir = getProjectMenusDir(slug);
       try {
         // Check if theme has menus directory
         if (await fs.pathExists(themeMenusDir)) {
@@ -284,6 +305,9 @@ export async function updateProject(req, res) {
 
     const currentProject = data.projects[projectIndex];
 
+    // Ensure backward compatibility - if project doesn't have slug, use its id
+    const currentSlug = currentProject.slug || currentProject.id;
+
     // Check for duplicate project names (excluding current project)
     if (updates.name && updates.name.trim() !== currentProject.name) {
       const duplicateName = data.projects.find(
@@ -297,47 +321,46 @@ export async function updateProject(req, res) {
     }
 
     let updatedProject = { ...currentProject };
-    let newProjectId = id; // Default to keeping the same ID
+    let newProjectId = id;
 
-    // Check if the name is being updated and if it's different
-    if (updates.name && updates.name.trim() !== currentProject.name) {
-      // Generate a new ID based on the new name
-      const potentialNewId = await generateUniqueProjectId(
-        updates.name,
-        data.projects.filter((p) => p.id !== id),
-      );
+    // Check if slug is being updated and if it would be different
+    if (updates.slug && updates.slug.trim() !== currentSlug) {
+      const newSlug = updates.slug.trim();
 
-      // Only rename if the new ID would be different from current ID
-      if (potentialNewId !== id) {
-        const oldDir = getProjectDir(id);
-        const newDir = getProjectDir(potentialNewId);
+      // Check for duplicate slugs (excluding current project)
+      const duplicateSlug = data.projects.find((p) => p.id !== id && p.slug === newSlug);
+      if (duplicateSlug) {
+        return res
+          .status(400)
+          .json({ error: `A project with slug "${newSlug}" already exists. Please choose a different slug.` });
+      }
 
-        try {
-          // Use copy + remove instead of rename for better Windows compatibility
-          await fs.copy(oldDir, newDir);
+      // Rename the project directory
+      const oldDir = getProjectDir(currentSlug);
+      const newDir = getProjectDir(newSlug);
 
-          // Wait a bit to ensure file handles are released
-          await new Promise((resolve) => setTimeout(resolve, 100));
+      try {
+        // Use copy + remove instead of rename for better Windows compatibility
+        await fs.copy(oldDir, newDir);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        await fs.remove(oldDir);
 
-          await fs.remove(oldDir);
-          newProjectId = potentialNewId;
+        newProjectId = newSlug; // Update the project ID to match the new slug
 
-          // Update activeProjectId if this project is currently active
-          if (data.activeProjectId === id) {
-            data.activeProjectId = newProjectId;
-          }
-        } catch (renameError) {
-          // If copy succeeded but remove failed, try to clean up the new directory
-          try {
-            if (await fs.pathExists(newDir)) {
-              await fs.remove(newDir);
-            }
-          } catch (cleanupError) {
-            console.warn(`Failed to cleanup new directory after error: ${cleanupError.message}`);
-          }
-
-          throw new Error(`Failed to rename project directory: ${renameError.message}`);
+        // Update activeProjectId if this project is currently active
+        if (data.activeProjectId === id) {
+          data.activeProjectId = newProjectId;
         }
+      } catch (renameError) {
+        // If copy succeeded but remove failed, try to clean up the new directory
+        try {
+          if (await fs.pathExists(newDir)) {
+            await fs.remove(newDir);
+          }
+        } catch (cleanupError) {
+          console.warn(`Failed to cleanup new directory after error: ${cleanupError.message}`);
+        }
+        throw new Error(`Failed to rename project directory: ${renameError.message}`);
       }
     }
 
@@ -345,6 +368,7 @@ export async function updateProject(req, res) {
     updatedProject = {
       ...updatedProject,
       id: newProjectId,
+      slug: updates.slug || currentSlug, // Ensure slug is always set
       name: updates.name || updatedProject.name,
       description: updates.description !== undefined ? updates.description : updatedProject.description,
       siteUrl: updates.siteUrl !== undefined ? updates.siteUrl : updatedProject.siteUrl,
@@ -378,8 +402,11 @@ export async function deleteProject(req, res) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    const projectName = data.projects[projectIndex].name;
+    const project = data.projects[projectIndex];
+    const projectName = project.name;
+    const projectSlug = project.slug || project.id;
 
+    // Remove from array AFTER we've captured the data we need
     data.projects.splice(projectIndex, 1);
     if (data.activeProjectId === id) {
       data.activeProjectId = data.projects[0]?.id || null;
@@ -387,8 +414,8 @@ export async function deleteProject(req, res) {
 
     await writeProjectsFile(data);
 
-    // Delete project directory
-    const projectDir = getProjectDir(id);
+    // Delete project directory using the slug we captured earlier
+    const projectDir = getProjectDir(projectSlug);
     await fs.remove(projectDir);
 
     // Clean up all exports for this project
@@ -447,12 +474,13 @@ export async function duplicateProject(req, res) {
 
     // Generate the new name and slug
     const newName = copyNumber === 0 ? `Copy of ${baseName}` : `Copy ${copyNumber + 1} of ${baseName}`;
-    const newId = await generateUniqueProjectId(newName, data.projects);
+    const newSlug = await generateUniqueProjectId(newName, data.projects);
 
     // Create the new project metadata
     const newProject = {
       ...originalProject,
-      id: newId,
+      id: newSlug, // Keep id same as slug for backward compatibility
+      slug: newSlug, // Permanent folder identifier
       name: newName,
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
@@ -460,7 +488,7 @@ export async function duplicateProject(req, res) {
 
     // Copy the entire project directory
     const originalDir = getProjectDir(originalProjectId);
-    const newDir = getProjectDir(newId);
+    const newDir = getProjectDir(newSlug);
 
     try {
       await fs.copy(originalDir, newDir);

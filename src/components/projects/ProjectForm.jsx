@@ -12,15 +12,16 @@ export default function ProjectForm({
   submitLabel = "Save",
   onCancel,
 }) {
+  const isNew = !initialData.id;
   const [formData, setFormData] = useState({
     name: initialData.name || "",
+    slug: initialData.slug || initialData.id || "", // Use id as fallback for existing projects
     description: initialData.description || "",
     theme: initialData.theme || "",
-    siteUrl: initialData.siteUrl || "",
+    siteUrl: initialData.siteUrl || (isNew ? "https://" : ""),
   });
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const isNew = !initialData.id;
   const showToast = useToastStore((state) => state.showToast);
 
   // Use a ref to track if this is the first render
@@ -46,9 +47,10 @@ export default function ProjectForm({
     if (prevInitialDataRef.current !== currentInitialDataStr) {
       setFormData({
         name: initialData.name || "",
+        slug: initialData.slug || initialData.id || "", // Use id as fallback for existing projects
         description: initialData.description || "",
         theme: initialData.theme || "",
-        siteUrl: initialData.siteUrl || "",
+        siteUrl: initialData.siteUrl || (isNew ? "https://" : ""),
       });
       prevInitialDataRef.current = currentInitialDataStr;
     }
@@ -62,6 +64,14 @@ export default function ProjectForm({
       }
       const data = await response.json();
       setThemes(data);
+
+      // Auto-select Default theme for new projects
+      if (isNew && !initialData.theme) {
+        const defaultTheme = data.find((theme) => theme.id === "default" || theme.name.toLowerCase() === "default");
+        if (defaultTheme) {
+          setFormData((prev) => ({ ...prev, theme: defaultTheme.id }));
+        }
+      }
     } catch {
       showToast("Failed to load themes", "error");
     } finally {
@@ -85,6 +95,18 @@ export default function ProjectForm({
       return;
     }
 
+    if (!formData.slug.trim()) {
+      showToast("Project slug is required", "error");
+      return;
+    }
+
+    // Validate slug format
+    const slugPattern = /^[a-z0-9-]+$/;
+    if (!slugPattern.test(formData.slug)) {
+      showToast("Slug can only contain lowercase letters, numbers, and hyphens", "error");
+      return;
+    }
+
     if (isNew && !formData.theme) {
       showToast("Theme is required", "error");
       return;
@@ -93,12 +115,13 @@ export default function ProjectForm({
     try {
       const result = await onSubmit({
         ...formData,
-        slug: formatSlug(formData.name),
+        // For new projects, the backend will generate the slug from the name
+        // For existing projects, the slug doesn't change
       });
 
       // If the parent component signals to reset the form
       if (result === true) {
-        setFormData({ name: "", description: "", theme: "", siteUrl: "" });
+        setFormData({ name: "", slug: "", description: "", theme: "", siteUrl: "https://" });
       }
       return result;
     } catch (err) {
@@ -109,10 +132,19 @@ export default function ProjectForm({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: value,
+      };
+
+      // For new projects, auto-generate slug from name
+      if (isNew && name === "name" && value) {
+        updated.slug = formatSlug(value);
+      }
+
+      return updated;
+    });
   };
 
   if (loading) return <LoadingSpinner message="Un momento por favor..." />;
@@ -133,12 +165,30 @@ export default function ProjectForm({
             className="form-input"
             required
           />
-          {!isNew && formData.name && (
-            <p className="form-description">
-              Project folder: <code>{formatSlug(formData.name)}</code>. The folder name updates when you save changes to
-              the title.
-            </p>
-          )}
+          <p className="form-description">
+            The display name for your project. Can be changed anytime without affecting the folder structure.
+          </p>
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="slug" className="form-label">
+            Slug
+          </label>
+          <input
+            type="text"
+            id="slug"
+            name="slug"
+            value={formData.slug}
+            onChange={handleChange}
+            className="form-input"
+            required
+            pattern="[a-z0-9-]+"
+            title="Only lowercase letters, numbers, and hyphens are allowed"
+          />
+          <p className="form-description">
+            The folder name for your project. Only lowercase letters, numbers, and hyphens.{" "}
+            {isNew ? "Auto-fills from title but you can edit it." : "Changing this will rename the project folder."}
+          </p>
         </div>
 
         <div className="form-field">
