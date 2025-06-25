@@ -72,7 +72,7 @@ export default function Sidebar({ guardedNavigate }) {
           </li>
         </ul>
         <div className="border-b border-slate-800 pb-4 mb-4">
-          <h3 className="text-slate-500 mb-2 ml-2 hidden md:block">Site</h3>
+          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">Site</h3>
           <ul className="space-y-2 md:space-y-1">
             <li>
               <NavLink to="/pages" className={linkClass("/pages")}>
@@ -110,7 +110,7 @@ export default function Sidebar({ guardedNavigate }) {
         </div>
 
         <div className="border-b border-slate-800 pb-4 mb-4">
-          <h3 className="text-slate-500 mb-2 ml-2 hidden md:block">Appearance</h3>
+          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">Appearance</h3>
           <ul className="space-y-2 md:space-y-1">
             <li>
               <NavLink to="/themes" className={linkClass("/themes")}>
@@ -124,7 +124,7 @@ export default function Sidebar({ guardedNavigate }) {
         </div>
 
         <div className="border-b border-slate-800 pb-4 mb-4">
-          <h3 className="text-slate-500 mb-2 ml-2 hidden md:block">Extend</h3>
+          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">Extend</h3>
           <ul className="space-y-2 md:space-y-1">
             <li>
               <NavLink to="/plugins" className={linkClass("/plugins")}>
@@ -136,7 +136,7 @@ export default function Sidebar({ guardedNavigate }) {
             </li>
           </ul>
         </div>
-        <h3 className="text-slate-500 mb-2 ml-2 hidden md:block">Tools</h3>
+        <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">Tools</h3>
         <ul className="space-y-2 md:space-y-1">
           <li>
             <NavLink to="/export-site" className={linkClass("/export-site")}>
@@ -149,7 +149,9 @@ export default function Sidebar({ guardedNavigate }) {
         </ul>
       </div>
       <div className="pb-2 px-2 md:pl-4">
-        <h3 className="text-slate-500 mb-2 ml-2 hidden md:block md:border-t md:border-slate-800 pt-4">General</h3>
+        <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block md:border-t md:border-slate-800 pt-4">
+          General
+        </h3>
         <ul className="border-t border-slate-800 pt-4 md:pt-0 md:border-0">
           <li>
             <NavLink to="/app-settings" className={linkClass("/app-settings")}>

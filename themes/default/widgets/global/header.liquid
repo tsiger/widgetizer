@@ -7,13 +7,23 @@
         #{{ widget.id }}.site-header__container {
             padding: {{ widget.settings.headerPadding }}px;
             background-color: {{ widget.settings.headerBackgroundColor }};
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
+            gap: 2rem;
+        }
+
+        #{{ widget.id }} .site-header__menu-left {
+            justify-self: start;
         }
 
         #{{ widget.id }} .site-header__branding {
-            flex: 0 0 auto;
+            justify-self: center;
+            text-align: center;
+        }
+
+        #{{ widget.id }} .site-header__menu-right {
+            justify-self: end;
         }
 
         #{{ widget.id }} .site-header__title {
@@ -25,13 +35,10 @@
         #{{ widget.id }} .site-header__tagline {
             color: {{ widget.settings.headerTaglineColor }};
             margin-top: 0.5rem;
+            font-size: 0.9em;
         }
 
-        /* Menu styles */
-        #{{ widget.id }} .site-header__menu {
-            flex: 0 0 auto;
-        }
-
+        /* Desktop Menu styles */
         #{{ widget.id }} .site-header__nav-list {
             display: flex;
             list-style: none;
@@ -39,9 +46,16 @@
             padding: 0;
         }
 
+        #{{ widget.id }} .site-header__menu-left .site-header__nav-item {
+            margin-right: 1.5rem;
+        }
+
+        #{{ widget.id }} .site-header__menu-right .site-header__nav-item {
+            margin-left: 1.5rem;
+        }
+
         #{{ widget.id }} .site-header__nav-item {
             position: relative;
-            margin-left: 1.5rem;
         }
 
         #{{ widget.id }} .site-header__nav-item::after {
@@ -122,21 +136,96 @@
         #{{ widget.id }} .site-header__nav-submenu .site-header__nav-link:hover {
             background: #f7f9fc;
         }
+
+        /* Mobile menu toggle */
+        #{{ widget.id }} .site-header__mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: {{ widget.settings.headerTitleColor }};
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        #{{ widget.id }} .site-header__mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: {{ widget.settings.headerBackgroundColor }};
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        #{{ widget.id }} .site-header__mobile-menu.active {
+            display: block;
+        }
+
+        #{{ widget.id }} .site-header__mobile-nav {
+            list-style: none;
+            margin: 0;
+            padding: 1rem 0;
+        }
+
+        #{{ widget.id }} .site-header__mobile-nav .site-header__nav-link,
+        #{{ widget.id }} .site-header__mobile-nav .site-header__mobile-nav-link {
+            padding: 0.75rem {{ widget.settings.headerPadding }}px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        #{{ widget.id }} .site-header__mobile-nav-item {
+            display: block;
+        }
+
+        #{{ widget.id }} .site-header__mobile-nav-item .site-header__nav-submenu {
+            display: none;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            #{{ widget.id }}.site-header__container {
+                grid-template-columns: auto 1fr auto;
+                gap: 1rem;
+                position: relative;
+            }
+
+            #{{ widget.id }} .site-header__menu-left,
+            #{{ widget.id }} .site-header__menu-right {
+                display: none;
+            }
+
+            #{{ widget.id }} .site-header__mobile-toggle {
+                display: block;
+                grid-column: 1;
+            }
+
+            #{{ widget.id }} .site-header__branding {
+                grid-column: 2;
+            }
+
+            #{{ widget.id }} .site-header__title {
+                font-size: {{ widget.settings.headerTitleSize | times: 0.8 }}px;
+            }
+
+            #{{ widget.id }} .site-header__tagline {
+                font-size: 0.8em;
+            }
+        }
     </style>
 
     <div id="{{ widget.id }}" class="site-header__container">
-        <div class="site-header__branding">
-            <h1 class="site-header__title">
-                {{ widget.settings.headerTitle }}
-            </h1>
-            <div class="site-header__tagline">
-                {{ widget.settings.headerTagline }}
-            </div>
-        </div>
-        {% if widget.settings.headerNavigation %}
-            <div class="site-header__menu">
+        <!-- Mobile menu toggle -->
+        <button class="site-header__mobile-toggle" onclick="toggleMobileMenu('{{ widget.id }}')">
+            <span id="menu-icon-{{ widget.id }}">☰</span>
+        </button>
+
+        <!-- Left Menu -->
+        {% if widget.settings.headerNavigationLeft %}
+            <div class="site-header__menu-left">
                 {% render 'menu',
-                    menu: widget.settings.headerNavigation,
+                    menu: widget.settings.headerNavigationLeft,
                     class_menu: 'site-header__nav',
                     class_list: 'site-header__nav-list',
                     class_item: 'site-header__nav-item',
@@ -146,7 +235,134 @@
                 %}
             </div>
         {% endif %}
+
+        <!-- Branding (Center) -->
+        <div class="site-header__branding">
+            <h1 class="site-header__title">
+                {{ widget.settings.headerTitle }}
+            </h1>
+            {% if widget.settings.headerTagline and widget.settings.headerTagline != '' %}
+                <div class="site-header__tagline">
+                    {{ widget.settings.headerTagline }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Menu -->
+        {% if widget.settings.headerNavigationRight %}
+            <div class="site-header__menu-right">
+                {% render 'menu',
+                    menu: widget.settings.headerNavigationRight,
+                    class_menu: 'site-header__nav',
+                    class_list: 'site-header__nav-list',
+                    class_item: 'site-header__nav-item',
+                    class_link: 'site-header__nav-link',
+                    class_submenu: 'site-header__nav-submenu',
+                    class_has_submenu: 'site-header__nav-item--has-submenu'
+                %}
+            </div>
+        {% endif %}
+
+        <!-- Mobile menu (populated by JavaScript) -->
+        <div class="site-header__mobile-menu" id="mobile-menu-{{ widget.id }}">
+            <ul class="site-header__mobile-nav" id="mobile-nav-{{ widget.id }}">
+                <!-- Menu items will be dynamically inserted here by JavaScript -->
+            </ul>
+        </div>
     </div>
+
+        <script>
+        function initializeHeader(widgetId) {
+            populateMobileMenu(widgetId);
+        }
+
+        function populateMobileMenu(widgetId) {
+            const mobileNav = document.getElementById('mobile-nav-' + widgetId);
+            const leftMenu = document.querySelector(`[data-widget-id="${widgetId}"] .site-header__menu-left .site-header__nav-list`);
+            const rightMenu = document.querySelector(`[data-widget-id="${widgetId}"] .site-header__menu-right .site-header__nav-list`);
+
+            if (!mobileNav) return;
+
+            // Clear existing mobile menu items
+            mobileNav.innerHTML = '';
+
+            // Add left menu items first
+            if (leftMenu) {
+                const leftItems = leftMenu.querySelectorAll('.site-header__nav-item');
+                leftItems.forEach(function(item) {
+                    const clonedItem = item.cloneNode(true);
+                    // Remove desktop-specific classes and add mobile classes
+                    clonedItem.classList.remove('site-header__nav-item');
+                    clonedItem.classList.add('site-header__mobile-nav-item');
+
+                    // Update link classes for mobile
+                    const link = clonedItem.querySelector('.site-header__nav-link');
+                    if (link) {
+                        link.classList.add('site-header__mobile-nav-link');
+                    }
+
+                    mobileNav.appendChild(clonedItem);
+                });
+            }
+
+            // Add right menu items after left items
+            if (rightMenu) {
+                const rightItems = rightMenu.querySelectorAll('.site-header__nav-item');
+                rightItems.forEach(function(item) {
+                    const clonedItem = item.cloneNode(true);
+                    // Remove desktop-specific classes and add mobile classes
+                    clonedItem.classList.remove('site-header__nav-item');
+                    clonedItem.classList.add('site-header__mobile-nav-item');
+
+                    // Update link classes for mobile
+                    const link = clonedItem.querySelector('.site-header__nav-link');
+                    if (link) {
+                        link.classList.add('site-header__mobile-nav-link');
+                    }
+
+                    mobileNav.appendChild(clonedItem);
+                });
+            }
+        }
+
+        function toggleMobileMenu(widgetId) {
+            const mobileMenu = document.getElementById('mobile-menu-' + widgetId);
+            const menuIcon = document.getElementById('menu-icon-' + widgetId);
+
+            if (mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+                menuIcon.textContent = '☰';
+            } else {
+                mobileMenu.classList.add('active');
+                menuIcon.textContent = '✕';
+            }
+        }
+
+        // Initialize header when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const headers = document.querySelectorAll('.site-header');
+            headers.forEach(function(header) {
+                const widgetId = header.getAttribute('data-widget-id');
+                initializeHeader(widgetId);
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const headers = document.querySelectorAll('.site-header');
+            headers.forEach(function(header) {
+                const widgetId = header.getAttribute('data-widget-id');
+                const mobileMenu = document.getElementById('mobile-menu-' + widgetId);
+
+                if (mobileMenu && mobileMenu.classList.contains('active') &&
+                    !header.contains(event.target)) {
+                    mobileMenu.classList.remove('active');
+                    const menuIcon = document.getElementById('menu-icon-' + widgetId);
+                    if (menuIcon) menuIcon.textContent = '☰';
+                }
+            });
+        });
+    </script>
 
     <script type="application/json" data-widget-schema>
         {
@@ -158,20 +374,27 @@
                     "id": "headerTitle",
                     "label": "Site Title",
                     "description": "Main site title",
-                    "default": "LiquidJS Riders"
+                    "default": "Aegean"
                 },
                 {
                     "type": "text",
                     "id": "headerTagline",
                     "label": "Tagline",
                     "description": "Site tagline or description",
-                    "default": "Liquid tagline"
+                    "default": "Boutique Villas in Santorini"
                 },
                 {
                     "type": "menu",
-                    "id": "headerNavigation",
-                    "label": "Navigation Menu",
-                    "description": "Select the menu to display in this location",
+                    "id": "headerNavigationLeft",
+                    "label": "Left Navigation Menu",
+                    "description": "Select the menu to display on the left side",
+                    "default": ""
+                },
+                {
+                    "type": "menu",
+                    "id": "headerNavigationRight",
+                    "label": "Right Navigation Menu",
+                    "description": "Select the menu to display on the right side",
                     "default": ""
                 },
                 {

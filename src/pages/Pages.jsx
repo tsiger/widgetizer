@@ -135,7 +135,7 @@ export default function Pages() {
       {pages.length > 0 && (
         <>
           {/* Toolbar */}
-          <div className="mt-4 flex flex-wrap justify-between mb-4 items-center">
+          <div className="flex flex-wrap justify-between mb-4 items-center">
             <div className="flex items-center mb-2 sm:mb-0">
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-slate-600">
