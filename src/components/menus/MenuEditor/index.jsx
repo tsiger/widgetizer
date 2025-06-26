@@ -352,6 +352,36 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
     setOpenDropdownId(isOpen ? dropdownId : null);
   }, []);
 
+  // Function to collect all expandable item IDs (items that have children)
+  const getAllExpandableIds = useCallback((menuItems) => {
+    const expandableIds = [];
+
+    const traverse = (items) => {
+      if (!items || !Array.isArray(items)) return;
+
+      items.forEach((item) => {
+        if (item.items && Array.isArray(item.items) && item.items.length > 0) {
+          expandableIds.push(item.id);
+          traverse(item.items); // Recursively check nested items
+        }
+      });
+    };
+
+    traverse(menuItems);
+    return expandableIds;
+  }, []);
+
+  // Expand all items
+  const handleExpandAll = useCallback(() => {
+    const allExpandableIds = getAllExpandableIds(items);
+    setExpandedItems(allExpandableIds);
+  }, [items, getAllExpandableIds]);
+
+  // Collapse all items
+  const handleCollapseAll = useCallback(() => {
+    setExpandedItems([]);
+  }, []);
+
   return (
     <DndContext
       sensors={sensors}
@@ -362,7 +392,27 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
     >
       <div className="menu-editor">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Menu Structure</h3>
+          <div className="flex items-center gap-4">
+            <h3 className="text-lg font-medium">Menu Structure</h3>
+            {/* Show expand/collapse controls when there are 3+ expandable items total */}
+            {(() => {
+              const totalExpandableItems = getAllExpandableIds(items);
+
+              if (totalExpandableItems.length >= 3) {
+                return (
+                  <div className="flex gap-3 text-sm">
+                    <button onClick={handleExpandAll} className="text-blue-600 hover:text-blue-800 underline">
+                      Expand all
+                    </button>
+                    <button onClick={handleCollapseAll} className="text-blue-600 hover:text-blue-800 underline">
+                      Collapse all
+                    </button>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+          </div>
           <Button onClick={handleAddItem} variant="primary" size="sm" icon={<Plus size={16} />}>
             Add Item
           </Button>
