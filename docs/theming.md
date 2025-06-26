@@ -328,7 +328,33 @@ The `image` filter is the recommended way to render images in your theme. It aut
 {{ widget.settings.myImage | image: 'large', 'hero-image', false, 'Custom alt text' }}
 ```
 
+#### Path-Only Mode (New)
+
+For cases where you need just the image URL (e.g., CSS background images), use `'path'` or `'url'` as the first parameter:
+
+```liquid
+<!-- Get image path for CSS backgrounds -->
+{{ widget.settings.backgroundImage | image: 'path' }}
+{{ widget.settings.heroImage | image: 'path', 'large' }}
+
+<!-- Use in inline CSS -->
+<div style="background-image: url('{{ widget.settings.bgImage | image: 'path', 'large' }}');">
+  Content here
+</div>
+
+<!-- Use in CSS blocks -->
+<style>
+  #{{ widget.id }} {
+    background-image: url('{{ widget.settings.backgroundImage | image: 'path' }}');
+    background-size: cover;
+    background-position: center;
+  }
+</style>
+```
+
 #### Parameter Order
+
+**For HTML `<img>` tag output:**
 
 | Position | Parameter | Type    | Default      | Description                                             |
 | :------- | :-------- | :------ | :----------- | :------------------------------------------------------ |
@@ -337,6 +363,13 @@ The `image` filter is the recommended way to render images in your theme. It aut
 | 3        | `lazy`    | Boolean | `true`       | Whether to add `loading="lazy"` attribute               |
 | 4        | `alt`     | String  | (from media) | Override alt text from media library                    |
 | 5        | `title`   | String  | (from media) | Override title text from media library                  |
+
+**For path-only output:**
+
+| Position | Parameter | Type   | Default    | Description                                             |
+| :------- | :-------- | :----- | :--------- | :------------------------------------------------------ |
+| 1        | `mode`    | String | (required) | Must be `'path'` or `'url'` to enable path-only mode    |
+| 2        | `size`    | String | `'medium'` | Image size: `'thumb'`, `'small'`, `'medium'`, `'large'` |
 
 #### Usage Examples
 
@@ -353,6 +386,11 @@ The `image` filter is the recommended way to render images in your theme. It aut
 
 <!-- Custom alt text -->
 {{ widget.settings.photo | image: 'medium', '', true, 'Custom description' }}
+
+<!-- Path-only for CSS backgrounds -->
+{{ widget.settings.backgroundImage | image: 'path' }}
+{{ widget.settings.backgroundImage | image: 'path', 'large' }}
+{{ widget.settings.backgroundImage | image: 'url', 'medium' }}
 ```
 
 ### Video Filter

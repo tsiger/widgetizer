@@ -18,7 +18,35 @@ function registerImageFilter(engine) {
 
     // Parse arguments - LiquidJS passes them as individual parameters
     // Usage: {{ image | image: 'small' }} or {{ image | image: 'large', 'hero-class', false }}
-    const size = args[0] || "medium";
+    // For path only: {{ image | image: 'path' }} or {{ image | image: 'url' }}
+    // For path with specific size: {{ image | image: 'path', 'large' }}
+    const firstArg = args[0] || "medium";
+
+    // Check if user wants just the path/url
+    const returnPathOnly = firstArg === "path" || firstArg === "url";
+
+    if (returnPathOnly) {
+      // For path-only mode, second argument can specify size
+      const size = args[1] || "medium";
+
+      // Find the requested size, or fallback gracefully
+      const imageSize = mediaFile.sizes?.[size] || {
+        path: mediaFile.path,
+        width: mediaFile.width,
+        height: mediaFile.height,
+      };
+
+      if (!imageSize || !imageSize.path) {
+        return `<!-- Image filter error: size "${size}" not found for "${filename}" -->`;
+      }
+
+      // Get the base path from the context and return just the URL
+      const imageBasePath = this.context.get(["imagePath"]);
+      return `${imageBasePath}/${path.basename(imageSize.path)}`;
+    }
+
+    // Original behavior for full img tag
+    const size = firstArg;
     const cssClass = args[1] || "";
     const lazy = args[2] !== false; // Default to true unless explicitly false
     const altOverride = args[3] || "";
