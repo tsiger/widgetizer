@@ -199,63 +199,62 @@ export async function uploadProjectMedia(req, res) {
     // Get the dynamic file size limits
     const maxImageSizeMB = await getSetting("media.maxFileSizeMB");
     const maxVideoSizeMB = await getSetting("media.maxVideoSizeMB");
+    const imageSizes = await getImageProcessingSettings();
 
     const mediaData = await readMediaFile(projectId);
-    const processedFiles = [];
-    const rejectedFiles = [];
 
-    // Process each uploaded file
-    for (const file of files) {
-      // Check file size against the appropriate limit
-      const isVideo = file.mimetype.startsWith("video/");
-      const maxSizeMB = isVideo ? maxVideoSizeMB || 50 : maxImageSizeMB || 5;
-      const maxSizeBytes = maxSizeMB * 1024 * 1024;
+    // Process files in parallel instead of sequentially
+    const filePromises = files.map(async (file) => {
+      try {
+        // Check file size against the appropriate limit
+        const isVideo = file.mimetype.startsWith("video/");
+        const maxSizeMB = isVideo ? maxVideoSizeMB || 50 : maxImageSizeMB || 5;
+        const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
-      if (file.size > maxSizeBytes) {
-        // File exceeds limit, reject it and delete temp file
-        const fileType = isVideo ? "video" : "image";
-        rejectedFiles.push({
-          originalName: file.originalname,
-          reason: `${fileType} size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds limit of ${maxSizeMB}MB.`,
-          sizeBytes: file.size,
-        });
-        // Attempt to delete the oversized file multer saved
-        try {
-          await fs.unlink(file.path);
-        } catch (unlinkError) {
-          console.warn(`Could not delete oversized temp file ${file.path}: ${unlinkError.message}`);
+        if (file.size > maxSizeBytes) {
+          // File exceeds limit, reject it and delete temp file
+          const fileType = isVideo ? "video" : "image";
+          try {
+            await fs.unlink(file.path);
+          } catch (unlinkError) {
+            console.warn(`Could not delete oversized temp file ${file.path}: ${unlinkError.message}`);
+          }
+          return {
+            success: false,
+            file: {
+              originalName: file.originalname,
+              reason: `${fileType} size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds limit of ${maxSizeMB}MB.`,
+              sizeBytes: file.size,
+            },
+          };
         }
-        continue; // Skip processing this file further
-      }
 
-      // --- File is within size limit, proceed with processing ---
-      const fileId = uuidv4();
-      const uploadPath = isVideo ? `/uploads/videos/${file.filename}` : `/uploads/images/${file.filename}`;
+        // --- File is within size limit, proceed with processing ---
+        const fileId = uuidv4();
+        const uploadPath = isVideo ? `/uploads/videos/${file.filename}` : `/uploads/images/${file.filename}`;
 
-      const fileInfo = {
-        id: fileId,
-        filename: file.filename,
-        originalName: file.originalname,
-        type: file.mimetype,
-        size: file.size,
-        uploaded: new Date().toISOString(),
-        path: uploadPath,
-        metadata: { alt: "", title: "" },
-        sizes: {}, // Initialize sizes object
-        // usedIn: [] // If using the previous usedIn tracking
-      };
+        const fileInfo = {
+          id: fileId,
+          filename: file.filename,
+          originalName: file.originalname,
+          type: file.mimetype,
+          size: file.size,
+          uploaded: new Date().toISOString(),
+          path: uploadPath,
+          metadata: { alt: "", title: "" },
+          sizes: {}, // Initialize sizes object
+        };
 
-      // Process image files (thumbnails, dimensions etc.)
-      if (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") {
-        try {
+        // Process image files (thumbnails, dimensions etc.)
+        if (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") {
           const image = sharp(file.path);
           const metadata = await image.metadata();
           fileInfo.width = metadata.width;
           fileInfo.height = metadata.height;
 
-          const imageSizes = await getImageProcessingSettings();
-          for (const [sizeName, sizeConfig] of Object.entries(imageSizes)) {
-            if (sizeConfig.width >= metadata.width) continue;
+          // Generate image sizes in parallel
+          const sizePromises = Object.entries(imageSizes).map(async ([sizeName, sizeConfig]) => {
+            if (sizeConfig.width >= metadata.width) return null;
 
             const resizedFilename = `${path.basename(
               file.filename,
@@ -263,41 +262,92 @@ export async function uploadProjectMedia(req, res) {
             )}-${sizeName}${path.extname(file.filename)}`;
             const resizedPath = path.join(path.dirname(file.path), resizedFilename);
 
-            await image.clone().resize({ width: sizeConfig.width }).toFile(resizedPath);
+            // Preserve original format while applying quality settings
+            const resizeOp = image.clone().resize({ width: sizeConfig.width });
+
+            // Apply quality based on original format
+            if (file.mimetype === "image/jpeg") {
+              resizeOp.jpeg({ quality: sizeConfig.quality });
+            } else if (file.mimetype === "image/png") {
+              resizeOp.png({ quality: sizeConfig.quality });
+            } else if (file.mimetype === "image/webp") {
+              resizeOp.webp({ quality: sizeConfig.quality });
+            }
+
+            await resizeOp.toFile(resizedPath);
 
             const resizedImageMetadata = await sharp(resizedPath).metadata();
 
-            fileInfo.sizes[sizeName] = {
-              path: `/uploads/images/${resizedFilename}`,
-              width: resizedImageMetadata.width,
-              height: resizedImageMetadata.height,
+            return {
+              sizeName,
+              data: {
+                path: `/uploads/images/${resizedFilename}`,
+                width: resizedImageMetadata.width,
+                height: resizedImageMetadata.height,
+              },
             };
-          }
-        } catch (error) {
-          console.error(`Failed to process image ${file.originalname}:`, error);
-          // Decide if you should reject the file or just log the error
-        }
-      } else if (file.mimetype === "image/svg+xml") {
-        try {
+          });
+
+          const sizeResults = await Promise.allSettled(sizePromises);
+          sizeResults.forEach((result) => {
+            if (result.status === "fulfilled" && result.value) {
+              fileInfo.sizes[result.value.sizeName] = result.value.data;
+            }
+          });
+        } else if (file.mimetype === "image/svg+xml") {
           const svgContent = await fs.readFile(file.path, "utf-8");
           const sanitizedSvg = DOMPurify.sanitize(svgContent, { USE_PROFILES: { svg: true } });
           await fs.writeFile(file.path, sanitizedSvg);
-          // You might want to get width/height for SVGs too, but it's more complex
-        } catch (error) {
-          console.error(`Could not sanitize SVG ${file.originalname}:`, error);
         }
-      }
 
-      // Process video files (basic metadata only)
-      if (file.mimetype.startsWith("video/")) {
-        // For videos, we don't generate thumbnails or extract metadata
-        // Just set some basic properties
-        fileInfo.thumbnail = null; // No thumbnail for videos
-      }
+        // Process video files (basic metadata only)
+        if (file.mimetype.startsWith("video/")) {
+          fileInfo.thumbnail = null; // No thumbnail for videos
+        }
 
-      mediaData.files.push(fileInfo);
-      processedFiles.push(fileInfo);
-    } // End loop through files
+        return {
+          success: true,
+          file: fileInfo,
+        };
+      } catch (error) {
+        console.error(`Failed to process file ${file.originalname}:`, error);
+        // Clean up the file on error
+        try {
+          await fs.unlink(file.path);
+        } catch (unlinkError) {
+          console.warn(`Could not delete failed temp file ${file.path}: ${unlinkError.message}`);
+        }
+        return {
+          success: false,
+          file: {
+            originalName: file.originalname,
+            reason: `Processing failed: ${error.message}`,
+          },
+        };
+      }
+    });
+
+    // Wait for all files to be processed
+    const results = await Promise.allSettled(filePromises);
+
+    const processedFiles = [];
+    const rejectedFiles = [];
+
+    results.forEach((result) => {
+      if (result.status === "fulfilled") {
+        if (result.value.success) {
+          processedFiles.push(result.value.file);
+          mediaData.files.push(result.value.file);
+        } else {
+          rejectedFiles.push(result.value.file);
+        }
+      } else {
+        rejectedFiles.push({
+          originalName: "Unknown file",
+          reason: `Unexpected error: ${result.reason}`,
+        });
+      }
+    });
 
     // Save updated metadata if any files were successfully processed
     if (processedFiles.length > 0) {

@@ -1,17 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import {
-  Home,
-  Folder,
-  File,
-  Menu,
-  Image,
-  Settings,
-  Palette,
-  Rocket,
-  SlidersHorizontal,
-  Layers,
-  Puzzle,
-} from "lucide-react";
+import { Home, Folder, File, Menu, Image, Settings, Rocket, SlidersHorizontal, Layers, Puzzle } from "lucide-react";
 import useProjectStore from "../../stores/projectStore";
 
 export default function Sidebar({ guardedNavigate }) {
