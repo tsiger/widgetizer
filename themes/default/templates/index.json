@@ -1,6 +1,6 @@
 {
   "name": "Home",
   "widgets": {},
-  "id": "home",
-  "slug": "home"
+  "id": "index",
+  "slug": "index"
 }

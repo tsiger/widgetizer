@@ -11,6 +11,7 @@ import {
   ImageInput,
   VideoInput,
   LinkInput,
+  YouTubeInput,
 } from "./inputs";
 import SettingsField from "./SettingsField";
 
@@ -81,6 +82,8 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
         return <VideoInput {...inputProps} />;
       case "link":
         return <LinkInput {...inputProps} />;
+      case "youtube":
+        return <YouTubeInput {...inputProps} setting={setting} />;
       default:
         return <div>Unsupported setting type: {type}</div>;
     }
