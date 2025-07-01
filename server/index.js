@@ -65,6 +65,11 @@ app.use("/themes", express.static(path.join(__dirname, "../themes")));
 // iFrame runtime script
 app.use("/runtime", express.static(path.join(__dirname, "../src/utils")));
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
