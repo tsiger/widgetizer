@@ -24,6 +24,20 @@
   ],
   "google": [
     {
+      "name": "Fraunces",
+      "stack": "\"Fraunces\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
+      "defaultWeight": 400
+    },
+    {
+      "name": "Jost",
+      "stack": "\"Jost\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
+      "defaultWeight": 400
+    },
+    {
       "name": "Roboto",
       "stack": "\"Roboto\", sans-serif",
       "isGoogleFont": true,

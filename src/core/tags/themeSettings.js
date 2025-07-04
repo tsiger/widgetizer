@@ -33,8 +33,12 @@ export const ThemeSettingsTag = {
           // Handle other types marked for CSS variable output
           else if (item.id && item.outputAsCssVar === true) {
             // Use value if present, otherwise use default
-            const value = item.value !== undefined ? item.value : item.default;
+            let value = item.value !== undefined ? item.value : item.default;
             if (value !== undefined) {
+              // For range inputs with units, append the unit to the value
+              if (item.type === "range" && item.unit && typeof value === "number") {
+                value = `${value}${item.unit}`;
+              }
               // Construct the CSS variable name
               cssVariables[`--${category}-${item.id}`] = value;
             }

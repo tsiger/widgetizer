@@ -126,7 +126,11 @@ export function settingsToCssVariables(settings) {
     if (Array.isArray(items)) {
       items.forEach((item) => {
         if (item.id) {
-          const value = item.value !== undefined ? item.value : item.default;
+          let value = item.value !== undefined ? item.value : item.default;
+          // For range inputs with units, append the unit to the value
+          if (item.type === "range" && item.unit && typeof value === "number") {
+            value = `${value}${item.unit}`;
+          }
           variables[`--${category}-${item.id}`] = value;
         }
       });
