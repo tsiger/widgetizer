@@ -1,0 +1,30 @@
+name: Deploy to widgetizer.dev
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Πήγαινε στον φάκελο του project
+            cd ~/widgetizer
+
+            # Κατέβασε τον τελευταίο κώδικα από το main branch
+            git pull origin main
+
+            # Εγκατέστησε τυχόν νέες εξαρτήσεις
+            npm install
+
+            # Δημιούργησε το production build του frontend
+            npm run build
+
+            # Κάνε επανεκκίνηση την εφαρμογή με το PM2
+            pm2 restart widgetizer
