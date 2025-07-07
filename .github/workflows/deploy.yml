@@ -15,7 +15,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           debug: true
           script: |
-          set -e
+            set -e
             cd ~/widgetizer
             git pull origin master
             npm install
