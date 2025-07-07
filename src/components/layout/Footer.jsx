@@ -22,7 +22,7 @@ export default function Footer() {
         )}
       </p>
       <p>
-        Thank you for creating with <strong>Widgetizer 0.1</strong>
+        Thank you for creating with <strong>Widgetizer 0.1b</strong>
       </p>
     </footer>
   );
