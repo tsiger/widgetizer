@@ -13,18 +13,11 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          debug: true
           script: |
-            # Πήγαινε στον φάκελο του project
+          set -e
             cd ~/widgetizer
-
-            # Κατέβασε τον τελευταίο κώδικα από το main branch
-            git pull origin main
-
-            # Εγκατέστησε τυχόν νέες εξαρτήσεις
+            git pull origin master
             npm install
-
-            # Δημιούργησε το production build του frontend
             npm run build
-
-            # Κάνε επανεκκίνηση την εφαρμογή με το PM2
             pm2 restart widgetizer
