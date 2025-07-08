@@ -6,7 +6,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 import { apiLimiter, editorApiLimiter } from "./middleware/rateLimiters.js";
-import requestLogger from "./middleware/requestLogger.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 // Load environment variables
@@ -33,8 +32,7 @@ if (process.env.NODE_ENV === "production") {
 app.use(cors());
 app.use(express.json());
 
-// Log all api requests
-app.use("/api", requestLogger);
+// Request logging removed
 
 // Apply lenient rate limiting for editor-heavy routes
 app.use("/api/projects", editorApiLimiter, projectRoutes);
