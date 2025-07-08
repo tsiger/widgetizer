@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { fetchPreview, updateThemeSettings, highlightWidget, updateWidget } from "../../utils/previewManager";
+import {
+  fetchPreview,
+  updateThemeSettings,
+  highlightWidget,
+  updateWidget,
+  addWidgetToPreview,
+  removeWidgetFromPreview,
+  reorderWidgetsInPreview,
+  detectWidgetChanges,
+} from "../../utils/previewManager";
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
 import { API_URL } from "../../config";
@@ -21,37 +30,30 @@ export default function PreviewPanel({
   const iframeRef = useRef(null);
   const prevThemeSettingsRef = useRef(null);
   const prevWidgetsRef = useRef(null);
+  const prevWidgetsOrderRef = useRef(null);
   const prevGlobalWidgetsRef = useRef(null);
   const widgetSettingsRef = useRef(new Map());
   const activeProject = useProjectStore((state) => state.activeProject);
 
   const { globalWidgets } = usePageStore();
 
-  // Load the initial preview or refresh when widgets structure changes
+  // Load the initial preview only on first load
   useEffect(() => {
     if (!page) {
       setLoading(false);
       return;
     }
 
-    // Check if widgets order has changed by comparing stringified widgets
-    const currentWidgetsString = JSON.stringify(Object.keys(widgets || {}));
-    const prevWidgetsString = prevWidgetsRef.current ? JSON.stringify(Object.keys(prevWidgetsRef.current || {})) : null;
-
-    const widgetsOrderChanged = currentWidgetsString !== prevWidgetsString;
-
-    // FIXED: Only reload on structural changes, not settings changes
-    // Do a full reload if we haven't loaded yet or if the widgets order changed
-    if (!initialLoadComplete || widgetsOrderChanged) {
+    // Only do full reload on initial load
+    if (!initialLoadComplete) {
       async function loadPreview() {
         try {
           setLoading(true);
           setError(null);
 
-          // NEW: Create enhanced page data with global widgets for preview
+          // Create enhanced page data with global widgets for preview
           const enhancedPageData = {
             ...page,
-            // Add global widgets back for server rendering (temporary for preview)
             globalWidgets: globalWidgets,
           };
 
@@ -59,9 +61,12 @@ export default function PreviewPanel({
           const html = await fetchPreview(enhancedPageData, themeSettings);
           setPreviewHtml(html);
           setInitialLoadComplete(true);
+
+          // Initialize refs with current state
           prevThemeSettingsRef.current = JSON.parse(JSON.stringify(themeSettings));
           prevWidgetsRef.current = JSON.parse(JSON.stringify(widgets));
-          prevGlobalWidgetsRef.current = JSON.parse(JSON.stringify(globalWidgets)); // NEW: Track global widgets
+          prevWidgetsOrderRef.current = [...(page.widgetsOrder || Object.keys(widgets || {}))];
+          prevGlobalWidgetsRef.current = JSON.parse(JSON.stringify(globalWidgets));
 
           // Reset widget settings cache
           widgetSettingsRef.current = new Map();
@@ -78,7 +83,71 @@ export default function PreviewPanel({
 
       loadPreview();
     }
-  }, [page, widgets, initialLoadComplete]); // FIXED: Removed globalWidgets from dependencies to prevent full reloads
+  }, [page, initialLoadComplete, globalWidgets, themeSettings, widgets]);
+
+  // Handle incremental widget changes after initial load
+  useEffect(() => {
+    if (!initialLoadComplete || !iframeRef.current || !widgets) return;
+
+    const currentOrder = page?.widgetsOrder || Object.keys(widgets || {});
+    const previousOrder = prevWidgetsOrderRef.current || [];
+    const previousWidgets = prevWidgetsRef.current || {};
+
+    // Detect what changed
+    const changes = detectWidgetChanges(widgets, previousWidgets, currentOrder, previousOrder);
+
+    async function handleIncrementalChanges() {
+      const iframe = iframeRef.current;
+
+      try {
+        // Handle widget additions
+        for (const widgetId of changes.addedWidgets) {
+          const widget = widgets[widgetId];
+          const position = currentOrder.indexOf(widgetId);
+
+          if (widget && position !== -1) {
+            console.log(`Adding widget ${widgetId} at position ${position}`);
+            const success = await addWidgetToPreview(iframe, widgetId, widget, position, themeSettings);
+            if (success) {
+              console.log(`Successfully added widget ${widgetId}`);
+            }
+          }
+        }
+
+        // Handle widget removals
+        for (const widgetId of changes.removedWidgets) {
+          console.log(`Removing widget ${widgetId}`);
+          const success = removeWidgetFromPreview(iframe, widgetId);
+          if (success) {
+            console.log(`Successfully removed widget ${widgetId}`);
+          }
+        }
+
+        // Handle reordering (only if no adds/removes)
+        if (changes.orderChanged) {
+          console.log(`Reordering widgets to:`, currentOrder);
+          const success = reorderWidgetsInPreview(iframe, currentOrder);
+          if (success) {
+            console.log(`Successfully reordered widgets`);
+          }
+        }
+
+        // Update refs for next comparison
+        prevWidgetsRef.current = JSON.parse(JSON.stringify(widgets));
+        prevWidgetsOrderRef.current = [...currentOrder];
+      } catch (error) {
+        console.error("Error handling incremental widget changes:", error);
+        // Fall back to full reload on error
+        console.log("Falling back to full reload...");
+        setInitialLoadComplete(false);
+      }
+    }
+
+    // Only apply incremental changes if there are structural changes
+    if (changes.addedWidgets.length > 0 || changes.removedWidgets.length > 0 || changes.orderChanged) {
+      handleIncrementalChanges();
+    }
+  }, [widgets, page?.widgetsOrder, initialLoadComplete, themeSettings]);
 
   // Update theme settings without reloading
   useEffect(() => {
@@ -110,30 +179,36 @@ export default function PreviewPanel({
       existingWidgetIds.add(el.getAttribute("data-widget-id"));
     });
 
-    // Check each widget for setting changes
+    // Check each widget for setting changes (NOT structural changes)
     Object.entries(widgets).forEach(async ([widgetId, widget]) => {
       const prevWidget = prevWidgetsRef.current?.[widgetId];
 
-      // Compare current and previous widget state
-      const hasChanges = JSON.stringify(widget) !== JSON.stringify(prevWidget);
+      // Only check for settings changes, not structural changes
+      if (prevWidget) {
+        const settingsChanged = JSON.stringify(widget.settings) !== JSON.stringify(prevWidget.settings);
+        const blocksChanged = JSON.stringify(widget.blocks) !== JSON.stringify(prevWidget.blocks);
+        const blockOrderChanged = JSON.stringify(widget.blocksOrder) !== JSON.stringify(prevWidget.blocksOrder);
 
-      if (hasChanges && existingWidgetIds.has(widgetId)) {
-        try {
-          // Pass themeSettings to updateWidget
-          const success = await updateWidget(iframe, widgetId, widget, selectedBlockId, themeSettings);
-          if (success) {
-            // Update our cache
-            if (!prevWidgetsRef.current) prevWidgetsRef.current = {};
-            prevWidgetsRef.current[widgetId] = JSON.parse(JSON.stringify(widget));
+        const hasSettingsChanges = settingsChanged || blocksChanged || blockOrderChanged;
+
+        if (hasSettingsChanges && existingWidgetIds.has(widgetId)) {
+          try {
+            // Pass themeSettings to updateWidget
+            const success = await updateWidget(iframe, widgetId, widget, selectedBlockId, themeSettings);
+            if (success) {
+              // Update our cache for this specific widget
+              if (!prevWidgetsRef.current) prevWidgetsRef.current = {};
+              prevWidgetsRef.current[widgetId] = JSON.parse(JSON.stringify(widget));
+            }
+          } catch (error) {
+            console.error(`Error updating widget ${widgetId}:`, error);
           }
-        } catch (error) {
-          console.error(`Error updating widget ${widgetId}:`, error);
         }
       }
     });
   }, [widgets, initialLoadComplete, themeSettings, selectedBlockId]);
 
-  // FIXED: Update global widgets by re-rendering them (individual updates, not full reload)
+  // Update global widgets by re-rendering them (individual updates, not full reload)
   useEffect(() => {
     if (!initialLoadComplete || !iframeRef.current || !globalWidgets) return;
 
@@ -184,7 +259,7 @@ export default function PreviewPanel({
 
     // Add a small delay to ensure the DOM is ready after any updates
     const highlightTimer = setTimeout(() => {
-      // NEW: Handle global widget highlighting
+      // Handle global widget highlighting
       if (selectedGlobalWidgetId) {
         highlightWidget(iframeRef.current, selectedGlobalWidgetId, selectedBlockId);
       } else {
@@ -193,9 +268,9 @@ export default function PreviewPanel({
     }, 50);
 
     return () => clearTimeout(highlightTimer);
-  }, [selectedWidgetId, selectedBlockId, selectedGlobalWidgetId, initialLoadComplete, previewHtml]); // NEW: Added selectedGlobalWidgetId
+  }, [selectedWidgetId, selectedBlockId, selectedGlobalWidgetId, initialLoadComplete, previewHtml]);
 
-  // Update iframe content when HTML changes
+  // Update iframe content when HTML changes (only for initial load now)
   useEffect(() => {
     if (!iframeRef.current || !previewHtml) return;
 
@@ -263,7 +338,7 @@ export default function PreviewPanel({
         </div>
       )}
 
-      {/* FIXED: Simplified iframe container to prevent double scrollbars */}
+      {/* Simplified iframe container to prevent double scrollbars */}
       <div
         className={`bg-white shadow-lg transition-all duration-300 ${
           previewMode === "mobile"

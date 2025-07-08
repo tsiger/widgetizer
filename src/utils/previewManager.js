@@ -259,3 +259,163 @@ export async function getProjectWidgets() {
     throw new Error("Failed to get project widgets");
   }
 }
+
+/**
+ * Add a new widget to the preview at the specified position
+ */
+export async function addWidgetToPreview(iframe, widgetId, widget, position, themeSettings) {
+  if (!iframe?.contentWindow) return false;
+
+  try {
+    // Render the new widget
+    const renderedWidget = await fetchRenderedWidget(widgetId, widget, themeSettings);
+
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    if (!iframeDoc) return false;
+
+    // Find the main content container where widgets are rendered
+    // Based on the theme layout, widgets are typically in .container div
+    const contentContainer =
+      iframeDoc.querySelector(".container") ||
+      iframeDoc.querySelector("[data-widgets-container]") ||
+      iframeDoc.querySelector("main") ||
+      iframeDoc.body;
+
+    if (!contentContainer) return false;
+
+    // Create the new widget element
+    const tempContainer = iframeDoc.createElement("div");
+    tempContainer.innerHTML = renderedWidget;
+    const newWidget = tempContainer.firstChild;
+
+    // Get all existing widgets
+    const existingWidgets = contentContainer.querySelectorAll("[data-widget-id]");
+
+    // Insert at the specified position
+    if (position >= existingWidgets.length) {
+      // Add to the end
+      contentContainer.appendChild(newWidget);
+    } else {
+      // Insert before the widget at the specified position
+      const insertBeforeWidget = existingWidgets[position];
+      contentContainer.insertBefore(newWidget, insertBeforeWidget);
+    }
+
+    // Initialize any scripts in the new widget
+    if (iframe.contentWindow && typeof iframe.contentWindow.PreviewRuntime !== "undefined") {
+      iframe.contentWindow.PreviewRuntime.initializeWidget(widgetId);
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Widget add error:", error);
+    return false;
+  }
+}
+
+/**
+ * Remove a widget from the preview
+ */
+export function removeWidgetFromPreview(iframe, widgetId) {
+  if (!iframe?.contentWindow) return false;
+
+  try {
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    if (!iframeDoc) return false;
+
+    const widgetElement = iframeDoc.querySelector(`[data-widget-id="${widgetId}"]`);
+    if (!widgetElement) return false;
+
+    // Add a smooth fade-out animation
+    widgetElement.style.transition = "opacity 0.2s ease-out, transform 0.2s ease-out";
+    widgetElement.style.opacity = "0";
+    widgetElement.style.transform = "scale(0.95)";
+
+    // Remove after animation
+    setTimeout(() => {
+      if (widgetElement.parentNode) {
+        widgetElement.parentNode.removeChild(widgetElement);
+      }
+    }, 200);
+
+    return true;
+  } catch (error) {
+    console.error("Widget remove error:", error);
+    return false;
+  }
+}
+
+/**
+ * Reorder widgets in the preview
+ */
+export function reorderWidgetsInPreview(iframe, newOrder) {
+  if (!iframe?.contentWindow) return false;
+
+  try {
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    if (!iframeDoc) return false;
+
+    // Find the main content container where widgets are rendered
+    const contentContainer =
+      iframeDoc.querySelector(".container") ||
+      iframeDoc.querySelector("[data-widgets-container]") ||
+      iframeDoc.querySelector("main") ||
+      iframeDoc.body;
+
+    if (!contentContainer) return false;
+
+    // Get all widget elements and store them in a map
+    const widgetElements = new Map();
+    const existingWidgets = contentContainer.querySelectorAll("[data-widget-id]");
+
+    existingWidgets.forEach((element) => {
+      const widgetId = element.getAttribute("data-widget-id");
+      if (widgetId) {
+        widgetElements.set(widgetId, element);
+      }
+    });
+
+    // Remove all widgets from the container
+    existingWidgets.forEach((element) => {
+      if (element.parentNode) {
+        element.parentNode.removeChild(element);
+      }
+    });
+
+    // Re-add widgets in the new order
+    newOrder.forEach((widgetId) => {
+      const element = widgetElements.get(widgetId);
+      if (element) {
+        contentContainer.appendChild(element);
+      }
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Widget reorder error:", error);
+    return false;
+  }
+}
+
+/**
+ * Detect structural changes between widget sets
+ */
+export function detectWidgetChanges(currentWidgets, previousWidgets, currentOrder, previousOrder) {
+  const currentIds = new Set(Object.keys(currentWidgets || {}));
+  const previousIds = new Set(Object.keys(previousWidgets || {}));
+
+  // Detect added widgets
+  const addedWidgets = [...currentIds].filter((id) => !previousIds.has(id));
+
+  // Detect removed widgets
+  const removedWidgets = [...previousIds].filter((id) => !currentIds.has(id));
+
+  // Detect if order changed
+  const orderChanged = JSON.stringify(currentOrder) !== JSON.stringify(previousOrder);
+
+  return {
+    addedWidgets,
+    removedWidgets,
+    orderChanged: orderChanged && addedWidgets.length === 0 && removedWidgets.length === 0,
+  };
+}

@@ -6,7 +6,6 @@ import PreviewPanel from "../components/pageEditor/PreviewPanel";
 import SettingsPanel from "../components/pageEditor/SettingsPanel";
 import EditorTopBar from "../components/pageEditor/EditorTopBar";
 import WidgetSelector from "../components/pageEditor/WidgetSelector";
-import ConfirmationModal from "../components/ui/ConfirmationModal";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import BlockSelector from "../components/pageEditor/blocks/BlockSelector";
 
@@ -14,7 +13,6 @@ import usePageStore from "../stores/pageStore";
 import useWidgetStore from "../stores/widgetStore";
 import useAutoSave from "../stores/saveStore";
 import useThemeStore from "../stores/themeStore";
-import useConfirmationModal from "../hooks/useConfirmationModal";
 import useNavigationGuard from "../hooks/useNavigationGuard";
 
 export default function PageEditor() {
@@ -75,32 +73,12 @@ export default function PageEditor() {
     setPreviewMode(mode);
   };
 
-  // Handle widget deletion with confirmation
-  const handleDeleteWithConfirmation = async (data) => {
-    deleteWidget(data.widgetId);
-    useAutoSave.getState().setStructureModified(true);
-  };
-
-  // Use our custom confirmation modal hook
-  const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDeleteWithConfirmation);
-
-  // Function to open delete confirmation
+  // Handle widget deletion (immediate, no confirmation)
   const handleDeleteWidgetClick = (widgetId) => {
     if (!page || !page.widgets[widgetId]) return;
 
-    // Get the widget name for the confirmation message
-    const widget = page.widgets[widgetId];
-    const widgetSchema = widgetSchemas[widget.type] || {};
-    const widgetName = widget.settings?.name || widgetSchema.displayName || widget.type;
-
-    openModal({
-      title: "Delete Widget",
-      message: `Are you sure you want to delete "${widgetName}"? This action cannot be undone.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
-      variant: "danger",
-      data: { widgetId, widgetName },
-    });
+    deleteWidget(widgetId);
+    useAutoSave.getState().setStructureModified(true);
   };
 
   // Handle opening the widget selector
@@ -297,17 +275,6 @@ export default function PageEditor() {
           setBlockInsertPosition(null);
         }}
         triggerRef={blockTriggerRef}
-      />
-
-      <ConfirmationModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        onConfirm={handleConfirm}
-        title={modalState.title}
-        message={modalState.message}
-        confirmText={modalState.confirmText}
-        cancelText={modalState.cancelText}
-        variant={modalState.variant}
       />
     </div>
   );

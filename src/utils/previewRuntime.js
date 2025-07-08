@@ -95,11 +95,20 @@ function initializeRuntime() {
   window.addEventListener("message", handleMessage);
 }
 
+// TODO: Implement safe widget initialization without eval()
+// When widgets are dynamically added, their scripts don't auto-execute
+// Consider: asset management, event delegation, or custom init patterns
+function initializeWidget(widgetId) {
+  // Placeholder - widget scripts currently won't execute on dynamic add
+  console.log(`Widget ${widgetId} added - scripts may need manual initialization`);
+}
+
 // Create global runtime object
 window.PreviewRuntime = {
   initializeRuntime,
   updateCssVariables,
   highlightWidget,
+  initializeWidget,
 };
 
 // Auto-initialize when the script loads
