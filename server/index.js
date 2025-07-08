@@ -49,6 +49,13 @@ app.use("/api/export", apiLimiter, exportRoutes);
 app.use("/api/settings", apiLimiter, appSettingsRoutes);
 app.use("/api/core-widgets", apiLimiter, coreWidgetsRoutes);
 
+// Serve static files from the themes directory
+// TODO: We use this only for the theme screenshot.png.
+app.use("/themes", express.static(path.join(__dirname, "../themes")));
+
+// iFrame runtime script (MUST be before production catch-all)
+app.use("/runtime", express.static(path.join(__dirname, "../src/utils")));
+
 // --- Production-Only Logic ---
 if (process.env.NODE_ENV === "production") {
   // Serve static assets from the dist/assets directory
@@ -62,13 +69,6 @@ if (process.env.NODE_ENV === "production") {
     res.sendFile(path.join(__dirname, "../dist/index.html"));
   });
 }
-
-// Serve static files from the themes directory
-// TODO: We use this only for the theme screenshot.png.
-app.use("/themes", express.static(path.join(__dirname, "../themes")));
-
-// iFrame runtime script
-app.use("/runtime", express.static(path.join(__dirname, "../src/utils")));
 
 // Health check endpoint
 app.get("/health", (req, res) => {
