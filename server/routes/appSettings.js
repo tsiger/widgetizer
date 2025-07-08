@@ -10,7 +10,7 @@ router.get("/", appSettingsController.getAppSettings);
 // PUT /api/settings - Update application settings
 router.put(
   "/",
-  [body("settings").isObject().withMessage("Settings must be an object.")],
+  [body().isObject().withMessage("Request body must be an object.")],
   appSettingsController.updateAppSettings,
 );
 

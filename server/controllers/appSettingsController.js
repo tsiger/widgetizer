@@ -85,7 +85,7 @@ export async function updateAppSettings(req, res) {
   }
 
   try {
-    const { settings } = req.body;
+    const settings = req.body;
     const currentSettings = await readAppSettingsFile();
     // Basic validation: Ensure request body is an object
     if (typeof settings !== "object" || settings === null) {
