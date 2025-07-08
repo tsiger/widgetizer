@@ -75,7 +75,8 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
       : {};
 
   // Determine API URL based on render mode
-  const apiUrl = renderMode === "preview" ? process.env.VITE_API_URL : "";
+  const apiUrl =
+    renderMode === "preview" ? process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}` : "";
 
   // Determine image base path based on render mode
   const imageBasePath =

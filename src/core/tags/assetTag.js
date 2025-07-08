@@ -61,7 +61,7 @@ export const AssetTag = {
 
       // Get context globals
       const globals = context.globals || {};
-      const apiUrl = globals.apiUrl || process.env.VITE_API_URL || "";
+      const apiUrl = globals.apiUrl || "";
       const activeProjectId = globals.projectId || "";
       const renderMode = globals.renderMode || "preview"; // Default to preview
 

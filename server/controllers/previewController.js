@@ -12,7 +12,9 @@ const __dirname = dirname(__filename);
 
 // Inject the runtime script
 function injectRuntimeScript(html) {
-  const scriptUrl = `${process.env.VITE_API_URL}/runtime/previewRuntime.js`;
+  // Use the SERVER_URL environment variable or fallback to localhost
+  const serverUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
+  const scriptUrl = `${serverUrl}/runtime/previewRuntime.js`;
   const script = `<script src="${scriptUrl}" type="module"></script>`;
   // Ensure replacement happens even with attributes on body tag
   return html.replace(/<\/body>/i, `${script}\n</body>`);
