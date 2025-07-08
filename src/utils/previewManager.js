@@ -288,17 +288,38 @@ export async function addWidgetToPreview(iframe, widgetId, widget, position, the
     tempContainer.innerHTML = renderedWidget;
     const newWidget = tempContainer.firstChild;
 
-    // Get all existing widgets
-    const existingWidgets = contentContainer.querySelectorAll("[data-widget-id]");
+    // Get only PAGE widgets (exclude global widgets like header/footer)
+    // Global widgets have data-widget-id="header" or "footer"
+    const pageWidgets = Array.from(contentContainer.querySelectorAll("[data-widget-id]")).filter((element) => {
+      const widgetId = element.getAttribute("data-widget-id");
+      return widgetId !== "header" && widgetId !== "footer";
+    });
 
-    // Insert at the specified position
-    if (position >= existingWidgets.length) {
-      // Add to the end
-      contentContainer.appendChild(newWidget);
+    // If no page widgets exist yet, we need to insert after header (if it exists) or at the beginning
+    if (pageWidgets.length === 0) {
+      const headerWidget = contentContainer.querySelector('[data-widget-id="header"]');
+      if (headerWidget) {
+        // Insert after header
+        headerWidget.insertAdjacentElement("afterend", newWidget);
+      } else {
+        // No header, insert at the beginning
+        contentContainer.insertBefore(newWidget, contentContainer.firstChild);
+      }
     } else {
-      // Insert before the widget at the specified position
-      const insertBeforeWidget = existingWidgets[position];
-      contentContainer.insertBefore(newWidget, insertBeforeWidget);
+      // Insert at the specified position among page widgets
+      if (position >= pageWidgets.length) {
+        // Add to the end (before footer if it exists)
+        const footerWidget = contentContainer.querySelector('[data-widget-id="footer"]');
+        if (footerWidget) {
+          footerWidget.insertAdjacentElement("beforebegin", newWidget);
+        } else {
+          contentContainer.appendChild(newWidget);
+        }
+      } else {
+        // Insert before the widget at the specified position
+        const insertBeforeWidget = pageWidgets[position];
+        contentContainer.insertBefore(newWidget, insertBeforeWidget);
+      }
     }
 
     // Initialize any scripts in the new widget
@@ -364,29 +385,50 @@ export function reorderWidgetsInPreview(iframe, newOrder) {
 
     if (!contentContainer) return false;
 
-    // Get all widget elements and store them in a map
-    const widgetElements = new Map();
-    const existingWidgets = contentContainer.querySelectorAll("[data-widget-id]");
+    // Get only PAGE widgets (exclude global widgets like header/footer)
+    const pageWidgetElements = new Map();
+    const allWidgets = contentContainer.querySelectorAll("[data-widget-id]");
 
-    existingWidgets.forEach((element) => {
+    // Separate page widgets from global widgets
+    const globalWidgets = { header: null, footer: null };
+
+    allWidgets.forEach((element) => {
       const widgetId = element.getAttribute("data-widget-id");
-      if (widgetId) {
-        widgetElements.set(widgetId, element);
+      if (widgetId === "header") {
+        globalWidgets.header = element;
+      } else if (widgetId === "footer") {
+        globalWidgets.footer = element;
+      } else {
+        // This is a page widget
+        pageWidgetElements.set(widgetId, element);
       }
     });
 
-    // Remove all widgets from the container
-    existingWidgets.forEach((element) => {
+    // Remove only page widgets from the container (keep global widgets in place)
+    pageWidgetElements.forEach((element) => {
       if (element.parentNode) {
         element.parentNode.removeChild(element);
       }
     });
 
-    // Re-add widgets in the new order
-    newOrder.forEach((widgetId) => {
-      const element = widgetElements.get(widgetId);
+    // Re-add page widgets in the new order
+    // Insert after header (if it exists) or before footer (if it exists)
+    const headerWidget = globalWidgets.header;
+    const footerWidget = globalWidgets.footer;
+
+    newOrder.forEach((widgetId, index) => {
+      const element = pageWidgetElements.get(widgetId);
       if (element) {
-        contentContainer.appendChild(element);
+        if (index === 0 && headerWidget) {
+          // First widget goes after header
+          headerWidget.insertAdjacentElement("afterend", element);
+        } else if (footerWidget) {
+          // Insert before footer
+          footerWidget.insertAdjacentElement("beforebegin", element);
+        } else {
+          // No footer, append to container
+          contentContainer.appendChild(element);
+        }
       }
     });
 
