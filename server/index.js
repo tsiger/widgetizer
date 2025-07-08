@@ -25,6 +25,11 @@ import coreWidgetsRoutes from "./routes/coreWidgets.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
+// Trust proxy in production (required for rate limiting behind reverse proxy)
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 app.use(cors());
 app.use(express.json());
 
