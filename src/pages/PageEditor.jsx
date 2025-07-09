@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import WidgetList from "../components/pageEditor/WidgetList";
@@ -14,6 +14,7 @@ import useWidgetStore from "../stores/widgetStore";
 import useAutoSave from "../stores/saveStore";
 import useThemeStore from "../stores/themeStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
+import { scrollWidgetIntoView } from "../utils/previewManager";
 
 export default function PageEditor() {
   const [searchParams] = useSearchParams();
@@ -27,6 +28,7 @@ export default function PageEditor() {
   const [activeBlockTriggerKey, setActiveBlockTriggerKey] = useState(null);
   const [blockInsertPosition, setBlockInsertPosition] = useState(null);
   const [previewMode, setPreviewMode] = useState("desktop");
+  const previewIframeRef = useRef(null);
 
   const { page, loading, error } = usePageStore();
   const {
@@ -102,9 +104,13 @@ export default function PageEditor() {
   };
 
   // Handle widget reordering
-  const handleWidgetsReorder = (newOrder) => {
+  const handleWidgetsReorder = (newOrder, movedWidgetId) => {
     reorderWidgets(newOrder);
     useAutoSave.getState().setStructureModified(true);
+    if (movedWidgetId && previewIframeRef.current) {
+      // Scroll the moved widget into view in the preview
+      scrollWidgetIntoView(previewIframeRef.current, movedWidgetId);
+    }
   };
 
   // Handle block settings change
@@ -211,6 +217,7 @@ export default function PageEditor() {
         />
 
         <PreviewPanel
+          ref={previewIframeRef}
           page={page}
           selectedWidgetId={selectedWidgetId}
           selectedBlockId={selectedBlockId}

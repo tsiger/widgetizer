@@ -128,11 +128,12 @@ const useWidgetStore = create((set, get) => ({
     const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
     const originalIndex = currentOrder.indexOf(widgetId);
 
-    const newWidgetsOrder = [
-      ...currentOrder.slice(0, originalIndex + 1),
-      newWidgetId,
-      ...currentOrder.slice(originalIndex + 1),
-    ];
+    const newWidgetsOrder = [...currentOrder];
+    if (originalIndex !== -1) {
+      newWidgetsOrder.splice(originalIndex + 1, 0, newWidgetId);
+    } else {
+      newWidgetsOrder.push(newWidgetId); // Fallback to add at the end
+    }
 
     pageStore.setPage({
       ...page,
@@ -143,9 +144,10 @@ const useWidgetStore = create((set, get) => ({
       widgetsOrder: newWidgetsOrder,
     });
 
+    // Select the new widget and mark changes for auto-save
+    set({ selectedWidgetId: newWidgetId, selectedBlockId: null });
     useAutoSave.getState().setStructureModified(true);
 
-    set({ selectedWidgetId: newWidgetId });
     return newWidgetId;
   },
 

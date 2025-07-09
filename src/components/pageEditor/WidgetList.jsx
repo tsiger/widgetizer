@@ -88,7 +88,7 @@ export default function WidgetList({
       const newOrder = arrayMove(oldWidgetIds, oldIndex, newIndex);
 
       if (onWidgetsReorder) {
-        onWidgetsReorder(newOrder);
+        onWidgetsReorder(newOrder, active.id);
       }
     }
   };

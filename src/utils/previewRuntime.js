@@ -55,7 +55,7 @@ function highlightWidget(widgetId, blockId) {
 
       // Only scroll to widget if no block is selected
       if (!blockId) {
-        widget.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+        widget.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
       }
     }
   }
@@ -68,7 +68,17 @@ function highlightWidget(widgetId, blockId) {
         block.classList.add("block-highlight");
       }
       // Always scroll to block when selected
-      block.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+      block.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
+    }
+  }
+}
+
+// Scroll to widget without highlighting
+function scrollToWidget(widgetId) {
+  if (widgetId) {
+    const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
+    if (widget) {
+      widget.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
     }
   }
 }
@@ -83,6 +93,9 @@ function handleMessage(event) {
       break;
     case "HIGHLIGHT_WIDGET":
       highlightWidget(payload.widgetId, payload.blockId);
+      break;
+    case "SCROLL_TO_WIDGET":
+      scrollToWidget(payload.widgetId);
       break;
     default:
       console.warn("Preview Runtime: Unknown message type:", type);
@@ -109,6 +122,7 @@ window.PreviewRuntime = {
   updateCssVariables,
   highlightWidget,
   initializeWidget,
+  scrollToWidget,
 };
 
 // Auto-initialize when the script loads

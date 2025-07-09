@@ -59,54 +59,193 @@ export async function fetchRenderedWidget(widgetId, widget, themeSettings) {
 }
 
 /**
- * Update a widget in the preview
+ * The primary function to synchronize the preview iframe with the current application state.
+ * This function is designed to be declarative. It compares the new state with the previous
+ * state and performs the minimum necessary DOM manipulations to bring the iframe up to date.
+ *
+ * It handles:
+ * - Adding, removing, and reordering widgets and their blocks.
+ * - Updating the content of widgets when their settings or block structure changes.
+ * - Applying global theme settings.
+ * - Highlighting the selected widget/block and scrolling it into view.
+ *
+ * @param {HTMLIFrameElement} iframe The preview iframe element.
+ * @param {object} newState The new, current state of the page from the stores.
+ * @param {object} oldState The previous state of the page to compare against.
  */
-export async function updateWidget(iframe, widgetId, widget, selectedBlockId, themeSettings) {
-  if (!iframe?.contentWindow) return false;
-
-  try {
-    // Render the updated widget with blocks and theme settings
-    const renderedWidget = await fetchRenderedWidget(
-      widgetId,
-      {
-        ...widget,
-        blocks: widget.blocks || {},
-        blocksOrder: widget.blocksOrder || [],
-      },
-      themeSettings,
-    );
-
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    if (!iframeDoc) return false;
-
-    const existingWidget = iframeDoc.querySelector(`[data-widget-id="${widgetId}"]`);
-    if (!existingWidget) return false;
-
-    // Create a temporary container
-    const tempContainer = iframeDoc.createElement("div");
-    tempContainer.innerHTML = renderedWidget;
-    const newWidget = tempContainer.firstChild;
-
-    // Replace the existing widget
-    existingWidget.parentNode.replaceChild(newWidget, existingWidget);
-
-    // Re-apply highlights after DOM update
-    iframe.contentWindow.postMessage(
-      {
-        type: "HIGHLIGHT_WIDGET",
-        payload: {
-          widgetId,
-          blockId: selectedBlockId,
-        },
-      },
-      "*",
-    );
-
-    return true;
-  } catch (error) {
-    console.error("Widget update error:", error);
-    return false;
+export async function updatePreview(iframe, newState, oldState) {
+  if (!iframe?.contentWindow || !newState || !oldState) {
+    return;
   }
+  const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+  if (!iframeDoc.body) {
+    // Body not ready, abort
+    return;
+  }
+
+  const {
+    widgets: newWidgets,
+    globalWidgets: newGlobalWidgets,
+    themeSettings: newThemeSettings,
+    selectedWidgetId: newSelectedWidgetId,
+    selectedBlockId: newSelectedBlockId,
+    page: newPage,
+  } = newState;
+
+  const {
+    widgets: oldWidgets,
+    globalWidgets: oldGlobalWidgets,
+    themeSettings: oldThemeSettings,
+    page: oldPage,
+  } = oldState;
+
+  // --- 1. DETECT CHANGES ---
+
+  const newWidgetOrder = newPage?.widgetsOrder || [];
+  const oldWidgetOrder = oldPage?.widgetsOrder || [];
+
+  const newWidgetIds = new Set(Object.keys(newWidgets || {}));
+  const oldWidgetIds = new Set(Object.keys(oldWidgets || {}));
+
+  const addedWidgetIds = [...newWidgetIds].filter((id) => !oldWidgetIds.has(id));
+  const removedWidgetIds = [...oldWidgetIds].filter((id) => !newWidgetIds.has(id));
+  const orderChanged = JSON.stringify(newWidgetOrder) !== JSON.stringify(oldWidgetOrder);
+
+  // Find widgets whose settings or block structure have changed
+  const changedWidgets = new Map();
+  for (const id of newWidgetIds) {
+    if (oldWidgetIds.has(id)) {
+      const oldWidget = oldWidgets[id];
+      const newWidget = newWidgets[id];
+      const settingsChanged = JSON.stringify(oldWidget.settings) !== JSON.stringify(newWidget.settings);
+      const blocksChanged = JSON.stringify(oldWidget.blocks) !== JSON.stringify(newWidget.blocks);
+      const blockOrderChanged = JSON.stringify(oldWidget.blocksOrder) !== JSON.stringify(newWidget.blocksOrder);
+
+      if (settingsChanged || blocksChanged || blockOrderChanged) {
+        changedWidgets.set(id, { newWidget, oldWidget });
+      }
+    }
+  }
+
+  // Find changed global widgets
+  if (
+    newGlobalWidgets?.header &&
+    JSON.stringify(newGlobalWidgets.header) !== JSON.stringify(oldGlobalWidgets?.header)
+  ) {
+    changedWidgets.set("header", { newWidget: newGlobalWidgets.header });
+  }
+  if (
+    newGlobalWidgets?.footer &&
+    JSON.stringify(newGlobalWidgets.footer) !== JSON.stringify(oldGlobalWidgets?.footer)
+  ) {
+    changedWidgets.set("footer", { newWidget: newGlobalWidgets.footer });
+  }
+
+  const themeSettingsChanged = JSON.stringify(newThemeSettings) !== JSON.stringify(oldThemeSettings);
+
+  // --- 2. PERFORM DOM UPDATES ---
+
+  // Get the container for page widgets
+  const contentContainer =
+    iframeDoc.querySelector("[data-widgets-container]") || iframeDoc.querySelector("main") || iframeDoc.body;
+
+  // Handle widget removals
+  removedWidgetIds.forEach((widgetId) => {
+    const el = iframeDoc.querySelector(`[data-widget-id="${widgetId}"]`);
+    if (el) el.parentNode.removeChild(el);
+  });
+
+  // Handle widget additions and changes by re-rendering them
+  const widgetsToUpdate = [...addedWidgetIds, ...changedWidgets.keys()];
+  for (const widgetId of widgetsToUpdate) {
+    const widgetData = newWidgets[widgetId] || newGlobalWidgets[widgetId];
+    if (widgetData) {
+      try {
+        const renderedWidgetHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings);
+        const tempDiv = iframeDoc.createElement("div");
+        tempDiv.innerHTML = renderedWidgetHtml;
+        const newElement = tempDiv.firstChild;
+
+        const existingElement = iframeDoc.querySelector(`[data-widget-id="${widgetId}"]`);
+        if (existingElement) {
+          existingElement.parentNode.replaceChild(newElement, existingElement);
+        } else if (newElement) {
+          // This is a new widget, it will be placed by the reordering logic below
+        }
+      } catch (error) {
+        console.error(`Error rendering widget ${widgetId}:`, error);
+      }
+    }
+  }
+
+  // Handle reordering if necessary
+  if (orderChanged || addedWidgetIds.length > 0) {
+    const pageWidgetElements = new Map();
+    contentContainer.querySelectorAll("[data-widget-id]").forEach((el) => {
+      const id = el.getAttribute("data-widget-id");
+      if (id !== "header" && id !== "footer") {
+        pageWidgetElements.set(id, el);
+      }
+    });
+
+    // Detach all page widgets
+    pageWidgetElements.forEach((el) => el.parentNode.removeChild(el));
+
+    // Re-attach in the correct order
+    const headerEl = iframeDoc.querySelector('[data-widget-id="header"]');
+    const footerEl = iframeDoc.querySelector('[data-widget-id="footer"]');
+    let lastAttachedElement = headerEl;
+
+    // Use a for...of loop to handle async operations correctly
+    for (const widgetId of newWidgetOrder) {
+      let elementToInsert = pageWidgetElements.get(widgetId);
+
+      // If it's a new widget, it wasn't in the DOM, so we need to render it now.
+      if (!elementToInsert) {
+        try {
+          const widgetData = newWidgets[widgetId];
+          if (widgetData) {
+            const renderedWidgetHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings);
+            const tempDiv = iframeDoc.createElement("div");
+            tempDiv.innerHTML = renderedWidgetHtml;
+            elementToInsert = tempDiv.firstChild;
+          }
+        } catch (error) {
+          console.error(`Error rendering new widget ${widgetId} during reorder:`, error);
+          continue; // continue to next widget
+        }
+      }
+
+      if (!elementToInsert) continue;
+
+      if (lastAttachedElement) {
+        lastAttachedElement.insertAdjacentElement("afterend", elementToInsert);
+      } else if (footerEl) {
+        // If there's no header, insert before the footer
+        footerEl.insertAdjacentElement("beforebegin", elementToInsert);
+      } else {
+        // If no header or footer, just append to the main container
+        contentContainer.appendChild(elementToInsert);
+      }
+      lastAttachedElement = elementToInsert;
+    }
+  }
+
+  // --- 3. APPLY STYLES & SELECTION ---
+
+  // Update theme settings (CSS variables)
+  if (themeSettingsChanged) {
+    updateThemeSettings(iframe, newThemeSettings);
+  }
+
+  // Finally, apply highlight and scroll to the selected widget/block
+  // We use a timeout to ensure the DOM is fully settled after all updates.
+  setTimeout(() => {
+    highlightWidget(iframe, newSelectedWidgetId, newSelectedBlockId);
+    if (newSelectedWidgetId) {
+      scrollWidgetIntoView(iframe, newSelectedWidgetId);
+    }
+  }, 50); // A small delay can help prevent race conditions
 }
 
 /**
@@ -143,7 +282,7 @@ export function settingsToCssVariables(settings) {
 /**
  * Update theme settings in the preview without reloading
  */
-export function updateThemeSettings(iframe, settings) {
+function updateThemeSettings(iframe, settings) {
   if (!iframe?.contentWindow) {
     console.warn("Preview Manager: No iframe window available");
     return;
@@ -261,203 +400,20 @@ export async function getProjectWidgets() {
 }
 
 /**
- * Add a new widget to the preview at the specified position
+ * Scroll a widget into view in the preview
  */
-export async function addWidgetToPreview(iframe, widgetId, widget, position, themeSettings) {
-  if (!iframe?.contentWindow) return false;
-
-  try {
-    // Render the new widget
-    const renderedWidget = await fetchRenderedWidget(widgetId, widget, themeSettings);
-
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    if (!iframeDoc) return false;
-
-    // Find the main content container where widgets are rendered
-    // Based on the theme layout, widgets are typically in .container div
-    const contentContainer =
-      iframeDoc.querySelector(".container") ||
-      iframeDoc.querySelector("[data-widgets-container]") ||
-      iframeDoc.querySelector("main") ||
-      iframeDoc.body;
-
-    if (!contentContainer) return false;
-
-    // Create the new widget element
-    const tempContainer = iframeDoc.createElement("div");
-    tempContainer.innerHTML = renderedWidget;
-    const newWidget = tempContainer.firstChild;
-
-    // Get only PAGE widgets (exclude global widgets like header/footer)
-    // Global widgets have data-widget-id="header" or "footer"
-    const pageWidgets = Array.from(contentContainer.querySelectorAll("[data-widget-id]")).filter((element) => {
-      const widgetId = element.getAttribute("data-widget-id");
-      return widgetId !== "header" && widgetId !== "footer";
-    });
-
-    // If no page widgets exist yet, we need to insert after header (if it exists) or at the beginning
-    if (pageWidgets.length === 0) {
-      const headerWidget = contentContainer.querySelector('[data-widget-id="header"]');
-      if (headerWidget) {
-        // Insert after header
-        headerWidget.insertAdjacentElement("afterend", newWidget);
-      } else {
-        // No header, insert at the beginning
-        contentContainer.insertBefore(newWidget, contentContainer.firstChild);
-      }
-    } else {
-      // Insert at the specified position among page widgets
-      if (position >= pageWidgets.length) {
-        // Add to the end (before footer if it exists)
-        const footerWidget = contentContainer.querySelector('[data-widget-id="footer"]');
-        if (footerWidget) {
-          footerWidget.insertAdjacentElement("beforebegin", newWidget);
-        } else {
-          contentContainer.appendChild(newWidget);
-        }
-      } else {
-        // Insert before the widget at the specified position
-        const insertBeforeWidget = pageWidgets[position];
-        contentContainer.insertBefore(newWidget, insertBeforeWidget);
-      }
-    }
-
-    // Initialize any scripts in the new widget
-    if (iframe.contentWindow && typeof iframe.contentWindow.PreviewRuntime !== "undefined") {
-      iframe.contentWindow.PreviewRuntime.initializeWidget(widgetId);
-    }
-
-    return true;
-  } catch (error) {
-    console.error("Widget add error:", error);
-    return false;
+export function scrollWidgetIntoView(iframe, widgetId) {
+  if (!iframe?.contentWindow) {
+    return;
   }
-}
 
-/**
- * Remove a widget from the preview
- */
-export function removeWidgetFromPreview(iframe, widgetId) {
-  if (!iframe?.contentWindow) return false;
-
-  try {
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    if (!iframeDoc) return false;
-
-    const widgetElement = iframeDoc.querySelector(`[data-widget-id="${widgetId}"]`);
-    if (!widgetElement) return false;
-
-    // Add a smooth fade-out animation
-    widgetElement.style.transition = "opacity 0.2s ease-out, transform 0.2s ease-out";
-    widgetElement.style.opacity = "0";
-    widgetElement.style.transform = "scale(0.95)";
-
-    // Remove after animation
-    setTimeout(() => {
-      if (widgetElement.parentNode) {
-        widgetElement.parentNode.removeChild(widgetElement);
-      }
-    }, 200);
-
-    return true;
-  } catch (error) {
-    console.error("Widget remove error:", error);
-    return false;
-  }
-}
-
-/**
- * Reorder widgets in the preview
- */
-export function reorderWidgetsInPreview(iframe, newOrder) {
-  if (!iframe?.contentWindow) return false;
-
-  try {
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    if (!iframeDoc) return false;
-
-    // Find the main content container where widgets are rendered
-    const contentContainer =
-      iframeDoc.querySelector(".container") ||
-      iframeDoc.querySelector("[data-widgets-container]") ||
-      iframeDoc.querySelector("main") ||
-      iframeDoc.body;
-
-    if (!contentContainer) return false;
-
-    // Get only PAGE widgets (exclude global widgets like header/footer)
-    const pageWidgetElements = new Map();
-    const allWidgets = contentContainer.querySelectorAll("[data-widget-id]");
-
-    // Separate page widgets from global widgets
-    const globalWidgets = { header: null, footer: null };
-
-    allWidgets.forEach((element) => {
-      const widgetId = element.getAttribute("data-widget-id");
-      if (widgetId === "header") {
-        globalWidgets.header = element;
-      } else if (widgetId === "footer") {
-        globalWidgets.footer = element;
-      } else {
-        // This is a page widget
-        pageWidgetElements.set(widgetId, element);
-      }
-    });
-
-    // Remove only page widgets from the container (keep global widgets in place)
-    pageWidgetElements.forEach((element) => {
-      if (element.parentNode) {
-        element.parentNode.removeChild(element);
-      }
-    });
-
-    // Re-add page widgets in the new order
-    // Insert after header (if it exists) or before footer (if it exists)
-    const headerWidget = globalWidgets.header;
-    const footerWidget = globalWidgets.footer;
-
-    newOrder.forEach((widgetId, index) => {
-      const element = pageWidgetElements.get(widgetId);
-      if (element) {
-        if (index === 0 && headerWidget) {
-          // First widget goes after header
-          headerWidget.insertAdjacentElement("afterend", element);
-        } else if (footerWidget) {
-          // Insert before footer
-          footerWidget.insertAdjacentElement("beforebegin", element);
-        } else {
-          // No footer, append to container
-          contentContainer.appendChild(element);
-        }
-      }
-    });
-
-    return true;
-  } catch (error) {
-    console.error("Widget reorder error:", error);
-    return false;
-  }
-}
-
-/**
- * Detect structural changes between widget sets
- */
-export function detectWidgetChanges(currentWidgets, previousWidgets, currentOrder, previousOrder) {
-  const currentIds = new Set(Object.keys(currentWidgets || {}));
-  const previousIds = new Set(Object.keys(previousWidgets || {}));
-
-  // Detect added widgets
-  const addedWidgets = [...currentIds].filter((id) => !previousIds.has(id));
-
-  // Detect removed widgets
-  const removedWidgets = [...previousIds].filter((id) => !currentIds.has(id));
-
-  // Detect if order changed
-  const orderChanged = JSON.stringify(currentOrder) !== JSON.stringify(previousOrder);
-
-  return {
-    addedWidgets,
-    removedWidgets,
-    orderChanged: orderChanged && addedWidgets.length === 0 && removedWidgets.length === 0,
-  };
+  iframe.contentWindow.postMessage(
+    {
+      type: "SCROLL_TO_WIDGET",
+      payload: {
+        widgetId,
+      },
+    },
+    "*",
+  );
 }

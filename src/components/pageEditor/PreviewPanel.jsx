@@ -1,355 +1,175 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, forwardRef } from "react";
 import {
   fetchPreview,
-  updateThemeSettings,
+  updatePreview, // Import the new master update function
   highlightWidget,
-  updateWidget,
-  addWidgetToPreview,
-  removeWidgetFromPreview,
-  reorderWidgetsInPreview,
-  detectWidgetChanges,
 } from "../../utils/previewManager";
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
 import { API_URL } from "../../config";
 
-export default function PreviewPanel({
-  page,
-  selectedWidgetId,
-  selectedBlockId,
-  selectedGlobalWidgetId,
-  widgets,
-  widgetSchemas,
-  themeSettings,
-  previewMode = "desktop",
-}) {
+const PreviewPanel = forwardRef(function PreviewPanel(
+  {
+    page,
+    selectedWidgetId,
+    selectedBlockId,
+    selectedGlobalWidgetId,
+    widgets,
+    widgetSchemas,
+    themeSettings,
+    previewMode = "desktop",
+  },
+  ref,
+) {
   const [previewHtml, setPreviewHtml] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const iframeRef = useRef(null);
-  const prevThemeSettingsRef = useRef(null);
-  const prevWidgetsRef = useRef(null);
-  const prevWidgetsOrderRef = useRef(null);
-  const prevGlobalWidgetsRef = useRef(null);
-  const widgetSettingsRef = useRef(new Map());
-  const activeProject = useProjectStore((state) => state.activeProject);
 
+  // A single ref to hold the entire previous state for comparison
+  const previousStateRef = useRef(null);
+
+  const activeProject = useProjectStore((state) => state.activeProject);
   const { globalWidgets } = usePageStore();
 
-  // Load the initial preview only on first load
+  // Expose the iframe ref to the parent component
   useEffect(() => {
-    if (!page) {
-      setLoading(false);
-      return;
+    if (ref) {
+      ref.current = iframeRef.current;
     }
+  }, [ref]);
 
-    // Only do full reload on initial load
-    if (!initialLoadComplete) {
-      async function loadPreview() {
-        try {
-          setLoading(true);
-          setError(null);
+  // Initial page load effect
+  useEffect(() => {
+    if (!page || initialLoadComplete) return;
 
-          // Create enhanced page data with global widgets for preview
-          const enhancedPageData = {
-            ...page,
-            globalWidgets: globalWidgets,
-          };
+    async function loadInitialPreview() {
+      try {
+        setLoading(true);
+        setError(null);
 
-          // Fetch the preview HTML from the server
-          const html = await fetchPreview(enhancedPageData, themeSettings);
-          setPreviewHtml(html);
-          setInitialLoadComplete(true);
+        const enhancedPageData = { ...page, globalWidgets };
+        const html = await fetchPreview(enhancedPageData, themeSettings);
+        setPreviewHtml(html);
 
-          // Initialize refs with current state
-          prevThemeSettingsRef.current = JSON.parse(JSON.stringify(themeSettings));
-          prevWidgetsRef.current = JSON.parse(JSON.stringify(widgets));
-          prevWidgetsOrderRef.current = [...(page.widgetsOrder || Object.keys(widgets || {}))];
-          prevGlobalWidgetsRef.current = JSON.parse(JSON.stringify(globalWidgets));
-
-          // Reset widget settings cache
-          widgetSettingsRef.current = new Map();
-          Object.entries(widgets || {}).forEach(([widgetId, widget]) => {
-            widgetSettingsRef.current.set(widgetId, { ...widget.settings });
-          });
-        } catch (err) {
-          console.error("Preview error:", err);
-          setError(err.message || "Failed to load preview");
-        } finally {
-          setLoading(false);
-        }
+        // Store the initial state for future diffing
+        previousStateRef.current = {
+          page,
+          widgets,
+          globalWidgets,
+          themeSettings,
+          selectedWidgetId,
+          selectedBlockId,
+          selectedGlobalWidgetId,
+        };
+      } catch (err) {
+        console.error("Preview error:", err);
+        setError(err.message || "Failed to load preview");
+      } finally {
+        setLoading(false);
+        setInitialLoadComplete(true);
       }
-
-      loadPreview();
     }
+
+    loadInitialPreview();
   }, [page, initialLoadComplete, globalWidgets, themeSettings, widgets]);
 
-  // Handle incremental widget changes after initial load
+  // The new, unified update effect
   useEffect(() => {
-    if (!initialLoadComplete || !iframeRef.current || !widgets) return;
-
-    const currentOrder = page?.widgetsOrder || Object.keys(widgets || {});
-    const previousOrder = prevWidgetsOrderRef.current || [];
-    const previousWidgets = prevWidgetsRef.current || {};
-
-    // Detect what changed
-    const changes = detectWidgetChanges(widgets, previousWidgets, currentOrder, previousOrder);
-
-    async function handleIncrementalChanges() {
-      const iframe = iframeRef.current;
-
-      try {
-        // Handle widget additions
-        for (const widgetId of changes.addedWidgets) {
-          const widget = widgets[widgetId];
-          const position = currentOrder.indexOf(widgetId);
-
-          if (widget && position !== -1) {
-            console.log(`Adding widget ${widgetId} at position ${position}`);
-            const success = await addWidgetToPreview(iframe, widgetId, widget, position, themeSettings);
-            if (success) {
-              console.log(`Successfully added widget ${widgetId}`);
-            }
-          }
-        }
-
-        // Handle widget removals
-        for (const widgetId of changes.removedWidgets) {
-          console.log(`Removing widget ${widgetId}`);
-          const success = removeWidgetFromPreview(iframe, widgetId);
-          if (success) {
-            console.log(`Successfully removed widget ${widgetId}`);
-          }
-        }
-
-        // Handle reordering (only if no adds/removes)
-        if (changes.orderChanged) {
-          console.log(`Reordering widgets to:`, currentOrder);
-          const success = reorderWidgetsInPreview(iframe, currentOrder);
-          if (success) {
-            console.log(`Successfully reordered widgets`);
-          }
-        }
-
-        // Update refs for next comparison
-        prevWidgetsRef.current = JSON.parse(JSON.stringify(widgets));
-        prevWidgetsOrderRef.current = [...currentOrder];
-      } catch (error) {
-        console.error("Error handling incremental widget changes:", error);
-        // Fall back to full reload on error
-        console.log("Falling back to full reload...");
-        setInitialLoadComplete(false);
-      }
-    }
-
-    // Only apply incremental changes if there are structural changes
-    if (changes.addedWidgets.length > 0 || changes.removedWidgets.length > 0 || changes.orderChanged) {
-      handleIncrementalChanges();
-    }
-  }, [widgets, page?.widgetsOrder, initialLoadComplete, themeSettings]);
-
-  // Update theme settings without reloading
-  useEffect(() => {
-    if (!initialLoadComplete || !iframeRef.current || !themeSettings) return;
-
-    // Only update if theme settings have changed
-    if (JSON.stringify(themeSettings) !== JSON.stringify(prevThemeSettingsRef.current)) {
-      updateThemeSettings(iframeRef.current, themeSettings);
-      prevThemeSettingsRef.current = JSON.parse(JSON.stringify(themeSettings));
-    }
-  }, [themeSettings, initialLoadComplete]);
-
-  // Update widget settings by re-rendering the widget
-  useEffect(() => {
-    if (!initialLoadComplete || !iframeRef.current || !widgets) return;
-
-    // Make sure the iframe and its document are fully loaded
-    const iframe = iframeRef.current;
-    const iframeDoc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
-
-    if (!iframeDoc) {
-      console.log("Iframe document not ready yet, skipping widget update");
-      return;
-    }
-
-    // Get the current widget IDs in the iframe
-    const existingWidgetIds = new Set();
-    iframeDoc.querySelectorAll("[data-widget-id]").forEach((el) => {
-      existingWidgetIds.add(el.getAttribute("data-widget-id"));
-    });
-
-    // Check each widget for setting changes (NOT structural changes)
-    Object.entries(widgets).forEach(async ([widgetId, widget]) => {
-      const prevWidget = prevWidgetsRef.current?.[widgetId];
-
-      // Only check for settings changes, not structural changes
-      if (prevWidget) {
-        const settingsChanged = JSON.stringify(widget.settings) !== JSON.stringify(prevWidget.settings);
-        const blocksChanged = JSON.stringify(widget.blocks) !== JSON.stringify(prevWidget.blocks);
-        const blockOrderChanged = JSON.stringify(widget.blocksOrder) !== JSON.stringify(prevWidget.blocksOrder);
-
-        const hasSettingsChanges = settingsChanged || blocksChanged || blockOrderChanged;
-
-        if (hasSettingsChanges && existingWidgetIds.has(widgetId)) {
-          try {
-            // Pass themeSettings to updateWidget
-            const success = await updateWidget(iframe, widgetId, widget, selectedBlockId, themeSettings);
-            if (success) {
-              // Update our cache for this specific widget
-              if (!prevWidgetsRef.current) prevWidgetsRef.current = {};
-              prevWidgetsRef.current[widgetId] = JSON.parse(JSON.stringify(widget));
-            }
-          } catch (error) {
-            console.error(`Error updating widget ${widgetId}:`, error);
-          }
-        }
-      }
-    });
-  }, [widgets, initialLoadComplete, themeSettings, selectedBlockId]);
-
-  // Update global widgets by re-rendering them (individual updates, not full reload)
-  useEffect(() => {
-    if (!initialLoadComplete || !iframeRef.current || !globalWidgets) return;
-
-    const iframe = iframeRef.current;
-    const iframeDoc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
-
-    if (!iframeDoc) {
-      console.log("Iframe document not ready yet, skipping global widget update");
-      return;
-    }
-
-    // Check header widget for changes (only settings, not structural)
-    if (globalWidgets.header && prevGlobalWidgetsRef.current?.header) {
-      const hasHeaderChanges =
-        JSON.stringify(globalWidgets.header.settings) !== JSON.stringify(prevGlobalWidgetsRef.current.header.settings);
-
-      if (hasHeaderChanges) {
-        updateWidget(iframe, "header", globalWidgets.header, selectedBlockId, themeSettings)
-          .then((success) => {
-            if (success && prevGlobalWidgetsRef.current) {
-              prevGlobalWidgetsRef.current.header = JSON.parse(JSON.stringify(globalWidgets.header));
-            }
-          })
-          .catch((error) => console.error("Error updating header widget:", error));
-      }
-    }
-
-    // Check footer widget for changes (only settings, not structural)
-    if (globalWidgets.footer && prevGlobalWidgetsRef.current?.footer) {
-      const hasFooterChanges =
-        JSON.stringify(globalWidgets.footer.settings) !== JSON.stringify(prevGlobalWidgetsRef.current.footer.settings);
-
-      if (hasFooterChanges) {
-        updateWidget(iframe, "footer", globalWidgets.footer, selectedBlockId, themeSettings)
-          .then((success) => {
-            if (success && prevGlobalWidgetsRef.current) {
-              prevGlobalWidgetsRef.current.footer = JSON.parse(JSON.stringify(globalWidgets.footer));
-            }
-          })
-          .catch((error) => console.error("Error updating footer widget:", error));
-      }
-    }
-  }, [globalWidgets, initialLoadComplete, themeSettings, selectedBlockId]);
-
-  // Highlight selected widget or block (updated to handle global widgets)
-  useEffect(() => {
+    // Don't run updates until the initial HTML has been loaded and rendered
     if (!initialLoadComplete || !iframeRef.current) return;
 
-    // Add a small delay to ensure the DOM is ready after any updates
-    const highlightTimer = setTimeout(() => {
-      // Handle global widget highlighting
-      if (selectedGlobalWidgetId) {
-        highlightWidget(iframeRef.current, selectedGlobalWidgetId, selectedBlockId);
-      } else {
-        highlightWidget(iframeRef.current, selectedWidgetId, selectedBlockId);
-      }
-    }, 50);
+    const currentState = {
+      page,
+      widgets,
+      globalWidgets,
+      themeSettings,
+      selectedWidgetId,
+      selectedBlockId,
+      selectedGlobalWidgetId,
+    };
 
-    return () => clearTimeout(highlightTimer);
-  }, [selectedWidgetId, selectedBlockId, selectedGlobalWidgetId, initialLoadComplete, previewHtml]);
+    // Call the master update function
+    updatePreview(iframeRef.current, currentState, previousStateRef.current);
 
-  // Update iframe content when HTML changes (only for initial load now)
+    // After the update, save the current state for the next comparison
+    previousStateRef.current = currentState;
+  }, [
+    initialLoadComplete,
+    page,
+    widgets,
+    globalWidgets,
+    themeSettings,
+    selectedWidgetId,
+    selectedBlockId,
+    selectedGlobalWidgetId,
+  ]);
+
+  // Highlight widget/block on selection change - keep this for immediate feedback
   useEffect(() => {
-    if (!iframeRef.current || !previewHtml) return;
+    if (!initialLoadComplete || !iframeRef.current) return;
+    highlightWidget(iframeRef.current, selectedWidgetId || selectedGlobalWidgetId, selectedBlockId);
+  }, [selectedWidgetId, selectedBlockId, selectedGlobalWidgetId, initialLoadComplete]);
 
-    try {
-      const iframe = iframeRef.current;
-      const iframeDoc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
-
-      if (!iframeDoc) {
-        console.error("Could not access iframe document");
-        return;
-      }
-
-      // Clear any existing content
-      iframeDoc.open();
-
-      // Transform image paths to API URLs for preview
-      const transformedHtml = previewHtml.replace(
-        /src="\/uploads\/images\//g,
-        `src="${API_URL("/api/media/projects/")}${activeProject.id}/uploads/images/`,
-      );
-
-      // Write the new content
-      iframeDoc.write(transformedHtml);
-
-      // Close the document
-      iframeDoc.close();
-
-      // Ensure the iframe window is properly initialized
-      if (iframe.contentWindow && typeof iframe.contentWindow.PreviewRuntime !== "undefined") {
-        iframe.contentWindow.PreviewRuntime.initializeRuntime();
-      }
-    } catch (error) {
-      console.error("Error updating iframe content:", error);
-      setError("Failed to update preview");
-    }
-  }, [previewHtml, activeProject]);
-
-  // Initialize the settings cache when the preview loads
-  useEffect(() => {
-    if (initialLoadComplete && widgets) {
-      // Reset widget settings cache
-      widgetSettingsRef.current = new Map();
-      Object.entries(widgets || {}).forEach(([widgetId, widget]) => {
-        widgetSettingsRef.current.set(widgetId, { ...widget.settings });
-      });
-    }
-  }, [initialLoadComplete, widgets]);
+  const iframeSrcDoc = previewHtml.replace(
+    "</head>",
+    `<script src="${API_URL(
+      "/src/utils/previewRuntime.js",
+    )}"></script><base href="${activeProject?.liveUrl || document.baseURI}" target="_blank"></head>`,
+  );
 
   return (
-    <div className="flex-1 bg-slate-100 relative flex justify-center overflow-auto">
+    <div className="flex-1 bg-white relative">
       {loading && (
-        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
-            <p className="mt-2 text-sm text-slate-600">Loading preview...</p>
+        <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-20">
+          <div className="text-center">
+            <svg
+              className="mx-auto h-12 w-12 text-slate-400 animate-spin"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            <p className="mt-2 text-sm text-slate-500">Loading Preview...</p>
           </div>
         </div>
       )}
       {error && (
-        <div className="absolute inset-0 bg-white flex items-center justify-center z-10">
-          <div className="text-red-500 text-center">
-            <p className="text-lg font-medium">Error loading preview</p>
-            <p className="text-sm mt-1">{error}</p>
-          </div>
+        <div className="absolute inset-0 bg-red-50 p-4 text-red-700 z-20">
+          <p className="font-bold">Preview Error</p>
+          <p className="text-sm">{error}</p>
+          <button
+            onClick={() => setInitialLoadComplete(false)}
+            className="mt-2 px-2 py-1 bg-red-200 text-red-800 rounded text-xs hover:bg-red-300"
+          >
+            Reload Preview
+          </button>
         </div>
       )}
-
-      {/* Simplified iframe container to prevent double scrollbars */}
-      <div
-        className={`bg-white shadow-lg transition-all duration-300 ${
-          previewMode === "mobile"
-            ? "w-[375px] h-[667px]"
-            : previewMode === "tablet"
-              ? "w-[768px] h-[1024px]"
-              : "w-full h-full"
+      <iframe
+        ref={iframeRef}
+        srcDoc={iframeSrcDoc}
+        title="Page Preview"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+        className={`w-full h-full border-0 transition-all duration-300 ease-in-out ${
+          previewMode === "desktop" ? "max-w-full" : ""
+        } ${previewMode === "tablet" ? "max-w-3xl mx-auto shadow-2xl" : ""} ${
+          previewMode === "mobile" ? "max-w-sm mx-auto shadow-2xl" : ""
         }`}
-      >
-        <iframe ref={iframeRef} className="w-full h-full border-0" title="Page Preview" />
-      </div>
+        onLoad={() => {
+          // This will be called after the initial srcDoc is loaded
+          setInitialLoadComplete(true);
+        }}
+      />
     </div>
   );
-}
+});
+
+export default PreviewPanel;
