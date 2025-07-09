@@ -89,6 +89,7 @@ export async function updatePreview(iframe, newState, oldState) {
     themeSettings: newThemeSettings,
     selectedWidgetId: newSelectedWidgetId,
     selectedBlockId: newSelectedBlockId,
+    selectedGlobalWidgetId: newSelectedGlobalWidgetId,
     page: newPage,
   } = newState;
 
@@ -241,9 +242,10 @@ export async function updatePreview(iframe, newState, oldState) {
   // Finally, apply highlight and scroll to the selected widget/block
   // We use a timeout to ensure the DOM is fully settled after all updates.
   setTimeout(() => {
-    highlightWidget(iframe, newSelectedWidgetId, newSelectedBlockId);
-    if (newSelectedWidgetId) {
-      scrollWidgetIntoView(iframe, newSelectedWidgetId);
+    const finalSelectedWidgetId = newSelectedWidgetId || newSelectedGlobalWidgetId;
+    highlightWidget(iframe, finalSelectedWidgetId, newSelectedBlockId);
+    if (finalSelectedWidgetId) {
+      scrollWidgetIntoView(iframe, finalSelectedWidgetId);
     }
   }, 50); // A small delay can help prevent race conditions
 }

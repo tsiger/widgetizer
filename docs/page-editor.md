@@ -19,7 +19,7 @@ The `PageEditor` is composed of several specialized child components, each with 
   - Adding, duplicating, and deleting widgets.
   - Adding blocks to a widget.
 
-- **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page as it would appear to an end-user. It reflects all changes to widget settings, content, and theme settings in real-time.
+- **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page. It has been refactored to work declaratively. Instead of being told _how_ to change, it simply receives the latest application state from the editor and uses a central `updatePreview` function to synchronize the `<iframe>`'s DOM. This makes it highly robust and less prone to rendering race conditions.
 
 - **`SettingsPanel`**: The right-hand panel. When a widget or block is selected, this panel dynamically displays the relevant configuration options based on its schema. All changes made here are immediately applied to the selected component and reflected in the preview.
 
@@ -58,7 +58,8 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 5.  This function executes two key actions:
     - It calls `updateWidgetSettings()` from the `useWidgetStore` to update the data.
     - It calls `useAutoSave.getState().markWidgetModified()` to notify the save store that a change has occurred.
-6.  The `PreviewPanel`, subscribed to the `useWidgetStore`, automatically re-renders to reflect the change.
+6.  The `PreviewPanel`, subscribed to all relevant stores, detects the state change.
+7.  It triggers a master `updatePreview` function located in `src/utils/previewManager.js`. This function intelligently diffs the new state against the previous state and applies only the necessary changes to the preview `<iframe>`. This ensures the preview is always a perfect, up-to-date reflection of the application state and resolves complex ordering and selection bugs.
 
 ### Previewing a Page
 
