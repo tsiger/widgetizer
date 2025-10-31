@@ -973,3 +973,14 @@ Automatic font loading and optimization:
 12. **Documentation**: Document custom features, settings, and usage guidelines
 
 This theming system provides a powerful and flexible foundation for creating beautiful, functional websites while maintaining consistency and ease of use. The combination of widgets and blocks allows for maximum flexibility while keeping the user interface intuitive and manageable.
+
+---
+
+## 14. Theme Lifecycle in Projects
+
+When a new project is created, the selected theme is copied into the project's data directory so it can be customized independently of the source theme:
+
+- **Destination**: `/data/projects/<projectId>/`
+- **Copied items**: `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`
+
+After this copy, edits in the project affect only that project's files and do not modify the original theme in `/themes/`.
