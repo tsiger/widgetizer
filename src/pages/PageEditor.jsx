@@ -57,8 +57,9 @@ export default function PageEditor() {
   // Load initial data
   useEffect(() => {
     const pageId = searchParams.get("pageId");
+    // Always call loadPage, even with null pageId - it handles the null case properly
+    usePageStore.getState().loadPage(pageId);
     if (pageId) {
-      usePageStore.getState().loadPage(pageId);
       useWidgetStore.getState().loadSchemas();
       useThemeStore.getState().loadSettings();
     }
