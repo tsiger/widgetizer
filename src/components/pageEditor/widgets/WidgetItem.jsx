@@ -1,6 +1,6 @@
 import { GripVertical, Trash2, Copy, Plus } from "lucide-react";
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import SortableBlockItem from "../blocks/SortableBlockItem";
 import BlockInsertionZone from "../blocks/BlockInsertionZone";
@@ -24,34 +24,14 @@ export default function WidgetItem({
   isBlockSelectorOpen,
   activeWidgetId,
   activeBlockTriggerKey,
+  onBlockDragEnd,
 }) {
   const widgetName = widget.settings?.name || widgetSchema.displayName || widget.type;
   const hasBlocks = widgetSchema.blocks && widgetSchema.blocks.length > 0;
   const blocks = widget.blocks || {};
   const blockOrder = widget.blocksOrder || [];
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 4,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const oldIndex = blockOrder.indexOf(active.id);
-      const newIndex = blockOrder.indexOf(over.id);
-      const newOrder = [...blockOrder];
-      newOrder.splice(oldIndex, 1);
-      newOrder.splice(newIndex, 0, active.id);
-      onBlocksReorder(widgetId, newOrder);
-    }
-  };
 
   return (
     <div
@@ -108,9 +88,8 @@ export default function WidgetItem({
         <div className="border-t border-slate-100">
           <div className="p-2">
             <DndContext
-              sensors={sensors}
               collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
+              onDragEnd={onBlockDragEnd}
               modifiers={[restrictToVerticalAxis]}
             >
               <SortableContext items={blockOrder} strategy={verticalListSortingStrategy}>
