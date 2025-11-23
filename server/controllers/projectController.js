@@ -250,13 +250,19 @@ export async function createProject(req, res) {
       throw new Error(`Failed to copy theme: ${error.message}`);
     }
 
+    // Track if we're setting this as active (only happens if no active project exists)
+    const wasFirstProject = data.projects.length === 0;
+
     data.projects.push(newProject);
     if (!data.activeProjectId) {
       data.activeProjectId = newProject.id;
     }
     await writeProjectsFile(data);
 
-    res.status(201).json(newProject);
+    res.status(201).json({
+      ...newProject,
+      wasSetAsActive: wasFirstProject,
+    });
   } catch (error) {
     console.error("Project creation error:", error);
     res.status(500).json({ error: error.message || "Failed to create project" });

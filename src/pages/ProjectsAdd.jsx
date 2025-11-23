@@ -6,7 +6,7 @@ import PageLayout from "../components/layout/PageLayout";
 import ProjectForm from "../components/projects/ProjectForm.jsx";
 import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
-import { createProject, setActiveProject, getActiveProject } from "../utils/projectManager";
+import { createProject } from "../utils/projectManager";
 import useProjectStore from "../stores/projectStore";
 
 export default function ProjectsAdd() {
@@ -22,16 +22,12 @@ export default function ProjectsAdd() {
     setIsSubmitting(true);
 
     try {
-      // Try to get active project first
-      const activeProject = await getActiveProject();
-
-      // Create the new project
+      // Create the project (backend handles activation if needed)
       const newProject = await createProject(formData);
       setLastCreatedProject(newProject);
 
-      // If we had no active project, this is our first one - set it as active
-      if (!activeProject) {
-        await setActiveProject(newProject.id);
+      // Update store if backend activated it
+      if (newProject.wasSetAsActive) {
         setActiveProjectInStore(newProject);
         showToast(`Project "${formData.name}" was created and set as active`, "success");
       } else {
