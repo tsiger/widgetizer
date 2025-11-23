@@ -6,7 +6,7 @@ import PageLayout from "../components/layout/PageLayout";
 import ProjectForm from "../components/projects/ProjectForm.jsx";
 import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
-import { createProject } from "../utils/projectManager";
+import { createProject } from "../queries/projectManager";
 import useProjectStore from "../stores/projectStore";
 
 export default function ProjectsAdd() {

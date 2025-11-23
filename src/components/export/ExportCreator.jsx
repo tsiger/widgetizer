@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Button from "../ui/Button";
-import { exportProjectAPI } from "../../utils/exportManager";
+import { exportProjectAPI } from "../../queries/exportManager";
 import useToastStore from "../../stores/toastStore";
 import { Loader2 } from "lucide-react";
 

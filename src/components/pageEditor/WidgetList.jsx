@@ -24,7 +24,7 @@ import WidgetSection from "./widgets/WidgetSection";
 import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
 import useAutoSave from "../../stores/saveStore";
-import { scrollWidgetIntoView } from "../../utils/previewManager";
+import { scrollWidgetIntoView } from "../../queries/previewManager";
 import WidgetSelector from "./WidgetSelector";
 import BlockSelector from "./blocks/BlockSelector";
 

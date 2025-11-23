@@ -1,6 +1,6 @@
 import { useState } from "react";
 import DOMPurify from "dompurify";
-import { uploadProjectMedia } from "../utils/mediaManager";
+import { uploadProjectMedia } from "../queries/mediaManager";
 
 const CHUNK_SIZE = 5; // Process 5 files at a time
 

@@ -8,7 +8,7 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 
 import useToastStore from "../stores/toastStore";
-import { getMenu, updateMenu } from "../utils/menuManager";
+import { getMenu, updateMenu } from "../queries/menuManager";
 
 export default function MenusEdit() {
   const { id } = useParams();

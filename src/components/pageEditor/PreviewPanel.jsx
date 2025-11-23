@@ -3,7 +3,7 @@ import {
   fetchPreview,
   updatePreview, // Import the new master update function
   highlightWidget,
-} from "../../utils/previewManager";
+} from "../../queries/previewManager";
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
 import { API_URL } from "../../config";

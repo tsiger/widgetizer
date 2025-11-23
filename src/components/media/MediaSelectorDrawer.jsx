@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Search, Play } from "lucide-react";
 import { API_URL } from "../../config";
-import { getProjectMedia } from "../../utils/mediaManager";
+import { getProjectMedia } from "../../queries/mediaManager";
 import LoadingSpinner from "../ui/LoadingSpinner";
 
 export default function MediaSelectorDrawer({ visible, onClose, onSelect, activeProject, filterType = "all" }) {

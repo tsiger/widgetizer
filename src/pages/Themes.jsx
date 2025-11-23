@@ -6,7 +6,7 @@ import Badge from "../components/ui/Badge";
 import { UploadCloud } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 
-import { getAllThemes, getThemeScreenshotUrl, uploadThemeZip } from "../utils/themeManager";
+import { getAllThemes, getThemeScreenshotUrl, uploadThemeZip } from "../queries/themeManager";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";

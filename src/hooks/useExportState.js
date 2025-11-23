@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getActiveProject } from "../utils/projectManager";
-import { getExportHistory } from "../utils/exportManager";
+import { getActiveProject } from "../queries/projectManager";
+import { getExportHistory } from "../queries/exportManager";
 import useToastStore from "../stores/toastStore";
 
 export default function useExportState() {

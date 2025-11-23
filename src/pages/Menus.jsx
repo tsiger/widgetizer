@@ -10,7 +10,7 @@ import { IconButton } from "../components/ui/Button";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import useConfirmationModal from "../hooks/useConfirmationModal";
 
-import { getAllMenus, deleteMenu, duplicateMenu } from "../utils/menuManager";
+import { getAllMenus, deleteMenu, duplicateMenu } from "../queries/menuManager";
 import { formatDate } from "../utils/dateFormatter";
 
 import useToastStore from "../stores/toastStore";

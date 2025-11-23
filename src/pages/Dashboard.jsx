@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import PageLayout from "../components/layout/PageLayout";
 import { LoadingSpinner, Card } from "../components/ui";
 
-import { getAllProjects } from "../utils/projectManager";
+import { getAllProjects } from "../queries/projectManager";
 import useProjectStore from "../stores/projectStore";
 
 export default function Dashboard() {

@@ -17,7 +17,7 @@ import {
   deleteProject,
   duplicateProject,
   setActiveProject as setActiveProjectInBackend,
-} from "../utils/projectManager";
+} from "../queries/projectManager";
 import { formatDate } from "../utils/dateFormatter";
 
 import ConfirmationModal from "../components/ui/ConfirmationModal";

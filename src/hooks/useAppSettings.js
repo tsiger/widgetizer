@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getAppSettings, saveAppSettings } from "../utils/appSettingsManager.js";
+import { getAppSettings, saveAppSettings } from "../queries/appSettingsManager.js";
 import useToastStore from "../stores/toastStore.js";
 import settingsSchema from "../config/appSettings.schema.json";
 

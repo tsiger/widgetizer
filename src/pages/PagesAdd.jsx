@@ -6,7 +6,7 @@ import PageLayout from "../components/layout/PageLayout";
 import PageForm from "../components/pages/PageForm";
 import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
-import { createPage } from "../utils/pageManager";
+import { createPage } from "../queries/pageManager";
 
 export default function PagesAdd() {
   const navigate = useNavigate();

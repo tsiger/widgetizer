@@ -5,7 +5,7 @@ import PageLayout from "../components/layout/PageLayout";
 import MenuEditor from "../components/menus/MenuEditor";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
-import { getMenu, updateMenu } from "../utils/menuManager";
+import { getMenu, updateMenu } from "../queries/menuManager";
 
 import useToastStore from "../stores/toastStore";
 

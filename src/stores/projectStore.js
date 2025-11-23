@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getActiveProject } from "../utils/projectManager";
+import { getActiveProject } from "../queries/projectManager";
 
 // Create the store
 const useProjectStore = create((set) => ({

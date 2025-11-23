@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { uploadProjectMedia, getProjectMedia } from "../../../utils/mediaManager";
+import { uploadProjectMedia, getProjectMedia } from "../../../queries/mediaManager";
 import { API_URL } from "../../../config";
 import useProjectStore from "../../../stores/projectStore";
 import useToastStore from "../../../stores/toastStore";

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getThemeSettings } from "../utils/themeManager";
+import { getThemeSettings } from "../queries/themeManager";
 
 const useThemeStore = create((set) => ({
   // State

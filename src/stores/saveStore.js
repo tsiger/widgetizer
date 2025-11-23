@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { savePageContent } from "../utils/pageManager";
-import { saveGlobalWidget } from "../utils/previewManager";
+import { savePageContent } from "../queries/pageManager";
+import { saveGlobalWidget } from "../queries/previewManager";
 import usePageStore from "./pageStore";
 
 const useAutoSave = create((set, get) => ({

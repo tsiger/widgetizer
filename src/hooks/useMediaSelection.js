@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { deleteProjectMedia, deleteMultipleMedia } from "../utils/mediaManager";
+import { deleteProjectMedia, deleteMultipleMedia } from "../queries/mediaManager";
 import useConfirmationModal from "./useConfirmationModal";
 
 export default function useMediaSelection({ activeProject, showToast, setFiles, filteredFiles }) {

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getProjectWidgets } from "../utils/previewManager";
+import { getProjectWidgets } from "../queries/previewManager";
 import usePageStore from "./pageStore";
 import useAutoSave from "./saveStore";
 

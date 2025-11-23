@@ -1,7 +1,7 @@
 import React from "react";
 import { IconButton } from "../ui/Button";
 import Tooltip from "../ui/Tooltip";
-import { getExportEntryFile, downloadExportZip, deleteExportAPI } from "../../utils/exportManager";
+import { getExportEntryFile, downloadExportZip, deleteExportAPI } from "../../queries/exportManager";
 import useToastStore from "../../stores/toastStore";
 import useConfirmationModal from "../../hooks/useConfirmationModal";
 import ConfirmationModal from "../ui/ConfirmationModal";

@@ -6,7 +6,7 @@ import PageLayout from "../components/layout/PageLayout";
 import MenuForm from "../components/menus/MenuForm";
 import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
-import { createMenu } from "../utils/menuManager";
+import { createMenu } from "../queries/menuManager";
 
 export default function MenusAdd() {
   const navigate = useNavigate();

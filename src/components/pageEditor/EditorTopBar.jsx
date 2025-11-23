@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Save, Clock, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { getAllPages } from "../../utils/pageManager";
+import { getAllPages } from "../../queries/pageManager";
 
 export default function EditorTopBar({
   pageName,

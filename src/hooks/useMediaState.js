@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getProjectMedia, refreshMediaUsage } from "../utils/mediaManager";
+import { getProjectMedia, refreshMediaUsage } from "../queries/mediaManager";
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
 

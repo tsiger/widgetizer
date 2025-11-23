@@ -5,7 +5,7 @@ import { API_URL } from "../config";
 import useProjectStore from "../stores/projectStore";
 import usePageStore from "../stores/pageStore";
 import useThemeStore from "../stores/themeStore";
-import { fetchPreview } from "../utils/previewManager";
+import { fetchPreview } from "../queries/previewManager";
 
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 

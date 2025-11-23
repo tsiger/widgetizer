@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getAllMenus } from "../../../utils/menuManager";
+import { getAllMenus } from "../../../queries/menuManager";
 
 /**
  * MenuSelectInput component

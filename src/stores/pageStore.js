@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { getPage } from "../utils/pageManager";
-import { getGlobalWidgets } from "../utils/previewManager";
+import { getPage } from "../queries/pageManager";
+import { getGlobalWidgets } from "../queries/previewManager";
 
 const usePageStore = create((set, get) => ({
   // State

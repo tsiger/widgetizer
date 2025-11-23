@@ -17,7 +17,7 @@ import Button from "../../ui/Button";
 import SortableList from "./SortableList";
 import DragOverlayComponent from "./DragOverlay";
 import { ensureIds, findItemById, getItemAtPath, generateId } from "./utils/menuUtils";
-import { getAllPages } from "../../../utils/pageManager";
+import { getAllPages } from "../../../queries/pageManager";
 
 function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
   // Ensure all items have IDs

@@ -7,7 +7,7 @@ import { SettingsPanel } from "../components/settings";
 
 import useToastStore from "../stores/toastStore";
 
-import { getThemeSettings, saveThemeSettings } from "../utils/themeManager";
+import { getThemeSettings, saveThemeSettings } from "../queries/themeManager";
 
 export default function Settings() {
   const [themeData, setThemeData] = useState(null);

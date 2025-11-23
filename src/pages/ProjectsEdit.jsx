@@ -8,7 +8,7 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 
 import useToastStore from "../stores/toastStore";
-import { updateProject, getAllProjects, getActiveProject } from "../utils/projectManager";
+import { updateProject, getAllProjects, getActiveProject } from "../queries/projectManager";
 import useProjectStore from "../stores/projectStore";
 
 export default function ProjectsEdit() {

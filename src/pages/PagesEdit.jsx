@@ -8,7 +8,7 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 
 import useToastStore from "../stores/toastStore";
-import { getPage, updatePage } from "../utils/pageManager";
+import { getPage, updatePage } from "../queries/pageManager";
 
 export default function PagesEdit() {
   const { id } = useParams();

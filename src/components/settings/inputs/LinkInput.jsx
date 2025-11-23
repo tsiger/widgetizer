@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { getAllPages } from "../../../utils/pageManager";
+import { getAllPages } from "../../../queries/pageManager";
 import TextInput from "./TextInput";
 import CheckboxInput from "./CheckboxInput";
 import SettingsField from "../SettingsField";
