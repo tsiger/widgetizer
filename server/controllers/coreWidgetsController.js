@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { CORE_WIDGETS_DIR } from "../config.js";
+import { extractWidgetSchema } from "../utils/widgetSchemaExtractor.js";
 
 /**
  * Get all available core widgets
@@ -24,15 +25,10 @@ export async function getCoreWidgets() {
           const filePath = path.join(CORE_WIDGETS_DIR, filename);
           const content = await fs.readFile(filePath, "utf8");
 
-          // Extract widget schema from HTML content
-          const scriptTagStart = '<script type="application/json" data-widget-schema>';
-          const scriptTagEnd = "</script>";
-          const startIndex = content.indexOf(scriptTagStart);
-          const endIndex = content.indexOf(scriptTagEnd, startIndex);
-
-          if (startIndex !== -1 && endIndex !== -1) {
-            const jsonStr = content.substring(startIndex + scriptTagStart.length, endIndex).trim();
-            return JSON.parse(jsonStr);
+          // Extract widget schema using HTML parser
+          const schema = extractWidgetSchema(content);
+          if (schema) {
+            return schema;
           }
         } catch (error) {
           console.error(`Error loading schema for core widget ${filename}:`, error);
@@ -59,16 +55,8 @@ export async function getCoreWidget(widgetName) {
     if (await fs.pathExists(filePath)) {
       const content = await fs.readFile(filePath, "utf8");
 
-      // Extract widget schema from HTML content
-      const scriptTagStart = '<script type="application/json" data-widget-schema>';
-      const scriptTagEnd = "</script>";
-      const startIndex = content.indexOf(scriptTagStart);
-      const endIndex = content.indexOf(scriptTagEnd, startIndex);
-
-      if (startIndex !== -1 && endIndex !== -1) {
-        const jsonStr = content.substring(startIndex + scriptTagStart.length, endIndex).trim();
-        return JSON.parse(jsonStr);
-      }
+      // Extract widget schema using HTML parser
+      return extractWidgetSchema(content);
     }
 
     return null;

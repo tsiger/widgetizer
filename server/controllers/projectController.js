@@ -12,6 +12,7 @@ import {
   getThemeDir,
   getProjectMenusDir,
 } from "../config.js";
+import { extractWidgetSchema } from "../utils/widgetSchemaExtractor.js";
 
 // Make sure the projects directory exists
 async function ensureDirectories() {
@@ -554,17 +555,8 @@ export async function getProjectWidgets(req, res) {
         }
         const content = await fs.readFile(filePath, "utf8");
 
-        // Extract widget schema from HTML content
-        const scriptTagStart = '<script type="application/json" data-widget-schema>';
-        const scriptTagEnd = "</script>";
-        const startIndex = content.indexOf(scriptTagStart);
-        const endIndex = content.indexOf(scriptTagEnd, startIndex);
-
-        if (startIndex !== -1 && endIndex !== -1) {
-          const jsonStr = content.substring(startIndex + scriptTagStart.length, endIndex).trim();
-          const schema = JSON.parse(jsonStr);
-          return schema;
-        }
+        // Extract widget schema using HTML parser
+        return extractWidgetSchema(content);
       } catch (parseError) {
         // Silently handle widget schema parsing errors
       }
