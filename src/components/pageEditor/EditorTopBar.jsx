@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Save, Clock, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getAllPages } from "../../utils/pageManager";
-import useNavigationGuard from "../../hooks/useNavigationGuard";
 
 export default function EditorTopBar({
   pageName,
@@ -18,7 +17,7 @@ export default function EditorTopBar({
   const [pages, setPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { guardedNavigate } = useNavigationGuard();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadPages = async () => {
@@ -50,7 +49,7 @@ export default function EditorTopBar({
   }, [isDropdownOpen]);
 
   const handlePageChange = (pageId) => {
-    guardedNavigate(`/page-editor?pageId=${pageId}`);
+    navigate(`/page-editor?pageId=${pageId}`);
     setIsDropdownOpen(false);
   };
 
@@ -60,7 +59,7 @@ export default function EditorTopBar({
     <div className="bg-white text-slate-900 border-b border-slate-200 p-2 flex justify-between items-center">
       <div className="flex items-center gap-3">
         <button
-          onClick={() => guardedNavigate("/pages")}
+          onClick={() => navigate("/pages")}
           className="flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm hover:bg-slate-100 text-slate-600 hover:text-slate-800"
           title="Back to Pages"
         >

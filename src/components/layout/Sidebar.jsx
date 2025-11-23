@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Home, Folder, File, Menu, Image, Settings, Rocket, SlidersHorizontal, Layers, Puzzle } from "lucide-react";
 import useProjectStore from "../../stores/projectStore";
 
-export default function Sidebar({ guardedNavigate }) {
+export default function Sidebar() {
   const location = useLocation();
   const { activeProject } = useProjectStore();
   const hasActiveProject = !!activeProject;
@@ -24,21 +24,16 @@ export default function Sidebar({ guardedNavigate }) {
       disabled ? "text-slate-500" : isActive(path) ? "text-white" : "text-pink-600"
     }`;
 
-  // Custom navigation handler
-  const handleNavigation = (e, path, disabled = false) => {
-    if (disabled) {
-      e.preventDefault();
-      return;
-    }
-    if (guardedNavigate) {
-      e.preventDefault();
-      guardedNavigate(path);
-    }
-    // If no guardedNavigate, let the Link handle it normally
-  };
-
   const NavLink = ({ to, children, disabled = false, ...props }) => (
-    <Link to={disabled ? "#" : to} onClick={(e) => handleNavigation(e, to, disabled)} {...props}>
+    <Link
+      to={disabled ? "#" : to}
+      onClick={(e) => {
+        if (disabled) {
+          e.preventDefault();
+        }
+      }}
+      {...props}
+    >
       {children}
     </Link>
   );

@@ -1,9 +1,8 @@
-import { useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useBlocker } from "react-router-dom";
 import useAutoSave from "../stores/saveStore";
 
 export default function useNavigationGuard() {
-  const navigate = useNavigate();
   const { hasUnsavedChanges, reset } = useAutoSave();
 
   // Layer 1: Browser navigation (beforeunload) - handles tab closing, URL changes, etc.
@@ -20,36 +19,34 @@ export default function useNavigationGuard() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasUnsavedChanges]);
 
-  // Layer 2: Internal navigation guard - provides a guarded navigate function
-  const guardedNavigate = useCallback(
-    (to, options = {}) => {
-      if (hasUnsavedChanges()) {
-        const confirmed = window.confirm(
-          'You have unsaved changes. Are you sure you want to leave?\n\nClick "OK" to discard changes or "Cancel" to stay.',
-        );
+  // Layer 2: Internal navigation blocking using React Router's useBlocker
+  // This automatically intercepts ALL navigation attempts (Link clicks, navigate() calls, etc.)
+  const blocker = useBlocker(({ currentLocation, nextLocation }) => {
+    // Block navigation if there are unsaved changes and the location is actually changing
+    // Check both pathname and search params (for page editor dropdown switching)
+    const isLocationChanging =
+      currentLocation.pathname !== nextLocation.pathname ||
+      currentLocation.search !== nextLocation.search;
+    
+    return hasUnsavedChanges() && isLocationChanging;
+  });
 
-        if (!confirmed) {
-          return false;
-        }
+  // Handle blocked navigation with confirmation dialog
+  useEffect(() => {
+    if (blocker.state === "blocked") {
+      const confirmed = window.confirm(
+        'You have unsaved changes. Are you sure you want to leave?\n\nClick "OK" to discard changes or "Cancel" to stay.',
+      );
 
+      if (confirmed) {
         // Reset unsaved changes state when user confirms leaving without saving
         reset();
+        // Allow the navigation to proceed
+        blocker.proceed();
+      } else {
+        // Cancel the navigation
+        blocker.reset();
       }
-
-      navigate(to, options);
-      return true;
-    },
-    [navigate, hasUnsavedChanges, reset],
-  );
-
-  // Helper function to check if we have unsaved changes
-  const checkUnsavedChanges = useCallback(() => {
-    return hasUnsavedChanges();
-  }, [hasUnsavedChanges]);
-
-  return {
-    guardedNavigate,
-    hasUnsavedChanges: checkUnsavedChanges(),
-    checkUnsavedChanges,
-  };
+    }
+  }, [blocker, reset]);
 }

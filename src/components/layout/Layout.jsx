@@ -7,11 +7,13 @@ import useNavigationGuard from "../../hooks/useNavigationGuard";
 export default function Layout() {
   const location = useLocation();
   const isPageEditor = location.pathname === "/page-editor";
-  const { guardedNavigate } = useNavigationGuard();
+  
+  // Activate navigation guard (useBlocker) when on page editor route
+  useNavigationGuard();
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {!isPageEditor && <Sidebar guardedNavigate={guardedNavigate} />}
+      {!isPageEditor && <Sidebar />}
 
       <div className={`flex-1 flex flex-col relative z-30 ${!isPageEditor ? "ml-[72px] md:ml-48" : ""}`}>
         <Content>
