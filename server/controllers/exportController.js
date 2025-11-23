@@ -143,6 +143,8 @@ export async function cleanupProjectExports(projectId) {
 }
 
 // Main function to handle the export request
+
+
 export async function exportProject(req, res) {
   const { projectId } = req.params;
 
@@ -151,16 +153,16 @@ export async function exportProject(req, res) {
       return res.status(400).json({ error: "Project ID is required" });
     }
 
-    // First, define the project directory path. This is essential.
-    const projectDir = getProjectDir(projectId);
-
-    // Now, read the central projects file to get metadata like siteUrl.
+    // Read projects file to get slug and metadata
     const projectsData = await readProjectsFile();
     const projectData = projectsData.projects.find((p) => p.id === projectId);
 
     if (!projectData) {
       throw new Error(`Project with ID "${projectId}" not found in projects.json`);
     }
+
+    const projectSlug = projectData.slug || projectData.id;
+    const projectDir = getProjectDir(projectSlug);
     const siteUrl = projectData.siteUrl || "";
 
     // Continue with defining export version and output directories.

@@ -53,28 +53,28 @@ export default function ProjectsEdit() {
       });
       setProject(updatedProject);
 
-      // Check if the project ID changed (due to slug change)
-      if (updatedProject.id !== id) {
+      // Check if the project slug changed
+      if (updatedProject.slug !== project.slug) {
         // If this was the active project, refresh the active project state
         if (activeProject && activeProject.id === id) {
           const refreshedActiveProject = await getActiveProject();
           setActiveProject(refreshedActiveProject);
         }
-        // Navigate to the new URL with the updated project ID
-        navigate(`/projects/edit/${updatedProject.id}`, { replace: true });
         showToast(`Project "${formData.name}" was updated successfully and folder was renamed.`, "success");
-        return false;
+        // No need to navigate as ID is stable
+      } else {
+        // If this was the active project, refresh the active project state
+        if (activeProject && activeProject.id === id) {
+          const refreshedActiveProject = await getActiveProject();
+          setActiveProject(refreshedActiveProject);
+        }
+        showToast(`Project "${formData.name}" was updated successfully!`, "success");
       }
 
-      // If this was the active project, refresh the active project state
-      if (activeProject && activeProject.id === id) {
-        const refreshedActiveProject = await getActiveProject();
-        setActiveProject(refreshedActiveProject);
-      }
-
-      showToast(`Project "${formData.name}" was updated successfully!`, "success");
       setShowSuccessActions(true);
       return false;
+
+
     } catch (err) {
       showToast(err.message || "Failed to update project", "error");
       return false;

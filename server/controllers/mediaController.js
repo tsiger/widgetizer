@@ -17,6 +17,7 @@ import {
 } from "../config.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
+import { getProjectSlug } from "../utils/projectHelpers.js";
 
 // Get image processing settings from app settings
 async function getImageProcessingSettings() {
@@ -64,7 +65,8 @@ function decodeFileName(filename) {
 
 // Read media.json metadata file
 export async function readMediaFile(projectId) {
-  const mediaFilePath = getProjectMediaJsonPath(projectId);
+  const projectSlug = await getProjectSlug(projectId);
+  const mediaFilePath = getProjectMediaJsonPath(projectSlug);
 
   try {
     await fs.access(mediaFilePath);
@@ -84,7 +86,8 @@ export async function readMediaFile(projectId) {
 
 // Write media metadata file
 async function writeMediaFile(projectId, data) {
-  const mediaFilePath = getProjectMediaJsonPath(projectId);
+  const projectSlug = await getProjectSlug(projectId);
+  const mediaFilePath = getProjectMediaJsonPath(projectSlug);
   await fs.outputFile(mediaFilePath, JSON.stringify(data, null, 2));
 }
 
@@ -93,12 +96,13 @@ const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
     try {
       const { projectId } = req.params;
+      const projectSlug = await getProjectSlug(projectId);
       let targetDir;
 
       if (file.mimetype.startsWith("video/")) {
-        targetDir = getProjectVideosDir(projectId);
+        targetDir = getProjectVideosDir(projectSlug);
       } else {
-        targetDir = getProjectImagesDir(projectId);
+        targetDir = getProjectImagesDir(projectSlug);
       }
 
       await fs.ensureDir(targetDir);
@@ -114,12 +118,13 @@ const storage = multer.diskStorage({
       const nameWithoutExt = path.basename(decodedName, extension);
       let cleanName = slugify(nameWithoutExt, { lower: true, strict: true, trim: true });
       const { projectId } = req.params;
+      const projectSlug = await getProjectSlug(projectId);
 
       let targetDir;
       if (file.mimetype.startsWith("video/")) {
-        targetDir = getProjectVideosDir(projectId);
+        targetDir = getProjectVideosDir(projectSlug);
       } else {
-        targetDir = getProjectImagesDir(projectId);
+        targetDir = getProjectImagesDir(projectSlug);
       }
 
       let finalName = `${cleanName}${extension}`;
@@ -160,9 +165,10 @@ export async function getProjectMedia(req, res) {
 
   try {
     const { projectId } = req.params;
+    const projectSlug = await getProjectSlug(projectId);
 
     // Ensure project exists
-    const projectDir = getProjectDir(projectId);
+    const projectDir = getProjectDir(projectSlug);
     if (!(await fs.pathExists(projectDir))) {
       return res.status(404).json({ error: "Project not found" });
     }
@@ -449,10 +455,11 @@ export async function deleteProjectMedia(req, res) {
 
     // Remove the physical files from storage
     let fileDir;
+    const projectSlug = await getProjectSlug(projectId);
     if (fileToDelete.type && fileToDelete.type.startsWith("video/")) {
-      fileDir = getProjectVideosDir(projectId);
+      fileDir = getProjectVideosDir(projectSlug);
     } else {
-      fileDir = getProjectImagesDir(projectId);
+      fileDir = getProjectImagesDir(projectSlug);
     }
 
     // 1. Delete the original file
@@ -512,10 +519,11 @@ export async function serveProjectMedia(req, res) {
       const ext = path.extname(filename).toLowerCase();
       const videoExtensions = [".mp4", ".webm", ".ogg", ".avi", ".mov"];
 
+      const projectSlug = await getProjectSlug(projectId);
       if (videoExtensions.includes(ext)) {
-        filePath = getVideoPath(projectId, filename);
+        filePath = getVideoPath(projectSlug, filename);
       } else {
-        filePath = getImagePath(projectId, filename);
+        filePath = getImagePath(projectSlug, filename);
       }
     }
     // Otherwise, look up the file by ID
@@ -529,7 +537,8 @@ export async function serveProjectMedia(req, res) {
         return res.status(404).json({ error: "File not found" });
       }
 
-      filePath = path.join(getProjectDir(projectId), fileInfo.path);
+      const projectSlug = await getProjectSlug(projectId);
+      filePath = path.join(getProjectDir(projectSlug), fileInfo.path);
     }
 
     if (!filePath) {
@@ -625,10 +634,11 @@ export async function bulkDeleteProjectMedia(req, res) {
     const deletePromises = filesToDelete.map(async (file) => {
       // 1. Delete the original file
       let fileDir;
+      const projectSlug = await getProjectSlug(projectId);
       if (file.type && file.type.startsWith("video/")) {
-        fileDir = getProjectVideosDir(projectId);
+        fileDir = getProjectVideosDir(projectSlug);
       } else {
-        fileDir = getProjectImagesDir(projectId);
+        fileDir = getProjectImagesDir(projectSlug);
       }
 
       const originalFilePath = path.join(fileDir, file.filename);
@@ -643,7 +653,7 @@ export async function bulkDeleteProjectMedia(req, res) {
           const size = file.sizes[sizeName];
           if (size && size.path) {
             const sizeFilename = path.basename(size.path);
-            const sizeFilePath = path.join(getProjectImagesDir(projectId), sizeFilename);
+            const sizeFilePath = path.join(getProjectImagesDir(projectSlug), sizeFilename);
             try {
               if (await fs.pathExists(sizeFilePath)) await fs.unlink(sizeFilePath);
             } catch (err) {

@@ -5,6 +5,7 @@ import { readProjectsFile } from "./projectController.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
+import { getProjectSlug } from "../utils/projectHelpers.js";
 
 // Get the directory path of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -19,6 +20,8 @@ function injectRuntimeScript(html) {
   // Ensure replacement happens even with attributes on body tag
   return html.replace(/<\/body>/i, `${script}\n</body>`);
 }
+
+
 
 // Generate preview HTML
 export async function generatePreview(req, res) {
@@ -146,7 +149,8 @@ export async function getGlobalWidgets(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const projectDir = getProjectDir(activeProjectId);
+    const projectSlug = await getProjectSlug(activeProjectId);
+    const projectDir = getProjectDir(projectSlug);
     // Global widgets *data* is stored in pages/global, not widgets/global
     const globalPagesDir = path.join(projectDir, "pages", "global");
 
@@ -212,7 +216,8 @@ export async function saveGlobalWidget(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const projectDir = getProjectDir(activeProjectId);
+    const projectSlug = await getProjectSlug(activeProjectId);
+    const projectDir = getProjectDir(projectSlug);
     const globalPagesDir = path.join(projectDir, "pages", "global");
 
     // Ensure global directory exists
@@ -236,7 +241,8 @@ export async function serveAsset(req, res) {
   const { projectId, folder, filename } = req.params;
 
   // Build the path to the asset file
-  const filePath = path.join(__dirname, "../../data/projects", projectId, folder, filename);
+  const projectSlug = await getProjectSlug(projectId);
+  const filePath = path.join(__dirname, "../../data/projects", projectSlug, folder, filename);
 
   try {
     // Check if file exists using fs-extra

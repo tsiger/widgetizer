@@ -14,8 +14,9 @@ export async function getAllMenus(req, res) {
     if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
+    const projectSlug = activeProject.slug || activeProject.id;
 
-    const menusDir = getProjectMenusDir(activeProject.id);
+    const menusDir = getProjectMenusDir(projectSlug);
 
     if (!(await fs.pathExists(menusDir))) {
       return res.json([]);
@@ -73,14 +74,15 @@ export async function createMenu(req, res) {
     if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
+    const projectSlug = activeProject.slug || activeProject.id;
 
-    const menusDir = getProjectMenusDir(activeProject.id);
+    const menusDir = getProjectMenusDir(projectSlug);
     await fs.ensureDir(menusDir);
 
     // Generate unique ID from name (or use requested ID if provided)
-    const menuId = requestedId || (await generateUniqueMenuId(activeProject.id, name));
+    const menuId = requestedId || (await generateUniqueMenuId(projectSlug, name));
 
-    const menuPath = getMenuPath(activeProject.id, menuId);
+    const menuPath = getMenuPath(projectSlug, menuId);
     if (await fs.pathExists(menuPath)) {
       return res.status(400).json({ error: "A menu with this name already exists" });
     }
@@ -112,13 +114,15 @@ export async function deleteMenu(req, res) {
 
   try {
     const { id } = req.params;
-    const { activeProjectId } = await readProjectsFile();
+    const { projects, activeProjectId } = await readProjectsFile();
+    const activeProject = projects.find((p) => p.id === activeProjectId);
 
-    if (!activeProjectId) {
+    if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
+    const projectSlug = activeProject.slug || activeProject.id;
 
-    const menuPath = getMenuPath(activeProjectId, id);
+    const menuPath = getMenuPath(projectSlug, id);
     await fs.remove(menuPath);
     res.json({ success: true });
   } catch (error) {
@@ -136,13 +140,15 @@ export async function getMenu(req, res) {
 
   try {
     const { id } = req.params;
-    const { activeProjectId } = await readProjectsFile();
+    const { projects, activeProjectId } = await readProjectsFile();
+    const activeProject = projects.find((p) => p.id === activeProjectId);
 
-    if (!activeProjectId) {
+    if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
+    const projectSlug = activeProject.slug || activeProject.id;
 
-    const menuPath = getMenuPath(activeProjectId, id);
+    const menuPath = getMenuPath(projectSlug, id);
     if (!(await fs.pathExists(menuPath))) {
       return res.status(404).json({ error: "Menu not found" });
     }
@@ -166,13 +172,15 @@ export async function updateMenu(req, res) {
     const currentMenuId = req.params.id;
     const menuData = req.body;
 
-    const { activeProjectId } = await readProjectsFile();
+    const { projects, activeProjectId } = await readProjectsFile();
+    const activeProject = projects.find((p) => p.id === activeProjectId);
 
-    if (!activeProjectId) {
+    if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
+    const projectSlug = activeProject.slug || activeProject.id;
 
-    const currentMenuPath = getMenuPath(activeProjectId, currentMenuId);
+    const currentMenuPath = getMenuPath(projectSlug, currentMenuId);
 
     // Check if current menu exists
     if (!(await fs.pathExists(currentMenuPath))) {
@@ -193,7 +201,7 @@ export async function updateMenu(req, res) {
 
     // Only rename if the expected ID is different from current AND the new path doesn't exist
     if (expectedIdFromName !== currentMenuId) {
-      const newMenuPath = getMenuPath(activeProjectId, expectedIdFromName);
+      const newMenuPath = getMenuPath(projectSlug, expectedIdFromName);
 
       if (!(await fs.pathExists(newMenuPath))) {
         // Safe to rename
@@ -276,13 +284,15 @@ export async function duplicateMenu(req, res) {
 
   try {
     const { id } = req.params;
-    const { activeProjectId } = await readProjectsFile();
+    const { projects, activeProjectId } = await readProjectsFile();
+    const activeProject = projects.find((p) => p.id === activeProjectId);
 
-    if (!activeProjectId) {
+    if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
+    const projectSlug = activeProject.slug || activeProject.id;
 
-    const originalMenuPath = getMenuPath(activeProjectId, id);
+    const originalMenuPath = getMenuPath(projectSlug, id);
 
     // Check if original menu exists
     if (!(await fs.pathExists(originalMenuPath))) {
@@ -295,7 +305,7 @@ export async function duplicateMenu(req, res) {
 
     // Generate new unique name and ID
     const baseName = `Copy of ${originalMenu.name}`;
-    const newMenuId = await generateUniqueMenuId(activeProjectId, baseName);
+    const newMenuId = await generateUniqueMenuId(projectSlug, baseName);
 
     // Create the duplicated menu with new data
     const duplicatedMenu = {
@@ -308,7 +318,7 @@ export async function duplicateMenu(req, res) {
     };
 
     // Save the new menu
-    const newMenuPath = getMenuPath(activeProjectId, newMenuId);
+    const newMenuPath = getMenuPath(projectSlug, newMenuId);
     await fs.outputFile(newMenuPath, JSON.stringify(duplicatedMenu, null, 2));
 
     res.status(201).json(duplicatedMenu);

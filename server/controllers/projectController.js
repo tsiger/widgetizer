@@ -13,6 +13,7 @@ import {
   getProjectMenusDir,
 } from "../config.js";
 import { extractWidgetSchema } from "../utils/widgetSchemaExtractor.js";
+import { v4 as uuidv4 } from "uuid";
 
 // Make sure the projects directory exists
 async function ensureDirectories() {
@@ -125,7 +126,7 @@ export async function createProject(req, res) {
         return res.status(400).json({ error: "Slug can only contain lowercase letters, numbers, and hyphens" });
       }
       // Check for duplicate slugs
-      const duplicateSlug = data.projects.find((p) => p.slug === slug || p.id === slug);
+      const duplicateSlug = data.projects.find((p) => p.slug === slug); // ID check removed
       if (duplicateSlug) {
         return res
           .status(400)
@@ -137,8 +138,8 @@ export async function createProject(req, res) {
     }
 
     const newProject = {
-      id: slug, // Keep id same as slug for backward compatibility
-      slug, // Permanent folder identifier
+      id: uuidv4(), // ✅ Generate stable UUID
+      slug, // Folder identifier
       name,
       description,
       theme,
@@ -352,12 +353,7 @@ export async function updateProject(req, res) {
         await new Promise((resolve) => setTimeout(resolve, 100));
         await fs.remove(oldDir);
 
-        newProjectId = newSlug; // Update the project ID to match the new slug
-
-        // Update activeProjectId if this project is currently active
-        if (data.activeProjectId === id) {
-          data.activeProjectId = newProjectId;
-        }
+        // ID remains the same! We only updated the slug/folder.
       } catch (renameError) {
         // If copy succeeded but remove failed, try to clean up the new directory
         try {
@@ -374,7 +370,7 @@ export async function updateProject(req, res) {
     // Update the project data
     updatedProject = {
       ...updatedProject,
-      id: newProjectId,
+      id: id, // ID never changes
       slug: updates.slug || currentSlug, // Ensure slug is always set
       name: updates.name || updatedProject.name,
       description: updates.description !== undefined ? updates.description : updatedProject.description,
@@ -486,7 +482,7 @@ export async function duplicateProject(req, res) {
     // Create the new project metadata
     const newProject = {
       ...originalProject,
-      id: newSlug, // Keep id same as slug for backward compatibility
+      id: uuidv4(), // ✅ Generate new stable UUID
       slug: newSlug, // Permanent folder identifier
       name: newName,
       created: new Date().toISOString(),
@@ -494,7 +490,9 @@ export async function duplicateProject(req, res) {
     };
 
     // Copy the entire project directory
-    const originalDir = getProjectDir(originalProjectId);
+    // Use slug for directory path, not ID
+    const originalSlug = originalProject.slug || originalProject.id;
+    const originalDir = getProjectDir(originalSlug);
     const newDir = getProjectDir(newSlug);
 
     try {
@@ -533,7 +531,17 @@ export async function getProjectWidgets(req, res) {
 
   try {
     const { projectId } = req.params;
-    const projectRootDir = getProjectDir(projectId);
+    
+    // Need to look up project to get the slug/folder name
+    const data = await readProjectsFile();
+    const project = data.projects.find(p => p.id === projectId);
+    
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+    
+    const projectSlug = project.slug || project.id;
+    const projectRootDir = getProjectDir(projectSlug);
     const widgetsBaseDir = path.join(projectRootDir, "widgets");
     const globalWidgetsDir = path.join(widgetsBaseDir, "global");
 

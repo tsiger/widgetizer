@@ -18,6 +18,7 @@ import { registerImageFilter } from "../../src/core/filters/imageFilter.js";
 import { registerVideoFilter } from "../../src/core/filters/videoFilter.js";
 import { registerYouTubeFilter } from "../../src/core/filters/youtubeFilter.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
+import { getProjectSlug } from "../utils/projectHelpers.js";
 
 // Get the directory path of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -45,6 +46,8 @@ engine.registerTag("seo", SeoTag);
 registerImageFilter(engine);
 registerVideoFilter(engine);
 registerYouTubeFilter(engine);
+
+
 
 /**
  * Helper function to get project data by ID
@@ -117,7 +120,8 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
 async function renderWidget(projectId, widgetId, widgetData, rawThemeSettings, renderMode = "preview") {
   try {
     const { type, settings = {}, blocks = {}, blocksOrder = [] } = widgetData;
-    const projectDir = getProjectDir(projectId);
+    const projectSlug = await getProjectSlug(projectId);
+    const projectDir = getProjectDir(projectSlug);
 
     // Determine if this is a core widget (prefixed with "core-")
     const isCoreWidget = type.startsWith("core-");
@@ -253,7 +257,8 @@ async function renderWidget(projectId, widgetId, widgetData, rawThemeSettings, r
 async function renderPageLayout(projectId, pageContent, pageData, rawThemeSettings, renderMode = "preview") {
   try {
     // 1. Fetch layout.liquid for the project
-    const projectDir = getProjectDir(projectId);
+    const projectSlug = await getProjectSlug(projectId);
+    const projectDir = getProjectDir(projectSlug);
     const layoutPath = path.join(projectDir, "layout.liquid");
 
     let layoutTemplate;
