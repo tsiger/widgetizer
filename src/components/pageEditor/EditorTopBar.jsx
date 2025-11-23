@@ -11,11 +11,11 @@ export default function EditorTopBar({
   isSaving,
   lastSaved,
   onSave,
-  previewMode = "desktop",
-  onPreviewModeChange,
+  onPreviewModeChange, // Callback to notify parent of preview mode changes
 }) {
   const [pages, setPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [previewMode, setPreviewMode] = useState("desktop");
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -53,6 +53,11 @@ export default function EditorTopBar({
     setIsDropdownOpen(false);
   };
 
+  const handlePreviewModeChange = (mode) => {
+    setPreviewMode(mode);
+    onPreviewModeChange?.(mode);
+  };
+
   const hasMultiplePages = pages.length > 1;
 
   return (
@@ -71,7 +76,7 @@ export default function EditorTopBar({
       <div className="flex items-center gap-3">
         <div className="flex gap-1 p-1 bg-slate-200 rounded-md">
           <button
-            onClick={() => onPreviewModeChange && onPreviewModeChange("desktop")}
+            onClick={() => handlePreviewModeChange("desktop")}
             title="Desktop View"
             className={`p-1.5 rounded ${
               previewMode === "desktop" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
@@ -80,7 +85,7 @@ export default function EditorTopBar({
             <Monitor size={18} />
           </button>
           <button
-            onClick={() => onPreviewModeChange && onPreviewModeChange("mobile")}
+            onClick={() => handlePreviewModeChange("mobile")}
             title="Mobile View"
             className={`p-1.5 rounded ${
               previewMode === "mobile" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"

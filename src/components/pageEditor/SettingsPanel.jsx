@@ -1,6 +1,8 @@
 import { ArrowLeft } from "lucide-react";
 import { SettingsRenderer } from "../settings";
 import usePageStore from "../../stores/pageStore";
+import useWidgetStore from "../../stores/widgetStore";
+import useAutoSave from "../../stores/saveStore";
 
 export default function SettingsPanel({
   selectedWidget,
@@ -9,12 +11,11 @@ export default function SettingsPanel({
   selectedBlockId,
   selectedGlobalWidgetId,
   widgetSchemas,
-  onSettingChange,
-  onBlockSettingChange,
-  onGlobalWidgetSettingChange,
   onBackToWidget,
 }) {
   const { globalWidgets } = usePageStore();
+  const { updateWidgetSettings, updateGlobalWidgetSettings, updateBlockSettings } = useWidgetStore();
+  const { markWidgetModified } = useAutoSave();
 
   const isGlobalWidget = !!selectedGlobalWidgetId;
   const globalWidget = isGlobalWidget ? globalWidgets[selectedGlobalWidgetId] : null;
@@ -47,11 +48,14 @@ export default function SettingsPanel({
 
   const handleSettingChange = (settingId, value) => {
     if (isGlobalWidget) {
-      onGlobalWidgetSettingChange && onGlobalWidgetSettingChange(selectedGlobalWidgetId, settingId, value);
+      updateGlobalWidgetSettings(selectedGlobalWidgetId, settingId, value);
+      markWidgetModified(selectedGlobalWidgetId);
     } else if (selectedBlockId) {
-      onBlockSettingChange(selectedWidgetId, selectedBlockId, settingId, value);
+      updateBlockSettings(selectedWidgetId, selectedBlockId, settingId, value);
+      markWidgetModified(selectedWidgetId);
     } else {
-      onSettingChange(selectedWidgetId, settingId, value);
+      updateWidgetSettings(selectedWidgetId, settingId, value);
+      markWidgetModified(selectedWidgetId);
     }
   };
 

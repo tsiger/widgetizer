@@ -22,6 +22,11 @@ import FixedWidgetItem from "./widgets/FixedWidgetItem";
 import WidgetItem from "./widgets/WidgetItem";
 import WidgetSection from "./widgets/WidgetSection";
 import usePageStore from "../../stores/pageStore";
+import useWidgetStore from "../../stores/widgetStore";
+import useAutoSave from "../../stores/saveStore";
+import { scrollWidgetIntoView } from "../../utils/previewManager";
+import WidgetSelector from "./WidgetSelector";
+import BlockSelector from "./blocks/BlockSelector";
 
 export default function WidgetList({
   page,
@@ -34,21 +39,26 @@ export default function WidgetList({
   onWidgetSelect,
   onBlockSelect,
   onGlobalWidgetSelect,
-  onWidgetsReorder,
-  onBlocksReorder,
-  onDeleteWidget,
-  onDuplicateWidget,
-  onAddWidgetClick,
-  onAddBlockClick,
-  isWidgetSelectorOpen,
-  activeWidgetTriggerPosition,
-  isBlockSelectorOpen,
-  activeWidgetId,
-  activeBlockTriggerKey,
+  previewIframeRef, // Need this for scroll coordination
 }) {
   const [activeId, setActiveId] = useState(null);
+  
+  // WidgetSelector modal state
+  const [isWidgetSelectorOpen, setIsWidgetSelectorOpen] = useState(false);
+  const [insertPosition, setInsertPosition] = useState(0);
+  const [widgetTriggerRef, setWidgetTriggerRef] = useState(null);
+  const [activeWidgetTriggerPosition, setActiveWidgetTriggerPosition] = useState(null);
+  
+  // BlockSelector modal state
+  const [isBlockSelectorOpen, setIsBlockSelectorOpen] = useState(false);
+  const [activeWidgetId, setActiveWidgetId] = useState(null);
+  const [blockTriggerRef, setBlockTriggerRef] = useState(null);
+  const [activeBlockTriggerKey, setActiveBlockTriggerKey] = useState(null);
+  const [blockInsertPosition, setBlockInsertPosition] = useState(null);
 
   const { globalWidgets } = usePageStore();
+  const { deleteWidget, duplicateWidget, reorderWidgets, reorderBlocks } = useWidgetStore();
+  const { setStructureModified } = useAutoSave();
   const { header: headerWidget, footer: footerWidget } = globalWidgets;
 
   const sortableWidgets = (page.widgetsOrder || []).map((widgetId) => ({
@@ -87,10 +97,43 @@ export default function WidgetList({
       const newIndex = oldWidgetIds.indexOf(over.id);
       const newOrder = arrayMove(oldWidgetIds, oldIndex, newIndex);
 
-      if (onWidgetsReorder) {
-        onWidgetsReorder(newOrder, active.id);
+      reorderWidgets(newOrder);
+      setStructureModified(true);
+      if (previewIframeRef?.current) {
+        scrollWidgetIntoView(previewIframeRef.current, active.id);
       }
     }
+  };
+
+  // Handle widget deletion
+  const handleDeleteWidget = (widgetId) => {
+    if (!page || !page.widgets[widgetId]) return;
+    deleteWidget(widgetId);
+    setStructureModified(true);
+  };
+
+  // Handle widget duplication
+  const handleDuplicateWidget = (widgetId) => {
+    duplicateWidget(widgetId);
+    setStructureModified(true);
+  };
+
+  // Handle opening widget selector
+  const handleAddWidgetClick = (position, triggerRef) => {
+    setInsertPosition(position);
+    setWidgetTriggerRef(triggerRef);
+    setActiveWidgetTriggerPosition(position);
+    setIsWidgetSelectorOpen(true);
+  };
+
+  // Handle opening block selector
+  const handleAddBlockClick = (widgetId, triggerRef, position = null) => {
+    setActiveWidgetId(widgetId);
+    setBlockTriggerRef(triggerRef);
+    const triggerKey = position !== null ? `${widgetId}-${position}` : `${widgetId}-add`;
+    setActiveBlockTriggerKey(triggerKey);
+    setBlockInsertPosition(position);
+    setIsBlockSelectorOpen(true);
   };
 
   const activeWidget = activeId ? sortableWidgets.find((item) => item.id === activeId) : null;
@@ -127,7 +170,7 @@ export default function WidgetList({
                 <div className="space-y-0">
                   <WidgetInsertionZone
                     position={0}
-                    onAddClick={onAddWidgetClick}
+                    onAddClick={handleAddWidgetClick}
                     isWidgetSelectorOpen={isWidgetSelectorOpen}
                     activeWidgetTriggerPosition={activeWidgetTriggerPosition}
                   />
@@ -146,19 +189,19 @@ export default function WidgetList({
                           isSelected={selectedWidgetId === widgetId}
                           isModified={isModified}
                           onWidgetSelect={onWidgetSelect}
-                          onDeleteClick={onDeleteWidget}
-                          onDuplicateClick={onDuplicateWidget}
+                          onDeleteClick={handleDeleteWidget}
+                          onDuplicateClick={handleDuplicateWidget}
                           selectedBlockId={selectedBlockId}
                           onBlockSelect={onBlockSelect}
-                          onBlocksReorder={onBlocksReorder}
-                          onAddBlockClick={onAddBlockClick}
+                          onBlocksReorder={reorderBlocks}
+                          onAddBlockClick={handleAddBlockClick}
                           isBlockSelectorOpen={isBlockSelectorOpen}
                           activeWidgetId={activeWidgetId}
                           activeBlockTriggerKey={activeBlockTriggerKey}
                         />
                         <WidgetInsertionZone
                           position={index + 1}
-                          onAddClick={onAddWidgetClick}
+                          onAddClick={handleAddWidgetClick}
                           isWidgetSelectorOpen={isWidgetSelectorOpen}
                           activeWidgetTriggerPosition={activeWidgetTriggerPosition}
                         />
@@ -178,7 +221,7 @@ export default function WidgetList({
                       isSelected={true}
                       isModified={modifiedWidgets.has(activeId)}
                       isOverlay={true}
-                      onDuplicateClick={onDeleteWidget}
+                      onDeleteClick={handleDeleteWidget}
                     />
                   </div>
                 ) : null}
@@ -195,7 +238,7 @@ export default function WidgetList({
               }}
               onClick={(e) => {
                 const triggerRef = { current: e.currentTarget };
-                onAddWidgetClick(0, triggerRef);
+                handleAddWidgetClick(0, triggerRef);
               }}
               className="flex items-center justify-center w-full text-slate-500 hover:text-slate-700 hover:bg-slate-100 py-2 rounded-md"
             >
@@ -220,6 +263,50 @@ export default function WidgetList({
           </WidgetSection>
         )}
       </div>
+
+      <WidgetSelector
+        isOpen={isWidgetSelectorOpen}
+        onClose={() => {
+          setIsWidgetSelectorOpen(false);
+          setWidgetTriggerRef(null);
+          setActiveWidgetTriggerPosition(null);
+        }}
+        widgetSchemas={widgetSchemas}
+        onSelectWidget={(type, position) => {
+          const { addWidget } = useWidgetStore.getState();
+          addWidget(type, position);
+          setStructureModified(true);
+        }}
+        position={insertPosition}
+        triggerRef={widgetTriggerRef}
+      />
+
+      <BlockSelector
+        isOpen={isBlockSelectorOpen}
+        onClose={() => {
+          setIsBlockSelectorOpen(false);
+          setActiveWidgetId(null);
+          setBlockTriggerRef(null);
+          setActiveBlockTriggerKey(null);
+          setBlockInsertPosition(null);
+        }}
+        widgetSchema={activeWidgetId ? widgetSchemas[page?.widgets[activeWidgetId]?.type] : null}
+        onSelectBlock={(blockType) => {
+          if (activeWidgetId) {
+            const { addBlock, setSelectedWidgetId, setSelectedBlockId } = useWidgetStore.getState();
+            const newBlockId = addBlock(activeWidgetId, blockType, blockInsertPosition);
+            setStructureModified(true);
+
+            // Keep the widget selected and select the new block
+            setSelectedWidgetId(activeWidgetId);
+            setSelectedBlockId(newBlockId);
+          }
+          setIsBlockSelectorOpen(false);
+          setActiveWidgetId(null);
+          setBlockInsertPosition(null);
+        }}
+        triggerRef={blockTriggerRef}
+      />
     </div>
   );
 }

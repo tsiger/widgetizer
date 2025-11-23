@@ -5,28 +5,16 @@ import WidgetList from "../components/pageEditor/WidgetList";
 import PreviewPanel from "../components/pageEditor/PreviewPanel";
 import SettingsPanel from "../components/pageEditor/SettingsPanel";
 import EditorTopBar from "../components/pageEditor/EditorTopBar";
-import WidgetSelector from "../components/pageEditor/WidgetSelector";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
-import BlockSelector from "../components/pageEditor/blocks/BlockSelector";
 
 import usePageStore from "../stores/pageStore";
 import useWidgetStore from "../stores/widgetStore";
 import useAutoSave from "../stores/saveStore";
 import useThemeStore from "../stores/themeStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
-import { scrollWidgetIntoView } from "../utils/previewManager";
 
 export default function PageEditor() {
   const [searchParams] = useSearchParams();
-  const [isWidgetSelectorOpen, setIsWidgetSelectorOpen] = useState(false);
-  const [insertPosition, setInsertPosition] = useState(0);
-  const [widgetTriggerRef, setWidgetTriggerRef] = useState(null);
-  const [activeWidgetTriggerPosition, setActiveWidgetTriggerPosition] = useState(null);
-  const [isBlockSelectorOpen, setIsBlockSelectorOpen] = useState(false);
-  const [activeWidgetId, setActiveWidgetId] = useState(null);
-  const [blockTriggerRef, setBlockTriggerRef] = useState(null);
-  const [activeBlockTriggerKey, setActiveBlockTriggerKey] = useState(null);
-  const [blockInsertPosition, setBlockInsertPosition] = useState(null);
   const [previewMode, setPreviewMode] = useState("desktop");
   const previewIframeRef = useRef(null);
 
@@ -39,14 +27,6 @@ export default function PageEditor() {
     setSelectedWidgetId,
     setSelectedBlockId,
     setSelectedGlobalWidgetId,
-    addWidget,
-    deleteWidget,
-    duplicateWidget,
-    reorderWidgets,
-    updateWidgetSettings,
-    updateGlobalWidgetSettings,
-    updateBlockSettings,
-    reorderBlocks,
   } = useWidgetStore();
   const { hasUnsavedChanges, isSaving, isAutoSaving, lastSaved, save, startAutoSave, stopAutoSave } = useAutoSave();
   const { settings: themeSettings } = useThemeStore();
@@ -71,86 +51,24 @@ export default function PageEditor() {
     return () => stopAutoSave();
   }, [startAutoSave, stopAutoSave]);
 
-  // Handle preview mode change
-  const handlePreviewModeChange = (mode) => {
-    setPreviewMode(mode);
-  };
-
-  // Handle widget deletion (immediate, no confirmation)
-  const handleDeleteWidgetClick = (widgetId) => {
-    if (!page || !page.widgets[widgetId]) return;
-
-    deleteWidget(widgetId);
-    useAutoSave.getState().setStructureModified(true);
-  };
-
-  // Handle opening the widget selector
-  const handleAddWidgetClick = (position, triggerRef) => {
-    setInsertPosition(position);
-    setWidgetTriggerRef(triggerRef);
-    setActiveWidgetTriggerPosition(position);
-    setIsWidgetSelectorOpen(true);
-  };
-
-  // Handle widget settings change
-  const handleSettingChange = (widgetId, settingId, value) => {
-    updateWidgetSettings(widgetId, settingId, value);
-    useAutoSave.getState().markWidgetModified(widgetId);
-  };
-
-  // NEW: Handle global widget settings change
-  const handleGlobalWidgetSettingChange = (widgetType, settingId, value) => {
-    updateGlobalWidgetSettings(widgetType, settingId, value);
-    useAutoSave.getState().markWidgetModified(widgetType);
-  };
-
-  // Handle widget reordering
-  const handleWidgetsReorder = (newOrder, movedWidgetId) => {
-    reorderWidgets(newOrder);
-    useAutoSave.getState().setStructureModified(true);
-    if (movedWidgetId && previewIframeRef.current) {
-      // Scroll the moved widget into view in the preview
-      scrollWidgetIntoView(previewIframeRef.current, movedWidgetId);
-    }
-  };
-
-  // Handle block settings change
-  const handleBlockSettingChange = (widgetId, blockId, settingId, value) => {
-    updateBlockSettings(widgetId, blockId, settingId, value);
-    useAutoSave.getState().markWidgetModified(widgetId);
-  };
-
-  // Handle block selection
+  // Handle block selection (cross-component coordination)
   const handleBlockSelect = (blockId) => {
     setSelectedBlockId(blockId);
   };
 
-  // Handle widget selection
+  // Handle widget selection (cross-component coordination)
   const handleWidgetSelect = (widgetId) => {
     setSelectedWidgetId(widgetId);
-    // Clear block selection when selecting a widget directly
-    // setSelectedBlockId(null);
   };
 
-  // NEW: Handle global widget selection
+  // Handle global widget selection (cross-component coordination)
   const handleGlobalWidgetSelect = (widgetType) => {
     setSelectedGlobalWidgetId(widgetType);
   };
 
-  // Get the selected widget and its schema
+  // Get the selected widget and its schema (needed by SettingsPanel)
   const selectedWidget = selectedWidgetId && page?.widgets[selectedWidgetId];
   const selectedWidgetSchema = selectedWidget ? widgetSchemas[selectedWidget.type] || {} : {};
-
-  // Add this handler
-  const handleAddBlockClick = (widgetId, triggerRef, position = null) => {
-    setActiveWidgetId(widgetId);
-    setBlockTriggerRef(triggerRef);
-    const triggerKey = position !== null ? `${widgetId}-${position}` : `${widgetId}-add`;
-
-    setActiveBlockTriggerKey(triggerKey);
-    setBlockInsertPosition(position);
-    setIsBlockSelectorOpen(true);
-  };
 
   if (loading) {
     return (
@@ -186,8 +104,7 @@ export default function PageEditor() {
         isSaving={isSaving}
         lastSaved={lastSaved}
         onSave={() => save(false)}
-        previewMode={previewMode}
-        onPreviewModeChange={handlePreviewModeChange}
+        onPreviewModeChange={setPreviewMode}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -201,20 +118,7 @@ export default function PageEditor() {
           onWidgetSelect={handleWidgetSelect}
           onBlockSelect={handleBlockSelect}
           onGlobalWidgetSelect={handleGlobalWidgetSelect}
-          onWidgetsReorder={handleWidgetsReorder}
-          onBlocksReorder={reorderBlocks}
-          onDuplicateWidget={(id) => {
-            duplicateWidget(id);
-            useAutoSave.getState().setStructureModified(true);
-          }}
-          onDeleteWidget={handleDeleteWidgetClick}
-          onAddWidgetClick={handleAddWidgetClick}
-          onAddBlockClick={(widgetId, triggerRef, position) => handleAddBlockClick(widgetId, triggerRef, position)}
-          isWidgetSelectorOpen={isWidgetSelectorOpen}
-          activeWidgetTriggerPosition={activeWidgetTriggerPosition}
-          isBlockSelectorOpen={isBlockSelectorOpen}
-          activeWidgetId={activeWidgetId}
-          activeBlockTriggerKey={activeBlockTriggerKey}
+          previewIframeRef={previewIframeRef}
         />
 
         <PreviewPanel
@@ -235,55 +139,10 @@ export default function PageEditor() {
           selectedWidgetId={selectedWidgetId}
           selectedBlockId={selectedBlockId}
           selectedGlobalWidgetId={selectedGlobalWidgetId}
-          widgetSchemas={widgetSchemas} // NEW: Pass widget schemas for global widget settings
-          onSettingChange={handleSettingChange}
-          onBlockSettingChange={handleBlockSettingChange}
-          onGlobalWidgetSettingChange={handleGlobalWidgetSettingChange}
+          widgetSchemas={widgetSchemas}
           onBackToWidget={() => setSelectedBlockId(null)}
         />
       </div>
-
-      <WidgetSelector
-        isOpen={isWidgetSelectorOpen}
-        onClose={() => {
-          setIsWidgetSelectorOpen(false);
-          setWidgetTriggerRef(null);
-          setActiveWidgetTriggerPosition(null);
-        }}
-        widgetSchemas={widgetSchemas}
-        onSelectWidget={(type, position) => {
-          addWidget(type, position);
-          useAutoSave.getState().setStructureModified(true);
-        }}
-        position={insertPosition}
-        triggerRef={widgetTriggerRef}
-      />
-
-      <BlockSelector
-        isOpen={isBlockSelectorOpen}
-        onClose={() => {
-          setIsBlockSelectorOpen(false);
-          setActiveWidgetId(null);
-          setBlockTriggerRef(null);
-          setActiveBlockTriggerKey(null);
-          setBlockInsertPosition(null);
-        }}
-        widgetSchema={activeWidgetId ? widgetSchemas[page?.widgets[activeWidgetId]?.type] : null}
-        onSelectBlock={(blockType) => {
-          if (activeWidgetId) {
-            const newBlockId = useWidgetStore.getState().addBlock(activeWidgetId, blockType, blockInsertPosition);
-            useAutoSave.getState().markWidgetModified(activeWidgetId);
-
-            // Keep the widget selected and select the new block
-            setSelectedWidgetId(activeWidgetId);
-            setSelectedBlockId(newBlockId);
-          }
-          setIsBlockSelectorOpen(false);
-          setActiveWidgetId(null);
-          setBlockInsertPosition(null);
-        }}
-        triggerRef={blockTriggerRef}
-      />
     </div>
   );
 }
