@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
 import { API_URL } from "../../config";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import Button from "../ui/Button";
@@ -13,48 +14,59 @@ export default function ProjectForm({
   onCancel,
 }) {
   const isNew = !initialData.id;
-  const [formData, setFormData] = useState({
-    name: initialData.name || "",
-    slug: initialData.slug || initialData.id || "", // Use id as fallback for existing projects
-    description: initialData.description || "",
-    theme: initialData.theme || "",
-    siteUrl: initialData.siteUrl || (isNew ? "https://" : ""),
-  });
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const showToast = useToastStore((state) => state.showToast);
 
-  // Use a ref to track if this is the first render
-  const initialRender = useRef(true);
+  const {
+    register,
+    handleSubmit: rhfHandleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm({
+    defaultValues: {
+      name: initialData.name || "",
+      slug: initialData.slug || initialData.id || "",
+      description: initialData.description || "",
+      theme: initialData.theme || "",
+      siteUrl: initialData.siteUrl || (isNew ? "https://" : ""),
+    },
+  });
 
-  // Store the previous initialData for comparison
+  // Watch name for auto-slug generation
+  const name = watch("name");
+  
+  // Track previous initialData to prevent infinite loops
   const prevInitialDataRef = useRef(JSON.stringify(initialData));
 
+  // Auto-generate slug from name for new projects
   useEffect(() => {
-    loadThemes();
-  }, []);
-
-  // Reset form data when initialData changes (for example, after successful submission)
-  useEffect(() => {
-    // Skip the first render since we already set state from initialData
-    if (initialRender.current) {
-      initialRender.current = false;
-      return;
+    if (isNew && name) {
+      setValue("slug", formatSlug(name));
     }
+  }, [name, isNew, setValue]);
 
-    // Compare with previous initialData, not with current formData
+  // Reset form when initialData actually changes
+  useEffect(() => {
     const currentInitialDataStr = JSON.stringify(initialData);
     if (prevInitialDataRef.current !== currentInitialDataStr) {
-      setFormData({
+      reset({
         name: initialData.name || "",
-        slug: initialData.slug || initialData.id || "", // Use id as fallback for existing projects
+        slug: initialData.slug || initialData.id || "",
         description: initialData.description || "",
         theme: initialData.theme || "",
         siteUrl: initialData.siteUrl || (isNew ? "https://" : ""),
       });
       prevInitialDataRef.current = currentInitialDataStr;
     }
-  }, [initialData]);
+  });
+
+  // Load themes and auto-select default
+  useEffect(() => {
+    loadThemes();
+  }, []);
 
   const loadThemes = async () => {
     try {
@@ -69,7 +81,7 @@ export default function ProjectForm({
       if (isNew && !initialData.theme) {
         const defaultTheme = data.find((theme) => theme.id === "default" || theme.name.toLowerCase() === "default");
         if (defaultTheme) {
-          setFormData((prev) => ({ ...prev, theme: defaultTheme.id }));
+          setValue("theme", defaultTheme.id);
         }
       }
     } catch {
@@ -87,41 +99,19 @@ export default function ProjectForm({
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.name.trim()) {
-      showToast("Project name is required", "error");
-      return;
-    }
-
-    if (!formData.slug.trim()) {
-      showToast("Project slug is required", "error");
-      return;
-    }
-
-    // Validate slug format
-    const slugPattern = /^[a-z0-9-]+$/;
-    if (!slugPattern.test(formData.slug)) {
-      showToast("Slug can only contain lowercase letters, numbers, and hyphens", "error");
-      return;
-    }
-
-    if (isNew && !formData.theme) {
-      showToast("Theme is required", "error");
-      return;
-    }
-
+  const onSubmitHandler = async (data) => {
     try {
-      const result = await onSubmit({
-        ...formData,
-        // For new projects, the backend will generate the slug from the name
-        // For existing projects, the slug doesn't change
-      });
+      const result = await onSubmit(data);
 
       // If the parent component signals to reset the form
       if (result === true) {
-        setFormData({ name: "", slug: "", description: "", theme: "", siteUrl: "https://" });
+        reset({
+          name: "",
+          slug: "",
+          description: "",
+          theme: "",
+          siteUrl: "https://",
+        });
       }
       return result;
     } catch (err) {
@@ -130,27 +120,10 @@ export default function ProjectForm({
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => {
-      const updated = {
-        ...prev,
-        [name]: value,
-      };
-
-      // For new projects, auto-generate slug from name
-      if (isNew && name === "name" && value) {
-        updated.slug = formatSlug(value);
-      }
-
-      return updated;
-    });
-  };
-
   if (loading) return <LoadingSpinner message="Un momento por favor..." />;
 
   return (
-    <form onSubmit={handleSubmit} className="form-container">
+    <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="form-container">
       <div className="form-section">
         <div className="form-field">
           <label htmlFor="name" className="form-label">
@@ -159,12 +132,13 @@ export default function ProjectForm({
           <input
             type="text"
             id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
+            {...register("name", {
+              required: "Project name is required",
+              validate: (value) => value.trim() !== "" || "Name cannot be empty",
+            })}
             className="form-input"
-            required
           />
+          {errors.name && <p className="form-error">{errors.name.message}</p>}
           <p className="form-description">
             The display name for your project. Can be changed anytime without affecting the folder structure.
           </p>
@@ -177,14 +151,17 @@ export default function ProjectForm({
           <input
             type="text"
             id="slug"
-            name="slug"
-            value={formData.slug}
-            onChange={handleChange}
+            {...register("slug", {
+              required: "Project slug is required",
+              validate: (value) => value.trim() !== "" || "Slug cannot be empty",
+              pattern: {
+                value: /^[a-z0-9-]+$/,
+                message: "Slug can only contain lowercase letters, numbers, and hyphens",
+              },
+            })}
             className="form-input"
-            required
-            pattern="[a-z0-9-]+"
-            title="Only lowercase letters, numbers, and hyphens are allowed"
           />
+          {errors.slug && <p className="form-error">{errors.slug.message}</p>}
           <p className="form-description">
             The folder name for your project. Only lowercase letters, numbers, and hyphens.{" "}
             {isNew ? "Auto-fills from title but you can edit it." : "Changing this will rename the project folder."}
@@ -197,9 +174,7 @@ export default function ProjectForm({
           </label>
           <textarea
             id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
+            {...register("description")}
             rows="4"
             className="form-textarea"
           />
@@ -212,9 +187,7 @@ export default function ProjectForm({
           <input
             type="url"
             id="siteUrl"
-            name="siteUrl"
-            value={formData.siteUrl}
-            onChange={handleChange}
+            {...register("siteUrl")}
             className="form-input"
             placeholder="https://mysite.com"
           />
@@ -230,11 +203,10 @@ export default function ProjectForm({
             </label>
             <select
               id="theme"
-              name="theme"
-              value={formData.theme}
-              onChange={handleChange}
+              {...register("theme", {
+                required: isNew ? "Theme is required" : false,
+              })}
               className="form-select"
-              required
             >
               <option value="">Select a theme</option>
               {themes.map((theme) => (
@@ -243,6 +215,7 @@ export default function ProjectForm({
                 </option>
               ))}
             </select>
+            {errors.theme && <p className="form-error">{errors.theme.message}</p>}
           </div>
         )}
       </div>

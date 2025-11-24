@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
 import slugify from "slugify";
 import useToastStore from "../../stores/toastStore";
 import useProjectStore from "../../stores/projectStore";
@@ -14,48 +15,68 @@ export default function PageForm({
   submitLabel = "Save",
   onCancel,
 }) {
-  // Initialize form data with SEO defaults
-  const initializeFormData = (data) => ({
-    name: data.name || "",
-    slug: data.slug || "",
-    seo: {
-      description: data.seo?.description || "",
-      og_title: data.seo?.og_title || "",
-      og_image: data.seo?.og_image || "",
-      og_type: data.seo?.og_type || "website",
-      twitter_card: data.seo?.twitter_card || "summary",
-      canonical_url: data.seo?.canonical_url || "",
-      robots: data.seo?.robots || "index,follow",
-    },
-  });
-
-  const [formData, setFormData] = useState(initializeFormData(initialData));
-  const [mediaSelectorVisible, setMediaSelectorVisible] = useState(false);
   const isNew = !initialData.id;
+  const [mediaSelectorVisible, setMediaSelectorVisible] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  // Use a ref to track if this is the first render
-  const initialRender = useRef(true);
+  const {
+    register,
+    handleSubmit: rhfHandleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm({
+    defaultValues: {
+      name: initialData.name || "",
+      slug: initialData.slug || "",
+      seo: {
+        description: initialData.seo?.description || "",
+        og_title: initialData.seo?.og_title || "",
+        og_image: initialData.seo?.og_image || "",
+        og_type: initialData.seo?.og_type || "website",
+        twitter_card: initialData.seo?.twitter_card || "summary",
+        canonical_url: initialData.seo?.canonical_url || "",
+        robots: initialData.seo?.robots || "index,follow",
+      },
+    },
+  });
 
-  // Store the previous initialData for comparison
+  // Watch fields for auto-slug and media display
+  const name = watch("name");
+  const ogImage = watch("seo.og_image");
+
+  // Track previous initialData to prevent infinite loops
   const prevInitialDataRef = useRef(JSON.stringify(initialData));
 
-  // Reset form data when initialData changes (for example, after successful submission)
+  // Auto-generate slug from name for new pages
   useEffect(() => {
-    // Skip the first render since we already set state from initialData
-    if (initialRender.current) {
-      initialRender.current = false;
-      return;
+    if (isNew && name) {
+      setValue("slug", formatSlug(name));
     }
+  }, [name, isNew, setValue]);
 
-    // Compare with previous initialData, not with current formData
+  // Reset form when initialData actually changes
+  useEffect(() => {
     const currentInitialDataStr = JSON.stringify(initialData);
     if (prevInitialDataRef.current !== currentInitialDataStr) {
-      setFormData(initializeFormData(initialData));
+      reset({
+        name: initialData.name || "",
+        slug: initialData.slug || "",
+        seo: {
+          description: initialData.seo?.description || "",
+          og_title: initialData.seo?.og_title || "",
+          og_image: initialData.seo?.og_image || "",
+          og_type: initialData.seo?.og_type || "website",
+          twitter_card: initialData.seo?.twitter_card || "summary",
+          canonical_url: initialData.seo?.canonical_url || "",
+          robots: initialData.seo?.robots || "index,follow",
+        },
+      });
       prevInitialDataRef.current = currentInitialDataStr;
     }
-  }, [initialData]);
+  });
 
   const formatSlug = (value) => {
     return slugify(value, {
@@ -65,23 +86,37 @@ export default function PageForm({
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.name.trim()) {
-      showToast("Page name is required", "error");
-      return;
+  const handleSlugBlur = (e) => {
+    const value = e.target.value;
+    if (value) {
+      setValue("slug", formatSlug(value));
     }
+  };
 
-    if (!formData.slug.trim()) {
-      showToast("Filename is required", "error");
-      return;
+  const handleSelectMedia = (selectedFile) => {
+    if (selectedFile && selectedFile.type && selectedFile.type.startsWith("image/")) {
+      setValue("seo.og_image", selectedFile.path, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setMediaSelectorVisible(false);
+    } else {
+      showToast("Please select an image file.", "error");
     }
+  };
 
+  const handleRemoveImage = () => {
+    setValue("seo.og_image", "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
+  const onSubmitHandler = async (data) => {
     try {
       const result = await onSubmit({
-        ...formData,
-        slug: formatSlug(formData.slug),
+        ...data,
+        slug: formatSlug(data.slug),
       });
 
       return result;
@@ -91,69 +126,8 @@ export default function PageForm({
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => {
-      const updates = { [name]: value };
-
-      // Auto-generate slug only when creating new page and editing the name
-      if (isNew && name === "name") {
-        updates.slug = formatSlug(value);
-      }
-
-      return { ...prev, ...updates };
-    });
-  };
-
-  const handleSeoChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      seo: {
-        ...prev.seo,
-        [name]: value,
-      },
-    }));
-  };
-
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    if (name === "slug") {
-      setFormData((prev) => ({
-        ...prev,
-        slug: formatSlug(value),
-      }));
-    }
-  };
-
-  const handleSelectMedia = (selectedFile) => {
-    if (selectedFile && selectedFile.type && selectedFile.type.startsWith("image/")) {
-      setFormData((prev) => ({
-        ...prev,
-        seo: {
-          ...prev.seo,
-          og_image: selectedFile.path,
-        },
-      }));
-      setMediaSelectorVisible(false);
-    } else {
-      showToast("Please select an image file.", "error");
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setFormData((prev) => ({
-      ...prev,
-      seo: {
-        ...prev.seo,
-        og_image: "",
-      },
-    }));
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="form-container">
+    <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="form-container">
       {/* Main Page Data */}
       <div className="form-section">
         <div className="form-field">
@@ -163,12 +137,13 @@ export default function PageForm({
           <input
             type="text"
             id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
+            {...register("name", {
+              required: "Page name is required",
+              validate: (value) => value.trim() !== "" || "Name cannot be empty",
+            })}
             className="form-input"
-            required
           />
+          {errors.name && <p className="form-error">{errors.name.message}</p>}
         </div>
 
         <div className="form-field">
@@ -180,15 +155,16 @@ export default function PageForm({
             <input
               type="text"
               id="slug"
-              name="slug"
-              value={formData.slug}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              {...register("slug", {
+                required: "Filename is required",
+                validate: (value) => value.trim() !== "" || "Filename cannot be empty",
+              })}
+              onBlur={handleSlugBlur}
               className="form-input flex-1"
-              required
             />
             <span className="text-slate-500 ml-1">.html</span>
           </div>
+          {errors.slug && <p className="form-error">{errors.slug.message}</p>}
         </div>
       </div>
 
@@ -202,9 +178,7 @@ export default function PageForm({
           </label>
           <textarea
             id="seo-description"
-            name="description"
-            value={formData.seo.description}
-            onChange={handleSeoChange}
+            {...register("seo.description")}
             rows={3}
             className="form-textarea"
           />
@@ -220,9 +194,7 @@ export default function PageForm({
           <input
             type="text"
             id="seo-og-title"
-            name="og_title"
-            value={formData.seo.og_title}
-            onChange={handleSeoChange}
+            {...register("seo.og_title")}
             className="form-input"
           />
           <p className="form-description">
@@ -232,18 +204,30 @@ export default function PageForm({
 
         <div className="form-field">
           <label className="form-label-optional">Social Media Image</label>
-          {formData.seo.og_image ? (
+          {ogImage ? (
             <div className="relative w-full max-w-md bg-slate-100 rounded-md overflow-hidden group">
               <img
-                src={API_URL(`/api/media/projects/${activeProject?.id}${formData.seo.og_image}`)}
+                src={API_URL(`/api/media/projects/${activeProject?.id}${ogImage}`)}
                 alt="Social media preview"
                 className="w-full h-32 object-cover"
               />
               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button variant="icon" size="sm" onClick={() => setMediaSelectorVisible(true)} title="Change image">
+                <Button 
+                  type="button"
+                  variant="icon" 
+                  size="sm" 
+                  onClick={() => setMediaSelectorVisible(true)} 
+                  title="Change image"
+                >
                   <FolderOpen size={16} />
                 </Button>
-                <Button variant="icon" size="sm" onClick={handleRemoveImage} title="Remove image">
+                <Button 
+                  type="button"
+                  variant="icon" 
+                  size="sm" 
+                  onClick={handleRemoveImage} 
+                  title="Remove image"
+                >
                   <X size={16} />
                 </Button>
               </div>
@@ -268,9 +252,7 @@ export default function PageForm({
           <input
             type="url"
             id="seo-canonical-url"
-            name="canonical_url"
-            value={formData.seo.canonical_url}
-            onChange={handleSeoChange}
+            {...register("seo.canonical_url")}
             className="form-input"
           />
           <p className="form-description">
@@ -284,9 +266,7 @@ export default function PageForm({
           </label>
           <select
             id="seo-robots"
-            name="robots"
-            value={formData.seo.robots}
-            onChange={handleSeoChange}
+            {...register("seo.robots")}
             className="form-select"
           >
             <option value="index,follow">Index and Follow (Default)</option>

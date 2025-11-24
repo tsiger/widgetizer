@@ -1,25 +1,43 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
-import { API_URL } from "../../config"; // Import API_URL
+import { API_URL } from "../../config";
 
 export default function MediaDrawer({ visible, onClose, selectedFile, onSave, loading, activeProject }) {
-  const [formData, setFormData] = useState({
-    alt: "",
-    title: "",
+  const {
+    register,
+    handleSubmit: rhfHandleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues: {
+      alt: "",
+      title: "",
+    },
   });
+
+  // Track previous selectedFile to prevent infinite loops
+  const prevSelectedFileRef = useRef(JSON.stringify(selectedFile));
 
   // Update form data when selectedFile or visibility changes
   useEffect(() => {
+    const currentSelectedFileStr = JSON.stringify(selectedFile);
+    
     if (visible && selectedFile) {
-      setFormData({
-        alt: selectedFile.metadata?.alt || "",
-        title: selectedFile.metadata?.title || "",
-      });
-    } else {
-      // Reset form when drawer is closed or no file is selected
-      setFormData({ alt: "", title: "" });
+      // Only reset if the file actually changed
+      if (prevSelectedFileRef.current !== currentSelectedFileStr) {
+        reset({
+          alt: selectedFile.metadata?.alt || "",
+          title: selectedFile.metadata?.title || "",
+        });
+        prevSelectedFileRef.current = currentSelectedFileStr;
+      }
+    } else if (!visible) {
+      // Reset form when drawer is closed
+      reset({ alt: "", title: "" });
+      prevSelectedFileRef.current = JSON.stringify(null);
     }
-  }, [visible, selectedFile]);
+  }, [visible, selectedFile, reset]);
 
   // Prevent background scroll when drawer is open
   useEffect(() => {
@@ -34,16 +52,10 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
     };
   }, [visible]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const onSubmitHandler = (data) => {
     if (selectedFile) {
-      onSave(selectedFile.id, formData);
+      onSave(selectedFile.id, data);
     }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle Escape key press to close the drawer
@@ -98,7 +110,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="p-6 space-y-6">
           {fileUrl && (
             <div className="mb-4 p-2 border border-slate-200 rounded-sm bg-slate-50 flex items-center justify-center">
               {isVideo ? (
@@ -123,13 +135,14 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
             <input
               type="text"
               id="alt"
-              name="alt"
-              value={formData.alt}
-              onChange={handleInputChange}
+              {...register("alt", {
+                required: "Alt text is required",
+                validate: (value) => value.trim() !== "" || "Alt text cannot be empty",
+              })}
               className="form-input"
-              required
               aria-required="true"
             />
+            {errors.alt && <p className="form-error">{errors.alt.message}</p>}
             <p className="form-description">Describes the {isVideo ? "video content" : "image"} for screen readers.</p>
           </div>
 
@@ -140,9 +153,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
             <input
               type="text"
               id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
+              {...register("title")}
               className="form-input"
             />
             <p className="form-description">Sets the title attribute (often shown on hover).</p>
