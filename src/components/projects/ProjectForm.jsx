@@ -12,6 +12,7 @@ export default function ProjectForm({
   isSubmitting,
   submitLabel = "Save",
   onCancel,
+  onDirtyChange,
 }) {
   const isNew = !initialData.id;
   const [themes, setThemes] = useState([]);
@@ -21,7 +22,7 @@ export default function ProjectForm({
   const {
     register,
     handleSubmit: rhfHandleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     watch,
     setValue,
@@ -37,6 +38,11 @@ export default function ProjectForm({
 
   // Watch name for auto-slug generation
   const name = watch("name");
+
+  // Notify parent of dirty state changes
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
   
   // Track previous initialData to prevent infinite loops
   const prevInitialDataRef = useRef(JSON.stringify(initialData));

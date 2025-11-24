@@ -3,10 +3,14 @@ import LoadingSpinner from "../components/ui/LoadingSpinner.jsx";
 import Button from "../components/ui/Button.jsx";
 import AppSettingsPanel from "../components/settings/AppSettingsPanel.jsx";
 import useAppSettings from "../hooks/useAppSettings.js";
+import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function AppSettings() {
   const { settings, loading, isSaving, hasChanges, schema, handleInputChange, handleSave, handleCancel } =
     useAppSettings();
+
+  // Add navigation guard
+  useFormNavigationGuard(hasChanges);
 
   if (loading) {
     return (

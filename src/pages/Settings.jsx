@@ -8,10 +8,16 @@ import { SettingsPanel } from "../components/settings";
 import useToastStore from "../stores/toastStore";
 
 import { getThemeSettings, saveThemeSettings } from "../queries/themeManager";
+import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function Settings() {
   const [themeData, setThemeData] = useState(null);
+  const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  // Add navigation guard
+  useFormNavigationGuard(hasChanges);
 
   // Get the showToast function from the toast store
   const showToast = useToastStore((state) => state.showToast);
@@ -25,6 +31,7 @@ export default function Settings() {
         // Load theme data
         const data = await getThemeSettings();
         setThemeData(data);
+        setOriginalData(JSON.parse(JSON.stringify(data))); // Deep copy for comparison
       } catch {
         showToast("Failed to load theme settings. Please try again.", "error");
       } finally {
@@ -34,6 +41,13 @@ export default function Settings() {
 
     loadThemeSettings();
   }, [showToast]);
+
+  // Track changes
+  useEffect(() => {
+    if (themeData && originalData) {
+      setHasChanges(JSON.stringify(themeData) !== JSON.stringify(originalData));
+    }
+  }, [themeData, originalData]);
 
   /**
    * Converts nested settings structure to a flat object of values
@@ -84,10 +98,17 @@ export default function Settings() {
   const handleSave = async () => {
     try {
       await saveThemeSettings(themeData);
+      setOriginalData(JSON.parse(JSON.stringify(themeData))); // Update original data
+      setHasChanges(false);
       showToast("Theme settings saved successfully!", "success");
     } catch {
       showToast("Failed to save theme settings. Please try again.", "error");
     }
+  };
+
+  const handleCancel = () => {
+    setThemeData(JSON.parse(JSON.stringify(originalData)));
+    setHasChanges(false);
   };
 
   if (loading) {
@@ -115,10 +136,22 @@ export default function Settings() {
         </div>
 
         {/* Save button */}
-        <div className="mt-6 flex justify-end">
-          <Button onClick={handleSave} disabled={loading || !themeData} variant="primary">
+        <div className="mt-6 flex justify-end gap-3">
+          {hasChanges && (
+            <Button onClick={handleCancel} variant="secondary">
+              Cancel
+            </Button>
+          )}
+          
+          <Button onClick={handleSave} disabled={loading || !themeData || !hasChanges} variant="primary">
             Save Settings
           </Button>
+          
+          {hasChanges && (
+            <span className="text-sm text-amber-600 self-center ml-2">
+              You have unsaved changes
+            </span>
+          )}
         </div>
       </>
     </PageLayout>

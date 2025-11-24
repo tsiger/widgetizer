@@ -10,6 +10,7 @@ import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
 import { updateProject, getAllProjects, getActiveProject } from "../queries/projectManager";
 import useProjectStore from "../stores/projectStore";
+import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function ProjectsEdit() {
   const { id } = useParams();
@@ -18,10 +19,14 @@ export default function ProjectsEdit() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showSuccessActions, setShowSuccessActions] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
   const showToast = useToastStore((state) => state.showToast);
   const setActiveProject = useProjectStore((state) => state.setActiveProject);
   const activeProject = useProjectStore((state) => state.activeProject);
+
+  // Add navigation guard
+  useFormNavigationGuard(isDirty);
 
   useEffect(() => {
     loadProject();
@@ -72,7 +77,8 @@ export default function ProjectsEdit() {
       }
 
       setShowSuccessActions(true);
-      return false;
+      setIsDirty(false); // Reset dirty state after successful save
+      return true;
 
 
     } catch (err) {
@@ -121,7 +127,14 @@ export default function ProjectsEdit() {
           isSubmitting={isSubmitting}
           submitLabel="Save Changes"
           onCancel={() => navigate("/projects")}
+          onDirtyChange={setIsDirty}
         />
+      )}
+
+      {isDirty && (
+        <div className="mt-4 text-sm text-amber-600">
+          You have unsaved changes
+        </div>
       )}
     </PageLayout>
   );

@@ -9,6 +9,7 @@ import Button from "../components/ui/Button";
 
 import useToastStore from "../stores/toastStore";
 import { getMenu, updateMenu } from "../queries/menuManager";
+import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function MenusEdit() {
   const { id } = useParams();
@@ -17,8 +18,12 @@ export default function MenusEdit() {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessActions, setShowSuccessActions] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
   const showToast = useToastStore((state) => state.showToast);
+
+  // Add navigation guard
+  useFormNavigationGuard(isDirty);
 
   useEffect(() => {
     loadMenu();
@@ -48,7 +53,8 @@ export default function MenusEdit() {
       setMenu(updatedMenu);
       showToast(`Menu "${formData.name}" was updated successfully!`, "success");
       setShowSuccessActions(true);
-      return false;
+      setIsDirty(false); // Reset dirty state after successful save
+      return true;
     } catch (err) {
       showToast(err.message || "Failed to update menu", "error");
       return false;
@@ -83,7 +89,14 @@ export default function MenusEdit() {
           isSubmitting={isSubmitting}
           submitLabel="Save Changes"
           onCancel={() => navigate("/menus")}
+          onDirtyChange={setIsDirty}
         />
+      )}
+      
+      {isDirty && (
+        <div className="mt-4 text-sm text-amber-600">
+          You have unsaved changes
+        </div>
       )}
     </PageLayout>
   );

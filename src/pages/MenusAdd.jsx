@@ -7,14 +7,19 @@ import MenuForm from "../components/menus/MenuForm";
 import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
 import { createMenu } from "../queries/menuManager";
+import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function MenusAdd() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastCreatedMenu, setLastCreatedMenu] = useState(null);
   const [formKey, setFormKey] = useState("initial");
+  const [isDirty, setIsDirty] = useState(false);
 
   const showToast = useToastStore((state) => state.showToast);
+
+  // Add navigation guard
+  useFormNavigationGuard(isDirty);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);
@@ -24,6 +29,7 @@ export default function MenusAdd() {
       setLastCreatedMenu(newMenu);
       showToast(`Menu "${formData.name}" was created successfully!`, "success");
       setFormKey(`new-form-${Date.now()}`);
+      setIsDirty(false); // Reset dirty state after successful save
       return true;
     } catch (err) {
       showToast(err.message || "Failed to create menu", "error");
@@ -58,7 +64,14 @@ export default function MenusAdd() {
         isSubmitting={isSubmitting}
         submitLabel="Create Menu"
         onCancel={() => navigate("/menus")}
+        onDirtyChange={setIsDirty}
       />
+      
+      {isDirty && (
+        <div className="mt-4 text-sm text-amber-600">
+          You have unsaved changes
+        </div>
+      )}
     </PageLayout>
   );
 }

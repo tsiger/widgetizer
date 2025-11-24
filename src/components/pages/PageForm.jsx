@@ -14,6 +14,7 @@ export default function PageForm({
   isSubmitting = false,
   submitLabel = "Save",
   onCancel,
+  onDirtyChange,
 }) {
   const isNew = !initialData.id;
   const [mediaSelectorVisible, setMediaSelectorVisible] = useState(false);
@@ -23,7 +24,7 @@ export default function PageForm({
   const {
     register,
     handleSubmit: rhfHandleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     watch,
     setValue,
@@ -46,6 +47,11 @@ export default function PageForm({
   // Watch fields for auto-slug and media display
   const name = watch("name");
   const ogImage = watch("seo.og_image");
+
+  // Notify parent of dirty state changes
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   // Track previous initialData to prevent infinite loops
   const prevInitialDataRef = useRef(JSON.stringify(initialData));

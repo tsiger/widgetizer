@@ -8,15 +8,20 @@ import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
 import { createProject } from "../queries/projectManager";
 import useProjectStore from "../stores/projectStore";
+import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function ProjectsAdd() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastCreatedProject, setLastCreatedProject] = useState(null);
   const [formKey, setFormKey] = useState("initial");
+  const [isDirty, setIsDirty] = useState(false);
 
   const showToast = useToastStore((state) => state.showToast);
   const { setActiveProject: setActiveProjectInStore } = useProjectStore();
+
+  // Add navigation guard
+  useFormNavigationGuard(isDirty);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);
@@ -35,6 +40,7 @@ export default function ProjectsAdd() {
       }
 
       setFormKey(`new-form-${Date.now()}`);
+      setIsDirty(false); // Reset dirty state after successful save
       return true;
     } catch (err) {
       showToast(err.message || "Failed to create project", "error");
@@ -69,7 +75,14 @@ export default function ProjectsAdd() {
         isSubmitting={isSubmitting}
         submitLabel="Create Project"
         onCancel={() => navigate("/projects")}
+        onDirtyChange={setIsDirty}
       />
+      
+      {isDirty && (
+        <div className="mt-4 text-sm text-amber-600">
+          You have unsaved changes
+        </div>
+      )}
     </PageLayout>
   );
 }

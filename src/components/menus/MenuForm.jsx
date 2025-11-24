@@ -10,6 +10,7 @@ export default function MenuForm({
   isSubmitting = false,
   submitLabel = "Save",
   onCancel,
+  onDirtyChange,
 }) {
   const isNew = !initialData.id;
   const showToast = useToastStore((state) => state.showToast);
@@ -17,7 +18,7 @@ export default function MenuForm({
   const {
     register,
     handleSubmit: rhfHandleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
   } = useForm({
     defaultValues: {
@@ -28,6 +29,11 @@ export default function MenuForm({
 
   // Track previous initialData to prevent infinite loops
   const prevInitialDataRef = useRef(JSON.stringify(initialData));
+
+  // Notify parent of dirty state changes
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   // Reset form when initialData actually changes
   useEffect(() => {
