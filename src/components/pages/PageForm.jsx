@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import slugify from "slugify";
+import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
 import useProjectStore from "../../stores/projectStore";
 import Button from "../ui/Button";
@@ -84,13 +84,6 @@ export default function PageForm({
     }
   });
 
-  const formatSlug = (value) => {
-    return slugify(value, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
-  };
 
   const handleSlugBlur = (e) => {
     const value = e.target.value;

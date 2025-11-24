@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { API_URL } from "../../config";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import Button from "../ui/Button";
-import slugify from "slugify";
+import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
 
 export default function ProjectForm({
@@ -97,13 +97,6 @@ export default function ProjectForm({
     }
   };
 
-  const formatSlug = (value) => {
-    return slugify(value, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
-  };
 
   const onSubmitHandler = async (data) => {
     try {
