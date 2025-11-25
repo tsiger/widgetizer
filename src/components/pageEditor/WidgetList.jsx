@@ -14,7 +14,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import WidgetInsertionZone from "./WidgetInsertionZone";
 import SortableWidgetItem from "./widgets/SortableWidgetItem";
@@ -135,6 +135,20 @@ export default function WidgetList({
     setBlockInsertPosition(position);
     setIsBlockSelectorOpen(true);
   };
+  
+  // Scroll selected widget into view
+  useEffect(() => {
+    const targetId = selectedWidgetId || selectedGlobalWidgetId;
+    if (targetId) {
+      const el = document.getElementById(`sidebar-widget-${targetId}`);
+      if (el) {
+        // Use a small timeout to allow for any layout shifts or rendering
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 100);
+      }
+    }
+  }, [selectedWidgetId, selectedGlobalWidgetId]);
 
   const activeWidget = activeId ? sortableWidgets.find((item) => item.id === activeId) : null;
   const activeWidgetSchema = activeWidget ? widgetSchemas[activeWidget.type] || {} : {};
@@ -144,7 +158,8 @@ export default function WidgetList({
       <div className="overflow-y-auto flex-grow p-3">
         {headerWidget && (
           <WidgetSection>
-            <FixedWidgetItem
+            <div id="sidebar-widget-header">
+              <FixedWidgetItem
               widgetId="header"
               widget={headerWidget}
               widgetSchema={widgetSchemas[headerWidget.type] || {}}
@@ -152,7 +167,8 @@ export default function WidgetList({
               isModified={modifiedWidgets.has("header")}
               onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("header")}
             />
-          </WidgetSection>
+          </div>
+        </WidgetSection>
         )}
 
         {headerWidget && <div className="my-4 border-t border-slate-200" />}
@@ -181,7 +197,7 @@ export default function WidgetList({
                     const isModified = modifiedWidgets.has(widgetId);
 
                     return (
-                      <div key={widgetId}>
+                      <div key={widgetId} id={`sidebar-widget-${widgetId}`}>
                         <SortableWidgetItem
                           widgetId={widgetId}
                           widget={widget}
@@ -252,7 +268,8 @@ export default function WidgetList({
 
         {footerWidget && (
           <WidgetSection>
-            <FixedWidgetItem
+            <div id="sidebar-widget-footer">
+              <FixedWidgetItem
               widgetId="footer"
               widget={footerWidget}
               widgetSchema={widgetSchemas[footerWidget.type] || {}}
@@ -260,7 +277,8 @@ export default function WidgetList({
               isModified={modifiedWidgets.has("footer")}
               onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("footer")}
             />
-          </WidgetSection>
+          </div>
+        </WidgetSection>
         )}
       </div>
 

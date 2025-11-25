@@ -18,6 +18,9 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     widgetSchemas,
     themeSettings,
     previewMode = "desktop",
+    onWidgetSelect,
+    onBlockSelect,
+    onGlobalWidgetSelect,
   },
   ref,
 ) {
@@ -112,10 +115,37 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     highlightWidget(iframeRef.current, selectedWidgetId || selectedGlobalWidgetId, selectedBlockId);
   }, [selectedWidgetId, selectedBlockId, selectedGlobalWidgetId, initialLoadComplete]);
 
+  // Handle messages from the iframe (e.g., widget selection)
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data.type === "WIDGET_SELECTED") {
+        const { widgetId, blockId } = event.data.payload;
+
+        if (widgetId === "header" || widgetId === "footer") {
+          onGlobalWidgetSelect?.(widgetId);
+          // Global widgets don't support block selection in the current store implementation
+        } else {
+          onWidgetSelect?.(widgetId);
+          if (blockId) {
+            // We need to set the block ID after the widget ID, as setting the widget ID clears the block ID
+            // Using a small timeout to ensure the state update order if needed, 
+            // but since zustand is synchronous, calling them in order should work.
+            // However, React batching might be an issue if they trigger re-renders.
+            // But let's try direct calls first.
+            onBlockSelect?.(blockId);
+          }
+        }
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [onWidgetSelect, onBlockSelect, onGlobalWidgetSelect]);
+
   const iframeSrcDoc = previewHtml.replace(
     "</head>",
     `<script src="${API_URL(
-      "/src/utils/previewRuntime.js",
+      "/runtime/previewRuntime.js",
     )}"></script><base href="${activeProject?.liveUrl || document.baseURI}" target="_blank"></head>`,
   );
 

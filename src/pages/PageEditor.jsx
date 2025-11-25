@@ -133,6 +133,9 @@ export default function PageEditor() {
           widgetSchemas={widgetSchemas}
           themeSettings={themeSettings}
           previewMode={previewMode}
+          onWidgetSelect={handleWidgetSelect}
+          onBlockSelect={handleBlockSelect}
+          onGlobalWidgetSelect={handleGlobalWidgetSelect}
         />
 
         <SettingsPanel
