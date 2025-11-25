@@ -6,6 +6,7 @@
     "pages": "Páginas",
     "menus": "Menús",
     "media": "Medios",
+    "settings": "Configuración",
     "appearance": "Apariencia",
     "themes": "Temas",
     "extend": "Extender",
@@ -372,7 +373,52 @@
     }
   },
   "exportSite": {
-    "title": "Exportar Sitio: {{name}}"
+    "title": "Exportar Sitio: {{name}}",
+    "creator": {
+      "title": "Crear Nueva Exportación",
+      "description": "Haz clic en el botón de abajo para generar una versión HTML estática de tu sitio para exportar. Cada exportación se asigna un número de versión para un fácil seguimiento.",
+      "exportButton": "Exportar Proyecto",
+      "exporting": "Exportando...",
+      "successTitle": "¡Versión de exportación {{version}} creada exitosamente!",
+      "successCreated": "Creado: {{date}}"
+    },
+    "history": {
+      "title": "Historial de Exportaciones",
+      "keepingVersions": "Manteniendo la última {{count}} versión",
+      "keepingVersions_other": "Manteniendo las últimas {{count}} versiones",
+      "loading": "Cargando historial de exportaciones...",
+      "noExportsTitle": "Aún no hay exportaciones",
+      "noExportsDesc": "¡Crea tu primera exportación arriba!",
+      "headers": {
+        "version": "Versión",
+        "created": "Creado",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "tooltips": {
+        "view": "Ver exportación",
+        "download": "Descargar exportación",
+        "delete": "Eliminar exportación"
+      },
+      "deleteModal": {
+        "title": "Eliminar Exportación",
+        "message": "¿Estás seguro de que quieres eliminar la versión de exportación {{version}}? Esta acción no se puede deshacer.",
+        "confirm": "Eliminar",
+        "cancel": "Cancelar"
+      },
+      "toasts": {
+        "deleteSuccess": "Versión de exportación {{version}} eliminada exitosamente",
+        "deleteError": "Error al eliminar la exportación: {{message}}",
+        "downloadStart": "Descarga iniciada para la versión {{version}}",
+        "downloadError": "Error al descargar la exportación: {{message}}"
+      }
+    },
+    "toasts": {
+      "noProjectId": "El ID del proyecto activo no está disponible.",
+      "exportSuccess": "¡Proyecto exportado exitosamente!",
+      "exportError": "La exportación falló con un problema desconocido.",
+      "unknownError": "Ocurrió un error desconocido durante la exportación."
+    }
   },
   "media": {
     "title": "Medios",
@@ -420,5 +466,101 @@
   "pagePreview": {
     "title": "Vista previa: {{name}}",
     "loading": "Cargando página..."
+  },
+  "appSettings": {
+    "tabs": {
+      "general": {
+        "label": "General",
+        "description": "Configuración general de la aplicación y preferencias"
+      },
+      "media": {
+        "label": "Medios y Carga",
+        "description": "Configurar límites de carga de archivos y procesamiento de medios"
+      },
+      "export": {
+        "label": "Exportación y Versionado",
+        "description": "Gestionar configuración de exportación y control de versiones"
+      }
+    },
+    "groups": {
+      "imageSizes": "Tamaños de Imagen"
+    },
+    "general": {
+      "language": {
+        "label": "Idioma",
+        "description": "Selecciona el idioma para la interfaz de administración"
+      },
+      "dateFormat": {
+        "label": "Formato de Fecha",
+        "description": "Elige el formato de fecha predeterminado para mostrar fechas en toda la aplicación"
+      }
+    },
+    "media": {
+      "maxFileSizeMB": {
+        "label": "Tamaño Máximo de Carga de Imagen (MB)",
+        "description": "Establece el tamaño máximo para cargas de imágenes individuales en todos los proyectos."
+      },
+      "maxVideoSizeMB": {
+        "label": "Tamaño Máximo de Carga de Video (MB)",
+        "description": "Establece el tamaño máximo para cargas de videos individuales en todos los proyectos."
+      },
+      "imageProcessing": {
+        "quality": {
+          "label": "Calidad de Imagen",
+          "description": "Configuración de calidad para todos los tamaños de imagen generados (1-100). Valores más altos significan mejor calidad pero archivos más grandes."
+        },
+        "sizes": {
+          "thumb": {
+            "width": {
+              "label": "Ancho de Miniatura (px)",
+              "description": "Ancho máximo para imágenes en miniatura"
+            },
+            "enabled": {
+              "label": "Habilitar Miniaturas",
+              "description": "Generar versiones en miniatura de las imágenes cargadas"
+            }
+          },
+          "small": {
+            "width": {
+              "label": "Ancho de Imagen Pequeña (px)",
+              "description": "Ancho máximo para imágenes pequeñas"
+            },
+            "enabled": {
+              "label": "Habilitar Imágenes Pequeñas",
+              "description": "Generar versiones pequeñas de las imágenes cargadas"
+            }
+          },
+          "medium": {
+            "width": {
+              "label": "Ancho de Imagen Mediana (px)",
+              "description": "Ancho máximo para imágenes medianas"
+            },
+            "enabled": {
+              "label": "Habilitar Imágenes Medianas",
+              "description": "Generar versiones medianas de las imágenes cargadas"
+            }
+          },
+          "large": {
+            "width": {
+              "label": "Ancho de Imagen Grande (px)",
+              "description": "Ancho máximo para imágenes grandes"
+            },
+            "enabled": {
+              "label": "Habilitar Imágenes Grandes",
+              "description": "Generar versiones grandes de las imágenes cargadas"
+            }
+          }
+        }
+      }
+    },
+    "export": {
+      "maxVersionsToKeep": {
+        "label": "Máximo de Versiones de Exportación a Mantener",
+        "description": "Número máximo de versiones de exportación a mantener por proyecto. Cuando se excede este límite, las exportaciones más antiguas se eliminan automáticamente para ahorrar espacio de almacenamiento."
+      }
+    },
+    "messages": {
+      "noSettings": "No hay configuraciones disponibles"
+    }
   }
 }

@@ -12,6 +12,10 @@ const settingsFilePath = path.join(__dirname, "../../data/appSettings.json");
 
 // Default settings in case the file is missing or corrupted
 const defaultSettings = {
+  general: {
+    language: "en",
+    dateFormat: "MM/DD/YYYY",
+  },
   media: {
     maxFileSizeMB: 5,
     maxVideoSizeMB: 50, // Separate size limit for videos

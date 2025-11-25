@@ -6,6 +6,7 @@
     "pages": "Pages",
     "menus": "Menus",
     "media": "Media",
+    "settings": "Settings",
     "appearance": "Appearance",
     "themes": "Themes",
     "extend": "Extend",
@@ -65,7 +66,7 @@
       "canonicalUrlHelp": "The preferred URL for this page. Leave blank to use default.",
       "robotsLabel": "Search Engine Indexing",
       "robotsHelp": "Controls how search engines index this page."
- },
+    },
     "project": {
       "titleLabel": "Title",
       "titleRequired": "Project name is required",
@@ -371,7 +372,52 @@
     }
   },
   "exportSite": {
-    "title": "Export Site: {{name}}"
+    "title": "Export Site: {{name}}",
+    "creator": {
+      "title": "Create New Export",
+      "description": "Click the button below to generate a static HTML version of your site for export. Each export is assigned a version number for easy tracking.",
+      "exportButton": "Export Project",
+      "exporting": "Exporting...",
+      "successTitle": "Export version {{version}} created successfully!",
+      "successCreated": "Created: {{date}}"
+    },
+    "history": {
+      "title": "Export History",
+      "keepingVersions": "Keeping latest {{count}} version",
+      "keepingVersions_other": "Keeping latest {{count}} versions",
+      "loading": "Loading export history...",
+      "noExportsTitle": "No exports yet",
+      "noExportsDesc": "Create your first export above!",
+      "headers": {
+        "version": "Version",
+        "created": "Created",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "tooltips": {
+        "view": "View export",
+        "download": "Download export",
+        "delete": "Delete export"
+      },
+      "deleteModal": {
+        "title": "Delete Export",
+        "message": "Are you sure you want to delete export version {{version}}? This action cannot be undone.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      },
+      "toasts": {
+        "deleteSuccess": "Export version {{version}} deleted successfully",
+        "deleteError": "Failed to delete export: {{message}}",
+        "downloadStart": "Download started for version {{version}}",
+        "downloadError": "Failed to download export: {{message}}"
+      }
+    },
+    "toasts": {
+      "noProjectId": "Active project ID is not available.",
+      "exportSuccess": "Project exported successfully!",
+      "exportError": "Exporting failed with an unknown issue.",
+      "unknownError": "An unknown error occurred during exporting."
+    }
   },
   "media": {
     "title": "Media",
@@ -419,5 +465,101 @@
   "pagePreview": {
     "title": "Preview: {{name}}",
     "loading": "Loading page..."
+  },
+  "appSettings": {
+    "tabs": {
+      "general": {
+        "label": "General",
+        "description": "General application settings and preferences"
+      },
+      "media": {
+        "label": "Media & Upload",
+        "description": "Configure file upload limits and media processing"
+      },
+      "export": {
+        "label": "Export & Versioning",
+        "description": "Manage export settings and version control"
+      }
+    },
+    "groups": {
+      "imageSizes": "Image Sizes"
+    },
+    "general": {
+      "language": {
+        "label": "Language",
+        "description": "Select the language for the admin interface"
+      },
+      "dateFormat": {
+        "label": "Date Format",
+        "description": "Choose the default date format for displaying dates throughout the application"
+      }
+    },
+    "media": {
+      "maxFileSizeMB": {
+        "label": "Max Image Upload Size (MB)",
+        "description": "Set the maximum size for individual image uploads across all projects."
+      },
+      "maxVideoSizeMB": {
+        "label": "Max Video Upload Size (MB)",
+        "description": "Set the maximum size for individual video uploads across all projects."
+      },
+      "imageProcessing": {
+        "quality": {
+          "label": "Image Quality",
+          "description": "Quality setting for all generated image sizes (1-100). Higher values mean better quality but larger file sizes."
+        },
+        "sizes": {
+          "thumb": {
+            "width": {
+              "label": "Thumbnail Width (px)",
+              "description": "Maximum width for thumbnail images"
+            },
+            "enabled": {
+              "label": "Enable Thumbnails",
+              "description": "Generate thumbnail versions of uploaded images"
+            }
+          },
+          "small": {
+            "width": {
+              "label": "Small Image Width (px)",
+              "description": "Maximum width for small images"
+            },
+            "enabled": {
+              "label": "Enable Small Images",
+              "description": "Generate small versions of uploaded images"
+            }
+          },
+          "medium": {
+            "width": {
+              "label": "Medium Image Width (px)",
+              "description": "Maximum width for medium images"
+            },
+            "enabled": {
+              "label": "Enable Medium Images",
+              "description": "Generate medium versions of uploaded images"
+            }
+          },
+          "large": {
+            "width": {
+              "label": "Large Image Width (px)",
+              "description": "Maximum width for large images"
+            },
+            "enabled": {
+              "label": "Enable Large Images",
+              "description": "Generate large versions of uploaded images"
+            }
+          }
+        }
+      }
+    },
+    "export": {
+      "maxVersionsToKeep": {
+        "label": "Max Export Versions to Keep",
+        "description": "Maximum number of export versions to keep per project. When this limit is exceeded, the oldest exports are automatically deleted to save storage space."
+      }
+    },
+    "messages": {
+      "noSettings": "No settings available"
+    }
   }
 }

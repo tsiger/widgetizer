@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import SettingsRenderer from "./SettingsRenderer";
 
 /**
@@ -6,6 +7,8 @@ import SettingsRenderer from "./SettingsRenderer";
  * Renders app settings using JSON schema format with vertical tabs
  */
 export default function AppSettingsPanel({ schema, settings, onChange }) {
+  const { t } = useTranslation();
+
   // Group settings by tab from the schema
   const settingsByTab = {};
 
@@ -25,7 +28,7 @@ export default function AppSettingsPanel({ schema, settings, onChange }) {
   const [activeTab, setActiveTab] = useState(Object.keys(settingsByTab)[0] || "");
 
   if (Object.keys(settingsByTab).length === 0) {
-    return <div className="p-4 text-slate-500">No settings available</div>;
+    return <div className="p-4 text-slate-500">{t("appSettings.messages.noSettings")}</div>;
   }
 
   // Get nested value from settings object using dot notation
@@ -45,9 +48,10 @@ export default function AppSettingsPanel({ schema, settings, onChange }) {
         // Add group header if this is a new group
         if (config.group && config.group !== currentGroup && config.group !== "general") {
           currentGroup = config.group;
+          const translatedGroup = config.group.startsWith("appSettings.") ? t(config.group) : config.group;
           elements.push(
             <div key={`header_${config.group}`} className="border-t border-slate-300/70 pt-2">
-              <h2 className="text-base font-semibold leading-7 text-slate-800">{config.group}</h2>
+              <h2 className="text-base font-semibold leading-7 text-slate-800">{translatedGroup}</h2>
             </div>,
           );
         }
@@ -92,7 +96,7 @@ export default function AppSettingsPanel({ schema, settings, onChange }) {
               }`}
               onClick={() => setActiveTab(tabKey)}
             >
-              {tabKey.charAt(0).toUpperCase() + tabKey.slice(1)}
+              {t(`appSettings.tabs.${tabKey}.label`)}
             </button>
           ))}
         </div>
@@ -101,7 +105,7 @@ export default function AppSettingsPanel({ schema, settings, onChange }) {
       {/* Content area */}
       <div className="flex-1 p-6 min-h-[400px]">
         <h2 className="text-lg font-semibold mb-4 text-slate-800">
-          {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Settings
+          {t(`appSettings.tabs.${activeTab}.label`)} {t("settings.title").split(" ")[1]}
         </h2>
         <div className="space-y-6">{renderTabSettings()}</div>
       </div>

@@ -1,0 +1,565 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projekte",
+    "site": "Website",
+    "pages": "Seiten",
+    "menus": "Menüs",
+    "media": "Medien",
+    "settings": "Einstellungen",
+    "appearance": "Design",
+    "themes": "Themes",
+    "extend": "Erweitern",
+    "plugins": "Plugins",
+    "tools": "Werkzeuge",
+    "exportSite": "Seite exportieren",
+    "general": "Allgemein",
+    "appSettings": "App-Einstellungen"
+  },
+  "layout": {
+    "toolbar": {
+      "profile": "Profil",
+      "settings": "Einstellungen",
+      "logout": "Abmelden"
+    },
+    "requireProject": {
+      "title": "Kein aktives Projekt",
+      "description": "Bitte erstellen oder wählen Sie ein Projekt aus, um fortzufahren.",
+      "goToProjects": "Zu den Projekten"
+    }
+  },
+  "forms": {
+    "common": {
+      "title": "Titel",
+      "description": "Beschreibung",
+      "saving": "Speichern...",
+      "cancel": "Abbrechen",
+      "selectImage": "Bild auswählen",
+      "changeImage": "Bild ändern",
+      "removeImage": "Bild entfernen",
+      "formError": "Beim Senden des Formulars ist ein Fehler aufgetreten",
+      "selectImageFile": "Bitte wählen Sie eine Bilddatei aus."
+    },
+    "menu": {
+      "titleLabel": "Titel",
+      "descriptionLabel": "Beschreibung",
+      "titleRequired": "Menüname ist erforderlich",
+      "nameNotEmpty": "Name darf nicht leer sein"
+    },
+    "page": {
+      "titleLabel": "Titel",
+      "filenameLabel": "Dateiname",
+      "titleRequired": "Seitenname ist erforderlich",
+      "nameNotEmpty": "Name darf nicht leer sein",
+      "filenameRequired": "Dateiname ist erforderlich",
+      "filenameNotEmpty": "Dateiname darf nicht leer sein",
+      "seoTitle": "SEO-Einstellungen",
+      "metaDescription": "Meta-Beschreibung",
+      "metaDescriptionHelp": "Wird für Suchergebnisse und Vorschauen in sozialen Medien verwendet. Empfohlen: 150-160 Zeichen.",
+      "socialTitle": "Social Media Titel",
+      "socialTitleHelp": "Leer lassen, um den Seitentitel zu verwenden. Wird beim Teilen auf Facebook, Twitter usw. verwendet.",
+      "socialImage": "Social Media Bild",
+      "socialImageHelp": "Empfohlene Größe: 1200×630px. Wird für Facebook Open Graph und Twitter Cards verwendet.",
+      "ogType": "Open Graph Typ",
+      "twitterCard": "Twitter Card Typ",
+      "canonicalUrl": "Canonical URL",
+      "canonicalUrlHelp": "Die bevorzugte URL für diese Seite. Leer lassen, um den Standard zu verwenden.",
+      "robotsLabel": "Suchmaschinen-Indexierung",
+      "robotsHelp": "Steuert, wie Suchmaschinen diese Seite indexieren."
+    },
+    "project": {
+      "titleLabel": "Titel",
+      "titleRequired": "Projektname ist erforderlich",
+      "nameNotEmpty": "Name darf nicht leer sein",
+      "titleHelp": "Der Anzeigename für Ihr Projekt. Kann jederzeit geändert werden, ohne die Ordnerstruktur zu beeinflussen.",
+      "slugLabel": "Slug",
+      "slugRequired": "Projekt-Slug ist erforderlich",
+      "slugNotEmpty": "Slug darf nicht leer sein",
+      "slugPattern": "Slug darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten",
+      "slugHelp": "Wird für Ordnernamen verwendet. Darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten. Kann nach der Erstellung nicht mehr geändert werden.",
+      "descriptionLabel": "Beschreibung",
+      "descriptionHelp": "Optional. Fügen Sie Notizen oder Details zu Ihrem Projekt hinzu.",
+      "themeLabel": "Theme",
+      "themeRequired": "Bitte wählen Sie ein Theme aus",
+      "themeHelp": "Das Theme bestimmt das Design und die verfügbaren Widgets für Ihre Website.",
+      "siteUrlLabel": "Website-URL",
+      "siteUrlHelp": "Die endgültige URL, unter der Ihre Website gehostet wird. Wird für die Sitemap-Erstellung verwendet.",
+      "loadingThemes": "Themes werden geladen..."
+    },
+    "media": {
+      "editTitle": "Metadaten für {{type}} bearbeiten",
+      "altLabel": "Alternativtext (Erforderlich)",
+      "altRequired": "Alternativtext ist erforderlich",
+      "altNotEmpty": "Alternativtext darf nicht leer sein",
+      "altHelp": "Beschreibt das {{type}} für Screenreader.",
+      "titleLabel": "Titel",
+      "titleHelp": "Setzt das title-Attribut (oft beim Überfahren mit der Maus angezeigt).",
+      "save": "Änderungen speichern",
+      "saving": "Speichern..."
+    }
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg"
+  },
+  "components": {
+    "mediaToolbar": {
+      "gridView": "Rasteransicht",
+      "listView": "Listenansicht",
+      "selected": "{{count}} ausgewählt",
+      "deleteSelected": "Ausgewählte löschen",
+      "delete": "Löschen",
+      "refreshUsage": "Verwendung aktualisieren",
+      "refreshUsageTitle": "Nutzungsverfolgung aktualisieren",
+      "searchPlaceholder": "Medien suchen..."
+    },
+    "mediaUploader": {
+      "dropActive": "Dateien hier ablegen...",
+      "dropInactive": "Ziehen Sie Bilder und Videos hierher oder",
+      "selectFiles": "Dateien auswählen",
+      "supportedImages": "Bilder: JPG, PNG, GIF, WebP, SVG",
+      "supportedVideos": "Videos: MP4, WebM, MOV, AVI, MKV",
+      "uploading": "Wird hochgeladen..."
+    },
+    "mediaSelector": {
+      "title": "Medien auswählen",
+      "searchPlaceholder": "Mediendateien suchen...",
+      "noMatch": "Keine Mediendateien entsprechen Ihrer Suche",
+      "noFiles": "Keine Mediendateien verfügbar",
+      "video": "Video",
+      "closeLabel": "Medienauswahl schließen"
+    }
+  },
+  "settings": {
+    "title": "Allgemeine Einstellungen",
+    "saveSuccess": "Einstellungen erfolgreich gespeichert",
+    "saveError": "Fehler beim Speichern der Einstellungen",
+    "unsavedChanges": "Sie haben ungespeicherte Änderungen"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "loading": "Dashboard-Daten werden geladen...",
+    "projectCount": "Anzahl der Projekte",
+    "readyToCreate": "Bereit, Ihr erstes Projekt zu erstellen!",
+    "projects": "Projekte",
+    "getStarted": "Loslegen",
+    "activeProject": "Aktives Projekt",
+    "createFirstProject": "Erstellen Sie Ihr erstes Projekt",
+    "noActiveProject": "Kein aktives Projekt",
+    "createProjectBtn": "Projekt erstellen →",
+    "letsGetAtIt": "Legen wir los! →",
+    "createProjectLink": "Ein Projekt erstellen →",
+    "magic": "Es ist Magie!",
+    "generateSite": "Seite generieren",
+    "todoDescription": "TODO: Beschreibung"
+  },
+  "projects": {
+    "title": "Projekte",
+    "loading": "Projekte werden geladen...",
+    "newProject": "Neues Projekt",
+    "noActiveProject": "Kein Aktives Projekt",
+    "noActiveProjectDesc": "Zeit, Ihre nächste große Idee zu verwirklichen!",
+    "noProjects": "Noch keine Projekte. Erstellen Sie Ihr erstes Projekt!",
+    "headers": {
+      "title": "Titel",
+      "created": "Erstellt",
+      "updated": "Aktualisiert",
+      "actions": "Aktionen"
+    },
+    "badges": {
+      "active": "Aktiv"
+    },
+    "actions": {
+      "currentActive": "Derzeit aktives Projekt",
+      "setActive": "Als aktives Projekt festlegen",
+      "edit": "Projekt bearbeiten",
+      "duplicate": "Projekt duplizieren",
+      "delete": "Projekt löschen",
+      "cannotDeleteActive": "Aktives Projekt kann nicht gelöscht werden"
+    },
+    "toasts": {
+      "deleteSuccess": "Projekt \"{{name}}\" wurde erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Projekts",
+      "cannotDeleteActive": "Das aktive Projekt kann nicht gelöscht werden. Bitte legen Sie zuerst ein anderes Projekt als aktiv fest.",
+      "setActiveSuccess": "\"{{name}}\" ist jetzt das aktive Projekt",
+      "setActiveError": "Fehler beim Festlegen des aktiven Projekts",
+      "duplicateSuccess": "Projekt erfolgreich dupliziert",
+      "duplicateError": "Fehler beim Duplizieren des Projekts"
+    },
+    "deleteModal": {
+      "title": "Projekt löschen",
+      "message": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten?\n\nDies wird dauerhaft gelöscht:\n• Alle Projektdateien und Seiten\n• Alle hochgeladenen Medien\n• Alle exportierten Versionen\n• Alle Projekteinstellungen\n\nDiese Aktion kann nicht rückgängig gemacht werden.",
+      "confirm": "Projekt löschen",
+      "cancel": "Abbrechen"
+    }
+  },
+  "pages": {
+    "title": "Seiten",
+    "loading": "Seiten werden geladen...",
+    "newPage": "Neue Seite",
+    "count": "{{count}} Seite",
+    "count_other": "{{count}} Seiten",
+    "selected": "{{count}} ausgewählt",
+    "deleteSelected": "Ausgewählte löschen",
+    "delete": "Löschen",
+    "searchPlaceholder": "Seiten suchen...",
+    "headers": {
+      "name": "Name",
+      "filename": "Dateiname",
+      "created": "Erstellt",
+      "updated": "Aktualisiert",
+      "actions": "Aktionen"
+    },
+    "noPagesFound": "Keine Seiten gefunden",
+    "noPagesMatch": "Keine Seiten entsprechen \"{{term}}\". Versuchen Sie einen anderen Suchbegriff.",
+    "noPagesAvailable": "Keine Seiten verfügbar",
+    "noPagesYet": "Noch keine Seiten",
+    "createFirstPage": "Erstellen Sie Ihre erste Seite, um zu beginnen.",
+    "actions": {
+      "design": "Seite gestalten",
+      "edit": "Seite bearbeiten",
+      "duplicate": "Seite duplizieren",
+      "delete": "Seite löschen"
+    },
+    "toasts": {
+      "deleteBulkSuccess": "{{count}} Seite erfolgreich gelöscht",
+      "deleteBulkSuccess_other": "{{count}} Seiten erfolgreich gelöscht",
+      "deleteSuccess": "Seite erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen der Seite(n)",
+      "loadError": "Fehler beim Laden der Seiten",
+      "duplicateSuccess": "Seite erfolgreich dupliziert",
+      "duplicateError": "Fehler beim Duplizieren der Seite"
+    },
+    "deleteModal": {
+      "title": "Seite löschen",
+      "message": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirm": "Löschen",
+      "cancel": "Abbrechen",
+      "titleBulk": "Seiten löschen",
+      "messageBulk": "Sind Sie sicher, dass Sie {{count}} Seite löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "messageBulk_other": "Sind Sie sicher, dass Sie {{count}} Seiten löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirmBulk": "{{count}} Seite löschen",
+      "confirmBulk_other": "{{count}} Seiten löschen"
+    }
+  },
+  "menus": {
+    "title": "Menüs",
+    "loading": "Menüs werden geladen...",
+    "newMenu": "Neues Menü",
+    "noMenus": "Noch keine Menüs. Erstellen Sie Ihr erstes Menü!",
+    "headers": {
+      "title": "Titel",
+      "description": "Beschreibung",
+      "created": "Erstellt",
+      "updated": "Aktualisiert",
+      "actions": "Aktionen"
+    },
+    "actions": {
+      "editStructure": "Menüstruktur bearbeiten",
+      "duplicate": "Menü duplizieren",
+      "editSettings": "Menüeinstellungen bearbeiten",
+      "delete": "Menü löschen"
+    },
+    "toasts": {
+      "loadError": "Fehler beim Laden der Menüs",
+      "deleteSuccess": "Menü \"{{name}}\" wurde erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Menüs",
+      "duplicateSuccess": "Menü erfolgreich dupliziert",
+      "duplicateError": "Fehler beim Duplizieren des Menüs"
+    },
+    "deleteModal": {
+      "title": "Menü löschen",
+      "message": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirm": "Löschen",
+      "cancel": "Abbrechen"
+    }
+  },
+  "menuStructure": {
+    "title": "Menüstruktur bearbeiten",
+    "loading": "Menü wird geladen...",
+    "notFound": "Menü nicht gefunden",
+    "description": "Sie können bis zu 3 Ebenen von Menüpunkten hinzufügen.",
+    "save": "Menü speichern",
+    "saving": "Speichern...",
+    "toasts": {
+      "itemDeleted": "\"{{label}}\" gelöscht",
+      "defaultItemLabel": "Menüpunkt",
+      "loadError": "Fehler beim Laden des Menüs",
+      "saveSuccess": "Menü erfolgreich gespeichert",
+      "saveError": "Fehler beim Speichern des Menüs",
+      "notFound": "Menü nicht gefunden"
+    }
+  },
+  "pageEditor": {
+    "loading": "Seite wird geladen...",
+    "error": "Fehler: {{message}}",
+    "noPageSelected": "Keine Seite ausgewählt. Bitte wählen Sie eine Seite aus der Seitenliste."
+  },
+  "menusAdd": {
+    "title": "Menü hinzufügen",
+    "goToList": "Zur Menüliste",
+    "editThis": "Dieses Menü bearbeiten",
+    "create": "Menü erstellen",
+    "toasts": {
+      "createSuccess": "Menü \"{{name}}\" wurde erfolgreich erstellt!",
+      "createError": "Fehler beim Erstellen des Menüs"
+    }
+  },
+  "menusEdit": {
+    "title": "Menü bearbeiten",
+    "loading": "Menü wird geladen...",
+    "notFound": "Menü nicht gefunden",
+    "backToList": "Zurück zur Menüliste",
+    "saveChanges": "Änderungen speichern",
+    "toasts": {
+      "loadError": "Fehler beim Laden des Menüs",
+      "updateSuccess": "Menü \"{{name}}\" wurde erfolgreich aktualisiert!",
+      "updateError": "Fehler beim Aktualisieren des Menüs"
+    }
+  },
+  "pagesAdd": {
+    "title": "Neue Seite",
+    "goToList": "Zur Seitenliste",
+    "editThis": "Diese Seite bearbeiten",
+    "create": "Seite erstellen",
+    "toasts": {
+      "createSuccess": "Seite \"{{name}}\" wurde erfolgreich erstellt!",
+      "createError": "Fehler beim Erstellen der Seite"
+    }
+  },
+  "pagesEdit": {
+    "title": "Seite bearbeiten",
+    "loading": "Seite wird geladen...",
+    "backToList": "Zurück zur Seitenliste",
+    "saveChanges": "Änderungen speichern",
+    "toasts": {
+      "loadError": "Fehler beim Laden der Seite",
+      "updateSuccess": "Seite \"{{name}}\" wurde erfolgreich aktualisiert!",
+      "updateSuccessUrlChanged": "Seite \"{{name}}\" wurde erfolgreich aktualisiert und die URL wurde geändert.",
+      "unknownError": "Unbekannter Fehler",
+      "updateError": "Fehler beim Aktualisieren der Seite"
+    }
+  },
+  "projectsAdd": {
+    "title": "Projekt hinzufügen",
+    "goToList": "Zur Projektliste",
+    "editThis": "Dieses Projekt bearbeiten",
+    "create": "Projekt erstellen",
+    "toasts": {
+      "createActiveSuccess": "Projekt \"{{name}}\" wurde erstellt und als aktiv festgelegt",
+      "createSuccess": "Projekt \"{{name}}\" wurde erfolgreich erstellt!",
+      "createError": "Fehler beim Erstellen des Projekts"
+    }
+  },
+  "projectsEdit": {
+    "title": "Projekt bearbeiten",
+    "loading": "Projekt wird geladen...",
+    "notFound": "Projekt nicht gefunden",
+    "noActiveProjectTitle": "Kein aktives Projekt",
+    "noActiveProjectDesc": "Bitte wählen oder erstellen Sie ein Projekt, um Ihre Projekte zu verwalten.",
+    "backToList": "Zurück zur Projektliste",
+    "saveChanges": "Änderungen speichern",
+    "toasts": {
+      "notFound": "Projekt nicht gefunden",
+      "loadError": "Fehler beim Laden des Projekts",
+      "updateSuccessRenamed": "Projekt \"{{name}}\" wurde erfolgreich aktualisiert und der Ordner wurde umbenannt.",
+      "updateSuccess": "Projekt \"{{name}}\" wurde erfolgreich aktualisiert!",
+      "updateError": "Fehler beim Aktualisieren des Projekts",
+      "noActiveProject": "Bitte wählen oder erstellen Sie ein Projekt, um Ihre Projekte zu verwalten"
+    }
+  },
+  "exportSite": {
+    "title": "Seite exportieren: {{name}}",
+    "creator": {
+      "title": "Neuen Export erstellen",
+      "description": "Klicken Sie auf die Schaltfläche unten, um eine statische HTML-Version Ihrer Website für den Export zu generieren. Jedem Export wird zur einfachen Nachverfolgung eine Versionsnummer zugewiesen.",
+      "exportButton": "Projekt exportieren",
+      "exporting": "Wird exportiert...",
+      "successTitle": "Exportversion {{version}} erfolgreich erstellt!",
+      "successCreated": "Erstellt: {{date}}"
+    },
+    "history": {
+      "title": "Exportverlauf",
+      "keepingVersions": "Behalte die letzte {{count}} Version",
+      "keepingVersions_other": "Behalte die letzten {{count}} Versionen",
+      "loading": "Exportverlauf wird geladen...",
+      "noExportsTitle": "Noch keine Exporte",
+      "noExportsDesc": "Erstellen Sie oben Ihren ersten Export!",
+      "headers": {
+        "version": "Version",
+        "created": "Erstellt",
+        "status": "Status",
+        "actions": "Aktionen"
+      },
+      "tooltips": {
+        "view": "Export ansehen",
+        "download": "Export herunterladen",
+        "delete": "Export löschen"
+      },
+      "deleteModal": {
+        "title": "Export löschen",
+        "message": "Sind Sie sicher, dass Sie die Exportversion {{version}} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "confirm": "Löschen",
+        "cancel": "Abbrechen"
+      },
+      "toasts": {
+        "deleteSuccess": "Exportversion {{version}} erfolgreich gelöscht",
+        "deleteError": "Fehler beim Löschen des Exports: {{message}}",
+        "downloadStart": "Download für Version {{version}} gestartet",
+        "downloadError": "Fehler beim Herunterladen des Exports: {{message}}"
+      }
+    },
+    "toasts": {
+      "noProjectId": "ID des aktiven Projekts ist nicht verfügbar.",
+      "exportSuccess": "Projekt erfolgreich exportiert!",
+      "exportError": "Der Export ist aufgrund eines unbekannten Problems fehlgeschlagen.",
+      "unknownError": "Ein unbekannter Fehler ist beim Exportieren aufgetreten."
+    }
+  },
+  "media": {
+    "title": "Medien",
+    "loading": "Mediendateien werden geladen...",
+    "emptyTitle": "Noch keine Mediendateien",
+    "emptyDesc": "Laden Sie einige Dateien mit dem Uploader oben hoch."
+  },
+  "themeSettings": {
+    "title": "Theme-Einstellungen",
+    "loading": "Einstellungen werden geladen...",
+    "noSettings": "Keine Theme-Einstellungen verfügbar",
+    "save": "Einstellungen speichern",
+    "cancel": "Abbrechen",
+    "toasts": {
+      "loadError": "Fehler beim Laden der Theme-Einstellungen. Bitte versuchen Sie es erneut.",
+      "saveSuccess": "Theme-Einstellungen erfolgreich gespeichert!",
+      "saveError": "Fehler beim Speichern der Theme-Einstellungen. Bitte versuchen Sie es erneut."
+    }
+  },
+  "themes": {
+    "title": "Themes",
+    "description": "Verwalten und passen Sie Ihre Themes an.",
+    "loading": "Themes werden geladen...",
+    "uploadingTheme": "Theme wird hochgeladen...",
+    "dropZoneActive": "Theme-Zip-Datei hier ablegen...",
+    "dropZoneInactive": "Ziehen Sie Ihre Theme-Zip-Datei hierher oder klicken Sie, um eine Datei auszuwählen",
+    "maxFileSize": "Max. Dateigröße: 10MB",
+    "version": "Version {{version}}",
+    "widgets": "{{count}} Widgets",
+    "by": "Von {{author}}",
+    "active": "Aktiv",
+    "emptyTitle": "Keine Themes verfügbar",
+    "emptyDesc": "Laden Sie ein Theme über den Bereich oben hoch, um zu beginnen",
+    "toasts": {
+      "singleFileError": "Bitte laden Sie nur eine einzelne Zip-Datei hoch.",
+      "uploadSuccess": "Theme erfolgreich hochgeladen!",
+      "uploadError": "Fehler beim Hochladen des Themes."
+    }
+  },
+  "plugins": {
+    "title": "Plugins",
+    "emptyTitle": "Keine Plugins installiert",
+    "emptyDesc": "Beginnen Sie, indem Sie Ihr erstes Plugin aus dem Store installieren oder ein benutzerdefiniertes Plugin hochladen."
+  },
+  "pagePreview": {
+    "title": "Vorschau: {{name}}",
+    "loading": "Seite wird geladen..."
+  },
+  "appSettings": {
+    "tabs": {
+      "general": {
+        "label": "Allgemein",
+        "description": "Allgemeine Anwendungseinstellungen und Präferenzen"
+      },
+      "media": {
+        "label": "Medien & Upload",
+        "description": "Datei-Upload-Limits und Medienverarbeitung konfigurieren"
+      },
+      "export": {
+        "label": "Export & Versionierung",
+        "description": "Export-Einstellungen und Versionskontrolle verwalten"
+      }
+    },
+    "groups": {
+      "imageSizes": "Bildgrößen"
+    },
+    "general": {
+      "language": {
+        "label": "Sprache",
+        "description": "Wählen Sie die Sprache für die Admin-Oberfläche"
+      },
+      "dateFormat": {
+        "label": "Datumsformat",
+        "description": "Wählen Sie das Standard-Datumsformat für die Anzeige von Daten in der gesamten Anwendung"
+      }
+    },
+    "media": {
+      "maxFileSizeMB": {
+        "label": "Maximale Upload-Größe für Bilder (MB)",
+        "description": "Legen Sie die maximale Größe für einzelne Bild-Uploads in allen Projekten fest."
+      },
+      "maxVideoSizeMB": {
+        "label": "Maximale Upload-Größe für Videos (MB)",
+        "description": "Legen Sie die maximale Größe für einzelne Video-Uploads in allen Projekten fest."
+      },
+      "imageProcessing": {
+        "quality": {
+          "label": "Bildqualität",
+          "description": "Qualitätseinstellung für alle generierten Bildgrößen (1-100). Höhere Werte bedeuten bessere Qualität, aber größere Dateigrößen."
+        },
+        "sizes": {
+          "thumb": {
+            "width": {
+              "label": "Thumbnail-Breite (px)",
+              "description": "Maximale Breite für Thumbnail-Bilder"
+            },
+            "enabled": {
+              "label": "Thumbnails aktivieren",
+              "description": "Thumbnail-Versionen von hochgeladenen Bildern generieren"
+            }
+          },
+          "small": {
+            "width": {
+              "label": "Breite kleines Bild (px)",
+              "description": "Maximale Breite für kleine Bilder"
+            },
+            "enabled": {
+              "label": "Kleine Bilder aktivieren",
+              "description": "Kleine Versionen von hochgeladenen Bildern generieren"
+            }
+          },
+          "medium": {
+            "width": {
+              "label": "Breite mittleres Bild (px)",
+              "description": "Maximale Breite für mittlere Bilder"
+            },
+            "enabled": {
+              "label": "Mittlere Bilder aktivieren",
+              "description": "Mittlere Versionen von hochgeladenen Bildern generieren"
+            }
+          },
+          "large": {
+            "width": {
+              "label": "Breite großes Bild (px)",
+              "description": "Maximale Breite für große Bilder"
+            },
+            "enabled": {
+              "label": "Große Bilder aktivieren",
+              "description": "Große Versionen von hochgeladenen Bildern generieren"
+            }
+          }
+        }
+      }
+    },
+    "export": {
+      "maxVersionsToKeep": {
+        "label": "Maximale Export-Versionen behalten",
+        "description": "Maximale Anzahl von Export-Versionen, die pro Projekt aufbewahrt werden sollen. Wenn dieses Limit überschritten wird, werden die ältesten Exporte automatisch gelöscht, um Speicherplatz zu sparen."
+      }
+    },
+    "messages": {
+      "noSettings": "Keine Einstellungen verfügbar"
+    }
+  }
+}

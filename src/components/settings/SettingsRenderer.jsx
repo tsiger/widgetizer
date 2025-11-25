@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   TextInput,
   TextareaInput,
@@ -19,11 +20,17 @@ import SettingsField from "./SettingsField";
  * Renders the appropriate input component for a given setting
  */
 export default function SettingsRenderer({ setting, value, onChange, error }) {
+  const { t } = useTranslation();
+
   if (!setting || !setting.type) {
     return <div>Error: Invalid setting configuration.</div>;
   }
 
   const { type, id, label, description, options, min, max, step, unit } = setting;
+
+  // Translate label and description if they are translation keys
+  const translatedLabel = label?.startsWith("appSettings.") ? t(label) : label;
+  const translatedDescription = description?.startsWith("appSettings.") ? t(description) : description;
 
   // Handle the new 'header' type, which acts as a section divider
   if (type === "header") {
@@ -33,8 +40,8 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
     // We add a top border and padding to visually separate the new section.
     return (
       <div className="border-t border-slate-300/70 pt-2">
-        {label && <h2 className="text-base font-semibold leading-7 text-slate-800">{label}</h2>}
-        {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
+        {translatedLabel && <h2 className="text-base font-semibold leading-7 text-slate-800">{translatedLabel}</h2>}
+        {translatedDescription && <p className="mt-1 text-sm text-slate-500">{translatedDescription}</p>}
       </div>
     );
   }
@@ -89,10 +96,10 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
     }
   };
 
-  const displayLabel = label || id;
+  const displayLabel = translatedLabel || id;
 
   return (
-    <SettingsField id={id} label={displayLabel} description={description} error={error} type={type}>
+    <SettingsField id={id} label={displayLabel} description={translatedDescription} error={error} type={type}>
       {renderInput()}
     </SettingsField>
   );

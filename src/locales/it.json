@@ -1,0 +1,565 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Progetti",
+    "site": "Sito",
+    "pages": "Pagine",
+    "menus": "Menu",
+    "media": "Media",
+    "settings": "Impostazioni",
+    "appearance": "Aspetto",
+    "themes": "Temi",
+    "extend": "Estendi",
+    "plugins": "Plugin",
+    "tools": "Strumenti",
+    "exportSite": "Esporta sito",
+    "general": "Generale",
+    "appSettings": "Impostazioni App"
+  },
+  "layout": {
+    "toolbar": {
+      "profile": "Profilo",
+      "settings": "Impostazioni",
+      "logout": "Esci"
+    },
+    "requireProject": {
+      "title": "Nessun progetto attivo",
+      "description": "Crea o seleziona un progetto per continuare.",
+      "goToProjects": "Vai ai Progetti"
+    }
+  },
+  "forms": {
+    "common": {
+      "title": "Titolo",
+      "description": "Descrizione",
+      "saving": "Salvataggio...",
+      "cancel": "Annulla",
+      "selectImage": "Seleziona immagine",
+      "changeImage": "Cambia immagine",
+      "removeImage": "Rimuovi immagine",
+      "formError": "Si è verificato un errore durante l'invio del modulo",
+      "selectImageFile": "Seleziona un file immagine."
+    },
+    "menu": {
+      "titleLabel": "Titolo",
+      "descriptionLabel": "Descrizione",
+      "titleRequired": "Il nome del menu è obbligatorio",
+      "nameNotEmpty": "Il nome non può essere vuoto"
+    },
+    "page": {
+      "titleLabel": "Titolo",
+      "filenameLabel": "Nome file",
+      "titleRequired": "Il nome della pagina è obbligatorio",
+      "nameNotEmpty": "Il nome non può essere vuoto",
+      "filenameRequired": "Il nome del file è obbligatorio",
+      "filenameNotEmpty": "Il nome del file non può essere vuoto",
+      "seoTitle": "Impostazioni SEO",
+      "metaDescription": "Meta Descrizione",
+      "metaDescriptionHelp": "Utilizzata per i risultati di ricerca e le anteprime sui social media. Consigliato: 150-160 caratteri.",
+      "socialTitle": "Titolo Social Media",
+      "socialTitleHelp": "Lascia vuoto per usare il titolo della pagina. Utilizzato per la condivisione su Facebook, Twitter, ecc.",
+      "socialImage": "Immagine Social Media",
+      "socialImageHelp": "Dimensione consigliata: 1200×630px. Utilizzata per Facebook Open Graph e Twitter Cards.",
+      "ogType": "Tipo Open Graph",
+      "twitterCard": "Tipo Twitter Card",
+      "canonicalUrl": "URL Canonico",
+      "canonicalUrlHelp": "L'URL preferito per questa pagina. Lascia vuoto per usare quello predefinito.",
+      "robotsLabel": "Indicizzazione Motori di Ricerca",
+      "robotsHelp": "Controlla come i motori di ricerca indicizzano questa pagina."
+    },
+    "project": {
+      "titleLabel": "Titolo",
+      "titleRequired": "Il nome del progetto è obbligatorio",
+      "nameNotEmpty": "Il nome non può essere vuoto",
+      "titleHelp": "Il nome visualizzato per il tuo progetto. Può essere modificato in qualsiasi momento senza influire sulla struttura delle cartelle.",
+      "slugLabel": "Slug",
+      "slugRequired": "Lo slug del progetto è obbligatorio",
+      "slugNotEmpty": "Lo slug non può essere vuoto",
+      "slugPattern": "Lo slug può contenere solo lettere minuscole, numeri e trattini",
+      "slugHelp": "Utilizzato per i nomi delle cartelle. Può contenere solo lettere minuscole, numeri e trattini. Non può essere modificato dopo la creazione.",
+      "descriptionLabel": "Descrizione",
+      "descriptionHelp": "Opzionale. Aggiungi note o dettagli sul tuo progetto.",
+      "themeLabel": "Tema",
+      "themeRequired": "Seleziona un tema",
+      "themeHelp": "Il tema determina lo stile e i widget disponibili per il tuo sito.",
+      "siteUrlLabel": "URL del Sito",
+      "siteUrlHelp": "L'URL finale dove sarà ospitato il tuo sito. Utilizzato per la generazione della sitemap.",
+      "loadingThemes": "Caricamento temi..."
+    },
+    "media": {
+      "editTitle": "Modifica Metadati {{type}}",
+      "altLabel": "Testo Alternativo (Obbligatorio)",
+      "altRequired": "Il testo alternativo è obbligatorio",
+      "altNotEmpty": "Il testo alternativo non può essere vuoto",
+      "altHelp": "Descrive il/la {{type}} per gli screen reader.",
+      "titleLabel": "Titolo",
+      "titleHelp": "Imposta l'attributo title (spesso mostrato al passaggio del mouse).",
+      "save": "Salva Modifiche",
+      "saving": "Salvataggio..."
+    }
+  },
+  "common": {
+    "save": "Salva",
+    "cancel": "Annulla",
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "success": "Successo"
+  },
+  "components": {
+    "mediaToolbar": {
+      "gridView": "Vista Griglia",
+      "listView": "Vista Elenco",
+      "selected": "{{count}} selezionati",
+      "deleteSelected": "Elimina Selezionati",
+      "delete": "Elimina",
+      "refreshUsage": "Aggiorna Utilizzo",
+      "refreshUsageTitle": "Aggiorna Tracciamento Utilizzo",
+      "searchPlaceholder": "Cerca media..."
+    },
+    "mediaUploader": {
+      "dropActive": "Rilascia i file qui...",
+      "dropInactive": "Trascina e rilascia immagini e video qui o",
+      "selectFiles": "Seleziona File",
+      "supportedImages": "Immagini: JPG, PNG, GIF, WebP, SVG",
+      "supportedVideos": "Video: MP4, WebM, MOV, AVI, MKV",
+      "uploading": "Caricamento..."
+    },
+    "mediaSelector": {
+      "title": "Seleziona Media",
+      "searchPlaceholder": "Cerca file media...",
+      "noMatch": "Nessun file media corrisponde alla tua ricerca",
+      "noFiles": "Nessun file media disponibile",
+      "video": "Video",
+      "closeLabel": "Chiudi selettore media"
+    }
+  },
+  "settings": {
+    "title": "Impostazioni Generali",
+    "saveSuccess": "Impostazioni salvate con successo",
+    "saveError": "Impossibile salvare le impostazioni",
+    "unsavedChanges": "Hai modifiche non salvate"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "loading": "Caricamento dati dashboard...",
+    "projectCount": "Numero di progetti",
+    "readyToCreate": "Pronto a creare il tuo primo progetto!",
+    "projects": "Progetti",
+    "getStarted": "Inizia",
+    "activeProject": "Progetto attivo",
+    "createFirstProject": "Crea il tuo primo progetto",
+    "noActiveProject": "Nessun progetto attivo",
+    "createProjectBtn": "Crea Progetto →",
+    "letsGetAtIt": "Iniziamo! →",
+    "createProjectLink": "Crea un progetto →",
+    "magic": "È magia!",
+    "generateSite": "Genera un sito",
+    "todoDescription": "DA FARE: Descrizione"
+  },
+  "projects": {
+    "title": "Progetti",
+    "loading": "Caricamento progetti...",
+    "newProject": "Nuovo progetto",
+    "noActiveProject": "Nessun Progetto Attivo",
+    "noActiveProjectDesc": "È ora di creare la tua prossima grande idea!",
+    "noProjects": "Nessun progetto ancora. Crea il tuo primo progetto!",
+    "headers": {
+      "title": "Titolo",
+      "created": "Creato",
+      "updated": "Aggiornato",
+      "actions": "Azioni"
+    },
+    "badges": {
+      "active": "Attivo"
+    },
+    "actions": {
+      "currentActive": "Progetto attivo corrente",
+      "setActive": "Imposta come progetto attivo",
+      "edit": "Modifica progetto",
+      "duplicate": "Duplica progetto",
+      "delete": "Elimina progetto",
+      "cannotDeleteActive": "Impossibile eliminare il progetto attivo"
+    },
+    "toasts": {
+      "deleteSuccess": "Il progetto \"{{name}}\" è stato eliminato con successo",
+      "deleteError": "Impossibile eliminare il progetto",
+      "cannotDeleteActive": "Impossibile eliminare il progetto attivo. Imposta prima un altro progetto come attivo.",
+      "setActiveSuccess": "\"{{name}}\" è ora il progetto attivo",
+      "setActiveError": "Impossibile impostare il progetto attivo",
+      "duplicateSuccess": "Progetto duplicato con successo",
+      "duplicateError": "Impossibile duplicare il progetto"
+    },
+    "deleteModal": {
+      "title": "Elimina Progetto",
+      "message": "Sei sicuro di voler eliminare \"{{name}}\"?\n\nQuesto eliminerà permanentemente:\n• Tutti i file e le pagine del progetto\n• Tutti i media caricati\n• Tutte le versioni esportate\n• Tutte le impostazioni del progetto\n\nQuesta azione non può essere annullata.",
+      "confirm": "Elimina Progetto",
+      "cancel": "Annulla"
+    }
+  },
+  "pages": {
+    "title": "Pagine",
+    "loading": "Caricamento pagine...",
+    "newPage": "Nuova pagina",
+    "count": "{{count}} pagina",
+    "count_other": "{{count}} pagine",
+    "selected": "{{count}} selezionati",
+    "deleteSelected": "Elimina Selezionati",
+    "delete": "Elimina",
+    "searchPlaceholder": "Cerca pagine...",
+    "headers": {
+      "name": "Nome",
+      "filename": "Nome file",
+      "created": "Creato",
+      "updated": "Aggiornato",
+      "actions": "Azioni"
+    },
+    "noPagesFound": "Nessuna pagina trovata",
+    "noPagesMatch": "Nessuna pagina corrisponde a \"{{term}}\". Prova un termine di ricerca diverso.",
+    "noPagesAvailable": "Nessuna pagina disponibile",
+    "noPagesYet": "Nessuna pagina ancora",
+    "createFirstPage": "Crea la tua prima pagina per iniziare.",
+    "actions": {
+      "design": "Progetta pagina",
+      "edit": "Modifica pagina",
+      "duplicate": "Duplica pagina",
+      "delete": "Elimina pagina"
+    },
+    "toasts": {
+      "deleteBulkSuccess": "Eliminata con successo {{count}} pagina",
+      "deleteBulkSuccess_other": "Eliminate con successo {{count}} pagine",
+      "deleteSuccess": "Pagina eliminata con successo",
+      "deleteError": "Impossibile eliminare la/le pagina/e",
+      "loadError": "Impossibile caricare le pagine",
+      "duplicateSuccess": "Pagina duplicata con successo",
+      "duplicateError": "Impossibile duplicare la pagina"
+    },
+    "deleteModal": {
+      "title": "Elimina Pagina",
+      "message": "Sei sicuro di voler eliminare \"{{name}}\"? Questa azione non può essere annullata.",
+      "confirm": "Elimina",
+      "cancel": "Annulla",
+      "titleBulk": "Elimina Pagine",
+      "messageBulk": "Sei sicuro di voler eliminare {{count}} pagina? Questa azione non può essere annullata.",
+      "messageBulk_other": "Sei sicuro di voler eliminare {{count}} pagine? Questa azione non può essere annullata.",
+      "confirmBulk": "Elimina {{count}} Pagina",
+      "confirmBulk_other": "Elimina {{count}} Pagine"
+    }
+  },
+  "menus": {
+    "title": "Menu",
+    "loading": "Caricamento menu...",
+    "newMenu": "Nuovo menu",
+    "noMenus": "Nessun menu ancora. Crea il tuo primo menu!",
+    "headers": {
+      "title": "Titolo",
+      "description": "Descrizione",
+      "created": "Creato",
+      "updated": "Aggiornato",
+      "actions": "Azioni"
+    },
+    "actions": {
+      "editStructure": "Modifica struttura menu",
+      "duplicate": "Duplica menu",
+      "editSettings": "Modifica impostazioni menu",
+      "delete": "Elimina menu"
+    },
+    "toasts": {
+      "loadError": "Impossibile caricare i menu",
+      "deleteSuccess": "Il menu \"{{name}}\" è stato eliminato con successo",
+      "deleteError": "Impossibile eliminare il menu",
+      "duplicateSuccess": "Menu duplicato con successo",
+      "duplicateError": "Impossibile duplicare il menu"
+    },
+    "deleteModal": {
+      "title": "Elimina Menu",
+      "message": "Sei sicuro di voler eliminare \"{{name}}\"? Questa azione non può essere annullata.",
+      "confirm": "Elimina",
+      "cancel": "Annulla"
+    }
+  },
+  "menuStructure": {
+    "title": "Modifica Struttura Menu",
+    "loading": "Caricamento menu...",
+    "notFound": "Menu non trovato",
+    "description": "Puoi aggiungere fino a 3 livelli di voci di menu.",
+    "save": "Salva Menu",
+    "saving": "Salvataggio...",
+    "toasts": {
+      "itemDeleted": "\"{{label}}\" eliminato",
+      "defaultItemLabel": "Voce di menu",
+      "loadError": "Impossibile caricare il menu",
+      "saveSuccess": "Menu salvato con successo",
+      "saveError": "Impossibile salvare il menu",
+      "notFound": "Menu non trovato"
+    }
+  },
+  "pageEditor": {
+    "loading": "Caricamento pagina...",
+    "error": "Errore: {{message}}",
+    "noPageSelected": "Nessuna pagina selezionata. Seleziona una pagina dall'elenco Pagine."
+  },
+  "menusAdd": {
+    "title": "Aggiungi menu",
+    "goToList": "Vai alla lista menu",
+    "editThis": "Modifica questo menu",
+    "create": "Crea Menu",
+    "toasts": {
+      "createSuccess": "Il menu \"{{name}}\" è stato creato con successo!",
+      "createError": "Impossibile creare il menu"
+    }
+  },
+  "menusEdit": {
+    "title": "Modifica menu",
+    "loading": "Caricamento menu...",
+    "notFound": "Menu non trovato",
+    "backToList": "Torna alla lista menu",
+    "saveChanges": "Salva Modifiche",
+    "toasts": {
+      "loadError": "Impossibile caricare il menu",
+      "updateSuccess": "Il menu \"{{name}}\" è stato aggiornato con successo!",
+      "updateError": "Impossibile aggiornare il menu"
+    }
+  },
+  "pagesAdd": {
+    "title": "Nuova pagina",
+    "goToList": "Vai alla Lista Pagine",
+    "editThis": "Modifica Questa Pagina",
+    "create": "Crea Pagina",
+    "toasts": {
+      "createSuccess": "La pagina \"{{name}}\" è stata creata con successo!",
+      "createError": "Impossibile creare la pagina"
+    }
+  },
+  "pagesEdit": {
+    "title": "Modifica pagina",
+    "loading": "Caricamento pagina...",
+    "backToList": "Torna alla lista pagine",
+    "saveChanges": "Salva Modifiche",
+    "toasts": {
+      "loadError": "Impossibile caricare la pagina",
+      "updateSuccess": "La pagina \"{{name}}\" è stata aggiornata con successo!",
+      "updateSuccessUrlChanged": "La pagina \"{{name}}\" è stata aggiornata con successo e l'URL è stato modificato.",
+      "unknownError": "Errore sconosciuto",
+      "updateError": "Impossibile aggiornare la pagina"
+    }
+  },
+  "projectsAdd": {
+    "title": "Aggiungi progetto",
+    "goToList": "Vai alla Lista Progetti",
+    "editThis": "Modifica Questo Progetto",
+    "create": "Crea Progetto",
+    "toasts": {
+      "createActiveSuccess": "Il progetto \"{{name}}\" è stato creato e impostato come attivo",
+      "createSuccess": "Il progetto \"{{name}}\" è stato creato con successo!",
+      "createError": "Impossibile creare il progetto"
+    }
+  },
+  "projectsEdit": {
+    "title": "Modifica progetto",
+    "loading": "Caricamento progetto...",
+    "notFound": "Progetto non trovato",
+    "noActiveProjectTitle": "Nessun Progetto Attivo",
+    "noActiveProjectDesc": "Seleziona o crea un progetto per gestire i tuoi progetti.",
+    "backToList": "Torna alla Lista Progetti",
+    "saveChanges": "Salva Modifiche",
+    "toasts": {
+      "notFound": "Progetto non trovato",
+      "loadError": "Impossibile caricare il progetto",
+      "updateSuccessRenamed": "Il progetto \"{{name}}\" è stato aggiornato con successo e la cartella è stata rinominata.",
+      "updateSuccess": "Il progetto \"{{name}}\" è stato aggiornato con successo!",
+      "updateError": "Impossibile aggiornare il progetto",
+      "noActiveProject": "Seleziona o crea un progetto per gestire i tuoi progetti"
+    }
+  },
+  "exportSite": {
+    "title": "Esporta Sito: {{name}}",
+    "creator": {
+      "title": "Crea Nuova Esportazione",
+      "description": "Clicca il pulsante qui sotto per generare una versione HTML statica del tuo sito per l'esportazione. Ad ogni esportazione viene assegnato un numero di versione per un facile tracciamento.",
+      "exportButton": "Esporta Progetto",
+      "exporting": "Esportazione...",
+      "successTitle": "Versione di esportazione {{version}} creata con successo!",
+      "successCreated": "Creata: {{date}}"
+    },
+    "history": {
+      "title": "Cronologia Esportazioni",
+      "keepingVersions": "Mantenimento dell'ultima {{count}} versione",
+      "keepingVersions_other": "Mantenimento delle ultime {{count}} versioni",
+      "loading": "Caricamento cronologia esportazioni...",
+      "noExportsTitle": "Nessuna esportazione ancora",
+      "noExportsDesc": "Crea la tua prima esportazione qui sopra!",
+      "headers": {
+        "version": "Versione",
+        "created": "Creata",
+        "status": "Stato",
+        "actions": "Azioni"
+      },
+      "tooltips": {
+        "view": "Vedi esportazione",
+        "download": "Scarica esportazione",
+        "delete": "Elimina esportazione"
+      },
+      "deleteModal": {
+        "title": "Elimina Esportazione",
+        "message": "Sei sicuro di voler eliminare la versione di esportazione {{version}}? Questa azione non può essere annullata.",
+        "confirm": "Elimina",
+        "cancel": "Annulla"
+      },
+      "toasts": {
+        "deleteSuccess": "Versione di esportazione {{version}} eliminata con successo",
+        "deleteError": "Impossibile eliminare l'esportazione: {{message}}",
+        "downloadStart": "Download avviato per la versione {{version}}",
+        "downloadError": "Impossibile scaricare l'esportazione: {{message}}"
+      }
+    },
+    "toasts": {
+      "noProjectId": "L'ID del progetto attivo non è disponibile.",
+      "exportSuccess": "Progetto esportato con successo!",
+      "exportError": "L'esportazione è fallita a causa di un problema sconosciuto.",
+      "unknownError": "Si è verificato un errore sconosciuto durante l'esportazione."
+    }
+  },
+  "media": {
+    "title": "Media",
+    "loading": "Caricamento file media...",
+    "emptyTitle": "Nessun file media ancora",
+    "emptyDesc": "Carica alcuni file utilizzando l'uploader qui sopra."
+  },
+  "themeSettings": {
+    "title": "Impostazioni tema",
+    "loading": "Caricamento impostazioni...",
+    "noSettings": "Nessuna impostazione tema disponibile",
+    "save": "Salva Impostazioni",
+    "cancel": "Annulla",
+    "toasts": {
+      "loadError": "Impossibile caricare le impostazioni del tema. Riprova.",
+      "saveSuccess": "Impostazioni tema salvate con successo!",
+      "saveError": "Impossibile salvare le impostazioni del tema. Riprova."
+    }
+  },
+  "themes": {
+    "title": "Temi",
+    "description": "Gestisci e personalizza i tuoi temi.",
+    "loading": "Caricamento temi...",
+    "uploadingTheme": "Caricamento tema...",
+    "dropZoneActive": "Rilascia il file zip del tema qui...",
+    "dropZoneInactive": "Trascina e rilascia il file zip del tuo tema qui, o clicca per selezionare il file",
+    "maxFileSize": "Dimensione massima file: 10MB",
+    "version": "Versione {{version}}",
+    "widgets": "{{count}} widget",
+    "by": "Di {{author}}",
+    "active": "Attivo",
+    "emptyTitle": "Nessun tema disponibile",
+    "emptyDesc": "Carica un tema utilizzando l'area qui sopra per iniziare",
+    "toasts": {
+      "singleFileError": "Si prega di caricare un singolo file zip.",
+      "uploadSuccess": "Tema caricato con successo!",
+      "uploadError": "Impossibile caricare il tema."
+    }
+  },
+  "plugins": {
+    "title": "Plugin",
+    "emptyTitle": "Nessun plugin installato",
+    "emptyDesc": "Inizia installando il tuo primo plugin dallo store o caricando un plugin personalizzato."
+  },
+  "pagePreview": {
+    "title": "Anteprima: {{name}}",
+    "loading": "Caricamento pagina..."
+  },
+  "appSettings": {
+    "tabs": {
+      "general": {
+        "label": "Generale",
+        "description": "Impostazioni generali e preferenze dell'applicazione"
+      },
+      "media": {
+        "label": "Media & Caricamento",
+        "description": "Configura limiti di caricamento file ed elaborazione media"
+      },
+      "export": {
+        "label": "Esportazione & Versioni",
+        "description": "Gestisci impostazioni di esportazione e controllo versioni"
+      }
+    },
+    "groups": {
+      "imageSizes": "Dimensioni Immagini"
+    },
+    "general": {
+      "language": {
+        "label": "Lingua",
+        "description": "Seleziona la lingua per l'interfaccia di amministrazione"
+      },
+      "dateFormat": {
+        "label": "Formato Data",
+        "description": "Scegli il formato data predefinito per visualizzare le date in tutta l'applicazione"
+      }
+    },
+    "media": {
+      "maxFileSizeMB": {
+        "label": "Dimensione Massima Caricamento Immagine (MB)",
+        "description": "Imposta la dimensione massima per i caricamenti di singole immagini in tutti i progetti."
+      },
+      "maxVideoSizeMB": {
+        "label": "Dimensione Massima Caricamento Video (MB)",
+        "description": "Imposta la dimensione massima per i caricamenti di singoli video in tutti i progetti."
+      },
+      "imageProcessing": {
+        "quality": {
+          "label": "Qualità Immagine",
+          "description": "Impostazione della qualità per tutte le dimensioni immagine generate (1-100). Valori più alti significano migliore qualità ma dimensioni file maggiori."
+        },
+        "sizes": {
+          "thumb": {
+            "width": {
+              "label": "Larghezza Miniatura (px)",
+              "description": "Larghezza massima per le immagini miniatura"
+            },
+            "enabled": {
+              "label": "Abilita Miniature",
+              "description": "Genera versioni miniatura delle immagini caricate"
+            }
+          },
+          "small": {
+            "width": {
+              "label": "Larghezza Immagine Piccola (px)",
+              "description": "Larghezza massima per immagini piccole"
+            },
+            "enabled": {
+              "label": "Abilita Immagini Piccole",
+              "description": "Genera versioni piccole delle immagini caricate"
+            }
+          },
+          "medium": {
+            "width": {
+              "label": "Larghezza Immagine Media (px)",
+              "description": "Larghezza massima per immagini medie"
+            },
+            "enabled": {
+              "label": "Abilita Immagini Medie",
+              "description": "Genera versioni medie delle immagini caricate"
+            }
+          },
+          "large": {
+            "width": {
+              "label": "Larghezza Immagine Grande (px)",
+              "description": "Larghezza massima per immagini grandi"
+            },
+            "enabled": {
+              "label": "Abilita Immagini Grandi",
+              "description": "Genera versioni grandi delle immagini caricate"
+            }
+          }
+        }
+      }
+    },
+    "export": {
+      "maxVersionsToKeep": {
+        "label": "Versioni Esportazione Massime da Mantenere",
+        "description": "Numero massimo di versioni di esportazione da mantenere per progetto. Quando questo limite viene superato, le esportazioni più vecchie vengono eliminate automaticamente per risparmiare spazio."
+      }
+    },
+    "messages": {
+      "noSettings": "Nessuna impostazione disponibile"
+    }
+  }
+}
