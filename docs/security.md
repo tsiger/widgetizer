@@ -26,11 +26,17 @@ These layers are applied automatically to API endpoints and provide a robust bas
 - **Why it's important:** These headers instruct the browser to enable its built-in security features, providing powerful protection against attacks like clickjacking, MIME-type sniffing, and cross-site scripting.
 - **Implementation:** The `helmet` package can be used as a global middleware to set these headers on all responses. _This is not currently implemented._
 
-### 4. Cross-Origin Resource Sharing (CORS) Whitelist [PENDING]
+### 4. Cross-Origin Resource Sharing (CORS)
 
-- **What it is:** In a production environment, the server should only accept API requests from a specific, pre-approved domain.
-- **Why it's important:** Prevents other websites from making unauthorized requests to your API, which could expose user data.
-- **Implementation:** The `cors` package can be configured to check the `NODE_ENV` environment variable. _This is not currently implemented._
+- **What it is:** The server controls which domains are allowed to access the API.
+- **Why it's important:** Prevents unauthorized websites from making requests to your API.
+- **Implementation:** The `cors` package is enabled globally (`app.use(cors())`). In a production environment, this should be configured to whitelist specific domains.
+
+### 5. SVG Sanitization
+
+- **What it is:** All uploaded SVG files are processed to remove potentially malicious scripts and event handlers.
+- **Why it's important:** SVGs are XML files that can contain JavaScript (XSS vectors). If served directly to a user, a malicious SVG could execute code in their browser.
+- **Implementation:** The `DOMPurify` library is used in the media upload controller to sanitize SVG content before saving it to the filesystem.
 
 ### 5. Global Error Handling
 
@@ -54,17 +60,15 @@ Sensitive configuration and environment-specific settings are stored in a `.env`
 - **Purpose:** This is primarily for development and debugging, allowing developers to monitor API traffic and analyze request patterns.
 - **Implementation:** A custom middleware logs the timestamp, method, and URL of every request to `logs/api-requests.log`. This directory is excluded from version control and development server hot-reloading.
 
-## Area 3: Deployment & Performance
+## ⚙️ Deployment Security
 
-These are the final steps to get your app ready to be served to the world.
+### Production Build
 
-- [x] **Generate a Production Build of the Frontend**
+- **Frontend**: The `npm run build` command creates an optimized, minified production build of the React application in the `dist` folder.
+- **Backend**: The Express server is configured to serve these static assets efficiently in production mode.
 
-  - **What it is:** Running the `npm run build` command for your React app.
-  - **Why it's important:** The Vite development server (`npm run dev`) is not for production. The `build` command creates a super-optimized, minified, and fast version of your React app in a `dist` folder.
-  - **Deep Dive Topic:** Run `npm run build` and explore the `dist` folder it creates to see how Vite packages your application.
+### Static File Serving
 
-- [x] **Configure Express to Serve Production React App**
-  - **What it is:** Configuring your Express server to serve the built React app from the `dist` folder.
-  - **Why it's important:** In production, your Node.js server must serve both your API and the main `index.html` file of your React app.
-  - **Deep Dive Topic:** In `server/index.js`, add `app.use(express.static('dist'))` and a catch-all route `app.get('*', ...)` to send `dist/index.html` for any request that doesn't match an API route. This allows React Router to work correctly.
+- **Configuration**: In production (`NODE_ENV=production`), the server uses `express.static` to serve files from the `dist` directory.
+- **Fallback**: A catch-all route (`*`) ensures that React Router handles client-side routing correctly by serving `index.html` for unknown routes.
+- **Trust Proxy**: The `trust proxy` setting is enabled in production to ensure rate limiting works correctly behind reverse proxies (like Nginx or Heroku).

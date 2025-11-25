@@ -12,7 +12,11 @@ The project management UI is primarily handled by three pages:
 
 These pages rely on a central form component for handling user input:
 
-- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (name, description, theme).
+- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (name, description, theme)
+  - Migrated to **react-hook-form** for improved validation and state management
+  - Fully **localized** using `react-i18next` for all labels, errors, and help text
+  - Exposes `dirt` state to parent components for navigation guard integration
+  - Automatic slug generation from project name for new projects
 
 ## Client-Side Routing
 
@@ -50,44 +54,49 @@ This file contains functions that make API calls to the backend:
 
 1.  **Navigation**: The user clicks the "New project" button on the `Projects.jsx` page, which navigates them to `/projects/add`.
 2.  **Rendering**: The `ProjectsAdd.jsx` page is rendered. It contains the `ProjectForm.jsx` component.
-3.  **Theme Loading**: `ProjectForm.jsx` makes an API call via `/api/themes` to fetch the list of available themes and populates the "Theme" dropdown.
-4.  **User Input**: The user fills in the project name, description, and selects a theme. The "Theme" dropdown is only enabled during project creation.
-5.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` formats the project name into a URL-friendly `slug` and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
-6.  **API Call**: `ProjectsAdd.jsx`'s `handleSubmit` function calls `createProject(formData)` from `projectManager.js`, which sends a `POST` request to the backend API to create the new project.
-7.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<projectId>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`. These become the project's working theme files.
-8.  **Setting Active Project**: If this is the very first project being created (i.e., there was no active project before), it is automatically set as the active project by calling `setActiveProject(newProject.id)`. The global state is updated via the `projectStore`.
-9.  **Feedback**: A success toast notification is shown, and the user is presented with buttons to either navigate to the project list or edit the newly created project.
+3.  **Navigation Guard**: The page integrates `useFormNavigationGuard` to prevent accidental navigation with unsaved changes.
+4.  **Theme Loading**: `ProjectForm.jsx` makes an API call via `/api/themes` to fetch the list of available themes and populates the "Theme" dropdown.
+5.  **User Input**: The user fills in the project name, description, and selects a theme. The "Theme" dropdown is only enabled during project creation.
+6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
+7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly `slug` from the project name and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
+8.  **API Call**: `ProjectsAdd.jsx`'s `handleSubmit` function calls `createProject(formData)` from `projectManager.js`, which sends a `POST` request to the backend API to create the new project.
+9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<projectId>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`. These become the project's working theme files.
+10. **Setting Active Project**: If this is the very first project being created (i.e., there was no active project before), it is automatically set as the active project by calling `setActiveProject(newProject.id)`. The global state is updated via the `projectStore`.
+11. **Feedback**: A success toast notification is shown (localized), and the user is presented with buttons to either navigate to the project list or edit the newly created project.
 
 ### 2. Listing and Managing Projects
 
 1.  **Data Fetching**: When `Projects.jsx` loads, it calls `getAllProjects()` to fetch and display a list of all projects in a table.
-2.  **Actions**: For each project in the list, a set of actions are available on hover:
+2.  **Localization**: The page is fully localized with translated headers, action labels, toast messages, and empty states.
+3.  **Actions**: For each project in the list, a set of actions are available on hover:
     - **Set Active (`Star` icon)**: Calls `handleSetActive`, which uses `setActiveProjectInBackend(id)` to update the backend. It then re-fetches the active project information to update the global store and UI. You cannot deactivate the active project; you must set another as active.
     - **Edit (`Pencil` icon)**: Navigates the user to `/projects/edit/:id`.
     - **Duplicate (`Copy` icon)**: Calls `handleDuplicate`, which uses `duplicateProject(id)` to make an API call. The project list is then reloaded.
-    - **Delete (`Trash2` icon)**: Calls `openDeleteConfirmation`, which opens a confirmation modal. You cannot delete the currently active project. If confirmed, the `deleteProject(id)` function is called, and the list is reloaded.
+    - **Delete (`Trash2` icon)**: Calls `openDeleteConfirmation`, which opens a localized confirmation modal. You cannot delete the currently active project. If confirmed, the `deleteProject(id)` function is called, and the list is reloaded.
 
 ### 3. Editing a Project
 
 1.  **Navigation**: From the project list, clicking the "Edit" icon navigates the user to `/projects/edit/:id`.
 2.  **Data Fetching**: `ProjectsEdit.jsx` loads. In its `useEffect` hook, it calls `getAllProjects()` and finds the specific project matching the `id` from the URL parameters to populate the form.
-3.  **Rendering**: The `ProjectForm.jsx` component is rendered with the `initialData` of the project being edited with several key features:
+3.  **Navigation Guard**: `useFormNavigationGuard` is integrated to prevent accidental navigation with unsaved changes.
+4.  **Rendering**: The `ProjectForm.jsx` component is rendered with the `initialData` of the project being edited with several key features:
     - **Theme Restriction**: The "Theme" dropdown is disabled, as themes cannot be changed after creation to maintain consistency
     - **Project Folder Display**: Shows the current project folder name (based on the project title) with a note that it updates when the title changes
     - **Site URL Field**: Allows setting the base URL for the project, used for generating absolute URLs in social media meta tags and SEO
-4.  **Form Features**:
+5.  **Form Features**:
     - **Live Folder Preview**: The project folder name updates in real-time as the user types the project title
-    - **URL Validation**: The site URL field includes validation to ensure proper URL format
+    - **URL Validation**: The site URL field includes validation to ensure proper URL format (via react-hook-form)
     - **Conditional Fields**: Theme selection only appears when creating new projects, not when editing existing ones
-5.  **Submission & URL Management**: The user modifies the form and clicks "Save Changes":
+    - **Localized Validation**: All error messages and help text are fully localized
+6.  **Submission & URL Management**: The user modifies the form and clicks "Save Changes":
     - **Project Renaming**: If the project title changes, the system automatically generates a new project ID and renames the project directory
     - **URL Redirection**: When a project is renamed (causing an ID change), the user is automatically redirected to the new URL (`/projects/edit/{newId}`)
     - **State Synchronization**: Active project state is properly maintained even when project IDs change due to renaming
-6.  **API Call**: The `handleSubmit` function calls `updateProject(id, formData)` using the `projectManager.js` utility functions for consistent API handling.
-7.  **State Updates**:
+7.  **API Call**: The `handleSubmit` function calls `updateProject(id, formData)` using the `projectManager.js` utility functions for consistent API handling.
+8.  **State Updates**:
     - **Active Project Sync**: If the edited project is currently active, the global store is updated using `getActiveProject()` and `setActiveProject()` to maintain proper state
     - **Windows Compatibility**: Project directory renaming uses a copy + remove approach for better Windows file system compatibility
-8.  **Feedback**: Success toast notifications show the completion status, and navigation buttons allow returning to the project list.
+9.  **Feedback**: Localized success toast notifications show the completion status, and navigation buttons allow returning to the project list.
 
 ---
 

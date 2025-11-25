@@ -63,7 +63,8 @@ The `theme.json` file serves as the theme's manifest and defines global settings
   "version": "1.0.0",
   "description": "A beautiful, responsive theme",
   "author": "Your Name",
-  "widgets": 15
+  "widgets": 15,
+  "useCoreWidgets": true
 }
 ```
 

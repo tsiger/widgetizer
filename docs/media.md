@@ -130,12 +130,13 @@ The Media page has been **refactored** into a clean, modular architecture with t
 
 ### Architecture Overview
 
-The `Media.jsx` component (reduced from ~410 lines to ~137 lines) now uses a **hook-based architecture** that separates concerns:
+The `Media.jsx` component (reduced from ~410 lines to ~126 lines) now uses a **hook-based architecture** that separates concerns:
 
 - **`useMediaState`**: Core state management and data loading
 - **`useMediaUpload`**: File upload logic with progress tracking
 - **`useMediaSelection`**: File selection and deletion workflows
 - **`useMediaMetadata`**: Metadata editing and drawer management
+- **Localization**: Fully integrated with `react-i18next` for all user-facing text
 
 This architecture provides better **maintainability**, **testability**, and **code reuse** while keeping the main component focused on UI orchestration.
 
@@ -156,10 +157,12 @@ Manages core media state and data loading:
 Handles all file upload operations:
 
 - **Upload Progress**: Real-time progress tracking using XMLHttpRequest
-- **Multi-file Processing**: Handles multiple file uploads simultaneously
-- **Error Handling**: Detailed error reporting for rejected files
+- **Chunked Processing**: Processes files in batches of 5 to avoid overwhelming the server
+- **Multi-file Support**: Handles multiple file uploads with sequential chunk processing
+- **SVG Sanitization**: Client-side SVG sanitization using DOMPurify before upload
+- **Error Handling**: Detailed error reporting for rejected files with unique toast IDs
 - **State Updates**: Updates parent files state with successful uploads
-- **Toast Notifications**: Success, warning, and error feedback
+- **Toast Notifications**: Success, warning, and error feedback with batch progress indicators
 
 #### `useMediaSelection` Hook (`src/hooks/useMediaSelection.js`)
 
@@ -183,13 +186,13 @@ Handles metadata editing and drawer functionality:
 
 ### Core UI Components
 
-- `MediaUploader`: Drag-and-drop zone with real-time upload progress display
-- `MediaToolbar`: Contains view toggle, search bar, bulk actions, and usage refresh
+- `MediaUploader`: Drag-and-drop zone with real-time upload progress display (localized)
+- `MediaToolbar`: Contains view toggle, search bar, bulk actions, and usage refresh (localized)
 - `MediaGrid`: Responsive grid view with thumbnail cards and usage badges
-- `MediaList`: Table view with detailed file information and select-all functionality
-- `MediaDrawer`: Slide-out panel for editing file metadata (alt text and title)
-- `MediaSelectorDrawer`: Media browser drawer for selecting existing files in setting inputs
-- `ConfirmationModal`: Deletion confirmation dialog with usage warnings
+- `MediaList`: Table view with detailed file information and select-all functionality (localized)
+- `MediaDrawer`: Slide-out panel for editing file metadata (alt text and title, localized)
+- `MediaSelectorDrawer`: Media browser drawer for selecting existing files in setting inputs (localized)
+- `ConfirmationModal`: Deletion confirmation dialog with usage warnings (localized)
 
 #### `MediaSelectorDrawer` Component (`src/components/media/MediaSelectorDrawer.jsx`)
 
@@ -275,20 +278,22 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
   1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (images: `/data/projects/<projectId>/uploads/images/`, videos: `/data/projects/<projectId>/uploads/videos/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type.
   2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the appropriate size limit (`media.maxFileSizeMB` for images, `media.maxVideoSizeMB` for videos).
   3.  For each valid file, it generates a unique ID (`uuidv4`).
-  4.  If the file is an image (not an SVG), it uses the `sharp` library to:
+  4.  **SVG Sanitization**: If the file is an SVG, it's sanitized using `DOMPurify` with SVG profile to prevent XSS attacks before being saved.
+  5.  If the file is an image (not an SVG), it uses the `sharp` library to:
       - Read the original `width` and `height`.
       - **Dynamically load** the current image processing settings from App Settings
       - Generate **only the enabled** image sizes with the configured quality setting
       - Apply the configured maximum widths for each enabled size
       - **Skip sizes larger than original**: Only creates sizes that are smaller than the original image dimensions to avoid storage waste
-  5.  If the file is a video, no processing is performed - it's simply stored as-is.
-  6.  It creates a new metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants (images only)—and adds it to the `files` array in `media.json`.
-  7.  **Thumbnail Assignment**: The system ensures there's always a thumbnail for previews:
+  6.  If the file is a video, no processing is performed - it's simply stored as-is.
+  7.  It creates a new metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants (images only)—and adds it to the `files` array in `media.json`.
+  8.  **Thumbnail Assignment**: The system ensures there's always a thumbnail for previews:
       - If `thumb` size is enabled: uses the thumb image
       - If `thumb` is disabled: uses the first available enabled size
       - If no sizes are enabled: uses the original image
-  8.  Files that are too large or have the wrong type are rejected and immediately deleted from the server.
-  9.  It returns a JSON response to the client with arrays of successfully processed and rejected files.
+  9.  Files that are too large or have the wrong type are rejected and immediately deleted from the server.
+  10. **Parallel Processing**: All files are processed in parallel using `Promise.allSettled` for optimal performance.
+  11. It returns a JSON response to the client with arrays of successfully processed and rejected files.
 - **Deletion Logic (`deleteProjectMedia`, `bulkDeleteProjectMedia`)**:
   1.  The controller reads `media.json`.
   2.  It finds the file entry (or entries) by ID.

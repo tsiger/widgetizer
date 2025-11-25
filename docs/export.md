@@ -15,6 +15,7 @@ The `ExportSite.jsx` component (reduced from ~300 lines to ~40 lines) now uses a
 - **`useExportState`**: Centralized state management and data loading
 - **`ExportCreator`**: Export creation interface and workflow
 - **`ExportHistoryTable`**: Export history display and management
+- **Localization**: Fully integrated with `react-i18next` for all user-facing text
 
 This architecture provides better **maintainability**, **reusability**, and **separation of concerns** while keeping the main component focused on layout orchestration.
 
@@ -41,6 +42,7 @@ Handles the export creation workflow:
 - **Progress Feedback**: Loading states and success/error notifications
 - **Version Management**: Updates export history after successful exports
 - **Error Handling**: Comprehensive error reporting and user feedback
+- **Localization**: All labels, status messages, and notifications are fully localized
 
 #### `ExportHistoryTable` Component (`src/components/export/ExportHistoryTable.jsx`)
 

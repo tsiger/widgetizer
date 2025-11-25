@@ -18,6 +18,7 @@ The frontend component provides a clean interface for theme management.
 - **Theme Grid**: Displays all available themes in a responsive grid layout.
 - **Upload Functionality**: Drag-and-drop interface for uploading new theme ZIP files.
 - **Active Theme Indicator**: Visual indication of which theme is currently active for the project.
+- **Localization**: Fully integrated with `react-i18next` for all user-facing text.
 
 ### Displaying Themes
 

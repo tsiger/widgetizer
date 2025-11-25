@@ -57,6 +57,32 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[project-id-slug-architecture.md](project-id-slug-architecture.md)** - Project Identity System
+
+**Purpose**: Explains the dual-identifier system (UUID vs Slug) for projects **When to use**:
+
+- Understanding how projects are identified and stored
+- Implementing project renaming logic
+- Working with filesystem paths vs API IDs
+- Troubleshooting "project not found" errors
+
+**Key topics**: UUID vs Slug, controller implementation, filesystem organization, renaming workflows
+
+---
+
+### **[react-hook-form-migration.md](react-hook-form-migration.md)** - Form Architecture Migration
+
+**Purpose**: Details the migration from manual forms to React Hook Form **When to use**:
+
+- Creating new forms in the application
+- Understanding form validation patterns
+- Debugging form state issues
+- Reviewing "lessons learned" for form development
+
+**Key topics**: React Hook Form integration, validation patterns, performance improvements, migration status
+
+---
+
 ## 🎨 Content Management
 
 ### **[projects.md](projects.md)** - Project Management System

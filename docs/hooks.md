@@ -130,6 +130,57 @@ function PageEditor() {
 - **Custom Dialogs**: Shows user-friendly confirmation dialogs for internal navigation
 - **Automatic Cleanup**: Properly removes event listeners on component unmount
 
+### `useFormNavigationGuard` Hook (`src/hooks/useFormNavigationGuard.js`)
+
+A simplified navigation guard hook specifically designed for form pages with a single bool boolean parameter.
+
+#### Purpose
+
+Provides streamlined navigation protection for form-based pages (Projects, Pages, App Settings, etc.) where the dirty state is tracked by form libraries like react-hook-form.
+
+#### Usage
+
+```javascript
+import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+
+function ProjectForm() {
+  const {
+    formState: { isDirty },
+  } = useForm();
+
+  // Protect against navigation when form is dirty
+  useFormNavigationGuard(isDirty);
+
+  return <form>...</form>;
+}
+```
+
+#### API Reference
+
+**Parameters:**
+
+- `hasUnsavedChanges` (boolean): Whether the form has unsaved changes
+
+**Returns:**
+
+- Nothing (hook handles protection automatically)
+
+#### Key Features
+
+- **Simplified API**: Single boolean parameter instead of complex state management
+- **Browser Protection**: Prevents tab closing and URL changes when form is dirty
+- **React Router Integration**: Works seamlessly with react-router-dom navigation
+- **Automatic Cleanup**: Removes event listeners on unmount
+
+#### Used In
+
+- Form pages throughout the application:
+  - `AppSettings.jsx`
+  - `ProjectsAdd.jsx`, `ProjectsEdit.jsx`
+  - `PagesAdd.jsx`, `PagesEdit.jsx`
+  - Theme settings forms
+  - Menu editing forms
+
 ## Selection & State Management Hooks
 
 ### `usePageSelection` Hook (`src/hooks/usePageSelection.js`)

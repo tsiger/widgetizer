@@ -44,12 +44,14 @@ The App Settings system uses a **schema-driven architecture** that is completely
 
 #### `AppSettings.jsx` (Main Page)
 
-The main page component (reduced to ~56 lines) acts as an orchestrator:
+The main page component (reduced to ~61 lines) acts as an orchestrator:
 
 - **Layout Management**: Uses `PageLayout` for consistent page structure
 - **Loading States**: Displays loading spinners and error states
 - **Hook Integration**: Uses `useAppSettings` hook for all data management
 - **Save/Cancel Actions**: Provides save and cancel buttons with change tracking
+- **Navigation Guard**: Integrated `useFormNavigationGuard` prevents accidental navigation with unsaved changes
+- **Localization**: Fully localized using `react-i18next` for all user-facing text
 
 #### `AppSettingsPanel.jsx` (`src/components/settings/AppSettingsPanel.jsx`)
 
@@ -60,6 +62,7 @@ A dedicated component for rendering app settings:
 - **Group Organization**: Supports setting groups with visual separators
 - **Vertical Tabs**: Consistent UI with theme settings but isolated architecture
 - **Native Schema Support**: No conversion logic - works directly with app settings format
+- **Localization**: Tab labels, section titles, and all text fully localized via translation keys
 
 #### `useAppSettings.js` Hook (`src/hooks/useAppSettings.js`)
 

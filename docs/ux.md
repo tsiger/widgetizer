@@ -29,11 +29,10 @@ This document provides a user experience (UX) audit of the application's core wo
 
 ### **1.3. Delete a Project**
 
-- **Current State:** Deletes the project and refreshes the list.
+- **Current State:** A confirmation modal appears. Upon confirmation, the project is deleted and the list is refreshed.
 - **Suggestion:**
-  1.  Use a confirmation modal with a stern warning, as this is a highly destructive action.
-  2.  If the user deletes the **active project**, the application must gracefully handle this by clearing the active project state in the store and redirecting to the project selection/creation page (`/projects`).
-  3.  If they delete an _inactive_ project, refreshing the list is the correct behavior.
+  1.  Ensure the active project cannot be deleted (or handle it gracefully).
+  2.  Continue using the confirmation modal.
 - **Feedback:** Show a success toast: `Success: Project "[Project Name]" has been deleted.`
 
 ---
@@ -56,8 +55,8 @@ _(Excluding the Page Editor itself)_
 
 ### **2.3. Delete a Page**
 
-- **Current State:** A page is deleted from the list.
-- **Suggestion:** Use a confirmation modal. After successful deletion, refresh the list. This is a standard and correct flow.
+- **Current State:** A confirmation modal appears. Upon confirmation, the page is deleted and the list is refreshed.
+- **Suggestion:** Continue using the confirmation modal.
 - **Feedback:** Show a success toast: `Success: Page "[Page Name]" has been deleted.`
 
 ---
@@ -72,8 +71,8 @@ _(Excluding the Page Editor itself)_
 
 ### **3.2. Delete a Menu**
 
-- **Current State:** Deletes from the list.
-- **Suggestion:** Standard flow: use a confirmation modal, then refresh the list.
+- **Current State:** A confirmation modal appears. Upon confirmation, the menu is deleted and the list is refreshed.
+- **Suggestion:** Continue using the confirmation modal.
 - **Feedback:** Show a success toast: `Success: Menu "[Menu Name]" has been deleted.`
 
 ---
@@ -88,10 +87,11 @@ _(Excluding the Page Editor itself)_
 
 ### **4.2. Delete Media**
 
-- **Current State:** A file is deleted.
-- **Suggestion:**
-  1.  **Deletion Protection is Critical:** The documentation mentions usage tracking. This should be exposed in the UI. If a file is in use, the "Delete" button should either be disabled with a tooltip (`This image is used on 3 pages.`) or clicking it should open a modal that says, "Cannot delete. This file is in use on the following pages: [List of pages]".
-  2.  If the file is **not** in use, a standard confirmation modal should appear.
+- **Current State:**
+  1.  The system checks if the file is in use.
+  2.  If in use, deletion is blocked or a warning is shown.
+  3.  If not in use, a confirmation modal appears.
+- **Suggestion:** Continue ensuring usage tracking is accurate and visible.
 - **Feedback:** Upon successful deletion, show a toast: `Success: "[file-name.jpg]" has been deleted.`
 
 ---
@@ -106,10 +106,8 @@ _(Excluding the Page Editor itself)_
 
 ### **5.2. Delete a Theme**
 
-- **Current State:** A theme is deleted.
-- **Suggestion:**
-  1.  **Disable Deleting the Active Theme.** The "Delete" button for the currently active theme should be disabled to prevent breaking the site.
-  2.  For other themes, use a standard confirmation modal.
+- **Current State:** A confirmation modal appears. Deleting the active theme is prevented/warned against.
+- **Suggestion:** Continue using the confirmation modal.
 - **Feedback:** Show a toast: `Success: Theme "[Theme Name]" has been deleted.`
 
 ---
@@ -118,11 +116,10 @@ _(Excluding the Page Editor itself)_
 
 ### **6.1. Create an Export**
 
-- **Current State:** An export is initiated.
-- **Suggestion:** This is an asynchronous process. No redirection is needed. The UX should be:
+- **Current State:**
   1.  User clicks "Create Export".
-  2.  A new row immediately appears in the history table with a "Processing..." or "In Progress" status.
-  3.  A toast appears: `Info: Export started. You can leave this page.`
-  4.  When the export is complete, the status in the table row updates to "Success", and the download/preview buttons become active.
-  5.  A final toast appears: `Success: Your site export is complete and ready to download.`
-- **Feedback:** Relies on toasts and UI state changes, not redirection.
+  2.  A new row appears in the history table with "Processing" status.
+  3.  Toasts provide feedback on start and completion.
+  4.  History table updates automatically.
+- **Suggestion:** Ensure the "Processing" state persists if the user navigates away and back (if supported by backend polling/sockets).
+- **Feedback:** Relies on toasts and UI state changes.

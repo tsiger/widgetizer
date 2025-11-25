@@ -10,7 +10,7 @@ The editor's interface is divided into three main columns: a component list on t
 
 The `PageEditor` is composed of several specialized child components, each with a distinct responsibility:
 
-- **`EditorTopBar`**: Located at the top of the page, this component displays the page name and provides global actions. It contains controls for manual saving, opening a live preview in a new tab, changing the preview mode (e.g., desktop, tablet, mobile), and shows the current save status (e.g., "All changes saved", "Saving...").
+- **`EditorTopBar`**: Located at the top of the page, this component displays the page name and provides global actions. It contains controls for manual saving, opening a live preview in a new tab, changing the preview mode (e.g., desktop, tablet, mobile), and shows the current save status (e.g., "All changes saved", "Saving..."). Fully localized.
 
 - **`WidgetList`**: The left-hand panel that displays the hierarchical structure of all widgets and their inner blocks for the current page. It's the main interface for:
 
@@ -27,7 +27,7 @@ The `PageEditor` is composed of several specialized child components, each with 
 
 - **`BlockSelector`**: Similar to the `WidgetSelector`, this modal allows the user to add a nested block (e.g., a slide in a carousel, a column in a grid) to a compatible widget.
 
-- **`ConfirmationModal`**: A generic modal used to confirm potentially destructive actions, ensuring the user doesn't accidentally delete content. It is used, for example, when deleting a widget.
+- **`ConfirmationModal`**: A generic modal used to confirm potentially destructive actions, ensuring the user doesn't accidentally delete content. It is used, for example, when deleting a widget. Localized messages and actions.
 
 ## State Management and Data Flow
 
