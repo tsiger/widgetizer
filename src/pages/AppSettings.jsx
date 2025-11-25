@@ -4,8 +4,10 @@ import Button from "../components/ui/Button.jsx";
 import AppSettingsPanel from "../components/settings/AppSettingsPanel.jsx";
 import useAppSettings from "../hooks/useAppSettings.js";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import { useTranslation } from "react-i18next";
 
 export default function AppSettings() {
+  const { t } = useTranslation();
   const { settings, loading, isSaving, hasChanges, schema, handleInputChange, handleSave, handleCancel } =
     useAppSettings();
 
@@ -14,24 +16,24 @@ export default function AppSettings() {
 
   if (loading) {
     return (
-      <PageLayout title="General Settings">
-        <LoadingSpinner message="Loading settings..." />
+      <PageLayout title={t("settings.title")}>
+        <LoadingSpinner message={t("common.loading")} />
       </PageLayout>
     );
   }
 
   if (!settings) {
     return (
-      <PageLayout title="General Settings">
+      <PageLayout title={t("settings.title")}>
         <div className="text-center py-8">
-          <p className="text-red-500">Could not load settings.</p>
+          <p className="text-red-500">{t("common.error")}</p>
         </div>
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout title="General Settings">
+    <PageLayout title={t("settings.title")}>
       <>
         {/* App Settings panel */}
         <div className="bg-white rounded-md border border-t-0 border-slate-200">
@@ -42,15 +44,15 @@ export default function AppSettings() {
         <div className="mt-6 flex justify-end gap-3">
           {hasChanges && (
             <Button onClick={handleCancel} disabled={isSaving} variant="secondary">
-              Cancel
+              {t("common.cancel")}
             </Button>
           )}
 
           <Button onClick={handleSave} disabled={isSaving || !hasChanges} variant="primary">
-            {isSaving ? "Saving..." : "Save Settings"}
+            {isSaving ? t("common.loading") : t("common.save")}
           </Button>
 
-          {hasChanges && <span className="text-sm text-amber-600 self-center ml-2">You have unsaved changes</span>}
+          {hasChanges && <span className="text-sm text-amber-600 self-center ml-2">{t("settings.unsavedChanges")}</span>}
         </div>
       </>
     </PageLayout>

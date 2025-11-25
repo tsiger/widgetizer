@@ -97,6 +97,13 @@ export default function useAppSettings() {
       setOriginalSettings(JSON.parse(JSON.stringify(savedSettings)));
       setHasChanges(false);
 
+      // Update language if it changed
+      if (savedSettings.general?.language) {
+        import("../i18n").then((module) => {
+          module.default.changeLanguage(savedSettings.general.language);
+        });
+      }
+
       showToast(result.message || "Settings saved successfully", "success");
     } catch (error) {
       showToast(error.message || "Failed to save settings", "error");

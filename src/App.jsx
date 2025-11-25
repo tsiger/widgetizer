@@ -21,6 +21,8 @@ import ProjectsEdit from "./pages/ProjectsEdit";
 import MenuStructure from "./pages/MenuStructure";
 import ToastContainer from "./components/ui/ToastContainer";
 import RequireActiveProject from "./components/layout/RequireActiveProject";
+import "./i18n";
+import LanguageInitializer from "./components/layout/LanguageInitializer";
 
 // Create router with data router API (required for useBlocker)
 const router = createBrowserRouter([
@@ -118,6 +120,7 @@ function AppWithToast() {
   return (
     <>
       <RouterProvider router={router} />
+      <LanguageInitializer />
       <ToastContainer />
     </>
   );

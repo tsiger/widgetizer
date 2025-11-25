@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -11,6 +12,7 @@ import { getThemeSettings, saveThemeSettings } from "../queries/themeManager";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function Settings() {
+  const { t } = useTranslation();
   const [themeData, setThemeData] = useState(null);
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ export default function Settings() {
         setThemeData(data);
         setOriginalData(JSON.parse(JSON.stringify(data))); // Deep copy for comparison
       } catch {
-        showToast("Failed to load theme settings. Please try again.", "error");
+        showToast(t("themeSettings.toasts.loadError"), "error");
       } finally {
         setLoading(false);
       }
@@ -100,9 +102,9 @@ export default function Settings() {
       await saveThemeSettings(themeData);
       setOriginalData(JSON.parse(JSON.stringify(themeData))); // Update original data
       setHasChanges(false);
-      showToast("Theme settings saved successfully!", "success");
+      showToast(t("themeSettings.toasts.saveSuccess"), "success");
     } catch {
-      showToast("Failed to save theme settings. Please try again.", "error");
+      showToast(t("themeSettings.toasts.saveError"), "error");
     }
   };
 
@@ -113,14 +115,14 @@ export default function Settings() {
 
   if (loading) {
     return (
-      <PageLayout title="Theme settings">
-        <LoadingSpinner message="Loading settings..." />
+      <PageLayout title={t("themeSettings.title")}>
+        <LoadingSpinner message={t("themeSettings.loading")} />
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout title="Theme settings">
+    <PageLayout title={t("themeSettings.title")}>
       <>
         {/* Settings panel container */}
         <div className="bg-white rounded-md border border-t-0 border-slate-200">
@@ -131,7 +133,7 @@ export default function Settings() {
               onChange={handleSettingChange}
             />
           ) : (
-            <div className="p-6 text-center text-slate-500">No theme settings available</div>
+            <div className="p-6 text-center text-slate-500">{t("themeSettings.noSettings")}</div>
           )}
         </div>
 
@@ -139,17 +141,17 @@ export default function Settings() {
         <div className="mt-6 flex justify-end gap-3">
           {hasChanges && (
             <Button onClick={handleCancel} variant="secondary">
-              Cancel
+              {t("themeSettings.cancel")}
             </Button>
           )}
           
           <Button onClick={handleSave} disabled={loading || !themeData || !hasChanges} variant="primary">
-            Save Settings
+            {t("themeSettings.save")}
           </Button>
           
           {hasChanges && (
             <span className="text-sm text-amber-600 self-center ml-2">
-              You have unsaved changes
+              {t("common.unsavedChanges")}
             </span>
           )}
         </div>

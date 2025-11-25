@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import EmptyState from "../components/ui/EmptyState";
@@ -13,6 +14,7 @@ import useToastStore from "../stores/toastStore";
 
 // Functional Theme Uploader component using react-dropzone
 const ThemeUploader = ({ onUploadSuccess }) => {
+  const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({ status: "idle", message: "" }); // Add state for upload status
   const showToast = useToastStore((state) => state.showToast);
@@ -20,10 +22,10 @@ const ThemeUploader = ({ onUploadSuccess }) => {
   // Effect to show toast based on uploadStatus
   useEffect(() => {
     if (uploadStatus.status === "success") {
-      showToast(uploadStatus.message || "Theme uploaded successfully!", "success");
+      showToast(uploadStatus.message || t("themes.toasts.uploadSuccess"), "success");
       setUploadStatus({ status: "idle", message: "" }); // Reset status
     } else if (uploadStatus.status === "error") {
-      showToast(uploadStatus.message || "Failed to upload theme.", "error");
+      showToast(uploadStatus.message || t("themes.toasts.uploadError"), "error");
       setUploadStatus({ status: "idle", message: "" }); // Reset status
     }
   }, [uploadStatus, showToast]);
@@ -31,7 +33,7 @@ const ThemeUploader = ({ onUploadSuccess }) => {
   const onDrop = useCallback(
     async (acceptedFiles) => {
       if (acceptedFiles.length !== 1) {
-        showToast("Please upload a single zip file.", "error");
+        showToast(t("themes.toasts.singleFileError"), "error");
         return;
       }
 
@@ -74,17 +76,18 @@ const ThemeUploader = ({ onUploadSuccess }) => {
       <UploadCloud className={`mx-auto h-12 w-12 ${isUploading ? "text-slate-300" : "text-slate-400"}`} />
       <p className={`mt-2 text-sm ${isUploading ? "text-slate-400" : "text-slate-600"}`}>
         {isUploading
-          ? "Uploading theme..."
+          ? t("themes.uploadingTheme")
           : isDragActive
-            ? "Drop the theme zip file here..."
-            : "Drag & drop your theme zip file here, or click to select file"}
+            ? t("themes.dropZoneActive")
+            : t("themes.dropZoneInactive")}
       </p>
-      <p className={`text-xs ${isUploading ? "text-slate-300" : "text-slate-500"}`}>Max file size: 10MB</p>
+      <p className={`text-xs ${isUploading ? "text-slate-300" : "text-slate-500"}`}>{t("themes.maxFileSize")}</p>
     </div>
   );
 };
 
 export default function Themes() {
+  const { t } = useTranslation();
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -117,14 +120,14 @@ export default function Themes() {
 
   if (loading) {
     return (
-      <PageLayout title="Themes">
-        <LoadingSpinner message="Loading themes..." />
+      <PageLayout title={t("themes.title")}>
+        <LoadingSpinner message={t("themes.loading")} />
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout title="Themes" description="Manage and customize your themes.">
+    <PageLayout title={t("themes.title")} description={t("themes.description")}>
       <ThemeUploader onUploadSuccess={handleUploadSuccess} />
 
       {themes.length > 0 ? (
@@ -149,18 +152,18 @@ export default function Themes() {
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h3 className="text-base font-semibold">{theme.name}</h3>
-                      <div className="text-xs text-slate-500">Version {theme.version}</div>
+                      <div className="text-xs text-slate-500">{t("themes.version", { version: theme.version })}</div>
                     </div>
-                    <Badge variant="neutral">{theme.widgets} widgets</Badge>
+                    <Badge variant="neutral">{t("themes.widgets", { count: theme.widgets })}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-500">By {theme.author || "Unknown"}</span>
+                    <span className="text-xs text-slate-500">{t("themes.by", { author: theme.author || "Unknown" })}</span>
                   </div>
                 </div>
 
                 {isActiveTheme && (
                   <Badge variant="pink" className="absolute top-2 right-2">
-                    Active
+                    {t("themes.active")}
                   </Badge>
                 )}
               </div>
@@ -168,7 +171,7 @@ export default function Themes() {
           })}
         </div>
       ) : (
-        <EmptyState title="No themes available" description="Upload a theme using the area above to get started" />
+        <EmptyState title={t("themes.emptyTitle")} description={t("themes.emptyDesc")} />
       )}
     </PageLayout>
   );

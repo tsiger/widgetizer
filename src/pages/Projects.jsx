@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Trash2, Star, Pencil, AlertCircle, CirclePlus, Copy } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -24,6 +25,7 @@ import ConfirmationModal from "../components/ui/ConfirmationModal";
 import useConfirmationModal from "../hooks/useConfirmationModal";
 
 export default function Projects() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,9 +45,9 @@ export default function Projects() {
     try {
       await deleteProject(data.projectId);
       await loadProjects(); // Reload the list
-      showToast(`Project "${data.projectName}" was deleted successfully`, "success");
+      showToast(t("projects.toasts.deleteSuccess", { name: data.projectName }), "success");
     } catch (err) {
-      showToast("Failed to delete project", "error");
+      showToast(t("projects.toasts.deleteError"), "error");
     }
   };
 
@@ -70,15 +72,15 @@ export default function Projects() {
   const openDeleteConfirmation = (id, name) => {
     // Check if it's the active project
     if (activeProject && id === activeProject.id) {
-      showToast("Cannot delete the active project. Please set another project as active first.", "error");
+      showToast(t("projects.toasts.cannotDeleteActive"), "error");
       return;
     }
 
     openModal({
-      title: "Delete Project",
-      message: `Are you sure you want to delete "${name}"?\n\nThis will permanently delete:\n• All project files and pages\n• All uploaded media\n• All exported versions\n• All project settings\n\nThis action cannot be undone.`,
-      confirmText: "Delete Project",
-      cancelText: "Cancel",
+      title: t("projects.deleteModal.title"),
+      message: t("projects.deleteModal.message", { name }),
+      confirmText: t("projects.deleteModal.confirm"),
+      cancelText: t("projects.deleteModal.cancel"),
       variant: "danger",
       data: { projectId: id, projectName: name },
     });
@@ -94,10 +96,10 @@ export default function Projects() {
       // Find the project name to show in toast
       const project = projects.find((p) => p.id === id);
       if (project) {
-        showToast(`"${project.name}" is now the active project`, "success");
+        showToast(t("projects.toasts.setActiveSuccess", { name: project.name }), "success");
       }
     } catch (err) {
-      showToast("Failed to set active project", "error");
+      showToast(t("projects.toasts.setActiveError"), "error");
     }
   };
 
@@ -105,16 +107,16 @@ export default function Projects() {
     try {
       const newProject = await duplicateProject(projectId);
       await loadProjects(); // Reload the list to show the new project
-      showToast(`Project duplicated successfully`, "success");
+      showToast(t("projects.toasts.duplicateSuccess"), "success");
     } catch (error) {
-      showToast("Failed to duplicate project", "error");
+      showToast(t("projects.toasts.duplicateError"), "error");
     }
   };
 
   if (loading) {
     return (
-      <PageLayout title="Projects">
-        <LoadingSpinner message="Loading projects..." />
+      <PageLayout title={t("projects.title")}>
+        <LoadingSpinner message={t("projects.loading")} />
       </PageLayout>
     );
   }
@@ -122,17 +124,17 @@ export default function Projects() {
   if (!activeProject) {
     return (
       <PageLayout
-        title="Projects"
+        title={t("projects.title")}
         buttonProps={{
           onClick: () => navigate("/projects/add"),
-          children: "New project",
+          children: t("projects.newProject"),
           icon: <CirclePlus size={18} />,
         }}
       >
         <div className="p-8 text-center">
           <AlertCircle className="mx-auto mb-4 text-yellow-500" size={48} />
-          <h2 className="text-xl font-semibold mb-2">No Active Project</h2>
-          <p className="text-slate-600 mb-4">Time to create your next big thing!</p>
+          <h2 className="text-xl font-semibold mb-2">{t("projects.noActiveProject")}</h2>
+          <p className="text-slate-600 mb-4">{t("projects.noActiveProjectDesc")}</p>
         </div>
       </PageLayout>
     );
@@ -140,18 +142,23 @@ export default function Projects() {
 
   return (
     <PageLayout
-      title="Projects"
+      title={t("projects.title")}
       buttonProps={{
         onClick: () => navigate("/projects/add"),
-        children: "New project",
+        children: t("projects.newProject"),
         icon: <CirclePlus size={18} />,
       }}
     >
       <div>
         <Table
-          headers={["Title", "Created", "Updated", "Actions"]}
+          headers={[
+            t("projects.headers.title"),
+            t("projects.headers.created"),
+            t("projects.headers.updated"),
+            t("projects.headers.actions"),
+          ]}
           data={projects}
-          emptyMessage="No projects yet. Create your first project!"
+          emptyMessage={t("projects.noProjects")}
           renderRow={(project) => {
             const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
 
@@ -160,7 +167,7 @@ export default function Projects() {
                 <td className="py-3 px-4">
                   {activeProject && project.id === activeProject.id && (
                     <Badge variant="pink" className="mr-2">
-                      Active
+                      {t("projects.badges.active")}
                     </Badge>
                   )}
                   {project.name}
@@ -173,8 +180,8 @@ export default function Projects() {
                       <Tooltip
                         content={
                           activeProject && project.id === activeProject.id
-                            ? "Current active project"
-                            : "Set as active project"
+                            ? t("projects.actions.currentActive")
+                            : t("projects.actions.setActive")
                         }
                       >
                         <IconButton
@@ -184,8 +191,8 @@ export default function Projects() {
                           disabled={activeProject && project.id === activeProject.id}
                           title={
                             activeProject && project.id === activeProject.id
-                              ? "Current active project"
-                              : "Set as active project"
+                              ? t("projects.actions.currentActive")
+                              : t("projects.actions.setActive")
                           }
                         >
                           <Star
@@ -199,12 +206,12 @@ export default function Projects() {
                         </IconButton>
                       </Tooltip>
                     </div>
-                    <Tooltip content="Edit project">
+                    <Tooltip content={t("projects.actions.edit")}>
                       <IconButton onClick={() => navigate(`/projects/edit/${project.id}`)} variant="neutral" size="sm">
                         <Pencil size={18} />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip content="Duplicate project">
+                    <Tooltip content={t("projects.actions.duplicate")}>
                       <IconButton onClick={() => handleDuplicate(project.id)} variant="neutral" size="sm">
                         <Copy size={18} />
                       </IconButton>
@@ -212,8 +219,8 @@ export default function Projects() {
                     <Tooltip
                       content={
                         activeProject && project.id === activeProject.id
-                          ? "Cannot delete active project"
-                          : "Delete project"
+                          ? t("projects.actions.cannotDeleteActive")
+                          : t("projects.actions.delete")
                       }
                     >
                       <IconButton

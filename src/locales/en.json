@@ -1,0 +1,423 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "site": "Site",
+    "pages": "Pages",
+    "menus": "Menus",
+    "media": "Media",
+    "appearance": "Appearance",
+    "themes": "Themes",
+    "extend": "Extend",
+    "plugins": "Plugins",
+    "tools": "Tools",
+    "exportSite": "Export site",
+    "general": "General",
+    "appSettings": "Settings"
+  },
+  "layout": {
+    "toolbar": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "requireProject": {
+      "title": "No Active Project",
+      "description": "Please create or select a project to continue.",
+      "goToProjects": "Go to Projects"
+    }
+  },
+  "forms": {
+    "common": {
+      "title": "Title",
+      "description": "Description",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "selectImage": "Select Image",
+      "changeImage": "Change image",
+      "removeImage": "Remove image",
+      "formError": "An error occurred while submitting the form",
+      "selectImageFile": "Please select an image file."
+    },
+    "menu": {
+      "titleLabel": "Title",
+      "descriptionLabel": "Description",
+      "titleRequired": "Menu name is required",
+      "nameNotEmpty": "Name cannot be empty"
+    },
+    "page": {
+      "titleLabel": "Title",
+      "filenameLabel": "Filename",
+      "titleRequired": "Page name is required",
+      "nameNotEmpty": "Name cannot be empty",
+      "filenameRequired": "Filename is required",
+      "filenameNotEmpty": "Filename cannot be empty",
+      "seoTitle": "SEO Settings",
+      "metaDescription": "Meta Description",
+      "metaDescriptionHelp": "Used for search results and social media previews. Recommended: 150-160 characters.",
+      "socialTitle": "Social Media Title",
+      "socialTitleHelp": "Leave blank to use the page title. Used when sharing on Facebook, Twitter, etc.",
+      "socialImage": "Social Media Image",
+      "socialImageHelp": "Recommended size: 1200×630px. Used for Facebook Open Graph and Twitter Cards.",
+      "ogType": "Open Graph Type",
+      "twitterCard": "Twitter Card Type",
+      "canonicalUrl": "Canonical URL",
+      "canonicalUrlHelp": "The preferred URL for this page. Leave blank to use default.",
+      "robotsLabel": "Search Engine Indexing",
+      "robotsHelp": "Controls how search engines index this page."
+ },
+    "project": {
+      "titleLabel": "Title",
+      "titleRequired": "Project name is required",
+      "nameNotEmpty": "Name cannot be empty",
+      "titleHelp": "The display name for your project. Can be changed anytime without affecting the folder structure.",
+      "slugLabel": "Slug",
+      "slugRequired": "Project slug is required",
+      "slugNotEmpty": "Slug cannot be empty",
+      "slugPattern": "Slug can only contain lowercase letters, numbers, and hyphens",
+      "slugHelp": "Used for folder names. Can only contain lowercase letters, numbers, and hyphens. Cannot be changed after creation.",
+      "descriptionLabel": "Description",
+      "descriptionHelp": "Optional. Add notes or details about your project.",
+      "themeLabel": "Theme",
+      "themeRequired": "Please select a theme",
+      "themeHelp": "The theme determines the styling and available widgets for your site.",
+      "siteUrlLabel": "Site URL",
+      "siteUrlHelp": "The final URL where your site will be hosted. Used for sitemap generation.",
+      "loadingThemes": "Loading themes..."
+    },
+    "media": {
+      "editTitle": "Edit {{type}} Metadata",
+      "altLabel": "Alt Text (Required)",
+      "altRequired": "Alt text is required",
+      "altNotEmpty": "Alt text cannot be empty",
+      "altHelp": "Describes the {{type}} for screen readers.",
+      "titleLabel": "Title",
+      "titleHelp": "Sets the title attribute (often shown on hover).",
+      "save": "Save Changes",
+      "saving": "Saving..."
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "components": {
+    "mediaToolbar": {
+      "gridView": "Grid View",
+      "listView": "List View",
+      "selected": "{{count}} selected",
+      "deleteSelected": "Delete Selected",
+      "delete": "Delete",
+      "refreshUsage": "Refresh Usage",
+      "refreshUsageTitle": "Refresh Usage Tracking",
+      "searchPlaceholder": "Search media..."
+    },
+    "mediaUploader": {
+      "dropActive": "Drop the files here...",
+      "dropInactive": "Drag and drop images and videos here or",
+      "selectFiles": "Select Files",
+      "supportedImages": "Images: JPG, PNG, GIF, WebP, SVG",
+      "supportedVideos": "Videos: MP4, WebM, MOV, AVI, MKV",
+      "uploading": "Uploading..."
+    },
+    "mediaSelector": {
+      "title": "Select Media",
+      "searchPlaceholder": "Search media files...",
+      "noMatch": "No media files match your search",
+      "noFiles": "No media files available",
+      "video": "Video",
+      "closeLabel": "Close media selector"
+    }
+  },
+  "settings": {
+    "title": "General Settings",
+    "saveSuccess": "Settings saved successfully",
+    "saveError": "Failed to save settings",
+    "unsavedChanges": "You have unsaved changes"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "loading": "Loading dashboard data...",
+    "projectCount": "Number of projects",
+    "readyToCreate": "Ready to create your first project!",
+    "projects": "Projects",
+    "getStarted": "Get started",
+    "activeProject": "Active project",
+    "createFirstProject": "Create your first project",
+    "noActiveProject": "No active project",
+    "createProjectBtn": "Create Project →",
+    "letsGetAtIt": "Let's get at it! →",
+    "createProjectLink": "Create a project →",
+    "magic": "It's magic!",
+    "generateSite": "Generate a site",
+    "todoDescription": "TODO: Description"
+  },
+  "projects": {
+    "title": "Projects",
+    "loading": "Loading projects...",
+    "newProject": "New project",
+    "noActiveProject": "No Active Project",
+    "noActiveProjectDesc": "Time to create your next big thing!",
+    "noProjects": "No projects yet. Create your first project!",
+    "headers": {
+      "title": "Title",
+      "created": "Created",
+      "updated": "Updated",
+      "actions": "Actions"
+    },
+    "badges": {
+      "active": "Active"
+    },
+    "actions": {
+      "currentActive": "Current active project",
+      "setActive": "Set as active project",
+      "edit": "Edit project",
+      "duplicate": "Duplicate project",
+      "delete": "Delete project",
+      "cannotDeleteActive": "Cannot delete active project"
+    },
+    "toasts": {
+      "deleteSuccess": "Project \"{{name}}\" was deleted successfully",
+      "deleteError": "Failed to delete project",
+      "cannotDeleteActive": "Cannot delete the active project. Please set another project as active first.",
+      "setActiveSuccess": "\"{{name}}\" is now the active project",
+      "setActiveError": "Failed to set active project",
+      "duplicateSuccess": "Project duplicated successfully",
+      "duplicateError": "Failed to duplicate project"
+    },
+    "deleteModal": {
+      "title": "Delete Project",
+      "message": "Are you sure you want to delete \"{{name}}\"?\n\nThis will permanently delete:\n• All project files and pages\n• All uploaded media\n• All exported versions\n• All project settings\n\nThis action cannot be undone.",
+      "confirm": "Delete Project",
+      "cancel": "Cancel"
+    }
+  },
+  "pages": {
+    "title": "Pages",
+    "loading": "Loading pages...",
+    "newPage": "New page",
+    "count": "{{count}} page",
+    "count_other": "{{count}} pages",
+    "selected": "{{count}} selected",
+    "deleteSelected": "Delete Selected",
+    "delete": "Delete",
+    "searchPlaceholder": "Search pages...",
+    "headers": {
+      "name": "Name",
+      "filename": "Filename",
+      "created": "Created",
+      "updated": "Updated",
+      "actions": "Actions"
+    },
+    "noPagesFound": "No pages found",
+    "noPagesMatch": "No pages match \"{{term}}\". Try a different search term.",
+    "noPagesAvailable": "No pages available",
+    "noPagesYet": "No pages yet",
+    "createFirstPage": "Create your first page to get started.",
+    "actions": {
+      "design": "Design page",
+      "edit": "Edit page",
+      "duplicate": "Duplicate page",
+      "delete": "Delete page"
+    },
+    "toasts": {
+      "deleteBulkSuccess": "Successfully deleted {{count}} page",
+      "deleteBulkSuccess_other": "Successfully deleted {{count}} pages",
+      "deleteSuccess": "Page deleted successfully",
+      "deleteError": "Failed to delete page(s)",
+      "loadError": "Failed to load pages",
+      "duplicateSuccess": "Page duplicated successfully",
+      "duplicateError": "Failed to duplicate page"
+    },
+    "deleteModal": {
+      "title": "Delete Page",
+      "message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "titleBulk": "Delete Pages",
+      "messageBulk": "Are you sure you want to delete {{count}} page? This action cannot be undone.",
+      "messageBulk_other": "Are you sure you want to delete {{count}} pages? This action cannot be undone.",
+      "confirmBulk": "Delete {{count}} Page",
+      "confirmBulk_other": "Delete {{count}} Pages"
+    }
+  },
+  "menus": {
+    "title": "Menus",
+    "loading": "Loading menus...",
+    "newMenu": "New menu",
+    "noMenus": "No menus yet. Create your first menu!",
+    "headers": {
+      "title": "Title",
+      "description": "Description",
+      "created": "Created",
+      "updated": "Updated",
+      "actions": "Actions"
+    },
+    "actions": {
+      "editStructure": "Edit menu structure",
+      "duplicate": "Duplicate menu",
+      "editSettings": "Edit menu settings",
+      "delete": "Delete menu"
+    },
+    "toasts": {
+      "loadError": "Failed to load menus",
+      "deleteSuccess": "Menu \"{{name}}\" was deleted successfully",
+      "deleteError": "Failed to delete menu",
+      "duplicateSuccess": "Menu duplicated successfully",
+      "duplicateError": "Failed to duplicate menu"
+    },
+    "deleteModal": {
+      "title": "Delete Menu",
+      "message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "menuStructure": {
+    "title": "Edit Menu Structure",
+    "loading": "Loading menu...",
+    "notFound": "Menu not found",
+    "description": "You can add up to 3 levels of menu items.",
+    "save": "Save Menu",
+    "saving": "Saving...",
+    "toasts": {
+      "itemDeleted": "\"{{label}}\" deleted",
+      "defaultItemLabel": "Menu item",
+      "loadError": "Failed to load menu",
+      "saveSuccess": "Menu saved successfully",
+      "saveError": "Failed to save menu",
+      "notFound": "Menu not found"
+    }
+  },
+  "pageEditor": {
+    "loading": "Loading page...",
+    "error": "Error: {{message}}",
+    "noPageSelected": "No page selected. Please select a page from the Pages list."
+  },
+  "menusAdd": {
+    "title": "Add menu",
+    "goToList": "Go to menus list",
+    "editThis": "Edit this menu",
+    "create": "Create Menu",
+    "toasts": {
+      "createSuccess": "Menu \"{{name}}\" was created successfully!",
+      "createError": "Failed to create menu"
+    }
+  },
+  "menusEdit": {
+    "title": "Edit menu",
+    "loading": "Loading menu...",
+    "notFound": "Menu not found",
+    "backToList": "Back to menus list",
+    "saveChanges": "Save Changes",
+    "toasts": {
+      "loadError": "Failed to load menu",
+      "updateSuccess": "Menu \"{{name}}\" was updated successfully!",
+      "updateError": "Failed to update menu"
+    }
+  },
+  "pagesAdd": {
+    "title": "New page",
+    "goToList": "Go to Pages List",
+    "editThis": "Edit This Page",
+    "create": "Create Page",
+    "toasts": {
+      "createSuccess": "Page \"{{name}}\" was created successfully!",
+      "createError": "Failed to create page"
+    }
+  },
+  "pagesEdit": {
+    "title": "Edit page",
+    "loading": "Loading page...",
+    "backToList": "Back to pages list",
+    "saveChanges": "Save Changes",
+    "toasts": {
+      "loadError": "Failed to load page",
+      "updateSuccess": "Page \"{{name}}\" was updated successfully!",
+      "updateSuccessUrlChanged": "Page \"{{name}}\" was updated successfully and URL was changed.",
+      "unknownError": "Unknown error",
+      "updateError": "Failed to update page"
+    }
+  },
+  "projectsAdd": {
+    "title": "Add project",
+    "goToList": "Go to Projects List",
+    "editThis": "Edit This Project",
+    "create": "Create Project",
+    "toasts": {
+      "createActiveSuccess": "Project \"{{name}}\" was created and set as active",
+      "createSuccess": "Project \"{{name}}\" was created successfully!",
+      "createError": "Failed to create project"
+    }
+  },
+  "projectsEdit": {
+    "title": "Edit project",
+    "loading": "Loading project...",
+    "notFound": "Project not found",
+    "noActiveProjectTitle": "No Active Project",
+    "noActiveProjectDesc": "Please select or create a project to manage your projects.",
+    "backToList": "Back to Projects List",
+    "saveChanges": "Save Changes",
+    "toasts": {
+      "notFound": "Project not found",
+      "loadError": "Failed to load project",
+      "updateSuccessRenamed": "Project \"{{name}}\" was updated successfully and folder was renamed.",
+      "updateSuccess": "Project \"{{name}}\" was updated successfully!",
+      "updateError": "Failed to update project",
+      "noActiveProject": "Please select or create a project to manage your projects"
+    }
+  },
+  "exportSite": {
+    "title": "Export Site: {{name}}"
+  },
+  "media": {
+    "title": "Media",
+    "loading": "Loading media files...",
+    "emptyTitle": "No media files yet",
+    "emptyDesc": "Upload some files using the uploader above."
+  },
+  "themeSettings": {
+    "title": "Theme settings",
+    "loading": "Loading settings...",
+    "noSettings": "No theme settings available",
+    "save": "Save Settings",
+    "cancel": "Cancel",
+    "toasts": {
+      "loadError": "Failed to load theme settings. Please try again.",
+      "saveSuccess": "Theme settings saved successfully!",
+      "saveError": "Failed to save theme settings. Please try again."
+    }
+  },
+  "themes": {
+    "title": "Themes",
+    "description": "Manage and customize your themes.",
+    "loading": "Loading themes...",
+    "uploadingTheme": "Uploading theme...",
+    "dropZoneActive": "Drop the theme zip file here...",
+    "dropZoneInactive": "Drag & drop your theme zip file here, or click to select file",
+    "maxFileSize": "Max file size: 10MB",
+    "version": "Version {{version}}",
+    "widgets": "{{count}} widgets",
+    "by": "By {{author}}",
+    "active": "Active",
+    "emptyTitle": "No themes available",
+    "emptyDesc": "Upload a theme using the area above to get started",
+    "toasts": {
+      "singleFileError": "Please upload a single zip file.",
+      "uploadSuccess": "Theme uploaded successfully!",
+      "uploadError": "Failed to upload theme."
+    }
+  },
+  "plugins": {
+    "title": "Plugins",
+    "emptyTitle": "No plugins installed",
+    "emptyDesc": "Get started by installing your first plugin from the store or uploading a custom plugin."
+  },
+  "pagePreview": {
+    "title": "Preview: {{name}}",
+    "loading": "Loading page..."
+  }
+}

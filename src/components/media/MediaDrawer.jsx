@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { API_URL } from "../../config";
 
 export default function MediaDrawer({ visible, onClose, selectedFile, onSave, loading, activeProject }) {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit: rhfHandleSubmit,
@@ -99,7 +101,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
       >
         <div className="flex items-center justify-between p-4 border-b border-slate-200">
           <h2 id="media-drawer-title" className="text-lg font-medium text-slate-800">
-            Edit {isVideo ? "Video" : "Image"} Metadata
+            {t("forms.media.editTitle", { type: isVideo ? "Video" : "Image" })}
           </h2>
           <button
             onClick={onClose}
@@ -130,25 +132,27 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
 
           <div className="form-field">
             <label htmlFor="alt" className="form-label">
-              Alt Text (Required)
+              {t("forms.media.altLabel")}
             </label>
             <input
               type="text"
               id="alt"
               {...register("alt", {
-                required: "Alt text is required",
-                validate: (value) => value.trim() !== "" || "Alt text cannot be empty",
+                required: t("forms.media.altRequired"),
+                validate: (value) => value.trim() !== "" || t("forms.media.altNotEmpty"),
               })}
               className="form-input"
               aria-required="true"
             />
             {errors.alt && <p className="form-error">{errors.alt.message}</p>}
-            <p className="form-description">Describes the {isVideo ? "video content" : "image"} for screen readers.</p>
+            <p className="form-description">
+              {t("forms.media.altHelp", { type: isVideo ? "video content" : "image" })}
+            </p>
           </div>
 
           <div className="form-field">
             <label htmlFor="title" className="form-label-optional">
-              Title
+              {t("forms.media.titleLabel")}
             </label>
             <input
               type="text"
@@ -156,7 +160,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
               {...register("title")}
               className="form-input"
             />
-            <p className="form-description">Sets the title attribute (often shown on hover).</p>
+            <p className="form-description">{t("forms.media.titleHelp")}</p>
           </div>
 
           <div className="form-actions-separated">
@@ -165,7 +169,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
@@ -194,10 +198,10 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Saving...
+                  {t("forms.media.saving")}
                 </>
               ) : (
-                "Save Changes"
+                t("forms.media.save")
               )}
             </button>
           </div>

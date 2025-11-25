@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -12,6 +13,7 @@ import { getMenu, updateMenu } from "../queries/menuManager";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function MenusEdit() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [menu, setMenu] = useState(null);
@@ -35,7 +37,7 @@ export default function MenusEdit() {
       setMenu(menuData);
       setLoading(false);
     } catch (err) {
-      showToast(err.message || "Failed to load menu", "error");
+      showToast(err.message || t("menusEdit.toasts.loadError"), "error");
       setLoading(false);
     }
   };
@@ -51,12 +53,12 @@ export default function MenusEdit() {
       });
 
       setMenu(updatedMenu);
-      showToast(`Menu "${formData.name}" was updated successfully!`, "success");
+      showToast(t("menusEdit.toasts.updateSuccess", { name: formData.name }), "success");
       setShowSuccessActions(true);
       setIsDirty(false); // Reset dirty state after successful save
       return true;
     } catch (err) {
-      showToast(err.message || "Failed to update menu", "error");
+      showToast(err.message || t("menusEdit.toasts.updateError"), "error");
       return false;
     } finally {
       setIsSubmitting(false);
@@ -65,19 +67,19 @@ export default function MenusEdit() {
 
   if (loading)
     return (
-      <PageLayout title="Edit menu">
-        <LoadingSpinner message="Loading menu..." />
+      <PageLayout title={t("menusEdit.title")}>
+        <LoadingSpinner message={t("menusEdit.loading")} />
       </PageLayout>
     );
 
-  if (!menu) return <PageLayout title="Edit menu">Menu not found</PageLayout>;
+  if (!menu) return <PageLayout title={t("menusEdit.title")}>{t("menusEdit.notFound")}</PageLayout>;
 
   return (
-    <PageLayout title="Edit menu">
+    <PageLayout title={t("menusEdit.title")}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/menus")} icon={<ChevronLeft size={18} />}>
-            Back to menus list
+            {t("menusEdit.backToList")}
           </Button>
         </div>
       )}
@@ -87,7 +89,7 @@ export default function MenusEdit() {
           initialData={menu}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          submitLabel="Save Changes"
+          submitLabel={t("menusEdit.saveChanges")}
           onCancel={() => navigate("/menus")}
           onDirtyChange={setIsDirty}
         />
@@ -95,7 +97,7 @@ export default function MenusEdit() {
       
       {isDirty && (
         <div className="mt-4 text-sm text-amber-600">
-          You have unsaved changes
+          {t("common.unsavedChanges")}
         </div>
       )}
     </PageLayout>

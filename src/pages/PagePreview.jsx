@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { API_URL } from "../config";
 import useProjectStore from "../stores/projectStore";
@@ -10,6 +11,7 @@ import { fetchPreview } from "../queries/previewManager";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 export default function PagePreview() {
+  const { t } = useTranslation();
   const { pageId } = useParams();
   const iframeRef = useRef(null);
 
@@ -84,7 +86,7 @@ export default function PagePreview() {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-900">
-        <LoadingSpinner message="Loading Preview..." />
+        <LoadingSpinner message={t("pagePreview.loading")} />
       </div>
     );
   }
@@ -107,7 +109,7 @@ export default function PagePreview() {
 
   return (
     <div className="h-screen w-screen overflow-hidden">
-      <iframe ref={iframeRef} title={page.name || "Page Preview"} className="h-full w-full border-0" />
+      <iframe ref={iframeRef} title={t("pagePreview.title", { name: page.name || "..." })} className="h-full w-full border-0" />
     </div>
   );
 }

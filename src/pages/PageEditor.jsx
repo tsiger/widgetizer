@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import WidgetList from "../components/pageEditor/WidgetList";
 import PreviewPanel from "../components/pageEditor/PreviewPanel";
@@ -14,6 +15,7 @@ import useThemeStore from "../stores/themeStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
 
 export default function PageEditor() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [previewMode, setPreviewMode] = useState("desktop");
   const previewIframeRef = useRef(null);
@@ -73,7 +75,7 @@ export default function PageEditor() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <LoadingSpinner message="Loading page..." />
+        <LoadingSpinner message={t("pageEditor.loading")} />
       </div>
     );
   }
@@ -81,7 +83,7 @@ export default function PageEditor() {
   if (error) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-500">{t("pageEditor.error", { message: error })}</p>
       </div>
     );
   }
@@ -89,7 +91,7 @@ export default function PageEditor() {
   if (!page) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p>No page selected. Please select a page from the Pages list.</p>
+        <p>{t("pageEditor.noPageSelected")}</p>
       </div>
     );
   }

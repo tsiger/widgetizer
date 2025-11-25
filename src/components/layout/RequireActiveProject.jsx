@@ -1,4 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import EmptyState from "../ui/EmptyState";
 import Button from "../ui/Button";
@@ -7,6 +8,7 @@ import { Link } from "react-router-dom";
 import LoadingSpinner from "../ui/LoadingSpinner";
 
 function RequireActiveProject() {
+  const { t } = useTranslation();
   const activeProject = useProjectStore((state) => state.activeProject);
   const loading = useProjectStore((state) => state.loading);
 
@@ -22,11 +24,11 @@ function RequireActiveProject() {
     return (
       <EmptyState
         icon={<Rocket />}
-        title="No Active Project"
-        description="Please create or select a project to continue."
+        title={t("layout.requireProject.title")}
+        description={t("layout.requireProject.description")}
       >
         <Button asChild>
-          <Link to="/projects">Go to Projects</Link>
+          <Link to="/projects">{t("layout.requireProject.goToProjects")}</Link>
         </Button>
       </EmptyState>
     );

@@ -6,13 +6,13 @@ export const navigationSections = [
     items: [
       {
         id: "dashboard",
-        label: "Dashboard",
+        labelKey: "navigation.dashboard",
         path: "/",
         icon: Home,
       },
       {
         id: "projects",
-        label: "Projects",
+        labelKey: "navigation.projects",
         path: "/projects",
         icon: Folder,
       },
@@ -20,32 +20,32 @@ export const navigationSections = [
   },
   {
     id: "site",
-    title: "Site",
+    titleKey: "navigation.site",
     items: [
       {
         id: "pages",
-        label: "Pages",
+        labelKey: "navigation.pages",
         path: "/pages",
         icon: File,
         requiresProject: true,
       },
       {
         id: "menus",
-        label: "Menus",
+        labelKey: "navigation.menus",
         path: "/menus",
         icon: Menu,
         requiresProject: true,
       },
       {
         id: "media",
-        label: "Media",
+        labelKey: "navigation.media",
         path: "/media",
         icon: Image,
         requiresProject: true,
       },
       {
         id: "settings",
-        label: "Settings",
+        labelKey: "navigation.settings",
         path: "/settings",
         icon: Settings,
         requiresProject: true,
@@ -54,11 +54,11 @@ export const navigationSections = [
   },
   {
     id: "appearance",
-    title: "Appearance",
+    titleKey: "navigation.appearance",
     items: [
       {
         id: "themes",
-        label: "Themes",
+        labelKey: "navigation.themes",
         path: "/themes",
         icon: Layers,
         requiresProject: true,
@@ -67,11 +67,11 @@ export const navigationSections = [
   },
   {
     id: "extend",
-    title: "Extend",
+    titleKey: "navigation.extend",
     items: [
       {
         id: "plugins",
-        label: "Plugins",
+        labelKey: "navigation.plugins",
         path: "/plugins",
         icon: Puzzle,
         requiresProject: true,
@@ -80,11 +80,11 @@ export const navigationSections = [
   },
   {
     id: "tools",
-    title: "Tools",
+    titleKey: "navigation.tools",
     items: [
       {
         id: "export",
-        label: "Export site",
+        labelKey: "navigation.exportSite",
         path: "/export-site",
         icon: Rocket,
         requiresProject: true,
@@ -93,12 +93,12 @@ export const navigationSections = [
   },
   {
     id: "general",
-    title: "General",
+    titleKey: "navigation.general",
     position: "bottom",
     items: [
       {
         id: "app-settings",
-        label: "Settings",
+        labelKey: "navigation.appSettings",
         path: "/app-settings",
         icon: SlidersHorizontal,
         requiresProject: true,
@@ -106,4 +106,5 @@ export const navigationSections = [
     ],
   },
 ];
+
 

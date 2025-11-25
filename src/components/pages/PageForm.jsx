@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
@@ -16,6 +17,7 @@ export default function PageForm({
   onCancel,
   onDirtyChange,
 }) {
+  const { t } = useTranslation();
   const isNew = !initialData.id;
   const [mediaSelectorVisible, setMediaSelectorVisible] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
@@ -100,7 +102,7 @@ export default function PageForm({
       });
       setMediaSelectorVisible(false);
     } else {
-      showToast("Please select an image file.", "error");
+      showToast(t("forms.common.selectImageFile"), "error");
     }
   };
 
@@ -120,7 +122,7 @@ export default function PageForm({
 
       return result;
     } catch (err) {
-      showToast(err.message || "An error occurred while submitting the form", "error");
+      showToast(err.message || t("forms.common.formError"), "error");
       return false;
     }
   };
@@ -131,14 +133,14 @@ export default function PageForm({
       <div className="form-section">
         <div className="form-field">
           <label htmlFor="name" className="form-label">
-            Title
+            {t("forms.page.titleLabel")}
           </label>
           <input
             type="text"
             id="name"
             {...register("name", {
-              required: "Page name is required",
-              validate: (value) => value.trim() !== "" || "Name cannot be empty",
+              required: t("forms.page.titleRequired"),
+              validate: (value) => value.trim() !== "" || t("forms.page.nameNotEmpty"),
             })}
             className="form-input"
           />
@@ -147,7 +149,7 @@ export default function PageForm({
 
         <div className="form-field">
           <label htmlFor="slug" className="form-label">
-            Filename
+            {t("forms.page.filenameLabel")}
           </label>
           <div className="flex items-center">
             <span className="text-slate-500 mr-1">/</span>
@@ -155,8 +157,8 @@ export default function PageForm({
               type="text"
               id="slug"
               {...register("slug", {
-                required: "Filename is required",
-                validate: (value) => value.trim() !== "" || "Filename cannot be empty",
+                required: t("forms.page.filenameRequired"),
+                validate: (value) => value.trim() !== "" || t("forms.page.filenameNotEmpty"),
               })}
               onBlur={handleSlugBlur}
               className="form-input flex-1"
@@ -169,11 +171,11 @@ export default function PageForm({
 
       {/* SEO Fields */}
       <div className="form-section">
-        <h3 className="form-section-title">SEO Settings</h3>
+        <h3 className="form-section-title">{t("forms.page.seoTitle")}</h3>
 
         <div className="form-field">
           <label htmlFor="seo-description" className="form-label">
-            Meta Description
+            {t("forms.page.metaDescription")}
           </label>
           <textarea
             id="seo-description"
@@ -182,13 +184,13 @@ export default function PageForm({
             className="form-textarea"
           />
           <p className="form-description">
-            Used for search results and social media previews. Recommended: 150-160 characters.
+            {t("forms.page.metaDescriptionHelp")}
           </p>
         </div>
 
         <div className="form-field">
           <label htmlFor="seo-og-title" className="form-label-optional">
-            Social Media Title
+            {t("forms.page.socialTitle")}
           </label>
           <input
             type="text"
@@ -197,12 +199,12 @@ export default function PageForm({
             className="form-input"
           />
           <p className="form-description">
-            Leave blank to use the page title. Used when sharing on Facebook, Twitter, etc.
+            {t("forms.page.socialTitleHelp")}
           </p>
         </div>
 
         <div className="form-field">
-          <label className="form-label-optional">Social Media Image</label>
+          <label className="form-label-optional">{t("forms.page.socialImage")}</label>
           {ogImage ? (
             <div className="relative w-full max-w-md bg-slate-100 rounded-md overflow-hidden group">
               <img
@@ -216,7 +218,7 @@ export default function PageForm({
                   variant="icon" 
                   size="sm" 
                   onClick={() => setMediaSelectorVisible(true)} 
-                  title="Change image"
+                  title={t("forms.common.changeImage")}
                 >
                   <FolderOpen size={16} />
                 </Button>
@@ -225,7 +227,7 @@ export default function PageForm({
                   variant="icon" 
                   size="sm" 
                   onClick={handleRemoveImage} 
-                  title="Remove image"
+                  title={t("forms.common.removeImage")}
                 >
                   <X size={16} />
                 </Button>
@@ -237,16 +239,16 @@ export default function PageForm({
               className="w-full max-w-md h-32 bg-slate-50 rounded-md border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors"
             >
               <FolderOpen size={32} />
-              <p className="mt-2 text-sm font-semibold">Click to select image</p>
+              <p className="mt-2 text-sm font-semibold">{t("forms.common.selectImage")}</p>
               <p className="text-xs">Recommended: 1200x630 pixels</p>
             </div>
           )}
-          <p className="form-description">Image for social media previews when sharing this page.</p>
+          <p className="form-description">{t("forms.page.socialImageHelp")}</p>
         </div>
 
         <div className="form-field">
           <label htmlFor="seo-canonical-url" className="form-label-optional">
-            Canonical URL
+            {t("forms.page.canonicalUrl")}
           </label>
           <input
             type="url"
@@ -255,13 +257,13 @@ export default function PageForm({
             className="form-input"
           />
           <p className="form-description">
-            Optional: Use if this page content exists at another URL to prevent duplicate content issues.
+            {t("forms.page.canonicalUrlHelp")}
           </p>
         </div>
 
         <div className="form-field">
           <label htmlFor="seo-robots" className="form-label">
-            Search Engine Instructions
+            {t("forms.page.robotsLabel")}
           </label>
           <select
             id="seo-robots"
@@ -273,17 +275,17 @@ export default function PageForm({
             <option value="index,nofollow">Index, but Don't Follow Links</option>
             <option value="noindex,nofollow">Don't Index or Follow Links</option>
           </select>
-          <p className="form-description">Controls how search engines index this page and follow its links.</p>
+          <p className="form-description">{t("forms.page.robotsHelp")}</p>
         </div>
       </div>
 
       <div className="form-actions-separated">
         <Button type="submit" disabled={isSubmitting} variant="primary">
-          {isSubmitting ? "Saving..." : submitLabel}
+          {isSubmitting ? t("forms.common.saving") : submitLabel}
         </Button>
         {onCancel && (
           <Button type="button" onClick={onCancel} variant="secondary">
-            Cancel
+            {t("forms.common.cancel")}
           </Button>
         )}
       </div>

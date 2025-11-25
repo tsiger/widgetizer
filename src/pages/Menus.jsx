@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Menu, Trash2, Pencil, CirclePlus, Copy } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -17,6 +18,7 @@ import useToastStore from "../stores/toastStore";
 import useAppSettings from "../hooks/useAppSettings";
 
 export default function Menus() {
+  const { t } = useTranslation();
   const [menus, setMenus] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -34,7 +36,7 @@ export default function Menus() {
       const menuData = await getAllMenus();
       setMenus(menuData);
     } catch {
-      showToast("Failed to load menus", "error");
+      showToast(t("menus.toasts.loadError"), "error");
     } finally {
       setLoading(false);
     }
@@ -48,9 +50,9 @@ export default function Menus() {
     try {
       await deleteMenu(data.id);
       setMenus(menus.filter((menu) => menu.id !== data.id));
-      showToast(`Menu "${data.name}" was deleted successfully`, "success");
+      showToast(t("menus.toasts.deleteSuccess", { name: data.name }), "success");
     } catch {
-      showToast("Failed to delete menu", "error");
+      showToast(t("menus.toasts.deleteError"), "error");
     }
   };
 
@@ -58,9 +60,9 @@ export default function Menus() {
     try {
       const newMenu = await duplicateMenu(menuId);
       setMenus([...menus, newMenu]);
-      showToast("Menu duplicated successfully", "success");
+      showToast(t("menus.toasts.duplicateSuccess"), "success");
     } catch {
-      showToast("Failed to duplicate menu", "error");
+      showToast(t("menus.toasts.duplicateError"), "error");
     }
   };
 
@@ -68,10 +70,10 @@ export default function Menus() {
 
   const openDeleteConfirmation = (id, name) => {
     openModal({
-      title: "Delete Menu",
-      message: `Are you sure you want to delete "${name}"? This action cannot be undone.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
+      title: t("menus.deleteModal.title"),
+      message: t("menus.deleteModal.message", { name }),
+      confirmText: t("menus.deleteModal.confirm"),
+      cancelText: t("menus.deleteModal.cancel"),
       variant: "danger",
       data: { id, name },
     });
@@ -79,26 +81,32 @@ export default function Menus() {
 
   if (loading) {
     return (
-      <PageLayout title="Menus">
-        <LoadingSpinner message="Loading menus..." />
+      <PageLayout title={t("menus.title")}>
+        <LoadingSpinner message={t("menus.loading")} />
       </PageLayout>
     );
   }
 
   return (
     <PageLayout
-      title="Menus"
+      title={t("menus.title")}
       buttonProps={{
         onClick: handleNewMenu,
-        children: "New menu",
+        children: t("menus.newMenu"),
         icon: <CirclePlus size={18} />,
       }}
     >
       <div>
         <Table
-          headers={["Title", "Description", "Created", "Updated", "Actions"]}
+          headers={[
+            t("menus.headers.title"),
+            t("menus.headers.description"),
+            t("menus.headers.created"),
+            t("menus.headers.updated"),
+            t("menus.headers.actions"),
+          ]}
           data={menus}
-          emptyMessage="No menus yet. Create your first menu!"
+          emptyMessage={t("menus.noMenus")}
           renderRow={(menu) => {
             const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
 
@@ -115,43 +123,43 @@ export default function Menus() {
                 <td className="py-3 px-4 text-right">
                   <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                     <div className="flex gap-2 pr-2 border-r border-slate-200">
-                      <Tooltip content="Edit menu structure">
+                      <Tooltip content={t("menus.actions.editStructure")}>
                         <IconButton
                           onClick={() => navigate(`/menus/${menu.id}/structure`)}
                           variant="neutral"
                           size="sm"
-                          title="Edit Menu Structure"
+                          title={t("menus.actions.editStructure")}
                         >
                           <Menu size={18} />
                         </IconButton>
                       </Tooltip>
                     </div>
-                    <Tooltip content="Duplicate menu">
+                    <Tooltip content={t("menus.actions.duplicate")}>
                       <IconButton
                         onClick={() => handleDuplicate(menu.id)}
                         variant="neutral"
                         size="sm"
-                        title="Duplicate Menu"
+                        title={t("menus.actions.duplicate")}
                       >
                         <Copy size={18} />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip content="Edit menu settings">
+                    <Tooltip content={t("menus.actions.editSettings")}>
                       <IconButton
                         onClick={() => navigate(`/menus/edit/${menu.id}`)}
                         variant="neutral"
                         size="sm"
-                        title="Edit Menu Settings"
+                        title={t("menus.actions.editSettings")}
                       >
                         <Pencil size={18} />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip content="Delete menu">
+                    <Tooltip content={t("menus.actions.delete")}>
                       <IconButton
                         onClick={() => openDeleteConfirmation(menu.id, menu.name)}
                         variant="danger"
                         size="sm"
-                        title="Delete Menu"
+                        title={t("menus.actions.delete")}
                       >
                         <Trash2 size={18} />
                       </IconButton>

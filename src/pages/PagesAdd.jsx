@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft, Pencil } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -10,6 +11,7 @@ import { createPage } from "../queries/pageManager";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function PagesAdd() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastCreatedPage, setLastCreatedPage] = useState(null);
@@ -27,12 +29,12 @@ export default function PagesAdd() {
     try {
       const newPage = await createPage(formData);
       setLastCreatedPage(newPage);
-      showToast(`Page "${formData.name}" was created successfully!`, "success");
+      showToast(t("pagesAdd.toasts.createSuccess", { name: formData.name }), "success");
       setFormKey(`new-form-${Date.now()}`);
       setIsDirty(false); // Reset dirty state after successful save
       return true;
     } catch (err) {
-      showToast(err.message || "Failed to create page", "error");
+      showToast(err.message || t("pagesAdd.toasts.createError"), "error");
       return false;
     } finally {
       setIsSubmitting(false);
@@ -40,11 +42,11 @@ export default function PagesAdd() {
   };
 
   return (
-    <PageLayout title="New page">
+    <PageLayout title={t("pagesAdd.title")}>
       {lastCreatedPage && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/pages")} icon={<ChevronLeft size={18} />}>
-            Go to Pages List
+            {t("pagesAdd.goToList")}
           </Button>
           {lastCreatedPage && (
             <Button
@@ -52,7 +54,7 @@ export default function PagesAdd() {
               onClick={() => navigate(`/pages/${lastCreatedPage.slug}/edit`)}
               icon={<Pencil size={18} />}
             >
-              Edit This Page
+              {t("pagesAdd.editThis")}
             </Button>
           )}
         </div>
@@ -62,14 +64,14 @@ export default function PagesAdd() {
         key={formKey}
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
-        submitLabel="Create Page"
+        submitLabel={t("pagesAdd.create")}
         onCancel={() => navigate("/pages")}
         onDirtyChange={setIsDirty}
       />
       
       {isDirty && (
         <div className="mt-4 text-sm text-amber-600">
-          You have unsaved changes
+          {t("common.unsavedChanges")}
         </div>
       )}
     </PageLayout>

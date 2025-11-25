@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Image } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -15,6 +16,7 @@ import useMediaSelection from "../hooks/useMediaSelection";
 import useMediaMetadata from "../hooks/useMediaMetadata";
 
 export default function Media() {
+  const { t } = useTranslation();
   // Use our custom hooks to manage different aspects of media functionality
   const mediaState = useMediaState();
 
@@ -40,14 +42,14 @@ export default function Media() {
   // Early returns for various states
   if (mediaState.loading) {
     return (
-      <PageLayout title="Media">
-        <LoadingSpinner message="Loading media files..." />
+      <PageLayout title={t("media.title")}>
+        <LoadingSpinner message={t("media.loading")} />
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout title="Media">
+    <PageLayout title={t("media.title")}>
       <MediaUploader
         onUpload={mediaUpload.handleUpload}
         uploading={mediaUpload.uploading}
@@ -94,8 +96,8 @@ export default function Media() {
       {mediaState.files.length === 0 && !mediaUpload.uploading && (
         <div className="p-8 text-center">
           <Image className="mx-auto mb-4 text-slate-400" size={48} />
-          <h2 className="text-xl font-semibold mb-2">No media files yet</h2>
-          <p className="text-slate-600 mb-4">Upload some files using the uploader above.</p>
+          <h2 className="text-xl font-semibold mb-2">{t("media.emptyTitle")}</h2>
+          <p className="text-slate-600 mb-4">{t("media.emptyDesc")}</p>
         </div>
       )}
 

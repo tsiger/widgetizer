@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -13,6 +14,7 @@ import useProjectStore from "../stores/projectStore";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function ProjectsEdit() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
@@ -37,12 +39,12 @@ export default function ProjectsEdit() {
       const projects = await getAllProjects();
       const project = projects.find((p) => p.id === id);
       if (!project) {
-        showToast("Project not found", "error");
+        showToast(t("projectsEdit.toasts.notFound"), "error");
         return;
       }
       setProject(project);
     } catch (err) {
-      showToast(err.message || "Failed to load project", "error");
+      showToast(err.message || t("projectsEdit.toasts.loadError"), "error");
     } finally {
       setLoading(false);
     }
@@ -65,7 +67,7 @@ export default function ProjectsEdit() {
           const refreshedActiveProject = await getActiveProject();
           setActiveProject(refreshedActiveProject);
         }
-        showToast(`Project "${formData.name}" was updated successfully and folder was renamed.`, "success");
+        showToast(t("projectsEdit.toasts.updateSuccessRenamed", { name: formData.name }), "success");
         // No need to navigate as ID is stable
       } else {
         // If this was the active project, refresh the active project state
@@ -73,7 +75,7 @@ export default function ProjectsEdit() {
           const refreshedActiveProject = await getActiveProject();
           setActiveProject(refreshedActiveProject);
         }
-        showToast(`Project "${formData.name}" was updated successfully!`, "success");
+        showToast(t("projectsEdit.toasts.updateSuccess", { name: formData.name }), "success");
       }
 
       setShowSuccessActions(true);
@@ -82,7 +84,7 @@ export default function ProjectsEdit() {
 
 
     } catch (err) {
-      showToast(err.message || "Failed to update project", "error");
+      showToast(err.message || t("projectsEdit.toasts.updateError"), "error");
       return false;
     } finally {
       setIsSubmitting(false);
@@ -91,31 +93,31 @@ export default function ProjectsEdit() {
 
   if (loading)
     return (
-      <PageLayout title="Edit project">
-        <LoadingSpinner message="Loading project..." />
+      <PageLayout title={t("projectsEdit.title")}>
+        <LoadingSpinner message={t("projectsEdit.loading")} />
       </PageLayout>
     );
 
-  if (!project) return <PageLayout title="Edit Project">Project not found</PageLayout>;
+  if (!project) return <PageLayout title={t("projectsEdit.title")}>{t("projectsEdit.notFound")}</PageLayout>;
 
   if (!activeProject) {
-    showToast("Please select or create a project to manage your projects", "error");
+    showToast(t("projectsEdit.toasts.noActiveProject"), "error");
     return (
-      <PageLayout title="Edit project">
+      <PageLayout title={t("projectsEdit.title")}>
         <div className="p-8 text-center">
-          <h2 className="text-xl font-semibold mb-2">No Active Project</h2>
-          <p className="text-slate-600 mb-4">Please select or create a project to manage your projects.</p>
+          <h2 className="text-xl font-semibold mb-2">{t("projectsEdit.noActiveProjectTitle")}</h2>
+          <p className="text-slate-600 mb-4">{t("projectsEdit.noActiveProjectDesc")}</p>
         </div>
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout title="Edit project">
+    <PageLayout title={t("projectsEdit.title")}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/projects")} icon={<ChevronLeft size={18} />}>
-            Back to Projects List
+            {t("projectsEdit.backToList")}
           </Button>
         </div>
       )}
@@ -125,7 +127,7 @@ export default function ProjectsEdit() {
           initialData={project}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          submitLabel="Save Changes"
+          submitLabel={t("projectsEdit.saveChanges")}
           onCancel={() => navigate("/projects")}
           onDirtyChange={setIsDirty}
         />
@@ -133,7 +135,7 @@ export default function ProjectsEdit() {
 
       {isDirty && (
         <div className="mt-4 text-sm text-amber-600">
-          You have unsaved changes
+          {t("common.unsavedChanges")}
         </div>
       )}
     </PageLayout>

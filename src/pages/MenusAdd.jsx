@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft, Pencil } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -10,6 +11,7 @@ import { createMenu } from "../queries/menuManager";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function MenusAdd() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastCreatedMenu, setLastCreatedMenu] = useState(null);
@@ -27,12 +29,12 @@ export default function MenusAdd() {
     try {
       const newMenu = await createMenu(formData);
       setLastCreatedMenu(newMenu);
-      showToast(`Menu "${formData.name}" was created successfully!`, "success");
+      showToast(t("menusAdd.toasts.createSuccess", { name: formData.name }), "success");
       setFormKey(`new-form-${Date.now()}`);
       setIsDirty(false); // Reset dirty state after successful save
       return true;
     } catch (err) {
-      showToast(err.message || "Failed to create menu", "error");
+      showToast(err.message || t("menusAdd.toasts.createError"), "error");
       return false;
     } finally {
       setIsSubmitting(false);
@@ -40,11 +42,11 @@ export default function MenusAdd() {
   };
 
   return (
-    <PageLayout title="Add menu">
+    <PageLayout title={t("menusAdd.title")}>
       {lastCreatedMenu && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/menus")} icon={<ChevronLeft size={18} />}>
-            Go to menus list
+            {t("menusAdd.goToList")}
           </Button>
           {lastCreatedMenu && (
             <Button
@@ -52,7 +54,7 @@ export default function MenusAdd() {
               onClick={() => navigate(`/menus/${lastCreatedMenu.id}/structure`)}
               icon={<Pencil size={18} />}
             >
-              Edit this menu
+              {t("menusAdd.editThis")}
             </Button>
           )}
         </div>
@@ -62,14 +64,14 @@ export default function MenusAdd() {
         key={formKey}
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
-        submitLabel="Create Menu"
+        submitLabel={t("menusAdd.create")}
         onCancel={() => navigate("/menus")}
         onDirtyChange={setIsDirty}
       />
       
       {isDirty && (
         <div className="mt-4 text-sm text-amber-600">
-          You have unsaved changes
+          {t("common.unsavedChanges")}
         </div>
       )}
     </PageLayout>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -12,6 +13,7 @@ import { getPage, updatePage } from "../queries/pageManager";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function PagesEdit() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [page, setPage] = useState(null);
@@ -35,7 +37,7 @@ export default function PagesEdit() {
       setPage(pageData);
       setLoading(false);
     } catch (err) {
-      showToast(err.message || "Failed to load page", "error");
+      showToast(err.message || t("pagesEdit.toasts.loadError"), "error");
       setLoading(false);
     }
   };
@@ -53,9 +55,9 @@ export default function PagesEdit() {
       if (result.success) {
         if (formData.slug !== id) {
           navigate(`/pages/${formData.slug}/edit`, { replace: true });
-          showToast(`Page "${formData.name}" was updated successfully and URL was changed.`, "success");
+          showToast(t("pagesEdit.toasts.updateSuccessUrlChanged", { name: formData.name }), "success");
         } else {
-          showToast(`Page "${formData.name}" was updated successfully!`, "success");
+          showToast(t("pagesEdit.toasts.updateSuccess", { name: formData.name }), "success");
         }
         setPage({
           ...page,
@@ -66,11 +68,11 @@ export default function PagesEdit() {
         setIsDirty(false); // Reset dirty state after successful save
         return true;
       } else {
-        showToast(result.message || "Unknown error", "error");
+        showToast(result.message || t("pagesEdit.toasts.unknownError"), "error");
         return false;
       }
     } catch (err) {
-      showToast(err.message || "Failed to update page", "error");
+      showToast(err.message || t("pagesEdit.toasts.updateError"), "error");
       return false;
     } finally {
       setIsSubmitting(false);
@@ -79,17 +81,17 @@ export default function PagesEdit() {
 
   if (loading)
     return (
-      <PageLayout title="Edit Page">
-        <LoadingSpinner message="Loading page..." />
+      <PageLayout title={t("pagesEdit.title")}>
+        <LoadingSpinner message={t("pagesEdit.loading")} />
       </PageLayout>
     );
 
   return (
-    <PageLayout title="Edit page">
+    <PageLayout title={t("pagesEdit.title")}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/pages")} icon={<ChevronLeft size={18} />}>
-            Back to pages list
+            {t("pagesEdit.backToList")}
           </Button>
         </div>
       )}
@@ -99,7 +101,7 @@ export default function PagesEdit() {
           initialData={page}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          submitLabel="Save Changes"
+          submitLabel={t("pagesEdit.saveChanges")}
           onCancel={() => navigate("/pages")}
           onDirtyChange={setIsDirty}
         />
@@ -107,7 +109,7 @@ export default function PagesEdit() {
       
       {isDirty && (
         <div className="mt-4 text-sm text-amber-600">
-          You have unsaved changes
+          {t("common.unsavedChanges")}
         </div>
       )}
     </PageLayout>

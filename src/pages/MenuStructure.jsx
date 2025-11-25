@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
 import MenuEditor from "../components/menus/MenuEditor";
@@ -10,6 +11,7 @@ import { getMenu, updateMenu } from "../queries/menuManager";
 import useToastStore from "../stores/toastStore";
 
 export default function MenuStructure() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [menu, setMenu] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -54,7 +56,10 @@ export default function MenuStructure() {
     setMenu(updatedMenu);
 
     // Show success message with subtle feedback
-    showToast(`"${itemToDelete.label || "Menu item"}" deleted`, "success");
+    showToast(
+      t("menuStructure.toasts.itemDeleted", { label: itemToDelete.label || t("menuStructure.toasts.defaultItemLabel") }),
+      "success",
+    );
   };
 
   // Load menu data
@@ -65,14 +70,14 @@ export default function MenuStructure() {
         const data = await getMenu(id);
         setMenu(data);
       } catch (err) {
-        showToast(err.message || "Failed to load menu", "error");
+        showToast(err.message || t("menuStructure.toasts.loadError"), "error");
       } finally {
         setLoading(false);
       }
     }
 
     loadMenu();
-  }, [id, showToast]);
+  }, [id, showToast, t]);
 
   // Save menu
   const handleSave = async () => {
@@ -82,9 +87,9 @@ export default function MenuStructure() {
       const savedMenu = await updateMenu(menu.id, menu);
       // Update the local state with the saved data (including new timestamp)
       setMenu(savedMenu);
-      showToast("Menu saved successfully", "success");
+      showToast(t("menuStructure.toasts.saveSuccess"), "success");
     } catch (err) {
-      showToast(err.message || "Failed to save menu", "error");
+      showToast(err.message || t("menuStructure.toasts.saveError"), "error");
     } finally {
       setSaving(false);
     }
@@ -100,24 +105,24 @@ export default function MenuStructure() {
 
   if (loading) {
     return (
-      <PageLayout title="Edit Menu Structure">
-        <LoadingSpinner message="Loading menu..." />
+      <PageLayout title={t("menuStructure.title")}>
+        <LoadingSpinner message={t("menuStructure.loading")} />
       </PageLayout>
     );
   }
 
   if (!menu) {
-    showToast("Menu not found", "error");
-    return <PageLayout title="Edit Menu Structure">Menu not found</PageLayout>;
+    showToast(t("menuStructure.toasts.notFound"), "error");
+    return <PageLayout title={t("menuStructure.title")}>{t("menuStructure.notFound")}</PageLayout>;
   }
 
   return (
     <PageLayout
       title={`${menu.name}`}
-      description="You can add up to 3 levels of menu items."
+      description={t("menuStructure.description")}
       buttonProps={{
         onClick: handleSave,
-        children: saving ? "Saving..." : "Save Menu",
+        children: saving ? t("menuStructure.saving") : t("menuStructure.save"),
         disabled: saving,
       }}
     >

@@ -1,8 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import { navigationSections } from "../../config/navigation";
 
 export default function Sidebar() {
+  const { t } = useTranslation();
   const location = useLocation();
   const { activeProject } = useProjectStore();
   const hasActiveProject = !!activeProject;
@@ -48,7 +50,7 @@ export default function Sidebar() {
           <div className={iconClass(item.path, disabled)}>
             <Icon size={20} />
           </div>
-          <span className="hidden md:inline ml-1 text-sm">{item.label}</span>
+          <span className="hidden md:inline ml-1 text-sm">{t(item.labelKey)}</span>
         </NavLink>
       </li>
     );
@@ -59,7 +61,7 @@ export default function Sidebar() {
       return (
         <div key={section.id} className="pb-2 px-2 md:pl-4">
           <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block md:border-t md:border-slate-800 pt-4">
-            {section.title}
+            {t(section.titleKey)}
           </h3>
           <ul className="border-t border-slate-800 pt-4 md:pt-0 md:border-0">
             {section.items.map(renderNavItem)}
@@ -70,7 +72,7 @@ export default function Sidebar() {
 
     return (
       <div key={section.id} className="border-b border-slate-800 pb-4 mb-4">
-        {section.title && <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">{section.title}</h3>}
+        {section.titleKey && <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">{t(section.titleKey)}</h3>}
         <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
       </div>
     );

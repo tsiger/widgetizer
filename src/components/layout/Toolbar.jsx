@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function Toolbar() {
+  const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -42,13 +44,13 @@ export default function Toolbar() {
         {isDropdownOpen && (
           <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-slate-200">
             <a href="#" className="block px-4 py-2 text-sm hover:bg-slate-100">
-              Profile
+              {t("layout.toolbar.profile")}
             </a>
             <a href="#" className="block px-4 py-2 text-sm hover:bg-slate-100">
-              Settings
+              {t("layout.toolbar.settings")}
             </a>
             <a href="#" className="border-t border-slate-200 block px-4 py-2 text-sm text-pink-600 hover:bg-slate-100">
-              Logout
+              {t("layout.toolbar.logout")}
             </a>
           </div>
         )}

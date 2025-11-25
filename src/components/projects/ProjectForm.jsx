@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { API_URL } from "../../config";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -14,6 +15,7 @@ export default function ProjectForm({
   onCancel,
   onDirtyChange,
 }) {
+  const { t } = useTranslation();
   const isNew = !initialData.id;
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +93,7 @@ export default function ProjectForm({
         }
       }
     } catch {
-      showToast("Failed to load themes", "error");
+      showToast(t("forms.project.loadThemesError"), "error");
     } finally {
       setLoading(false);
     }
@@ -114,62 +116,61 @@ export default function ProjectForm({
       }
       return result;
     } catch (err) {
-      showToast(err.message || "An error occurred while submitting the form", "error");
+      showToast(err.message || t("forms.common.formError"), "error");
       return false;
     }
   };
 
-  if (loading) return <LoadingSpinner message="Un momento por favor..." />;
+  if (loading) return <LoadingSpinner message={t("forms.project.loadingThemes")} />;
 
   return (
     <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="form-container">
       <div className="form-section">
         <div className="form-field">
           <label htmlFor="name" className="form-label">
-            Title
+            {t("forms.project.titleLabel")}
           </label>
           <input
             type="text"
             id="name"
             {...register("name", {
-              required: "Project name is required",
-              validate: (value) => value.trim() !== "" || "Name cannot be empty",
+              required: t("forms.project.titleRequired"),
+              validate: (value) => value.trim() !== "" || t("forms.project.nameNotEmpty"),
             })}
             className="form-input"
           />
           {errors.name && <p className="form-error">{errors.name.message}</p>}
           <p className="form-description">
-            The display name for your project. Can be changed anytime without affecting the folder structure.
+            {t("forms.project.titleHelp")}
           </p>
         </div>
 
         <div className="form-field">
           <label htmlFor="slug" className="form-label">
-            Slug
+            {t("forms.project.slugLabel")}
           </label>
           <input
             type="text"
             id="slug"
             {...register("slug", {
-              required: "Project slug is required",
-              validate: (value) => value.trim() !== "" || "Slug cannot be empty",
+              required: t("forms.project.slugRequired"),
+              validate: (value) => value.trim() !== "" || t("forms.project.slugNotEmpty"),
               pattern: {
                 value: /^[a-z0-9-]+$/,
-                message: "Slug can only contain lowercase letters, numbers, and hyphens",
+                message: t("forms.project.slugPattern"),
               },
             })}
             className="form-input"
           />
           {errors.slug && <p className="form-error">{errors.slug.message}</p>}
           <p className="form-description">
-            The folder name for your project. Only lowercase letters, numbers, and hyphens.{" "}
-            {isNew ? "Auto-fills from title but you can edit it." : "Changing this will rename the project folder."}
+            {t("forms.project.slugHelp")}
           </p>
         </div>
 
         <div className="form-field">
           <label htmlFor="description" className="form-label-optional">
-            Description
+            {t("forms.project.descriptionLabel")}
           </label>
           <textarea
             id="description"
@@ -177,11 +178,12 @@ export default function ProjectForm({
             rows="4"
             className="form-textarea"
           />
+          <p className="form-description">{t("forms.project.descriptionHelp")}</p>
         </div>
 
         <div className="form-field">
           <label htmlFor="siteUrl" className="form-label-optional">
-            Site URL
+            {t("forms.project.siteUrlLabel")}
           </label>
           <input
             type="url"
@@ -190,24 +192,22 @@ export default function ProjectForm({
             className="form-input"
             placeholder="https://mysite.com"
           />
-          <p className="form-description">
-            The full URL where this project will be deployed. Used for social media images and canonical URLs.
-          </p>
+          <p className="form-description">{t("forms.project.siteUrlHelp")}</p>
         </div>
 
         {isNew && (
           <div className="form-field">
             <label htmlFor="theme" className="form-label">
-              Theme
+              {t("forms.project.themeLabel")}
             </label>
             <select
               id="theme"
               {...register("theme", {
-                required: isNew ? "Theme is required" : false,
+                required: isNew ? t("forms.project.themeRequired") : false,
               })}
               className="form-select"
             >
-              <option value="">Select a theme</option>
+              <option value="">{t("forms.project.selectTheme")}</option>
               {themes.map((theme) => (
                 <option key={theme.id} value={theme.id}>
                   {theme.name}
@@ -215,17 +215,18 @@ export default function ProjectForm({
               ))}
             </select>
             {errors.theme && <p className="form-error">{errors.theme.message}</p>}
+            <p className="form-description">{t("forms.project.themeHelp")}</p>
           </div>
         )}
       </div>
 
       <div className="form-actions">
         <Button type="submit" disabled={isSubmitting} variant="primary">
-          {isSubmitting ? "Saving..." : submitLabel}
+          {isSubmitting ? t("forms.common.saving") : submitLabel}
         </Button>
         {onCancel && (
           <Button type="button" onClick={onCancel} variant="secondary">
-            Cancel
+            {t("forms.common.cancel")}
           </Button>
         )}
       </div>

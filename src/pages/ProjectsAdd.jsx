@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft, Pencil } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -11,6 +12,7 @@ import useProjectStore from "../stores/projectStore";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function ProjectsAdd() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastCreatedProject, setLastCreatedProject] = useState(null);
@@ -34,16 +36,16 @@ export default function ProjectsAdd() {
       // Update store if backend activated it
       if (newProject.wasSetAsActive) {
         setActiveProjectInStore(newProject);
-        showToast(`Project "${formData.name}" was created and set as active`, "success");
+        showToast(t("projectsAdd.toasts.createActiveSuccess", { name: formData.name }), "success");
       } else {
-        showToast(`Project "${formData.name}" was created successfully!`, "success");
+        showToast(t("projectsAdd.toasts.createSuccess", { name: formData.name }), "success");
       }
 
       setFormKey(`new-form-${Date.now()}`);
       setIsDirty(false); // Reset dirty state after successful save
       return true;
     } catch (err) {
-      showToast(err.message || "Failed to create project", "error");
+      showToast(err.message || t("projectsAdd.toasts.createError"), "error");
       return false;
     } finally {
       setIsSubmitting(false);
@@ -51,11 +53,11 @@ export default function ProjectsAdd() {
   };
 
   return (
-    <PageLayout title="Add project">
+    <PageLayout title={t("projectsAdd.title")}>
       {lastCreatedProject && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/projects")} icon={<ChevronLeft size={18} />}>
-            Go to Projects List
+            {t("projectsAdd.goToList")}
           </Button>
           {lastCreatedProject && (
             <Button
@@ -63,7 +65,7 @@ export default function ProjectsAdd() {
               onClick={() => navigate(`/projects/edit/${lastCreatedProject.id}`)}
               icon={<Pencil size={18} />}
             >
-              Edit This Project
+              {t("projectsAdd.editThis")}
             </Button>
           )}
         </div>
@@ -73,14 +75,14 @@ export default function ProjectsAdd() {
         key={formKey}
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
-        submitLabel="Create Project"
+        submitLabel={t("projectsAdd.create")}
         onCancel={() => navigate("/projects")}
         onDirtyChange={setIsDirty}
       />
       
       {isDirty && (
         <div className="mt-4 text-sm text-amber-600">
-          You have unsaved changes
+          {t("common.unsavedChanges")}
         </div>
       )}
     </PageLayout>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Palette, Pencil, Trash2, Copy, Search, Check, FileText, CirclePlus } from "lucide-react";
 import { getAllPages, deletePage, duplicatePage, bulkDeletePages } from "../queries/pageManager";
 import { usePageSelection } from "../hooks/usePageSelection";
@@ -15,6 +16,7 @@ import { formatDate } from "../utils/dateFormatter";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 export default function Pages() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [pages, setPages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,16 +32,16 @@ export default function Pages() {
     try {
       if (data.isBulkDelete) {
         await bulkDeletePages(data.pageIds);
-        showToast(`Successfully deleted ${data.pageIds.length} page${data.pageIds.length > 1 ? "s" : ""}`, "success");
+        showToast(t("pages.toasts.deleteBulkSuccess", { count: data.pageIds.length }), "success");
         clearSelection();
       } else {
         await deletePage(data.pageId);
-        showToast("Page deleted successfully", "success");
+        showToast(t("pages.toasts.deleteSuccess"), "success");
       }
       loadPages();
     } catch (error) {
       console.error("Error deleting page(s):", error);
-      showToast("Failed to delete page(s)", "error");
+      showToast(t("pages.toasts.deleteError"), "error");
     }
   };
 
@@ -60,7 +62,7 @@ export default function Pages() {
       setPages(data);
     } catch (error) {
       console.error("Error loading pages:", error);
-      showToast("Failed to load pages", "error");
+      showToast(t("pages.toasts.loadError"), "error");
     } finally {
       setLoading(false);
     }
@@ -68,10 +70,10 @@ export default function Pages() {
 
   const handleDeletePage = (pageId, pageName) => {
     openModal({
-      title: "Delete Page",
-      message: `Are you sure you want to delete "${pageName}"? This action cannot be undone.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
+      title: t("pages.deleteModal.title"),
+      message: t("pages.deleteModal.message", { name: pageName }),
+      confirmText: t("pages.deleteModal.confirm"),
+      cancelText: t("pages.deleteModal.cancel"),
       variant: "danger",
       data: { pageId, pageName, isBulkDelete: false },
     });
@@ -80,10 +82,10 @@ export default function Pages() {
   const handleBulkDelete = () => {
     const selectedCount = selectedPages.length;
     openModal({
-      title: "Delete Pages",
-      message: `Are you sure you want to delete ${selectedCount} page${selectedCount > 1 ? "s" : ""}? This action cannot be undone.`,
-      confirmText: `Delete ${selectedCount} Page${selectedCount > 1 ? "s" : ""}`,
-      cancelText: "Cancel",
+      title: t("pages.deleteModal.titleBulk"),
+      message: t("pages.deleteModal.messageBulk", { count: selectedCount }),
+      confirmText: t("pages.deleteModal.confirmBulk", { count: selectedCount }),
+      cancelText: t("pages.deleteModal.cancel"),
       variant: "danger",
       data: { pageIds: selectedPages, isBulkDelete: true },
     });
@@ -92,11 +94,11 @@ export default function Pages() {
   const handleDuplicatePage = async (pageId) => {
     try {
       await duplicatePage(pageId);
-      showToast("Page duplicated successfully", "success");
+      showToast(t("pages.toasts.duplicateSuccess"), "success");
       loadPages();
     } catch (error) {
       console.error("Error duplicating page:", error);
-      showToast("Failed to duplicate page", "error");
+      showToast(t("pages.toasts.duplicateError"), "error");
     }
   };
 
@@ -117,18 +119,18 @@ export default function Pages() {
 
   if (loading) {
     return (
-      <PageLayout title="Pages">
-        <LoadingSpinner message="Loading pages..." />
+      <PageLayout title={t("pages.title")}>
+        <LoadingSpinner message={t("pages.loading")} />
       </PageLayout>
     );
   }
 
   return (
     <PageLayout
-      title="Pages"
+      title={t("pages.title")}
       buttonProps={{
         onClick: handleNewPage,
-        children: "New page",
+        children: t("pages.newPage"),
         icon: <CirclePlus size={18} />,
       }}
     >
@@ -139,19 +141,19 @@ export default function Pages() {
             <div className="flex items-center mb-2 sm:mb-0">
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-slate-600">
-                  {pages.length} page{pages.length !== 1 ? "s" : ""}
+                  {t("pages.count", { count: pages.length })}
                 </span>
                 {selectedPages.length > 0 && (
                   <>
-                    <span className="text-sm text-slate-600">• {selectedPages.length} selected</span>
+                    <span className="text-sm text-slate-600">• {t("pages.selected", { count: selectedPages.length })}</span>
                     <Button
                       onClick={handleBulkDelete}
                       variant="danger"
                       size="sm"
                       icon={<Trash2 size={18} />}
-                      title="Delete Selected"
+                      title={t("pages.deleteSelected")}
                     >
-                      Delete
+                      {t("pages.delete")}
                     </Button>
                   </>
                 )}
@@ -162,7 +164,7 @@ export default function Pages() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={16} />
               <input
                 type="text"
-                placeholder="Search pages..."
+                placeholder={t("pages.searchPlaceholder")}
                 className="form-input pl-10"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -181,24 +183,24 @@ export default function Pages() {
                   <div className="w-4 h-4 border border-slate-400 rounded-sm"></div>
                 )}
               </IconButton>,
-              "Name",
-              "Filename",
-              "Created",
-              "Updated",
-              "Actions",
+              t("pages.headers.name"),
+              t("pages.headers.filename"),
+              t("pages.headers.created"),
+              t("pages.headers.updated"),
+              t("pages.headers.actions"),
             ]}
             data={filteredPages}
             emptyMessage={
               searchTerm ? (
                 <div className="text-center py-4">
                   <FileText className="mx-auto mb-2 text-slate-400" size={32} />
-                  <div className="font-medium">No pages found</div>
+                  <div className="font-medium">{t("pages.noPagesFound")}</div>
                   <div className="text-sm text-slate-500">
-                    No pages match "{searchTerm}". Try a different search term.
+                    {t("pages.noPagesMatch", { term: searchTerm })}
                   </div>
                 </div>
               ) : (
-                "No pages available"
+                t("pages.noPagesAvailable")
               )
             }
             renderRow={(page) => {
@@ -232,7 +234,7 @@ export default function Pages() {
                   <td className={`py-3 px-4 text-right ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
                     <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                       <div className="flex gap-2 pr-2 border-r border-slate-200">
-                        <Tooltip content="Design page">
+                        <Tooltip content={t("pages.actions.design")}>
                           <Link to={`/page-editor?pageId=${page.id}`}>
                             <IconButton variant="neutral" size="sm">
                               <Palette size={18} />
@@ -240,19 +242,19 @@ export default function Pages() {
                           </Link>
                         </Tooltip>
                       </div>
-                      <Tooltip content="Edit page">
+                      <Tooltip content={t("pages.actions.edit")}>
                         <Link to={`/pages/${page.id}/edit`}>
                           <IconButton variant="neutral" size="sm">
                             <Pencil size={18} />
                           </IconButton>
                         </Link>
                       </Tooltip>
-                      <Tooltip content="Duplicate page">
+                      <Tooltip content={t("pages.actions.duplicate")}>
                         <IconButton onClick={() => handleDuplicatePage(page.id)} variant="neutral" size="sm">
                           <Copy size={18} />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip content="Delete page">
+                      <Tooltip content={t("pages.actions.delete")}>
                         <IconButton onClick={() => handleDeletePage(page.id, page.name)} variant="danger" size="sm">
                           <Trash2 size={18} />
                         </IconButton>
@@ -269,11 +271,11 @@ export default function Pages() {
       {pages.length === 0 && (
         <div className="p-8 text-center">
           <FileText className="mx-auto mb-4 text-slate-400" size={48} />
-          <h2 className="text-xl font-semibold mb-2">No pages yet</h2>
-          <p className="text-slate-600 mb-4">Create your first page to get started.</p>
+          <h2 className="text-xl font-semibold mb-2">{t("pages.noPagesYet")}</h2>
+          <p className="text-slate-600 mb-4">{t("pages.createFirstPage")}</p>
           <Link to="/pages/add">
             <Button variant="primary" icon={<CirclePlus size={18} />}>
-              New page
+              {t("pages.newPage")}
             </Button>
           </Link>
         </div>

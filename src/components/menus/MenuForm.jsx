@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import slugify from "slugify";
 import useToastStore from "../../stores/toastStore";
@@ -12,6 +13,7 @@ export default function MenuForm({
   onCancel,
   onDirtyChange,
 }) {
+  const { t } = useTranslation();
   const isNew = !initialData.id;
   const showToast = useToastStore((state) => state.showToast);
 
@@ -64,7 +66,7 @@ export default function MenuForm({
 
       return result;
     } catch (err) {
-      showToast(err.message || "An error occurred while submitting the form", "error");
+      showToast(err.message || t("forms.common.formError"), "error");
       return false;
     }
   };
@@ -74,14 +76,14 @@ export default function MenuForm({
       <div className="form-section">
         <div className="form-field">
           <label htmlFor="name" className="form-label">
-            Title
+            {t("forms.menu.titleLabel")}
           </label>
           <input
             type="text"
             id="name"
             {...register("name", {
-              required: "Menu name is required",
-              validate: (value) => value.trim() !== "" || "Name cannot be empty",
+              required: t("forms.menu.titleRequired"),
+              validate: (value) => value.trim() !== "" || t("forms.menu.nameNotEmpty"),
             })}
             className="form-input"
           />
@@ -90,7 +92,7 @@ export default function MenuForm({
 
         <div className="form-field">
           <label htmlFor="description" className="form-label-optional">
-            Description
+            {t("forms.menu.descriptionLabel")}
           </label>
           <textarea
             id="description"
@@ -103,11 +105,11 @@ export default function MenuForm({
 
       <div className="form-actions">
         <Button type="submit" disabled={isSubmitting} variant="primary">
-          {isSubmitting ? "Saving..." : submitLabel}
+          {isSubmitting ? t("forms.common.saving") : submitLabel}
         </Button>
         {onCancel && (
           <Button type="button" onClick={onCancel} variant="secondary">
-            Cancel
+            {t("forms.common.cancel")}
           </Button>
         )}
       </div>

@@ -1,8 +1,11 @@
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import { useTranslation } from "react-i18next";
 import Button from "../ui/Button";
 
 export default function MediaUploader({ onUpload, uploading, uploadProgress = {} }) {
+  const { t } = useTranslation();
+
   const onDrop = useCallback(
     (acceptedFiles) => {
       if (acceptedFiles.length === 0) return;
@@ -29,19 +32,19 @@ export default function MediaUploader({ onUpload, uploading, uploadProgress = {}
       >
         <input {...getInputProps()} />
         <p className="text-slate-500 mb-2">
-          {isDragActive ? "Drop the files here..." : "Drag and drop images and videos here or"}
+          {isDragActive ? t("components.mediaUploader.dropActive") : t("components.mediaUploader.dropInactive")}
         </p>
-        <Button variant="primary">Select Files</Button>
+        <Button variant="primary">{t("components.mediaUploader.selectFiles")}</Button>
         <p className="text-xs text-slate-500 mt-2">
-          Images: JPG, PNG, GIF, WebP, SVG
+          {t("components.mediaUploader.supportedImages")}
           <br />
-          Videos: MP4, WebM, MOV, AVI, MKV
+          {t("components.mediaUploader.supportedVideos")}
         </p>
       </div>
 
       {uploading && Object.keys(uploadProgress).length > 0 && (
         <div className="mb-4 p-4 border border-slate-200 rounded-sm bg-slate-50">
-          <h3 className="font-medium mb-2">Uploading...</h3>
+          <h3 className="font-medium mb-2">{t("components.mediaUploader.uploading")}</h3>
           {Object.entries(uploadProgress).map(([filename, progress]) => (
             <div key={filename} className="mb-2">
               <div className="flex justify-between mb-1">
