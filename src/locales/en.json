@@ -470,15 +470,18 @@
     "tabs": {
       "general": {
         "label": "General",
-        "description": "General application settings and preferences"
+        "description": "General application settings and preferences",
+        "sectionTitle": "General Settings"
       },
       "media": {
         "label": "Media & Upload",
-        "description": "Configure file upload limits and media processing"
+        "description": "Configure file upload limits and media processing",
+        "sectionTitle": "Media & Upload Settings"
       },
       "export": {
         "label": "Export & Versioning",
-        "description": "Manage export settings and version control"
+        "description": "Manage export settings and version control",
+        "sectionTitle": "Export & Versioning Settings"
       }
     },
     "groups": {

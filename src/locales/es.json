@@ -471,15 +471,18 @@
     "tabs": {
       "general": {
         "label": "General",
-        "description": "Configuración general de la aplicación y preferencias"
+        "description": "Configuración general de la aplicación y preferencias",
+        "sectionTitle": "Configuración General"
       },
       "media": {
         "label": "Medios y Carga",
-        "description": "Configurar límites de carga de archivos y procesamiento de medios"
+        "description": "Configurar límites de carga de archivos y procesamiento de medios",
+        "sectionTitle": "Configuración de Medios y Carga"
       },
       "export": {
         "label": "Exportación y Versionado",
-        "description": "Gestionar configuración de exportación y control de versiones"
+        "description": "Gestionar configuración de exportación y control de versiones",
+        "sectionTitle": "Configuración de Exportación y Versionado"
       }
     },
     "groups": {

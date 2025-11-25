@@ -470,15 +470,18 @@
     "tabs": {
       "general": {
         "label": "Allgemein",
-        "description": "Allgemeine Anwendungseinstellungen und Präferenzen"
+        "description": "Allgemeine Anwendungseinstellungen und Präferenzen",
+        "sectionTitle": "Allgemeine Einstellungen"
       },
       "media": {
         "label": "Medien & Upload",
-        "description": "Datei-Upload-Limits und Medienverarbeitung konfigurieren"
+        "description": "Datei-Upload-Limits und Medienverarbeitung konfigurieren",
+        "sectionTitle": "Medien & Upload Einstellungen"
       },
       "export": {
         "label": "Export & Versionierung",
-        "description": "Export-Einstellungen und Versionskontrolle verwalten"
+        "description": "Export-Einstellungen und Versionskontrolle verwalten",
+        "sectionTitle": "Export & Versionierung Einstellungen"
       }
     },
     "groups": {

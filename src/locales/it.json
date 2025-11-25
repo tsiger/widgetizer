@@ -470,15 +470,18 @@
     "tabs": {
       "general": {
         "label": "Generale",
-        "description": "Impostazioni generali e preferenze dell'applicazione"
+        "description": "Impostazioni generali e preferenze dell'applicazione",
+        "sectionTitle": "Impostazioni Generali"
       },
       "media": {
         "label": "Media & Caricamento",
-        "description": "Configura limiti di caricamento file ed elaborazione media"
+        "description": "Configura limiti di caricamento file ed elaborazione media",
+        "sectionTitle": "Impostazioni Media & Caricamento"
       },
       "export": {
         "label": "Esportazione & Versioni",
-        "description": "Gestisci impostazioni di esportazione e controllo versioni"
+        "description": "Gestisci impostazioni di esportazione e controllo versioni",
+        "sectionTitle": "Impostazioni Esportazione & Versioni"
       }
     },
     "groups": {

@@ -104,9 +104,7 @@ export default function AppSettingsPanel({ schema, settings, onChange }) {
 
       {/* Content area */}
       <div className="flex-1 p-6 min-h-[400px]">
-        <h2 className="text-lg font-semibold mb-4 text-slate-800">
-          {t(`appSettings.tabs.${activeTab}.label`)} {t("settings.title").split(" ")[1]}
-        </h2>
+        <h2 className="text-lg font-semibold mb-4 text-slate-800">{t(`appSettings.tabs.${activeTab}.sectionTitle`)}</h2>
         <div className="space-y-6">{renderTabSettings()}</div>
       </div>
     </div>

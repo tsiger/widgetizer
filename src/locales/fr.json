@@ -470,15 +470,18 @@
     "tabs": {
       "general": {
         "label": "Général",
-        "description": "Paramètres généraux et préférences de l'application"
+        "description": "Paramètres généraux et préférences de l'application",
+        "sectionTitle": "Paramètres Généraux"
       },
       "media": {
         "label": "Médias et Téléversement",
-        "description": "Configurer les limites de téléversement et le traitement des médias"
+        "description": "Configurer les limites de téléversement et le traitement des médias",
+        "sectionTitle": "Paramètres Médias et Téléversement"
       },
       "export": {
         "label": "Export et Versionnage",
-        "description": "Gérer les paramètres d'exportation et le contrôle de version"
+        "description": "Gérer les paramètres d'exportation et le contrôle de version",
+        "sectionTitle": "Paramètres Export et Versionnage"
       }
     },
     "groups": {
