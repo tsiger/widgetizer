@@ -16,7 +16,9 @@ export default function EditorTopBar({
 }) {
   const [pages, setPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [previewMode, setPreviewMode] = useState("desktop");
+  const [previewMode, setPreviewMode] = useState(() => {
+    return localStorage.getItem("editorPreviewMode") || "desktop";
+  });
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -56,6 +58,7 @@ export default function EditorTopBar({
 
   const handlePreviewModeChange = (mode) => {
     setPreviewMode(mode);
+    localStorage.setItem("editorPreviewMode", mode);
     onPreviewModeChange?.(mode);
   };
 
@@ -119,13 +122,16 @@ export default function EditorTopBar({
                 <button
                   key={page.id}
                   onClick={() => handlePageChange(page.id)}
-                  className={`w-full px-4 py-2 text-left ${
+                  className={`w-full px-4 py-2 text-left flex items-center justify-between ${
                     page.id === pageId
                       ? "bg-pink-600 text-white hover:bg-pink-700"
                       : "text-slate-800 hover:bg-slate-100"
                   }`}
                 >
-                  {page.name}
+                  <span>{page.name}</span>
+                  {page.id === pageId && hasUnsavedChanges && (
+                    <div className="w-2 h-2 bg-pink-500 rounded-full border border-white"></div>
+                  )}
                 </button>
               ))}
             </div>
