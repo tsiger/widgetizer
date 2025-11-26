@@ -304,6 +304,11 @@
       "placeholder": "es. Hero Principale, Prodotti in Evidenza"
     }
   },
+  "breadcrumb": {
+    "edit": "Modifica",
+    "structure": "Struttura",
+    "pageEditor": "Editor di Pagina"
+  },
   "menusAdd": {
     "title": "Aggiungi menu",
     "goToList": "Vai alla lista menu",

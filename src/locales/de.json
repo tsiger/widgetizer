@@ -304,6 +304,11 @@
       "placeholder": "z.B. Haupt-Hero, Empfohlene Produkte"
     }
   },
+  "breadcrumb": {
+    "edit": "Bearbeiten",
+    "structure": "Struktur",
+    "pageEditor": "Seiteneditor"
+  },
   "menusAdd": {
     "title": "Menü hinzufügen",
     "goToList": "Zur Menüliste",

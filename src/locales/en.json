@@ -304,6 +304,11 @@
       "placeholder": "e.g., Main Hero, Featured Products"
     }
   },
+  "breadcrumb": {
+    "edit": "Edit",
+    "structure": "Structure",
+    "pageEditor": "Page Editor"
+  },
   "menusAdd": {
     "title": "Add menu",
     "goToList": "Go to menus list",

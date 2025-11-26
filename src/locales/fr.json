@@ -304,6 +304,11 @@
       "placeholder": "ex : Hero Principal, Produits en Vedette"
     }
   },
+  "breadcrumb": {
+    "edit": "Modifier",
+    "structure": "Structure",
+    "pageEditor": "Éditeur de Page"
+  },
   "menusAdd": {
     "title": "Ajouter un menu",
     "goToList": "Aller à la liste des menus",
