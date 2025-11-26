@@ -9,6 +9,7 @@ const useWidgetStore = create((set, get) => ({
   selectedWidgetId: null,
   selectedBlockId: null,
   selectedGlobalWidgetId: null,
+  selectedThemeGroup: null,
   loading: false,
   error: null,
 
@@ -33,6 +34,7 @@ const useWidgetStore = create((set, get) => ({
       selectedWidgetId: id,
       selectedBlockId: null,
       selectedGlobalWidgetId: null,
+      selectedThemeGroup: null,
     });
   },
 
@@ -45,6 +47,16 @@ const useWidgetStore = create((set, get) => ({
       selectedGlobalWidgetId: id,
       selectedWidgetId: null,
       selectedBlockId: null,
+      selectedThemeGroup: null,
+    });
+  },
+
+  setSelectedThemeGroup: (groupKey) => {
+    set({
+      selectedThemeGroup: groupKey,
+      selectedWidgetId: null,
+      selectedBlockId: null,
+      selectedGlobalWidgetId: null,
     });
   },
 

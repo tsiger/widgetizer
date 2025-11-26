@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import { savePageContent } from "../queries/pageManager";
 import { saveGlobalWidget } from "../queries/previewManager";
+import { saveThemeSettings } from "../queries/themeManager";
 import usePageStore from "./pageStore";
+import useThemeStore from "./themeStore";
 
 const useAutoSave = create((set, get) => ({
   // State
@@ -10,12 +12,13 @@ const useAutoSave = create((set, get) => ({
   lastSaved: null,
   modifiedWidgets: new Set(),
   structureModified: false,
+  themeSettingsModified: false,
   autoSaveInterval: null,
 
   // Computed
   hasUnsavedChanges: () => {
-    const { modifiedWidgets, structureModified } = get();
-    return modifiedWidgets.size > 0 || structureModified;
+    const { modifiedWidgets, structureModified, themeSettingsModified } = get();
+    return modifiedWidgets.size > 0 || structureModified || themeSettingsModified;
   },
 
   // Actions
@@ -37,12 +40,17 @@ const useAutoSave = create((set, get) => ({
     set({ structureModified: modified });
   },
 
+  setThemeSettingsModified: (modified) => {
+    set({ themeSettingsModified: modified });
+  },
+
   save: async (isAuto = false) => {
-    const { modifiedWidgets, structureModified, hasUnsavedChanges } = get();
+    const { modifiedWidgets, structureModified, themeSettingsModified, hasUnsavedChanges } = get();
     const pageStore = usePageStore.getState();
     const { page, globalWidgets } = pageStore;
+    const themeStore = useThemeStore.getState();
 
-    if (!page || !hasUnsavedChanges()) return;
+    if (!hasUnsavedChanges()) return;
 
     if (isAuto) {
       set({ isAutoSaving: true });
@@ -51,29 +59,45 @@ const useAutoSave = create((set, get) => ({
     }
 
     try {
-      const globalWidgetPromises = [];
+      const savePromises = [];
 
+      // Save global widgets
       if (globalWidgets.header && modifiedWidgets.has("header")) {
-        globalWidgetPromises.push(saveGlobalWidget("header", globalWidgets.header));
+        savePromises.push(saveGlobalWidget("header", globalWidgets.header));
       }
 
       if (globalWidgets.footer && modifiedWidgets.has("footer")) {
-        globalWidgetPromises.push(saveGlobalWidget("footer", globalWidgets.footer));
+        savePromises.push(saveGlobalWidget("footer", globalWidgets.footer));
       }
 
-      await Promise.all(globalWidgetPromises);
+      // Save page content if there are page changes
+      if (page && (modifiedWidgets.size > 0 || structureModified)) {
+        savePromises.push(savePageContent(page.id, page));
+      }
 
-      await savePageContent(page.id, page);
+      // Save theme settings if modified
+      if (themeSettingsModified && themeStore.settings) {
+        savePromises.push(saveThemeSettings(themeStore.settings));
+      }
+
+      await Promise.all(savePromises);
 
       set({
         modifiedWidgets: new Set(),
         structureModified: false,
+        themeSettingsModified: false,
         lastSaved: new Date(),
       });
 
-      pageStore.setOriginalPage(page);
+      if (page) {
+        pageStore.setOriginalPage(page);
+      }
+
+      if (themeSettingsModified && themeStore.settings) {
+        themeStore.markThemeSettingsSaved();
+      }
     } catch (err) {
-      console.error("Failed to save page content:", err);
+      console.error("Failed to save:", err);
     } finally {
       if (isAuto) {
         set({ isAutoSaving: false });
@@ -114,6 +138,7 @@ const useAutoSave = create((set, get) => ({
       lastSaved: null,
       modifiedWidgets: new Set(),
       structureModified: false,
+      themeSettingsModified: false,
     });
   },
 }));

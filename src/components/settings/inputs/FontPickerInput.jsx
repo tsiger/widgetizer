@@ -71,14 +71,14 @@ export default function FontPickerInput({
 
   return (
     <div className="space-y-2">
-      <div className="flex gap-2 items-center">
+      <div className="flex flex-col gap-2">
         {/* Font Stack Selector */}
-        <div className="flex-grow">
+        <div className="w-full">
           <select
             id={id}
             value={currentVal.stack}
             onChange={(e) => handleFontChange(e.target.value)}
-            className="form-select"
+            className="form-select w-full"
           >
             {Object.entries(fonts).map(([category, fontList]) => (
               <optgroup key={category} label={category}>
@@ -94,12 +94,12 @@ export default function FontPickerInput({
 
         {/* Weight Selector (Conditional) */}
         {selectedFontObject?.availableWeights && selectedFontObject.availableWeights.length > 0 && (
-          <div className="w-40 shrink-0">
+          <div className="w-full">
             <select
               id={`${id}-weight`}
               value={selectedWeight}
               onChange={(e) => handleWeightChange(e.target.value)}
-              className="form-select"
+              className="form-select w-full"
               aria-label="Font weight"
             >
               {selectedFontObject.availableWeights.map((weight) => (

@@ -12,6 +12,7 @@ export default function EditorTopBar({
   lastSaved,
   onSave,
   onPreviewModeChange, // Callback to notify parent of preview mode changes
+  children,
 }) {
   const [pages, setPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -112,7 +113,6 @@ export default function EditorTopBar({
               {pageName} {hasUnsavedChanges && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
             </div>
           )}
-
           {isDropdownOpen && hasMultiplePages && (
             <div className="absolute top-full left-0 mt-1 w-64 max-h-96 overflow-y-auto bg-white border border-slate-200 rounded-md shadow-lg z-50">
               {pages.map((page) => (
@@ -131,6 +131,9 @@ export default function EditorTopBar({
             </div>
           )}
         </div>
+
+        {/* Render injected children (e.g. ThemeSelector) */}
+        {children}
       </div>
 
       <div className="flex items-center gap-4">

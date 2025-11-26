@@ -6,6 +6,7 @@ import WidgetList from "../components/pageEditor/WidgetList";
 import PreviewPanel from "../components/pageEditor/PreviewPanel";
 import SettingsPanel from "../components/pageEditor/SettingsPanel";
 import EditorTopBar from "../components/pageEditor/EditorTopBar";
+import ThemeSelector from "../components/pageEditor/ThemeSelector";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 import usePageStore from "../stores/pageStore";
@@ -29,6 +30,8 @@ export default function PageEditor() {
     setSelectedWidgetId,
     setSelectedBlockId,
     setSelectedGlobalWidgetId,
+    selectedThemeGroup,
+    setSelectedThemeGroup,
   } = useWidgetStore();
   const { hasUnsavedChanges, isSaving, isAutoSaving, lastSaved, save, startAutoSave, stopAutoSave } = useAutoSave();
   const { settings: themeSettings } = useThemeStore();
@@ -66,6 +69,10 @@ export default function PageEditor() {
   // Handle global widget selection (cross-component coordination)
   const handleGlobalWidgetSelect = (widgetType) => {
     setSelectedGlobalWidgetId(widgetType);
+  };
+
+  const handleThemeGroupSelect = (groupKey) => {
+    setSelectedThemeGroup(groupKey);
   };
 
   // Get the selected widget and its schema (needed by SettingsPanel)
@@ -107,7 +114,9 @@ export default function PageEditor() {
         lastSaved={lastSaved}
         onSave={() => save(false)}
         onPreviewModeChange={setPreviewMode}
-      />
+      >
+        <ThemeSelector />
+      </EditorTopBar>
 
       <div className="flex flex-1 overflow-hidden">
         <WidgetList
@@ -120,6 +129,7 @@ export default function PageEditor() {
           onWidgetSelect={handleWidgetSelect}
           onBlockSelect={handleBlockSelect}
           onGlobalWidgetSelect={handleGlobalWidgetSelect}
+          // Theme props removed from here as they are now handled via TopBar -> SettingsPanel
           previewIframeRef={previewIframeRef}
         />
 
@@ -144,6 +154,8 @@ export default function PageEditor() {
           selectedWidgetId={selectedWidgetId}
           selectedBlockId={selectedBlockId}
           selectedGlobalWidgetId={selectedGlobalWidgetId}
+          selectedThemeGroup={selectedThemeGroup}
+          themeSettings={themeSettings}
           widgetSchemas={widgetSchemas}
           onBackToWidget={() => setSelectedBlockId(null)}
         />

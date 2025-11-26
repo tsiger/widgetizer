@@ -1,5 +1,34 @@
 import { API_URL } from "../config";
 import useProjectStore from "../stores/projectStore";
+import fontDefinitions from "../core/config/fonts.json";
+
+/**
+ * Extract used fonts from theme settings with their weights
+ */
+function extractFonts(settings) {
+  const fontsToLoad = {}; // { FontName: Set(weights) }
+  if (!settings?.settings?.global?.typography) return {};
+
+  const allFonts = [...fontDefinitions.system, ...fontDefinitions.google];
+
+  settings.settings.global.typography.forEach((setting) => {
+    if (setting.type === "font_picker" && setting.value) {
+      const value = setting.value; // { stack, weight }
+      if (value && typeof value === "object" && value.stack && value.weight) {
+        const fontDef = allFonts.find((f) => f.stack === value.stack);
+        if (fontDef && fontDef.isGoogleFont) {
+          const fontName = fontDef.name;
+          if (!fontsToLoad[fontName]) {
+            fontsToLoad[fontName] = new Set();
+          }
+          fontsToLoad[fontName].add(value.weight);
+        }
+      }
+    }
+  });
+
+  return fontsToLoad;
+}
 
 /**
  * Fetch a preview of the page from the server
@@ -144,6 +173,24 @@ export async function updatePreview(iframe, newState, oldState) {
 
   const themeSettingsChanged = JSON.stringify(newThemeSettings) !== JSON.stringify(oldThemeSettings);
 
+  // If theme settings changed, we need to re-render ALL widgets because theme settings
+  // might affect the HTML structure (not just CSS variables)
+  if (themeSettingsChanged) {
+    // Mark all page widgets as changed
+    for (const id of newWidgetIds) {
+      if (!changedWidgets.has(id)) {
+        changedWidgets.set(id, { newWidget: newWidgets[id], oldWidget: oldWidgets[id] });
+      }
+    }
+    // Mark global widgets as changed
+    if (newGlobalWidgets?.header && !changedWidgets.has("header")) {
+      changedWidgets.set("header", { newWidget: newGlobalWidgets.header });
+    }
+    if (newGlobalWidgets?.footer && !changedWidgets.has("footer")) {
+      changedWidgets.set("footer", { newWidget: newGlobalWidgets.footer });
+    }
+  }
+
   // --- 2. PERFORM DOM UPDATES ---
 
   // Get the container for page widgets
@@ -266,13 +313,28 @@ export function settingsToCssVariables(settings) {
   Object.entries(global).forEach(([category, items]) => {
     if (Array.isArray(items)) {
       items.forEach((item) => {
-        if (item.id) {
-          let value = item.value !== undefined ? item.value : item.default;
-          // For range inputs with units, append the unit to the value
-          if (item.type === "range" && item.unit && typeof value === "number") {
-            value = `${value}${item.unit}`;
+        // Handle font_picker type specifically (always output, no outputAsCssVar check)
+        if (item.type === "font_picker") {
+          const value = item.value !== undefined ? item.value : item.default;
+          // Ensure value is the expected object { stack, weight }
+          if (value && typeof value === "object" && value.stack && value.weight !== undefined) {
+            const cssVarBase = `--${category}-${item.id}`;
+            variables[`${cssVarBase}-family`] = value.stack;
+            variables[`${cssVarBase}-weight`] = value.weight;
           }
-          variables[`--${category}-${item.id}`] = value;
+        }
+        // Handle other types marked for CSS variable output
+        else if (item.id && item.outputAsCssVar === true) {
+          // Use value if present, otherwise use default
+          let value = item.value !== undefined ? item.value : item.default;
+          if (value !== undefined) {
+            // For range inputs with units, append the unit to the value
+            if (item.type === "range" && item.unit && typeof value === "number") {
+              value = `${value}${item.unit}`;
+            }
+            // Construct the CSS variable name
+            variables[`--${category}-${item.id}`] = value;
+          }
         }
       });
     }
@@ -284,19 +346,39 @@ export function settingsToCssVariables(settings) {
 /**
  * Update theme settings in the preview without reloading
  */
+/**
+ * Update theme settings in the preview without reloading
+ */
 function updateThemeSettings(iframe, settings) {
   if (!iframe?.contentWindow) {
     console.warn("Preview Manager: No iframe window available");
     return;
   }
 
+  const variables = settingsToCssVariables(settings);
+  const fontsMetadata = extractFonts(settings);
+
   iframe.contentWindow.postMessage(
     {
       type: "UPDATE_CSS_VARIABLES",
-      payload: settings,
+      payload: variables,
     },
     "*",
   );
+
+  if (Object.keys(fontsMetadata).length > 0) {
+    // Convert Set to Array for JSON serialization
+    const fontsPayload = Object.fromEntries(
+      Object.entries(fontsMetadata).map(([name, weightsSet]) => [name, Array.from(weightsSet)]),
+    );
+    iframe.contentWindow.postMessage(
+      {
+        type: "LOAD_FONTS",
+        payload: fontsPayload,
+      },
+      "*",
+    );
+  }
 }
 
 /**

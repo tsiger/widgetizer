@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import { SettingsRenderer } from "../settings";
 import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
+import useThemeStore from "../../stores/themeStore";
 import useAutoSave from "../../stores/saveStore";
 import { useTranslation } from "react-i18next";
 
@@ -11,15 +12,19 @@ export default function SettingsPanel({
   selectedWidgetId,
   selectedBlockId,
   selectedGlobalWidgetId,
+  selectedThemeGroup,
+  themeSettings,
   widgetSchemas,
   onBackToWidget,
 }) {
   const { t } = useTranslation();
   const { globalWidgets } = usePageStore();
   const { updateWidgetSettings, updateGlobalWidgetSettings, updateBlockSettings } = useWidgetStore();
-  const { markWidgetModified } = useAutoSave();
+  const { updateThemeSetting } = useThemeStore();
+  const { markWidgetModified, setThemeSettingsModified } = useAutoSave();
 
   const isGlobalWidget = !!selectedGlobalWidgetId;
+  const isThemeSettings = !!selectedThemeGroup;
   const globalWidget = isGlobalWidget ? globalWidgets[selectedGlobalWidgetId] : null;
 
   const currentWidget = isGlobalWidget ? globalWidget : selectedWidget;
@@ -35,10 +40,22 @@ export default function SettingsPanel({
     selectedBlock &&
     selectedWidgetSchema?.blocks?.find((block) => block.type === selectedBlock.type);
 
-  const settings = selectedBlockId && !isGlobalWidget ? selectedBlockSchema?.settings : currentWidgetSchema?.settings;
-  const currentValues = selectedBlockId && !isGlobalWidget ? selectedBlock?.settings : currentWidget?.settings;
+  const settings = isThemeSettings
+    ? themeSettings?.settings?.global?.[selectedThemeGroup] || []
+    : selectedBlockId && !isGlobalWidget
+      ? selectedBlockSchema?.settings
+      : currentWidgetSchema?.settings;
 
-  if (!currentWidget || (!selectedWidgetId && !selectedGlobalWidgetId)) {
+  const currentValues = isThemeSettings
+    ? (themeSettings?.settings?.global?.[selectedThemeGroup] || []).reduce(
+        (acc, s) => ({ ...acc, [s.id]: s.value }),
+        {},
+      )
+    : selectedBlockId && !isGlobalWidget
+      ? selectedBlock?.settings
+      : currentWidget?.settings;
+
+  if (!isThemeSettings && (!currentWidget || (!selectedWidgetId && !selectedGlobalWidgetId))) {
     return (
       <div className="w-60 bg-white border-l border-slate-200">
         <div className="p-4">
@@ -49,7 +66,10 @@ export default function SettingsPanel({
   }
 
   const handleSettingChange = (settingId, value) => {
-    if (isGlobalWidget) {
+    if (isThemeSettings) {
+      updateThemeSetting(selectedThemeGroup, settingId, value);
+      setThemeSettingsModified(true);
+    } else if (isGlobalWidget) {
       updateGlobalWidgetSettings(selectedGlobalWidgetId, settingId, value);
       markWidgetModified(selectedGlobalWidgetId);
     } else if (selectedBlockId) {
@@ -62,8 +82,9 @@ export default function SettingsPanel({
   };
 
   // Calculate display name with priority: custom name > block name > widget schema name > fallback
-  const displayName =
-    selectedBlockId && !isGlobalWidget
+  const displayName = isThemeSettings
+    ? selectedThemeGroup.charAt(0).toUpperCase() + selectedThemeGroup.slice(1)
+    : selectedBlockId && !isGlobalWidget
       ? selectedBlockSchema?.displayName || "Block Settings"
       : currentWidget?.settings?.name || // Use custom name if set
         currentWidgetSchema?.displayName ||
@@ -79,7 +100,7 @@ export default function SettingsPanel({
   };
 
   // Combine name setting with other settings for widgets
-  const allSettings = !selectedBlockId && settings ? [widgetNameSetting, ...settings] : settings;
+  const allSettings = !isThemeSettings && !selectedBlockId && settings ? [widgetNameSetting, ...settings] : settings;
 
   return (
     <div className="w-60 bg-white border-l border-slate-200 flex flex-col h-full">
