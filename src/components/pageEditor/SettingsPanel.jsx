@@ -3,6 +3,7 @@ import { SettingsRenderer } from "../settings";
 import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
 import useAutoSave from "../../stores/saveStore";
+import { useTranslation } from "react-i18next";
 
 export default function SettingsPanel({
   selectedWidget,
@@ -13,6 +14,7 @@ export default function SettingsPanel({
   widgetSchemas,
   onBackToWidget,
 }) {
+  const { t } = useTranslation();
   const { globalWidgets } = usePageStore();
   const { updateWidgetSettings, updateGlobalWidgetSettings, updateBlockSettings } = useWidgetStore();
   const { markWidgetModified } = useAutoSave();
@@ -59,11 +61,25 @@ export default function SettingsPanel({
     }
   };
 
+  // Calculate display name with priority: custom name > block name > widget schema name > fallback
   const displayName =
     selectedBlockId && !isGlobalWidget
       ? selectedBlockSchema?.displayName || "Block Settings"
-      : currentWidgetSchema?.displayName ||
+      : currentWidget?.settings?.name || // Use custom name if set
+        currentWidgetSchema?.displayName ||
         (isGlobalWidget ? (selectedGlobalWidgetId === "header" ? "Header" : "Footer") : "Widget Settings");
+
+  // Inject "name" setting for widgets (not blocks)
+  const widgetNameSetting = {
+    id: "name",
+    type: "text",
+    label: t("pageEditor.widgetName.label"),
+    description: t("pageEditor.widgetName.description"),
+    placeholder: t("pageEditor.widgetName.placeholder"),
+  };
+
+  // Combine name setting with other settings for widgets
+  const allSettings = !selectedBlockId && settings ? [widgetNameSetting, ...settings] : settings;
 
   return (
     <div className="w-60 bg-white border-l border-slate-200 flex flex-col h-full">
@@ -82,7 +98,7 @@ export default function SettingsPanel({
         </div>
 
         <div className="space-y-6">
-          {settings?.map((setting) => (
+          {allSettings?.map((setting) => (
             <SettingsRenderer
               key={setting.id}
               setting={setting}

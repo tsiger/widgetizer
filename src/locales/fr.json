@@ -297,7 +297,12 @@
   "pageEditor": {
     "loading": "Chargement de la page...",
     "error": "Erreur : {{message}}",
-    "noPageSelected": "Aucune page sélectionnée. Veuillez sélectionner une page dans la liste des pages."
+    "noPageSelected": "Aucune page sélectionnée. Veuillez sélectionner une page dans la liste des pages.",
+    "widgetName": {
+      "label": "Nom du Widget",
+      "description": "Nom personnalisé optionnel pour identifier cette instance de widget",
+      "placeholder": "ex : Hero Principal, Produits en Vedette"
+    }
   },
   "menusAdd": {
     "title": "Ajouter un menu",

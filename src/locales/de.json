@@ -297,7 +297,12 @@
   "pageEditor": {
     "loading": "Seite wird geladen...",
     "error": "Fehler: {{message}}",
-    "noPageSelected": "Keine Seite ausgewählt. Bitte wählen Sie eine Seite aus der Seitenliste."
+    "noPageSelected": "Keine Seite ausgewählt. Bitte wählen Sie eine Seite aus der Seitenliste.",
+    "widgetName": {
+      "label": "Widget-Name",
+      "description": "Optionaler benutzerdefinierter Name zur Identifizierung dieser Widget-Instanz",
+      "placeholder": "z.B. Haupt-Hero, Empfohlene Produkte"
+    }
   },
   "menusAdd": {
     "title": "Menü hinzufügen",

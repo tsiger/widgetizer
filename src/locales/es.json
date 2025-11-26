@@ -298,7 +298,12 @@
   "pageEditor": {
     "loading": "Cargando página...",
     "error": "Error: {{message}}",
-    "noPageSelected": "Ninguna página seleccionada. Por favor, selecciona una página de la lista de Páginas."
+    "noPageSelected": "Ninguna página seleccionada. Por favor, selecciona una página de la lista de Páginas.",
+    "widgetName": {
+      "label": "Nombre del Widget",
+      "description": "Nombre personalizado opcional para identificar esta instancia del widget",
+      "placeholder": "ej. Hero Principal, Productos Destacados"
+    }
   },
   "menusAdd": {
     "title": "Agregar menú",

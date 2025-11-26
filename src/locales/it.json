@@ -297,7 +297,12 @@
   "pageEditor": {
     "loading": "Caricamento pagina...",
     "error": "Errore: {{message}}",
-    "noPageSelected": "Nessuna pagina selezionata. Seleziona una pagina dall'elenco Pagine."
+    "noPageSelected": "Nessuna pagina selezionata. Seleziona una pagina dall'elenco Pagine.",
+    "widgetName": {
+      "label": "Nome Widget",
+      "description": "Nome personalizzato opzionale per identificare questa istanza del widget",
+      "placeholder": "es. Hero Principale, Prodotti in Evidenza"
+    }
   },
   "menusAdd": {
     "title": "Aggiungi menu",
