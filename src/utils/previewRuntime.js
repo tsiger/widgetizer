@@ -11,7 +11,7 @@ function initializeHighlightStyles() {
       transition: outline 0.1s ease-out;
     }
     .widget-highlight {
-      outline: 2px solid #0066cc !important;
+      outline: 1px solid #0066cc !important;
       position: relative;
       box-shadow: 0 0 10px rgba(0, 102, 204, 0.3);
       z-index: 10;
@@ -19,11 +19,10 @@ function initializeHighlightStyles() {
     .block-highlight {
       outline: 1px solid #22c55e !important;
       position: relative;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
       z-index: 11;
     }
     [data-widget-id]:hover {
-      outline: 2px dashed rgba(0, 102, 204, 0.5);
+      outline: 1px dashed rgba(0, 102, 204, 0.5);
       cursor: pointer;
     }
     [data-block-id]:hover {
@@ -32,10 +31,10 @@ function initializeHighlightStyles() {
     }
     /* Prevent hover styles on highlighted elements */
     .widget-highlight:hover {
-      outline: 2px solid #0066cc !important;
+      outline: 1px solid #0066cc !important;
     }
     .block-highlight:hover {
-      outline: 1px solid #22c55e !important;
+      outline: 1px dashed rgba(34, 197, 94, 0.5);
     }
   `;
   document.head.appendChild(style);
@@ -72,7 +71,7 @@ function highlightWidget(widgetId, blockId) {
       if (!widget.classList.contains("widget-highlight")) {
         widget.classList.add("widget-highlight");
       }
-      
+
       // Only scroll to widget if no block is selected (i.e., widget was clicked directly)
       if (!blockId) {
         widget.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
@@ -122,29 +121,33 @@ function handleMessage(event) {
 
 // Setup interaction handler for widget selection
 function setupInteractionHandler() {
-  document.addEventListener("click", (event) => {
-    // Find the closest widget or block element
-    const blockEl = event.target.closest("[data-block-id]");
-    const widgetEl = event.target.closest("[data-widget-id]");
+  document.addEventListener(
+    "click",
+    (event) => {
+      // Find the closest widget or block element
+      const blockEl = event.target.closest("[data-block-id]");
+      const widgetEl = event.target.closest("[data-widget-id]");
 
-    if (widgetEl) {
-      // Prevent default behavior (e.g., following links)
-      event.preventDefault();
-      event.stopPropagation();
+      if (widgetEl) {
+        // Prevent default behavior (e.g., following links)
+        event.preventDefault();
+        event.stopPropagation();
 
-      const widgetId = widgetEl.getAttribute("data-widget-id");
-      const blockId = blockEl ? blockEl.getAttribute("data-block-id") : null;
+        const widgetId = widgetEl.getAttribute("data-widget-id");
+        const blockId = blockEl ? blockEl.getAttribute("data-block-id") : null;
 
-      // Send message to parent
-      window.parent.postMessage(
-        {
-          type: "WIDGET_SELECTED",
-          payload: { widgetId, blockId },
-        },
-        "*"
-      );
-    }
-  }, true); // Use capture phase to ensure we catch it before other handlers
+        // Send message to parent
+        window.parent.postMessage(
+          {
+            type: "WIDGET_SELECTED",
+            payload: { widgetId, blockId },
+          },
+          "*",
+        );
+      }
+    },
+    true,
+  ); // Use capture phase to ensure we catch it before other handlers
 }
 
 // Initialize the preview runtime

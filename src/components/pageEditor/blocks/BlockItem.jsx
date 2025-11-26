@@ -48,7 +48,7 @@ export default function BlockItem({
       <div className="text-slate-400 hover:text-slate-600 transition-colors" {...dragHandleProps}>
         <GripVertical size={14} />
       </div>
-      <span className="truncate flex-grow text-sm font-medium text-slate-600">{blockName}</span>
+      <span className="truncate flex-grow text-xs font-medium text-slate-600">{blockName}</span>
 
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <button

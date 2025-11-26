@@ -103,7 +103,8 @@
     "cancel": "Abbrechen",
     "loading": "Laden...",
     "error": "Fehler",
-    "success": "Erfolg"
+    "success": "Erfolg",
+    "unsavedChanges": "Sie haben ungespeicherte Änderungen"
   },
   "components": {
     "mediaToolbar": {

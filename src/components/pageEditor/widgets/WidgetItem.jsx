@@ -31,8 +31,6 @@ export default function WidgetItem({
   const blocks = widget.blocks || {};
   const blockOrder = widget.blocksOrder || [];
 
-
-
   return (
     <div
       className={`rounded-sm border border-1 transition-all duration-200 ${
@@ -44,7 +42,7 @@ export default function WidgetItem({
       } ${isDragging ? "opacity-30" : ""} ${isOverlay ? "shadow-lg" : ""}`}
     >
       <div
-        className="flex items-center gap-2 p-1 cursor-pointer group widget-item"
+        className={`flex items-center p-1 cursor-pointer group widget-item ${isSelected ? "bg-pink-50" : ""} rounded-sm`}
         onClick={(e) => {
           e.stopPropagation();
           onWidgetSelect(widgetId);
@@ -55,7 +53,7 @@ export default function WidgetItem({
           <GripVertical size={16} />
         </div>
         <div className="flex-grow min-w-0 flex items-center gap-2">
-          <span className="font-medium text-sm truncate text-slate-700">{widgetName}</span>
+          <span className="font-medium text-xs truncate text-slate-700">{widgetName}</span>
           {isModified && !isDragging && (
             <div className="h-2 w-2 rounded-full bg-amber-500 ring-2 ring-amber-200" title="Unsaved changes"></div>
           )}

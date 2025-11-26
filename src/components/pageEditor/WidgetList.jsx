@@ -42,13 +42,13 @@ export default function WidgetList({
   previewIframeRef, // Need this for scroll coordination
 }) {
   const [activeId, setActiveId] = useState(null);
-  
+
   // WidgetSelector modal state
   const [isWidgetSelectorOpen, setIsWidgetSelectorOpen] = useState(false);
   const [insertPosition, setInsertPosition] = useState(0);
   const [widgetTriggerRef, setWidgetTriggerRef] = useState(null);
   const [activeWidgetTriggerPosition, setActiveWidgetTriggerPosition] = useState(null);
-  
+
   // BlockSelector modal state
   const [isBlockSelectorOpen, setIsBlockSelectorOpen] = useState(false);
   const [activeWidgetId, setActiveWidgetId] = useState(null);
@@ -135,7 +135,7 @@ export default function WidgetList({
     setBlockInsertPosition(position);
     setIsBlockSelectorOpen(true);
   };
-  
+
   // Scroll selected widget into view
   useEffect(() => {
     const targetId = selectedWidgetId || selectedGlobalWidgetId;
@@ -160,15 +160,15 @@ export default function WidgetList({
           <WidgetSection>
             <div id="sidebar-widget-header">
               <FixedWidgetItem
-              widgetId="header"
-              widget={headerWidget}
-              widgetSchema={widgetSchemas[headerWidget.type] || {}}
-              isSelected={selectedGlobalWidgetId === "header"}
-              isModified={modifiedWidgets.has("header")}
-              onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("header")}
-            />
-          </div>
-        </WidgetSection>
+                widgetId="header"
+                widget={headerWidget}
+                widgetSchema={widgetSchemas[headerWidget.type] || {}}
+                isSelected={selectedGlobalWidgetId === "header"}
+                isModified={modifiedWidgets.has("header")}
+                onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("header")}
+              />
+            </div>
+          </WidgetSection>
         )}
 
         {headerWidget && <div className="my-4 border-t border-slate-200" />}
@@ -270,15 +270,15 @@ export default function WidgetList({
           <WidgetSection>
             <div id="sidebar-widget-footer">
               <FixedWidgetItem
-              widgetId="footer"
-              widget={footerWidget}
-              widgetSchema={widgetSchemas[footerWidget.type] || {}}
-              isSelected={selectedGlobalWidgetId === "footer"}
-              isModified={modifiedWidgets.has("footer")}
-              onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("footer")}
-            />
-          </div>
-        </WidgetSection>
+                widgetId="footer"
+                widget={footerWidget}
+                widgetSchema={widgetSchemas[footerWidget.type] || {}}
+                isSelected={selectedGlobalWidgetId === "footer"}
+                isModified={modifiedWidgets.has("footer")}
+                onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("footer")}
+              />
+            </div>
+          </WidgetSection>
         )}
       </div>
 

@@ -3,16 +3,16 @@ export default function FixedWidgetItem({ widgetId, widget, widgetSchema, isSele
 
   return (
     <div
-      className={`rounded-md border transition-all hover:shadow-sm ${
+      className={`rounded border transition-all hover:shadow-sm ${
         isSelected
           ? "border-blue-300 bg-blue-50"
           : isModified
-          ? "border-amber-400"
-          : "border-slate-200 hover:border-slate-300"
+            ? "border-amber-400"
+            : "border-slate-200 hover:border-slate-300"
       }`}
     >
       <div
-        className="flex items-center gap-1 p-1.5 cursor-pointer group widget-item"
+        className="flex items-center gap-1 p-2 cursor-pointer group widget-item"
         onClick={() => onWidgetSelect && onWidgetSelect(widgetId)}
       >
         <div className="flex-grow min-w-0 flex items-center pl-1">

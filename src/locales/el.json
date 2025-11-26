@@ -103,7 +103,8 @@
     "cancel": "Ακύρωση",
     "loading": "Φόρτωση...",
     "error": "Σφάλμα",
-    "success": "Επιτυχία"
+    "success": "Επιτυχία",
+    "unsavedChanges": "Έχετε μη αποθηκευμένες αλλαγές"
   },
   "components": {
     "mediaToolbar": {

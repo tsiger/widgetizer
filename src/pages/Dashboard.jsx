@@ -48,17 +48,19 @@ export default function Dashboard() {
     <PageLayout title={t("dashboard.title")}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card variant="feature">
-          <p className="text-xs uppercase font-semibold mb-4 text-gray-500">{t("dashboard.projectCount")}</p>
+          <p className="text-lg font-semibold mb-4 text-gray-500">{t("dashboard.projectCount")}</p>
           <h2 className="text-2xl font-semibold tracking-tight text-gray-900">{projectCount}</h2>
           <p className="text-gray-600">{isFirstTimeUser ? t("dashboard.readyToCreate") : t("dashboard.projects")}</p>
         </Card>
 
         <Card variant="feature">
-          <p className="text-xs uppercase font-semibold mb-4 text-gray-500">
+          <p className="text-lg font-semibold mb-4 text-gray-500">
             {isFirstTimeUser ? t("dashboard.getStarted") : t("dashboard.activeProject")}
           </p>
           <h2 className="text-2xl font-semibold tracking-tight text-gray-900">
-            {isFirstTimeUser ? t("dashboard.createFirstProject") : activeProject?.name || t("dashboard.noActiveProject")}
+            {isFirstTimeUser
+              ? t("dashboard.createFirstProject")
+              : activeProject?.name || t("dashboard.noActiveProject")}
           </h2>
           {isFirstTimeUser ? (
             <Link
@@ -79,7 +81,7 @@ export default function Dashboard() {
         </Card>
 
         <Card variant="featureReverse" className="">
-          <p className="text-xs uppercase font-semibold mb-4 text-gray-400">{t("dashboard.magic")}</p>
+          <p className="text-lg font-semibold mb-4 text-gray-400">{t("dashboard.magic")}</p>
           <h2 className="text-2xl font-semibold tracking-tight text-white">{t("dashboard.generateSite")}</h2>
           <p className="text-gray-400">{t("dashboard.todoDescription")}</p>
         </Card>
