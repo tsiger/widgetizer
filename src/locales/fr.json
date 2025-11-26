@@ -306,8 +306,7 @@
   },
   "breadcrumb": {
     "edit": "Modifier",
-    "structure": "Structure",
-    "pageEditor": "Éditeur de Page"
+    "structure": "Structure"
   },
   "menusAdd": {
     "title": "Ajouter un menu",

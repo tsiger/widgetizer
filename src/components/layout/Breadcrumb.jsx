@@ -61,18 +61,6 @@ export default function Breadcrumb() {
         }
       }
 
-      // Page Editor
-      else if (path === "/page-editor") {
-        crumbs.push({ label: t("breadcrumb.pageEditor"), to: "/page-editor" });
-        const pageId = searchParams.get("pageId");
-        if (pageId) {
-          const page = pages?.[pageId];
-          if (page?.title) {
-            crumbs.push({ label: page.title });
-          }
-        }
-      }
-
       // Menus routes
       else if (path.startsWith("/menus")) {
         crumbs.push({ label: t("navigation.menus"), to: "/menus" });
