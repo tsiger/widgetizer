@@ -1,0 +1,26 @@
+{
+  "name": "Arch",
+  "version": "1.0.0",
+  "description": "A custom theme based on the Arch design system",
+  "author": "Widgetizer",
+  "settings": {
+    "global": {
+      "colors": [
+        {
+          "type": "color",
+          "id": "bg_primary",
+          "label": "Background Color",
+          "default": "#ffffff",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "text_primary",
+          "label": "Text Color",
+          "default": "#000000",
+          "outputAsCssVar": true
+        }
+      ]
+    }
+  }
+}

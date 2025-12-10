@@ -180,10 +180,10 @@ export async function exportProject(req, res) {
     await fs.ensureDir(outputImagesDir);
     await fs.ensureDir(outputVideosDir);
 
-    const rawThemeSettings = await readProjectThemeData(projectId);
+    const rawThemeSettings = await readProjectThemeData(projectSlug);
 
     // Fetch list of page data using the helper function
-    const pagesDataArray = await listProjectPagesData(projectId);
+    const pagesDataArray = await listProjectPagesData(projectSlug);
 
     // --- Generate sitemap.xml and robots.txt ---
     if (siteUrl) {
@@ -220,8 +220,8 @@ Sitemap: ${sitemapUrl}`;
     }
     // --- End of new SEO file generation ---
 
-    const headerData = await readGlobalWidgetData(projectId, "header");
-    const footerData = await readGlobalWidgetData(projectId, "footer");
+    const headerData = await readGlobalWidgetData(projectSlug, "header");
+    const footerData = await readGlobalWidgetData(projectSlug, "footer");
 
     // Handle case where no pages are found (except for theme files etc)
     if (pagesDataArray.length === 0) {

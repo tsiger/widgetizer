@@ -1,0 +1,1537 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Widgetizer - Podcast Player</title>
+    <link rel="stylesheet" href="theme.css" />
+  </head>
+  <body>
+    <!-- Announcement Bar Widget -->
+<style>
+  .widget-announcement-bar {
+    padding-block: var(--space-sm);
+    padding-inline: var(--space-lg);
+    background-color: var(--text-primary);
+    color: var(--bg-primary);
+    text-align: center;
+    position: relative;
+
+    & .announcement-bar-container {
+      max-width: var(--container-max-width);
+      margin-inline: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+    }
+
+    & .announcement-bar-text {
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-normal);
+      margin: 0;
+    }
+
+    & .announcement-bar-link {
+      color: var(--bg-primary);
+      text-decoration: underline;
+      font-weight: var(--font-weight-semibold);
+      transition: opacity 0.3s;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    & .announcement-bar-close {
+      position: absolute;
+      inset-inline-end: var(--space-md);
+      inset-block-start: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--bg-primary);
+      cursor: pointer;
+      padding: var(--space-xs);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s;
+
+      &:hover {
+        opacity: 0.7;
+      }
+
+      &:focus {
+        outline: var(--border-width-medium) solid var(--bg-primary);
+        outline-offset: 0.2rem; /* 2px */
+      }
+    }
+
+    & .announcement-bar-close-icon {
+      width: 1.6rem; /* 16px */
+      height: 1.6rem;
+      stroke: currentColor;
+      stroke-width: 0.2rem; /* 2px */
+    }
+
+    @media (min-width: 750px) {
+      & {
+        padding-block: var(--space-md);
+      }
+
+      & .announcement-bar-text {
+        font-size: var(--font-size-sm);
+      }
+    }
+  }
+
+  /* Hidden state */
+  .widget-announcement-bar.is-hidden {
+    display: none;
+  }
+</style>
+
+<section id="announcement-bar-1" class="widget-announcement-bar">
+  <div class="announcement-bar-container">
+    <p class="announcement-bar-text">
+      🎉 Limited Time Offer: Get 20% off all plans!
+      <a href="/pricing" class="announcement-bar-link">Shop Now</a>
+    </p>
+    <button type="button" class="announcement-bar-close" aria-label="Close announcement">
+      <svg class="announcement-bar-close-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const allAnnouncementBars = document.querySelectorAll(".widget-announcement-bar");
+
+    allAnnouncementBars.forEach((widgetElement) => {
+      const closeButton = widgetElement.querySelector(".announcement-bar-close");
+
+      if (!closeButton) return;
+
+      closeButton.addEventListener("click", () => {
+        widgetElement.classList.add("is-hidden");
+
+        // Optional: Store dismissal in localStorage so it stays hidden
+        const barId = widgetElement.id;
+        if (barId) {
+          localStorage.setItem(`announcement-bar-${barId}-dismissed`, "true");
+        }
+      });
+
+      // Optional: Check if previously dismissed
+      const barId = widgetElement.id;
+      if (barId) {
+        const isDismissed = localStorage.getItem(`announcement-bar-${barId}-dismissed`);
+        if (isDismissed === "true") {
+          widgetElement.classList.add("is-hidden");
+        }
+      }
+    });
+  });
+</script>
+    <!-- Header Widget -->
+<style>
+  .widget-site-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-md);
+    padding-inline: var(--space-md);
+    border-block-end: var(--border-width-thin) solid var(--border-light);
+
+    & .header-logo {
+      display: block;
+      text-decoration: none;
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      z-index: 1001;
+    }
+
+    & .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      z-index: 1001;
+    }
+
+    & .menu-toggle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 4.4rem; /* 44px */
+      height: 4.4rem;
+      padding: 0;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+
+      & .icon-menu,
+      & .icon-close {
+        width: 2.4rem; /* 24px */
+        height: 2.4rem;
+        display: block;
+      }
+
+      & .icon-close {
+        display: none;
+      }
+
+      &[aria-expanded="true"] {
+        & .icon-menu {
+          display: none;
+        }
+
+        & .icon-close {
+          display: block;
+        }
+      }
+    }
+
+    & .header-nav {
+      position: fixed;
+      inset-block-start: 0;
+      inset-inline-end: -32rem; /* -320px */
+      width: 32rem; /* 320px */
+      max-width: 85vw;
+      height: 100vh;
+      background-color: var(--bg-primary);
+      padding-block-start: var(--space-md);
+      padding-inline: var(--space-lg);
+      overflow-y: auto;
+      transition: inset-inline-end 0.3s ease-in-out;
+      z-index: 1000;
+
+      &.nav-open {
+        inset-inline-end: 0;
+      }
+    }
+
+    & .nav-close {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-block-end: var(--space-xl);
+      padding-block-end: var(--space-md);
+      border-block-end: var(--border-width-thin) solid var(--border-light);
+
+      & .nav-close-title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+      }
+
+      & .nav-close-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 4rem; /* 40px */
+        height: 4rem;
+        padding: 0;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+
+        & svg {
+          width: 2.4rem; /* 24px */
+          height: 2.4rem;
+        }
+      }
+    }
+
+    & .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    & .nav-item {
+      & > a,
+      & > button {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding-block: 1.4rem; /* 14px adjusted */
+        padding-inline: 0;
+        text-decoration: none;
+        color: var(--text-primary);
+        font-weight: var(--font-weight-normal);
+        font-size: var(--font-size-base);
+        background: transparent;
+        border: none;
+        text-align: start;
+        cursor: pointer;
+        transition: color 0.2s;
+
+        &:hover {
+          color: var(--text-muted);
+        }
+      }
+
+      & .submenu-toggle {
+        & .submenu-icon {
+          width: 2rem; /* 20px */
+          height: 2rem;
+          transition: transform 0.3s;
+          flex-shrink: 0;
+        }
+
+        &[aria-expanded="true"] .submenu-icon {
+          transform: rotate(90deg);
+        }
+      }
+    }
+
+    & .nav-submenu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+
+      &.submenu-open {
+        max-height: 1000px;
+      }
+
+      & .nav-item {
+        padding-inline-start: var(--space-lg);
+
+        & > a,
+        & > button {
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-normal);
+          padding-block: 1.2rem; /* 12px */
+        }
+      }
+
+      & .nav-submenu {
+        & .nav-item {
+          padding-inline-start: var(--space-lg);
+
+          & > a,
+          & > button {
+            font-size: var(--font-size-sm);
+          }
+        }
+      }
+    }
+
+    & .mobile-cta {
+      margin-block-start: var(--space-xl);
+      width: 100%;
+      text-align: center;
+    }
+
+    & .desktop-cta {
+      display: none;
+    }
+
+    @media (min-width: 990px) {
+      & {
+        padding-inline: var(--space-xl);
+      }
+
+      & .header-actions {
+        flex: 1;
+        justify-content: flex-end;
+      }
+
+      & .menu-toggle {
+        display: none;
+      }
+
+      & .nav-close {
+        display: none;
+      }
+
+      & .header-nav {
+        position: static;
+        width: auto;
+        height: auto;
+        display: flex;
+        align-items: center;
+        background-color: transparent;
+        padding: 0;
+        overflow: visible;
+        transform: none;
+        box-shadow: none;
+      }
+
+      & .nav-list {
+        display: flex;
+        gap: var(--space-xs);
+        align-items: center;
+      }
+
+      & .nav-item {
+        position: relative;
+
+        & > a,
+        & > button {
+          padding-block: 1rem; /* 10px */
+          padding-inline: var(--space-md);
+          font-size: var(--font-size-sm);
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+          }
+        }
+
+        & > .submenu-toggle {
+          & .submenu-icon {
+            width: 1.6rem; /* 16px */
+            height: 1.6rem;
+            margin-inline-start: var(--space-xs);
+            transform: rotate(90deg);
+          }
+        }
+
+        &:hover > .nav-submenu,
+        &:focus-within > .nav-submenu {
+          max-height: none;
+          display: block;
+        }
+      }
+
+      & .nav-submenu {
+        position: absolute;
+        inset-block-start: calc(100% - 0.4rem);
+        inset-inline-start: 0;
+        min-width: 22rem; /* 220px */
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-light);
+        display: none;
+        max-height: none;
+        overflow: visible;
+        padding-block: var(--space-xs);
+        padding-inline: 0;
+
+        & .nav-item {
+          padding: 0;
+
+          & > a,
+          & > button {
+            padding-block: 1.2rem; /* 12px */
+            padding-inline: var(--space-md);
+            font-size: var(--font-size-sm);
+            transition: background-color 0.2s;
+
+            &:hover {
+              background-color: var(--bg-secondary);
+            }
+          }
+
+          & > .submenu-toggle {
+            & .submenu-icon {
+              transform: rotate(0deg);
+            }
+          }
+        }
+
+        & .nav-submenu {
+          position: absolute;
+          inset-block-start: -0.8rem; /* -8px adjusted */
+          inset-inline-start: calc(100% - 0.4rem);
+          min-width: 22rem; /* 220px */
+          background-color: var(--bg-primary);
+          border: var(--border-width-thin) solid var(--border-light);
+          padding-block: var(--space-xs);
+          padding-inline: 0;
+          display: none;
+
+          & .nav-item {
+            padding: 0;
+          }
+        }
+
+        &:hover > .nav-submenu,
+        &:focus-within > .nav-submenu {
+          display: block;
+        }
+      }
+
+      & .mobile-cta {
+        display: none;
+      }
+
+      & .desktop-cta {
+        display: inline-block;
+        margin-inline-start: var(--space-md);
+      }
+    }
+  }
+</style>
+
+<header id="header" class="widget-site-header">
+  <a href="/" class="header-logo">Widgetizer</a>
+
+  <div class="header-actions">
+    <nav class="header-nav" id="main-navigation">
+      <div class="nav-close">
+        <span class="nav-close-title">Menu</span>
+        <button class="nav-close-btn" aria-label="Close navigation menu">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M18 6l-12 12" />
+            <path d="M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a class="submenu-toggle" href="#" aria-expanded="false">
+            Features
+            <svg
+              class="submenu-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M9 6l6 6l-6 6" />
+            </svg>
+          </a>
+          <ul class="nav-submenu">
+            <li class="nav-item"><a href="#feature-1">Feature One</a></li>
+            <li class="nav-item"><a href="#feature-2">Feature Two</a></li>
+            <li class="nav-item">
+              <a class="submenu-toggle" href="#" aria-expanded="false">
+                More Features
+                <svg
+                  class="submenu-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M9 6l6 6l-6 6" />
+                </svg>
+              </a>
+              <ul class="nav-submenu">
+                <li class="nav-item">
+                  <a href="#feature-3">Feature Three</a>
+                </li>
+                <li class="nav-item">
+                  <a href="#feature-4">Feature Four</a>
+                </li>
+                <li class="nav-item">
+                  <a href="#feature-5">Feature Five</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="submenu-toggle" href="#" aria-expanded="false">
+            Products
+            <svg
+              class="submenu-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M9 6l6 6l-6 6" />
+            </svg>
+          </a>
+          <ul class="nav-submenu">
+            <li class="nav-item"><a href="#product-1">Product One</a></li>
+            <li class="nav-item">
+              <a class="submenu-toggle" href="#" aria-expanded="false">
+                Categories
+                <svg
+                  class="submenu-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M9 6l6 6l-6 6" />
+                </svg>
+              </a>
+              <ul class="nav-submenu">
+                <li class="nav-item">
+                  <a href="#category-1">Category One</a>
+                </li>
+                <li class="nav-item">
+                  <a href="#category-2">Category Two</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item"><a href="#about">About</a></li>
+        <li class="nav-item"><a href="#pricing">Pricing</a></li>
+        <li class="nav-item">
+          <a class="submenu-toggle" href="#" aria-expanded="false">
+            Widgets
+            <svg
+              class="submenu-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M9 6l6 6l-6 6" />
+            </svg>
+          </a>
+          <ul class="nav-submenu">
+            <li class="nav-item"><a href="accordion.html">Accordion</a></li>
+            <li class="nav-item"><a href="backlog.html">Backlog</a></li>
+            <li class="nav-item"><a href="brands.html">Brands</a></li>
+            <li class="nav-item"><a href="card-grid.html">Card Grid</a></li>
+            <li class="nav-item"><a href="comparison-slider.html">Comparison Slider</a></li>
+            <li class="nav-item"><a href="comparison-table.html">Comparison Table</a></li>
+            <li class="nav-item"><a href="contact.html">Contact</a></li>
+            <li class="nav-item"><a href="events.html">Events</a></li>
+            <li class="nav-item"><a href="heroes.html">Heroes</a></li>
+            <li class="nav-item"><a href="image-hotspots.html">Image Hotspots</a></li>
+            <li class="nav-item"><a href="image-tabs.html">Image Tabs</a></li>
+            <li class="nav-item"><a href="image-text.html">Image Text</a></li>
+            <li class="nav-item"><a href="job-listings.html">Job Listings</a></li>
+            <li class="nav-item"><a href="mobile-app.html">Mobile App</a></li>
+            <li class="nav-item"><a href="overlap-layout.html">Overlap Layout</a></li>
+            <li class="nav-item"><a href="podcast.html">Podcast</a></li>
+            <li class="nav-item"><a href="pricing.html">Pricing</a></li>
+            <li class="nav-item"><a href="stats.html">Stats</a></li>
+            <li class="nav-item"><a href="tabs.html">Tabs</a></li>
+            <li class="nav-item"><a href="timeline.html">Timeline</a></li>
+            <li class="nav-item"><a href="youtube.html">YouTube</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><a href="#contact">Contact</a></li>
+      </ul>
+      <a href="/get-started" class="widget-button mobile-cta">Get Started</a>
+    </nav>
+
+    <a href="/get-started" class="widget-button desktop-cta">Get Started</a>
+
+    <button
+      class="menu-toggle"
+      aria-label="Toggle navigation menu"
+      aria-expanded="false"
+      aria-controls="main-navigation"
+    >
+      <svg
+        class="icon-menu"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M4 6l16 0" />
+        <path d="M4 12l16 0" />
+        <path d="M4 18l16 0" />
+      </svg>
+      <svg
+        class="icon-close"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M18 6l-12 12" />
+        <path d="M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+</header>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const widgetElement = document.getElementById("header");
+    if (!widgetElement) return;
+
+    const menuToggle = widgetElement.querySelector(".menu-toggle");
+    const navCloseBtn = widgetElement.querySelector(".nav-close-btn");
+    const headerNav = widgetElement.querySelector(".header-nav");
+    const submenuToggles = widgetElement.querySelectorAll(".submenu-toggle");
+
+    // Function to open mobile menu
+    const openMobileMenu = () => {
+      menuToggle.setAttribute("aria-expanded", "true");
+      headerNav.classList.add("nav-open");
+      document.body.style.overflow = "hidden";
+
+      // Focus the close button when menu opens
+      setTimeout(() => {
+        if (navCloseBtn) {
+          navCloseBtn.focus();
+        }
+      }, 100);
+    };
+
+    // Function to close mobile menu
+    const closeMobileMenu = () => {
+      menuToggle.setAttribute("aria-expanded", "false");
+      headerNav.classList.remove("nav-open");
+      document.body.style.overflow = "";
+    };
+
+    // Focus trap for mobile menu
+    const trapFocus = (e) => {
+      if (window.innerWidth >= 990) return;
+      if (!headerNav.classList.contains("nav-open")) return;
+
+      const focusableElements = headerNav.querySelectorAll(
+        'button:not([disabled]), a[href]:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (e.key === "Tab") {
+        if (e.shiftKey) {
+          // Shift + Tab
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          // Tab
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener("keydown", trapFocus);
+
+    // Mobile menu toggle
+    if (menuToggle) {
+      menuToggle.addEventListener("click", () => {
+        const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
+        if (isExpanded) {
+          closeMobileMenu();
+        } else {
+          openMobileMenu();
+        }
+      });
+    }
+
+    // Close button in mobile menu
+    if (navCloseBtn) {
+      navCloseBtn.addEventListener("click", closeMobileMenu);
+    }
+
+    // Function to open a submenu
+    const openSubmenu = (toggle) => {
+      const submenu = toggle.nextElementSibling;
+      toggle.setAttribute("aria-expanded", "true");
+      if (submenu) {
+        submenu.classList.add("submenu-open");
+      }
+    };
+
+    // Function to close a submenu
+    const closeSubmenu = (toggle) => {
+      const submenu = toggle.nextElementSibling;
+      toggle.setAttribute("aria-expanded", "false");
+      if (submenu) {
+        submenu.classList.remove("submenu-open");
+      }
+    };
+
+    // Function to close sibling submenus
+    const closeSiblingSubmenus = (toggle) => {
+      const parentItem = toggle.parentElement;
+      const parentList = parentItem.parentElement;
+      const siblingItems = parentList.querySelectorAll(":scope > .nav-item");
+
+      siblingItems.forEach((item) => {
+        if (item !== parentItem) {
+          const siblingToggle = item.querySelector(":scope > .submenu-toggle");
+          if (siblingToggle) {
+            closeSubmenu(siblingToggle);
+          }
+        }
+      });
+    };
+
+    // Submenu toggles (mobile) - Click handler
+    submenuToggles.forEach((toggle) => {
+      toggle.addEventListener("click", (e) => {
+        e.preventDefault();
+        const isExpanded = toggle.getAttribute("aria-expanded") === "true";
+
+        // Close other submenus at the same level
+        closeSiblingSubmenus(toggle);
+
+        // Toggle current submenu
+        if (isExpanded) {
+          closeSubmenu(toggle);
+        } else {
+          openSubmenu(toggle);
+        }
+      });
+
+      // Keyboard navigation - Focus handler for mobile menu
+      toggle.addEventListener("focus", () => {
+        if (window.innerWidth < 990) {
+          // Close sibling submenus
+          closeSiblingSubmenus(toggle);
+          // Open current submenu
+          openSubmenu(toggle);
+        }
+      });
+    });
+
+    // Close submenu when focus leaves the entire submenu branch
+    const navItems = widgetElement.querySelectorAll(".nav-item");
+    navItems.forEach((item) => {
+      item.addEventListener("focusout", (e) => {
+        if (window.innerWidth < 990) {
+          // Check if the new focus target is outside this nav item
+          setTimeout(() => {
+            if (!item.contains(document.activeElement)) {
+              const toggle = item.querySelector(":scope > .submenu-toggle");
+              if (toggle) {
+                closeSubmenu(toggle);
+              }
+            }
+          }, 0);
+        }
+      });
+    });
+
+    // Keyboard navigation
+    widgetElement.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        // Close mobile menu
+        if (headerNav.classList.contains("nav-open")) {
+          closeMobileMenu();
+          menuToggle.focus();
+        }
+
+        // Close open submenus
+        submenuToggles.forEach((toggle) => {
+          const submenu = toggle.nextElementSibling;
+          if (submenu && submenu.classList.contains("submenu-open")) {
+            toggle.setAttribute("aria-expanded", "false");
+            submenu.classList.remove("submenu-open");
+            toggle.focus();
+          }
+        });
+      }
+    });
+
+    // Close mobile menu when clicking outside (on desktop breakpoint)
+    document.addEventListener("click", (e) => {
+      if (window.innerWidth >= 990) return;
+
+      if (!widgetElement.contains(e.target) && headerNav.classList.contains("nav-open")) {
+        closeMobileMenu();
+      }
+    });
+
+    // Handle window resize
+    window.addEventListener("resize", () => {
+      if (window.innerWidth >= 990) {
+        // Reset mobile menu state on desktop
+        closeMobileMenu();
+
+        // Reset submenu states
+        submenuToggles.forEach((toggle) => {
+          toggle.setAttribute("aria-expanded", "false");
+          const submenu = toggle.nextElementSibling;
+          if (submenu) {
+            submenu.classList.remove("submenu-open");
+          }
+        });
+      }
+    });
+  });
+</script>
+
+    <main>
+      <section class="widget">
+        <div class="widget-container">
+          <div class="widget-header">
+            <h1 class="widget-title">Podcast Player Widget</h1>
+            <p class="widget-description">
+              Feature-rich audio player for podcasts with playback controls, progress tracking, and
+              speed adjustment.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Audio Player Widget -->
+<style>
+  .widget-audio-player {
+    & .audio-player-wrapper {
+      background-color: var(--bg-primary);
+      border: var(--border-width-thin) solid var(--border-light);
+      padding: var(--space-2xl);
+    }
+
+    & .audio-player-episode {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+      margin-block-end: var(--space-2xl);
+    }
+
+    & .audio-player-artwork {
+      width: 100%;
+      max-width: 30rem;
+      aspect-ratio: 1;
+      margin-inline: auto;
+    }
+
+    & .audio-player-artwork-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border: var(--border-width-thin) solid var(--border-light);
+    }
+
+    & .audio-player-info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    & .audio-player-episode-number {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    & .audio-player-episode-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      line-height: var(--line-height-tight);
+      margin-block-end: var(--space-xs);
+    }
+
+    & .audio-player-episode-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      font-size: var(--font-size-sm);
+      color: var(--text-muted);
+      margin-block-end: var(--space-sm);
+    }
+
+    & .audio-player-episode-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    & .audio-player-episode-meta-icon {
+      width: 1.6rem;
+      height: 1.6rem;
+      stroke: currentColor;
+      stroke-width: var(--border-width-medium);
+    }
+
+    & .audio-player-episode-description {
+      font-size: var(--font-size-base);
+      line-height: var(--line-height-relaxed);
+      color: var(--text-muted);
+    }
+
+    & .audio-player-controls {
+      border-block-start: var(--border-width-thin) solid var(--border-light);
+      padding-block-start: var(--space-2xl);
+    }
+
+    & .audio-player-progress {
+      margin-block-end: var(--space-xl);
+    }
+
+    & .audio-player-progress-bar {
+      width: 100%;
+      height: 0.8rem;
+      background-color: var(--border-light);
+      cursor: pointer;
+      position: relative;
+      margin-block-end: var(--space-xs);
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: var(--border-medium);
+      }
+    }
+
+    & .audio-player-progress-fill {
+      height: 100%;
+      background-color: var(--text-primary);
+      width: 0%;
+      transition: width 0.1s linear;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset-inline-end: -0.8rem;
+        inset-block-start: 50%;
+        transform: translateY(-50%);
+        width: 1.6rem;
+        height: 1.6rem;
+        background-color: var(--text-primary);
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+    }
+
+    & .audio-player-progress-bar:hover .audio-player-progress-fill::after {
+      opacity: 1;
+    }
+
+    & .audio-player-progress-time {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--font-size-sm);
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    & .audio-player-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-block-end: var(--space-xl);
+    }
+
+    & .audio-player-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-xs);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s;
+
+      &:hover {
+        opacity: 0.7;
+      }
+
+      &:focus {
+        outline: var(--border-width-medium) solid var(--text-primary);
+        outline-offset: var(--space-xs);
+      }
+    }
+
+    & .audio-player-button-icon {
+      width: 3.2rem;
+      height: 3.2rem;
+      stroke: var(--text-primary);
+      stroke-width: var(--border-width-medium);
+    }
+
+    & .audio-player-button-play {
+      background-color: var(--text-primary);
+      border-radius: 50%;
+      padding: var(--space-md);
+
+      &:hover {
+        opacity: 1;
+        background-color: var(--text-muted);
+      }
+    }
+
+    & .audio-player-button-play .audio-player-button-icon {
+      width: 4.8rem;
+      height: 4.8rem;
+      stroke: var(--bg-primary);
+    }
+
+    & .audio-player-secondary-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    & .audio-player-volume {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      flex: 1;
+      max-width: 15rem;
+    }
+
+    & .audio-player-volume-icon {
+      width: 2rem;
+      height: 2rem;
+      stroke: var(--text-muted);
+      stroke-width: var(--border-width-medium);
+      flex-shrink: 0;
+    }
+
+    & .audio-player-volume-slider {
+      flex: 1;
+      height: 0.8rem;
+      background-color: var(--border-light);
+      position: relative;
+      cursor: pointer;
+    }
+
+    & .audio-player-volume-fill {
+      height: 100%;
+      background-color: var(--text-muted);
+      width: 100%;
+    }
+
+    & .audio-player-speed {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    & .audio-player-speed-button {
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      font-family: inherit;
+      background-color: var(--bg-primary);
+      border: var(--border-width-thin) solid var(--border-light);
+      cursor: pointer;
+      transition: all 0.3s;
+
+      &:hover {
+        background-color: var(--bg-secondary);
+        border-color: var(--border-medium);
+      }
+
+      &:focus {
+        outline: var(--border-width-medium) solid var(--text-primary);
+        outline-offset: var(--space-xs);
+      }
+    }
+
+    @media (min-width: 750px) {
+      & .audio-player-wrapper {
+        padding: var(--space-3xl);
+      }
+
+      & .audio-player-episode {
+        grid-template-columns: 25rem 1fr;
+        gap: var(--space-xl);
+      }
+
+      & .audio-player-artwork {
+        max-width: 25rem;
+        margin-inline: 0;
+      }
+
+      & .audio-player-episode-title {
+        font-size: var(--font-size-2xl);
+      }
+    }
+
+    @media (min-width: 990px) {
+      & .audio-player-episode {
+        grid-template-columns: 28rem 1fr;
+      }
+
+      & .audio-player-artwork {
+        max-width: 28rem;
+      }
+    }
+  }
+</style>
+
+<section id="audio-player-1" class="widget-audio-player widget has-bg-color" style="--widget-bg-color: var(--bg-secondary)">
+  <div class="widget-container">
+    <div class="widget-header">
+      <span class="widget-eyebrow">Latest Episode</span>
+      <h2 class="widget-title">The Design Podcast</h2>
+    </div>
+
+    <div class="widget-content">
+      <div class="audio-player-wrapper">
+        <!-- Episode Information -->
+        <div class="audio-player-episode">
+          <!-- Album Art -->
+          <div class="audio-player-artwork">
+            <img
+              src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=600&h=600&fit=crop"
+              alt="The Design Podcast Episode 24 cover art"
+              class="audio-player-artwork-image"
+            />
+          </div>
+
+          <!-- Episode Info -->
+          <div class="audio-player-info">
+            <span class="audio-player-episode-number">Episode 24</span>
+            <h3 class="audio-player-episode-title">Building Design Systems That Scale</h3>
+
+            <div class="audio-player-episode-meta">
+              <div class="audio-player-episode-meta-item">
+                <svg class="audio-player-episode-meta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>42:18</span>
+              </div>
+              <div class="audio-player-episode-meta-item">
+                <svg class="audio-player-episode-meta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                <span>January 15, 2024</span>
+              </div>
+            </div>
+
+            <p class="audio-player-episode-description">
+              In this episode, we dive deep into the world of design systems with Sarah Chen, Head
+              of Design at Stripe. Learn how to build scalable design systems that grow with your
+              organization, from documentation strategies to component architecture.
+            </p>
+          </div>
+        </div>
+
+        <!-- Audio Controls -->
+        <div class="audio-player-controls">
+          <!-- Progress Bar -->
+          <div class="audio-player-progress">
+            <div
+              class="audio-player-progress-bar"
+              role="slider"
+              aria-label="Seek"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+              tabindex="0"
+            >
+              <div class="audio-player-progress-fill"></div>
+            </div>
+            <div class="audio-player-progress-time">
+              <span class="audio-player-current-time">0:00</span>
+              <span class="audio-player-duration">42:18</span>
+            </div>
+          </div>
+
+          <!-- Main Controls -->
+          <div class="audio-player-buttons">
+            <button class="audio-player-button" aria-label="Rewind 15 seconds" data-action="rewind">
+              <svg class="audio-player-button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+                <text x="12" y="16" font-size="8" text-anchor="middle" fill="currentColor" font-weight="600">15</text>
+              </svg>
+            </button>
+
+            <button class="audio-player-button audio-player-button-play" aria-label="Play" data-action="play">
+              <svg class="audio-player-button-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3" stroke="none" />
+              </svg>
+            </button>
+
+            <button class="audio-player-button" aria-label="Forward 15 seconds" data-action="forward">
+              <svg class="audio-player-button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                <path d="M21 3v5h-5" />
+                <text x="12" y="16" font-size="8" text-anchor="middle" fill="currentColor" font-weight="600">15</text>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Secondary Controls -->
+          <div class="audio-player-secondary-controls">
+            <div class="audio-player-volume">
+              <svg class="audio-player-volume-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+              </svg>
+              <div
+                class="audio-player-volume-slider"
+                role="slider"
+                aria-label="Volume"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="100"
+                tabindex="0"
+              >
+                <div class="audio-player-volume-fill"></div>
+              </div>
+            </div>
+
+            <div class="audio-player-speed">
+              <button class="audio-player-speed-button" aria-label="Playback speed: 1x" data-action="speed">
+                1x
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Audio Element -->
+  <audio class="audio-player-audio-element" preload="metadata">
+    <source src="groovy.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+</section>
+
+<script>
+(function() {
+  const allAudioPlayers = document.querySelectorAll(".widget-audio-player");
+
+  allAudioPlayers.forEach((widget) => {
+    if (widget.dataset.initialized) return;
+    widget.dataset.initialized = "true";
+
+    const audio = widget.querySelector(".audio-player-audio-element");
+    const playButton = widget.querySelector('[data-action="play"]');
+    const rewindButton = widget.querySelector('[data-action="rewind"]');
+    const forwardButton = widget.querySelector('[data-action="forward"]');
+    const speedButton = widget.querySelector('[data-action="speed"]');
+    const progressBar = widget.querySelector(".audio-player-progress-bar");
+    const progressFill = widget.querySelector(".audio-player-progress-fill");
+    const currentTimeEl = widget.querySelector(".audio-player-current-time");
+    const durationEl = widget.querySelector(".audio-player-duration");
+    const volumeSlider = widget.querySelector(".audio-player-volume-slider");
+    const volumeFill = widget.querySelector(".audio-player-volume-fill");
+
+    let isPlaying = false;
+    let currentSpeed = 1;
+    const speeds = [1, 1.25, 1.5, 1.75, 2];
+
+    // Format time as MM:SS
+    const formatTime = (seconds) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, "0")}`;
+    };
+
+    // Play/Pause
+    playButton.addEventListener("click", function() {
+      if (isPlaying) {
+        audio.pause();
+        this.innerHTML = `
+          <svg class="audio-player-button-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <polygon points="5 3 19 12 5 21 5 3" stroke="none"/>
+          </svg>
+        `;
+        this.setAttribute("aria-label", "Play");
+      } else {
+        audio.play();
+        this.innerHTML = `
+          <svg class="audio-player-button-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <rect x="6" y="4" width="4" height="16" stroke="none"/>
+            <rect x="14" y="4" width="4" height="16" stroke="none"/>
+          </svg>
+        `;
+        this.setAttribute("aria-label", "Pause");
+      }
+      isPlaying = !isPlaying;
+    });
+
+    // Rewind 15 seconds
+    rewindButton.addEventListener("click", () => {
+      audio.currentTime = Math.max(0, audio.currentTime - 15);
+    });
+
+    // Forward 15 seconds
+    forwardButton.addEventListener("click", () => {
+      audio.currentTime = Math.min(audio.duration, audio.currentTime + 15);
+    });
+
+    // Speed control
+    speedButton.addEventListener("click", function() {
+      const currentIndex = speeds.indexOf(currentSpeed);
+      currentSpeed = speeds[(currentIndex + 1) % speeds.length];
+      audio.playbackRate = currentSpeed;
+      this.textContent = `${currentSpeed}x`;
+    });
+
+    // Update progress bar
+    audio.addEventListener("timeupdate", () => {
+      const progress = (audio.currentTime / audio.duration) * 100;
+      progressFill.style.width = `${progress}%`;
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+      progressBar.setAttribute("aria-valuenow", progress);
+    });
+
+    // Update duration when metadata loads
+    audio.addEventListener("loadedmetadata", () => {
+      durationEl.textContent = formatTime(audio.duration);
+    });
+
+    // Seek functionality
+    progressBar.addEventListener("click", (e) => {
+      const rect = progressBar.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = pos * audio.duration;
+    });
+
+    // Volume control
+    volumeSlider.addEventListener("click", (e) => {
+      const rect = volumeSlider.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      audio.volume = Math.max(0, Math.min(1, pos));
+      volumeFill.style.width = `${pos * 100}%`;
+      volumeSlider.setAttribute("aria-valuenow", pos * 100);
+    });
+
+    // Keyboard controls for progress bar
+    progressBar.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        audio.currentTime = Math.max(0, audio.currentTime - 5);
+      } else if (e.key === "ArrowRight") {
+        audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
+      }
+    });
+
+    // Keyboard controls for volume
+    volumeSlider.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        audio.volume = Math.max(0, audio.volume - 0.1);
+        volumeFill.style.width = `${audio.volume * 100}%`;
+      } else if (e.key === "ArrowRight") {
+        audio.volume = Math.min(1, audio.volume + 0.1);
+        volumeFill.style.width = `${audio.volume * 100}%`;
+      }
+    });
+  });
+})();
+</script>
+    </main>
+
+    <!-- Footer Widget -->
+<style>
+  .widget-footer {
+    padding-block: var(--space-3xl);
+    padding-inline: var(--space-xl);
+    border-block-start: var(--border-width-thin) solid var(--border-light);
+    background-color: var(--bg-secondary);
+
+    & .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-lg);
+    }
+
+    & .footer-copyright {
+      color: var(--text-muted);
+      font-size: var(--font-size-sm);
+    }
+
+    & .social-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      gap: var(--space-lg);
+    }
+
+    & .social-item {
+      display: inline-block;
+
+      & a {
+        text-decoration: none;
+        color: var(--text-body);
+        font-weight: var(--font-weight-semibold);
+        padding: var(--space-xs);
+        display: block;
+        transition: color 0.2s;
+
+        &:hover {
+          color: var(--text-primary);
+        }
+      }
+    }
+  }
+</style>
+
+<footer id="footer" class="widget-footer">
+  <div class="footer-content">
+    <p class="footer-copyright">&copy; 2025 Widgetizer. All rights reserved.</p>
+    <ul class="social-list">
+      <li class="social-item">
+        <a href="https://facebook.com" aria-label="Facebook">FB</a>
+      </li>
+      <li class="social-item">
+        <a href="https://twitter.com" aria-label="Twitter">TW</a>
+      </li>
+      <li class="social-item">
+        <a href="https://instagram.com" aria-label="Instagram">IG</a>
+      </li>
+      <li class="social-item">
+        <a href="https://linkedin.com" aria-label="LinkedIn">LI</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+  </body>
+</html>
