@@ -1,0 +1,30 @@
+{
+  "type": "gallery",
+  "displayName": "Gallery",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Project Gallery"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "displayName": "Image",
+      "settings": [
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption"
+        }
+      ]
+    }
+  ]
+}
