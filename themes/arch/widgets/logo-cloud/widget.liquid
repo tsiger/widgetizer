@@ -1,0 +1,108 @@
+<section
+  id="{{ widget.id }}"
+  class="widget-logo-cloud widget"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="logo-cloud"
+>
+  <style>
+    #{{ widget.id }} {
+      & .logo-cloud-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-lg);
+        align-items: center;
+        justify-items: center;
+      }
+
+      & .logo-cloud-item {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-md);
+      }
+
+      & .logo-cloud-image {
+        max-width: 12rem;
+        height: auto;
+        max-height: 4.8rem;
+        width: auto;
+        filter: grayscale(100%);
+        opacity: 0.6;
+        transition: opacity 0.3s, filter 0.3s;
+        display: block;
+
+        &:hover {
+          opacity: 1;
+          filter: grayscale(0%);
+        }
+      }
+
+      & .logo-cloud-link {
+        display: block;
+      }
+
+      @media (min-width: 750px) {
+        & .logo-cloud-list {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        & .logo-cloud-image {
+          max-width: 14rem;
+          max-height: 5.6rem;
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .logo-cloud-list {
+          grid-template-columns: repeat(6, 1fr);
+        }
+
+        & .logo-cloud-image {
+          max-width: 16rem;
+          max-height: 6.4rem;
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <ul class="logo-cloud-list">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <li class="logo-cloud-item" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+            {% if block.settings.link.href != blank %}
+              <a href="{{ block.settings.link.href }}" class="logo-cloud-link" {% if block.settings.link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+                {% if block.settings.image != blank %}
+                  {{ block.settings.image | image: 'small', 'logo-cloud-image', block.settings.name }}
+                {% endif %}
+              </a>
+            {% else %}
+              {% if block.settings.image != blank %}
+                {{ block.settings.image | image: 'small', 'logo-cloud-image', block.settings.name }}
+              {% endif %}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>

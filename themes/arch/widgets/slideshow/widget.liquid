@@ -1,0 +1,247 @@
+<section
+  id="{{ widget.id }}"
+  class="widget-slideshow widget color-scheme-dark"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="slideshow"
+>
+  <style>
+    #{{ widget.id }} {
+      overflow: hidden;
+      background-color: var(--color-black);
+      /* Reset default widget spacing for full-bleed */
+      margin-block: 0;
+      padding-inline: 0;
+
+      {% unless widget.settings.fullwidth %}
+      max-width: var(--container-max-width);
+      margin-inline: auto;
+      {% endunless %}
+
+      & .slideshow-track {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      & .slideshow-slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.8s ease-in-out;
+
+        &.is-active {
+          opacity: 1;
+          z-index: 1;
+          position: relative;
+        }
+
+        /* Since each slide IS a .widget, reset its margins */
+        &.widget {
+          margin-block: 0;
+          padding-inline: 0;
+        }
+      }
+
+      /* Navigation */
+      & .slideshow-nav {
+        position: absolute;
+        inset-block-start: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        background-color: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: var(--color-white);
+        width: 5rem;
+        height: 5rem;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        & svg {
+          width: 2.4rem;
+          height: 2.4rem;
+        }
+      }
+
+      & .slideshow-prev {
+        inset-inline-start: var(--space-lg);
+      }
+
+      & .slideshow-next {
+        inset-inline-end: var(--space-lg);
+      }
+
+      /* Pagination */
+      & .slideshow-pagination {
+        position: absolute;
+        inset-block-end: var(--space-xl);
+        inset-inline: 0;
+        z-index: 10;
+        display: flex;
+        justify-content: center;
+        gap: var(--space-sm);
+      }
+
+      & .slideshow-dot {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background-color: var(--color-white);
+        opacity: 0.5;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.3s, transform 0.3s;
+        padding: 0;
+
+        &:hover,
+        &.is-active {
+          opacity: 1;
+        }
+
+        &.is-active {
+          transform: scale(1.2);
+        }
+      }
+
+      @media (max-width: 749px) {
+        & .slideshow-nav {
+          width: 4rem;
+          height: 4rem;
+
+          & svg {
+            width: 2rem;
+            height: 2rem;
+          }
+        }
+      }
+    }
+  </style>
+
+  <div class="slideshow-track">
+    {% for blockId in widget.blocksOrder %}
+      {% assign block = widget.blocks[blockId] %}
+      {% assign isFirst = forloop.first %}
+      <div
+        class="slideshow-slide widget {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %} {% if block.settings.image != blank %}has-bg-image has-overlay overlay-medium{% endif %} color-scheme-dark{% if isFirst %} is-active{% endif %}"
+        {% if block.settings.image != blank %}style="--widget-bg-image: url('{{ block.settings.image | image: 'path', 'large' }}');"{% endif %}
+        data-block-id="{{ blockId }}"
+        {{ block.shopify_attributes }}
+      >
+        <div class="widget-container">
+          <div class="widget-content widget-content-lg widget-content-align-center">
+            {% if block.settings.eyebrow != blank %}
+              <span class="widget-eyebrow">{{ block.settings.eyebrow }}</span>
+            {% endif %}
+            {% if block.settings.headline != blank %}
+              <h2 class="widget-headline">{{ block.settings.headline }}</h2>
+            {% endif %}
+            {% if block.settings.description != blank %}
+              <p class="widget-description">{{ block.settings.description }}</p>
+            {% endif %}
+            {% if block.settings.button_link.text != blank %}
+              <div class="widget-actions">
+                <a href="{{ block.settings.button_link.href }}" class="widget-button widget-button-primary" {% if block.settings.button_link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+                  {{ block.settings.button_link.text }}
+                </a>
+                {% if block.settings.secondary_link.text != blank %}
+                  <a href="{{ block.settings.secondary_link.href }}" class="widget-button widget-button-secondary" {% if block.settings.secondary_link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+                    {{ block.settings.secondary_link.text }}
+                  </a>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    <!-- Navigation -->
+    <button class="slideshow-nav slideshow-prev" aria-label="Previous slide">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <button class="slideshow-nav slideshow-next" aria-label="Next slide">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+
+    <!-- Pagination -->
+    <div class="slideshow-pagination">
+      {% for blockId in widget.blocksOrder %}
+        <button class="slideshow-dot{% if forloop.first %} is-active{% endif %}" data-index="{{ forloop.index0 }}" aria-label="Go to slide {{ forloop.index }}"></button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const allWidgets = document.querySelectorAll('#{{ widget.id }}');
+
+      allWidgets.forEach((widgetElement) => {
+        if (widgetElement.dataset.initialized) return;
+        widgetElement.dataset.initialized = 'true';
+
+        const slides = widgetElement.querySelectorAll('.slideshow-slide');
+        const dots = widgetElement.querySelectorAll('.slideshow-dot');
+        const prevBtn = widgetElement.querySelector('.slideshow-prev');
+        const nextBtn = widgetElement.querySelector('.slideshow-next');
+        let currentIndex = 0;
+        let autoplayInterval;
+        const autoplayDelay = {{ widget.settings.autoplay_speed | default: 5000 }};
+
+        const goToSlide = (index) => {
+          slides[currentIndex].classList.remove('is-active');
+          dots[currentIndex].classList.remove('is-active');
+          currentIndex = (index + slides.length) % slides.length;
+          slides[currentIndex].classList.add('is-active');
+          dots[currentIndex].classList.add('is-active');
+        };
+
+        const nextSlide = () => goToSlide(currentIndex + 1);
+        const prevSlide = () => goToSlide(currentIndex - 1);
+
+        const startAutoplay = () => {
+          {% if widget.settings.autoplay %}
+          autoplayInterval = setInterval(nextSlide, autoplayDelay);
+          {% endif %}
+        };
+
+        const stopAutoplay = () => {
+          clearInterval(autoplayInterval);
+        };
+
+        prevBtn.addEventListener('click', () => {
+          stopAutoplay();
+          prevSlide();
+          startAutoplay();
+        });
+
+        nextBtn.addEventListener('click', () => {
+          stopAutoplay();
+          nextSlide();
+          startAutoplay();
+        });
+
+        dots.forEach((dot, index) => {
+          dot.addEventListener('click', () => {
+            stopAutoplay();
+            goToSlide(index);
+            startAutoplay();
+          });
+        });
+
+        startAutoplay();
+      });
+    })();
+  </script>
+</section>

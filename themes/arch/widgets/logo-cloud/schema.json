@@ -1,0 +1,47 @@
+{
+  "type": "logo-cloud",
+  "displayName": "Logo Cloud",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Trusted By"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join 500+ Companies Already Using Our Platform"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "displayName": "Logo",
+      "settings": [
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Logo Image"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Company Name",
+          "default": "Company"
+        },
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Link (optional)"
+        }
+      ]
+    }
+  ]
+}
