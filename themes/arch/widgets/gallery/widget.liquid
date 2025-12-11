@@ -132,9 +132,17 @@
   </style>
 
   <div class="widget-container">
-    {% if widget.settings.title != blank %}
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
-        <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description">{{ widget.settings.description }}</p>
+        {% endif %}
       </div>
     {% endif %}
 

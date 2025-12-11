@@ -1,0 +1,49 @@
+{
+  "type": "feature-benefit-list",
+  "displayName": "Feature Benefit List",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Key Benefits"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Discover how our platform can transform your business."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "displayName": "Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Category / Subtitle",
+          "default": "Feature"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Feature Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Describe the benefit or feature here."
+        }
+      ]
+    }
+  ]
+}

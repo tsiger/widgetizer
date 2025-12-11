@@ -4,6 +4,11 @@
   "settings": [
     {
       "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text"
+    },
+    {
+      "type": "text",
       "id": "title",
       "label": "Heading",
       "default": "Masonry Gallery"
