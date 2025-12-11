@@ -82,6 +82,7 @@
       "themeLabel": "Theme",
       "themeRequired": "Bitte wählen Sie ein Theme aus",
       "themeHelp": "Das Theme bestimmt das Design und die verfügbaren Widgets für Ihre Website.",
+      "selectTheme": "Theme auswählen",
       "siteUrlLabel": "Website-URL",
       "siteUrlHelp": "Die endgültige URL, unter der Ihre Website gehostet wird. Wird für die Sitemap-Erstellung verwendet.",
       "loadingThemes": "Themes werden geladen..."

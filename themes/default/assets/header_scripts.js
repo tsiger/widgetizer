@@ -1,1 +1,0 @@
-// Theme header scripts

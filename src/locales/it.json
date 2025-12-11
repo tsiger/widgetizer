@@ -82,6 +82,7 @@
       "themeLabel": "Tema",
       "themeRequired": "Seleziona un tema",
       "themeHelp": "Il tema determina lo stile e i widget disponibili per il tuo sito.",
+      "selectTheme": "Seleziona un tema",
       "siteUrlLabel": "URL del Sito",
       "siteUrlHelp": "L'URL finale dove sarà ospitato il tuo sito. Utilizzato per la generazione della sitemap.",
       "loadingThemes": "Caricamento temi..."

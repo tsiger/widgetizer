@@ -1,1 +1,0 @@
-// Theme footer scripts
