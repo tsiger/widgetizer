@@ -1,0 +1,20 @@
+<div class="core-spacer" data-widget-id="{{ widget.id }}" data-widget-type="core-spacer">
+  <style>
+    #{{ widget.id }} {
+      height: {{ widget.settings.height }}px;
+      display: block;
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      #{{ widget.id }} {
+        height: {{ widget.settings.mobileHeight }}px;
+        {% if widget.settings.showOnMobile == false %}
+        display: none;
+        {% endif %}
+      }
+    }
+  </style>
+
+  <div id="{{ widget.id }}" class="spacer-content" aria-hidden="true"></div>
+</div>

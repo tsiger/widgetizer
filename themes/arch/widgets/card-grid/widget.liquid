@@ -1,0 +1,106 @@
+<section
+  id="{{ widget.id }}"
+  class="widget-card-grid widget"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="card-grid"
+>
+  <style>
+    #{{ widget.id }} {
+      & .card-grid-items {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+
+      & .widget-card {
+        display: flex;
+        flex-direction: column;
+      }
+
+      & .widget-card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      & .widget-card-footer {
+        margin-block-start: auto;
+      }
+
+      @media (min-width: 750px) {
+        & .card-grid-items {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .card-grid-items {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      @media (min-width: 1200px) {
+        & .card-grid-items {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description">
+            {{ widget.settings.description }}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="card-grid-items">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <article class="widget-card" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+            {% if block.settings.image != blank %}
+              {% if block.settings.image != blank %}
+                {{ block.settings.image | image: 'medium', 'widget-card-image' }}
+              {% endif %}
+            {% endif %}
+            <div class="widget-card-content">
+              {% if block.settings.subtitle != blank %}
+                <span class="widget-card-subtitle">{{ block.settings.subtitle }}</span>
+              {% endif %}
+              {% if block.settings.title != blank %}
+                <h3 class="widget-card-title">{{ block.settings.title }}</h3>
+              {% endif %}
+              {% if block.settings.description != blank %}
+                <p class="widget-card-description">
+                  {{ block.settings.description }}
+                </p>
+              {% endif %}
+              {% if block.settings.button_link != blank %}
+                <div class="widget-card-footer">
+                  <a
+                    href="{{ block.settings.button_link.href }}"
+                    class="widget-button"
+                    target="{{ block.settings.button_link.target | default: '_self' }}"
+                  >
+                    {{- block.settings.button_link.text -}}
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

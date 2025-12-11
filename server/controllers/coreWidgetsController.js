@@ -1,7 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
 import { CORE_WIDGETS_DIR } from "../config.js";
-import { extractWidgetSchema } from "../utils/widgetSchemaExtractor.js";
 
 /**
  * Get all available core widgets
@@ -14,26 +13,21 @@ export async function getCoreWidgets() {
       return [];
     }
 
-    // Read all widget files
-    const widgetFiles = await fs.readdir(CORE_WIDGETS_DIR);
-    const liquidFiles = widgetFiles.filter((file) => file.endsWith(".liquid"));
+    // Read all widget folders
+    const entries = await fs.readdir(CORE_WIDGETS_DIR, { withFileTypes: true });
+    const widgetFolders = entries.filter((entry) => entry.isDirectory());
 
-    // Process each widget to extract its schema
+    // Process each widget folder to read its schema.json
     const widgetSchemas = await Promise.all(
-      liquidFiles.map(async (filename) => {
+      widgetFolders.map(async (folder) => {
         try {
-          const filePath = path.join(CORE_WIDGETS_DIR, filename);
-          const content = await fs.readFile(filePath, "utf8");
-
-          // Extract widget schema using HTML parser
-          const schema = extractWidgetSchema(content);
-          if (schema) {
-            return schema;
-          }
+          const schemaPath = path.join(CORE_WIDGETS_DIR, folder.name, "schema.json");
+          const content = await fs.readFile(schemaPath, "utf8");
+          return JSON.parse(content);
         } catch (error) {
-          console.error(`Error loading schema for core widget ${filename}:`, error);
+          console.error(`Error loading schema for core widget ${folder.name}:`, error);
+          return null;
         }
-        return null;
       }),
     );
 
@@ -50,13 +44,11 @@ export async function getCoreWidgets() {
  */
 export async function getCoreWidget(widgetName) {
   try {
-    const filePath = path.join(CORE_WIDGETS_DIR, `${widgetName}.liquid`);
+    const schemaPath = path.join(CORE_WIDGETS_DIR, widgetName, "schema.json");
 
-    if (await fs.pathExists(filePath)) {
-      const content = await fs.readFile(filePath, "utf8");
-
-      // Extract widget schema using HTML parser
-      return extractWidgetSchema(content);
+    if (await fs.pathExists(schemaPath)) {
+      const content = await fs.readFile(schemaPath, "utf8");
+      return JSON.parse(content);
     }
 
     return null;

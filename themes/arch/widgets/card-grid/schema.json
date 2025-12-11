@@ -1,0 +1,65 @@
+{
+  "type": "card-grid",
+  "displayName": "Card Grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Our Services"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Card Grid - Services Showcase"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "A responsive grid layout showcasing services with images, descriptions, and call-to-action buttons."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "displayName": "Card",
+      "settings": [
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle",
+          "default": "Subtitle"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Card Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Card description text goes here."
+        },
+        {
+          "type": "link",
+          "id": "button_link",
+          "label": "Button Link",
+          "default": {
+            "text": "Learn More",
+            "href": "#",
+            "target": "_self"
+          }
+        }
+      ]
+    }
+  ]
+}

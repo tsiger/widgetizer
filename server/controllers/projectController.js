@@ -12,7 +12,6 @@ import {
   getThemeDir,
   getProjectMenusDir,
 } from "../config.js";
-import { extractWidgetSchema } from "../utils/widgetSchemaExtractor.js";
 import { v4 as uuidv4 } from "uuid";
 
 // Make sure the projects directory exists
@@ -531,15 +530,15 @@ export async function getProjectWidgets(req, res) {
 
   try {
     const { projectId } = req.params;
-    
+
     // Need to look up project to get the slug/folder name
     const data = await readProjectsFile();
-    const project = data.projects.find(p => p.id === projectId);
-    
+    const project = data.projects.find((p) => p.id === projectId);
+
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
-    
+
     const projectSlug = project.slug || project.id;
     const projectRootDir = getProjectDir(projectSlug);
     const widgetsBaseDir = path.join(projectRootDir, "widgets");
@@ -560,17 +559,12 @@ export async function getProjectWidgets(req, res) {
       // If there's an error reading theme.json, default to including core widgets
     }
 
-    // Helper function to process a single widget file
-    async function processWidgetFile(filePath) {
+    // Helper function to process a widget folder (reads schema.json)
+    async function processWidgetFolder(folderPath) {
       try {
-        // Ensure it's a liquid file
-        if (!filePath.endsWith(".liquid")) {
-          return null;
-        }
-        const content = await fs.readFile(filePath, "utf8");
-
-        // Extract widget schema using HTML parser
-        return extractWidgetSchema(content);
+        const schemaPath = path.join(folderPath, "schema.json");
+        const content = await fs.readFile(schemaPath, "utf8");
+        return JSON.parse(content);
       } catch (parseError) {
         // Silently handle widget schema parsing errors
       }
@@ -589,15 +583,15 @@ export async function getProjectWidgets(req, res) {
       }
     }
 
-    // Process top-level widgets
+    // Process widget folders (new structure: widgets/widget-name/schema.json)
     try {
       const topLevelEntries = await fs.readdir(widgetsBaseDir, { withFileTypes: true });
-      const topLevelFiles = topLevelEntries
-        .filter((entry) => entry.isFile())
+      const widgetFolders = topLevelEntries
+        .filter((entry) => entry.isDirectory() && entry.name !== "global")
         .map((entry) => path.join(widgetsBaseDir, entry.name));
 
-      const topLevelSchemas = await Promise.all(topLevelFiles.map(processWidgetFile));
-      allSchemas = allSchemas.concat(topLevelSchemas);
+      const folderSchemas = await Promise.all(widgetFolders.map(processWidgetFolder));
+      allSchemas = allSchemas.concat(folderSchemas);
     } catch (err) {
       // Ignore if widgetsBaseDir doesn't exist
       if (err.code !== "ENOENT") {
@@ -605,14 +599,14 @@ export async function getProjectWidgets(req, res) {
       }
     }
 
-    // Process global widgets
+    // Process global widget folders (widgets/global/widget-name/schema.json)
     try {
       const globalEntries = await fs.readdir(globalWidgetsDir, { withFileTypes: true });
-      const globalFiles = globalEntries
-        .filter((entry) => entry.isFile())
+      const globalFolders = globalEntries
+        .filter((entry) => entry.isDirectory())
         .map((entry) => path.join(globalWidgetsDir, entry.name));
 
-      const globalSchemas = await Promise.all(globalFiles.map(processWidgetFile));
+      const globalSchemas = await Promise.all(globalFolders.map(processWidgetFolder));
       allSchemas = allSchemas.concat(globalSchemas);
     } catch (err) {
       // Ignore if globalWidgetsDir doesn't exist

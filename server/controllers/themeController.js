@@ -11,8 +11,6 @@ import {
 } from "../config.js";
 import { getProjectSlug } from "../utils/projectHelpers.js";
 
-
-
 export async function ensureThemesDirectory() {
   try {
     await fs.mkdir(THEMES_DIR, { recursive: true });
@@ -72,18 +70,21 @@ export async function getThemeWidgets(req, res) {
   try {
     const { id } = req.params;
     const widgetsDir = getThemeWidgetsDir(id);
-    const widgets = await fs.readdir(widgetsDir);
+    const entries = await fs.readdir(widgetsDir, { withFileTypes: true });
 
     const widgetsList = await Promise.all(
-      widgets.map(async (widget) => {
-        const widgetPath = path.join(widgetsDir, widget);
-        const content = await fs.readFile(widgetPath, "utf8");
-        // Extract widget schema from HTML content
-        const schemaMatch = content.match(/<script type="application\/json" data-widget-schema>(.*?)<\/script>/s);
-        if (schemaMatch) {
-          return JSON.parse(schemaMatch[1]);
+      entries.map(async (entry) => {
+        try {
+          // Process widget folders (new structure)
+          if (entry.isDirectory() && entry.name !== "global") {
+            const schemaPath = path.join(widgetsDir, entry.name, "schema.json");
+            const content = await fs.readFile(schemaPath, "utf8");
+            return JSON.parse(content);
+          }
+          return null;
+        } catch (err) {
+          return null;
         }
-        return null;
       }),
     );
 

@@ -1,0 +1,30 @@
+{
+  "type": "header",
+  "displayName": "Header",
+  "settings": [
+    {
+      "type": "text",
+      "id": "logoText",
+      "label": "Logo Text",
+      "description": "Text to display in the header logo",
+      "default": "Widgetizer"
+    },
+    {
+      "type": "menu",
+      "id": "headerNavigation",
+      "label": "Navigation Menu",
+      "description": "Select the menu to display in the header"
+    },
+    {
+      "type": "link",
+      "id": "ctaButtonLink",
+      "label": "CTA Button",
+      "description": "Call-to-action button (leave text empty to hide)",
+      "default": {
+        "href": "/get-started",
+        "text": "Get Started",
+        "target": "_self"
+      }
+    }
+  ]
+}

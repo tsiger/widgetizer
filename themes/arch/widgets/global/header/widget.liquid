@@ -138,17 +138,19 @@
           }
         }
 
-        & .submenu-toggle {
-          & .submenu-icon {
-            width: 2rem; /* 20px */
-            height: 2rem;
-            transition: transform 0.3s;
-            flex-shrink: 0;
-          }
-
-          &[aria-expanded='true'] .submenu-icon {
-            transform: rotate(90deg);
-          }
+        /* Chevron icon for items with submenus */
+        &.has-submenu > a::after {
+          content: '';
+          display: inline-block;
+          width: 2rem;
+          height: 2rem;
+          margin-inline-start: auto;
+          flex-shrink: 0;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6l-6 6'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: contain;
+          transition: transform 0.3s;
         }
       }
 
@@ -250,13 +252,12 @@
             }
           }
 
-          & > .submenu-toggle {
-            & .submenu-icon {
-              width: 1.6rem; /* 16px */
-              height: 1.6rem;
-              margin-inline-start: var(--space-xs);
-              transform: rotate(90deg);
-            }
+          /* Desktop chevron styling */
+          &.has-submenu > a::after {
+            width: 1.6rem;
+            height: 1.6rem;
+            margin-inline-start: var(--space-xs);
+            transform: rotate(90deg);
           }
 
           &:hover > .nav-submenu,
@@ -291,10 +292,9 @@
                 background-color: var(--bg-secondary);
               }
             }
-            & > .submenu-toggle {
-              & .submenu-icon {
-                transform: rotate(0deg);
-              }
+            /* Reset chevron rotation in nested submenus */
+            &.has-submenu > a::after {
+              transform: rotate(0deg);
             }
           }
 
@@ -331,7 +331,7 @@
     }
   </style>
 
-  <a href="/" class="header-logo">Widgetizer</a>
+  <a href="/" class="header-logo">{{ widget.settings.logoText | default: 'Widgetizer' }}</a>
 
   <div class="header-actions">
     <nav class="header-nav" id="main-navigation">
@@ -355,148 +355,28 @@
           </svg>
         </button>
       </div>
-      <ul class="nav-list">
-        <li class="nav-item">
-          <a class="submenu-toggle" href="#" aria-expanded="false">
-            Features
-            <svg
-              class="submenu-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M9 6l6 6l-6 6" />
-            </svg>
-          </a>
-          <ul class="nav-submenu">
-            <li class="nav-item"><a href="#feature-1">Feature One</a></li>
-            <li class="nav-item"><a href="#feature-2">Feature Two</a></li>
-            <li class="nav-item">
-              <a class="submenu-toggle" href="#" aria-expanded="false">
-                More Features
-                <svg
-                  class="submenu-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M9 6l6 6l-6 6" />
-                </svg>
-              </a>
-              <ul class="nav-submenu">
-                <li class="nav-item">
-                  <a href="#feature-3">Feature Three</a>
-                </li>
-                <li class="nav-item">
-                  <a href="#feature-4">Feature Four</a>
-                </li>
-                <li class="nav-item">
-                  <a href="#feature-5">Feature Five</a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="submenu-toggle" href="#" aria-expanded="false">
-            Products
-            <svg
-              class="submenu-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M9 6l6 6l-6 6" />
-            </svg>
-          </a>
-          <ul class="nav-submenu">
-            <li class="nav-item"><a href="#product-1">Product One</a></li>
-            <li class="nav-item">
-              <a class="submenu-toggle" href="#" aria-expanded="false">
-                Categories
-                <svg
-                  class="submenu-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M9 6l6 6l-6 6" />
-                </svg>
-              </a>
-              <ul class="nav-submenu">
-                <li class="nav-item">
-                  <a href="#category-1">Category One</a>
-                </li>
-                <li class="nav-item">
-                  <a href="#category-2">Category Two</a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item"><a href="#about">About</a></li>
-        <li class="nav-item"><a href="#pricing">Pricing</a></li>
-        <li class="nav-item">
-          <a class="submenu-toggle" href="#" aria-expanded="false">
-            Widgets
-            <svg
-              class="submenu-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M9 6l6 6l-6 6" />
-            </svg>
-          </a>
-          <ul class="nav-submenu">
-            <li class="nav-item"><a href="image-text.html">Image Text</a></li>
-            <li class="nav-item"><a href="overlap-layout.html">Overlap Layout</a></li>
-            <li class="nav-item"><a href="accordion.html">Accordion</a></li>
-            <li class="nav-item"><a href="card-grid.html">Card Grid</a></li>
-            <li class="nav-item"><a href="backlog.html">Backlog</a></li>
-          </ul>
-        </li>
-        <li class="nav-item"><a href="#contact">Contact</a></li>
-      </ul>
-      <a href="/get-started" class="widget-button mobile-cta">Get Started</a>
+      {% if widget.settings.headerNavigation %}
+        {% render 'menu',
+          menu: widget.settings.headerNavigation,
+          class_list: 'nav-list',
+          class_item: 'nav-item',
+          class_link: '',
+          class_submenu: 'nav-submenu',
+          class_has_submenu: 'has-submenu'
+        %}
+      {% endif %}
+      {% if widget.settings.ctaButtonLink.text != blank %}
+        <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button mobile-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
+          {{ widget.settings.ctaButtonLink.text }}
+        </a>
+      {% endif %}
     </nav>
 
-    <a href="/get-started" class="widget-button desktop-cta">Get Started</a>
+    {% if widget.settings.ctaButtonLink.text != blank %}
+      <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button desktop-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
+        {{ widget.settings.ctaButtonLink.text }}
+      </a>
+    {% endif %}
 
     <button
       class="menu-toggle"
@@ -548,7 +428,8 @@
       const menuToggle = widgetElement.querySelector('.menu-toggle');
       const navCloseBtn = widgetElement.querySelector('.nav-close-btn');
       const headerNav = widgetElement.querySelector('.header-nav');
-      const submenuToggles = widgetElement.querySelectorAll('.submenu-toggle');
+      // Select links within has-submenu items as toggles
+      const submenuItems = widgetElement.querySelectorAll('.has-submenu');
 
       // Function to open mobile menu
       const openMobileMenu = () => {
@@ -619,63 +500,67 @@
       }
 
       // Function to open a submenu
-      const openSubmenu = (toggle) => {
-        const submenu = toggle.nextElementSibling;
-        toggle.setAttribute('aria-expanded', 'true');
+      const openSubmenu = (item) => {
+        const submenu = item.querySelector(':scope > ul');
+        const link = item.querySelector(':scope > a');
+        if (link) link.setAttribute('aria-expanded', 'true');
         if (submenu) {
           submenu.classList.add('submenu-open');
         }
       };
 
       // Function to close a submenu
-      const closeSubmenu = (toggle) => {
-        const submenu = toggle.nextElementSibling;
-        toggle.setAttribute('aria-expanded', 'false');
+      const closeSubmenu = (item) => {
+        const submenu = item.querySelector(':scope > ul');
+        const link = item.querySelector(':scope > a');
+        if (link) link.setAttribute('aria-expanded', 'false');
         if (submenu) {
           submenu.classList.remove('submenu-open');
         }
       };
 
       // Function to close sibling submenus
-      const closeSiblingSubmenus = (toggle) => {
-        const parentItem = toggle.parentElement;
-        const parentList = parentItem.parentElement;
-        const siblingItems = parentList.querySelectorAll(':scope > .nav-item');
+      const closeSiblingSubmenus = (item) => {
+        const parentList = item.parentElement;
+        const siblingItems = parentList.querySelectorAll(':scope > .has-submenu');
 
-        siblingItems.forEach((item) => {
-          if (item !== parentItem) {
-            const siblingToggle = item.querySelector(':scope > .submenu-toggle');
-            if (siblingToggle) {
-              closeSubmenu(siblingToggle);
-            }
+        siblingItems.forEach((sibling) => {
+          if (sibling !== item) {
+            closeSubmenu(sibling);
           }
         });
       };
 
       // Submenu toggles (mobile) - Click handler
-      submenuToggles.forEach((toggle) => {
-        toggle.addEventListener('click', (e) => {
+      submenuItems.forEach((item) => {
+        const link = item.querySelector(':scope > a');
+        if (!link) return;
+
+        link.addEventListener('click', (e) => {
+          // Only handle on mobile
+          if (window.innerWidth >= 990) return;
+          
           e.preventDefault();
-          const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+          const isExpanded = link.getAttribute('aria-expanded') === 'true';
 
           // Close other submenus at the same level
-          closeSiblingSubmenus(toggle);
+          closeSiblingSubmenus(item);
 
           // Toggle current submenu
           if (isExpanded) {
-            closeSubmenu(toggle);
+            closeSubmenu(item);
           } else {
-            openSubmenu(toggle);
+            openSubmenu(item);
           }
         });
 
         // Keyboard navigation - Focus handler for mobile menu
-        toggle.addEventListener('focus', () => {
+        link.addEventListener('focus', () => {
           if (window.innerWidth < 990) {
             // Close sibling submenus
-            closeSiblingSubmenus(toggle);
+            closeSiblingSubmenus(item);
             // Open current submenu
-            openSubmenu(toggle);
+            openSubmenu(item);
           }
         });
       });
@@ -688,9 +573,8 @@
             // Check if the new focus target is outside this nav item
             setTimeout(() => {
               if (!item.contains(document.activeElement)) {
-                const toggle = item.querySelector(':scope > .submenu-toggle');
-                if (toggle) {
-                  closeSubmenu(toggle);
+                if (item.classList.contains('has-submenu')) {
+                  closeSubmenu(item);
                 }
               }
             }, 0);
@@ -708,12 +592,12 @@
           }
 
           // Close open submenus
-          submenuToggles.forEach((toggle) => {
-            const submenu = toggle.nextElementSibling;
+          submenuItems.forEach((item) => {
+            const submenu = item.querySelector(':scope > ul');
             if (submenu && submenu.classList.contains('submenu-open')) {
-              toggle.setAttribute('aria-expanded', 'false');
-              submenu.classList.remove('submenu-open');
-              toggle.focus();
+              closeSubmenu(item);
+              const link = item.querySelector(':scope > a');
+              if (link) link.focus();
             }
           });
         }
@@ -735,23 +619,11 @@
           closeMobileMenu();
 
           // Reset submenu states
-          submenuToggles.forEach((toggle) => {
-            toggle.setAttribute('aria-expanded', 'false');
-            const submenu = toggle.nextElementSibling;
-            if (submenu) {
-              submenu.classList.remove('submenu-open');
-            }
+          submenuItems.forEach((item) => {
+            closeSubmenu(item);
           });
         }
       });
     });
-  </script>
-
-  <script type="application/json" data-widget-schema>
-    {
-      "type": "header",
-      "displayName": "Header",
-      "settings": []
-    }
   </script>
 </header>

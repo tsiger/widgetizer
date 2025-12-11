@@ -1,0 +1,36 @@
+{
+  "type": "core-spacer",
+  "displayName": "Spacer",
+  "description": "Add vertical spacing between content sections",
+  "category": "Layout",
+  "isCore": true,
+  "settings": [
+    {
+      "type": "range",
+      "id": "height",
+      "label": "Height",
+      "description": "The height of the spacer in pixels",
+      "default": 40,
+      "min": 10,
+      "max": 200,
+      "step": 10
+    },
+    {
+      "type": "checkbox",
+      "id": "showOnMobile",
+      "label": "Show on Mobile",
+      "description": "Whether to show the spacer on mobile devices",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "mobileHeight",
+      "label": "Mobile Height",
+      "description": "The height of the spacer on mobile devices in pixels",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "step": 5
+    }
+  ]
+}

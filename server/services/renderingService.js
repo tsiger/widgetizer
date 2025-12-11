@@ -47,8 +47,6 @@ registerImageFilter(engine);
 registerVideoFilter(engine);
 registerYouTubeFilter(engine);
 
-
-
 /**
  * Helper function to get project data by ID
  */
@@ -128,15 +126,19 @@ async function renderWidget(projectId, widgetId, widgetData, rawThemeSettings, r
 
     // Determine the correct path based on widget type
     let widgetPath;
+    let schemaPath;
     if (isCoreWidget) {
-      // Core widget path
-      widgetPath = path.join(CORE_WIDGETS_DIR, `${type}.liquid`);
+      // Core widget (folder structure)
+      widgetPath = path.join(CORE_WIDGETS_DIR, type, "widget.liquid");
+      schemaPath = path.join(CORE_WIDGETS_DIR, type, "schema.json");
     } else if (type === "header" || type === "footer") {
-      // Global theme widget
-      widgetPath = path.join(projectDir, "widgets", "global", `${type}.liquid`);
+      // Global theme widget (folder structure)
+      widgetPath = path.join(projectDir, "widgets", "global", type, "widget.liquid");
+      schemaPath = path.join(projectDir, "widgets", "global", type, "schema.json");
     } else {
-      // Regular theme widget
-      widgetPath = path.join(projectDir, "widgets", `${type}.liquid`);
+      // Regular theme widget (folder structure)
+      widgetPath = path.join(projectDir, "widgets", type, "widget.liquid");
+      schemaPath = path.join(projectDir, "widgets", type, "schema.json");
     }
 
     // Read the widget template
@@ -149,15 +151,18 @@ async function renderWidget(projectId, widgetId, widgetData, rawThemeSettings, r
       return `<div class="widget-error">Widget template not found: ${type}.liquid</div>`;
     }
 
-    // Extract schema from the template
-    const schemaMatch = template.match(/<script type="application\/json" data-widget-schema>([\s\S]*?)<\/script>/);
-    const schema = schemaMatch ? JSON.parse(schemaMatch[1]) : { settings: [], blocks: [] };
-
-    let templateForRender = template;
-    if (schemaMatch) {
-      // Remove the entire matched script block (schemaMatch[0] contains the full match)
-      templateForRender = template.replace(schemaMatch[0], "");
+    // Load schema from schema.json file
+    let schema;
+    try {
+      const schemaContent = await fs.readFile(schemaPath, "utf-8");
+      schema = JSON.parse(schemaContent);
+    } catch (schemaErr) {
+      console.error(`Widget schema not found at ${schemaPath}`);
+      schema = { settings: [], blocks: [] };
     }
+
+    // Use template directly for rendering (no embedded schema to remove)
+    let templateForRender = template;
 
     // Create settings with defaults (using the extracted schema)
     const enhancedSettings = {};
