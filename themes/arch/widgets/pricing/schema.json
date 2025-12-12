@@ -1,0 +1,71 @@
+{
+  "type": "pricing",
+  "displayName": "Pricing",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Pricing Plans"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Choose the plan that fits your needs."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "plan",
+      "displayName": "Plan",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Plan name",
+          "default": "Pro"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$49"
+        },
+        {
+          "type": "text",
+          "id": "period",
+          "label": "Period",
+          "default": "per month"
+        },
+        {
+          "type": "textarea",
+          "id": "features",
+          "label": "Features (one per line)",
+          "default": "Unlimited Projects\nPriority Support\n10GB Storage"
+        },
+        {
+          "type": "link",
+          "id": "button_link",
+          "label": "Button",
+          "default": {
+            "text": "Get Started",
+            "href": "#",
+            "target": "_self"
+          }
+        },
+        {
+          "type": "checkbox",
+          "id": "featured",
+          "label": "Featured plan",
+          "default": false
+        }
+      ]
+    }
+  ]
+}

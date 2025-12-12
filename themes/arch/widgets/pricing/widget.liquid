@@ -1,0 +1,125 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-pricing"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="pricing"
+>
+  <style>
+    #{{ widget.id }} {
+      & .pricing-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+
+      /* Featured Card Override */
+      & .widget-card.is-featured {
+        border-width: var(--border-width-medium);
+        border-color: var(--border-darker);
+        position: relative;
+        transform: scale(1.02);
+        z-index: 1;
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.05);
+      }
+
+      /* Pricing Specific Elements */
+      & .pricing-header {
+        text-align: center;
+      }
+
+      & .pricing-price {
+        font-size: var(--font-size-5xl);
+        font-weight: var(--font-weight-bold);
+        margin-block-end: var(--space-xs);
+      }
+
+      & .pricing-features {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex: 1;
+      }
+
+      & .pricing-feature {
+        padding: var(--space-md) 0;
+        border-block-end: var(--border-width-thin) solid var(--border-light);
+        font-size: var(--font-size-base);
+
+        &:first-child {
+          border-block-start: var(--border-width-thin) solid var(--border-light);
+        }
+      }
+
+      @media (min-width: 750px) {
+        & .pricing-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .pricing-grid {
+          grid-template-columns: repeat(3, 1fr);
+          gap: var(--space-lg);
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="pricing-grid">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <div class="widget-card {% if block.settings.featured %}is-featured{% endif %}" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+            <div class="widget-card-header">
+              {% if block.settings.title != blank %}
+                <h3 class="widget-card-title">{{ block.settings.title }}</h3>
+              {% endif %}
+              {% if block.settings.price != blank %}
+                <div class="pricing-price">{{ block.settings.price }}</div>
+              {% endif %}
+              {% if block.settings.period != blank %}
+                <div class="widget-card-subtitle">{{ block.settings.period }}</div>
+              {% endif %}
+            </div>
+            <div class="widget-card-content">
+              {% if block.settings.features != blank %}
+                <ul class="pricing-features">
+                  {% assign features = block.settings.features | split: '
+' %}
+                  {% for feature in features %}
+                    {% assign trimmed_feature = feature | strip %}
+                    {% if trimmed_feature != blank %}
+                      <li class="pricing-feature">{{ trimmed_feature }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+            {% if block.settings.button_link.text != blank %}
+              <div class="widget-card-footer">
+                <a href="{{ block.settings.button_link.href }}" class="widget-button widget-button-full" {% if block.settings.button_link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+                  {{ block.settings.button_link.text }}
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
