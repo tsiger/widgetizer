@@ -1,0 +1,216 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-image-tabs {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="image-tabs"
+>
+  <style>
+    #{{ widget.id }} {
+      & .image-tabs-wrapper {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+
+      & .image-tabs-image-area {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+        background-color: var(--bg-secondary);
+        border: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .image-tabs-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      & .image-tabs-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+
+      & .image-tabs-tab {
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-light);
+        border-block-start: none;
+        padding: var(--space-lg);
+        cursor: pointer;
+        transition: background-color 0.3s;
+        position: relative;
+
+        &:first-child {
+          border-block-start: var(--border-width-thin) solid var(--border-light);
+        }
+
+        &:hover {
+          background-color: var(--bg-secondary);
+        }
+
+        &.is-active {
+          background-color: var(--bg-secondary);
+          box-shadow: inset 0.3rem 0 0 0 var(--text-primary);
+        }
+      }
+
+      & .image-tabs-tab-button {
+        background: none;
+        border: none;
+        padding: 0;
+        text-align: start;
+        width: 100%;
+        cursor: pointer;
+        font-family: inherit;
+      }
+
+      & .image-tabs-tab-title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-bold);
+        line-height: var(--line-height-tight);
+        margin-block-end: var(--space-xs);
+        color: var(--text-primary);
+      }
+
+      & .image-tabs-tab-description {
+        font-size: var(--font-size-sm);
+        line-height: var(--line-height-relaxed);
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      @media (min-width: 750px) {
+        & .image-tabs-wrapper {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        & .image-tabs-tab {
+          padding: var(--space-xl);
+        }
+
+        & .image-tabs-tab-title {
+          font-size: var(--font-size-xl);
+        }
+
+        & .image-tabs-tab-description {
+          font-size: var(--font-size-base);
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .image-tabs-image-area {
+          aspect-ratio: 3 / 2;
+        }
+      }
+
+      &.layout-image-right {
+        @media (min-width: 750px) {
+          & .image-tabs-image-area {
+            order: 2;
+          }
+
+          & .image-tabs-list {
+            order: 1;
+          }
+
+          & .image-tabs-tab.is-active {
+            box-shadow: inset -0.3rem 0 0 0 var(--text-primary);
+          }
+        }
+      }
+    }
+  </style>
+
+  {%- assign first_image = '' -%}
+  {%- for blockId in widget.blocksOrder -%}
+    {%- assign block = widget.blocks[blockId] -%}
+    {%- if block.settings.image and first_image == '' -%}
+      {%- assign first_image = block.settings.image | image: 'path' -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="image-tabs-wrapper">
+        <div class="image-tabs-image-area">
+          <img src="{{ first_image }}" alt="" class="image-tabs-image" loading="lazy" />
+        </div>
+
+        <ul class="image-tabs-list" role="tablist">
+          {% assign first_tab = true %}
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+            {% assign image_url = block.settings.image | image: 'path' %}
+            <li class="image-tabs-tab {% if first_tab %}is-active{% endif %}" role="presentation" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+              <button
+                class="image-tabs-tab-button"
+                role="tab"
+                aria-selected="{% if first_tab %}true{% else %}false{% endif %}"
+                data-image="{{ image_url }}"
+              >
+                {% if block.settings.title != blank %}
+                  <h3 class="image-tabs-tab-title">{{ block.settings.title }}</h3>
+                {% endif %}
+                {% if block.settings.description != blank %}
+                  <p class="image-tabs-tab-description">{{ block.settings.description }}</p>
+                {% endif %}
+              </button>
+            </li>
+            {% assign first_tab = false %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const widget = document.getElementById('{{ widget.id }}');
+      if (!widget || widget.dataset.initialized) return;
+      widget.dataset.initialized = 'true';
+
+      const image = widget.querySelector('.image-tabs-image');
+      const tabs = widget.querySelectorAll('.image-tabs-tab');
+
+      tabs.forEach((tab) => {
+        const button = tab.querySelector('.image-tabs-tab-button');
+
+        button.addEventListener('click', () => {
+          // Update active tab
+          tabs.forEach((t) => {
+            t.classList.remove('is-active');
+            t.querySelector('.image-tabs-tab-button').setAttribute('aria-selected', 'false');
+          });
+          tab.classList.add('is-active');
+          button.setAttribute('aria-selected', 'true');
+
+          // Swap image
+          const newSrc = button.dataset.image;
+          if (newSrc) {
+            image.src = newSrc;
+          }
+        });
+      });
+    })();
+  </script>
+</section>

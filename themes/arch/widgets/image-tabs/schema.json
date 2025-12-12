@@ -1,0 +1,56 @@
+{
+  "type": "image-tabs",
+  "displayName": "Image Tabs",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Features"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "displayName": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Tab title",
+          "default": "Feature Name"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Tab description"
+        },
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ]
+}
