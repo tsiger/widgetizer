@@ -1,0 +1,222 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-accordion {% if widget.settings.style == 'connected' %}accordion-bordered{% endif %} {% if widget.settings.text_color == 'light' %}color-scheme-dark{% else %}color-scheme-light{% endif %} {% if widget.settings.background_color != blank %}has-bg-color{% endif %}"
+  {% if widget.settings.background_color != blank %}style="--widget-bg-color: {{ widget.settings.background_color }};"{% endif %}
+  {% if widget.settings.allow_multiple %}data-multi-open="true"{% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="accordion"
+>
+  <style>
+    #{{ widget.id }} {
+      & .accordion-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      & .accordion-item {
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-light);
+        overflow: hidden;
+      }
+
+      & .accordion-trigger {
+        width: 100%;
+        padding: var(--space-md) var(--space-lg);
+        text-align: start;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-md);
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        transition: background-color 0.2s;
+        font-family: inherit;
+
+        &:hover {
+          background-color: var(--bg-secondary);
+        }
+
+        &:focus-visible {
+          outline: var(--border-width-medium) solid var(--border-darker);
+          outline-offset: -0.2rem;
+        }
+      }
+
+      & .accordion-question {
+        flex: 1;
+        text-align: start;
+      }
+
+      & .accordion-icon {
+        width: 2.4rem;
+        height: 2.4rem;
+        flex-shrink: 0;
+        transition: transform 0.3s ease;
+
+        & svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      & .accordion-trigger[aria-expanded="true"] .accordion-icon {
+        transform: rotate(180deg);
+      }
+
+      & .accordion-content {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      & .accordion-content.accordion-open {
+        grid-template-rows: 1fr;
+
+        & .accordion-answer {
+          padding: 0 var(--space-lg) var(--space-lg) var(--space-lg);
+          opacity: 1;
+        }
+      }
+
+      & .accordion-answer {
+        min-height: 0;
+        overflow: hidden;
+        font-size: var(--font-size-sm);
+        line-height: var(--line-height-relaxed);
+        color: var(--text-muted);
+        margin: 0;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      @media (min-width: 750px) {
+        & .accordion-trigger {
+          font-size: var(--font-size-lg);
+          padding: var(--space-lg);
+        }
+
+        & .accordion-content.accordion-open .accordion-answer {
+          padding: 0 var(--space-lg) var(--space-lg) var(--space-lg);
+        }
+
+        & .accordion-answer {
+          font-size: var(--font-size-base);
+        }
+      }
+
+      /* Variation: Connected/Bordered */
+      &.accordion-bordered {
+        & .accordion-list {
+          gap: 0;
+          border: var(--border-width-thin) solid var(--border-light);
+          overflow: hidden;
+        }
+
+        & .accordion-item {
+          border: none;
+          border-radius: 0;
+          border-block-end: var(--border-width-thin) solid var(--border-light);
+
+          &:last-child {
+            border-block-end: none;
+          }
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content widget-content-md">
+      <ul class="accordion-list">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <li class="accordion-item" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+            <button class="accordion-trigger" aria-expanded="false">
+              <span class="accordion-question">{{ block.settings.question }}</span>
+              <span class="accordion-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </button>
+            <div class="accordion-content">
+              <p class="accordion-answer">{{ block.settings.answer }}</p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const allAccordions = document.querySelectorAll('#{{ widget.id }}');
+
+      allAccordions.forEach((widgetElement) => {
+        if (widgetElement.dataset.initialized) return;
+        widgetElement.dataset.initialized = 'true';
+
+        const isMultiOpen = widgetElement.dataset.multiOpen === 'true';
+        const triggers = widgetElement.querySelectorAll('.accordion-trigger');
+
+        triggers.forEach((trigger) => {
+          trigger.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            const content = this.nextElementSibling;
+
+            if (!isMultiOpen) {
+              // Close other items if not multi-open
+              const allTriggers = widgetElement.querySelectorAll('.accordion-trigger');
+              const allContents = widgetElement.querySelectorAll('.accordion-content');
+
+              allTriggers.forEach((t) => {
+                if (t !== this) t.setAttribute('aria-expanded', 'false');
+              });
+              allContents.forEach((c) => {
+                if (c !== content) c.classList.remove('accordion-open');
+              });
+            }
+
+            // Toggle current item
+            if (isExpanded) {
+              this.setAttribute('aria-expanded', 'false');
+              content.classList.remove('accordion-open');
+            } else {
+              this.setAttribute('aria-expanded', 'true');
+              content.classList.add('accordion-open');
+            }
+          });
+
+          trigger.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              this.click();
+            }
+          });
+        });
+      });
+    })();
+  </script>
+</section>

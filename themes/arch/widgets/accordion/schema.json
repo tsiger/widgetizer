@@ -1,0 +1,73 @@
+{
+  "type": "accordion",
+  "displayName": "Accordion",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "default": "separated",
+      "options": [
+        { "value": "separated", "label": "Separated" },
+        { "value": "connected", "label": "Connected" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "allow_multiple",
+      "label": "Allow multiple open",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "dark",
+      "options": [
+        { "value": "dark", "label": "Dark" },
+        { "value": "light", "label": "Light" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "displayName": "Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Question goes here"
+        },
+        {
+          "type": "textarea",
+          "id": "answer",
+          "label": "Answer",
+          "default": "Answer goes here"
+        }
+      ]
+    }
+  ]
+}
