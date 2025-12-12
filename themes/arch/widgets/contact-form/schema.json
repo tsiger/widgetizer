@@ -1,0 +1,217 @@
+{
+  "type": "contact-form",
+  "displayName": "Contact Form",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Get in Touch"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "text",
+      "id": "form_action",
+      "label": "Form action URL",
+      "default": "/submit"
+    },
+    {
+      "type": "select",
+      "id": "form_method",
+      "label": "Form method",
+      "default": "POST",
+      "options": [
+        { "value": "POST", "label": "POST" },
+        { "value": "GET", "label": "GET" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sidebar",
+      "label": "Show contact info sidebar",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "sidebar_position",
+      "label": "Sidebar position",
+      "default": "right",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "input",
+      "displayName": "Input Field",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Name"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Field name (for form submission)",
+          "default": "name"
+        },
+        {
+          "type": "select",
+          "id": "input_type",
+          "label": "Input type",
+          "default": "text",
+          "options": [
+            { "value": "text", "label": "Text" },
+            { "value": "email", "label": "Email" },
+            { "value": "tel", "label": "Phone" },
+            { "value": "url", "label": "URL" },
+            { "value": "number", "label": "Number" },
+            { "value": "date", "label": "Date" }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Placeholder"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Required",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "textarea",
+      "displayName": "Textarea",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Message"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Field name (for form submission)",
+          "default": "message"
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Placeholder"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Required",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "displayName": "Dropdown",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Subject"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Field name (for form submission)",
+          "default": "subject"
+        },
+        {
+          "type": "textarea",
+          "id": "options",
+          "label": "Options (one per line)",
+          "default": "General Inquiry\nSupport\nSales\nOther"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Required",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "displayName": "Checkbox",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "I agree to the terms"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Field name (for form submission)",
+          "default": "agree"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Required",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "submit",
+      "displayName": "Submit Button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Button text",
+          "default": "Send Message"
+        }
+      ]
+    },
+    {
+      "type": "info",
+      "displayName": "Contact Info",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Email Us"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text/Details",
+          "default": "hello@example.com"
+        },
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Link (optional)"
+        }
+      ]
+    }
+  ]
+}
