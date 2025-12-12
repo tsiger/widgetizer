@@ -1,0 +1,76 @@
+{
+  "type": "comparison-table",
+  "displayName": "Comparison Table",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Compare Our Plans"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "text",
+      "id": "feature_column_label",
+      "label": "Feature column label",
+      "default": "Features"
+    },
+    {
+      "type": "link",
+      "id": "cta_link",
+      "label": "Footer CTA button"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "displayName": "Column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Column name",
+          "default": "Our Product"
+        },
+        {
+          "type": "checkbox",
+          "id": "featured",
+          "label": "Featured (highlighted)",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge text (optional)"
+        }
+      ]
+    },
+    {
+      "type": "feature",
+      "displayName": "Feature Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Feature name",
+          "default": "Feature Name"
+        },
+        {
+          "type": "textarea",
+          "id": "values",
+          "label": "Values for each column (one per line: ✓, ✗, or custom text)",
+          "default": "✓\n✓\n✗"
+        }
+      ]
+    }
+  ]
+}
