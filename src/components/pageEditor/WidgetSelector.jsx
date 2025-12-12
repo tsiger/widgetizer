@@ -32,9 +32,9 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     };
   }, [isOpen, onClose, triggerRef]);
 
-  const availableWidgets = Object.values(widgetSchemas).filter(
-    (schema) => schema.type !== "header" && schema.type !== "footer",
-  );
+  const availableWidgets = Object.values(widgetSchemas)
+    .filter((schema) => schema.type !== "header" && schema.type !== "footer")
+    .sort((a, b) => (a.displayName || a.type).localeCompare(b.displayName || b.type));
 
   if (!isOpen) return null;
 

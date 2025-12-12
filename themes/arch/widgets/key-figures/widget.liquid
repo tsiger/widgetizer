@@ -1,0 +1,175 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-key-figures {% if widget.settings.layout == 'bar' %}layout-bar{% endif %}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="key-figures"
+  {% if widget.settings.animate %}data-animate="true"{% endif %}
+>
+  <style>
+    #{{ widget.id }} {
+      & .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      & .stats-item {
+        text-align: center;
+        padding: var(--space-xl) var(--space-lg);
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-light);
+        transition: border-color 0.3s;
+
+        &:hover {
+          border-color: var(--border-darker);
+        }
+      }
+
+      & .stats-number {
+        font-size: var(--font-size-5xl);
+        line-height: 1;
+        font-weight: var(--font-weight-bold);
+        color: var(--text-primary);
+        margin-block-end: var(--space-sm);
+        font-variant-numeric: tabular-nums;
+      }
+
+      & .stats-label {
+        font-size: var(--font-size-base);
+        line-height: 1.4;
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      & .stats-desc {
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+        margin-block-start: var(--space-sm);
+      }
+
+      @media (min-width: 750px) {
+        & .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        & .stats-number {
+          font-size: var(--font-size-6xl);
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .stats-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+
+        & .stats-item {
+          padding: var(--space-3xl) var(--space-xl);
+        }
+
+        & .stats-number {
+          font-size: 6.4rem;
+        }
+      }
+
+      /* Variant: Bar (Horizontal) */
+      &.layout-bar {
+        background-color: var(--bg-secondary);
+        padding-block: var(--space-2xl);
+
+        & .stats-grid {
+          @media (min-width: 750px) {
+            grid-template-columns: repeat(4, 1fr);
+          }
+        }
+
+        & .stats-item {
+          background: transparent;
+          border: none;
+          padding: 0;
+
+          &:hover {
+            border-color: transparent;
+          }
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <ul class="stats-grid">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <li class="stats-item" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+            <div class="stats-number" {% if widget.settings.animate %}data-count="{{ block.settings.number }}" data-suffix="{{ block.settings.suffix }}"{% endif %}>
+              {% if widget.settings.animate %}0{% else %}{{ block.settings.number }}{{ block.settings.suffix }}{% endif %}
+            </div>
+            {% if block.settings.label != blank %}
+              <div class="stats-label">{{ block.settings.label }}</div>
+            {% endif %}
+            {% if block.settings.description != blank %}
+              <p class="stats-desc">{{ block.settings.description }}</p>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  {% if widget.settings.animate %}
+  <script>
+    (function() {
+      const widgetElement = document.getElementById('{{ widget.id }}');
+      if (!widgetElement || widgetElement.dataset.initialized) return;
+      widgetElement.dataset.initialized = 'true';
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            const target = parseFloat(el.getAttribute('data-count'));
+            const suffix = el.getAttribute('data-suffix') || '';
+            const duration = 2000;
+            const startTime = performance.now();
+
+            const animate = (currentTime) => {
+              const elapsed = currentTime - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              const ease = 1 - Math.pow(1 - progress, 4); // Ease out quart
+
+              el.textContent = Math.floor(ease * target) + suffix;
+
+              if (progress < 1) requestAnimationFrame(animate);
+              else el.textContent = target + suffix;
+            };
+
+            requestAnimationFrame(animate);
+            observer.unobserve(el);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      widgetElement.querySelectorAll('.stats-number').forEach(el => observer.observe(el));
+    })();
+  </script>
+  {% endif %}
+</section>

@@ -1,0 +1,90 @@
+{
+  "type": "image-text",
+  "displayName": "Image + Text",
+  "settings": [
+    {
+      "type": "image",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "eyebrow",
+      "displayName": "Eyebrow",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Our Approach"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "displayName": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Built for Modern Teams"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "displayName": "Text",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "A paragraph of descriptive text goes here."
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "displayName": "Button",
+      "settings": [
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Button",
+          "default": {
+            "text": "Learn More",
+            "href": "#",
+            "target": "_self"
+          }
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "default": "primary",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ]
+        }
+      ]
+    }
+  ]
+}
