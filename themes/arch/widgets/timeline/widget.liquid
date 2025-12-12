@@ -1,0 +1,374 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-timeline {% if widget.settings.layout == 'horizontal' %}layout-horizontal{% elsif widget.settings.layout == 'centered' %}layout-centered{% endif %}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="timeline"
+>
+  <style>
+    #{{ widget.id }} {
+      & .timeline-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: relative;
+      }
+
+      & .timeline-item {
+        position: relative;
+        padding-inline-start: 4rem;
+        padding-block-end: var(--space-3xl);
+
+        &:last-child {
+          padding-block-end: 0;
+        }
+
+        &::before {
+          content: "";
+          position: absolute;
+          inset-inline-start: 1.4375rem;
+          inset-block-start: 3.5rem;
+          inset-block-end: 0;
+          width: var(--border-width-medium);
+          background-color: var(--border-light);
+        }
+
+        &:last-child::before {
+          display: none;
+        }
+      }
+
+      & .timeline-marker {
+        position: absolute;
+        inset-inline-start: 0;
+        inset-block-start: 0;
+        width: 3rem;
+        height: 3rem;
+        background-color: var(--text-primary);
+        border: 0.3rem solid var(--bg-primary);
+        box-shadow: 0 0 0 var(--border-width-medium) var(--text-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+      }
+
+      & .marker-number {
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-bold);
+        color: var(--bg-primary);
+      }
+
+      & .timeline-content {
+        background-color: var(--bg-secondary);
+        padding: var(--space-lg);
+        border-inline-start: 0.3rem solid var(--text-primary);
+      }
+
+      & .timeline-meta {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        margin-block-end: var(--space-sm);
+        flex-wrap: wrap;
+      }
+
+      & .timeline-date {
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      & .timeline-duration {
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+        padding-inline-start: var(--space-sm);
+        border-inline-start: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .timeline-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-bold);
+        margin-block-end: var(--space-sm);
+      }
+
+      & .timeline-text {
+        font-size: var(--font-size-sm);
+        line-height: var(--line-height-relaxed);
+        color: var(--text-muted);
+        margin-block-end: var(--space-md);
+
+        &:last-child {
+          margin-block-end: 0;
+        }
+      }
+
+      & .timeline-features {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        margin-block-start: var(--space-md);
+      }
+
+      & .feature-item {
+        padding-block: var(--space-xs);
+        padding-inline-start: var(--space-lg);
+        position: relative;
+        font-size: var(--font-size-sm);
+        line-height: var(--line-height-relaxed);
+        color: var(--text-muted);
+
+        &::before {
+          content: "✓";
+          position: absolute;
+          inset-inline-start: 0;
+          inset-block-start: var(--space-xs);
+          color: var(--text-primary);
+          font-weight: var(--font-weight-bold);
+        }
+      }
+
+      @media (min-width: 750px) {
+        & .timeline-item {
+          padding-inline-start: 5rem;
+        }
+
+        & .timeline-marker {
+          width: 3.5rem;
+          height: 3.5rem;
+        }
+
+        & .marker-number {
+          font-size: var(--font-size-lg);
+        }
+
+        & .timeline-item::before {
+          inset-inline-start: 1.6875rem;
+        }
+
+        & .timeline-content {
+          padding: var(--space-xl);
+        }
+
+        & .timeline-title {
+          font-size: var(--font-size-2xl);
+        }
+
+        & .timeline-text {
+          font-size: var(--font-size-base);
+        }
+      }
+
+      /* Layout: Horizontal */
+      &.layout-horizontal {
+        @media (min-width: 990px) {
+          & .timeline-list {
+            display: flex;
+            gap: 0;
+            position: relative;
+            padding-block-start: 0;
+
+            &::before {
+              content: "";
+              position: absolute;
+              inset-inline-start: 2rem;
+              inset-inline-end: 2rem;
+              inset-block-start: 1.75rem;
+              height: var(--border-width-medium);
+              background-color: var(--border-light);
+              z-index: 0;
+            }
+          }
+
+          & .timeline-item {
+            flex: 1;
+            padding-inline-start: 0;
+            padding-block-end: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+
+            &::before {
+              display: none;
+            }
+          }
+
+          & .timeline-marker {
+            position: relative;
+            inset-inline-start: 0;
+            inset-block-start: 0;
+            margin-block-end: var(--space-lg);
+            z-index: 1;
+          }
+
+          & .timeline-content {
+            flex: 1;
+            border-inline-start: none;
+            background-color: transparent;
+            padding: 0;
+          }
+
+          & .timeline-meta {
+            justify-content: center;
+          }
+
+          & .timeline-title {
+            font-size: var(--font-size-xl);
+          }
+
+          & .timeline-text {
+            font-size: var(--font-size-sm);
+          }
+
+          & .timeline-features {
+            text-align: start;
+          }
+        }
+
+        @media (min-width: 1200px) {
+          & .timeline-title {
+            font-size: var(--font-size-2xl);
+          }
+
+          & .timeline-text {
+            font-size: var(--font-size-base);
+          }
+        }
+      }
+
+      /* Layout: Centered (alternating sides) */
+      &.layout-centered {
+        & .widget-content {
+          max-width: 90rem;
+          margin-inline: auto;
+        }
+
+        @media (min-width: 990px) {
+          & .timeline-list {
+            position: relative;
+
+            &::before {
+              content: "";
+              position: absolute;
+              inset-inline-start: 50%;
+              inset-block-start: 0;
+              inset-block-end: 0;
+              width: var(--border-width-medium);
+              background-color: var(--border-light);
+              transform: translateX(-50%);
+            }
+          }
+
+          & .timeline-item {
+            padding-inline-start: 0;
+            padding-inline-end: 0;
+            width: 50%;
+            padding-block-end: var(--space-4xl);
+
+            &:nth-child(odd) {
+              margin-inline-start: 0;
+              margin-inline-end: auto;
+              padding-inline-end: var(--space-3xl);
+
+              & .timeline-marker {
+                inset-inline-start: auto;
+                inset-inline-end: -1.75rem;
+              }
+
+              & .timeline-content {
+                border-inline-start: none;
+                border-inline-end: 0.3rem solid var(--text-primary);
+              }
+            }
+
+            &:nth-child(even) {
+              margin-inline-start: auto;
+              margin-inline-end: 0;
+              padding-inline-start: var(--space-3xl);
+
+              & .timeline-marker {
+                inset-inline-start: -1.75rem;
+              }
+            }
+
+            &::before {
+              display: none;
+            }
+          }
+
+          & .timeline-item:last-child::before {
+            display: none;
+          }
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <ul class="timeline-list">
+        {% assign item_index = 0 %}
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          {% assign item_index = item_index | plus: 1 %}
+          <li class="timeline-item" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+            <div class="timeline-marker">
+              <span class="marker-number">{{ item_index }}</span>
+            </div>
+
+            <div class="timeline-content">
+              {% if block.settings.date != blank or block.settings.duration != blank %}
+                <div class="timeline-meta">
+                  {% if block.settings.date != blank %}
+                    <span class="timeline-date">{{ block.settings.date }}</span>
+                  {% endif %}
+                  {% if block.settings.duration != blank %}
+                    <span class="timeline-duration">{{ block.settings.duration }}</span>
+                  {% endif %}
+                </div>
+              {% endif %}
+
+              {% if block.settings.title != blank %}
+                <h3 class="timeline-title">{{ block.settings.title }}</h3>
+              {% endif %}
+
+              {% if block.settings.description != blank %}
+                <p class="timeline-text">{{ block.settings.description }}</p>
+              {% endif %}
+
+              {% if block.settings.features != blank %}
+                <ul class="timeline-features">
+                  {% assign features = block.settings.features | split: '
+' %}
+                  {% for feature in features %}
+                    {% assign trimmed_feature = feature | strip %}
+                    {% if trimmed_feature != blank %}
+                      <li class="feature-item">{{ trimmed_feature }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
