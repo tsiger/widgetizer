@@ -1,0 +1,69 @@
+{
+  "type": "event-list",
+  "displayName": "Event List",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Upcoming Events"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "event",
+      "displayName": "Event",
+      "settings": [
+        {
+          "type": "text",
+          "id": "day",
+          "label": "Day (number)",
+          "default": "15"
+        },
+        {
+          "type": "text",
+          "id": "month",
+          "label": "Month (short)",
+          "default": "Dec"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Event title",
+          "default": "Event Name"
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "Location & time",
+          "default": "New York, NY • 6:00 PM"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "link",
+          "id": "button_link",
+          "label": "Button",
+          "default": {
+            "text": "Register Now",
+            "href": "#",
+            "target": "_self"
+          }
+        }
+      ]
+    }
+  ]
+}
