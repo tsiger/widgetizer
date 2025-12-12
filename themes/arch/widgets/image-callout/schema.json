@@ -1,0 +1,96 @@
+{
+  "type": "image-callout",
+  "displayName": "Image Callout",
+  "settings": [
+    {
+      "type": "image",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "eyebrow",
+      "displayName": "Eyebrow",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Why Choose Us"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "displayName": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Enterprise Solutions"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "displayName": "Text",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "feature",
+      "displayName": "Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Feature text",
+          "default": "Feature benefit goes here"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "displayName": "Button",
+      "settings": [
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Button",
+          "default": {
+            "text": "Learn More",
+            "href": "#",
+            "target": "_self"
+          }
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "default": "primary",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ]
+        }
+      ]
+    }
+  ]
+}

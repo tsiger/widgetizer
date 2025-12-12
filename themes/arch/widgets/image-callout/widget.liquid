@@ -1,0 +1,219 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-image-callout {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="image-callout"
+>
+  <style>
+    #{{ widget.id }} {
+      overflow: hidden;
+
+      & .callout-wrapper {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+
+      & .callout-image-wrapper {
+        position: relative;
+        width: 100%;
+        height: 40rem;
+        overflow: hidden;
+      }
+
+      & .callout-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .callout-content {
+        background-color: var(--bg-primary);
+        padding: var(--space-xl);
+        border: var(--border-width-thin) solid var(--border-light);
+        position: relative;
+        z-index: 2;
+      }
+
+      & .callout-title {
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-bold);
+        line-height: var(--line-height-tight);
+        margin-block-end: var(--space-md);
+      }
+
+      & .callout-text {
+        font-size: var(--font-size-base);
+        line-height: var(--line-height-relaxed);
+        color: var(--text-body);
+        margin-block-end: var(--space-lg);
+      }
+
+      & .callout-features {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        margin-block-end: var(--space-lg);
+      }
+
+      & .callout-feature {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-sm);
+        padding-block: var(--space-xs);
+        font-size: var(--font-size-base);
+        line-height: var(--line-height-relaxed);
+        color: var(--text-body);
+      }
+
+      & .callout-feature-icon {
+        color: var(--text-primary);
+        font-weight: var(--font-weight-bold);
+        flex-shrink: 0;
+      }
+
+      @media (min-width: 750px) {
+        & .callout-image-wrapper {
+          height: 50rem;
+        }
+
+        & .callout-content {
+          padding: var(--space-3xl);
+        }
+
+        & .callout-title {
+          font-size: var(--font-size-3xl);
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .callout-wrapper {
+          grid-template-columns: repeat(12, 1fr);
+          align-items: center;
+          gap: 0;
+        }
+
+        & .callout-image-wrapper {
+          grid-column: 1 / 8;
+          grid-row: 1;
+          height: 60rem;
+        }
+
+        & .callout-content {
+          grid-column: 6 / 13;
+          grid-row: 1;
+          padding: var(--space-4xl);
+          margin-inline-start: -4rem;
+        }
+
+        & .callout-title {
+          font-size: var(--font-size-4xl);
+        }
+
+        & .callout-text {
+          font-size: var(--font-size-lg);
+        }
+      }
+
+      @media (min-width: 1200px) {
+        & .callout-content {
+          padding: var(--space-5xl);
+          margin-inline-start: -6rem;
+        }
+      }
+
+      /* Variant: Image Right */
+      &.layout-image-right {
+        @media (min-width: 990px) {
+          & .callout-image-wrapper {
+            grid-column: 6 / 13;
+            grid-row: 1;
+          }
+
+          & .callout-content {
+            grid-column: 1 / 9;
+            grid-row: 1;
+            margin-inline-start: 0;
+            margin-inline-end: -4rem;
+          }
+        }
+
+        @media (min-width: 1200px) {
+          & .callout-content {
+            margin-inline-end: -6rem;
+          }
+        }
+      }
+    }
+  </style>
+
+  {%- comment -%} Collect feature blocks for rendering as a list {%- endcomment -%}
+  {%- assign has_features = false -%}
+  {%- for blockId in widget.blocksOrder -%}
+    {%- assign block = widget.blocks[blockId] -%}
+    {%- if block.type == 'feature' -%}
+      {%- assign has_features = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  <div class="widget-container">
+    <div class="callout-wrapper">
+      <div class="callout-image-wrapper">
+        {% if widget.settings.image %}
+          {{ widget.settings.image | image: 'large', 'callout-image' }}
+        {% endif %}
+      </div>
+
+      <div class="callout-content">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          
+          {% case block.type %}
+            {% when 'eyebrow' %}
+              {% if block.settings.text != blank %}
+                <span class="widget-eyebrow" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+              {% endif %}
+
+            {% when 'heading' %}
+              {% if block.settings.text != blank %}
+                <h2 class="callout-title" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>{{ block.settings.text }}</h2>
+              {% endif %}
+
+            {% when 'text' %}
+              {% if block.settings.text != blank %}
+                <p class="callout-text" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>{{ block.settings.text }}</p>
+              {% endif %}
+
+            {% when 'feature' %}
+              {%- comment -%} Features are collected and rendered as a group below {%- endcomment -%}
+
+            {% when 'button' %}
+              {% if block.settings.link.text != blank %}
+                <a href="{{ block.settings.link.href }}" class="widget-button {% if block.settings.style == 'secondary' %}widget-button-secondary{% endif %}" data-block-id="{{ blockId }}" {{ block.shopify_attributes }} {% if block.settings.link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+                  {{ block.settings.link.text }}
+                </a>
+              {% endif %}
+          {% endcase %}
+        {% endfor %}
+
+        {% if has_features %}
+          <ul class="callout-features">
+            {% for blockId in widget.blocksOrder %}
+              {% assign block = widget.blocks[blockId] %}
+              {% if block.type == 'feature' and block.settings.text != blank %}
+                <li class="callout-feature" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+                  <span class="callout-feature-icon">✓</span>
+                  {{ block.settings.text }}
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
