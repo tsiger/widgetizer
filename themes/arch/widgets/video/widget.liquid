@@ -1,0 +1,93 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-video"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="video"
+>
+  {%- comment -%} Convert YouTube/Vimeo URL to embed URL {%- endcomment -%}
+  {%- assign video_url = widget.settings.video_url -%}
+  {%- assign embed_url = '' -%}
+
+  {%- if video_url contains 'youtube.com/watch' -%}
+    {%- assign video_id = video_url | split: 'v=' | last | split: '&' | first -%}
+    {%- assign embed_url = 'https://www.youtube.com/embed/' | append: video_id -%}
+  {%- elsif video_url contains 'youtu.be/' -%}
+    {%- assign video_id = video_url | split: 'youtu.be/' | last | split: '?' | first -%}
+    {%- assign embed_url = 'https://www.youtube.com/embed/' | append: video_id -%}
+  {%- elsif video_url contains 'youtube.com/embed/' -%}
+    {%- assign embed_url = video_url -%}
+  {%- elsif video_url contains 'vimeo.com/' -%}
+    {%- assign video_id = video_url | split: 'vimeo.com/' | last | split: '?' | first -%}
+    {%- assign embed_url = 'https://player.vimeo.com/video/' | append: video_id -%}
+  {%- elsif video_url contains 'player.vimeo.com' -%}
+    {%- assign embed_url = video_url -%}
+  {%- else -%}
+    {%- assign embed_url = video_url -%}
+  {%- endif -%}
+
+  {%- comment -%} Calculate aspect ratio padding {%- endcomment -%}
+  {%- assign aspect_padding = '56.25%' -%}
+  {%- case widget.settings.aspect_ratio -%}
+    {%- when '4:3' -%}
+      {%- assign aspect_padding = '75%' -%}
+    {%- when '21:9' -%}
+      {%- assign aspect_padding = '42.86%' -%}
+    {%- when '1:1' -%}
+      {%- assign aspect_padding = '100%' -%}
+  {%- endcase -%}
+
+  <style>
+    #{{ widget.id }} {
+      & .video-embed-container {
+        position: relative;
+        padding-block-end: {{ aspect_padding }};
+        height: 0;
+        overflow: hidden;
+
+        & iframe {
+          position: absolute;
+          inset-block-start: 0;
+          inset-inline-start: 0;
+          width: 100%;
+          height: 100%;
+          border: var(--border-width-thin) solid var(--border-light);
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="video-embed-container">
+        {% if embed_url != blank %}
+          <iframe
+            src="{{ embed_url }}"
+            title="{{ widget.settings.video_title | default: 'Video' }}"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+        {% else %}
+          <p style="text-align: center; padding: var(--space-2xl); color: var(--text-muted);">
+            Enter a YouTube or Vimeo URL to embed a video
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
