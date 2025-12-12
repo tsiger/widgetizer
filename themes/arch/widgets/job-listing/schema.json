@@ -1,0 +1,77 @@
+{
+  "type": "job-listing",
+  "displayName": "Job Listing",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Join Our Team"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Open Positions"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show department filters",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "job",
+      "displayName": "Job",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Job title",
+          "default": "Software Engineer"
+        },
+        {
+          "type": "text",
+          "id": "department",
+          "label": "Department",
+          "default": "Engineering"
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "Location",
+          "default": "Remote"
+        },
+        {
+          "type": "select",
+          "id": "type",
+          "label": "Employment type",
+          "default": "full-time",
+          "options": [
+            { "value": "full-time", "label": "Full-Time" },
+            { "value": "part-time", "label": "Part-Time" },
+            { "value": "contract", "label": "Contract" },
+            { "value": "internship", "label": "Internship" }
+          ]
+        },
+        {
+          "type": "link",
+          "id": "apply_link",
+          "label": "Apply button",
+          "default": {
+            "text": "Apply Now",
+            "href": "#",
+            "target": "_self"
+          }
+        }
+      ]
+    }
+  ]
+}
