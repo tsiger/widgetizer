@@ -2,18 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import { Save, Clock, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllPages } from "../../queries/pageManager";
+import useAutoSave from "../../stores/saveStore";
 
 export default function EditorTopBar({
   pageName,
   pageId,
-  hasUnsavedChanges,
-  isAutoSaving,
-  isSaving,
-  lastSaved,
-  onSave,
   onPreviewModeChange, // Callback to notify parent of preview mode changes
   children,
 }) {
+  const { hasUnsavedChanges, isSaving, isAutoSaving, lastSaved, save, startAutoSave, stopAutoSave } = useAutoSave();
   const [pages, setPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(() => {
@@ -33,6 +30,12 @@ export default function EditorTopBar({
     };
     loadPages();
   }, []);
+
+  // Setup auto-save lifecycle
+  useEffect(() => {
+    startAutoSave();
+    return () => stopAutoSave();
+  }, [startAutoSave, stopAutoSave]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -105,7 +108,7 @@ export default function EditorTopBar({
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="font-medium px-4 py-2 rounded-sm hover:bg-slate-100 flex items-center gap-2"
             >
-              {pageName} {hasUnsavedChanges && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
+              {pageName} {hasUnsavedChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
               <ChevronDown
                 size={16}
                 className={`transform transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
@@ -113,7 +116,7 @@ export default function EditorTopBar({
             </button>
           ) : (
             <div className="font-medium px-4 py-2 flex items-center gap-2">
-              {pageName} {hasUnsavedChanges && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
+              {pageName} {hasUnsavedChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
             </div>
           )}
           {isDropdownOpen && hasMultiplePages && (
@@ -129,7 +132,7 @@ export default function EditorTopBar({
                   }`}
                 >
                   <span>{page.name}</span>
-                  {page.id === pageId && hasUnsavedChanges && (
+                  {page.id === pageId && hasUnsavedChanges() && (
                     <div className="w-2 h-2 bg-pink-500 rounded-full border border-white"></div>
                   )}
                 </button>
@@ -164,10 +167,10 @@ export default function EditorTopBar({
         </Link>
 
         <button
-          onClick={onSave}
-          disabled={!hasUnsavedChanges || isSaving || isAutoSaving}
+          onClick={() => save(false)}
+          disabled={!hasUnsavedChanges() || isSaving || isAutoSaving}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm ${
-            hasUnsavedChanges && !isSaving && !isAutoSaving
+            hasUnsavedChanges() && !isSaving && !isAutoSaving
               ? "bg-pink-600 hover:bg-pink-700 text-white"
               : "bg-slate-200 text-slate-500 cursor-not-allowed"
           }`}

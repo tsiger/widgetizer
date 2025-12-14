@@ -11,7 +11,6 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 import usePageStore from "../stores/pageStore";
 import useWidgetStore from "../stores/widgetStore";
-import useAutoSave from "../stores/saveStore";
 import useThemeStore from "../stores/themeStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
 
@@ -33,7 +32,6 @@ export default function PageEditor() {
     selectedThemeGroup,
     setSelectedThemeGroup,
   } = useWidgetStore();
-  const { hasUnsavedChanges, isSaving, isAutoSaving, lastSaved, save, startAutoSave, stopAutoSave } = useAutoSave();
   const { settings: themeSettings } = useThemeStore();
 
   // Add navigation guard
@@ -49,12 +47,6 @@ export default function PageEditor() {
       useThemeStore.getState().loadSettings();
     }
   }, [searchParams]);
-
-  // Setup auto-save
-  useEffect(() => {
-    startAutoSave();
-    return () => stopAutoSave();
-  }, [startAutoSave, stopAutoSave]);
 
   // Handle block selection (cross-component coordination)
   const handleBlockSelect = (blockId) => {
@@ -108,11 +100,6 @@ export default function PageEditor() {
       <EditorTopBar
         pageName={page.name}
         pageId={page.id}
-        hasUnsavedChanges={hasUnsavedChanges()}
-        isAutoSaving={isAutoSaving}
-        isSaving={isSaving}
-        lastSaved={lastSaved}
-        onSave={() => save(false)}
         onPreviewModeChange={setPreviewMode}
       >
         <ThemeSelector />

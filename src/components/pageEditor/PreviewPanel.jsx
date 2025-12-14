@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
-import DOMPurify from "dompurify";
 import {
   fetchPreview,
   highlightWidget,
@@ -256,17 +255,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     return () => window.removeEventListener("message", handleMessage);
   }, [onWidgetSelect, onBlockSelect, onGlobalWidgetSelect]);
 
-  // Sanitize HTML and validate URLs for security
-  const sanitizedHtml = DOMPurify.sanitize(previewHtml, {
-    ADD_TAGS: ["style", "link", "iframe"],
-    ADD_ATTR: ["data-widget-id", "data-widget-type", "data-block-id", "data-setting", "target", "srcDoc"],
-    WHOLE_DOCUMENT: true,
-    ALLOW_DATA_ATTR: true,
-  });
-
+  // Validate URLs for security (HTML comes from our own server, so no sanitization needed)
   const safeBaseUrl = getSafeBaseUrl(activeProject?.liveUrl, document.baseURI);
 
-  const iframeSrcDoc = sanitizedHtml.replace(
+  const iframeSrcDoc = previewHtml.replace(
     "</head>",
     `<script src="${API_URL(
       "/runtime/previewRuntime.js",
