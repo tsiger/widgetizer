@@ -82,7 +82,7 @@ export default function WidgetItem({
         </div>
       </div>
 
-      {hasBlocks && (
+      {hasBlocks && isSelected && (
         <div className="border-t border-slate-100">
           <div className="p-2">
             <DndContext
