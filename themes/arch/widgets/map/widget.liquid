@@ -1,0 +1,163 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-map"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="map"
+>
+  <style>
+    #{{ widget.id }} {
+      & .map-container {
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        border: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .map-iframe {
+        width: 100%;
+        border: 0;
+        display: block;
+      }
+
+      & .map-iframe.height-small {
+        height: 300px;
+      }
+
+      & .map-iframe.height-medium {
+        height: 450px;
+      }
+
+      & .map-iframe.height-large {
+        height: 600px;
+      }
+
+      & .map-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-block-start: var(--space-lg);
+        flex-wrap: wrap;
+        gap: var(--space-md);
+      }
+
+      & .map-address {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-sm);
+        color: var(--text-secondary);
+      }
+
+      & .map-address-icon {
+        flex-shrink: 0;
+        margin-block-start: 0.1em;
+      }
+
+      & .map-address-text {
+        margin: 0;
+      }
+
+      & .map-directions {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
+        color: var(--color-primary);
+        text-decoration: none;
+        font-weight: var(--font-weight-medium);
+      }
+
+      & .map-directions:hover {
+        text-decoration: underline;
+      }
+
+      & .map-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface-secondary);
+        color: var(--text-muted);
+        text-align: center;
+        padding: var(--space-xl);
+      }
+
+      & .map-placeholder.height-small {
+        height: 300px;
+      }
+
+      & .map-placeholder.height-medium {
+        height: 450px;
+      }
+
+      & .map-placeholder.height-large {
+        height: 600px;
+      }
+
+      & .map-placeholder-icon {
+        font-size: 3rem;
+        margin-block-end: var(--space-md);
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="map-container">
+        {% if widget.settings.embed_url != blank %}
+          <iframe
+            class="map-iframe height-{{ widget.settings.height }}"
+            src="{{ widget.settings.embed_url }}"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Map showing {{ widget.settings.address }}"
+          ></iframe>
+        {% else %}
+          <div class="map-placeholder height-{{ widget.settings.height }}">
+            <span class="map-placeholder-icon">📍</span>
+            <p>Add a Google Maps embed URL to display the map</p>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if widget.settings.show_address
+        and widget.settings.address != blank
+        or widget.settings.directions_link.text != blank
+      %}
+        <div class="map-info">
+          {% if widget.settings.show_address and widget.settings.address != blank %}
+            <div class="map-address">
+              <span class="map-address-icon">📍</span>
+              <p class="map-address-text" data-setting="address">{{ widget.settings.address }}</p>
+            </div>
+          {% endif %}
+
+          {% if widget.settings.directions_link.text != blank %}
+            <a
+              href="{{ widget.settings.directions_link.href }}"
+              class="map-directions"
+              data-setting="directions_link"
+              {% if widget.settings.directions_link.target == '_blank' %}
+                target="_blank" rel="noopener"
+              {% endif %}
+            >
+              {{ widget.settings.directions_link.text }} →
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

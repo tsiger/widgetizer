@@ -1,0 +1,214 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-countdown"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="countdown"
+>
+  <style>
+    #{{ widget.id }} {
+      & .countdown-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      & .countdown-timer {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-md);
+        margin-block: var(--space-xl);
+      }
+
+      & .countdown-unit {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 80px;
+      }
+
+      /* Cards style */
+      &.style-cards .countdown-unit {
+        background: var(--surface-secondary);
+        border: var(--border-width-thin) solid var(--border-light);
+        border-radius: var(--radius-md);
+        padding: var(--space-lg);
+      }
+
+      & .countdown-number {
+        font-size: var(--font-size-4xl);
+        font-weight: var(--font-weight-bold);
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+
+      & .countdown-label {
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-block-start: var(--space-xs);
+      }
+
+      /* Minimal style */
+      &.style-minimal .countdown-unit {
+        min-width: auto;
+      }
+
+      &.style-minimal .countdown-number {
+        font-size: var(--font-size-5xl);
+      }
+
+      &.style-minimal .countdown-separator {
+        font-size: var(--font-size-4xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--text-muted);
+        align-self: flex-start;
+        padding-block-start: var(--space-md);
+      }
+
+      & .countdown-expired {
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-primary);
+        margin-block: var(--space-xl);
+      }
+
+      & .countdown-button {
+        margin-block-start: var(--space-md);
+      }
+
+      @media (max-width: 600px) {
+        & .countdown-timer {
+          gap: var(--space-sm);
+        }
+
+        & .countdown-unit {
+          min-width: 60px;
+        }
+
+        &.style-cards .countdown-unit {
+          padding: var(--space-md);
+        }
+
+        & .countdown-number {
+          font-size: var(--font-size-2xl);
+        }
+
+        &.style-minimal .countdown-number {
+          font-size: var(--font-size-3xl);
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content style-{{ widget.settings.style }}">
+      <div class="countdown-container">
+        <div
+          class="countdown-timer"
+          data-target="{{ widget.settings.target_date }}"
+          data-expired-message="{{ widget.settings.expired_message }}"
+          data-show-seconds="{{ widget.settings.show_seconds }}"
+          data-style="{{ widget.settings.style }}"
+        >
+          <div class="countdown-unit">
+            <span class="countdown-number" data-unit="days">00</span>
+            <span class="countdown-label">Days</span>
+          </div>
+          {% if widget.settings.style == 'minimal' -%}
+            <span class="countdown-separator">:</span>
+          {%- endif %}
+          <div class="countdown-unit">
+            <span class="countdown-number" data-unit="hours">00</span>
+            <span class="countdown-label">Hours</span>
+          </div>
+          {% if widget.settings.style == 'minimal' -%}
+            <span class="countdown-separator">:</span>
+          {%- endif %}
+          <div class="countdown-unit">
+            <span class="countdown-number" data-unit="minutes">00</span>
+            <span class="countdown-label">Minutes</span>
+          </div>
+          {% if widget.settings.show_seconds %}
+            {% if widget.settings.style == 'minimal' -%}
+              <span class="countdown-separator">:</span>
+            {%- endif %}
+            <div class="countdown-unit">
+              <span class="countdown-number" data-unit="seconds">00</span>
+              <span class="countdown-label">Seconds</span>
+            </div>
+          {% endif %}
+        </div>
+
+        {% if widget.settings.button.text != blank %}
+          <div class="countdown-button">
+            <a
+              href="{{ widget.settings.button.href }}"
+              class="widget-button"
+              data-setting="button"
+              {% if widget.settings.button.target == '_blank' %}
+                target="_blank" rel="noopener"
+              {% endif %}
+            >
+              {{ widget.settings.button.text }}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const timer = document.querySelector('#{{ widget.id }} .countdown-timer');
+      if (!timer) return;
+
+      const targetDate = new Date(timer.dataset.target).getTime();
+      const expiredMessage = timer.dataset.expiredMessage;
+      const showSeconds = timer.dataset.showSeconds === 'true';
+
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        if (distance < 0) {
+          timer.innerHTML = '<div class="countdown-expired">' + expiredMessage + '</div>';
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        const daysEl = timer.querySelector('[data-unit="days"]');
+        const hoursEl = timer.querySelector('[data-unit="hours"]');
+        const minutesEl = timer.querySelector('[data-unit="minutes"]');
+        const secondsEl = timer.querySelector('[data-unit="seconds"]');
+
+        if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+        if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    })();
+  </script>
+</section>

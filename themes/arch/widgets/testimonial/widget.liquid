@@ -1,0 +1,233 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-testimonial layout-{{ widget.settings.layout }}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="testimonial"
+>
+  <style>
+    #{{ widget.id }} {
+      & .testimonial-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+      }
+
+      & .testimonial-card {
+        display: flex;
+        flex-direction: column;
+        padding: var(--space-xl);
+        background: var(--surface-secondary);
+        border-radius: var(--radius-md);
+        border: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .testimonial-quote {
+        font-size: var(--font-size-lg);
+        line-height: 1.7;
+        margin: 0 0 var(--space-lg) 0;
+        position: relative;
+        font-style: italic;
+      }
+
+      & .testimonial-quote::before {
+        content: """;
+        position: absolute;
+        top: -0.5em;
+        left: -0.3em;
+        font-size: 4rem;
+        color: var(--color-primary);
+        opacity: 0.2;
+        font-family: Georgia, serif;
+        line-height: 1;
+      }
+
+      & .testimonial-rating {
+        display: flex;
+        gap: 0.125rem;
+        margin-block-end: var(--space-md);
+      }
+
+      & .testimonial-star {
+        color: #fbbf24;
+        font-size: 1.125rem;
+      }
+
+      & .testimonial-star.empty {
+        color: var(--border-light);
+      }
+
+      & .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        margin-block-start: auto;
+      }
+
+      & .testimonial-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      & .testimonial-avatar-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: var(--font-weight-bold);
+        font-size: var(--font-size-lg);
+      }
+
+      & .testimonial-info {
+        display: flex;
+        flex-direction: column;
+      }
+
+      & .testimonial-name {
+        font-weight: var(--font-weight-semibold);
+        margin: 0;
+      }
+
+      & .testimonial-title {
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      /* Single layout */
+      &.layout-single .testimonial-grid {
+        max-width: 800px;
+        margin-inline: auto;
+      }
+
+      &.layout-single .testimonial-card {
+        text-align: center;
+        align-items: center;
+      }
+
+      &.layout-single .testimonial-quote {
+        font-size: var(--font-size-2xl);
+      }
+
+      &.layout-single .testimonial-quote::before {
+        position: static;
+        display: block;
+        margin-block-end: var(--space-md);
+      }
+
+      &.layout-single .testimonial-author {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      &.layout-single .testimonial-rating {
+        justify-content: center;
+      }
+
+      /* Carousel layout */
+      &.layout-carousel .testimonial-grid {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: var(--space-lg);
+        padding-block-end: var(--space-sm);
+      }
+
+      &.layout-carousel .testimonial-grid::-webkit-scrollbar {
+        display: none;
+      }
+
+      &.layout-carousel .testimonial-card {
+        flex: 0 0 100%;
+        scroll-snap-align: start;
+      }
+
+      @media (min-width: 750px) {
+        & .testimonial-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        &.layout-carousel .testimonial-card {
+          flex: 0 0 calc(50% - var(--space-md));
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .testimonial-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        &.layout-carousel .testimonial-card {
+          flex: 0 0 calc(33.333% - var(--space-lg));
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="testimonial-grid">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <div class="testimonial-card" data-block-id="{{ blockId }}">
+            {% if block.settings.rating != blank %}
+              <div class="testimonial-rating">
+                {% assign rating = block.settings.rating | plus: 0 %}
+                {% for i in (1..5) %}
+                  {% if i <= rating %}
+                    <span class="testimonial-star">★</span>
+                  {% else %}
+                    <span class="testimonial-star empty">★</span>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            {% if block.settings.quote != blank %}
+              <p class="testimonial-quote" data-setting="quote">{{ block.settings.quote }}</p>
+            {% endif %}
+
+            <div class="testimonial-author">
+              {% if block.settings.avatar != blank %}
+                {{ block.settings.avatar | image: 'small', 'testimonial-avatar' }}
+              {% else %}
+                {% assign initials = block.settings.name | slice: 0 %}
+                <div class="testimonial-avatar-placeholder">{{ initials }}</div>
+              {% endif %}
+
+              <div class="testimonial-info">
+                {% if block.settings.name != blank %}
+                  <p class="testimonial-name" data-setting="name">{{ block.settings.name }}</p>
+                {% endif %}
+                {% if block.settings.title != blank %}
+                  <p class="testimonial-title" data-setting="title">{{ block.settings.title }}</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

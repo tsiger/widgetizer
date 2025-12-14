@@ -1,0 +1,105 @@
+{
+  "type": "testimonial",
+  "displayName": "Testimonial",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "What Our Customers Say"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "single", "label": "Single (large)" },
+        { "value": "grid", "label": "Grid" },
+        { "value": "carousel", "label": "Carousel" }
+      ],
+      "default": "grid"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "quote",
+      "displayName": "Quote",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote text",
+          "default": "This product has completely transformed how we work. Highly recommended!"
+        },
+        {
+          "type": "image",
+          "id": "avatar",
+          "label": "Photo"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "Jane Smith"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title / Company",
+          "default": "CEO, Acme Inc."
+        },
+        {
+          "type": "select",
+          "id": "rating",
+          "label": "Star rating",
+          "options": [
+            { "value": "", "label": "No rating" },
+            { "value": "5", "label": "5 stars" },
+            { "value": "4", "label": "4 stars" },
+            { "value": "3", "label": "3 stars" }
+          ],
+          "default": "5"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "quote",
+      "settings": {
+        "quote": "Working with this team has been an absolute pleasure. They delivered beyond our expectations and the results speak for themselves.",
+        "name": "Sarah Johnson",
+        "title": "Marketing Director, TechCorp",
+        "rating": "5"
+      }
+    },
+    {
+      "type": "quote",
+      "settings": {
+        "quote": "The attention to detail and commitment to quality is unmatched. I've recommended them to everyone I know.",
+        "name": "Michael Chen",
+        "title": "Founder, StartupXYZ",
+        "rating": "5"
+      }
+    },
+    {
+      "type": "quote",
+      "settings": {
+        "quote": "From start to finish, the experience was seamless. They truly understand what their customers need.",
+        "name": "Emily Rodriguez",
+        "title": "Operations Manager",
+        "rating": "5"
+      }
+    }
+  ]
+}
