@@ -79,5 +79,33 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "slide",
+      "settings": {
+        "eyebrow": "Welcome",
+        "headline": "Your First Slide",
+        "description": "Add your content here",
+        "button_link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "slide",
+      "settings": {
+        "eyebrow": "Featured",
+        "headline": "Your Second Slide",
+        "description": "Add your content here",
+        "button_link": {
+          "text": "Shop Now",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    }
   ]
 }

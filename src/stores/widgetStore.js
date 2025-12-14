@@ -80,12 +80,46 @@ const useWidgetStore = create((set, get) => ({
       });
     }
 
+    // Process default blocks if defined in schema
+    const blocks = {};
+    const blocksOrder = [];
+    
+    if (Array.isArray(schema.defaultBlocks)) {
+      schema.defaultBlocks.forEach((defaultBlock) => {
+        const blockId = `block_${Date.now()}_${Math.floor(Math.random() * 1000)}_${blocksOrder.length}`;
+        
+        // Get block schema for this block type to apply defaults
+        const blockSchema = schema.blocks?.find((b) => b.type === defaultBlock.type);
+        
+        // Start with defaults from block schema
+        const blockSettings = {};
+        if (blockSchema && Array.isArray(blockSchema.settings)) {
+          blockSchema.settings.forEach((setting) => {
+            if (setting.default !== undefined) {
+              blockSettings[setting.id] = setting.default;
+            }
+          });
+        }
+        
+        // Override with values from defaultBlocks
+        if (defaultBlock.settings) {
+          Object.assign(blockSettings, defaultBlock.settings);
+        }
+        
+        blocks[blockId] = {
+          type: defaultBlock.type,
+          settings: blockSettings,
+        };
+        blocksOrder.push(blockId);
+      });
+    }
+
     const newWidgetId = get().generateWidgetId();
     const newWidget = {
       type: widgetType,
       settings: defaultSettings,
-      blocks: {},
-      blocksOrder: [],
+      blocks,
+      blocksOrder,
     };
 
     const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
