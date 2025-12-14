@@ -198,6 +198,12 @@
       "cancel": "Annuler"
     }
   },
+  "preview": {
+    "emptyState": {
+      "title": "Aucun widget pour le moment",
+      "description": "Commencez à construire votre page en ajoutant des widgets depuis la barre latérale"
+    }
+  },
   "pages": {
     "title": "Pages",
     "loading": "Chargement des pages...",

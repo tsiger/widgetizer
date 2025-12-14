@@ -56,8 +56,9 @@ export async function generatePreview(req, res) {
     }
 
     // Render page widgets in the middle
-    if (pageData.widgets) {
-      const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets);
+    const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets || {});
+    
+    if (widgetOrder.length > 0 && pageData.widgets) {
       const widgetPromises = widgetOrder.map(async (widgetId) => {
         const widget = pageData.widgets[widgetId];
         if (!widget) return null; // Return null to filter later
@@ -71,9 +72,66 @@ export async function generatePreview(req, res) {
       // Filter out any null results from missing widgets before joining
       const renderedWidgets = (await Promise.all(widgetPromises)).filter((html) => html !== null);
       content += renderedWidgets.join(""); // Join the HTML strings directly
+    } else {
+      // No page widgets - show empty state message
+      let emptyStateTitle = "No widgets yet";
+      let emptyStateDescription = "Start building your page by adding widgets from the sidebar";
+      
+      try {
+        // Read app settings to get user's locale
+        const appSettingsPath = path.join(__dirname, "../../data/appSettings.json");
+        if (await fs.pathExists(appSettingsPath)) {
+          const appSettings = JSON.parse(await fs.readFile(appSettingsPath, "utf-8"));
+          const userLocale = appSettings?.general?.language || "en";
+          
+          // Load the corresponding locale file
+          const localePath = path.join(__dirname, `../../src/locales/${userLocale}.json`);
+          if (await fs.pathExists(localePath)) {
+            const localeData = JSON.parse(await fs.readFile(localePath, "utf-8"));
+            emptyStateTitle = localeData?.preview?.emptyState?.title || emptyStateTitle;
+            emptyStateDescription = localeData?.preview?.emptyState?.description || emptyStateDescription;
+          }
+        }
+      } catch (error) {
+        console.warn("Could not load translations for empty state, using default:", error.message);
+        // Fall back to English defaults
+      }
+
+      content += `
+        <div class="preview-empty-state">
+          <style>
+            .preview-empty-state {
+              min-height: 30vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-direction: column;
+              padding: var(--space-3xl, 3rem);
+              text-align: center;
+            }
+            .preview-empty-state-title {
+              font-size: var(--font-size-lg, 1.125rem);
+              color: var(--text-muted, #6b7280);
+              margin-bottom: 0.5rem;
+              font-weight: var(--font-weight-medium, 500);
+            }
+            .preview-empty-state-description {
+              font-size: var(--font-size-sm, 0.875rem);
+              color: var(--text-muted, #6b7280);
+              max-width: 28rem;
+            }
+          </style>
+          <p class="preview-empty-state-title">
+            ${emptyStateTitle}
+          </p>
+          <p class="preview-empty-state-description">
+            ${emptyStateDescription}
+          </p>
+        </div>
+      `;
     }
 
-    // NEW: Render footer widget last (if it exists)
+    // Render footer widget last (if it exists)
     if (pageData.globalWidgets?.footer) {
       try {
         const footerHtml = await renderWidget(

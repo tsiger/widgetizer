@@ -198,6 +198,12 @@
       "cancel": "Cancelar"
     }
   },
+  "preview": {
+    "emptyState": {
+      "title": "Aún no hay widgets",
+      "description": "Comienza a crear tu página agregando widgets desde la barra lateral"
+    }
+  },
   "pages": {
     "title": "Páginas",
     "loading": "Cargando páginas...",

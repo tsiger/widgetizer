@@ -199,6 +199,12 @@
       "cancel": "Cancel"
     }
   },
+  "preview": {
+    "emptyState": {
+      "title": "No widgets yet",
+      "description": "Start building your page by adding widgets from the sidebar"
+    }
+  },
   "pages": {
     "title": "Pages",
     "loading": "Loading pages...",

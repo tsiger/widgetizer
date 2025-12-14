@@ -198,6 +198,12 @@
       "cancel": "Abbrechen"
     }
   },
+  "preview": {
+    "emptyState": {
+      "title": "Noch keine Widgets",
+      "description": "Beginnen Sie mit dem Aufbau Ihrer Seite, indem Sie Widgets aus der Seitenleiste hinzufügen"
+    }
+  },
   "pages": {
     "title": "Seiten",
     "loading": "Seiten werden geladen...",
