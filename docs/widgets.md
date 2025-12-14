@@ -65,9 +65,32 @@ Define the widget configuration:
         {
           "type": "text",
           "id": "title",
-          "label": "Title"
+          "label": "Title",
+          "default": "Item Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Item description text"
         }
       ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "item",
+      "settings": {
+        "title": "First Item",
+        "description": "Description for the first item"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Second Item",
+        "description": "Description for the second item"
+      }
     }
   ]
 }
@@ -98,13 +121,13 @@ Convert the static HTML into a Liquid template:
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description">{{ widget.settings.description }}</p>
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -114,7 +137,8 @@ Convert the static HTML into a Liquid template:
       {% for blockId in widget.blocksOrder %}
         {% assign block = widget.blocks[blockId] %}
         <div class="widget-card" data-block-id="{{ blockId }}">
-          {{ block.settings.title }}
+          <h3 data-setting="title">{{ block.settings.title }}</h3>
+          <p data-setting="description">{{ block.settings.description }}</p>
         </div>
       {% endfor %}
     </div>
@@ -153,6 +177,63 @@ All widgets should include these three section-level settings for consistency:
 | `range`    | Numeric slider                   |
 | `color`    | Color picker                     |
 | `menu`     | Menu selector                    |
+
+---
+
+## Default Blocks
+
+Widgets with blocks should provide `defaultBlocks` to ensure they're not empty when first added to a page:
+
+```json
+"defaultBlocks": [
+  {
+    "type": "item",
+    "settings": {
+      "title": "Sample Title",
+      "description": "Sample description text"
+    }
+  }
+]
+```
+
+**Guidelines:**
+
+- Provide 2-6 default blocks depending on the widget type
+- Use realistic, meaningful sample content
+- Don't leave text fields empty in defaults
+- For image fields, omit them (widgets handle empty images gracefully)
+
+---
+
+## Real-time Preview Updates
+
+All widgets should include `data-setting` attributes on text elements for instant preview updates:
+
+```liquid
+<h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
+<p data-setting="description">{{ block.settings.description }}</p>
+<a href="..." data-setting="button_link">{{ block.settings.button_link.text }}</a>
+```
+
+**How it works:**
+
+1. User types in settings panel
+2. Text updates instantly via DOM manipulation
+3. After 300ms, full reload ensures scripts work correctly
+4. Scroll position is preserved across reloads
+
+**Supported setting types:**
+
+- `text` and `textarea` → updates `textContent`
+- `image` → updates `src` attribute
+- `video` → updates `src` attribute
+- `link` → updates `textContent` and `href`
+
+**Usage pattern:**
+
+- Add to ALL text-displaying elements in widget and block content
+- Match the `data-setting` value to the setting `id` in schema.json
+- Works for both widget-level and block-level settings
 
 ---
 

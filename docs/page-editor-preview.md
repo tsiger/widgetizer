@@ -146,7 +146,7 @@ The preview runtime intercepts clicks for widget selection, but allows interacti
 
 ## Real-time Updates
 
-For instant feedback while typing, widgets can optionally use `data-setting` attributes:
+All widgets use `data-setting` attributes on text elements for instant feedback while typing:
 
 ```liquid
 <h2 data-setting="headline">{{ block.settings.headline }}</h2>
@@ -160,6 +160,8 @@ When a setting changes:
 2. previewRuntime finds elements with matching `data-setting`
 3. Updates `textContent`, `src`, or `href` based on element type
 4. Debounced reload still happens for script consistency
+
+All 21 core widgets have `data-setting` attributes and `defaultBlocks` for initial content, ensuring a seamless editing experience.
 
 ## Performance Considerations
 
