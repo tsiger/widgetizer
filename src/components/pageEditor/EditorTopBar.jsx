@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Save, Clock, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft } from "lucide-react";
+import { Save, Clock, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllPages } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
+import usePageStore from "../../stores/pageStore";
 
 export default function EditorTopBar({
   pageName,
@@ -18,6 +19,35 @@ export default function EditorTopBar({
   });
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  // Force re-render when undo/redo happens
+  const [, forceUpdate] = useState(0);
+  
+  // Subscribe to temporal store changes
+  useEffect(() => {
+    const unsubscribe = usePageStore.temporal.subscribe(() => {
+      forceUpdate(c => c + 1);
+    });
+    return unsubscribe;
+  }, []);
+
+  // Get undo/redo state
+  const { pastStates, futureStates, undo, redo } = usePageStore.temporal.getState();
+  const canUndo = pastStates.length > 0 && pastStates[pastStates.length - 1]?.page;
+  const canRedo = futureStates.length > 0;
+
+  // Safe undo - only undo if the previous state has a valid page
+  const safeUndo = () => {
+    const { pastStates, undo } = usePageStore.temporal.getState();
+    if (pastStates.length > 0 && pastStates[pastStates.length - 1]?.page) {
+      undo();
+    }
+  };
+
+  const safeRedo = () => {
+    const { redo } = usePageStore.temporal.getState();
+    redo();
+  };
 
   useEffect(() => {
     const loadPages = async () => {
@@ -36,6 +66,27 @@ export default function EditorTopBar({
     startAutoSave();
     return () => stopAutoSave();
   }, [startAutoSave, stopAutoSave]);
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        if (e.shiftKey) {
+          e.preventDefault();
+          safeRedo();
+        } else {
+          e.preventDefault();
+          safeUndo();
+        }
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        safeRedo();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [safeUndo, safeRedo]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -78,6 +129,30 @@ export default function EditorTopBar({
           <ArrowLeft size={18} />
           Back
         </button>
+
+        {/* Undo/Redo buttons */}
+        <div className="flex gap-1 p-1 bg-slate-200 rounded-md">
+          <button
+            onClick={safeUndo}
+            disabled={!canUndo}
+            title="Undo (Ctrl+Z)"
+            className={`p-1.5 rounded ${
+              canUndo ? "text-slate-600 hover:bg-white hover:text-slate-800" : "text-slate-400 cursor-not-allowed"
+            }`}
+          >
+            <Undo2 size={18} />
+          </button>
+          <button
+            onClick={safeRedo}
+            disabled={!canRedo}
+            title="Redo (Ctrl+Shift+Z)"
+            className={`p-1.5 rounded ${
+              canRedo ? "text-slate-600 hover:bg-white hover:text-slate-800" : "text-slate-400 cursor-not-allowed"
+            }`}
+          >
+            <Redo2 size={18} />
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
