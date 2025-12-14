@@ -65,5 +65,43 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "figure",
+      "settings": {
+        "number": "500",
+        "suffix": "+",
+        "label": "Happy Clients",
+        "description": "And growing every day"
+      }
+    },
+    {
+      "type": "figure",
+      "settings": {
+        "number": "98",
+        "suffix": "%",
+        "label": "Success Rate",
+        "description": "Project completion"
+      }
+    },
+    {
+      "type": "figure",
+      "settings": {
+        "number": "24",
+        "suffix": "/7",
+        "label": "Support",
+        "description": "Always here to help"
+      }
+    },
+    {
+      "type": "figure",
+      "settings": {
+        "number": "10",
+        "suffix": "+",
+        "label": "Years",
+        "description": "Industry experience"
+      }
+    }
   ]
 }

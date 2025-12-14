@@ -69,13 +69,13 @@
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description">{{ widget.settings.description }}</p>
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -87,13 +87,13 @@
           <div class="widget-card {% if block.settings.featured %}is-featured{% endif %}" data-block-id="{{ blockId }}">
             <div class="widget-card-header">
               {% if block.settings.title != blank %}
-                <h3 class="widget-card-title">{{ block.settings.title }}</h3>
+                <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
               {% endif %}
               {% if block.settings.price != blank %}
-                <div class="pricing-price">{{ block.settings.price }}</div>
+                <div class="pricing-price" data-setting="price">{{ block.settings.price }}</div>
               {% endif %}
               {% if block.settings.period != blank %}
-                <div class="widget-card-subtitle">{{ block.settings.period }}</div>
+                <div class="widget-card-subtitle" data-setting="period">{{ block.settings.period }}</div>
               {% endif %}
             </div>
             <div class="widget-card-content">
@@ -115,6 +115,7 @@
                 <a
                   href="{{ block.settings.button_link.href }}"
                   class="widget-button widget-button-full"
+                  data-setting="button_link"
                   {% if block.settings.button_link.target == '_blank' %}
                     target="_blank" rel="noopener"
                   {% endif %}

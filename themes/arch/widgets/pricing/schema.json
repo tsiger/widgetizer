@@ -67,5 +67,52 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "plan",
+      "settings": {
+        "title": "Starter",
+        "price": "$19",
+        "period": "per month",
+        "features": "5 Projects\nEmail Support\n2GB Storage\nBasic Analytics",
+        "button_link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        },
+        "featured": false
+      }
+    },
+    {
+      "type": "plan",
+      "settings": {
+        "title": "Professional",
+        "price": "$49",
+        "period": "per month",
+        "features": "Unlimited Projects\nPriority Support\n10GB Storage\nAdvanced Analytics\nCustom Domain",
+        "button_link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        },
+        "featured": true
+      }
+    },
+    {
+      "type": "plan",
+      "settings": {
+        "title": "Enterprise",
+        "price": "$99",
+        "period": "per month",
+        "features": "Unlimited Everything\n24/7 Phone Support\n100GB Storage\nAdvanced Analytics\nCustom Domain\nDedicated Manager",
+        "button_link": {
+          "text": "Contact Sales",
+          "href": "#",
+          "target": "_self"
+        },
+        "featured": false
+      }
+    }
   ]
 }

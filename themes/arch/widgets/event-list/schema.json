@@ -65,5 +65,52 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "event",
+      "settings": {
+        "day": "15",
+        "month": "Jan",
+        "title": "Product Launch Webinar",
+        "location": "Online • 2:00 PM EST",
+        "description": "Join us for an exclusive first look at our latest product release.",
+        "button_link": {
+          "text": "Register Now",
+          "href": "#",
+         "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "event",
+      "settings": {
+        "day": "22",
+        "month": "Jan",
+        "title": "Customer Workshop",
+        "location": "San Francisco, CA • 10:00 AM",
+        "description": "Hands-on workshop covering best practices and advanced features.",
+        "button_link": {
+          "text": "Register Now",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "event",
+      "settings": {
+        "day": "5",
+        "month": "Feb",
+        "title": "Annual Conference",
+        "location": "New York, NY • 9:00 AM",
+        "description": "Our biggest event of the year featuring speakers, workshops, and networking.",
+        "button_link": {
+          "text": "Get Tickets",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    }
   ]
 }

@@ -43,5 +43,43 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "logo",
+      "settings": {
+        "name": "Company 1"
+      }
+    },
+    {
+      "type": "logo",
+      "settings": {
+        "name": "Company 2"
+      }
+    },
+    {
+      "type": "logo",
+      "settings": {
+        "name": "Company 3"
+      }
+    },
+    {
+      "type": "logo",
+      "settings": {
+        "name": "Company 4"
+      }
+    },
+    {
+      "type": "logo",
+      "settings": {
+        "name": "Company 5"
+      }
+    },
+    {
+      "type": "logo",
+      "settings": {
+        "name": "Company 6"
+      }
+    }
   ]
 }

@@ -311,13 +311,13 @@
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description">{{ widget.settings.description }}</p>
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -337,20 +337,20 @@
               {% if block.settings.date != blank or block.settings.duration != blank %}
                 <div class="timeline-meta">
                   {% if block.settings.date != blank %}
-                    <span class="timeline-date">{{ block.settings.date }}</span>
+                    <span class="timeline-date" data-setting="date">{{ block.settings.date }}</span>
                   {% endif %}
                   {% if block.settings.duration != blank %}
-                    <span class="timeline-duration">{{ block.settings.duration }}</span>
+                    <span class="timeline-duration" data-setting="duration">{{ block.settings.duration }}</span>
                   {% endif %}
                 </div>
               {% endif %}
 
               {% if block.settings.title != blank %}
-                <h3 class="timeline-title">{{ block.settings.title }}</h3>
+                <h3 class="timeline-title" data-setting="title">{{ block.settings.title }}</h3>
               {% endif %}
 
               {% if block.settings.description != blank %}
-                <p class="timeline-text">{{ block.settings.description }}</p>
+                <p class="timeline-text" data-setting="description">{{ block.settings.description }}</p>
               {% endif %}
 
               {% if block.settings.features != blank %}

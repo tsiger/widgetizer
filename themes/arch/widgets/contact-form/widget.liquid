@@ -162,13 +162,13 @@
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description">{{ widget.settings.description }}</p>
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -290,7 +290,7 @@
               {% if block.type == 'info' %}
                 <div class="contact-info-block" data-block-id="{{ blockId }}">
                   {% if block.settings.title != blank %}
-                    <h3 class="contact-info-title">{{ block.settings.title }}</h3>
+                    <h3 class="contact-info-title" data-setting="title">{{ block.settings.title }}</h3>
                   {% endif %}
                   {% if block.settings.text != blank %}
                     <p class="contact-info-text">
@@ -298,6 +298,7 @@
                         <a
                           href="{{ block.settings.link.href }}"
                           class="contact-info-link"
+                          data-setting="text"
                           {% if block.settings.link.target == '_blank' %}
                             target="_blank" rel="noopener"
                           {% endif %}
@@ -305,7 +306,7 @@
                           {{ block.settings.text }}
                         </a>
                       {% else %}
-                        {{ block.settings.text }}
+                        <span data-setting="text">{{ block.settings.text }}</span>
                       {% endif %}
                     </p>
                   {% endif %}

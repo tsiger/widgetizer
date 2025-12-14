@@ -72,5 +72,50 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "column",
+      "settings": {
+        "name": "Free",
+        "featured": false
+      }
+    },
+    {
+      "type": "column",
+      "settings": {
+        "name": "Pro",
+        "featured": true,
+        "badge": "Popular"
+      }
+    },
+    {
+      "type": "column",
+      "settings": {
+        "name": "Enterprise",
+        "featured": false
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "name": "Basic Features",
+        "values": "✓\n✓\n✓"
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "name": "Advanced Analytics",
+        "values": "✗\n✓\n✓"
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "name": "Priority Support",
+        "values": "✗\n✗\n✓"
+      }
+    }
   ]
 }

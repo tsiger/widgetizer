@@ -36,5 +36,31 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "image",
+      "settings": {
+        "caption": "Gallery Image 1"
+      }
+    },
+    {
+      "type": "image",
+      "settings": {
+        "caption": "Gallery Image 2"
+      }
+    },
+    {
+      "type": "image",
+      "settings": {
+        "caption": "Gallery Image 3"
+      }
+    },
+    {
+      "type": "image",
+      "settings": {
+        "caption": "Gallery Image 4"
+      }
+    }
   ]
 }

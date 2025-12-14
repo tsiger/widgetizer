@@ -61,5 +61,46 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "card",
+      "settings": {
+        "subtitle": "Design",
+        "title": "Web Design",
+        "description": "Beautiful, responsive websites that engage and convert visitors.",
+        "button_link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "card",
+      "settings": {
+        "subtitle": "Development",
+        "title": "Web Development",
+        "description": "Custom web applications built with modern technologies.",
+        "button_link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "card",
+      "settings": {
+        "subtitle": "Marketing",
+        "title": "Digital Marketing",
+        "description": "Strategies that drive traffic and grow your business.",
+        "button_link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    }
   ]
 }

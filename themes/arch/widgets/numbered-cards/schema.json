@@ -38,5 +38,28 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "step",
+      "settings": {
+        "title": "Consultation",
+        "description": "Schedule a free consultation to discuss your goals and requirements."
+      }
+    },
+    {
+      "type": "step",
+      "settings": {
+        "title": "Planning",
+        "description": "We create a detailed plan tailored to your specific needs."
+      }
+    },
+    {
+      "type": "step",
+      "settings": {
+        "title": "Execution",
+        "description": "Our team implements the solution with precision and care."
+      }
+    }
   ]
 }

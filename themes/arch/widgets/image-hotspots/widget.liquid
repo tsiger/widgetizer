@@ -226,13 +226,13 @@
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description">{{ widget.settings.description }}</p>
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -272,7 +272,7 @@
             <div class="image-hotspot-tooltip" role="tooltip">
               <div class="image-hotspot-tooltip-header">
                 {% if block.settings.title != blank %}
-                  <h3 class="image-hotspot-tooltip-title">{{ block.settings.title }}</h3>
+                  <h3 class="image-hotspot-tooltip-title" data-setting="title">{{ block.settings.title }}</h3>
                 {% endif %}
                 <button type="button" class="image-hotspot-tooltip-close" aria-label="Close tooltip">
                   <svg class="image-hotspot-tooltip-close-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -282,12 +282,18 @@
               </div>
 
               {% if block.settings.description != blank %}
-                <p class="image-hotspot-tooltip-description">{{ block.settings.description }}</p>
+                <p class="image-hotspot-tooltip-description" data-setting="description">
+                  {{ block.settings.description }}
+                </p>
               {% endif %}
 
               {% if block.settings.button_text != blank and block.settings.button_link != blank %}
                 <div class="image-hotspot-tooltip-footer">
-                  <a href="{{ block.settings.button_link }}" class="widget-button widget-button-small">
+                  <a
+                    href="{{ block.settings.button_link }}"
+                    class="widget-button widget-button-small"
+                    data-setting="button_text"
+                  >
                     {{ block.settings.button_text }}
                   </a>
                 </div>

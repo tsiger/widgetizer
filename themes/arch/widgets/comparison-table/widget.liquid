@@ -188,13 +188,13 @@
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description">{{ widget.settings.description }}</p>
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -207,10 +207,14 @@
               <th class="comparison-table-th">{{ widget.settings.feature_column_label | default: 'Features' }}</th>
               {% for colId in column_ids %}
                 {% assign col = widget.blocks[colId] %}
-                <th class="comparison-table-th {% if col.settings.featured %}comparison-table-th-featured{% endif %}" data-block-id="{{ colId }}" {{ col.shopify_attributes }}>
-                  <div>{{ col.settings.name }}</div>
+                <th
+                  class="comparison-table-th {% if col.settings.featured %}comparison-table-th-featured{% endif %}"
+                  data-block-id="{{ colId }}"
+                  {{ col.shopify_attributes }}
+                >
+                  <div data-setting="name">{{ col.settings.name }}</div>
                   {% if col.settings.badge != blank %}
-                    <span class="comparison-table-badge">{{ col.settings.badge }}</span>
+                    <span class="comparison-table-badge" data-setting="badge">{{ col.settings.badge }}</span>
                   {% endif %}
                 </th>
               {% endfor %}
@@ -223,7 +227,7 @@
               {% assign values = feature.settings.values | split: '
 ' %}
               <tr data-block-id="{{ featureId }}" {{ feature.shopify_attributes }}>
-                <td class="comparison-table-td">{{ feature.settings.name }}</td>
+                <td class="comparison-table-td" data-setting="name">{{ feature.settings.name }}</td>
                 {% for colId in column_ids %}
                   {% assign col = widget.blocks[colId] %}
                   {% assign col_index = forloop.index0 %}
@@ -231,7 +235,13 @@
                   <td class="comparison-table-td {% if col.settings.featured %}comparison-table-td-featured{% endif %}">
                     {% if value == '✓' or value == 'yes' or value == 'Yes' or value == 'true' %}
                       <span class="comparison-table-check" aria-label="Included">✓</span>
-                    {% elsif value == '✗' or value == 'no' or value == 'No' or value == 'false' or value == 'x' or value == 'X' %}
+                    {% elsif value == '✗'
+                      or value == 'no'
+                      or value == 'No'
+                      or value == 'false'
+                      or value == 'x'
+                      or value == 'X'
+                    %}
                       <span class="comparison-table-cross" aria-label="Not included">✗</span>
                     {% elsif value != blank %}
                       {{ value }}
@@ -248,7 +258,13 @@
 
       {% if widget.settings.cta_link.text != blank %}
         <div class="comparison-table-footer">
-          <a href="{{ widget.settings.cta_link.href }}" class="widget-button widget-button-primary" {% if widget.settings.cta_link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+          <a
+            href="{{ widget.settings.cta_link.href }}"
+            class="widget-button widget-button-primary"
+            {% if widget.settings.cta_link.target == '_blank' %}
+              target="_blank" rel="noopener"
+            {% endif %}
+          >
             {{ widget.settings.cta_link.text }}
           </a>
         </div>

@@ -74,5 +74,25 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "hotspot",
+      "settings": {
+        "position_x": 30,
+        "position_y": 40,
+        "title": "Premium Quality",
+        "description": "Crafted with the finest materials for lasting durability."
+      }
+    },
+    {
+      "type": "hotspot",
+      "settings": {
+        "position_x": 70,
+        "position_y": 30,
+        "title": "Advanced Technology",
+        "description": "Cutting-edge features that make your life easier."
+      }
+    }
   ]
 }

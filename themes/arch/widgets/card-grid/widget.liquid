@@ -51,13 +51,13 @@
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description">
+          <p class="widget-description" data-setting="description">
             {{ widget.settings.description }}
           </p>
         {% endif %}
@@ -76,13 +76,13 @@
             {% endif %}
             <div class="widget-card-content">
               {% if block.settings.subtitle != blank %}
-                <span class="widget-card-subtitle">{{ block.settings.subtitle }}</span>
+                <span class="widget-card-subtitle" data-setting="subtitle">{{ block.settings.subtitle }}</span>
               {% endif %}
               {% if block.settings.title != blank %}
-                <h3 class="widget-card-title">{{ block.settings.title }}</h3>
+                <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
               {% endif %}
               {% if block.settings.description != blank %}
-                <p class="widget-card-description">
+                <p class="widget-card-description" data-setting="description">
                   {{ block.settings.description }}
                 </p>
               {% endif %}
@@ -91,6 +91,7 @@
                   <a
                     href="{{ block.settings.button_link.href }}"
                     class="widget-button"
+                    data-setting="button_link"
                     target="{{ block.settings.button_link.target | default: '_self' }}"
                   >
                     {{- block.settings.button_link.text -}}

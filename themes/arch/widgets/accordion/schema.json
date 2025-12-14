@@ -69,5 +69,28 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "item",
+      "settings": {
+        "question": "What is your refund policy?",
+        "answer": "We offer a 30-day money-back guarantee on all purchases. If you're not satisfied, contact us for a full refund."
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "question": "How long does shipping take?",
+        "answer": "Standard shipping takes 5-7 business days. Express shipping is available for 2-3 day delivery."
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "question": "Do you offer customer support?",
+        "answer": "Yes! Our support team is available 24/7 via email and live chat to assist you with any questions."
+      }
+    }
   ]
 }

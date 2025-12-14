@@ -52,13 +52,13 @@
     {% if widget.settings.title != blank or widget.settings.description != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description">{{ widget.settings.description }}</p>
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -94,11 +94,11 @@
               </svg>
             {% endif %}
             {% if block.settings.title != blank %}
-              <h3 class="widget-card-title">{{ block.settings.title }}</h3>
+              <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
             {% endif %}
             {% if block.settings.description != blank %}
               <div class="widget-card-content">
-                <p>{{ block.settings.description }}</p>
+                <p data-setting="description">{{ block.settings.description }}</p>
               </div>
             {% endif %}
           </li>

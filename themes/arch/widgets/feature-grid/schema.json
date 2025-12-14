@@ -55,5 +55,39 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "feature",
+      "settings": {
+        "icon": "lightning",
+        "title": "Lightning Fast",
+        "description": "Experience blazing fast performance with our optimized infrastructure."
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "icon": "shield",
+        "title": "Secure & Reliable",
+        "description": "Your data is protected with enterprise-grade security and 99.9% uptime."
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "icon": "phone",
+        "title": "Mobile Ready",
+        "description": "Perfect experience across all devices, from desktop to mobile."
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "icon": "chart",
+        "title": "Advanced Analytics",
+        "description": "Track your growth with powerful insights and detailed reports."
+      }
+    }
   ]
 }

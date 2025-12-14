@@ -141,13 +141,13 @@
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description">{{ widget.settings.description }}</p>
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -158,7 +158,7 @@
           {% assign block = widget.blocks[blockId] %}
           <li class="accordion-item" data-block-id="{{ blockId }}">
             <button class="accordion-trigger" aria-expanded="false">
-              <span class="accordion-question">{{ block.settings.question }}</span>
+              <span class="accordion-question" data-setting="question">{{ block.settings.question }}</span>
               <span class="accordion-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -174,7 +174,7 @@
               </span>
             </button>
             <div class="accordion-content">
-              <p class="accordion-answer">{{ block.settings.answer }}</p>
+              <p class="accordion-answer" data-setting="answer">{{ block.settings.answer }}</p>
             </div>
           </li>
         {% endfor %}

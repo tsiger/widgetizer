@@ -45,5 +45,39 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "feature",
+      "settings": {
+        "subtitle": "Performance",
+        "title": "Lightning Fast",
+        "description": "Optimized for speed with best-in-class performance metrics."
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "subtitle": "Security",
+        "title": "Enterprise Grade",
+        "description": "Bank-level security protecting your sensitive data 24/7."
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "subtitle": "Support",
+        "title": "Always Available",
+        "description": "Expert support team ready to help whenever you need us."
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "subtitle": "Integration",
+        "title": "Seamless Setup",
+        "description": "Connect with all your favorite tools in just a few clicks."
+      }
+    }
   ]
 }

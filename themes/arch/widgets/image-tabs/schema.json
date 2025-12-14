@@ -52,5 +52,28 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "tab",
+      "settings": {
+        "title": "Easy Integration",
+        "description": "Connect with all your favorite tools in minutes with our simple API"
+      }
+    },
+    {
+      "type": "tab",
+      "settings": {
+        "title": "Real-time Analytics",
+        "description": "Track performance with live dashboards and detailed reports"
+      }
+    },
+    {
+      "type": "tab",
+      "settings": {
+        "title": "Team Collaboration",
+        "description": "Work together seamlessly with built-in collaboration features"
+      }
+    }
   ]
 }

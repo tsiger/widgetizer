@@ -106,13 +106,13 @@
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description">{{ widget.settings.description }}</p>
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -173,20 +173,20 @@
           >
             <div class="widget-card-content">
               <div class="job-header">
-                <h3 class="widget-card-title">{{ block.settings.title }}</h3>
+                <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
                 <div class="job-meta">
                   <span class="job-meta-item">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" />
                     </svg>
-                    {{ block.settings.department }}
+                    <span data-setting="department">{{ block.settings.department }}</span>
                   </span>
                   <span class="job-meta-item">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2" />
                       <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2" />
                     </svg>
-                    {{ block.settings.location }}
+                    <span data-setting="location">{{ block.settings.location }}</span>
                   </span>
                   <span class="job-badge">
                     {% case block.settings.type %}
@@ -207,6 +207,7 @@
                   <a
                     href="{{ block.settings.apply_link.href }}"
                     class="widget-button"
+                    data-setting="apply_link"
                     {% if block.settings.apply_link.target == '_blank' %}
                       target="_blank" rel="noopener"
                     {% endif %}

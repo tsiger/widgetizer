@@ -1,6 +1,6 @@
 {
   "type": "image-text",
-  "displayName": "Image + Text",
+  "displayName": "Image +Text",
   "settings": [
     {
       "type": "image",
@@ -85,6 +85,37 @@
           ]
         }
       ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "eyebrow",
+      "settings": {
+        "text": "Our Approach"
+      }
+    },
+    {
+      "type": "heading",
+      "settings": {
+        "text": "Built for Modern Teams"
+      }
+    },
+    {
+      "type": "text",
+      "settings": {
+        "text": "We combine cutting-edge technology with proven methodologies to deliver exceptional results. Our platform is designed to help teams collaborate more effectively and achieve their goals faster."
+      }
+    },
+    {
+      "type": "button",
+      "settings": {
+        "link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        },
+        "style": "primary"
+      }
     }
   ]
 }

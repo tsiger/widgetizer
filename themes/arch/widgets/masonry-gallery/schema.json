@@ -42,5 +42,49 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "item",
+      "settings": {
+        "title": "Image 1",
+        "category": "Photography"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Image 2",
+        "category": "Design"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Image 3",
+        "category": "Art"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Image 4",
+        "category": "Photography"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Image 5",
+        "category": "Design"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Image 6",
+        "category": "Art"
+      }
+    }
   ]
 }

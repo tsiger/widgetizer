@@ -49,5 +49,28 @@
         }
       ]
     }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "project",
+      "settings": {
+        "title": "E-Commerce Platform",
+        "description": "A modern shopping experience with seamless checkout"
+      }
+    },
+    {
+      "type": "project",
+      "settings": {
+        "title": "Brand Redesign",
+        "description": "Complete visual identity overhaul for a tech startup"
+      }
+    },
+    {
+      "type": "project",
+      "settings": {
+        "title": "Mobile App",
+        "description": "Award-winning iOS and Android application"
+      }
+    }
   ]
 }
