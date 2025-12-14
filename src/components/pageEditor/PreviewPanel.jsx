@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
+import DOMPurify from "dompurify";
 import {
   fetchPreview,
   highlightWidget,
@@ -6,6 +7,23 @@ import {
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
 import { API_URL } from "../../config";
+
+/**
+ * Validate liveUrl to prevent malicious base href injection.
+ * Only allows http/https URLs.
+ */
+function getSafeBaseUrl(liveUrl, fallback) {
+  if (!liveUrl) return fallback;
+  try {
+    const url = new URL(liveUrl);
+    if (url.protocol === "https:" || url.protocol === "http:") {
+      return liveUrl;
+    }
+  } catch {
+    return fallback;
+  }
+  return fallback;
+}
 
 const PreviewPanel = forwardRef(function PreviewPanel(
   {
@@ -238,11 +256,21 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     return () => window.removeEventListener("message", handleMessage);
   }, [onWidgetSelect, onBlockSelect, onGlobalWidgetSelect]);
 
-  const iframeSrcDoc = previewHtml.replace(
+  // Sanitize HTML and validate URLs for security
+  const sanitizedHtml = DOMPurify.sanitize(previewHtml, {
+    ADD_TAGS: ["style", "link", "iframe"],
+    ADD_ATTR: ["data-widget-id", "data-widget-type", "data-block-id", "data-setting", "target", "srcDoc"],
+    WHOLE_DOCUMENT: true,
+    ALLOW_DATA_ATTR: true,
+  });
+
+  const safeBaseUrl = getSafeBaseUrl(activeProject?.liveUrl, document.baseURI);
+
+  const iframeSrcDoc = sanitizedHtml.replace(
     "</head>",
     `<script src="${API_URL(
       "/runtime/previewRuntime.js",
-    )}"></script><base href="${activeProject?.liveUrl || document.baseURI}" target="_blank"></head>`,
+    )}"></script><base href="${safeBaseUrl}" target="_blank"></head>`,
   );
 
   return (
