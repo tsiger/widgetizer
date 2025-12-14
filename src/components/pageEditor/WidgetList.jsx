@@ -204,6 +204,7 @@ export default function WidgetList({
                           widgetSchema={widgetSchema}
                           isSelected={selectedWidgetId === widgetId}
                           isModified={isModified}
+                          isDraggingAny={activeId !== null}
                           onWidgetSelect={onWidgetSelect}
                           onDeleteClick={handleDeleteWidget}
                           onDuplicateClick={handleDuplicateWidget}
@@ -237,6 +238,7 @@ export default function WidgetList({
                       isSelected={true}
                       isModified={modifiedWidgets.has(activeId)}
                       isOverlay={true}
+                      isDraggingAny={true}
                       onDeleteClick={handleDeleteWidget}
                     />
                   </div>

@@ -12,6 +12,7 @@ export default function WidgetItem({
   isSelected,
   isModified,
   isDragging,
+  isDraggingAny = false,
   isOverlay = false,
   onWidgetSelect,
   dragHandleProps = {},
@@ -82,7 +83,7 @@ export default function WidgetItem({
         </div>
       </div>
 
-      {hasBlocks && isSelected && (
+      {hasBlocks && isSelected && !isDraggingAny && (
         <div className="border-t border-slate-100">
           <div className="p-2">
             <DndContext

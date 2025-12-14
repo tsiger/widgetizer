@@ -10,6 +10,7 @@ export default function SortableWidgetItem({
   widgetSchema,
   isSelected,
   isModified,
+  isDraggingAny,
   onWidgetSelect,
   onDeleteClick,
   onDuplicateClick,
@@ -67,6 +68,7 @@ export default function SortableWidgetItem({
         isSelected={isSelected}
         isModified={isModified}
         isDragging={isDragging}
+        isDraggingAny={isDraggingAny}
         onWidgetSelect={onWidgetSelect}
         dragHandleProps={dragHandleProps}
         onDeleteClick={onDeleteClick}
