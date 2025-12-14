@@ -328,7 +328,7 @@
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
           {% assign item_index = item_index | plus: 1 %}
-          <li class="timeline-item" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+          <li class="timeline-item" data-block-id="{{ blockId }}">
             <div class="timeline-marker">
               <span class="marker-number">{{ item_index }}</span>
             </div>

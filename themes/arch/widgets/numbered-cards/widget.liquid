@@ -71,7 +71,7 @@
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
           {% assign step_number = forloop.index | prepend: '0' | slice: -2, 2 %}
-          <article class="widget-card" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+          <article class="widget-card" data-block-id="{{ blockId }}">
             <div class="widget-card-number">{{ step_number }}</div>
             {% if block.settings.title != blank %}
               <h3 class="widget-card-title">{{ block.settings.title }}</h3>

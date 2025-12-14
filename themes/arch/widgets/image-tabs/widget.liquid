@@ -153,7 +153,7 @@
     <div class="widget-content">
       <div class="image-tabs-wrapper">
         <div class="image-tabs-image-area">
-          <img src="{{ first_image }}" alt="" class="image-tabs-image" loading="lazy" />
+          <img src="{{ first_image }}" alt="" class="image-tabs-image" loading="lazy">
         </div>
 
         <ul class="image-tabs-list" role="tablist">
@@ -161,7 +161,11 @@
           {% for blockId in widget.blocksOrder %}
             {% assign block = widget.blocks[blockId] %}
             {% assign image_url = block.settings.image | image: 'path' %}
-            <li class="image-tabs-tab {% if first_tab %}is-active{% endif %}" role="presentation" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+            <li
+              class="image-tabs-tab {% if first_tab %}is-active{% endif %}"
+              role="presentation"
+              data-block-id="{{ blockId }}"
+            >
               <button
                 class="image-tabs-tab-button"
                 role="tab"
@@ -184,7 +188,7 @@
   </div>
 
   <script>
-    (function() {
+    (function () {
       const widget = document.getElementById('{{ widget.id }}');
       if (!widget || widget.dataset.initialized) return;
       widget.dataset.initialized = 'true';

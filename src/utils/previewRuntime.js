@@ -142,6 +142,73 @@ function scrollToWidget(widgetId) {
     }
   }
 }
+// Update widget settings in real-time (for immediate feedback while typing)
+// This updates DOM content without reloading - scripts stay running
+function updateWidgetSettings(widgetId, changes) {
+  const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
+  if (!widget) return;
+  
+  // Update widget-level settings
+  if (changes.settings) {
+    Object.entries(changes.settings).forEach(([settingId, value]) => {
+      applySettingToElement(widget, settingId, value);
+    });
+  }
+  
+  // Update block-level settings
+  if (changes.blocks) {
+    Object.entries(changes.blocks).forEach(([blockId, blockChanges]) => {
+      const blockEl = widget.querySelector(`[data-block-id="${blockId}"]`);
+      if (blockEl && blockChanges.settings) {
+        Object.entries(blockChanges.settings).forEach(([settingId, value]) => {
+          applySettingToElement(blockEl, settingId, value);
+        });
+      }
+    });
+  }
+}
+
+// Apply a setting value to elements within a container
+function applySettingToElement(container, settingId, value) {
+  // Find elements with data-setting attribute matching this settingId
+  const elements = container.querySelectorAll(`[data-setting="${settingId}"]`);
+  
+  elements.forEach((el) => {
+    const tagName = el.tagName.toLowerCase();
+    
+    // Handle different element types
+    if (tagName === 'img') {
+      // Image: update src
+      if (typeof value === 'string') {
+        el.src = value;
+      } else if (value?.url) {
+        el.src = value.url;
+      }
+    } else if (tagName === 'video') {
+      // Video: update src
+      if (typeof value === 'string') {
+        el.src = value;
+      } else if (value?.url) {
+        el.src = value.url;
+      }
+    } else if (tagName === 'a') {
+      // Link: update href and/or text
+      if (typeof value === 'object') {
+        if (value.href !== undefined) el.href = value.href;
+        if (value.text !== undefined) el.textContent = value.text;
+      } else {
+        el.textContent = value;
+      }
+    } else {
+      // Default: update text content (for text, textarea, etc.)
+      if (typeof value === 'string' || typeof value === 'number') {
+        el.textContent = value;
+      } else if (value?.text) {
+        el.textContent = value.text;
+      }
+    }
+  });
+}
 
 // Message handler
 function handleMessage(event) {
@@ -160,6 +227,9 @@ function handleMessage(event) {
     case "SCROLL_TO_WIDGET":
       scrollToWidget(payload.widgetId);
       break;
+    case "UPDATE_WIDGET_SETTINGS":
+      updateWidgetSettings(payload.widgetId, payload.changes);
+      break;
     default:
       console.warn("Preview Runtime: Unknown message type:", type);
   }
@@ -170,12 +240,33 @@ function setupInteractionHandler() {
   document.addEventListener(
     "click",
     (event) => {
+      // Don't intercept clicks on interactive elements - let them work normally
+      const interactiveElement = event.target.closest('button, a, input, select, textarea, [role="button"]');
+      if (interactiveElement) {
+        // Still send selection message, but don't prevent the click
+        const blockEl = event.target.closest("[data-block-id]");
+        const widgetEl = event.target.closest("[data-widget-id]");
+        if (widgetEl) {
+          window.parent.postMessage(
+            {
+              type: "WIDGET_SELECTED",
+              payload: {
+                widgetId: widgetEl.getAttribute("data-widget-id"),
+                blockId: blockEl ? blockEl.getAttribute("data-block-id") : null,
+              },
+            },
+            "*",
+          );
+        }
+        return; // Let the click proceed to the interactive element
+      }
+
       // Find the closest widget or block element
       const blockEl = event.target.closest("[data-block-id]");
       const widgetEl = event.target.closest("[data-widget-id]");
 
       if (widgetEl) {
-        // Prevent default behavior (e.g., following links)
+        // Prevent default behavior (e.g., following links) for non-interactive clicks
         event.preventDefault();
         event.stopPropagation();
 

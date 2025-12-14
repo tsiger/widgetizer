@@ -176,52 +176,69 @@
     <div class="widget-content">
       <div class="contact-content {% unless widget.settings.show_sidebar %}no-sidebar{% endunless %}">
         <!-- Contact Form -->
-        <form class="contact-form" action="{{ widget.settings.form_action }}" method="{{ widget.settings.form_method }}">
+        <form
+          class="contact-form"
+          action="{{ widget.settings.form_action }}"
+          method="{{ widget.settings.form_method }}"
+        >
           {% for blockId in widget.blocksOrder %}
             {% assign block = widget.blocks[blockId] %}
             {% if block.type != 'info' %}
               {% assign field_id = widget.id | append: '-' | append: block.settings.name %}
-              
+
               {% case block.type %}
                 {% when 'input' %}
-                  <div class="form-group" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+                  <div class="form-group" data-block-id="{{ blockId }}">
                     <label for="{{ field_id }}" class="form-label">
-                      {{ block.settings.label }}{% if block.settings.required %} *{% endif %}
+                      {{ block.settings.label -}}
+                      {%- if block.settings.required %} *{% endif %}
                     </label>
                     <input
                       type="{{ block.settings.input_type }}"
                       id="{{ field_id }}"
                       name="{{ block.settings.name }}"
                       class="form-input"
-                      {% if block.settings.placeholder != blank %}placeholder="{{ block.settings.placeholder }}"{% endif %}
-                      {% if block.settings.required %}required aria-required="true"{% endif %}
-                    />
+                      {% if block.settings.placeholder != blank %}
+                        placeholder="{{ block.settings.placeholder }}"
+                      {% endif %}
+                      {% if block.settings.required %}
+                        required aria-required="true"
+                      {% endif %}
+                    >
                   </div>
 
                 {% when 'textarea' %}
-                  <div class="form-group" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+                  <div class="form-group" data-block-id="{{ blockId }}">
                     <label for="{{ field_id }}" class="form-label">
-                      {{ block.settings.label }}{% if block.settings.required %} *{% endif %}
+                      {{ block.settings.label -}}
+                      {%- if block.settings.required %} *{% endif %}
                     </label>
                     <textarea
                       id="{{ field_id }}"
                       name="{{ block.settings.name }}"
                       class="form-textarea"
-                      {% if block.settings.placeholder != blank %}placeholder="{{ block.settings.placeholder }}"{% endif %}
-                      {% if block.settings.required %}required aria-required="true"{% endif %}
+                      {% if block.settings.placeholder != blank %}
+                        placeholder="{{ block.settings.placeholder }}"
+                      {% endif %}
+                      {% if block.settings.required %}
+                        required aria-required="true"
+                      {% endif %}
                     ></textarea>
                   </div>
 
                 {% when 'dropdown' %}
-                  <div class="form-group" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+                  <div class="form-group" data-block-id="{{ blockId }}">
                     <label for="{{ field_id }}" class="form-label">
-                      {{ block.settings.label }}{% if block.settings.required %} *{% endif %}
+                      {{ block.settings.label -}}
+                      {%- if block.settings.required %} *{% endif %}
                     </label>
                     <select
                       id="{{ field_id }}"
                       name="{{ block.settings.name }}"
                       class="form-select"
-                      {% if block.settings.required %}required aria-required="true"{% endif %}
+                      {% if block.settings.required %}
+                        required aria-required="true"
+                      {% endif %}
                     >
                       <option value="">Select an option</option>
                       {% assign options = block.settings.options | split: '
@@ -236,23 +253,26 @@
                   </div>
 
                 {% when 'checkbox' %}
-                  <div class="form-group" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+                  <div class="form-group" data-block-id="{{ blockId }}">
                     <div class="form-checkbox-group">
                       <input
                         type="checkbox"
                         id="{{ field_id }}"
                         name="{{ block.settings.name }}"
                         class="form-checkbox"
-                        {% if block.settings.required %}required aria-required="true"{% endif %}
-                      />
+                        {% if block.settings.required %}
+                          required aria-required="true"
+                        {% endif %}
+                      >
                       <label for="{{ field_id }}" class="form-checkbox-label">
-                        {{ block.settings.label }}{% if block.settings.required %} *{% endif %}
+                        {{ block.settings.label -}}
+                        {%- if block.settings.required %} *{% endif %}
                       </label>
                     </div>
                   </div>
 
                 {% when 'submit' %}
-                  <div class="form-group" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+                  <div class="form-group" data-block-id="{{ blockId }}">
                     <button type="submit" class="widget-button widget-button-primary">
                       {{ block.settings.text }}
                     </button>
@@ -268,14 +288,20 @@
             {% for blockId in widget.blocksOrder %}
               {% assign block = widget.blocks[blockId] %}
               {% if block.type == 'info' %}
-                <div class="contact-info-block" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+                <div class="contact-info-block" data-block-id="{{ blockId }}">
                   {% if block.settings.title != blank %}
                     <h3 class="contact-info-title">{{ block.settings.title }}</h3>
                   {% endif %}
                   {% if block.settings.text != blank %}
                     <p class="contact-info-text">
                       {% if block.settings.link.href != blank %}
-                        <a href="{{ block.settings.link.href }}" class="contact-info-link" {% if block.settings.link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+                        <a
+                          href="{{ block.settings.link.href }}"
+                          class="contact-info-link"
+                          {% if block.settings.link.target == '_blank' %}
+                            target="_blank" rel="noopener"
+                          {% endif %}
+                        >
                           {{ block.settings.text }}
                         </a>
                       {% else %}

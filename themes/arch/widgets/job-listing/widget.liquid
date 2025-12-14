@@ -134,14 +134,26 @@
 
       <ul class="widget-filter-list" role="tablist">
         <li role="presentation">
-          <button type="button" class="widget-filter-btn job-filter-btn is-active" data-filter="all" role="tab" aria-selected="true">
+          <button
+            type="button"
+            class="widget-filter-btn job-filter-btn is-active"
+            data-filter="all"
+            role="tab"
+            aria-selected="true"
+          >
             All Positions
           </button>
         </li>
         {% for dept in dept_array %}
           {% if dept != blank %}
             <li role="presentation">
-              <button type="button" class="widget-filter-btn job-filter-btn" data-filter="{{ dept }}" role="tab" aria-selected="false">
+              <button
+                type="button"
+                class="widget-filter-btn job-filter-btn"
+                data-filter="{{ dept }}"
+                role="tab"
+                aria-selected="false"
+              >
                 {{ dept | capitalize }}
               </button>
             </li>
@@ -154,7 +166,11 @@
       <ul class="job-list">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <li class="widget-card" data-department="{{ block.settings.department | downcase }}" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+          <li
+            class="widget-card"
+            data-department="{{ block.settings.department | downcase }}"
+            data-block-id="{{ blockId }}"
+          >
             <div class="widget-card-content">
               <div class="job-header">
                 <h3 class="widget-card-title">{{ block.settings.title }}</h3>
@@ -174,17 +190,27 @@
                   </span>
                   <span class="job-badge">
                     {% case block.settings.type %}
-                      {% when 'full-time' %}Full-Time
-                      {% when 'part-time' %}Part-Time
-                      {% when 'contract' %}Contract
-                      {% when 'internship' %}Internship
+                      {% when 'full-time' -%}
+                        Full-Time
+                      {% when 'part-time' -%}
+                        Part-Time
+                      {% when 'contract' -%}
+                        Contract
+                      {% when 'internship' -%}
+                        Internship
                     {% endcase %}
                   </span>
                 </div>
               </div>
               {% if block.settings.apply_link.text != blank %}
                 <div class="widget-card-footer">
-                  <a href="{{ block.settings.apply_link.href }}" class="widget-button" {% if block.settings.apply_link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+                  <a
+                    href="{{ block.settings.apply_link.href }}"
+                    class="widget-button"
+                    {% if block.settings.apply_link.target == '_blank' %}
+                      target="_blank" rel="noopener"
+                    {% endif %}
+                  >
                     {{ block.settings.apply_link.text }}
                   </a>
                 </div>
@@ -197,43 +223,43 @@
   </div>
 
   {% if widget.settings.show_filters %}
-  <script>
-    (function() {
-      const widgetElement = document.getElementById('{{ widget.id }}');
-      if (!widgetElement || widgetElement.dataset.initialized) return;
-      widgetElement.dataset.initialized = 'true';
+    <script>
+      (function () {
+        const widgetElement = document.getElementById('{{ widget.id }}');
+        if (!widgetElement || widgetElement.dataset.initialized) return;
+        widgetElement.dataset.initialized = 'true';
 
-      const filterButtons = widgetElement.querySelectorAll('.widget-filter-btn');
-      const jobItems = widgetElement.querySelectorAll('.widget-card');
+        const filterButtons = widgetElement.querySelectorAll('.widget-filter-btn');
+        const jobItems = widgetElement.querySelectorAll('.widget-card');
 
-      const filterJobs = (filter) => {
-        jobItems.forEach((item) => {
-          const department = item.getAttribute('data-department');
+        const filterJobs = (filter) => {
+          jobItems.forEach((item) => {
+            const department = item.getAttribute('data-department');
 
-          if (filter === 'all' || department === filter) {
-            item.classList.remove('is-hidden');
-          } else {
-            item.classList.add('is-hidden');
-          }
-        });
-      };
-
-      filterButtons.forEach((button) => {
-        button.addEventListener('click', function() {
-          const filter = this.getAttribute('data-filter');
-
-          filterButtons.forEach((btn) => {
-            btn.classList.remove('is-active');
-            btn.setAttribute('aria-selected', 'false');
+            if (filter === 'all' || department === filter) {
+              item.classList.remove('is-hidden');
+            } else {
+              item.classList.add('is-hidden');
+            }
           });
+        };
 
-          this.classList.add('is-active');
-          this.setAttribute('aria-selected', 'true');
+        filterButtons.forEach((button) => {
+          button.addEventListener('click', function () {
+            const filter = this.getAttribute('data-filter');
 
-          filterJobs(filter);
+            filterButtons.forEach((btn) => {
+              btn.classList.remove('is-active');
+              btn.setAttribute('aria-selected', 'false');
+            });
+
+            this.classList.add('is-active');
+            this.setAttribute('aria-selected', 'true');
+
+            filterJobs(filter);
+          });
         });
-      });
-    })();
-  </script>
+      })();
+    </script>
   {% endif %}
 </section>

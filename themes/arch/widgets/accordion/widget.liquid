@@ -1,8 +1,12 @@
 <section
   id="{{ widget.id }}"
   class="widget widget-accordion {% if widget.settings.style == 'connected' %}accordion-bordered{% endif %} {% if widget.settings.text_color == 'light' %}color-scheme-dark{% else %}color-scheme-light{% endif %} {% if widget.settings.background_color != blank %}has-bg-color{% endif %}"
-  {% if widget.settings.background_color != blank %}style="--widget-bg-color: {{ widget.settings.background_color }};"{% endif %}
-  {% if widget.settings.allow_multiple %}data-multi-open="true"{% endif %}
+  {% if widget.settings.background_color != blank %}
+    style="--widget-bg-color: {{ widget.settings.background_color }};"
+  {% endif %}
+  {% if widget.settings.allow_multiple %}
+    data-multi-open="true"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="accordion"
 >
@@ -152,11 +156,19 @@
       <ul class="accordion-list">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <li class="accordion-item" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+          <li class="accordion-item" data-block-id="{{ blockId }}">
             <button class="accordion-trigger" aria-expanded="false">
               <span class="accordion-question">{{ block.settings.question }}</span>
               <span class="accordion-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </span>
@@ -171,7 +183,7 @@
   </div>
 
   <script>
-    (function() {
+    (function () {
       const allAccordions = document.querySelectorAll('#{{ widget.id }}');
 
       allAccordions.forEach((widgetElement) => {
@@ -182,7 +194,7 @@
         const triggers = widgetElement.querySelectorAll('.accordion-trigger');
 
         triggers.forEach((trigger) => {
-          trigger.addEventListener('click', function() {
+          trigger.addEventListener('click', function () {
             const isExpanded = this.getAttribute('aria-expanded') === 'true';
             const content = this.nextElementSibling;
 
@@ -209,7 +221,7 @@
             }
           });
 
-          trigger.addEventListener('keydown', function(e) {
+          trigger.addEventListener('keydown', function (e) {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               this.click();

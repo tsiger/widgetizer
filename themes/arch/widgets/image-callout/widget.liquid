@@ -171,21 +171,21 @@
       <div class="callout-content">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          
+
           {% case block.type %}
             {% when 'eyebrow' %}
               {% if block.settings.text != blank %}
-                <span class="widget-eyebrow" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+                <span class="widget-eyebrow" data-block-id="{{ blockId }}">{{ block.settings.text }}</span>
               {% endif %}
 
             {% when 'heading' %}
               {% if block.settings.text != blank %}
-                <h2 class="callout-title" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>{{ block.settings.text }}</h2>
+                <h2 class="callout-title" data-block-id="{{ blockId }}">{{ block.settings.text }}</h2>
               {% endif %}
 
             {% when 'text' %}
               {% if block.settings.text != blank %}
-                <p class="callout-text" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>{{ block.settings.text }}</p>
+                <p class="callout-text" data-block-id="{{ blockId }}">{{ block.settings.text }}</p>
               {% endif %}
 
             {% when 'feature' %}
@@ -193,7 +193,14 @@
 
             {% when 'button' %}
               {% if block.settings.link.text != blank %}
-                <a href="{{ block.settings.link.href }}" class="widget-button {% if block.settings.style == 'secondary' %}widget-button-secondary{% endif %}" data-block-id="{{ blockId }}" {{ block.shopify_attributes }} {% if block.settings.link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+                <a
+                  href="{{ block.settings.link.href }}"
+                  class="widget-button {% if block.settings.style == 'secondary' %}widget-button-secondary{% endif %}"
+                  data-block-id="{{ blockId }}"
+                  {% if block.settings.link.target == '_blank' %}
+                    target="_blank" rel="noopener"
+                  {% endif %}
+                >
                   {{ block.settings.link.text }}
                 </a>
               {% endif %}
@@ -205,7 +212,7 @@
             {% for blockId in widget.blocksOrder %}
               {% assign block = widget.blocks[blockId] %}
               {% if block.type == 'feature' and block.settings.text != blank %}
-                <li class="callout-feature" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+                <li class="callout-feature" data-block-id="{{ blockId }}">
                   <span class="callout-feature-icon">✓</span>
                   {{ block.settings.text }}
                 </li>

@@ -113,7 +113,7 @@ Convert the static HTML into a Liquid template:
     <div class="widget-content">
       {% for blockId in widget.blocksOrder %}
         {% assign block = widget.blocks[blockId] %}
-        <div class="widget-card" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+        <div class="widget-card" data-block-id="{{ blockId }}">
           {{ block.settings.title }}
         </div>
       {% endfor %}

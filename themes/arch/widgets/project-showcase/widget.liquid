@@ -96,7 +96,7 @@
       <div class="project-grid">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <article class="widget-card" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+          <article class="widget-card" data-block-id="{{ blockId }}">
             {% if block.settings.image != blank %}
               {{ block.settings.image | image: 'large', 'project-image' }}
             {% else %}
@@ -113,7 +113,12 @@
               </div>
             </div>
             {% if block.settings.link.href != blank %}
-              <a href="{{ block.settings.link.href }}" class="widget-card-link" target="{{ block.settings.link.target | default: '_self' }}" aria-label="{{ block.settings.title }}"></a>
+              <a
+                href="{{ block.settings.link.href }}"
+                class="widget-card-link"
+                target="{{ block.settings.link.target | default: '_self' }}"
+                aria-label="{{ block.settings.title }}"
+              ></a>
             {% endif %}
           </article>
         {% endfor %}

@@ -155,7 +155,6 @@
             data-block-id="{{ blockId }}"
             data-full-image="{{ block.settings.image }}"
             data-caption="{{ block.settings.caption }}"
-            {{ block.shopify_attributes }}
           >
             {% if block.settings.image != blank %}
               {{ block.settings.image | image: 'medium', 'widget-card-image' }}
@@ -178,7 +177,7 @@
             <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </button>
-        <img class="gallery-modal-image" src="" alt="" />
+        <img class="gallery-modal-image" src="" alt="">
         <p class="gallery-modal-caption"></p>
       </div>
     </div>

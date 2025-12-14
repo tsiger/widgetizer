@@ -69,7 +69,7 @@
       <div class="feature-list">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <div class="widget-card" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+          <div class="widget-card" data-block-id="{{ blockId }}">
             <div class="widget-card-header">
               {% if block.settings.subtitle != blank %}
                 <span class="widget-card-subtitle">{{ block.settings.subtitle }}</span>

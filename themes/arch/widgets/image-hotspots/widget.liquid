@@ -251,11 +251,12 @@
         {% endif %}
 
         <!-- Hotspots -->
-        {% for block in widget.blocks %}
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
           <div
             class="image-hotspot"
             style="inset-inline-start: {{ block.settings.position_x | default: 50 }}%; inset-block-start: {{ block.settings.position_y | default: 50 }}%"
-            data-block-id="{{ block.id }}"
+            data-block-id="{{ blockId }}"
           >
             <button
               type="button"

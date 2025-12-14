@@ -131,28 +131,43 @@
       {% assign isFirst = forloop.first %}
       <div
         class="slideshow-slide widget {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %} {% if block.settings.image != blank %}has-bg-image has-overlay overlay-medium{% endif %} color-scheme-dark{% if isFirst %} is-active{% endif %}"
-        {% if block.settings.image != blank %}style="--widget-bg-image: url('{{ block.settings.image | image: 'path', 'large' }}');"{% endif %}
+        {% if block.settings.image != blank %}
+          style="--widget-bg-image: url('{{ block.settings.image | image: 'path', 'large' }}');"
+        {% endif %}
         data-block-id="{{ blockId }}"
-        {{ block.shopify_attributes }}
       >
         <div class="widget-container">
           <div class="widget-content widget-content-lg widget-content-align-center">
             {% if block.settings.eyebrow != blank %}
-              <span class="widget-eyebrow">{{ block.settings.eyebrow }}</span>
+              <span class="widget-eyebrow" data-setting="eyebrow">{{ block.settings.eyebrow }}</span>
             {% endif %}
             {% if block.settings.headline != blank %}
-              <h2 class="widget-headline">{{ block.settings.headline }}</h2>
+              <h2 class="widget-headline" data-setting="headline">{{ block.settings.headline }}</h2>
             {% endif %}
             {% if block.settings.description != blank %}
-              <p class="widget-description">{{ block.settings.description }}</p>
+              <p class="widget-description" data-setting="description">{{ block.settings.description }}</p>
             {% endif %}
             {% if block.settings.button_link.text != blank %}
               <div class="widget-actions">
-                <a href="{{ block.settings.button_link.href }}" class="widget-button widget-button-primary" {% if block.settings.button_link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+                <a
+                  href="{{ block.settings.button_link.href }}"
+                  class="widget-button widget-button-primary"
+                  data-setting="button_link"
+                  {% if block.settings.button_link.target == '_blank' %}
+                    target="_blank" rel="noopener"
+                  {% endif %}
+                >
                   {{ block.settings.button_link.text }}
                 </a>
                 {% if block.settings.secondary_link.text != blank %}
-                  <a href="{{ block.settings.secondary_link.href }}" class="widget-button widget-button-secondary" {% if block.settings.secondary_link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+                  <a
+                    href="{{ block.settings.secondary_link.href }}"
+                    class="widget-button widget-button-secondary"
+                    data-setting="secondary_link"
+                    {% if block.settings.secondary_link.target == '_blank' %}
+                      target="_blank" rel="noopener"
+                    {% endif %}
+                  >
                     {{ block.settings.secondary_link.text }}
                   </a>
                 {% endif %}
@@ -178,12 +193,17 @@
     <!-- Pagination -->
     <div class="slideshow-pagination">
       {% for blockId in widget.blocksOrder %}
-        <button class="slideshow-dot{% if forloop.first %} is-active{% endif %}" data-index="{{ forloop.index0 }}" aria-label="Go to slide {{ forloop.index }}"></button>
+        <button
+          class="slideshow-dot{% if forloop.first %} is-active{% endif %}"
+          data-index="{{ forloop.index0 }}"
+          aria-label="Go to slide {{ forloop.index }}"
+        ></button>
       {% endfor %}
     </div>
   </div>
 
   <script>
+    console.log('hello');
     (function() {
       const allWidgets = document.querySelectorAll('#{{ widget.id }}');
 

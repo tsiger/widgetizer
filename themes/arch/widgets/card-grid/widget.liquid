@@ -68,7 +68,7 @@
       <div class="card-grid-items">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <article class="widget-card" data-block-id="{{ blockId }}" {{ block.shopify_attributes }}>
+          <article class="widget-card" data-block-id="{{ blockId }}">
             {% if block.settings.image != blank %}
               {% if block.settings.image != blank %}
                 {{ block.settings.image | image: 'medium', 'widget-card-image' }}

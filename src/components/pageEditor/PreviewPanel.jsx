@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
 import {
   fetchPreview,
-  updatePreview, // Import the new master update function
   highlightWidget,
 } from "../../queries/previewManager";
 import useProjectStore from "../../stores/projectStore";
@@ -78,26 +77,123 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     loadInitialPreview();
   }, [page, initialLoadComplete, globalWidgets, themeSettings, widgets]);
 
-  // The new, unified update effect
+  // Full reload on widget/page/theme changes (debounced)
+  // But also send immediate updates for real-time feedback
   useEffect(() => {
-    // Don't run updates until the initial HTML has been loaded and rendered
-    if (!initialLoadComplete || !iframeRef.current) return;
+    if (!initialLoadComplete) return;
 
-    const currentState = {
-      page,
-      widgets,
-      globalWidgets,
-      themeSettings,
-      selectedWidgetId,
-      selectedBlockId,
-      selectedGlobalWidgetId,
-    };
-
-    // Call the master update function
-    updatePreview(iframeRef.current, currentState, previousStateRef.current);
-
-    // After the update, save the current state for the next comparison
-    previousStateRef.current = currentState;
+    const previousState = previousStateRef.current;
+    
+    // Check if only selection changed (no reload needed, just highlight)
+    const contentChanged = 
+      JSON.stringify(page) !== JSON.stringify(previousState?.page) ||
+      JSON.stringify(widgets) !== JSON.stringify(previousState?.widgets) ||
+      JSON.stringify(globalWidgets) !== JSON.stringify(previousState?.globalWidgets) ||
+      JSON.stringify(themeSettings) !== JSON.stringify(previousState?.themeSettings);
+    
+    if (!contentChanged) {
+      // Only selection changed - just update highlight
+      if (iframeRef.current) {
+        highlightWidget(iframeRef.current, selectedWidgetId || selectedGlobalWidgetId, selectedBlockId);
+      }
+      previousStateRef.current = {
+        page, widgets, globalWidgets, themeSettings,
+        selectedWidgetId, selectedBlockId, selectedGlobalWidgetId,
+      };
+      return;
+    }
+    
+    // Send IMMEDIATE real-time updates for changed widget settings
+    // This provides instant feedback while the debounced reload is pending
+    if (iframeRef.current?.contentWindow && previousState?.widgets) {
+      Object.entries(widgets || {}).forEach(([widgetId, widget]) => {
+        const oldWidget = previousState.widgets[widgetId];
+        if (!oldWidget) return; // New widget, will be handled by reload
+        
+        // Check for setting changes (not structural)
+        const settingsChanged = JSON.stringify(widget.settings) !== JSON.stringify(oldWidget.settings);
+        const blocksSettingsChanged = widget.blocksOrder?.some((blockId) => {
+          const newBlock = widget.blocks?.[blockId];
+          const oldBlock = oldWidget.blocks?.[blockId];
+          return newBlock && oldBlock && 
+            JSON.stringify(newBlock.settings) !== JSON.stringify(oldBlock.settings);
+        });
+        
+        if (settingsChanged || blocksSettingsChanged) {
+          // Compute changed settings only
+          const changes = { settings: {}, blocks: {} };
+          
+          if (settingsChanged) {
+            Object.entries(widget.settings || {}).forEach(([key, value]) => {
+              if (JSON.stringify(value) !== JSON.stringify(oldWidget.settings?.[key])) {
+                changes.settings[key] = value;
+              }
+            });
+          }
+          
+          if (blocksSettingsChanged) {
+            widget.blocksOrder?.forEach((blockId) => {
+              const newBlock = widget.blocks?.[blockId];
+              const oldBlock = oldWidget.blocks?.[blockId];
+              if (newBlock && oldBlock) {
+                const changedBlockSettings = {};
+                Object.entries(newBlock.settings || {}).forEach(([key, value]) => {
+                  if (JSON.stringify(value) !== JSON.stringify(oldBlock.settings?.[key])) {
+                    changedBlockSettings[key] = value;
+                  }
+                });
+                if (Object.keys(changedBlockSettings).length > 0) {
+                  changes.blocks[blockId] = { settings: changedBlockSettings };
+                }
+              }
+            });
+          }
+          
+          // Send update to iframe
+          iframeRef.current.contentWindow.postMessage({
+            type: "UPDATE_WIDGET_SETTINGS",
+            payload: { widgetId, changes }
+          }, "*");
+        }
+      });
+    }
+    
+    // Content changed - debounce the reload
+    const timeoutId = setTimeout(async () => {
+      try {
+        // Save scroll position
+        const scrollY = iframeRef.current?.contentWindow?.scrollY || 0;
+        
+        // Fetch fresh HTML
+        const enhancedPageData = { ...page, globalWidgets };
+        const html = await fetchPreview(enhancedPageData, themeSettings);
+        setPreviewHtml(html);
+        
+        // Restore scroll position after load
+        const handleLoad = () => {
+          iframeRef.current?.contentWindow?.scrollTo(0, scrollY);
+          // Re-apply highlight after reload
+          setTimeout(() => {
+            if (iframeRef.current) {
+              highlightWidget(iframeRef.current, selectedWidgetId || selectedGlobalWidgetId, selectedBlockId);
+            }
+          }, 100);
+        };
+        
+        if (iframeRef.current) {
+          iframeRef.current.addEventListener('load', handleLoad, { once: true });
+        }
+      } catch (err) {
+        console.error("Preview reload error:", err);
+      }
+      
+      previousStateRef.current = {
+        page, widgets, globalWidgets, themeSettings,
+        selectedWidgetId, selectedBlockId, selectedGlobalWidgetId,
+      };
+    }, 300); // 300ms debounce
+    
+    return () => clearTimeout(timeoutId);
   }, [
     initialLoadComplete,
     page,
