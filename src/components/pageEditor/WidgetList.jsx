@@ -27,6 +27,7 @@ import useAutoSave from "../../stores/saveStore";
 import { scrollWidgetIntoView } from "../../queries/previewManager";
 import WidgetSelector from "./WidgetSelector";
 import BlockSelector from "./blocks/BlockSelector";
+import { createReusableBlock } from "../../queries/reusableBlocksManager";
 
 export default function WidgetList({
   page,
@@ -116,6 +117,23 @@ export default function WidgetList({
   const handleDuplicateWidget = (widgetId) => {
     duplicateWidget(widgetId);
     setStructureModified(true);
+  };
+
+  // Handle saving widget as reusable block
+  const handleSaveAsReusable = async (widgetId, widget) => {
+    const widgetSchema = widgetSchemas[widget.type];
+    const defaultName = widgetSchema?.displayName || widget.type;
+    const name = window.prompt("Enter a name for this reusable block:", defaultName);
+    
+    if (!name || !name.trim()) return;
+    
+    try {
+      await createReusableBlock(name.trim(), widget);
+      alert(`"${name.trim()}" saved as a reusable block!`);
+    } catch (error) {
+      console.error("Failed to save as reusable:", error);
+      alert("Failed to save as reusable block. Please try again.");
+    }
   };
 
   // Handle opening widget selector
@@ -208,6 +226,7 @@ export default function WidgetList({
                           onWidgetSelect={onWidgetSelect}
                           onDeleteClick={handleDeleteWidget}
                           onDuplicateClick={handleDuplicateWidget}
+                          onSaveAsReusable={handleSaveAsReusable}
                           selectedBlockId={selectedBlockId}
                           onBlockSelect={onBlockSelect}
                           onBlocksReorder={reorderBlocks}
@@ -295,6 +314,11 @@ export default function WidgetList({
         onSelectWidget={(type, position) => {
           const { addWidget } = useWidgetStore.getState();
           addWidget(type, position);
+          setStructureModified(true);
+        }}
+        onInsertReusable={(block, position) => {
+          const { insertReusableBlock } = useWidgetStore.getState();
+          insertReusableBlock(block, position);
           setStructureModified(true);
         }}
         position={insertPosition}

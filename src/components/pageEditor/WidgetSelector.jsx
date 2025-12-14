@@ -1,7 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getReusableBlocks } from "../../queries/reusableBlocksManager";
 
-export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelectWidget, position, triggerRef }) {
+export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelectWidget, onInsertReusable, position, triggerRef }) {
   const dropdownRef = useRef(null);
+  const [activeTab, setActiveTab] = useState("widgets");
+  const [reusableBlocks, setReusableBlocks] = useState([]);
+  const [loadingBlocks, setLoadingBlocks] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -32,6 +36,17 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     };
   }, [isOpen, onClose, triggerRef]);
 
+  // Load reusable blocks when tab is activated or dropdown opens
+  useEffect(() => {
+    if (isOpen && activeTab === "reusable") {
+      setLoadingBlocks(true);
+      getReusableBlocks()
+        .then((blocks) => setReusableBlocks(blocks))
+        .catch((err) => console.error("Failed to load reusable blocks:", err))
+        .finally(() => setLoadingBlocks(false));
+    }
+  }, [isOpen, activeTab]);
+
   const availableWidgets = Object.values(widgetSchemas)
     .filter((schema) => schema.type !== "header" && schema.type !== "footer")
     .sort((a, b) => (a.displayName || a.type).localeCompare(b.displayName || b.type));
@@ -48,7 +63,7 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
 
   if (triggerRef?.current) {
     const triggerRect = triggerRef.current.getBoundingClientRect();
-    const dropdownWidth = 224; // w-56 = 224px
+    const dropdownWidth = 280; // Slightly wider to accommodate tabs
 
     // Position the dropdown outside the sidebar (sidebar is w-60 = 240px)
     const sidebarWidth = 240;
@@ -66,7 +81,7 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
 
     // For vertical positioning, check if there's enough space below
     let topPosition = triggerRect.top;
-    const estimatedDropdownHeight = 300; // Generous estimate
+    const estimatedDropdownHeight = 350; // Generous estimate
 
     // If dropdown would go off screen, position it above the trigger
     if (triggerRect.top + estimatedDropdownHeight > window.innerHeight - 20) {
@@ -88,33 +103,95 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
 
       <div
         ref={dropdownRef}
-        className="bg-white border-2 border-slate-300 rounded-lg shadow-lg w-56"
+        className="bg-white border-2 border-slate-300 rounded-lg shadow-lg w-70"
         style={{
           ...style,
-          position: "fixed", // Force fixed positioning
-          zIndex: 9999, // Higher z-index
+          position: "fixed",
+          zIndex: 9999,
+          width: "280px",
         }}
       >
-        <div className="px-3 py-2 border-b border-slate-100 bg-slate-50 rounded-t-lg">
-          <h3 className="text-sm font-medium text-slate-700 text-left">Add Widget</h3>
+        {/* Tabs */}
+        <div className="flex border-b border-slate-200">
+          <button
+            className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+              activeTab === "widgets"
+                ? "text-pink-600 border-b-2 border-pink-600 bg-pink-50"
+                : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
+            }`}
+            onClick={() => setActiveTab("widgets")}
+          >
+            Widgets
+          </button>
+          <button
+            className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+              activeTab === "reusable"
+                ? "text-pink-600 border-b-2 border-pink-600 bg-pink-50"
+                : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
+            }`}
+            onClick={() => setActiveTab("reusable")}
+          >
+            Reusable
+          </button>
         </div>
 
-        <div className="max-h-64 overflow-y-auto">
-          {availableWidgets.map((schema) => (
-            <button
-              key={schema.type}
-              className="w-full px-3 py-2 text-left hover:bg-slate-50 transition-colors group"
-              onClick={() => {
-                onSelectWidget(schema.type, position);
-                onClose();
-              }}
-            >
-              <div className="text-sm font-medium text-slate-800 group-hover:text-pink-600">
-                {schema.displayName || schema.type}
+        {/* Widgets Tab Content */}
+        {activeTab === "widgets" && (
+          <div className="max-h-64 overflow-y-auto">
+            {availableWidgets.map((schema) => (
+              <button
+                key={schema.type}
+                className="w-full px-3 py-2 text-left hover:bg-slate-50 transition-colors group"
+                onClick={() => {
+                  onSelectWidget(schema.type, position);
+                  onClose();
+                }}
+              >
+                <div className="text-sm font-medium text-slate-800 group-hover:text-pink-600">
+                  {schema.displayName || schema.type}
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Reusable Blocks Tab Content */}
+        {activeTab === "reusable" && (
+          <div className="max-h-64 overflow-y-auto">
+            {loadingBlocks ? (
+              <div className="px-3 py-4 text-center text-sm text-slate-500">
+                Loading...
               </div>
-            </button>
-          ))}
-        </div>
+            ) : reusableBlocks.length === 0 ? (
+              <div className="px-3 py-4 text-center">
+                <p className="text-sm text-slate-500 mb-2">No reusable blocks yet</p>
+                <p className="text-xs text-slate-400">
+                  Right-click a widget and select "Save as Reusable" to create one
+                </p>
+              </div>
+            ) : (
+              reusableBlocks.map((block) => (
+                <button
+                  key={block.id}
+                  className="w-full px-3 py-2 text-left hover:bg-slate-50 transition-colors group"
+                  onClick={() => {
+                    if (onInsertReusable) {
+                      onInsertReusable(block, position);
+                    }
+                    onClose();
+                  }}
+                >
+                  <div className="text-sm font-medium text-slate-800 group-hover:text-pink-600">
+                    {block.name}
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    {block.widgetType}
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        )}
       </div>
     </>
   );

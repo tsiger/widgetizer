@@ -197,6 +197,47 @@ const useWidgetStore = create((set, get) => ({
     return newWidgetId;
   },
 
+  // Insert a reusable block reference
+  insertReusableBlock: (block, position) => {
+    const pageStore = usePageStore.getState();
+    const { page } = pageStore;
+
+    if (!page) return null;
+
+    const newWidgetId = get().generateWidgetId();
+    
+    // Create a reference widget that points to the reusable block
+    const refWidget = {
+      type: "__reusable_ref__",
+      reusableId: block.id,
+      reusableName: block.name,
+      // Store a copy of the widget data for preview/rendering
+      widgetData: block.widgetData,
+    };
+
+    const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
+    const newWidgetsOrder = [...currentOrder];
+
+    if (position >= newWidgetsOrder.length) {
+      newWidgetsOrder.push(newWidgetId);
+    } else {
+      newWidgetsOrder.splice(position, 0, newWidgetId);
+    }
+
+    pageStore.setPage({
+      ...page,
+      widgets: {
+        ...page.widgets,
+        [newWidgetId]: refWidget,
+      },
+      widgetsOrder: newWidgetsOrder,
+    });
+
+    set({ selectedWidgetId: newWidgetId });
+    useAutoSave.getState().setStructureModified(true);
+    return newWidgetId;
+  },
+
   deleteWidget: (widgetId) => {
     const pageStore = usePageStore.getState();
     const { page } = pageStore;

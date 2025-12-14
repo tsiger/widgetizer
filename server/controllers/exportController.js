@@ -247,11 +247,20 @@ Sitemap: ${sitemapUrl}`;
           if (widgetId === "header_widget" || widgetId === "footer_widget") {
             return null;
           }
-          const widget = pageData.widgets[widgetId];
+          let widget = pageData.widgets[widgetId];
           if (!widget) {
             console.warn(` -> Widget data missing for ID: ${widgetId} on page ${pageData.id}`);
             return null;
           }
+          
+          // Handle reusable block references
+          if (widget.type === "__reusable_ref__" && widget.widgetData) {
+            widget = {
+              ...widget.widgetData,
+              type: widget.widgetData.type,
+            };
+          }
+          
           return await renderWidget(projectId, widgetId, widget, rawThemeSettings, "publish");
         });
         const renderedWidgets = (await Promise.all(widgetPromises)).filter((html) => html !== null);
