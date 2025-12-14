@@ -1,0 +1,93 @@
+{
+  "type": "staff-cards",
+  "displayName": "Staff Cards",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Our Team"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Meet Our Chefs"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "staff",
+      "displayName": "Staff Member",
+      "settings": [
+        {
+          "type": "image",
+          "id": "photo",
+          "label": "Photo"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "John Doe"
+        },
+        {
+          "type": "text",
+          "id": "role",
+          "label": "Role / Title",
+          "default": "Head Chef"
+        },
+        {
+          "type": "text",
+          "id": "specialty",
+          "label": "Specialty",
+          "default": "Italian Cuisine"
+        },
+        {
+          "type": "textarea",
+          "id": "bio",
+          "label": "Bio"
+        },
+        {
+          "type": "link",
+          "id": "social_link",
+          "label": "Social / Contact link"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "staff",
+      "settings": {
+        "name": "Marco Rossi",
+        "role": "Executive Chef",
+        "specialty": "Italian & Mediterranean",
+        "bio": "With over 15 years of culinary experience, Chef Marco brings authentic Italian flavors to every dish."
+      }
+    },
+    {
+      "type": "staff",
+      "settings": {
+        "name": "Sofia Chen",
+        "role": "Pastry Chef",
+        "specialty": "French Pastries",
+        "bio": "Trained in Paris, Sofia crafts exquisite desserts that are as beautiful as they are delicious."
+      }
+    },
+    {
+      "type": "staff",
+      "settings": {
+        "name": "James Wilson",
+        "role": "Sous Chef",
+        "specialty": "Farm-to-Table",
+        "bio": "James sources the freshest local ingredients to create seasonal specialties."
+      }
+    }
+  ]
+}

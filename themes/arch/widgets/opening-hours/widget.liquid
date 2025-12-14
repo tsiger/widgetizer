@@ -1,0 +1,101 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-opening-hours"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="opening-hours"
+>
+  <style>
+    #{{ widget.id }} {
+      & .hours-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        max-width: 400px;
+        margin-inline: auto;
+      }
+
+      & .hours-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-md) 0;
+        border-block-end: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .hours-row:first-child {
+        border-block-start: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .hours-row.is-highlighted {
+        background: var(--color-accent-subtle);
+        margin-inline: calc(var(--space-sm) * -1);
+        padding-inline: var(--space-sm);
+        border-radius: var(--radius-sm);
+        font-weight: var(--font-weight-semibold);
+      }
+
+      & .hours-row.is-closed .hours-time {
+        color: var(--text-muted);
+      }
+
+      & .hours-day {
+        font-weight: var(--font-weight-medium);
+      }
+
+      & .hours-time {
+        color: var(--text-primary);
+      }
+
+      & .hours-closed {
+        color: var(--text-muted);
+        font-style: italic;
+      }
+
+      & .hours-note {
+        margin-block-start: var(--space-lg);
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+        font-style: italic;
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="hours-list">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <div
+            class="hours-row {% if block.settings.highlight %}is-highlighted{% endif %} {% if block.settings.closed %}is-closed{% endif %}"
+            data-block-id="{{ blockId }}"
+          >
+            <span class="hours-day" data-setting="day">{{ block.settings.day }}</span>
+            {% if block.settings.closed %}
+              <span class="hours-closed">Closed</span>
+            {% else %}
+              <span class="hours-time" data-setting="hours">{{ block.settings.hours }}</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if widget.settings.note != blank %}
+        <p class="hours-note" data-setting="note">{{ widget.settings.note }}</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
