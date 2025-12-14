@@ -1,0 +1,425 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-image-hotspots"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="image-hotspots"
+>
+  <style>
+    #{{ widget.id }} {
+      & .image-hotspots-wrapper {
+        position: relative;
+        border: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .image-hotspots-image {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      & .image-hotspot {
+        position: absolute;
+        width: 3.2rem;
+        height: 3.2rem;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+      }
+
+      & .image-hotspot-button {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-color: var(--text-primary);
+        border: var(--border-width-medium) solid var(--bg-primary);
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s, background-color 0.3s;
+
+        &::before {
+          content: "";
+          position: absolute;
+          inset: calc(var(--space-xs) * -1);
+          border: var(--border-width-medium) solid var(--border-light);
+          border-radius: 50%;
+          animation: hotspot-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        &:hover {
+          transform: scale(1.1);
+        }
+
+        &:focus {
+          outline: var(--border-width-medium) solid var(--text-primary);
+          outline-offset: 0.3rem;
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      & .image-hotspot-button.is-active {
+        transform: scale(1.1);
+
+        &::before {
+          animation: none;
+        }
+      }
+
+      & .image-hotspot-icon {
+        width: 1.2rem;
+        height: 1.2rem;
+        stroke: var(--bg-primary);
+        stroke-width: 2.5;
+        fill: none;
+      }
+
+      & .image-hotspot-tooltip {
+        position: absolute;
+        inset-block-start: calc(100% + 1.2rem);
+        inset-inline-start: 50%;
+        transform: translateX(-50%);
+        width: 28rem;
+        max-width: calc(100vw - var(--space-xl));
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-light);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+        z-index: 10;
+        pointer-events: none;
+        padding: var(--space-lg);
+
+        &::before {
+          content: "";
+          position: absolute;
+          inset-block-end: 100%;
+          inset-inline-start: 50%;
+          transform: translateX(-50%);
+          border: 0.8rem solid transparent;
+          border-block-end-color: var(--border-light);
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          inset-block-end: calc(100% - 1px);
+          inset-inline-start: 50%;
+          transform: translateX(-50%);
+          border: 0.8rem solid transparent;
+          border-block-end-color: var(--bg-primary);
+        }
+      }
+
+      & .image-hotspot-tooltip.is-visible {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      & .image-hotspot-tooltip-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: var(--space-sm);
+        margin-block-end: var(--space-sm);
+      }
+
+      & .image-hotspot-tooltip-title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-bold);
+        line-height: var(--line-height-tight);
+        margin: 0;
+      }
+
+      & .image-hotspot-tooltip-close {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: var(--space-2xs);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s;
+        flex-shrink: 0;
+        margin-block-start: calc(var(--space-2xs) * -1);
+        margin-inline-end: calc(var(--space-2xs) * -1);
+
+        &:hover {
+          opacity: 0.7;
+        }
+
+        &:focus {
+          outline: var(--border-width-medium) solid var(--text-primary);
+          outline-offset: 0.2rem;
+        }
+      }
+
+      & .image-hotspot-tooltip-close-icon {
+        width: 1.6rem;
+        height: 1.6rem;
+        stroke: var(--text-primary);
+        stroke-width: 2;
+        fill: none;
+      }
+
+      & .image-hotspot-tooltip-description {
+        font-size: var(--font-size-sm);
+        line-height: var(--line-height-relaxed);
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      & .image-hotspot-tooltip-footer {
+        margin-block-start: var(--space-md);
+      }
+
+      @keyframes hotspot-pulse {
+        0%, 100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0;
+          transform: scale(1.5);
+        }
+      }
+
+      @media (min-width: 750px) {
+        & .image-hotspot {
+          width: 4rem;
+          height: 4rem;
+        }
+
+        & .image-hotspot-icon {
+          width: 1.6rem;
+          height: 1.6rem;
+        }
+
+        & .image-hotspot-tooltip {
+          width: 32rem;
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .image-hotspot {
+          width: 4.4rem;
+          height: 4.4rem;
+        }
+
+        & .image-hotspot-icon {
+          width: 2rem;
+          height: 2rem;
+        }
+
+        & .image-hotspot-tooltip {
+          width: 36rem;
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content widget-content-lg">
+      <div class="image-hotspots-wrapper">
+        <!-- Main Image -->
+        {% if widget.settings.image != blank %}
+          {{ widget.settings.image | image: 'large', 'image-hotspots-image', false }}
+        {% else %}
+          <img
+            class="image-hotspots-image"
+            src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=800&fit=crop"
+            alt="{{ widget.settings.image_alt | default: 'Interactive image' }}"
+          >
+        {% endif %}
+
+        <!-- Hotspots -->
+        {% for block in widget.blocks %}
+          <div
+            class="image-hotspot"
+            style="inset-inline-start: {{ block.settings.position_x | default: 50 }}%; inset-block-start: {{ block.settings.position_y | default: 50 }}%"
+            data-block-id="{{ block.id }}"
+          >
+            <button
+              type="button"
+              class="image-hotspot-button"
+              aria-label="{{ block.settings.title | default: 'View details' }}"
+              aria-expanded="false"
+            >
+              <svg class="image-hotspot-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <div class="image-hotspot-tooltip" role="tooltip">
+              <div class="image-hotspot-tooltip-header">
+                {% if block.settings.title != blank %}
+                  <h3 class="image-hotspot-tooltip-title">{{ block.settings.title }}</h3>
+                {% endif %}
+                <button type="button" class="image-hotspot-tooltip-close" aria-label="Close tooltip">
+                  <svg class="image-hotspot-tooltip-close-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+              </div>
+
+              {% if block.settings.description != blank %}
+                <p class="image-hotspot-tooltip-description">{{ block.settings.description }}</p>
+              {% endif %}
+
+              {% if block.settings.button_text != blank and block.settings.button_link != blank %}
+                <div class="image-hotspot-tooltip-footer">
+                  <a href="{{ block.settings.button_link }}" class="widget-button widget-button-small">
+                    {{ block.settings.button_text }}
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const widget = document.getElementById('{{ widget.id }}');
+      if (!widget || widget.dataset.initialized) return;
+      widget.dataset.initialized = 'true';
+
+      const hotspots = widget.querySelectorAll('.image-hotspot');
+
+      hotspots.forEach((hotspot) => {
+        const button = hotspot.querySelector('.image-hotspot-button');
+        const tooltip = hotspot.querySelector('.image-hotspot-tooltip');
+        const closeButton = hotspot.querySelector('.image-hotspot-tooltip-close');
+
+        if (!button || !tooltip) return;
+
+        // Toggle tooltip
+        const toggleTooltip = () => {
+          const isVisible = tooltip.classList.contains('is-visible');
+
+          // Close all other tooltips first
+          widget.querySelectorAll('.image-hotspot-tooltip.is-visible').forEach((t) => {
+            t.classList.remove('is-visible');
+            // Reset positioning
+            t.style.insetInlineStart = '';
+            t.style.insetInlineEnd = '';
+            t.style.transform = '';
+          });
+          widget.querySelectorAll('.image-hotspot-button.is-active').forEach((b) => {
+            b.classList.remove('is-active');
+            b.setAttribute('aria-expanded', 'false');
+          });
+
+          if (!isVisible) {
+            tooltip.classList.add('is-visible');
+            button.classList.add('is-active');
+            button.setAttribute('aria-expanded', 'true');
+
+            // Smart positioning: check if tooltip would go off-screen
+            setTimeout(() => {
+              const tooltipRect = tooltip.getBoundingClientRect();
+              const viewportWidth = window.innerWidth;
+
+              // If tooltip goes off right edge
+              if (tooltipRect.right > viewportWidth - 16) {
+                tooltip.style.insetInlineStart = 'auto';
+                tooltip.style.insetInlineEnd = '0';
+                tooltip.style.transform = 'none';
+              }
+              // If tooltip goes off left edge
+              else if (tooltipRect.left < 16) {
+                tooltip.style.insetInlineStart = '0';
+                tooltip.style.insetInlineEnd = 'auto';
+                tooltip.style.transform = 'none';
+              }
+            }, 0);
+          }
+        };
+
+        // Button click
+        button.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleTooltip();
+        });
+
+        // Keyboard support
+        button.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleTooltip();
+          }
+        });
+
+        // Close button
+        if (closeButton) {
+          closeButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            tooltip.classList.remove('is-visible');
+            tooltip.style.insetInlineStart = '';
+            tooltip.style.insetInlineEnd = '';
+            tooltip.style.transform = '';
+            button.classList.remove('is-active');
+            button.setAttribute('aria-expanded', 'false');
+            button.focus();
+          });
+        }
+      });
+
+      // Close tooltips when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!widget.contains(e.target)) {
+          widget.querySelectorAll('.image-hotspot-tooltip.is-visible').forEach((tooltip) => {
+            tooltip.classList.remove('is-visible');
+            tooltip.style.insetInlineStart = '';
+            tooltip.style.insetInlineEnd = '';
+            tooltip.style.transform = '';
+          });
+          widget.querySelectorAll('.image-hotspot-button.is-active').forEach((button) => {
+            button.classList.remove('is-active');
+            button.setAttribute('aria-expanded', 'false');
+          });
+        }
+      });
+
+      // Close tooltips with ESC key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const activeTooltips = widget.querySelectorAll('.image-hotspot-tooltip.is-visible');
+          if (activeTooltips.length > 0) {
+            activeTooltips.forEach((tooltip) => {
+              tooltip.classList.remove('is-visible');
+              tooltip.style.insetInlineStart = '';
+              tooltip.style.insetInlineEnd = '';
+              tooltip.style.transform = '';
+            });
+            widget.querySelectorAll('.image-hotspot-button.is-active').forEach((button) => {
+              button.classList.remove('is-active');
+              button.setAttribute('aria-expanded', 'false');
+              button.focus();
+            });
+          }
+        }
+      });
+    })();
+  </script>
+</section>

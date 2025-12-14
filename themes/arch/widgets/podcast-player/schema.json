@@ -1,0 +1,73 @@
+{
+  "type": "podcast-player",
+  "displayName": "Podcast Player",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "The Podcast"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "image",
+      "id": "artwork",
+      "label": "Episode artwork"
+    },
+    {
+      "type": "text",
+      "id": "episode_number",
+      "label": "Episode number",
+      "default": "Episode 1"
+    },
+    {
+      "type": "text",
+      "id": "episode_title",
+      "label": "Episode title",
+      "default": "Welcome to the Show"
+    },
+    {
+      "type": "text",
+      "id": "duration",
+      "label": "Duration",
+      "default": "42:18"
+    },
+    {
+      "type": "text",
+      "id": "date",
+      "label": "Publish date",
+      "default": "January 15, 2024"
+    },
+    {
+      "type": "textarea",
+      "id": "episode_description",
+      "label": "Episode description"
+    },
+    {
+      "type": "text",
+      "id": "audio_url",
+      "label": "Audio file URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_volume",
+      "label": "Show volume control",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_speed",
+      "label": "Show speed control",
+      "default": true
+    }
+  ]
+}

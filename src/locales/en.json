@@ -85,7 +85,8 @@
       "selectTheme": "Select a theme",
       "siteUrlLabel": "Site URL",
       "siteUrlHelp": "The final URL where your site will be hosted. Used for sitemap generation.",
-      "loadingThemes": "Loading themes..."
+      "loadingThemes": "Loading themes...",
+      "loadThemesError": "Failed to load themes. Please restart the application."
     },
     "media": {
       "editTitle": "Edit {{type}} Metadata",

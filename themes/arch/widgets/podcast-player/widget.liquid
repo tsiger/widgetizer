@@ -1,0 +1,597 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-podcast-player"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="podcast-player"
+>
+  <style>
+    #{{ widget.id }} {
+      & .audio-player-wrapper {
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-light);
+        padding: var(--space-2xl);
+      }
+
+      & .audio-player-episode {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+        margin-block-end: var(--space-2xl);
+      }
+
+      & .audio-player-artwork {
+        width: 100%;
+        max-width: 30rem;
+        aspect-ratio: 1;
+        margin-inline: auto;
+      }
+
+      & .audio-player-artwork-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .audio-player-info {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      & .audio-player-episode-number {
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+      }
+
+      & .audio-player-episode-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-bold);
+        line-height: var(--line-height-tight);
+        margin-block-end: var(--space-xs);
+      }
+
+      & .audio-player-episode-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+        margin-block-end: var(--space-sm);
+      }
+
+      & .audio-player-episode-meta-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+      }
+
+      & .audio-player-episode-meta-icon {
+        width: 1.6rem;
+        height: 1.6rem;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        fill: none;
+      }
+
+      & .audio-player-episode-description {
+        font-size: var(--font-size-base);
+        line-height: var(--line-height-relaxed);
+        color: var(--text-muted);
+      }
+
+      & .audio-player-controls {
+        border-block-start: var(--border-width-thin) solid var(--border-light);
+        padding-block-start: var(--space-2xl);
+      }
+
+      & .audio-player-progress {
+        margin-block-end: var(--space-xl);
+      }
+
+      & .audio-player-progress-bar {
+        width: 100%;
+        height: 0.8rem;
+        background-color: var(--border-light);
+        cursor: pointer;
+        position: relative;
+        margin-block-end: var(--space-xs);
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: var(--border-medium);
+        }
+      }
+
+      & .audio-player-progress-fill {
+        height: 100%;
+        background-color: var(--text-primary);
+        width: 0%;
+        transition: width 0.1s linear;
+        position: relative;
+
+        &::after {
+          content: "";
+          position: absolute;
+          inset-inline-end: -0.8rem;
+          inset-block-start: 50%;
+          transform: translateY(-50%);
+          width: 1.6rem;
+          height: 1.6rem;
+          background-color: var(--text-primary);
+          border-radius: 50%;
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+      }
+
+      & .audio-player-progress-bar:hover .audio-player-progress-fill::after {
+        opacity: 1;
+      }
+
+      & .audio-player-progress-time {
+        display: flex;
+        justify-content: space-between;
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+      }
+
+      & .audio-player-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-md);
+        margin-block-end: var(--space-xl);
+      }
+
+      & .audio-player-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: var(--space-xs);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s;
+
+        &:hover {
+          opacity: 0.7;
+        }
+
+        &:focus {
+          outline: var(--border-width-medium) solid var(--text-primary);
+          outline-offset: var(--space-xs);
+        }
+      }
+
+      & .audio-player-button-icon {
+        width: 3.2rem;
+        height: 3.2rem;
+        stroke: var(--text-primary);
+        stroke-width: 1.5;
+        fill: none;
+      }
+
+      & .audio-player-button-play {
+        background-color: var(--text-primary);
+        border-radius: 50%;
+        padding: var(--space-md);
+
+        &:hover {
+          opacity: 1;
+          background-color: var(--text-muted);
+        }
+      }
+
+      & .audio-player-button-play .audio-player-button-icon {
+        width: 4.8rem;
+        height: 4.8rem;
+        stroke: var(--bg-primary);
+        fill: var(--bg-primary);
+      }
+
+      & .audio-player-secondary-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-md);
+      }
+
+      & .audio-player-volume {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        flex: 1;
+        max-width: 15rem;
+      }
+
+      & .audio-player-volume-icon {
+        width: 2rem;
+        height: 2rem;
+        stroke: var(--text-muted);
+        stroke-width: 1.5;
+        fill: none;
+        flex-shrink: 0;
+      }
+
+      & .audio-player-volume-slider {
+        flex: 1;
+        height: 0.8rem;
+        background-color: var(--border-light);
+        position: relative;
+        cursor: pointer;
+      }
+
+      & .audio-player-volume-fill {
+        height: 100%;
+        background-color: var(--text-muted);
+        width: 100%;
+      }
+
+      & .audio-player-speed {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+      }
+
+      & .audio-player-speed-button {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        font-family: inherit;
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-light);
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+          background-color: var(--bg-secondary);
+          border-color: var(--border-medium);
+        }
+
+        &:focus {
+          outline: var(--border-width-medium) solid var(--text-primary);
+          outline-offset: var(--space-xs);
+        }
+      }
+
+      @media (min-width: 750px) {
+        & .audio-player-wrapper {
+          padding: var(--space-3xl);
+        }
+
+        & .audio-player-episode {
+          grid-template-columns: 25rem 1fr;
+          gap: var(--space-xl);
+        }
+
+        & .audio-player-artwork {
+          max-width: 25rem;
+          margin-inline: 0;
+        }
+
+        & .audio-player-episode-title {
+          font-size: var(--font-size-2xl);
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .audio-player-episode {
+          grid-template-columns: 28rem 1fr;
+        }
+
+        & .audio-player-artwork {
+          max-width: 28rem;
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="audio-player-wrapper">
+        <!-- Episode Information -->
+        <div class="audio-player-episode">
+          <!-- Album Art -->
+          <div class="audio-player-artwork">
+            {% if widget.settings.artwork != blank %}
+              {{ widget.settings.artwork | image: 'medium', 'audio-player-artwork-image', false }}
+            {% else %}
+              <div class="audio-player-artwork-image" style="background-color: var(--bg-secondary);"></div>
+            {% endif %}
+          </div>
+
+          <!-- Episode Info -->
+          <div class="audio-player-info">
+            {% if widget.settings.episode_number != blank %}
+              <span class="audio-player-episode-number">{{ widget.settings.episode_number }}</span>
+            {% endif %}
+            {% if widget.settings.episode_title != blank %}
+              <h3 class="audio-player-episode-title">{{ widget.settings.episode_title }}</h3>
+            {% endif %}
+
+            <div class="audio-player-episode-meta">
+              {% if widget.settings.duration != blank %}
+                <div class="audio-player-episode-meta-item">
+                  <svg class="audio-player-episode-meta-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  <span>{{ widget.settings.duration }}</span>
+                </div>
+              {% endif %}
+              {% if widget.settings.date != blank %}
+                <div class="audio-player-episode-meta-item">
+                  <svg class="audio-player-episode-meta-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
+                  </svg>
+                  <span>{{ widget.settings.date }}</span>
+                </div>
+              {% endif %}
+            </div>
+
+            {% if widget.settings.episode_description != blank %}
+              <p class="audio-player-episode-description">{{ widget.settings.episode_description }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Audio Controls -->
+        <div class="audio-player-controls">
+          <!-- Progress Bar -->
+          <div class="audio-player-progress">
+            <div
+              class="audio-player-progress-bar"
+              role="slider"
+              aria-label="Seek"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+              tabindex="0"
+            >
+              <div class="audio-player-progress-fill"></div>
+            </div>
+            <div class="audio-player-progress-time">
+              <span class="audio-player-current-time">0:00</span>
+              <span class="audio-player-duration">{{ widget.settings.duration | default: '0:00' }}</span>
+            </div>
+          </div>
+
+          <!-- Main Controls -->
+          <div class="audio-player-buttons">
+            <button class="audio-player-button" aria-label="Rewind 15 seconds" data-action="rewind">
+              <svg class="audio-player-button-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L4 8" />
+                <path d="M4 4v4h4" />
+                <text x="12" y="14" font-size="6" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">15</text>
+              </svg>
+            </button>
+
+            <button class="audio-player-button audio-player-button-play" aria-label="Play" data-action="play">
+              <svg class="audio-player-button-icon audio-player-icon-play" viewBox="0 0 24 24" aria-hidden="true">
+                <polygon points="6 4 20 12 6 20 6 4" stroke="none" />
+              </svg>
+              <svg
+                class="audio-player-button-icon audio-player-icon-pause"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                style="display: none;"
+              >
+                <rect x="6" y="4" width="4" height="16" stroke="none" />
+                <rect x="14" y="4" width="4" height="16" stroke="none" />
+              </svg>
+            </button>
+
+            <button class="audio-player-button" aria-label="Forward 15 seconds" data-action="forward">
+              <svg class="audio-player-button-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L20 8" />
+                <path d="M20 4v4h-4" />
+                <text x="12" y="14" font-size="6" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">15</text>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Secondary Controls -->
+          <div class="audio-player-secondary-controls">
+            {% if widget.settings.show_volume %}
+              <div class="audio-player-volume">
+                <svg class="audio-player-volume-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
+                </svg>
+                <div
+                  class="audio-player-volume-slider"
+                  role="slider"
+                  aria-label="Volume"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="100"
+                  tabindex="0"
+                >
+                  <div class="audio-player-volume-fill"></div>
+                </div>
+              </div>
+            {% endif %}
+
+            {% if widget.settings.show_speed %}
+              <div class="audio-player-speed">
+                <button class="audio-player-speed-button" aria-label="Playback speed: 1x" data-action="speed">
+                  1x
+                </button>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Audio Element -->
+  {% if widget.settings.audio_url != blank %}
+    <audio class="audio-player-audio-element" preload="metadata">
+      <source src="{{ widget.settings.audio_url }}" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  {% endif %}
+
+  <script>
+    (function () {
+      const widget = document.getElementById('{{ widget.id }}');
+      if (!widget || widget.dataset.initialized) return;
+      widget.dataset.initialized = 'true';
+
+      const audio = widget.querySelector('.audio-player-audio-element');
+      const playButton = widget.querySelector('[data-action="play"]');
+      const rewindButton = widget.querySelector('[data-action="rewind"]');
+      const forwardButton = widget.querySelector('[data-action="forward"]');
+      const speedButton = widget.querySelector('[data-action="speed"]');
+      const progressBar = widget.querySelector('.audio-player-progress-bar');
+      const progressFill = widget.querySelector('.audio-player-progress-fill');
+      const currentTimeEl = widget.querySelector('.audio-player-current-time');
+      const durationEl = widget.querySelector('.audio-player-duration');
+      const volumeSlider = widget.querySelector('.audio-player-volume-slider');
+      const volumeFill = widget.querySelector('.audio-player-volume-fill');
+      const playIcon = widget.querySelector('.audio-player-icon-play');
+      const pauseIcon = widget.querySelector('.audio-player-icon-pause');
+
+      if (!audio || !playButton) return;
+
+      let isPlaying = false;
+      let currentSpeed = 1;
+      const speeds = [1, 1.25, 1.5, 1.75, 2];
+
+      // Format time as MM:SS
+      const formatTime = (seconds) => {
+        if (isNaN(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+      };
+
+      // Play/Pause
+      playButton.addEventListener('click', function () {
+        if (isPlaying) {
+          audio.pause();
+          playIcon.style.display = 'block';
+          pauseIcon.style.display = 'none';
+          this.setAttribute('aria-label', 'Play');
+        } else {
+          audio.play();
+          playIcon.style.display = 'none';
+          pauseIcon.style.display = 'block';
+          this.setAttribute('aria-label', 'Pause');
+        }
+        isPlaying = !isPlaying;
+      });
+
+      // Rewind 15 seconds
+      if (rewindButton) {
+        rewindButton.addEventListener('click', () => {
+          audio.currentTime = Math.max(0, audio.currentTime - 15);
+        });
+      }
+
+      // Forward 15 seconds
+      if (forwardButton) {
+        forwardButton.addEventListener('click', () => {
+          audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 15);
+        });
+      }
+
+      // Speed control
+      if (speedButton) {
+        speedButton.addEventListener('click', function () {
+          const currentIndex = speeds.indexOf(currentSpeed);
+          currentSpeed = speeds[(currentIndex + 1) % speeds.length];
+          audio.playbackRate = currentSpeed;
+          this.textContent = `${currentSpeed}x`;
+        });
+      }
+
+      // Update progress bar
+      audio.addEventListener('timeupdate', () => {
+        if (!audio.duration) return;
+        const progress = (audio.currentTime / audio.duration) * 100;
+        if (progressFill) progressFill.style.width = `${progress}%`;
+        if (currentTimeEl) currentTimeEl.textContent = formatTime(audio.currentTime);
+        if (progressBar) progressBar.setAttribute('aria-valuenow', Math.round(progress));
+      });
+
+      // Update duration when metadata loads
+      audio.addEventListener('loadedmetadata', () => {
+        if (durationEl) durationEl.textContent = formatTime(audio.duration);
+      });
+
+      // Seek functionality
+      if (progressBar) {
+        progressBar.addEventListener('click', (e) => {
+          const rect = progressBar.getBoundingClientRect();
+          const pos = (e.clientX - rect.left) / rect.width;
+          audio.currentTime = pos * (audio.duration || 0);
+        });
+
+        // Keyboard controls for progress bar
+        progressBar.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            audio.currentTime = Math.max(0, audio.currentTime - 5);
+          } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 5);
+          }
+        });
+      }
+
+      // Volume control
+      if (volumeSlider && volumeFill) {
+        volumeSlider.addEventListener('click', (e) => {
+          const rect = volumeSlider.getBoundingClientRect();
+          const pos = (e.clientX - rect.left) / rect.width;
+          audio.volume = Math.max(0, Math.min(1, pos));
+          volumeFill.style.width = `${pos * 100}%`;
+          volumeSlider.setAttribute('aria-valuenow', Math.round(pos * 100));
+        });
+
+        // Keyboard controls for volume
+        volumeSlider.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            audio.volume = Math.max(0, audio.volume - 0.1);
+            volumeFill.style.width = `${audio.volume * 100}%`;
+          } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            audio.volume = Math.min(1, audio.volume + 0.1);
+            volumeFill.style.width = `${audio.volume * 100}%`;
+          }
+        });
+      }
+
+      // Handle audio end
+      audio.addEventListener('ended', () => {
+        isPlaying = false;
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+        playButton.setAttribute('aria-label', 'Play');
+      });
+    })();
+  </script>
+</section>
