@@ -8,33 +8,25 @@ function initializeHighlightStyles() {
   const style = document.createElement("style");
   style.textContent = `
     [data-widget-id], [data-block-id] {
-      transition: outline 0.1s ease-out;
+      transition: box-shadow 0.15s ease-out;
     }
     .widget-highlight {
-      outline: 1px solid #0066cc !important;
+      box-shadow: inset 0 0 0 2px #0066cc, 0 0 12px rgba(0, 102, 204, 0.25) !important;
       position: relative;
-      box-shadow: 0 0 10px rgba(0, 102, 204, 0.3);
       z-index: 10;
     }
     .block-highlight {
-      outline: 1px solid #22c55e !important;
+      box-shadow: inset 0 0 0 2px #22c55e !important;
       position: relative;
       z-index: 11;
     }
-    [data-widget-id]:hover {
-      outline: 1px dashed rgba(0, 102, 204, 0.5);
+    [data-widget-id]:hover:not(.widget-highlight) {
+      box-shadow: inset 0 0 0 1px rgba(0, 102, 204, 0.4);
       cursor: pointer;
     }
-    [data-block-id]:hover {
-      outline: 1px dashed rgba(34, 197, 94, 0.5);
+    [data-block-id]:hover:not(.block-highlight) {
+      box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.4);
       cursor: pointer;
-    }
-    /* Prevent hover styles on highlighted elements */
-    .widget-highlight:hover {
-      outline: 1px solid #0066cc !important;
-    }
-    .block-highlight:hover {
-      outline: 1px dashed rgba(34, 197, 94, 0.5);
     }
   `;
   document.head.appendChild(style);
