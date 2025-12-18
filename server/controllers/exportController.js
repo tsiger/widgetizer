@@ -168,7 +168,7 @@ export async function exportProject(req, res) {
     // Continue with defining export version and output directories.
     const version = await getNextVersion(projectId);
     const outputBaseDir = PUBLISH_DIR;
-    const outputDir = path.join(outputBaseDir, `${projectId}-v${version}`);
+    const outputDir = path.join(outputBaseDir, `${projectSlug}-v${version}`);
     const outputAssetsDir = path.join(outputDir, "assets");
     const outputUploadsDir = path.join(outputDir, "uploads");
     const outputImagesDir = path.join(outputUploadsDir, "images");
