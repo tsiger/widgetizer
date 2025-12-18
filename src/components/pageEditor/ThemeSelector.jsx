@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Palette, ChevronDown } from "lucide-react";
-import useThemeStore from "../../stores/themeStore";
+import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
 
 export default function ThemeSelector() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { settings, originalSettings, hasUnsavedThemeChanges } = useThemeStore();
+  const { themeSettings: settings, originalThemeSettings: originalSettings, hasUnsavedThemeChanges } = usePageStore();
   const { selectedThemeGroup, setSelectedThemeGroup } = useWidgetStore();
 
   const themeGroups = settings?.settings?.global

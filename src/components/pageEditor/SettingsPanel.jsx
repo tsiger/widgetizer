@@ -2,7 +2,6 @@ import { ArrowLeft } from "lucide-react";
 import { SettingsRenderer } from "../settings";
 import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
-import useThemeStore from "../../stores/themeStore";
 import useAutoSave from "../../stores/saveStore";
 import { useTranslation } from "react-i18next";
 
@@ -18,9 +17,8 @@ export default function SettingsPanel({
   onBackToWidget,
 }) {
   const { t } = useTranslation();
-  const { globalWidgets } = usePageStore();
+  const { globalWidgets, updateThemeSetting } = usePageStore();
   const { updateWidgetSettings, updateGlobalWidgetSettings, updateBlockSettings } = useWidgetStore();
-  const { updateThemeSetting } = useThemeStore();
   const { markWidgetModified, setThemeSettingsModified } = useAutoSave();
 
   const isGlobalWidget = !!selectedGlobalWidgetId;
