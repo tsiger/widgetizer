@@ -1,10 +1,9 @@
-import { GripVertical, Trash2, Copy, Plus, Bookmark } from "lucide-react";
+import { GripVertical, Trash2, Copy, Plus } from "lucide-react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import SortableBlockItem from "../blocks/SortableBlockItem";
 import BlockInsertionZone from "../blocks/BlockInsertionZone";
-
 
 export default function WidgetItem({
   widgetId,
@@ -19,7 +18,6 @@ export default function WidgetItem({
   dragHandleProps = {},
   onDeleteClick,
   onDuplicateClick,
-  onSaveAsReusable,
   onBlockSelect,
   selectedBlockId,
   onBlocksReorder,
@@ -29,16 +27,10 @@ export default function WidgetItem({
   activeBlockTriggerKey,
   onBlockDragEnd,
 }) {
-  const isReusableRef = widget.type === "__reusable_ref__";
-  const displayWidget = isReusableRef ? widget.widgetData : widget;
-  const displaySchema = isReusableRef ? {} : widgetSchema;
-  const widgetName = isReusableRef 
-    ? widget.reusableName || "Reusable Block"
-    : (displayWidget?.settings?.name || widgetSchema?.displayName || widget.type);
-  const hasBlocks = !isReusableRef && displaySchema.blocks && displaySchema.blocks.length > 0;
-  const blocks = displayWidget?.blocks || {};
-  const blockOrder = displayWidget?.blocksOrder || [];
-
+  const widgetName = widget.settings?.name || widgetSchema.displayName || widget.type;
+  const hasBlocks = widgetSchema.blocks && widgetSchema.blocks.length > 0;
+  const blocks = widget.blocks || {};
+  const blockOrder = widget.blocksOrder || [];
 
   return (
     <div
@@ -62,27 +54,12 @@ export default function WidgetItem({
           <GripVertical size={16} />
         </div>
         <div className="flex-grow min-w-0 flex items-center gap-2">
-          {isReusableRef && (
-            <Bookmark size={12} className="text-purple-500 flex-shrink-0" title="Reusable Block" />
-          )}
           <span className="font-medium text-xs truncate text-slate-700">{widgetName}</span>
           {isModified && !isDragging && (
             <div className="h-2 w-2 rounded-full bg-amber-500 ring-2 ring-amber-200" title="Unsaved changes"></div>
           )}
         </div>
         <div className="flex opacity-0 group-hover:opacity-100 transition-opacity duration-200 gap-1">
-          {!isReusableRef && onSaveAsReusable && (
-            <button
-              className="p-1.5 text-slate-400 hover:text-purple-600 rounded-md hover:bg-white/80 transition-colors"
-              title="Save as Reusable"
-              onClick={(e) => {
-                e.stopPropagation();
-                onSaveAsReusable(widgetId, widget);
-              }}
-            >
-              <Bookmark size={14} />
-            </button>
-          )}
           <button
             className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-white/80 transition-colors"
             title="Duplicate widget"

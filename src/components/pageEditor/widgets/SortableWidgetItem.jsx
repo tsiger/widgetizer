@@ -14,7 +14,6 @@ export default function SortableWidgetItem({
   onWidgetSelect,
   onDeleteClick,
   onDuplicateClick,
-  onSaveAsReusable,
   selectedBlockId,
   onBlockSelect,
   onBlocksReorder,
@@ -74,7 +73,6 @@ export default function SortableWidgetItem({
         dragHandleProps={dragHandleProps}
         onDeleteClick={onDeleteClick}
         onDuplicateClick={onDuplicateClick}
-        onSaveAsReusable={onSaveAsReusable}
         selectedBlockId={selectedBlockId}
         onBlockSelect={onBlockSelect}
         onBlocksReorder={onBlocksReorder}

@@ -60,18 +60,8 @@ export async function generatePreview(req, res) {
     
     if (widgetOrder.length > 0 && pageData.widgets) {
       const widgetPromises = widgetOrder.map(async (widgetId) => {
-        let widget = pageData.widgets[widgetId];
+        const widget = pageData.widgets[widgetId];
         if (!widget) return null; // Return null to filter later
-        
-        // Handle reusable block references
-        if (widget.type === "__reusable_ref__" && widget.widgetData) {
-          // Use the embedded widget data for rendering
-          widget = {
-            ...widget.widgetData,
-            type: widget.widgetData.type,
-          };
-        }
-        
         // Call the service function, passing projectId
         // Ensure rawThemeSettings is passed correctly
         const renderedWidgetHtml = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings, "preview");

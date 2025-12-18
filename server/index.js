@@ -20,7 +20,6 @@ import previewRoutes from "./routes/preview.js";
 import exportRoutes from "./routes/export.js";
 import appSettingsRoutes from "./routes/appSettings.js";
 import coreWidgetsRoutes from "./routes/coreWidgets.js";
-import reusableBlocksRoutes from "./routes/reusableBlocks.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -40,7 +39,6 @@ app.use("/api/projects", editorApiLimiter, projectRoutes);
 app.use("/api/themes", editorApiLimiter, themeRoutes);
 app.use("/api/pages", editorApiLimiter, pagesRoutes);
 app.use("/api/preview", editorApiLimiter, previewRoutes);
-app.use("/api/reusable-blocks", editorApiLimiter, reusableBlocksRoutes);
 
 // Apply stricter rate limiting for other routes
 app.use("/api/menus", apiLimiter, menusRoutes);
