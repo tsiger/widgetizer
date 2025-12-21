@@ -161,7 +161,7 @@ When a setting changes:
 3. Updates `textContent`, `src`, or `href` based on element type
 4. Debounced reload still happens for script consistency
 
-All 21 core widgets have `data-setting` attributes and `defaultBlocks` for initial content, ensuring a seamless editing experience.
+The system currently supports **32 standard widgets** (plus core platform widgets like `core-divider` and `core-spacer`). All standard widgets have `data-setting` attributes and `defaultBlocks` for initial content, ensuring a seamless editing experience.
 
 ## Performance Considerations
 

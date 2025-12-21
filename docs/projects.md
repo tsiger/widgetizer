@@ -89,9 +89,9 @@ This file contains functions that make API calls to the backend:
     - **Conditional Fields**: Theme selection only appears when creating new projects, not when editing existing ones
     - **Localized Validation**: All error messages and help text are fully localized
 6.  **Submission & URL Management**: The user modifies the form and clicks "Save Changes":
-    - **Project Renaming**: If the project title changes, the system automatically generates a new project ID and renames the project directory
-    - **URL Redirection**: When a project is renamed (causing an ID change), the user is automatically redirected to the new URL (`/projects/edit/{newId}`)
-    - **State Synchronization**: Active project state is properly maintained even when project IDs change due to renaming
+    - **Project Renaming**: If the project title changes, the system automatically generates a new project **slug** and renames the project directory.
+    - **URL Persistence**: Since the project ID is stable, the user is **not** redirected; the API and frontend routes remain valid even after a rename.
+    - **State Synchronization**: Active project state is properly maintained as the ID remains constant.
 7.  **API Call**: The `handleSubmit` function calls `updateProject(id, formData)` using the `projectManager.js` utility functions for consistent API handling.
 8.  **State Updates**:
     - **Active Project Sync**: If the edited project is currently active, the global store is updated using `getActiveProject()` and `setActiveProject()` to maintain proper state

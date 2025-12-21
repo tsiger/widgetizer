@@ -32,11 +32,11 @@ These layers are applied automatically to API endpoints and provide a robust bas
 - **Why it's important:** Prevents unauthorized websites from making requests to your API.
 - **Implementation:** The `cors` package is enabled globally (`app.use(cors())`). In a production environment, this should be configured to whitelist specific domains.
 
-### 5. SVG Sanitization
+### 5. Multi-layered SVG Sanitization
 
-- **What it is:** All uploaded SVG files are processed to remove potentially malicious scripts and event handlers.
-- **Why it's important:** SVGs are XML files that can contain JavaScript (XSS vectors). If served directly to a user, a malicious SVG could execute code in their browser.
-- **Implementation:** The `DOMPurify` library is used in the media upload controller to sanitize SVG content before saving it to the filesystem.
+- **What it is:** All uploaded SVG files are sanitized twice: first on the client using `DOMPurify` before upload, and then again on the server using `isomorphic-dompurify`.
+- **Why it's important:** SVGs are XML files that can contain JavaScript (XSS vectors). Defense-in-depth ensures that even if client-side sanitization is bypassed, the server protects the filesystem.
+- **Implementation:** Integrated into `useMediaUpload.js` (client) and `mediaController.js` (server).
 
 ### 5. Global Error Handling
 

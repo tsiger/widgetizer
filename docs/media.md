@@ -159,7 +159,9 @@ Handles all file upload operations:
 - **Upload Progress**: Real-time progress tracking using XMLHttpRequest
 - **Chunked Processing**: Processes files in batches of 5 to avoid overwhelming the server
 - **Multi-file Support**: Handles multiple file uploads with sequential chunk processing
-- **SVG Sanitization**: Client-side SVG sanitization using DOMPurify before upload
+- **Multi-layered SVG Sanitization**: For defense-in-depth, SVG files are sanitized twice:
+  - **Client-side**: Sanitized in the browser using `DOMPurify` before the upload starts.
+  - **Server-side**: Re-sanitized on the server using `isomorphic-dompurify` before being saved to the filesystem.
 - **Error Handling**: Detailed error reporting for rejected files with unique toast IDs
 - **State Updates**: Updates parent files state with successful uploads
 - **Toast Notifications**: Success, warning, and error feedback with batch progress indicators
