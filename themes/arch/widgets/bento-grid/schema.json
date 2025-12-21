@@ -1,0 +1,162 @@
+{
+  "type": "bento-grid",
+  "displayName": "Bento Grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Feature Spotlight"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "Desktop Columns",
+      "default": "4",
+      "options": [
+        { "value": "2", "label": "2 Columns" },
+        { "value": "3", "label": "3 Columns" },
+        { "value": "4", "label": "4 Columns" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "gap",
+      "label": "Gap Size",
+      "default": "var(--space-md)",
+      "options": [
+        { "value": "var(--space-sm)", "label": "Small" },
+        { "value": "var(--space-md)", "label": "Medium" },
+        { "value": "var(--space-lg)", "label": "Large" },
+        { "value": "var(--space-xl)", "label": "Extra Large" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "displayName": "Bento Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Bento Tile"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Describe this featured item here."
+        },
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "range",
+          "id": "col_span",
+          "label": "Column Span",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "row_span",
+          "label": "Row Span",
+          "min": 1,
+          "max": 2,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "header",
+          "content": "Style"
+        },
+        {
+          "type": "select",
+          "id": "bg_style",
+          "label": "Background Style",
+          "default": "surface",
+          "options": [
+            { "value": "surface", "label": "Surface (Secondary)" },
+            { "value": "accent", "label": "Accent Color" },
+            { "value": "dark", "label": "Dark" },
+            { "value": "image-bg", "label": "Image Background" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "text_color",
+          "label": "Text Color",
+          "default": "dark",
+          "options": [
+            { "value": "dark", "label": "Dark" },
+            { "value": "light", "label": "Light" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Text Alignment",
+          "default": "start",
+          "options": [
+            { "value": "start", "label": "Left" },
+            { "value": "center", "label": "Center" }
+          ]
+        },
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "item",
+      "settings": {
+        "title": "Main Highlight",
+        "text": "This is a larger bento tile spanning multiple columns.",
+        "col_span": 2,
+        "bg_style": "accent",
+        "text_color": "light"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Sub Feature",
+        "col_span": 1,
+        "bg_style": "surface"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Visual Entry",
+        "col_span": 1,
+        "row_span": 2,
+        "bg_style": "surface"
+      }
+    }
+  ]
+}

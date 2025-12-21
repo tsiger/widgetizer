@@ -1,0 +1,136 @@
+{
+  "type": "content-switcher",
+  "displayName": "Content Switcher",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Flexible Plans"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "switcher_type",
+      "label": "Switcher Style",
+      "default": "toggle",
+      "options": [
+        { "value": "toggle", "label": "Toggle (2 Options)" },
+        { "value": "tabs", "label": "Tabs (Up to 3 Options)" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Labels"
+    },
+    {
+      "type": "text",
+      "id": "option_1_label",
+      "label": "Option 1 Label",
+      "default": "Monthly"
+    },
+    {
+      "type": "text",
+      "id": "option_2_label",
+      "label": "Option 2 Label",
+      "default": "Yearly"
+    },
+    {
+      "type": "text",
+      "id": "option_3_label",
+      "label": "Option 3 Label (Tabs only)",
+      "default": "Lifetime"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Columns per state",
+      "default": "3",
+      "options": [
+        { "value": "1", "label": "1 Column" },
+        { "value": "2", "label": "2 Columns" },
+        { "value": "3", "label": "3 Columns" },
+        { "value": "4", "label": "4 Columns" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "displayName": "Content Item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "target_option",
+          "label": "Assign to Option",
+          "default": "1",
+          "options": [
+            { "value": "1", "label": "Option 1" },
+            { "value": "2", "label": "Option 2" },
+            { "value": "3", "label": "Option 3" }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Item Title"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Item description goes here."
+        },
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price / Value (Optional)"
+        },
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Link / CTA"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "item",
+      "settings": {
+        "title": "Basic Plan",
+        "text": "Perfect for individuals.",
+        "price": "$10",
+        "target_option": "1"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Pro Plan",
+        "text": "For growing teams.",
+        "price": "$90",
+        "target_option": "2"
+      }
+    }
+  ]
+}

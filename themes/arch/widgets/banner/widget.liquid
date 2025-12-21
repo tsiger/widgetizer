@@ -1,7 +1,11 @@
 <section
   id="{{ widget.id }}"
-  class="widget-banner widget {% if widget.settings.image != blank %}has-bg-image has-overlay overlay-medium{% elsif widget.settings.background_color != blank %}has-bg-color{% endif %} {% if widget.settings.text_color == 'light' %}color-scheme-dark{% else %}color-scheme-light{% endif %} {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %}"
-  {% if widget.settings.image != blank %}style="--widget-bg-image: url('{{ widget.settings.image | image: 'path', 'large' }}');"{% elsif widget.settings.background_color != blank %}style="--widget-bg-color: {{ widget.settings.background_color }};"{% endif %}
+  class="widget widget-banner {% if widget.settings.image != blank %}has-bg-image has-overlay overlay-medium{% elsif widget.settings.background_color != blank %}has-bg-color{% endif %} {% if widget.settings.text_color == 'light' %}color-scheme-dark{% else %}color-scheme-light{% endif %} {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %}"
+  {% if widget.settings.image != blank %}
+    style="--widget-bg-image: url('{{ widget.settings.image | image: 'path', 'large' }}');"
+  {% elsif widget.settings.background_color != blank %}
+    style="--widget-bg-color: {{ widget.settings.background_color }};"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="banner"
 >
@@ -31,11 +35,23 @@
       {% endif %}
       {% if widget.settings.button_link.text != blank %}
         <div class="widget-actions">
-          <a href="{{ widget.settings.button_link.href }}" class="widget-button widget-button-primary" {% if widget.settings.button_link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+          <a
+            href="{{ widget.settings.button_link.href }}"
+            class="widget-button widget-button-primary"
+            {% if widget.settings.button_link.target == '_blank' %}
+              target="_blank" rel="noopener"
+            {% endif %}
+          >
             {{ widget.settings.button_link.text }}
           </a>
           {% if widget.settings.secondary_link.text != blank %}
-            <a href="{{ widget.settings.secondary_link.href }}" class="widget-button widget-button-secondary" {% if widget.settings.secondary_link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+            <a
+              href="{{ widget.settings.secondary_link.href }}"
+              class="widget-button widget-button-secondary"
+              {% if widget.settings.secondary_link.target == '_blank' %}
+                target="_blank" rel="noopener"
+              {% endif %}
+            >
               {{ widget.settings.secondary_link.text }}
             </a>
           {% endif %}

@@ -1,0 +1,163 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-sticky-split {% if widget.settings.background_color != blank %}has-bg-color{% endif %}"
+  {% if widget.settings.background_color != blank %}
+    style="--widget-bg-color: {{ widget.settings.background_color }};"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="sticky-split"
+>
+  <style>
+    #{{ widget.id }} {
+      & .sticky-split-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-3xl);
+        position: relative;
+      }
+
+      & .sticky-column {
+        position: relative;
+        height: min-content;
+      }
+
+      & .sticky-image-container {
+        width: 100%;
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        background: var(--bg-secondary);
+        aspect-ratio: 4/5;
+
+        & img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      & .sticky-content-box {
+        margin-block-start: var(--space-lg);
+      }
+
+      & .scrolling-column {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3xl);
+      }
+
+      & .split-item {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      & .split-item-icon {
+        color: var(--text-primary);
+        width: 2.4rem;
+        height: 2.4rem;
+
+        & svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      & .split-item-action {
+        margin-block-start: var(--space-md);
+      }
+
+      @media (min-width: 990px) {
+        & .sticky-split-grid {
+          grid-template-columns: repeat(2, 1fr);
+          align-items: start;
+        }
+
+        & .sticky-column {
+          position: sticky;
+          inset-block-start: var(--space-3xl);
+          order: {% if widget.settings.sticky_side == 'right' %}2{% else %}1{% endif %};
+        }
+
+        & .scrolling-column {
+          order: {% if widget.settings.sticky_side == 'right' %}1{% else %}2{% endif %};
+        }
+
+        & .sticky-image-container {
+          height: calc(100vh - 2 * var(--space-3xl));
+          aspect-ratio: auto;
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="sticky-split-grid">
+        <!-- Sticky Column -->
+        <div class="sticky-column">
+          <div class="sticky-image-container">
+            {% if widget.settings.sticky_image != blank %}
+              {{ widget.settings.sticky_image | image: 'large' }}
+            {% else %}
+              <img
+                src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=1000&fit=crop"
+                alt="Placeholder image"
+                loading="lazy"
+              >
+            {% endif %}
+          </div>
+          {% if widget.settings.sticky_title != blank %}
+            <div class="sticky-content-box">
+              <h3 class="widget-title" data-setting="sticky_title">{{ widget.settings.sticky_title }}</h3>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Scrolling Column -->
+        <div class="scrolling-column">
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+            <div class="split-item" data-block-id="{{ blockId }}">
+              {% if block.settings.icon != blank %}
+                <div class="split-item-icon" data-setting="icon">
+                  <svg class="widget-icon">
+                    <use href="/assets/lucide-sprite.svg#{{ block.settings.icon }}"></use>
+                  </svg>
+                </div>
+              {% endif %}
+
+              <div class="split-item-content">
+                <h3 class="widget-title" data-setting="title">{{ block.settings.title }}</h3>
+                <p class="widget-text" data-setting="text">{{ block.settings.text }}</p>
+                {% if block.settings.link.href != blank %}
+                  <div class="split-item-action">
+                    <a href="{{ block.settings.link.href }}" class="widget-button widget-button-secondary">
+                      {{ block.settings.link.text | default: 'Read More' }}
+                      <svg class="widget-button-icon">
+                        <use href="/assets/lucide-sprite.svg#arrow-right"></use>
+                      </svg>
+                    </a>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

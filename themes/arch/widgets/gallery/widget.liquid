@@ -1,6 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget-gallery widget"
+  class="widget widget-gallery"
   data-widget-id="{{ widget.id }}"
   data-widget-type="gallery"
 >
@@ -89,8 +89,8 @@
 
       & .gallery-modal-close {
         position: absolute;
-        top: -4rem;
-        right: 0;
+        inset-block-start: -4rem;
+        inset-inline-end: 0;
         background: none;
         border: none;
         cursor: pointer;
@@ -138,7 +138,7 @@
           <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
           <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
