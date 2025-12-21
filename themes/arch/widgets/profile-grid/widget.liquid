@@ -1,0 +1,164 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-profile-grid"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="profile-grid"
+>
+  <style>
+    #{{ widget.id }} {
+      & .profile-grid-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+      }
+
+      & .profile-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      & .profile-image {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-block-end: var(--space-md);
+        border: var(--border-width-medium) solid var(--border-light);
+      }
+
+      & .profile-image-placeholder {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: var(--surface-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-block-end: var(--space-md);
+        border: var(--border-width-medium) solid var(--border-light);
+        color: var(--text-muted);
+        font-size: var(--font-size-4xl);
+      }
+
+      & .profile-name {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-bold);
+        margin: 0 0 var(--space-xs) 0;
+      }
+
+      & .profile-role {
+        font-size: var(--font-size-base);
+        color: var(--color-primary);
+        font-weight: var(--font-weight-medium);
+        margin: 0 0 var(--space-xs) 0;
+      }
+
+      & .profile-specialty {
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+        margin: 0 0 var(--space-sm) 0;
+        font-style: italic;
+      }
+
+      & .profile-bio {
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+        margin: 0;
+        max-width: 300px;
+      }
+
+      & .profile-footer {
+        margin-block-start: var(--space-md);
+      }
+
+      & .profile-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
+        font-size: var(--font-size-sm);
+        color: var(--color-primary);
+        text-decoration: none;
+      }
+
+      & .profile-link:hover {
+        text-decoration: underline;
+      }
+
+      @media (min-width: 600px) {
+        & .profile-grid-list {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .profile-grid-list {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="profile-grid-list">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <div class="profile-card" data-block-id="{{ blockId }}">
+            {% if block.settings.photo != blank %}
+              {{ block.settings.photo | image: 'medium', 'profile-image' }}
+            {% else %}
+              <div class="profile-image-placeholder">👤</div>
+            {% endif %}
+
+            {% if block.settings.name != blank %}
+              <h3 class="profile-name" data-setting="name">{{ block.settings.name }}</h3>
+            {% endif %}
+
+            {% if block.settings.role != blank %}
+              <p class="profile-role" data-setting="role">{{ block.settings.role }}</p>
+            {% endif %}
+
+            {% if block.settings.specialty != blank %}
+              <p class="profile-specialty" data-setting="specialty">{{ block.settings.specialty }}</p>
+            {% endif %}
+
+            {% if block.settings.bio != blank %}
+              <p class="profile-bio" data-setting="bio">{{ block.settings.bio }}</p>
+            {% endif %}
+
+            {% if block.settings.social_link.text != blank %}
+              <div class="profile-footer">
+                <a
+                  href="{{ block.settings.social_link.href }}"
+                  class="profile-link"
+                  data-setting="social_link"
+                  {% if block.settings.social_link.target == '_blank' %}
+                    target="_blank" rel="noopener"
+                  {% endif %}
+                >
+                  {{ block.settings.social_link.text }}
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

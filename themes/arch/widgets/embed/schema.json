@@ -1,0 +1,52 @@
+{
+  "type": "embed",
+  "displayName": "Embed Widget",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "textarea",
+      "id": "code",
+      "label": "Embed Code (HTML/JS/Iframe)",
+      "default": "<!-- Paste your embed code here -->"
+    },
+    {
+      "type": "select",
+      "id": "max_width",
+      "label": "Container Width",
+      "default": "large",
+      "options": [
+        { "value": "full", "label": "Full Width" },
+        { "value": "large", "label": "Large (900px)" },
+        { "value": "medium", "label": "Medium (800px)" },
+        { "value": "small", "label": "Small (600px)" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "default": "center",
+      "options": [
+        { "value": "start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "end", "label": "Right" }
+      ]
+    }
+  ],
+  "blocks": [],
+  "defaultBlocks": []
+}

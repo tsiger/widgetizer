@@ -1,0 +1,72 @@
+{
+  "type": "download-cta",
+  "displayName": "Download/CTA Box",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Ready to get started?"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Download our comprehensive guide or contact us today to learn more."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Download Now"
+    },
+    {
+      "type": "link",
+      "id": "button_link",
+      "label": "Action URL or File"
+    },
+    {
+      "type": "checkbox",
+      "id": "is_download",
+      "label": "Treate link as file download",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "Action Icon",
+      "default": "download",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "download", "label": "Download" },
+        { "value": "arrow", "label": "Arrow" },
+        { "value": "document", "label": "Document" },
+        { "value": "external", "label": "External Link" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "default": "center",
+      "options": [
+        { "value": "start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "end", "label": "Right" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f5f5f5"
+    }
+  ],
+  "blocks": [],
+  "defaultBlocks": []
+}

@@ -1,0 +1,95 @@
+{
+  "type": "social-icons",
+  "displayName": "Social Icons",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Follow Us"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Stay connected with us on social media."
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "default": "center",
+      "options": [
+        { "value": "start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "end", "label": "Right" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon Size (rem)",
+      "default": 2.4,
+      "min": 1.6,
+      "max": 4.8,
+      "step": 0.2
+    }
+  ],
+  "blocks": [
+    {
+      "type": "social_link",
+      "displayName": "Social Link",
+      "settings": [
+        {
+          "type": "select",
+          "id": "platform",
+          "label": "Platform",
+          "default": "facebook",
+          "options": [
+            { "value": "facebook", "label": "Facebook" },
+            { "value": "instagram", "label": "Instagram" },
+            { "value": "twitter", "label": "X (Twitter)" },
+            { "value": "linkedin", "label": "LinkedIn" },
+            { "value": "youtube", "label": "YouTube" },
+            { "value": "tiktok", "label": "TikTok" },
+            { "value": "pinterest", "label": "Pinterest" },
+            { "value": "generic", "label": "Generic Link" }
+          ]
+        },
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "social_link",
+      "settings": {
+        "platform": "facebook",
+        "link": { "href": "https://facebook.com", "text": "Facebook" }
+      }
+    },
+    {
+      "type": "social_link",
+      "settings": {
+        "platform": "instagram",
+        "link": { "href": "https://instagram.com", "text": "Instagram" }
+      }
+    },
+    {
+      "type": "social_link",
+      "settings": {
+        "platform": "twitter",
+        "link": { "href": "https://twitter.com", "text": "X" }
+      }
+    }
+  ]
+}

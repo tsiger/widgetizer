@@ -1,0 +1,196 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-priced-list"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="priced-list"
+>
+  <style>
+    #{{ widget.id }} {
+      & .priced-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+
+      & .priced-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: var(--space-md);
+        padding: var(--space-lg) 0;
+        border-block-end: var(--border-width-thin) solid var(--border-light);
+        align-items: start;
+      }
+
+      & .priced-item:first-child {
+        border-block-start: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .priced-item.is-featured {
+        background: linear-gradient(90deg, var(--color-accent-subtle) 0%, transparent 100%);
+        margin-inline: calc(var(--space-md) * -1);
+        padding-inline: var(--space-md);
+        border-radius: var(--radius-sm);
+      }
+
+      & .priced-item-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+      }
+
+      & .priced-item-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        flex-wrap: wrap;
+      }
+
+      & .priced-item-name {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        margin: 0;
+      }
+
+      & .priced-item-badges {
+        display: flex;
+        gap: var(--space-xs);
+        flex-wrap: wrap;
+      }
+
+      & .priced-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+        font-size: 0.7rem;
+        font-weight: var(--font-weight-bold);
+        text-transform: uppercase;
+      }
+
+      & .priced-badge-vegetarian { background: #22c55e; color: white; }
+      & .priced-badge-vegan { background: #16a34a; color: white; }
+      & .priced-badge-gluten-free { background: #f59e0b; color: white; }
+      & .priced-badge-dairy-free { background: #3b82f6; color: white; }
+      & .priced-badge-nut-free { background: #8b5cf6; color: white; }
+      & .priced-badge-spicy { background: #ef4444; color: white; }
+      & .priced-badge-halal { background: #06b6d4; color: white; }
+      & .priced-badge-kosher { background: #6366f1; color: white; }
+
+      & .priced-item-description {
+        color: var(--text-muted);
+        font-size: var(--font-size-sm);
+        margin: 0;
+        max-width: 60ch;
+      }
+
+      & .priced-item-price {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-bold);
+        color: var(--text-primary);
+        white-space: nowrap;
+      }
+
+      & .priced-item-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+        margin-inline-start: var(--space-md);
+      }
+
+      & .priced-item-right {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+      }
+
+      @media (max-width: 600px) {
+        & .priced-item {
+          grid-template-columns: 1fr;
+        }
+
+        & .priced-item-right {
+          justify-content: space-between;
+          margin-block-start: var(--space-sm);
+        }
+
+        & .priced-item-image {
+          width: 60px;
+          height: 60px;
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="priced-list">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <div class="priced-item {% if block.settings.featured %}is-featured{% endif %}" data-block-id="{{ blockId }}">
+            <div class="priced-item-content">
+              <div class="priced-item-header">
+                {% if block.settings.name != blank %}
+                  <h3 class="priced-item-name" data-setting="name">{{ block.settings.name }}</h3>
+                {% endif %}
+                <div class="priced-item-badges">
+                  {% if block.settings.vegetarian %}
+                    <span class="priced-badge priced-badge-vegetarian" title="Vegetarian">V</span>
+                  {% endif %}
+                  {% if block.settings.vegan %}
+                    <span class="priced-badge priced-badge-vegan" title="Vegan">VG</span>
+                  {% endif %}
+                  {% if block.settings.gluten_free %}
+                    <span class="priced-badge priced-badge-gluten-free" title="Gluten-Free">GF</span>
+                  {% endif %}
+                  {% if block.settings.dairy_free %}
+                    <span class="priced-badge priced-badge-dairy-free" title="Dairy-Free">DF</span>
+                  {% endif %}
+                  {% if block.settings.nut_free %}
+                    <span class="priced-badge priced-badge-nut-free" title="Nut-Free">NF</span>
+                  {% endif %}
+                  {% if block.settings.spicy %}
+                    <span class="priced-badge priced-badge-spicy" title="Spicy">🌶</span>
+                  {% endif %}
+                  {% if block.settings.halal %}
+                    <span class="priced-badge priced-badge-halal" title="Halal">H</span>
+                  {% endif %}
+                  {% if block.settings.kosher %}
+                    <span class="priced-badge priced-badge-kosher" title="Kosher">K</span>
+                  {% endif %}
+                </div>
+              </div>
+              {% if block.settings.description != blank %}
+                <p class="priced-item-description" data-setting="description">{{ block.settings.description }}</p>
+              {% endif %}
+            </div>
+            <div class="priced-item-right">
+              {% if block.settings.price != blank %}
+                <span class="priced-item-price" data-setting="price">{{ block.settings.price }}</span>
+              {% endif %}
+              {% if block.settings.image != blank %}
+                {{ block.settings.image | image: 'small', 'priced-item-image' }}
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

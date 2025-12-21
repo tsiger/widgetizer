@@ -306,12 +306,3 @@ Source files in `themes/arch-static/`:
 | And more... |  |
 
 ---
-
-## Testing
-
-After creating a widget:
-
-1. Refresh the Widgetizer admin
-2. Add the widget to a page
-3. Configure settings and add blocks
-4. Preview the rendered output
