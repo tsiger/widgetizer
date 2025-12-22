@@ -92,8 +92,13 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     renderMode === "preview" ? process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}` : "";
 
   // Determine image base path based on render mode
+  // Publish mode uses assets/images/ for consistent CSS path resolution
   const imageBasePath =
-    renderMode === "publish" ? "uploads/images" : `${apiUrl}/api/media/projects/${projectId}/uploads/images`;
+    renderMode === "publish" ? "assets/images" : `${apiUrl}/api/media/projects/${projectId}/uploads/images`;
+
+  // Video base path (also in assets for consistency)
+  const videoBasePath =
+    renderMode === "publish" ? "assets/videos" : `${apiUrl}/api/media/projects/${projectId}/uploads/videos`;
 
   // Load media metadata and create a useful map
   let mediaFiles = {};
@@ -126,6 +131,7 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     mediaFiles,
     globals,
     imagePath: imageBasePath,
+    videoPath: videoBasePath,
   };
 }
 

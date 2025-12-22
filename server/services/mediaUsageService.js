@@ -4,20 +4,21 @@ import { getProjectPagesDir, getProjectMediaJsonPath } from "../config.js";
 import { readMediaFile } from "../controllers/mediaController.js";
 
 /**
- * Extract all image paths from page content (widgets and blocks)
+ * Extract all media paths (images and videos) from page content (widgets and blocks)
  */
-function extractImagePathsFromPage(pageData) {
-  const imagePaths = new Set();
+function extractMediaPathsFromPage(pageData) {
+  const mediaPaths = new Set();
 
-  if (!pageData.widgets) return Array.from(imagePaths);
+  if (!pageData.widgets) return Array.from(mediaPaths);
 
-  // Helper function to extract images from settings object
+  // Helper function to extract media from settings object
   function extractFromSettings(settings) {
     if (!settings) return;
 
     Object.values(settings).forEach((value) => {
-      if (typeof value === "string" && value.startsWith("/uploads/images/")) {
-        imagePaths.add(value);
+      // Track both images and videos
+      if (typeof value === "string" && (value.startsWith("/uploads/images/") || value.startsWith("/uploads/videos/"))) {
+        mediaPaths.add(value);
       }
     });
   }
@@ -35,7 +36,7 @@ function extractImagePathsFromPage(pageData) {
     }
   });
 
-  return Array.from(imagePaths);
+  return Array.from(mediaPaths);
 }
 
 /**
@@ -43,8 +44,8 @@ function extractImagePathsFromPage(pageData) {
  */
 export async function updatePageMediaUsage(projectId, pageId, pageData) {
   try {
-    // Extract all image paths from the page
-    const imagePaths = extractImagePathsFromPage(pageData);
+    // Extract all media paths from the page
+    const mediaPaths = extractMediaPathsFromPage(pageData);
 
     // Read current media data
     const mediaData = await readMediaFile(projectId);
@@ -57,8 +58,8 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
     });
 
     // Then, add this page to the usedIn array of files that are actually used
-    imagePaths.forEach((imagePath) => {
-      const file = mediaData.files.find((f) => f.path === imagePath);
+    mediaPaths.forEach((mediaPath) => {
+      const file = mediaData.files.find((f) => f.path === mediaPath);
       if (file) {
         if (!file.usedIn) {
           file.usedIn = [];
@@ -73,7 +74,7 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
     const mediaFilePath = getProjectMediaJsonPath(projectId);
     await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
 
-    return { success: true, imagePaths };
+    return { success: true, mediaPaths };
   } catch (error) {
     console.error("Error updating page media usage:", error);
     throw error;
@@ -162,10 +163,10 @@ export async function refreshAllMediaUsage(projectId) {
         const pageContent = await fs.readFile(pagePath, "utf8");
         const pageData = JSON.parse(pageContent);
 
-        // Extract image paths and update usage
-        const imagePaths = extractImagePathsFromPage(pageData);
-        imagePaths.forEach((imagePath) => {
-          const file = mediaData.files.find((f) => f.path === imagePath);
+        // Extract media paths and update usage
+        const mediaPaths = extractMediaPathsFromPage(pageData);
+        mediaPaths.forEach((mediaPath) => {
+          const file = mediaData.files.find((f) => f.path === mediaPath);
           if (file) {
             if (!file.usedIn.includes(pageId)) {
               file.usedIn.push(pageId);

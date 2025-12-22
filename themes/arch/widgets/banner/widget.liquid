@@ -2,7 +2,7 @@
   id="{{ widget.id }}"
   class="widget widget-banner {% if widget.settings.image != blank %}has-bg-image has-overlay overlay-medium{% elsif widget.settings.background_color != blank %}has-bg-color{% endif %} {% if widget.settings.text_color == 'light' %}color-scheme-dark{% else %}color-scheme-light{% endif %} {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %}"
   {% if widget.settings.image != blank %}
-    style="--widget-bg-image: url('{{ widget.settings.image | image: 'path', 'large' }}');"
+    style="background-image: url('{{ widget.settings.image | image: 'path', 'large' }}');"
   {% elsif widget.settings.background_color != blank %}
     style="--widget-bg-color: {{ widget.settings.background_color }};"
   {% endif %}

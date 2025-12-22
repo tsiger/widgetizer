@@ -169,9 +169,8 @@ export async function exportProject(req, res) {
     const outputBaseDir = PUBLISH_DIR;
     const outputDir = path.join(outputBaseDir, `${projectSlug}-v${version}`);
     const outputAssetsDir = path.join(outputDir, "assets");
-    const outputUploadsDir = path.join(outputDir, "uploads");
-    const outputImagesDir = path.join(outputUploadsDir, "images");
-    const outputVideosDir = path.join(outputUploadsDir, "videos");
+    const outputImagesDir = path.join(outputAssetsDir, "images"); // Images now in assets/images/
+    const outputVideosDir = path.join(outputAssetsDir, "videos"); // Videos now in assets/videos/
 
     // Ensure output directories exist
     await fs.ensureDir(outputDir);
@@ -383,7 +382,8 @@ Sitemap: ${sitemapUrl}`;
 
         for (const imageFile of usedImages) {
           const sourceImagePath = path.join(projectDir, imageFile.path.replace(/^\//, ""));
-          const targetImagePath = path.join(outputDir, imageFile.path.replace(/^\//, ""));
+          // Changed: Export images to assets/images/ instead of uploads/images/
+          const targetImagePath = path.join(outputDir, "assets", "images", path.basename(imageFile.path));
 
           // Copy original image
           try {
@@ -400,7 +400,8 @@ Sitemap: ${sitemapUrl}`;
           if (imageFile.sizes) {
             for (const [sizeName, sizeInfo] of Object.entries(imageFile.sizes)) {
               const sourceSizePath = path.join(projectDir, sizeInfo.path.replace(/^\//, ""));
-              const targetSizePath = path.join(outputDir, sizeInfo.path.replace(/^\//, ""));
+              // Changed: Export image sizes to assets/images/ instead of uploads/images/
+              const targetSizePath = path.join(outputDir, "assets", "images", path.basename(sizeInfo.path));
 
               try {
                 if (await fs.pathExists(sourceSizePath)) {
@@ -418,7 +419,9 @@ Sitemap: ${sitemapUrl}`;
         const allImages = mediaData.files.filter((file) => file.path.startsWith("/uploads/images/"));
         skippedCount = allImages.length - usedImages.length;
 
-        console.log(`Export optimization: Copied ${copiedCount} used images, skipped ${skippedCount} unused images`);
+        console.log(
+          `Export optimization: Copied ${copiedCount} used images to assets/images/, skipped ${skippedCount} unused images`,
+        );
       } else {
         console.log("No media data found or no images to process");
       }
@@ -456,7 +459,8 @@ Sitemap: ${sitemapUrl}`;
 
         for (const videoFile of usedVideos) {
           const sourceVideoPath = path.join(projectDir, videoFile.path.replace(/^\//, ""));
-          const targetVideoPath = path.join(outputDir, videoFile.path.replace(/^\//, ""));
+          // Changed: Export videos to assets/videos/ instead of uploads/videos/
+          const targetVideoPath = path.join(outputDir, "assets", "videos", path.basename(videoFile.path));
 
           try {
             if (await fs.pathExists(sourceVideoPath)) {
@@ -472,7 +476,9 @@ Sitemap: ${sitemapUrl}`;
         const allVideos = mediaData.files.filter((file) => file.type.startsWith("video/"));
         skippedCount = allVideos.length - usedVideos.length;
 
-        console.log(`Export optimization: Copied ${copiedCount} used videos, skipped ${skippedCount} unused videos`);
+        console.log(
+          `Export optimization: Copied ${copiedCount} used videos to assets/videos/, skipped ${skippedCount} unused videos`,
+        );
       } else {
         console.log("No media data found or no videos to process");
       }
