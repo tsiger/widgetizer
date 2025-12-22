@@ -89,7 +89,7 @@
       }
     },
     {
-      "type": "special",
+      "type": "featured",
       "settings": {
         "tag": "New",
         "name": "Truffle Mushroom Risotto",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "type": "special",
+      "type": "featured",
       "settings": {
         "tag": "Popular",
         "name": "Dessert Trio",

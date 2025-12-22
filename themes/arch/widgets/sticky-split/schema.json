@@ -45,10 +45,20 @@
       "displayName": "Scrolling Content Item",
       "settings": [
         {
-          "type": "text",
+          "type": "select",
           "id": "icon",
-          "label": "Lucide Icon Name",
-          "default": "check-circle"
+          "label": "Icon",
+          "default": "lightning",
+          "options": [
+            { "value": "lightning", "label": "Lightning" },
+            { "value": "phone", "label": "Phone / Mobile" },
+            { "value": "shield", "label": "Shield / Security" },
+            { "value": "chart", "label": "Chart / Analytics" },
+            { "value": "star", "label": "Star" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "check", "label": "Checkmark" },
+            { "value": "cog", "label": "Cog / Settings" }
+          ]
         },
         {
           "type": "text",
@@ -76,7 +86,7 @@
       "settings": {
         "title": "Unmatched Performance",
         "text": "Engineered for speed and reliability, our platform ensures your business never misses a beat.",
-        "icon": "zap"
+        "icon": "lightning"
       }
     },
     {
@@ -92,7 +102,7 @@
       "settings": {
         "title": "Seamless Integration",
         "text": "Connect with all your favorite tools in minutes with our robust API and marketplace.",
-        "icon": "layers"
+        "icon": "chart"
       }
     },
     {
@@ -100,7 +110,7 @@
       "settings": {
         "title": "Global Scalability",
         "text": "Grow from one user to one million effortlessly with our auto-scaling cloud architecture.",
-        "icon": "globe"
+        "icon": "star"
       }
     }
   ]

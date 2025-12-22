@@ -24,7 +24,7 @@ import WidgetSection from "./widgets/WidgetSection";
 import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
 import useAutoSave from "../../stores/saveStore";
-import { scrollWidgetIntoView } from "../../queries/previewManager";
+import { scrollWidgetIntoView, hoverWidget } from "../../queries/previewManager";
 import WidgetSelector from "./WidgetSelector";
 import BlockSelector from "./blocks/BlockSelector";
 
@@ -60,6 +60,13 @@ export default function WidgetList({
   const { deleteWidget, duplicateWidget, reorderWidgets, reorderBlocks } = useWidgetStore();
   const { setStructureModified } = useAutoSave();
   const { header: headerWidget, footer: footerWidget } = globalWidgets;
+
+  // Handle widget/block hover from sidebar
+  const handleHover = (widgetId, blockId) => {
+    if (previewIframeRef?.current) {
+      hoverWidget(previewIframeRef.current, widgetId, blockId);
+    }
+  };
 
   const sortableWidgets = (page.widgetsOrder || []).map((widgetId) => ({
     id: widgetId,
@@ -184,6 +191,7 @@ export default function WidgetList({
                 isSelected={selectedGlobalWidgetId === "header"}
                 isModified={modifiedWidgets.has("header")}
                 onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("header")}
+                onHover={handleHover}
               />
             </div>
           </WidgetSection>
@@ -233,6 +241,7 @@ export default function WidgetList({
                           isBlockSelectorOpen={isBlockSelectorOpen}
                           activeWidgetId={activeWidgetId}
                           activeBlockTriggerKey={activeBlockTriggerKey}
+                          onHover={handleHover}
                         />
                         <WidgetInsertionZone
                           position={index + 1}
@@ -296,6 +305,7 @@ export default function WidgetList({
                 isSelected={selectedGlobalWidgetId === "footer"}
                 isModified={modifiedWidgets.has("footer")}
                 onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("footer")}
+                onHover={handleHover}
               />
             </div>
           </WidgetSection>

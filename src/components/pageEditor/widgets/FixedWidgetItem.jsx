@@ -1,4 +1,12 @@
-export default function FixedWidgetItem({ widgetId, widget, widgetSchema, isSelected, isModified, onWidgetSelect }) {
+export default function FixedWidgetItem({
+  widgetId,
+  widget,
+  widgetSchema,
+  isSelected,
+  isModified,
+  onWidgetSelect,
+  onHover,
+}) {
   const widgetName = widget.settings?.name || widgetSchema.displayName || widget.type;
 
   return (
@@ -10,6 +18,8 @@ export default function FixedWidgetItem({ widgetId, widget, widgetSchema, isSele
             ? "border-amber-400"
             : "border-slate-200 hover:border-slate-300"
       }`}
+      onMouseEnter={() => onHover && onHover(widgetId)}
+      onMouseLeave={() => onHover && onHover(null)}
     >
       <div
         className="flex items-center gap-1 p-2 cursor-pointer group widget-item"

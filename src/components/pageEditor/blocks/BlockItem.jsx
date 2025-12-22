@@ -11,6 +11,7 @@ export default function BlockItem({
   isDragging,
   onBlockSelect,
   dragHandleProps = {},
+  onHover,
 }) {
   const blockName = blockSchema?.displayName || block.type || "Block";
   const duplicateBlock = useWidgetStore((state) => state.duplicateBlock);
@@ -40,6 +41,14 @@ export default function BlockItem({
           ? "border-blue-300 bg-blue-50 ring-2 ring-blue-200"
           : "border-slate-200 hover:border-slate-300 hover:shadow-"
       } ${isDragging ? "opacity-50" : ""} cursor-pointer`}
+      onMouseEnter={(e) => {
+        e.stopPropagation();
+        onHover && onHover(widgetId, blockId);
+      }}
+      onMouseLeave={(e) => {
+        e.stopPropagation();
+        onHover && onHover(widgetId);
+      }}
       onClick={(e) => {
         e.stopPropagation();
         onBlockSelect(blockId);

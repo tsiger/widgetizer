@@ -21,6 +21,7 @@ export default function SortableWidgetItem({
   isBlockSelectorOpen,
   activeWidgetId,
   activeBlockTriggerKey,
+  onHover,
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: widgetId });
 
@@ -81,6 +82,7 @@ export default function SortableWidgetItem({
         activeWidgetId={activeWidgetId}
         activeBlockTriggerKey={activeBlockTriggerKey}
         onBlockDragEnd={handleBlockDragEnd}
+        onHover={onHover}
       />
     </div>
   );

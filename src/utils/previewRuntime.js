@@ -8,24 +8,52 @@ function initializeHighlightStyles() {
   const style = document.createElement("style");
   style.textContent = `
     [data-widget-id], [data-block-id] {
-      transition: box-shadow 0.15s ease-out;
-    }
-    .widget-highlight {
-      box-shadow: inset 0 0 0 2px #0066cc, 0 0 12px rgba(0, 102, 204, 0.25) !important;
       position: relative;
-      z-index: 10;
     }
-    .block-highlight {
-      box-shadow: inset 0 0 0 2px #22c55e !important;
-      position: relative;
-      z-index: 11;
+    
+    /* Widget Outline */
+    .widget-highlight::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 2px solid #0066cc;
+      box-shadow: 0 0 12px rgba(0, 102, 204, 0.25);
+      z-index: 9999;
+      pointer-events: none;
     }
-    [data-widget-id]:hover:not(.widget-highlight) {
-      box-shadow: inset 0 0 0 1px rgba(0, 102, 204, 0.4);
-      cursor: pointer;
+    
+    /* Block Outline */
+    .block-highlight::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 2px solid #22c55e;
+      z-index: 10000;
+      pointer-events: none;
     }
-    [data-block-id]:hover:not(.block-highlight) {
-      box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.4);
+
+    [data-widget-id]:hover:not(.widget-highlight)::after,
+    .widget-hover:not(.widget-highlight)::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(0, 102, 204, 0.4);
+      z-index: 9998;
+      pointer-events: none;
+    }
+
+    [data-block-id]:hover:not(.block-highlight)::after,
+    .block-hover:not(.block-highlight)::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      z-index: 9999;
+      pointer-events: none;
+    }
+    
+    /* Ensure the element itself allows clicks but the overlay doesn't block them */
+    [data-widget-id]:hover, [data-block-id]:hover {
       cursor: pointer;
     }
   `;
@@ -210,6 +238,30 @@ function applySettingToElement(container, settingId, value) {
   });
 }
 
+// Handle widget hovering (from sidebar)
+function highlightHoverWidget(widgetId, blockId) {
+  // Clear existing hover classes
+  document.querySelectorAll(".widget-hover, .block-hover").forEach((el) => {
+    el.classList.remove("widget-hover");
+    el.classList.remove("block-hover");
+  });
+
+  if (widgetId) {
+    const selector = blockId
+      ? `[data-widget-id="${widgetId}"] [data-block-id="${blockId}"]`
+      : `[data-widget-id="${widgetId}"]`;
+
+    const el = document.querySelector(selector);
+    if (el) {
+      if (blockId) {
+        el.classList.add("block-hover");
+      } else {
+        el.classList.add("widget-hover");
+      }
+    }
+  }
+}
+
 // Message handler
 function handleMessage(event) {
   const { type, payload } = event.data;
@@ -223,6 +275,9 @@ function handleMessage(event) {
       break;
     case "HIGHLIGHT_WIDGET":
       highlightWidget(payload.widgetId, payload.blockId);
+      break;
+    case "HOVER_WIDGET":
+      highlightHoverWidget(payload.widgetId, payload.blockId);
       break;
     case "SCROLL_TO_WIDGET":
       scrollToWidget(payload.widgetId);

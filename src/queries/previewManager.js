@@ -402,6 +402,26 @@ export function highlightWidget(iframe, widgetId, blockId) {
 }
 
 /**
+ * Trigger hover effect on a widget/block in the preview
+ */
+export function hoverWidget(iframe, widgetId, blockId) {
+  if (!iframe?.contentWindow) {
+    return;
+  }
+
+  iframe.contentWindow.postMessage(
+    {
+      type: "HOVER_WIDGET",
+      payload: {
+        widgetId,
+        blockId,
+      },
+    },
+    "*",
+  );
+}
+
+/**
  * Update a widget setting in the preview without reloading
  */
 export function updateWidgetSetting(iframe, widgetId, settingId, value) {

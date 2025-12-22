@@ -26,6 +26,7 @@ export default function WidgetItem({
   activeWidgetId,
   activeBlockTriggerKey,
   onBlockDragEnd,
+  onHover,
 }) {
   const widgetName = widget.settings?.name || widgetSchema.displayName || widget.type;
   const hasBlocks = widgetSchema.blocks && widgetSchema.blocks.length > 0;
@@ -41,6 +42,8 @@ export default function WidgetItem({
             ? "border-amber-400 bg-amber-50"
             : "border-slate-200 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-100"
       } ${isDragging ? "opacity-30" : ""} ${isOverlay ? "shadow-lg" : ""}`}
+      onMouseEnter={() => onHover && onHover(widgetId)}
+      onMouseLeave={() => onHover && onHover(null)}
     >
       <div
         className={`flex items-center p-1 cursor-pointer group widget-item ${isSelected ? "bg-pink-50" : ""} rounded-sm`}
@@ -118,6 +121,7 @@ export default function WidgetItem({
                           block={block}
                           blockSchema={blockSchema}
                           isSelected={blockId === selectedBlockId && isSelected}
+                          onHover={onHover}
                           onBlockSelect={(clickedBlockId) => {
                             if (onWidgetSelect) onWidgetSelect(widgetId);
                             if (onBlockSelect) onBlockSelect(clickedBlockId);
