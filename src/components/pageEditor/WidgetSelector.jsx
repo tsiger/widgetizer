@@ -1,7 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Search } from "lucide-react";
 
 export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelectWidget, position, triggerRef }) {
   const dropdownRef = useRef(null);
+  const inputRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -16,9 +19,14 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     };
 
     if (isOpen) {
+      setSearchTerm(""); // Reset search when opening
       // Add a small delay to ensure the dropdown is fully rendered
       const timer = setTimeout(() => {
         document.addEventListener("mousedown", handleClickOutside);
+        // Focus the search input
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
       }, 10);
 
       return () => {
@@ -35,6 +43,11 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
   const availableWidgets = Object.values(widgetSchemas)
     .filter((schema) => schema.type !== "header" && schema.type !== "footer")
     .sort((a, b) => (a.displayName || a.type).localeCompare(b.displayName || b.type));
+
+  const filteredWidgets = availableWidgets.filter((schema) => {
+    const name = schema.displayName || schema.type;
+    return name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   if (!isOpen) return null;
 
@@ -88,7 +101,7 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
 
       <div
         ref={dropdownRef}
-        className="bg-white border-2 border-slate-300 rounded-lg shadow-lg w-56"
+        className="bg-white border-2 border-slate-300 rounded-lg shadow-lg w-56 flex flex-col"
         style={{
           ...style,
           position: "fixed", // Force fixed positioning
@@ -96,24 +109,39 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
         }}
       >
         <div className="px-3 py-2 border-b border-slate-100 bg-slate-50 rounded-t-lg">
-          <h3 className="text-sm font-medium text-slate-700 text-left">Add Widget</h3>
+          <h3 className="text-sm font-medium text-slate-700 text-left mb-2">Add Widget</h3>
+          <div className="relative">
+            <Search size={14} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-slate-400" />
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full text-sm pl-8 pr-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
+            />
+          </div>
         </div>
 
         <div className="max-h-64 overflow-y-auto">
-          {availableWidgets.map((schema) => (
-            <button
-              key={schema.type}
-              className="w-full px-3 py-2 text-left hover:bg-slate-50 transition-colors group"
-              onClick={() => {
-                onSelectWidget(schema.type, position);
-                onClose();
-              }}
-            >
-              <div className="text-sm font-medium text-slate-800 group-hover:text-pink-600">
-                {schema.displayName || schema.type}
-              </div>
-            </button>
-          ))}
+          {filteredWidgets.length > 0 ? (
+            filteredWidgets.map((schema) => (
+              <button
+                key={schema.type}
+                className="w-full px-3 py-2 text-left hover:bg-slate-50 transition-colors group border-b border-transparent hover:border-slate-100 last:border-0"
+                onClick={() => {
+                  onSelectWidget(schema.type, position);
+                  onClose();
+                }}
+              >
+                <div className="text-sm font-medium text-slate-800 group-hover:text-pink-600">
+                  {schema.displayName || schema.type}
+                </div>
+              </button>
+            ))
+          ) : (
+            <div className="px-3 py-4 text-center text-sm text-slate-500">No widgets found</div>
+          )}
         </div>
       </div>
     </>
