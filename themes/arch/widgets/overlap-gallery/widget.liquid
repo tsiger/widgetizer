@@ -1,0 +1,165 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-overlap-gallery {% if widget.settings.background_color != blank %}has-bg-color{% endif %}"
+  {% if widget.settings.background_color != blank %}
+    style="--widget-bg-color: {{ widget.settings.background_color }};"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="overlap-gallery"
+>
+  <style>
+    #{{ widget.id }} {
+      & .overlap-gallery-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+        position: relative;
+      }
+
+      & .overlap-item {
+        position: relative;
+        overflow: hidden;
+        background-color: var(--bg-secondary);
+        aspect-ratio: 4 / 3;
+        border: var(--border-width-thin) solid var(--border-light);
+        transition: transform var(--transition-speed-normal), box-shadow var(--transition-speed-normal);
+
+        &:hover {
+          transform: translateY(-0.4rem);
+          border-color: var(--border-darker);
+        }
+
+        & img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+      }
+
+      & .overlap-caption {
+        position: absolute;
+        inset-block-end: 0;
+        inset-inline: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+        padding: var(--space-lg);
+        color: var(--bg-primary);
+      }
+
+      & .overlap-caption-title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+      }
+
+      @media (min-width: 750px) {
+        & .overlap-gallery-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: var(--space-xl);
+        }
+
+        & .overlap-item:nth-child(odd) {
+          margin-block-start: var(--space-3xl);
+        }
+
+        & .overlap-item:nth-child(even) {
+          margin-block-end: var(--space-3xl);
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .overlap-gallery-grid {
+          grid-template-columns: repeat(4, 1fr);
+          gap: var(--space-lg);
+        }
+
+        & .overlap-item {
+          aspect-ratio: 3 / 4;
+        }
+
+        & .overlap-item:nth-child(1) {
+          margin-block-start: var(--space-4xl);
+        }
+
+        & .overlap-item:nth-child(2) {
+          margin-block-start: 0;
+          margin-block-end: var(--space-4xl);
+        }
+
+        & .overlap-item:nth-child(3) {
+          margin-block-start: var(--space-5xl);
+        }
+
+        & .overlap-item:nth-child(4) {
+          margin-block-start: var(--space-2xl);
+          margin-block-end: var(--space-2xl);
+        }
+
+        /* Pattern repeats for additional items */
+        & .overlap-item:nth-child(4n+5) {
+          margin-block-start: var(--space-4xl);
+        }
+
+        & .overlap-item:nth-child(4n+6) {
+          margin-block-start: 0;
+          margin-block-end: var(--space-4xl);
+        }
+
+        & .overlap-item:nth-child(4n+7) {
+          margin-block-start: var(--space-5xl);
+        }
+
+        & .overlap-item:nth-child(4n+8) {
+          margin-block-start: var(--space-2xl);
+          margin-block-end: var(--space-2xl);
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="overlap-gallery-grid">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <{% if block.settings.link.href != blank %}a href="{{ block.settings.link.href }}"{% else %}div{% endif %}
+            class="overlap-item"
+            data-block-id="{{ blockId }}"
+            {% if block.settings.link.target == '_blank' %}
+              target="_blank" rel="noopener"
+            {% endif %}
+          >
+            {% if block.settings.image != blank %}
+              {{ block.settings.image | image: 'large', 'overlap-image' }}
+            {% else %}
+              <img
+                src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=800&fit=crop"
+                alt="Placeholder image"
+                loading="lazy"
+              >
+            {% endif %}
+
+            {% if block.settings.caption != blank %}
+              <div class="overlap-caption">
+                <span class="overlap-caption-title" data-setting="caption">{{ block.settings.caption }}</span>
+              </div>
+            {% endif %}
+          </{% if block.settings.link.href != blank %}a{% else %}div{% endif %}>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

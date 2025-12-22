@@ -1,0 +1,101 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-schedule-table"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="schedule-table"
+>
+  <style>
+    #{{ widget.id }} {
+      & .schedule-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        max-width: 400px;
+        margin-inline: auto;
+      }
+
+      & .schedule-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-md) 0;
+        border-block-end: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .schedule-row:first-child {
+        border-block-start: var(--border-width-thin) solid var(--border-light);
+      }
+
+      & .schedule-row.is-highlighted {
+        background: var(--color-accent-subtle);
+        margin-inline: calc(var(--space-sm) * -1);
+        padding-inline: var(--space-sm);
+        border-radius: var(--radius-sm);
+        font-weight: var(--font-weight-semibold);
+      }
+
+      & .schedule-row.is-closed .schedule-value {
+        color: var(--text-muted);
+      }
+
+      & .schedule-label {
+        font-weight: var(--font-weight-medium);
+      }
+
+      & .schedule-value {
+        color: var(--text-primary);
+      }
+
+      & .schedule-closed {
+        color: var(--text-muted);
+        font-style: italic;
+      }
+
+      & .schedule-note {
+        margin-block-start: var(--space-lg);
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+        font-style: italic;
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="schedule-list">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <div
+            class="schedule-row {% if block.settings.highlight %}is-highlighted{% endif %} {% if block.settings.closed %}is-closed{% endif %}"
+            data-block-id="{{ blockId }}"
+          >
+            <span class="schedule-label" data-setting="day">{{ block.settings.day }}</span>
+            {% if block.settings.closed %}
+              <span class="schedule-closed">Closed</span>
+            {% else %}
+              <span class="schedule-value" data-setting="hours">{{ block.settings.hours }}</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if widget.settings.note != blank %}
+        <p class="schedule-note" data-setting="note">{{ widget.settings.note }}</p>
+      {% endif %}
+    </div>
+  </div>
+</section>

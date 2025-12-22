@@ -80,6 +80,24 @@ The editor is designed to save changes automatically, providing a seamless user 
 3.  The `useAutoSave` hook contains logic (likely a debounced function) that automatically triggers a save to the backend API shortly after changes have been made. The `isAutoSaving` flag is used to show a visual indicator during this process.
 4.  For immediate persistence, the user can also click the "Save" button in the `EditorTopBar`, which directly invokes the `save()` action.
 
+### Undo/Redo System
+
+The Page Editor features a comprehensive undo/redo system powered by `zundo` (Zustand temporal state management).
+
+- **Implementation**: The `usePageStore` is wrapped with `temporal` middleware to track changes to the page content.
+- **Tracked Data**:
+  - `page`: All widget settings and top-level page metadata.
+  - `globalWidgets`: Changes to the header and footer widgets.
+  - `themeSettings`: Theme-wide settings (only when edited within the Page Editor).
+- **UI Controls**: The `EditorTopBar` includes Undo and Redo buttons that reflect the current history state.
+- **Keyboard Shortcuts**:
+  - `Ctrl+Z` (or `Cmd+Z`): Undo
+  - `Ctrl+Shift+Z` (or `Cmd+Shift+Z`) / `Ctrl+Y`: Redo
+- **History Management**:
+  - The history is cleared whenever a new page is loaded to prevent cross-page undoing.
+  - The system tracks up to 50 states by default.
+  - It intelligently handles state snapshots to ensure that only relevant data changes (and not loading/error states) are recorded.
+
 ### Navigation Protection (`useNavigationGuard`)
 
 The page editor implements comprehensive navigation protection to prevent users from accidentally losing unsaved changes when attempting to leave the editor.

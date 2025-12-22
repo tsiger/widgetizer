@@ -1,6 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget-masonry widget"
+  class="widget widget-masonry-gallery"
   data-widget-id="{{ widget.id }}"
   data-widget-type="masonry-gallery"
 >
@@ -76,7 +76,7 @@
           <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
+          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
           <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>

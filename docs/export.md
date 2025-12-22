@@ -97,7 +97,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
 2.  **Create Output Directory**:
 
     - A new directory is created inside `/data/publish/`.
-    - To prevent overwriting previous exports, the directory is named with the project's ID and version number (e.g., `my-project-id-v1`, `my-project-id-v2`, etc.).
+    - To prevent overwriting previous exports, the directory is named with the project's **slug** (with ID as fallback) and version number (e.g., `my-project-slug-v1`, `my-project-slug-v2`, etc.).
 
 3.  **Load Project Data**:
 
@@ -111,12 +111,18 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
 
     - The controller loops through each page of the project. For each page, it: a. Renders all the widgets assigned to that page into a single HTML string. b. Combines the rendered header, page widgets, and footer into the final page content. c. Passes this combined content to the main `layout.liquid` template via the `renderPageLayout` function. d. The final, complete HTML for the page is generated.
 
-6.  **Format and Write HTML Files**:
+6.  **Generate SEO Files**:
+
+    - If the project has a `siteUrl` defined, the system automatically generates:
+      - **`sitemap.xml`**: A complete sitemap of all indexed pages (respecting SEO metadata).
+      - **`robots.txt`**: A standard instructions file for search engines, including the sitemap location.
+
+7.  **Format and Write HTML Files**:
 
     - The generated HTML for each page is run through **Prettier** to ensure clean, readable formatting.
     - The formatted HTML is saved as a file in the output directory (e.g., `about-us.html`). If a page's slug is "home" or "index", it is saved as `index.html`.
 
-7.  **Copy Static Assets**:
+8.  **Copy Static Assets**:
 
     - The system performs several copy operations to ensure the static site is self-contained:
       - **Theme Assets**: All files from the project's `/assets` directory (e.g., `style.css`, `main.js`) are copied to `/assets` in the output directory.
@@ -129,7 +135,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
         - **Fallback Safety**: If media tracking fails, automatically falls back to copying all images to ensure exports never fail
         - **Directory Structure**: Maintains the original `/uploads/images/` directory structure in the export
 
-8.  **Record Export History**:
+9.  **Record Export History**:
 
     - The export metadata is recorded in `/data/publish/export-history.json` with version number, timestamp, output directory, and status.
     - **Automatic Cleanup**: If the number of exports exceeds the user's configured limit (from App Settings), the oldest exports are automatically deleted:
@@ -137,7 +143,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
       - Export history entries are cleaned up
       - The cleanup process respects the `export.maxVersionsToKeep` setting
 
-9.  **Send Response**:
+10. **Send Response**:
     - Once all steps are complete, the server sends a success response to the client, including the export record with version information.
 
 ## 3. Export Management Features

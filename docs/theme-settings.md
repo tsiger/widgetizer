@@ -175,6 +175,8 @@ An image uploader that includes a preview, the ability to replace the image, and
 - **Replace**: Easy replacement of existing images
 - **File Validation**: Automatic validation of image file types
 
+> [!NOTE] All theme settings modified within the Page Editor are tracked by the unified **Undo/Redo system**. Changes can be reversed using the editor's undo controls or standard keyboard shortcuts (`Ctrl+Z`).
+
 ```json
 {
   "id": "logo_image",

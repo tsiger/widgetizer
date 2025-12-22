@@ -11,7 +11,6 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 import usePageStore from "../stores/pageStore";
 import useWidgetStore from "../stores/widgetStore";
-import useThemeStore from "../stores/themeStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
 
 export default function PageEditor() {
@@ -20,7 +19,7 @@ export default function PageEditor() {
   const [previewMode, setPreviewMode] = useState("desktop");
   const previewIframeRef = useRef(null);
 
-  const { page, loading, error } = usePageStore();
+  const { page, loading, error, themeSettings } = usePageStore();
   const {
     schemas: widgetSchemas,
     selectedWidgetId,
@@ -32,7 +31,6 @@ export default function PageEditor() {
     selectedThemeGroup,
     setSelectedThemeGroup,
   } = useWidgetStore();
-  const { settings: themeSettings } = useThemeStore();
 
   // Add navigation guard
   useNavigationGuard();
@@ -44,7 +42,6 @@ export default function PageEditor() {
     usePageStore.getState().loadPage(pageId);
     if (pageId) {
       useWidgetStore.getState().loadSchemas();
-      useThemeStore.getState().loadSettings();
     }
   }, [searchParams]);
 

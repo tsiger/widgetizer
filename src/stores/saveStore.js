@@ -47,7 +47,7 @@ const useAutoSave = create((set, get) => ({
   save: async (isAuto = false) => {
     const { modifiedWidgets, structureModified, themeSettingsModified, hasUnsavedChanges } = get();
     const pageStore = usePageStore.getState();
-    const { page, globalWidgets } = pageStore;
+    const { page, globalWidgets, themeSettings } = pageStore;
     const themeStore = useThemeStore.getState();
 
     if (!hasUnsavedChanges()) return;
@@ -75,9 +75,9 @@ const useAutoSave = create((set, get) => ({
         savePromises.push(savePageContent(page.id, page));
       }
 
-      // Save theme settings if modified
-      if (themeSettingsModified && themeStore.settings) {
-        savePromises.push(saveThemeSettings(themeStore.settings));
+      // Save theme settings if modified (use pageStore's copy for unified undo)
+      if (themeSettingsModified && themeSettings) {
+        savePromises.push(saveThemeSettings(themeSettings));
       }
 
       await Promise.all(savePromises);
@@ -93,7 +93,11 @@ const useAutoSave = create((set, get) => ({
         pageStore.setOriginalPage(page);
       }
 
-      if (themeSettingsModified && themeStore.settings) {
+      // Mark theme settings as saved in pageStore and sync to themeStore
+      if (themeSettingsModified && themeSettings) {
+        pageStore.markThemeSettingsSaved();
+        // Sync to themeStore so Settings page sees the changes
+        themeStore.setSettings(themeSettings);
         themeStore.markThemeSettingsSaved();
       }
     } catch (err) {

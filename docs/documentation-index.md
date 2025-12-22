@@ -70,19 +70,6 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[react-hook-form-migration.md](react-hook-form-migration.md)** - Form Architecture Migration
-
-**Purpose**: Details the migration from manual forms to React Hook Form **When to use**:
-
-- Creating new forms in the application
-- Understanding form validation patterns
-- Debugging form state issues
-- Reviewing "lessons learned" for form development
-
-**Key topics**: React Hook Form integration, validation patterns, performance improvements, migration status
-
----
-
 ## 🎨 Content Management
 
 ### **[projects.md](projects.md)** - Project Management System
@@ -219,7 +206,7 @@ Primary docs: `theming.md`, `theme-settings.md` Secondary: `export.md`, `menus.m
 
 ### **Frontend Developers**
 
-Primary docs: `page-editor.md`, `projects.md`, `pages.md` Secondary: `media.md`, `app-settings.md` ⚠️ **Avoid**: `page-editor-poc.md` (not implemented)
+Primary docs: `page-editor.md`, `projects.md`, `pages.md` Secondary: `media.md`, `app-settings.md`
 
 ### **Backend Developers**
 
@@ -227,7 +214,7 @@ Primary docs: `export.md`, `media.md`, `projects.md` Secondary: `pages.md`, `men
 
 ### **System Architects**
 
-Primary docs: `theming.md`, `projects.md`, `hooks.md` Secondary: All other documents for comprehensive understanding ⚠️ **Conceptual only**: `page-editor-poc.md` (design proposal, not implemented)
+Primary docs: `theming.md`, `projects.md`, `hooks.md` Secondary: All other documents for comprehensive understanding
 
 ### **Content Managers / End-Users**
 
@@ -248,12 +235,7 @@ Primary docs: `themes.md`, `page-editor.md` Secondary: `media.md`, `menus.md`
 ## 🔄 Maintenance Notes
 
 - **theming.md** – Most comprehensive, covers theme system architecture.
-- **⚠️ page-editor-poc.md** – _NOT IMPLEMENTED_ – theoretical document only; do **not** reference for current functionality.
 - **theme-settings.md** – Reference document, stable API definitions.
 - All other docs – Feature-specific implementation guides.
 
 When adding new features, always update the relevant documentation **and** this index.
-
-### ⚠️ Important Warning About POC Documents
-
-`page-editor-poc.md` contains conceptual designs that have **not** been implemented. Developers and LLMs must not rely on it for current functionality; use `page-editor.md` for the actual implementation.

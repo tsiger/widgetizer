@@ -98,7 +98,7 @@ The controller handles the logic for interacting with the menu JSON files on the
 - **ID Generation**: When a new menu is created, a unique, URL-friendly ID is generated from its name using `slugify`. This ID is used as the filename (e.g., "Header Menu" becomes `header-menu.json`).
 - **CRUD Logic**:
   - `createMenu`: Creates a new JSON file with a basic menu structure.
-  - `updateMenu`: Overwrites an existing menu file with the new data sent from the client. This is used to save both simple changes (like the name) and complex structural changes to the `items` array.
+  - `updateMenu`: Overwrites an existing menu file with the new data. If the menu name is changed, the system automatically renames the underlying JSON file to match the new slugified name, while ensuring no conflicts with existing menus.
   - `duplicateMenu`: Creates a complete copy of an existing menu with:
     - **New unique ID**: Generated using the existing `generateUniqueMenuId()` helper
     - **New name**: Follows the pattern "Copy of {original-name}"

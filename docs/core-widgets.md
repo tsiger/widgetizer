@@ -29,30 +29,18 @@ All core widget **type** strings are prefixed with `core-` to avoid collisions w
 
 ```
 src/core/widgets/
-├── core-spacer.liquid   # schema + markup + styles
-└── core-divider.liquid
+├── core-spacer/
+│   ├── schema.json
+│   └── widget.liquid
+└── core-divider/
+    ├── schema.json
+    └── widget.liquid
 ```
 
-Each file **contains everything**:
+Each widget has its own folder containing:
 
-```liquid
-<div class="core-spacer" data-widget-id="{{ widget.id }}" data-widget-type="core-spacer">
-  <!-- styles & markup here -->
-
-  <script type="application/json" data-widget-schema>
-  {
-    "type": "core-spacer",
-    "displayName": "Spacer",
-    "isCore": true,
-    "settings": [ ... ]
-  }
-  </script>
-</div>
-```
-
-`isCore: true` is an internal flag – the editor doesn't surface it but the back-end uses it when merging widget lists.
-
----
+- **`schema.json`**: The widget's configuration and setting definitions.
+- **`widget.liquid`**: The markup and logic (Liquid) for the widget.
 
 ## 4. Theme Opt-Out
 
@@ -73,8 +61,9 @@ If the flag is **absent or `true`**, core widgets are included.
 
 1. `GET /api/projects/:id/widgets` is called from the editor.
 2. The server reads **theme.json** for `useCoreWidgets`.
-3. If allowed, it calls `getCoreWidgets()` which: • scans `/src/core/widgets/*.liquid` • extracts each `<script data-widget-schema>` block.
-4. Schemas from core widgets and theme widgets are concatenated and returned to the editor.
+3. If allowed, it scans `/src/core/widgets/` for subdirectories.
+4. For each subdirectory, it reads `schema.json` to load the widget definition.
+5. Schemas from core widgets and theme widgets are concatenated and returned to the editor.
 
 ---
 
@@ -82,7 +71,7 @@ If the flag is **absent or `true`**, core widgets are included.
 
 During page rendering the service checks `widget.type`:
 
-- `type.startsWith("core-")` ➜ template is read from `/src/core/widgets/${type}.liquid`.
+- `type.startsWith("core-")` ➜ template is read from `/src/core/widgets/${type}/widget.liquid`.
 - otherwise ➜ template is loaded from the project's theme folder.
 
 This keeps theme overrides intact: a theme can still provide its own widget named `core-spacer` and it will shadow the core one.
@@ -91,9 +80,9 @@ This keeps theme overrides intact: a theme can still provide its own widget name
 
 ## 7. Adding a New Core Widget
 
-1. Create `core-mywidget.liquid` inside `src/core/widgets/`.
-2. Embed schema, markup, and scoped styles in the file.
-3. Ensure the schema's `type` matches the filename.
+1. Create a new folder `core-mywidget` inside `src/core/widgets/`.
+2. Add `schema.json` and `widget.liquid` to the folder.
+3. Ensure the schema's `type` matches the folder name.
 4. Commit – no additional registration is required.
 
 ---

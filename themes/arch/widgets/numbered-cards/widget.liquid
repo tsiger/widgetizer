@@ -1,6 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget-numbered-cards widget"
+  class="widget widget-numbered-cards"
   data-widget-id="{{ widget.id }}"
   data-widget-type="numbered-cards"
 >
@@ -59,7 +59,7 @@
         {% if widget.settings.eyebrow != blank %}
           <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
-        <h2 class="widget-title" data-setting="title">{{ widget.settings.title }}</h2>
+        <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
         {% if widget.settings.description != blank %}
           <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}

@@ -1,0 +1,112 @@
+{
+  "type": "featured-cards",
+  "displayName": "Featured Cards",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Limited Time"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Today's Specials"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        { "value": "cards", "label": "Cards" },
+        { "value": "list", "label": "List" }
+      ],
+      "default": "cards"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "featured",
+      "displayName": "Special Item",
+      "settings": [
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Tag (e.g., Chef's Pick, New)",
+          "default": "Chef's Pick"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Item name",
+          "default": "Special Dish"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$18"
+        },
+        {
+          "type": "text",
+          "id": "original_price",
+          "label": "Original price (optional)"
+        },
+        {
+          "type": "text",
+          "id": "availability",
+          "label": "Availability (e.g., Today Only, This Week)"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "featured",
+      "settings": {
+        "tag": "Chef's Pick",
+        "name": "Grilled Salmon Teriyaki",
+        "description": "Fresh Atlantic salmon glazed with house-made teriyaki sauce, served with seasonal vegetables and jasmine rice.",
+        "price": "$24",
+        "original_price": "$32",
+        "availability": "Today Only"
+      }
+    },
+    {
+      "type": "special",
+      "settings": {
+        "tag": "New",
+        "name": "Truffle Mushroom Risotto",
+        "description": "Creamy Arborio rice with wild mushrooms, finished with black truffle oil and aged Parmesan.",
+        "price": "$22",
+        "availability": "This Week"
+      }
+    },
+    {
+      "type": "special",
+      "settings": {
+        "tag": "Popular",
+        "name": "Dessert Trio",
+        "description": "A selection of our pastry chef's finest: chocolate lava cake, crème brûlée, and berry tart.",
+        "price": "$14",
+        "availability": "Daily"
+      }
+    }
+  ]
+}

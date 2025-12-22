@@ -8,6 +8,11 @@ The App Settings system has been **refactored** to use a clean, modular architec
 
 ## Current Settings
 
+### General Settings
+
+- **Default Language**: Sets the application's user interface language (English, French, German, Greek, Italian, Spanish).
+- **Date Format**: Configures how dates are displayed throughout the platform (e.g., MM/DD/YYYY, YYYY-MM-DD, etc.).
+
 ### Media Settings
 
 #### File Upload Limits

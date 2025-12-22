@@ -1,0 +1,112 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-newsletter {% if widget.settings.background_color != blank %}has-bg-color{% endif %}"
+  {% if widget.settings.background_color != blank %}
+    style="--widget-bg-color: {{ widget.settings.background_color }};"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="newsletter"
+>
+  <style>
+    #{{ widget.id }} {
+      & .newsletter-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      & .newsletter-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      & .newsletter-success {
+        display: none;
+        text-align: center;
+        padding: var(--space-lg);
+        color: var(--text-primary);
+        font-weight: var(--font-weight-medium);
+      }
+
+      &.is-submitted .newsletter-form {
+        display: none;
+      }
+
+      &.is-submitted .newsletter-success {
+        display: block;
+      }
+
+      @media (min-width: 750px) {
+        & .newsletter-input-group {
+          flex-direction: row;
+          gap: var(--space-md);
+        }
+
+        & .widget-button {
+          flex-shrink: 0;
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content widget-content-sm">
+      <form class="newsletter-form" action="{{ widget.settings.form_action }}" method="POST">
+        <div class="newsletter-input-group">
+          <label for="{{ widget.id }}-email" class="visually-hidden">Email address</label>
+          <input
+            type="email"
+            id="{{ widget.id }}-email"
+            name="email"
+            class="widget-input"
+            placeholder="{{ widget.settings.placeholder }}"
+            required
+            aria-required="true"
+          >
+          <button type="submit" class="widget-button widget-button-primary" data-setting="button_text">
+            {{ widget.settings.button_text }}
+          </button>
+        </div>
+      </form>
+
+      <div class="newsletter-success" data-setting="success_message">
+        <p class="widget-text">{{ widget.settings.success_message }}</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const allWidgets = document.querySelectorAll('.widget-newsletter');
+
+      allWidgets.forEach((widget) => {
+        if (widget.dataset.initialized) return;
+        widget.dataset.initialized = 'true';
+
+        const form = widget.querySelector('.newsletter-form');
+
+        if (form) {
+          form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            widget.classList.add('is-submitted');
+          });
+        }
+      });
+    })();
+  </script>
+</section>

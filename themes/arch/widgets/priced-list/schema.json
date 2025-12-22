@@ -1,0 +1,140 @@
+{
+  "type": "priced-list",
+  "displayName": "Priced List",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Category label",
+      "default": "Starters"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section heading",
+      "default": "Appetizers"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Section description"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "displayName": "Menu Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Item name",
+          "default": "Dish Name"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "A delicious dish made with fresh ingredients."
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$12"
+        },
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Photo (optional)"
+        },
+        {
+          "type": "checkbox",
+          "id": "featured",
+          "label": "Featured item",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "vegetarian",
+          "label": "Vegetarian",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "vegan",
+          "label": "Vegan",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "gluten_free",
+          "label": "Gluten-Free",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "dairy_free",
+          "label": "Dairy-Free",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "nut_free",
+          "label": "Nut-Free",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "spicy",
+          "label": "Spicy",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "halal",
+          "label": "Halal",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "kosher",
+          "label": "Kosher",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "item",
+      "settings": {
+        "name": "Garden Bruschetta",
+        "description": "Toasted sourdough topped with fresh tomatoes, basil, garlic, and extra virgin olive oil.",
+        "price": "$9",
+        "vegetarian": true,
+        "vegan": true
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "name": "Crispy Calamari",
+        "description": "Lightly battered calamari rings served with lemon aioli and marinara sauce.",
+        "price": "$14",
+        "gluten_free": false
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "name": "Spicy Buffalo Wings",
+        "description": "Crispy chicken wings tossed in our signature buffalo sauce. Served with blue cheese dip.",
+        "price": "$12",
+        "spicy": true,
+        "gluten_free": true,
+        "featured": true
+      }
+    }
+  ]
+}

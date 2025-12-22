@@ -1,0 +1,56 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-embed {% if widget.settings.background_color != blank %}has-bg-color{% endif %}"
+  {% if widget.settings.background_color != blank %}
+    style="--widget-bg-color: {{ widget.settings.background_color }};"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="embed"
+>
+  <style>
+    #{{ widget.id }} {
+      & .embed-container {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xl);
+        text-align: {{ widget.settings.alignment | default: 'center' }};
+        align-items: {% case widget.settings.alignment %}{% when 'start' %}flex-start{% when 'end' %}flex-end{% else %}center{% endcase %};
+      }
+
+      & .embed-code-wrapper {
+        width: 100%;
+
+        & iframe {
+          max-width: 100%;
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    <div class="widget-content {% case widget.settings.max_width %}{% when 'small' %}widget-content-sm{% when 'medium' %}widget-content-md{% when 'large' %}widget-content-lg{% else %}{% endcase %}">
+      <div class="embed-container">
+        {% if widget.settings.title != blank
+          or widget.settings.description != blank
+          or widget.settings.eyebrow != blank
+        %}
+          <div class="widget-header">
+            {% if widget.settings.eyebrow != blank %}
+              <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+            {% endif %}
+            {% if widget.settings.title != blank %}
+              <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+            {% endif %}
+            {% if widget.settings.description != blank %}
+              <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="embed-code-wrapper">
+          {{ widget.settings.code }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

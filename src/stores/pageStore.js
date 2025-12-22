@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { temporal } from "zundo";
 import { getPage } from "../queries/pageManager";
 import { getGlobalWidgets } from "../queries/previewManager";
+import { getThemeSettings } from "../queries/themeManager";
 
 const usePageStore = create(
   temporal(
@@ -10,6 +11,8 @@ const usePageStore = create(
       page: null,
       originalPage: null,
       globalWidgets: { header: null, footer: null },
+      themeSettings: null,
+      originalThemeSettings: null,
       loading: true,
       error: null,
 
@@ -22,6 +25,8 @@ const usePageStore = create(
             page: null,
             originalPage: null,
             globalWidgets: { header: null, footer: null },
+            themeSettings: null,
+            originalThemeSettings: null,
           });
           return;
         }
@@ -48,6 +53,9 @@ const usePageStore = create(
 
           // Load global widgets separately
           await get().loadGlobalWidgets();
+          
+          // Load theme settings for undo tracking
+          await get().loadThemeSettings();
 
           set({
             page: cleanPageData,
@@ -61,6 +69,53 @@ const usePageStore = create(
         } catch (err) {
           set({ error: err.message, loading: false });
           console.error("Failed to load page:", err);
+        }
+      },
+      
+      // Load theme settings into pageStore for undo tracking
+      loadThemeSettings: async () => {
+        try {
+          const settings = await getThemeSettings();
+          set({
+            themeSettings: settings,
+            originalThemeSettings: JSON.parse(JSON.stringify(settings)),
+          });
+        } catch (err) {
+          console.error("Failed to load theme settings:", err);
+          set({ themeSettings: null, originalThemeSettings: null });
+        }
+      },
+      
+      // Update a single theme setting (tracked by undo)
+      updateThemeSetting: (groupKey, settingId, value) => {
+        const { themeSettings } = get();
+        if (!themeSettings?.settings?.global) return;
+
+        const updatedSettings = JSON.parse(JSON.stringify(themeSettings));
+        const group = updatedSettings.settings.global[groupKey];
+
+        if (!group) return;
+
+        const settingIndex = group.findIndex((s) => s.id === settingId);
+        if (settingIndex !== -1) {
+          group[settingIndex].value = value;
+        }
+
+        set({ themeSettings: updatedSettings });
+      },
+      
+      // Check if there are unsaved theme changes
+      hasUnsavedThemeChanges: () => {
+        const { themeSettings, originalThemeSettings } = get();
+        if (!themeSettings || !originalThemeSettings) return false;
+        return JSON.stringify(themeSettings) !== JSON.stringify(originalThemeSettings);
+      },
+      
+      // Mark theme settings as saved (update original)
+      markThemeSettingsSaved: () => {
+        const { themeSettings } = get();
+        if (themeSettings) {
+          set({ originalThemeSettings: JSON.parse(JSON.stringify(themeSettings)) });
         }
       },
 
@@ -147,6 +202,7 @@ const usePageStore = create(
         // Only track page content for undo, not loading/error states
         page: state.page,
         globalWidgets: state.globalWidgets,
+        themeSettings: state.themeSettings,
       }),
       // Only track changes after page is loaded, skip initial load
       handleSet: (handleSet) => (state) => {
