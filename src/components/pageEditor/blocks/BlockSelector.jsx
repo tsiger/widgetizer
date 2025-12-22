@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useLayoutEffect } from "react";
 
 export default function BlockSelector({ isOpen, onClose, widgetSchema, onSelectBlock, triggerRef }) {
   const dropdownRef = useRef(null);
+  const [positionStyle, setPositionStyle] = useState({});
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -32,50 +33,62 @@ export default function BlockSelector({ isOpen, onClose, widgetSchema, onSelectB
     };
   }, [isOpen, onClose, triggerRef]);
 
-  if (!isOpen || !widgetSchema?.blocks) return null;
+  // Calculate position securely with useLayoutEffect to prevent flicker
+  useLayoutEffect(() => {
+    if (!isOpen || !triggerRef?.current || !dropdownRef.current) return;
 
-  // Calculate position relative to trigger
-  let style = {
-    position: "fixed",
-    top: 100,
-    left: 100,
-    zIndex: 1000,
-  };
-
-  if (triggerRef?.current) {
     const triggerRect = triggerRef.current.getBoundingClientRect();
-    const dropdownWidth = 224; // w-56 = 224px
+    const dropdownRect = dropdownRef.current.getBoundingClientRect();
+    const dropdownHeight = dropdownRect.height || 200; // Fallback if not yet measured
+    const dropdownWidth = 224; // w-56
 
-    // Position the dropdown outside the sidebar (sidebar is w-60 = 240px)
-    const sidebarWidth = 240;
-    let leftPosition = sidebarWidth - 24; // Position closer to sidebar edge
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
 
-    // If it would go off the right edge of the screen, position to the left instead
-    if (leftPosition + dropdownWidth > window.innerWidth) {
-      leftPosition = triggerRect.left - dropdownWidth - 12;
+    // Default position: to the right of the sidebar
+    // Sidebar width is typically 240px (w-60)
+    let left = 240 - 24; // Overlap slightly
+
+    // Ensure horizontal fit
+    if (left + dropdownWidth > viewportWidth) {
+      // If fits to the left of trigger
+      if (triggerRect.left - dropdownWidth > 0) {
+        left = triggerRect.left - dropdownWidth;
+      } else {
+        // Center if tight
+        left = Math.max(10, (viewportWidth - dropdownWidth) / 2);
+      }
     }
 
-    // Make sure it doesn't go off the left edge either
-    if (leftPosition < 12) {
-      leftPosition = 12;
+    // Vertical positioning
+    let top = triggerRect.top;
+
+    // Check if it fits below
+    const fitsBelow = top + dropdownHeight < viewportHeight - 10;
+
+    if (!fitsBelow) {
+      // Try positioning above
+      const topAbove = triggerRect.top - dropdownHeight + triggerRect.height;
+
+      // If fits above (and not off top of screen)
+      if (topAbove > 10) {
+        top = topAbove;
+      } else {
+        // If fits neither, position at bottom of viewport
+        top = viewportHeight - dropdownHeight - 10;
+      }
     }
 
-    // For vertical positioning, check if there's enough space below
-    let topPosition = triggerRect.top;
-    const estimatedDropdownHeight = 300; // Generous estimate
-
-    // If dropdown would go off screen, position it above the trigger
-    if (triggerRect.top + estimatedDropdownHeight > window.innerHeight - 20) {
-      topPosition = triggerRect.top - estimatedDropdownHeight - 10;
-    }
-
-    style = {
+    setPositionStyle({
       position: "fixed",
-      top: Math.max(12, topPosition), // Don't go above top of screen
-      left: leftPosition,
-      zIndex: 1000,
-    };
-  }
+      top: top,
+      left: left,
+      zIndex: 9999,
+      width: dropdownWidth,
+    });
+  }, [isOpen, triggerRef]);
+
+  if (!isOpen || !widgetSchema?.blocks) return null;
 
   return (
     <>
@@ -84,12 +97,8 @@ export default function BlockSelector({ isOpen, onClose, widgetSchema, onSelectB
 
       <div
         ref={dropdownRef}
-        className="bg-white border-2 border-slate-300 rounded-lg shadow-lg w-56"
-        style={{
-          ...style,
-          position: "fixed", // Force fixed positioning
-          zIndex: 9999, // Higher z-index
-        }}
+        className="bg-white border-2 border-slate-300 rounded-lg shadow-lg"
+        style={positionStyle.top ? positionStyle : { visibility: "hidden", position: "fixed" }} // Hide until positioned
       >
         <div className="px-3 py-2 border-b border-slate-100 bg-slate-50 rounded-t-lg">
           <h3 className="text-sm font-medium text-slate-700 text-left">Add Block</h3>
