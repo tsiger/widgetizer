@@ -128,6 +128,24 @@ export default function WidgetList({
 
   // Handle opening block selector
   const handleAddBlockClick = (widgetId, triggerRef, position = null) => {
+    // Check if widget has only one block type available
+    const widget = widgets[widgetId] || (page?.widgets && page.widgets[widgetId]);
+    const schema = widget && widgetSchemas[widget.type];
+
+    if (schema && schema.blocks && schema.blocks.length === 1) {
+      // Direct add
+      const blockType = schema.blocks[0].type;
+
+      const { addBlock, setSelectedWidgetId, setSelectedBlockId } = useWidgetStore.getState();
+      const newBlockId = addBlock(widgetId, blockType, position);
+      setStructureModified(true);
+
+      // Keep the widget selected and select the new block
+      setSelectedWidgetId(widgetId);
+      setSelectedBlockId(newBlockId);
+      return;
+    }
+
     setActiveWidgetId(widgetId);
     setBlockTriggerRef(triggerRef);
     const triggerKey = position !== null ? `${widgetId}-${position}` : `${widgetId}-add`;
