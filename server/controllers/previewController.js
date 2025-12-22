@@ -34,6 +34,17 @@ export async function generatePreview(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
+    // Create shared globals for asset enqueue system
+    const apiUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
+    const sharedGlobals = {
+      projectId: activeProjectId,
+      apiUrl,
+      renderMode: "preview",
+      themeSettingsRaw: rawThemeSettings,
+      enqueuedStyles: new Map(),
+      enqueuedScripts: new Map(),
+    };
+
     let headerContent = "";
     let mainContent = "";
     let footerContent = "";
@@ -47,6 +58,7 @@ export async function generatePreview(req, res) {
           pageData.globalWidgets.header,
           rawThemeSettings,
           "preview",
+          sharedGlobals,
         );
       } catch (error) {
         console.error("Error rendering header widget:", error);
@@ -58,19 +70,20 @@ export async function generatePreview(req, res) {
     const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets || {});
 
     if (widgetOrder.length > 0 && pageData.widgets) {
-      const widgetPromises = widgetOrder.map(async (widgetId) => {
+      // Render widgets sequentially to preserve enqueue order
+      for (const widgetId of widgetOrder) {
         const widget = pageData.widgets[widgetId];
-        if (!widget) return null; // Return null to filter later
-        // Call the service function, passing projectId
-        // Ensure rawThemeSettings is passed correctly
-        const renderedWidgetHtml = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings, "preview");
-        // Return only the HTML string
-        return renderedWidgetHtml;
-      });
-
-      // Filter out any null results from missing widgets before joining
-      const renderedWidgets = (await Promise.all(widgetPromises)).filter((html) => html !== null);
-      mainContent += renderedWidgets.join(""); // Join the HTML strings directly
+        if (!widget) continue;
+        const renderedWidgetHtml = await renderWidget(
+          activeProjectId,
+          widgetId,
+          widget,
+          rawThemeSettings,
+          "preview",
+          sharedGlobals,
+        );
+        mainContent += renderedWidgetHtml;
+      }
     } else {
       // No page widgets - show empty state message
       let emptyStateTitle = "No widgets yet";
@@ -139,6 +152,7 @@ export async function generatePreview(req, res) {
           pageData.globalWidgets.footer,
           rawThemeSettings,
           "preview",
+          sharedGlobals,
         );
       } catch (error) {
         console.error("Error rendering footer widget:", error);
@@ -152,6 +166,7 @@ export async function generatePreview(req, res) {
       pageData, // Pass the full page data
       rawThemeSettings, // Pass the raw theme settings
       "preview", // Render mode
+      sharedGlobals, // Pass shared globals with enqueued assets
     );
 
     // Inject runtime script

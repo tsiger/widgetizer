@@ -229,32 +229,65 @@ Sitemap: ${sitemapUrl}`;
     }
 
     let headerHtml = "";
-    if (headerData) {
-      headerHtml = await renderWidget(projectId, "header_widget", headerData, rawThemeSettings, "publish");
-    }
     let footerHtml = "";
-    if (footerData) {
-      footerHtml = await renderWidget(projectId, "footer_widget", footerData, rawThemeSettings, "publish");
-    }
 
     for (const pageData of pagesDataArray) {
-      // Render page-specific widgets
+      // Create shared globals for this page (each page gets fresh enqueue Maps)
+      const sharedGlobals = {
+        projectId,
+        apiUrl: "",
+        renderMode: "publish",
+        themeSettingsRaw: rawThemeSettings,
+        enqueuedStyles: new Map(),
+        enqueuedScripts: new Map(),
+      };
+
+      // Render header if exists (for each page to capture enqueued assets)
+      if (headerData) {
+        headerHtml = await renderWidget(
+          projectId,
+          "header_widget",
+          headerData,
+          rawThemeSettings,
+          "publish",
+          sharedGlobals,
+        );
+      }
+
+      // Render page-specific widgets sequentially
       let pageWidgetsHtml = "";
       if (pageData.widgets && pageData.widgetsOrder) {
-        const widgetPromises = pageData.widgetsOrder.map(async (widgetId) => {
+        for (const widgetId of pageData.widgetsOrder) {
           // Skip header/footer as they are rendered separately
           if (widgetId === "header_widget" || widgetId === "footer_widget") {
-            return null;
+            continue;
           }
           const widget = pageData.widgets[widgetId];
           if (!widget) {
             console.warn(` -> Widget data missing for ID: ${widgetId} on page ${pageData.id}`);
-            return null;
+            continue;
           }
-          return await renderWidget(projectId, widgetId, widget, rawThemeSettings, "publish");
-        });
-        const renderedWidgets = (await Promise.all(widgetPromises)).filter((html) => html !== null);
-        pageWidgetsHtml = renderedWidgets.join("");
+          pageWidgetsHtml += await renderWidget(
+            projectId,
+            widgetId,
+            widget,
+            rawThemeSettings,
+            "publish",
+            sharedGlobals,
+          );
+        }
+      }
+
+      // Render footer if exists
+      if (footerData) {
+        footerHtml = await renderWidget(
+          projectId,
+          "footer_widget",
+          footerData,
+          rawThemeSettings,
+          "publish",
+          sharedGlobals,
+        );
       }
 
       // Pass separated content sections to layout
@@ -268,6 +301,7 @@ Sitemap: ${sitemapUrl}`;
         pageData,
         rawThemeSettings,
         "publish",
+        sharedGlobals,
       );
 
       let processedHtml = renderedHtml; // Start with the rendered HTML

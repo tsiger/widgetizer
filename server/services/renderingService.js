@@ -14,6 +14,10 @@ import { AssetTag } from "../../src/core/tags/assetTag.js";
 import { FontsPreconnectTag } from "../../src/core/tags/FontsPreconnectTag.js";
 import { FontsStylesheetTag } from "../../src/core/tags/FontsStylesheetTag.js";
 import { SeoTag } from "../../src/core/tags/SeoTag.js";
+import { EnqueueStyleTag } from "../../src/core/tags/enqueueStyle.js";
+import { EnqueueScriptTag } from "../../src/core/tags/enqueueScript.js";
+import { RenderStylesTag } from "../../src/core/tags/renderStyles.js";
+import { RenderScriptsTag } from "../../src/core/tags/renderScripts.js";
 import { registerImageFilter } from "../../src/core/filters/imageFilter.js";
 import { registerVideoFilter } from "../../src/core/filters/videoFilter.js";
 import { registerYouTubeFilter } from "../../src/core/filters/youtubeFilter.js";
@@ -41,6 +45,10 @@ engine.registerTag("asset", AssetTag);
 engine.registerTag("fonts_preconnect", FontsPreconnectTag);
 engine.registerTag("fonts_stylesheet", FontsStylesheetTag);
 engine.registerTag("seo", SeoTag);
+engine.registerTag("enqueue_style", EnqueueStyleTag);
+engine.registerTag("enqueue_script", EnqueueScriptTag);
+engine.registerTag("render_styles", RenderStylesTag);
+engine.registerTag("render_scripts", RenderScriptsTag);
 
 // Register custom filters
 registerImageFilter(engine);
@@ -62,8 +70,12 @@ async function getProjectData(projectId) {
 
 /**
  * Creates base render context with common properties
+ * @param {string} projectId
+ * @param {object} rawThemeSettings
+ * @param {string} renderMode
+ * @param {object} sharedGlobals - Optional shared globals object to preserve enqueued assets
  */
-async function createBaseRenderContext(projectId, rawThemeSettings, renderMode = "preview") {
+async function createBaseRenderContext(projectId, rawThemeSettings, renderMode = "preview", sharedGlobals = null) {
   // Validate project ID
   if (!projectId) {
     throw new Error("projectId must be provided to create render context");
@@ -98,24 +110,42 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     console.warn(`Could not read or parse media file for project ${projectId}: ${err.message}`);
   }
 
+  // Use shared globals if provided, otherwise create new ones
+  const globals = sharedGlobals || {
+    projectId,
+    apiUrl,
+    renderMode,
+    themeSettingsRaw: rawThemeSettings,
+    enqueuedStyles: new Map(),
+    enqueuedScripts: new Map(),
+  };
+
   // Return the base context
   return {
     theme: processedThemeSettings,
     mediaFiles,
-    globals: {
-      projectId,
-      apiUrl,
-      renderMode,
-      themeSettingsRaw: rawThemeSettings,
-    },
+    globals,
     imagePath: imageBasePath,
   };
 }
 
 /**
  * Renders a specific widget template with given data.
+ * @param {string} projectId
+ * @param {string} widgetId
+ * @param {object} widgetData
+ * @param {object} rawThemeSettings
+ * @param {string} renderMode
+ * @param {object} sharedGlobals - Optional shared globals to preserve enqueued assets
  */
-async function renderWidget(projectId, widgetId, widgetData, rawThemeSettings, renderMode = "preview") {
+async function renderWidget(
+  projectId,
+  widgetId,
+  widgetData,
+  rawThemeSettings,
+  renderMode = "preview",
+  sharedGlobals = null,
+) {
   try {
     const { type, settings = {}, blocks = {}, blocksOrder = [] } = widgetData;
     const projectSlug = await getProjectSlug(projectId);
@@ -230,8 +260,8 @@ async function renderWidget(projectId, widgetId, widgetData, rawThemeSettings, r
       blocksOrder: blocksOrder || [],
     };
 
-    // Get base render context
-    const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, renderMode);
+    // Get base render context (use shared globals if provided)
+    const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, renderMode, sharedGlobals);
 
     // Merge with widget-specific context
     const renderContext = {
@@ -263,8 +293,16 @@ async function renderWidget(projectId, widgetId, widgetData, rawThemeSettings, r
  * @param {object} pageData - Page metadata
  * @param {object} rawThemeSettings - Theme settings
  * @param {string} renderMode - Render mode ('preview' or 'publish')
+ * @param {object} sharedGlobals - Optional shared globals with enqueued assets
  */
-async function renderPageLayout(projectId, contentSections, pageData, rawThemeSettings, renderMode = "preview") {
+async function renderPageLayout(
+  projectId,
+  contentSections,
+  pageData,
+  rawThemeSettings,
+  renderMode = "preview",
+  sharedGlobals = null,
+) {
   try {
     // 1. Fetch layout.liquid for the project
     const projectSlug = await getProjectSlug(projectId);
@@ -279,8 +317,8 @@ async function renderPageLayout(projectId, contentSections, pageData, rawThemeSe
       return `<html><body><h1>Error: Layout template not found</h1><pre>${readErr.message}</pre></body></html>`;
     }
 
-    // 2. Create context for layout render
-    const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, renderMode);
+    // 2. Create context for layout render (use shared globals if provided)
+    const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, renderMode, sharedGlobals);
 
     // 3. Load project data
     const projectData = await getProjectData(projectId);
