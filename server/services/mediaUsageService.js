@@ -16,8 +16,13 @@ function extractMediaPathsFromPage(pageData) {
     if (!settings) return;
 
     Object.values(settings).forEach((value) => {
-      // Track both images and videos
-      if (typeof value === "string" && (value.startsWith("/uploads/images/") || value.startsWith("/uploads/videos/"))) {
+      // Track images, videos, and audios
+      if (
+        typeof value === "string" &&
+        (value.startsWith("/uploads/images/") ||
+          value.startsWith("/uploads/videos/") ||
+          value.startsWith("/uploads/audios/"))
+      ) {
         mediaPaths.add(value);
       }
     });

@@ -446,9 +446,9 @@
   </div>
 
   <!-- Hidden Audio Element -->
-  {% if widget.settings.audio_url != blank %}
-    <audio class="audio-player-audio-element" preload="metadata">
-      <source src="{{ widget.settings.audio_url }}" type="audio/mpeg">
+  {% if widget.settings.audio_file != blank %}
+    <audio class="audio-player-audio-element" preload="metadata" title="{{ widget.settings.audio_file | media_meta: 'title' }}">
+      <source src="{{ widget.settings.audio_file | audio: 'path' }}" type="audio/mpeg">
       Your browser does not support the audio element.
     </audio>
   {% endif %}

@@ -68,6 +68,7 @@
         <div class="video-container">
           <video
             src="{{ widget.settings.video | video: 'path' }}"
+            title="{{ widget.settings.video | media_meta: 'title' }}"
             {% if widget.settings.controls %}controls{% endif %}
             {% if widget.settings.autoplay %}autoplay{% endif %}
             {% if widget.settings.muted %}muted{% endif %}

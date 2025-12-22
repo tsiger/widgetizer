@@ -20,6 +20,7 @@ import { RenderStylesTag } from "../../src/core/tags/renderStyles.js";
 import { RenderScriptsTag } from "../../src/core/tags/renderScripts.js";
 import { registerImageFilter } from "../../src/core/filters/imageFilter.js";
 import { registerVideoFilter } from "../../src/core/filters/videoFilter.js";
+import { registerAudioFilter } from "../../src/core/filters/audioFilter.js";
 import { registerYouTubeFilter } from "../../src/core/filters/youtubeFilter.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { getProjectSlug } from "../utils/projectHelpers.js";
@@ -53,7 +54,10 @@ engine.registerTag("render_scripts", RenderScriptsTag);
 // Register custom filters
 registerImageFilter(engine);
 registerVideoFilter(engine);
+registerAudioFilter(engine);
 registerYouTubeFilter(engine);
+import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
+registerMediaMetaFilter(engine);
 
 /**
  * Helper function to get project data by ID
@@ -100,6 +104,10 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   const videoBasePath =
     renderMode === "publish" ? "assets/videos" : `${apiUrl}/api/media/projects/${projectId}/uploads/videos`;
 
+  // Audio base path (also in assets for consistency)
+  const audioBasePath =
+    renderMode === "publish" ? "assets/audios" : `${apiUrl}/api/media/projects/${projectId}/uploads/audios`;
+
   // Load media metadata and create a useful map
   let mediaFiles = {};
   try {
@@ -132,6 +140,7 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     globals,
     imagePath: imageBasePath,
     videoPath: videoBasePath,
+    audioPath: audioBasePath,
   };
 }
 

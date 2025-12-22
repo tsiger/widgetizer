@@ -524,6 +524,10 @@
         "label": "Tamaño Máximo de Carga de Video (MB)",
         "description": "Establece el tamaño máximo para cargas de videos individuales en todos los proyectos."
       },
+      "maxAudioSizeMB": {
+        "label": "Tamaño Máximo de Carga de Audio (MB)",
+        "description": "Establece el tamaño máximo para cargas de audio (MP3) individuales en todos los proyectos."
+      },
       "imageProcessing": {
         "quality": {
           "label": "Calidad de Imagen",

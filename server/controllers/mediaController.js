@@ -11,9 +11,11 @@ import {
   getProjectDir,
   getProjectImagesDir,
   getProjectVideosDir,
+  getProjectAudiosDir,
   getProjectMediaJsonPath,
   getImagePath,
   getVideoPath,
+  getAudioPath,
 } from "../config.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
@@ -52,6 +54,7 @@ const ALLOWED_MIME_TYPES = [
   "video/ogg",
   "video/avi",
   "video/mov",
+  "audio/mpeg", // MP3 audio files
 ];
 
 // Decode the filename TODO: Where should things like this live?
@@ -101,6 +104,8 @@ const storage = multer.diskStorage({
 
       if (file.mimetype.startsWith("video/")) {
         targetDir = getProjectVideosDir(projectSlug);
+      } else if (file.mimetype.startsWith("audio/")) {
+        targetDir = getProjectAudiosDir(projectSlug);
       } else {
         targetDir = getProjectImagesDir(projectSlug);
       }
@@ -123,6 +128,8 @@ const storage = multer.diskStorage({
       let targetDir;
       if (file.mimetype.startsWith("video/")) {
         targetDir = getProjectVideosDir(projectSlug);
+      } else if (file.mimetype.startsWith("audio/")) {
+        targetDir = getProjectAudiosDir(projectSlug);
       } else {
         targetDir = getProjectImagesDir(projectSlug);
       }
@@ -205,6 +212,7 @@ export async function uploadProjectMedia(req, res) {
     // Get the dynamic file size limits
     const maxImageSizeMB = await getSetting("media.maxFileSizeMB");
     const maxVideoSizeMB = await getSetting("media.maxVideoSizeMB");
+    const maxAudioSizeMB = await getSetting("media.maxAudioSizeMB");
     const imageSizes = await getImageProcessingSettings();
 
     const mediaData = await readMediaFile(projectId);
@@ -214,12 +222,22 @@ export async function uploadProjectMedia(req, res) {
       try {
         // Check file size against the appropriate limit
         const isVideo = file.mimetype.startsWith("video/");
-        const maxSizeMB = isVideo ? maxVideoSizeMB || 50 : maxImageSizeMB || 5;
+        const isAudio = file.mimetype.startsWith("audio/");
+        let maxSizeMB, fileType;
+        if (isVideo) {
+          maxSizeMB = maxVideoSizeMB || 50;
+          fileType = "video";
+        } else if (isAudio) {
+          maxSizeMB = maxAudioSizeMB || 25;
+          fileType = "audio";
+        } else {
+          maxSizeMB = maxImageSizeMB || 5;
+          fileType = "image";
+        }
         const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
         if (file.size > maxSizeBytes) {
           // File exceeds limit, reject it and delete temp file
-          const fileType = isVideo ? "video" : "image";
           try {
             await fs.unlink(file.path);
           } catch (unlinkError) {
@@ -237,7 +255,14 @@ export async function uploadProjectMedia(req, res) {
 
         // --- File is within size limit, proceed with processing ---
         const fileId = uuidv4();
-        const uploadPath = isVideo ? `/uploads/videos/${file.filename}` : `/uploads/images/${file.filename}`;
+        let uploadPath;
+        if (isVideo) {
+          uploadPath = `/uploads/videos/${file.filename}`;
+        } else if (isAudio) {
+          uploadPath = `/uploads/audios/${file.filename}`;
+        } else {
+          uploadPath = `/uploads/images/${file.filename}`;
+        }
 
         const fileInfo = {
           id: fileId,
@@ -247,7 +272,7 @@ export async function uploadProjectMedia(req, res) {
           size: file.size,
           uploaded: new Date().toISOString(),
           path: uploadPath,
-          metadata: { alt: "", title: "" },
+          metadata: isVideo || isAudio ? { title: "", description: "" } : { alt: "", title: "" },
           sizes: {}, // Initialize sizes object
         };
 
@@ -387,12 +412,7 @@ export async function updateMediaMetadata(req, res) {
 
   try {
     const { projectId, fileId } = req.params;
-    const { alt, title } = req.body;
-
-    // Validate input
-    if (typeof alt === "undefined" || typeof title === "undefined") {
-      return res.status(400).json({ error: "Missing alt or title in request body" });
-    }
+    const { alt, title, description } = req.body;
 
     // Read media metadata
     const mediaData = await readMediaFile(projectId);
@@ -403,12 +423,42 @@ export async function updateMediaMetadata(req, res) {
       return res.status(404).json({ error: "File not found" });
     }
 
+    const file = mediaData.files[fileIndex];
+    const isImage = file.type && file.type.startsWith("image/");
+    const isVideoOrAudio = file.type && (file.type.startsWith("video/") || file.type.startsWith("audio/"));
+
+    // Validate input based on media type
+    // Images require alt text; video/audio only need title and description (both optional)
+    if (isImage && typeof alt === "undefined") {
+      return res.status(400).json({ error: "Alt text is required for images" });
+    }
+
     // Update metadata - ensure metadata object exists
-    mediaData.files[fileIndex].metadata = {
-      ...mediaData.files[fileIndex].metadata,
-      alt: alt || "",
-      title: title || "",
-    };
+    if (isImage) {
+      mediaData.files[fileIndex].metadata = {
+        ...mediaData.files[fileIndex].metadata,
+        alt: alt || "",
+        title: title || "",
+      };
+    } else if (isVideoOrAudio) {
+      // Create new metadata object, preserving other fields but explicitly removing alt
+      const newMetadata = {
+        ...mediaData.files[fileIndex].metadata,
+        title: title || "",
+        description: description || "",
+      };
+      delete newMetadata.alt;
+
+      mediaData.files[fileIndex].metadata = newMetadata;
+    } else {
+      // Fallback for unknown types
+      mediaData.files[fileIndex].metadata = {
+        ...mediaData.files[fileIndex].metadata,
+        alt: alt || "",
+        title: title || "",
+        description: description || "",
+      };
+    }
 
     // Save updated metadata
     await writeMediaFile(projectId, mediaData);
@@ -458,6 +508,8 @@ export async function deleteProjectMedia(req, res) {
     const projectSlug = await getProjectSlug(projectId);
     if (fileToDelete.type && fileToDelete.type.startsWith("video/")) {
       fileDir = getProjectVideosDir(projectSlug);
+    } else if (fileToDelete.type && fileToDelete.type.startsWith("audio/")) {
+      fileDir = getProjectAudiosDir(projectSlug);
     } else {
       fileDir = getProjectImagesDir(projectSlug);
     }
@@ -518,10 +570,13 @@ export async function serveProjectMedia(req, res) {
       // Determine file type by extension to choose correct directory
       const ext = path.extname(filename).toLowerCase();
       const videoExtensions = [".mp4", ".webm", ".ogg", ".avi", ".mov"];
+      const audioExtensions = [".mp3"];
 
       const projectSlug = await getProjectSlug(projectId);
       if (videoExtensions.includes(ext)) {
         filePath = getVideoPath(projectSlug, filename);
+      } else if (audioExtensions.includes(ext)) {
+        filePath = getAudioPath(projectSlug, filename);
       } else {
         filePath = getImagePath(projectSlug, filename);
       }
@@ -566,6 +621,7 @@ export async function serveProjectMedia(req, res) {
       ".ogg": "video/ogg",
       ".avi": "video/avi",
       ".mov": "video/mov",
+      ".mp3": "audio/mpeg",
     };
 
     const contentType = contentTypes[ext] || "application/octet-stream";
@@ -637,6 +693,8 @@ export async function bulkDeleteProjectMedia(req, res) {
       const projectSlug = await getProjectSlug(projectId);
       if (file.type && file.type.startsWith("video/")) {
         fileDir = getProjectVideosDir(projectSlug);
+      } else if (file.type && file.type.startsWith("audio/")) {
+        fileDir = getProjectAudiosDir(projectSlug);
       } else {
         fileDir = getProjectImagesDir(projectSlug);
       }

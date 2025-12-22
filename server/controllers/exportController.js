@@ -171,12 +171,14 @@ export async function exportProject(req, res) {
     const outputAssetsDir = path.join(outputDir, "assets");
     const outputImagesDir = path.join(outputAssetsDir, "images"); // Images now in assets/images/
     const outputVideosDir = path.join(outputAssetsDir, "videos"); // Videos now in assets/videos/
+    const outputAudiosDir = path.join(outputAssetsDir, "audios"); // Audios now in assets/audios/
 
     // Ensure output directories exist
     await fs.ensureDir(outputDir);
     await fs.ensureDir(outputAssetsDir);
     await fs.ensureDir(outputImagesDir);
     await fs.ensureDir(outputVideosDir);
+    await fs.ensureDir(outputAudiosDir);
 
     const rawThemeSettings = await readProjectThemeData(projectSlug);
 
@@ -493,6 +495,61 @@ Sitemap: ${sitemapUrl}`;
         }
       } catch (fallbackError) {
         console.error("Error in fallback video copying:", fallbackError);
+      }
+    }
+
+    // Copy used audio files to assets/audios/
+    try {
+      const { readMediaFile } = await import("./mediaController.js");
+      const mediaData = await readMediaFile(projectId);
+
+      if (mediaData && mediaData.files) {
+        const usedAudios = mediaData.files.filter(
+          (file) =>
+            file.type.startsWith("audio/") &&
+            file.usedIn &&
+            file.usedIn.length > 0 &&
+            file.path.startsWith("/uploads/audios/"),
+        );
+
+        let copiedCount = 0;
+        let skippedCount = 0;
+
+        for (const audioFile of usedAudios) {
+          const sourceAudioPath = path.join(projectDir, audioFile.path.replace(/^\//, ""));
+          const targetAudioPath = path.join(outputDir, "assets", "audios", path.basename(audioFile.path));
+
+          try {
+            if (await fs.pathExists(sourceAudioPath)) {
+              await fs.ensureDir(path.dirname(targetAudioPath));
+              await fs.copy(sourceAudioPath, targetAudioPath);
+              copiedCount++;
+            }
+          } catch (copyError) {
+            console.error(`Error copying audio ${audioFile.filename}:`, copyError);
+          }
+        }
+
+        const allAudios = mediaData.files.filter((file) => file.type.startsWith("audio/"));
+        skippedCount = allAudios.length - usedAudios.length;
+
+        console.log(
+          `Export optimization: Copied ${copiedCount} used audios to assets/audios/, skipped ${skippedCount} unused audios`,
+        );
+      } else {
+        console.log("No media data found or no audios to process");
+      }
+    } catch (mediaError) {
+      console.error("Error reading media data for audio export:", mediaError);
+      // Fallback to copying all audios if media tracking fails
+      const projectAudiosDir = path.join(projectDir, "uploads", "audios");
+      try {
+        if (await fs.pathExists(projectAudiosDir)) {
+          await fs.copy(projectAudiosDir, outputAudiosDir);
+          console.log("Fallback: Copied all audios due to media tracking error");
+        }
+      } catch (fallbackError) {
+        console.error("Error in fallback audio copying:", fallbackError);
       }
     }
 

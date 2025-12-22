@@ -85,4 +85,15 @@ router.get(
   },
 );
 
+// Serve media files directly from uploads/audios
+router.get(
+  "/projects/:projectId/uploads/audios/:filename",
+  [param("projectId").notEmpty(), param("filename").notEmpty()],
+  (req, res) => {
+    const { projectId, filename } = req.params;
+    req.params.filename = filename;
+    serveProjectMedia(req, res);
+  },
+);
+
 export default router;

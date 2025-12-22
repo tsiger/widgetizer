@@ -1,11 +1,17 @@
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { X } from "lucide-react";
+import { X, Music } from "lucide-react";
 import { API_URL } from "../../config";
 
 export default function MediaDrawer({ visible, onClose, selectedFile, onSave, loading, activeProject }) {
   const { t } = useTranslation();
+
+  // Determine media type
+  const isVideo = selectedFile?.type?.startsWith("video/");
+  const isAudio = selectedFile?.type?.startsWith("audio/");
+  const isImage = !isVideo && !isAudio;
+
   const {
     register,
     handleSubmit: rhfHandleSubmit,
@@ -15,6 +21,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
     defaultValues: {
       alt: "",
       title: "",
+      description: "",
     },
   });
 
@@ -24,19 +31,20 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
   // Update form data when selectedFile or visibility changes
   useEffect(() => {
     const currentSelectedFileStr = JSON.stringify(selectedFile);
-    
+
     if (visible && selectedFile) {
       // Only reset if the file actually changed
       if (prevSelectedFileRef.current !== currentSelectedFileStr) {
         reset({
           alt: selectedFile.metadata?.alt || "",
           title: selectedFile.metadata?.title || "",
+          description: selectedFile.metadata?.description || "",
         });
         prevSelectedFileRef.current = currentSelectedFileStr;
       }
     } else if (!visible) {
       // Reset form when drawer is closed
-      reset({ alt: "", title: "" });
+      reset({ alt: "", title: "", description: "" });
       prevSelectedFileRef.current = JSON.stringify(null);
     }
   }, [visible, selectedFile, reset]);
@@ -56,7 +64,11 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
 
   const onSubmitHandler = (data) => {
     if (selectedFile) {
-      onSave(selectedFile.id, data);
+      // Only send relevant fields based on media type
+      const metadata = isImage
+        ? { alt: data.alt, title: data.title }
+        : { title: data.title, description: data.description };
+      onSave(selectedFile.id, metadata);
     }
   };
 
@@ -83,8 +95,12 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
       ? API_URL(`/api/media/projects/${activeProject.id}/media/${selectedFile.id}`)
       : null;
 
-  // Determine if the file is a video
-  const isVideo = selectedFile?.type?.startsWith("video/");
+  // Get the media type label for the drawer title
+  const getMediaTypeLabel = () => {
+    if (isAudio) return "Audio";
+    if (isVideo) return "Video";
+    return "Image";
+  };
 
   return (
     <div
@@ -101,7 +117,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
       >
         <div className="flex items-center justify-between p-4 border-b border-slate-200">
           <h2 id="media-drawer-title" className="text-lg font-medium text-slate-800">
-            {t("forms.media.editTitle", { type: isVideo ? "Video" : "Image" })}
+            {t("forms.media.editTitle", { type: getMediaTypeLabel() })}
           </h2>
           <button
             onClick={onClose}
@@ -113,6 +129,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
         </div>
 
         <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="p-6 space-y-6">
+          {/* Preview section */}
           {fileUrl && (
             <div className="mb-4 p-2 border border-slate-200 rounded-sm bg-slate-50 flex items-center justify-center">
               {isVideo ? (
@@ -124,44 +141,90 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
                 >
                   Your browser does not support the video tag.
                 </video>
+              ) : isAudio ? (
+                <div className="flex flex-col items-center py-4">
+                  <Music size={48} className="text-pink-500 mb-2" />
+                  <audio src={fileUrl} controls preload="metadata" className="w-full max-w-xs">
+                    Your browser does not support the audio tag.
+                  </audio>
+                </div>
               ) : (
                 <img src={fileUrl} alt="Preview" className="max-h-40 max-w-full object-contain rounded-sm" />
               )}
             </div>
           )}
 
-          <div className="form-field">
-            <label htmlFor="alt" className="form-label">
-              {t("forms.media.altLabel")}
-            </label>
-            <input
-              type="text"
-              id="alt"
-              {...register("alt", {
-                required: t("forms.media.altRequired"),
-                validate: (value) => value.trim() !== "" || t("forms.media.altNotEmpty"),
-              })}
-              className="form-input"
-              aria-required="true"
-            />
-            {errors.alt && <p className="form-error">{errors.alt.message}</p>}
-            <p className="form-description">
-              {t("forms.media.altHelp", { type: isVideo ? "video content" : "image" })}
-            </p>
-          </div>
+          {/* Image-specific fields: Alt Text (required) + Title */}
+          {isImage && (
+            <>
+              <div className="form-field">
+                <label htmlFor="alt" className="form-label">
+                  {t("forms.media.altLabel")}
+                </label>
+                <input
+                  type="text"
+                  id="alt"
+                  {...register("alt", {
+                    required: t("forms.media.altRequired"),
+                    validate: (value) => value.trim() !== "" || t("forms.media.altNotEmpty"),
+                  })}
+                  className="form-input"
+                  aria-required="true"
+                />
+                {errors.alt && <p className="form-error">{errors.alt.message}</p>}
+                <p className="form-description">{t("forms.media.altHelp", { type: "image" })}</p>
+              </div>
 
-          <div className="form-field">
-            <label htmlFor="title" className="form-label-optional">
-              {t("forms.media.titleLabel")}
-            </label>
-            <input
-              type="text"
-              id="title"
-              {...register("title")}
-              className="form-input"
-            />
-            <p className="form-description">{t("forms.media.titleHelp")}</p>
-          </div>
+              <div className="form-field">
+                <label htmlFor="title" className="form-label-optional">
+                  {t("forms.media.titleLabel")}
+                </label>
+                <input type="text" id="title" {...register("title")} className="form-input" />
+                <p className="form-description">{t("forms.media.titleHelp")}</p>
+              </div>
+            </>
+          )}
+
+          {/* Video/Audio fields: Title + Description (both optional) */}
+          {(isVideo || isAudio) && (
+            <>
+              <div className="form-field">
+                <label htmlFor="title" className="form-label-optional">
+                  {t("forms.media.titleLabel")}
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  {...register("title")}
+                  className="form-input"
+                  placeholder={isAudio ? "Song or episode title" : "Video title"}
+                />
+                <p className="form-description">
+                  {isAudio ? "The title of the audio track or podcast episode." : "The title of the video."}
+                </p>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="description" className="form-label-optional">
+                  {t("forms.media.descriptionLabel", { defaultValue: "Description" })}
+                </label>
+                <textarea
+                  id="description"
+                  {...register("description")}
+                  className="form-input"
+                  rows={3}
+                  placeholder={
+                    isAudio ? "Artist, album, or notes about this audio" : "Description or notes about this video"
+                  }
+                />
+                <p className="form-description">
+                  {isAudio
+                    ? "Optional notes about this audio file (artist, album, etc.)."
+                    : "Optional description or notes about this video."}
+                </p>
+              </div>
+            </>
+          )}
 
           <div className="form-actions-separated">
             <button
