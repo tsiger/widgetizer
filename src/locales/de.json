@@ -523,6 +523,10 @@
         "label": "Maximale Upload-Größe für Videos (MB)",
         "description": "Legen Sie die maximale Größe für einzelne Video-Uploads in allen Projekten fest."
       },
+      "maxAudioSizeMB": {
+        "label": "Maximale Upload-Größe für Audio (MB)",
+        "description": "Legen Sie die maximale Größe für einzelne Audio-Uploads (MP3) in allen Projekten fest."
+      },
       "imageProcessing": {
         "quality": {
           "label": "Bildqualität",

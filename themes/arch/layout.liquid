@@ -9,6 +9,7 @@
     {% fonts_stylesheet %}
 
     {% asset "base.css" %}
+    {% render_styles %}
     {% theme_settings %}
 
     <style>
@@ -24,5 +25,8 @@
       {{ main_content }}
     </main>
     {{ footer }}
+
+    {% render_scripts %}
   </body>
 </html>
+

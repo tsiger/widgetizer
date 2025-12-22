@@ -3,6 +3,7 @@ export { default as ColorInput } from "./ColorInput";
 export { default as FontPickerInput } from "./FontPickerInput";
 export { default as ImageInput } from "./ImageInput";
 export { default as VideoInput } from "./VideoInput";
+export { default as AudioInput } from "./AudioInput";
 export { default as MenuSelectInput } from "./MenuSelectInput";
 export { default as RadioInput } from "./RadioInput";
 export { default as RangeInput } from "./RangeInput";

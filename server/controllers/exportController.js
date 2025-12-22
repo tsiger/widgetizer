@@ -169,15 +169,16 @@ export async function exportProject(req, res) {
     const outputBaseDir = PUBLISH_DIR;
     const outputDir = path.join(outputBaseDir, `${projectSlug}-v${version}`);
     const outputAssetsDir = path.join(outputDir, "assets");
-    const outputUploadsDir = path.join(outputDir, "uploads");
-    const outputImagesDir = path.join(outputUploadsDir, "images");
-    const outputVideosDir = path.join(outputUploadsDir, "videos");
+    const outputImagesDir = path.join(outputAssetsDir, "images"); // Images now in assets/images/
+    const outputVideosDir = path.join(outputAssetsDir, "videos"); // Videos now in assets/videos/
+    const outputAudiosDir = path.join(outputAssetsDir, "audios"); // Audios now in assets/audios/
 
     // Ensure output directories exist
     await fs.ensureDir(outputDir);
     await fs.ensureDir(outputAssetsDir);
     await fs.ensureDir(outputImagesDir);
     await fs.ensureDir(outputVideosDir);
+    await fs.ensureDir(outputAudiosDir);
 
     const rawThemeSettings = await readProjectThemeData(projectSlug);
 
@@ -229,32 +230,65 @@ Sitemap: ${sitemapUrl}`;
     }
 
     let headerHtml = "";
-    if (headerData) {
-      headerHtml = await renderWidget(projectId, "header_widget", headerData, rawThemeSettings, "publish");
-    }
     let footerHtml = "";
-    if (footerData) {
-      footerHtml = await renderWidget(projectId, "footer_widget", footerData, rawThemeSettings, "publish");
-    }
 
     for (const pageData of pagesDataArray) {
-      // Render page-specific widgets
+      // Create shared globals for this page (each page gets fresh enqueue Maps)
+      const sharedGlobals = {
+        projectId,
+        apiUrl: "",
+        renderMode: "publish",
+        themeSettingsRaw: rawThemeSettings,
+        enqueuedStyles: new Map(),
+        enqueuedScripts: new Map(),
+      };
+
+      // Render header if exists (for each page to capture enqueued assets)
+      if (headerData) {
+        headerHtml = await renderWidget(
+          projectId,
+          "header_widget",
+          headerData,
+          rawThemeSettings,
+          "publish",
+          sharedGlobals,
+        );
+      }
+
+      // Render page-specific widgets sequentially
       let pageWidgetsHtml = "";
       if (pageData.widgets && pageData.widgetsOrder) {
-        const widgetPromises = pageData.widgetsOrder.map(async (widgetId) => {
+        for (const widgetId of pageData.widgetsOrder) {
           // Skip header/footer as they are rendered separately
           if (widgetId === "header_widget" || widgetId === "footer_widget") {
-            return null;
+            continue;
           }
           const widget = pageData.widgets[widgetId];
           if (!widget) {
             console.warn(` -> Widget data missing for ID: ${widgetId} on page ${pageData.id}`);
-            return null;
+            continue;
           }
-          return await renderWidget(projectId, widgetId, widget, rawThemeSettings, "publish");
-        });
-        const renderedWidgets = (await Promise.all(widgetPromises)).filter((html) => html !== null);
-        pageWidgetsHtml = renderedWidgets.join("");
+          pageWidgetsHtml += await renderWidget(
+            projectId,
+            widgetId,
+            widget,
+            rawThemeSettings,
+            "publish",
+            sharedGlobals,
+          );
+        }
+      }
+
+      // Render footer if exists
+      if (footerData) {
+        footerHtml = await renderWidget(
+          projectId,
+          "footer_widget",
+          footerData,
+          rawThemeSettings,
+          "publish",
+          sharedGlobals,
+        );
       }
 
       // Pass separated content sections to layout
@@ -268,6 +302,7 @@ Sitemap: ${sitemapUrl}`;
         pageData,
         rawThemeSettings,
         "publish",
+        sharedGlobals,
       );
 
       let processedHtml = renderedHtml; // Start with the rendered HTML
@@ -349,7 +384,8 @@ Sitemap: ${sitemapUrl}`;
 
         for (const imageFile of usedImages) {
           const sourceImagePath = path.join(projectDir, imageFile.path.replace(/^\//, ""));
-          const targetImagePath = path.join(outputDir, imageFile.path.replace(/^\//, ""));
+          // Changed: Export images to assets/images/ instead of uploads/images/
+          const targetImagePath = path.join(outputDir, "assets", "images", path.basename(imageFile.path));
 
           // Copy original image
           try {
@@ -366,7 +402,8 @@ Sitemap: ${sitemapUrl}`;
           if (imageFile.sizes) {
             for (const [sizeName, sizeInfo] of Object.entries(imageFile.sizes)) {
               const sourceSizePath = path.join(projectDir, sizeInfo.path.replace(/^\//, ""));
-              const targetSizePath = path.join(outputDir, sizeInfo.path.replace(/^\//, ""));
+              // Changed: Export image sizes to assets/images/ instead of uploads/images/
+              const targetSizePath = path.join(outputDir, "assets", "images", path.basename(sizeInfo.path));
 
               try {
                 if (await fs.pathExists(sourceSizePath)) {
@@ -384,7 +421,9 @@ Sitemap: ${sitemapUrl}`;
         const allImages = mediaData.files.filter((file) => file.path.startsWith("/uploads/images/"));
         skippedCount = allImages.length - usedImages.length;
 
-        console.log(`Export optimization: Copied ${copiedCount} used images, skipped ${skippedCount} unused images`);
+        console.log(
+          `Export optimization: Copied ${copiedCount} used images to assets/images/, skipped ${skippedCount} unused images`,
+        );
       } else {
         console.log("No media data found or no images to process");
       }
@@ -422,7 +461,8 @@ Sitemap: ${sitemapUrl}`;
 
         for (const videoFile of usedVideos) {
           const sourceVideoPath = path.join(projectDir, videoFile.path.replace(/^\//, ""));
-          const targetVideoPath = path.join(outputDir, videoFile.path.replace(/^\//, ""));
+          // Changed: Export videos to assets/videos/ instead of uploads/videos/
+          const targetVideoPath = path.join(outputDir, "assets", "videos", path.basename(videoFile.path));
 
           try {
             if (await fs.pathExists(sourceVideoPath)) {
@@ -438,7 +478,9 @@ Sitemap: ${sitemapUrl}`;
         const allVideos = mediaData.files.filter((file) => file.type.startsWith("video/"));
         skippedCount = allVideos.length - usedVideos.length;
 
-        console.log(`Export optimization: Copied ${copiedCount} used videos, skipped ${skippedCount} unused videos`);
+        console.log(
+          `Export optimization: Copied ${copiedCount} used videos to assets/videos/, skipped ${skippedCount} unused videos`,
+        );
       } else {
         console.log("No media data found or no videos to process");
       }
@@ -453,6 +495,61 @@ Sitemap: ${sitemapUrl}`;
         }
       } catch (fallbackError) {
         console.error("Error in fallback video copying:", fallbackError);
+      }
+    }
+
+    // Copy used audio files to assets/audios/
+    try {
+      const { readMediaFile } = await import("./mediaController.js");
+      const mediaData = await readMediaFile(projectId);
+
+      if (mediaData && mediaData.files) {
+        const usedAudios = mediaData.files.filter(
+          (file) =>
+            file.type.startsWith("audio/") &&
+            file.usedIn &&
+            file.usedIn.length > 0 &&
+            file.path.startsWith("/uploads/audios/"),
+        );
+
+        let copiedCount = 0;
+        let skippedCount = 0;
+
+        for (const audioFile of usedAudios) {
+          const sourceAudioPath = path.join(projectDir, audioFile.path.replace(/^\//, ""));
+          const targetAudioPath = path.join(outputDir, "assets", "audios", path.basename(audioFile.path));
+
+          try {
+            if (await fs.pathExists(sourceAudioPath)) {
+              await fs.ensureDir(path.dirname(targetAudioPath));
+              await fs.copy(sourceAudioPath, targetAudioPath);
+              copiedCount++;
+            }
+          } catch (copyError) {
+            console.error(`Error copying audio ${audioFile.filename}:`, copyError);
+          }
+        }
+
+        const allAudios = mediaData.files.filter((file) => file.type.startsWith("audio/"));
+        skippedCount = allAudios.length - usedAudios.length;
+
+        console.log(
+          `Export optimization: Copied ${copiedCount} used audios to assets/audios/, skipped ${skippedCount} unused audios`,
+        );
+      } else {
+        console.log("No media data found or no audios to process");
+      }
+    } catch (mediaError) {
+      console.error("Error reading media data for audio export:", mediaError);
+      // Fallback to copying all audios if media tracking fails
+      const projectAudiosDir = path.join(projectDir, "uploads", "audios");
+      try {
+        if (await fs.pathExists(projectAudiosDir)) {
+          await fs.copy(projectAudiosDir, outputAudiosDir);
+          console.log("Fallback: Copied all audios due to media tracking error");
+        }
+      } catch (fallbackError) {
+        console.error("Error in fallback audio copying:", fallbackError);
       }
     }
 

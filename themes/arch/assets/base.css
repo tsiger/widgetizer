@@ -109,7 +109,7 @@ img {
 
   /* Widget Background System (defaults) */
   --widget-bg-color: transparent;
-  --widget-bg-image: none;
+  /* Note: background-image is set inline on elements, not via CSS variable */
   --widget-bg-size: cover;
   --widget-bg-position: center;
   --widget-bg-repeat: no-repeat;
@@ -282,7 +282,7 @@ body {
   padding-block: 0;
   padding-inline: var(--section-padding-inline);
   background-color: var(--widget-bg-color, transparent);
-  background-image: var(--widget-bg-image, none);
+  /* background-image is set inline on elements with .has-bg-image class */
   background-size: var(--widget-bg-size, cover);
   background-position: var(--widget-bg-position, center);
   background-repeat: var(--widget-bg-repeat, no-repeat);

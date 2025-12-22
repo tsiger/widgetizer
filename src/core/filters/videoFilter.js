@@ -15,7 +15,15 @@ function registerVideoFilter(engine) {
       return `<!-- Video filter error: "${filename}" is not a video file -->`;
     }
 
-    // Simple positional arguments, like imageFilter.js
+    const firstArg = args[0];
+
+    // Check if user wants just the path/url (like image filter)
+    if (firstArg === "path" || firstArg === "url") {
+      const videoBasePath = this.context.get(["videoPath"]);
+      return `${videoBasePath}/${filename}`;
+    }
+
+    // Original behavior: full video tag
     // arg[0]: controls (boolean)
     // arg[1]: autoplay (boolean)
     // arg[2]: muted (boolean)
@@ -27,7 +35,7 @@ function registerVideoFilter(engine) {
     const loop = args[3] === true; // default false
     const cssClass = args[4] || "";
 
-    const videoBasePath = this.context.get(["imagePath"]);
+    const videoBasePath = this.context.get(["videoPath"]);
     const src = `${videoBasePath}/${filename}`;
 
     const attributes = [];

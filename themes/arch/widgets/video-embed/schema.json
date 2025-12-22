@@ -1,6 +1,6 @@
 {
-  "type": "video",
-  "displayName": "Video",
+  "type": "video-embed",
+  "displayName": "YouTube/Vimeo",
   "settings": [
     {
       "type": "text",
@@ -19,33 +19,16 @@
       "label": "Description"
     },
     {
-      "type": "video",
-      "id": "video",
-      "label": "Video file"
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL (YouTube or Vimeo)",
+      "default": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     },
     {
-      "type": "checkbox",
-      "id": "autoplay",
-      "label": "Autoplay",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "muted",
-      "label": "Muted (required for autoplay)",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "loop",
-      "label": "Loop video",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "controls",
-      "label": "Show controls",
-      "default": true
+      "type": "text",
+      "id": "video_title",
+      "label": "Video title (for accessibility)",
+      "default": "Video"
     },
     {
       "type": "select",

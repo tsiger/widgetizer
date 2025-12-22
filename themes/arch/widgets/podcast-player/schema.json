@@ -53,9 +53,9 @@
       "label": "Episode description"
     },
     {
-      "type": "text",
-      "id": "audio_url",
-      "label": "Audio file URL"
+      "type": "audio",
+      "id": "audio_file",
+      "label": "Audio file (MP3)"
     },
     {
       "type": "checkbox",

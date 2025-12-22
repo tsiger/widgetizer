@@ -523,6 +523,10 @@
         "label": "Taille max de téléchargement vidéo (Mo)",
         "description": "Définir la taille maximale pour les téléchargements de vidéos individuelles sur tous les projets."
       },
+      "maxAudioSizeMB": {
+        "label": "Taille max de téléchargement audio (Mo)",
+        "description": "Définir la taille maximale pour les téléchargements audio (MP3) individuels sur tous les projets."
+      },
       "imageProcessing": {
         "quality": {
           "label": "Qualité de l'image",
