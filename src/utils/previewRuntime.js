@@ -139,14 +139,14 @@ function scrollToWidget(widgetId) {
 function updateWidgetSettings(widgetId, changes) {
   const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
   if (!widget) return;
-  
+
   // Update widget-level settings
   if (changes.settings) {
     Object.entries(changes.settings).forEach(([settingId, value]) => {
       applySettingToElement(widget, settingId, value);
     });
   }
-  
+
   // Update block-level settings
   if (changes.blocks) {
     Object.entries(changes.blocks).forEach(([blockId, blockChanges]) => {
@@ -164,28 +164,36 @@ function updateWidgetSettings(widgetId, changes) {
 function applySettingToElement(container, settingId, value) {
   // Find elements with data-setting attribute matching this settingId
   const elements = container.querySelectorAll(`[data-setting="${settingId}"]`);
-  
+
   elements.forEach((el) => {
+    // Check if this element belongs to a nested block (prevent bleeding)
+    // If the element is inside a data-block-id, and that block is NOT the container itself,
+    // then this element belongs to a child block and should not be updated by the container's settings.
+    const closestBlock = el.closest("[data-block-id]");
+    if (closestBlock && closestBlock !== container) {
+      return;
+    }
+
     const tagName = el.tagName.toLowerCase();
-    
+
     // Handle different element types
-    if (tagName === 'img') {
+    if (tagName === "img") {
       // Image: update src
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         el.src = value;
       } else if (value?.url) {
         el.src = value.url;
       }
-    } else if (tagName === 'video') {
+    } else if (tagName === "video") {
       // Video: update src
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         el.src = value;
       } else if (value?.url) {
         el.src = value.url;
       }
-    } else if (tagName === 'a') {
+    } else if (tagName === "a") {
       // Link: update href and/or text
-      if (typeof value === 'object') {
+      if (typeof value === "object") {
         if (value.href !== undefined) el.href = value.href;
         if (value.text !== undefined) el.textContent = value.text;
       } else {
@@ -193,7 +201,7 @@ function applySettingToElement(container, settingId, value) {
       }
     } else {
       // Default: update text content (for text, textarea, etc.)
-      if (typeof value === 'string' || typeof value === 'number') {
+      if (typeof value === "string" || typeof value === "number") {
         el.textContent = value;
       } else if (value?.text) {
         el.textContent = value.text;
