@@ -165,12 +165,21 @@ img {
    ========================================================================== */
 
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
   color: var(--text-primary);
   background-color: var(--bg-primary);
+  /* Sticky footer layout */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh; /* Mobile viewport fix */
+}
+
+/* Main content grows to push footer down */
+#main-content {
+  flex: 1;
 }
 
 /* ==========================================================================

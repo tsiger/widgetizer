@@ -257,9 +257,14 @@ async function renderWidget(projectId, widgetId, widgetData, rawThemeSettings, r
 }
 
 /**
- * Renders a page layout with content
+ * Renders a page layout with separated content sections
+ * @param {string} projectId - The project ID
+ * @param {object} contentSections - Object with { headerContent, mainContent, footerContent }
+ * @param {object} pageData - Page metadata
+ * @param {object} rawThemeSettings - Theme settings
+ * @param {string} renderMode - Render mode ('preview' or 'publish')
  */
-async function renderPageLayout(projectId, pageContent, pageData, rawThemeSettings, renderMode = "preview") {
+async function renderPageLayout(projectId, contentSections, pageData, rawThemeSettings, renderMode = "preview") {
   try {
     // 1. Fetch layout.liquid for the project
     const projectSlug = await getProjectSlug(projectId);
@@ -280,16 +285,18 @@ async function renderPageLayout(projectId, pageContent, pageData, rawThemeSettin
     // 3. Load project data
     const projectData = await getProjectData(projectId);
 
-    // 4. Add page-specific context
+    // 4. Add page-specific context with separated content sections
     const renderContext = {
       ...baseContext,
-      content: pageContent,
+      header: contentSections.headerContent || "",
+      main_content: contentSections.mainContent || "",
+      footer: contentSections.footerContent || "",
       page: pageData,
       project: projectData,
       body_class: pageData?.slug || "",
     };
 
-    // 4. Render the layout
+    // 5. Render the layout
     const renderedHtml = await engine.parseAndRender(layoutTemplate, renderContext, { globals: renderContext.globals });
     return renderedHtml;
   } catch (error) {

@@ -21,8 +21,6 @@ function injectRuntimeScript(html) {
   return html.replace(/<\/body>/i, `${script}\n</body>`);
 }
 
-
-
 // Generate preview HTML
 export async function generatePreview(req, res) {
   try {
@@ -36,19 +34,20 @@ export async function generatePreview(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    let content = "";
+    let headerContent = "";
+    let mainContent = "";
+    let footerContent = "";
 
-    // NEW: Render header widget first (if it exists)
+    // Render header widget first (if it exists)
     if (pageData.globalWidgets?.header) {
       try {
-        const headerHtml = await renderWidget(
+        headerContent = await renderWidget(
           activeProjectId,
           "header",
           pageData.globalWidgets.header,
           rawThemeSettings,
           "preview",
         );
-        content += headerHtml;
       } catch (error) {
         console.error("Error rendering header widget:", error);
         // Continue without header rather than failing completely
@@ -57,7 +56,7 @@ export async function generatePreview(req, res) {
 
     // Render page widgets in the middle
     const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets || {});
-    
+
     if (widgetOrder.length > 0 && pageData.widgets) {
       const widgetPromises = widgetOrder.map(async (widgetId) => {
         const widget = pageData.widgets[widgetId];
@@ -71,19 +70,19 @@ export async function generatePreview(req, res) {
 
       // Filter out any null results from missing widgets before joining
       const renderedWidgets = (await Promise.all(widgetPromises)).filter((html) => html !== null);
-      content += renderedWidgets.join(""); // Join the HTML strings directly
+      mainContent += renderedWidgets.join(""); // Join the HTML strings directly
     } else {
       // No page widgets - show empty state message
       let emptyStateTitle = "No widgets yet";
       let emptyStateDescription = "Start building your page by adding widgets from the sidebar";
-      
+
       try {
         // Read app settings to get user's locale
         const appSettingsPath = path.join(__dirname, "../../data/appSettings.json");
         if (await fs.pathExists(appSettingsPath)) {
           const appSettings = JSON.parse(await fs.readFile(appSettingsPath, "utf-8"));
           const userLocale = appSettings?.general?.language || "en";
-          
+
           // Load the corresponding locale file
           const localePath = path.join(__dirname, `../../src/locales/${userLocale}.json`);
           if (await fs.pathExists(localePath)) {
@@ -97,7 +96,7 @@ export async function generatePreview(req, res) {
         // Fall back to English defaults
       }
 
-      content += `
+      mainContent += `
         <div class="preview-empty-state">
           <style>
             .preview-empty-state {
@@ -134,14 +133,13 @@ export async function generatePreview(req, res) {
     // Render footer widget last (if it exists)
     if (pageData.globalWidgets?.footer) {
       try {
-        const footerHtml = await renderWidget(
+        footerContent = await renderWidget(
           activeProjectId,
           "footer",
           pageData.globalWidgets.footer,
           rawThemeSettings,
           "preview",
         );
-        content += footerHtml;
       } catch (error) {
         console.error("Error rendering footer widget:", error);
         // Continue without footer rather than failing completely
@@ -150,7 +148,7 @@ export async function generatePreview(req, res) {
 
     let renderedHtml = await renderPageLayout(
       activeProjectId,
-      content, // Pass the assembled widget HTML (header + page widgets + footer)
+      { headerContent, mainContent, footerContent }, // Pass separated content sections
       pageData, // Pass the full page data
       rawThemeSettings, // Pass the raw theme settings
       "preview", // Render mode

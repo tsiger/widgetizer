@@ -144,7 +144,6 @@ export async function cleanupProjectExports(projectId) {
 
 // Main function to handle the export request
 
-
 export async function exportProject(req, res) {
   const { projectId } = req.params;
 
@@ -258,11 +257,18 @@ Sitemap: ${sitemapUrl}`;
         pageWidgetsHtml = renderedWidgets.join("");
       }
 
-      // Combine header + page widgets + footer for layout content
-      const contentForLayout = headerHtml + pageWidgetsHtml + footerHtml;
-
-      // Render layout with combined content
-      const renderedHtml = await renderPageLayout(projectId, contentForLayout, pageData, rawThemeSettings, "publish");
+      // Pass separated content sections to layout
+      const renderedHtml = await renderPageLayout(
+        projectId,
+        {
+          headerContent: headerHtml,
+          mainContent: pageWidgetsHtml,
+          footerContent: footerHtml,
+        },
+        pageData,
+        rawThemeSettings,
+        "publish",
+      );
 
       let processedHtml = renderedHtml; // Start with the rendered HTML
 
