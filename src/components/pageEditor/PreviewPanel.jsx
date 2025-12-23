@@ -1,8 +1,5 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
-import {
-  fetchPreview,
-  highlightWidget,
-} from "../../queries/previewManager";
+import { fetchPreview, highlightWidget } from "../../queries/previewManager";
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
 import { API_URL } from "../../config";
@@ -100,46 +97,50 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     if (!initialLoadComplete) return;
 
     const previousState = previousStateRef.current;
-    
+
     // Check if only selection changed (no reload needed, just highlight)
-    const contentChanged = 
+    const contentChanged =
       JSON.stringify(page) !== JSON.stringify(previousState?.page) ||
       JSON.stringify(widgets) !== JSON.stringify(previousState?.widgets) ||
       JSON.stringify(globalWidgets) !== JSON.stringify(previousState?.globalWidgets) ||
       JSON.stringify(themeSettings) !== JSON.stringify(previousState?.themeSettings);
-    
+
     if (!contentChanged) {
       // Only selection changed - just update highlight
       if (iframeRef.current) {
         highlightWidget(iframeRef.current, selectedWidgetId || selectedGlobalWidgetId, selectedBlockId);
       }
       previousStateRef.current = {
-        page, widgets, globalWidgets, themeSettings,
-        selectedWidgetId, selectedBlockId, selectedGlobalWidgetId,
+        page,
+        widgets,
+        globalWidgets,
+        themeSettings,
+        selectedWidgetId,
+        selectedBlockId,
+        selectedGlobalWidgetId,
       };
       return;
     }
-    
+
     // Send IMMEDIATE real-time updates for changed widget settings
     // This provides instant feedback while the debounced reload is pending
     if (iframeRef.current?.contentWindow && previousState?.widgets) {
       Object.entries(widgets || {}).forEach(([widgetId, widget]) => {
         const oldWidget = previousState.widgets[widgetId];
         if (!oldWidget) return; // New widget, will be handled by reload
-        
+
         // Check for setting changes (not structural)
         const settingsChanged = JSON.stringify(widget.settings) !== JSON.stringify(oldWidget.settings);
         const blocksSettingsChanged = widget.blocksOrder?.some((blockId) => {
           const newBlock = widget.blocks?.[blockId];
           const oldBlock = oldWidget.blocks?.[blockId];
-          return newBlock && oldBlock && 
-            JSON.stringify(newBlock.settings) !== JSON.stringify(oldBlock.settings);
+          return newBlock && oldBlock && JSON.stringify(newBlock.settings) !== JSON.stringify(oldBlock.settings);
         });
-        
+
         if (settingsChanged || blocksSettingsChanged) {
           // Compute changed settings only
           const changes = { settings: {}, blocks: {} };
-          
+
           if (settingsChanged) {
             Object.entries(widget.settings || {}).forEach(([key, value]) => {
               if (JSON.stringify(value) !== JSON.stringify(oldWidget.settings?.[key])) {
@@ -147,7 +148,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
               }
             });
           }
-          
+
           if (blocksSettingsChanged) {
             widget.blocksOrder?.forEach((blockId) => {
               const newBlock = widget.blocks?.[blockId];
@@ -165,27 +166,30 @@ const PreviewPanel = forwardRef(function PreviewPanel(
               }
             });
           }
-          
+
           // Send update to iframe
-          iframeRef.current.contentWindow.postMessage({
-            type: "UPDATE_WIDGET_SETTINGS",
-            payload: { widgetId, changes }
-          }, "*");
+          iframeRef.current.contentWindow.postMessage(
+            {
+              type: "UPDATE_WIDGET_SETTINGS",
+              payload: { widgetId, changes },
+            },
+            "*",
+          );
         }
       });
     }
-    
+
     // Content changed - debounce the reload
     const timeoutId = setTimeout(async () => {
       try {
         // Save scroll position
         const scrollY = iframeRef.current?.contentWindow?.scrollY || 0;
-        
+
         // Fetch fresh HTML
         const enhancedPageData = { ...page, globalWidgets };
         const html = await fetchPreview(enhancedPageData, themeSettings);
         setPreviewHtml(html);
-        
+
         // Restore scroll position after load
         const handleLoad = () => {
           iframeRef.current?.contentWindow?.scrollTo(0, scrollY);
@@ -196,20 +200,25 @@ const PreviewPanel = forwardRef(function PreviewPanel(
             }
           }, 100);
         };
-        
+
         if (iframeRef.current) {
-          iframeRef.current.addEventListener('load', handleLoad, { once: true });
+          iframeRef.current.addEventListener("load", handleLoad, { once: true });
         }
       } catch (err) {
         console.error("Preview reload error:", err);
       }
-      
+
       previousStateRef.current = {
-        page, widgets, globalWidgets, themeSettings,
-        selectedWidgetId, selectedBlockId, selectedGlobalWidgetId,
+        page,
+        widgets,
+        globalWidgets,
+        themeSettings,
+        selectedWidgetId,
+        selectedBlockId,
+        selectedGlobalWidgetId,
       };
     }, 300); // 300ms debounce
-    
+
     return () => clearTimeout(timeoutId);
   }, [
     initialLoadComplete,
@@ -241,7 +250,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           onWidgetSelect?.(widgetId);
           if (blockId) {
             // We need to set the block ID after the widget ID, as setting the widget ID clears the block ID
-            // Using a small timeout to ensure the state update order if needed, 
+            // Using a small timeout to ensure the state update order if needed,
             // but since zustand is synchronous, calling them in order should work.
             // However, React batching might be an issue if they trigger re-renders.
             // But let's try direct calls first.
@@ -266,7 +275,11 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   );
 
   return (
-    <div className="flex-1 bg-white relative">
+    <div
+      className={`flex-1 relative transition-colors duration-300 ${
+        previewMode === "desktop" ? "bg-white" : "bg-slate-200"
+      }`}
+    >
       {loading && (
         <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-20">
           <div className="text-center">
@@ -304,11 +317,12 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         srcDoc={iframeSrcDoc}
         title="Page Preview"
         sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-        className={`w-full h-full border-0 transition-all duration-300 ease-in-out ${
-          previewMode === "desktop" ? "max-w-full" : ""
-        } ${previewMode === "tablet" ? "max-w-3xl mx-auto shadow-2xl" : ""} ${
-          previewMode === "mobile" ? "max-w-sm mx-auto shadow-2xl" : ""
+        className={`w-full h-full border-0 transition-all duration-300 ease-in-out mx-auto ${
+          previewMode !== "desktop" ? "shadow-2xl" : ""
         }`}
+        style={{
+          maxWidth: previewMode === "desktop" ? "100%" : previewMode === "tablet" ? "48rem" : "24rem",
+        }}
         onLoad={() => {
           // This will be called after the initial srcDoc is loaded
           setInitialLoadComplete(true);

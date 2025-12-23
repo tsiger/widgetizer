@@ -16,7 +16,9 @@ import useNavigationGuard from "../hooks/useNavigationGuard";
 export default function PageEditor() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
-  const [previewMode, setPreviewMode] = useState("desktop");
+  const [previewMode, setPreviewMode] = useState(() => {
+    return localStorage.getItem("editorPreviewMode") || "desktop";
+  });
   const previewIframeRef = useRef(null);
 
   const { page, loading, error, themeSettings } = usePageStore();
@@ -94,11 +96,7 @@ export default function PageEditor() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-slate-900">
-      <EditorTopBar
-        pageName={page.name}
-        pageId={page.id}
-        onPreviewModeChange={setPreviewMode}
-      >
+      <EditorTopBar pageName={page.name} pageId={page.id} onPreviewModeChange={setPreviewMode}>
         <ThemeSelector />
       </EditorTopBar>
 
