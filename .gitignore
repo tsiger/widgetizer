@@ -20,4 +20,3 @@ data/projects/*
 .env.test
 .env.production
 logs/
-docs/icons.json
