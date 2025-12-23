@@ -484,6 +484,40 @@ Outputs all stylesheets that have been registered using `{% enqueue_style %}`.
 {% render_styles %}
 ```
 
+#### Placeholder Image
+
+Outputs a placeholder image for development and preview purposes. Theme authors can use the default core placeholder or provide a custom image from their theme's `assets/` folder.
+
+**Basic Usage:**
+
+```liquid
+{# Core placeholder as <img> tag #}
+{% placeholder_image %}
+
+{# Core placeholder URL for inline styles #}
+{% placeholder_image 'url' %}
+
+{# Custom theme placeholder from assets/ folder #}
+{% placeholder_image 'my-placeholder.png' %}
+{% placeholder_image 'my-placeholder.jpg', 'url' %}
+```
+
+**Options (for `<img>` output):**
+
+```liquid
+{% placeholder_image 'custom.svg', { "alt": "Add image here", "class": "placeholder", "loading": "lazy" } %}
+```
+
+| Option    | Description                             |
+| :-------- | :-------------------------------------- |
+| `alt`     | Alt text (default: "Placeholder image") |
+| `class`   | CSS class for the `<img>` tag           |
+| `loading` | Loading attribute (`"lazy"`, etc.)      |
+| `width`   | Width attribute                         |
+| `height`  | Height attribute                        |
+
+**Supported formats:** SVG, JPG, JPEG, PNG, GIF, WebP
+
 ## 6. Widgets
 
 Widgets are reusable components that can be added to pages. Each widget is a self-contained Liquid template with embedded configuration schema.

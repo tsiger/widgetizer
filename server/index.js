@@ -20,6 +20,7 @@ import previewRoutes from "./routes/preview.js";
 import exportRoutes from "./routes/export.js";
 import appSettingsRoutes from "./routes/appSettings.js";
 import coreWidgetsRoutes from "./routes/coreWidgets.js";
+import coreRoutes from "./routes/core.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -46,6 +47,7 @@ app.use("/api/media", apiLimiter, mediaRoutes);
 app.use("/api/export", apiLimiter, exportRoutes);
 app.use("/api/settings", apiLimiter, appSettingsRoutes);
 app.use("/api/core-widgets", apiLimiter, coreWidgetsRoutes);
+app.use("/api/core", apiLimiter, coreRoutes);
 
 // Serve static files from the themes directory
 // TODO: We use this only for the theme screenshot.png.

@@ -18,6 +18,7 @@ import { EnqueueStyleTag } from "../../src/core/tags/enqueueStyle.js";
 import { EnqueueScriptTag } from "../../src/core/tags/enqueueScript.js";
 import { RenderStylesTag } from "../../src/core/tags/renderStyles.js";
 import { RenderScriptsTag } from "../../src/core/tags/renderScripts.js";
+import { PlaceholderImageTag } from "../../src/core/tags/placeholderImageTag.js";
 import { registerImageFilter } from "../../src/core/filters/imageFilter.js";
 import { registerVideoFilter } from "../../src/core/filters/videoFilter.js";
 import { registerAudioFilter } from "../../src/core/filters/audioFilter.js";
@@ -50,6 +51,7 @@ engine.registerTag("enqueue_style", EnqueueStyleTag);
 engine.registerTag("enqueue_script", EnqueueScriptTag);
 engine.registerTag("render_styles", RenderStylesTag);
 engine.registerTag("render_scripts", RenderScriptsTag);
+engine.registerTag("placeholder_image", PlaceholderImageTag);
 
 // Register custom filters
 registerImageFilter(engine);
