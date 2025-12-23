@@ -199,6 +199,17 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
 
   const projectIcons = global.iconsCache.get(projectId) || { icons: {} };
 
+  // Flatten grouped icons into a single icons object for Liquid templates
+  // Supports both: { icons: {...} } and { groups: { "Category": {...} } }
+  let flatIcons = {};
+  if (projectIcons.icons && typeof projectIcons.icons === "object") {
+    flatIcons = projectIcons.icons;
+  } else if (projectIcons.groups && typeof projectIcons.groups === "object") {
+    Object.values(projectIcons.groups).forEach((groupIcons) => {
+      Object.assign(flatIcons, groupIcons);
+    });
+  }
+
   // Use shared globals if provided, otherwise create new ones
   const globals = sharedGlobals || {
     projectId,
@@ -211,7 +222,7 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
 
   // Always ensure icons are present in globals (whether shared or new)
   if (!globals.icons) {
-    globals.icons = projectIcons.icons || {};
+    globals.icons = flatIcons;
     globals.iconPrefix = projectIcons.prefix || "";
   }
 

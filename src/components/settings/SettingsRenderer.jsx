@@ -101,6 +101,7 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
             {...inputProps}
             options={setting.options} // Pass explicit options if any
             allow_patterns={setting.allow_patterns} // Pass patterns if any
+            defaultValue={setting.default} // Pass default to compare
           />
         );
       default:
