@@ -241,10 +241,6 @@
 
       /* Layout: Centered (alternating sides) */
       &.layout-centered {
-        & .widget-content {
-          max-width: 90rem;
-          margin-inline: auto;
-        }
 
         @media (min-width: 990px) {
           & .timeline-list {
@@ -322,7 +318,7 @@
       </div>
     {% endif %}
 
-    <div class="widget-content">
+    <div class="widget-content {% if widget.settings.layout == 'centered' %}widget-content-lg{% endif %}">
       <ul class="timeline-list">
         {% assign item_index = 0 %}
         {% for blockId in widget.blocksOrder %}

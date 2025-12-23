@@ -72,6 +72,7 @@ img {
   --container-max-width: 142rem; /* 1420px */
 
   /* Content Width Constraints */
+  --content-width-xs: 40rem; /* 400px - Narrow content (schedules, forms) */
   --content-width-sm: 60rem; /* 600px - Forms, modals */
   --content-width-md: 80rem; /* 800px - Text-heavy sections */
   --content-width-lg: 90rem; /* 900px - Comfortable reading width */
@@ -363,6 +364,11 @@ body {
 }
 
 /* Content width modifiers */
+.widget-content-xs {
+  max-width: var(--content-width-xs);
+  margin-inline: auto;
+}
+
 .widget-content-sm {
   max-width: var(--content-width-sm);
   margin-inline: auto;

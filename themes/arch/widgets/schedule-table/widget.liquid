@@ -10,8 +10,6 @@
         display: flex;
         flex-direction: column;
         gap: 0;
-        max-width: 400px;
-        margin-inline: auto;
       }
 
       & .schedule-row {
@@ -75,7 +73,7 @@
       </div>
     {% endif %}
 
-    <div class="widget-content">
+    <div class="widget-content widget-content-xs">
       <div class="schedule-list">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}

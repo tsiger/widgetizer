@@ -12,12 +12,6 @@
         gap: var(--space-lg);
       }
 
-      /* Centered form when no sidebar */
-      & .contact-content.no-sidebar {
-        max-width: 60rem;
-        margin-inline: auto;
-      }
-
       & .contact-form {
         display: flex;
         flex-direction: column;
@@ -173,7 +167,7 @@
       </div>
     {% endif %}
 
-    <div class="widget-content">
+    <div class="widget-content {% unless widget.settings.show_sidebar %}widget-content-sm{% endunless %}">
       <div class="contact-content {% unless widget.settings.show_sidebar %}no-sidebar{% endunless %}">
         <!-- Contact Form -->
         <form
