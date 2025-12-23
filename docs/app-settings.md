@@ -19,6 +19,7 @@ The App Settings system has been **refactored** to use a clean, modular architec
 
 - **Maximum Image File Size**: Controls the size limit for individual image uploads across all projects
 - **Maximum Video File Size**: Controls the size limit for individual video uploads across all projects (separate from image limit)
+- **Maximum Audio File Size**: Controls the size limit for individual audio uploads across all projects (separate from image and video limits)
 
 #### Image Processing Configuration
 
@@ -137,6 +138,7 @@ The file size settings demonstrate server-side enforcement:
 3.  Before processing the upload, the server-side controller (`mediaController.js`) reads the appropriate size limit directly from the application's settings file:
     - `maxFileSizeMB` for images
     - `maxVideoSizeMB` for videos
+    - `maxAudioSizeMB` for audios
 4.  It compares each uploaded file's size against the appropriate limit. If a file is too large, the server rejects it and sends an error message back to the client.
 
 ### Image Processing Configuration

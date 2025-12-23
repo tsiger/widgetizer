@@ -124,6 +124,28 @@ The media library supports video uploads alongside images with the following fea
 - `thumbnail`: Always `null` for videos (no thumbnails generated)
 - No additional metadata is extracted or stored for videos
 
+### Audio Support
+
+The media library supports audio uploads alongside images and videos with the following features:
+
+**Supported Audio Formats:**
+
+- MP3 (audio/mpeg)
+
+**Audio Processing:**
+
+- **No Processing**: Audio files are uploaded and stored as-is without any processing
+- **No Thumbnails**: Audio files do not generate thumbnail images
+- **Simple Storage**: Audio files maintain their original quality and file size
+- **Separate Directory**: Audio files are stored in `/uploads/audios/` directory
+- **Size Limits**: Audio files have separate size limits from images and videos (configurable in App Settings)
+
+**Audio-Specific Metadata:**
+
+- `thumbnail`: Always `null` for audio files
+- Metadata includes `title` and `description` (both optional)
+- No additional metadata is extracted or stored for audio files
+
 ## 2. Frontend Implementation (`src/pages/Media.jsx`)
 
 The Media page has been **refactored** into a clean, modular architecture with the main component acting as an orchestrator for several specialized hooks and UI components.

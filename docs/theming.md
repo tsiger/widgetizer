@@ -228,15 +228,19 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
     {% fonts_preconnect %}      <!-- Font preconnection links -->
     {% fonts_stylesheet %}      <!-- Font stylesheets -->
     {% asset "base.css" %}      <!-- Load theme CSS -->
-    {% asset "header_scripts.js" %} <!-- Load header scripts -->
+    {% render_styles %}         <!-- Render enqueued styles -->
     {% theme_settings %}        <!-- Output CSS variables from global settings -->
 </head>
 <body class="{{ body_class }}">
-    <div class="container">
-        {{ content }}           <!-- Page content insertion point -->
-    </div>
+    {{ header }}                <!-- Global header widget -->
 
-    {% asset "footer_scripts.js" %} <!-- Load footer scripts -->
+    <main id="main-content">
+        {{ main_content }}      <!-- Page content insertion point -->
+    </main>
+
+    {{ footer }}                <!-- Global footer widget -->
+
+    {% render_scripts %}        <!-- Render enqueued scripts -->
 </body>
 </html>
 ```
@@ -248,14 +252,18 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 - `{% fonts_stylesheet %}`: Includes CSS for selected fonts
 - `{% asset "filename" %}`: Loads and includes assets from the `/assets/` directory
 - `{% theme_settings %}`: Outputs CSS custom properties from global settings as `<style>` tags in the document head
-- `{{ content }}`: The insertion point for page content
+- `{{ header }}`: Renders the global header widget
+- `{{ main_content }}`: The insertion point for page content (widgets)
+- `{{ footer }}`: Renders the global footer widget
 - `{{ body_class }}`: Dynamic CSS classes for the body element
 
 ### Available Template Variables (Layout Only)
 
 The `layout.liquid` template has access to additional objects that individual widgets cannot access:
 
-- `{{ content }}`: Rendered page content (all widgets combined)
+- `{{ header }}`: Rendered header content
+- `{{ main_content }}`: Rendered main page content
+- `{{ footer }}`: Rendered footer content
 - `{{ body_class }}`: Dynamic CSS classes for the body element
 - `{{ page.* }}`: Current page data
 - `{{ project.* }}`: Project information
@@ -419,6 +427,62 @@ The `video` filter renders HTML5 video elements with proper attributes and fallb
 | 3        | `muted`    | Boolean | `false` | Mute video by default. Pass `true` to enable.   |
 | 4        | `loop`     | Boolean | `false` | Loop video playback. Pass `true` to enable.     |
 | 5        | `class`    | String  | `''`    | CSS class for the `<video>` tag.                |
+
+### Asset Management Tags
+
+These tags allow for efficient, deduplicated loading of assets (CSS and JS) in your theme. They are particularly useful when multiple widgets might require the same library (e.g., a slider plugin), ensuring it is only loaded once.
+
+#### Enqueue Script
+
+Registers a JavaScript file for loading. The script will be output where `{% render_scripts %}` is placed (usually in the footer).
+
+**Usage:**
+
+```liquid
+{% enqueue_script "filename.js" %}
+{% enqueue_script "vendor.js", { "defer": false, "async": true } %}
+```
+
+**Options:**
+
+- `defer`: (Boolean, default: `true`) Whether to add the `defer` attribute.
+- `async`: (Boolean, default: `false`) Whether to add the `async` attribute.
+
+#### Enqueue Style
+
+Registers a CSS file for loading. The stylesheet will be output where `{% render_styles %}` is placed (usually in the head).
+
+**Usage:**
+
+```liquid
+{% enqueue_style "filename.css" %}
+{% enqueue_style "print.css", { "media": "print" } %}
+```
+
+**Options:**
+
+- `media`: (String, default: `null`) The value for the `media` attribute (e.g., `"screen"`, `"print"`).
+- `id`: (String, default: `null`) The value for the `id` attribute.
+
+#### Render Scripts
+
+Outputs all scripts that have been registered using `{% enqueue_script %}`.
+
+**Usage:** Place this tag in your `layout.liquid` file, traditionally just before the closing `</body>` tag.
+
+```liquid
+{% render_scripts %}
+```
+
+#### Render Styles
+
+Outputs all stylesheets that have been registered using `{% enqueue_style %}`.
+
+**Usage:** Place this tag in your `layout.liquid` file, traditionally inside the `<head>` section.
+
+```liquid
+{% render_styles %}
+```
 
 ## 6. Widgets
 
