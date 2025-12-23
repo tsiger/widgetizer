@@ -624,3 +624,40 @@ export async function getProjectWidgets(req, res) {
     res.status(500).json({ error: `Failed to get project widgets: ${error.message}` });
   }
 }
+
+// Get project icons
+export async function getProjectIcons(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { projectId } = req.params;
+
+    // Need to look up project to get the slug/folder name
+    const data = await readProjectsFile();
+    const project = data.projects.find((p) => p.id === projectId);
+
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    const projectSlug = project.slug || project.id;
+    const projectRootDir = getProjectDir(projectSlug);
+    const iconsPath = path.join(projectRootDir, "assets", "icons.json");
+
+    if (await fs.pathExists(iconsPath)) {
+      const content = await fs.readFile(iconsPath, "utf8");
+      const iconsData = JSON.parse(content);
+      // Return the full icons object (including prefix and icons map)
+      res.json(iconsData);
+    } else {
+      // Return empty structure if no icons file exists
+      res.json({ icons: {} });
+    }
+  } catch (error) {
+    console.error("Error getting project icons:", error);
+    res.status(500).json({ error: "Failed to get project icons" });
+  }
+}

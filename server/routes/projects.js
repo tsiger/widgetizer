@@ -53,7 +53,15 @@ router.post(
 router.get(
   "/:projectId/widgets",
   [param("projectId").notEmpty().withMessage("Project ID is required.")],
+  [param("projectId").notEmpty().withMessage("Project ID is required.")],
   projectController.getProjectWidgets,
+);
+
+// GET /api/projects/:projectId/icons - Get project icons
+router.get(
+  "/:projectId/icons",
+  [param("projectId").notEmpty().withMessage("Project ID is required.")],
+  projectController.getProjectIcons,
 );
 
 export default router;

@@ -69,9 +69,7 @@
           {% assign block = widget.blocks[blockId] %}
           <li class="widget-card" data-block-id="{{ blockId }}">
             {% if block.settings.icon != blank %}
-              <svg class="widget-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                {% render 'icon', icon: block.settings.icon %}
-              </svg>
+              {% render 'icon', icon: block.settings.icon, class: 'widget-card-icon' %}
             {% endif %}
             {% if block.settings.title != blank %}
               <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>

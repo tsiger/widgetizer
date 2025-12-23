@@ -14,6 +14,7 @@ import {
   AudioInput,
   LinkInput,
   YouTubeInput,
+  IconInput,
 } from "./inputs";
 import SettingsField from "./SettingsField";
 
@@ -94,6 +95,14 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
         return <LinkInput {...inputProps} />;
       case "youtube":
         return <YouTubeInput {...inputProps} setting={setting} />;
+      case "icon":
+        return (
+          <IconInput
+            {...inputProps}
+            options={setting.options} // Pass explicit options if any
+            allow_patterns={setting.allow_patterns} // Pass patterns if any
+          />
+        );
       default:
         return <div>Unsupported setting type: {type}</div>;
     }

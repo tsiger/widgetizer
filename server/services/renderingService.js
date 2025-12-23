@@ -148,6 +148,57 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     console.warn(`Could not read or parse media file for project ${projectId}: ${err.message}`);
   }
 
+  // Cache for project icons (with mtime tracking)
+  if (!global.iconsCache) {
+    global.iconsCache = new Map(); // projectId -> { icons: {}, prefix: '', mtime: number }
+  }
+
+  // Check if icons need to be reloaded (new project, or file changed in preview mode)
+  let shouldReloadIcons = !global.iconsCache.has(projectId);
+
+  const projectSlug = await getProjectSlug(projectId);
+  const projectDir = getProjectDir(projectSlug);
+  const iconsPath = path.join(projectDir, "assets", "icons.json");
+
+  if (!shouldReloadIcons && renderMode === "preview") {
+    // In preview mode, check if file has been modified since last cache
+    try {
+      const stats = await fs.stat(iconsPath);
+      const cachedData = global.iconsCache.get(projectId);
+      if (!cachedData?.mtime || stats.mtimeMs > cachedData.mtime) {
+        shouldReloadIcons = true;
+      }
+    } catch {
+      // File doesn't exist or can't be read, will handle below
+    }
+  }
+
+  if (shouldReloadIcons) {
+    try {
+      if (
+        await fs
+          .access(iconsPath)
+          .then(() => true)
+          .catch(() => false)
+      ) {
+        const stats = await fs.stat(iconsPath);
+        const content = await fs.readFile(iconsPath, "utf8");
+        const iconsData = JSON.parse(content);
+        global.iconsCache.set(projectId, { ...iconsData, mtime: stats.mtimeMs });
+      } else {
+        global.iconsCache.set(projectId, { icons: {}, mtime: 0 });
+      }
+    } catch (err) {
+      console.warn(`Failed to load icons for project ${projectId}:`, err);
+      // Ensure we have an entry even if failed
+      if (!global.iconsCache.has(projectId)) {
+        global.iconsCache.set(projectId, { icons: {}, mtime: 0 });
+      }
+    }
+  }
+
+  const projectIcons = global.iconsCache.get(projectId) || { icons: {} };
+
   // Use shared globals if provided, otherwise create new ones
   const globals = sharedGlobals || {
     projectId,
@@ -157,6 +208,12 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     enqueuedStyles: new Map(),
     enqueuedScripts: new Map(),
   };
+
+  // Always ensure icons are present in globals (whether shared or new)
+  if (!globals.icons) {
+    globals.icons = projectIcons.icons || {};
+    globals.iconPrefix = projectIcons.prefix || "";
+  }
 
   // Return the base context
   return {

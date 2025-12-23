@@ -26,20 +26,10 @@
       "displayName": "Feature",
       "settings": [
         {
-          "type": "select",
+          "type": "icon",
           "id": "icon",
           "label": "Icon",
-          "default": "lightning",
-          "options": [
-            { "value": "lightning", "label": "Lightning" },
-            { "value": "phone", "label": "Phone / Mobile" },
-            { "value": "shield", "label": "Shield / Security" },
-            { "value": "chart", "label": "Chart / Analytics" },
-            { "value": "star", "label": "Star" },
-            { "value": "heart", "label": "Heart" },
-            { "value": "check", "label": "Checkmark" },
-            { "value": "cog", "label": "Cog / Settings" }
-          ]
+          "default": "cloud-lightning"
         },
         {
           "type": "text",
@@ -60,7 +50,7 @@
     {
       "type": "feature",
       "settings": {
-        "icon": "lightning",
+        "icon": "cloud-lightning",
         "title": "Lightning Fast",
         "description": "Experience blazing fast performance with our optimized infrastructure."
       }
@@ -68,7 +58,7 @@
     {
       "type": "feature",
       "settings": {
-        "icon": "shield",
+        "icon": "check-circle",
         "title": "Secure & Reliable",
         "description": "Your data is protected with enterprise-grade security and 99.9% uptime."
       }
@@ -76,7 +66,7 @@
     {
       "type": "feature",
       "settings": {
-        "icon": "phone",
+        "icon": "layers",
         "title": "Mobile Ready",
         "description": "Perfect experience across all devices, from desktop to mobile."
       }
@@ -84,7 +74,7 @@
     {
       "type": "feature",
       "settings": {
-        "icon": "chart",
+        "icon": "bar-chart",
         "title": "Advanced Analytics",
         "description": "Track your growth with powerful insights and detailed reports."
       }
