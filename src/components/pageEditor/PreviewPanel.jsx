@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
-import { fetchPreview } from "../../queries/previewManager";
+import { fetchPreview, scrollWidgetIntoView } from "../../queries/previewManager";
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
 import { API_URL } from "../../config";
@@ -188,10 +188,22 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         const html = await fetchPreview(enhancedPageData, themeSettings);
         setPreviewHtml(html);
 
-        // Restore scroll position after load
+        // Restore scroll position OR scroll to newly added widget
         const handleLoad = () => {
-          iframeRef.current?.contentWindow?.scrollTo(0, scrollY);
-          // Overlay will auto-sync on load event
+          // Check if the selected widget is new (not in previous widgets)
+          const isNewWidget = selectedWidgetId && previousState?.widgets && !previousState.widgets[selectedWidgetId];
+          
+          if (isNewWidget && iframeRef.current) {
+            // First restore scroll position instantly (so scroll starts from where user was)
+            iframeRef.current.contentWindow?.scrollTo(0, scrollY);
+            // Then smooth scroll to the newly added widget
+            setTimeout(() => {
+              scrollWidgetIntoView(iframeRef.current, selectedWidgetId);
+            }, 50);
+          } else {
+            // Restore scroll position for regular updates
+            iframeRef.current?.contentWindow?.scrollTo(0, scrollY);
+          }
         };
 
         if (iframeRef.current) {
