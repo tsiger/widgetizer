@@ -212,8 +212,7 @@
               {% if block.settings.avatar != blank %}
                 {{ block.settings.avatar | image: 'small', 'testimonial-avatar' }}
               {% else %}
-                {% assign initials = block.settings.name | slice: 0 %}
-                <div class="testimonial-avatar-placeholder">{{ initials }}</div>
+                <div class="testimonial-avatar-placeholder" style="background-image: url({% placeholder_image 'square', 'url' %}); background-size: cover; background-position: center;"></div>
               {% endif %}
 
               <div class="testimonial-info">

@@ -80,7 +80,8 @@
         "quote": "Working with this team has been an absolute pleasure. They delivered beyond our expectations and the results speak for themselves.",
         "name": "Sarah Johnson",
         "title": "Marketing Director, TechCorp",
-        "rating": "5"
+        "rating": "5",
+        "avatar": "placeholder"
       }
     },
     {
@@ -89,7 +90,8 @@
         "quote": "The attention to detail and commitment to quality is unmatched. I've recommended them to everyone I know.",
         "name": "Michael Chen",
         "title": "Founder, StartupXYZ",
-        "rating": "5"
+        "rating": "5",
+        "avatar": "placeholder"
       }
     },
     {
@@ -98,7 +100,8 @@
         "quote": "From start to finish, the experience was seamless. They truly understand what their customers need.",
         "name": "Emily Rodriguez",
         "title": "Operations Manager",
-        "rating": "5"
+        "rating": "5",
+        "avatar": "placeholder"
       }
     }
   ]

@@ -48,37 +48,43 @@
     {
       "type": "logo",
       "settings": {
-        "name": "Company 1"
+        "name": "Company 1",
+        "image": "placeholder"
       }
     },
     {
       "type": "logo",
       "settings": {
-        "name": "Company 2"
+        "name": "Company 2",
+        "image": "placeholder"
       }
     },
     {
       "type": "logo",
       "settings": {
-        "name": "Company 3"
+        "name": "Company 3",
+        "image": "placeholder"
       }
     },
     {
       "type": "logo",
       "settings": {
-        "name": "Company 4"
+        "name": "Company 4",
+        "image": "placeholder"
       }
     },
     {
       "type": "logo",
       "settings": {
-        "name": "Company 5"
+        "name": "Company 5",
+        "image": "placeholder"
       }
     },
     {
       "type": "logo",
       "settings": {
-        "name": "Company 6"
+        "name": "Company 6",
+        "image": "placeholder"
       }
     }
   ]

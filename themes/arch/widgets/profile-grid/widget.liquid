@@ -123,7 +123,7 @@
             {% if block.settings.photo != blank %}
               {{ block.settings.photo | image: 'medium', 'profile-image' }}
             {% else %}
-              <div class="profile-image-placeholder">👤</div>
+              <div class="profile-image-placeholder" style="background-image: url({% placeholder_image 'square', 'url' %}); background-size: cover; background-position: center;"></div>
             {% endif %}
 
             {% if block.settings.name != blank %}

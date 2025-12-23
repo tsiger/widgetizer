@@ -48,42 +48,48 @@
       "type": "item",
       "settings": {
         "title": "Image 1",
-        "category": "Photography"
+        "category": "Photography",
+        "image": "placeholder"
       }
     },
     {
       "type": "item",
       "settings": {
         "title": "Image 2",
-        "category": "Design"
+        "category": "Design",
+        "image": "placeholder"
       }
     },
     {
       "type": "item",
       "settings": {
         "title": "Image 3",
-        "category": "Art"
+        "category": "Art",
+        "image": "placeholder"
       }
     },
     {
       "type": "item",
       "settings": {
         "title": "Image 4",
-        "category": "Photography"
+        "category": "Photography",
+        "image": "placeholder"
       }
     },
     {
       "type": "item",
       "settings": {
         "title": "Image 5",
-        "category": "Design"
+        "category": "Design",
+        "image": "placeholder"
       }
     },
     {
       "type": "item",
       "settings": {
         "title": "Image 6",
-        "category": "Art"
+        "category": "Art",
+        "image": "placeholder"
       }
     }
   ]

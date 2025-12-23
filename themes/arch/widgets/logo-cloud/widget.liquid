@@ -99,11 +99,15 @@
               >
                 {% if block.settings.image != blank %}
                   {{ block.settings.image | image: 'small', 'logo-cloud-image', block.settings.name }}
+                {% else %}
+                  {% placeholder_image '', { "class": "logo-cloud-image", "alt": block.settings.name } %}
                 {% endif %}
               </a>
             {% else %}
               {% if block.settings.image != blank %}
                 {{ block.settings.image | image: 'small', 'logo-cloud-image', block.settings.name }}
+              {% else %}
+                {% placeholder_image '', { "class": "logo-cloud-image", "alt": block.settings.name } %}
               {% endif %}
             {% endif %}
           </li>

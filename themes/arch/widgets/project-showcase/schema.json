@@ -55,21 +55,24 @@
       "type": "project",
       "settings": {
         "title": "E-Commerce Platform",
-        "description": "A modern shopping experience with seamless checkout"
+        "description": "A modern shopping experience with seamless checkout",
+        "image": "placeholder"
       }
     },
     {
       "type": "project",
       "settings": {
         "title": "Brand Redesign",
-        "description": "Complete visual identity overhaul for a tech startup"
+        "description": "Complete visual identity overhaul for a tech startup",
+        "image": "placeholder"
       }
     },
     {
       "type": "project",
       "settings": {
         "title": "Mobile App",
-        "description": "Award-winning iOS and Android application"
+        "description": "Award-winning iOS and Android application",
+        "image": "placeholder"
       }
     }
   ]

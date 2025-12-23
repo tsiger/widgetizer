@@ -163,8 +163,10 @@
   <div class="widget-container">
     <div class="callout-wrapper">
       <div class="callout-image-wrapper">
-        {% if widget.settings.image %}
+        {% if widget.settings.image != blank %}
           {{ widget.settings.image | image: 'large', 'callout-image' }}
+        {% else %}
+          <div class="callout-image" style="background-image: url({% placeholder_image 'url' %}); background-size: cover; background-position: center;"></div>
         {% endif %}
       </div>
 

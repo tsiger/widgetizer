@@ -100,7 +100,7 @@
             {% if block.settings.image != blank %}
               {{ block.settings.image | image: 'large', 'project-image' }}
             {% else %}
-              <div class="project-image" style="background-color: var(--bg-secondary);"></div>
+              <div class="project-image" style="background-image: url({% placeholder_image 'url' %}); background-size: cover; background-position: center;"></div>
             {% endif %}
             <div class="project-overlay">
               <div class="project-content">

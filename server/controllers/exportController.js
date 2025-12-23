@@ -343,15 +343,22 @@ Sitemap: ${sitemapUrl}`;
       console.error("Error copying assets:", copyError);
     }
 
-    // --- Copy Core Assets (placeholder.svg etc.) ---
+    // --- Copy Core Assets (placeholder images) ---
     try {
       const coreAssetsDir = path.join(process.cwd(), "src", "core", "assets");
-      const corePlaceholder = path.join(coreAssetsDir, "placeholder.svg");
-      if (await fs.pathExists(corePlaceholder)) {
-        await fs.copy(corePlaceholder, path.join(outputAssetsDir, "placeholder.svg"));
+      const placeholderFiles = [
+        "placeholder.svg", // landscape (default)
+        "placeholder-portrait.svg", // portrait
+        "placeholder-square.svg", // square
+      ];
+      for (const file of placeholderFiles) {
+        const src = path.join(coreAssetsDir, file);
+        if (await fs.pathExists(src)) {
+          await fs.copy(src, path.join(outputAssetsDir, file));
+        }
       }
     } catch (coreAssetError) {
-      console.warn("Could not copy core placeholder asset:", coreAssetError.message);
+      console.warn("Could not copy core placeholder assets:", coreAssetError.message);
     }
 
     // --- Copy Widget Assets (CSS/JS) ---

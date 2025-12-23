@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
-  <rect width="1600" height="900" fill="#E5E7EB"/>
+  <rect width="1200" height="1200" fill="#E5E7EB"/>
   
   <!-- Image icon -->
-  <g transform="translate(750, 400)">
+  <g transform="translate(550, 550)">
     <!-- Frame -->
     <rect x="0" y="0" width="100" height="100" rx="8" stroke="#9CA3AF" stroke-width="4" fill="none"/>
     

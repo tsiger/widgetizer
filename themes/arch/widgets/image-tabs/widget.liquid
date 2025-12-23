@@ -156,7 +156,7 @@
           {% if first_image != blank %}
             <img src="{{ first_image }}" alt="" class="image-tabs-image" loading="lazy">
           {% else %}
-            {% placeholder_image '', { "class": "image-tabs-image" } %}
+            <div class="image-tabs-image" style="background-image: url({% placeholder_image 'url' %}); background-size: cover; background-position: center;"></div>
           {% endif %}
         </div>
 
