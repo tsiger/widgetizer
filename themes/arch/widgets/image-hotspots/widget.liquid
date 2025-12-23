@@ -243,11 +243,7 @@
         {% if widget.settings.image != blank %}
           {{ widget.settings.image | image: 'large', 'image-hotspots-image', false }}
         {% else %}
-          <img
-            class="image-hotspots-image"
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=800&fit=crop"
-            alt="{{ widget.settings.image_alt | default: 'Interactive image' }}"
-          >
+          {% placeholder_image '', { "class": "image-hotspots-image", "alt": "Interactive image" } %}
         {% endif %}
 
         <!-- Hotspots -->

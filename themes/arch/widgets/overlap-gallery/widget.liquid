@@ -145,11 +145,7 @@
             {% if block.settings.image != blank %}
               {{ block.settings.image | image: 'large', 'overlap-image' }}
             {% else %}
-              <img
-                src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=800&fit=crop"
-                alt="Placeholder image"
-                loading="lazy"
-              >
+              {% placeholder_image %}
             {% endif %}
 
             {% if block.settings.caption != blank %}

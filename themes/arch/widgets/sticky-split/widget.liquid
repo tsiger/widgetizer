@@ -113,11 +113,7 @@
             {% if widget.settings.sticky_image != blank %}
               {{ widget.settings.sticky_image | image: 'large' }}
             {% else %}
-              <img
-                src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=1000&fit=crop"
-                alt="Placeholder image"
-                loading="lazy"
-              >
+              {% placeholder_image %}
             {% endif %}
           </div>
           {% if widget.settings.sticky_title != blank %}
