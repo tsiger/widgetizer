@@ -23,6 +23,7 @@ import { registerImageFilter } from "../../src/core/filters/imageFilter.js";
 import { registerVideoFilter } from "../../src/core/filters/videoFilter.js";
 import { registerAudioFilter } from "../../src/core/filters/audioFilter.js";
 import { registerYouTubeFilter } from "../../src/core/filters/youtubeFilter.js";
+import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { getProjectSlug } from "../utils/projectHelpers.js";
 
@@ -33,33 +34,55 @@ const __dirname = dirname(__filename);
 // Get the path to core snippets (adjust path relative to this service file)
 const coreSnippetsDir = path.join(__dirname, "../../src/core/snippets");
 
-// Initialize LiquidJS engine once
-const engine = new Liquid({
-  extname: ".liquid",
-  cache: process.env.NODE_ENV === "production",
-  root: [coreSnippetsDir],
-  partials: [coreSnippetsDir],
-});
+// Cache for LiquidJS engines, keyed by project directory path
+const engineCache = new Map();
 
-// Register custom tags once
-engine.registerTag("theme_settings", ThemeSettingsTag);
-engine.registerTag("asset", AssetTag);
-engine.registerTag("fonts_preconnect", FontsPreconnectTag);
-engine.registerTag("fonts_stylesheet", FontsStylesheetTag);
-engine.registerTag("seo", SeoTag);
-engine.registerTag("enqueue_style", EnqueueStyleTag);
-engine.registerTag("enqueue_script", EnqueueScriptTag);
-engine.registerTag("render_styles", RenderStylesTag);
-engine.registerTag("render_scripts", RenderScriptsTag);
-engine.registerTag("placeholder_image", PlaceholderImageTag);
+// Helper to get or create an engine for a specific project
+function getOrCreateEngine(projectDir, themeSnippetsDir) {
+  const cacheKey = projectDir;
 
-// Register custom filters
-registerImageFilter(engine);
-registerVideoFilter(engine);
-registerAudioFilter(engine);
-registerYouTubeFilter(engine);
-import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
-registerMediaMetaFilter(engine);
+  if (engineCache.has(cacheKey)) {
+    return engineCache.get(cacheKey);
+  }
+
+  // Create a NEW engine instance with correct roots
+  const engine = new Liquid({
+    extname: ".liquid",
+    cache: process.env.NODE_ENV === "production",
+    root: [themeSnippetsDir, coreSnippetsDir],
+    partials: [themeSnippetsDir, coreSnippetsDir],
+  });
+
+  configureLiquidEngine(engine);
+
+  engineCache.set(cacheKey, engine);
+  return engine;
+}
+
+// Configure LiquidJS engine helper
+function configureLiquidEngine(engine) {
+  // Register custom tags
+  engine.registerTag("theme_settings", ThemeSettingsTag);
+  engine.registerTag("asset", AssetTag);
+  engine.registerTag("fonts_preconnect", FontsPreconnectTag);
+  engine.registerTag("fonts_stylesheet", FontsStylesheetTag);
+  engine.registerTag("seo", SeoTag);
+  engine.registerTag("enqueue_style", EnqueueStyleTag);
+  engine.registerTag("enqueue_script", EnqueueScriptTag);
+  engine.registerTag("render_styles", RenderStylesTag);
+  engine.registerTag("render_scripts", RenderScriptsTag);
+  engine.registerTag("placeholder_image", PlaceholderImageTag);
+
+  // Register custom filters
+  registerImageFilter(engine);
+  registerVideoFilter(engine);
+  registerAudioFilter(engine);
+  registerYouTubeFilter(engine);
+  registerMediaMetaFilter(engine);
+}
+
+// Global engine for fallback/static use if needed (optional, can be removed if strictly per-request)
+// Removing global engine significantly reduces risk of shared state pollution
 
 /**
  * Helper function to get project data by ID
@@ -286,8 +309,16 @@ async function renderWidget(
       widget: widgetContext,
     };
 
+    // Get theme snippets directory for this project
+    const themeSnippetsDir = path.join(projectDir, "snippets");
+
+    // Get or create cached engine
+    const engine = getOrCreateEngine(projectDir, themeSnippetsDir);
+
     // Render the template
-    let rendered = await engine.parseAndRender(templateForRender, renderContext, { globals: renderContext.globals });
+    let rendered = await engine.parseAndRender(templateForRender, renderContext, {
+      globals: renderContext.globals,
+    });
     return rendered;
   } catch (error) {
     console.error(`Error rendering widget ${widgetId} (Project: ${projectId}):`, error);
@@ -334,7 +365,7 @@ async function renderPageLayout(
       return `<html><body><h1>Error: Layout template not found</h1><pre>${readErr.message}</pre></body></html>`;
     }
 
-    // 2. Create context for layout render (use shared globals if provided)
+    // 2. Create context for layout render (use shared globals
     const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, renderMode, sharedGlobals);
 
     // 3. Load project data
@@ -351,8 +382,15 @@ async function renderPageLayout(
       body_class: pageData?.slug || "",
     };
 
-    // 5. Render the layout
-    const renderedHtml = await engine.parseAndRender(layoutTemplate, renderContext, { globals: renderContext.globals });
+    // 5. Render the layout with theme snippets path included
+    const themeSnippetsDir = path.join(projectDir, "snippets");
+
+    // Get or create cached engine
+    const engine = getOrCreateEngine(projectDir, themeSnippetsDir);
+
+    const renderedHtml = await engine.parseAndRender(layoutTemplate, renderContext, {
+      globals: renderContext.globals,
+    });
     return renderedHtml;
   } catch (error) {
     console.error(`Error rendering page layout for project ${projectId}:`, error);
@@ -361,9 +399,4 @@ async function renderPageLayout(
 }
 
 // Export the necessary functions
-export {
-  renderWidget,
-  renderPageLayout,
-  // Export the engine instance if needed elsewhere (e.g., for direct parsing)
-  // engine
-};
+export { renderWidget, renderPageLayout };
