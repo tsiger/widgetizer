@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
-import { fetchPreview, highlightWidget } from "../../queries/previewManager";
+import { fetchPreview } from "../../queries/previewManager";
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
 import { API_URL } from "../../config";
+import SelectionOverlay from "./SelectionOverlay";
 
 /**
  * Validate liveUrl to prevent malicious base href injection.
@@ -106,10 +107,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       JSON.stringify(themeSettings) !== JSON.stringify(previousState?.themeSettings);
 
     if (!contentChanged) {
-      // Only selection changed - just update highlight
-      if (iframeRef.current) {
-        highlightWidget(iframeRef.current, selectedWidgetId || selectedGlobalWidgetId, selectedBlockId);
-      }
+      // Only selection changed - overlay handles highlighting now
       previousStateRef.current = {
         page,
         widgets,
@@ -193,12 +191,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         // Restore scroll position after load
         const handleLoad = () => {
           iframeRef.current?.contentWindow?.scrollTo(0, scrollY);
-          // Re-apply highlight after reload
-          setTimeout(() => {
-            if (iframeRef.current) {
-              highlightWidget(iframeRef.current, selectedWidgetId || selectedGlobalWidgetId, selectedBlockId);
-            }
-          }, 100);
+          // Overlay will auto-sync on load event
         };
 
         if (iframeRef.current) {
@@ -231,38 +224,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     selectedGlobalWidgetId,
   ]);
 
-  // Highlight widget/block on selection change - keep this for immediate feedback
-  useEffect(() => {
-    if (!initialLoadComplete || !iframeRef.current) return;
-    highlightWidget(iframeRef.current, selectedWidgetId || selectedGlobalWidgetId, selectedBlockId);
-  }, [selectedWidgetId, selectedBlockId, selectedGlobalWidgetId, initialLoadComplete]);
-
-  // Handle messages from the iframe (e.g., widget selection)
-  useEffect(() => {
-    const handleMessage = (event) => {
-      if (event.data.type === "WIDGET_SELECTED") {
-        const { widgetId, blockId } = event.data.payload;
-
-        if (widgetId === "header" || widgetId === "footer") {
-          onGlobalWidgetSelect?.(widgetId);
-          // Global widgets don't support block selection in the current store implementation
-        } else {
-          onWidgetSelect?.(widgetId);
-          if (blockId) {
-            // We need to set the block ID after the widget ID, as setting the widget ID clears the block ID
-            // Using a small timeout to ensure the state update order if needed,
-            // but since zustand is synchronous, calling them in order should work.
-            // However, React batching might be an issue if they trigger re-renders.
-            // But let's try direct calls first.
-            onBlockSelect?.(blockId);
-          }
-        }
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [onWidgetSelect, onBlockSelect, onGlobalWidgetSelect]);
+  // Message handler moved to SelectionOverlay component
 
   // Validate URLs for security (HTML comes from our own server, so no sanitization needed)
   const safeBaseUrl = getSafeBaseUrl(activeProject?.liveUrl, document.baseURI);
@@ -327,6 +289,15 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           // This will be called after the initial srcDoc is loaded
           setInitialLoadComplete(true);
         }}
+      />
+      <SelectionOverlay
+        iframeRef={iframeRef}
+        selectedWidgetId={selectedWidgetId}
+        selectedBlockId={selectedBlockId}
+        selectedGlobalWidgetId={selectedGlobalWidgetId}
+        onWidgetSelect={onWidgetSelect}
+        onBlockSelect={onBlockSelect}
+        onGlobalWidgetSelect={onGlobalWidgetSelect}
       />
     </div>
   );

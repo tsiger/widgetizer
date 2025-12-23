@@ -286,15 +286,14 @@ export async function updatePreview(iframe, newState, oldState) {
     updateThemeSettings(iframe, newThemeSettings);
   }
 
-  // Finally, apply highlight and scroll to the selected widget/block
-  // We use a timeout to ensure the DOM is fully settled after all updates.
+  // Scroll to selected widget after DOM updates
+  // Note: Highlighting is now handled by SelectionOverlay component
   setTimeout(() => {
     const finalSelectedWidgetId = newSelectedWidgetId || newSelectedGlobalWidgetId;
-    highlightWidget(iframe, finalSelectedWidgetId, newSelectedBlockId);
     if (finalSelectedWidgetId) {
       scrollWidgetIntoView(iframe, finalSelectedWidgetId);
     }
-  }, 50); // A small delay can help prevent race conditions
+  }, 50);
 }
 
 /**
@@ -381,45 +380,9 @@ function updateThemeSettings(iframe, settings) {
   }
 }
 
-/**
- * Highlight a widget in the preview
- */
-export function highlightWidget(iframe, widgetId, blockId) {
-  if (!iframe?.contentWindow) {
-    return;
-  }
-
-  iframe.contentWindow.postMessage(
-    {
-      type: "HIGHLIGHT_WIDGET",
-      payload: {
-        widgetId,
-        blockId,
-      },
-    },
-    "*",
-  );
-}
-
-/**
- * Trigger hover effect on a widget/block in the preview
- */
-export function hoverWidget(iframe, widgetId, blockId) {
-  if (!iframe?.contentWindow) {
-    return;
-  }
-
-  iframe.contentWindow.postMessage(
-    {
-      type: "HOVER_WIDGET",
-      payload: {
-        widgetId,
-        blockId,
-      },
-    },
-    "*",
-  );
-}
+// Note: highlightWidget and hoverWidget functions removed.
+// Widget highlighting is now handled by the SelectionOverlay component
+// in the parent window, not via iframe postMessage.
 
 /**
  * Update a widget setting in the preview without reloading

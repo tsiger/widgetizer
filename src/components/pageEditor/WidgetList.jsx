@@ -24,7 +24,7 @@ import WidgetSection from "./widgets/WidgetSection";
 import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
 import useAutoSave from "../../stores/saveStore";
-import { scrollWidgetIntoView, hoverWidget } from "../../queries/previewManager";
+import { scrollWidgetIntoView } from "../../queries/previewManager";
 import WidgetSelector from "./WidgetSelector";
 import BlockSelector from "./blocks/BlockSelector";
 
@@ -57,15 +57,13 @@ export default function WidgetList({
   const [blockInsertPosition, setBlockInsertPosition] = useState(null);
 
   const { globalWidgets } = usePageStore();
-  const { deleteWidget, duplicateWidget, reorderWidgets, reorderBlocks } = useWidgetStore();
+  const { deleteWidget, duplicateWidget, reorderWidgets, reorderBlocks, setHoveredWidget } = useWidgetStore();
   const { setStructureModified } = useAutoSave();
   const { header: headerWidget, footer: footerWidget } = globalWidgets;
 
-  // Handle widget/block hover from sidebar
+  // Handle widget/block hover from sidebar - now uses store state for overlay
   const handleHover = (widgetId, blockId) => {
-    if (previewIframeRef?.current) {
-      hoverWidget(previewIframeRef.current, widgetId, blockId);
-    }
+    setHoveredWidget(widgetId, blockId);
   };
 
   const sortableWidgets = (page.widgetsOrder || []).map((widgetId) => ({

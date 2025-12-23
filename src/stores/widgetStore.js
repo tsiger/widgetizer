@@ -10,6 +10,8 @@ const useWidgetStore = create((set, get) => ({
   selectedBlockId: null,
   selectedGlobalWidgetId: null,
   selectedThemeGroup: null,
+  hoveredWidgetId: null,
+  hoveredBlockId: null,
   loading: false,
   error: null,
 
@@ -60,6 +62,13 @@ const useWidgetStore = create((set, get) => ({
     });
   },
 
+  setHoveredWidget: (widgetId, blockId = null) => {
+    set({
+      hoveredWidgetId: widgetId,
+      hoveredBlockId: blockId,
+    });
+  },
+
   generateWidgetId: () => {
     return `widget_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   },
@@ -83,14 +92,14 @@ const useWidgetStore = create((set, get) => ({
     // Process default blocks if defined in schema
     const blocks = {};
     const blocksOrder = [];
-    
+
     if (Array.isArray(schema.defaultBlocks)) {
       schema.defaultBlocks.forEach((defaultBlock) => {
         const blockId = `block_${Date.now()}_${Math.floor(Math.random() * 1000)}_${blocksOrder.length}`;
-        
+
         // Get block schema for this block type to apply defaults
         const blockSchema = schema.blocks?.find((b) => b.type === defaultBlock.type);
-        
+
         // Start with defaults from block schema
         const blockSettings = {};
         if (blockSchema && Array.isArray(blockSchema.settings)) {
@@ -100,12 +109,12 @@ const useWidgetStore = create((set, get) => ({
             }
           });
         }
-        
+
         // Override with values from defaultBlocks
         if (defaultBlock.settings) {
           Object.assign(blockSettings, defaultBlock.settings);
         }
-        
+
         blocks[blockId] = {
           type: defaultBlock.type,
           settings: blockSettings,
