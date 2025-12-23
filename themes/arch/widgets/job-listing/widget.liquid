@@ -99,6 +99,50 @@
           flex: 1;
         }
       }
+
+      /* Filter List */
+      & .job-filter-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        justify-content: center;
+        margin-block-end: var(--space-2xl);
+        padding: 0;
+        list-style: none;
+      }
+
+      /* Filter Button */
+      & .job-filter-btn {
+        padding: var(--space-sm) var(--space-lg);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        font-family: inherit;
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-light);
+        color: var(--text-muted);
+        cursor: pointer;
+        transition:
+          background-color 0.3s,
+          color 0.3s,
+          border-color 0.3s;
+
+        &:hover {
+          background-color: var(--text-primary);
+          color: var(--bg-primary);
+          border-color: var(--text-primary);
+        }
+
+        &:focus {
+          outline: var(--border-width-medium) solid var(--border-darker);
+          outline-offset: 0.2rem;
+        }
+
+        &.is-active {
+          background-color: var(--text-primary);
+          color: var(--bg-primary);
+          border-color: var(--text-primary);
+        }
+      }
     }
   </style>
 
@@ -132,11 +176,11 @@
       {% endfor %}
       {% assign dept_array = departments | split: ',' %}
 
-      <ul class="widget-filter-list" role="tablist">
+      <ul class="job-filter-list" role="tablist">
         <li role="presentation">
           <button
             type="button"
-            class="widget-filter-btn job-filter-btn is-active"
+            class="job-filter-btn is-active"
             data-filter="all"
             role="tab"
             aria-selected="true"
@@ -149,7 +193,7 @@
             <li role="presentation">
               <button
                 type="button"
-                class="widget-filter-btn job-filter-btn"
+                class="job-filter-btn"
                 data-filter="{{ dept }}"
                 role="tab"
                 aria-selected="false"
@@ -230,7 +274,7 @@
         if (!widgetElement || widgetElement.dataset.initialized) return;
         widgetElement.dataset.initialized = 'true';
 
-        const filterButtons = widgetElement.querySelectorAll('.widget-filter-btn');
+        const filterButtons = widgetElement.querySelectorAll('.job-filter-btn');
         const jobItems = widgetElement.querySelectorAll('.widget-card');
 
         const filterJobs = (filter) => {
