@@ -48,14 +48,117 @@ function loadFonts(fontsMetadata) {
   link.href = url;
 }
 
-// Scroll to widget
+// Scroll to widget and report bounds when done
+let currentSelectedWidgetId = null;
+let currentSelectedBlockId = null;
+
 function scrollToWidget(widgetId) {
+  if (!widgetId) return;
+  
+  // Update tracked selection
+  currentSelectedWidgetId = widgetId;
+  
+  const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
+  if (!widget) {
+    reportElementBounds(widgetId, currentSelectedBlockId);
+    return;
+  }
+  
+  const rect = widget.getBoundingClientRect();
+  const padding = 40; // Padding from top of viewport
+  
+  // Only skip scroll if widget top is already near top of viewport
+  const isTopNearTop = rect.top >= 0 && rect.top <= padding * 2;
+  
+  if (isTopNearTop) {
+    // Widget top is already near top, just report bounds
+    reportElementBounds(widgetId, currentSelectedBlockId);
+    return;
+  }
+  
+  // Scroll to put widget near top of viewport
+  const viewportHeight = window.innerHeight;
+  const documentHeight = document.documentElement.scrollHeight;
+  let targetScroll = window.scrollY + rect.top - padding;
+  
+  // Clamp to valid scroll range (prevent over-scroll)
+  const maxScroll = documentHeight - viewportHeight;
+  targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+  
+  // Scroll smoothly
+  window.scrollTo({
+    top: targetScroll,
+    behavior: "smooth"
+  });
+  
+  // Report bounds after scroll animation
+  setTimeout(() => {
+    reportElementBounds(widgetId, currentSelectedBlockId);
+  }, 400);
+}
+
+// Calculate and report element bounds to parent
+function reportElementBounds(widgetId, blockId = null) {
+  let bounds = null;
+  let blockBounds = null;
+
   if (widgetId) {
     const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
     if (widget) {
-      widget.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+      const rect = widget.getBoundingClientRect();
+      bounds = {
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height,
+      };
+
+      if (blockId) {
+        const block = widget.querySelector(`[data-block-id="${blockId}"]`);
+        if (block) {
+          const blockRect = block.getBoundingClientRect();
+          blockBounds = {
+            top: blockRect.top,
+            left: blockRect.left,
+            width: blockRect.width,
+            height: blockRect.height,
+          };
+        }
+      }
     }
   }
+
+  window.parent.postMessage(
+    {
+      type: "ELEMENT_BOUNDS",
+      payload: { widgetId, blockId, bounds, blockBounds },
+    },
+    "*",
+  );
+}
+
+// Report bounds on user scroll (debounced)
+let scrollDebounceTimer = null;
+function setupScrollBoundsReporting() {
+  window.addEventListener("scroll", () => {
+    if (scrollDebounceTimer) cancelAnimationFrame(scrollDebounceTimer);
+    scrollDebounceTimer = requestAnimationFrame(() => {
+      // Report selection bounds
+      if (currentSelectedWidgetId) {
+        reportElementBounds(currentSelectedWidgetId, currentSelectedBlockId);
+      }
+      // Report hover bounds
+      if (currentHoveredWidgetId) {
+        reportHoverBounds();
+      }
+    });
+  }, { passive: true });
+}
+
+// Update tracked selection
+function updateSelection(widgetId, blockId) {
+  currentSelectedWidgetId = widgetId;
+  currentSelectedBlockId = blockId;
 }
 
 // Update widget settings in real-time (for immediate feedback while typing)
@@ -140,6 +243,13 @@ function handleMessage(event) {
     case "UPDATE_WIDGET_SETTINGS":
       updateWidgetSettings(payload.widgetId, payload.changes);
       break;
+    case "GET_ELEMENT_BOUNDS":
+      reportElementBounds(payload.widgetId, payload.blockId);
+      break;
+    case "UPDATE_SELECTION":
+      updateSelection(payload.widgetId, payload.blockId);
+      reportElementBounds(payload.widgetId, payload.blockId);
+      break;
     // Legacy message types - no longer used but kept for compatibility
     case "HIGHLIGHT_WIDGET":
     case "HOVER_WIDGET":
@@ -203,10 +313,63 @@ function setupInteractionHandler() {
 }
 
 // Setup hover handler to send hover events to parent
-function setupHoverHandler() {
-  let lastHoveredWidget = null;
-  let lastHoveredBlock = null;
+let currentHoveredWidgetId = null;
+let currentHoveredBlockId = null;
 
+function reportHoverBounds() {
+  if (!currentHoveredWidgetId) {
+    window.parent.postMessage(
+      {
+        type: "WIDGET_HOVERED",
+        payload: { widgetId: null, blockId: null, bounds: null, blockBounds: null },
+      },
+      "*",
+    );
+    return;
+  }
+
+  const widget = document.querySelector(`[data-widget-id="${currentHoveredWidgetId}"]`);
+  let bounds = null;
+  let blockBounds = null;
+
+  if (widget) {
+    const rect = widget.getBoundingClientRect();
+    bounds = {
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height,
+    };
+
+    if (currentHoveredBlockId) {
+      const block = widget.querySelector(`[data-block-id="${currentHoveredBlockId}"]`);
+      if (block) {
+        const blockRect = block.getBoundingClientRect();
+        blockBounds = {
+          top: blockRect.top,
+          left: blockRect.left,
+          width: blockRect.width,
+          height: blockRect.height,
+        };
+      }
+    }
+  }
+
+  window.parent.postMessage(
+    {
+      type: "WIDGET_HOVERED",
+      payload: {
+        widgetId: currentHoveredWidgetId,
+        blockId: currentHoveredBlockId,
+        bounds,
+        blockBounds,
+      },
+    },
+    "*",
+  );
+}
+
+function setupHoverHandler() {
   document.addEventListener(
     "mouseover",
     (event) => {
@@ -217,17 +380,10 @@ function setupHoverHandler() {
       const blockId = blockEl?.getAttribute("data-block-id") || null;
 
       // Only send if changed
-      if (widgetId !== lastHoveredWidget || blockId !== lastHoveredBlock) {
-        lastHoveredWidget = widgetId;
-        lastHoveredBlock = blockId;
-
-        window.parent.postMessage(
-          {
-            type: "WIDGET_HOVERED",
-            payload: { widgetId, blockId },
-          },
-          "*",
-        );
+      if (widgetId !== currentHoveredWidgetId || blockId !== currentHoveredBlockId) {
+        currentHoveredWidgetId = widgetId;
+        currentHoveredBlockId = blockId;
+        reportHoverBounds();
       }
     },
     true,
@@ -237,16 +393,10 @@ function setupHoverHandler() {
   document.addEventListener(
     "mouseleave",
     () => {
-      if (lastHoveredWidget !== null || lastHoveredBlock !== null) {
-        lastHoveredWidget = null;
-        lastHoveredBlock = null;
-        window.parent.postMessage(
-          {
-            type: "WIDGET_HOVERED",
-            payload: { widgetId: null, blockId: null },
-          },
-          "*",
-        );
+      if (currentHoveredWidgetId !== null || currentHoveredBlockId !== null) {
+        currentHoveredWidgetId = null;
+        currentHoveredBlockId = null;
+        reportHoverBounds();
       }
     },
     true,
@@ -257,7 +407,18 @@ function setupHoverHandler() {
 function initializeRuntime() {
   setupInteractionHandler();
   setupHoverHandler();
+  setupScrollBoundsReporting();
   window.addEventListener("message", handleMessage);
+
+  // Notify parent that preview content is ready (wait for DOM to be fully parsed)
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      window.parent.postMessage({ type: "PREVIEW_READY" }, "*");
+    });
+  } else {
+    // DOM already loaded
+    window.parent.postMessage({ type: "PREVIEW_READY" }, "*");
+  }
 }
 
 // TODO: Implement safe widget initialization without eval()

@@ -159,16 +159,26 @@ export default function WidgetList({
     setIsBlockSelectorOpen(true);
   };
 
-  // Scroll selected widget into view
+  // Scroll selected widget into view in sidebar (without scrolling main page)
   useEffect(() => {
     const targetId = selectedWidgetId || selectedGlobalWidgetId;
     if (targetId) {
       const el = document.getElementById(`sidebar-widget-${targetId}`);
       if (el) {
-        // Use a small timeout to allow for any layout shifts or rendering
-        setTimeout(() => {
-          el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 100);
+        // Find the scrollable sidebar container
+        const scrollContainer = el.closest(".overflow-y-auto");
+        if (scrollContainer) {
+          // Calculate scroll position within container
+          const containerRect = scrollContainer.getBoundingClientRect();
+          const elRect = el.getBoundingClientRect();
+          const elTop = elRect.top - containerRect.top + scrollContainer.scrollTop;
+          const elCenter = elTop - containerRect.height / 2 + elRect.height / 2;
+          
+          scrollContainer.scrollTo({
+            top: Math.max(0, elCenter),
+            behavior: "smooth"
+          });
+        }
       }
     }
   }, [selectedWidgetId, selectedGlobalWidgetId]);

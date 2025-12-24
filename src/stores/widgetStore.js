@@ -199,8 +199,8 @@ const useWidgetStore = create((set, get) => ({
       widgetsOrder: newWidgetsOrder,
     });
 
-    // Select the new widget and mark changes for auto-save
-    set({ selectedWidgetId: newWidgetId, selectedBlockId: null });
+    // Select the new widget, clear hover state, and mark changes for auto-save
+    set({ selectedWidgetId: newWidgetId, selectedBlockId: null, hoveredWidgetId: null, hoveredBlockId: null });
     useAutoSave.getState().setStructureModified(true);
 
     return newWidgetId;
