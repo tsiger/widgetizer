@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import useWidgetStore from "../../stores/widgetStore";
+import usePageStore from "../../stores/pageStore";
 import { scrollWidgetIntoView } from "../../queries/previewManager";
 
 /**
@@ -19,13 +20,15 @@ export default function SelectionOverlay({
   const [blockBounds, setBlockBounds] = useState(null);
   const [widgetHoverBounds, setWidgetHoverBounds] = useState(null);
   const [blockHoverBounds, setBlockHoverBounds] = useState(null);
-  const [widgetType, setWidgetType] = useState(null);
-  const [hoverWidgetType, setHoverWidgetType] = useState(null);
+  const [widgetDisplayName, setWidgetDisplayName] = useState(null);
+  const [hoverWidgetDisplayName, setHoverWidgetDisplayName] = useState(null);
   const overlayRef = useRef(null);
 
-  // Get hover state from store (set by WidgetList on sidebar hover)
+  // Get hover state and schemas from store
   const sidebarHoveredWidgetId = useWidgetStore((state) => state.hoveredWidgetId);
   const sidebarHoveredBlockId = useWidgetStore((state) => state.hoveredBlockId);
+  const schemas = useWidgetStore((state) => state.schemas);
+  const page = usePageStore((state) => state.page);
 
   // Preview hover state (from iframe mouseover events)
   const [previewHoveredWidgetId, setPreviewHoveredWidgetId] = useState(null);
@@ -76,15 +79,17 @@ export default function SelectionOverlay({
       const widgetBounds = getElementBounds(`[data-widget-id="${effectiveWidgetId}"]`);
       setSelectionBounds(widgetBounds);
 
-      // Get widget type for label
+      // Get widget displayName for label (custom name > schema displayName > type)
       const iframe = iframeRef?.current;
       if (iframe?.contentDocument) {
         const widgetEl = iframe.contentDocument.querySelector(`[data-widget-id="${effectiveWidgetId}"]`);
-        setWidgetType(widgetEl?.getAttribute("data-widget-type") || null);
+        const type = widgetEl?.getAttribute("data-widget-type");
+        const customName = page?.widgets?.[effectiveWidgetId]?.settings?.name;
+        setWidgetDisplayName(customName || schemas[type]?.displayName || type || null);
       }
     } else {
       setSelectionBounds(null);
-      setWidgetType(null);
+      setWidgetDisplayName(null);
     }
 
     // Update block bounds
@@ -107,15 +112,17 @@ export default function SelectionOverlay({
         const bounds = getElementBounds(`[data-widget-id="${hoveredWidgetId}"]`);
         setWidgetHoverBounds(bounds);
 
-        // Get hover widget type
+        // Get hover widget displayName (custom name > schema displayName > type)
         const iframe = iframeRef?.current;
         if (iframe?.contentDocument) {
           const widgetEl = iframe.contentDocument.querySelector(`[data-widget-id="${hoveredWidgetId}"]`);
-          setHoverWidgetType(widgetEl?.getAttribute("data-widget-type") || null);
+          const type = widgetEl?.getAttribute("data-widget-type");
+          const customName = page?.widgets?.[hoveredWidgetId]?.settings?.name;
+          setHoverWidgetDisplayName(customName || schemas[type]?.displayName || type || null);
         }
       } else {
         setWidgetHoverBounds(null);
-        setHoverWidgetType(null);
+        setHoverWidgetDisplayName(null);
       }
 
       // Block hover: show when hovering a block that isn't the selected block
@@ -128,9 +135,9 @@ export default function SelectionOverlay({
     } else {
       setWidgetHoverBounds(null);
       setBlockHoverBounds(null);
-      setHoverWidgetType(null);
+      setHoverWidgetDisplayName(null);
     }
-  }, [effectiveWidgetId, selectedBlockId, hoveredWidgetId, hoveredBlockId, getElementBounds, iframeRef]);
+  }, [effectiveWidgetId, selectedBlockId, hoveredWidgetId, hoveredBlockId, getElementBounds, iframeRef, schemas, page]);
 
   // Sync on selection/hover changes
   useEffect(() => {
@@ -246,13 +253,13 @@ export default function SelectionOverlay({
             backgroundColor: "rgba(59, 130, 246, 0.05)",
           }}
         >
-          {/* Hover widget type label */}
-          {hoverWidgetType && (
+          {/* Hover widget displayName label */}
+          {hoverWidgetDisplayName && (
             <div
-              className="absolute -top-5 left-0 px-1.5 py-0.5 text-xs font-medium text-blue-600 bg-blue-100 rounded pointer-events-none"
-              style={{ fontSize: "9px" }}
+              className="absolute -top-6 left-1/2 -translate-x-1/2 px-1.5 py-0.5 text-xs font-medium text-blue-600 bg-blue-100 rounded pointer-events-none whitespace-nowrap"
+              style={{ fontSize: "11px" }}
             >
-              {hoverWidgetType}
+              {hoverWidgetDisplayName}
             </div>
           )}
         </div>
@@ -284,13 +291,13 @@ export default function SelectionOverlay({
             boxShadow: "0 0 12px rgba(59, 130, 246, 0.3)",
           }}
         >
-          {/* Widget type label */}
-          {widgetType && (
+          {/* Widget displayName label */}
+          {widgetDisplayName && (
             <div
-              className="absolute -top-6 left-0 px-2 py-0.5 text-xs font-medium text-white bg-blue-500 rounded-t pointer-events-none"
-              style={{ fontSize: "10px" }}
+              className="absolute -top-5 left-1/2 -translate-x-1/2 px-2 py-0.5 text-xs font-medium text-white bg-blue-500 rounded-t pointer-events-none whitespace-nowrap"
+              style={{ fontSize: "11px" }}
             >
-              {widgetType}
+              {widgetDisplayName}
             </div>
           )}
         </div>
