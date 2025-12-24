@@ -5,8 +5,46 @@ import usePageStore from "../../stores/pageStore";
 import { scrollWidgetIntoView } from "../../queries/previewManager";
 
 /**
- * SelectionOverlay renders selection and hover boxes on top of the preview iframe.
- * This replaces the previous approach of injecting highlight styles into the iframe.
+ * SelectionOverlay - Renders selection and hover boxes on top of the preview iframe.
+ *
+ * ## Architecture
+ * This component uses a message-based communication pattern with the iframe's previewRuntime.js
+ * to handle element bounds calculation. The iframe reports bounds via postMessage, which avoids
+ * cross-frame timing issues and ensures accurate positioning.
+ *
+ * ## Message Flow
+ *
+ * ### Selection:
+ * 1. User selects widget → effectiveWidgetId changes
+ * 2. Component sends SCROLL_TO_WIDGET message to iframe
+ * 3. Iframe scrolls to widget and reports ELEMENT_BOUNDS after scroll completes
+ * 4. Component receives bounds, translates to overlay coords, renders selection box
+ *
+ * ### Hover (from preview):
+ * 1. User hovers in iframe → iframe sends WIDGET_HOVERED with bounds
+ * 2. Component receives, translates bounds, renders hover box
+ *
+ * ### Hover (from sidebar):
+ * 1. User hovers in sidebar → sidebarHoveredWidgetId changes
+ * 2. Component calculates bounds directly (queries iframe DOM)
+ * 3. Renders hover box
+ *
+ * ### Scroll tracking:
+ * 1. User scrolls in iframe → iframe sends updated ELEMENT_BOUNDS and WIDGET_HOVERED
+ * 2. Component updates overlay positions in real-time
+ *
+ * ## Key Messages (iframe → parent):
+ * - ELEMENT_BOUNDS: Reports widget/block positions after scroll or on request
+ * - WIDGET_HOVERED: Reports hover state with bounds during hover/scroll
+ * - WIDGET_SELECTED: Reports click selection from preview
+ * - PREVIEW_READY: Signals iframe is ready for messages
+ *
+ * ## Key Messages (parent → iframe):
+ * - SCROLL_TO_WIDGET: Scroll widget into view (iframe reports bounds after)
+ * - UPDATE_SELECTION: Update tracked selection and report bounds
+ *
+ * @see src/utils/previewRuntime.js - Iframe-side message handling
+ * @see docs/selection-overlay-scenarios.md - Test scenarios
  */
 export default function SelectionOverlay({
   iframeRef,
@@ -24,10 +62,7 @@ export default function SelectionOverlay({
   const [blockHoverBounds, setBlockHoverBounds] = useState(null);
   const [widgetDisplayName, setWidgetDisplayName] = useState(null);
   const [hoverWidgetDisplayName, setHoverWidgetDisplayName] = useState(null);
-  const [isPendingRefresh, setIsPendingRefresh] = useState(false);
-  const isPendingRefreshRef = useRef(false);
   const overlayRef = useRef(null);
-  const lastWidgetsOrderRef = useRef(null);
 
   // Get hover state and schemas from store
   const sidebarHoveredWidgetId = useWidgetStore((state) => state.hoveredWidgetId);
@@ -77,134 +112,165 @@ export default function SelectionOverlay({
   );
 
   /**
-   * Sync all overlay positions
+   * Translate bounds received from iframe to overlay-relative coords
    */
-  const syncOverlay = useCallback(() => {
-    // Skip sync if refresh is pending (iframe content is stale)
-    if (isPendingRefreshRef.current) {
-      return;
-    }
+  const translateBoundsToOverlay = useCallback(
+    (iframeBounds) => {
+      if (!iframeBounds) return null;
 
-    // Update selection bounds
-    if (effectiveWidgetId) {
-      const widgetBounds = getElementBounds(`[data-widget-id="${effectiveWidgetId}"]`);
-      setSelectionBounds(widgetBounds);
-
-      // Get widget displayName for label (custom name > schema displayName > type)
       const iframe = iframeRef?.current;
-      if (iframe?.contentDocument) {
-        const widgetEl = iframe.contentDocument.querySelector(`[data-widget-id="${effectiveWidgetId}"]`);
-        const type = widgetEl?.getAttribute("data-widget-type");
-        const customName = page?.widgets?.[effectiveWidgetId]?.settings?.name;
-        setWidgetDisplayName(customName || schemas[type]?.displayName || type || null);
+      const overlayRect = overlayRef.current?.getBoundingClientRect();
+      const iframeRect = iframe?.getBoundingClientRect();
+
+      if (!overlayRect || !iframeRect) return null;
+
+      return {
+        top: iframeRect.top - overlayRect.top + iframeBounds.top,
+        left: iframeRect.left - overlayRect.left + iframeBounds.left,
+        width: iframeBounds.width,
+        height: iframeBounds.height,
+      };
+    },
+    [iframeRef],
+  );
+
+  /**
+   * Request bounds from iframe
+   */
+  const requestBounds = useCallback((widgetId, blockId = null) => {
+    const iframe = iframeRef?.current;
+    if (!iframe?.contentWindow) return;
+
+    iframe.contentWindow.postMessage(
+      {
+        type: "UPDATE_SELECTION",
+        payload: { widgetId, blockId },
+      },
+      "*",
+    );
+  }, [iframeRef]);
+
+  // Scroll and update display name when selection changes
+  useEffect(() => {
+    if (effectiveWidgetId) {
+      // Scroll to widget - iframe will report bounds after scroll settles
+      if (iframeRef?.current) {
+        scrollWidgetIntoView(iframeRef.current, effectiveWidgetId);
       }
+      
+      // Update display name
+      const customName = page?.widgets?.[effectiveWidgetId]?.settings?.name;
+      const widgetType = page?.widgets?.[effectiveWidgetId]?.type;
+      setWidgetDisplayName(customName || schemas[widgetType]?.displayName || widgetType || null);
     } else {
       setSelectionBounds(null);
       setWidgetDisplayName(null);
     }
+  }, [effectiveWidgetId, selectedBlockId, page, schemas, iframeRef]);
 
-    // Update block bounds
-    if (selectedBlockId && effectiveWidgetId) {
-      const bounds = getElementBounds(`[data-widget-id="${effectiveWidgetId}"] [data-block-id="${selectedBlockId}"]`);
-      setBlockBounds(bounds);
-    } else {
-      setBlockBounds(null);
-    }
-
-    // Update hover bounds
-    // Show widget hover when hovering a non-selected widget
-    // Show block hover when hovering a block (either in selected or non-selected widget)
-    if (hoveredWidgetId) {
-      const isHoveringSelectedWidget = hoveredWidgetId === effectiveWidgetId;
-      const isHoveringSelectedBlock = hoveredBlockId === selectedBlockId;
-
-      // Widget hover: show when hovering a different widget than selected
-      if (!isHoveringSelectedWidget) {
-        const bounds = getElementBounds(`[data-widget-id="${hoveredWidgetId}"]`);
-        setWidgetHoverBounds(bounds);
-
-        // Get hover widget displayName (custom name > schema displayName > type)
-        const iframe = iframeRef?.current;
-        if (iframe?.contentDocument) {
-          const widgetEl = iframe.contentDocument.querySelector(`[data-widget-id="${hoveredWidgetId}"]`);
-          const type = widgetEl?.getAttribute("data-widget-type");
-          const customName = page?.widgets?.[hoveredWidgetId]?.settings?.name;
-          setHoverWidgetDisplayName(customName || schemas[type]?.displayName || type || null);
-        }
-      } else {
-        setWidgetHoverBounds(null);
-        setHoverWidgetDisplayName(null);
-      }
-
-      // Block hover: show when hovering a block that isn't the selected block
-      if (hoveredBlockId && !isHoveringSelectedBlock) {
-        const bounds = getElementBounds(`[data-widget-id="${hoveredWidgetId}"] [data-block-id="${hoveredBlockId}"]`);
-        setBlockHoverBounds(bounds);
-      } else {
-        setBlockHoverBounds(null);
-      }
-    } else {
-      setWidgetHoverBounds(null);
-      setBlockHoverBounds(null);
-      setHoverWidgetDisplayName(null);
-    }
-  }, [effectiveWidgetId, selectedBlockId, hoveredWidgetId, hoveredBlockId, getElementBounds, iframeRef, schemas, page]);
-
-  // Sync on selection/hover changes
-  useEffect(() => {
-    syncOverlay();
-  }, [syncOverlay]);
-
-  // Detect page changes and hide overlay until iframe signals ready
-  useEffect(() => {
-    const currentPageData = JSON.stringify({
-      widgetsOrder: page?.widgetsOrder,
-      widgets: page?.widgets ? Object.keys(page.widgets).length : 0,
-    });
-    const previousPageData = lastWidgetsOrderRef.current;
-
-    if (previousPageData !== null && currentPageData !== previousPageData) {
-      // Page changed - hide overlay until iframe sends PREVIEW_READY
-      isPendingRefreshRef.current = true;
-      setIsPendingRefresh(true);
-      setSelectionBounds(null);
-      setBlockBounds(null);
-    }
-
-    lastWidgetsOrderRef.current = currentPageData;
-  }, [page?.widgetsOrder, page?.widgets]);
-
-  // Listen for PREVIEW_READY message from iframe
+  // Listen for all iframe messages
   useEffect(() => {
     const handleMessage = (event) => {
-      if (event.data?.type === "PREVIEW_READY") {
-        isPendingRefreshRef.current = false;
-        setIsPendingRefresh(false);
-        // Small delay to ensure DOM is fully rendered
-        requestAnimationFrame(() => {
-          syncOverlay();
-        });
+      const { type, payload } = event.data || {};
+
+      switch (type) {
+        case "PREVIEW_READY":
+          // On preview ready, scroll and request bounds
+          if (effectiveWidgetId && iframeRef?.current) {
+            scrollWidgetIntoView(iframeRef.current, effectiveWidgetId);
+          }
+          break;
+
+        case "ELEMENT_BOUNDS":
+          // Received bounds from iframe - translate and apply
+          if (payload.widgetId === effectiveWidgetId) {
+            const translated = translateBoundsToOverlay(payload.bounds);
+            setSelectionBounds(translated);
+
+            if (payload.blockId && payload.blockBounds) {
+              const translatedBlock = translateBoundsToOverlay(payload.blockBounds);
+              setBlockBounds(translatedBlock);
+            } else {
+              setBlockBounds(null);
+            }
+          }
+          break;
+
+        case "WIDGET_SELECTED":
+          if (payload.widgetId === "header" || payload.widgetId === "footer") {
+            onGlobalWidgetSelect?.(payload.widgetId);
+          } else {
+            onWidgetSelect?.(payload.widgetId);
+            if (payload.blockId) {
+              onBlockSelect?.(payload.blockId);
+            }
+          }
+          break;
+
+        case "WIDGET_HOVERED":
+          setPreviewHoveredWidgetId(payload.widgetId);
+          setPreviewHoveredBlockId(payload.blockId);
+          
+          // Handle hover bounds from message
+          if (payload.widgetId && payload.widgetId !== effectiveWidgetId) {
+            // Hovering a different widget - show widget hover
+            const translated = translateBoundsToOverlay(payload.bounds);
+            setWidgetHoverBounds(translated);
+            
+            // Get display name for hovered widget
+            const widgetType = page?.widgets?.[payload.widgetId]?.type;
+            const customName = page?.widgets?.[payload.widgetId]?.settings?.name;
+            setHoverWidgetDisplayName(customName || schemas[widgetType]?.displayName || widgetType || null);
+          } else {
+            // Hovering the selected widget or nothing - no widget hover
+            setWidgetHoverBounds(null);
+            setHoverWidgetDisplayName(null);
+          }
+          
+          // Block hover - works for any widget including the selected one
+          if (payload.blockId && payload.blockId !== selectedBlockId) {
+            const translatedBlock = translateBoundsToOverlay(payload.blockBounds);
+            setBlockHoverBounds(translatedBlock);
+          } else {
+            setBlockHoverBounds(null);
+          }
+          break;
       }
     };
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [syncOverlay]);
+  }, [effectiveWidgetId, selectedBlockId, translateBoundsToOverlay, onWidgetSelect, onBlockSelect, onGlobalWidgetSelect, iframeRef, page, schemas]);
 
-  // Sync on iframe scroll
+  // Handle sidebar hover (calculated locally since it doesn't come from iframe)
   useEffect(() => {
-    const iframe = iframeRef?.current;
-    if (!iframe?.contentWindow) return;
+    // Widget hover: show when hovering a different widget than selected
+    if (sidebarHoveredWidgetId && sidebarHoveredWidgetId !== effectiveWidgetId) {
+      const bounds = getElementBounds(`[data-widget-id="${sidebarHoveredWidgetId}"]`);
+      setWidgetHoverBounds(bounds);
 
-    const handleScroll = () => {
-      syncOverlay();
-    };
+      const widgetType = page?.widgets?.[sidebarHoveredWidgetId]?.type;
+      const customName = page?.widgets?.[sidebarHoveredWidgetId]?.settings?.name;
+      setHoverWidgetDisplayName(customName || schemas[widgetType]?.displayName || widgetType || null);
+    } else if (!previewHoveredWidgetId) {
+      // Only clear widget hover if preview isn't also hovering
+      setWidgetHoverBounds(null);
+      setHoverWidgetDisplayName(null);
+    }
 
-    iframe.contentWindow.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      iframe.contentWindow?.removeEventListener("scroll", handleScroll);
-    };
-  }, [iframeRef, syncOverlay]);
+    // Block hover: show when hovering a block that isn't the selected block
+    // This works for both the selected widget AND other widgets
+    if (sidebarHoveredBlockId && sidebarHoveredBlockId !== selectedBlockId) {
+      // Use the hovered widget if available, otherwise use the selected widget
+      const targetWidgetId = sidebarHoveredWidgetId || effectiveWidgetId;
+      if (targetWidgetId) {
+        const blockBounds = getElementBounds(`[data-widget-id="${targetWidgetId}"] [data-block-id="${sidebarHoveredBlockId}"]`);
+        setBlockHoverBounds(blockBounds);
+      }
+    } else if (!previewHoveredWidgetId) {
+      setBlockHoverBounds(null);
+    }
+  }, [sidebarHoveredWidgetId, sidebarHoveredBlockId, effectiveWidgetId, selectedBlockId, previewHoveredWidgetId, getElementBounds, page, schemas]);
 
   // Sync on iframe load
   useEffect(() => {
@@ -212,17 +278,14 @@ export default function SelectionOverlay({
     if (!iframe) return;
 
     const handleLoad = () => {
-      // Clear pending refresh state and sync overlay
-      setIsPendingRefresh(false);
-      // Small delay to ensure content is rendered
-      setTimeout(syncOverlay, 100);
+      if (effectiveWidgetId) {
+        requestBounds(effectiveWidgetId, selectedBlockId);
+      }
     };
 
     iframe.addEventListener("load", handleLoad);
-    return () => {
-      iframe.removeEventListener("load", handleLoad);
-    };
-  }, [iframeRef, syncOverlay]);
+    return () => iframe.removeEventListener("load", handleLoad);
+  }, [iframeRef, effectiveWidgetId, selectedBlockId, requestBounds]);
 
   // Sync on iframe resize (handles preview mode changes)
   useEffect(() => {
@@ -230,8 +293,10 @@ export default function SelectionOverlay({
     if (!iframe) return;
 
     const resizeObserver = new ResizeObserver(() => {
-      // Use requestAnimationFrame to debounce rapid resize events
-      requestAnimationFrame(syncOverlay);
+      if (effectiveWidgetId) {
+        // Scroll to widget after layout change (desktop/mobile switch)
+        scrollWidgetIntoView(iframe, effectiveWidgetId);
+      }
     });
 
     resizeObserver.observe(iframe);
@@ -239,12 +304,14 @@ export default function SelectionOverlay({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [iframeRef, syncOverlay]);
+  }, [iframeRef, effectiveWidgetId, selectedBlockId]);
 
   // Also sync on overlay container resize
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
-      syncOverlay();
+      if (effectiveWidgetId) {
+        requestBounds(effectiveWidgetId, selectedBlockId);
+      }
     });
 
     if (overlayRef.current) {
@@ -254,39 +321,7 @@ export default function SelectionOverlay({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [syncOverlay]);
-
-  // Listen for messages from iframe (selection and hover)
-  useEffect(() => {
-    const handleMessage = (event) => {
-      if (event.data.type === "WIDGET_SELECTED") {
-        const { widgetId, blockId } = event.data.payload;
-
-        if (widgetId === "header" || widgetId === "footer") {
-          onGlobalWidgetSelect?.(widgetId);
-        } else {
-          onWidgetSelect?.(widgetId);
-          if (blockId) {
-            onBlockSelect?.(blockId);
-          }
-        }
-      } else if (event.data.type === "WIDGET_HOVERED") {
-        const { widgetId, blockId } = event.data.payload;
-        setPreviewHoveredWidgetId(widgetId);
-        setPreviewHoveredBlockId(blockId);
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [onWidgetSelect, onBlockSelect, onGlobalWidgetSelect]);
-
-  // Scroll selected widget into view
-  useEffect(() => {
-    if (effectiveWidgetId && iframeRef?.current) {
-      scrollWidgetIntoView(iframeRef.current, effectiveWidgetId);
-    }
-  }, [effectiveWidgetId, iframeRef]);
+  }, [effectiveWidgetId, selectedBlockId, requestBounds]);
 
   return (
     <div ref={overlayRef} className="absolute inset-0 pointer-events-none z-10">
@@ -329,7 +364,7 @@ export default function SelectionOverlay({
       )}
 
       {/* Widget selection box */}
-      {selectionBounds && effectiveWidgetId && !isPendingRefresh && (
+      {selectionBounds && effectiveWidgetId && (
         <div
           className="absolute border-2 border-pink-400"
           style={{
@@ -347,7 +382,7 @@ export default function SelectionOverlay({
             style={{ pointerEvents: "auto" }}
           >
             {/* Reorder up button */}
-            {page?.widgetsOrder && selectedWidgetId && page.widgetsOrder.includes(selectedWidgetId) && (
+            {page?.widgetsOrder && page.widgetsOrder.length > 1 && selectedWidgetId && page.widgetsOrder.includes(selectedWidgetId) && (
               <button
                 className={`p-0.5 rounded bg-white border border-slate-200 shadow-sm transition-all ${
                   page.widgetsOrder.indexOf(selectedWidgetId) === 0
@@ -381,7 +416,7 @@ export default function SelectionOverlay({
             )}
 
             {/* Reorder down button */}
-            {page?.widgetsOrder && selectedWidgetId && page.widgetsOrder.includes(selectedWidgetId) && (
+            {page?.widgetsOrder && page.widgetsOrder.length > 1 && selectedWidgetId && page.widgetsOrder.includes(selectedWidgetId) && (
               <button
                 className={`p-0.5 rounded bg-white border border-slate-200 shadow-sm transition-all ${
                   page.widgetsOrder.indexOf(selectedWidgetId) === page.widgetsOrder.length - 1
@@ -408,7 +443,7 @@ export default function SelectionOverlay({
       )}
 
       {/* Block selection box */}
-      {blockBounds && !isPendingRefresh && (
+      {blockBounds && (
         <div
           className="absolute border-2 border-blue-400 pointer-events-none"
           style={{

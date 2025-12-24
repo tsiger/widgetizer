@@ -68,6 +68,7 @@ export default function WidgetItem({
             title="Duplicate widget"
             onClick={(e) => {
               e.stopPropagation();
+              if (onHover) onHover(null); // Clear hover before action
               if (onDuplicateClick) onDuplicateClick(widgetId);
             }}
           >
@@ -78,6 +79,7 @@ export default function WidgetItem({
             title="Delete widget"
             onClick={(e) => {
               e.stopPropagation();
+              if (onHover) onHover(null); // Clear hover before action
               if (onDeleteClick) onDeleteClick(widgetId);
             }}
           >
