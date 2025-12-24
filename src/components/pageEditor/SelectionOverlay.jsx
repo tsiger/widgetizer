@@ -244,19 +244,19 @@ export default function SelectionOverlay({
       {/* Widget hover box (render first so selection appears on top) */}
       {widgetHoverBounds && (
         <div
-          className="absolute border border-blue-400/60 pointer-events-none"
+          className="absolute border border-pink-300 pointer-events-none"
           style={{
             top: widgetHoverBounds.top,
             left: widgetHoverBounds.left,
             width: widgetHoverBounds.width,
             height: widgetHoverBounds.height,
-            backgroundColor: "rgba(59, 130, 246, 0.05)",
+            backgroundColor: "rgba(236, 72, 153, 0.05)",
           }}
         >
           {/* Hover widget displayName label */}
           {hoverWidgetDisplayName && (
             <div
-              className="absolute -top-6 left-1/2 -translate-x-1/2 px-1.5 py-0.5 text-xs font-medium text-blue-600 bg-blue-100 rounded pointer-events-none whitespace-nowrap"
+              className="absolute -top-6 left-1/2 -translate-x-1/2 px-1.5 py-0.5 text-xs font-medium text-pink-600 bg-pink-100 rounded pointer-events-none whitespace-nowrap"
               style={{ fontSize: "11px" }}
             >
               {hoverWidgetDisplayName}
@@ -268,13 +268,13 @@ export default function SelectionOverlay({
       {/* Block hover box */}
       {blockHoverBounds && (
         <div
-          className="absolute border border-green-400/60 pointer-events-none"
+          className="absolute border border-blue-300 pointer-events-none"
           style={{
             top: blockHoverBounds.top,
             left: blockHoverBounds.left,
             width: blockHoverBounds.width,
             height: blockHoverBounds.height,
-            backgroundColor: "rgba(34, 197, 94, 0.05)",
+            backgroundColor: "rgba(59, 130, 246, 0.05)",
           }}
         />
       )}
@@ -282,19 +282,19 @@ export default function SelectionOverlay({
       {/* Widget selection box */}
       {selectionBounds && (
         <div
-          className="absolute border-2 border-blue-500 pointer-events-none"
+          className="absolute border-2 border-pink-400 pointer-events-none"
           style={{
             top: selectionBounds.top,
             left: selectionBounds.left,
             width: selectionBounds.width,
             height: selectionBounds.height,
-            boxShadow: "0 0 12px rgba(59, 130, 246, 0.3)",
+            boxShadow: "0 0 12px rgba(236, 72, 153, 0.25)",
           }}
         >
           {/* Widget displayName label */}
           {widgetDisplayName && (
             <div
-              className="absolute -top-5 left-1/2 -translate-x-1/2 px-2 py-0.5 text-xs font-medium text-white bg-blue-500 rounded-t pointer-events-none whitespace-nowrap"
+              className="absolute -top-5 left-1/2 -translate-x-1/2 px-2 py-0.5 text-xs font-medium text-white bg-pink-500 rounded-t pointer-events-none whitespace-nowrap"
               style={{ fontSize: "11px" }}
             >
               {widgetDisplayName}
@@ -306,12 +306,13 @@ export default function SelectionOverlay({
       {/* Block selection box */}
       {blockBounds && (
         <div
-          className="absolute border-2 border-green-500 pointer-events-none"
+          className="absolute border-2 border-blue-400 pointer-events-none"
           style={{
             top: blockBounds.top,
             left: blockBounds.left,
             width: blockBounds.width,
             height: blockBounds.height,
+            boxShadow: "0 0 8px rgba(59, 130, 246, 0.2)",
           }}
         />
       )}
