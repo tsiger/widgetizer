@@ -42,6 +42,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [previewReadyKey, setPreviewReadyKey] = useState(0);
   const iframeRef = useRef(null);
 
   // A single ref to hold the entire previous state for comparison
@@ -188,15 +189,17 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         const html = await fetchPreview(enhancedPageData, themeSettings);
         setPreviewHtml(html);
 
-        // Restore scroll position OR scroll to newly added widget
+        // Restore scroll position OR scroll to selected widget after structural changes
         const handleLoad = () => {
+          // Check if the widgets order changed (reordering)
+          const orderChanged = JSON.stringify(page?.widgetsOrder) !== JSON.stringify(previousState?.page?.widgetsOrder);
           // Check if the selected widget is new (not in previous widgets)
           const isNewWidget = selectedWidgetId && previousState?.widgets && !previousState.widgets[selectedWidgetId];
-          
-          if (isNewWidget && iframeRef.current) {
+
+          if ((isNewWidget || orderChanged) && selectedWidgetId && iframeRef.current) {
             // First restore scroll position instantly (so scroll starts from where user was)
             iframeRef.current.contentWindow?.scrollTo(0, scrollY);
-            // Then smooth scroll to the newly added widget
+            // Then smooth scroll to the widget in its new position
             setTimeout(() => {
               scrollWidgetIntoView(iframeRef.current, selectedWidgetId);
             }, 50);
@@ -204,6 +207,9 @@ const PreviewPanel = forwardRef(function PreviewPanel(
             // Restore scroll position for regular updates
             iframeRef.current?.contentWindow?.scrollTo(0, scrollY);
           }
+
+          // Notify SelectionOverlay that content is ready
+          setPreviewReadyKey((prev) => prev + 1);
         };
 
         if (iframeRef.current) {
@@ -310,6 +316,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         onWidgetSelect={onWidgetSelect}
         onBlockSelect={onBlockSelect}
         onGlobalWidgetSelect={onGlobalWidgetSelect}
+        previewReadyKey={previewReadyKey}
       />
     </div>
   );

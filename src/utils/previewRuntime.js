@@ -258,6 +258,16 @@ function initializeRuntime() {
   setupInteractionHandler();
   setupHoverHandler();
   window.addEventListener("message", handleMessage);
+
+  // Notify parent that preview content is ready (wait for DOM to be fully parsed)
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      window.parent.postMessage({ type: "PREVIEW_READY" }, "*");
+    });
+  } else {
+    // DOM already loaded
+    window.parent.postMessage({ type: "PREVIEW_READY" }, "*");
+  }
 }
 
 // TODO: Implement safe widget initialization without eval()

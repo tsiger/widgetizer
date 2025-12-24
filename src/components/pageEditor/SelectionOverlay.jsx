@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import useWidgetStore from "../../stores/widgetStore";
 import usePageStore from "../../stores/pageStore";
 import { scrollWidgetIntoView } from "../../queries/previewManager";
@@ -15,6 +16,7 @@ export default function SelectionOverlay({
   onWidgetSelect,
   onBlockSelect,
   onGlobalWidgetSelect,
+  previewReadyKey,
 }) {
   const [selectionBounds, setSelectionBounds] = useState(null);
   const [blockBounds, setBlockBounds] = useState(null);
@@ -22,12 +24,16 @@ export default function SelectionOverlay({
   const [blockHoverBounds, setBlockHoverBounds] = useState(null);
   const [widgetDisplayName, setWidgetDisplayName] = useState(null);
   const [hoverWidgetDisplayName, setHoverWidgetDisplayName] = useState(null);
+  const [isPendingRefresh, setIsPendingRefresh] = useState(false);
+  const isPendingRefreshRef = useRef(false);
   const overlayRef = useRef(null);
+  const lastWidgetsOrderRef = useRef(null);
 
   // Get hover state and schemas from store
   const sidebarHoveredWidgetId = useWidgetStore((state) => state.hoveredWidgetId);
   const sidebarHoveredBlockId = useWidgetStore((state) => state.hoveredBlockId);
   const schemas = useWidgetStore((state) => state.schemas);
+  const reorderWidgets = useWidgetStore((state) => state.reorderWidgets);
   const page = usePageStore((state) => state.page);
 
   // Preview hover state (from iframe mouseover events)
@@ -74,6 +80,11 @@ export default function SelectionOverlay({
    * Sync all overlay positions
    */
   const syncOverlay = useCallback(() => {
+    // Skip sync if refresh is pending (iframe content is stale)
+    if (isPendingRefreshRef.current) {
+      return;
+    }
+
     // Update selection bounds
     if (effectiveWidgetId) {
       const widgetBounds = getElementBounds(`[data-widget-id="${effectiveWidgetId}"]`);
@@ -144,6 +155,42 @@ export default function SelectionOverlay({
     syncOverlay();
   }, [syncOverlay]);
 
+  // Detect page changes and hide overlay until iframe signals ready
+  useEffect(() => {
+    const currentPageData = JSON.stringify({
+      widgetsOrder: page?.widgetsOrder,
+      widgets: page?.widgets ? Object.keys(page.widgets).length : 0,
+    });
+    const previousPageData = lastWidgetsOrderRef.current;
+
+    if (previousPageData !== null && currentPageData !== previousPageData) {
+      // Page changed - hide overlay until iframe sends PREVIEW_READY
+      isPendingRefreshRef.current = true;
+      setIsPendingRefresh(true);
+      setSelectionBounds(null);
+      setBlockBounds(null);
+    }
+
+    lastWidgetsOrderRef.current = currentPageData;
+  }, [page?.widgetsOrder, page?.widgets]);
+
+  // Listen for PREVIEW_READY message from iframe
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data?.type === "PREVIEW_READY") {
+        isPendingRefreshRef.current = false;
+        setIsPendingRefresh(false);
+        // Small delay to ensure DOM is fully rendered
+        requestAnimationFrame(() => {
+          syncOverlay();
+        });
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [syncOverlay]);
+
   // Sync on iframe scroll
   useEffect(() => {
     const iframe = iframeRef?.current;
@@ -165,6 +212,8 @@ export default function SelectionOverlay({
     if (!iframe) return;
 
     const handleLoad = () => {
+      // Clear pending refresh state and sync overlay
+      setIsPendingRefresh(false);
       // Small delay to ensure content is rendered
       setTimeout(syncOverlay, 100);
     };
@@ -240,7 +289,7 @@ export default function SelectionOverlay({
   }, [effectiveWidgetId, iframeRef]);
 
   return (
-    <div ref={overlayRef} className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
+    <div ref={overlayRef} className="absolute inset-0 pointer-events-none z-10">
       {/* Widget hover box (render first so selection appears on top) */}
       {widgetHoverBounds && (
         <div
@@ -280,31 +329,86 @@ export default function SelectionOverlay({
       )}
 
       {/* Widget selection box */}
-      {selectionBounds && (
+      {selectionBounds && effectiveWidgetId && !isPendingRefresh && (
         <div
-          className="absolute border-2 border-pink-400 pointer-events-none"
+          className="absolute border-2 border-pink-400"
           style={{
             top: selectionBounds.top,
             left: selectionBounds.left,
             width: selectionBounds.width,
             height: selectionBounds.height,
             boxShadow: "0 0 12px rgba(236, 72, 153, 0.25)",
+            pointerEvents: "none",
           }}
         >
-          {/* Widget displayName label */}
-          {widgetDisplayName && (
-            <div
-              className="absolute -top-5 left-1/2 -translate-x-1/2 px-2 py-0.5 text-xs font-medium text-white bg-pink-500 rounded-t pointer-events-none whitespace-nowrap"
-              style={{ fontSize: "11px" }}
-            >
-              {widgetDisplayName}
-            </div>
-          )}
+          {/* Widget label and reorder buttons */}
+          <div
+            className="absolute -top-6 left-1/2 -translate-x-1/2 flex items-center gap-1"
+            style={{ pointerEvents: "auto" }}
+          >
+            {/* Reorder up button */}
+            {page?.widgetsOrder && selectedWidgetId && page.widgetsOrder.includes(selectedWidgetId) && (
+              <button
+                className={`p-0.5 rounded bg-white border border-slate-200 shadow-sm transition-all ${
+                  page.widgetsOrder.indexOf(selectedWidgetId) === 0
+                    ? "opacity-30 cursor-not-allowed"
+                    : "hover:bg-pink-50 hover:border-pink-300 cursor-pointer"
+                }`}
+                disabled={page.widgetsOrder.indexOf(selectedWidgetId) === 0}
+                onClick={() => {
+                  const currentOrder = page.widgetsOrder;
+                  const index = currentOrder.indexOf(selectedWidgetId);
+                  if (index > 0) {
+                    const newOrder = [...currentOrder];
+                    [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+                    reorderWidgets(newOrder);
+                  }
+                }}
+                title="Move widget up"
+              >
+                <ChevronUp size={14} className="text-slate-600" />
+              </button>
+            )}
+
+            {/* Widget displayName label */}
+            {widgetDisplayName && (
+              <div
+                className="px-2 py-0.5 text-xs font-medium text-white bg-pink-500 rounded pointer-events-none whitespace-nowrap"
+                style={{ fontSize: "11px" }}
+              >
+                {widgetDisplayName}
+              </div>
+            )}
+
+            {/* Reorder down button */}
+            {page?.widgetsOrder && selectedWidgetId && page.widgetsOrder.includes(selectedWidgetId) && (
+              <button
+                className={`p-0.5 rounded bg-white border border-slate-200 shadow-sm transition-all ${
+                  page.widgetsOrder.indexOf(selectedWidgetId) === page.widgetsOrder.length - 1
+                    ? "opacity-30 cursor-not-allowed"
+                    : "hover:bg-pink-50 hover:border-pink-300 cursor-pointer"
+                }`}
+                disabled={page.widgetsOrder.indexOf(selectedWidgetId) === page.widgetsOrder.length - 1}
+                onClick={() => {
+                  const currentOrder = page.widgetsOrder;
+                  const index = currentOrder.indexOf(selectedWidgetId);
+                  if (index < currentOrder.length - 1) {
+                    const newOrder = [...currentOrder];
+                    [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+                    reorderWidgets(newOrder);
+                  }
+                }}
+                title="Move widget down"
+              >
+                <ChevronDown size={14} className="text-slate-600" />
+              </button>
+            )}
+          </div>
         </div>
       )}
 
       {/* Block selection box */}
-      {blockBounds && (
+      {blockBounds && !isPendingRefresh && (
         <div
           className="absolute border-2 border-blue-400 pointer-events-none"
           style={{
