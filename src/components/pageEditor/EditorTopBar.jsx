@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Save, Clock, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2 } from "lucide-react";
+import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllPages } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
@@ -11,7 +11,7 @@ export default function EditorTopBar({
   onPreviewModeChange, // Callback to notify parent of preview mode changes
   children,
 }) {
-  const { hasUnsavedChanges, isSaving, isAutoSaving, lastSaved, save, startAutoSave, stopAutoSave } = useAutoSave();
+  const { hasUnsavedChanges, isSaving, save, startAutoSave, stopAutoSave } = useAutoSave();
   const [pages, setPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(() => {
@@ -129,53 +129,9 @@ export default function EditorTopBar({
           <ArrowLeft size={18} />
           Back
         </button>
-
-        {/* Undo/Redo buttons */}
-        <div className="flex gap-1 p-1 bg-slate-200 rounded-md">
-          <button
-            onClick={safeUndo}
-            disabled={!canUndo}
-            title="Undo (Ctrl+Z)"
-            className={`p-1.5 rounded ${
-              canUndo ? "text-slate-600 hover:bg-white hover:text-slate-800" : "text-slate-400 cursor-not-allowed"
-            }`}
-          >
-            <Undo2 size={18} />
-          </button>
-          <button
-            onClick={safeRedo}
-            disabled={!canRedo}
-            title="Redo (Ctrl+Shift+Z)"
-            className={`p-1.5 rounded ${
-              canRedo ? "text-slate-600 hover:bg-white hover:text-slate-800" : "text-slate-400 cursor-not-allowed"
-            }`}
-          >
-            <Redo2 size={18} />
-          </button>
-        </div>
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="flex gap-1 p-1 bg-slate-200 rounded-md">
-          <button
-            onClick={() => handlePreviewModeChange("desktop")}
-            title="Desktop View"
-            className={`p-1.5 rounded ${
-              previewMode === "desktop" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            <Monitor size={18} />
-          </button>
-          <button
-            onClick={() => handlePreviewModeChange("mobile")}
-            title="Mobile View"
-            className={`p-1.5 rounded ${
-              previewMode === "mobile" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            <Smartphone size={18} />
-          </button>
-        </div>
 
         <div className="relative" ref={dropdownRef}>
           {hasMultiplePages ? (
@@ -220,38 +176,77 @@ export default function EditorTopBar({
         {children}
       </div>
 
-      <div className="flex items-center gap-4">
-        {isAutoSaving && (
-          <div className="flex items-center gap-2 text-slate-500 text-sm">
-            <Clock size={14} className="animate-spin" />
-            Auto-saving...
-          </div>
-        )}
-        {lastSaved && !isAutoSaving && !isSaving && (
-          <div className="text-slate-500 text-sm">Last saved: {lastSaved.toLocaleTimeString()}</div>
-        )}
+      <div className="flex items-center gap-3">
+        {/* Desktop/Mobile switcher */}
+        <div className="flex gap-1 p-1 h-9 bg-slate-200 rounded-md items-center">
+          <button
+            onClick={() => handlePreviewModeChange("desktop")}
+            title="Desktop View"
+            className={`p-1.5 rounded ${
+              previewMode === "desktop" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <Monitor size={18} />
+          </button>
+          <button
+            onClick={() => handlePreviewModeChange("mobile")}
+            title="Mobile View"
+            className={`p-1.5 rounded ${
+              previewMode === "mobile" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <Smartphone size={18} />
+          </button>
+        </div>
 
         <Link
           to={`/preview/${pageId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm bg-slate-200 hover:bg-slate-300 text-slate-800"
+          className="flex items-center gap-2 px-3 h-9 rounded-sm text-sm bg-slate-200 hover:bg-slate-300 text-slate-800"
         >
           <Eye size={18} />
           Preview
         </Link>
 
+        {/* Vertical divider */}
+        <div className="h-6 w-px bg-slate-300"></div>
+
+        {/* Undo/Redo buttons */}
+        <div className="flex gap-1 p-1 h-9 bg-slate-200 rounded-md items-center">
+          <button
+            onClick={safeUndo}
+            disabled={!canUndo}
+            title="Undo (Ctrl+Z)"
+            className={`p-1.5 rounded ${
+              canUndo ? "text-slate-600 hover:bg-white hover:text-slate-800" : "text-slate-400 cursor-not-allowed"
+            }`}
+          >
+            <Undo2 size={18} />
+          </button>
+          <button
+            onClick={safeRedo}
+            disabled={!canRedo}
+            title="Redo (Ctrl+Shift+Z)"
+            className={`p-1.5 rounded ${
+              canRedo ? "text-slate-600 hover:bg-white hover:text-slate-800" : "text-slate-400 cursor-not-allowed"
+            }`}
+          >
+            <Redo2 size={18} />
+          </button>
+        </div>
+
         <button
           onClick={() => save(false)}
-          disabled={!hasUnsavedChanges() || isSaving || isAutoSaving}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm ${
-            hasUnsavedChanges() && !isSaving && !isAutoSaving
+          disabled={!hasUnsavedChanges() || isSaving}
+          className={`flex items-center justify-center gap-2 px-3 h-9 min-w-24 rounded-sm text-sm ${
+            hasUnsavedChanges() && !isSaving
               ? "bg-pink-600 hover:bg-pink-700 text-white"
               : "bg-slate-200 text-slate-500 cursor-not-allowed"
           }`}
         >
           <Save size={18} />
-          {isSaving ? "Saving..." : "Save"}
+          {isSaving ? "Saving" : "Save"}
         </button>
       </div>
     </div>
