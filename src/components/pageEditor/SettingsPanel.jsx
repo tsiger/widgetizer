@@ -97,8 +97,8 @@ export default function SettingsPanel({
     placeholder: t("pageEditor.widgetName.placeholder"),
   };
 
-  // Combine name setting with other settings for widgets
-  const allSettings = !isThemeSettings && !selectedBlockId && settings ? [widgetNameSetting, ...settings] : settings;
+  // Combine name setting with other settings for widgets (not global widgets, blocks, or theme settings)
+  const allSettings = !isThemeSettings && !selectedBlockId && !isGlobalWidget && settings ? [widgetNameSetting, ...settings] : settings;
 
   return (
     <div className="w-60 bg-white border-l border-slate-200 flex flex-col h-full">
@@ -117,14 +117,24 @@ export default function SettingsPanel({
         </div>
 
         <div className="space-y-6">
-          {allSettings?.map((setting) => (
-            <SettingsRenderer
-              key={setting.id}
-              setting={setting}
-              value={currentValues?.[setting.id]}
-              onChange={handleSettingChange}
-            />
-          ))}
+          {allSettings?.map((setting) => {
+            // Create a unique key that includes widget/block/theme context to force React to remount on switch
+            const contextKey = isThemeSettings
+              ? `theme-${selectedThemeGroup}`
+              : selectedBlockId
+                ? `block-${selectedBlockId}`
+                : isGlobalWidget
+                  ? `global-${selectedGlobalWidgetId}`
+                  : `widget-${selectedWidgetId}`;
+            return (
+              <SettingsRenderer
+                key={`${contextKey}-${setting.id}`}
+                setting={setting}
+                value={currentValues?.[setting.id]}
+                onChange={handleSettingChange}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

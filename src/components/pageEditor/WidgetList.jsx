@@ -57,7 +57,7 @@ export default function WidgetList({
   const [blockInsertPosition, setBlockInsertPosition] = useState(null);
 
   const { globalWidgets } = usePageStore();
-  const { deleteWidget, duplicateWidget, reorderWidgets, reorderBlocks, setHoveredWidget } = useWidgetStore();
+  const { deleteWidget, duplicateWidget, reorderWidgets, reorderBlocks, setHoveredWidget, updateWidgetSettings } = useWidgetStore();
   const { setStructureModified } = useAutoSave();
   const { header: headerWidget, footer: footerWidget } = globalWidgets;
 
@@ -122,6 +122,12 @@ export default function WidgetList({
     duplicateWidget(widgetId);
     setStructureModified(true);
   };
+
+  // Handle widget rename
+  const handleRenameWidget = (widgetId, newName) => {
+    updateWidgetSettings(widgetId, "name", newName);
+  };
+
 
   // Handle opening widget selector
   const handleAddWidgetClick = (position, triggerRef) => {
@@ -250,6 +256,7 @@ export default function WidgetList({
                           activeWidgetId={activeWidgetId}
                           activeBlockTriggerKey={activeBlockTriggerKey}
                           onHover={handleHover}
+                          onRenameWidget={handleRenameWidget}
                         />
                         <WidgetInsertionZone
                           position={index + 1}

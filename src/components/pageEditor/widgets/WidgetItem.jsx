@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { GripVertical, Trash2, Copy, Plus } from "lucide-react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -27,11 +28,60 @@ export default function WidgetItem({
   activeBlockTriggerKey,
   onBlockDragEnd,
   onHover,
+  onRenameWidget,
 }) {
   const widgetName = widget.settings?.name || widgetSchema.displayName || widget.type;
   const hasBlocks = widgetSchema.blocks && widgetSchema.blocks.length > 0;
   const blocks = widget.blocks || {};
   const blockOrder = widget.blocksOrder || [];
+
+  // Inline editing state
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState("");
+  const inputRef = useRef(null);
+
+  // Focus input when entering edit mode
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleDoubleClick = (e) => {
+    e.stopPropagation();
+    setEditValue(widget.settings?.name || "");
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    const trimmedValue = editValue.trim();
+    // Save if callback exists and value changed (or if clearing to revert)
+    if (onRenameWidget) {
+      const currentName = widget.settings?.name || "";
+      if (trimmedValue !== currentName || (!trimmedValue && currentName)) {
+        onRenameWidget(widgetId, trimmedValue || null); // null clears custom name
+      }
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditValue("");
+  };
+
+  const handleKeyDown = (e) => {
+    // Stop propagation for all keys to prevent drag handlers from capturing them
+    e.stopPropagation();
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      handleCancel();
+    }
+  };
 
   return (
     <div
@@ -49,7 +99,9 @@ export default function WidgetItem({
         className={`flex items-center p-1 cursor-pointer group widget-item ${isSelected ? "bg-pink-50" : ""} rounded-sm`}
         onClick={(e) => {
           e.stopPropagation();
-          onWidgetSelect(widgetId);
+          if (!isEditing) {
+            onWidgetSelect(widgetId);
+          }
         }}
         {...dragHandleProps}
       >
@@ -57,8 +109,28 @@ export default function WidgetItem({
           <GripVertical size={16} />
         </div>
         <div className="flex-grow min-w-0 flex items-center gap-2">
-          <span className="font-medium text-xs truncate text-slate-700">{widgetName}</span>
-          {isModified && !isDragging && (
+          {isEditing ? (
+            <input
+              ref={inputRef}
+              type="text"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={handleSave}
+              onKeyDown={handleKeyDown}
+              onClick={(e) => e.stopPropagation()}
+              className="font-medium text-xs text-slate-700 bg-white border border-pink-300 rounded px-1 py-0.5 w-full outline-none focus:ring-1 focus:ring-pink-400"
+              placeholder={widgetSchema.displayName || widget.type}
+            />
+          ) : (
+            <span
+              className={`font-medium text-xs truncate text-slate-700 ${isSelected ? "cursor-text" : ""}`}
+              onDoubleClick={handleDoubleClick}
+              title={isSelected ? "Double-click to rename" : undefined}
+            >
+              {widgetName}
+            </span>
+          )}
+          {isModified && !isDragging && !isEditing && (
             <div className="h-2 w-2 rounded-full bg-amber-500 ring-2 ring-amber-200" title="Unsaved changes"></div>
           )}
         </div>
