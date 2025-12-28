@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
-import { getProjectDir } from "../config.js";
+import { getProjectDir, getAppSettingsPath } from "../config.js";
 import { readProjectsFile } from "./projectController.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -91,7 +91,7 @@ export async function generatePreview(req, res) {
 
       try {
         // Read app settings to get user's locale
-        const appSettingsPath = path.join(__dirname, "../../data/appSettings.json");
+        const appSettingsPath = getAppSettingsPath();
         if (await fs.pathExists(appSettingsPath)) {
           const appSettings = JSON.parse(await fs.readFile(appSettingsPath, "utf-8"));
           const userLocale = appSettings?.general?.language || "en";
@@ -313,7 +313,7 @@ export async function serveAsset(req, res) {
 
   // Build the path to the asset file
   const projectSlug = await getProjectSlug(projectId);
-  const filePath = path.join(__dirname, "../../data/projects", projectSlug, folder, filename);
+  const filePath = path.join(getProjectDir(projectSlug), folder, filename);
 
   try {
     // Check if file exists using fs-extra

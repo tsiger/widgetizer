@@ -1,10 +1,18 @@
 import path from "path";
 
-// Base directories
-export const DATA_DIR = path.join(process.cwd(), "data");
-export const THEMES_DIR = path.join(process.cwd(), "themes");
+// Base directories with environment variable support.
+const BASE_DIR = process.cwd();
+export const DATA_DIR = process.env.DATA_ROOT
+  ? path.resolve(process.env.DATA_ROOT)
+  : path.join(BASE_DIR, "data");
+export const THEMES_DIR = process.env.THEMES_ROOT
+  ? path.resolve(process.env.THEMES_ROOT)
+  : path.join(BASE_DIR, "themes");
 export const PUBLISH_DIR = path.join(DATA_DIR, "publish");
-export const CORE_WIDGETS_DIR = path.join(process.cwd(), "src", "core", "widgets");
+export const CORE_WIDGETS_DIR = path.join(BASE_DIR, "src", "core", "widgets");
+
+// App settings path
+export const getAppSettingsPath = () => path.join(DATA_DIR, "appSettings.json");
 
 // Theme paths
 export const getThemeDir = (themeId) => path.join(THEMES_DIR, themeId);

@@ -1,14 +1,9 @@
 import fs from "fs-extra";
-import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
 import { validationResult } from "express-validator";
+import { getAppSettingsPath } from "../config.js";
 
-// Helper to get the path to the settings file
-// TODO: Fixed path. Maybe add it in config.js?
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const settingsFilePath = path.join(__dirname, "../../data/appSettings.json");
+// Get the settings file path from centralized config
+const settingsFilePath = getAppSettingsPath();
 
 // Default settings in case the file is missing or corrupted
 const defaultSettings = {
