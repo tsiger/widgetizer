@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
@@ -22,13 +22,14 @@ export default function ProjectsEdit() {
   const [loading, setLoading] = useState(true);
   const [showSuccessActions, setShowSuccessActions] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
   const setActiveProject = useProjectStore((state) => state.setActiveProject);
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  // Add navigation guard
-  useFormNavigationGuard(isDirty);
+  // Add navigation guard with skip ref for intentional navigation
+  useFormNavigationGuard(isDirty, skipNavigationGuardRef);
 
   useEffect(() => {
     loadProject();
@@ -128,7 +129,10 @@ export default function ProjectsEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("projectsEdit.saveChanges")}
-          onCancel={() => navigate("/projects")}
+          onCancel={() => {
+            skipNavigationGuardRef.current = true;
+            navigate("/projects");
+          }}
           onDirtyChange={setIsDirty}
         />
       )}

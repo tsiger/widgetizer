@@ -86,13 +86,14 @@ export async function updatePage(id, pageData) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to update page");
+      const errorData = await response.json();
+      throw new Error(errorData.message || errorData.error || "Failed to update page");
     }
 
     return await response.json();
   } catch (error) {
     console.error("Error updating page:", error);
-    throw new Error("Failed to update page");
+    throw error; // Re-throw the original error with its message
   }
 }
 

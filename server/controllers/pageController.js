@@ -227,10 +227,16 @@ export async function updatePage(req, res) {
 
     // Check if the desired slug (after potential generation/sanitization) is different from the old one
     if (oldSlug !== desiredNewSlug) {
-      // Ensure the desired slug is unique, appending -n if needed
-      // We only need ensureUniqueSlug if the slug came directly from input, not if generated from name
+      // For explicit slug changes, check if the new slug already exists (conflict)
       if (pageData.slug && typeof pageData.slug === "string" && pageData.slug.trim() !== "") {
-        finalNewSlug = await ensureUniqueSlug(desiredNewSlug, projectSlug);
+        const existingPath = getPagePath(projectSlug, desiredNewSlug);
+        if (await fs.pathExists(existingPath)) {
+          return res.status(409).json({
+            error: "Slug already exists",
+            message: `A page with the slug "${desiredNewSlug}" already exists. Please choose a different slug.`,
+          });
+        }
+        finalNewSlug = desiredNewSlug;
       } else {
         finalNewSlug = desiredNewSlug; // Already unique from generateUniqueSlug fallback
       }

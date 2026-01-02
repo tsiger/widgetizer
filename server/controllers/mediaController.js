@@ -530,7 +530,7 @@ export async function deleteProjectMedia(req, res) {
         const size = fileToDelete.sizes[sizeName];
         if (size && size.path) {
           const sizeFilename = path.basename(size.path);
-          const sizeFilePath = path.join(getProjectImagesDir(projectId), sizeFilename);
+          const sizeFilePath = path.join(getProjectImagesDir(projectSlug), sizeFilename);
           try {
             if (await fs.pathExists(sizeFilePath)) {
               await fs.unlink(sizeFilePath);

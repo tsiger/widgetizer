@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
@@ -21,11 +21,12 @@ export default function MenusEdit() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessActions, setShowSuccessActions] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
 
-  // Add navigation guard
-  useFormNavigationGuard(isDirty);
+  // Add navigation guard with skip ref
+  useFormNavigationGuard(isDirty, skipNavigationGuardRef);
 
   useEffect(() => {
     loadMenu();
@@ -90,7 +91,10 @@ export default function MenusEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("menusEdit.saveChanges")}
-          onCancel={() => navigate("/menus")}
+          onCancel={() => {
+            skipNavigationGuardRef.current = true;
+            navigate("/menus");
+          }}
           onDirtyChange={setIsDirty}
         />
       )}

@@ -185,6 +185,17 @@ export async function exportProject(req, res) {
     // Fetch list of page data using the helper function
     const pagesDataArray = await listProjectPagesData(projectSlug);
 
+    // Validate that at least one page has the "index" slug (required for homepage)
+    // Note: page.id is derived from filename, which is the authoritative slug
+    const hasIndexPage = pagesDataArray.some((page) => page.id === "index");
+    if (!hasIndexPage) {
+      return res.status(400).json({
+        error: "Export failed: No homepage found",
+        message:
+          'Your project must have a page with the slug "index" to serve as the homepage. Please create or rename a page to have the slug "index" before exporting.',
+      });
+    }
+
     // --- Generate sitemap.xml and robots.txt ---
     if (siteUrl) {
       // 1. Generate sitemap.xml

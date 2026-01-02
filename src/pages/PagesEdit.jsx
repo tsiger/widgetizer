@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
@@ -21,13 +21,16 @@ export default function PagesEdit() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessActions, setShowSuccessActions] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const isNavigatingAfterSaveRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
 
-  // Add navigation guard
-  useFormNavigationGuard(isDirty);
+  // Add navigation guard - bypass when navigating after successful save
+  useFormNavigationGuard(isDirty, isNavigatingAfterSaveRef);
 
   useEffect(() => {
+    // Reset navigation skip ref when page changes
+    isNavigatingAfterSaveRef.current = false;
     loadPage();
   }, [id]);
 
@@ -53,7 +56,9 @@ export default function PagesEdit() {
       });
 
       if (result.success) {
+        // Set ref BEFORE navigation to bypass guard (refs update synchronously)
         if (formData.slug !== id) {
+          isNavigatingAfterSaveRef.current = true;
           navigate(`/pages/${formData.slug}/edit`, { replace: true });
           showToast(t("pagesEdit.toasts.updateSuccessUrlChanged", { name: formData.name }), "success");
         } else {
@@ -65,7 +70,7 @@ export default function PagesEdit() {
           updated: new Date().toISOString(),
         });
         setShowSuccessActions(true);
-        setIsDirty(false); // Reset dirty state after successful save
+        setIsDirty(false);
         return true;
       } else {
         showToast(result.message || t("pagesEdit.toasts.unknownError"), "error");
@@ -102,7 +107,10 @@ export default function PagesEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("pagesEdit.saveChanges")}
-          onCancel={() => navigate("/pages")}
+          onCancel={() => {
+            isNavigatingAfterSaveRef.current = true; // Bypass guard for intentional cancel
+            navigate("/pages");
+          }}
           onDirtyChange={setIsDirty}
         />
       )}

@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import { getProjectPagesDir, getProjectMediaJsonPath } from "../config.js";
 import { readMediaFile } from "../controllers/mediaController.js";
+import { getProjectSlug } from "../utils/projectHelpers.js";
 
 /**
  * Extract all media paths (images and videos) from page content (widgets and blocks)
@@ -76,7 +77,8 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
     });
 
     // Write updated media data
-    const mediaFilePath = getProjectMediaJsonPath(projectId);
+    const projectSlug = await getProjectSlug(projectId);
+    const mediaFilePath = getProjectMediaJsonPath(projectSlug);
     await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
 
     return { success: true, mediaPaths };
@@ -101,7 +103,8 @@ export async function removePageFromMediaUsage(projectId, pageId) {
     });
 
     // Write updated media data
-    const mediaFilePath = getProjectMediaJsonPath(projectId);
+    const projectSlug = await getProjectSlug(projectId);
+    const mediaFilePath = getProjectMediaJsonPath(projectSlug);
     await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
 
     return { success: true };
@@ -140,7 +143,8 @@ export async function getMediaUsage(projectId, fileId) {
  */
 export async function refreshAllMediaUsage(projectId) {
   try {
-    const pagesDir = getProjectPagesDir(projectId);
+    const projectSlug = await getProjectSlug(projectId);
+    const pagesDir = getProjectPagesDir(projectSlug);
 
     // Check if pages directory exists
     if (!(await fs.pathExists(pagesDir))) {
@@ -184,7 +188,7 @@ export async function refreshAllMediaUsage(projectId) {
     }
 
     // Write updated media data
-    const mediaFilePath = getProjectMediaJsonPath(projectId);
+    const mediaFilePath = getProjectMediaJsonPath(projectSlug);
     await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
 
     return {

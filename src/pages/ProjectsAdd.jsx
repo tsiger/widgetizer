@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, Pencil } from "lucide-react";
@@ -18,12 +18,13 @@ export default function ProjectsAdd() {
   const [lastCreatedProject, setLastCreatedProject] = useState(null);
   const [formKey, setFormKey] = useState("initial");
   const [isDirty, setIsDirty] = useState(false);
+  const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
   const { setActiveProject: setActiveProjectInStore } = useProjectStore();
 
-  // Add navigation guard
-  useFormNavigationGuard(isDirty);
+  // Add navigation guard with skip ref
+  useFormNavigationGuard(isDirty, skipNavigationGuardRef);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);
@@ -76,7 +77,10 @@ export default function ProjectsAdd() {
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel={t("projectsAdd.create")}
-        onCancel={() => navigate("/projects")}
+        onCancel={() => {
+          skipNavigationGuardRef.current = true;
+          navigate("/projects");
+        }}
         onDirtyChange={setIsDirty}
       />
       

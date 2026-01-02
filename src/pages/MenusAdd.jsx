@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, Pencil } from "lucide-react";
@@ -17,11 +17,12 @@ export default function MenusAdd() {
   const [lastCreatedMenu, setLastCreatedMenu] = useState(null);
   const [formKey, setFormKey] = useState("initial");
   const [isDirty, setIsDirty] = useState(false);
+  const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
 
-  // Add navigation guard
-  useFormNavigationGuard(isDirty);
+  // Add navigation guard with skip ref
+  useFormNavigationGuard(isDirty, skipNavigationGuardRef);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);
@@ -65,7 +66,10 @@ export default function MenusAdd() {
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel={t("menusAdd.create")}
-        onCancel={() => navigate("/menus")}
+        onCancel={() => {
+          skipNavigationGuardRef.current = true;
+          navigate("/menus");
+        }}
         onDirtyChange={setIsDirty}
       />
       
