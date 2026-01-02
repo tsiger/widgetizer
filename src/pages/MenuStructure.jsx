@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -9,6 +9,7 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import { getMenu, updateMenu } from "../queries/menuManager";
 
 import useToastStore from "../stores/toastStore";
+import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function MenuStructure() {
   const { t } = useTranslation();
@@ -16,7 +17,18 @@ export default function MenuStructure() {
   const [menu, setMenu] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const initialMenuRef = useRef(null);
   const showToast = useToastStore((state) => state.showToast);
+
+  // Add navigation guard for unsaved changes
+  useFormNavigationGuard(isDirty);
+
+  // Helper to check if menu has changed
+  const checkIfDirty = (currentMenu) => {
+    if (!initialMenuRef.current || !currentMenu) return false;
+    return JSON.stringify(currentMenu.items) !== JSON.stringify(initialMenuRef.current.items);
+  };
 
   // Handle item deletion directly (no confirmation)
   const handleDeleteItem = (itemToDelete) => {
@@ -54,6 +66,7 @@ export default function MenuStructure() {
 
     // Update state with the new menu
     setMenu(updatedMenu);
+    setIsDirty(checkIfDirty(updatedMenu));
 
     // Show success message with subtle feedback
     showToast(
@@ -69,6 +82,8 @@ export default function MenuStructure() {
         setLoading(true);
         const data = await getMenu(id);
         setMenu(data);
+        initialMenuRef.current = JSON.parse(JSON.stringify(data)); // Deep clone for comparison
+        setIsDirty(false);
       } catch (err) {
         showToast(err.message || t("menuStructure.toasts.loadError"), "error");
       } finally {
@@ -87,6 +102,8 @@ export default function MenuStructure() {
       const savedMenu = await updateMenu(menu.id, menu);
       // Update the local state with the saved data (including new timestamp)
       setMenu(savedMenu);
+      initialMenuRef.current = JSON.parse(JSON.stringify(savedMenu)); // Reset initial state
+      setIsDirty(false);
       showToast(t("menuStructure.toasts.saveSuccess"), "success");
     } catch (err) {
       showToast(err.message || t("menuStructure.toasts.saveError"), "error");
@@ -99,7 +116,10 @@ export default function MenuStructure() {
   const handleMenuItemsChange = (newItems) => {
     setMenu((prev) => {
       if (prev.items === newItems) return prev; // no change → no update
-      return { ...prev, items: newItems };
+      const updatedMenu = { ...prev, items: newItems };
+      // Check dirty state after update
+      setIsDirty(checkIfDirty(updatedMenu));
+      return updatedMenu;
     });
   };
 
