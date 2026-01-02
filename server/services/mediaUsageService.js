@@ -46,6 +46,42 @@ function extractMediaPathsFromPage(pageData) {
 }
 
 /**
+ * Extract all media paths from a global widget
+ */
+function extractMediaPathsFromGlobalWidget(widgetData) {
+  const mediaPaths = new Set();
+
+  function extractFromSettings(settings) {
+    if (!settings) return;
+
+    Object.values(settings).forEach((value) => {
+      if (
+        typeof value === "string" &&
+        (value.startsWith("/uploads/images/") ||
+          value.startsWith("/uploads/videos/") ||
+          value.startsWith("/uploads/audios/"))
+      ) {
+        mediaPaths.add(value);
+      }
+    });
+  }
+
+  // Extract from main settings
+  if (widgetData.settings) {
+    extractFromSettings(widgetData.settings);
+  }
+
+  // Extract from blocks if they exist
+  if (widgetData.blocks) {
+    Object.values(widgetData.blocks).forEach((block) => {
+      extractFromSettings(block.settings);
+    });
+  }
+
+  return Array.from(mediaPaths);
+}
+
+/**
  * Update usage tracking for a specific page
  */
 export async function updatePageMediaUsage(projectId, pageId, pageData) {
@@ -84,6 +120,51 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
     return { success: true, mediaPaths };
   } catch (error) {
     console.error("Error updating page media usage:", error);
+    throw error;
+  }
+}
+
+/**
+ * Update usage tracking for a global widget
+ */
+export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData) {
+  try {
+    const mediaPaths = extractMediaPathsFromGlobalWidget(widgetData);
+    const mediaData = await readMediaFile(projectId);
+    
+    // Identifier for global widget, e.g. "global:header"
+    // globalId should be passed as "global:header" or just "header" depending on convention
+    // Let's standardized on "global:{id}"
+    
+    const usageId = globalId.startsWith("global:") ? globalId : `global:${globalId}`;
+
+    // Remove old usage
+    mediaData.files.forEach((file) => {
+      if (file.usedIn) {
+        file.usedIn = file.usedIn.filter((slug) => slug !== usageId);
+      }
+    });
+
+    // Add new usage
+    mediaPaths.forEach((mediaPath) => {
+      const file = mediaData.files.find((f) => f.path === mediaPath);
+      if (file) {
+        if (!file.usedIn) {
+          file.usedIn = [];
+        }
+        if (!file.usedIn.includes(usageId)) {
+          file.usedIn.push(usageId);
+        }
+      }
+    });
+
+    const projectSlug = await getProjectSlug(projectId);
+    const mediaFilePath = getProjectMediaJsonPath(projectSlug);
+    await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
+
+    return { success: true, mediaPaths };
+  } catch (error) {
+    console.error("Error updating global widget media usage:", error);
     throw error;
   }
 }
@@ -187,13 +268,43 @@ export async function refreshAllMediaUsage(projectId) {
       }
     }
 
+    // Also scan global widgets (header and footer)
+    const globalWidgetsDir = path.join(pagesDir, "global");
+    if (await fs.pathExists(globalWidgetsDir)) {
+      const globalWidgetFiles = ["header.json", "footer.json"];
+      
+      for (const fileName of globalWidgetFiles) {
+        const globalFilePath = path.join(globalWidgetsDir, fileName);
+        if (await fs.pathExists(globalFilePath)) {
+          try {
+            const globalContent = await fs.readFile(globalFilePath, "utf8");
+            const globalData = JSON.parse(globalContent);
+            const globalId = `global:${fileName.replace(".json", "")}`; // e.g., "global:header"
+            
+            // Extract media from global widget settings
+            const mediaPaths = extractMediaPathsFromGlobalWidget(globalData);
+            mediaPaths.forEach((mediaPath) => {
+              const file = mediaData.files.find((f) => f.path === mediaPath);
+              if (file) {
+                if (!file.usedIn.includes(globalId)) {
+                  file.usedIn.push(globalId);
+                }
+              }
+            });
+          } catch (error) {
+            console.error(`Error processing global widget ${fileName}:`, error);
+          }
+        }
+      }
+    }
+
     // Write updated media data
     const mediaFilePath = getProjectMediaJsonPath(projectSlug);
     await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
 
     return {
       success: true,
-      message: `Refreshed usage tracking for ${pageFiles.length} pages`,
+      message: `Refreshed usage tracking for ${pageFiles.length} pages and global widgets`,
     };
   } catch (error) {
     console.error("Error refreshing media usage:", error);

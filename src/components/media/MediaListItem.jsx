@@ -64,9 +64,17 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
         {file.usedIn && file.usedIn.length > 0 ? (
           <div
             className="inline-flex items-center bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
-            title={`Used in: ${file.usedIn.join(", ")}`}
+            title={`Used in: ${file.usedIn
+              .map((u) => {
+                if (u.startsWith("global:")) {
+                  const type = u.split(":")[1];
+                  return `${type.charAt(0).toUpperCase() + type.slice(1)} (Global)`;
+                }
+                return u;
+              })
+              .join(", ")}`}
           >
-            {file.usedIn.length} page{file.usedIn.length > 1 ? "s" : ""}
+            {file.usedIn.length} place{file.usedIn.length > 1 ? "s" : ""}
           </div>
         ) : (
           <span className="text-slate-400 text-xs">Unused</span>

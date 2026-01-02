@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
 import { getProjectSlug } from "../utils/projectHelpers.js";
+import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 
 // Get the directory path of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -297,6 +298,14 @@ export async function saveGlobalWidget(req, res) {
     // Save the widget
     const filePath = path.join(globalPagesDir, `${type}.json`);
     await fs.outputFile(filePath, JSON.stringify(widgetData, null, 2));
+
+    // Update media usage
+    try {
+      await updateGlobalWidgetMediaUsage(activeProjectId, `global:${type}`, widgetData);
+    } catch (usageError) {
+      console.error("Error updating media usage for global widget:", usageError);
+      // Don't fail the save if usage update fails, but log it
+    }
 
     res.json({ success: true, data: widgetData });
   } catch (error) {
