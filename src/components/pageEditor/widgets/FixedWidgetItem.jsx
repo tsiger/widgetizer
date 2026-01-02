@@ -11,18 +11,18 @@ export default function FixedWidgetItem({
 
   return (
     <div
-      className={`rounded border transition-all hover:shadow-sm ${
+      className={`rounded-sm border border-1 transition-all duration-200 ${
         isSelected
-          ? "border-blue-300 bg-blue-50"
+          ? "border-pink-300 bg-white ring-2 ring-pink-200 shadow-lg shadow-pink-100"
           : isModified
-            ? "border-amber-400"
-            : "border-slate-200 hover:border-slate-300"
+            ? "border-amber-400 bg-amber-50"
+            : "border-slate-200 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-100"
       }`}
       onMouseEnter={() => onHover && onHover(widgetId)}
       onMouseLeave={() => onHover && onHover(null)}
     >
       <div
-        className="flex items-center gap-1 p-2 cursor-pointer group widget-item"
+        className={`flex items-center gap-1 p-2 cursor-pointer group widget-item ${isSelected ? "bg-pink-50" : ""} rounded-sm`}
         onClick={() => onWidgetSelect && onWidgetSelect(widgetId)}
       >
         <div className="flex-grow min-w-0 flex items-center pl-1">
