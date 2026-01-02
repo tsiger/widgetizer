@@ -3,6 +3,28 @@
   "displayName": "Header",
   "settings": [
     {
+      "type": "header",
+      "id": "logo_settings_header",
+      "label": "Logo Settings"
+    },
+    {
+      "type": "image",
+      "id": "logoImage",
+      "label": "Logo Image",
+      "description": "Upload a logo image. If provided, this will be displayed instead of the text logo."
+    },
+    {
+      "type": "range",
+      "id": "logoMaxWidth",
+      "label": "Logo Max Width",
+      "description": "Maximum width of the logo image",
+      "default": 150,
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px"
+    },
+    {
       "type": "text",
       "id": "logoText",
       "label": "Logo Text",

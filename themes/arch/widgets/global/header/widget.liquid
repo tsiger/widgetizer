@@ -1,6 +1,20 @@
 <header id="{{ widget.id }}" class="widget-site-header" data-widget-id="{{ widget.id }}" data-widget-type="header">
 
-  <a href="/" class="header-logo">{{ widget.settings.logoText | default: 'Widgetizer' }}</a>
+  <style>
+    #{{ widget.id }} .header-logo-image {
+      max-width: {{ widget.settings.logoMaxWidth | default: 150 }}px;
+      height: auto;
+      display: block;
+    }
+  </style>
+
+  <a href="/" class="header-logo">
+    {% if widget.settings.logoImage != blank %}
+      {{ widget.settings.logoImage | image: 'medium', 'header-logo-image', false }}
+    {% else %}
+      {{ widget.settings.logoText | default: 'Widgetizer' }}
+    {% endif %}
+  </a>
 
   <div class="header-actions">
     <nav class="header-nav" id="main-navigation">
