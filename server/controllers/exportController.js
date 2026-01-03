@@ -179,7 +179,7 @@ export async function exportProject(req, res) {
     await fs.ensureDir(outputImagesDir);
     await fs.ensureDir(outputVideosDir);
     await fs.ensureDir(outputAudiosDir);
-
+21
     const rawThemeSettings = await readProjectThemeData(projectFolderName);
 
     // Fetch list of page data using the helper function
@@ -197,35 +197,43 @@ export async function exportProject(req, res) {
     }
 
     // --- Generate sitemap.xml and robots.txt ---
-    if (siteUrl) {
-      // 1. Generate sitemap.xml
-      const sitemapUrls = pagesDataArray
-        .filter((page) => !page.seo?.robots?.includes("noindex")) // Filter out 'noindex' pages
-        .map((page) => {
-          const pageUrl = new URL(`${page.slug}.html`, siteUrl).href;
-          const lastMod = page.updated || page.gcreated || new Date().toISOString();
-          return `
+    // --- Generate sitemap.xml and robots.txt ---
+    if (siteUrl && siteUrl.trim() !== "") {
+      try {
+        // Validate URL format first
+        new URL(siteUrl); // Will throw if invalid
+
+        // 1. Generate sitemap.xml
+        const sitemapUrls = pagesDataArray
+          .filter((page) => !page.seo?.robots?.includes("noindex")) // Filter out 'noindex' pages
+          .map((page) => {
+            const pageUrl = new URL(`${page.slug}.html`, siteUrl).href;
+            const lastMod = page.updated || page.gcreated || new Date().toISOString();
+            return `
   <url>
     <loc>${pageUrl}</loc>
     <lastmod>${lastMod.split("T")[0]}</lastmod>
   </url>`;
-        });
+          });
 
-      const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
+        const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${sitemapUrls.join("")}
 </urlset>`;
 
-      const formattedSitemap = await prettier.format(sitemapContent, { parser: "html" });
-      await fs.writeFile(path.join(outputDir, "sitemap.xml"), formattedSitemap);
+        const formattedSitemap = await prettier.format(sitemapContent, { parser: "html" });
+        await fs.writeFile(path.join(outputDir, "sitemap.xml"), formattedSitemap);
 
-      // 2. Generate robots.txt
-      const sitemapUrl = new URL("sitemap.xml", siteUrl).href;
-      const robotsContent = `User-agent: *
+        // 2. Generate robots.txt
+        const sitemapUrl = new URL("sitemap.xml", siteUrl).href;
+        const robotsContent = `User-agent: *
 Allow: /
 
 Sitemap: ${sitemapUrl}`;
 
-      await fs.writeFile(path.join(outputDir, "robots.txt"), robotsContent);
+        await fs.writeFile(path.join(outputDir, "robots.txt"), robotsContent);
+      } catch (err) {
+         console.warn(`Skipping sitemap/robots generation due to invalid siteUrl: ${siteUrl}`, err.message);
+      }
     } else {
       console.warn(`Project ${projectId} has no siteUrl defined. Skipping sitemap.xml and robots.txt generation.`);
     }
