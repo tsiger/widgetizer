@@ -132,6 +132,13 @@
       "supportedVideos": "Videos: MP4, WebM, MOV, AVI, MKV",
       "uploading": "Uploading..."
     },
+    "fileUploader": {
+      "dropActive": "Drop the files here...",
+      "dropHere": "Drop your files here",
+      "clickOrDrop": "Click to upload or drag and drop",
+      "browseFiles": "Browse Files",
+      "uploading": "Uploading..."
+    },
     "mediaSelector": {
       "title": "Select Media",
       "searchPlaceholder": "Search media files...",
@@ -447,7 +454,11 @@
     "title": "Media",
     "loading": "Loading media files...",
     "emptyTitle": "No media files yet",
-    "emptyDesc": "Upload some files using the uploader above."
+    "emptyDesc": "Upload some files using the uploader above.",
+    "uploader": {
+      "title": "Upload Media",
+      "description": "Drag and drop images or videos to upload them to your project library"
+    }
   },
   "themeSettings": {
     "title": "Theme settings",
@@ -469,6 +480,11 @@
     "dropZoneActive": "Drop the theme zip file here...",
     "dropZoneInactive": "Drag & drop your theme zip file here, or click to select file",
     "maxFileSize": "Max file size: 10MB",
+    "uploader": {
+      "title": "Upload Theme",
+      "description": "Drag and drop a .zip file to install a new theme",
+      "supported": "Supported format: .zip"
+    },
     "version": "Version {{version}}",
     "widgets": "{{count}} widgets",
     "by": "By {{author}}",

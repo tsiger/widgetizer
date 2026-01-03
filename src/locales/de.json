@@ -123,13 +123,21 @@
       "searchPlaceholder": "Medien suchen..."
     },
     "mediaUploader": {
-      "dropActive": "Dateien hier ablegen...",
+      "dropActive": "Lassen Sie die Dateien hier fallen...",
       "dropInactive": "Ziehen Sie Bilder und Videos hierher oder",
       "selectFiles": "Dateien auswählen",
       "supportedImages": "Bilder: JPG, PNG, GIF, WebP, SVG",
       "supportedVideos": "Videos: MP4, WebM, MOV, AVI, MKV",
       "uploading": "Wird hochgeladen..."
     },
+    "fileUploader": {
+      "dropActive": "Lassen Sie die Dateien hier fallen...",
+      "dropHere": "Lassen Sie Ihre Dateien hier fallen",
+      "clickOrDrop": "Klicken Sie zum Hochladen oder ziehen Sie Dateien hierher",
+      "browseFiles": "Dateien durchsuchen",
+      "uploading": "Wird hochgeladen..."
+    },
+
     "mediaSelector": {
       "title": "Medien auswählen",
       "searchPlaceholder": "Mediendateien suchen...",
@@ -445,7 +453,11 @@
     "title": "Medien",
     "loading": "Mediendateien werden geladen...",
     "emptyTitle": "Noch keine Mediendateien",
-    "emptyDesc": "Laden Sie einige Dateien mit dem Uploader oben hoch."
+    "emptyDesc": "Laden Sie einige Dateien mit dem Uploader oben hoch.",
+    "uploader": {
+      "title": "Medien hochladen",
+      "description": "Ziehen Sie Bilder oder Videos hierher, um sie in Ihre Projektbibliothek hochzuladen"
+    }
   },
   "themeSettings": {
     "title": "Theme-Einstellungen",
@@ -467,6 +479,11 @@
     "dropZoneActive": "Theme-Zip-Datei hier ablegen...",
     "dropZoneInactive": "Ziehen Sie Ihre Theme-Zip-Datei hierher oder klicken Sie, um eine Datei auszuwählen",
     "maxFileSize": "Max. Dateigröße: 10MB",
+    "uploader": {
+      "title": "Theme hochladen",
+      "description": "Ziehen Sie eine .zip-Datei hierher, um ein neues Theme zu installieren",
+      "supported": "Unterstütztes Format: .zip"
+    },
     "version": "Version {{version}}",
     "widgets": "{{count}} Widgets",
     "by": "Von {{author}}",

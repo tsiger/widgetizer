@@ -4,7 +4,7 @@ import { Image } from "lucide-react";
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import MediaToolbar from "../components/media/MediaToolbar";
-import MediaUploader from "../components/media/MediaUploader";
+import FileUploader from "../components/ui/FileUploader";
 import MediaGrid from "../components/media/MediaGrid";
 import MediaList from "../components/media/MediaList";
 import MediaDrawer from "../components/media/MediaDrawer";
@@ -50,10 +50,18 @@ export default function Media() {
 
   return (
     <PageLayout title={t("media.title")}>
-      <MediaUploader
+      <FileUploader
         onUpload={mediaUpload.handleUpload}
         uploading={mediaUpload.uploading}
         uploadProgress={mediaUpload.uploadProgress}
+        accept={{
+          "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp", ".svg"],
+          "video/*": [".mp4", ".webm", ".mov", ".avi", ".mkv"],
+        }}
+        multiple={true}
+        title={t("media.uploader.title")}
+        description={t("media.uploader.description")}
+        maxSizeText={`${t("components.mediaUploader.supportedImages")} • ${t("components.mediaUploader.supportedVideos")}`}
       />
 
       {mediaState.files.length > 0 && (

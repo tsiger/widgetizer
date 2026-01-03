@@ -4,87 +4,12 @@ import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import EmptyState from "../components/ui/EmptyState";
 import Badge from "../components/ui/Badge";
-import { UploadCloud } from "lucide-react";
-import { useDropzone } from "react-dropzone";
 
 import { getAllThemes, getThemeScreenshotUrl, uploadThemeZip } from "../queries/themeManager";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
-
-// Functional Theme Uploader component using react-dropzone
-const ThemeUploader = ({ onUploadSuccess }) => {
-  const { t } = useTranslation();
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState({ status: "idle", message: "" }); // Add state for upload status
-  const showToast = useToastStore((state) => state.showToast);
-
-  // Effect to show toast based on uploadStatus
-  useEffect(() => {
-    if (uploadStatus.status === "success") {
-      showToast(uploadStatus.message || t("themes.toasts.uploadSuccess"), "success");
-      setUploadStatus({ status: "idle", message: "" }); // Reset status
-    } else if (uploadStatus.status === "error") {
-      showToast(uploadStatus.message || t("themes.toasts.uploadError"), "error");
-      setUploadStatus({ status: "idle", message: "" }); // Reset status
-    }
-  }, [uploadStatus, showToast]);
-
-  const onDrop = useCallback(
-    async (acceptedFiles) => {
-      if (acceptedFiles.length !== 1) {
-        showToast(t("themes.toasts.singleFileError"), "error");
-        return;
-      }
-
-      const file = acceptedFiles[0];
-      setIsUploading(true);
-      setUploadStatus({ status: "uploading", message: "" }); // Set status to uploading
-
-      try {
-        const result = await uploadThemeZip(file);
-        // Trigger state update first
-        if (result.theme) {
-          onUploadSuccess(result.theme);
-        }
-        // Then set status to trigger toast effect
-        setUploadStatus({ status: "success", message: result.message });
-      } catch (error) {
-        console.error("Theme upload error:", error);
-        // Set status to trigger error toast effect
-        setUploadStatus({ status: "error", message: error.message });
-      } finally {
-        setIsUploading(false);
-      }
-    },
-    [onUploadSuccess, showToast],
-  );
-
-  const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
-    onDrop,
-    accept: { "application/zip": [".zip"] },
-    multiple: false,
-    disabled: isUploading, // Disable dropzone while uploading
-  });
-
-  return (
-    <div
-      {...getRootProps()}
-      className={`mb-6 p-6 border-2 border-dashed rounded-lg text-center transition-colors duration-200 ${isUploading ? "cursor-not-allowed bg-slate-50" : "cursor-pointer hover:border-slate-400"} ${isDragAccept ? "border-green-500 bg-green-50" : "border-slate-300"} ${isDragReject ? "border-red-500 bg-red-50" : "border-slate-300"}`}
-    >
-      <input {...getInputProps()} />
-      <UploadCloud className={`mx-auto h-12 w-12 ${isUploading ? "text-slate-300" : "text-slate-400"}`} />
-      <p className={`mt-2 text-sm ${isUploading ? "text-slate-400" : "text-slate-600"}`}>
-        {isUploading
-          ? t("themes.uploadingTheme")
-          : isDragActive
-            ? t("themes.dropZoneActive")
-            : t("themes.dropZoneInactive")}
-      </p>
-      <p className={`text-xs ${isUploading ? "text-slate-300" : "text-slate-500"}`}>{t("themes.maxFileSize")}</p>
-    </div>
-  );
-};
+import FileUploader from "../components/ui/FileUploader";
 
 export default function Themes() {
   const { t } = useTranslation();
@@ -118,6 +43,59 @@ export default function Themes() {
     setThemes((prevThemes) => [...prevThemes, newTheme]);
   };
 
+  const handleThemeUpload = async (files) => {
+     if (files.length !== 1) {
+       // Should be handled by multiple={false} but safe to check
+       return; 
+     }
+     const file = files[0];
+     // We need to implement the upload logic here since FileUploader gives us the file
+     // Existing logic was in ThemeUploader component, moving it here.
+     
+     // Note: FileUploader doesn't handle the async upload state internally for us aside from the 'uploading' prop we pass it.
+     // So we need to manage state here.
+  };
+  
+  // Re-implementing the upload logic from the deleted ThemeUploader inside the main component or a wrapper
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({}); // FileUploader expects progress object
+  const showToast = useToastStore((state) => state.showToast);
+
+  const onThemeDrop = useCallback(async (files) => {
+    if (files.length !== 1) {
+       showToast(t("themes.toasts.singleFileError"), "error");
+       return;
+    }
+    const file = files[0];
+    setIsUploading(true);
+    // Fake progress for now since uploadThemeZip doesn't support it yet match interface
+    setUploadProgress({ [file.name]: 0 });
+
+    try {
+        // Simulate progress
+        const interval = setInterval(() => {
+           setUploadProgress(prev => ({ ...prev, [file.name]: Math.min((prev[file.name] || 0) + 10, 90) }));
+        }, 100);
+
+        const result = await uploadThemeZip(file);
+        
+        clearInterval(interval);
+        setUploadProgress({ [file.name]: 100 });
+        
+        if (result.theme) {
+          handleUploadSuccess(result.theme);
+        }
+        showToast(result.message || t("themes.toasts.uploadSuccess"), "success");
+    } catch (error) {
+        console.error("Theme upload error:", error);
+        showToast(error.message || t("themes.toasts.uploadError"), "error");
+    } finally {
+        setIsUploading(false);
+        setUploadProgress({});
+    }
+  }, [showToast, t]);
+
+
   if (loading) {
     return (
       <PageLayout title={t("themes.title")}>
@@ -128,7 +106,18 @@ export default function Themes() {
 
   return (
     <PageLayout title={t("themes.title")} description={t("themes.description")}>
-      <ThemeUploader onUploadSuccess={handleUploadSuccess} />
+      <div className="mb-6">
+        <FileUploader 
+          onUpload={onThemeDrop}
+          uploading={isUploading}
+          uploadProgress={uploadProgress}
+          accept={{ "application/zip": [".zip"] }}
+          multiple={false}
+          title={t("themes.uploader.title")}
+          description={t("themes.uploader.description")}
+          maxSizeText={t("themes.uploader.supported")}
+        />
+      </div>
 
       {themes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

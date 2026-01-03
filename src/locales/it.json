@@ -125,11 +125,19 @@
     "mediaUploader": {
       "dropActive": "Rilascia i file qui...",
       "dropInactive": "Trascina e rilascia immagini e video qui o",
-      "selectFiles": "Seleziona File",
+      "selectFiles": "Seleziona file",
       "supportedImages": "Immagini: JPG, PNG, GIF, WebP, SVG",
       "supportedVideos": "Video: MP4, WebM, MOV, AVI, MKV",
       "uploading": "Caricamento..."
     },
+    "fileUploader": {
+      "dropActive": "Rilascia i file qui...",
+      "dropHere": "Rilascia i tuoi file qui",
+      "clickOrDrop": "Clicca per caricare o trascina e rilascia",
+      "browseFiles": "Sfoglia file",
+      "uploading": "Caricamento..."
+    },
+
     "mediaSelector": {
       "title": "Seleziona Media",
       "searchPlaceholder": "Cerca file media...",
@@ -445,7 +453,11 @@
     "title": "Media",
     "loading": "Caricamento file media...",
     "emptyTitle": "Nessun file media ancora",
-    "emptyDesc": "Carica alcuni file utilizzando l'uploader qui sopra."
+    "emptyDesc": "Carica alcuni file utilizzando l'uploader qui sopra.",
+    "uploader": {
+      "title": "Carica Media",
+      "description": "Trascina e rilascia immagini o video per caricarli nella tua libreria"
+    }
   },
   "themeSettings": {
     "title": "Impostazioni tema",
@@ -467,6 +479,11 @@
     "dropZoneActive": "Rilascia il file zip del tema qui...",
     "dropZoneInactive": "Trascina e rilascia il file zip del tuo tema qui, o clicca per selezionare il file",
     "maxFileSize": "Dimensione massima file: 10MB",
+    "uploader": {
+      "title": "Carica Tema",
+      "description": "Trascina e rilascia un file .zip per installare un nuovo tema",
+      "supported": "Formato supportato: .zip"
+    },
     "version": "Versione {{version}}",
     "widgets": "{{count}} widget",
     "by": "Di {{author}}",

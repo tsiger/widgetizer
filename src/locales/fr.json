@@ -124,12 +124,20 @@
     },
     "mediaUploader": {
       "dropActive": "Déposez les fichiers ici...",
-      "dropInactive": "Glissez-déposez des images et vidéos ici ou",
+      "dropInactive": "Glissez et déposez des images et des vidéos ici ou",
       "selectFiles": "Sélectionner des fichiers",
       "supportedImages": "Images : JPG, PNG, GIF, WebP, SVG",
       "supportedVideos": "Vidéos : MP4, WebM, MOV, AVI, MKV",
-      "uploading": "Téléversement..."
+      "uploading": "Téléchargement..."
     },
+    "fileUploader": {
+      "dropActive": "Déposez les fichiers ici...",
+      "dropHere": "Déposez vos fichiers ici",
+      "clickOrDrop": "Cliquez pour télécharger ou glissez-déposez",
+      "browseFiles": "Parcourir les fichiers",
+      "uploading": "Téléchargement..."
+    },
+
     "mediaSelector": {
       "title": "Sélectionner un média",
       "searchPlaceholder": "Rechercher des fichiers médias...",
@@ -445,7 +453,11 @@
     "title": "Médias",
     "loading": "Chargement des fichiers médias...",
     "emptyTitle": "Pas encore de fichiers médias",
-    "emptyDesc": "Téléversez des fichiers en utilisant le formulaire ci-dessus."
+    "emptyDesc": "Téléversez des fichiers en utilisant le formulaire ci-dessus.",
+    "uploader": {
+      "title": "Télécharger des médias",
+      "description": "Glissez et déposez des images ou des vidéos pour les télécharger dans votre bibliothèque"
+    }
   },
   "themeSettings": {
     "title": "Paramètres du thème",
@@ -467,6 +479,11 @@
     "dropZoneActive": "Déposez le fichier zip du thème ici...",
     "dropZoneInactive": "Glissez-déposez votre fichier zip de thème ici, ou cliquez pour sélectionner un fichier",
     "maxFileSize": "Taille max du fichier : 10 Mo",
+    "uploader": {
+      "title": "Télécharger un thème",
+      "description": "Glissez et déposez un fichier .zip pour installer un nouveau thème",
+      "supported": "Format pris en charge : .zip"
+    },
     "version": "Version {{version}}",
     "widgets": "{{count}} widgets",
     "by": "Par {{author}}",

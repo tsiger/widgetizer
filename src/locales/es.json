@@ -123,13 +123,21 @@
       "searchPlaceholder": "Buscar medios..."
     },
     "mediaUploader": {
-      "dropActive": "Suelta los archivos aquí...",
-      "dropInactive": "Arrastra y suelta imágenes y videos aquí o",
+      "dropActive": "Suelte los archivos aquí...",
+      "dropInactive": "Arrastre y suelte imágenes y videos aquí o",
       "selectFiles": "Seleccionar Archivos",
       "supportedImages": "Imágenes: JPG, PNG, GIF, WebP, SVG",
       "supportedVideos": "Videos: MP4, WebM, MOV, AVI, MKV",
       "uploading": "Subiendo..."
     },
+    "fileUploader": {
+      "dropActive": "Suelte los archivos aquí...",
+      "dropHere": "Suelte sus archivos aquí",
+      "clickOrDrop": "Haga clic para subir o arrastre y suelte",
+      "browseFiles": "Explorar Archivos",
+      "uploading": "Subiendo..."
+    },
+
     "mediaSelector": {
       "title": "Seleccionar Medios",
       "searchPlaceholder": "Buscar archivos de medios...",
@@ -446,7 +454,11 @@
     "title": "Medios",
     "loading": "Cargando archivos de medios...",
     "emptyTitle": "Aún no hay archivos de medios",
-    "emptyDesc": "Sube algunos archivos usando el cargador de arriba."
+    "emptyDesc": "Sube algunos archivos usando el cargador de arriba.",
+    "uploader": {
+      "title": "Subir Medios",
+      "description": "Arrastre y suelte imágenes o videos para subirlos a su biblioteca de proyectos"
+    }
   },
   "themeSettings": {
     "title": "Configuración del tema",
@@ -468,6 +480,11 @@
     "dropZoneActive": "Suelta el archivo zip del tema aquí...",
     "dropZoneInactive": "Arrastra y suelta tu archivo zip de tema aquí, o haz clic para seleccionar archivo",
     "maxFileSize": "Tamaño máximo de archivo: 10MB",
+    "uploader": {
+      "title": "Subir Tema",
+      "description": "Arrastre y suelte un archivo .zip para instalar un nuevo tema",
+      "supported": "Formato compatible: .zip"
+    },
     "version": "Versión {{version}}",
     "widgets": "{{count}} widgets",
     "by": "Por {{author}}",
