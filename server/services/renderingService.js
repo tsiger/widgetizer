@@ -25,7 +25,7 @@ import { registerAudioFilter } from "../../src/core/filters/audioFilter.js";
 import { registerYouTubeFilter } from "../../src/core/filters/youtubeFilter.js";
 import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
-import { getProjectSlug } from "../utils/projectHelpers.js";
+import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 // Get the directory path of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -156,8 +156,8 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   // Check if icons need to be reloaded (new project, or file changed in preview mode)
   let shouldReloadIcons = !global.iconsCache.has(projectId);
 
-  const projectSlug = await getProjectSlug(projectId);
-  const projectDir = getProjectDir(projectSlug);
+  const projectFolderName = await getProjectFolderName(projectId);
+  const projectDir = getProjectDir(projectFolderName);
   const iconsPath = path.join(projectDir, "assets", "icons.json");
 
   if (!shouldReloadIcons && renderMode === "preview") {
@@ -256,8 +256,8 @@ async function renderWidget(
 ) {
   try {
     const { type, settings = {}, blocks = {}, blocksOrder = [] } = widgetData;
-    const projectSlug = await getProjectSlug(projectId);
-    const projectDir = getProjectDir(projectSlug);
+    const projectFolderName = await getProjectFolderName(projectId);
+    const projectDir = getProjectDir(projectFolderName);
 
     // Determine if this is a core widget (prefixed with "core-")
     const isCoreWidget = type.startsWith("core-");
@@ -421,8 +421,8 @@ async function renderPageLayout(
 ) {
   try {
     // 1. Fetch layout.liquid for the project
-    const projectSlug = await getProjectSlug(projectId);
-    const projectDir = getProjectDir(projectSlug);
+    const projectFolderName = await getProjectFolderName(projectId);
+    const projectDir = getProjectDir(projectFolderName);
     const layoutPath = path.join(projectDir, "layout.liquid");
 
     let layoutTemplate;

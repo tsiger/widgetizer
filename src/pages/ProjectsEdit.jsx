@@ -61,8 +61,8 @@ export default function ProjectsEdit() {
       });
       setProject(updatedProject);
 
-      // Check if the project slug changed
-      if (updatedProject.slug !== project.slug) {
+      // Check if the project folderName changed
+      if (updatedProject.folderName !== project.folderName) {
         // If this was the active project, refresh the active project state
         if (activeProject && activeProject.id === id) {
           const refreshedActiveProject = await getActiveProject();

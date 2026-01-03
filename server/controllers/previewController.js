@@ -5,7 +5,7 @@ import { readProjectsFile } from "./projectController.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
-import { getProjectSlug } from "../utils/projectHelpers.js";
+import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 
 // Get the directory path of the current module
@@ -221,8 +221,8 @@ export async function getGlobalWidgets(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const projectSlug = await getProjectSlug(activeProjectId);
-    const projectDir = getProjectDir(projectSlug);
+    const projectFolderName = await getProjectFolderName(activeProjectId);
+    const projectDir = getProjectDir(projectFolderName);
     // Global widgets *data* is stored in pages/global, not widgets/global
     const globalPagesDir = path.join(projectDir, "pages", "global");
 
@@ -288,8 +288,8 @@ export async function saveGlobalWidget(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const projectSlug = await getProjectSlug(activeProjectId);
-    const projectDir = getProjectDir(projectSlug);
+    const projectFolderName = await getProjectFolderName(activeProjectId);
+    const projectDir = getProjectDir(projectFolderName);
     const globalPagesDir = path.join(projectDir, "pages", "global");
 
     // Ensure global directory exists
@@ -321,8 +321,8 @@ export async function serveAsset(req, res) {
   const { projectId, folder, filename } = req.params;
 
   // Build the path to the asset file
-  const projectSlug = await getProjectSlug(projectId);
-  const filePath = path.join(getProjectDir(projectSlug), folder, filename);
+  const projectFolderName = await getProjectFolderName(projectId);
+  const filePath = path.join(getProjectDir(projectFolderName), folder, filename);
 
   try {
     // Check if file exists using fs-extra

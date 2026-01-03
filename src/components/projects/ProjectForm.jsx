@@ -31,14 +31,14 @@ export default function ProjectForm({
   } = useForm({
     defaultValues: {
       name: initialData.name || "",
-      slug: initialData.slug || initialData.id || "",
+      folderName: initialData.folderName || initialData.id || "",
       description: initialData.description || "",
       theme: initialData.theme || "",
       siteUrl: initialData.siteUrl || (isNew ? "https://" : ""),
     },
   });
 
-  // Watch name for auto-slug generation
+  // Watch name for auto-folder-name generation
   const name = watch("name");
 
   // Notify parent of dirty state changes
@@ -49,10 +49,10 @@ export default function ProjectForm({
   // Track previous initialData to prevent infinite loops
   const prevInitialDataRef = useRef(JSON.stringify(initialData));
 
-  // Auto-generate slug from name for new projects
+  // Auto-generate folderName from name for new projects
   useEffect(() => {
     if (isNew && name) {
-      setValue("slug", formatSlug(name));
+      setValue("folderName", formatSlug(name));
     }
   }, [name, isNew, setValue]);
 
@@ -62,7 +62,7 @@ export default function ProjectForm({
     if (prevInitialDataRef.current !== currentInitialDataStr) {
       reset({
         name: initialData.name || "",
-        slug: initialData.slug || initialData.id || "",
+        folderName: initialData.folderName || initialData.id || "",
         description: initialData.description || "",
         theme: initialData.theme || "",
         siteUrl: initialData.siteUrl || (isNew ? "https://" : ""),
@@ -108,7 +108,7 @@ export default function ProjectForm({
       if (result === true) {
         reset({
           name: "",
-          slug: "",
+          folderName: "",
           description: "",
           theme: "",
           siteUrl: "https://",
@@ -146,25 +146,25 @@ export default function ProjectForm({
         </div>
 
         <div className="form-field">
-          <label htmlFor="slug" className="form-label">
-            {t("forms.project.slugLabel")}
+          <label htmlFor="folderName" className="form-label">
+            {t("forms.project.folderNameLabel")}
           </label>
           <input
             type="text"
-            id="slug"
-            {...register("slug", {
-              required: t("forms.project.slugRequired"),
-              validate: (value) => value.trim() !== "" || t("forms.project.slugNotEmpty"),
+            id="folderName"
+            {...register("folderName", {
+              required: t("forms.project.folderNameRequired"),
+              validate: (value) => value.trim() !== "" || t("forms.project.folderNameNotEmpty"),
               pattern: {
                 value: /^[a-z0-9-]+$/,
-                message: t("forms.project.slugPattern"),
+                message: t("forms.project.folderNamePattern"),
               },
             })}
             className="form-input"
           />
-          {errors.slug && <p className="form-error">{errors.slug.message}</p>}
+          {errors.folderName && <p className="form-error">{errors.folderName.message}</p>}
           <p className="form-description">
-            {t("forms.project.slugHelp")}
+            {t("forms.project.folderNameHelp")}
           </p>
         </div>
 

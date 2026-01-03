@@ -26,7 +26,7 @@
   }
 
   .form-label-optional {
-    @apply block text-sm font-normal text-slate-600 mb-1;
+    @apply block text-sm font-medium text-slate-600 mb-1;
   }
 
   .form-label-large {

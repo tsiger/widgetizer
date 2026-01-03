@@ -104,7 +104,7 @@ export async function createProject(req, res) {
   }
 
   try {
-    const { name, slug: providedSlug, description, theme, siteUrl } = req.body;
+    const { name, folderName: providedFolderName, description, theme, siteUrl } = req.body;
     const data = await readProjectsFile();
 
     // Check for duplicate project names
@@ -115,30 +115,30 @@ export async function createProject(req, res) {
         .json({ error: `A project named "${name}" already exists. Please choose a different name.` });
     }
 
-    // Use provided slug or generate one from name
-    let slug;
-    if (providedSlug && providedSlug.trim()) {
-      slug = providedSlug.trim();
-      // Validate slug format
-      const slugPattern = /^[a-z0-9-]+$/;
-      if (!slugPattern.test(slug)) {
-        return res.status(400).json({ error: "Slug can only contain lowercase letters, numbers, and hyphens" });
+    // Use provided folderName or generate one from name
+    let folderName;
+    if (providedFolderName && providedFolderName.trim()) {
+      folderName = providedFolderName.trim();
+      // Validate folderName format
+      const folderNamePattern = /^[a-z0-9-]+$/;
+      if (!folderNamePattern.test(folderName)) {
+        return res.status(400).json({ error: "Folder Name can only contain lowercase letters, numbers, and hyphens" });
       }
-      // Check for duplicate slugs
-      const duplicateSlug = data.projects.find((p) => p.slug === slug); // ID check removed
-      if (duplicateSlug) {
+      // Check for duplicate folderNames
+      const duplicateFolderName = data.projects.find((p) => p.folderName === folderName);
+      if (duplicateFolderName) {
         return res
           .status(400)
-          .json({ error: `A project with slug "${slug}" already exists. Please choose a different slug.` });
+          .json({ error: `A project with folder name "${folderName}" already exists. Please choose a different folder name.` });
       }
     } else {
-      // Generate slug from name if not provided
-      slug = await generateUniqueProjectId(name, data.projects);
+      // Generate folderName from name if not provided
+      folderName = await generateUniqueProjectId(name, data.projects);
     }
 
     const newProject = {
       id: uuidv4(), // ✅ Generate stable UUID
-      slug, // Folder identifier
+      folderName, // Folder identifier
       name,
       description,
       theme,
@@ -147,8 +147,8 @@ export async function createProject(req, res) {
       updated: new Date().toISOString(),
     };
 
-    // Use the permanent slug for directory creation
-    const projectDir = getProjectDir(slug);
+    // Use the permanent folderName for directory creation
+    const projectDir = getProjectDir(folderName);
     await fs.ensureDir(projectDir);
 
     if (!theme) {
@@ -160,7 +160,7 @@ export async function createProject(req, res) {
       await themeController.copyThemeToProject(theme, projectDir, ["templates"]);
 
       // Then handle templates separately, recursively
-      const pagesDir = getProjectPagesDir(slug);
+      const pagesDir = getProjectPagesDir(folderName);
       const themeTemplatesDir = getThemeTemplatesDir(theme);
 
       // Helper function to recursively find and process templates
@@ -207,7 +207,7 @@ export async function createProject(req, res) {
       await processTemplatesRecursive(themeTemplatesDir, pagesDir);
 
       const themeMenusDir = path.join(getThemeDir(theme), "menus");
-      const projectMenusDir = getProjectMenusDir(slug);
+      const projectMenusDir = getProjectMenusDir(folderName);
       try {
         // Check if theme has menus directory
         if (await fs.pathExists(themeMenusDir)) {
@@ -312,8 +312,7 @@ export async function updateProject(req, res) {
 
     const currentProject = data.projects[projectIndex];
 
-    // Ensure backward compatibility - if project doesn't have slug, use its id
-    const currentSlug = currentProject.slug || currentProject.id;
+    const currentFolderName = currentProject.folderName;
 
     // Check for duplicate project names (excluding current project)
     if (updates.name && updates.name.trim() !== currentProject.name) {
@@ -330,21 +329,21 @@ export async function updateProject(req, res) {
     let updatedProject = { ...currentProject };
     let newProjectId = id;
 
-    // Check if slug is being updated and if it would be different
-    if (updates.slug && updates.slug.trim() !== currentSlug) {
-      const newSlug = updates.slug.trim();
+    // Check if folderName is being updated and if it would be different
+    if (updates.folderName && updates.folderName.trim() !== currentFolderName) {
+      const newFolderName = updates.folderName.trim();
 
-      // Check for duplicate slugs (excluding current project)
-      const duplicateSlug = data.projects.find((p) => p.id !== id && p.slug === newSlug);
-      if (duplicateSlug) {
+      // Check for duplicate folderNames (excluding current project)
+      const duplicateFolderName = data.projects.find((p) => p.id !== id && (p.folderName === newFolderName || p.slug === newFolderName));
+      if (duplicateFolderName) {
         return res
           .status(400)
-          .json({ error: `A project with slug "${newSlug}" already exists. Please choose a different slug.` });
+          .json({ error: `A project with folder name "${newFolderName}" already exists. Please choose a different folder name.` });
       }
 
       // Rename the project directory
-      const oldDir = getProjectDir(currentSlug);
-      const newDir = getProjectDir(newSlug);
+      const oldDir = getProjectDir(currentFolderName);
+      const newDir = getProjectDir(newFolderName);
 
       try {
         // Use copy + remove instead of rename for better Windows compatibility
@@ -370,7 +369,8 @@ export async function updateProject(req, res) {
     updatedProject = {
       ...updatedProject,
       id: id, // ID never changes
-      slug: updates.slug || currentSlug, // Ensure slug is always set
+      folderName: updates.folderName || currentFolderName, // Ensure folderName is always set
+      slug: undefined, // Remove legacy slug if it exists
       name: updates.name || updatedProject.name,
       description: updates.description !== undefined ? updates.description : updatedProject.description,
       siteUrl: updates.siteUrl !== undefined ? updates.siteUrl : updatedProject.siteUrl,
@@ -406,7 +406,7 @@ export async function deleteProject(req, res) {
 
     const project = data.projects[projectIndex];
     const projectName = project.name;
-    const projectSlug = project.slug || project.id;
+    const projectFolderName = project.folderName;
 
     // Remove from array AFTER we've captured the data we need
     data.projects.splice(projectIndex, 1);
@@ -416,8 +416,8 @@ export async function deleteProject(req, res) {
 
     await writeProjectsFile(data);
 
-    // Delete project directory using the slug we captured earlier
-    const projectDir = getProjectDir(projectSlug);
+    // Delete project directory using the folderName we captured earlier
+    const projectDir = getProjectDir(projectFolderName);
     await fs.remove(projectDir);
 
     // Clean up all exports for this project
@@ -474,25 +474,26 @@ export async function duplicateProject(req, res) {
       }
     });
 
-    // Generate the new name and slug
+    // Generate the new name and folderName
     const newName = copyNumber === 0 ? `Copy of ${baseName}` : `Copy ${copyNumber + 1} of ${baseName}`;
-    const newSlug = await generateUniqueProjectId(newName, data.projects);
+    const newFolderName = await generateUniqueProjectId(newName, data.projects);
 
     // Create the new project metadata
     const newProject = {
       ...originalProject,
       id: uuidv4(), // ✅ Generate new stable UUID
-      slug: newSlug, // Permanent folder identifier
+      folderName: newFolderName, // Permanent folder identifier
+      slug: undefined, // Clear legacy slug
       name: newName,
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
 
     // Copy the entire project directory
-    // Use slug for directory path, not ID
-    const originalSlug = originalProject.slug || originalProject.id;
-    const originalDir = getProjectDir(originalSlug);
-    const newDir = getProjectDir(newSlug);
+    // Use folderName for directory path, not ID
+    const originalFolderName = originalProject.folderName;
+    const originalDir = getProjectDir(originalFolderName);
+    const newDir = getProjectDir(newFolderName);
 
     try {
       await fs.copy(originalDir, newDir);
@@ -539,8 +540,8 @@ export async function getProjectWidgets(req, res) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    const projectSlug = project.slug || project.id;
-    const projectRootDir = getProjectDir(projectSlug);
+    const projectFolderName = project.folderName;
+    const projectRootDir = getProjectDir(projectFolderName);
     const widgetsBaseDir = path.join(projectRootDir, "widgets");
     const globalWidgetsDir = path.join(widgetsBaseDir, "global");
 
@@ -635,7 +636,7 @@ export async function getProjectIcons(req, res) {
   try {
     const { projectId } = req.params;
 
-    // Need to look up project to get the slug/folder name
+    // Need to look up project to get the folderName/folder name
     const data = await readProjectsFile();
     const project = data.projects.find((p) => p.id === projectId);
 
@@ -643,8 +644,8 @@ export async function getProjectIcons(req, res) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    const projectSlug = project.slug || project.id;
-    const projectRootDir = getProjectDir(projectSlug);
+    const projectFolderName = project.folderName;
+    const projectRootDir = getProjectDir(projectFolderName);
     const iconsPath = path.join(projectRootDir, "assets", "icons.json");
 
     if (await fs.pathExists(iconsPath)) {

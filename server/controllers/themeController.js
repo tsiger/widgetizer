@@ -9,7 +9,7 @@ import {
   getProjectDir,
   getProjectThemeJsonPath,
 } from "../config.js";
-import { getProjectSlug } from "../utils/projectHelpers.js";
+import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 export async function ensureThemesDirectory() {
   try {
@@ -301,9 +301,9 @@ export async function uploadTheme(req, res) {
 export async function getProjectThemeSettings(req, res) {
   try {
     const { projectId } = req.params;
-    const projectSlug = await getProjectSlug(projectId);
+    const projectFolderName = await getProjectFolderName(projectId);
     // Call the internal helper function
-    const themeData = await readProjectThemeData(projectSlug);
+    const themeData = await readProjectThemeData(projectFolderName);
     res.json(themeData);
   } catch (error) {
     // Handle errors appropriately for the API response
@@ -320,11 +320,11 @@ export async function getProjectThemeSettings(req, res) {
 export async function saveProjectThemeSettings(req, res) {
   try {
     const { projectId } = req.params;
-    const projectSlug = await getProjectSlug(projectId);
-    const themeFile = getProjectThemeJsonPath(projectSlug);
+    const projectFolderName = await getProjectFolderName(projectId);
+    const themeFile = getProjectThemeJsonPath(projectFolderName);
 
     // Check if project exists
-    const projectDir = getProjectDir(projectSlug);
+    const projectDir = getProjectDir(projectFolderName);
     try {
       await fs.access(projectDir);
     } catch (err) {

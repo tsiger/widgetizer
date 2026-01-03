@@ -19,7 +19,7 @@ import {
 } from "../config.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
-import { getProjectSlug } from "../utils/projectHelpers.js";
+import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 // Get image processing settings from app settings
 async function getImageProcessingSettings() {
@@ -68,8 +68,8 @@ function decodeFileName(filename) {
 
 // Read media.json metadata file
 export async function readMediaFile(projectId) {
-  const projectSlug = await getProjectSlug(projectId);
-  const mediaFilePath = getProjectMediaJsonPath(projectSlug);
+  const projectFolderName = await getProjectFolderName(projectId);
+  const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
 
   try {
     await fs.access(mediaFilePath);
@@ -89,8 +89,8 @@ export async function readMediaFile(projectId) {
 
 // Write media metadata file
 async function writeMediaFile(projectId, data) {
-  const projectSlug = await getProjectSlug(projectId);
-  const mediaFilePath = getProjectMediaJsonPath(projectSlug);
+  const projectFolderName = await getProjectFolderName(projectId);
+  const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
   await fs.outputFile(mediaFilePath, JSON.stringify(data, null, 2));
 }
 
@@ -99,15 +99,15 @@ const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
     try {
       const { projectId } = req.params;
-      const projectSlug = await getProjectSlug(projectId);
+      const projectFolderName = await getProjectFolderName(projectId);
       let targetDir;
 
       if (file.mimetype.startsWith("video/")) {
-        targetDir = getProjectVideosDir(projectSlug);
+        targetDir = getProjectVideosDir(projectFolderName);
       } else if (file.mimetype.startsWith("audio/")) {
-        targetDir = getProjectAudiosDir(projectSlug);
+        targetDir = getProjectAudiosDir(projectFolderName);
       } else {
-        targetDir = getProjectImagesDir(projectSlug);
+        targetDir = getProjectImagesDir(projectFolderName);
       }
 
       await fs.ensureDir(targetDir);
@@ -123,15 +123,15 @@ const storage = multer.diskStorage({
       const nameWithoutExt = path.basename(decodedName, extension);
       let cleanName = slugify(nameWithoutExt, { lower: true, strict: true, trim: true });
       const { projectId } = req.params;
-      const projectSlug = await getProjectSlug(projectId);
+      const projectFolderName = await getProjectFolderName(projectId);
 
       let targetDir;
       if (file.mimetype.startsWith("video/")) {
-        targetDir = getProjectVideosDir(projectSlug);
+        targetDir = getProjectVideosDir(projectFolderName);
       } else if (file.mimetype.startsWith("audio/")) {
-        targetDir = getProjectAudiosDir(projectSlug);
+        targetDir = getProjectAudiosDir(projectFolderName);
       } else {
-        targetDir = getProjectImagesDir(projectSlug);
+        targetDir = getProjectImagesDir(projectFolderName);
       }
 
       let finalName = `${cleanName}${extension}`;
@@ -172,10 +172,10 @@ export async function getProjectMedia(req, res) {
 
   try {
     const { projectId } = req.params;
-    const projectSlug = await getProjectSlug(projectId);
+    const projectFolderName = await getProjectFolderName(projectId);
 
     // Ensure project exists
-    const projectDir = getProjectDir(projectSlug);
+    const projectDir = getProjectDir(projectFolderName);
     if (!(await fs.pathExists(projectDir))) {
       return res.status(404).json({ error: "Project not found" });
     }
@@ -505,13 +505,13 @@ export async function deleteProjectMedia(req, res) {
 
     // Remove the physical files from storage
     let fileDir;
-    const projectSlug = await getProjectSlug(projectId);
+    const projectFolderName = await getProjectFolderName(projectId);
     if (fileToDelete.type && fileToDelete.type.startsWith("video/")) {
-      fileDir = getProjectVideosDir(projectSlug);
+      fileDir = getProjectVideosDir(projectFolderName);
     } else if (fileToDelete.type && fileToDelete.type.startsWith("audio/")) {
-      fileDir = getProjectAudiosDir(projectSlug);
+      fileDir = getProjectAudiosDir(projectFolderName);
     } else {
-      fileDir = getProjectImagesDir(projectSlug);
+      fileDir = getProjectImagesDir(projectFolderName);
     }
 
     // 1. Delete the original file
@@ -530,7 +530,7 @@ export async function deleteProjectMedia(req, res) {
         const size = fileToDelete.sizes[sizeName];
         if (size && size.path) {
           const sizeFilename = path.basename(size.path);
-          const sizeFilePath = path.join(getProjectImagesDir(projectSlug), sizeFilename);
+          const sizeFilePath = path.join(getProjectImagesDir(projectFolderName), sizeFilename);
           try {
             if (await fs.pathExists(sizeFilePath)) {
               await fs.unlink(sizeFilePath);
@@ -572,13 +572,13 @@ export async function serveProjectMedia(req, res) {
       const videoExtensions = [".mp4", ".webm", ".ogg", ".avi", ".mov"];
       const audioExtensions = [".mp3"];
 
-      const projectSlug = await getProjectSlug(projectId);
+      const projectFolderName = await getProjectFolderName(projectId);
       if (videoExtensions.includes(ext)) {
-        filePath = getVideoPath(projectSlug, filename);
+        filePath = getVideoPath(projectFolderName, filename);
       } else if (audioExtensions.includes(ext)) {
-        filePath = getAudioPath(projectSlug, filename);
+        filePath = getAudioPath(projectFolderName, filename);
       } else {
-        filePath = getImagePath(projectSlug, filename);
+        filePath = getImagePath(projectFolderName, filename);
       }
     }
     // Otherwise, look up the file by ID
@@ -592,8 +592,8 @@ export async function serveProjectMedia(req, res) {
         return res.status(404).json({ error: "File not found" });
       }
 
-      const projectSlug = await getProjectSlug(projectId);
-      filePath = path.join(getProjectDir(projectSlug), fileInfo.path);
+      const projectFolderName = await getProjectFolderName(projectId);
+      filePath = path.join(getProjectDir(projectFolderName), fileInfo.path);
     }
 
     if (!filePath) {
@@ -690,13 +690,13 @@ export async function bulkDeleteProjectMedia(req, res) {
     const deletePromises = filesToDelete.map(async (file) => {
       // 1. Delete the original file
       let fileDir;
-      const projectSlug = await getProjectSlug(projectId);
+      const projectFolderName = await getProjectFolderName(projectId);
       if (file.type && file.type.startsWith("video/")) {
-        fileDir = getProjectVideosDir(projectSlug);
+        fileDir = getProjectVideosDir(projectFolderName);
       } else if (file.type && file.type.startsWith("audio/")) {
-        fileDir = getProjectAudiosDir(projectSlug);
+        fileDir = getProjectAudiosDir(projectFolderName);
       } else {
-        fileDir = getProjectImagesDir(projectSlug);
+        fileDir = getProjectImagesDir(projectFolderName);
       }
 
       const originalFilePath = path.join(fileDir, file.filename);
@@ -711,7 +711,7 @@ export async function bulkDeleteProjectMedia(req, res) {
           const size = file.sizes[sizeName];
           if (size && size.path) {
             const sizeFilename = path.basename(size.path);
-            const sizeFilePath = path.join(getProjectImagesDir(projectSlug), sizeFilename);
+            const sizeFilePath = path.join(getProjectImagesDir(projectFolderName), sizeFilename);
             try {
               if (await fs.pathExists(sizeFilePath)) await fs.unlink(sizeFilePath);
             } catch (err) {

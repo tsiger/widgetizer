@@ -14,9 +14,9 @@ export async function getAllMenus(req, res) {
     if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
-    const projectSlug = activeProject.slug || activeProject.id;
+    const projectFolderName = activeProject.folderName;
 
-    const menusDir = getProjectMenusDir(projectSlug);
+    const menusDir = getProjectMenusDir(projectFolderName);
 
     if (!(await fs.pathExists(menusDir))) {
       return res.json([]);
@@ -74,15 +74,15 @@ export async function createMenu(req, res) {
     if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
-    const projectSlug = activeProject.slug || activeProject.id;
+    const projectFolderName = activeProject.folderName;
 
-    const menusDir = getProjectMenusDir(projectSlug);
+    const menusDir = getProjectMenusDir(projectFolderName);
     await fs.ensureDir(menusDir);
 
     // Generate unique ID from name (or use requested ID if provided)
-    const menuId = requestedId || (await generateUniqueMenuId(projectSlug, name));
+    const menuId = requestedId || (await generateUniqueMenuId(projectFolderName, name));
 
-    const menuPath = getMenuPath(projectSlug, menuId);
+    const menuPath = getMenuPath(projectFolderName, menuId);
     if (await fs.pathExists(menuPath)) {
       return res.status(400).json({ error: "A menu with this name already exists" });
     }
@@ -120,9 +120,9 @@ export async function deleteMenu(req, res) {
     if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
-    const projectSlug = activeProject.slug || activeProject.id;
+    const projectFolderName = activeProject.folderName;
 
-    const menuPath = getMenuPath(projectSlug, id);
+    const menuPath = getMenuPath(projectFolderName, id);
     await fs.remove(menuPath);
     res.json({ success: true });
   } catch (error) {
@@ -146,9 +146,9 @@ export async function getMenu(req, res) {
     if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
-    const projectSlug = activeProject.slug || activeProject.id;
+    const projectFolderName = activeProject.folderName;
 
-    const menuPath = getMenuPath(projectSlug, id);
+    const menuPath = getMenuPath(projectFolderName, id);
     if (!(await fs.pathExists(menuPath))) {
       return res.status(404).json({ error: "Menu not found" });
     }
@@ -178,9 +178,9 @@ export async function updateMenu(req, res) {
     if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
-    const projectSlug = activeProject.slug || activeProject.id;
+    const projectFolderName = activeProject.folderName;
 
-    const currentMenuPath = getMenuPath(projectSlug, currentMenuId);
+    const currentMenuPath = getMenuPath(projectFolderName, currentMenuId);
 
     // Check if current menu exists
     if (!(await fs.pathExists(currentMenuPath))) {
@@ -201,7 +201,7 @@ export async function updateMenu(req, res) {
 
     // Only rename if the expected ID is different from current AND the new path doesn't exist
     if (expectedIdFromName !== currentMenuId) {
-      const newMenuPath = getMenuPath(projectSlug, expectedIdFromName);
+      const newMenuPath = getMenuPath(projectFolderName, expectedIdFromName);
 
       if (!(await fs.pathExists(newMenuPath))) {
         // Safe to rename
@@ -290,9 +290,9 @@ export async function duplicateMenu(req, res) {
     if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });
     }
-    const projectSlug = activeProject.slug || activeProject.id;
+    const projectFolderName = activeProject.folderName;
 
-    const originalMenuPath = getMenuPath(projectSlug, id);
+    const originalMenuPath = getMenuPath(projectFolderName, id);
 
     // Check if original menu exists
     if (!(await fs.pathExists(originalMenuPath))) {
@@ -305,7 +305,7 @@ export async function duplicateMenu(req, res) {
 
     // Generate new unique name and ID
     const baseName = `Copy of ${originalMenu.name}`;
-    const newMenuId = await generateUniqueMenuId(projectSlug, baseName);
+    const newMenuId = await generateUniqueMenuId(projectFolderName, baseName);
 
     // Create the duplicated menu with new data
     const duplicatedMenu = {
@@ -318,7 +318,7 @@ export async function duplicateMenu(req, res) {
     };
 
     // Save the new menu
-    const newMenuPath = getMenuPath(projectSlug, newMenuId);
+    const newMenuPath = getMenuPath(projectFolderName, newMenuId);
     await fs.outputFile(newMenuPath, JSON.stringify(duplicatedMenu, null, 2));
 
     res.status(201).json(duplicatedMenu);

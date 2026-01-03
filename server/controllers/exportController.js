@@ -160,14 +160,14 @@ export async function exportProject(req, res) {
       throw new Error(`Project with ID "${projectId}" not found in projects.json`);
     }
 
-    const projectSlug = projectData.slug || projectData.id;
-    const projectDir = getProjectDir(projectSlug);
+    const projectFolderName = projectData.folderName;
+    const projectDir = getProjectDir(projectFolderName);
     const siteUrl = projectData.siteUrl || "";
 
     // Continue with defining export version and output directories.
     const version = await getNextVersion(projectId);
     const outputBaseDir = PUBLISH_DIR;
-    const outputDir = path.join(outputBaseDir, `${projectSlug}-v${version}`);
+    const outputDir = path.join(outputBaseDir, `${projectFolderName}-v${version}`);
     const outputAssetsDir = path.join(outputDir, "assets");
     const outputImagesDir = path.join(outputAssetsDir, "images"); // Images now in assets/images/
     const outputVideosDir = path.join(outputAssetsDir, "videos"); // Videos now in assets/videos/
@@ -180,10 +180,10 @@ export async function exportProject(req, res) {
     await fs.ensureDir(outputVideosDir);
     await fs.ensureDir(outputAudiosDir);
 
-    const rawThemeSettings = await readProjectThemeData(projectSlug);
+    const rawThemeSettings = await readProjectThemeData(projectFolderName);
 
     // Fetch list of page data using the helper function
-    const pagesDataArray = await listProjectPagesData(projectSlug);
+    const pagesDataArray = await listProjectPagesData(projectFolderName);
 
     // Validate that at least one page has the "index" slug (required for homepage)
     // Note: page.id is derived from filename, which is the authoritative slug
@@ -231,8 +231,8 @@ Sitemap: ${sitemapUrl}`;
     }
     // --- End of new SEO file generation ---
 
-    const headerData = await readGlobalWidgetData(projectSlug, "header");
-    const footerData = await readGlobalWidgetData(projectSlug, "footer");
+    const headerData = await readGlobalWidgetData(projectFolderName, "header");
+    const footerData = await readGlobalWidgetData(projectFolderName, "footer");
 
     // Handle case where no pages are found (except for theme files etc)
     if (pagesDataArray.length === 0) {

@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import { getProjectPagesDir, getProjectMediaJsonPath } from "../config.js";
 import { readMediaFile } from "../controllers/mediaController.js";
-import { getProjectSlug } from "../utils/projectHelpers.js";
+import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 /**
  * Extract all media paths (images and videos) from page content (widgets and blocks)
@@ -113,8 +113,8 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
     });
 
     // Write updated media data
-    const projectSlug = await getProjectSlug(projectId);
-    const mediaFilePath = getProjectMediaJsonPath(projectSlug);
+    const projectFolderName = await getProjectFolderName(projectId);
+    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
     await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
 
     return { success: true, mediaPaths };
@@ -158,8 +158,8 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
       }
     });
 
-    const projectSlug = await getProjectSlug(projectId);
-    const mediaFilePath = getProjectMediaJsonPath(projectSlug);
+    const projectFolderName = await getProjectFolderName(projectId);
+    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
     await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
 
     return { success: true, mediaPaths };
@@ -184,8 +184,8 @@ export async function removePageFromMediaUsage(projectId, pageId) {
     });
 
     // Write updated media data
-    const projectSlug = await getProjectSlug(projectId);
-    const mediaFilePath = getProjectMediaJsonPath(projectSlug);
+    const projectFolderName = await getProjectFolderName(projectId);
+    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
     await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
 
     return { success: true };
@@ -224,8 +224,8 @@ export async function getMediaUsage(projectId, fileId) {
  */
 export async function refreshAllMediaUsage(projectId) {
   try {
-    const projectSlug = await getProjectSlug(projectId);
-    const pagesDir = getProjectPagesDir(projectSlug);
+    const projectFolderName = await getProjectFolderName(projectId);
+    const pagesDir = getProjectPagesDir(projectFolderName);
 
     // Check if pages directory exists
     if (!(await fs.pathExists(pagesDir))) {
@@ -299,7 +299,7 @@ export async function refreshAllMediaUsage(projectId) {
     }
 
     // Write updated media data
-    const mediaFilePath = getProjectMediaJsonPath(projectSlug);
+    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
     await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
 
     return {
