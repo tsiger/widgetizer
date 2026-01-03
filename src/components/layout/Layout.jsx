@@ -1,14 +1,10 @@
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import { Outlet, useLocation } from "react-router-dom";
-import useNavigationGuard from "../../hooks/useNavigationGuard";
 
 export default function Layout() {
   const location = useLocation();
   const isPageEditor = location.pathname === "/page-editor";
-  
-  // Activate navigation guard (useBlocker) when on page editor route
-  useNavigationGuard();
 
   return (
     <div className="flex h-screen overflow-hidden">
