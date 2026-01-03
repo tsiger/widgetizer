@@ -52,7 +52,7 @@ export default function MediaUploader({ onUpload, uploading, uploadProgress = {}
                 <span className="text-sm">{progress}%</span>
               </div>
               <div className="w-full bg-slate-200 rounded-full h-2">
-                <div className="bg-pink-600 h-2 rounded-full" style={{ width: `${progress}%` }}></div>
+                <div className="bg-pink-500 h-2 rounded-full" style={{ width: `${progress}%` }}></div>
               </div>
             </div>
           ))}

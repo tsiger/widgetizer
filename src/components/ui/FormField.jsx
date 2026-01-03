@@ -18,7 +18,7 @@ export default function FormField({ id, label, error, help, required = false, cl
           {error}
         </p>
       )}
-      {help && !error && <p className="form-help">{help}</p>}
+      {help && !error && <p className="form-description">{help}</p>}
     </div>
   );
 }

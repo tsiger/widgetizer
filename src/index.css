@@ -68,9 +68,7 @@
     @apply text-xs text-slate-600 mt-1 font-medium;
   }
 
-  .form-help {
-    @apply text-xs text-slate-500 mt-1;
-  }
+
 
   .form-hint {
     @apply text-xs text-slate-400 mt-1 italic;
