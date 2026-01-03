@@ -61,7 +61,7 @@
 
   /* === FORM DESCRIPTIONS & HELP TEXT === */
   .form-description {
-    @apply text-xs text-slate-500 mt-1;
+    @apply text-sm text-slate-500 mt-1;
   }
 
   .form-description-emphasis {
@@ -78,7 +78,7 @@
 
   /* === FORM FEEDBACK === */
   .form-error {
-    @apply text-xs text-pink-600 mt-1;
+    @apply text-sm font-medium bg-pink-50 py-1 px-2 rounded-sm text-pink-600 mt-1;
   }
 
   .form-warning {

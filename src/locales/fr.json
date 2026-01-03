@@ -42,41 +42,45 @@
     },
     "menu": {
       "titleLabel": "Titre",
+      "titleHelp": "Un nom pour identifier ce menu dans l'éditeur.",
       "descriptionLabel": "Description",
+      "descriptionHelp": "Notes optionnelles sur l'utilisation de ce menu.",
       "titleRequired": "Le nom du menu est requis",
       "nameNotEmpty": "Le nom ne peut pas être vide"
     },
     "page": {
       "titleLabel": "Titre",
+      "titleHelp": "Le titre affiché dans l'onglet du navigateur et les résultats de recherche.",
       "filenameLabel": "Nom du fichier",
+      "filenameHelp": "Le nom du fichier HTML qui sera créé.",
       "titleRequired": "Le nom de la page est requis",
       "nameNotEmpty": "Le nom ne peut pas être vide",
       "filenameRequired": "Le nom de fichier est requis",
       "filenameNotEmpty": "Le nom de fichier ne peut pas être vide",
       "seoTitle": "Paramètres SEO",
       "metaDescription": "Méta Description",
-      "metaDescriptionHelp": "Utilisé pour les résultats de recherche et les aperçus sur les réseaux sociaux. Recommandé : 150-160 caractères.",
+      "metaDescriptionHelp": "Court résumé affiché dans les résultats de recherche (150-160 caractères).",
       "socialTitle": "Titre Réseaux Sociaux",
-      "socialTitleHelp": "Laissez vide pour utiliser le titre de la page. Utilisé lors du partage sur Facebook, Twitter, etc.",
+      "socialTitleHelp": "Titre personnalisé lors du partage sur Facebook, Twitter, etc.",
       "socialImage": "Image Réseaux Sociaux",
-      "socialImageHelp": "Taille recommandée : 1200×630px. Utilisé pour Facebook Open Graph et Twitter Cards.",
+      "socialImageHelp": "Image affichée lors du partage sur les réseaux sociaux (1200×630px).",
       "ogType": "Type Open Graph",
       "twitterCard": "Type de carte Twitter",
       "canonicalUrl": "URL Canonique",
-      "canonicalUrlHelp": "L'URL préférée pour cette page. Laissez vide pour utiliser la valeur par défaut.",
+      "canonicalUrlHelp": "L'URL préférée pour cette page si elle existe ailleurs.",
       "robotsLabel": "Indexation des moteurs de recherche",
-      "robotsHelp": "Contrôle la façon dont les moteurs de recherche indexent cette page."
+      "robotsHelp": "Contrôle si les moteurs de recherche peuvent trouver cette page."
     },
     "project": {
       "titleLabel": "Titre",
       "titleRequired": "Le nom du projet est requis",
       "nameNotEmpty": "Le nom ne peut pas être vide",
-      "titleHelp": "Le nom d'affichage de votre projet. Peut être modifié à tout moment sans affecter la structure des dossiers.",
+      "titleHelp": "Le nom d'affichage de votre projet.",
       "slugLabel": "Slug",
       "slugRequired": "Le slug du projet est requis",
       "slugNotEmpty": "Le slug ne peut pas être vide",
       "slugPattern": "Le slug ne peut contenir que des lettres minuscules, des chiffres et des traits d'union",
-      "slugHelp": "Utilisé pour les noms de dossiers. Ne peut contenir que des lettres minuscules, des chiffres et des traits d'union. Ne peut pas être modifié après la création.",
+      "folderNameHelp": "Le nom du dossier où votre projet sera sauvegardé et exporté.",
       "descriptionLabel": "Description",
       "descriptionHelp": "Facultatif. Ajoutez des notes ou des détails sur votre projet.",
       "themeLabel": "Thème",
@@ -84,7 +88,7 @@
       "themeHelp": "Le thème détermine le style et les widgets disponibles pour votre site.",
       "selectTheme": "Sélectionnez un thème",
       "siteUrlLabel": "URL du site",
-      "siteUrlHelp": "L'URL finale où votre site sera hébergé. Utilisé pour la génération du plan du site (sitemap).",
+      "siteUrlHelp": "L'URL de votre site web (ex., https://monsite.com).",
       "loadingThemes": "Chargement des thèmes..."
     },
     "media": {
@@ -167,6 +171,7 @@
     "noProjects": "Pas encore de projets. Créez votre premier projet !",
     "headers": {
       "title": "Titre",
+      "folderName": "Nom du Dossier",
       "created": "Créé le",
       "updated": "Mis à jour le",
       "actions": "Actions"
@@ -215,7 +220,7 @@
     "delete": "Supprimer",
     "searchPlaceholder": "Rechercher des pages...",
     "headers": {
-      "name": "Nom",
+      "title": "Titre",
       "filename": "Nom de fichier",
       "created": "Créé le",
       "updated": "Mis à jour le",

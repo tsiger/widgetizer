@@ -42,41 +42,45 @@
     },
     "menu": {
       "titleLabel": "Título",
+      "titleHelp": "Un nombre para identificar este menú en el editor.",
       "descriptionLabel": "Descripción",
+      "descriptionHelp": "Notas opcionales sobre dónde se usa este menú.",
       "titleRequired": "El nombre del menú es obligatorio",
       "nameNotEmpty": "El nombre no puede estar vacío"
     },
     "page": {
       "titleLabel": "Título",
+      "titleHelp": "El título que se muestra en la pestaña del navegador y en los resultados de búsqueda.",
       "filenameLabel": "Nombre de archivo",
+      "filenameHelp": "El nombre del archivo HTML que se creará.",
       "titleRequired": "El nombre de la página es obligatorio",
       "nameNotEmpty": "El nombre no puede estar vacío",
       "filenameRequired": "El nombre de archivo es obligatorio",
       "filenameNotEmpty": "El nombre de archivo no puede estar vacío",
       "seoTitle": "Configuración SEO",
       "metaDescription": "Meta Descripción",
-      "metaDescriptionHelp": "Usado para resultados de búsqueda y vistas previas en redes sociales. Recomendado: 150-160 caracteres.",
+      "metaDescriptionHelp": "Breve resumen mostrado en los resultados de búsqueda (150-160 caracteres).",
       "socialTitle": "Título para Redes Sociales",
-      "socialTitleHelp": "Deja en blanco para usar el título de la página. Se usa al compartir en Facebook, Twitter, etc.",
+      "socialTitleHelp": "Título personalizado al compartir en Facebook, Twitter, etc.",
       "socialImage": "Imagen para Redes Sociales",
-      "socialImageHelp": "Tamaño recomendado: 1200×630px. Usado para Facebook Open Graph y Twitter Cards.",
+      "socialImageHelp": "Imagen mostrada al compartir en redes sociales (1200×630px).",
       "ogType": "Tipo de Open Graph",
       "twitterCard": "Tipo de Twitter Card",
       "canonicalUrl": "URL Canónica",
-      "canonicalUrlHelp": "La URL preferida para esta página. Deja en blanco para usar la predeterminada.",
+      "canonicalUrlHelp": "La URL preferida para esta página si existe en otro lugar.",
       "robotsLabel": "Indexación de Motores de Búsqueda",
-      "robotsHelp": "Controla cómo los motores de búsqueda indexan esta página."
+      "robotsHelp": "Controla si los motores de búsqueda pueden encontrar esta página."
     },
     "project": {
       "titleLabel": "Título",
       "titleRequired": "El nombre del proyecto es obligatorio",
       "nameNotEmpty": "El nombre no puede estar vacío",
-      "titleHelp": "El nombre para mostrar de tu proyecto. Puede cambiarse en cualquier momento sin afectar la estructura de carpetas.",
+      "titleHelp": "El nombre para mostrar de tu proyecto.",
       "slugLabel": "Slug",
       "slugRequired": "El slug del proyecto es obligatorio",
       "slugNotEmpty": "El slug no puede estar vacío",
       "slugPattern": "El slug solo puede contener letras minúsculas, números y guiones",
-      "slugHelp": "Usado para nombres de carpetas. Solo puede contener letras minúsculas, números y guiones. No se puede cambiar después de la creación.",
+      "folderNameHelp": "El nombre de la carpeta donde se guardará y exportará tu proyecto.",
       "descriptionLabel": "Descripción",
       "descriptionHelp": "Opcional. Agrega notas o detalles sobre tu proyecto.",
       "themeLabel": "Tema",
@@ -84,7 +88,7 @@
       "themeHelp": "El tema determina el estilo y los widgets disponibles para tu sitio.",
       "selectTheme": "Selecciona un tema",
       "siteUrlLabel": "URL del Sitio",
-      "siteUrlHelp": "La URL final donde se alojará tu sitio. Se usa para la generación del sitemap.",
+      "siteUrlHelp": "La URL de tu sitio web en vivo (ej., https://misitio.com).",
       "loadingThemes": "Cargando temas..."
     },
     "media": {
@@ -167,6 +171,7 @@
     "noProjects": "Aún no hay proyectos. ¡Crea tu primer proyecto!",
     "headers": {
       "title": "Título",
+      "folderName": "Nombre de Carpeta",
       "created": "Creado",
       "updated": "Actualizado",
       "actions": "Acciones"
@@ -216,7 +221,7 @@
     "delete": "Eliminar",
     "searchPlaceholder": "Buscar páginas...",
     "headers": {
-      "name": "Nombre",
+      "title": "Título",
       "filename": "Nombre de archivo",
       "created": "Creado",
       "updated": "Actualizado",

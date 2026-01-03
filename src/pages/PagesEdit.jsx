@@ -91,8 +91,15 @@ export default function PagesEdit() {
       </PageLayout>
     );
 
+  const pageTitle = (
+    <span className="flex items-center gap-2">
+      {t("pagesEdit.title")}
+      {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
+    </span>
+  );
+
   return (
-    <PageLayout title={t("pagesEdit.title")}>
+    <PageLayout title={pageTitle}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/pages")} icon={<ChevronLeft size={18} />}>
@@ -112,13 +119,8 @@ export default function PagesEdit() {
             navigate("/pages");
           }}
           onDirtyChange={setIsDirty}
+          isDirty={isDirty}
         />
-      )}
-      
-      {isDirty && (
-        <div className="mt-4 text-sm text-amber-600">
-          {t("common.unsavedChanges")}
-        </div>
       )}
     </PageLayout>
   );

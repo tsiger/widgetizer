@@ -49,8 +49,15 @@ export default function ProjectsAdd() {
     }
   };
 
+  const pageTitle = (
+    <span className="flex items-center gap-2">
+      {t("projectsAdd.title")}
+      {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
+    </span>
+  );
+
   return (
-    <PageLayout title={t("projectsAdd.title")}>
+    <PageLayout title={pageTitle}>
       <ProjectForm
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
@@ -60,13 +67,8 @@ export default function ProjectsAdd() {
           navigate("/projects");
         }}
         onDirtyChange={setIsDirty}
+        isDirty={isDirty}
       />
-      
-      {isDirty && (
-        <div className="mt-4 text-sm text-amber-600">
-          {t("common.unsavedChanges")}
-        </div>
-      )}
     </PageLayout>
   );
 }

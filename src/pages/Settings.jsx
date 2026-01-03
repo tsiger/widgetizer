@@ -122,7 +122,12 @@ export default function Settings() {
   }
 
   return (
-    <PageLayout title={t("themeSettings.title")}>
+    <PageLayout title={
+      <span className="flex items-center gap-2">
+        {t("themeSettings.title")}
+        {hasChanges && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
+      </span>
+    }>
       <>
         {/* Settings panel container */}
         <div className="bg-white rounded-md border border-t-0 border-slate-200">
@@ -145,15 +150,10 @@ export default function Settings() {
             </Button>
           )}
           
-          <Button onClick={handleSave} disabled={loading || !themeData || !hasChanges} variant="primary">
+          <Button onClick={handleSave} disabled={loading || !themeData || !hasChanges} variant={hasChanges ? "dark" : "primary"}>
             {t("themeSettings.save")}
+            {hasChanges && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
           </Button>
-          
-          {hasChanges && (
-            <span className="text-sm text-amber-600 self-center ml-2">
-              {t("common.unsavedChanges")}
-            </span>
-          )}
         </div>
       </>
     </PageLayout>

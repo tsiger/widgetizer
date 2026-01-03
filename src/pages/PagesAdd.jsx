@@ -39,8 +39,15 @@ export default function PagesAdd() {
     }
   };
 
+  const pageTitle = (
+    <span className="flex items-center gap-2">
+      {t("pagesAdd.title")}
+      {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
+    </span>
+  );
+
   return (
-    <PageLayout title={t("pagesAdd.title")}>
+    <PageLayout title={pageTitle}>
       <PageForm
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
@@ -50,13 +57,8 @@ export default function PagesAdd() {
           navigate("/pages");
         }}
         onDirtyChange={setIsDirty}
+        isDirty={isDirty}
       />
-      
-      {isDirty && (
-        <div className="mt-4 text-sm text-amber-600">
-          {t("common.unsavedChanges")}
-        </div>
-      )}
     </PageLayout>
   );
 }

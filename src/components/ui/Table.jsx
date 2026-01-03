@@ -27,7 +27,7 @@ export default function Table({
           ))}
         </tr>
       </thead>
-      <tbody className="[&_td]:text-xs [&_td_*]:text-xs">
+      <tbody className="[&_td]:text-sm [&_td_*]:text-sm">
         {data.length === 0 ? (
           <tr>
             <td colSpan={headers.length} className="text-center py-8 text-slate-500">

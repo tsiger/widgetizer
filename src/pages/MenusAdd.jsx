@@ -40,7 +40,12 @@ export default function MenusAdd() {
   };
 
   return (
-    <PageLayout title={t("menusAdd.title")}>
+    <PageLayout title={
+      <span className="flex items-center gap-2">
+        {t("menusAdd.title")}
+        {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
+      </span>
+    }>
       <MenuForm
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
@@ -50,13 +55,8 @@ export default function MenusAdd() {
           navigate("/menus");
         }}
         onDirtyChange={setIsDirty}
+        isDirty={isDirty}
       />
-      
-      {isDirty && (
-        <div className="mt-4 text-sm text-amber-600">
-          {t("common.unsavedChanges")}
-        </div>
-      )}
     </PageLayout>
   );
 }

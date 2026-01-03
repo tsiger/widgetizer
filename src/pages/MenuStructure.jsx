@@ -138,12 +138,23 @@ export default function MenuStructure() {
 
   return (
     <PageLayout
-      title={`${menu.name}`}
+      title={
+        <span className="flex items-center gap-2">
+          {menu.name}
+          {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
+        </span>
+      }
       description={t("menuStructure.description")}
       buttonProps={{
         onClick: handleSave,
-        children: saving ? t("menuStructure.saving") : t("menuStructure.save"),
+        children: (
+          <>
+            {saving ? t("menuStructure.saving") : t("menuStructure.save")}
+            {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
+          </>
+        ),
         disabled: saving,
+        variant: isDirty ? "dark" : "primary",
       }}
     >
       <MenuEditor initialItems={menu.items || []} onChange={handleMenuItemsChange} onDeleteItem={handleDeleteItem} />

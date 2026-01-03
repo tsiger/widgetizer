@@ -12,6 +12,7 @@ export default function MenuForm({
   submitLabel = "Save",
   onCancel,
   onDirtyChange,
+  isDirty: isDirtyProp = false,
 }) {
   const { t } = useTranslation();
   const isNew = !initialData.id;
@@ -76,7 +77,7 @@ export default function MenuForm({
       <div className="form-section">
         <div className="form-field">
           <label htmlFor="name" className="form-label">
-            {t("forms.menu.titleLabel")}
+            {t("forms.menu.titleLabel")} <span className="text-pink-500">*</span>
           </label>
           <input
             type="text"
@@ -88,6 +89,7 @@ export default function MenuForm({
             className="form-input"
           />
           {errors.name && <p className="form-error">{errors.name.message}</p>}
+          <p className="form-description">{t("forms.menu.titleHelp")}</p>
         </div>
 
         <div className="form-field">
@@ -100,14 +102,16 @@ export default function MenuForm({
             className="form-textarea"
             rows={3}
           />
+          <p className="form-description">{t("forms.menu.descriptionHelp")}</p>
         </div>
       </div>
 
       <div className="form-actions">
-        <Button type="submit" disabled={isSubmitting} variant="primary">
+        <Button type="submit" disabled={isSubmitting || !isDirtyProp} variant={isDirtyProp ? "dark" : "primary"}>
           {isSubmitting ? t("forms.common.saving") : submitLabel}
+          {isDirtyProp && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
         </Button>
-        {onCancel && (
+        {isDirtyProp && onCancel && (
           <Button type="button" onClick={onCancel} variant="secondary">
             {t("forms.common.cancel")}
           </Button>

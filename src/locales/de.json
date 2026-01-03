@@ -42,41 +42,45 @@
     },
     "menu": {
       "titleLabel": "Titel",
+      "titleHelp": "Ein Name zur Identifizierung dieses Menüs im Editor.",
       "descriptionLabel": "Beschreibung",
+      "descriptionHelp": "Optionale Notizen darüber, wo dieses Menü verwendet wird.",
       "titleRequired": "Menüname ist erforderlich",
       "nameNotEmpty": "Name darf nicht leer sein"
     },
     "page": {
       "titleLabel": "Titel",
+      "titleHelp": "Der Titel, der im Browser-Tab und in Suchergebnissen angezeigt wird.",
       "filenameLabel": "Dateiname",
+      "filenameHelp": "Der Name der HTML-Datei, die erstellt wird.",
       "titleRequired": "Seitenname ist erforderlich",
       "nameNotEmpty": "Name darf nicht leer sein",
       "filenameRequired": "Dateiname ist erforderlich",
       "filenameNotEmpty": "Dateiname darf nicht leer sein",
       "seoTitle": "SEO-Einstellungen",
       "metaDescription": "Meta-Beschreibung",
-      "metaDescriptionHelp": "Wird für Suchergebnisse und Vorschauen in sozialen Medien verwendet. Empfohlen: 150-160 Zeichen.",
+      "metaDescriptionHelp": "Kurze Zusammenfassung für Suchergebnisse (150-160 Zeichen).",
       "socialTitle": "Social Media Titel",
-      "socialTitleHelp": "Leer lassen, um den Seitentitel zu verwenden. Wird beim Teilen auf Facebook, Twitter usw. verwendet.",
+      "socialTitleHelp": "Benutzerdefinierter Titel beim Teilen auf Facebook, Twitter usw.",
       "socialImage": "Social Media Bild",
-      "socialImageHelp": "Empfohlene Größe: 1200×630px. Wird für Facebook Open Graph und Twitter Cards verwendet.",
+      "socialImageHelp": "Bild beim Teilen in sozialen Medien (1200×630px).",
       "ogType": "Open Graph Typ",
       "twitterCard": "Twitter Card Typ",
       "canonicalUrl": "Canonical URL",
-      "canonicalUrlHelp": "Die bevorzugte URL für diese Seite. Leer lassen, um den Standard zu verwenden.",
+      "canonicalUrlHelp": "Bevorzugte URL für diese Seite, falls sie woanders existiert.",
       "robotsLabel": "Suchmaschinen-Indexierung",
-      "robotsHelp": "Steuert, wie Suchmaschinen diese Seite indexieren."
+      "robotsHelp": "Steuert, ob Suchmaschinen diese Seite finden können."
     },
     "project": {
       "titleLabel": "Titel",
       "titleRequired": "Projektname ist erforderlich",
       "nameNotEmpty": "Name darf nicht leer sein",
-      "titleHelp": "Der Anzeigename für Ihr Projekt. Kann jederzeit geändert werden, ohne die Ordnerstruktur zu beeinflussen.",
+      "titleHelp": "Der Anzeigename für Ihr Projekt.",
       "slugLabel": "Slug",
       "slugRequired": "Projekt-Slug ist erforderlich",
       "slugNotEmpty": "Slug darf nicht leer sein",
       "slugPattern": "Slug darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten",
-      "slugHelp": "Wird für Ordnernamen verwendet. Darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten. Kann nach der Erstellung nicht mehr geändert werden.",
+      "folderNameHelp": "Der Ordnername, in dem Ihr Projekt gespeichert und exportiert wird.",
       "descriptionLabel": "Beschreibung",
       "descriptionHelp": "Optional. Fügen Sie Notizen oder Details zu Ihrem Projekt hinzu.",
       "themeLabel": "Theme",
@@ -84,7 +88,7 @@
       "themeHelp": "Das Theme bestimmt das Design und die verfügbaren Widgets für Ihre Website.",
       "selectTheme": "Theme auswählen",
       "siteUrlLabel": "Website-URL",
-      "siteUrlHelp": "Die endgültige URL, unter der Ihre Website gehostet wird. Wird für die Sitemap-Erstellung verwendet.",
+      "siteUrlHelp": "Die URL Ihrer Live-Website (z.B. https://meineseite.com).",
       "loadingThemes": "Themes werden geladen..."
     },
     "media": {
@@ -167,6 +171,7 @@
     "noProjects": "Noch keine Projekte. Erstellen Sie Ihr erstes Projekt!",
     "headers": {
       "title": "Titel",
+      "folderName": "Ordnername",
       "created": "Erstellt",
       "updated": "Aktualisiert",
       "actions": "Aktionen"
@@ -215,7 +220,7 @@
     "delete": "Löschen",
     "searchPlaceholder": "Seiten suchen...",
     "headers": {
-      "name": "Name",
+      "title": "Titel",
       "filename": "Dateiname",
       "created": "Erstellt",
       "updated": "Aktualisiert",

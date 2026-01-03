@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
+import { ChevronDown, ChevronUp, X, FolderOpen } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
 import useProjectStore from "../../stores/projectStore";
 import Button from "../ui/Button";
 import MediaSelectorDrawer from "../media/MediaSelectorDrawer";
-import { X, FolderOpen } from "lucide-react";
 import { API_URL } from "../../config";
 
 export default function PageForm({
@@ -16,10 +16,12 @@ export default function PageForm({
   submitLabel = "Save",
   onCancel,
   onDirtyChange,
+  isDirty: isDirtyProp = false,
 }) {
   const { t } = useTranslation();
   const isNew = !initialData.id;
   const [mediaSelectorVisible, setMediaSelectorVisible] = useState(false);
+  const [showMoreSettings, setShowMoreSettings] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 
@@ -133,7 +135,7 @@ export default function PageForm({
       <div className="form-section">
         <div className="form-field">
           <label htmlFor="name" className="form-label">
-            {t("forms.page.titleLabel")}
+            {t("forms.page.titleLabel")} <span className="text-pink-500">*</span>
           </label>
           <input
             type="text"
@@ -145,11 +147,12 @@ export default function PageForm({
             className="form-input"
           />
           {errors.name && <p className="form-error">{errors.name.message}</p>}
+          <p className="form-description">{t("forms.page.titleHelp")}</p>
         </div>
 
         <div className="form-field">
           <label htmlFor="slug" className="form-label">
-            {t("forms.page.filenameLabel")}
+            {t("forms.page.filenameLabel")} <span className="text-pink-500">*</span>
           </label>
           <div className="flex items-center">
             <span className="text-slate-500 mr-1">/</span>
@@ -166,10 +169,22 @@ export default function PageForm({
             <span className="text-slate-500 ml-1">.html</span>
           </div>
           {errors.slug && <p className="form-error">{errors.slug.message}</p>}
+          <p className="form-description">{t("forms.page.filenameHelp")}</p>
         </div>
       </div>
 
-      {/* SEO Fields */}
+      {/* More Settings Toggle */}
+      <button
+        type="button"
+        onClick={() => setShowMoreSettings(!showMoreSettings)}
+        className="flex items-center gap-1 text-sm text-pink-500 hover:text-pink-700 mt-2 mb-4"
+      >
+        {showMoreSettings ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        {t("forms.project.moreSettings")}
+      </button>
+
+      {/* SEO Fields - Collapsible */}
+      {showMoreSettings && (
       <div className="form-section">
         <h3 className="form-section-title">{t("forms.page.seoTitle")}</h3>
 
@@ -278,12 +293,14 @@ export default function PageForm({
           <p className="form-description">{t("forms.page.robotsHelp")}</p>
         </div>
       </div>
+      )}
 
       <div className="form-actions-separated">
-        <Button type="submit" disabled={isSubmitting} variant="primary">
+        <Button type="submit" disabled={isSubmitting || !isDirtyProp} variant={isDirtyProp ? "dark" : "primary"}>
           {isSubmitting ? t("forms.common.saving") : submitLabel}
+          {isDirtyProp && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
         </Button>
-        {onCancel && (
+        {isDirtyProp && onCancel && (
           <Button type="button" onClick={onCancel} variant="secondary">
             {t("forms.common.cancel")}
           </Button>

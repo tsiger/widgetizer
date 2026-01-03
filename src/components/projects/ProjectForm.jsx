@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { API_URL } from "../../config";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import Button from "../ui/Button";
@@ -14,11 +15,13 @@ export default function ProjectForm({
   submitLabel = "Save",
   onCancel,
   onDirtyChange,
+  isDirty: isDirtyProp = false,
 }) {
   const { t } = useTranslation();
   const isNew = !initialData.id;
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showMoreSettings, setShowMoreSettings] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
 
   const {
@@ -128,7 +131,7 @@ export default function ProjectForm({
       <div className="form-section">
         <div className="form-field">
           <label htmlFor="name" className="form-label">
-            {t("forms.project.titleLabel")}
+            {t("forms.project.titleLabel")} <span className="text-pink-500">*</span>
           </label>
           <input
             type="text"
@@ -145,60 +148,11 @@ export default function ProjectForm({
           </p>
         </div>
 
-        <div className="form-field">
-          <label htmlFor="folderName" className="form-label">
-            {t("forms.project.folderNameLabel")}
-          </label>
-          <input
-            type="text"
-            id="folderName"
-            {...register("folderName", {
-              required: t("forms.project.folderNameRequired"),
-              validate: (value) => value.trim() !== "" || t("forms.project.folderNameNotEmpty"),
-              pattern: {
-                value: /^[a-z0-9-]+$/,
-                message: t("forms.project.folderNamePattern"),
-              },
-            })}
-            className="form-input"
-          />
-          {errors.folderName && <p className="form-error">{errors.folderName.message}</p>}
-          <p className="form-description">
-            {t("forms.project.folderNameHelp")}
-          </p>
-        </div>
-
-        <div className="form-field">
-          <label htmlFor="description" className="form-label-optional">
-            {t("forms.project.descriptionLabel")}
-          </label>
-          <textarea
-            id="description"
-            {...register("description")}
-            rows="4"
-            className="form-textarea"
-          />
-          <p className="form-description">{t("forms.project.descriptionHelp")}</p>
-        </div>
-
-        <div className="form-field">
-          <label htmlFor="siteUrl" className="form-label-optional">
-            {t("forms.project.siteUrlLabel")}
-          </label>
-          <input
-            type="url"
-            id="siteUrl"
-            {...register("siteUrl")}
-            className="form-input"
-            placeholder="https://mysite.com"
-          />
-          <p className="form-description">{t("forms.project.siteUrlHelp")}</p>
-        </div>
-
+        {/* Theme field - shown for new projects before More Settings */}
         {isNew && (
           <div className="form-field">
             <label htmlFor="theme" className="form-label">
-              {t("forms.project.themeLabel")}
+              {t("forms.project.themeLabel")} <span className="text-pink-500">*</span>
             </label>
             <select
               id="theme"
@@ -218,13 +172,79 @@ export default function ProjectForm({
             <p className="form-description">{t("forms.project.themeHelp")}</p>
           </div>
         )}
+
+        {/* More Settings Toggle */}
+        <button
+          type="button"
+          onClick={() => setShowMoreSettings(!showMoreSettings)}
+          className="flex items-center gap-1 text-sm text-pink-500 hover:text-pink-700 mt-2 mb-4"
+        >
+          {showMoreSettings ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          {t("forms.project.moreSettings")}
+        </button>
+
+        {/* Collapsible Settings */}
+        {showMoreSettings && (
+          <>
+            <div className="form-field">
+              <label htmlFor="folderName" className="form-label">
+                {t("forms.project.folderNameLabel")} <span className="text-pink-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="folderName"
+                {...register("folderName", {
+                  required: t("forms.project.folderNameRequired"),
+                  validate: (value) => value.trim() !== "" || t("forms.project.folderNameNotEmpty"),
+                  pattern: {
+                    value: /^[a-z0-9-]+$/,
+                    message: t("forms.project.folderNamePattern"),
+                  },
+                })}
+                className="form-input"
+              />
+              {errors.folderName && <p className="form-error">{errors.folderName.message}</p>}
+              <p className="form-description">
+                {t("forms.project.folderNameHelp")}
+              </p>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="description" className="form-label-optional">
+                {t("forms.project.descriptionLabel")}
+              </label>
+              <textarea
+                id="description"
+                {...register("description")}
+                rows="4"
+                className="form-textarea"
+              />
+              <p className="form-description">{t("forms.project.descriptionHelp")}</p>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="siteUrl" className="form-label-optional">
+                {t("forms.project.siteUrlLabel")}
+              </label>
+              <input
+                type="url"
+                id="siteUrl"
+                {...register("siteUrl")}
+                className="form-input"
+                placeholder="https://mysite.com"
+              />
+              <p className="form-description">{t("forms.project.siteUrlHelp")}</p>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="form-actions">
-        <Button type="submit" disabled={isSubmitting} variant="primary">
+        <Button type="submit" disabled={isSubmitting || !isDirtyProp} variant={isDirtyProp ? "dark" : "primary"}>
           {isSubmitting ? t("forms.common.saving") : submitLabel}
+          {isDirtyProp && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
         </Button>
-        {onCancel && (
+        {isDirtyProp && onCancel && (
           <Button type="button" onClick={onCancel} variant="secondary">
             {t("forms.common.cancel")}
           </Button>

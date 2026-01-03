@@ -81,7 +81,7 @@ export default function ProjectsEdit() {
 
       setShowSuccessActions(true);
       setIsDirty(false); // Reset dirty state after successful save
-      return true;
+      return false; // Don't reset the form on edit
 
 
     } catch (err) {
@@ -113,8 +113,15 @@ export default function ProjectsEdit() {
     );
   }
 
+  const pageTitle = (
+    <span className="flex items-center gap-2">
+      {t("projectsEdit.title")}
+      {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
+    </span>
+  );
+
   return (
-    <PageLayout title={t("projectsEdit.title")}>
+    <PageLayout title={pageTitle}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/projects")} icon={<ChevronLeft size={18} />}>
@@ -134,13 +141,8 @@ export default function ProjectsEdit() {
             navigate("/projects");
           }}
           onDirtyChange={setIsDirty}
+          isDirty={isDirty}
         />
-      )}
-
-      {isDirty && (
-        <div className="mt-4 text-sm text-amber-600">
-          {t("common.unsavedChanges")}
-        </div>
       )}
     </PageLayout>
   );

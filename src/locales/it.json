@@ -42,41 +42,45 @@
     },
     "menu": {
       "titleLabel": "Titolo",
+      "titleHelp": "Un nome per identificare questo menu nell'editor.",
       "descriptionLabel": "Descrizione",
+      "descriptionHelp": "Note opzionali su dove viene utilizzato questo menu.",
       "titleRequired": "Il nome del menu è obbligatorio",
       "nameNotEmpty": "Il nome non può essere vuoto"
     },
     "page": {
       "titleLabel": "Titolo",
+      "titleHelp": "Il titolo mostrato nella scheda del browser e nei risultati di ricerca.",
       "filenameLabel": "Nome file",
+      "filenameHelp": "Il nome del file HTML che verrà creato.",
       "titleRequired": "Il nome della pagina è obbligatorio",
       "nameNotEmpty": "Il nome non può essere vuoto",
       "filenameRequired": "Il nome del file è obbligatorio",
       "filenameNotEmpty": "Il nome del file non può essere vuoto",
       "seoTitle": "Impostazioni SEO",
       "metaDescription": "Meta Descrizione",
-      "metaDescriptionHelp": "Utilizzata per i risultati di ricerca e le anteprime sui social media. Consigliato: 150-160 caratteri.",
+      "metaDescriptionHelp": "Breve sintesi mostrata nei risultati di ricerca (150-160 caratteri).",
       "socialTitle": "Titolo Social Media",
-      "socialTitleHelp": "Lascia vuoto per usare il titolo della pagina. Utilizzato per la condivisione su Facebook, Twitter, ecc.",
+      "socialTitleHelp": "Titolo personalizzato quando condiviso su Facebook, Twitter, ecc.",
       "socialImage": "Immagine Social Media",
-      "socialImageHelp": "Dimensione consigliata: 1200×630px. Utilizzata per Facebook Open Graph e Twitter Cards.",
+      "socialImageHelp": "Immagine mostrata quando condiviso sui social media (1200×630px).",
       "ogType": "Tipo Open Graph",
       "twitterCard": "Tipo Twitter Card",
       "canonicalUrl": "URL Canonico",
-      "canonicalUrlHelp": "L'URL preferito per questa pagina. Lascia vuoto per usare quello predefinito.",
+      "canonicalUrlHelp": "L'URL preferito per questa pagina se esiste altrove.",
       "robotsLabel": "Indicizzazione Motori di Ricerca",
-      "robotsHelp": "Controlla come i motori di ricerca indicizzano questa pagina."
+      "robotsHelp": "Controlla se i motori di ricerca possono trovare questa pagina."
     },
     "project": {
       "titleLabel": "Titolo",
       "titleRequired": "Il nome del progetto è obbligatorio",
       "nameNotEmpty": "Il nome non può essere vuoto",
-      "titleHelp": "Il nome visualizzato per il tuo progetto. Può essere modificato in qualsiasi momento senza influire sulla struttura delle cartelle.",
+      "titleHelp": "Il nome visualizzato per il tuo progetto.",
       "slugLabel": "Slug",
       "slugRequired": "Lo slug del progetto è obbligatorio",
       "slugNotEmpty": "Lo slug non può essere vuoto",
       "slugPattern": "Lo slug può contenere solo lettere minuscole, numeri e trattini",
-      "slugHelp": "Utilizzato per i nomi delle cartelle. Può contenere solo lettere minuscole, numeri e trattini. Non può essere modificato dopo la creazione.",
+      "folderNameHelp": "Il nome della cartella dove il tuo progetto verrà salvato ed esportato.",
       "descriptionLabel": "Descrizione",
       "descriptionHelp": "Opzionale. Aggiungi note o dettagli sul tuo progetto.",
       "themeLabel": "Tema",
@@ -84,7 +88,7 @@
       "themeHelp": "Il tema determina lo stile e i widget disponibili per il tuo sito.",
       "selectTheme": "Seleziona un tema",
       "siteUrlLabel": "URL del Sito",
-      "siteUrlHelp": "L'URL finale dove sarà ospitato il tuo sito. Utilizzato per la generazione della sitemap.",
+      "siteUrlHelp": "L'URL del tuo sito web live (es., https://miosito.com).",
       "loadingThemes": "Caricamento temi..."
     },
     "media": {
@@ -167,6 +171,7 @@
     "noProjects": "Nessun progetto ancora. Crea il tuo primo progetto!",
     "headers": {
       "title": "Titolo",
+      "folderName": "Nome Cartella",
       "created": "Creato",
       "updated": "Aggiornato",
       "actions": "Azioni"
@@ -215,7 +220,7 @@
     "delete": "Elimina",
     "searchPlaceholder": "Cerca pagine...",
     "headers": {
-      "name": "Nome",
+      "title": "Titolo",
       "filename": "Nome file",
       "created": "Creato",
       "updated": "Aggiornato",

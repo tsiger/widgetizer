@@ -76,7 +76,12 @@ export default function MenusEdit() {
   if (!menu) return <PageLayout title={t("menusEdit.title")}>{t("menusEdit.notFound")}</PageLayout>;
 
   return (
-    <PageLayout title={t("menusEdit.title")}>
+    <PageLayout title={
+      <span className="flex items-center gap-2">
+        {t("menusEdit.title")}
+        {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
+      </span>
+    }>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/menus")} icon={<ChevronLeft size={18} />}>
@@ -96,13 +101,8 @@ export default function MenusEdit() {
             navigate("/menus");
           }}
           onDirtyChange={setIsDirty}
+          isDirty={isDirty}
         />
-      )}
-      
-      {isDirty && (
-        <div className="mt-4 text-sm text-amber-600">
-          {t("common.unsavedChanges")}
-        </div>
       )}
     </PageLayout>
   );

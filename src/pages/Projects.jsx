@@ -153,6 +153,7 @@ export default function Projects() {
         <Table
           headers={[
             t("projects.headers.title"),
+            t("projects.headers.folderName"),
             t("projects.headers.created"),
             t("projects.headers.updated"),
             t("projects.headers.actions"),
@@ -171,6 +172,9 @@ export default function Projects() {
                     </Badge>
                   )}
                   {project.name}
+                </td>
+                <td className="py-3 px-4">
+                  <span className="font-mono text-slate-600">{project.folderName}</span>
                 </td>
                 <td className="py-3 px-4">{formatDate(project.created, dateFormat)}</td>
                 <td className="py-3 px-4">{formatDate(project.updated, dateFormat)}</td>

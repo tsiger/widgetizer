@@ -183,7 +183,7 @@ export default function Pages() {
                   <div className="w-4 h-4 border border-slate-400 rounded-sm"></div>
                 )}
               </IconButton>,
-              t("pages.headers.name"),
+              t("pages.headers.title"),
               t("pages.headers.filename"),
               t("pages.headers.created"),
               t("pages.headers.updated"),
