@@ -129,6 +129,7 @@ export default function ImageInput({ id, value = "", onChange }) {
             </Button>
           </div>
         </div>
+
       ) : (
         <div
           onClick={() => fileInputRef.current?.click()}
@@ -136,15 +137,15 @@ export default function ImageInput({ id, value = "", onChange }) {
         >
           <UploadCloud size={32} />
           <p className="mt-2 text-sm font-semibold">Click to upload</p>
-          <p className="text-xs">PNG, JPG, GIF up to 10MB</p>
+          <p className="text-xs">PNG, JPG, GIF</p>
         </div>
       )}
 
       <div className="flex items-center gap-2 mt-2">
-        <Button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="flex-1">
-          {uploading ? "Uploading..." : value ? "Replace" : "Upload"}
+        <Button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="flex-1" type="button">
+          {uploading ? "Uploading..." : "Upload"}
         </Button>
-        <Button onClick={handleOpenMediaSelector} disabled={uploading} variant="secondary" className="flex-1">
+        <Button onClick={handleOpenMediaSelector} disabled={uploading} variant="secondary" className="flex-1" type="button">
           Browse
         </Button>
       </div>

@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
-import { ChevronDown, ChevronUp, X, FolderOpen } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
 import useProjectStore from "../../stores/projectStore";
 import Button from "../ui/Button";
-import MediaSelectorDrawer from "../media/MediaSelectorDrawer";
+import ImageInput from "../settings/inputs/ImageInput";
 import { API_URL } from "../../config";
 
 export default function PageForm({
@@ -20,7 +20,6 @@ export default function PageForm({
 }) {
   const { t } = useTranslation();
   const isNew = !initialData.id;
-  const [mediaSelectorVisible, setMediaSelectorVisible] = useState(false);
   const [showMoreSettings, setShowMoreSettings] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
@@ -96,24 +95,7 @@ export default function PageForm({
     }
   };
 
-  const handleSelectMedia = (selectedFile) => {
-    if (selectedFile && selectedFile.type && selectedFile.type.startsWith("image/")) {
-      setValue("seo.og_image", selectedFile.path, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-      setMediaSelectorVisible(false);
-    } else {
-      showToast(t("forms.common.selectImageFile"), "error");
-    }
-  };
 
-  const handleRemoveImage = () => {
-    setValue("seo.og_image", "", {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  };
 
   const onSubmitHandler = async (data) => {
     try {
@@ -220,44 +202,16 @@ export default function PageForm({
 
         <div className="form-field">
           <label className="form-label-optional">{t("forms.page.socialImage")}</label>
-          {ogImage ? (
-            <div className="relative w-full max-w-md bg-slate-100 rounded-md overflow-hidden group">
-              <img
-                src={API_URL(`/api/media/projects/${activeProject?.id}${ogImage}`)}
-                alt="Social media preview"
-                className="w-full h-32 object-cover"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button 
-                  type="button"
-                  variant="icon" 
-                  size="sm" 
-                  onClick={() => setMediaSelectorVisible(true)} 
-                  title={t("forms.common.changeImage")}
-                >
-                  <FolderOpen size={16} />
-                </Button>
-                <Button 
-                  type="button"
-                  variant="icon" 
-                  size="sm" 
-                  onClick={handleRemoveImage} 
-                  title={t("forms.common.removeImage")}
-                >
-                  <X size={16} />
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div
-              onClick={() => setMediaSelectorVisible(true)}
-              className="w-full max-w-md h-32 bg-slate-50 rounded-md border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors"
-            >
-              <FolderOpen size={32} />
-              <p className="mt-2 text-sm font-semibold">{t("forms.common.selectImage")}</p>
-              <p className="text-xs">Recommended: 1200x630 pixels</p>
-            </div>
-          )}
+          <ImageInput
+            id="seo-og-image"
+            value={ogImage}
+            onChange={(value) =>
+              setValue("seo.og_image", value, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+          />
           <p className="form-description">{t("forms.page.socialImageHelp")}</p>
         </div>
 
@@ -307,15 +261,6 @@ export default function PageForm({
         )}
       </div>
 
-      {mediaSelectorVisible && activeProject && (
-        <MediaSelectorDrawer
-          visible={mediaSelectorVisible}
-          onClose={() => setMediaSelectorVisible(false)}
-          onSelect={handleSelectMedia}
-          activeProject={activeProject}
-          filterType="image"
-        />
-      )}
     </form>
   );
 }
