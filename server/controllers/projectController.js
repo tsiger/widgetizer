@@ -183,13 +183,17 @@ export async function createProject(req, res) {
             // Use the template's slug or fallback to filename
             const templateSlug = templatePage.slug || path.basename(entry.name, ".json");
 
+            // Define the new target path based on the slug (e.g., home.json -> index.json)
+            const targetFilename = `${templateSlug}.json`;
+            const targetPathWithSlug = path.join(targetDir, targetFilename);
+
             // Create initialized page
             const initializedPage = {
               ...templatePage,
               // Only add metadata for non-global widgets (pages become editable templates)
               ...(templatePage.type !== "header" && templatePage.type !== "footer"
                 ? {
-                    id: path.relative(themeTemplatesDir, sourcePath).replace(/\\/g, "/").replace(".json", ""),
+                    id: templateSlug, // Set ID to match the new filename/slug
                     slug: templateSlug,
                     created: new Date().toISOString(),
                     updated: new Date().toISOString(),
@@ -197,8 +201,8 @@ export async function createProject(req, res) {
                 : {}),
             };
 
-            // Save with the same relative structure
-            await fs.outputFile(targetPath, JSON.stringify(initializedPage, null, 2));
+            // Save with the new filename
+            await fs.outputFile(targetPathWithSlug, JSON.stringify(initializedPage, null, 2));
           }
         }
       }
