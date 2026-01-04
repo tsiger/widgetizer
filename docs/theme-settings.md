@@ -162,6 +162,8 @@ A specialized input with two dropdowns for selecting a font family and its corre
 }
 ```
 
+**Privacy Option**: When users select Google Fonts, they can optionally enable the "Use Privacy-Friendly Font CDN" setting (checkbox type, `use_bunny_fonts`) to serve fonts via Bunny Fonts instead of Google Fonts CDN. This provides GDPR compliance without tracking or data sharing with Google, while maintaining the same font selection and appearance.
+
 ### Image
 
 An image uploader that includes a preview, the ability to replace the image, and a button to browse the media library. The value is the URL path to the image.

@@ -19,6 +19,20 @@
           "label": "Text Color",
           "default": "#000000",
           "outputAsCssVar": true
+        },
+         {
+          "type": "color",
+          "id": "text_muted",
+          "label": "Muted Text Color",
+          "default": "#666666",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "heading_color",
+          "label": "Heading Color",
+          "default": "#000000",
+          "outputAsCssVar": true
         }
       ],
       "typography": [
@@ -44,6 +58,20 @@
             "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
             "weight": 400
           }
+        }
+      ],
+      "privacy": [
+        {
+          "type": "header",
+          "id": "privacy_header",
+          "label": "Privacy"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_bunny_fonts",
+          "label": "Use Privacy-Friendly Font CDN",
+          "default": false,
+          "description": "Enable to serve Google Fonts from Bunny CDN (GDPR-compliant, no tracking)"
         }
       ]
     }

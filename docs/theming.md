@@ -1052,9 +1052,10 @@ The `{% seo %}` tag automatically handles:
 
 Automatic font loading and optimization:
 
-- `{% fonts_preconnect %}`: DNS prefetching for faster loading
-- `{% fonts_stylesheet %}`: Optimized font CSS inclusion
-- Support for Google Fonts
+- `{% fonts %}`: Consolidated tag for font preconnect and stylesheet inclusion
+- Support for Google Fonts and Bunny Fonts (GDPR-compliant alternative)
+- Privacy-friendly font delivery can be enabled via theme settings (`use_bunny_fonts` checkbox)
+- Automatically generates optimized font URLs with only the weights being used
 
 ## 13. Theme Development Workflow
 

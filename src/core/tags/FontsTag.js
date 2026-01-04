@@ -49,25 +49,53 @@ export const FontsTag = {
       return ""; // No Google Fonts to load
     }
 
+    // Check if user enabled privacy-friendly font CDN (Bunny Fonts)
+    const privacySettings = rawSettings?.settings?.global?.privacy;
+    const useBunnyFonts = Array.isArray(privacySettings)
+      ? privacySettings.find(s => s.id === 'use_bunny_fonts')?.value || false
+      : false;
+
     // Build output: preconnect links + stylesheet link
     let output = "";
 
-    // 1. Preconnect links for performance
-    output += `<link rel="preconnect" href="https://fonts.googleapis.com">
+    // 1. Preconnect links for performance (different for each CDN)
+    if (useBunnyFonts) {
+      output += `<link rel="preconnect" href="https://fonts.bunny.net">
+`;
+    } else {
+      output += `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 `;
+    }
 
     // 2. Stylesheet link
-    const base = "https://fonts.googleapis.com/css2";
-    const families = Object.entries(fontsToLoad)
-      .map(([name, weightsSet]) => {
-        const weights = Array.from(weightsSet).sort((a, b) => a - b); // Sort weights numerically
-        // URL encode name, join weights with semicolon
-        return `family=${encodeURIComponent(name)}:wght@${weights.join(";")}`;
-      })
-      .join("&");
-
-    const url = `${base}?${families}&display=swap`;
+    // Bunny Fonts uses v1 API (pipe-separated), Google uses v2 API (ampersand-separated)
+    let url;
+    
+    if (useBunnyFonts) {
+      // Bunny Fonts v1 API format: family=Font1:wght@400;700|Font2:wght@400
+      const base = "https://fonts.bunny.net/css";
+      const families = Object.entries(fontsToLoad)
+        .map(([name, weightsSet]) => {
+          const weights = Array.from(weightsSet).sort((a, b) => a - b);
+          return `${encodeURIComponent(name)}:wght@${weights.join(";")}`;
+        })
+        .join("|"); // Pipe separator for v1 API
+      
+      url = `${base}?family=${families}&display=swap`;
+    } else {
+      // Google Fonts v2 API format: family=Font1:wght@400;700&family=Font2:wght@400
+      const base = "https://fonts.googleapis.com/css2";
+      const families = Object.entries(fontsToLoad)
+        .map(([name, weightsSet]) => {
+          const weights = Array.from(weightsSet).sort((a, b) => a - b);
+          return `family=${encodeURIComponent(name)}:wght@${weights.join(";")}`;
+        })
+        .join("&"); // Ampersand separator for v2 API
+      
+      url = `${base}?${families}&display=swap`;
+    }
+    
     output += `<link href="${url}" rel="stylesheet">`;
 
     return output;

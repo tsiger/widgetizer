@@ -7,27 +7,9 @@
     {% seo %}
     {% fonts %}
 
+    {% theme_settings %}
     {% asset "base.css" %}
     {% render_styles %}
-    {% theme_settings %}
-
-    <style>
-      :root {
-        --bg-primary: var(--colors-bg_primary);
-        --text-primary: var(--colors-text_primary);
-      }
-
-      /* Typography */
-      body {
-        font-family: var(--typography-body_font-family);
-        font-weight: var(--typography-body_font-weight);
-      }
-
-      h1, h2, h3, h4, h5, h6 {
-        font-family: var(--typography-heading_font-family);
-        font-weight: var(--typography-heading_font-weight);
-      }
-    </style>
   </head>
   <body class="{{ body_class }}">
     {{ header }}
