@@ -1,14 +1,14 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-image-text {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %} {% if widget.settings.background_color != blank %}has-bg-color{% endif %}"
-  {% if widget.settings.background_color != blank %}
-    style="--widget-bg-color: {{ widget.settings.background_color }};"
+  class="widget widget-image-text widget-{{ widget.id }} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="image-text"
 >
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       & .image-text-wrapper {
         display: flex;
         flex-direction: column;
@@ -58,7 +58,7 @@
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     <div class="widget-content">
       <div class="image-text-wrapper">
         <div class="image-wrapper">
@@ -90,7 +90,7 @@
                   <div class="widget-actions" data-block-id="{{ blockId }}">
                     <a
                       href="{{ block.settings.link.href }}"
-                      class="widget-button {% if block.settings.style == 'secondary' %}widget-button-secondary{% endif %}"
+                    class="widget-button {% if block.settings.style == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
                       data-setting="link"
                       {% if block.settings.link.target == '_blank' %}
                         target="_blank" rel="noopener"

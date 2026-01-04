@@ -1,7 +1,6 @@
 # Widgetizer Design System Reference
 
-> **Last Updated:** November 22, 2025
-> **Status:** ✅ Active - Complete design system implemented in `theme.css`
+> **Last Updated:** January 4, 2026 **Status:** ✅ Active - Complete design system implemented in `base.css`
 
 ## 📋 Table of Contents
 
@@ -165,28 +164,33 @@ All design tokens are defined as CSS custom properties in `:root`. These variabl
   --border-radius-lg: 1.2rem; /* 12px */
   --border-radius-full: 9999px;
 
-  /* Border Colors (grayscale only) */
-  --border-light: #e0e0e0;
-  --border-medium: #ccc;
-  --border-dark: #999;
-  --border-darker: #333;
+  /* Border Color (from theme setting) */
+  --border-color: var(--colors-border_color, #e0e0e0);
 }
 ```
 
-### Background & Text Colors
+### Color System
+
+All colors are driven by theme settings with sensible fallbacks:
 
 ```css
 :root {
-  /* Backgrounds (wireframe mode - grayscale only) */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f5f5;
-  --bg-tertiary: #e0e0e0;
-
   /* Text Colors */
-  --text-primary: #1a1a1a;
-  --text-body: #333333;
-  --text-muted: #666666;
-  --text-light: #999999;
+  --text-content: var(--colors-text_content, #333); /* Body text */
+  --text-heading: var(--colors-text_heading, #000); /* Headings */
+  --text-muted: var(--colors-text_muted, #666); /* Secondary text */
+
+  /* Background Colors */
+  --bg-primary: var(--colors-bg_primary, #fff); /* Main background */
+  --bg-secondary: var(--colors-bg_secondary, #f9f9f9); /* Alt background */
+
+  /* Accent Colors (for buttons, links, highlights) */
+  --accent: var(--colors-accent, #000); /* Primary accent */
+  --accent-text: var(--colors-accent_text, #fff); /* Text on accent bg */
+
+  /* Inverse Colors (for dark schemes) */
+  --inverse-bg: var(--colors-inverse_bg, #000); /* Dark background */
+  --inverse-text: var(--colors-inverse_text, #fff); /* Light text */
 }
 ```
 
@@ -425,29 +429,29 @@ Utilities for controlling widget height, useful for hero sections or full-screen
 
 ## Color Scheme System
 
-The color scheme system provides light-on-dark and dark-on-light color variants for widgets with different backgrounds.
+The color scheme system provides color variants for widgets with different backgrounds. It uses theme-configurable inverse colors.
 
 ### Color Scheme Classes
 
 ```css
-/* Light-on-dark (light text on dark backgrounds) */
+/* Light-on-dark (uses inverse colors from theme settings) */
 .color-scheme-dark {
-  --text-primary: #ffffff;
-  --text-body: #e0e0e0;
-  --text-muted: #cccccc;
-  --border-light: rgba(255, 255, 255, 0.2);
-  --border-medium: rgba(255, 255, 255, 0.3);
+  --text-heading: var(--inverse-text);
+  --text-content: var(--inverse-text);
+  --text-muted: var(--inverse-text);
+  --border-color: var(--inverse-text);
+  --bg-primary: var(--inverse-bg);
   --bg-secondary: rgba(255, 255, 255, 0.1);
 }
 
-/* Dark-on-light (dark text on light backgrounds) */
+/* Dark-on-light (resets to main theme defaults) */
 .color-scheme-light {
-  --text-primary: #1a1a1a;
-  --text-body: #333333;
-  --text-muted: #666666;
-  --border-light: #e0e0e0;
-  --border-medium: #cccccc;
-  --bg-secondary: #f5f5f5;
+  --text-heading: var(--colors-text_heading, #000);
+  --text-content: var(--colors-text_content, #333);
+  --text-muted: var(--colors-text_muted, #666);
+  --border-color: var(--colors-border_color, #e0e0e0);
+  --bg-primary: var(--colors-bg_primary, #fff);
+  --bg-secondary: var(--colors-bg_secondary, #f9f9f9);
 }
 ```
 
@@ -455,25 +459,21 @@ The color scheme system provides light-on-dark and dark-on-light color variants 
 
 ```html
 <!-- Dark background with light text -->
-<section class="widget-hero widget has-bg-color color-scheme-dark" style="--widget-bg-color: #000">
+<section class="widget has-bg-color color-scheme-dark" style="--widget-bg-color: var(--inverse-bg);">
   <h1 class="widget-headline">Light text on dark background</h1>
 </section>
 
-<!-- Light background with dark text -->
-<section
-  class="widget-hero widget has-bg-color color-scheme-light"
-  style="--widget-bg-color: #f5f5f5"
->
-  <h1 class="widget-headline">Dark text on light background</h1>
-</section>
+<!-- Revert to light scheme inside a dark section -->
+<div class="widget-card color-scheme-light">
+  <p>This card uses the main theme colors</p>
+</div>
 ```
 
 **Key Points:**
 
-- All grayscale colors (wireframe mode compliant)
-- Automatically applies to all typography using design tokens
-- Works with background images, overlays, and solid colors
-- Buttons automatically adapt to color scheme
+- `.color-scheme-dark` uses theme `inverse_bg` and `inverse_text` settings
+- `.color-scheme-light` resets all colors to the main theme defaults
+- Both classes are customizable via theme settings in the admin
 
 ---
 
@@ -573,10 +573,7 @@ Per-instance background customization via CSS custom properties:
 <section class="widget-hero widget has-bg-color" style="--widget-bg-color: #f5f5f5;">...</section>
 
 <!-- Background Image with Overlay (preset handles color) -->
-<section
-  class="widget-hero widget has-bg-image has-overlay overlay-dark"
-  style="--widget-bg-image: url('hero.jpg');"
->
+<section class="widget-hero widget has-bg-image has-overlay overlay-dark" style="--widget-bg-image: url('hero.jpg');">
   ...
 </section>
 
@@ -602,50 +599,64 @@ Per-instance background customization via CSS custom properties:
 
 ## Typography System
 
-### Heading Classes
+### Default Heading Sizes
+
+All headings have default sizes defined. Font family, weight, and color are inherited from theme settings.
 
 ```css
-/* Widget Headlines (section titles, centered) */
-.widget-headline {
-  font-size: var(--font-size-4xl); /* 32px mobile */
+/* Base heading styles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--typography-heading_font-family, inherit);
+  font-weight: var(--typography-heading_font-weight, 700);
+  color: var(--text-heading);
   line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-bold);
+  margin-block-end: var(--space-sm);
+}
+
+/* Default heading sizes */
+h1 {
+  font-size: var(--font-size-5xl);
+} /* 36px */
+h2 {
+  font-size: var(--font-size-4xl);
+} /* 32px */
+h3 {
+  font-size: var(--font-size-3xl);
+} /* 28px */
+h4 {
+  font-size: var(--font-size-2xl);
+} /* 24px */
+h5 {
+  font-size: var(--font-size-xl);
+} /* 20px */
+h6 {
+  font-size: var(--font-size-lg);
+} /* 18px */
+```
+
+### Typography Utility Classes
+
+These classes adjust margins for specific contexts. They inherit heading styles.
+
+```css
+/* Widget Headlines (larger margin for section titles) */
+.widget-headline {
   margin-block-end: var(--space-md);
 }
 
-/* Widget Titles (card titles, smaller) */
+/* Widget Titles (standard margin) */
 .widget-title {
-  font-size: var(--font-size-2xl); /* 24px mobile */
-  line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-bold);
   margin-block-end: var(--space-sm);
 }
 
-/* Widget Subtitles (h3 level) */
+/* Widget Subtitles */
 .widget-subtitle {
-  font-size: var(--font-size-xl); /* 20px */
-  line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-semibold);
   margin-block-end: var(--space-sm);
-}
-
-/* Responsive Scaling */
-@media (min-width: 750px) {
-  .widget-headline {
-    font-size: var(--font-size-5xl);
-  } /* 40px */
-  .widget-title {
-    font-size: var(--font-size-3xl);
-  } /* 28px */
-}
-
-@media (min-width: 990px) {
-  .widget-headline {
-    font-size: var(--font-size-6xl);
-  } /* 48px */
-  .widget-title {
-    font-size: var(--font-size-4xl);
-  } /* 32px */
 }
 ```
 
@@ -736,34 +747,65 @@ The card system provides a consistent structure for content containers across wi
 
 ## Button System
 
-### Base Button
+Buttons use theme accent colors and have two variants: Primary (filled) and Secondary (outlined).
+
+### Base Button (Secondary Style)
 
 ```css
 .widget-button {
   display: inline-flex;
   align-items: center;
-  align-self: flex-start; /* Prevents stretching in flex containers */
+  align-self: flex-start;
   gap: var(--space-sm);
   padding: 1.2rem 2.4rem;
   font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-normal);
+  font-family: inherit;
   background-color: transparent;
-  color: var(--text-primary);
-  border: var(--border-width-medium) solid var(--border-darker);
+  color: var(--accent);
+  border: var(--border-width-medium) solid var(--accent);
   cursor: pointer;
   transition: all 0.3s;
+
+  &:hover {
+    background-color: var(--accent);
+    color: var(--accent-text);
+  }
 }
 ```
 
 ### Button Variants
 
 ```css
+/* Primary Button - Filled with accent color */
+.widget-button-primary {
+  background-color: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+
+  &:hover {
+    background-color: transparent;
+    color: var(--accent);
+  }
+}
+
+/* Secondary Button - Outlined (same as base) */
+.widget-button-secondary {
+  background-color: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+
+  &:hover {
+    background-color: var(--accent);
+    color: var(--accent-text);
+  }
+}
+
 /* Size Variants */
 .widget-button-large {
   padding: 1.6rem 4rem;
   font-size: var(--font-size-lg);
 }
-
 .widget-button-small {
   padding: 0.8rem 1.6rem;
   font-size: var(--font-size-sm);
@@ -774,61 +816,29 @@ The card system provides a consistent structure for content containers across wi
   display: flex;
   align-self: stretch;
   width: 100%;
-  justify-content: center; /* Centers text */
-}
-
-/* Filled Button (inverted style) */
-.widget-button-filled {
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
-
-  &:hover {
-    background-color: transparent;
-    color: var(--text-primary);
-  }
-}
-```
-
-### Color Scheme Adaptation
-
-Buttons automatically adapt to color schemes:
-
-```css
-/* On dark backgrounds */
-.color-scheme-dark .widget-button {
-  background-color: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
+  justify-content: center;
 }
 ```
 
 ### Usage Examples
 
 ```html
-<!-- Default button (natural width) -->
-<a href="#" class="widget-button">Click Me</a>
+<!-- Primary button (filled) -->
+<a href="#" class="widget-button widget-button-primary">Get Started</a>
 
-<!-- Large button -->
-<a href="#" class="widget-button widget-button-large">Get Started</a>
+<!-- Secondary button (outlined) -->
+<a href="#" class="widget-button widget-button-secondary">Learn More</a>
 
-<!-- Full-width button (for pricing cards, etc.) -->
-<a href="#" class="widget-button widget-button-full">Subscribe</a>
-
-<!-- Filled button (for forms, CTAs) -->
-<button class="widget-button widget-button-filled">Submit</button>
-
-<!-- Button on dark background -->
-<section class="widget has-bg-color color-scheme-dark" style="--widget-bg-color: #000">
-  <a href="#" class="widget-button">Light Button</a>
-</section>
+<!-- Full-width button -->
+<a href="#" class="widget-button widget-button-primary widget-button-full">Subscribe</a>
 ```
 
 **Key Points:**
 
-- Default buttons maintain natural width (content + padding)
-- `align-self: flex-start` prevents unwanted stretching in flex containers
-- `.widget-button-full` explicitly makes buttons full-width with centered text
-- Buttons automatically adapt colors based on `.color-scheme-dark` or `.color-scheme-light`
+- Both button variants use the theme's `accent` and `accent_text` colors
+- Primary = filled background, Secondary = outlined
+- Normal font weight (not bold)
+- Colors are customizable via theme settings
 
 ---
 
@@ -1029,24 +1039,12 @@ Standardized sizing and styling for SVG icons.
 ```html
 <ul class="widget-filter-list" role="tablist">
   <li role="presentation">
-    <button
-      type="button"
-      class="widget-filter-btn is-active"
-      data-filter="all"
-      role="tab"
-      aria-selected="true"
-    >
+    <button type="button" class="widget-filter-btn is-active" data-filter="all" role="tab" aria-selected="true">
       All Items
     </button>
   </li>
   <li role="presentation">
-    <button
-      type="button"
-      class="widget-filter-btn"
-      data-filter="category"
-      role="tab"
-      aria-selected="false"
-    >
+    <button type="button" class="widget-filter-btn" data-filter="category" role="tab" aria-selected="false">
       Category
     </button>
   </li>
@@ -1306,12 +1304,8 @@ Override styles in widget-specific CSS:
 ```html
 <div class="widget-tabs">
   <div role="tablist" class="tabs-list">
-    <button role="tab" aria-selected="true" aria-controls="panel-1" id="tab-1" class="tabs-tab">
-      Tab 1
-    </button>
-    <button role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2" class="tabs-tab">
-      Tab 2
-    </button>
+    <button role="tab" aria-selected="true" aria-controls="panel-1" id="tab-1" class="tabs-tab">Tab 1</button>
+    <button role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2" class="tabs-tab">Tab 2</button>
   </div>
   <div class="tabs-panels">
     <div role="tabpanel" id="panel-1" aria-labelledby="tab-1" class="tabs-panel">

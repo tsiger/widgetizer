@@ -261,12 +261,9 @@ h6 { font-size: var(--font-size-lg); }
    LAYOUT UTILITIES
    ========================================================================== */
 
-/* Widget wrapper (smart spacing + background system) */
+/* Widget wrapper (handles background only, no spacing) */
 .widget {
   position: relative;
-  /* Default: Margin-based spacing (no background) */
-  margin-block: var(--section-padding-block);
-  padding-block: 0;
   padding-inline: var(--section-padding-inline);
   background-color: var(--widget-bg-color, transparent);
   /* background-image is set inline on elements with .has-bg-image class */
@@ -274,24 +271,6 @@ h6 { font-size: var(--font-size-lg); }
   background-position: var(--widget-bg-position, center);
   background-repeat: var(--widget-bg-repeat, no-repeat);
   background-attachment: var(--widget-bg-attachment, scroll);
-
-  /* Background present: Padding-based spacing (background fills element) */
-  &.has-bg-color,
-  &.has-bg-image {
-    margin-block: 0;
-    padding-block: var(--section-padding-block);
-  }
-
-  /* Optional: Explicit spacing control */
-  &.spacing-margin {
-    margin-block: var(--section-padding-block);
-    padding-block: 0;
-  }
-
-  &.spacing-padding {
-    margin-block: 0;
-    padding-block: var(--section-padding-block);
-  }
 
   /* Overlay pseudo-element */
   &.has-overlay::before {
@@ -304,7 +283,7 @@ h6 { font-size: var(--font-size-lg); }
     pointer-events: none;
   }
 
-  /* Overlay opacity presets (also set default black color) */
+  /* Overlay opacity presets */
   &.overlay-light {
     --widget-overlay-color: rgba(0, 0, 0, 0.3);
     --widget-overlay-opacity: 1;
@@ -321,12 +300,20 @@ h6 { font-size: var(--font-size-lg); }
   }
 }
 
-/* Widget inner container */
+/* Widget inner container (handles spacing) */
 .widget-container {
   position: relative;
   z-index: 2;
   max-width: var(--container-max-width);
   margin-inline: auto;
+  /* Default: margin-based spacing (collapses) */
+  margin-block: var(--section-padding-block);
+}
+
+/* Padded variant: for widgets with different background */
+.widget-container-padded {
+  margin-block: 0;
+  padding-block: var(--section-padding-block);
 }
 
 /* Widget header (centered section header) */

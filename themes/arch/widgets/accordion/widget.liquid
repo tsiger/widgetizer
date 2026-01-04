@@ -1,6 +1,9 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-accordion widget-{{ widget.id }} {% if widget.settings.style == 'connected' %}accordion-bordered{% endif %} {% if widget.settings.background == 'secondary' %}bg-secondary{% endif %}"
+  class="widget widget-accordion widget-{{ widget.id }} {% if widget.settings.style == 'connected' %}accordion-bordered{% endif %}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   {% if widget.settings.allow_multiple %}
     data-multi-open="true"
   {% endif %}
@@ -40,12 +43,7 @@
         transition: background-color 0.2s;
         font-family: inherit;
 
-        &:hover {
-          background-color: var(--bg-secondary);
-        }
-
         &:focus-visible {
-          outline: var(--border-width-medium) solid var(--border-color);
           outline-offset: -0.2rem;
         }
       }
@@ -133,7 +131,7 @@
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
