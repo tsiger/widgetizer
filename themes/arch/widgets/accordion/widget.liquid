@@ -1,9 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-accordion {% if widget.settings.style == 'connected' %}accordion-bordered{% endif %} {% if widget.settings.text_color == 'light' %}color-scheme-dark{% else %}color-scheme-light{% endif %} {% if widget.settings.background_color != blank %}has-bg-color{% endif %}"
-  {% if widget.settings.background_color != blank %}
-    style="--widget-bg-color: {{ widget.settings.background_color }};"
-  {% endif %}
+  class="widget widget-accordion widget-{{ widget.id }} {% if widget.settings.style == 'connected' %}accordion-bordered{% endif %} {% if widget.settings.background == 'secondary' %}bg-secondary{% endif %}"
   {% if widget.settings.allow_multiple %}
     data-multi-open="true"
   {% endif %}
@@ -11,7 +8,7 @@
   data-widget-type="accordion"
 >
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       & .accordion-list {
         list-style: none;
         padding: 0;

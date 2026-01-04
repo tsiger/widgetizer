@@ -36,18 +36,13 @@
     },
     {
       "type": "select",
-      "id": "text_color",
-      "label": "Text color",
-      "default": "dark",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
       "options": [
-        { "value": "dark", "label": "Dark" },
-        { "value": "light", "label": "Light" }
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
       ]
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background color"
     }
   ],
   "blocks": [

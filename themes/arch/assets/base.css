@@ -38,8 +38,8 @@ img {
   --font-size-2xl: 2.4rem; /* 24px */
   --font-size-3xl: 2.8rem; /* 28px */
   --font-size-4xl: 3.2rem; /* 32px */
-  --font-size-5xl: 4rem; /* 40px */
-  --font-size-6xl: 4.8rem; /* 48px */
+  --font-size-5xl: 3.6rem; /* 36px */
+  --font-size-6xl: 4rem; /* 40px */
 
   /* Line Heights */
   --line-height-tight: 1.2;
@@ -159,8 +159,6 @@ img {
   --bg-secondary: var(--colors-bg_secondary, #f9f9f9);
 }
 
-/* Button variants for color schemes */
-
 /* ==========================================================================
    BASE STYLES
    ========================================================================== */
@@ -194,7 +192,16 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--typography-heading_font-family, inherit);
   font-weight: var(--typography-heading_font-weight, 700);
   color: var(--text-heading);
+  line-height: var(--line-height-tight);
+  margin-block-end: var(--space-sm);
 }
+
+h1 { font-size: var(--font-size-5xl); }
+h2 { font-size: var(--font-size-4xl); }
+h3 { font-size: var(--font-size-3xl); }
+h4 { font-size: var(--font-size-2xl); }
+h5 { font-size: var(--font-size-xl); }
+h6 { font-size: var(--font-size-lg); }
 
 /* ==========================================================================
    TYPOGRAPHY UTILITIES
@@ -202,52 +209,24 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Headlines (Section titles, usually centered) */
 .widget-headline {
-  font-size: var(--font-size-4xl);
-  line-height: var(--line-height-tight);
   margin-block-end: var(--space-md);
-
-  @media (min-width: 750px) {
-    font-size: var(--font-size-5xl);
-  }
-
-  @media (min-width: 990px) {
-    font-size: var(--font-size-6xl);
-  }
 }
 
 /* Titles (Card/item titles) */
 .widget-title {
-  font-size: var(--font-size-2xl);
-  line-height: var(--line-height-tight);
   margin-block-end: var(--space-sm);
-
-  @media (min-width: 750px) {
-    font-size: var(--font-size-3xl);
-  }
-
-  @media (min-width: 990px) {
-    font-size: var(--font-size-4xl);
-  }
 }
 
-/* Subtitles (H3 level) */
+/* Subtitles */
 .widget-subtitle {
-  font-size: var(--font-size-xl);
-  line-height: var(--line-height-tight);
   margin-block-end: var(--space-sm);
 }
 
 /* Body text / Description */
 .widget-text,
 .widget-description {
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-relaxed);
   color: var(--text-content);
   margin-block-end: var(--space-lg);
-
-  @media (min-width: 990px) {
-    font-size: var(--font-size-lg);
-  }
 }
 
 /* Large text */
@@ -458,13 +437,13 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Card Title */
 .widget-card-title {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   line-height: var(--line-height-tight);
   color: var(--text-heading);
   margin-block-end: var(--space-xs);
 
   @media (min-width: 990px) {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
   }
 }
 
@@ -608,7 +587,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .widget-label {
   display: block;
-  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   margin-block-end: var(--space-xs);
 }
@@ -709,7 +687,7 @@ h1, h2, h3, h4, h5, h6 {
   & .header-logo {
     display: block;
     text-decoration: none;
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-lg);
     font-weight: var(--font-weight-bold);
     color: var(--text-heading);
     z-index: 1001;
