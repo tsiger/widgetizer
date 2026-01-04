@@ -26,6 +26,7 @@
     </main>
     {{ footer }}
 
+    {% asset "scripts.js", { "defer": false } %}
     {% render_scripts %}
   </body>
 </html>

@@ -39,7 +39,7 @@ export const EnqueueScriptTag = {
 
       // Add to the Map (filepath as key for deduplication)
       context.globals.enqueuedScripts.set(this.filepath, {
-        defer: this.options.defer !== false, // Default true
+        defer: this.options.defer || false, // Default false (render_scripts is in footer)
         async: this.options.async || false,
       });
 
