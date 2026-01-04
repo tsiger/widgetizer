@@ -1,11 +1,14 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-countdown"
+  class="widget widget-countdown widget-{{ widget.id }}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="countdown"
 >
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       & .countdown-container {
         display: flex;
         flex-direction: column;
@@ -17,7 +20,6 @@
         display: flex;
         justify-content: center;
         gap: var(--space-md);
-        margin-block: var(--space-xl);
       }
 
       & .countdown-unit {
@@ -28,10 +30,10 @@
       }
 
       /* Cards style */
-      &.style-cards .countdown-unit {
-        background: var(--surface-secondary);
+      & .style-cards .countdown-unit {
+        background: var(--bg-primary);
         border: var(--border-width-thin) solid var(--border-color);
-        border-radius: var(--radius-md);
+        border-radius: var(--border-radius-lg);
         padding: var(--space-lg);
       }
 
@@ -99,7 +101,7 @@
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}

@@ -50,6 +50,16 @@
       "id": "show_seconds",
       "label": "Show seconds",
       "default": true
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
     }
   ],
   "blocks": [],
