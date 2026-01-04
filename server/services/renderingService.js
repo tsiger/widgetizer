@@ -11,8 +11,7 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { ThemeSettingsTag } from "../../src/core/tags/themeSettings.js";
 import { AssetTag } from "../../src/core/tags/assetTag.js";
-import { FontsPreconnectTag } from "../../src/core/tags/FontsPreconnectTag.js";
-import { FontsStylesheetTag } from "../../src/core/tags/FontsStylesheetTag.js";
+import { FontsTag } from "../../src/core/tags/FontsTag.js";
 import { SeoTag } from "../../src/core/tags/SeoTag.js";
 import { EnqueueStyleTag } from "../../src/core/tags/enqueueStyle.js";
 import { EnqueueScriptTag } from "../../src/core/tags/enqueueScript.js";
@@ -64,8 +63,7 @@ function configureLiquidEngine(engine) {
   // Register custom tags
   engine.registerTag("theme_settings", ThemeSettingsTag);
   engine.registerTag("asset", AssetTag);
-  engine.registerTag("fonts_preconnect", FontsPreconnectTag);
-  engine.registerTag("fonts_stylesheet", FontsStylesheetTag);
+  engine.registerTag("fonts", FontsTag);
   engine.registerTag("seo", SeoTag);
   engine.registerTag("enqueue_style", EnqueueStyleTag);
   engine.registerTag("enqueue_script", EnqueueScriptTag);

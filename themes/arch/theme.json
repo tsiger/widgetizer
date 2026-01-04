@@ -20,6 +20,31 @@
           "default": "#000000",
           "outputAsCssVar": true
         }
+      ],
+      "typography": [
+        {
+          "type": "header",
+          "id": "typography_header",
+          "label": "Typography"
+        },
+        {
+          "type": "font_picker",
+          "id": "heading_font",
+          "label": "Heading Font",
+          "default": {
+            "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+            "weight": 700
+          }
+        },
+        {
+          "type": "font_picker",
+          "id": "body_font",
+          "label": "Body Font",
+          "default": {
+            "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+            "weight": 400
+          }
+        }
       ]
     }
   }

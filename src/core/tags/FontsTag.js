@@ -1,17 +1,15 @@
-// Purpose: Liquid tag to output font stylesheet links.
+// Purpose: Liquid tag to output both font preconnect links and stylesheet for optimal font loading.
 
 import fontDefinitions from "../config/fonts.json" with { type: "json" };
 
 const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
 
-export const FontsStylesheetTag = {
+export const FontsTag = {
   parse: function (tagToken, remainTokens) {
-    //TODO: remainTokens is not used
     // No arguments expected
     this.tagName = tagToken.name;
   },
   render: function (context, hash) {
-    //TODO: hash is not used
     const rawSettings = context.globals?.themeSettingsRaw;
 
     if (!rawSettings || !rawSettings.settings || !rawSettings.settings.global) {
@@ -31,17 +29,16 @@ export const FontsStylesheetTag = {
               : { stack: setting.default?.stack, weight: setting.default?.weight };
 
           // Ensure value is an object with stack and weight
-          if (value && typeof value === "object" && value.stack && value.weight) {
+          if (value && typeof value === "object" && value.stack) {
             const fontInfo = ALL_FONTS_LIST.find((f) => f.stack === value.stack);
 
-            if (fontInfo && fontInfo.isGoogleFont) {
+            if (fontInfo && fontInfo.isGoogleFont && value.weight) {
               const fontName = fontInfo.name; // Use the font name for the URL
-              const weight = value.weight;
 
               if (!fontsToLoad[fontName]) {
                 fontsToLoad[fontName] = new Set();
               }
-              fontsToLoad[fontName].add(weight);
+              fontsToLoad[fontName].add(value.weight);
             }
           }
         }
@@ -49,10 +46,18 @@ export const FontsStylesheetTag = {
     }
 
     if (Object.keys(fontsToLoad).length === 0) {
-      return ""; // No web fonts to load
+      return ""; // No Google Fonts to load
     }
 
-    // Construct the URL
+    // Build output: preconnect links + stylesheet link
+    let output = "";
+
+    // 1. Preconnect links for performance
+    output += `<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+`;
+
+    // 2. Stylesheet link
     const base = "https://fonts.googleapis.com/css2";
     const families = Object.entries(fontsToLoad)
       .map(([name, weightsSet]) => {
@@ -63,8 +68,8 @@ export const FontsStylesheetTag = {
       .join("&");
 
     const url = `${base}?${families}&display=swap`;
+    output += `<link href="${url}" rel="stylesheet">`;
 
-    // Output the link tag
-    return `<link href="${url}" rel="stylesheet">`;
+    return output;
   },
 };
