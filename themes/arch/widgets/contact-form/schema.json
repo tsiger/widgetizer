@@ -49,6 +49,16 @@
         { "value": "left", "label": "Left" },
         { "value": "right", "label": "Right" }
       ]
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
     }
   ],
   "blocks": [
@@ -205,11 +215,6 @@
           "id": "text",
           "label": "Text/Details",
           "default": "hello@example.com"
-        },
-        {
-          "type": "link",
-          "id": "link",
-          "label": "Link (optional)"
         }
       ]
     }

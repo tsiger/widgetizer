@@ -1,11 +1,14 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-contact {% if widget.settings.sidebar_position == 'left' %}layout-reverse{% endif %}"
+  class="widget widget-contact widget-{{ widget.id }} {% if widget.settings.sidebar_position == 'left' %}layout-reverse{% endif %}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="contact-form"
 >
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       & .contact-content {
         display: grid;
         grid-template-columns: 1fr;
@@ -149,7 +152,7 @@
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -164,7 +167,7 @@
       </div>
     {% endif %}
 
-    <div class="widget-content {% unless widget.settings.show_sidebar %}widget-content-sm{% endunless %}">
+    <div class="widget-content {% if widget.settings.show_sidebar %}widget-content-md{% else %}widget-content-sm{% endif %}">
       <div class="contact-content {% unless widget.settings.show_sidebar %}no-sidebar{% endunless %}">
         <!-- Contact Form -->
         <form
@@ -284,21 +287,8 @@
                     <h3 class="contact-info-title" data-setting="title">{{ block.settings.title }}</h3>
                   {% endif %}
                   {% if block.settings.text != blank %}
-                    <p class="contact-info-text">
-                      {% if block.settings.link.href != blank %}
-                        <a
-                          href="{{ block.settings.link.href }}"
-                          class="contact-info-link"
-                          data-setting="text"
-                          {% if block.settings.link.target == '_blank' %}
-                            target="_blank" rel="noopener"
-                          {% endif %}
-                        >
-                          {{ block.settings.text }}
-                        </a>
-                      {% else %}
-                        <span data-setting="text">{{ block.settings.text }}</span>
-                      {% endif %}
+                    <p class="contact-info-text" data-setting="text">
+                      {{ block.settings.text }}
                     </p>
                   {% endif %}
                 </div>
