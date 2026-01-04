@@ -9,29 +9,36 @@
         {
           "type": "color",
           "id": "bg_primary",
-          "label": "Background Color",
+          "label": "Primary Background",
           "default": "#ffffff",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "text_primary",
-          "label": "Text Color",
-          "default": "#000000",
-          "outputAsCssVar": true
-        },
-         {
-          "type": "color",
-          "id": "text_muted",
-          "label": "Muted Text Color",
-          "default": "#666666",
+          "id": "bg_secondary",
+          "label": "Secondary Background",
+          "default": "#f9f9f9",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "heading_color",
-          "label": "Heading Color",
+          "id": "text_content",
+          "label": "Content Text",
+          "default": "#333333",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "text_heading",
+          "label": "Heading Text",
           "default": "#000000",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "text_muted",
+          "label": "Muted Text",
+          "default": "#666666",
           "outputAsCssVar": true
         },
         {
@@ -39,6 +46,34 @@
           "id": "border_color",
           "label": "Border Color",
           "default": "#e0e0e0",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "accent",
+          "label": "Accent Color",
+          "default": "#000000",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "accent_text",
+          "label": "Accent Text Color",
+          "default": "#ffffff",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "inverse_bg",
+          "label": "Inverse Background",
+          "default": "#000000",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "inverse_text",
+          "label": "Inverse Text",
+          "default": "#ffffff",
           "outputAsCssVar": true
         }
       ],

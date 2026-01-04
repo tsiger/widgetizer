@@ -86,13 +86,21 @@ img {
   --border-color: var(--colors-border_color, #e0e0e0);
 
   /* Text Colors */
-  --text-primary: var(--colors-text_primary, #000); /* Theme setting with fallback */
-  --text-body: #333;
-  --text-muted: var(--colors-text_muted, #666); /* Falls back to #666 if theme setting not available */
+  --text-content: var(--colors-text_content, #333);
+  --text-heading: var(--colors-text_heading, #000);
+  --text-muted: var(--colors-text_muted, #666);
 
   /* Background Colors */
-  --bg-primary: var(--colors-bg_primary, #fff); /* Theme setting with fallback */
-  --bg-secondary: #f9f9f9;
+  --bg-primary: var(--colors-bg_primary, #fff);
+  --bg-secondary: var(--colors-bg_secondary, #f9f9f9);
+
+  /* Accent Colors */
+  --accent: var(--colors-accent, #000);
+  --accent-text: var(--colors-accent_text, #fff);
+
+  /* Inverse Colors */
+  --inverse-bg: var(--colors-inverse_bg, #000);
+  --inverse-text: var(--colors-inverse_text, #fff);
 
   /* Primitive Colors */
   --color-white: #ffffff;
@@ -131,23 +139,24 @@ img {
    COLOR SCHEME SYSTEM
    ========================================================================== */
 
-/* Light-on-dark color scheme (light text on dark backgrounds) */
+/* Light-on-dark color scheme (uses inverse colors) */
 .color-scheme-dark {
-  --text-primary: #ffffff;
-  --text-body: #e0e0e0;
-  --text-muted: #cccccc;
-  --border-color: rgba(255, 255, 255, 0.2);
-  --bg-primary: rgba(255, 255, 255, 0.05);
-  --bg-secondary: rgba(255, 255, 255, 0.1);
+  --text-heading: var(--inverse-text);
+  --text-content: var(--inverse-text);
+  --text-muted: var(--inverse-text); /* Fallback to inverse text with opacity controlled by opacity property if needed, or simple inheritance */
+  --border-color: var(--inverse-text); /* Will need opacity adjustment in components usually */
+  --bg-primary: var(--inverse-bg);
+  --bg-secondary: rgba(255, 255, 255, 0.1); /* Keep transparent white for secondary bg on dark */
 }
 
-/* Dark-on-light color scheme (dark text on light backgrounds) */
+/* Dark-on-light color scheme (resets to main theme defaults) */
 .color-scheme-light {
-  --text-primary: #1a1a1a;
-  --text-body: #333333;
-  --text-muted: #666666;
-  --border-color: #e0e0e0;
-  --bg-secondary: #f5f5f5;
+  --text-heading: var(--colors-text_heading, #000);
+  --text-content: var(--colors-text_content, #333);
+  --text-muted: var(--colors-text_muted, #666);
+  --border-color: var(--colors-border_color, #e0e0e0);
+  --bg-primary: var(--colors-bg_primary, #fff);
+  --bg-secondary: var(--colors-bg_secondary, #f9f9f9);
 }
 
 /* Button variants for color schemes */
@@ -161,7 +170,7 @@ body {
   font-weight: var(--typography-body_font-weight, 400);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
-  color: var(--text-primary);
+  color: var(--text-content);
   background-color: var(--bg-primary);
   /* Sticky footer layout */
   display: flex;
@@ -184,7 +193,7 @@ strong, b {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--typography-heading_font-family, inherit);
   font-weight: var(--typography-heading_font-weight, 700);
-  color: var(--colors-heading_color, inherit);
+  color: var(--text-heading);
 }
 
 /* ==========================================================================
@@ -233,7 +242,7 @@ h1, h2, h3, h4, h5, h6 {
 .widget-description {
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
-  color: var(--text-body);
+  color: var(--text-content);
   margin-block-end: var(--space-lg);
 
   @media (min-width: 990px) {
@@ -451,7 +460,7 @@ h1, h2, h3, h4, h5, h6 {
 .widget-card-title {
   font-size: var(--font-size-xl);
   line-height: var(--line-height-tight);
-  color: var(--text-primary);
+  color: var(--text-heading);
   margin-block-end: var(--space-xs);
 
   @media (min-width: 990px) {
@@ -481,7 +490,7 @@ h1, h2, h3, h4, h5, h6 {
 .widget-card-content {
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
-  color: var(--text-body);
+  color: var(--text-content);
   flex: 1;
 }
 
@@ -508,7 +517,7 @@ h1, h2, h3, h4, h5, h6 {
   width: var(--icon-size-lg);
   height: var(--icon-size-lg);
   margin-block-end: var(--space-md);
-  color: var(--text-primary);
+  color: var(--text-heading);
   stroke-width: 0.15rem;
 }
 
@@ -516,6 +525,7 @@ h1, h2, h3, h4, h5, h6 {
    BUTTON UTILITIES
    ========================================================================== */
 
+/* Base Button - Secondary style by default */
 .widget-button {
   display: inline-flex;
   align-items: center;
@@ -523,27 +533,27 @@ h1, h2, h3, h4, h5, h6 {
   gap: var(--space-sm);
   padding: 1.2rem 2.4rem;
   font-size: var(--font-size-base);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-normal);
   font-family: inherit;
   background-color: transparent;
-  color: var(--text-primary);
-  border: var(--border-width-medium) solid var(--border-color);
+  color: var(--accent);
+  border: var(--border-width-medium) solid var(--accent);
   text-decoration: none;
   cursor: pointer;
   transition: all 0.3s;
 
   &:hover {
-    border-color: var(--text-primary);
-    transform: translateY(-0.2rem);
+    background-color: var(--accent);
+    color: var(--accent-text);
   }
 
   &:focus {
-    outline: var(--border-width-medium) solid var(--border-color);
+    outline: var(--border-width-medium) solid var(--accent);
     outline-offset: 0.2rem;
   }
 }
 
-/* Button variants */
+/* Button Sizes */
 .widget-button-large {
   padding: 1.6rem 4rem;
   font-size: var(--font-size-lg);
@@ -561,59 +571,27 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
 }
 
-.widget-button-filled {
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
-
-  &:hover {
-    background-color: transparent;
-    color: var(--text-primary);
-  }
-}
-
-/* Primary Button (Filled) */
+/* Primary Button - Filled with accent color */
 .widget-button-primary {
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
-  border-color: var(--text-primary);
+  background-color: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
 
   &:hover {
     background-color: transparent;
-    color: var(--text-primary);
+    color: var(--accent);
   }
 }
 
-/* Secondary Button (Outlined) */
+/* Secondary Button - Outlined with accent color (same as base) */
 .widget-button-secondary {
   background-color: transparent;
-  color: var(--text-primary);
-  border-color: var(--text-primary);
+  color: var(--accent);
+  border-color: var(--accent);
 
   &:hover {
-    background-color: var(--text-primary);
-    color: var(--bg-primary);
-  }
-}
-
-/* Dark Scheme Overrides for Buttons */
-.color-scheme-dark .widget-button-primary {
-  background-color: var(--color-white);
-  color: var(--color-black);
-  border-color: var(--color-white);
-
-  &:hover {
-    background-color: transparent;
-    color: var(--color-white);
-  }
-}
-
-.color-scheme-dark .widget-button-secondary {
-  color: var(--color-white);
-  border-color: var(--color-white);
-
-  &:hover {
-    background-color: var(--color-white);
-    color: var(--color-black);
+    background-color: var(--accent);
+    color: var(--accent-text);
   }
 }
 
@@ -640,7 +618,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1.2rem 1.6rem;
   font-size: var(--font-size-base);
   font-family: inherit;
-  color: var(--text-primary);
+  color: var(--text-content);
   background-color: var(--bg-primary);
   border: var(--border-width-thin) solid var(--border-color);
   transition: border-color 0.3s;
@@ -733,7 +711,7 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: none;
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
+    color: var(--text-heading);
     z-index: 1001;
   }
 
@@ -843,7 +821,7 @@ h1, h2, h3, h4, h5, h6 {
       padding-block: 1.4rem;
       padding-inline: 0;
       text-decoration: none;
-      color: var(--text-primary);
+      color: var(--text-heading);
       font-weight: var(--font-weight-normal);
       font-size: var(--font-size-base);
       background: transparent;
@@ -964,7 +942,7 @@ h1, h2, h3, h4, h5, h6 {
 
         &:hover {
           background-color: var(--bg-secondary);
-          color: var(--text-primary);
+          color: var(--text-heading);
         }
       }
 
@@ -1084,14 +1062,14 @@ h1, h2, h3, h4, h5, h6 {
 
     & a {
       text-decoration: none;
-      color: var(--text-body);
+      color: var(--text-content);
       font-weight: var(--font-weight-semibold);
       padding: var(--space-xs);
       display: block;
       transition: color 0.2s;
 
       &:hover {
-        color: var(--text-primary);
+        color: var(--text-heading);
       }
     }
   }
