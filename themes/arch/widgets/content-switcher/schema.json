@@ -5,18 +5,20 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "Eyebrow text",
+      "default": "Pricing"
     },
     {
       "type": "text",
       "id": "title",
       "label": "Heading",
-      "default": "Flexible Plans"
+      "default": "Choose Your Plan"
     },
     {
       "type": "textarea",
       "id": "description",
-      "label": "Description"
+      "label": "Description",
+      "default": "Select the billing cycle that works best for you. All plans include our core features."
     },
     {
       "type": "select",
@@ -64,6 +66,16 @@
         { "value": "2", "label": "2 Columns" },
         { "value": "3", "label": "3 Columns" },
         { "value": "4", "label": "4 Columns" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
       ]
     }
   ],
@@ -117,19 +129,127 @@
     {
       "type": "item",
       "settings": {
-        "title": "Basic Plan",
-        "text": "Perfect for individuals.",
-        "price": "$10",
-        "target_option": "1"
+        "title": "Starter",
+        "text": "Perfect for individuals and small projects just getting started.",
+        "price": "$12/mo",
+        "target_option": "1",
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        }
       }
     },
     {
       "type": "item",
       "settings": {
-        "title": "Pro Plan",
-        "text": "For growing teams.",
-        "price": "$90",
-        "target_option": "2"
+        "title": "Professional",
+        "text": "Ideal for growing teams and businesses with advanced needs.",
+        "price": "$29/mo",
+        "target_option": "1",
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Enterprise",
+        "text": "Comprehensive solution for large organizations and enterprises.",
+        "price": "$99/mo",
+        "target_option": "1",
+        "link": {
+          "text": "Contact Sales",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Starter",
+        "text": "Perfect for individuals and small projects just getting started.",
+        "price": "$120/yr",
+        "target_option": "2",
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Professional",
+        "text": "Ideal for growing teams and businesses with advanced needs.",
+        "price": "$290/yr",
+        "target_option": "2",
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Enterprise",
+        "text": "Comprehensive solution for large organizations and enterprises.",
+        "price": "$990/yr",
+        "target_option": "2",
+        "link": {
+          "text": "Contact Sales",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Starter",
+        "text": "Perfect for individuals and small projects just getting started.",
+        "price": "$499",
+        "target_option": "3",
+        "link": {
+          "text": "Buy Now",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Professional",
+        "text": "Ideal for growing teams and businesses with advanced needs.",
+        "price": "$999",
+        "target_option": "3",
+        "link": {
+          "text": "Buy Now",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Enterprise",
+        "text": "Comprehensive solution for large organizations and enterprises.",
+        "price": "$2,999",
+        "target_option": "3",
+        "link": {
+          "text": "Contact Sales",
+          "href": "#",
+          "target": "_self"
+        }
       }
     }
   ]

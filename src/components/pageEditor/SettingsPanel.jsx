@@ -116,8 +116,17 @@ export default function SettingsPanel({
           )}
         </div>
 
-        <div className="space-y-6">
-          {allSettings?.map((setting) => {
+        <div 
+          key={isThemeSettings
+            ? `theme-${selectedThemeGroup}`
+            : selectedBlockId && !isGlobalWidget
+              ? `block-${selectedBlockId}`
+              : isGlobalWidget
+                ? `global-${selectedGlobalWidgetId}`
+                : `widget-${selectedWidgetId}`}
+          className="space-y-6"
+        >
+          {allSettings?.map((setting, index) => {
             // Create a unique key that includes widget/block/theme context to force React to remount on switch
             const contextKey = isThemeSettings
               ? `theme-${selectedThemeGroup}`
@@ -132,6 +141,7 @@ export default function SettingsPanel({
                 setting={setting}
                 value={currentValues?.[setting.id]}
                 onChange={handleSettingChange}
+                isFirst={index === 0}
               />
             );
           })}

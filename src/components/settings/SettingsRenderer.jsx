@@ -21,7 +21,7 @@ import SettingsField from "./SettingsField";
 /**
  * Renders the appropriate input component for a given setting
  */
-export default function SettingsRenderer({ setting, value, onChange, error }) {
+export default function SettingsRenderer({ setting, value, onChange, error, isFirst = false }) {
   const { t } = useTranslation();
 
   if (!setting || !setting.type) {
@@ -39,9 +39,10 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
     // The parent container is expected to have a `space-y-*` class,
     // which provides the margin-top to create space between this header
     // and the previous setting.
-    // We add a top border and padding to visually separate the new section.
+    // We add a top border and padding to visually separate the new section,
+    // but skip the border if this is the first setting to avoid duplicate borders.
     return (
-      <div className="border-t border-slate-300/70 pt-2">
+      <div className={isFirst ? "pt-2" : "border-t border-slate-300/70 pt-2"}>
         {translatedLabel && <h2 className="text-base font-semibold leading-7 text-slate-800">{translatedLabel}</h2>}
         {translatedDescription && <p className="mt-1 text-sm text-slate-500">{translatedDescription}</p>}
       </div>

@@ -1,14 +1,14 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-content-switcher {% if widget.settings.background_color != blank %}has-bg-color{% endif %}"
-  {% if widget.settings.background_color != blank %}
-    style="--widget-bg-color: {{ widget.settings.background_color }};"
+  class="widget widget-content-switcher widget-{{ widget.id }}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="content-switcher"
 >
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       & .switcher-ui-wrapper {
         display: flex;
         justify-content: center;
@@ -79,6 +79,10 @@
         &:hover {
           border-color: var(--border-color);
         }
+
+        & .widget-button {
+          align-self: center;
+        }
       }
 
       & .switcher-item-price {
@@ -94,7 +98,7 @@
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -155,7 +159,7 @@
                   {% endif %}
 
                   {% if block.settings.link.href != blank %}
-                    <a href="{{ block.settings.link.href }}" class="widget-button widget-button-primary">
+                    <a href="{{ block.settings.link.href }}" class="widget-button widget-button-secondary">
                       {{ block.settings.link.text | default: 'Learn More' }}
                     </a>
                   {% endif %}
