@@ -1,14 +1,14 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-alternating-rows {% if widget.settings.background_color != blank %}has-bg-color{% endif %}"
-  {% if widget.settings.background_color != blank %}
-    style="--widget-bg-color: {{ widget.settings.background_color }};"
+  class="widget widget-alternating-rows widget-{{ widget.id }}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="alternating-rows"
 >
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       & .rows-wrapper {
         display: flex;
         flex-direction: column;
@@ -68,7 +68,7 @@
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.eyebrow != blank or widget.settings.description != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}

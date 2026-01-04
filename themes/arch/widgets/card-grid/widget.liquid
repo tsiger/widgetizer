@@ -1,11 +1,14 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-card-grid"
+  class="widget widget-card-grid widget-{{ widget.id }}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="card-grid"
 >
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       & .card-grid-items {
         display: grid;
         grid-template-columns: 1fr;
@@ -47,7 +50,7 @@
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -86,11 +89,11 @@
                   {{ block.settings.description }}
                 </p>
               {% endif %}
-              {% if block.settings.button_link != blank %}
+              {% if block.settings.button_link.text != blank %}
                 <div class="widget-card-footer">
                   <a
                     href="{{ block.settings.button_link.href }}"
-                    class="widget-button"
+                    class="widget-button widget-button-small widget-button-secondary"
                     data-setting="button_link"
                     target="{{ block.settings.button_link.target | default: '_self' }}"
                   >

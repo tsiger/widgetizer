@@ -67,10 +67,14 @@
       "default": true
     },
     {
-      "type": "checkbox",
-      "id": "show_instructions",
-      "label": "Show interaction instructions",
-      "default": true
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
     }
   ]
 }

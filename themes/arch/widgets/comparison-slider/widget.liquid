@@ -1,11 +1,14 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-comparison-slider {% if widget.settings.orientation == 'vertical' %}variant-vertical{% endif %}"
+  class="widget widget-comparison-slider widget-{{ widget.id }} {% if widget.settings.orientation == 'vertical' %}variant-vertical{% endif %}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="comparison-slider"
 >
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       & .comparison-slider-wrapper {
         position: relative;
         overflow: hidden;
@@ -207,7 +210,7 @@
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -290,10 +293,6 @@
           </svg>
         </button>
       </div>
-
-      {% if widget.settings.show_instructions %}
-        <p class="comparison-slider-instructions">Drag the slider or use arrow keys to compare</p>
-      {% endif %}
     </div>
   </div>
 
