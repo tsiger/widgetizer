@@ -108,6 +108,7 @@
   "common": {
     "save": "Save",
     "cancel": "Cancel",
+    "reset": "Reset",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",

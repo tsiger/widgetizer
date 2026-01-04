@@ -146,12 +146,12 @@ export default function Settings() {
         <div className="mt-6 flex justify-end gap-3">
           {hasChanges && (
             <Button onClick={handleCancel} variant="secondary">
-              {t("themeSettings.cancel")}
+              {t("common.reset")}
             </Button>
           )}
           
           <Button onClick={handleSave} disabled={loading || !themeData || !hasChanges} variant={hasChanges ? "dark" : "primary"}>
-            {t("themeSettings.save")}
+            {t("common.save")}
             {hasChanges && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
           </Button>
         </div>

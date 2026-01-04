@@ -106,6 +106,7 @@
   "common": {
     "save": "Enregistrer",
     "cancel": "Annuler",
+    "reset": "Réinitialiser",
     "loading": "Chargement...",
     "error": "Erreur",
     "success": "Succès",

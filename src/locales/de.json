@@ -106,6 +106,7 @@
   "common": {
     "save": "Speichern",
     "cancel": "Abbrechen",
+    "reset": "Zurücksetzen",
     "loading": "Laden...",
     "error": "Fehler",
     "success": "Erfolg",

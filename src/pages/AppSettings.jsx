@@ -49,7 +49,7 @@ export default function AppSettings() {
         <div className="mt-6 flex justify-end gap-3">
           {hasChanges && (
             <Button onClick={handleCancel} disabled={isSaving} variant="secondary">
-              {t("common.cancel")}
+              {t("common.reset")}
             </Button>
           )}
 

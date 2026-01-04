@@ -1,7 +1,7 @@
 {
   "name": "Arch",
   "version": "1.0.0",
-  "description": "A custom theme based on the Arch design system",
+  "description": "The default Widgetizer theme",
   "author": "Widgetizer",
   "settings": {
     "global": {
@@ -52,7 +52,7 @@
           "type": "color",
           "id": "accent",
           "label": "Accent Color",
-          "default": "#000000",
+          "default": "#0d47b7",
           "outputAsCssVar": true
         },
         {
@@ -67,14 +67,16 @@
           "id": "inverse_bg",
           "label": "Inverse Background",
           "default": "#000000",
-          "outputAsCssVar": true
+          "outputAsCssVar": true,
+          "description": "Background color for widgets with dark background and light text"
         },
         {
           "type": "color",
           "id": "inverse_text",
           "label": "Inverse Text",
           "default": "#ffffff",
-          "outputAsCssVar": true
+          "outputAsCssVar": true,
+          "description": "Text color for widgets with dark background and light text"
         }
       ],
       "typography": [
