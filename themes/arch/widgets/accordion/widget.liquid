@@ -23,7 +23,7 @@
 
       & .accordion-item {
         background-color: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         overflow: hidden;
       }
 
@@ -39,7 +39,6 @@
         align-items: center;
         gap: var(--space-md);
         font-size: var(--font-size-base);
-        font-weight: var(--font-weight-semibold);
         color: var(--text-primary);
         transition: background-color 0.2s;
         font-family: inherit;
@@ -49,7 +48,7 @@
         }
 
         &:focus-visible {
-          outline: var(--border-width-medium) solid var(--border-darker);
+          outline: var(--border-width-medium) solid var(--border-color);
           outline-offset: -0.2rem;
         }
       }
@@ -120,14 +119,14 @@
       &.accordion-bordered {
         & .accordion-list {
           gap: 0;
-          border: var(--border-width-thin) solid var(--border-light);
+          border: var(--border-width-thin) solid var(--border-color);
           overflow: hidden;
         }
 
         & .accordion-item {
           border: none;
           border-radius: 0;
-          border-block-end: var(--border-width-thin) solid var(--border-light);
+          border-block-end: var(--border-width-thin) solid var(--border-color);
 
           &:last-child {
             border-block-end: none;

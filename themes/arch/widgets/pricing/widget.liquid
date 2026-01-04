@@ -15,7 +15,7 @@
       /* Featured Card Override */
       & .widget-card.is-featured {
         border-width: var(--border-width-medium);
-        border-color: var(--border-darker);
+        border-color: var(--border-color);
         position: relative;
         transform: scale(1.02);
         z-index: 1;
@@ -29,7 +29,6 @@
 
       & .pricing-price {
         font-size: var(--font-size-5xl);
-        font-weight: var(--font-weight-bold);
         margin-block-end: var(--space-xs);
       }
 
@@ -42,11 +41,11 @@
 
       & .pricing-feature {
         padding: var(--space-md) 0;
-        border-block-end: var(--border-width-thin) solid var(--border-light);
+        border-block-end: var(--border-width-thin) solid var(--border-color);
         font-size: var(--font-size-base);
 
         &:first-child {
-          border-block-start: var(--border-width-thin) solid var(--border-light);
+          border-block-start: var(--border-width-thin) solid var(--border-color);
         }
       }
 

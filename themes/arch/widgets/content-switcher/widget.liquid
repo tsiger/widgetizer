@@ -23,7 +23,7 @@
         border-radius: var(--border-radius-full);
         position: relative;
         gap: var(--space-xs);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
       }
 
       & .switcher-btn {
@@ -32,7 +32,6 @@
         border: none;
         background: transparent;
         color: var(--text-muted);
-        font-weight: var(--font-weight-medium);
         cursor: pointer;
         transition: all var(--transition-speed-normal);
         z-index: 2;
@@ -46,7 +45,7 @@
       & .switcher-btn.is-active {
         background: var(--bg-primary);
         color: var(--text-primary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
       }
 
       /* Content Display */
@@ -68,7 +67,7 @@
 
       & .switcher-item {
         background: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         border-radius: var(--border-radius-lg);
         padding: var(--space-xl);
         display: flex;
@@ -78,13 +77,12 @@
         align-items: center;
 
         &:hover {
-          border-color: var(--border-dark);
+          border-color: var(--border-color);
         }
       }
 
       & .switcher-item-price {
         font-size: var(--font-size-3xl);
-        font-weight: var(--font-weight-bold);
         color: var(--text-primary);
       }
 

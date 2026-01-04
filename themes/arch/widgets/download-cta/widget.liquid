@@ -12,7 +12,7 @@
         flex-direction: column;
         gap: var(--space-xl);
         padding: var(--space-2xl);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         text-align: {{ widget.settings.alignment | default: 'center' }};
         align-items: {% case widget.settings.alignment %}{% when 'start' %}flex-start{% when 'end' %}flex-end{% else %}center{% endcase %};
       }

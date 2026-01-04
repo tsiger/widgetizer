@@ -56,12 +56,11 @@
 
       & .job-badge {
         font-size: var(--font-size-xs);
-        font-weight: var(--font-weight-bold);
         text-transform: uppercase;
         letter-spacing: 0.05em;
         padding: var(--space-2xs) var(--space-sm);
         background-color: var(--bg-secondary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         color: var(--text-muted);
       }
 
@@ -115,10 +114,9 @@
       & .job-filter-btn {
         padding: var(--space-sm) var(--space-lg);
         font-size: var(--font-size-sm);
-        font-weight: var(--font-weight-semibold);
         font-family: inherit;
         background-color: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         color: var(--text-muted);
         cursor: pointer;
         transition:
@@ -133,7 +131,7 @@
         }
 
         &:focus {
-          outline: var(--border-width-medium) solid var(--border-darker);
+          outline: var(--border-width-medium) solid var(--border-color);
           outline-offset: 0.2rem;
         }
 

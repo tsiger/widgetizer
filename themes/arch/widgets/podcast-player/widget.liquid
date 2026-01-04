@@ -8,7 +8,7 @@
     #{{ widget.id }} {
       & .audio-player-wrapper {
         background-color: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         padding: var(--space-2xl);
       }
 
@@ -31,7 +31,7 @@
         height: 100%;
         object-fit: cover;
         display: block;
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
       }
 
       & .audio-player-info {
@@ -42,7 +42,6 @@
 
       & .audio-player-episode-number {
         font-size: var(--font-size-sm);
-        font-weight: var(--font-weight-semibold);
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: var(--text-muted);
@@ -50,7 +49,6 @@
 
       & .audio-player-episode-title {
         font-size: var(--font-size-xl);
-        font-weight: var(--font-weight-bold);
         line-height: var(--line-height-tight);
         margin-block-end: var(--space-xs);
       }
@@ -85,7 +83,7 @@
       }
 
       & .audio-player-controls {
-        border-block-start: var(--border-width-thin) solid var(--border-light);
+        border-block-start: var(--border-width-thin) solid var(--border-color);
         padding-block-start: var(--space-2xl);
       }
 
@@ -96,14 +94,14 @@
       & .audio-player-progress-bar {
         width: 100%;
         height: 0.8rem;
-        background-color: var(--border-light);
+        background-color: var(--border-color);
         cursor: pointer;
         position: relative;
         margin-block-end: var(--space-xs);
         transition: background-color 0.3s;
 
         &:hover {
-          background-color: var(--border-medium);
+          background-color: var(--border-color);
         }
       }
 
@@ -222,7 +220,7 @@
       & .audio-player-volume-slider {
         flex: 1;
         height: 0.8rem;
-        background-color: var(--border-light);
+        background-color: var(--border-color);
         position: relative;
         cursor: pointer;
       }
@@ -242,16 +240,15 @@
       & .audio-player-speed-button {
         padding: var(--space-xs) var(--space-sm);
         font-size: var(--font-size-sm);
-        font-weight: var(--font-weight-semibold);
         font-family: inherit;
         background-color: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         cursor: pointer;
         transition: all 0.3s;
 
         &:hover {
           background-color: var(--bg-secondary);
-          border-color: var(--border-medium);
+          border-color: var(--border-color);
         }
 
         &:focus {

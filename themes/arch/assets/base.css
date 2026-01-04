@@ -82,11 +82,8 @@ img {
   --border-width-medium: 0.2rem; /* 2px */
   --border-width-thick: 0.3rem; /* 3px */
 
-  /* Border Colors (Grayscale - Wireframe Mode) */
-  --border-light: #e0e0e0;
-  --border-medium: #ccc;
-  --border-dark: #999;
-  --border-darker: #333;
+  /* Border */
+  --border-color: var(--colors-border_color, #e0e0e0);
 
   /* Text Colors */
   --text-primary: var(--colors-text_primary, #000); /* Theme setting with fallback */
@@ -139,10 +136,7 @@ img {
   --text-primary: #ffffff;
   --text-body: #e0e0e0;
   --text-muted: #cccccc;
-  --border-light: rgba(255, 255, 255, 0.2);
-  --border-medium: rgba(255, 255, 255, 0.3);
-  --border-dark: rgba(255, 255, 255, 0.4);
-  --border-darker: rgba(255, 255, 255, 0.6);
+  --border-color: rgba(255, 255, 255, 0.2);
   --bg-primary: rgba(255, 255, 255, 0.05);
   --bg-secondary: rgba(255, 255, 255, 0.1);
 }
@@ -152,10 +146,7 @@ img {
   --text-primary: #1a1a1a;
   --text-body: #333333;
   --text-muted: #666666;
-  --border-light: #e0e0e0;
-  --border-medium: #cccccc;
-  --border-dark: #999999;
-  --border-darker: #333333;
+  --border-color: #e0e0e0;
   --bg-secondary: #f5f5f5;
 }
 
@@ -429,12 +420,12 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Base Card */
 .widget-card {
-  border: var(--border-width-thin) solid var(--border-light);
+  border: var(--border-width-thin) solid var(--border-color);
   padding: var(--space-xl);
   transition: border-color var(--transition-speed-normal);
 
   &:hover {
-    border-color: var(--border-darker);
+    border-color: var(--border-color);
   }
 
   @media (min-width: 750px) {
@@ -536,7 +527,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: inherit;
   background-color: transparent;
   color: var(--text-primary);
-  border: var(--border-width-medium) solid var(--border-darker);
+  border: var(--border-width-medium) solid var(--border-color);
   text-decoration: none;
   cursor: pointer;
   transition: all 0.3s;
@@ -547,7 +538,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   &:focus {
-    outline: var(--border-width-medium) solid var(--border-darker);
+    outline: var(--border-width-medium) solid var(--border-color);
     outline-offset: 0.2rem;
   }
 }
@@ -651,17 +642,17 @@ h1, h2, h3, h4, h5, h6 {
   font-family: inherit;
   color: var(--text-primary);
   background-color: var(--bg-primary);
-  border: var(--border-width-thin) solid var(--border-light);
+  border: var(--border-width-thin) solid var(--border-color);
   transition: border-color 0.3s;
 
   &:hover {
-    border-color: var(--border-medium);
+    border-color: var(--border-color);
   }
 
   &:focus {
-    outline: var(--border-width-medium) solid var(--border-darker);
+    outline: var(--border-width-medium) solid var(--border-color);
     outline-offset: 0.2rem;
-    border-color: var(--border-darker);
+    border-color: var(--border-color);
   }
 }
 
@@ -735,7 +726,7 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: space-between;
   padding-block: var(--space-md);
   padding-inline: var(--space-md);
-  border-block-end: var(--border-width-thin) solid var(--border-light);
+  border-block-end: var(--border-width-thin) solid var(--border-color);
 
   & .header-logo {
     display: block;
@@ -811,7 +802,7 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     margin-block-end: var(--space-xl);
     padding-block-end: var(--space-md);
-    border-block-end: var(--border-width-thin) solid var(--border-light);
+    border-block-end: var(--border-width-thin) solid var(--border-color);
 
     & .nav-close-title {
       font-size: var(--font-size-lg);
@@ -997,7 +988,7 @@ h1, h2, h3, h4, h5, h6 {
       inset-inline-start: 0;
       min-width: 22rem;
       background-color: var(--bg-primary);
-      border: var(--border-width-thin) solid var(--border-light);
+      border: var(--border-width-thin) solid var(--border-color);
       display: none;
       max-height: none;
       overflow: visible;
@@ -1030,7 +1021,7 @@ h1, h2, h3, h4, h5, h6 {
         inset-inline-start: calc(100% - 0.4rem);
         min-width: 22rem;
         background-color: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         padding-block: var(--space-xs);
         padding-inline: 0;
         display: none;
@@ -1064,7 +1055,7 @@ h1, h2, h3, h4, h5, h6 {
 .widget-footer {
   padding-block: var(--space-3xl);
   padding-inline: var(--space-xl);
-  border-block-start: var(--border-width-thin) solid var(--border-light);
+  border-block-start: var(--border-width-thin) solid var(--border-color);
   background-color: var(--bg-secondary);
 
   & .footer-content {

@@ -17,12 +17,12 @@
         grid-template-columns: 1fr auto;
         gap: var(--space-md);
         padding: var(--space-lg) 0;
-        border-block-end: var(--border-width-thin) solid var(--border-light);
+        border-block-end: var(--border-width-thin) solid var(--border-color);
         align-items: start;
       }
 
       & .priced-item:first-child {
-        border-block-start: var(--border-width-thin) solid var(--border-light);
+        border-block-start: var(--border-width-thin) solid var(--border-color);
       }
 
       & .priced-item.is-featured {
@@ -47,7 +47,6 @@
 
       & .priced-item-name {
         font-size: var(--font-size-lg);
-        font-weight: var(--font-weight-semibold);
         margin: 0;
       }
 
@@ -65,7 +64,6 @@
         height: 1.5rem;
         border-radius: 50%;
         font-size: 0.7rem;
-        font-weight: var(--font-weight-bold);
         text-transform: uppercase;
       }
 
@@ -87,7 +85,6 @@
 
       & .priced-item-price {
         font-size: var(--font-size-lg);
-        font-weight: var(--font-weight-bold);
         color: var(--text-primary);
         white-space: nowrap;
       }

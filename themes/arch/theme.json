@@ -33,6 +33,13 @@
           "label": "Heading Color",
           "default": "#000000",
           "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "border_color",
+          "label": "Border Color",
+          "default": "#e0e0e0",
+          "outputAsCssVar": true
         }
       ],
       "typography": [

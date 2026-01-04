@@ -8,7 +8,7 @@
     #{{ widget.id }} {
       & .image-hotspots-wrapper {
         position: relative;
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
       }
 
       & .image-hotspots-image {
@@ -42,7 +42,7 @@
           content: "";
           position: absolute;
           inset: calc(var(--space-xs) * -1);
-          border: var(--border-width-medium) solid var(--border-light);
+          border: var(--border-width-medium) solid var(--border-color);
           border-radius: 50%;
           animation: hotspot-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
@@ -85,7 +85,7 @@
         width: 28rem;
         max-width: calc(100vw - var(--space-xl));
         background-color: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.3s, visibility 0.3s;
@@ -100,7 +100,7 @@
           inset-inline-start: 50%;
           transform: translateX(-50%);
           border: 0.8rem solid transparent;
-          border-block-end-color: var(--border-light);
+          border-block-end-color: var(--border-color);
         }
 
         &::after {
@@ -130,7 +130,6 @@
 
       & .image-hotspot-tooltip-title {
         font-size: var(--font-size-lg);
-        font-weight: var(--font-weight-bold);
         line-height: var(--line-height-tight);
         margin: 0;
       }

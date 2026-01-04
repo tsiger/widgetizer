@@ -18,7 +18,7 @@
         aspect-ratio: 4 / 3;
         overflow: hidden;
         background-color: var(--bg-secondary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
       }
 
       & .image-tabs-image {
@@ -39,7 +39,7 @@
 
       & .image-tabs-tab {
         background-color: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         border-block-start: none;
         padding: var(--space-lg);
         cursor: pointer;
@@ -47,7 +47,7 @@
         position: relative;
 
         &:first-child {
-          border-block-start: var(--border-width-thin) solid var(--border-light);
+          border-block-start: var(--border-width-thin) solid var(--border-color);
         }
 
         &:hover {
@@ -72,7 +72,6 @@
 
       & .image-tabs-tab-title {
         font-size: var(--font-size-lg);
-        font-weight: var(--font-weight-bold);
         line-height: var(--line-height-tight);
         margin-block-end: var(--space-xs);
         color: var(--text-primary);

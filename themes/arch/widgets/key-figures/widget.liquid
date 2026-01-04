@@ -22,18 +22,17 @@
         text-align: center;
         padding: var(--space-xl) var(--space-lg);
         background-color: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         transition: border-color 0.3s;
 
         &:hover {
-          border-color: var(--border-darker);
+          border-color: var(--border-color);
         }
       }
 
       & .stats-number {
         font-size: var(--font-size-5xl);
         line-height: 1;
-        font-weight: var(--font-weight-bold);
         color: var(--text-primary);
         margin-block-end: var(--space-sm);
         font-variant-numeric: tabular-nums;
@@ -42,7 +41,6 @@
       & .stats-label {
         font-size: var(--font-size-base);
         line-height: 1.4;
-        font-weight: var(--font-weight-semibold);
         color: var(--text-primary);
         text-transform: uppercase;
         letter-spacing: 0.05em;

@@ -21,12 +21,12 @@
         overflow: hidden;
         background-color: var(--bg-secondary);
         aspect-ratio: 4 / 3;
-        border: var(--border-width-thin) solid var(--border-light);
+        border: var(--border-width-thin) solid var(--border-color);
         transition: transform var(--transition-speed-normal), box-shadow var(--transition-speed-normal);
 
         &:hover {
           transform: translateY(-0.4rem);
-          border-color: var(--border-darker);
+          border-color: var(--border-color);
         }
 
         & img {
@@ -48,7 +48,6 @@
 
       & .overlap-caption-title {
         font-size: var(--font-size-lg);
-        font-weight: var(--font-weight-semibold);
       }
 
       @media (min-width: 750px) {
