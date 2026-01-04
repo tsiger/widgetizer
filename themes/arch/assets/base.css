@@ -46,11 +46,11 @@ img {
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.6;
 
-  /* Font Weights */
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+  /* Font Weights - mapped to theme settings */
+  --font-weight-normal: var(--typography-body_font-weight, 400);
+  --font-weight-bold: var(--typography-body_font_bold-weight, 700);
+  --font-weight-medium: 500; /* Static utility */
+  --font-weight-semibold: 600; /* Static utility */
 
   /* Spacing Scale (0.1rem = 1px) */
   --space-xs: 0.8rem; /* 8px */
@@ -180,8 +180,13 @@ body {
 }
 
 /* Main content grows to push footer down */
-#main-content {
+.main-content {
   flex: 1;
+}
+
+/* Bold elements use smart bold weight */
+strong, b {
+  font-weight: var(--font-weight-bold);
 }
 
 /* Heading styles */
@@ -199,7 +204,6 @@ h1, h2, h3, h4, h5, h6 {
 .widget-headline {
   font-size: var(--font-size-4xl);
   line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-bold);
   margin-block-end: var(--space-md);
 
   @media (min-width: 750px) {
@@ -215,7 +219,6 @@ h1, h2, h3, h4, h5, h6 {
 .widget-title {
   font-size: var(--font-size-2xl);
   line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-bold);
   margin-block-end: var(--space-sm);
 
   @media (min-width: 750px) {
@@ -231,7 +234,6 @@ h1, h2, h3, h4, h5, h6 {
 .widget-subtitle {
   font-size: var(--font-size-xl);
   line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-semibold);
   margin-block-end: var(--space-sm);
 }
 
@@ -269,7 +271,7 @@ h1, h2, h3, h4, h5, h6 {
 .widget-eyebrow {
   display: block;
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
@@ -457,7 +459,6 @@ h1, h2, h3, h4, h5, h6 {
 /* Card Title */
 .widget-card-title {
   font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
   color: var(--text-primary);
   margin-block-end: var(--space-xs);
@@ -531,7 +532,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: var(--space-sm);
   padding: 1.2rem 2.4rem;
   font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   font-family: inherit;
   background-color: transparent;
   color: var(--text-primary);
@@ -639,7 +640,7 @@ h1, h2, h3, h4, h5, h6 {
 .widget-label {
   display: block;
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   margin-block-end: var(--space-xs);
 }
 

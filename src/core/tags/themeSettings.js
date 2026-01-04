@@ -1,3 +1,7 @@
+import fontDefinitions from "../config/fonts.json" with { type: "json" };
+
+const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
+
 export const ThemeSettingsTag = {
   parse: function (tagToken, remainTokens) {
     //TODO: remainTokens is not used
@@ -28,6 +32,25 @@ export const ThemeSettingsTag = {
               const cssVarBase = `--${category}-${item.id}`;
               cssVariables[`${cssVarBase}-family`] = value.stack;
               cssVariables[`${cssVarBase}-weight`] = value.weight;
+              
+              // Smart bold weight calculation for body_font
+              if (item.id === "body_font" && value.weight === 400) {
+                const fontInfo = ALL_FONTS_LIST.find((f) => f.stack === value.stack);
+                if (fontInfo && fontInfo.isGoogleFont) {
+                  const availableWeights = fontInfo.availableWeights || [];
+                  
+                  // Find best bold weight: 700 > 600 > 500
+                  let boldWeight = 700; // Default fallback
+                  if (availableWeights.includes(700)) boldWeight = 700;
+                  else if (availableWeights.includes(600)) boldWeight = 600;
+                  else if (availableWeights.includes(500)) boldWeight = 500;
+                  
+                  cssVariables[`--${category}-${item.id}_bold-weight`] = boldWeight;
+                }
+              } else if (item.id === "body_font") {
+                // For non-400 weights, use the selected weight as bold
+                cssVariables[`--${category}-${item.id}_bold-weight`] = value.weight;
+              }
             }
           }
           // Handle other types marked for CSS variable output

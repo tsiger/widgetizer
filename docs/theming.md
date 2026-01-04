@@ -1056,6 +1056,7 @@ Automatic font loading and optimization:
 - Support for Google Fonts and Bunny Fonts (GDPR-compliant alternative)
 - Privacy-friendly font delivery can be enabled via theme settings (`use_bunny_fonts` checkbox)
 - Automatically generates optimized font URLs with only the weights being used
+- **Smart Bold Loading**: When body font weight is 400 (normal), automatically loads an appropriate bold weight (700/600/500) to prevent browser faux-bold rendering for `<strong>`, `<b>`, and bold UI elements
 
 ## 13. Theme Development Workflow
 

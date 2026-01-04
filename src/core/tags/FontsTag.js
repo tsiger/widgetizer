@@ -18,6 +18,11 @@ export const FontsTag = {
 
     const fontsToLoad = {}; // { FontName: Set(weight) }
     const typographySettings = rawSettings.settings.global.typography;
+    
+    // Track body font for smart bold loading
+    let bodyFontName = null;
+    let bodyFontWeight = null;
+    let bodyFontInfo = null;
 
     if (Array.isArray(typographySettings)) {
       for (const setting of typographySettings) {
@@ -39,9 +44,32 @@ export const FontsTag = {
                 fontsToLoad[fontName] = new Set();
               }
               fontsToLoad[fontName].add(value.weight);
+              
+              // Track body font for smart bold loading
+              if (setting.id === "body_font") {
+                bodyFontName = fontName;
+                bodyFontWeight = value.weight;
+                bodyFontInfo = fontInfo;
+              }
             }
           }
         }
+      }
+    }
+    
+    // Smart bold weight loading for body font
+    // If body font is normal (400), auto-load a proper bold weight to prevent faux-bold
+    if (bodyFontName && bodyFontWeight === 400 && bodyFontInfo) {
+      const availableWeights = bodyFontInfo.availableWeights || [];
+      
+      // Find best bold weight: 700 (bold) > 600 (semibold) > 500 (medium)
+      let boldWeight = null;
+      if (availableWeights.includes(700)) boldWeight = 700;
+      else if (availableWeights.includes(600)) boldWeight = 600;
+      else if (availableWeights.includes(500)) boldWeight = 500;
+      
+      if (boldWeight) {
+        fontsToLoad[bodyFontName].add(boldWeight);
       }
     }
 
