@@ -20,6 +20,16 @@
       "default": "Get the latest updates delivered to your inbox."
     },
     {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
+    },
+    {
       "type": "text",
       "id": "placeholder",
       "label": "Email placeholder",

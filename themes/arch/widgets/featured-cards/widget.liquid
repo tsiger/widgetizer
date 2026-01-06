@@ -1,54 +1,33 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-featured-cards"
+  class="widget widget-type-featured-cards widget-{{ widget.id }} {% if widget.settings.style == 'list' %}style-list{% endif %}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="featured-cards"
 >
   <style>
-    #{{ widget.id }} {
-      & .featured-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: var(--space-lg);
-      }
-
-      & .featured-card {
-        display: flex;
-        flex-direction: column;
-        background: var(--surface-secondary);
-        border-radius: var(--radius-md);
-        overflow: hidden;
-        border: var(--border-width-thin) solid var(--border-color);
-      }
-
+    .widget-{{ widget.id }} {
+      /* Featured-specific elements */
       & .featured-image-container {
         position: relative;
       }
 
-      & .featured-image {
-        width: 100%;
+      & .widget-card-image {
         height: 200px;
-        object-fit: cover;
       }
 
       & .featured-tag {
         position: absolute;
         top: var(--space-sm);
         left: var(--space-sm);
-        background: var(--color-primary);
-        color: white;
+        background: var(--accent);
+        color: var(--accent-text);
         padding: var(--space-xs) var(--space-sm);
-        border-radius: var(--radius-sm);
         font-size: var(--font-size-xs);
         text-transform: uppercase;
         letter-spacing: 0.05em;
-      }
-
-      & .featured-content {
-        padding: var(--space-lg);
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-sm);
       }
 
       & .featured-header {
@@ -56,11 +35,6 @@
         justify-content: space-between;
         align-items: flex-start;
         gap: var(--space-md);
-      }
-
-      & .featured-name {
-        font-size: var(--font-size-xl);
-        margin: 0;
       }
 
       & .featured-pricing {
@@ -72,20 +46,13 @@
 
       & .featured-price {
         font-size: var(--font-size-xl);
-        color: var(--color-primary);
+        color: var(--accent);
       }
 
       & .featured-original-price {
         font-size: var(--font-size-base);
         color: var(--text-muted);
         text-decoration: line-through;
-      }
-
-      & .featured-description {
-        color: var(--text-secondary);
-        font-size: var(--font-size-sm);
-        margin: 0;
-        line-height: 1.6;
       }
 
       & .featured-availability {
@@ -102,20 +69,19 @@
       }
 
       /* List style variant */
-      &.style-list .featured-grid {
+      &.style-list .widget-card-grid {
         gap: 0;
       }
 
-      &.style-list .featured-card {
+      &.style-list .widget-card {
         flex-direction: row;
-        border-radius: 0;
         border-left: none;
         border-right: none;
         border-top: none;
         background: transparent;
       }
 
-      &.style-list .featured-card:first-child {
+      &.style-list .widget-card:first-child {
         border-top: var(--border-width-thin) solid var(--border-color);
       }
 
@@ -124,35 +90,22 @@
         width: 120px;
       }
 
-      &.style-list .featured-image {
+      &.style-list .widget-card-image {
         height: 120px;
-        border-radius: var(--radius-sm);
       }
 
-      &.style-list .featured-content {
+      &.style-list .widget-card-content {
         flex: 1;
         padding: var(--space-md);
       }
 
-      @media (min-width: 750px) {
-        & .featured-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-
-        &.style-list .featured-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      @media (min-width: 990px) {
-        & .featured-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
+      &.style-list .widget-card-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -167,24 +120,24 @@
       </div>
     {% endif %}
 
-    <div class="widget-content {% if widget.settings.style == 'list' %}style-list{% endif %}">
-      <div class="featured-grid">
+    <div class="widget-content">
+      <ul class="widget-card-grid">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <div class="featured-card" data-block-id="{{ blockId }}">
+          <li class="widget-card" data-block-id="{{ blockId }}">
             {% if block.settings.image != blank %}
               <div class="featured-image-container">
-                {{ block.settings.image | image: 'medium', 'featured-image' }}
+                {{ block.settings.image | image: 'medium', 'widget-card-image' }}
                 {% if block.settings.tag != blank %}
                   <span class="featured-tag" data-setting="tag">{{ block.settings.tag }}</span>
                 {% endif %}
               </div>
             {% endif %}
 
-            <div class="featured-content">
+            <div class="widget-card-content">
               <div class="featured-header">
                 {% if block.settings.name != blank %}
-                  <h3 class="featured-name" data-setting="name">{{ block.settings.name }}</h3>
+                  <h3 class="widget-card-title" data-setting="name">{{ block.settings.name }}</h3>
                 {% endif %}
                 <div class="featured-pricing">
                   {% if block.settings.original_price != blank %}
@@ -199,16 +152,16 @@
               </div>
 
               {% if block.settings.description != blank %}
-                <p class="featured-description" data-setting="description">{{ block.settings.description }}</p>
+                <p class="widget-card-description" data-setting="description">{{ block.settings.description }}</p>
               {% endif %}
 
               {% if block.settings.availability != blank %}
                 <span class="featured-availability" data-setting="availability">{{ block.settings.availability }}</span>
               {% endif %}
             </div>
-          </div>
+          </li>
         {% endfor %}
-      </div>
+      </ul>
     </div>
   </div>
 </section>

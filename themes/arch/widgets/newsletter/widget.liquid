@@ -1,14 +1,14 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-newsletter {% if widget.settings.background_color != blank %}has-bg-color{% endif %}"
-  {% if widget.settings.background_color != blank %}
-    style="--widget-bg-color: {{ widget.settings.background_color }};"
+  class="widget widget-type-newsletter widget-{{ widget.id }}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="newsletter"
 >
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       & .newsletter-form {
         display: flex;
         flex-direction: column;
@@ -49,7 +49,7 @@
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -91,21 +91,18 @@
 
   <script>
     (function () {
-      const allWidgets = document.querySelectorAll('.widget-newsletter');
+      const widgetElement = document.getElementById('{{ widget.id }}');
+      if (!widgetElement || widgetElement.dataset.newsletterInitialized) return;
+      widgetElement.dataset.newsletterInitialized = 'true';
 
-      allWidgets.forEach((widget) => {
-        if (widget.dataset.initialized) return;
-        widget.dataset.initialized = 'true';
+      const form = widgetElement.querySelector('.newsletter-form');
 
-        const form = widget.querySelector('.newsletter-form');
-
-        if (form) {
-          form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            widget.classList.add('is-submitted');
-          });
-        }
-      });
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          widgetElement.classList.add('is-submitted');
+        });
+      }
     })();
   </script>
 </section>

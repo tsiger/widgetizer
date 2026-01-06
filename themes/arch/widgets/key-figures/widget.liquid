@@ -1,6 +1,9 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-key-figures {% if widget.settings.layout == 'bar' %}layout-bar{% endif %}"
+  class="widget widget-type-key-figures widget-{{ widget.id }} {% if widget.settings.layout == 'bar' %}layout-bar{% endif %}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="key-figures"
   {% if widget.settings.animate %}
@@ -8,26 +11,10 @@
   {% endif %}
 >
   <style>
-    #{{ widget.id }} {
-      & .stats-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: var(--space-lg);
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-
-      & .stats-item {
+    .widget-{{ widget.id }} {
+      & .widget-card {
         text-align: center;
         padding: var(--space-xl) var(--space-lg);
-        background-color: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-color);
-        transition: border-color 0.3s;
-
-        &:hover {
-          border-color: var(--border-color);
-        }
       }
 
       & .stats-number {
@@ -38,36 +25,20 @@
         font-variant-numeric: tabular-nums;
       }
 
-      & .stats-label {
-        font-size: var(--font-size-base);
-        line-height: 1.4;
-        color: var(--text-heading);
+      & .widget-card-title {
         text-transform: uppercase;
         letter-spacing: 0.05em;
-      }
-
-      & .stats-desc {
-        font-size: var(--font-size-sm);
-        color: var(--text-muted);
-        margin-block-start: var(--space-sm);
+        margin-block-end: var(--space-xs);
       }
 
       @media (min-width: 750px) {
-        & .stats-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-
         & .stats-number {
           font-size: var(--font-size-6xl);
         }
       }
 
       @media (min-width: 990px) {
-        & .stats-grid {
-          grid-template-columns: repeat(4, 1fr);
-        }
-
-        & .stats-item {
+        & .widget-card {
           padding: var(--space-3xl) var(--space-xl);
         }
 
@@ -78,19 +49,16 @@
 
       /* Variant: Bar (Horizontal) */
       &.layout-bar {
-        background-color: var(--bg-secondary);
-        padding-block: var(--space-2xl);
-
-        & .stats-grid {
+        & .widget-card-grid {
           @media (min-width: 750px) {
             grid-template-columns: repeat(4, 1fr);
           }
         }
 
-        & .stats-item {
+        & .widget-card {
           background: transparent;
           border: none;
-          padding: 0;
+          padding: var(--space-lg);
 
           &:hover {
             border-color: transparent;
@@ -100,7 +68,7 @@
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -116,10 +84,10 @@
     {% endif %}
 
     <div class="widget-content">
-      <ul class="stats-grid">
+      <ul class="widget-card-grid">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <li class="stats-item" data-block-id="{{ blockId }}">
+          <li class="widget-card" data-block-id="{{ blockId }}">
             <div
               class="stats-number"
               {% if widget.settings.animate %}
@@ -133,12 +101,14 @@
                 {{- block.settings.suffix -}}
               {%- endif %}
             </div>
-            {% if block.settings.label != blank %}
-              <div class="stats-label" data-setting="label">{{ block.settings.label }}</div>
-            {% endif %}
-            {% if block.settings.description != blank %}
-              <p class="stats-desc" data-setting="description">{{ block.settings.description }}</p>
-            {% endif %}
+            <div class="widget-card-content">
+              {% if block.settings.label != blank %}
+                <h3 class="widget-card-title" data-setting="label">{{ block.settings.label }}</h3>
+              {% endif %}
+              {% if block.settings.description != blank %}
+                <p class="widget-card-description" data-setting="description">{{ block.settings.description }}</p>
+              {% endif %}
+            </div>
           </li>
         {% endfor %}
       </ul>
@@ -149,8 +119,8 @@
     <script>
       (function () {
         const widgetElement = document.getElementById('{{ widget.id }}');
-        if (!widgetElement || widgetElement.dataset.initialized) return;
-        widgetElement.dataset.initialized = 'true';
+        if (!widgetElement || widgetElement.dataset.statsInitialized) return;
+        widgetElement.dataset.statsInitialized = 'true';
 
         const observer = new IntersectionObserver(
           (entries) => {

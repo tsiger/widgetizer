@@ -18,6 +18,16 @@
       "type": "textarea",
       "id": "description",
       "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
     }
   ],
   "blocks": [
@@ -48,43 +58,37 @@
     {
       "type": "logo",
       "settings": {
-        "name": "Company 1",
-        "image": "placeholder"
+        "name": "Acme Corp"
       }
     },
     {
       "type": "logo",
       "settings": {
-        "name": "Company 2",
-        "image": "placeholder"
+        "name": "TechFlow"
       }
     },
     {
       "type": "logo",
       "settings": {
-        "name": "Company 3",
-        "image": "placeholder"
+        "name": "Innovate Inc"
       }
     },
     {
       "type": "logo",
       "settings": {
-        "name": "Company 4",
-        "image": "placeholder"
+        "name": "DataPro"
       }
     },
     {
       "type": "logo",
       "settings": {
-        "name": "Company 5",
-        "image": "placeholder"
+        "name": "CloudSync"
       }
     },
     {
       "type": "logo",
       "settings": {
-        "name": "Company 6",
-        "image": "placeholder"
+        "name": "NextGen"
       }
     }
   ]

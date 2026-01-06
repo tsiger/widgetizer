@@ -11,13 +11,23 @@
       "type": "text",
       "id": "title",
       "label": "Heading",
-      "default": "Masonry Gallery"
+      "default": "Our Work"
     },
     {
       "type": "textarea",
       "id": "description",
       "label": "Description",
-      "default": "A dynamic grid layout that adapts to image aspect ratios."
+      "default": "A collection of our recent projects and creative work."
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
     }
   ],
   "blocks": [
@@ -47,49 +57,43 @@
     {
       "type": "item",
       "settings": {
-        "title": "Image 1",
-        "category": "Photography",
-        "image": "placeholder"
+        "title": "Mountain Retreat",
+        "category": "Architecture"
       }
     },
     {
       "type": "item",
       "settings": {
-        "title": "Image 2",
-        "category": "Design",
-        "image": "placeholder"
+        "title": "Urban Renewal",
+        "category": "Branding"
       }
     },
     {
       "type": "item",
       "settings": {
-        "title": "Image 3",
-        "category": "Art",
-        "image": "placeholder"
+        "title": "Coastal Living",
+        "category": "Interior Design"
       }
     },
     {
       "type": "item",
       "settings": {
-        "title": "Image 4",
-        "category": "Photography",
-        "image": "placeholder"
+        "title": "Tech Campus",
+        "category": "Commercial"
       }
     },
     {
       "type": "item",
       "settings": {
-        "title": "Image 5",
-        "category": "Design",
-        "image": "placeholder"
+        "title": "Art Gallery",
+        "category": "Cultural"
       }
     },
     {
       "type": "item",
       "settings": {
-        "title": "Image 6",
-        "category": "Art",
-        "image": "placeholder"
+        "title": "Lakeside Villa",
+        "category": "Residential"
       }
     }
   ]

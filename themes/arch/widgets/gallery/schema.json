@@ -17,6 +17,16 @@
       "type": "textarea",
       "id": "description",
       "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
     }
   ],
   "blocks": [
@@ -41,25 +51,37 @@
     {
       "type": "image",
       "settings": {
-        "caption": "Gallery Image 1"
+        "caption": "Mountain Landscape"
       }
     },
     {
       "type": "image",
       "settings": {
-        "caption": "Gallery Image 2"
+        "caption": "Ocean Sunset"
       }
     },
     {
       "type": "image",
       "settings": {
-        "caption": "Gallery Image 3"
+        "caption": "Urban Architecture"
       }
     },
     {
       "type": "image",
       "settings": {
-        "caption": "Gallery Image 4"
+        "caption": "Forest Trail"
+      }
+    },
+    {
+      "type": "image",
+      "settings": {
+        "caption": "Desert Dunes"
+      }
+    },
+    {
+      "type": "image",
+      "settings": {
+        "caption": "City Skyline"
       }
     }
   ]

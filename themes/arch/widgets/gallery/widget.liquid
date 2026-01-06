@@ -1,24 +1,17 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-gallery"
+  class="widget widget-type-gallery widget-{{ widget.id }}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="gallery"
 >
   <style>
-    #{{ widget.id }} {
-      & .gallery-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: var(--space-lg);
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-
+    .widget-{{ widget.id }} {
       & .widget-card {
         position: relative;
         overflow: hidden;
-        background-color: var(--bg-secondary);
         aspect-ratio: 4 / 3;
         cursor: pointer;
         padding: 0;
@@ -40,6 +33,8 @@
         display: block;
         transition: transform 0.3s;
         aspect-ratio: auto;
+        margin-block-end: 0;
+        border-radius: 0;
       }
 
       & .gallery-overlay {
@@ -115,22 +110,10 @@
         padding-block-start: var(--space-md);
         color: var(--text-muted);
       }
-
-      @media (min-width: 750px) {
-        & .gallery-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-
-      @media (min-width: 990px) {
-        & .gallery-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-      }
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -146,17 +129,18 @@
     {% endif %}
 
     <div class="widget-content">
-      <ul class="gallery-grid">
+      <ul class="widget-card-grid">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
           <li
             class="widget-card"
             data-block-id="{{ blockId }}"
-            data-full-image="{{ block.settings.image }}"
             data-caption="{{ block.settings.caption }}"
           >
             {% if block.settings.image != blank %}
               {{ block.settings.image | image: 'medium', 'widget-card-image' }}
+            {% else %}
+              <img src="{% placeholder_image 'url' %}" alt="{{ block.settings.caption }}" class="widget-card-image">
             {% endif %}
             {% if block.settings.caption != blank %}
               <div class="gallery-overlay">
@@ -183,54 +167,66 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const widgetElement = document.getElementById('{{ widget.id }}');
-      if (!widgetElement) return;
+    (function() {
+      setTimeout(function() {
+        const widgetElement = document.getElementById('{{ widget.id }}');
+        if (!widgetElement || widgetElement.dataset.galleryInitialized) return;
+        widgetElement.dataset.galleryInitialized = 'true';
 
-      const modal = widgetElement.querySelector('.gallery-modal');
-      const modalImage = widgetElement.querySelector('.gallery-modal-image');
-      const modalCaption = widgetElement.querySelector('.gallery-modal-caption');
-      const closeBtn = widgetElement.querySelector('.gallery-modal-close');
-      const galleryItems = widgetElement.querySelectorAll('.widget-card');
+        const modal = widgetElement.querySelector('.gallery-modal');
+        const modalImage = widgetElement.querySelector('.gallery-modal-image');
+        const modalCaption = widgetElement.querySelector('.gallery-modal-caption');
+        const closeBtn = widgetElement.querySelector('.gallery-modal-close');
+        const galleryItems = widgetElement.querySelectorAll('.widget-card');
 
-      const openModal = (imageSrc, caption) => {
-        modalImage.src = imageSrc;
-        modalImage.alt = caption || '';
-        modalCaption.textContent = caption || '';
-        modal.classList.add('is-open');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-      };
+        if (!modal || !modalImage) return;
 
-      const closeModal = () => {
-        modal.classList.remove('is-open');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-      };
+        const openModal = (imageSrc, caption) => {
+          modalImage.src = imageSrc;
+          modalImage.alt = caption || '';
+          modalCaption.textContent = caption || '';
+          modal.classList.add('is-open');
+          modal.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        };
 
-      galleryItems.forEach((item) => {
-        item.addEventListener('click', () => {
-          const img = item.querySelector('.widget-card-image');
-          const caption = item.dataset.caption;
-          if (img) {
-            openModal(img.src, caption);
+        const closeModal = () => {
+          modal.classList.remove('is-open');
+          modal.setAttribute('aria-hidden', 'true');
+          document.body.style.overflow = '';
+        };
+
+        galleryItems.forEach((item) => {
+          item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const img = item.querySelector('.widget-card-image');
+            const caption = item.dataset.caption;
+            if (img) {
+              openModal(img.src, caption);
+            }
+          });
+        });
+
+        if (closeBtn) {
+          closeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeModal();
+          });
+        }
+
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            closeModal();
           }
         });
-      });
 
-      closeBtn.addEventListener('click', closeModal);
-
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          closeModal();
-        }
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.classList.contains('is-open')) {
-          closeModal();
-        }
-      });
-    });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+            closeModal();
+          }
+        });
+      }, 0);
+    })();
   </script>
 </section>
