@@ -18,6 +18,16 @@
       "type": "textarea",
       "id": "description",
       "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
     }
   ],
   "blocks": [

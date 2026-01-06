@@ -1,63 +1,32 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-numbered-cards"
+  class="widget widget-numbered-cards widget-{{ widget.id }}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="numbered-cards"
 >
   <style>
-    #{{ widget.id }} {
-      & .numbered-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: var(--space-lg);
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-
-      & .widget-card {
-        background-color: var(--bg-secondary);
-      }
-
+    .widget-{{ widget.id }} {
       & .widget-card-number {
         font-size: var(--font-size-6xl);
         line-height: 1;
         margin-block-end: var(--space-md);
         opacity: 0.1;
       }
-
-      & .widget-card-title {
-        font-size: var(--font-size-xl);
-        margin-block-end: var(--space-sm);
-      }
-
-      & .widget-card-content {
-        color: var(--text-muted);
-        font-size: var(--font-size-base);
-        line-height: var(--line-height-relaxed);
-      }
-
-      @media (min-width: 750px) {
-        & .numbered-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-
-      @media (min-width: 990px) {
-        & .numbered-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-      }
     }
   </style>
 
-  <div class="widget-container">
-    {% if widget.settings.title != blank %}
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
           <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
-        <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+        {% if widget.settings.title != blank %}
+          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+        {% endif %}
         {% if widget.settings.description != blank %}
           <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
@@ -65,23 +34,23 @@
     {% endif %}
 
     <div class="widget-content">
-      <div class="numbered-grid">
+      <ul class="widget-card-grid">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
           {% assign step_number = forloop.index | prepend: '0' | slice: -2, 2 %}
-          <article class="widget-card" data-block-id="{{ blockId }}">
+          <li class="widget-card" data-block-id="{{ blockId }}">
             <div class="widget-card-number">{{ step_number }}</div>
-            {% if block.settings.title != blank %}
-              <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
-            {% endif %}
-            {% if block.settings.description != blank %}
-              <div class="widget-card-content">
-                <p data-setting="description">{{ block.settings.description }}</p>
-              </div>
-            {% endif %}
-          </article>
+            <div class="widget-card-content">
+              {% if block.settings.title != blank %}
+                <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
+              {% endif %}
+              {% if block.settings.description != blank %}
+                <p class="widget-card-description" data-setting="description">{{ block.settings.description }}</p>
+              {% endif %}
+            </div>
+          </li>
         {% endfor %}
-      </div>
+      </ul>
     </div>
   </div>
 </section>

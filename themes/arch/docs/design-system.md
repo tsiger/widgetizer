@@ -701,6 +701,39 @@ These classes adjust margins for specific contexts. They inherit heading styles.
 
 ## Card System
 
+### Card Grid Container
+
+For grid-based card layouts, use the `.widget-card-grid` class. This provides a consistent responsive grid structure for card collections:
+
+```html
+<ul class="widget-card-grid">
+  <li class="widget-card" data-block-id="{{ blockId }}">
+    <!-- Optional: Image OR Icon -->
+    <img src="..." class="widget-card-image" alt="..." />
+    <!-- OR -->
+    {% render 'icon', icon: 'star', class: 'widget-card-icon' %}
+
+    <div class="widget-card-content">
+      <span class="widget-card-subtitle">Category</span>
+      <h3 class="widget-card-title">Card Title</h3>
+      <p class="widget-card-description">Description text...</p>
+
+      <!-- Optional Button -->
+      <div class="widget-card-footer">
+        <a href="#" class="widget-button widget-button-secondary">Action</a>
+      </div>
+    </div>
+  </li>
+</ul>
+```
+
+**Grid Breakpoints:**
+
+- Mobile (< 750px): 1 column
+- Tablet (750px+): 2 columns
+- Desktop (990px+): 3 columns
+- Large (1200px+): 4 columns
+
 ### Standard Card Structure
 
 The card system provides a consistent structure for content containers across widgets.
@@ -732,14 +765,15 @@ The card system provides a consistent structure for content containers across wi
 
 | Class                      | Description                                            |
 | -------------------------- | ------------------------------------------------------ |
+| `.widget-card-grid`        | Responsive grid container (1-4 columns)                |
 | `.widget-card`             | Base container with border, padding, and hover effect  |
 | `.widget-card-flat`        | Variant with background color instead of border        |
 | `.widget-card-header`      | Container for title and subtitle                       |
 | `.widget-card-title`       | Primary heading (XL size)                              |
 | `.widget-card-subtitle`    | Secondary text, category, or eyebrow label (uppercase) |
 | `.widget-card-description` | Muted body text for card content                       |
-| `.widget-card-content`     | Main content area (flex-grow)                          |
-| `.widget-card-footer`      | Action area at bottom                                  |
+| `.widget-card-content`     | Main content area (flex-grow, last-child margin reset) |
+| `.widget-card-footer`      | Action area at bottom (margin-block-start: auto)       |
 | `.widget-card-image`       | Standard 16:9 cover image                              |
 | `.widget-card-icon`        | Standard sized icon wrapper                            |
 

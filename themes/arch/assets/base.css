@@ -395,7 +395,9 @@ h6 { font-size: var(--font-size-lg); }
 
 /* Base Card */
 .widget-card {
-  background-color: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
   border: var(--border-width-thin) solid var(--border-color);
   padding: var(--space-lg);
   transition: border-color var(--transition-speed-normal);
@@ -459,11 +461,18 @@ h6 { font-size: var(--font-size-lg); }
   line-height: var(--line-height-relaxed);
   color: var(--text-content);
   flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  & > *:last-child {
+    margin-block-end: 0;
+  }
 }
 
 /* Card Footer */
 .widget-card-footer {
-  margin-block-start: var(--space-lg);
+  margin-block-start: auto;
+  padding-block-start: var(--space-md);
   display: flex;
   align-items: center;
   gap: var(--space-md);
@@ -486,6 +495,28 @@ h6 { font-size: var(--font-size-lg); }
   margin-block-end: var(--space-md);
   color: var(--text-heading);
   stroke-width: 0.15rem;
+}
+
+/* Card Grid Container */
+.widget-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  @media (min-width: 750px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 990px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 /* ==========================================================================
