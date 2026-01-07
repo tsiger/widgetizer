@@ -51,13 +51,11 @@
       /* Content Display */
       & .switcher-content-group {
         display: none;
-        grid-template-columns: repeat(1, 1fr);
-        gap: var(--space-lg);
         animation: switcherFadeIn 0.3s ease-out;
       }
 
       & .switcher-content-group.is-active {
-        display: grid;
+        display: block;
       }
 
       @keyframes switcherFadeIn {
@@ -65,24 +63,9 @@
         to { opacity: 1; transform: translateY(0); }
       }
 
-      & .switcher-item {
-        background: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-color);
-        border-radius: var(--border-radius-lg);
-        padding: var(--space-xl);
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-md);
+      & .widget-card {
         text-align: center;
         align-items: center;
-
-        &:hover {
-          border-color: var(--border-color);
-        }
-
-        & .widget-button {
-          align-self: center;
-        }
       }
 
       & .switcher-item-price {
@@ -91,7 +74,7 @@
       }
 
       @media (min-width: 990px) {
-        & .switcher-content-group {
+        & .widget-card-grid {
           grid-template-columns: repeat({{ widget.settings.columns | default: 3 }}, 1fr);
         }
       }
@@ -134,41 +117,47 @@
         </div>
       </div>
 
-      <div class="switcher-content-reveal">
+        <div class="switcher-content-reveal">
         {% for i in (1..3) %}
           {% assign option_str = i | append: '' %}
           <div class="switcher-content-group {% if i == 1 %}is-active{% endif %}" data-option="{{ i }}" role="tabpanel">
+            <ul class="widget-card-grid">
             {% for blockId in widget.blocksOrder %}
               {% assign block = widget.blocks[blockId] %}
               {% if block.settings.target_option == option_str %}
-                <div class="switcher-item" data-block-id="{{ blockId }}">
+                <li class="widget-card" data-block-id="{{ blockId }}">
                   {% if block.settings.image != blank %}
-                    {{ block.settings.image | image: 'medium', 'switcher-item-image' }}
+                    {{ block.settings.image | image: 'medium', 'widget-card-image' }}
                   {% endif %}
 
-                  {% if block.settings.title != blank %}
-                    <h3 class="widget-title" data-setting="title">{{ block.settings.title }}</h3>
-                  {% endif %}
+                  <div class="widget-card-content">
+                    {% if block.settings.title != blank %}
+                      <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
+                    {% endif %}
 
-                  {% if block.settings.price != blank %}
-                    <div class="switcher-item-price" data-setting="price">{{ block.settings.price }}</div>
-                  {% endif %}
+                    {% if block.settings.price != blank %}
+                      <div class="switcher-item-price" data-setting="price">{{ block.settings.price }}</div>
+                    {% endif %}
 
-                  {% if block.settings.text != blank %}
-                    <p class="widget-text" data-setting="text">{{ block.settings.text }}</p>
-                  {% endif %}
+                    {% if block.settings.text != blank %}
+                      <p class="widget-card-description" data-setting="text">{{ block.settings.text }}</p>
+                    {% endif %}
+                  </div>
 
                   {% if block.settings.link.href != blank %}
-                    <a href="{{ block.settings.link.href }}" class="widget-button widget-button-secondary">
-                      {{ block.settings.link.text | default: 'Learn More' }}
-                    </a>
+                    <div class="widget-card-footer">
+                      <a href="{{ block.settings.link.href }}" class="widget-button widget-button-secondary">
+                        {{ block.settings.link.text | default: 'Learn More' }}
+                      </a>
+                    </div>
                   {% endif %}
-                </div>
+                </li>
               {% endif %}
             {% endfor %}
+            </ul>
           </div>
         {% endfor %}
-      </div>
+        </div>
     </div>
   </div>
 

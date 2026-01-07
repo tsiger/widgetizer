@@ -8,6 +8,17 @@
 
 This document outlines the strict standards for all Arch theme widgets.
 
+## Current Initiative: Comprehensive Widget Audit
+
+We are currently performing a systematic, one-by-one verification of every single widget in `themes/arch/widgets/` against the standards below.
+
+**Process:**
+
+1. Open the widget folder.
+2. Verified `schema.json` and `widget.liquid` against ALL critical rules (Structure, Typography, Semantic HTML, Layout, Backgrounds, etc.).
+3. Update `docs/task.md` or `docs/widget-audit.md` with findings.
+4. Fix non-compliant items immediately.
+
 ---
 
 ## 1. Widget Structure
@@ -219,6 +230,7 @@ For blocks/items that need individual background/overlay support (e.g., bento-gr
 
 - **Header**: Eyebrow, Title, and Description defaults SHOULD be present and engaging.
 - **Blocks**: `defaultBlocks` must contain 3-4 realistic, varied items.
+- **Widgets without blocks**: MUST provide functional default values for all key settings (e.g., specific dates, messages, or configurations) so the widget works immediately when added.
 
 ### Naming:
 

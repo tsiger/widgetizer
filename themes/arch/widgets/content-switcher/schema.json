@@ -85,17 +85,6 @@
       "displayName": "Content Item",
       "settings": [
         {
-          "type": "select",
-          "id": "target_option",
-          "label": "Assign to Option",
-          "default": "1",
-          "options": [
-            { "value": "1", "label": "Option 1" },
-            { "value": "2", "label": "Option 2" },
-            { "value": "3", "label": "Option 3" }
-          ]
-        },
-        {
           "type": "text",
           "id": "title",
           "label": "Title",
@@ -121,6 +110,17 @@
           "type": "link",
           "id": "link",
           "label": "Link / CTA"
+        },
+        {
+          "type": "select",
+          "id": "target_option",
+          "label": "Assign to Option",
+          "default": "1",
+          "options": [
+            { "value": "1", "label": "Option 1" },
+            { "value": "2", "label": "Option 2" },
+            { "value": "3", "label": "Option 3" }
+          ]
         }
       ]
     }

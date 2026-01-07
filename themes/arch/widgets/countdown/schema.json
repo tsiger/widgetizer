@@ -61,7 +61,5 @@
         { "value": "secondary", "label": "Secondary" }
       ]
     }
-  ],
-  "blocks": [],
-  "defaultBlocks": []
+  ]
 }

@@ -16,6 +16,12 @@ Reference: [standards.md](./standards.md)
 - ✅ `video-embed` - Added missing data-setting attributes
 - ✅ `image-callout` - Refactored to unified block pattern (heading, text, features, button)
 - ✅ `image-text` - Added features block
+- ✅ `card-grid` - Merged `feature-grid` into it, added icon support
+- ✅ `comparison-slider` - Verified compliant
+- ✅ `comparison-table` - Verified compliant
+- ✅ `contact-form` - Moved styles to global base.css
+- ✅ `content-switcher` - Refactored to use standard card layout
+- ✅ `countdown` - Refactored typography to use utilities, removed empty blocks
 
 ---
 

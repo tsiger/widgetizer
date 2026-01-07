@@ -43,13 +43,7 @@
         font-variant-numeric: tabular-nums;
       }
 
-      & .countdown-label {
-        font-size: var(--font-size-sm);
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-block-start: var(--space-xs);
-      }
+
 
       /* Minimal style */
       &.style-minimal .countdown-unit {
@@ -127,21 +121,21 @@
         >
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="days">00</span>
-            <span class="countdown-label">Days</span>
+            <span class="countdown-label block-text block-text-sm block-text-muted block-text-uppercase">Days</span>
           </div>
           {% if widget.settings.style == 'minimal' -%}
             <span class="countdown-separator">:</span>
           {%- endif %}
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="hours">00</span>
-            <span class="countdown-label">Hours</span>
+            <span class="countdown-label block-text block-text-sm block-text-muted block-text-uppercase">Hours</span>
           </div>
           {% if widget.settings.style == 'minimal' -%}
             <span class="countdown-separator">:</span>
           {%- endif %}
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="minutes">00</span>
-            <span class="countdown-label">Minutes</span>
+            <span class="countdown-label block-text block-text-sm block-text-muted block-text-uppercase">Minutes</span>
           </div>
           {% if widget.settings.show_seconds %}
             {% if widget.settings.style == 'minimal' -%}
@@ -149,7 +143,7 @@
             {%- endif %}
             <div class="countdown-unit">
               <span class="countdown-number" data-unit="seconds">00</span>
-              <span class="countdown-label">Seconds</span>
+              <span class="countdown-label block-text block-text-sm block-text-muted block-text-uppercase">Seconds</span>
             </div>
           {% endif %}
         </div>
