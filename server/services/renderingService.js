@@ -243,6 +243,7 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
  * @param {object} rawThemeSettings
  * @param {string} renderMode
  * @param {object} sharedGlobals - Optional shared globals to preserve enqueued assets
+ * @param {number} index - Optional 1-based index of the widget in the page (first widget = 1, second = 2, etc.)
  */
 async function renderWidget(
   projectId,
@@ -251,6 +252,7 @@ async function renderWidget(
   rawThemeSettings,
   renderMode = "preview",
   sharedGlobals = null,
+  index = null,
 ) {
   try {
     const { type, settings = {}, blocks = {}, blocksOrder = [] } = widgetData;
@@ -364,6 +366,7 @@ async function renderWidget(
       settings: enhancedSettings,
       blocks: enhancedBlocks,
       blocksOrder: blocksOrder || [],
+      index: index, // 1-based index of widget in page (null for global widgets or when not provided)
     };
 
     // Get base render context (use shared globals if provided)

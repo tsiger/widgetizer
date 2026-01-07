@@ -3,6 +3,7 @@
   class="core-spacer widget-{{ widget.id }}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="core-spacer"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   <style>
     .widget-{{ widget.id }} {

@@ -9,6 +9,7 @@
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="accordion"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   <style>
     .widget-{{ widget.id }} {

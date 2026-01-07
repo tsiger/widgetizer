@@ -6,6 +6,7 @@
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="card-grid"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}

@@ -6,6 +6,7 @@
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="video-embed"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   {%- comment -%} Convert YouTube/Vimeo URL to embed URL {%- endcomment -%}
   {%- assign video_url = widget.settings.video_url -%}

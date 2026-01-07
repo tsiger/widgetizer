@@ -6,6 +6,7 @@
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="bento-grid"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   <style>
     .widget-{{ widget.id }} {
@@ -26,7 +27,7 @@
         transition: transform var(--transition-speed-normal), border-color var(--transition-speed-normal);
         min-height: 20rem;
         justify-content: flex-end;
-        
+
         &.has-bg-color,
         &.has-bg-image {
           border: none;
@@ -85,25 +86,25 @@
       <div class="bento-grid-container">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          
+
           {% assign item_classes = 'bento-item block-item' | append: ' align-' | append: block.settings.alignment %}
           {% assign item_style = '' %}
-          
+
           {% if block.settings.image != blank %}
              {% assign item_classes = item_classes | append: ' has-bg-image has-overlay' %}
-             
+
              {% assign overlay_val = block.settings.overlay_color | default: 'rgba(0,0,0,0.5)' %}
              {% capture item_style %}
                {{ item_style }} --widget-overlay-color: {{ overlay_val }}; background-image: url('{{ block.settings.image | image: 'path', 'large' }}');
              {% endcapture %}
-             
+
           {% elsif block.settings.background_color != blank %}
              {% assign item_classes = item_classes | append: ' has-bg-color' %}
              {% capture item_style %}
                {{ item_style }} --widget-bg-color: {{ block.settings.background_color }};
              {% endcapture %}
           {% endif %}
-          
+
           {% if block.settings.text_color == 'light' %}
              {% assign item_classes = item_classes | append: ' color-scheme-dark' %}
           {% elsif block.settings.text_color == 'dark' %}

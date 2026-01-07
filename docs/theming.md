@@ -599,9 +599,25 @@ Within individual widget templates (`widgets/*.liquid`), you have access to:
 - `{{ widget.type }}`: Widget type identifier
 - `{{ widget.settings.* }}`: Widget-specific settings
 - `{{ widget.blocks }}`: Widget's blocks (if applicable)
+- `{{ widget.index }}`: 1-based index of the widget in the page (first widget = 1, second = 2, etc.). This is `null` for global widgets (header/footer) or when the index is not available.
 - `{{ theme.* }}`: Global theme settings organized by group
 
 **Note:** `page.*` and `project.*` objects are only available in `layout.liquid`, not in individual widget templates.
+
+#### Widget Index Example
+
+The widget index can be useful for styling alternate widgets, creating numbered sections, or applying different styles based on position:
+
+```liquid
+<div class="widget widget--{{ widget.index | modulo: 2 }}" data-widget-index="{{ widget.index }}">
+  {% if widget.index == 1 %}
+    <h2>First Widget</h2>
+  {% endif %}
+
+  <div class="widget-number">{{ widget.index }}</div>
+  <!-- Widget content -->
+</div>
+```
 
 ### Global Widgets
 

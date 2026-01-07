@@ -6,6 +6,7 @@
   class="widget widget-slideshow widget-{{ widget.id }} color-scheme-dark{% unless widget.settings.fullwidth %} slideshow-constrained{% endunless %}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="slideshow"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
   data-autoplay="{{ widget.settings.autoplay | default: false }}"
   data-autoplay-speed="{{ widget.settings.autoplay_speed | default: 5000 }}"
 >

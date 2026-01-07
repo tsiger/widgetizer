@@ -72,9 +72,11 @@ export async function generatePreview(req, res) {
 
     if (widgetOrder.length > 0 && pageData.widgets) {
       // Render widgets sequentially to preserve enqueue order
+      let widgetIndex = 0;
       for (const widgetId of widgetOrder) {
         const widget = pageData.widgets[widgetId];
         if (!widget) continue;
+        widgetIndex += 1; // 1-based index (first widget = 1, second = 2, etc.)
         const renderedWidgetHtml = await renderWidget(
           activeProjectId,
           widgetId,
@@ -82,6 +84,7 @@ export async function generatePreview(req, res) {
           rawThemeSettings,
           "preview",
           sharedGlobals,
+          widgetIndex,
         );
         mainContent += renderedWidgetHtml;
       }

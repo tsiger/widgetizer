@@ -277,6 +277,7 @@ Sitemap: ${sitemapUrl}`;
       // Render page-specific widgets sequentially
       let pageWidgetsHtml = "";
       if (pageData.widgets && pageData.widgetsOrder) {
+        let widgetIndex = 0;
         for (const widgetId of pageData.widgetsOrder) {
           // Skip header/footer as they are rendered separately
           if (widgetId === "header_widget" || widgetId === "footer_widget") {
@@ -287,6 +288,7 @@ Sitemap: ${sitemapUrl}`;
             console.warn(` -> Widget data missing for ID: ${widgetId} on page ${pageData.id}`);
             continue;
           }
+          widgetIndex += 1; // 1-based index (first widget = 1, second = 2, etc.)
           pageWidgetsHtml += await renderWidget(
             projectId,
             widgetId,
@@ -294,6 +296,7 @@ Sitemap: ${sitemapUrl}`;
             rawThemeSettings,
             "publish",
             sharedGlobals,
+            widgetIndex,
           );
         }
       }

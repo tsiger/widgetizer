@@ -6,6 +6,7 @@
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="key-figures"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
   {% if widget.settings.animate %}
     data-animate="true"
   {% endif %}

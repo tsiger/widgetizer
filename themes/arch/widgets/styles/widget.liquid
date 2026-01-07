@@ -1,4 +1,4 @@
-<section id="{{ widget.id }}" class="widget" data-widget-id="{{ widget.id }}" data-widget-type="styles">
+<section id="{{ widget.id }}" class="widget" data-widget-id="{{ widget.id }}" data-widget-type="styles"{% if widget.index != null %} data-widget-index="{{ widget.index }}"{% endif %}>
   <div class="widget-container">
     <div class="widget-header">
       <h2 class="widget-headline">Design System Showcase</h2>
@@ -6,11 +6,11 @@
     </div>
 
     <div class="widget-content">
-      
+
       <!-- Typography Section -->
       <div style="margin-block-end: var(--space-6xl); padding-block-end: var(--space-4xl); border-block-end: var(--border-width-thin) solid var(--border-color);">
         <h3 class="widget-title">Typography</h3>
-        
+
         <div style="margin-block-end: var(--space-4xl);">
           <h4 style="font-size: var(--font-size-xl); margin-block-end: var(--space-lg); color: var(--text-muted);">Headings</h4>
           <h1 style="margin-block-end: var(--space-md);">Heading 1 - Main Page Title</h1>
@@ -35,7 +35,7 @@
       <!-- Buttons Section -->
       <div style="margin-block-end: var(--space-6xl); padding-block-end: var(--space-4xl); border-block-end: var(--border-width-thin) solid var(--border-color);">
         <h3 class="widget-title">Buttons</h3>
-        
+
         <div style="margin-block-end: var(--space-3xl);">
           <h4 style="font-size: var(--font-size-xl); margin-block-end: var(--space-lg); color: var(--text-muted);">Button Variants</h4>
           <div style="display: flex; flex-wrap: wrap; gap: var(--space-md); margin-block-end: var(--space-lg);">
@@ -59,7 +59,7 @@
       <!-- Cards Section -->
       <div style="margin-block-end: var(--space-6xl); padding-block-end: var(--space-4xl); border-block-end: var(--border-width-thin) solid var(--border-color);">
         <h3 class="widget-title">Cards</h3>
-        
+
         <div class="widget-grid widget-grid-3">
           <!-- Card 1: Basic -->
           <div class="widget-card">
@@ -108,13 +108,13 @@
       <!-- Form Elements Section -->
       <div style="margin-block-end: var(--space-6xl); padding-block-end: var(--space-4xl); border-block-end: var(--border-width-thin) solid var(--border-color);">
         <h3 class="widget-title">Form Elements</h3>
-        
+
         <div style="max-width: 50rem;">
           <div style="margin-block-end: var(--space-lg);">
             <label class="widget-label">Text Input Label</label>
             <input type="text" class="widget-input" placeholder="Enter text here...">
           </div>
-          
+
           <div style="margin-block-end: var(--space-lg);">
             <label class="widget-label">Email Input</label>
             <input type="email" class="widget-input" placeholder="your@email.com">
@@ -130,7 +130,7 @@
       <!-- Grid System Section -->
       <div style="margin-block-end: var(--space-6xl); padding-block-end: var(--space-4xl); border-block-end: var(--border-width-thin) solid var(--border-color);">
         <h3 class="widget-title">Grid System</h3>
-        
+
         <div style="margin-block-end: var(--space-3xl);">
           <h4 style="font-size: var(--font-size-xl); margin-block-end: var(--space-lg); color: var(--text-muted);">2 Column Grid</h4>
           <div class="widget-grid widget-grid-2">
@@ -168,38 +168,38 @@
       <div>
         <h3 class="widget-title">Current Color Variables</h3>
         <p class="widget-description">These swatches show the current values of the theme color variables.</p>
-        
+
         <div class="widget-grid widget-grid-3">
           <div>
             <div style="width: 100%; height: 8rem; background-color: var(--bg-primary); border: var(--border-width-thin) solid var(--border-color); margin-block-end: var(--space-sm);"></div>
             <p style="font-size: var(--font-size-sm); margin: 0;"><strong>--bg-primary</strong></p>
             <p style="font-size: var(--font-size-xs); margin: 0; color: var(--text-muted);">Primary Background</p>
           </div>
-          
+
           <div>
             <div style="width: 100%; height: 8rem; background-color: var(--bg-secondary); border: var(--border-width-thin) solid var(--border-color); margin-block-end: var(--space-sm);"></div>
             <p style="font-size: var(--font-size-sm); margin: 0;"><strong>--bg-secondary</strong></p>
             <p style="font-size: var(--font-size-xs); margin: 0; color: var(--text-muted);">Secondary Background</p>
           </div>
-          
+
           <div>
             <div style="width: 100%; height: 8rem; background-color: var(--text-heading); border: var(--border-width-thin) solid var(--border-color); margin-block-end: var(--space-sm);"></div>
             <p style="font-size: var(--font-size-sm); margin: 0;"><strong>--text-heading</strong></p>
             <p style="font-size: var(--font-size-xs); margin: 0; color: var(--text-muted);">Heading Text</p>
           </div>
-          
+
           <div>
             <div style="width: 100%; height: 8rem; background-color: var(--text-content); border: var(--border-width-thin) solid var(--border-color); margin-block-end: var(--space-sm);"></div>
             <p style="font-size: var(--font-size-sm); margin: 0;"><strong>--text-content</strong></p>
             <p style="font-size: var(--font-size-xs); margin: 0; color: var(--text-muted);">Content Text</p>
           </div>
-          
+
           <div>
             <div style="width: 100%; height: 8rem; background-color: var(--text-muted); border: var(--border-width-thin) solid var(--border-color); margin-block-end: var(--space-sm);"></div>
             <p style="font-size: var(--font-size-sm); margin: 0;"><strong>--text-muted</strong></p>
             <p style="font-size: var(--font-size-xs); margin: 0; color: var(--text-muted);">Muted Text</p>
           </div>
-          
+
           <div>
             <div style="width: 100%; height: 8rem; background-color: var(--border-color); border: var(--border-width-thin) solid var(--border-color); margin-block-end: var(--space-sm);"></div>
             <p style="font-size: var(--font-size-sm); margin: 0;"><strong>--border-color</strong></p>
