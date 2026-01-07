@@ -19,10 +19,7 @@
       }
 
       & .testimonial-quote {
-        font-size: var(--font-size-lg);
-        line-height: var(--line-height-relaxed);
         margin: 0 0 var(--space-lg) 0;
-        color: var(--text-content);
         position: relative;
       }
 
@@ -86,13 +83,9 @@
 
       & .testimonial-name {
         margin: 0;
-        font-weight: var(--font-weight-semibold);
-        color: var(--text-heading);
       }
 
       & .testimonial-title {
-        font-size: var(--font-size-sm);
-        color: var(--text-muted);
         margin: 0;
       }
     }
@@ -132,7 +125,7 @@
             {% endif %}
 
             {% if block.settings.quote != blank %}
-              <p class="testimonial-quote" data-setting="quote">{{ block.settings.quote }}</p>
+              <p class="testimonial-quote block-text block-text-lg" data-setting="quote">{{ block.settings.quote }}</p>
             {% endif %}
 
             <div class="testimonial-author">
@@ -144,10 +137,10 @@
 
               <div class="testimonial-info">
                 {% if block.settings.name != blank %}
-                  <p class="testimonial-name" data-setting="name">{{ block.settings.name }}</p>
+                  <p class="testimonial-name block-text block-text-semibold block-text-heading" data-setting="name">{{ block.settings.name }}</p>
                 {% endif %}
                 {% if block.settings.title != blank %}
-                  <p class="testimonial-title" data-setting="title">{{ block.settings.title }}</p>
+                  <p class="testimonial-title block-text block-text-sm block-text-muted" data-setting="title">{{ block.settings.title }}</p>
                 {% endif %}
               </div>
             </div>

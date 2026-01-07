@@ -90,10 +90,6 @@
         padding: var(--space-sm) var(--space-md);
         background-color: var(--bg-primary);
         border: var(--border-width-thin) solid var(--border-color);
-        color: var(--text-heading);
-        font-size: var(--font-size-sm);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
         z-index: 5;
         pointer-events: none;
       }
@@ -111,8 +107,6 @@
       & .comparison-slider-instructions {
         text-align: center;
         margin-block-start: var(--space-lg);
-        font-size: var(--font-size-sm);
-        color: var(--text-muted);
       }
 
       @media (min-width: 750px) {
@@ -249,10 +243,10 @@
 
         <!-- Labels -->
         {% if widget.settings.show_labels %}
-          <div class="comparison-slider-label comparison-slider-label-before">
+          <div class="comparison-slider-label comparison-slider-label-before block-text block-text-sm block-text-uppercase block-text-heading">
             {{ widget.settings.before_label | default: 'Before' }}
           </div>
-          <div class="comparison-slider-label comparison-slider-label-after">
+          <div class="comparison-slider-label comparison-slider-label-after block-text block-text-sm block-text-uppercase block-text-heading">
             {{ widget.settings.after_label | default: 'After' }}
           </div>
         {% endif %}

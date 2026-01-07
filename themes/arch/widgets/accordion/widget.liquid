@@ -181,14 +181,12 @@
 
   <script>
     (function () {
-      const allAccordions = document.querySelectorAll('#{{ widget.id }}');
+      const widget = document.getElementById('{{ widget.id }}');
+      if (!widget || widget.dataset.initialized) return;
+      widget.dataset.initialized = 'true';
 
-      allAccordions.forEach((widgetElement) => {
-        if (widgetElement.dataset.initialized) return;
-        widgetElement.dataset.initialized = 'true';
-
-        const isMultiOpen = widgetElement.dataset.multiOpen === 'true';
-        const triggers = widgetElement.querySelectorAll('.accordion-trigger');
+      const isMultiOpen = widget.dataset.multiOpen === 'true';
+      const triggers = widget.querySelectorAll('.accordion-trigger');
 
         triggers.forEach((trigger) => {
           trigger.addEventListener('click', function () {
@@ -197,8 +195,8 @@
 
             if (!isMultiOpen) {
               // Close other items if not multi-open
-              const allTriggers = widgetElement.querySelectorAll('.accordion-trigger');
-              const allContents = widgetElement.querySelectorAll('.accordion-content');
+              const allTriggers = widget.querySelectorAll('.accordion-trigger');
+              const allContents = widget.querySelectorAll('.accordion-content');
 
               allTriggers.forEach((t) => {
                 if (t !== this) t.setAttribute('aria-expanded', 'false');
@@ -225,7 +223,6 @@
             }
           });
         });
-      });
     })();
   </script>
 </section>

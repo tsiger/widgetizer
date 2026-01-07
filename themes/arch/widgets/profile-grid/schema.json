@@ -97,8 +97,7 @@
         "name": "Marco Rossi",
         "role": "Executive Chef",
         "specialty": "Italian & Mediterranean",
-        "bio": "With over 15 years of culinary experience, Chef Marco brings authentic Italian flavors to every dish.",
-        "photo": "placeholder"
+        "bio": "With over 15 years of culinary experience, Chef Marco brings authentic Italian flavors to every dish."
       }
     },
     {
@@ -107,8 +106,7 @@
         "name": "Sofia Chen",
         "role": "Pastry Chef",
         "specialty": "French Pastries",
-        "bio": "Trained in Paris, Sofia crafts exquisite desserts that are as beautiful as they are delicious.",
-        "photo": "placeholder"
+        "bio": "Trained in Paris, Sofia crafts exquisite desserts that are as beautiful as they are delicious."
       }
     },
     {
@@ -117,8 +115,7 @@
         "name": "James Wilson",
         "role": "Sous Chef",
         "specialty": "Farm-to-Table",
-        "bio": "James sources the freshest local ingredients to create seasonal specialties.",
-        "photo": "placeholder"
+        "bio": "James sources the freshest local ingredients to create seasonal specialties."
       }
     }
   ]

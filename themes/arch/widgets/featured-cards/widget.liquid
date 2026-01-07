@@ -25,9 +25,6 @@
         background: var(--accent);
         color: var(--accent-text);
         padding: var(--space-xs) var(--space-sm);
-        font-size: var(--font-size-xs);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
       }
 
       & .featured-header {
@@ -44,14 +41,7 @@
         flex-shrink: 0;
       }
 
-      & .featured-price {
-        font-size: var(--font-size-xl);
-        color: var(--accent);
-      }
-
       & .featured-original-price {
-        font-size: var(--font-size-base);
-        color: var(--text-muted);
         text-decoration: line-through;
       }
 
@@ -59,8 +49,6 @@
         display: inline-flex;
         align-items: center;
         gap: var(--space-xs);
-        font-size: var(--font-size-sm);
-        color: var(--text-muted);
         margin-block-start: var(--space-xs);
       }
 
@@ -129,7 +117,7 @@
               <div class="featured-image-container">
                 {{ block.settings.image | image: 'medium', 'widget-card-image' }}
                 {% if block.settings.tag != blank %}
-                  <span class="featured-tag" data-setting="tag">{{ block.settings.tag }}</span>
+                  <span class="featured-tag block-text block-text-xs block-text-uppercase" data-setting="tag">{{ block.settings.tag }}</span>
                 {% endif %}
               </div>
             {% endif %}
@@ -141,12 +129,12 @@
                 {% endif %}
                 <div class="featured-pricing">
                   {% if block.settings.original_price != blank %}
-                    <span class="featured-original-price" data-setting="original_price">
+                    <span class="featured-original-price block-text block-text-base block-text-muted" data-setting="original_price">
                       {{- block.settings.original_price -}}
                     </span>
                   {% endif %}
                   {% if block.settings.price != blank %}
-                    <span class="featured-price" data-setting="price">{{ block.settings.price }}</span>
+                    <span class="featured-price block-text block-text-xl block-text-accent" data-setting="price">{{ block.settings.price }}</span>
                   {% endif %}
                 </div>
               </div>
@@ -156,7 +144,7 @@
               {% endif %}
 
               {% if block.settings.availability != blank %}
-                <span class="featured-availability" data-setting="availability">{{ block.settings.availability }}</span>
+                <span class="featured-availability block-text block-text-sm block-text-muted" data-setting="availability">{{ block.settings.availability }}</span>
               {% endif %}
             </div>
           </li>

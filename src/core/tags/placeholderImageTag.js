@@ -75,7 +75,11 @@ export const PlaceholderImageTag = {
           try {
             this.options = JSON.parse(secondPart);
           } catch (e) {
-            console.warn("placeholder_image: Failed to parse options JSON");
+            console.warn("placeholder_image: Failed to parse options JSON", {
+              args: this.args,
+              secondPart: secondPart,
+              error: e.message,
+            });
           }
         }
       }
@@ -113,15 +117,14 @@ export const PlaceholderImageTag = {
         return assetUrl;
       }
 
-      // Build img tag
-      const alt = this.options.alt || "Placeholder image";
+      // Build img tag (no alt tag - placeholders don't need it)
       const classAttr = this.options.class ? ` class="${this.options.class}"` : "";
       const styleAttr = this.options.style ? ` style="${this.options.style}"` : "";
       const loading = this.options.loading ? ` loading="${this.options.loading}"` : "";
       const width = this.options.width ? ` width="${this.options.width}"` : "";
       const height = this.options.height ? ` height="${this.options.height}"` : "";
 
-      return `<img src="${assetUrl}" alt="${alt}"${classAttr}${styleAttr}${loading}${width}${height}>`;
+      return `<img src="${assetUrl}"${classAttr}${styleAttr}${loading}${width}${height}>`;
     } catch (error) {
       console.error("Error in placeholder_image tag:", error);
       return `<!-- Error in placeholder_image: ${error.message} -->`;

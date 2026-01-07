@@ -30,29 +30,15 @@
       & .schedule-row.is-today {
         border-block-start: var(--border-width-medium) solid var(--accent);
         border-block-end: var(--border-width-medium) solid var(--accent);
+      }
+
+      & .schedule-row.is-today .schedule-label,
+      & .schedule-row.is-today .schedule-value {
         font-weight: var(--font-weight-semibold);
-      }
-
-      & .schedule-row.is-closed .schedule-value {
-        color: var(--text-muted);
-      }
-
-      & .schedule-label {
-        color: var(--text-content);
-      }
-
-      & .schedule-value {
-        color: var(--text-heading);
-      }
-
-      & .schedule-closed {
-        color: var(--text-muted);
       }
 
       & .schedule-note {
         margin-block-start: var(--space-lg);
-        font-size: var(--font-size-sm);
-        color: var(--text-muted);
       }
     }
   </style>
@@ -81,31 +67,35 @@
             data-block-id="{{ blockId }}"
             data-day-index="{{ forloop.index0 }}"
           >
-            <span class="schedule-label" data-setting="day">{{ block.settings.day }}</span>
+            <span class="schedule-label block-text" data-setting="day">{{ block.settings.day }}</span>
             {% if block.settings.closed %}
-              <span class="schedule-closed">Closed</span>
+              <span class="schedule-closed block-text block-text-muted">Closed</span>
             {% else %}
-              <span class="schedule-value" data-setting="hours">{{ block.settings.hours }}</span>
+              <span class="schedule-value block-text block-text-heading" data-setting="hours">{{ block.settings.hours }}</span>
             {% endif %}
           </div>
         {% endfor %}
       </div>
 
       {% if widget.settings.note != blank %}
-        <p class="schedule-note" data-setting="note">{{ widget.settings.note }}</p>
+        <p class="schedule-note block-text block-text-sm block-text-muted" data-setting="note">{{ widget.settings.note }}</p>
       {% endif %}
     </div>
   </div>
 
   <script>
     (function() {
+      const widget = document.getElementById('{{ widget.id }}');
+      if (!widget || widget.dataset.initialized) return;
+      widget.dataset.initialized = 'true';
+
       const weekStartDay = parseInt('{{ widget.settings.week_start_day }}', 10);
       const jsDay = new Date().getDay();
-      
+
       // Convert JS day (0=Sun, 1=Mon, ..., 6=Sat) to schedule index based on week start
       const today = (jsDay - weekStartDay + 7) % 7;
-      
-      const scheduleRows = document.querySelectorAll('#{{ widget.id }} .schedule-row');
+
+      const scheduleRows = widget.querySelectorAll('.schedule-row');
       scheduleRows.forEach(row => {
         const dayIndex = parseInt(row.getAttribute('data-day-index'), 10);
         if (dayIndex === today) {

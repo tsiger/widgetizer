@@ -20,6 +20,16 @@
       "default": true
     },
     {
+      "type": "select",
+      "id": "alignment",
+      "label": "Content alignment",
+      "default": "center",
+      "options": [
+        { "value": "center", "label": "Center" },
+        { "value": "start", "label": "Left" }
+      ]
+    },
+    {
       "type": "checkbox",
       "id": "autoplay",
       "label": "Auto-rotate slides",

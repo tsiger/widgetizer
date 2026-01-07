@@ -56,6 +56,11 @@
           border: var(--border-width-thin) solid var(--border-color);
         }
       }
+
+      & .video-embed-placeholder {
+        text-align: center;
+        padding: var(--space-2xl);
+      }
     }
   </style>
 
@@ -86,7 +91,7 @@
             loading="lazy"
           ></iframe>
         {% else %}
-          <p style="text-align: center; padding: var(--space-2xl); color: var(--text-muted);">
+          <p class="video-embed-placeholder block-text block-text-muted">
             Enter a YouTube or Vimeo URL to embed a video
           </p>
         {% endif %}

@@ -52,7 +52,6 @@
       & .gallery-caption {
         color: #fff;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        font-size: var(--font-size-sm);
       }
 
       /* Lightbox Styles */
@@ -144,7 +143,7 @@
             {% endif %}
             {% if block.settings.caption != blank %}
               <div class="gallery-overlay">
-                <span class="gallery-caption" data-setting="caption">{{ block.settings.caption }}</span>
+                <span class="gallery-caption block-text block-text-sm" data-setting="caption">{{ block.settings.caption }}</span>
               </div>
             {% endif %}
           </li>
@@ -169,15 +168,15 @@
   <script>
     (function() {
       setTimeout(function() {
-        const widgetElement = document.getElementById('{{ widget.id }}');
-        if (!widgetElement || widgetElement.dataset.galleryInitialized) return;
-        widgetElement.dataset.galleryInitialized = 'true';
+        const widget = document.getElementById('{{ widget.id }}');
+        if (!widget || widget.dataset.initialized) return;
+        widget.dataset.initialized = 'true';
 
-        const modal = widgetElement.querySelector('.gallery-modal');
-        const modalImage = widgetElement.querySelector('.gallery-modal-image');
-        const modalCaption = widgetElement.querySelector('.gallery-modal-caption');
-        const closeBtn = widgetElement.querySelector('.gallery-modal-close');
-        const galleryItems = widgetElement.querySelectorAll('.widget-card');
+        const modal = widget.querySelector('.gallery-modal');
+        const modalImage = widget.querySelector('.gallery-modal-image');
+        const modalCaption = widget.querySelector('.gallery-modal-caption');
+        const closeBtn = widget.querySelector('.gallery-modal-close');
+        const galleryItems = widget.querySelectorAll('.widget-card');
 
         if (!modal || !modalImage) return;
 

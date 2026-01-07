@@ -3,7 +3,7 @@
 
 <section
   id="{{ widget.id }}"
-  class="widget widget-slideshow color-scheme-dark{% unless widget.settings.fullwidth %} slideshow-constrained{% endunless %}"
+  class="widget widget-slideshow widget-{{ widget.id }} color-scheme-dark{% unless widget.settings.fullwidth %} slideshow-constrained{% endunless %}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="slideshow"
   data-autoplay="{{ widget.settings.autoplay | default: false }}"
@@ -21,7 +21,7 @@
         data-block-id="{{ blockId }}"
       >
         <div class="widget-container">
-          <div class="widget-content widget-content-lg widget-content-align-center">
+          <div class="widget-content widget-content-lg {% if widget.settings.alignment == 'center' %}widget-content-align-center{% else %}widget-content-align-start{% endif %}">
             {% if block.settings.eyebrow != blank %}
               <span class="widget-eyebrow" data-setting="eyebrow">{{ block.settings.eyebrow }}</span>
             {% endif %}
@@ -31,18 +31,20 @@
             {% if block.settings.description != blank %}
               <p class="widget-description" data-setting="description">{{ block.settings.description }}</p>
             {% endif %}
-            {% if block.settings.button_link.text != blank %}
+            {% if block.settings.button_link.text != blank or block.settings.secondary_link.text != blank %}
               <div class="widget-actions">
-                <a
-                  href="{{ block.settings.button_link.href }}"
-                  class="widget-button widget-button-primary"
-                  data-setting="button_link"
-                  {% if block.settings.button_link.target == '_blank' %}
-                    target="_blank" rel="noopener"
-                  {% endif %}
-                >
-                  {{ block.settings.button_link.text }}
-                </a>
+                {% if block.settings.button_link.text != blank %}
+                  <a
+                    href="{{ block.settings.button_link.href }}"
+                    class="widget-button widget-button-primary"
+                    data-setting="button_link"
+                    {% if block.settings.button_link.target == '_blank' %}
+                      target="_blank" rel="noopener"
+                    {% endif %}
+                  >
+                    {{ block.settings.button_link.text }}
+                  </a>
+                {% endif %}
                 {% if block.settings.secondary_link.text != blank %}
                   <a
                     href="{{ block.settings.secondary_link.href }}"

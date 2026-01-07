@@ -18,32 +18,18 @@
       }
 
       & .stats-number {
-        font-size: var(--font-size-5xl);
         line-height: 1;
-        color: var(--text-heading);
         margin-block-end: var(--space-sm);
         font-variant-numeric: tabular-nums;
       }
 
       & .widget-card-title {
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
         margin-block-end: var(--space-xs);
-      }
-
-      @media (min-width: 750px) {
-        & .stats-number {
-          font-size: var(--font-size-6xl);
-        }
       }
 
       @media (min-width: 990px) {
         & .widget-card {
           padding: var(--space-3xl) var(--space-xl);
-        }
-
-        & .stats-number {
-          font-size: 6.4rem;
         }
       }
 
@@ -89,7 +75,7 @@
           {% assign block = widget.blocks[blockId] %}
           <li class="widget-card" data-block-id="{{ blockId }}">
             <div
-              class="stats-number"
+              class="stats-number block-text block-text-5xl block-text-heading"
               {% if widget.settings.animate %}
                 data-count="{{ block.settings.number }}" data-suffix="{{ block.settings.suffix }}"
               {% endif %}
@@ -103,7 +89,7 @@
             </div>
             <div class="widget-card-content">
               {% if block.settings.label != blank %}
-                <h3 class="widget-card-title" data-setting="label">{{ block.settings.label }}</h3>
+                <h3 class="widget-card-title block-text block-text-uppercase" data-setting="label">{{ block.settings.label }}</h3>
               {% endif %}
               {% if block.settings.description != blank %}
                 <p class="widget-card-description" data-setting="description">{{ block.settings.description }}</p>
@@ -118,9 +104,9 @@
   {% if widget.settings.animate %}
     <script>
       (function () {
-        const widgetElement = document.getElementById('{{ widget.id }}');
-        if (!widgetElement || widgetElement.dataset.statsInitialized) return;
-        widgetElement.dataset.statsInitialized = 'true';
+        const widget = document.getElementById('{{ widget.id }}');
+        if (!widget || widget.dataset.initialized) return;
+        widget.dataset.initialized = 'true';
 
         const observer = new IntersectionObserver(
           (entries) => {
@@ -151,7 +137,7 @@
           { threshold: 0.2 },
         );
 
-        widgetElement.querySelectorAll('.stats-number').forEach((el) => observer.observe(el));
+        widget.querySelectorAll('.stats-number').forEach((el) => observer.observe(el));
       })();
     </script>
   {% endif %}

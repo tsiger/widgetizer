@@ -21,7 +21,6 @@
       }
 
       & .pricing-price {
-        font-size: var(--font-size-5xl);
         margin-block-end: var(--space-xs);
       }
 
@@ -35,7 +34,6 @@
       & .pricing-feature {
         padding: var(--space-md) 0;
         border-block-end: var(--border-width-thin) solid var(--border-color);
-        font-size: var(--font-size-base);
 
         &:first-child {
           border-block-start: var(--border-width-thin) solid var(--border-color);
@@ -48,7 +46,7 @@
       }
 
       /* Smart layout for different item counts */
-      
+
       /* 1 item: centered with grid column width */
       & .widget-card-grid:has(> :nth-child(1):last-child) {
         display: flex;
@@ -116,7 +114,7 @@
                 <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
               {% endif %}
               {% if block.settings.price != blank %}
-                <div class="pricing-price" data-setting="price">{{ block.settings.price }}</div>
+                <div class="pricing-price block-text block-text-5xl block-text-bold block-text-heading" data-setting="price">{{ block.settings.price }}</div>
               {% endif %}
               {% if block.settings.period != blank %}
                 <div class="widget-card-subtitle" data-setting="period">{{ block.settings.period }}</div>
@@ -130,7 +128,7 @@
                   {% for feature in features %}
                     {% assign trimmed_feature = feature | strip %}
                     {% if trimmed_feature != blank %}
-                      <li class="pricing-feature">{{ trimmed_feature }}</li>
+                      <li class="pricing-feature block-text block-text-base">{{ trimmed_feature }}</li>
                     {% endif %}
                   {% endfor %}
                 </ul>

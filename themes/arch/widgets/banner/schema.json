@@ -30,6 +30,16 @@
       ]
     },
     {
+      "type": "select",
+      "id": "alignment",
+      "label": "Content alignment",
+      "default": "center",
+      "options": [
+        { "value": "center", "label": "Center" },
+        { "value": "start", "label": "Left" }
+      ]
+    },
+    {
       "type": "image",
       "id": "image",
       "label": "Background image"

@@ -42,12 +42,9 @@
 
       & .widget-card-title {
         margin: 0;
-        font-size: var(--font-size-base);
       }
 
       & .widget-card-category {
-        color: var(--text-muted);
-        font-size: var(--font-size-sm);
         margin-block-start: var(--space-xs);
       }
 
@@ -106,10 +103,10 @@
             {% if block.settings.title != blank or block.settings.category != blank %}
               <div class="widget-card-content">
                 {% if block.settings.title != blank %}
-                  <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
+                  <h3 class="widget-card-title block-text block-text-base block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
                 {% endif %}
                 {% if block.settings.category != blank %}
-                  <p class="widget-card-category" data-setting="category">{{ block.settings.category }}</p>
+                  <p class="widget-card-category block-text block-text-sm block-text-muted" data-setting="category">{{ block.settings.category }}</p>
                 {% endif %}
               </div>
             {% endif %}

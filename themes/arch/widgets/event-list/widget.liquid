@@ -1,6 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-event-list widget-{{ widget.id }}"
+  class="widget widget-type-event-list widget-{{ widget.id }}"
   {% if widget.settings.background == 'secondary' %}
     style="--widget-bg-color: var(--bg-secondary);"
   {% endif %}
@@ -19,8 +19,6 @@
       }
 
       & .widget-card {
-        display: flex;
-        flex-direction: column;
         gap: var(--space-lg);
       }
 
@@ -38,15 +36,10 @@
       }
 
       & .event-date-day {
-        font-size: var(--font-size-4xl);
         line-height: 1;
       }
 
       & .event-date-month {
-        font-size: var(--font-size-sm);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--text-muted);
         margin-block-start: var(--space-xs);
       }
 
@@ -60,10 +53,6 @@
         & .event-date {
           width: 10rem;
           height: 10rem;
-        }
-
-        & .event-date-day {
-          font-size: var(--font-size-5xl);
         }
       }
     }
@@ -90,8 +79,8 @@
           {% assign block = widget.blocks[blockId] %}
           <li class="widget-card" data-block-id="{{ blockId }}">
             <div class="event-date">
-              <span class="event-date-day" data-setting="day">{{ block.settings.day }}</span>
-              <span class="event-date-month" data-setting="month">{{ block.settings.month }}</span>
+              <span class="event-date-day block-text-4xl block-text-bold" data-setting="day">{{ block.settings.day }}</span>
+              <span class="event-date-month block-text-sm block-text-uppercase block-text-muted" data-setting="month">{{ block.settings.month }}</span>
             </div>
             <div class="widget-card-content">
               {% if block.settings.title != blank %}

@@ -46,17 +46,6 @@
       "displayName": "Special Item",
       "settings": [
         {
-          "type": "image",
-          "id": "image",
-          "label": "Image"
-        },
-        {
-          "type": "text",
-          "id": "tag",
-          "label": "Tag (e.g., Chef's Pick, New)",
-          "default": "Chef's Pick"
-        },
-        {
           "type": "text",
           "id": "name",
           "label": "Item name",
@@ -82,6 +71,17 @@
           "type": "text",
           "id": "availability",
           "label": "Availability (e.g., Today Only, This Week)"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Tag (e.g., Chef's Pick, New)",
+          "default": "Chef's Pick"
+        },
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Image"
         }
       ]
     }

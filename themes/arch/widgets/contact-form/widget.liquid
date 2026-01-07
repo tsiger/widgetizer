@@ -35,25 +35,18 @@
       }
 
       & .contact-info-title {
-        font-size: var(--font-size-lg);
-        color: var(--text-heading);
         margin: 0;
       }
 
       & .contact-info-text {
-        font-size: var(--font-size-base);
-        line-height: var(--line-height-relaxed);
-        color: var(--text-muted);
         margin: 0;
       }
 
       & .contact-info-link {
-        color: var(--text-heading);
         text-decoration: none;
         transition: color 0.3s;
 
         &:hover {
-          color: var(--text-muted);
           text-decoration: underline;
         }
       }
@@ -216,10 +209,10 @@
               {% if block.type == 'info' %}
                 <div class="contact-info-block" data-block-id="{{ blockId }}">
                   {% if block.settings.title != blank %}
-                    <h3 class="contact-info-title" data-setting="title">{{ block.settings.title }}</h3>
+                    <h3 class="contact-info-title block-text block-text-lg block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
                   {% endif %}
                   {% if block.settings.text != blank %}
-                    <p class="contact-info-text" data-setting="text">
+                    <p class="contact-info-text block-text block-text-base block-text-muted" data-setting="text">
                       {{ block.settings.text }}
                     </p>
                   {% endif %}

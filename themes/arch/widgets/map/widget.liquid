@@ -46,7 +46,6 @@
         display: flex;
         align-items: flex-start;
         gap: var(--space-sm);
-        color: var(--text-secondary);
       }
 
       & .map-address-icon {
@@ -62,7 +61,6 @@
         display: inline-flex;
         align-items: center;
         gap: var(--space-xs);
-        color: var(--color-primary);
         text-decoration: none;
       }
 
@@ -76,7 +74,6 @@
         align-items: center;
         justify-content: center;
         background: var(--surface-secondary);
-        color: var(--text-muted);
         text-align: center;
         padding: var(--space-xl);
       }
@@ -127,7 +124,7 @@
             title="Map showing {{ widget.settings.address }}"
           ></iframe>
         {% else %}
-          <div class="map-placeholder height-{{ widget.settings.height }}">
+          <div class="map-placeholder height-{{ widget.settings.height }} block-text block-text-muted">
             <span class="map-placeholder-icon">📍</span>
             <p>Add a Google Maps embed URL to display the map</p>
           </div>
@@ -140,7 +137,7 @@
       %}
         <div class="map-info">
           {% if widget.settings.show_address and widget.settings.address != blank %}
-            <div class="map-address">
+            <div class="map-address block-text block-text-muted">
               <span class="map-address-icon">📍</span>
               <p class="map-address-text" data-setting="address">{{ widget.settings.address }}</p>
             </div>
@@ -149,7 +146,7 @@
           {% if widget.settings.directions_link.text != blank %}
             <a
               href="{{ widget.settings.directions_link.href }}"
-              class="map-directions"
+              class="map-directions block-text block-text-accent"
               data-setting="directions_link"
               {% if widget.settings.directions_link.target == '_blank' %}
                 target="_blank" rel="noopener"

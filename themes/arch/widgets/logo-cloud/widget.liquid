@@ -105,14 +105,14 @@
                 {% if block.settings.image != blank %}
                   {{ block.settings.image | image: 'small', 'logo-image', block.settings.name }}
                 {% else %}
-                  {% placeholder_image 'landscape', { "alt": block.settings.name, "class": "logo-image" } %}
+                  {% placeholder_image 'landscape', { "class": "logo-image" } %}
                 {% endif %}
               </a>
             {% else %}
               {% if block.settings.image != blank %}
                 {{ block.settings.image | image: 'small', 'logo-image', block.settings.name }}
               {% else %}
-                {% placeholder_image 'landscape', { "alt": block.settings.name, "class": "logo-image" } %}
+                {% placeholder_image 'landscape', { "class": "logo-image", "alt": "Logo" } %}
               {% endif %}
             {% endif %}
           </li>

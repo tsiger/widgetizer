@@ -31,20 +31,13 @@
         border-radius: var(--border-radius-full);
         border: none;
         background: transparent;
-        color: var(--text-muted);
         cursor: pointer;
         transition: all var(--transition-speed-normal);
         z-index: 2;
-        font-size: var(--font-size-sm);
-
-        &:hover {
-          color: var(--text-heading);
-        }
       }
 
       & .switcher-btn.is-active {
         background: var(--bg-primary);
-        color: var(--text-heading);
         border: var(--border-width-thin) solid var(--border-color);
       }
 
@@ -69,8 +62,6 @@
       }
 
       & .switcher-item-price {
-        font-size: var(--font-size-3xl);
-        color: var(--text-heading);
       }
 
       @media (min-width: 990px) {
@@ -100,17 +91,17 @@
       <div class="switcher-ui-wrapper">
         <div class="switcher-toggle" role="tablist">
           {% if widget.settings.option_1_label != blank %}
-            <button class="switcher-btn is-active" data-target="1" role="tab" aria-selected="true">
+            <button class="switcher-btn is-active block-text block-text-sm block-text-heading" data-target="1" role="tab" aria-selected="true">
               {{ widget.settings.option_1_label }}
             </button>
           {% endif %}
           {% if widget.settings.option_2_label != blank %}
-            <button class="switcher-btn" data-target="2" role="tab" aria-selected="false">
+            <button class="switcher-btn block-text block-text-sm block-text-muted" data-target="2" role="tab" aria-selected="false">
               {{ widget.settings.option_2_label }}
             </button>
           {% endif %}
           {% if widget.settings.switcher_type == 'tabs' and widget.settings.option_3_label != blank %}
-            <button class="switcher-btn" data-target="3" role="tab" aria-selected="false">
+            <button class="switcher-btn block-text block-text-sm block-text-muted" data-target="3" role="tab" aria-selected="false">
               {{ widget.settings.option_3_label }}
             </button>
           {% endif %}
@@ -136,7 +127,7 @@
                     {% endif %}
 
                     {% if block.settings.price != blank %}
-                      <div class="switcher-item-price" data-setting="price">{{ block.settings.price }}</div>
+                      <div class="switcher-item-price block-text block-text-3xl block-text-heading" data-setting="price">{{ block.settings.price }}</div>
                     {% endif %}
 
                     {% if block.settings.text != blank %}
@@ -163,14 +154,12 @@
 
   <script>
     (function () {
-      const allWidgets = document.querySelectorAll('.widget-content-switcher');
+      const widget = document.getElementById('{{ widget.id }}');
+      if (!widget || widget.dataset.initialized) return;
+      widget.dataset.initialized = 'true';
 
-      allWidgets.forEach((widget) => {
-        if (widget.dataset.initialized) return;
-        widget.dataset.initialized = 'true';
-
-        const buttons = widget.querySelectorAll('.switcher-btn');
-        const groups = widget.querySelectorAll('.switcher-content-group');
+      const buttons = widget.querySelectorAll('.switcher-btn');
+      const groups = widget.querySelectorAll('.switcher-content-group');
 
         buttons.forEach((btn) => {
           btn.addEventListener('click', function () {
@@ -179,9 +168,13 @@
             // Update buttons
             buttons.forEach((b) => {
               b.classList.remove('is-active');
+              b.classList.remove('block-text-heading');
+              b.classList.add('block-text-muted');
               b.setAttribute('aria-selected', 'false');
             });
             this.classList.add('is-active');
+            this.classList.remove('block-text-muted');
+            this.classList.add('block-text-heading');
             this.setAttribute('aria-selected', 'true');
 
             // Update groups
@@ -194,7 +187,6 @@
             });
           });
         });
-      });
     })();
   </script>
 </section>

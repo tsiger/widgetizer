@@ -62,9 +62,11 @@ Every widget follows this standard structure:
 ## 2. Class Naming & Structure
 
 - **Widget Header**:
-  - Eyebrow: `.widget-eyebrow`
-  - Headline: `.widget-headline` (usually `<h2>`)
-  - Description: `.widget-description` (usually `<p>`)
+  - Container: `.widget-header` - Flex column container with centered alignment
+  - Eyebrow: `.widget-eyebrow` - Has `margin-block-end: var(--space-sm)` for spacing from headline
+  - Headline: `.widget-headline` (usually `<h2>`) - Has `margin-block-end: var(--space-sm)` for spacing from description
+  - Description: `.widget-description` (usually `<p>`) - No top margin, sits closer to headline
+  - **Spacing**: Uses individual margins instead of gap for better visual hierarchy (eyebrow → headline has more space, headline → description is tighter)
 - **Block Content**:
   - Titles/Headings: `<h3>` tags. Styling via `block-text` utilities.
   - Body Text: `<p>` tags. Styling via `block-text` utilities.
@@ -246,3 +248,68 @@ For blocks/items that need individual background/overlay support (e.g., bento-gr
 - **DO NOT** duplicate styles that exist in `base.css`.
 - **DELETE** unused CSS rules (e.g., styles for elements that don't exist in the HTML).
 - **USE** design system variables (`--space-md`, `--border-radius-lg`, etc.) in local styles.
+
+## Standards Checklist Per Widget
+
+When auditing each widget, check:
+
+### Structure (Rules 1-2)
+
+- [ ] Section has id, class, data-widget-id, data-widget-type
+- [ ] Uses widget-eyebrow, widget-headline, widget-description for header
+- [ ] Uses data-setting attributes on editable elements
+
+### Typography (Rule 3)
+
+- [ ] Uses block-text utilities (not hardcoded font-size/color in CSS)
+- [ ] No redundant typography CSS in style block
+
+### Semantic HTML (Rule 4)
+
+- [ ] h2 for widget title, h3 for items
+- [ ] ARIA attributes on interactive elements
+
+### Layout (Rule 5)
+
+- [ ] Uses flex/grid with gap for spacing
+- [ ] No hardcoded margins on semantic classes
+
+### Background (Rule 6)
+
+- [ ] Background setting at END of settings array
+- [ ] Correct liquid implementation on section/container
+
+### Block Settings Order (Rules 7, 10)
+
+- [ ] For items with backgrounds: image → overlay_color → background_color
+- [ ] Content settings first, layout, style, background last
+
+### Block Architecture (Rule 9)
+
+- [ ] Uses blocksOrder loop for rendering
+- [ ] Flexible blocks where appropriate
+
+### Local Styles (Rule 11)
+
+- [ ] Only widget-specific layout in style block
+- [ ] Uses design system variables
+- [ ] No duplicate CSS properties
+
+---
+
+## Priority Queue
+
+### High Priority (Structural Changes):
+
+1. `alternating-rows` - Add features, add text options
+2. `card-grid` - Review block structure consistency
+3. `feature-grid` - Review block structure consistency
+
+### Medium Priority (Minor Fixes):
+
+4. `gallery` - Has hardcoded colors (deferred per user)
+5. Other Category B widgets - Review for consistency
+
+### Low Priority (Review Only):
+
+6. Category C specialized widgets - Case-by-case review

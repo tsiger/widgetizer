@@ -36,33 +36,21 @@
         justify-content: center;
         margin-block-end: var(--space-md);
         border: var(--border-width-medium) solid var(--border-color);
-        color: var(--text-muted);
-        font-size: var(--font-size-4xl);
       }
 
       & .profile-name {
-        font-size: var(--font-size-xl);
-        color: var(--text-heading);
         margin-block-end: var(--space-xs);
       }
 
       & .profile-role {
-        font-size: var(--font-size-base);
-        color: var(--accent);
-        font-weight: var(--font-weight-semibold);
         margin-block-end: var(--space-xs);
       }
 
       & .profile-specialty {
-        font-size: var(--font-size-sm);
-        color: var(--text-muted);
         margin-block-end: var(--space-sm);
       }
 
       & .profile-bio {
-        font-size: var(--font-size-sm);
-        color: var(--text-content);
-        line-height: var(--line-height-relaxed);
         margin-block-end: var(--space-md);
         max-width: 30rem; /* 300px */
       }
@@ -99,7 +87,7 @@
       }
 
       /* Smart layout for different item counts */
-      
+
       /* 1 item: centered with grid column width */
       & .widget-card-grid:has(> :nth-child(1):last-child) {
         display: flex;
@@ -162,26 +150,26 @@
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
           <li class="profile-card" data-block-id="{{ blockId }}">
-            {% if block.settings.photo != blank %}
+            {% if block.settings.photo != blank and block.settings.photo != 'placeholder' %}
               {{ block.settings.photo | image: 'medium', 'profile-image' }}
             {% else %}
-              <div class="profile-image-placeholder" style="background-image: url({% placeholder_image 'square', 'url' %}); background-size: cover; background-position: center;"></div>
+              <div class="profile-image-placeholder block-text block-text-4xl block-text-muted" style="background-image: url({% placeholder_image 'square', 'url' %}); background-size: cover; background-position: center;"></div>
             {% endif %}
 
             {% if block.settings.name != blank %}
-              <h3 class="profile-name" data-setting="name">{{ block.settings.name }}</h3>
+              <h3 class="profile-name block-text block-text-xl block-text-bold block-text-heading" data-setting="name">{{ block.settings.name }}</h3>
             {% endif %}
 
             {% if block.settings.role != blank %}
-              <p class="profile-role" data-setting="role">{{ block.settings.role }}</p>
+              <p class="profile-role block-text block-text-base block-text-semibold block-text-accent" data-setting="role">{{ block.settings.role }}</p>
             {% endif %}
 
             {% if block.settings.specialty != blank %}
-              <p class="profile-specialty" data-setting="specialty">{{ block.settings.specialty }}</p>
+              <p class="profile-specialty block-text block-text-sm block-text-muted" data-setting="specialty">{{ block.settings.specialty }}</p>
             {% endif %}
 
             {% if block.settings.bio != blank %}
-              <p class="profile-bio" data-setting="bio">{{ block.settings.bio }}</p>
+              <p class="profile-bio block-text block-text-sm" data-setting="bio">{{ block.settings.bio }}</p>
             {% endif %}
 
             {% assign has_social = false %}

@@ -278,20 +278,37 @@ Automatically switches between margin and padding based on background presence:
 
 ### Widget Header (Centered Section Headers)
 
+**Use `.widget-header` wrapper** for standard section headers (e.g., card grids, feature lists):
+
 ```css
 .widget-header {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-block-end: var(--space-3xl);
+  margin-block-end: var(--space-lg);
+
+  .widget-eyebrow {
+    margin-block-end: var(--space-sm);
+  }
+
+  .widget-headline {
+    margin-block-end: var(--space-sm);
+  }
 
   .widget-description {
     max-width: 70rem; /* 700px */
     margin-inline: auto;
+    margin-block-start: 0;
   }
 }
 ```
+
+**Spacing Hierarchy:**
+
+- Eyebrow → Headline: `var(--space-sm)` (12px) - Clear separation
+- Headline → Description: `var(--space-sm)` (12px) - Tighter connection
+- Uses individual margins instead of `gap` for better visual control
 
 ### Content Width Modifiers
 
@@ -1035,350 +1052,6 @@ Standardized sizing and styling for SVG icons.
 
 ---
 
-## Filter / Tab System
-
-### Filter List Container
-
-```css
-.widget-filter-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-md);
-  justify-content: center;
-  margin-block-end: var(--space-2xl);
-  padding: 0;
-  list-style: none;
-}
-```
-
-### Filter Button
-
-```css
-.widget-filter-btn {
-  padding: var(--space-sm) var(--space-lg);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  font-family: inherit;
-  background-color: var(--bg-primary);
-  border: var(--border-width-thin) solid var(--border-light);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition:
-    background-color 0.3s,
-    color 0.3s,
-    border-color 0.3s;
-
-  &:hover {
-    background-color: var(--text-primary);
-    color: var(--bg-primary);
-    border-color: var(--text-primary);
-  }
-
-  &:focus {
-    outline: var(--border-width-medium) solid var(--border-darker);
-    outline-offset: 0.2rem;
-  }
-
-  &.is-active {
-    background-color: var(--text-primary);
-    color: var(--bg-primary);
-    border-color: var(--text-primary);
-  }
-}
-```
-
-### Hidden State
-
-```css
-.is-hidden {
-  display: none;
-}
-```
-
-### Usage Example
-
-```html
-<ul class="widget-filter-list" role="tablist">
-  <li role="presentation">
-    <button type="button" class="widget-filter-btn is-active" data-filter="all" role="tab" aria-selected="true">
-      All Items
-    </button>
-  </li>
-  <li role="presentation">
-    <button type="button" class="widget-filter-btn" data-filter="category" role="tab" aria-selected="false">
-      Category
-    </button>
-  </li>
-</ul>
-
-<div class="widget-content">
-  <article class="widget-card" data-category="category">
-    <!-- Content -->
-  </article>
-  <article class="widget-card is-hidden" data-category="other">
-    <!-- Hidden content -->
-  </article>
-</div>
-```
-
-### Customization
-
-Override styles in widget-specific CSS:
-
-```css
-.widget-name {
-  & .widget-filter-list {
-    gap: var(--space-sm); /* Custom gap */
-    margin-block-end: var(--space-3xl); /* Custom margin */
-  }
-
-  & .widget-filter-btn {
-    background-color: var(--bg-secondary); /* Custom background */
-    color: var(--text-body); /* Custom text color */
-    text-transform: uppercase; /* Add uppercase */
-    letter-spacing: 0.05em; /* Add letter spacing */
-  }
-}
-```
-
-**Key Points:**
-
-- Use `.widget-filter-list` for the container `<ul>`
-- Use `.widget-filter-btn` for filter/tab buttons
-- Use `.is-hidden` class for filtered items (via JavaScript)
-- Always include proper ARIA attributes (`role="tablist"`, `role="tab"`, `aria-selected`)
-- Override styles in widget-specific CSS when needed
-
----
-
-## Testimonial System
-
-### Testimonial Quote
-
-```css
-.testimonial-quote {
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-relaxed);
-  color: var(--text-primary);
-  position: relative;
-  font-style: italic;
-
-  &::before {
-    content: '"';
-    font-size: var(--font-size-5xl);
-    line-height: 1;
-    color: var(--border-light);
-    position: absolute;
-    inset-block-start: calc(var(--space-sm) * -1);
-    inset-inline-start: calc(var(--space-sm) * -1);
-  }
-
-  @media (min-width: 750px) {
-    font-size: var(--font-size-lg);
-  }
-}
-```
-
-### Testimonial Author
-
-```css
-.testimonial-author {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-}
-
-.testimonial-avatar {
-  width: 5.6rem;
-  height: 5.6rem;
-  border-radius: 50%;
-  overflow: hidden;
-  background-color: var(--border-light);
-  border: var(--border-width-thin) solid var(--border-light);
-  flex-shrink: 0;
-}
-
-.testimonial-author-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.testimonial-author-name {
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-}
-
-.testimonial-author-role {
-  font-size: var(--font-size-sm);
-  color: var(--text-muted);
-}
-
-.testimonial-rating {
-  display: flex;
-  gap: var(--space-xs);
-  margin-block-start: var(--space-sm);
-}
-```
-
-### Usage Example
-
-```html
-<div class="widget-card">
-  <div class="widget-card-content testimonial-quote">
-    This platform completely transformed our workflow. Highly recommended!
-  </div>
-  <div class="widget-card-footer testimonial-author">
-    <div class="testimonial-avatar">
-      <img src="avatar.jpg" alt="Jane Doe" />
-    </div>
-    <div class="testimonial-author-info">
-      <cite class="testimonial-author-name">Jane Doe</cite>
-      <span class="testimonial-author-role">Director, Tech Co</span>
-      <!-- Optional: Rating -->
-      <div class="testimonial-rating" aria-label="5 stars">
-        <!-- Star SVGs -->
-      </div>
-    </div>
-  </div>
-</div>
-```
-
-### Customization
-
-Override styles in widget-specific CSS:
-
-```css
-.widget-name {
-  & .testimonial-avatar {
-    width: 6.4rem; /* Larger avatar */
-    height: 6.4rem;
-  }
-
-  & .testimonial-quote {
-    flex: 1; /* For flex layouts */
-  }
-}
-```
-
-**Key Points:**
-
-- Use `.testimonial-quote` for the quote text (includes decorative quote mark)
-- Use `.testimonial-author` for the author container
-- Use `.testimonial-avatar` for circular avatar images
-- Use `.testimonial-author-info` for name/role container
-- Use `.testimonial-rating` for optional star ratings
-- All classes work within `.widget-card` structure
-
----
-
-## Widget Structure Patterns
-
-### Standard Widget Structure
-
-```html
-<style>
-  .widget-name {
-    /* Widget-specific CSS */
-  }
-</style>
-
-<section id="widget-1" class="widget-name widget">
-  <div class="widget-container">
-    <!-- Optional: Section Header -->
-    <div class="widget-header">
-      <span class="widget-eyebrow">Label</span>
-      <h2 class="widget-title">Section Title</h2>
-      <p class="widget-description">Section description</p>
-    </div>
-
-    <!-- Main Content -->
-    <div class="widget-content">
-      <!-- Widget-specific layout -->
-    </div>
-  </div>
-</section>
-
-<script>
-  /* Widget-specific JavaScript (if needed) */
-</script>
-```
-
-### Common Patterns
-
-**Grid Layout:**
-
-```html
-<div class="widget-content">
-  <div class="widget-grid widget-grid-3">
-    <div class="widget-card">...</div>
-    <div class="widget-card">...</div>
-    <div class="widget-card">...</div>
-  </div>
-</div>
-```
-
-**Narrow Content:**
-
-```html
-<div class="widget-content widget-content-sm">
-  <!-- Form or narrow content -->
-</div>
-```
-
-**Two-Column Layout:**
-
-```html
-<div class="widget-content">
-  <div class="widget-grid widget-grid-2">
-    <div>Column 1</div>
-    <div>Column 2</div>
-  </div>
-</div>
-```
-
-**Stats / Counters:**
-
-```html
-<ul class="stats-grid">
-  <li class="stats-item">
-    <div class="stats-number" data-count="100" data-suffix="+">0</div>
-    <div class="stats-label">Label</div>
-    <p class="stats-desc">Description</p>
-  </li>
-</ul>
-```
-
-**Brands / Logo Grid:**
-
-```html
-<ul class="logo-cloud-list">
-  <li class="logo-cloud-item">
-    <img src="logo.svg" alt="Brand" class="logo-cloud-image" />
-  </li>
-</ul>
-```
-
-**Tabs Structure:**
-
-```html
-<div class="widget-tabs">
-  <div role="tablist" class="tabs-list">
-    <button role="tab" aria-selected="true" aria-controls="panel-1" id="tab-1" class="tabs-tab">Tab 1</button>
-    <button role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2" class="tabs-tab">Tab 2</button>
-  </div>
-  <div class="tabs-panels">
-    <div role="tabpanel" id="panel-1" aria-labelledby="tab-1" class="tabs-panel">
-      <!-- Content -->
-    </div>
-    <div role="tabpanel" id="panel-2" aria-labelledby="tab-2" class="tabs-panel" hidden>
-      <!-- Content -->
-    </div>
-  </div>
-</div>
-```
-
 ---
 
 ## Quick Reference
@@ -1431,7 +1104,3 @@ Override styles in widget-specific CSS:
 | `--font-size-4xl`  | 3.2rem | 32px   | H1 (mobile)    |
 | `--font-size-5xl`  | 4rem   | 40px   | H1 (tablet)    |
 | `--font-size-6xl`  | 4.8rem | 48px   | H1 (desktop)   |
-
----
-
-**For implementation details, see [Coding Standards](coding-standards.md)**

@@ -1,11 +1,16 @@
-<div class="core-divider" data-widget-id="{{ widget.id }}" data-widget-type="core-divider">
+<div
+  id="{{ widget.id }}"
+  class="core-divider widget-{{ widget.id }}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="core-divider"
+>
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       padding: {{ widget.settings.padding }}px 0;
       width: 100%;
     }
 
-    #{{ widget.id }} .divider-line {
+    .widget-{{ widget.id }} .divider-line {
       height: {{ widget.settings.thickness }}px;
       background-color: {{ widget.settings.color }};
       width: {{ widget.settings.width }}%;
@@ -13,7 +18,7 @@
     }
   </style>
 
-  <div id="{{ widget.id }}" class="divider-container">
+  <div class="divider-container">
     <div class="divider-line"></div>
   </div>
 </div>

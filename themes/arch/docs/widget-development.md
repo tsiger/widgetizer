@@ -43,31 +43,6 @@ themes/arch/widgets/{widget-name}/
 }
 ```
 
-### Standard Section Settings
-
-**Always include these three settings** for consistency across all widgets:
-
-```json
-"settings": [
-  {
-    "type": "text",
-    "id": "eyebrow",
-    "label": "Eyebrow Text"
-  },
-  {
-    "type": "text",
-    "id": "title",
-    "label": "Heading",
-    "default": "Section Title"
-  },
-  {
-    "type": "textarea",
-    "id": "description",
-    "label": "Description"
-  }
-]
-```
-
 ### Available Setting Types
 
 | Type       | Use For                    | Example                       |
@@ -117,7 +92,7 @@ Blocks create repeatable content within a widget:
 
 ### Default Blocks
 
-**Always provide 2-6 default blocks** with meaningful content:
+**Always provide default blocks** with meaningful content:
 
 ```json
 "defaultBlocks": [

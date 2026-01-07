@@ -323,18 +323,25 @@ h6 {
 }
 
 /* Widget header (centered section header) */
-/* Widget header (centered section header) */
 .widget-header {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
   align-items: center;
   text-align: center;
   margin-block-end: var(--space-lg);
 
+  .widget-eyebrow {
+    margin-block-end: var(--space-sm);
+  }
+
+  .widget-headline {
+    margin-block-end: var(--space-sm);
+  }
+
   .widget-description {
     max-width: 70rem; /* 700px */
     margin-inline: auto;
+    margin-block-start: 0;
   }
 }
 

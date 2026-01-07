@@ -25,7 +25,6 @@
         display: none;
         text-align: center;
         padding: var(--space-lg);
-        color: var(--text-heading);
       }
 
       &.is-submitted .newsletter-form {
@@ -84,23 +83,23 @@
       </form>
 
       <div class="newsletter-success" data-setting="success_message">
-        <p class="widget-text">{{ widget.settings.success_message }}</p>
+        <p class="widget-text block-text block-text-heading">{{ widget.settings.success_message }}</p>
       </div>
     </div>
   </div>
 
   <script>
     (function () {
-      const widgetElement = document.getElementById('{{ widget.id }}');
-      if (!widgetElement || widgetElement.dataset.newsletterInitialized) return;
-      widgetElement.dataset.newsletterInitialized = 'true';
+      const widget = document.getElementById('{{ widget.id }}');
+      if (!widget || widget.dataset.initialized) return;
+      widget.dataset.initialized = 'true';
 
-      const form = widgetElement.querySelector('.newsletter-form');
+      const form = widget.querySelector('.newsletter-form');
 
       if (form) {
         form.addEventListener('submit', function (e) {
           e.preventDefault();
-          widgetElement.classList.add('is-submitted');
+          widget.classList.add('is-submitted');
         });
       }
     })();

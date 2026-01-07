@@ -39,8 +39,6 @@
         align-items: center;
         gap: var(--space-md);
         flex-wrap: wrap;
-        font-size: var(--font-size-sm);
-        color: var(--text-muted);
       }
 
       & .job-meta-item {
@@ -58,22 +56,14 @@
       }
 
       & .job-badge {
-        font-size: var(--font-size-xs);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
         padding: var(--space-2xs) var(--space-sm);
         background-color: var(--bg-secondary);
         border: var(--border-width-thin) solid var(--border-color);
-        color: var(--text-muted);
       }
 
       @media (min-width: 750px) {
         & .widget-card {
           padding: var(--space-2xl);
-        }
-
-        & .widget-card-title {
-          font-size: var(--font-size-2xl);
         }
       }
 
@@ -116,11 +106,9 @@
       /* Filter Button */
       & .job-filter-btn {
         padding: var(--space-sm) var(--space-lg);
-        font-size: var(--font-size-sm);
         font-family: inherit;
         background-color: var(--bg-primary);
         border: var(--border-width-thin) solid var(--border-color);
-        color: var(--text-muted);
         cursor: pointer;
         transition:
           background-color 0.3s,
@@ -181,7 +169,7 @@
         <li role="presentation">
           <button
             type="button"
-            class="job-filter-btn is-active"
+            class="job-filter-btn block-text block-text-sm block-text-muted is-active"
             data-filter="all"
             role="tab"
             aria-selected="true"
@@ -194,7 +182,7 @@
             <li role="presentation">
               <button
                 type="button"
-                class="job-filter-btn"
+                class="job-filter-btn block-text block-text-sm block-text-muted"
                 data-filter="{{ dept }}"
                 role="tab"
                 aria-selected="false"
@@ -218,8 +206,8 @@
           >
             <div class="widget-card-content">
               <div class="job-header">
-                <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
-                <div class="job-meta">
+                <h3 class="widget-card-title block-text block-text-xl block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
+                <div class="job-meta block-text block-text-sm block-text-muted">
                   <span class="job-meta-item">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" />
@@ -233,7 +221,7 @@
                     </svg>
                     <span data-setting="location">{{ block.settings.location }}</span>
                   </span>
-                  <span class="job-badge">
+                  <span class="job-badge block-text block-text-xs block-text-uppercase block-text-muted">
                     {% case block.settings.type %}
                       {% when 'full-time' -%}
                         Full-Time

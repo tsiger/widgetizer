@@ -1,6 +1,9 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-image-tabs {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
+  class="widget widget-image-tabs widget-{{ widget.id }} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="image-tabs"
 >
@@ -71,16 +74,10 @@
       }
 
       & .image-tabs-tab-title {
-        font-size: var(--font-size-lg);
-        line-height: var(--line-height-tight);
         margin-block-end: var(--space-xs);
-        color: var(--text-heading);
       }
 
       & .image-tabs-tab-description {
-        font-size: var(--font-size-sm);
-        line-height: var(--line-height-relaxed);
-        color: var(--text-muted);
         margin: 0;
       }
 
@@ -91,14 +88,6 @@
 
         & .image-tabs-tab {
           padding: var(--space-xl);
-        }
-
-        & .image-tabs-tab-title {
-          font-size: var(--font-size-xl);
-        }
-
-        & .image-tabs-tab-description {
-          font-size: var(--font-size-base);
         }
       }
 
@@ -134,7 +123,7 @@
     {%- endif -%}
   {%- endfor -%}
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -176,10 +165,10 @@
                 data-image="{{ image_url }}"
               >
                 {% if block.settings.title != blank %}
-                  <h3 class="image-tabs-tab-title" data-setting="title">{{ block.settings.title }}</h3>
+                  <h3 class="image-tabs-tab-title block-text block-text-lg block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
                 {% endif %}
                 {% if block.settings.description != blank %}
-                  <p class="image-tabs-tab-description" data-setting="description">{{ block.settings.description }}</p>
+                  <p class="image-tabs-tab-description block-text block-text-sm block-text-muted" data-setting="description">{{ block.settings.description }}</p>
                 {% endif %}
               </button>
             </li>

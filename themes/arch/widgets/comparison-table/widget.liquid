@@ -30,8 +30,6 @@
       & .comparison-table-th {
         padding: var(--space-lg) var(--space-md);
         text-align: center;
-        font-size: var(--font-size-sm);
-        color: var(--text-content);
         border-block-end: var(--border-width-medium) solid var(--border-color);
         vertical-align: top;
 
@@ -48,9 +46,6 @@
 
       & .comparison-table-badge {
         display: block;
-        font-size: var(--font-size-xs);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
         background-color: var(--accent);
         color: var(--accent-text);
         padding: 0.4rem 0.8rem;
@@ -73,7 +68,6 @@
 
         &:first-child {
           text-align: start;
-          color: var(--text-content);
           padding-inline-start: var(--space-lg);
         }
       }
@@ -83,13 +77,11 @@
       }
 
       & .comparison-table-check {
-        color: var(--text-heading);
         font-size: 2.4rem;
         line-height: 1;
       }
 
       & .comparison-table-cross {
-        color: var(--text-muted);
         font-size: 2.4rem;
         line-height: 1;
       }
@@ -111,7 +103,6 @@
 
         & .comparison-table-th {
           padding: var(--space-xl) var(--space-lg);
-          font-size: var(--font-size-base);
 
           &:first-child {
             padding-inline-start: var(--space-xl);
@@ -119,7 +110,6 @@
         }
 
         & .comparison-table-badge {
-          font-size: var(--font-size-xs);
           padding: 0.6rem 1.2rem;
         }
 
@@ -134,16 +124,6 @@
         & .comparison-table-check,
         & .comparison-table-cross {
           font-size: 2.8rem;
-        }
-      }
-
-      @media (min-width: 990px) {
-        & .comparison-table-th {
-          font-size: var(--font-size-lg);
-        }
-
-        & .comparison-table-td {
-          font-size: var(--font-size-base);
         }
       }
     }
@@ -199,9 +179,9 @@
                   data-block-id="{{ colId }}"
                   {{ col.shopify_attributes }}
                 >
-                  <div data-setting="name">{{ col.settings.name }}</div>
+                  <div class="block-text block-text-sm block-text-heading" data-setting="name">{{ col.settings.name }}</div>
                   {% if col.settings.badge != blank %}
-                    <span class="comparison-table-badge" data-setting="badge">{{ col.settings.badge }}</span>
+                    <span class="comparison-table-badge block-text block-text-xs block-text-uppercase" data-setting="badge">{{ col.settings.badge }}</span>
                   {% endif %}
                 </th>
               {% endfor %}
@@ -214,14 +194,14 @@
               {% assign values = feature.settings.values | split: '
 ' %}
               <tr data-block-id="{{ featureId }}" {{ feature.shopify_attributes }}>
-                <td class="comparison-table-td" data-setting="name">{{ feature.settings.name }}</td>
+                <td class="comparison-table-td block-text block-text-heading" data-setting="name">{{ feature.settings.name }}</td>
                 {% for colId in column_ids %}
                   {% assign col = widget.blocks[colId] %}
                   {% assign col_index = forloop.index0 %}
                   {% assign value = values[col_index] | strip %}
                   <td class="comparison-table-td {% if col.settings.featured %}comparison-table-td-featured{% endif %}">
                     {% if value == '✓' or value == 'yes' or value == 'Yes' or value == 'true' %}
-                      <span class="comparison-table-check" aria-label="Included">✓</span>
+                      <span class="comparison-table-check block-text block-text-heading" aria-label="Included">✓</span>
                     {% elsif value == '✗'
                       or value == 'no'
                       or value == 'No'
@@ -229,11 +209,11 @@
                       or value == 'x'
                       or value == 'X'
                     %}
-                      <span class="comparison-table-cross" aria-label="Not included">✗</span>
+                      <span class="comparison-table-cross block-text block-text-muted" aria-label="Not included">✗</span>
                     {% elsif value != blank %}
-                      {{ value }}
+                      <span class="block-text">{{ value }}</span>
                     {% else %}
-                      <span class="comparison-table-cross" aria-label="Not included">✗</span>
+                      <span class="comparison-table-cross block-text block-text-muted" aria-label="Not included">✗</span>
                     {% endif %}
                   </td>
                 {% endfor %}

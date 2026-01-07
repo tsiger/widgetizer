@@ -53,13 +53,11 @@
 
       & .project-title {
         color: #ffffff;
-        font-size: var(--font-size-xl);
         margin: 0;
       }
 
       & .project-description {
         color: rgba(255, 255, 255, 0.8);
-        font-size: var(--font-size-sm);
         margin-block-start: var(--space-xs);
         margin-block-end: 0;
       }
@@ -100,10 +98,10 @@
             <div class="project-overlay">
               <div class="project-content">
                 {% if block.settings.title != blank %}
-                  <h3 class="project-title" data-setting="title">{{ block.settings.title }}</h3>
+                  <h3 class="project-title block-text block-text-xl block-text-bold" data-setting="title">{{ block.settings.title }}</h3>
                 {% endif %}
                 {% if block.settings.description != blank %}
-                  <p class="project-description" data-setting="description">{{ block.settings.description }}</p>
+                  <p class="project-description block-text block-text-sm" data-setting="description">{{ block.settings.description }}</p>
                 {% endif %}
               </div>
             </div>

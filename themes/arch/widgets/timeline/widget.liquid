@@ -57,7 +57,6 @@
       }
 
       & .marker-number {
-        font-size: var(--font-size-md);
         color: var(--bg-primary);
       }
 
@@ -75,30 +74,16 @@
         flex-wrap: wrap;
       }
 
-      & .timeline-date {
-        font-size: var(--font-size-sm);
-        color: var(--accent);
-        font-weight: var(--font-weight-semibold);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-
       & .timeline-duration {
-        font-size: var(--font-size-sm);
-        color: var(--text-muted);
         padding-inline-start: var(--space-sm);
         border-inline-start: var(--border-width-thin) solid var(--border-color);
       }
 
       & .timeline-title {
-        font-size: var(--font-size-xl);
         margin-block-end: var(--space-sm);
       }
 
       & .timeline-text {
-        font-size: var(--font-size-sm);
-        line-height: var(--line-height-relaxed);
-        color: var(--text-muted);
         margin-block-end: var(--space-md);
 
         &:last-child {
@@ -117,9 +102,6 @@
         padding-block: var(--space-xs);
         padding-inline-start: var(--space-lg);
         position: relative;
-        font-size: var(--font-size-sm);
-        line-height: var(--line-height-relaxed);
-        color: var(--text-muted);
 
         &::before {
           content: "✓";
@@ -140,9 +122,6 @@
           height: 3.5rem;
         }
 
-        & .marker-number {
-          font-size: var(--font-size-lg);
-        }
 
         & .timeline-item::before {
           inset-inline-start: 1.6875rem;
@@ -152,13 +131,6 @@
           padding: var(--space-xl);
         }
 
-        & .timeline-title {
-          font-size: var(--font-size-2xl);
-        }
-
-        & .timeline-text {
-          font-size: var(--font-size-base);
-        }
       }
 
       /* Layout: Horizontal */
@@ -215,13 +187,6 @@
             justify-content: center;
           }
 
-          & .timeline-title {
-            font-size: var(--font-size-xl);
-          }
-
-          & .timeline-text {
-            font-size: var(--font-size-sm);
-          }
 
           & .timeline-features {
             text-align: start;
@@ -229,13 +194,6 @@
         }
 
         @media (min-width: 1200px) {
-          & .timeline-title {
-            font-size: var(--font-size-2xl);
-          }
-
-          & .timeline-text {
-            font-size: var(--font-size-base);
-          }
         }
       }
 
@@ -326,27 +284,27 @@
           {% assign item_index = item_index | plus: 1 %}
           <li class="timeline-item" data-block-id="{{ blockId }}">
             <div class="timeline-marker">
-              <span class="marker-number">{{ item_index }}</span>
+              <span class="marker-number block-text block-text-base">{{ item_index }}</span>
             </div>
 
             <div class="timeline-content">
               {% if block.settings.date != blank or block.settings.duration != blank %}
                 <div class="timeline-meta">
                   {% if block.settings.date != blank %}
-                    <span class="timeline-date" data-setting="date">{{ block.settings.date }}</span>
+                    <span class="timeline-date block-text block-text-sm block-text-semibold block-text-uppercase block-text-accent" data-setting="date">{{ block.settings.date }}</span>
                   {% endif %}
                   {% if block.settings.duration != blank %}
-                    <span class="timeline-duration" data-setting="duration">{{ block.settings.duration }}</span>
+                    <span class="timeline-duration block-text block-text-sm block-text-muted" data-setting="duration">{{ block.settings.duration }}</span>
                   {% endif %}
                 </div>
               {% endif %}
 
               {% if block.settings.title != blank %}
-                <h3 class="timeline-title" data-setting="title">{{ block.settings.title }}</h3>
+                <h3 class="timeline-title block-text block-text-xl block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
               {% endif %}
 
               {% if block.settings.description != blank %}
-                <p class="timeline-text" data-setting="description">{{ block.settings.description }}</p>
+                <p class="timeline-text block-text block-text-sm block-text-muted" data-setting="description">{{ block.settings.description }}</p>
               {% endif %}
 
               {% if block.settings.features != blank %}
@@ -356,7 +314,7 @@
                   {% for feature in features %}
                     {% assign trimmed_feature = feature | strip %}
                     {% if trimmed_feature != blank %}
-                      <li class="feature-item">{{ trimmed_feature }}</li>
+                      <li class="feature-item block-text block-text-sm block-text-muted">{{ trimmed_feature }}</li>
                     {% endif %}
                   {% endfor %}
                 </ul>

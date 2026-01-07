@@ -10,7 +10,6 @@
   <style>
     .widget-{{ widget.id }} {
       & .widget-card-number {
-        font-size: var(--font-size-6xl);
         line-height: 1;
         margin-block-end: var(--space-md);
         opacity: 0.1;
@@ -39,7 +38,7 @@
           {% assign block = widget.blocks[blockId] %}
           {% assign step_number = forloop.index | prepend: '0' | slice: -2, 2 %}
           <li class="widget-card" data-block-id="{{ blockId }}">
-            <div class="widget-card-number">{{ step_number }}</div>
+            <div class="widget-card-number block-text block-text-5xl">{{ step_number }}</div>
             <div class="widget-card-content">
               {% if block.settings.title != blank %}
                 <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>

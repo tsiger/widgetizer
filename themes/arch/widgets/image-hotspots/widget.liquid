@@ -132,8 +132,6 @@
       }
 
       & .image-hotspot-tooltip-title {
-        font-size: var(--font-size-lg);
-        line-height: var(--line-height-tight);
         margin: 0;
       }
 
@@ -169,9 +167,6 @@
       }
 
       & .image-hotspot-tooltip-description {
-        font-size: var(--font-size-sm);
-        line-height: var(--line-height-relaxed);
-        color: var(--text-muted);
         margin: 0;
       }
 
@@ -245,7 +240,7 @@
         {% if widget.settings.image != blank %}
           {{ widget.settings.image | image: 'large', 'image-hotspots-image', false }}
         {% else %}
-          {% placeholder_image '', { "class": "image-hotspots-image", "alt": "Interactive image" } %}
+          {% placeholder_image 'landscape', { "class": "image-hotspots-image", "alt": "Interactive image" } %}
         {% endif %}
 
         <!-- Hotspots -->
@@ -270,7 +265,7 @@
             <div class="image-hotspot-tooltip" role="tooltip">
               <div class="image-hotspot-tooltip-header">
                 {% if block.settings.title != blank %}
-                  <h3 class="image-hotspot-tooltip-title" data-setting="title">{{ block.settings.title }}</h3>
+                  <h3 class="image-hotspot-tooltip-title block-text block-text-lg block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
                 {% endif %}
                 <button type="button" class="image-hotspot-tooltip-close" aria-label="Close tooltip">
                   <svg class="image-hotspot-tooltip-close-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -280,7 +275,7 @@
               </div>
 
               {% if block.settings.description != blank %}
-                <p class="image-hotspot-tooltip-description" data-setting="description">
+                <p class="image-hotspot-tooltip-description block-text block-text-sm block-text-muted" data-setting="description">
                   {{ block.settings.description }}
                 </p>
               {% endif %}

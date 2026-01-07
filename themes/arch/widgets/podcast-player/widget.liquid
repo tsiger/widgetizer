@@ -44,15 +44,9 @@
       }
 
       & .audio-player-episode-number {
-        font-size: var(--font-size-sm);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--text-muted);
       }
 
       & .audio-player-episode-title {
-        font-size: var(--font-size-xl);
-        line-height: var(--line-height-tight);
         margin-block-end: var(--space-xs);
       }
 
@@ -60,8 +54,6 @@
         display: flex;
         flex-wrap: wrap;
         gap: var(--space-md);
-        font-size: var(--font-size-sm);
-        color: var(--text-muted);
         margin-block-end: var(--space-sm);
       }
 
@@ -80,9 +72,6 @@
       }
 
       & .audio-player-episode-description {
-        font-size: var(--font-size-base);
-        line-height: var(--line-height-relaxed);
-        color: var(--text-muted);
       }
 
       & .audio-player-controls {
@@ -137,8 +126,6 @@
       & .audio-player-progress-time {
         display: flex;
         justify-content: space-between;
-        font-size: var(--font-size-sm);
-        color: var(--text-muted);
         font-variant-numeric: tabular-nums;
       }
 
@@ -242,7 +229,6 @@
 
       & .audio-player-speed-button {
         padding: var(--space-xs) var(--space-sm);
-        font-size: var(--font-size-sm);
         font-family: inherit;
         background-color: var(--bg-primary);
         border: var(--border-width-thin) solid var(--border-color);
@@ -275,9 +261,6 @@
           margin-inline: 0;
         }
 
-        & .audio-player-episode-title {
-          font-size: var(--font-size-2xl);
-        }
       }
 
       @media (min-width: 990px) {
@@ -323,13 +306,13 @@
           <!-- Episode Info -->
           <div class="audio-player-info">
             {% if widget.settings.episode_number != blank %}
-              <span class="audio-player-episode-number">{{ widget.settings.episode_number }}</span>
+              <span class="audio-player-episode-number block-text block-text-sm block-text-uppercase block-text-muted">{{ widget.settings.episode_number }}</span>
             {% endif %}
             {% if widget.settings.episode_title != blank %}
-              <h3 class="audio-player-episode-title">{{ widget.settings.episode_title }}</h3>
+              <h3 class="audio-player-episode-title block-text block-text-xl block-text-bold block-text-heading">{{ widget.settings.episode_title }}</h3>
             {% endif %}
 
-            <div class="audio-player-episode-meta">
+            <div class="audio-player-episode-meta block-text block-text-sm block-text-muted">
               {% if widget.settings.duration != blank %}
                 <div class="audio-player-episode-meta-item">
                   <svg class="audio-player-episode-meta-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -350,7 +333,7 @@
             </div>
 
             {% if widget.settings.episode_description != blank %}
-              <p class="audio-player-episode-description">{{ widget.settings.episode_description }}</p>
+              <p class="audio-player-episode-description block-text block-text-base block-text-muted">{{ widget.settings.episode_description }}</p>
             {% endif %}
           </div>
         </div>
@@ -370,7 +353,7 @@
             >
               <div class="audio-player-progress-fill"></div>
             </div>
-            <div class="audio-player-progress-time">
+            <div class="audio-player-progress-time block-text block-text-sm block-text-muted">
               <span class="audio-player-current-time">0:00</span>
               <span class="audio-player-duration">{{ widget.settings.duration | default: '0:00' }}</span>
             </div>
@@ -434,7 +417,7 @@
 
             {% if widget.settings.show_speed %}
               <div class="audio-player-speed">
-                <button class="audio-player-speed-button" aria-label="Playback speed: 1x" data-action="speed">
+                <button class="audio-player-speed-button block-text block-text-sm" aria-label="Playback speed: 1x" data-action="speed">
                   1x
                 </button>
               </div>
