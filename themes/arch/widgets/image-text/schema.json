@@ -89,6 +89,18 @@
       ]
     },
     {
+      "type": "features",
+      "displayName": "Features",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "features",
+          "label": "Features (one per line)",
+          "default": "Feature 1\nFeature 2\nFeature 3"
+        }
+      ]
+    },
+    {
       "type": "button",
       "displayName": "Button",
       "settings": [

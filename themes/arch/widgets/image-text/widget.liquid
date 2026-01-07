@@ -41,6 +41,24 @@
         gap: var(--space-md);
       }
 
+      & .features-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      & .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-sm);
+        padding-block: var(--space-xs);
+      }
+
+      & .feature-icon {
+        color: var(--text-heading);
+        flex-shrink: 0;
+      }
+
       @media (min-width: 990px) {
         & .image-text-wrapper {
           flex-direction: row;
@@ -88,6 +106,22 @@
                 <p class="widget-description block-text {{ size_class }}{{ style_class }}" data-block-id="{{ blockId }}" data-setting="text">
                   {{ block.settings.text }}
                 </p>
+              {% when 'features' %}
+                {% if block.settings.features != blank %}
+                  <ul class="features-list" data-block-id="{{ blockId }}">
+                    {% assign features_list = block.settings.features | split: '
+' %}
+                    {% for feature in features_list %}
+                      {% assign trimmed_feature = feature | strip %}
+                      {% if trimmed_feature != blank %}
+                        <li class="feature-item block-text block-text-muted">
+                          <span class="feature-icon">✓</span>
+                          <span>{{ trimmed_feature }}</span>
+                        </li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {% endif %}
               {% when 'button' %}
                 {% if block.settings.link.text != blank or block.settings.link_2.text != blank %}
                   <div class="widget-actions" data-block-id="{{ blockId }}">

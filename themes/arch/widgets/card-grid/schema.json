@@ -37,6 +37,11 @@
       "displayName": "Card",
       "settings": [
         {
+          "type": "icon",
+          "id": "icon",
+          "label": "Icon"
+        },
+        {
           "type": "image",
           "id": "image",
           "label": "Image"
