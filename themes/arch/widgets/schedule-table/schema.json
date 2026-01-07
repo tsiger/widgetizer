@@ -23,6 +23,26 @@
       "id": "note",
       "label": "Additional note",
       "default": "We are closed on public holidays"
+    },
+    {
+      "type": "select",
+      "id": "week_start_day",
+      "label": "Week starts on",
+      "options": [
+        { "value": "0", "label": "Sunday" },
+        { "value": "1", "label": "Monday" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ],
+      "default": "primary"
     }
   ],
   "blocks": [
@@ -46,12 +66,6 @@
           "type": "checkbox",
           "id": "closed",
           "label": "Closed",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "highlight",
-          "label": "Highlight (e.g., today)",
           "default": false
         }
       ]

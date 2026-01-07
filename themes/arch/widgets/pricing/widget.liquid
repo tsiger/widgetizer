@@ -1,29 +1,22 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-pricing"
+  class="widget widget-type-pricing widget-{{ widget.id }}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="pricing"
 >
   <style>
-    #{{ widget.id }} {
-      & .pricing-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: var(--space-lg);
-      }
-
-      /* Featured Card Override */
+    .widget-{{ widget.id }} {
+      /* Featured Card - Accent Border */
       & .widget-card.is-featured {
+        border-color: var(--accent);
         border-width: var(--border-width-medium);
-        border-color: var(--border-color);
-        position: relative;
-        transform: scale(1.02);
-        z-index: 1;
-        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.05);
       }
 
-      /* Pricing Specific Elements */
-      & .pricing-header {
+      /* Pricing Header */
+      & .widget-card-header {
         text-align: center;
       }
 
@@ -47,24 +40,58 @@
         &:first-child {
           border-block-start: var(--border-width-thin) solid var(--border-color);
         }
+
+        &:last-child {
+          border-block-end: none;
+          padding-block-end: var(--space-lg); /* Extra space before button */
+        }
+      }
+
+      /* Smart layout for different item counts */
+      
+      /* 1 item: centered with grid column width */
+      & .widget-card-grid:has(> :nth-child(1):last-child) {
+        display: flex;
+        justify-content: center;
+      }
+
+      @media (min-width: 990px) {
+        & .widget-card-grid:has(> :nth-child(1):last-child) > .widget-card {
+          /* Match width of 1 column in 3-column grid */
+          width: calc((var(--container-max-width) - (2 * var(--space-lg))) / 3);
+          max-width: 100%;
+        }
+      }
+
+      /* 2 items: centered in constrained container */
+      & .widget-card-grid:has(> :nth-child(2):last-child) {
+        max-width: var(--content-width-md); /* 80rem = 800px */
+        margin-inline: auto;
       }
 
       @media (min-width: 750px) {
-        & .pricing-grid {
+        & .widget-card-grid:has(> :nth-child(2):last-child) {
           grid-template-columns: repeat(2, 1fr);
         }
       }
 
+      /* 3 items: centered in constrained container */
+      & .widget-card-grid:has(> :nth-child(3):last-child) {
+        max-width: var(--content-width-lg); /* 90rem = 900px */
+        margin-inline: auto;
+      }
+
       @media (min-width: 990px) {
-        & .pricing-grid {
+        & .widget-card-grid:has(> :nth-child(3):last-child) {
           grid-template-columns: repeat(3, 1fr);
-          gap: var(--space-lg);
         }
       }
+
+      /* 4+ items: use full responsive grid (default behavior) */
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -80,10 +107,10 @@
     {% endif %}
 
     <div class="widget-content">
-      <div class="pricing-grid">
+      <ul class="widget-card-grid">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <div class="widget-card {% if block.settings.featured %}is-featured{% endif %}" data-block-id="{{ blockId }}">
+          <li class="widget-card {% if block.settings.featured %}is-featured{% endif %}" data-block-id="{{ blockId }}">
             <div class="widget-card-header">
               {% if block.settings.title != blank %}
                 <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
@@ -123,9 +150,9 @@
                 </a>
               </div>
             {% endif %}
-          </div>
+          </li>
         {% endfor %}
-      </div>
+      </ul>
     </div>
   </div>
 </section>

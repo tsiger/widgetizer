@@ -28,6 +28,16 @@
         { "value": "horizontal", "label": "Horizontal" },
         { "value": "centered", "label": "Centered (Alternating)" }
       ]
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ],
+      "default": "primary"
     }
   ],
   "blocks": [

@@ -12,18 +12,28 @@
       "type": "text",
       "id": "title",
       "label": "Heading",
-      "default": "Meet Our Chefs"
+      "default": "Meet Our Team"
     },
     {
       "type": "textarea",
       "id": "description",
       "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ],
+      "default": "primary"
     }
   ],
   "blocks": [
     {
       "type": "profile",
-      "displayName": "Staff Member",
+      "displayName": "Team Member",
       "settings": [
         {
           "type": "image",
@@ -40,13 +50,12 @@
           "type": "text",
           "id": "role",
           "label": "Role / Title",
-          "default": "Head Chef"
+          "default": "Team Member"
         },
         {
           "type": "text",
           "id": "specialty",
-          "label": "Specialty",
-          "default": "Italian Cuisine"
+          "label": "Specialty"
         },
         {
           "type": "textarea",
@@ -54,9 +63,29 @@
           "label": "Bio"
         },
         {
-          "type": "link",
-          "id": "social_link",
-          "label": "Social / Contact link"
+          "type": "text",
+          "id": "linkedin",
+          "label": "LinkedIn URL"
+        },
+        {
+          "type": "text",
+          "id": "twitter",
+          "label": "Twitter URL"
+        },
+        {
+          "type": "text",
+          "id": "instagram",
+          "label": "Instagram URL"
+        },
+        {
+          "type": "text",
+          "id": "facebook",
+          "label": "Facebook URL"
+        },
+        {
+          "type": "text",
+          "id": "email",
+          "label": "Email"
         }
       ]
     }

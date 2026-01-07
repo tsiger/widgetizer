@@ -18,6 +18,16 @@
       "id": "description",
       "label": "Description",
       "default": "Choose the plan that fits your needs."
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ],
+      "default": "primary"
     }
   ],
   "blocks": [

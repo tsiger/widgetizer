@@ -1,30 +1,28 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-testimonial layout-{{ widget.settings.layout }}"
+  class="widget widget-type-testimonials widget-{{ widget.id }}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
-  data-widget-type="testimonial"
+  data-widget-type="testimonials"
 >
   <style>
-    #{{ widget.id }} {
-      & .testimonial-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: var(--space-xl);
-      }
-
+    .widget-{{ widget.id }} {
       & .testimonial-card {
         display: flex;
         flex-direction: column;
         padding: var(--space-xl);
-        background: var(--surface-secondary);
+        background: var(--bg-secondary);
         border-radius: var(--radius-md);
         border: var(--border-width-thin) solid var(--border-color);
       }
 
       & .testimonial-quote {
         font-size: var(--font-size-lg);
-        line-height: 1.7;
+        line-height: var(--line-height-relaxed);
         margin: 0 0 var(--space-lg) 0;
+        color: var(--text-content);
         position: relative;
       }
 
@@ -34,7 +32,7 @@
         top: -0.5em;
         left: -0.3em;
         font-size: 4rem;
-        color: var(--color-primary);
+        color: var(--accent);
         opacity: 0.2;
         font-family: Georgia, serif;
         line-height: 1;
@@ -42,13 +40,14 @@
 
       & .testimonial-rating {
         display: flex;
-        gap: 0.125rem;
+        gap: 0.2rem;
         margin-block-end: var(--space-md);
       }
 
       & .testimonial-star {
         color: #fbbf24;
-        font-size: 1.125rem;
+        font-size: 1.8rem;
+        line-height: 1;
       }
 
       & .testimonial-star.empty {
@@ -63,31 +62,32 @@
       }
 
       & .testimonial-avatar {
-        width: 48px;
-        height: 48px;
+        width: 4.8rem;
+        height: 4.8rem;
         border-radius: 50%;
         object-fit: cover;
       }
 
       & .testimonial-avatar-placeholder {
-        width: 48px;
-        height: 48px;
+        width: 4.8rem;
+        height: 4.8rem;
         border-radius: 50%;
-        background: var(--color-primary);
-        color: white;
+        background: var(--bg-secondary);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: var(--font-size-lg);
       }
 
       & .testimonial-info {
         display: flex;
         flex-direction: column;
+        gap: var(--space-2xs);
       }
 
       & .testimonial-name {
         margin: 0;
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-heading);
       }
 
       & .testimonial-title {
@@ -95,75 +95,10 @@
         color: var(--text-muted);
         margin: 0;
       }
-
-      /* Single layout */
-      &.layout-single .testimonial-card {
-        text-align: center;
-        align-items: center;
-      }
-
-      &.layout-single .testimonial-quote {
-        font-size: var(--font-size-2xl);
-      }
-
-      &.layout-single .testimonial-quote::before {
-        position: static;
-        display: block;
-        margin-block-end: var(--space-md);
-      }
-
-      &.layout-single .testimonial-author {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      &.layout-single .testimonial-rating {
-        justify-content: center;
-      }
-
-      /* Carousel layout */
-      &.layout-carousel .testimonial-grid {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        gap: var(--space-lg);
-        padding-block-end: var(--space-sm);
-      }
-
-      &.layout-carousel .testimonial-grid::-webkit-scrollbar {
-        display: none;
-      }
-
-      &.layout-carousel .testimonial-card {
-        flex: 0 0 100%;
-        scroll-snap-align: start;
-      }
-
-      @media (min-width: 750px) {
-        & .testimonial-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-
-        &.layout-carousel .testimonial-card {
-          flex: 0 0 calc(50% - var(--space-md));
-        }
-      }
-
-      @media (min-width: 990px) {
-        & .testimonial-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-
-        &.layout-carousel .testimonial-card {
-          flex: 0 0 calc(33.333% - var(--space-lg));
-        }
-      }
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -178,11 +113,11 @@
       </div>
     {% endif %}
 
-    <div class="widget-content {% if widget.settings.layout == 'single' %}widget-content-md{% endif %}">
-      <div class="testimonial-grid">
+    <div class="widget-content">
+      <ul class="widget-card-grid">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <div class="testimonial-card" data-block-id="{{ blockId }}">
+          <li class="testimonial-card" data-block-id="{{ blockId }}">
             {% if block.settings.rating != blank %}
               <div class="testimonial-rating">
                 {% assign rating = block.settings.rating | plus: 0 %}
@@ -204,7 +139,7 @@
               {% if block.settings.avatar != blank %}
                 {{ block.settings.avatar | image: 'small', 'testimonial-avatar' }}
               {% else %}
-                <div class="testimonial-avatar-placeholder" style="background-image: url({% placeholder_image 'square', 'url' %}); background-size: cover; background-position: center;"></div>
+                {% placeholder_image 'square', { "class": "testimonial-avatar-placeholder", "alt": "Avatar" } %}
               {% endif %}
 
               <div class="testimonial-info">
@@ -216,9 +151,9 @@
                 {% endif %}
               </div>
             </div>
-          </div>
+          </li>
         {% endfor %}
-      </div>
+      </ul>
     </div>
   </div>
 </section>

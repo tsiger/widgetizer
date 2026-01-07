@@ -1,17 +1,15 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-profile-grid"
+  class="widget widget-type-profile-grid widget-{{ widget.id }}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="profile-grid"
 >
   <style>
-    #{{ widget.id }} {
-      & .profile-grid-list {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: var(--space-xl);
-      }
-
+    .widget-{{ widget.id }} {
+      /* Profile-specific styles */
       & .profile-card {
         display: flex;
         flex-direction: column;
@@ -20,8 +18,8 @@
       }
 
       & .profile-image {
-        width: 160px;
-        height: 160px;
+        width: 16rem; /* 160px */
+        height: 16rem;
         border-radius: 50%;
         object-fit: cover;
         margin-block-end: var(--space-md);
@@ -29,10 +27,10 @@
       }
 
       & .profile-image-placeholder {
-        width: 160px;
-        height: 160px;
+        width: 16rem;
+        height: 16rem;
         border-radius: 50%;
-        background: var(--surface-secondary);
+        background: var(--bg-secondary);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -44,60 +42,107 @@
 
       & .profile-name {
         font-size: var(--font-size-xl);
-        margin: 0 0 var(--space-xs) 0;
+        color: var(--text-heading);
+        margin-block-end: var(--space-xs);
       }
 
       & .profile-role {
         font-size: var(--font-size-base);
-        color: var(--color-primary);
-        margin: 0 0 var(--space-xs) 0;
+        color: var(--accent);
+        font-weight: var(--font-weight-semibold);
+        margin-block-end: var(--space-xs);
       }
 
       & .profile-specialty {
         font-size: var(--font-size-sm);
         color: var(--text-muted);
-        margin: 0 0 var(--space-sm) 0;
+        margin-block-end: var(--space-sm);
       }
 
       & .profile-bio {
         font-size: var(--font-size-sm);
-        color: var(--text-secondary);
-        margin: 0;
-        max-width: 300px;
+        color: var(--text-content);
+        line-height: var(--line-height-relaxed);
+        margin-block-end: var(--space-md);
+        max-width: 30rem; /* 300px */
       }
 
-      & .profile-footer {
+      & .profile-social {
+        display: flex;
+        gap: var(--space-sm);
+        justify-content: center;
         margin-block-start: var(--space-md);
       }
 
-      & .profile-link {
+      & .profile-social-link {
         display: inline-flex;
         align-items: center;
-        gap: var(--space-xs);
-        font-size: var(--font-size-sm);
-        color: var(--color-primary);
+        justify-content: center;
+        width: 3.6rem; /* 36px */
+        height: 3.6rem;
+        border-radius: 50%;
+        border: var(--border-width-thin) solid var(--border-color);
+        color: var(--text-content);
         text-decoration: none;
+        transition: all var(--transition-speed-normal);
+
+        &:hover {
+          border-color: var(--accent);
+          color: var(--accent);
+        }
+
+        svg {
+          width: 1.8rem; /* 18px */
+          height: 1.8rem;
+          stroke-width: 0.2rem;
+        }
       }
 
-      & .profile-link:hover {
-        text-decoration: underline;
+      /* Smart layout for different item counts */
+      
+      /* 1 item: centered with grid column width */
+      & .widget-card-grid:has(> :nth-child(1):last-child) {
+        display: flex;
+        justify-content: center;
       }
 
-      @media (min-width: 600px) {
-        & .profile-grid-list {
+      @media (min-width: 990px) {
+        & .widget-card-grid:has(> :nth-child(1):last-child) > .profile-card {
+          /* Match width of 1 column in 3-column grid */
+          width: calc((var(--container-max-width) - (2 * var(--space-lg))) / 3);
+          max-width: 100%;
+        }
+      }
+
+      /* 2 items: centered in constrained container */
+      & .widget-card-grid:has(> :nth-child(2):last-child) {
+        max-width: var(--content-width-md); /* 80rem = 800px */
+        margin-inline: auto;
+      }
+
+      @media (min-width: 750px) {
+        & .widget-card-grid:has(> :nth-child(2):last-child) {
           grid-template-columns: repeat(2, 1fr);
         }
       }
 
+      /* 3 items: centered in constrained container */
+      & .widget-card-grid:has(> :nth-child(3):last-child) {
+        max-width: var(--content-width-lg); /* 90rem = 900px */
+        margin-inline: auto;
+      }
+
       @media (min-width: 990px) {
-        & .profile-grid-list {
+        & .widget-card-grid:has(> :nth-child(3):last-child) {
           grid-template-columns: repeat(3, 1fr);
         }
       }
+
+      /* 4+ items: use full responsive grid (default behavior) */
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
@@ -113,10 +158,10 @@
     {% endif %}
 
     <div class="widget-content">
-      <div class="profile-grid-list">
+      <ul class="widget-card-grid">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <div class="profile-card" data-block-id="{{ blockId }}">
+          <li class="profile-card" data-block-id="{{ blockId }}">
             {% if block.settings.photo != blank %}
               {{ block.settings.photo | image: 'medium', 'profile-image' }}
             {% else %}
@@ -139,23 +184,43 @@
               <p class="profile-bio" data-setting="bio">{{ block.settings.bio }}</p>
             {% endif %}
 
-            {% if block.settings.social_link.text != blank %}
-              <div class="profile-footer">
-                <a
-                  href="{{ block.settings.social_link.href }}"
-                  class="profile-link"
-                  data-setting="social_link"
-                  {% if block.settings.social_link.target == '_blank' %}
-                    target="_blank" rel="noopener"
-                  {% endif %}
-                >
-                  {{ block.settings.social_link.text }}
-                </a>
+            {% assign has_social = false %}
+            {% if block.settings.linkedin != blank or block.settings.twitter != blank or block.settings.instagram != blank or block.settings.facebook != blank or block.settings.email != blank %}
+              {% assign has_social = true %}
+            {% endif %}
+
+            {% if has_social %}
+              <div class="profile-social">
+                {% if block.settings.linkedin != blank %}
+                  <a href="{{ block.settings.linkedin }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="LinkedIn" data-setting="linkedin">
+                    {% render 'icon', icon: 'linkedin' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.twitter != blank %}
+                  <a href="{{ block.settings.twitter }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="Twitter" data-setting="twitter">
+                    {% render 'icon', icon: 'twitter' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.instagram != blank %}
+                  <a href="{{ block.settings.instagram }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="Instagram" data-setting="instagram">
+                    {% render 'icon', icon: 'instagram' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.facebook != blank %}
+                  <a href="{{ block.settings.facebook }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="Facebook" data-setting="facebook">
+                    {% render 'icon', icon: 'facebook' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.email != blank %}
+                  <a href="mailto:{{ block.settings.email }}" class="profile-social-link" aria-label="Email" data-setting="email">
+                    {% render 'icon', icon: 'mail' %}
+                  </a>
+                {% endif %}
               </div>
             {% endif %}
-          </div>
+          </li>
         {% endfor %}
-      </div>
+      </ul>
     </div>
   </div>
 </section>

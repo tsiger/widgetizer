@@ -19,6 +19,16 @@
       "id": "description",
       "label": "Description",
       "default": "Browse through our collection of successful projects and client collaborations."
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ],
+      "default": "primary"
     }
   ],
   "blocks": [
@@ -55,24 +65,28 @@
       "type": "project",
       "settings": {
         "title": "E-Commerce Platform",
-        "description": "A modern shopping experience with seamless checkout",
-        "image": "placeholder"
+        "description": "A modern shopping experience with seamless checkout"
       }
     },
     {
       "type": "project",
       "settings": {
         "title": "Brand Redesign",
-        "description": "Complete visual identity overhaul for a tech startup",
-        "image": "placeholder"
+        "description": "Complete visual identity overhaul for a tech startup"
       }
     },
     {
       "type": "project",
       "settings": {
         "title": "Mobile App",
-        "description": "Award-winning iOS and Android application",
-        "image": "placeholder"
+        "description": "Award-winning iOS and Android application"
+      }
+    },
+    {
+      "type": "project",
+      "settings": {
+        "title": "Corporate Website",
+        "description": "Professional web presence for a growing enterprise"
       }
     }
   ]

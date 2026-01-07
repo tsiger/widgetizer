@@ -1,6 +1,6 @@
 {
-  "type": "testimonial",
-  "displayName": "Testimonial",
+  "type": "testimonials",
+  "displayName": "Testimonials",
   "settings": [
     {
       "type": "text",
@@ -20,20 +20,19 @@
     },
     {
       "type": "select",
-      "id": "layout",
-      "label": "Layout",
+      "id": "background",
+      "label": "Background",
       "options": [
-        { "value": "single", "label": "Single (large)" },
-        { "value": "grid", "label": "Grid" },
-        { "value": "carousel", "label": "Carousel" }
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
       ],
-      "default": "grid"
+      "default": "primary"
     }
   ],
   "blocks": [
     {
       "type": "quote",
-      "displayName": "Quote",
+      "displayName": "Testimonial",
       "settings": [
         {
           "type": "textarea",
@@ -80,8 +79,7 @@
         "quote": "Working with this team has been an absolute pleasure. They delivered beyond our expectations and the results speak for themselves.",
         "name": "Sarah Johnson",
         "title": "Marketing Director, TechCorp",
-        "rating": "5",
-        "avatar": "placeholder"
+        "rating": "5"
       }
     },
     {
@@ -90,8 +88,7 @@
         "quote": "The attention to detail and commitment to quality is unmatched. I've recommended them to everyone I know.",
         "name": "Michael Chen",
         "title": "Founder, StartupXYZ",
-        "rating": "5",
-        "avatar": "placeholder"
+        "rating": "5"
       }
     },
     {
@@ -100,8 +97,7 @@
         "quote": "From start to finish, the experience was seamless. They truly understand what their customers need.",
         "name": "Emily Rodriguez",
         "title": "Operations Manager",
-        "rating": "5",
-        "avatar": "placeholder"
+        "rating": "5"
       }
     }
   ]

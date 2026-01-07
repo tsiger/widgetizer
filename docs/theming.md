@@ -491,16 +491,33 @@ Outputs a placeholder image for development and preview purposes. Theme authors 
 **Basic Usage:**
 
 ```liquid
-{# Core placeholder as <img> tag #}
+{# Default landscape placeholder as <img> tag #}
 {% placeholder_image %}
 
-{# Core placeholder URL for inline styles #}
+{# Specific aspect ratio as <img> tag #}
+{% placeholder_image 'landscape' %}
+{% placeholder_image 'portrait' %}
+{% placeholder_image 'square' %}
+
+{# URL only for inline styles #}
 {% placeholder_image 'url' %}
+{% placeholder_image 'landscape', 'url' %}
+{% placeholder_image 'square', 'url' %}
+
+{# With options #}
+{% placeholder_image 'landscape', { "class": "hero-image", "alt": "Hero placeholder" } %}
+{% placeholder_image 'square', { "class": "avatar", "alt": "Profile photo" } %}
 
 {# Custom theme placeholder from assets/ folder #}
 {% placeholder_image 'my-placeholder.png' %}
 {% placeholder_image 'my-placeholder.jpg', 'url' %}
 ```
+
+**Aspect Ratios:**
+
+- `landscape` (16:9, 1600x900) - default
+- `portrait` (9:16, 900x1600)
+- `square` (1:1, 1200x1200)
 
 **Options (for `<img>` output):**
 

@@ -1,11 +1,14 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-priced-list"
+  class="widget widget-type-priced-list widget-{{ widget.id }}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="priced-list"
 >
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       & .priced-list {
         display: flex;
         flex-direction: column;
@@ -26,10 +29,12 @@
       }
 
       & .priced-item.is-featured {
-        background: linear-gradient(90deg, var(--color-accent-subtle) 0%, transparent 100%);
-        margin-inline: calc(var(--space-md) * -1);
-        padding-inline: var(--space-md);
-        border-radius: var(--radius-sm);
+        border-block-start: var(--border-width-medium) solid var(--accent);
+        border-block-end: var(--border-width-medium) solid var(--accent);
+      }
+
+      & .priced-item.is-featured + .priced-item.is-featured {
+        border-block-start: none;
       }
 
       & .priced-item-content {
@@ -60,10 +65,11 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 2rem;
+        height: 2rem;
         border-radius: 50%;
-        font-size: 0.7rem;
+        font-size: 0.9rem;
+        font-weight: var(--font-weight-semibold);
         text-transform: uppercase;
       }
 
@@ -93,7 +99,7 @@
         width: 80px;
         height: 80px;
         object-fit: cover;
-        border-radius: var(--radius-sm);
+        border-radius: var(--border-radius-sm);
         margin-inline-start: var(--space-md);
       }
 
@@ -121,7 +127,7 @@
     }
   </style>
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}

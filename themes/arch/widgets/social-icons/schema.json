@@ -38,6 +38,16 @@
       "min": 1.6,
       "max": 4.8,
       "step": 0.2
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ],
+      "default": "primary"
     }
   ],
   "blocks": [
@@ -58,7 +68,8 @@
             { "value": "youtube", "label": "YouTube" },
             { "value": "tiktok", "label": "TikTok" },
             { "value": "pinterest", "label": "Pinterest" },
-            { "value": "generic", "label": "Generic Link" }
+            { "value": "github", "label": "GitHub" },
+            { "value": "mail", "label": "Email" }
           ]
         },
         {
