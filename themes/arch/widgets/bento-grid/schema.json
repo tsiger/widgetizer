@@ -60,17 +60,17 @@
           "default": "Describe this featured item here."
         },
         {
+          "type": "image",
+          "id": "image",
+          "label": "Background image"
+        },
+        {
           "type": "color",
           "id": "overlay_color",
           "label": "Overlay color",
           "default": "#00000080",
           "allow_alpha": true,
           "description": "Applies only if there is a background image."
-        },
-        {
-          "type": "image",
-          "id": "image",
-          "label": "Background image"
         },
         {
           "type": "color",
