@@ -143,7 +143,9 @@ img {
 .color-scheme-dark {
   --text-heading: var(--inverse-text);
   --text-content: var(--inverse-text);
-  --text-muted: var(--inverse-text); /* Fallback to inverse text with opacity controlled by opacity property if needed, or simple inheritance */
+  --text-muted: var(
+    --inverse-text
+  ); /* Fallback to inverse text with opacity controlled by opacity property if needed, or simple inheritance */
   --border-color: var(--inverse-text); /* Will need opacity adjustment in components usually */
   --bg-primary: var(--inverse-bg);
   --bg-secondary: rgba(255, 255, 255, 0.1); /* Keep transparent white for secondary bg on dark */
@@ -164,7 +166,16 @@ img {
    ========================================================================== */
 
 body {
-  font-family: var(--typography-body_font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif);
+  font-family: var(
+    --typography-body_font-family,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Ubuntu,
+    "Helvetica Neue",
+    sans-serif
+  );
   font-weight: var(--typography-body_font-weight, 400);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
@@ -183,12 +194,18 @@ body {
 }
 
 /* Bold elements use smart bold weight */
-strong, b {
+strong,
+b {
   font-weight: var(--font-weight-bold);
 }
 
 /* Heading styles */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--typography-heading_font-family, inherit);
   font-weight: var(--typography-heading_font-weight, 700);
   color: var(--text-heading);
@@ -196,12 +213,24 @@ h1, h2, h3, h4, h5, h6 {
   margin-block-end: var(--space-sm);
 }
 
-h1 { font-size: var(--font-size-5xl); }
-h2 { font-size: var(--font-size-4xl); }
-h3 { font-size: var(--font-size-3xl); }
-h4 { font-size: var(--font-size-2xl); }
-h5 { font-size: var(--font-size-xl); }
-h6 { font-size: var(--font-size-lg); }
+h1 {
+  font-size: var(--font-size-5xl);
+}
+h2 {
+  font-size: var(--font-size-4xl);
+}
+h3 {
+  font-size: var(--font-size-3xl);
+}
+h4 {
+  font-size: var(--font-size-2xl);
+}
+h5 {
+  font-size: var(--font-size-xl);
+}
+h6 {
+  font-size: var(--font-size-lg);
+}
 
 /* ==========================================================================
    TYPOGRAPHY UTILITIES
@@ -520,6 +549,88 @@ h6 { font-size: var(--font-size-lg); }
 }
 
 /* ==========================================================================
+   BLOCK TEXT UTILITIES
+   ========================================================================== */
+
+/* Base block text - resets and default styling */
+.block-text {
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+  color: var(--text-content);
+}
+
+/* Size modifiers */
+.block-text-xs {
+  font-size: var(--font-size-xs);
+}
+
+.block-text-sm {
+  font-size: var(--font-size-sm);
+}
+
+.block-text-base {
+  font-size: var(--font-size-base);
+}
+
+.block-text-lg {
+  font-size: var(--font-size-lg);
+}
+
+.block-text-xl {
+  font-size: var(--font-size-xl);
+}
+
+.block-text-2xl {
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-tight);
+}
+
+.block-text-3xl {
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-tight);
+}
+
+/* Weight modifiers */
+.block-text-normal {
+  font-weight: var(--font-weight-normal);
+}
+
+.block-text-medium {
+  font-weight: var(--font-weight-medium);
+}
+
+.block-text-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+.block-text-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+/* Style modifiers */
+.block-text-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.block-text-muted {
+  color: var(--text-muted);
+}
+
+.block-text-heading {
+  color: var(--text-heading);
+}
+
+.block-text-accent {
+  color: var(--accent);
+}
+
+/* Spacing modifiers */
+.block-text-spaced {
+  margin-block-end: var(--space-md);
+}
+
+/* ==========================================================================
    BUTTON UTILITIES
    ========================================================================== */
 
@@ -529,8 +640,8 @@ h6 { font-size: var(--font-size-lg); }
   align-items: center;
   align-self: flex-start;
   gap: var(--space-sm);
-  padding: 1.2rem 2.4rem;
-  font-size: var(--font-size-base);
+  padding: 0.8rem 1.6rem;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-normal);
   font-family: inherit;
   background-color: transparent;
@@ -552,14 +663,19 @@ h6 { font-size: var(--font-size-lg); }
 }
 
 /* Button Sizes */
+.widget-button-medium {
+  padding: 1.2rem 2.4rem;
+  font-size: var(--font-size-base);
+}
+
 .widget-button-large {
-  padding: 1.6rem 4rem;
+  padding: 1.6rem 3.2rem;
   font-size: var(--font-size-lg);
 }
 
-.widget-button-small {
-  padding: 0.8rem 1.6rem;
-  font-size: var(--font-size-sm);
+.widget-button-xlarge {
+  padding: 2rem 4.8rem;
+  font-size: var(--font-size-xl);
 }
 
 .widget-button-full {

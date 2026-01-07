@@ -30,18 +30,6 @@
   ],
   "blocks": [
     {
-      "type": "eyebrow",
-      "displayName": "Eyebrow",
-      "settings": [
-        {
-          "type": "text",
-          "id": "text",
-          "label": "Text",
-          "default": "Our Approach"
-        }
-      ]
-    },
-    {
       "type": "heading",
       "displayName": "Heading",
       "settings": [
@@ -50,6 +38,18 @@
           "id": "text",
           "label": "Text",
           "default": "Built for Modern Teams"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "default": "2xl",
+          "options": [
+            { "value": "lg", "label": "Large" },
+            { "value": "xl", "label": "Extra Large" },
+            { "value": "2xl", "label": "2X Large" },
+            { "value": "3xl", "label": "3X Large" }
+          ]
         }
       ]
     },
@@ -62,6 +62,29 @@
           "id": "text",
           "label": "Text",
           "default": "A paragraph of descriptive text goes here."
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "default": "base",
+          "options": [
+            { "value": "sm", "label": "Small" },
+            { "value": "base", "label": "Base" },
+            { "value": "lg", "label": "Large" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "uppercase",
+          "label": "Uppercase",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "muted",
+          "label": "Muted color",
+          "default": false
         }
       ]
     },
@@ -82,8 +105,23 @@
         {
           "type": "select",
           "id": "style",
-          "label": "Style",
-          "default": "primary",
+          "label": "Button 1 style",
+          "default": "secondary",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ]
+        },
+        {
+          "type": "link",
+          "id": "link_2",
+          "label": "Button 2"
+        },
+        {
+          "type": "select",
+          "id": "style_2",
+          "label": "Button 2 style",
+          "default": "secondary",
           "options": [
             { "value": "primary", "label": "Primary" },
             { "value": "secondary", "label": "Secondary" }
@@ -94,21 +132,28 @@
   ],
   "defaultBlocks": [
     {
-      "type": "eyebrow",
+      "type": "text",
       "settings": {
-        "text": "Our Approach"
+        "text": "Our Approach",
+        "size": "sm",
+        "uppercase": true,
+        "muted": true
       }
     },
     {
       "type": "heading",
       "settings": {
-        "text": "Built for Modern Teams"
+        "text": "Built for Modern Teams",
+        "size": "2xl"
       }
     },
     {
       "type": "text",
       "settings": {
-        "text": "We combine cutting-edge technology with proven methodologies to deliver exceptional results. Our platform is designed to help teams collaborate more effectively and achieve their goals faster."
+        "text": "We combine cutting-edge technology with proven methodologies to deliver exceptional results. Our platform is designed to help teams collaborate more effectively and achieve their goals faster.",
+        "size": "base",
+        "uppercase": false,
+        "muted": false
       }
     },
     {
@@ -119,7 +164,13 @@
           "href": "#",
           "target": "_self"
         },
-        "style": "primary"
+        "style": "secondary",
+        "link_2": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        },
+        "style_2": "primary"
       }
     }
   ]

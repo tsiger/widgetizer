@@ -1,6 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-image-text widget-{{ widget.id }} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
+  class="widget widget-type-image-text widget-{{ widget.id }} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
   {% if widget.settings.background == 'secondary' %}
     style="--widget-bg-color: var(--bg-secondary);"
   {% endif %}
@@ -29,14 +29,16 @@
 
       & .text-content {
         width: 100%;
-      }
-
-      & .text-description {
-        margin-block-end: var(--space-xl);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
       }
 
       & .widget-actions {
-        margin-block-start: var(--space-lg);
+        margin-block-start: var(--space-sm);
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
       }
 
       @media (min-width: 990px) {
@@ -73,31 +75,46 @@
           {% for blockId in widget.blocksOrder %}
             {% assign block = widget.blocks[blockId] %}
             {% case block.type %}
-              {% when 'eyebrow' %}
-                <span class="widget-eyebrow" data-block-id="{{ blockId }}" data-setting="text">
-                  {{- block.settings.text -}}
-                </span>
               {% when 'heading' %}
-                <h2 class="widget-headline" data-block-id="{{ blockId }}" data-setting="text">
+                {% assign size_class = 'block-text-' | append: block.settings.size %}
+                <h2 class="block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="text">
                   {{ block.settings.text }}
                 </h2>
               {% when 'text' %}
-                <p class="text-description widget-description" data-block-id="{{ blockId }}" data-setting="text">
+                {% assign size_class = 'block-text-' | append: block.settings.size %}
+                {% assign style_class = '' %}
+                {% if block.settings.uppercase %}{% assign style_class = style_class | append: ' block-text-uppercase' %}{% endif %}
+                {% if block.settings.muted %}{% assign style_class = style_class | append: ' block-text-muted' %}{% endif %}
+                <p class="block-text {{ size_class }}{{ style_class }}" data-block-id="{{ blockId }}" data-setting="text">
                   {{ block.settings.text }}
                 </p>
               {% when 'button' %}
-                {% if block.settings.link.text != blank %}
+                {% if block.settings.link.text != blank or block.settings.link_2.text != blank %}
                   <div class="widget-actions" data-block-id="{{ blockId }}">
-                    <a
-                      href="{{ block.settings.link.href }}"
-                    class="widget-button {% if block.settings.style == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
-                      data-setting="link"
-                      {% if block.settings.link.target == '_blank' %}
-                        target="_blank" rel="noopener"
-                      {% endif %}
-                    >
-                      {{ block.settings.link.text }}
-                    </a>
+                    {% if block.settings.link.text != blank %}
+                      <a
+                        href="{{ block.settings.link.href }}"
+                        class="widget-button {% if block.settings.style == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
+                        data-setting="link"
+                        {% if block.settings.link.target == '_blank' %}
+                          target="_blank" rel="noopener"
+                        {% endif %}
+                      >
+                        {{ block.settings.link.text }}
+                      </a>
+                    {% endif %}
+                    {% if block.settings.link_2.text != blank %}
+                      <a
+                        href="{{ block.settings.link_2.href }}"
+                        class="widget-button {% if block.settings.style_2 == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
+                        data-setting="link_2"
+                        {% if block.settings.link_2.target == '_blank' %}
+                          target="_blank" rel="noopener"
+                        {% endif %}
+                      >
+                        {{ block.settings.link_2.text }}
+                      </a>
+                    {% endif %}
                   </div>
                 {% endif %}
             {% endcase %}
