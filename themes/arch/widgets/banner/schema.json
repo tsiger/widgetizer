@@ -30,47 +30,168 @@
       ]
     },
     {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background color",
-      "default": "#000000"
-    },
-    {
       "type": "image",
       "id": "image",
       "label": "Background image"
     },
     {
-      "type": "text",
-      "id": "eyebrow",
-      "label": "Eyebrow text"
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#00000080",
+      "allow_alpha": true,
+      "description": "Applies only if there is a background image."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#000000"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "displayName": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Build your future"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "default": "5xl",
+          "options": [
+            { "value": "2xl", "label": "2X Large" },
+            { "value": "3xl", "label": "3X Large" },
+            { "value": "4xl", "label": "4X Large" },
+            { "value": "5xl", "label": "5X Large" }
+          ]
+        }
+      ]
     },
     {
       "type": "text",
-      "id": "headline",
-      "label": "Headline",
-      "default": "Your Headline Here"
+      "displayName": "Text",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Start your journey with our powerful platform."
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "default": "lg",
+          "options": [
+            { "value": "sm", "label": "Small" },
+            { "value": "base", "label": "Base" },
+            { "value": "lg", "label": "Large" },
+            { "value": "xl", "label": "Extra Large" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "uppercase",
+          "label": "Uppercase",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "bold",
+          "label": "Bold",
+          "default": false
+        }
+      ]
     },
     {
-      "type": "textarea",
-      "id": "description",
-      "label": "Description"
-    },
+      "type": "button",
+      "displayName": "Button Group",
+      "settings": [
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Button 1",
+          "default": {
+            "text": "Get Started",
+            "href": "#",
+            "target": "_self"
+          }
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Button 1 style",
+          "default": "primary",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ]
+        },
+        {
+          "type": "link",
+          "id": "link_2",
+          "label": "Button 2"
+        },
+        {
+          "type": "select",
+          "id": "style_2",
+          "label": "Button 2 style",
+          "default": "secondary",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ]
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
     {
-      "type": "link",
-      "id": "button_link",
-      "label": "Primary button",
-      "default": {
-        "text": "Get Started",
-        "href": "#",
-        "target": "_self"
+      "type": "text",
+      "settings": {
+        "text": "Welcome",
+        "size": "sm",
+        "uppercase": true,
+        "bold": true
       }
     },
     {
-      "type": "link",
-      "id": "secondary_link",
-      "label": "Secondary button"
+      "type": "heading",
+      "settings": {
+        "text": "Build your future",
+        "size": "5xl"
+      }
+    },
+    {
+      "type": "text",
+      "settings": {
+        "text": "Start your journey with our powerful platform. Scalable, secure, and ready for growth.",
+        "size": "lg"
+      }
+    },
+    {
+      "type": "button",
+      "settings": {
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        },
+        "style": "primary",
+        "link_2": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        },
+        "style_2": "secondary"
+      }
     }
-  ],
-  "blocks": []
+  ]
 }

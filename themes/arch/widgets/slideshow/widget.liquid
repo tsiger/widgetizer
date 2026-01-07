@@ -14,9 +14,9 @@
       {% assign block = widget.blocks[blockId] %}
       {% assign isFirst = forloop.first %}
       <div
-        class="slideshow-slide widget {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %} {% if block.settings.image != blank %}has-bg-image has-overlay overlay-medium{% endif %} color-scheme-dark{% if isFirst %} is-active{% endif %}"
+        class="slideshow-slide widget {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %} {% if block.settings.image != blank %}has-bg-image has-overlay{% endif %} color-scheme-dark{% if isFirst %} is-active{% endif %}"
         {% if block.settings.image != blank %}
-          style="background-image: url('{{ block.settings.image | image: 'path', 'large' }}');"
+          style="background-image: url('{{ block.settings.image | image: 'path', 'large' }}'); --widget-overlay-color: rgba(0,0,0,0.5);"
         {% endif %}
         data-block-id="{{ blockId }}"
       >

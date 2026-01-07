@@ -237,25 +237,18 @@ h6 {
    ========================================================================== */
 
 /* Headlines (Section titles, usually centered) */
-.widget-headline {
-  margin-block-end: var(--space-md);
-}
+/* .widget-headline - No default style, used for semantic hooking */
 
 /* Titles (Card/item titles) */
-.widget-title {
-  margin-block-end: var(--space-sm);
-}
+/* .widget-title - No default style, used for semantic hooking */
 
 /* Subtitles */
-.widget-subtitle {
-  margin-block-end: var(--space-sm);
-}
+/* .widget-subtitle - No default style, used for semantic hooking */
 
 /* Body text / Description */
 .widget-text,
 .widget-description {
   color: var(--text-content);
-  margin-block-end: var(--space-lg);
 }
 
 /* Large text */
@@ -311,22 +304,6 @@ h6 {
     z-index: 1;
     pointer-events: none;
   }
-
-  /* Overlay opacity presets */
-  &.overlay-light {
-    --widget-overlay-color: rgba(0, 0, 0, 0.3);
-    --widget-overlay-opacity: 1;
-  }
-
-  &.overlay-medium {
-    --widget-overlay-color: rgba(0, 0, 0, 0.5);
-    --widget-overlay-opacity: 1;
-  }
-
-  &.overlay-dark {
-    --widget-overlay-color: rgba(0, 0, 0, 0.7);
-    --widget-overlay-opacity: 1;
-  }
 }
 
 /* Widget inner container (handles spacing) */
@@ -346,9 +323,11 @@ h6 {
 }
 
 /* Widget header (centered section header) */
+/* Widget header (centered section header) */
 .widget-header {
   display: flex;
   flex-direction: column;
+  gap: var(--space-md);
   align-items: center;
   text-align: center;
   margin-block-end: var(--space-lg);
@@ -459,7 +438,6 @@ h6 {
   font-size: var(--font-size-lg);
   line-height: var(--line-height-tight);
   color: var(--text-heading);
-  margin-block-end: var(--space-xs);
 
   @media (min-width: 990px) {
     font-size: var(--font-size-xl);
@@ -473,7 +451,6 @@ h6 {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
-  margin-block-end: var(--space-xs);
 }
 
 /* Card Description */
@@ -587,6 +564,16 @@ h6 {
 
 .block-text-3xl {
   font-size: var(--font-size-3xl);
+  line-height: var(--line-height-tight);
+}
+
+.block-text-4xl {
+  font-size: var(--font-size-4xl);
+  line-height: var(--line-height-tight);
+}
+
+.block-text-5xl {
+  font-size: var(--font-size-5xl);
   line-height: var(--line-height-tight);
 }
 

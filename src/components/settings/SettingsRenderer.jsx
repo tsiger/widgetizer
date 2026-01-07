@@ -28,7 +28,7 @@ export default function SettingsRenderer({ setting, value, onChange, error, isFi
     return <div>Error: Invalid setting configuration.</div>;
   }
 
-  const { type, id, label, description, options, min, max, step, unit } = setting;
+  const { type, id, label, description, options, min, max, step, unit, allow_alpha } = setting;
 
   // Translate label and description if they are translation keys
   const translatedLabel = label?.startsWith("appSettings.") ? t(label) : label;
@@ -61,6 +61,7 @@ export default function SettingsRenderer({ setting, value, onChange, error, isFi
     max,
     step,
     unit,
+    allow_alpha,
   };
 
   const renderInput = () => {

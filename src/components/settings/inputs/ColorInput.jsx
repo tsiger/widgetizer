@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { HexColorPicker } from "react-colorful";
+import { HexColorPicker, HexAlphaColorPicker } from "react-colorful";
 
 /**
  * ColorInput component
  * Renders a color picker with hex input and popover
  */
-export default function ColorInput({ id, value = "#000000", onChange }) {
+export default function ColorInput({ id, value = "#000000", onChange, allow_alpha = false }) {
   const [isOpen, setIsOpen] = useState(false);
   const [localColor, setLocalColor] = useState(value);
   const [isDragging, setIsDragging] = useState(false);
@@ -106,7 +106,11 @@ export default function ColorInput({ id, value = "#000000", onChange }) {
               onMouseDown={handleColorPickerMouseDown}
               onTouchStart={handleColorPickerMouseDown}
             >
-              <HexColorPicker color={localColor} onChange={handleColorPickerChange} />
+              {allow_alpha ? (
+                <HexAlphaColorPicker color={localColor} onChange={handleColorPickerChange} />
+              ) : (
+                <HexColorPicker color={localColor} onChange={handleColorPickerChange} />
+              )}
             </div>
           </div>
         </div>

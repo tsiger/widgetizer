@@ -550,20 +550,6 @@ Per-instance background customization via CSS custom properties:
 .has-overlay {
   /* Enables overlay layer */
 }
-
-/* Overlay Opacity Presets (includes default black color) */
-.overlay-light {
-  --widget-overlay-color: rgba(0, 0, 0, 0.3);
-  --widget-overlay-opacity: 1;
-}
-.overlay-medium {
-  --widget-overlay-color: rgba(0, 0, 0, 0.5);
-  --widget-overlay-opacity: 1;
-}
-.overlay-dark {
-  --widget-overlay-color: rgba(0, 0, 0, 0.7);
-  --widget-overlay-opacity: 1;
-}
 ```
 
 ### Usage Examples
@@ -572,16 +558,11 @@ Per-instance background customization via CSS custom properties:
 <!-- Solid Color Background -->
 <section class="widget-hero widget has-bg-color" style="--widget-bg-color: #f5f5f5;">...</section>
 
-<!-- Background Image with Overlay (preset handles color) -->
-<section class="widget-hero widget has-bg-image has-overlay overlay-dark" style="--widget-bg-image: url('hero.jpg');">
-  ...
-</section>
-
-<!-- Custom Overlay Color (override preset) -->
+<!-- Background Image with Overlay (color set via style) -->
 <section
-  class="widget-hero widget has-bg-image has-overlay overlay-dark"
+  class="widget-hero widget has-bg-image has-overlay"
   style="--widget-bg-image: url('hero.jpg');
-                --widget-overlay-color: rgba(255, 0, 0, 0.5);"
+         --widget-overlay-color: rgba(0, 0, 0, 0.5);"
 >
   ...
 </section>

@@ -36,6 +36,13 @@
 
       & .row-text-content {
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      & .widget-actions {
+        margin-block-start: var(--space-sm);
       }
 
       @media (min-width: 990px) {
@@ -99,15 +106,15 @@
 
             <div class="row-text-content">
               {% if block.settings.eyebrow != blank %}
-                <span class="widget-eyebrow" data-setting="eyebrow">{{ block.settings.eyebrow }}</span>
+                <span class="widget-eyebrow block-text block-text-sm block-text-uppercase block-text-muted" data-setting="eyebrow">{{ block.settings.eyebrow }}</span>
               {% endif %}
 
               {% if block.settings.heading != blank %}
-                <h3 class="widget-title" data-setting="heading">{{ block.settings.heading }}</h3>
+                <h3 class="widget-title block-text block-text-2xl block-text-bold block-text-heading" data-setting="heading">{{ block.settings.heading }}</h3>
               {% endif %}
 
               {% if block.settings.text != blank %}
-                <p class="widget-description" data-setting="text">{{ block.settings.text }}</p>
+                <p class="widget-description block-text block-text-base block-text-muted" data-setting="text">{{ block.settings.text }}</p>
               {% endif %}
 
               {% if block.settings.button_link.text != blank %}

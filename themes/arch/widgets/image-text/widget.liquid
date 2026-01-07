@@ -77,7 +77,7 @@
             {% case block.type %}
               {% when 'heading' %}
                 {% assign size_class = 'block-text-' | append: block.settings.size %}
-                <h2 class="block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="text">
+                <h2 class="widget-title block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="text">
                   {{ block.settings.text }}
                 </h2>
               {% when 'text' %}
@@ -85,7 +85,7 @@
                 {% assign style_class = '' %}
                 {% if block.settings.uppercase %}{% assign style_class = style_class | append: ' block-text-uppercase' %}{% endif %}
                 {% if block.settings.muted %}{% assign style_class = style_class | append: ' block-text-muted' %}{% endif %}
-                <p class="block-text {{ size_class }}{{ style_class }}" data-block-id="{{ blockId }}" data-setting="text">
+                <p class="widget-description block-text {{ size_class }}{{ style_class }}" data-block-id="{{ blockId }}" data-setting="text">
                   {{ block.settings.text }}
                 </p>
               {% when 'button' %}

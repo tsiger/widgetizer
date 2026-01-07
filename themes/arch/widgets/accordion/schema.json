@@ -5,7 +5,8 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "Eyebrow text",
+      "default": "Support"
     },
     {
       "type": "text",
@@ -16,7 +17,8 @@
     {
       "type": "textarea",
       "id": "description",
-      "label": "Description"
+      "label": "Description",
+      "default": "Everything you need to know about the product and billing."
     },
     {
       "type": "select",
@@ -69,22 +71,29 @@
     {
       "type": "item",
       "settings": {
-        "question": "What is your refund policy?",
-        "answer": "We offer a 30-day money-back guarantee on all purchases. If you're not satisfied, contact us for a full refund."
+        "question": "What is the return policy?",
+        "answer": "We offer a 30-day money-back guarantee on all purchases. If you're not satisfied, simply contact our support team to initiate a return."
       }
     },
     {
       "type": "item",
       "settings": {
-        "question": "How long does shipping take?",
-        "answer": "Standard shipping takes 5-7 business days. Express shipping is available for 2-3 day delivery."
+        "question": "Do you offer international shipping?",
+        "answer": "Yes, we ship to over 100 countries worldwide. Shipping times and costs vary by location and are calculated at checkout."
       }
     },
     {
       "type": "item",
       "settings": {
-        "question": "Do you offer customer support?",
-        "answer": "Yes! Our support team is available 24/7 via email and live chat to assist you with any questions."
+        "question": "Can I change my plan later?",
+        "answer": "Absolutely. You can upgrade or downgrade your subscription plan at any time from your account settings. Changes take effect immediately."
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "question": "Is technical support included?",
+        "answer": "Yes, all plans include 24/7 email support. Premium plans also include priority live chat and phone support options."
       }
     }
   ]

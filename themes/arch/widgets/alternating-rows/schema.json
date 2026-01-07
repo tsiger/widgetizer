@@ -98,6 +98,14 @@
         "heading": "Enterprise-grade security",
         "text": "Your data is protected with state-of-the-art encryption and security protocols. We ensure your information remains private and secure."
       }
+    },
+    {
+      "type": "row",
+      "settings": {
+        "eyebrow": "Global Scale",
+        "heading": "Worldwide infrastructure",
+        "text": "Deploy your application to 35+ regions around the globe. Our distributed network ensures low latency and high availability for all users."
+      }
     }
   ]
 }
