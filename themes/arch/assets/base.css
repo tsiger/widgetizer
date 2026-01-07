@@ -526,6 +526,30 @@ h6 {
 }
 
 /* ==========================================================================
+   BLOCK ITEM SYSTEM
+   Reusable background/overlay system for blocks within widgets.
+   Uses same CSS variables as .widget: --widget-bg-color, --widget-overlay-color
+   ========================================================================== */
+
+.block-item {
+  position: relative;
+  background-color: var(--widget-bg-color, transparent);
+  background-size: var(--widget-bg-size, cover);
+  background-position: var(--widget-bg-position, center);
+  background-repeat: var(--widget-bg-repeat, no-repeat);
+
+  /* Overlay pseudo-element (activated by .has-overlay class) */
+  &.has-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--widget-overlay-color, transparent);
+    z-index: 1;
+    pointer-events: none;
+  }
+}
+
+/* ==========================================================================
    BLOCK TEXT UTILITIES
    ========================================================================== */
 

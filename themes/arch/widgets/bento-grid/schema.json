@@ -18,17 +18,7 @@
       "id": "description",
       "label": "Description"
     },
-    {
-      "type": "select",
-      "id": "columns_desktop",
-      "label": "Desktop Columns",
-      "default": "4",
-      "options": [
-        { "value": "2", "label": "2 Columns" },
-        { "value": "3", "label": "3 Columns" },
-        { "value": "4", "label": "4 Columns" }
-      ]
-    },
+
     {
       "type": "select",
       "id": "gap",
@@ -39,6 +29,16 @@
         { "value": "var(--space-md)", "label": "Medium" },
         { "value": "var(--space-lg)", "label": "Large" },
         { "value": "var(--space-xl)", "label": "Extra Large" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
       ]
     }
   ],
@@ -60,9 +60,23 @@
           "default": "Describe this featured item here."
         },
         {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "Overlay color",
+          "default": "#00000080",
+          "allow_alpha": true,
+          "description": "Applies only if there is a background image."
+        },
+        {
           "type": "image",
           "id": "image",
-          "label": "Image"
+          "label": "Background image"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color",
+          "default": "#f9f9f9"
         },
         {
           "type": "header",
@@ -89,18 +103,6 @@
         {
           "type": "header",
           "content": "Style"
-        },
-        {
-          "type": "select",
-          "id": "bg_style",
-          "label": "Background Style",
-          "default": "surface",
-          "options": [
-            { "value": "surface", "label": "Surface (Secondary)" },
-            { "value": "accent", "label": "Accent Color" },
-            { "value": "dark", "label": "Dark" },
-            { "value": "image-bg", "label": "Image Background" }
-          ]
         },
         {
           "type": "select",
@@ -137,7 +139,7 @@
         "title": "Main Highlight",
         "text": "This is a larger bento tile spanning multiple columns.",
         "col_span": 2,
-        "bg_style": "accent",
+        "background_color": "#000000",
         "text_color": "light"
       }
     },
@@ -146,7 +148,7 @@
       "settings": {
         "title": "Sub Feature",
         "col_span": 1,
-        "bg_style": "surface"
+        "background_color": "#f9f9f9"
       }
     },
     {
@@ -155,7 +157,7 @@
         "title": "Visual Entry",
         "col_span": 1,
         "row_span": 2,
-        "bg_style": "surface"
+        "background_color": "#f0f0f0"
       }
     }
   ]

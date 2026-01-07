@@ -576,6 +576,52 @@ Per-instance background customization via CSS custom properties:
 </section>
 ```
 
+### Block Item Background & Overlay
+
+For blocks/items within widgets that need background support, use `.block-item`. This provides the same CSS variable-driven background/overlay system as `.widget`:
+
+```css
+.block-item {
+  position: relative;
+  background-color: var(--widget-bg-color, transparent);
+  background-size: var(--widget-bg-size, cover);
+  background-position: var(--widget-bg-position, center);
+  background-repeat: var(--widget-bg-repeat, no-repeat);
+
+  /* Overlay pseudo-element (activated by .has-overlay class) */
+  &.has-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--widget-overlay-color, transparent);
+    z-index: 1;
+    pointer-events: none;
+  }
+}
+```
+
+### Block Item Usage Examples
+
+```html
+<!-- Block with solid color background -->
+<div class="block-item has-bg-color" style="--widget-bg-color: #f5f5f5;">...</div>
+
+<!-- Block with background image and overlay -->
+<div
+  class="block-item has-bg-image has-overlay"
+  style="background-image: url('image.jpg'); --widget-overlay-color: rgba(0, 0, 0, 0.5);"
+>
+  ...
+</div>
+```
+
+**Key Points:**
+
+- Use `.block-item` on any block/card that needs the background/overlay system
+- Uses the same CSS variables as `.widget`: `--widget-bg-color`, `--widget-overlay-color`
+- Combine with `.has-bg-color`, `.has-bg-image`, `.has-overlay` modifier classes
+- Background image is set via inline `background-image` style, not a CSS variable
+
 ---
 
 ## Typography System

@@ -38,10 +38,40 @@ This document outlines the strict standards for all Arch theme widgets.
 - **ARIA**: Mandatory for interactive elements (Accordions: `aria-expanded`, `aria-controls`, `role="region"`).
 - **Images**: Ensure `alt` text is supported and rendered.
 
-## 4. Schemas & Presets
+## 4. Layout & Spacing
+
+- **Container-Based Spacing**:
+  - Semantic classes (`.widget-title`, `.widget-description`) **DO NOT** carry default margins.
+  - **USE** local style blocks with `display: flex; flex-direction: column; gap: var(--space-md);` (or consistent spacing variable) on the content container to manage vertical rhythm.
+  - This allows semantic classes to be used purely as hooks without layout side effects.
+
+## 5. Backgrounds & Color Schemes
+
+- **Backgrounds**:
+  - **DO NOT** use inline `background-color: ...`.
+  - **USE** `style="--widget-bg-color: {{ widget.settings.background_color }};"` combined with `.has-bg-color` class.
+  - For images: `style="background-image: ..."` with `.has-bg-image`.
+- **Overlays**:
+  - **USE** `.has-overlay` class.
+  - **SET** `style="--widget-overlay-color: {{ widget.settings.overlay_color }};"`.
+  - **Deprecated**: Do not use `.overlay-light/medium/dark` presets. Use the alpha-picker setting.
+- **Color Schemes**:
+  - **USE** `.color-scheme-light` or `.color-scheme-dark` classes to toggle text/border colors locally.
+  - Logic: `{% if widget.settings.text_color == 'light' %}color-scheme-dark{% else %}color-scheme-light{% endif %}`.
+
+## 6. Block Architecture
+
+- **Flexible Content**:
+  - Move away from fixed top-level settings (`eyebrow`, `headline`, `button`) where possible.
+  - **USE** a `blocks` array with `heading`, `text`, `button` block types.
+  - This allows users to reorder elements freely.
+- **Loop Rendering**: Render blocks via `{% for blockId in widget.blocksOrder %}` using `widget.blocks[blockId]`.
+
+## 7. Schemas & Presets
 
 - **Defaults**:
-  - **Header**: Eyebrow, Title, and Description defaults SHOULD be present.
-  - **Blocks**: `defaultBlocks` must contain 3-4 realistic, varied items (not "Item 1", "Item 2").
+  - **Header**: Eyebrow, Title, and Description defaults SHOULD be present and engaging.
+  - **Blocks**: `defaultBlocks` must contain 3-4 realistic, varied items.
 - **Settings**:
   - Consistent naming (`title`, `description`, `text`, `image`).
+  - **Overlay**: Use `"type": "color"` with `"allow_alpha": true` for overlay settings.
