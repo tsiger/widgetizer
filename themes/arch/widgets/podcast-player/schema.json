@@ -68,6 +68,16 @@
       "id": "show_speed",
       "label": "Show speed control",
       "default": true
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
     }
   ]
 }

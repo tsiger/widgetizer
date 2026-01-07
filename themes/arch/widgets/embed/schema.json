@@ -45,6 +45,16 @@
         { "value": "center", "label": "Center" },
         { "value": "end", "label": "Right" }
       ]
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
     }
   ],
   "blocks": [],

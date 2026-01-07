@@ -16,6 +16,16 @@
         { "value": "left", "label": "Left" },
         { "value": "right", "label": "Right" }
       ]
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
     }
   ],
   "blocks": [
@@ -55,14 +65,14 @@
       ]
     },
     {
-      "type": "feature",
-      "displayName": "Feature",
+      "type": "features",
+      "displayName": "Features",
       "settings": [
         {
-          "type": "text",
-          "id": "text",
-          "label": "Feature text",
-          "default": "Feature benefit goes here"
+          "type": "textarea",
+          "id": "features",
+          "label": "Features (one per line)",
+          "default": "Feature 1\nFeature 2\nFeature 3"
         }
       ]
     },
@@ -113,21 +123,9 @@
       }
     },
     {
-      "type": "feature",
+      "type": "features",
       "settings": {
-        "text": "99.9% uptime SLA guarantee"
-      }
-    },
-    {
-      "type": "feature",
-      "settings": {
-        "text": "24/7 dedicated support team"
-      }
-    },
-    {
-      "type": "feature",
-      "settings": {
-        "text": "Enterprise security & compliance"
+        "features": "99.9% uptime SLA guarantee\n24/7 dedicated support team\nEnterprise security & compliance"
       }
     },
     {

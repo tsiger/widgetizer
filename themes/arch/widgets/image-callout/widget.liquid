@@ -1,11 +1,14 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-image-callout {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
+  class="widget widget-image-callout widget-{{ widget.id }} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
+  {% if widget.settings.background == 'secondary' %}
+    style="--widget-bg-color: var(--bg-secondary);"
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="image-callout"
 >
   <style>
-    #{{ widget.id }} {
+    .widget-{{ widget.id }} {
       overflow: hidden;
 
       & .callout-wrapper {
@@ -148,17 +151,17 @@
     }
   </style>
 
-  {%- comment -%} Collect feature blocks for rendering as a list {%- endcomment -%}
+  {%- comment -%} Check for features blocks {%- endcomment -%}
   {%- assign has_features = false -%}
   {%- for blockId in widget.blocksOrder -%}
     {%- assign block = widget.blocks[blockId] -%}
-    {%- if block.type == 'feature' -%}
+    {%- if block.type == 'features' and block.settings.features != blank -%}
       {%- assign has_features = true -%}
       {%- break -%}
     {%- endif -%}
   {%- endfor -%}
 
-  <div class="widget-container">
+  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
     <div class="callout-wrapper">
       <div class="callout-image-wrapper">
         {% if widget.settings.image != blank %}
@@ -192,8 +195,23 @@
                 <p class="callout-text" data-block-id="{{ blockId }}" data-setting="text">{{ block.settings.text }}</p>
               {% endif %}
 
-            {% when 'feature' %}
-              {%- comment -%} Features are collected and rendered as a group below {%- endcomment -%}
+            {% when 'features' %}
+              {%- comment -%} Features are rendered inline as a list {%- endcomment -%}
+              {% if block.settings.features != blank %}
+                <ul class="callout-features" data-block-id="{{ blockId }}">
+                  {% assign features_list = block.settings.features | split: '
+' %}
+                  {% for feature in features_list %}
+                    {% assign trimmed_feature = feature | strip %}
+                    {% if trimmed_feature != blank %}
+                      <li class="callout-feature">
+                        <span class="callout-feature-icon">✓</span>
+                        <span>{{ trimmed_feature }}</span>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endif %}
 
             {% when 'button' %}
               {% if block.settings.link.text != blank %}
@@ -212,19 +230,7 @@
           {% endcase %}
         {% endfor %}
 
-        {% if has_features %}
-          <ul class="callout-features">
-            {% for blockId in widget.blocksOrder %}
-              {% assign block = widget.blocks[blockId] %}
-              {% if block.type == 'feature' and block.settings.text != blank %}
-                <li class="callout-feature" data-block-id="{{ blockId }}">
-                  <span class="callout-feature-icon">✓</span>
-                  <span data-setting="text">{{ block.settings.text }}</span>
-                </li>
-              {% endif %}
-            {% endfor %}
-          </ul>
-        {% endif %}
+
       </div>
     </div>
   </div>
