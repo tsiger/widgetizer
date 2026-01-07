@@ -57,25 +57,80 @@
           "label": "Background Image"
         },
         {
-          "type": "text",
-          "id": "eyebrow",
-          "label": "Eyebrow Text"
+          "type": "color",
+          "id": "overlay_color",
+          "label": "Overlay color",
+          "default": "#00000080",
+          "allow_alpha": true,
+          "description": "Applies only if there is a background image."
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "select",
+          "id": "text_color",
+          "label": "Text color",
+          "default": "light",
+          "options": [
+            { "value": "light", "label": "Light" },
+            { "value": "dark", "label": "Dark" }
+          ]
         },
         {
           "type": "text",
-          "id": "headline",
-          "label": "Headline",
-          "default": "Slide Headline"
+          "id": "heading_text",
+          "label": "Heading Text",
+          "default": "Build your future"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Heading Size",
+          "default": "5xl",
+          "options": [
+            { "value": "2xl", "label": "2X Large" },
+            { "value": "3xl", "label": "3X Large" },
+            { "value": "4xl", "label": "4X Large" },
+            { "value": "5xl", "label": "5X Large" }
+          ]
         },
         {
           "type": "textarea",
-          "id": "description",
-          "label": "Description"
+          "id": "text_content",
+          "label": "Text Content",
+          "default": "Start your journey with our powerful platform."
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "label": "Text Size",
+          "default": "lg",
+          "options": [
+            { "value": "sm", "label": "Small" },
+            { "value": "base", "label": "Base" },
+            { "value": "lg", "label": "Large" },
+            { "value": "xl", "label": "Extra Large" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "text_uppercase",
+          "label": "Text Uppercase",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "text_bold",
+          "label": "Text Bold",
+          "default": false
         },
         {
           "type": "link",
           "id": "button_link",
-          "label": "Primary Button",
+          "label": "Button 1",
           "default": {
             "text": "Get Started",
             "href": "#",
@@ -83,9 +138,29 @@
           }
         },
         {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button 1 style",
+          "default": "primary",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ]
+        },
+        {
           "type": "link",
-          "id": "secondary_link",
-          "label": "Secondary Button"
+          "id": "button_link_2",
+          "label": "Button 2"
+        },
+        {
+          "type": "select",
+          "id": "button_style_2",
+          "label": "Button 2 style",
+          "default": "secondary",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ]
         }
       ]
     }
@@ -94,27 +169,33 @@
     {
       "type": "slide",
       "settings": {
-        "eyebrow": "Welcome",
-        "headline": "Your First Slide",
-        "description": "Add your content here",
+        "text_color": "light",
+        "heading_text": "Your First Slide",
+        "heading_size": "5xl",
+        "text_content": "Add your content here",
+        "text_size": "lg",
         "button_link": {
           "text": "Learn More",
           "href": "#",
           "target": "_self"
-        }
+        },
+        "button_style": "primary"
       }
     },
     {
       "type": "slide",
       "settings": {
-        "eyebrow": "Featured",
-        "headline": "Your Second Slide",
-        "description": "Add your content here",
+        "text_color": "light",
+        "heading_text": "Your Second Slide",
+        "heading_size": "5xl",
+        "text_content": "Add your content here",
+        "text_size": "lg",
         "button_link": {
           "text": "Shop Now",
           "href": "#",
           "target": "_self"
-        }
+        },
+        "button_style": "primary"
       }
     }
   ]

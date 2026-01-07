@@ -59,6 +59,11 @@
       margin-block-start: var(--space-xl);
     }
 
+    /* Center single button */
+    & .widget-actions-single {
+      justify-content: center;
+    }
+
     /* Larger buttons */
     & .widget-button {
       padding: 1.6rem 3.2rem;

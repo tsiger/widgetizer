@@ -14,29 +14,43 @@
       {% assign block = widget.blocks[blockId] %}
       {% assign isFirst = forloop.first %}
       <div
-        class="slideshow-slide widget {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %} {% if block.settings.image != blank %}has-bg-image has-overlay{% endif %} color-scheme-dark{% if isFirst %} is-active{% endif %}"
+        class="slideshow-slide widget {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %} {% if block.settings.image != blank %}has-bg-image has-overlay{% elsif block.settings.background_color != blank %}has-bg-color{% endif %} {% if block.settings.text_color == 'light' %}color-scheme-dark{% else %}color-scheme-light{% endif %}{% if isFirst %} is-active{% endif %}"
         {% if block.settings.image != blank %}
-          style="background-image: url('{{ block.settings.image | image: 'path', 'large' }}'); --widget-overlay-color: rgba(0,0,0,0.5);"
+          style="background-image: url('{{ block.settings.image | image: 'path', 'large' }}'); --widget-overlay-color: {{ block.settings.overlay_color | default: 'rgba(0,0,0,0.5)' }}; --widget-overlay-opacity: 1;"
+        {% elsif block.settings.background_color != blank %}
+          style="--widget-bg-color: {{ block.settings.background_color }};"
         {% endif %}
         data-block-id="{{ blockId }}"
       >
         <div class="widget-container">
           <div class="widget-content widget-content-lg {% if widget.settings.alignment == 'center' %}widget-content-align-center{% else %}widget-content-align-start{% endif %}">
-            {% if block.settings.eyebrow != blank %}
-              <span class="widget-eyebrow" data-setting="eyebrow">{{ block.settings.eyebrow }}</span>
+            {% if block.settings.heading_text != blank %}
+              {% assign size_class = 'block-text-' | append: block.settings.heading_size %}
+              <h1 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="heading_text">
+                {{ block.settings.heading_text }}
+              </h1>
             {% endif %}
-            {% if block.settings.headline != blank %}
-              <h2 class="widget-headline" data-setting="headline">{{ block.settings.headline }}</h2>
+            {% if block.settings.text_content != blank %}
+              {% assign size_class = 'block-text-' | append: block.settings.text_size %}
+              {% assign style_class = '' %}
+              {% if block.settings.text_uppercase %}{% assign style_class = style_class | append: ' block-text-uppercase' %}{% endif %}
+              {% if block.settings.text_bold %}{% assign style_class = style_class | append: ' block-text-bold' %}{% endif %}
+              <p class="widget-description block-text {{ size_class }}{{ style_class }}" data-block-id="{{ blockId }}" data-setting="text_content">
+                {{ block.settings.text_content }}
+              </p>
             {% endif %}
-            {% if block.settings.description != blank %}
-              <p class="widget-description" data-setting="description">{{ block.settings.description }}</p>
-            {% endif %}
-            {% if block.settings.button_link.text != blank or block.settings.secondary_link.text != blank %}
-              <div class="widget-actions">
+            {% if block.settings.button_link.text != blank or block.settings.button_link_2.text != blank %}
+              {% assign hasSingleButton = false %}
+              {% if block.settings.button_link.text != blank and block.settings.button_link_2.text == blank %}
+                {% assign hasSingleButton = true %}
+              {% elsif block.settings.button_link.text == blank and block.settings.button_link_2.text != blank %}
+                {% assign hasSingleButton = true %}
+              {% endif %}
+              <div class="widget-actions{% if hasSingleButton %} widget-actions-single{% endif %}" data-block-id="{{ blockId }}">
                 {% if block.settings.button_link.text != blank %}
                   <a
                     href="{{ block.settings.button_link.href }}"
-                    class="widget-button widget-button-primary"
+                    class="widget-button {% if block.settings.button_style == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
                     data-setting="button_link"
                     {% if block.settings.button_link.target == '_blank' %}
                       target="_blank" rel="noopener"
@@ -45,16 +59,16 @@
                     {{ block.settings.button_link.text }}
                   </a>
                 {% endif %}
-                {% if block.settings.secondary_link.text != blank %}
+                {% if block.settings.button_link_2.text != blank %}
                   <a
-                    href="{{ block.settings.secondary_link.href }}"
-                    class="widget-button widget-button-secondary"
-                    data-setting="secondary_link"
-                    {% if block.settings.secondary_link.target == '_blank' %}
+                    href="{{ block.settings.button_link_2.href }}"
+                    class="widget-button {% if block.settings.button_style_2 == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
+                    data-setting="button_link_2"
+                    {% if block.settings.button_link_2.target == '_blank' %}
                       target="_blank" rel="noopener"
                     {% endif %}
                   >
-                    {{ block.settings.secondary_link.text }}
+                    {{ block.settings.button_link_2.text }}
                   </a>
                 {% endif %}
               </div>
