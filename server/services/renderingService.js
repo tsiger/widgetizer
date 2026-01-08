@@ -15,8 +15,8 @@ import { FontsTag } from "../../src/core/tags/FontsTag.js";
 import { SeoTag } from "../../src/core/tags/SeoTag.js";
 import { EnqueueStyleTag } from "../../src/core/tags/enqueueStyle.js";
 import { EnqueueScriptTag } from "../../src/core/tags/enqueueScript.js";
-import { RenderStylesTag } from "../../src/core/tags/renderStyles.js";
-import { RenderScriptsTag } from "../../src/core/tags/renderScripts.js";
+import { RenderHeaderAssetsTag } from "../../src/core/tags/renderHeaderAssets.js";
+import { RenderFooterAssetsTag } from "../../src/core/tags/renderFooterAssets.js";
 import { PlaceholderImageTag } from "../../src/core/tags/placeholderImageTag.js";
 import { registerImageFilter } from "../../src/core/filters/imageFilter.js";
 import { registerVideoFilter } from "../../src/core/filters/videoFilter.js";
@@ -65,8 +65,8 @@ function configureLiquidEngine(engine) {
   engine.registerTag("seo", SeoTag);
   engine.registerTag("enqueue_style", EnqueueStyleTag);
   engine.registerTag("enqueue_script", EnqueueScriptTag);
-  engine.registerTag("render_styles", RenderStylesTag);
-  engine.registerTag("render_scripts", RenderScriptsTag);
+  engine.registerTag("header_assets", RenderHeaderAssetsTag);
+  engine.registerTag("footer_assets", RenderFooterAssetsTag);
   engine.registerTag("placeholder_image", PlaceholderImageTag);
 
   // Register custom filters

@@ -1,5 +1,5 @@
-{% enqueue_style "slideshow.css" %}
-{% enqueue_script "slideshow.js" %}
+{% enqueue_style "slideshow.css", { "priority": 30 } %}
+{% enqueue_script "slideshow.js", { "priority": 30 } %}
 
 <section
   id="{{ widget.id }}"

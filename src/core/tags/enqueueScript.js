@@ -1,11 +1,17 @@
 /**
  * {% enqueue_script %} Liquid Tag
  *
- * Registers a JS file for deduped loading in the layout footer.
+ * Registers a JS file for deduped loading in the layout.
  *
  * Usage:
  * {% enqueue_script "widgets.js" %}
- * {% enqueue_script "vendor.js", { "defer": false, "async": true } %}
+ * {% enqueue_script "vendor.js", { "defer": true, "async": false, "location": "header", "priority": 20 } %}
+ *
+ * Options:
+ * - location: "footer" (default) or "header"
+ * - priority: number (default: 50), lower numbers load first
+ * - defer: boolean (default: false), opt-in
+ * - async: boolean (default: false), opt-in
  */
 export const EnqueueScriptTag = {
   parse(tagToken) {
@@ -37,10 +43,18 @@ export const EnqueueScriptTag = {
         context.globals.enqueuedScripts = new Map();
       }
 
+      // Parse location option (default: "footer")
+      const location = this.options.location || "footer";
+
+      // Parse priority option (default: 50)
+      const priority = this.options.priority !== undefined ? this.options.priority : 50;
+
       // Add to the Map (filepath as key for deduplication)
       context.globals.enqueuedScripts.set(this.filepath, {
-        defer: this.options.defer || false, // Default false (render_scripts is in footer)
-        async: this.options.async || false,
+        defer: this.options.defer === true, // Opt-in
+        async: this.options.async === true, // Opt-in
+        location: location,
+        priority: priority,
       });
 
       // No output - just registers the asset

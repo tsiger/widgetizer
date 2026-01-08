@@ -232,7 +232,7 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
     {% seo %}                    <!-- SEO meta tags -->
     {% fonts %}                  <!-- Font preconnect links and stylesheet (recommended) -->
     {% asset "base.css" %}      <!-- Load theme CSS -->
-    {% render_styles %}         <!-- Render enqueued styles -->
+    {% header_assets %}         <!-- Render enqueued header styles and scripts (sorted by priority) -->
     {% theme_settings %}        <!-- Output CSS variables from global settings -->
 </head>
 <body class="{{ body_class }}">
@@ -244,7 +244,8 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 
     {{ footer }}                <!-- Global footer widget -->
 
-    {% render_scripts %}        <!-- Render enqueued scripts -->
+    {% asset "scripts.js" %}
+    {% footer_assets %}         <!-- Render enqueued footer styles and scripts (sorted by priority) -->
 </body>
 </html>
 ```
@@ -254,6 +255,8 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 - `{% seo %}`: Automatically generates SEO meta tags (title, description, Open Graph, etc.)
 - `{% fonts %}`: Outputs both font preconnect links and stylesheet in one tag. Automatically handles Google Fonts and Bunny Fonts based on theme settings.
 - `{% asset "filename" %}`: Loads and includes assets from the `/assets/` directory
+- `{% header_assets %}`: Renders all enqueued CSS and JS files marked for header, sorted by priority
+- `{% footer_assets %}`: Renders all enqueued CSS and JS files marked for footer, sorted by priority
 - `{% theme_settings %}`: Outputs CSS custom properties from global settings as `<style>` tags in the document head
 - `{{ header }}`: Renders the global header widget
 - `{{ main_content }}`: The insertion point for page content (widgets)
@@ -501,58 +504,147 @@ All three forms return the same audio file path.
 
 ### Asset Management Tags
 
-These tags allow for efficient, deduplicated loading of assets (CSS and JS) in your theme. They are particularly useful when multiple widgets might require the same library (e.g., a slider plugin), ensuring it is only loaded once.
+These tags allow for efficient, deduplicated loading of assets (CSS and JS) in your theme with fine-grained control over placement and loading order. They are particularly useful when multiple widgets might require the same library (e.g., a slider plugin), ensuring it is only loaded once.
 
 #### Enqueue Script
 
-Registers a JavaScript file for loading. The script will be output where `{% render_scripts %}` is placed (usually in the footer).
+Registers a JavaScript file for loading. By default, scripts are output in the footer, but you can specify header placement.
 
 **Usage:**
 
 ```liquid
 {% enqueue_script "filename.js" %}
-{% enqueue_script "vendor.js", { "defer": false, "async": true } %}
+{% enqueue_script "vendor.js", { "defer": true, "async": false, "location": "footer", "priority": 30 } %}
+{% enqueue_script "analytics.js", { "location": "header", "priority": 10 } %}
 ```
 
 **Options:**
 
-- `defer`: (Boolean, default: `true`) Whether to add the `defer` attribute.
-- `async`: (Boolean, default: `false`) Whether to add the `async` attribute.
+- `location`: (String, default: `"footer"`) Where to render the script: `"header"` or `"footer"`
+- `priority`: (Number, default: `50`) Loading order priority. Lower numbers load first (10 → 20 → 30 → 50 → 100)
+- `defer`: (Boolean, default: `false`) Whether to add the `defer` attribute (opt-in)
+- `async`: (Boolean, default: `false`) Whether to add the `async` attribute (opt-in)
+
+**Priority Examples:**
+
+```liquid
+{# High priority - loads early #}
+{% enqueue_script "analytics.js", { "location": "header", "priority": 10 } %}
+
+{# Medium priority - default #}
+{% enqueue_script "widgets.js", { "priority": 50 } %}
+
+{# Low priority - loads late #}
+{% enqueue_script "non-critical.js", { "priority": 100 } %}
+```
 
 #### Enqueue Style
 
-Registers a CSS file for loading. The stylesheet will be output where `{% render_styles %}` is placed (usually in the head).
+Registers a CSS file for loading. By default, styles are output in the header, but you can specify footer placement.
 
 **Usage:**
 
 ```liquid
 {% enqueue_style "filename.css" %}
-{% enqueue_style "print.css", { "media": "print" } %}
+{% enqueue_style "print.css", { "media": "print", "location": "footer", "priority": 90 } %}
+{% enqueue_style "critical.css", { "location": "header", "priority": 10 } %}
 ```
 
 **Options:**
 
-- `media`: (String, default: `null`) The value for the `media` attribute (e.g., `"screen"`, `"print"`).
-- `id`: (String, default: `null`) The value for the `id` attribute.
+- `location`: (String, default: `"header"`) Where to render the stylesheet: `"header"` or `"footer"`
+- `priority`: (Number, default: `50`) Loading order priority. Lower numbers load first (10 → 20 → 30 → 50 → 100)
+- `media`: (String, default: `null`) The value for the `media` attribute (e.g., `"screen"`, `"print"`)
+- `id`: (String, default: `null`) The value for the `id` attribute
 
-#### Render Scripts
+**Priority Examples:**
 
-Outputs all scripts that have been registered using `{% enqueue_script %}`.
+```liquid
+{# Critical CSS - loads first #}
+{% enqueue_style "critical.css", { "priority": 10 } %}
+
+{# Base styles #}
+{% enqueue_style "base.css", { "priority": 20 } %}
+
+{# Widget styles - default priority #}
+{% enqueue_style "slideshow.css", { "priority": 50 } %}
+
+{# Print styles - loads last #}
+{% enqueue_style "print.css", { "location": "footer", "priority": 90, "media": "print" } %}
+```
+
+#### Header Assets
+
+Outputs all CSS and JS files marked for header, sorted by priority. Styles render first, then scripts, both sorted by priority.
+
+**Usage:** Place this tag in your `layout.liquid` file, inside the `<head>` section.
+
+```liquid
+<head>
+  {% seo %}
+  {% fonts %}
+  {% theme_settings %}
+  {% asset "base.css" %}
+  {% header_assets %}
+</head>
+```
+
+**Rendering Order:**
+
+1. Header styles sorted by priority (ascending)
+2. Header scripts sorted by priority (ascending)
+
+#### Footer Assets
+
+Outputs all CSS and JS files marked for footer, sorted by priority. Styles render first, then scripts, both sorted by priority.
 
 **Usage:** Place this tag in your `layout.liquid` file, traditionally just before the closing `</body>` tag.
 
 ```liquid
-{% render_scripts %}
+<body>
+  <!-- content -->
+  {% asset "scripts.js" %}
+  {% footer_assets %}
+</body>
 ```
 
-#### Render Styles
+**Rendering Order:**
 
-Outputs all stylesheets that have been registered using `{% enqueue_style %}`.
+1. Footer styles sorted by priority (ascending)
+2. Footer scripts sorted by priority (ascending)
 
-**Usage:** Place this tag in your `layout.liquid` file, traditionally inside the `<head>` section.
+#### Priority System
+
+The priority system allows you to control the exact loading order of assets:
+
+- **Lower numbers = earlier loading** (10 loads before 20, which loads before 50)
+- **Default priority: 50** (middle priority)
+- **Common pattern:** Use increments of 10 (10, 20, 30, 40, 50, 60, 70, 80, 90, 100) to leave room for future insertions
+- **Within same priority:** Assets maintain insertion order (stable sort)
+
+**Example Priority Strategy:**
 
 ```liquid
-{% render_styles %}
+{# Foundation/Critical - Priority 10 #}
+{% enqueue_style "reset.css", { "priority": 10 } %}
+{% enqueue_script "analytics.js", { "location": "header", "priority": 10 } %}
+
+{# Base Styles - Priority 20 #}
+{% enqueue_style "base.css", { "priority": 20 } %}
+
+{# Components - Priority 30 #}
+{% enqueue_style "components.css", { "priority": 30 } %}
+{% enqueue_script "components.js", { "priority": 30 } %}
+
+{# Widgets - Priority 40-50 #}
+{% enqueue_style "slideshow.css", { "priority": 40 } %}
+{% enqueue_script "slideshow.js", { "priority": 40 } %}
+
+{# Theme Overrides - Priority 50 (default) #}
+{% enqueue_style "theme.css" %}
+
+{# Non-critical/Print - Priority 90+ #}
+{% enqueue_style "print.css", { "location": "footer", "priority": 90, "media": "print" } %}
 ```
 
 #### Asset Tag
@@ -1195,12 +1287,14 @@ The menu snippet automatically adds the `class_has_submenu` class to items that 
 - `base.css`: Core theme styles (design tokens, utility classes, component styles)
 - Shared CSS files for complex widgets (e.g., `slideshow.css`)
 - Loaded via `{% asset "filename.css" %}` or `{% enqueue_style "filename.css" %}`
+- Use `{% header_assets %}` or `{% footer_assets %}` to render enqueued styles
 
 ### JavaScript Files
 
 - `scripts.js`: Main theme scripts
 - Shared JS files for complex widgets (e.g., `slideshow.js`)
 - Loaded via `{% asset "filename.js" %}` or `{% enqueue_script "filename.js" %}`
+- Use `{% header_assets %}` or `{% footer_assets %}` to render enqueued scripts
 
 ### Widget Styles & Scripts
 
@@ -1228,9 +1322,11 @@ Widget-specific CSS and JavaScript are typically **inline** within the `widget.l
 For complex widgets that need shared scripts (like sliders or carousels), place reusable assets in the `assets/` folder and enqueue them:
 
 ```liquid
-{% enqueue_script "slideshow.js" %}
-{% enqueue_style "slideshow.css" %}
+{% enqueue_style "slideshow.css", { "priority": 30 } %}
+{% enqueue_script "slideshow.js", { "priority": 30 } %}
 ```
+
+These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority.
 
 ### Assets During Export
 

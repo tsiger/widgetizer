@@ -1,11 +1,17 @@
 /**
  * {% enqueue_style %} Liquid Tag
  *
- * Registers a CSS file for deduped loading in the layout's <head>.
+ * Registers a CSS file for deduped loading in the layout.
  *
  * Usage:
  * {% enqueue_style "slideshow.css" %}
- * {% enqueue_style "special.css", { "media": "print" } %}
+ * {% enqueue_style "special.css", { "media": "print", "location": "footer", "priority": 10 } %}
+ *
+ * Options:
+ * - location: "header" (default) or "footer"
+ * - priority: number (default: 50), lower numbers load first
+ * - media: string (e.g., "print", "screen")
+ * - id: string for the link tag id attribute
  */
 export const EnqueueStyleTag = {
   parse(tagToken) {
@@ -37,10 +43,18 @@ export const EnqueueStyleTag = {
         context.globals.enqueuedStyles = new Map();
       }
 
+      // Parse location option (default: "header")
+      const location = this.options.location || "header";
+
+      // Parse priority option (default: 50)
+      const priority = this.options.priority !== undefined ? this.options.priority : 50;
+
       // Add to the Map (filepath as key for deduplication)
       context.globals.enqueuedStyles.set(this.filepath, {
         media: this.options.media || null,
         id: this.options.id || null,
+        location: location,
+        priority: priority,
       });
 
       // No output - just registers the asset

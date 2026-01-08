@@ -9,7 +9,7 @@
 
     {% theme_settings %}
     {% asset "base.css" %}
-    {% render_styles %}
+    {% header_assets %}
   </head>
   <body class="{{ body_class }}">
     {{ header }}
@@ -19,7 +19,7 @@
     {{ footer }}
 
     {% asset "scripts.js" %}
-    {% render_scripts %}
+    {% footer_assets %}
   </body>
 </html>
 

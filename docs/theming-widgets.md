@@ -626,10 +626,13 @@ Available icon classes:
 For complex widgets, use external files:
 
 ```liquid
-{% enqueue_script "widget-name.js" %}
+{% enqueue_style "widget-name.css", { "priority": 30 } %}
+{% enqueue_script "widget-name.js", { "priority": 30 } %}
 ```
 
-File location: `assets/widget-name.js`
+File location: `assets/widget-name.css` and `assets/widget-name.js`
+
+These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority.
 
 ---
 
