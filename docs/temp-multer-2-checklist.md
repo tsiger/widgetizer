@@ -1,6 +1,7 @@
 # Multer 2.0 Upgrade Testing Checklist
 
 **Upgrade Details:**
+
 - **From:** multer `1.4.5-lts.2`
 - **To:** multer `2.0.2`
 - **Date:** Upgrade completed
@@ -11,6 +12,7 @@
 ### 1. Media File Uploads (`/api/media/projects/:projectId/media`)
 
 **Images:**
+
 - [ ] Upload a single image (JPG, PNG, GIF, WebP, SVG)
 - [ ] Upload multiple images (up to 10 at once)
 - [ ] Verify files are saved to the correct project directory
@@ -19,16 +21,19 @@
 - [ ] Check that image thumbnails are generated correctly
 
 **Videos:**
+
 - [ ] Upload a video file (MP4, WebM, etc.)
 - [ ] Verify video is saved to `uploads/videos/` directory
 - [ ] Verify video metadata is stored correctly
 
 **Audio:**
+
 - [ ] Upload an audio file (MP3, WAV, etc.)
 - [ ] Verify audio is saved to `uploads/audios/` directory
 - [ ] Verify audio metadata is stored correctly
 
 **Error Handling:**
+
 - [ ] Try uploading an invalid file type (should be rejected)
 - [ ] Try uploading without selecting a file
 - [ ] Try uploading to a non-existent project ID
@@ -78,6 +83,7 @@ curl -X POST http://localhost:3001/api/themes/upload \
 ## Priority Tests
 
 **Start with these critical paths:**
+
 1. Image uploads through the UI
 2. Theme uploads
 3. File serving endpoints
