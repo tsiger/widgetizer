@@ -257,7 +257,7 @@ export async function getProjectFolderName(projectId) {
 
 - Imported by controllers that need folderName resolution
 - Provides consistent error handling
-- Falls back to using the ID if folderName cannot be resolved (for backward compatibility)
+- Falls back to using the ID if folderName cannot be resolved
 
 ---
 
@@ -289,23 +289,7 @@ export async function getProjectFolderName(projectId) {
 
 ---
 
-## Migration Considerations
-
-### Existing Projects
-
-Projects created before this system may have:
-
-- Legacy `slug` property instead of `folderName`
-- No explicit folderName at all
-
-**Handling:**
-
-- The system now uses `project.folderName` exclusively
-- Legacy `slug` properties are removed during updates
-- Existing projects continue to work without migration
-- New projects automatically use the UUID/folderName system
-
-### FolderName Changes
+## Renaming Projects
 
 When a project's name (and thus folderName) changes:
 
