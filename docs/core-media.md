@@ -88,15 +88,17 @@ _Note: The `sizes` object only contains entries for enabled image sizes. Disable
 
 ### Usage Tracking
 
-The media library automatically tracks which pages are using each media file to prevent accidental deletion of images that are currently in use.
+The media library automatically tracks which pages and global widgets are using each media file to prevent accidental deletion of images that are currently in use.
 
-- **`usedIn` Array**: Each file object contains a `usedIn` array with the slugs of pages that reference this file
+- **`usedIn` Array**: Each file object contains a `usedIn` array with the slugs of pages and IDs of global widgets that reference this file
 - **Automatic Updates**: Usage tracking is updated automatically when:
-  - Pages are saved or updated (scans widget and block settings for `/uploads/images/` paths)
+  - Pages are saved or updated (scans widget and block settings for media paths)
   - Pages are deleted (removes the page slug from all media files)
   - Page slugs are changed (removes old slug, adds new slug to relevant files)
+  - **Global widgets** (header/footer) are saved or updated (scans settings for media paths)
 - **Delete Protection**: Files with a non-empty `usedIn` array cannot be deleted
 - **Manual Refresh**: Users can manually refresh usage tracking to recalculate all relationships
+- **Media Types Tracked**: Images, videos, and audio files are all tracked
 
 ### Video Support
 
@@ -333,12 +335,13 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 
 ### Usage Tracking Service (`server/services/mediaUsageService.js`)
 
-The media usage tracking is handled by a dedicated service that provides automated tracking of which pages use which media files:
+The media usage tracking is handled by a dedicated service that provides automated tracking of which pages and global widgets use which media files:
 
-- **`updatePageMediaUsage(projectId, pageId, pageData)`**: Scans a page's content for image references and updates the `usedIn` arrays in `media.json`. First removes the page from all existing `usedIn` arrays, then adds it to files that are actually referenced.
+- **`updatePageMediaUsage(projectId, pageId, pageData)`**: Scans a page's content for media references and updates the `usedIn` arrays in `media.json`. First removes the page from all existing `usedIn` arrays, then adds it to files that are actually referenced.
+- **`updateGlobalWidgetMediaUsage(projectId, globalId, widgetData)`**: Scans a global widget (header/footer) for media references and updates the `usedIn` arrays. Works the same way as page tracking but for global widgets.
 - **`removePageFromMediaUsage(projectId, pageId)`**: Removes a page from all media files' `usedIn` arrays when the page is deleted.
-- **`getMediaUsage(projectId, fileId)`**: Returns usage information for a specific media file, including which pages use it.
-- **`refreshAllMediaUsage(projectId)`**: Scans all pages in a project and rebuilds the complete usage tracking data.
+- **`getMediaUsage(projectId, fileId)`**: Returns usage information for a specific media file, including which pages and global widgets use it.
+- **`refreshAllMediaUsage(projectId)`**: Scans all pages and global widgets in a project and rebuilds the complete usage tracking data.
 
 **Integration with Page Operations:**
 
@@ -346,6 +349,19 @@ The media usage tracking is handled by a dedicated service that provides automat
 - **Page Delete**: Automatically removes page from all media usage arrays
 - **Slug Changes**: Removes old slug and adds new slug to relevant media files
 
+**Integration with Global Widget Operations:**
+
+- **Header/Footer Save**: Automatically triggers usage tracking updates for images used in global widgets
+- This ensures images used in the header logo, footer, etc. are protected from deletion
+
 ## Security Considerations
 
-All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
+
+---
+
+**See also:**
+
+- [App Settings](core-app-settings.md) - Configure image processing and upload limits
+- [Export System](core-export.md) - How media usage tracking optimizes exports
+- [Custom Hooks](core-hooks.md) - Media management hooks documentation

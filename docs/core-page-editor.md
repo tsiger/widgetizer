@@ -167,3 +167,12 @@ Global widgets are managed through the `usePageStore`:
 - **No Reordering**: Global widgets cannot be reordered or moved
 - **Fixed Position**: Header always appears first, footer always appears last
 - **Theme-wide**: Changes apply to the entire project, not just the current page
+
+---
+
+**See also:**
+
+- [Page Editor Preview](core-page-editor-preview.md) - Deep-dive into the preview system
+- [Page Management](core-pages.md) - Page CRUD operations
+- [Custom Hooks](core-hooks.md) - `useNavigationGuard` and other hooks
+- [Theming Guide](theming.md) - Widget schemas and settings

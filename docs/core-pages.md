@@ -128,6 +128,7 @@ This Express router maps the HTTP requests from `pageManager.js` to the appropri
 | `DELETE` | `/api/pages/:id`           | `deletePage`        | Delete a page                 |
 | `POST`   | `/api/pages/:id/duplicate` | `duplicatePage`     | Duplicate an existing page    |
 | `POST`   | `/api/pages/:id/content`   | `savePageContent`   | Save content from page editor |
+| `POST`   | `/api/pages/bulk-delete`   | `bulkDeletePages`   | Delete multiple pages at once |
 
 ### Controller Logic (`server/controllers/pageController.js`)
 
@@ -144,4 +145,12 @@ This is the core of the backend logic. The controller functions interact with th
 
 ### Security Considerations
 
-All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
+
+---
+
+**See also:**
+
+- [Page Editor](core-page-editor.md) - Visual editor for page content
+- [Media Library](core-media.md) - Media usage tracking integration
+- [Custom Hooks](core-hooks.md) - `usePageSelection` hook documentation

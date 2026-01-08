@@ -18,7 +18,22 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[theme-settings.md](theme-settings.md)** - Setting Types Reference
+### **[theming-widgets.md](theming-widgets.md)** - Widget Authoring Guide
+
+**Purpose**: Complete guide to creating widgets for themes **When to use**:
+
+- Building new widgets from scratch
+- Understanding widget file structure (schema.json + widget.liquid)
+- Implementing design tokens and CSS patterns
+- Working with typography and layout utilities
+- Adding JavaScript interactivity to widgets
+- Following accessibility best practices
+
+**Key topics**: Widget structure, CSS design tokens, typography system, layout utilities, component patterns, JavaScript initialization, schema conventions, accessibility, blocks
+
+---
+
+### **[theming-setting-types.md](theming-setting-types.md)** - Setting Types Reference
 
 **Purpose**: Comprehensive reference for all available setting types in theme.json and widget schemas **When to use**:
 
@@ -202,7 +217,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **Theme Developers**
 
-Primary docs: `theming.md`, `theme-settings.md` Secondary: `export.md`, `menus.md`
+Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md` Secondary: `export.md`, `menus.md`
 
 ### **Frontend Developers**
 
@@ -247,23 +262,10 @@ Primary docs: `themes.md`, `page-editor.md` Secondary: `media.md`, `menus.md`
 
 ---
 
-### **[standards.md](standards.md)** - Widget Standardization Guidelines
-
-**Purpose**: Strict standards for all Arch theme widgets **When to use**:
-
-- Creating or modifying theme widgets
-- Auditing widgets for compliance
-- Understanding widget structure requirements
-- Implementing consistent widget patterns
-
-**Key topics**: Widget structure, class naming, typography, semantic HTML, layout, backgrounds, block architecture
-
----
-
 ## 🔄 Maintenance Notes
 
 - **theming.md** – Most comprehensive, covers theme system architecture.
-- **theme-settings.md** – Reference document, stable API definitions.
+- **theming-setting-types.md** – Reference document, stable API definitions.
 - All other docs – Feature-specific implementation guides.
 
 When adding new features, always update the relevant documentation **and** this index.

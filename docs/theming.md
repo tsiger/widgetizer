@@ -214,7 +214,7 @@ The `settings.global` object defines customizable options organized into logical
 
 The `theme` object structure follows your `theme.json` groups and setting IDs: `theme.{group}.{setting_id}`.
 
-For complete details on all available setting types and their properties, see the [Theme & Widget Setting Types documentation](theme-settings.md).
+For complete details on all available setting types and their properties, see the [Setting Types Reference](theming-setting-types.md).
 
 ## 4. Layout Template (layout.liquid)
 

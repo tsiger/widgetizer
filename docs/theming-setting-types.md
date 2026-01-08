@@ -61,6 +61,10 @@ A multi-line text input field.
 
 A color picker with a hex input field and a pop-over color swatch.
 
+**Additional Properties:**
+
+- **`allow_alpha`** (boolean, optional): If `true`, enables an alpha/opacity slider alongside the color picker. The value will include alpha (e.g., `#00000080` for 50% black). Defaults to `false`.
+
 ```json
 {
   "id": "accent_color",
@@ -69,6 +73,19 @@ A color picker with a hex input field and a pop-over color swatch.
   "default": "#ec4899",
   "description": "The primary color for buttons and links.",
   "outputAsCssVar": true
+}
+```
+
+**With Alpha Channel:**
+
+```json
+{
+  "id": "overlay_color",
+  "type": "color",
+  "label": "Overlay Color",
+  "default": "#00000080",
+  "allow_alpha": true,
+  "description": "Semi-transparent overlay for background images."
 }
 ```
 
@@ -166,6 +183,27 @@ A specialized input with two dropdowns for selecting a font family and its corre
 
 **Smart Bold Loading**: For `body_font` font pickers, when the selected weight is 400 (normal), the system automatically loads an appropriate bold weight (700, or 600, or 500 if 700 is unavailable) to prevent browser faux-bold rendering. This ensures `<strong>`, `<b>`, and bold UI elements render with proper typography. For other selected weights (500, 600, 700, etc.), only the selected weight is loaded. The auto-loaded bold weight is available via the `--typography-body_font_bold-weight` CSS variable.
 
+### Icon
+
+An icon picker that allows users to select from a library of available icons. The value is the icon name/identifier.
+
+```json
+{
+  "id": "card_icon",
+  "type": "icon",
+  "label": "Icon",
+  "description": "Select an icon to display on the card."
+}
+```
+
+**Usage in Templates:**
+
+```liquid
+{% if block.settings.icon != blank %}
+  {% render 'icon', icon: block.settings.icon, class: 'widget-card-icon' %}
+{% endif %}
+```
+
 ### Image
 
 An image uploader that includes a preview, the ability to replace the image, and a button to browse the media library. The value is the URL path to the image.
@@ -250,3 +288,10 @@ The UI for this setting type provides a choice between selecting from a list of 
   "description": "The primary call-to-action link in the hero section."
 }
 ```
+
+---
+
+**See also:**
+
+- [Theming Guide](theming.md) - Theme structure, global settings, layout templates
+- [Widget Authoring Guide](theming-widgets.md) - Complete widget development reference

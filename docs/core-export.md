@@ -102,6 +102,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
 3.  **Load Project Data**:
 
     - The controller loads all necessary data for the project, including the theme settings (`theme.json`), a list of all pages, and the global header and footer data.
+    - **Homepage Validation**: The system verifies that at least one page has the slug "index" to serve as the homepage. If no homepage exists, the export fails with a clear error message.
 
 4.  **Render Global Widgets**:
 
@@ -125,15 +126,22 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
 8.  **Copy Static Assets**:
 
     - The system performs several copy operations to ensure the static site is self-contained:
-      - **Theme Assets**: All files from the project's `/assets` directory (e.g., `style.css`, `main.js`) are copied to `/assets` in the output directory.
-      - **Widget Assets**: The controller recursively searches the project's `/widgets` directory for any `.css` or `.js` files and copies them into the output `/assets` directory. This ensures that widget-specific styles and scripts are included.
-      - **Optimized Image Copying**: The system uses the media usage tracking to selectively copy only images that are actually used in pages:
-        - **Usage Analysis**: Reads the project's `media.json` file to identify which images have a non-empty `usedIn` array
-        - **Selective Copying**: Only copies images that are referenced in at least one page
-        - **Complete Size Support**: For each used image, copies the original file plus all generated sizes (thumb, small, medium, large)
-        - **Export Optimization**: Logs how many images were copied vs. skipped, often reducing export size significantly
-        - **Fallback Safety**: If media tracking fails, automatically falls back to copying all images to ensure exports never fail
-        - **Directory Structure**: Maintains the original `/uploads/images/` directory structure in the export
+      - **Theme Assets**: All files from the project's `/assets` directory (e.g., `base.css`, `scripts.js`) are copied to `/assets` in the output directory.
+      - **Core Assets**: Placeholder images (SVG) from the core assets are copied to ensure widgets using placeholders work correctly.
+      - **Widget Assets**: The controller recursively searches the project's `/widgets` directory for any `.css` or `.js` files and copies them into the output `/assets` directory.
+      - **Optimized Image Copying**: Uses media usage tracking to selectively copy only images that are actually used:
+        - Reads the project's `media.json` file to identify which images have a non-empty `usedIn` array
+        - Only copies images that are referenced in at least one page
+        - For each used image, copies the original file plus all generated sizes (thumb, small, medium, large)
+        - Images are copied to `assets/images/` (not `uploads/images/`)
+        - Falls back to copying all images if media tracking fails
+      - **Optimized Video Copying**: Same usage-based approach for videos:
+        - Only copies videos that have a non-empty `usedIn` array
+        - Videos are copied to `assets/videos/`
+      - **Optimized Audio Copying**: Same usage-based approach for audio files:
+        - Only copies audio files that have a non-empty `usedIn` array
+        - Audio files are copied to `assets/audios/`
+      - **Export Optimization**: Logs how many media files were copied vs. skipped, often reducing export size significantly
 
 9.  **Record Export History**:
 
@@ -201,3 +209,10 @@ The system automatically manages storage by:
 ## Security Considerations
 
 All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.
+
+---
+
+**See also:**
+
+- [App Settings](app-settings.md) - Configure export retention limits
+- [Media Library](media.md) - Media usage tracking for optimized exports

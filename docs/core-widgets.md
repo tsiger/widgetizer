@@ -16,10 +16,10 @@ Unlike theme widgets (which live inside each theme's `/widgets` folder), core wi
 
 ## 2. Current Core Widgets
 
-| Widget  | `type` value   | Purpose                                                        |
-| ------- | -------------- | -------------------------------------------------------------- |
-| Spacer  | `core-spacer`  | Adds vertical whitespace that can respond to break-points      |
-| Divider | `core-divider` | Renders a horizontal line with configurable colour / thickness |
+| Widget  | `type` value   | Purpose                                                                       |
+| ------- | -------------- | ----------------------------------------------------------------------------- |
+| Spacer  | `core-spacer`  | Adds vertical whitespace with separate desktop/mobile heights and visibility  |
+| Divider | `core-divider` | Renders a horizontal line with configurable color, thickness, width & padding |
 
 All core widget **type** strings are prefixed with `core-` to avoid collisions with theme widgets.
 
@@ -41,6 +41,24 @@ Each widget has its own folder containing:
 
 - **`schema.json`**: The widget's configuration and setting definitions.
 - **`widget.liquid`**: The markup and logic (Liquid) for the widget.
+
+### Schema Properties
+
+Core widget schemas use the same format as theme widgets, plus additional metadata:
+
+```json
+{
+  "type": "core-spacer",
+  "displayName": "Spacer",
+  "description": "Add vertical spacing between content sections",
+  "category": "Layout",
+  "isCore": true,
+  "settings": [...]
+}
+```
+
+- **`isCore`**: Boolean flag identifying this as a core widget (used by the editor)
+- **`category`**: Grouping category for the widget picker (e.g., "Layout")
 
 ## 4. Theme Opt-Out
 
@@ -71,10 +89,10 @@ If the flag is **absent or `true`**, core widgets are included.
 
 During page rendering the service checks `widget.type`:
 
-- `type.startsWith("core-")` ➜ template is read from `/src/core/widgets/${type}/widget.liquid`.
-- otherwise ➜ template is loaded from the project's theme folder.
+- `type.startsWith("core-")` → template is read from `CORE_WIDGETS_DIR/${type}/widget.liquid`
+- otherwise → template is loaded from the project's theme folder
 
-This keeps theme overrides intact: a theme can still provide its own widget named `core-spacer` and it will shadow the core one.
+**Note:** Core widgets cannot be overridden by themes because the `core-` prefix check runs first. If a theme needs different behavior, it should not use core widgets and instead provide its own `spacer` or `divider` widget.
 
 ---
 
@@ -82,9 +100,13 @@ This keeps theme overrides intact: a theme can still provide its own widget name
 
 1. Create a new folder `core-mywidget` inside `src/core/widgets/`.
 2. Add `schema.json` and `widget.liquid` to the folder.
-3. Ensure the schema's `type` matches the folder name.
-4. Commit – no additional registration is required.
+3. Ensure the schema's `type` matches the folder name and uses the `core-` prefix.
+4. Include `"isCore": true` and a `"category"` in the schema.
+5. Commit – no additional registration is required.
 
 ---
 
-Happy widget-building! 🎉
+**See also:**
+
+- [Widget Authoring Guide](theming-widgets.md) - Complete widget development reference
+- [Setting Types Reference](theming-setting-types.md) - All available setting types for schemas

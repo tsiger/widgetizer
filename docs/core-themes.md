@@ -74,3 +74,15 @@ The backend handles the logic for listing the themes and processing uploads.
       - It checks if a theme directory with the same name already exists in `/themes/` to prevent overwriting an existing theme.
   3.  **Extraction**: If all validation checks pass, the controller extracts the contents of the zip file's root folder into a new directory within `/themes/`.
   4.  **Response**: It sends a success response to the client, including the `theme.json` data of the newly installed theme so the frontend can update its state.
+
+## Security Considerations
+
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
+
+---
+
+**See also:**
+
+- [Theming Guide](theming.md) - How to author themes (structure, settings, widgets)
+- [Widget Authoring Guide](theming-widgets.md) - Creating widgets for themes
+- [Project Management](core-projects.md) - How themes are copied to projects on creation

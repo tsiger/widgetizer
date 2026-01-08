@@ -899,5 +899,4 @@ Before submitting a widget:
 **See also:**
 
 - [Theming Guide](theming.md) - Theme structure, global settings, layout templates
-- [Theme & Widget Setting Types](theme-settings.md) - All available setting types
-- [Widget Standardization Guidelines](standards.md) - Detailed audit checklist
+- [Setting Types Reference](theming-setting-types.md) - All available setting types

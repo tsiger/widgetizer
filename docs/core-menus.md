@@ -109,4 +109,11 @@ The controller handles the logic for interacting with the menu JSON files on the
 
 ## Security Considerations
 
-All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
+
+---
+
+**See also:**
+
+- [Theming Guide](theming.md) - How menus are rendered in theme templates using the `{% render 'menu' %}` snippet
+- [Page Editor](core-page-editor.md) - How menus integrate with header/footer widgets

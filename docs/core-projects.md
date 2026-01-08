@@ -114,7 +114,17 @@ The frontend `projectManager.js` communicates with a set of backend API endpoint
 | `DELETE` | `/api/projects/:id` | `deleteProject` | Deletes a specific project. |
 | `POST` | `/api/projects/:id/duplicate` | `duplicateProject` | Creates a complete copy of a project. |
 | `GET` | `/api/projects/:projectId/widgets` | `getProjectWidgets` | Retrieves all widget schemas for a project. |
+| `GET` | `/api/projects/:projectId/icons` | `getProjectIcons` | Retrieves all available icons for a project. |
 
 ### Security Considerations
 
-All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
+
+---
+
+**See also:**
+
+- [Page Management](core-pages.md) - Managing pages within projects
+- [Export System](core-export.md) - Exporting projects as static sites
+- [Media Library](core-media.md) - Managing project media files
+- [Theming Guide](theming.md) - Theme structure copied during project creation

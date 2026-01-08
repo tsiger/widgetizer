@@ -362,3 +362,12 @@ Used by `AppSettings.jsx` page for managing system-wide configuration that affec
 - Always handle loading and error states
 - Provide user feedback for async operations
 - Follow the established patterns for consistency
+
+---
+
+**See also:**
+
+- [App Settings](core-app-settings.md) - Settings managed by `useAppSettings` hook
+- [Export System](core-export.md) - Export functionality using `useExportState` hook
+- [Media Library](core-media.md) - Media management using media hooks
+- [Page Editor](core-page-editor.md) - Editor functionality using navigation guards
