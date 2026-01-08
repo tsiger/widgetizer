@@ -29,27 +29,39 @@ A theme is organized as a directory with the following structure:
 ```
 /themes/my-theme/
 ├── theme.json              # Theme manifest and global settings schema
-├── layout.liquid          # Main HTML layout template
-├── screenshot.png         # Preview image for the theme
-├── widgets/               # Widget templates
-│   ├── basic-text.liquid  # Individual widget templates
-│   ├── basic-text.css     # Widget-specific styles (optional)
-│   ├── basic-text.js      # Widget-specific scripts (optional)
-│   └── global/            # Global widgets
-│       ├── header.liquid  # Site header
-│       └── footer.liquid  # Site footer
-├── templates/             # Page and global templates
-│   ├── basic.json         # Page template definitions
-│   └── global/            # Global template instances
-│       ├── header.json    # Global header configuration
-│       └── footer.json    # Global footer configuration
-├── menus/                 # Navigation menu definitions
-│   └── main-nav.json      # Menu structure and items
-└── assets/                # Static assets
-    ├── base.css           # Theme base styles
-    ├── header_scripts.js  # Scripts loaded in <head>
-    └── footer_scripts.js  # Scripts loaded before </body>
+├── layout.liquid           # Main HTML layout template
+├── screenshot.png          # Preview image for the theme
+├── widgets/                # Widget templates
+│   ├── basic-text/         # Each widget in its own folder
+│   │   ├── schema.json     # Widget configuration schema
+│   │   └── widget.liquid   # Widget template (HTML, CSS, JS)
+│   ├── hero-banner/
+│   │   ├── schema.json
+│   │   └── widget.liquid
+│   └── global/             # Global widgets
+│       ├── header/
+│       │   ├── schema.json
+│       │   └── widget.liquid
+│       └── footer/
+│           ├── schema.json
+│           └── widget.liquid
+├── snippets/               # Reusable Liquid partials
+│   └── icon.liquid         # Icon rendering snippet
+├── templates/              # Page and global templates
+│   ├── index.json          # Homepage template
+│   ├── about.json          # About page template
+│   └── global/             # Global template instances
+│       ├── header.json     # Global header configuration
+│       └── footer.json     # Global footer configuration
+├── menus/                  # Navigation menu definitions
+│   └── main-nav.json       # Menu structure and items
+└── assets/                 # Static assets
+    ├── base.css            # Theme base styles (design tokens, utilities)
+    ├── scripts.js          # Theme scripts
+    └── icons.json          # Icon definitions (optional)
 ```
+
+> **Note:** Each widget lives in its own subdirectory containing a `schema.json` (widget configuration) and `widget.liquid` (template). For comprehensive widget authoring guidance, see the [Widget Authoring Guide](theming-widgets.md).
 
 ## 3. Theme Manifest (theme.json)
 
@@ -70,7 +82,7 @@ The `theme.json` file serves as the theme's manifest and defines global settings
 
 ### Global Settings Schema
 
-The `settings.global` object defines customizable options organized into logical groups:
+The `settings.global` object defines customizable options organized into logical groups. **You can create any groups you want** — each key in the `global` object becomes a group in the theme settings UI. Common groups include `colors`, `typography`, `layout`, and `privacy`, but you can add custom groups like `social`, `advanced`, or anything relevant to your theme:
 
 ```json
 {
@@ -78,21 +90,37 @@ The `settings.global` object defines customizable options organized into logical
     "global": {
       "colors": [
         {
-          "id": "colors_header",
-          "type": "header",
-          "label": "Color Settings"
+          "id": "bg_primary",
+          "label": "Primary Background",
+          "default": "#ffffff",
+          "type": "color",
+          "outputAsCssVar": true
         },
         {
-          "id": "background",
-          "label": "Background Color",
-          "default": "#FFFFFF",
+          "id": "bg_secondary",
+          "label": "Secondary Background",
+          "default": "#f9f9f9",
+          "type": "color",
+          "outputAsCssVar": true
+        },
+        {
+          "id": "text_content",
+          "label": "Content Text",
+          "default": "#333333",
+          "type": "color",
+          "outputAsCssVar": true
+        },
+        {
+          "id": "text_heading",
+          "label": "Heading Text",
+          "default": "#000000",
           "type": "color",
           "outputAsCssVar": true
         },
         {
           "id": "accent",
           "label": "Accent Color",
-          "default": "#0066cc",
+          "default": "#0d47b7",
           "type": "color",
           "outputAsCssVar": true
         }
@@ -101,67 +129,39 @@ The `settings.global` object defines customizable options organized into logical
         {
           "id": "typography_header",
           "type": "header",
-          "label": "Typography Settings"
+          "label": "Typography"
         },
         {
           "id": "heading_font",
           "label": "Heading Font",
           "type": "font_picker",
           "default": {
-            "stack": "system-ui, sans-serif",
+            "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
             "weight": 700
-          },
-          "outputAsCssVar": true
+          }
         },
         {
-          "id": "base_font_size",
-          "type": "range",
-          "label": "Base Font Size",
-          "default": 16,
-          "min": 12,
-          "max": 24,
-          "step": 1,
-          "unit": "px",
-          "outputAsCssVar": true
+          "id": "body_font",
+          "label": "Body Font",
+          "type": "font_picker",
+          "default": {
+            "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+            "weight": 400
+          }
         }
       ],
-      "layout": [
+      "privacy": [
         {
-          "id": "layout_header",
+          "id": "privacy_header",
           "type": "header",
-          "label": "Layout Settings"
+          "label": "Privacy"
         },
         {
-          "id": "show_header",
-          "label": "Show Header",
-          "default": true,
-          "type": "checkbox"
-        },
-        {
-          "id": "site_width",
-          "type": "select",
-          "label": "Site Width",
-          "default": "normal",
-          "options": [
-            { "value": "narrow", "label": "Narrow" },
-            { "value": "normal", "label": "Normal" },
-            { "value": "wide", "label": "Wide" }
-          ]
-        }
-      ],
-      "content": [
-        {
-          "id": "logo_image",
-          "type": "image",
-          "label": "Site Logo",
-          "description": "Upload your site logo"
-        },
-        {
-          "id": "footer_text",
-          "type": "textarea",
-          "label": "Footer Text",
-          "default": "© 2024 My Website",
-          "description": "Text displayed in the footer"
+          "id": "use_bunny_fonts",
+          "type": "checkbox",
+          "label": "Use Privacy-Friendly Font CDN",
+          "default": false,
+          "description": "Enable to serve Google Fonts from Bunny CDN (GDPR-compliant, no tracking)"
         }
       ]
     }
@@ -608,63 +608,87 @@ Outputs a placeholder image for development and preview purposes. Theme authors 
 
 ## 6. Widgets
 
-Widgets are reusable components that can be added to pages. Each widget is a self-contained Liquid template with embedded configuration schema.
+Widgets are reusable components that can be added to pages. Each widget lives in its own subdirectory containing a **schema file** (`schema.json`) and a **template file** (`widget.liquid`).
 
-### Widget Structure
+> For comprehensive guidance on building widgets, including design tokens, layout utilities, typography systems, component patterns, and best practices, see the [Widget Authoring Guide](theming-widgets.md).
+
+### Widget File Structure
+
+Each widget consists of two files in its own directory:
+
+```
+widgets/
+└── basic-text/
+    ├── schema.json     # Widget configuration schema
+    └── widget.liquid   # Widget template (HTML, CSS, JS)
+```
+
+**Schema file (`schema.json`):**
+
+```json
+{
+  "type": "basic-text",
+  "displayName": "Basic Text",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Default Title"
+    },
+    {
+      "type": "textarea",
+      "id": "content",
+      "label": "Content",
+      "default": "Default content..."
+    },
+    {
+      "type": "color",
+      "id": "textColor",
+      "label": "Text Color",
+      "default": "#333333"
+    }
+  ]
+}
+```
+
+**Template file (`widget.liquid`):**
 
 ```liquid
-<div class="my-widget" data-widget-id="{{ widget.id }}" data-widget-type="basic-text">
-    <style>
-        #{{ widget.id }} .widget-content {
-            color: {{ widget.settings.textColor }};
-            font-size: {{ widget.settings.fontSize }}px;
-        }
-    </style>
-
-    <div id="{{ widget.id }}" class="widget-content">
-        <h2>{{ widget.settings.title }}</h2>
-        <p>{{ widget.settings.content }}</p>
-    </div>
-
-    <script type="application/json" data-widget-schema>
-    {
-        "type": "basic-text",
-        "displayName": "Basic Text",
-        "settings": [
-            {
-                "type": "text",
-                "id": "title",
-                "label": "Heading",
-                "default": "Default Title"
-            },
-            {
-                "type": "textarea",
-                "id": "content",
-                "label": "Content",
-                "default": "Default content..."
-            },
-            {
-                "type": "color",
-                "id": "textColor",
-                "label": "Text Color",
-                "default": "#333333"
-            }
-        ]
+<section
+  id="{{ widget.id }}"
+  class="widget widget-basic-text widget-{{ widget.id }}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="basic-text"
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .widget-content {
+        color: {{ widget.settings.textColor }};
+      }
     }
-    </script>
-</div>
+  </style>
+
+  <div class="widget-container">
+    <div class="widget-content">
+      <h2 data-setting="title">{{ widget.settings.title }}</h2>
+      <p data-setting="content">{{ widget.settings.content }}</p>
+    </div>
+  </div>
+</section>
 ```
 
 ### Widget Features
 
-- **Scoped Styling**: Use `#{{ widget.id }}` for widget-specific CSS to avoid conflicts
+- **Scoped Styling**: Use `.widget-{{ widget.id }}` for widget-specific CSS to avoid conflicts
 - **Settings Access**: Access widget settings via `{{ widget.settings.settingId }}`
 - **Theme Settings Access**: Access global theme settings via `{{ theme.group.settingId }}`
-- **Embedded Schema**: JSON schema defines the widget's configuration interface
+- **External Schema**: Configuration is defined in a separate `schema.json` file
+- **Live Preview**: Add `data-setting` attributes to elements for instant text updates in the editor
 
 ### Available Template Variables (Widget Templates)
 
-Within individual widget templates (`widgets/*.liquid`), you have access to:
+Within individual widget templates (`widgets/{name}/widget.liquid`), you have access to:
 
 - `{{ widget.id }}`: Unique widget instance ID
 - `{{ widget.type }}`: Widget type identifier
@@ -694,20 +718,22 @@ The widget index can be useful for styling alternate widgets, creating numbered 
 
 Global widgets are special widgets that appear on every page of the website. Currently, the system supports two types: **header** and **footer**.
 
-#### Header Widget (`widgets/global/header.liquid`)
+#### Header Widget (`widgets/global/header/`)
 
+- Located in `widgets/global/header/` with `schema.json` and `widget.liquid`
 - Typically includes site branding, navigation, and search
 - Can reference menu systems via `{% render 'menu', menu: widget.settings.headerNavigation %}`
 - Supports responsive navigation patterns
 - Paired with `templates/global/header.json` for default configuration
 
-#### Footer Widget (`widgets/global/footer.liquid`)
+#### Footer Widget (`widgets/global/footer/`)
 
+- Located in `widgets/global/footer/` with `schema.json` and `widget.liquid`
 - Usually contains copyright, credits, and additional navigation
 - Often includes social links and contact information
 - Paired with `templates/global/footer.json` for default configuration
 
-**Important:** Currently, header and footer are the only supported global widget types. Each global widget requires both a Liquid template in `widgets/global/` and a corresponding JSON configuration in `templates/global/`.
+**Important:** Currently, header and footer are the only supported global widget types. Each global widget requires both a schema + template in `widgets/global/{name}/` and a corresponding JSON configuration in `templates/global/`.
 
 ## 7. Widget Blocks System
 
@@ -1079,25 +1105,45 @@ The menu snippet automatically adds the `class_has_submenu` class to items that 
 
 ### CSS Files
 
-- `base.css`: Core theme styles
-- Widget-specific CSS files (e.g., `basic-text.css`)
-- Loaded via `{% asset "filename.css" %}`
+- `base.css`: Core theme styles (design tokens, utility classes, component styles)
+- Shared CSS files for complex widgets (e.g., `slideshow.css`)
+- Loaded via `{% asset "filename.css" %}` or `{% enqueue_style "filename.css" %}`
 
 ### JavaScript Files
 
-- `header_scripts.js`: Scripts loaded in `<head>`
-- `footer_scripts.js`: Scripts loaded before `</body>`
-- Widget-specific JS files
-- Loaded via `{% asset "filename.js" %}`
+- `scripts.js`: Main theme scripts
+- Shared JS files for complex widgets (e.g., `slideshow.js`)
+- Loaded via `{% asset "filename.js" %}` or `{% enqueue_script "filename.js" %}`
 
-### Widget Assets
+### Widget Styles & Scripts
 
-Widgets can include their own CSS and JavaScript files placed alongside the widget's Liquid template:
+Widget-specific CSS and JavaScript are typically **inline** within the `widget.liquid` file:
 
-- `widget-name.css`: Widget-specific styles
-- `widget-name.js`: Widget-specific JavaScript
+```liquid
+<section id="{{ widget.id }}" class="widget widget-{{ widget.id }}">
+  <style>
+    .widget-{{ widget.id }} {
+      /* Scoped styles using CSS nesting */
+    }
+  </style>
 
-These files are automatically discovered and included during the build process.
+  <!-- Widget HTML -->
+
+  <script>
+    (function() {
+      const widget = document.getElementById('{{ widget.id }}');
+      // Scoped JavaScript
+    })();
+  </script>
+</section>
+```
+
+For complex widgets that need shared scripts (like sliders or carousels), place reusable assets in the `assets/` folder and enqueue them:
+
+```liquid
+{% enqueue_script "slideshow.js" %}
+{% enqueue_style "slideshow.css" %}
+```
 
 ### Assets During Export
 
