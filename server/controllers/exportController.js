@@ -178,7 +178,6 @@ export async function exportProject(req, res) {
     await fs.ensureDir(outputImagesDir);
     await fs.ensureDir(outputVideosDir);
     await fs.ensureDir(outputAudiosDir);
-21
     const rawThemeSettings = await readProjectThemeData(projectFolderName);
 
     // Fetch list of page data using the helper function
@@ -195,7 +194,6 @@ export async function exportProject(req, res) {
       });
     }
 
-    // --- Generate sitemap.xml and robots.txt ---
     // --- Generate sitemap.xml and robots.txt ---
     if (siteUrl && siteUrl.trim() !== "") {
       try {
@@ -231,7 +229,7 @@ Sitemap: ${sitemapUrl}`;
 
         await fs.writeFile(path.join(outputDir, "robots.txt"), robotsContent);
       } catch (err) {
-         console.warn(`Skipping sitemap/robots generation due to invalid siteUrl: ${siteUrl}`, err.message);
+        console.warn(`Skipping sitemap/robots generation due to invalid siteUrl: ${siteUrl}`, err.message);
       }
     } else {
       console.warn(`Project ${projectId} has no siteUrl defined. Skipping sitemap.xml and robots.txt generation.`);
