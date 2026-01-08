@@ -232,6 +232,34 @@ Primary docs: `themes.md`, `page-editor.md` Secondary: `media.md`, `menus.md`
 
 ---
 
+## 🎨 Code Quality & Standards
+
+### **[code-comments.md](code-comments.md)** - Code Comments Guidelines
+
+**Purpose**: Guidelines for writing effective code comments that help new contributors understand complex logic **When to use**:
+
+- Writing new code and deciding what to comment
+- Reviewing code for comment quality
+- Understanding when comments are helpful vs. noise
+- Refactoring code with better documentation
+
+**Key topics**: Comment philosophy, when to comment, explaining complex logic, anti-patterns, best practices
+
+---
+
+### **[standards.md](standards.md)** - Widget Standardization Guidelines
+
+**Purpose**: Strict standards for all Arch theme widgets **When to use**:
+
+- Creating or modifying theme widgets
+- Auditing widgets for compliance
+- Understanding widget structure requirements
+- Implementing consistent widget patterns
+
+**Key topics**: Widget structure, class naming, typography, semantic HTML, layout, backgrounds, block architecture
+
+---
+
 ## 🔄 Maintenance Notes
 
 - **theming.md** – Most comprehensive, covers theme system architecture.

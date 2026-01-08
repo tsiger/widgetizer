@@ -26,11 +26,9 @@ import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 
-// Get the directory path of the current module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Get the path to core snippets (adjust path relative to this service file)
 const coreSnippetsDir = path.join(__dirname, "../../src/core/snippets");
 
 // Cache for LiquidJS engines, keyed by project directory path

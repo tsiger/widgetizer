@@ -49,7 +49,6 @@ export default function SettingsRenderer({ setting, value, onChange, error, isFi
     );
   }
 
-  // Use the default value from the setting if the provided value is undefined
   const currentValue = value !== undefined ? value : setting.default;
 
   const inputProps = {
@@ -79,7 +78,7 @@ export default function SettingsRenderer({ setting, value, onChange, error, isFi
       case "select":
         return <SelectInput {...inputProps} />;
       case "checkbox":
-        // Checkbox needs boolean value
+        // Convert to boolean - React checkboxes require boolean, not truthy values
         return <CheckboxInput {...inputProps} value={!!currentValue} />;
       case "radio":
         return <RadioInput {...inputProps} />;

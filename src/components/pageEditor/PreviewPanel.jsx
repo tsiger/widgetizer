@@ -93,14 +93,16 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     loadInitialPreview();
   }, [page, initialLoadComplete, globalWidgets, themeSettings, widgets]);
 
-  // Full reload on widget/page/theme changes (debounced)
-  // But also send immediate updates for real-time feedback
+  // We use a dual-update strategy: immediate postMessage for instant visual feedback
+  // while typing, plus debounced full reload to ensure scripts execute fresh with
+  // no stale state. See page-editor-preview.md for details.
   useEffect(() => {
     if (!initialLoadComplete) return;
 
     const previousState = previousStateRef.current;
 
-    // Check if only selection changed (no reload needed, just highlight)
+    // Skip expensive reload if only selection changed - overlay handles highlighting
+    // without needing to re-render the entire preview
     const contentChanged =
       JSON.stringify(page) !== JSON.stringify(previousState?.page) ||
       JSON.stringify(widgets) !== JSON.stringify(previousState?.widgets) ||
@@ -108,7 +110,6 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       JSON.stringify(themeSettings) !== JSON.stringify(previousState?.themeSettings);
 
     if (!contentChanged) {
-      // Only selection changed - overlay handles highlighting now
       previousStateRef.current = {
         page,
         widgets,
@@ -121,14 +122,11 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       return;
     }
 
-    // Send IMMEDIATE real-time updates for changed widget settings
-    // This provides instant feedback while the debounced reload is pending
     if (iframeRef.current?.contentWindow && previousState?.widgets) {
       Object.entries(widgets || {}).forEach(([widgetId, widget]) => {
         const oldWidget = previousState.widgets[widgetId];
-        if (!oldWidget) return; // New widget, will be handled by reload
+        if (!oldWidget) return;
 
-        // Check for setting changes (not structural)
         const settingsChanged = JSON.stringify(widget.settings) !== JSON.stringify(oldWidget.settings);
         const blocksSettingsChanged = widget.blocksOrder?.some((blockId) => {
           const newBlock = widget.blocks?.[blockId];
@@ -137,7 +135,6 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         });
 
         if (settingsChanged || blocksSettingsChanged) {
-          // Compute changed settings only
           const changes = { settings: {}, blocks: {} };
 
           if (settingsChanged) {
@@ -166,7 +163,6 @@ const PreviewPanel = forwardRef(function PreviewPanel(
             });
           }
 
-          // Send update to iframe
           iframeRef.current.contentWindow.postMessage(
             {
               type: "UPDATE_WIDGET_SETTINGS",

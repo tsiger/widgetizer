@@ -8,7 +8,6 @@ import { renderWidget, renderPageLayout } from "../services/renderingService.js"
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 
-// Get the directory path of the current module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -27,7 +26,6 @@ export async function generatePreview(req, res) {
   try {
     const { pageData, themeSettings: rawThemeSettings } = req.body;
 
-    // Get active project
     const projectsData = await readProjectsFile();
     const activeProjectId = projectsData.activeProjectId;
 
@@ -36,6 +34,7 @@ export async function generatePreview(req, res) {
     }
 
     // Create shared globals for asset enqueue system
+    // Each page gets fresh enqueue Maps to prevent cross-page asset pollution
     const apiUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
     const sharedGlobals = {
       projectId: activeProjectId,

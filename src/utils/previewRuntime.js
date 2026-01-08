@@ -54,43 +54,40 @@ let currentSelectedBlockId = null;
 
 function scrollToWidget(widgetId) {
   if (!widgetId) return;
-  
-  // Update tracked selection
+
   currentSelectedWidgetId = widgetId;
-  
+
   const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
   if (!widget) {
     reportElementBounds(widgetId, currentSelectedBlockId);
     return;
   }
-  
+
   const rect = widget.getBoundingClientRect();
-  const padding = 40; // Padding from top of viewport
-  
-  // Only skip scroll if widget top is already near top of viewport
+  const padding = 40;
+
   const isTopNearTop = rect.top >= 0 && rect.top <= padding * 2;
-  
+
   if (isTopNearTop) {
-    // Widget top is already near top, just report bounds
+    // Skip scrolling to avoid unnecessary movement when widget is already visible
     reportElementBounds(widgetId, currentSelectedBlockId);
     return;
   }
-  
-  // Scroll to put widget near top of viewport
+
   const viewportHeight = window.innerHeight;
   const documentHeight = document.documentElement.scrollHeight;
   let targetScroll = window.scrollY + rect.top - padding;
-  
+
   // Clamp to valid scroll range (prevent over-scroll)
   const maxScroll = documentHeight - viewportHeight;
   targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
-  
+
   // Scroll smoothly
   window.scrollTo({
     top: targetScroll,
     behavior: "smooth"
   });
-  
+
   // Report bounds after scroll animation
   setTimeout(() => {
     reportElementBounds(widgetId, currentSelectedBlockId);
@@ -155,13 +152,13 @@ function setupScrollBoundsReporting() {
   }, { passive: true });
 }
 
-// Update tracked selection
 function updateSelection(widgetId, blockId) {
   currentSelectedWidgetId = widgetId;
   currentSelectedBlockId = blockId;
 }
 
-// Update widget settings in real-time (for immediate feedback while typing)
+// Update widget settings in real-time for immediate feedback while typing
+// This avoids waiting for the debounced full reload
 function updateWidgetSettings(widgetId, changes) {
   const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
   if (!widget) return;

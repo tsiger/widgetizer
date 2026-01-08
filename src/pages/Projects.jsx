@@ -30,28 +30,21 @@ export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Get the showToast function from the toast store
   const showToast = useToastStore((state) => state.showToast);
-
-  // Get state from the project store
   const activeProject = useProjectStore((state) => state.activeProject);
   const fetchActiveProject = useProjectStore((state) => state.fetchActiveProject);
-
-  // Get app settings for date formatting
   const { settings: appSettings } = useAppSettings();
 
-  // Handle project deletion with confirmation
   const handleDelete = async (data) => {
     try {
       await deleteProject(data.projectId);
-      await loadProjects(); // Reload the list
+      await loadProjects();
       showToast(t("projects.toasts.deleteSuccess", { name: data.projectName }), "success");
     } catch (err) {
       showToast(t("projects.toasts.deleteError"), "error");
     }
   };
 
-  // Use our custom confirmation modal hook
   const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDelete);
 
   useEffect(() => {
@@ -70,7 +63,6 @@ export default function Projects() {
   };
 
   const openDeleteConfirmation = (id, name) => {
-    // Check if it's the active project
     if (activeProject && id === activeProject.id) {
       showToast(t("projects.toasts.cannotDeleteActive"), "error");
       return;
@@ -89,11 +81,9 @@ export default function Projects() {
   const handleSetActive = async (id) => {
     try {
       await setActiveProjectInBackend(id);
-      // Update the store with the new active project
       await fetchActiveProject();
-      await loadProjects(); // Reload to update active status
+      await loadProjects();
 
-      // Find the project name to show in toast
       const project = projects.find((p) => p.id === id);
       if (project) {
         showToast(t("projects.toasts.setActiveSuccess", { name: project.name }), "success");
@@ -106,7 +96,7 @@ export default function Projects() {
   const handleDuplicate = async (projectId) => {
     try {
       const newProject = await duplicateProject(projectId);
-      await loadProjects(); // Reload the list to show the new project
+      await loadProjects();
       showToast(t("projects.toasts.duplicateSuccess"), "success");
     } catch (error) {
       showToast(t("projects.toasts.duplicateError"), "error");

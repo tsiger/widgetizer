@@ -152,7 +152,7 @@ export async function exportProject(req, res) {
       return res.status(400).json({ error: "Project ID is required" });
     }
 
-    // Read projects file to get slug and metadata
+    // Read projects file to resolve UUID to folderName (slug) for filesystem paths
     const projectsData = await readProjectsFile();
     const projectData = projectsData.projects.find((p) => p.id === projectId);
 
@@ -164,7 +164,6 @@ export async function exportProject(req, res) {
     const projectDir = getProjectDir(projectFolderName);
     const siteUrl = projectData.siteUrl || "";
 
-    // Continue with defining export version and output directories.
     const version = await getNextVersion(projectId);
     const outputBaseDir = PUBLISH_DIR;
     const outputDir = path.join(outputBaseDir, `${projectFolderName}-v${version}`);

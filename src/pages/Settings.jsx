@@ -18,19 +18,13 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Add navigation guard
   useFormNavigationGuard(hasChanges);
-
-  // Get the showToast function from the toast store
   const showToast = useToastStore((state) => state.showToast);
 
-  // Load theme settings
   useEffect(() => {
     const loadThemeSettings = async () => {
       try {
         setLoading(true);
-
-        // Load theme data
         const data = await getThemeSettings();
         setThemeData(data);
         setOriginalData(JSON.parse(JSON.stringify(data))); // Deep copy for comparison
@@ -44,7 +38,6 @@ export default function Settings() {
     loadThemeSettings();
   }, [showToast]);
 
-  // Track changes
   useEffect(() => {
     if (themeData && originalData) {
       setHasChanges(JSON.stringify(themeData) !== JSON.stringify(originalData));
@@ -81,7 +74,6 @@ export default function Settings() {
       const newData = { ...prevData };
       const { global } = newData.settings;
 
-      // Find and update the setting in the nested structure
       Object.keys(global).forEach((groupKey) => {
         const settingIndex = global[groupKey].findIndex((s) => s.id === id);
         if (settingIndex !== -1) {
@@ -149,7 +141,7 @@ export default function Settings() {
               {t("common.reset")}
             </Button>
           )}
-          
+
           <Button onClick={handleSave} disabled={loading || !themeData || !hasChanges} variant={hasChanges ? "dark" : "primary"}>
             {t("common.save")}
             {hasChanges && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
