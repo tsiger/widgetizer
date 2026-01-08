@@ -60,7 +60,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## 🏛️ Platform Architecture
 
-### **[security.md](security.md)** - Platform Security
+### **[core-security.md](core-security.md)** - Platform Security
 
 **Purpose**: Outlines the core security measures protecting the application, its data, and users. **When to use**:
 
@@ -72,22 +72,35 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[project-id-slug-architecture.md](project-id-slug-architecture.md)** - Project Identity System
+### **[core-ux.md](core-ux.md)** - Core UX Patterns & Audit
 
-**Purpose**: Explains the dual-identifier system (UUID vs Slug) for projects **When to use**:
+**Purpose**: Documents standard UX patterns, workflows, and implementation status **When to use**:
+
+- Understanding standard user flows (creation, deletion, etc.)
+- Checking implementation status of core features
+- Implementing consistent UI behaviors (toasts, redirects)
+- Reviewing UX guidelines (consistency, feedback, protection)
+
+**Key topics**: Project/Page/Menu management workflows, toast notifications, redirect patterns, confirmation modals
+
+---
+
+### **[core-project-id-architecture.md](core-project-id-architecture.md)** - Project Identity System
+
+**Purpose**: Explains the dual-identifier system (UUID vs FolderName) for projects **When to use**:
 
 - Understanding how projects are identified and stored
 - Implementing project renaming logic
 - Working with filesystem paths vs API IDs
 - Troubleshooting "project not found" errors
 
-**Key topics**: UUID vs Slug, controller implementation, filesystem organization, renaming workflows
+**Key topics**: UUID vs FolderName, controller implementation, filesystem organization, renaming workflows
 
 ---
 
 ## 🎨 Content Management
 
-### **[projects.md](projects.md)** - Project Management System
+### **[core-projects.md](core-projects.md)** - Project Management System
 
 **Purpose**: Complete workflow for project creation, management, and updates **When to use**:
 
@@ -100,7 +113,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[pages.md](pages.md)** - Page Management System
+### **[core-pages.md](core-pages.md)** - Page Management System
 
 **Purpose**: Page creation, editing, and management within projects **When to use**:
 
@@ -113,7 +126,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[page-editor.md](page-editor.md)** - Visual Page Editor
+### **[core-page-editor.md](core-page-editor.md)** - Visual Page Editor
 
 **Purpose**: Central page editing interface and component orchestration **When to use**:
 
@@ -128,7 +141,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## 🗂️ Content Organization
 
-### **[menus.md](menus.md)** - Navigation Menu System
+### **[core-menus.md](core-menus.md)** - Navigation Menu System
 
 **Purpose**: Menu creation, management, and hierarchical structure handling **When to use**:
 
@@ -141,7 +154,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[media.md](media.md)** - Media Library System
+### **[core-media.md](core-media.md)** - Media Library System
 
 **Purpose**: File upload, storage, and media management **When to use**:
 
@@ -157,7 +170,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## 🛠️ Theme & Content Distribution
 
-### **[themes.md](themes.md)** - Theme Management Interface
+### **[core-themes.md](core-themes.md)** - Theme Management Interface
 
 **Purpose**: User interface for viewing and uploading themes **When to use**:
 
@@ -170,7 +183,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[export.md](export.md)** - Static Site Export & Version Management
+### **[core-export.md](core-export.md)** - Static Site Export & Version Management
 
 **Purpose**: Exporting projects to static HTML websites with comprehensive version control **When to use**:
 
@@ -186,7 +199,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## ⚙️ Configuration & Settings
 
-### **[app-settings.md](app-settings.md)** - Global Application Settings
+### **[core-appSettings.md](core-appSettings.md)** - Global Application Settings
 
 **Purpose**: System-level configuration management **When to use**:
 
@@ -199,7 +212,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[hooks.md](hooks.md)** - Custom React Hooks
+### **[core-hooks.md](core-hooks.md)** - Custom React Hooks
 
 **Purpose**: Documentation for reusable React hooks used throughout the application **When to use**:
 
@@ -217,23 +230,23 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **Theme Developers**
 
-Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md` Secondary: `export.md`, `menus.md`
+Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md` Secondary: `core-export.md`, `core-menus.md`
 
 ### **Frontend Developers**
 
-Primary docs: `page-editor.md`, `projects.md`, `pages.md` Secondary: `media.md`, `app-settings.md`
+Primary docs: `core-page-editor.md`, `core-projects.md`, `core-pages.md` Secondary: `core-media.md`, `core-appSettings.md`
 
 ### **Backend Developers**
 
-Primary docs: `export.md`, `media.md`, `projects.md` Secondary: `pages.md`, `menus.md`, `app-settings.md`
+Primary docs: `core-export.md`, `core-media.md`, `core-projects.md` Secondary: `core-pages.md`, `core-menus.md`, `core-appSettings.md`
 
 ### **System Architects**
 
-Primary docs: `theming.md`, `projects.md`, `hooks.md` Secondary: All other documents for comprehensive understanding
+Primary docs: `theming.md`, `core-projects.md`, `core-hooks.md` Secondary: All other documents for comprehensive understanding
 
 ### **Content Managers / End-Users**
 
-Primary docs: `themes.md`, `page-editor.md` Secondary: `media.md`, `menus.md`
+Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`, `core-menus.md`
 
 ---
 
@@ -249,7 +262,7 @@ Primary docs: `themes.md`, `page-editor.md` Secondary: `media.md`, `menus.md`
 
 ## 🎨 Code Quality & Standards
 
-### **[code-comments.md](code-comments.md)** - Code Comments Guidelines
+### **[rules-comments.md](rules-comments.md)** - Code Comments Guidelines
 
 **Purpose**: Guidelines for writing effective code comments that help new contributors understand complex logic **When to use**:
 

@@ -362,6 +362,6 @@ All API endpoints described in this document are protected by the platform's cor
 
 **See also:**
 
-- [App Settings](core-app-settings.md) - Configure image processing and upload limits
+- [App Settings](core-appSettings.md) - Configure image processing and upload limits
 - [Export System](core-export.md) - How media usage tracking optimizes exports
 - [Custom Hooks](core-hooks.md) - Media management hooks documentation

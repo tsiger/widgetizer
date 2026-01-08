@@ -367,7 +367,7 @@ Used by `AppSettings.jsx` page for managing system-wide configuration that affec
 
 **See also:**
 
-- [App Settings](core-app-settings.md) - Settings managed by `useAppSettings` hook
+- [App Settings](core-appSettings.md) - Settings managed by `useAppSettings` hook
 - [Export System](core-export.md) - Export functionality using `useExportState` hook
 - [Media Library](core-media.md) - Media management using media hooks
 - [Page Editor](core-page-editor.md) - Editor functionality using navigation guards

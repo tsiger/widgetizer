@@ -208,11 +208,11 @@ The system automatically manages storage by:
 
 ## Security Considerations
 
-All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
 
 ---
 
 **See also:**
 
-- [App Settings](app-settings.md) - Configure export retention limits
-- [Media Library](media.md) - Media usage tracking for optimized exports
+- [App Settings](core-appSettings.md) - Configure export retention limits
+- [Media Library](core-media.md) - Media usage tracking for optimized exports

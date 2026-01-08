@@ -159,4 +159,4 @@ This server-side validation and processing ensures that the constraints are alwa
 
 ## Security Considerations
 
-All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](security.md)** documentation.
+All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
