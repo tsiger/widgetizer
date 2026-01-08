@@ -27,7 +27,7 @@ export const AssetTag = {
      * {% asset "filename.js" %}
      *
      * Advanced usage with options:
-     * {% asset "filename.js", { "defer": false, "async": true } %}
+     * {% asset "filename.js", { "defer": true, "async": true } %}
      *
      * File Location:
      * Assets are loaded from different directories based on context:
@@ -35,10 +35,10 @@ export const AssetTag = {
      * - When used elsewhere: loads from "data/projects/{projectId}/assets/{filename}"
      *
      * Available options:
-     * - defer (boolean, default: true): For JS files, whether to add the defer attribute
-     *   Example: {% asset "script.js", { "defer": false } %}
+     * - defer (boolean, default: false): For JS files, whether to add the defer attribute (opt-in)
+     *   Example: {% asset "script.js", { "defer": true } %}
      *
-     * - async (boolean, default: false): For JS files, whether to add the async attribute
+     * - async (boolean, default: false): For JS files, whether to add the async attribute (opt-in)
      *   Example: {% asset "script.js", { "async": true } %}
      *
      * - crossorigin (string, default: null): For resources loaded from other domains
@@ -85,9 +85,9 @@ export const AssetTag = {
         assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/${folder}/${this.filepath}`;
       }
 
-      // Extract options with defaults
+      // Extract options with defaults (opt-in behavior)
       const {
-        defer = true,
+        defer = false,
         async = false,
         crossorigin = null,
         integrity = null,
@@ -116,8 +116,9 @@ export const AssetTag = {
         return cssTag;
       } else if (isJS) {
         let scriptTag = `<script src="${assetUrl}"${attributes}`;
-        if (defer) scriptTag += " defer";
-        if (async) scriptTag += " async";
+        // Only add attributes if explicitly set to true (opt-in)
+        if (defer === true) scriptTag += " defer";
+        if (async === true) scriptTag += " async";
         scriptTag += `></script>`;
         return scriptTag;
       } else if (isImage) {
