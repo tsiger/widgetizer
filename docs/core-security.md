@@ -17,8 +17,8 @@ These layers are applied automatically to API endpoints and provide a robust bas
 - **What it is:** Limits the number of requests an IP address can make to the API within a specific timeframe.
 - **Why it's important:** Prevents abuse and Denial-of-Service (DoS) attacks where a single actor could overwhelm the server, making it unavailable for legitimate users.
 - **Implementation:** Uses the `express-rate-limit` package. Two policies are in place:
-  - A stricter, general limit for most API endpoints.
-  - A more lenient limit for editor-related endpoints (`/api/projects`, `/api/pages`, etc.) to accommodate their higher request volume during content creation.
+  - **Editor routes** (`/api/projects`, `/api/themes`, `/api/pages`, `/api/preview`): 1500 requests per 15 minutes
+  - **Other API routes** (`/api/menus`, `/api/media`, `/api/export`, `/api/settings`): 1000 requests per 15 minutes
 
 ### 3. HTTP Security Headers [PENDING]
 
@@ -38,13 +38,13 @@ These layers are applied automatically to API endpoints and provide a robust bas
 - **Why it's important:** SVGs are XML files that can contain JavaScript (XSS vectors). Defense-in-depth ensures that even if client-side sanitization is bypassed, the server protects the filesystem.
 - **Implementation:** Integrated into `useMediaUpload.js` (client) and `mediaController.js` (server).
 
-### 5. Global Error Handling
+### 6. Global Error Handling
 
 - **What it is:** A catch-all "safety net" middleware that handles any unexpected errors that occur within the application.
 - **Why it's important:** Prevents the server from crashing due to unhandled exceptions. It also ensures that sensitive error details (like stack traces) are not leaked to the client in a production environment.
-- **Implementation:** A custom error-handling middleware is registered as the final middleware in `server/index.js`.
+- **Implementation:** A custom error-handling middleware (`server/middleware/errorHandler.js`) is registered as the final middleware in `server/index.js`.
 
-## ⚙️ Configuration & Monitoring
+## ⚙️ Configuration
 
 ### Environment Variables (`.env`)
 
@@ -53,12 +53,13 @@ Sensitive configuration and environment-specific settings are stored in a `.env`
 - `NODE_ENV`: Controls whether the application runs in `development` or `production` mode.
 - `PRODUCTION_URL`: The whitelisted domain for CORS in production.
 - `VITE_API_URL`: The URL for the backend API, used by the frontend.
+- `PORT`: The port number for the server (defaults to 3001).
 
-### Request Logging
+### Health Check Endpoint
 
-- **What it is:** All incoming API requests are logged to a file.
-- **Purpose:** This is primarily for development and debugging, allowing developers to monitor API traffic and analyze request patterns.
-- **Implementation:** A custom middleware logs the timestamp, method, and URL of every request to `logs/api-requests.log`. This directory is excluded from version control and development server hot-reloading.
+- **What it is:** A simple endpoint (`/health`) that returns the server status and current timestamp.
+- **Purpose:** Used for monitoring and load balancer health checks in production environments.
+- **Response:** `{ "status": "ok", "timestamp": "..." }`
 
 ## ⚙️ Deployment Security
 
@@ -72,3 +73,10 @@ Sensitive configuration and environment-specific settings are stored in a `.env`
 - **Configuration**: In production (`NODE_ENV=production`), the server uses `express.static` to serve files from the `dist` directory.
 - **Fallback**: A catch-all route (`*`) ensures that React Router handles client-side routing correctly by serving `index.html` for unknown routes.
 - **Trust Proxy**: The `trust proxy` setting is enabled in production to ensure rate limiting works correctly behind reverse proxies (like Nginx or Heroku).
+
+---
+
+**See also:**
+
+- [Media Library](core-media.md) - SVG sanitization in media uploads
+- [Custom Hooks](core-hooks.md) - Client-side sanitization in `useMediaUpload`
