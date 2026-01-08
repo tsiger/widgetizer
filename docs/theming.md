@@ -555,6 +555,93 @@ Outputs all stylesheets that have been registered using `{% enqueue_style %}`.
 {% render_styles %}
 ```
 
+#### Asset Tag
+
+Directly includes CSS, JavaScript, or image assets in your templates. Unlike `enqueue_*` tags, this tag outputs the asset immediately where it's placed.
+
+**Usage:**
+
+```liquid
+{# Basic usage - CSS files #}
+{% asset "base.css" %}
+{% asset "theme.css" %}
+
+{# Basic usage - JavaScript files #}
+{% asset "scripts.js" %}
+
+{# Basic usage - Images #}
+{% asset "logo.svg" %}
+```
+
+**Advanced Usage with Options:**
+
+```liquid
+{# JavaScript with defer attribute (opt-in) #}
+{% asset "scripts.js", { "defer": true } %}
+
+{# JavaScript with async attribute (opt-in) #}
+{% asset "vendor.js", { "async": true } %}
+
+{# JavaScript with both defer and async #}
+{% asset "module.js", { "defer": true, "async": true } %}
+
+{# CSS with media query #}
+{% asset "print.css", { "media": "print" } %}
+
+{# CSS with ID attribute #}
+{% asset "theme.css", { "id": "theme-stylesheet" } %}
+
+{# External resource with crossorigin #}
+{% asset "font.css", { "crossorigin": "anonymous" } %}
+
+{# Resource with integrity hash #}
+{% asset "vendor.js", { "integrity": "sha384-..." } %}
+```
+
+**Options:**
+
+| Option        | Type    | Default | Description                                                              |
+| :------------ | :------ | :------ | :----------------------------------------------------------------------- |
+| `defer`       | Boolean | `false` | For JS files, adds the `defer` attribute (opt-in - only added if `true`) |
+| `async`       | Boolean | `false` | For JS files, adds the `async` attribute (opt-in - only added if `true`) |
+| `crossorigin` | String  | `null`  | For external resources, sets the `crossorigin` attribute                 |
+| `integrity`   | String  | `null`  | Subresource Integrity hash for security (e.g., `"sha384-..."`)           |
+| `media`       | String  | `null`  | For CSS files, specifies media query (e.g., `"print"`, `"screen"`)       |
+| `id`          | String  | `null`  | Adds an `id` attribute to the generated tag                              |
+
+**File Location:**
+
+Assets are loaded from different directories based on context:
+
+- **When used in a widget template**: Loads from `data/projects/{projectId}/widgets/{filename}`
+- **When used elsewhere (layout, snippets)**: Loads from `data/projects/{projectId}/assets/{filename}`
+
+**Output:**
+
+- **CSS files** (`.css`): Outputs `<link rel="stylesheet">` tag
+- **JavaScript files** (`.js`): Outputs `<script>` tag
+- **Image files** (`.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`, `.svg`): Outputs `<img>` tag with metadata (alt, title) when available
+- **Other file types**: Returns the asset URL as a string
+
+**Examples:**
+
+```liquid
+{# In layout.liquid - loads from assets/ folder #}
+<head>
+  {% asset "base.css" %}
+  {% asset "theme.css", { "id": "theme-styles", "media": "screen" } %}
+</head>
+<body>
+  <!-- Content -->
+  {% asset "scripts.js" %}
+  {% asset "analytics.js", { "async": true } %}
+</body>
+
+{# In widget template - loads from widgets/ folder #}
+{% asset "widget-specific.css" %}
+{% asset "widget-script.js", { "defer": true } %}
+```
+
 #### Placeholder Image
 
 Outputs a placeholder image for development and preview purposes. Theme authors can use the default core placeholder or provide a custom image from their theme's `assets/` folder.
