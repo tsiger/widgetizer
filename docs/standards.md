@@ -34,6 +34,7 @@ Every widget follows this standard structure:
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="widget-type-name"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   <style>
     .widget-{{ widget.id }} {
@@ -56,6 +57,11 @@ Every widget follows this standard structure:
   </div>
 </section>
 ```
+
+**Data Attributes:**
+- `data-widget-id`: Unique widget instance ID
+- `data-widget-type`: Widget type identifier (e.g., `"banner"`, `"card-grid"`)
+- `data-widget-index`: 1-based index of the widget in the page (first widget = 1, second = 2, etc.). This is `null` for global widgets (header/footer) or when the index is not available, so it's conditionally rendered.
 
 ---
 
@@ -255,7 +261,7 @@ When auditing each widget, check:
 
 ### Structure (Rules 1-2)
 
-- [ ] Section has id, class, data-widget-id, data-widget-type
+- [ ] Section has id, class, data-widget-id, data-widget-type, data-widget-index (when available)
 - [ ] Uses widget-eyebrow, widget-headline, widget-description for header
 - [ ] Uses data-setting attributes on editable elements
 
