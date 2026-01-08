@@ -32,7 +32,7 @@
     "isomorphic-dompurify": "^2.25.0",
     "liquidjs": "^10.21.0",
     "lucide-react": "^0.562.0",
-    "multer": "^1.4.5-lts.2",
+    "multer": "^2.0.2",
     "rc-slider": "^11.1.8",
     "react": "^19.1.0",
     "react-colorful": "^5.6.1",
