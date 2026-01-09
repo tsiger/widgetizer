@@ -1,6 +1,7 @@
 {
   "type": "pricing",
   "displayName": "Pricing",
+  "aliases": ["plans", "packages", "subscription", "pricing tiers"],
   "settings": [
     {
       "type": "text",

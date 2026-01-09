@@ -1,6 +1,7 @@
 {
   "type": "styles",
   "displayName": "Design System Showcase",
+  "aliases": ["design", "style guide", "branding", "look and feel"],
   "category": "content",
   "description": "A comprehensive style guide showing all available design system components and utilities",
   "settings": []

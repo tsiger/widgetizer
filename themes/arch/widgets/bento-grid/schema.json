@@ -1,6 +1,7 @@
 {
   "type": "bento-grid",
   "displayName": "Bento Grid",
+  "aliases": ["dashboard", "tiles", "highlights", "featured grid"],
   "settings": [
     {
       "type": "text",

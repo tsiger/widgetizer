@@ -1,6 +1,7 @@
 {
   "type": "event-list",
   "displayName": "Event List",
+  "aliases": ["calendar", "schedule", "upcoming events", "agenda"],
   "settings": [
     {
       "type": "text",

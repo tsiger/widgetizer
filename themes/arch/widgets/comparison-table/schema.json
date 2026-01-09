@@ -1,6 +1,7 @@
 {
   "type": "comparison-table",
   "displayName": "Comparison Table",
+  "aliases": ["pricing table", "features comparison", "specs", "benchmark"],
   "settings": [
     {
       "type": "text",

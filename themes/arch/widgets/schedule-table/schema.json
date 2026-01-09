@@ -1,6 +1,7 @@
 {
   "type": "schedule-table",
   "displayName": "Schedule Table",
+  "aliases": ["agenda", "time table", "timetable", "events schedule"],
   "settings": [
     {
       "type": "text",

@@ -1,6 +1,7 @@
 {
   "type": "podcast-player",
   "displayName": "Podcast Player",
+  "aliases": ["audio", "music", "spotify", "stream"],
   "settings": [
     {
       "type": "text",

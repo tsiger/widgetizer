@@ -1,6 +1,7 @@
 {
   "type": "social-icons",
   "displayName": "Social Icons",
+  "aliases": ["links", "follow", "share", "connect"],
   "settings": [
     {
       "type": "text",

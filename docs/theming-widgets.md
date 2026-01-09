@@ -644,6 +644,7 @@ These will be automatically rendered by `{% header_assets %}` (for styles) and `
 {
   "type": "my-widget",
   "displayName": "My Widget",
+  "aliases": ["alternative name", "keyword"],
   "settings": [
     // Widget settings here
   ],

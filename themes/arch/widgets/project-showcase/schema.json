@@ -1,6 +1,7 @@
 {
   "type": "project-showcase",
   "displayName": "Project Showcase",
+  "aliases": ["portfolio", "works", "case studies", "projects"],
   "settings": [
     {
       "type": "text",

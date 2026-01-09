@@ -1,6 +1,7 @@
 {
   "type": "newsletter",
   "displayName": "Newsletter Signup",
+  "aliases": ["subscribe", "signup", "email marketing", "join"],
   "settings": [
     {
       "type": "text",

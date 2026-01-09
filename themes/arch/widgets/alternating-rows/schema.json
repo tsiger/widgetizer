@@ -1,6 +1,7 @@
 {
   "type": "alternating-rows",
   "displayName": "Alternating Rows",
+  "aliases": ["content rows", "zigzag", "split content", "alternating layout"],
   "settings": [
     {
       "type": "text",

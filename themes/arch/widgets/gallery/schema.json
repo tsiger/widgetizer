@@ -1,6 +1,7 @@
 {
   "type": "gallery",
   "displayName": "Gallery",
+  "aliases": ["images", "photos", "portfolio", "showcase"],
   "settings": [
     {
       "type": "text",

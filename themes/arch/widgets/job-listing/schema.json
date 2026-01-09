@@ -1,6 +1,7 @@
 {
   "type": "job-listing",
   "displayName": "Job Listing",
+  "aliases": ["careers", "hiring", "positions", "vacancies"],
   "settings": [
     {
       "type": "text",

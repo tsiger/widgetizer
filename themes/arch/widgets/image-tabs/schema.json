@@ -1,6 +1,7 @@
 {
   "type": "image-tabs",
   "displayName": "Image Tabs",
+  "aliases": ["visual tabs", "image selector", "gallery tabs", "interactive gallery"],
   "settings": [
     {
       "type": "text",

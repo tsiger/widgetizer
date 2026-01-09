@@ -1,6 +1,7 @@
 {
   "type": "testimonials",
   "displayName": "Testimonials",
+  "aliases": ["reviews", "feedback", "social proof", "quotes"],
   "settings": [
     {
       "type": "text",

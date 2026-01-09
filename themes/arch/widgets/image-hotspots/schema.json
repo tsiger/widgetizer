@@ -1,6 +1,7 @@
 {
   "type": "image-hotspots",
   "displayName": "Image Hotspots",
+  "aliases": ["interactive image", "markers", "product details", "hotspots"],
   "settings": [
     {
       "type": "text",

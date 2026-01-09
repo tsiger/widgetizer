@@ -1,6 +1,7 @@
 {
   "type": "masonry-gallery",
   "displayName": "Masonry Gallery",
+  "aliases": ["pinterest style", "dynamic grid", "auto layout", "photo grid"],
   "settings": [
     {
       "type": "text",

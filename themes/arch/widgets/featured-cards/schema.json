@@ -1,6 +1,7 @@
 {
   "type": "featured-cards",
   "displayName": "Featured Cards",
+  "aliases": ["highlights", "key items", "spotlight", "featured content"],
   "settings": [
     {
       "type": "text",

@@ -1,6 +1,7 @@
 {
   "type": "slideshow",
   "displayName": "Slideshow",
+  "aliases": ["carousel", "slider", "banner slider", "rotating banners"],
   "settings": [
     {
       "type": "select",

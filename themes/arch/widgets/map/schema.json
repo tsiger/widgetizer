@@ -1,6 +1,7 @@
 {
   "type": "map",
   "displayName": "Map",
+  "aliases": ["location", "directions", "store finder", "google maps"],
   "settings": [
     {
       "type": "text",

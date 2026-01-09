@@ -1,6 +1,7 @@
 {
   "type": "logo-cloud",
   "displayName": "Logo Cloud",
+  "aliases": ["partners", "clients", "trust signals", "brands"],
   "settings": [
     {
       "type": "text",

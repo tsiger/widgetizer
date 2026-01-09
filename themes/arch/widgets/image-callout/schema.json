@@ -1,6 +1,7 @@
 {
   "type": "image-callout",
   "displayName": "Image Callout",
+  "aliases": ["cta image", "visual lead", "promotion", "highlight image"],
   "settings": [
     {
       "type": "image",

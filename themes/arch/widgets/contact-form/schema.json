@@ -1,6 +1,7 @@
 {
   "type": "contact-form",
   "displayName": "Contact Form",
+  "aliases": ["lead capture", "inquiry", "message", "feedback"],
   "settings": [
     {
       "type": "text",

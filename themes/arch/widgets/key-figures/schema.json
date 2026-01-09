@@ -1,6 +1,7 @@
 {
   "type": "key-figures",
   "displayName": "Key Figures",
+  "aliases": ["stats", "metrics", "data points", "numbers"],
   "settings": [
     {
       "type": "text",

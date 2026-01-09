@@ -49,7 +49,11 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
 
   const filteredWidgets = availableWidgets.filter((schema) => {
     const name = schema.displayName || schema.type;
-    return name.toLowerCase().includes(searchTerm.toLowerCase());
+    const aliases = schema.aliases || [];
+    const searchLower = searchTerm.toLowerCase();
+    
+    return name.toLowerCase().includes(searchLower) || 
+           aliases.some(alias => alias.toLowerCase().includes(searchLower));
   });
 
   // Calculate position relative to trigger (using useLayoutEffect to avoid accessing refs during render)

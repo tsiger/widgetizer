@@ -1,6 +1,7 @@
 {
   "type": "numbered-cards",
   "displayName": "Numbered Cards",
+  "aliases": ["steps", "process", "workflow", "ordered list"],
   "settings": [
     {
       "type": "text",

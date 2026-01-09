@@ -1,6 +1,7 @@
 {
   "type": "priced-list",
   "displayName": "Priced List",
+  "aliases": ["menu", "catalog", "services with price", "inventory"],
   "settings": [
     {
       "type": "text",

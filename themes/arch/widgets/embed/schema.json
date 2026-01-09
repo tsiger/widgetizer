@@ -1,6 +1,7 @@
 {
   "type": "embed",
   "displayName": "Embed Widget",
+  "aliases": ["iframe", "external content", "integration", "third-party"],
   "settings": [
     {
       "type": "text",

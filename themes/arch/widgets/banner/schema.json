@@ -1,6 +1,7 @@
 {
   "type": "banner",
   "displayName": "Banner",
+  "aliases": ["hero", "intro", "cover", "billboard", "jumbotron", "header", "splash"],
   "settings": [
     {
       "type": "select",

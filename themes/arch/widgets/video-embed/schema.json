@@ -1,6 +1,7 @@
 {
   "type": "video-embed",
   "displayName": "YouTube/Vimeo",
+  "aliases": ["youtube", "vimeo", "streaming", "external video"],
   "settings": [
     {
       "type": "text",

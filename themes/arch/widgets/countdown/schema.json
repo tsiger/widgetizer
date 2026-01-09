@@ -1,6 +1,7 @@
 {
   "type": "countdown",
   "displayName": "Countdown Timer",
+  "aliases": ["timer", "launch date", "offer ends", "deadline"],
   "settings": [
     {
       "type": "text",

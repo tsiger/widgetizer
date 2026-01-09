@@ -1,6 +1,7 @@
 {
   "type": "video",
   "displayName": "Video",
+  "aliases": ["mp4", "player", "clip", "media"],
   "settings": [
     {
       "type": "text",

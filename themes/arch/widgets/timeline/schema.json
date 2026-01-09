@@ -1,6 +1,7 @@
 {
   "type": "timeline",
   "displayName": "Timeline",
+  "aliases": ["history", "roadmap", "milestones", "journey"],
   "settings": [
     {
       "type": "text",

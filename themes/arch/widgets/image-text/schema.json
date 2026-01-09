@@ -1,6 +1,7 @@
 {
   "type": "image-text",
   "displayName": "Image + Text",
+  "aliases": ["split layout", "visual content", "side by side", "media text"],
   "settings": [
     {
       "type": "image",

@@ -1,6 +1,7 @@
 {
   "type": "comparison-slider",
   "displayName": "Comparison Slider",
+  "aliases": ["before after", "visual comparison", "image slider", "compare"],
   "settings": [
     {
       "type": "text",

@@ -1,6 +1,7 @@
 {
   "type": "card-grid",
   "displayName": "Card Grid",
+  "aliases": ["features", "services", "grid", "blocks"],
   "settings": [
     {
       "type": "text",

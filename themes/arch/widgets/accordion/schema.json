@@ -1,6 +1,7 @@
 {
   "type": "accordion",
   "displayName": "Accordion",
+  "aliases": ["faq", "details", "toggle", "collapsible"],
   "settings": [
     {
       "type": "text",

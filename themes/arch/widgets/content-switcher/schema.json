@@ -1,6 +1,7 @@
 {
   "type": "content-switcher",
   "displayName": "Content Switcher",
+  "aliases": ["tabs", "toggle content", "switch", "selector"],
   "settings": [
     {
       "type": "text",
