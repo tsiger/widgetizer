@@ -31,7 +31,6 @@ export default function PageEditor() {
     setSelectedBlockId,
     setSelectedGlobalWidgetId,
     selectedThemeGroup,
-    setSelectedThemeGroup,
   } = useWidgetStore();
 
   // Add navigation guard
@@ -62,9 +61,6 @@ export default function PageEditor() {
     setSelectedGlobalWidgetId(widgetType);
   };
 
-  const handleThemeGroupSelect = (groupKey) => {
-    setSelectedThemeGroup(groupKey);
-  };
 
   // Get the selected widget and its schema (needed by SettingsPanel)
   const selectedWidget = selectedWidgetId && page?.widgets[selectedWidgetId];

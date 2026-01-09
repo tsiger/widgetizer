@@ -9,7 +9,6 @@ const MenuCombobox = memo(function MenuCombobox({
   placeholder,
   isOpen,
   onOpenChange,
-  depth,
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const containerRef = useRef(null);

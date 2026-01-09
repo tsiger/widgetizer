@@ -72,7 +72,7 @@ const SortableItem = memo(function SortableItem({
     (e) => {
       onEdit(item.id, { ...item, label: e.target.value });
     },
-    [onEdit, item.id, item],
+    [onEdit, item],
   );
 
   const handleLinkChange = useCallback(
@@ -80,7 +80,7 @@ const SortableItem = memo(function SortableItem({
       // Accept whatever the user types. If they choose a page option, its value already contains .html.
       onEdit(item.id, { ...item, link: value });
     },
-    [onEdit, item.id, item],
+    [onEdit, item],
   );
 
   // Get background color based on depth for visual hierarchy
@@ -171,7 +171,6 @@ const SortableItem = memo(function SortableItem({
               placeholder="Select page or type URL..."
               isOpen={openDropdownId === item.id}
               onOpenChange={(isOpen) => onDropdownOpen(item.id, isOpen)}
-              depth={depth}
             />
           </div>
         </div>

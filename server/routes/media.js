@@ -15,7 +15,18 @@ import {
 const router = express.Router();
 
 // Get all media for a project
-router.get("/projects/:projectId/media", [param("projectId").notEmpty()], getProjectMedia);
+router.get(
+  "/projects/:projectId/media",
+  [
+    param("projectId")
+      .notEmpty()
+      .withMessage("Project ID is required")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Project ID cannot be empty"),
+  ],
+  getProjectMedia,
+);
 
 // Upload media to a project
 router.post(
@@ -68,7 +79,7 @@ router.get(
   "/projects/:projectId/uploads/images/:filename",
   [param("projectId").notEmpty(), param("filename").notEmpty()],
   (req, res) => {
-    const { projectId, filename } = req.params;
+    const { filename } = req.params;
     req.params.filename = filename;
     serveProjectMedia(req, res);
   },
@@ -79,7 +90,7 @@ router.get(
   "/projects/:projectId/uploads/videos/:filename",
   [param("projectId").notEmpty(), param("filename").notEmpty()],
   (req, res) => {
-    const { projectId, filename } = req.params;
+    const { filename } = req.params;
     req.params.filename = filename;
     serveProjectMedia(req, res);
   },
@@ -90,7 +101,7 @@ router.get(
   "/projects/:projectId/uploads/audios/:filename",
   [param("projectId").notEmpty(), param("filename").notEmpty()],
   (req, res) => {
-    const { projectId, filename } = req.params;
+    const { filename } = req.params;
     req.params.filename = filename;
     serveProjectMedia(req, res);
   },

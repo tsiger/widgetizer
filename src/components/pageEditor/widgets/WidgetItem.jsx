@@ -21,7 +21,6 @@ export default function WidgetItem({
   onDuplicateClick,
   onBlockSelect,
   selectedBlockId,
-  onBlocksReorder,
   onAddBlockClick,
   isBlockSelectorOpen,
   activeWidgetId,

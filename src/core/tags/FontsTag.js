@@ -5,10 +5,12 @@ import fontDefinitions from "../config/fonts.json" with { type: "json" };
 const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
 
 export const FontsTag = {
+  // eslint-disable-next-line no-unused-vars
   parse: function (tagToken, remainTokens) {
     // No arguments expected
     this.tagName = tagToken.name;
   },
+  // eslint-disable-next-line no-unused-vars
   render: function (context, hash) {
     const rawSettings = context.globals?.themeSettingsRaw;
 
@@ -18,7 +20,7 @@ export const FontsTag = {
 
     const fontsToLoad = {}; // { FontName: Set(weight) }
     const typographySettings = rawSettings.settings.global.typography;
-    
+
     // Track body font for smart bold loading
     let bodyFontName = null;
     let bodyFontWeight = null;
@@ -44,7 +46,7 @@ export const FontsTag = {
                 fontsToLoad[fontName] = new Set();
               }
               fontsToLoad[fontName].add(value.weight);
-              
+
               // Track body font for smart bold loading
               if (setting.id === "body_font") {
                 bodyFontName = fontName;
@@ -56,18 +58,18 @@ export const FontsTag = {
         }
       }
     }
-    
+
     // Smart bold weight loading for body font
     // If body font is normal (400), auto-load a proper bold weight to prevent faux-bold
     if (bodyFontName && bodyFontWeight === 400 && bodyFontInfo) {
       const availableWeights = bodyFontInfo.availableWeights || [];
-      
+
       // Find best bold weight: 700 (bold) > 600 (semibold) > 500 (medium)
       let boldWeight = null;
       if (availableWeights.includes(700)) boldWeight = 700;
       else if (availableWeights.includes(600)) boldWeight = 600;
       else if (availableWeights.includes(500)) boldWeight = 500;
-      
+
       if (boldWeight) {
         fontsToLoad[bodyFontName].add(boldWeight);
       }
@@ -99,7 +101,7 @@ export const FontsTag = {
     // 2. Stylesheet link
     // Bunny Fonts uses v1 API (pipe-separated), Google uses v2 API (ampersand-separated)
     let url;
-    
+
     if (useBunnyFonts) {
       // Bunny Fonts v1 API format: family=Font1:wght@400;700|Font2:wght@400
       const base = "https://fonts.bunny.net/css";
@@ -109,7 +111,7 @@ export const FontsTag = {
           return `${encodeURIComponent(name)}:wght@${weights.join(";")}`;
         })
         .join("|"); // Pipe separator for v1 API
-      
+
       url = `${base}?family=${families}&display=swap`;
     } else {
       // Google Fonts v2 API format: family=Font1:wght@400;700&family=Font2:wght@400
@@ -120,10 +122,10 @@ export const FontsTag = {
           return `family=${encodeURIComponent(name)}:wght@${weights.join(";")}`;
         })
         .join("&"); // Ampersand separator for v2 API
-      
+
       url = `${base}?${families}&display=swap`;
     }
-    
+
     output += `<link href="${url}" rel="stylesheet">`;
 
     return output;

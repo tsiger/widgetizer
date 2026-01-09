@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Play, ExternalLink, Settings, Check, X, AlertCircle } from "lucide-react";
-import { extractVideoId, validateYouTubeUrl, createYouTubeEmbed, getThumbnailUrl } from "../../../utils/youtubeHelpers";
+import { validateYouTubeUrl, createYouTubeEmbed } from "../../../utils/youtubeHelpers";
 
 export default function YouTubeInput({ id, label, description, value = null, onChange, setting = {} }) {
   const [url, setUrl] = useState(value?.url || "");
@@ -57,10 +57,10 @@ export default function YouTubeInput({ id, label, description, value = null, onC
           setError("Could not process YouTube URL");
           setIsValid(false);
           setEmbedData(null);
-          onChange(null);
-        }
-      } catch (err) {
-        setError("Error processing YouTube URL");
+        onChange(null);
+      }
+    } catch {
+      setError("Error processing YouTube URL");
         setIsValid(false);
         setEmbedData(null);
         onChange(null);

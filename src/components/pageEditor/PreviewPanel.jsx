@@ -29,7 +29,6 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     selectedBlockId,
     selectedGlobalWidgetId,
     widgets,
-    widgetSchemas,
     themeSettings,
     previewMode = "desktop",
     onWidgetSelect,

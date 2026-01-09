@@ -1,4 +1,4 @@
-import { Check, Search, Trash2, Image, Edit2, AlertCircle } from "lucide-react";
+import { Check, Search, Trash2, Image, Edit2 } from "lucide-react";
 import { API_URL } from "../../config";
 
 export default function MediaGridItem({ file, isSelected, onSelect, onDelete, onView, onEdit, activeProject }) {

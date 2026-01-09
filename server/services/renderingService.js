@@ -281,7 +281,7 @@ async function renderWidget(
     let template;
     try {
       template = await fs.readFile(widgetPath, "utf-8");
-    } catch (readErr) {
+    } catch {
       // If template not found, return an informative error message instead of crashing
       console.error(`Widget template not found at ${widgetPath}`);
       return `<div class="widget-error">Widget template not found: ${type}.liquid</div>`;
@@ -292,7 +292,7 @@ async function renderWidget(
     try {
       const schemaContent = await fs.readFile(schemaPath, "utf-8");
       schema = JSON.parse(schemaContent);
-    } catch (schemaErr) {
+    } catch {
       console.error(`Widget schema not found at ${schemaPath}`);
       schema = { settings: [], blocks: [] };
     }

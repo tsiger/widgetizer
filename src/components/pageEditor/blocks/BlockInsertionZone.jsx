@@ -6,7 +6,6 @@ export default function BlockInsertionZone({
   position,
   onAddClick,
   isBlockSelectorOpen,
-  activeWidgetId,
   activeBlockTriggerKey,
 }) {
   const [isHovered, setIsHovered] = useState(false);
@@ -28,6 +27,7 @@ export default function BlockInsertionZone({
       if (hoverTimerRef.current) {
         clearTimeout(hoverTimerRef.current);
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsVisible(false);
     }
 

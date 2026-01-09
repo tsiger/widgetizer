@@ -523,8 +523,8 @@ export async function savePageContent(req, res) {
     return res.status(400).json({ errors: errors.array() });
   }
 
+  const { id } = req.params;
   try {
-    const { id } = req.params;
     const pageData = req.body; // Get all data including SEO
     const { projects, activeProjectId } = await readProjectsFile();
     const activeProject = projects.find((p) => p.id === activeProjectId);

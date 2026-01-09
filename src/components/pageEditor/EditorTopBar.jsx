@@ -22,7 +22,7 @@ export default function EditorTopBar({
 
   // Force re-render when undo/redo happens
   const [, forceUpdate] = useState(0);
-  
+
   // Subscribe to temporal store changes
   useEffect(() => {
     const unsubscribe = usePageStore.temporal.subscribe(() => {
@@ -32,7 +32,7 @@ export default function EditorTopBar({
   }, []);
 
   // Get undo/redo state
-  const { pastStates, futureStates, undo, redo } = usePageStore.temporal.getState();
+  const { pastStates, futureStates } = usePageStore.temporal.getState();
   const canUndo = pastStates.length > 0 && pastStates[pastStates.length - 1]?.page;
   const canRedo = futureStates.length > 0;
 

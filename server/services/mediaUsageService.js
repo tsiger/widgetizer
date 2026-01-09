@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
-import { getProjectPagesDir, getProjectMediaJsonPath } from "../config.js";
-import { readMediaFile } from "../controllers/mediaController.js";
+import { getProjectPagesDir } from "../config.js";
+import { readMediaFile, writeMediaFile } from "../controllers/mediaController.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 /**
@@ -112,10 +112,8 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
       }
     });
 
-    // Write updated media data
-    const projectFolderName = await getProjectFolderName(projectId);
-    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
-    await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
+    // Write updated media data (using locked write function to prevent race conditions)
+    await writeMediaFile(projectId, mediaData);
 
     return { success: true, mediaPaths };
   } catch (error) {
@@ -131,11 +129,11 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
   try {
     const mediaPaths = extractMediaPathsFromGlobalWidget(widgetData);
     const mediaData = await readMediaFile(projectId);
-    
+
     // Identifier for global widget, e.g. "global:header"
     // globalId should be passed as "global:header" or just "header" depending on convention
     // Let's standardized on "global:{id}"
-    
+
     const usageId = globalId.startsWith("global:") ? globalId : `global:${globalId}`;
 
     // Remove old usage
@@ -158,9 +156,8 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
       }
     });
 
-    const projectFolderName = await getProjectFolderName(projectId);
-    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
-    await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
+    // Write updated media data (using locked write function to prevent race conditions)
+    await writeMediaFile(projectId, mediaData);
 
     return { success: true, mediaPaths };
   } catch (error) {
@@ -183,10 +180,8 @@ export async function removePageFromMediaUsage(projectId, pageId) {
       }
     });
 
-    // Write updated media data
-    const projectFolderName = await getProjectFolderName(projectId);
-    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
-    await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
+    // Write updated media data (using locked write function to prevent race conditions)
+    await writeMediaFile(projectId, mediaData);
 
     return { success: true };
   } catch (error) {
@@ -272,7 +267,7 @@ export async function refreshAllMediaUsage(projectId) {
     const globalWidgetsDir = path.join(pagesDir, "global");
     if (await fs.pathExists(globalWidgetsDir)) {
       const globalWidgetFiles = ["header.json", "footer.json"];
-      
+
       for (const fileName of globalWidgetFiles) {
         const globalFilePath = path.join(globalWidgetsDir, fileName);
         if (await fs.pathExists(globalFilePath)) {
@@ -280,7 +275,7 @@ export async function refreshAllMediaUsage(projectId) {
             const globalContent = await fs.readFile(globalFilePath, "utf8");
             const globalData = JSON.parse(globalContent);
             const globalId = `global:${fileName.replace(".json", "")}`; // e.g., "global:header"
-            
+
             // Extract media from global widget settings
             const mediaPaths = extractMediaPathsFromGlobalWidget(globalData);
             mediaPaths.forEach((mediaPath) => {
@@ -298,9 +293,8 @@ export async function refreshAllMediaUsage(projectId) {
       }
     }
 
-    // Write updated media data
-    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
-    await fs.outputFile(mediaFilePath, JSON.stringify(mediaData, null, 2));
+    // Write updated media data (using locked write function to prevent race conditions)
+    await writeMediaFile(projectId, mediaData);
 
     return {
       success: true,

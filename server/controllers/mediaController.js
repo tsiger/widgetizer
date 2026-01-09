@@ -66,6 +66,27 @@ function decodeFileName(filename) {
   }
 }
 
+// Write lock to prevent concurrent writes to media.json files
+// Maps projectId -> Promise that resolves when write is complete
+const writeLocks = new Map();
+
+// Acquire write lock for a project
+async function acquireWriteLock(projectId) {
+  // Wait for any existing write to complete
+  while (writeLocks.has(projectId)) {
+    await writeLocks.get(projectId);
+  }
+
+  // Create a new lock promise
+  let releaseLock;
+  const lockPromise = new Promise((resolve) => {
+    releaseLock = resolve;
+  });
+  writeLocks.set(projectId, lockPromise);
+
+  return releaseLock;
+}
+
 // Read media.json metadata file
 export async function readMediaFile(projectId) {
   const projectFolderName = await getProjectFolderName(projectId);
@@ -74,24 +95,85 @@ export async function readMediaFile(projectId) {
   try {
     await fs.access(mediaFilePath);
     const data = await fs.readFile(mediaFilePath, "utf8");
-    return JSON.parse(data);
+    try {
+      return JSON.parse(data);
+    } catch (parseError) {
+      // If JSON parsing fails, try to extract valid JSON
+      console.error(`JSON parse error in ${mediaFilePath}:`, parseError.message);
+
+      // Try to find the end of valid JSON by looking for the last closing brace/bracket
+      // This handles cases where extra content was accidentally appended
+      const lastBrace = data.lastIndexOf("}");
+      const lastBracket = data.lastIndexOf("]");
+      const lastValidPos = Math.max(lastBrace, lastBracket);
+
+      if (lastValidPos > 0) {
+        const validJson = data.substring(0, lastValidPos + 1);
+        try {
+          const parsed = JSON.parse(validJson);
+          // Backup corrupted file and write fixed version (with lock)
+          const releaseLock = await acquireWriteLock(projectId);
+          try {
+            const backupPath = `${mediaFilePath}.backup.${Date.now()}`;
+            await fs.copy(mediaFilePath, backupPath);
+            await fs.writeFile(mediaFilePath, JSON.stringify(parsed, null, 2));
+            console.log(`Fixed corrupted JSON in ${mediaFilePath}. Backup saved to ${backupPath}`);
+            return parsed;
+          } finally {
+            releaseLock();
+            writeLocks.delete(projectId);
+          }
+        } catch (recoveryError) {
+          console.error(`Could not recover JSON from ${mediaFilePath}:`, recoveryError.message);
+          // Fall through to create new file
+        }
+      }
+
+      // If recovery failed, create a new file (with lock)
+      console.warn(`Creating new media.json file for project ${projectId} due to corruption`);
+      const releaseLock = await acquireWriteLock(projectId);
+      try {
+        const initialData = { files: [] };
+        await fs.outputFile(mediaFilePath, JSON.stringify(initialData, null, 2));
+        return initialData;
+      } finally {
+        releaseLock();
+        writeLocks.delete(projectId);
+      }
+    }
   } catch (error) {
     // If file doesn't exist, create a new one
     if (error.code === "ENOENT") {
-      const initialData = { files: [] };
-      // Use outputFile which creates directories if needed
-      await fs.outputFile(mediaFilePath, JSON.stringify(initialData, null, 2));
-      return initialData;
+      const releaseLock = await acquireWriteLock(projectId);
+      try {
+        const initialData = { files: [] };
+        // Use outputFile which creates directories if needed
+        await fs.outputFile(mediaFilePath, JSON.stringify(initialData, null, 2));
+        return initialData;
+      } finally {
+        releaseLock();
+        writeLocks.delete(projectId);
+      }
     }
     throw error;
   }
 }
 
-// Write media metadata file
-async function writeMediaFile(projectId, data) {
-  const projectFolderName = await getProjectFolderName(projectId);
-  const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
-  await fs.outputFile(mediaFilePath, JSON.stringify(data, null, 2));
+// Write media metadata file (with write lock to prevent race conditions)
+export async function writeMediaFile(projectId, data) {
+  const releaseLock = await acquireWriteLock(projectId);
+  try {
+    const projectFolderName = await getProjectFolderName(projectId);
+    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
+
+    // Use atomic write: write to temp file first, then rename
+    const tempFilePath = `${mediaFilePath}.tmp.${Date.now()}`;
+    await fs.writeFile(tempFilePath, JSON.stringify(data, null, 2), "utf8");
+    await fs.move(tempFilePath, mediaFilePath, { overwrite: true });
+  } finally {
+    releaseLock();
+    writeLocks.delete(projectId);
+  }
 }
 
 // Configure multer storage
@@ -167,11 +249,20 @@ export const upload = multer({
 export async function getProjectMedia(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    console.error("Validation errors in getProjectMedia:", errors.array());
+    return res.status(400).json({
+      error: "Validation failed",
+      errors: errors.array(),
+    });
   }
 
   try {
     const { projectId } = req.params;
+
+    if (!projectId) {
+      return res.status(400).json({ error: "Project ID is required" });
+    }
+
     const projectFolderName = await getProjectFolderName(projectId);
 
     // Ensure project exists
@@ -185,9 +276,10 @@ export async function getProjectMedia(req, res) {
 
     res.json(mediaData);
   } catch (error) {
-    console.error("Error getting project media:", error);
+    console.error(`Error getting project media for project ${req.params.projectId}:`, error);
     res.status(500).json({
       error: "Failed to get project media",
+      message: error.message,
       details: process.env.NODE_ENV === "development" ? error.stack : undefined,
     });
   }
@@ -652,6 +744,7 @@ export async function bulkDeleteProjectMedia(req, res) {
     }
 
     const mediaData = await readMediaFile(projectId);
+
     const filesToDelete = [];
     const remainingFiles = [];
 
@@ -661,11 +754,13 @@ export async function bulkDeleteProjectMedia(req, res) {
       if (fileIds.includes(file.id)) {
         // Check if file is in use before adding to delete list
         if (file.usedIn && file.usedIn.length > 0) {
+          // File is in use - add to filesInUse for the response AND keep it in remainingFiles
           filesInUse.push({
             id: file.id,
             filename: file.filename,
             usedIn: file.usedIn,
           });
+          remainingFiles.push(file); // ← IMPORTANT: Keep in-use files in the library!
         } else {
           filesToDelete.push(file);
         }
@@ -674,17 +769,22 @@ export async function bulkDeleteProjectMedia(req, res) {
       }
     });
 
-    // If any files are in use, return error
-    if (filesInUse.length > 0) {
-      return res.status(400).json({
-        error: "Cannot delete files that are currently in use",
+    // If all files are in use, return success with info (not an error - the request was valid)
+    if (filesToDelete.length === 0 && filesInUse.length > 0) {
+      return res.status(200).json({
+        message: "No files were deleted because they are all currently in use.",
+        deletedCount: 0,
         filesInUse: filesInUse,
       });
     }
 
-    if (filesToDelete.length === 0) {
+    // If no files found at all
+    if (filesToDelete.length === 0 && filesInUse.length === 0) {
       return res.status(404).json({ error: "No matching files found to delete" });
     }
+
+    // If some files are in use but some can be deleted, proceed with partial deletion
+    // We'll delete what we can and return info about files that couldn't be deleted
 
     // Asynchronously delete all associated physical files
     const deletePromises = filesToDelete.map(async (file) => {
@@ -728,9 +828,19 @@ export async function bulkDeleteProjectMedia(req, res) {
     mediaData.files = remainingFiles;
     await writeMediaFile(projectId, mediaData);
 
-    res.status(200).json({
-      message: `${filesToDelete.length} files have been deleted.`,
-    });
+    // Build response message
+    const response = {
+      message: `${filesToDelete.length} file${filesToDelete.length !== 1 ? "s" : ""} deleted successfully.`,
+      deletedCount: filesToDelete.length,
+    };
+
+    // If some files were in use, include that info
+    if (filesInUse.length > 0) {
+      response.filesInUse = filesInUse;
+      response.warning = `${filesInUse.length} file${filesInUse.length !== 1 ? "s" : ""} could not be deleted because ${filesInUse.length !== 1 ? "they are" : "it is"} currently in use.`;
+    }
+
+    res.status(200).json(response);
   } catch (error) {
     console.error("Error during bulk media deletion:", error);
     res.status(500).json({

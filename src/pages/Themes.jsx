@@ -39,18 +39,6 @@ export default function Themes() {
     setThemes((prevThemes) => [...prevThemes, newTheme]);
   };
 
-  const handleThemeUpload = async (files) => {
-     if (files.length !== 1) {
-       // Should be handled by multiple={false} but safe to check
-       return;
-     }
-     const file = files[0];
-     // We need to implement the upload logic here since FileUploader gives us the file
-     // Existing logic was in ThemeUploader component, moving it here.
-
-     // Note: FileUploader doesn't handle the async upload state internally for us aside from the 'uploading' prop we pass it.
-     // So we need to manage state here.
-  };
 
   // Re-implementing the upload logic from the deleted ThemeUploader inside the main component or a wrapper
   const [isUploading, setIsUploading] = useState(false);

@@ -4,10 +4,8 @@ import { useForm } from "react-hook-form";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
-import useProjectStore from "../../stores/projectStore";
 import Button from "../ui/Button";
 import ImageInput from "../settings/inputs/ImageInput";
-import { API_URL } from "../../config";
 
 export default function PageForm({
   initialData = { name: "", slug: "" },
@@ -22,7 +20,6 @@ export default function PageForm({
   const isNew = !initialData.id;
   const [showMoreSettings, setShowMoreSettings] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
-  const activeProject = useProjectStore((state) => state.activeProject);
 
   const {
     register,
@@ -240,9 +237,9 @@ export default function PageForm({
             className="form-select"
           >
             <option value="index,follow">Index and Follow (Default)</option>
-            <option value="noindex,follow">Don't Index, but Follow Links</option>
-            <option value="index,nofollow">Index, but Don't Follow Links</option>
-            <option value="noindex,nofollow">Don't Index or Follow Links</option>
+            <option value="noindex,follow">Don&apos;t Index, but Follow Links</option>
+            <option value="index,nofollow">Index, but Don&apos;t Follow Links</option>
+            <option value="noindex,nofollow">Don&apos;t Index or Follow Links</option>
           </select>
           <p className="form-description">{t("forms.page.robotsHelp")}</p>
         </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Tooltip({ children, content, position = "top" }) {
+export default function Tooltip({ children, content }) {
   const [isVisible, setIsVisible] = useState(false);
 
   return (

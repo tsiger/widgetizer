@@ -2,8 +2,10 @@ import { create } from "zustand";
 import { savePageContent } from "../queries/pageManager";
 import { saveGlobalWidget } from "../queries/previewManager";
 import { saveThemeSettings } from "../queries/themeManager";
+import { invalidateMediaCache } from "../queries/mediaManager";
 import usePageStore from "./pageStore";
 import useThemeStore from "./themeStore";
+import useProjectStore from "./projectStore";
 
 const useAutoSave = create((set, get) => ({
   // State
@@ -81,6 +83,12 @@ const useAutoSave = create((set, get) => ({
       }
 
       await Promise.all(savePromises);
+
+      // Invalidate media cache since page saves update media usage tracking
+      const activeProject = useProjectStore.getState().activeProject;
+      if (activeProject) {
+        invalidateMediaCache(activeProject.id);
+      }
 
       set({
         modifiedWidgets: new Set(),

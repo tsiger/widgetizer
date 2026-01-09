@@ -12,7 +12,7 @@ import { Search } from "lucide-react";
  * - Grouped icons: { "prefix": "...", "groups": { "Category": { "icon-name": { "body": "..." } } } }
  * - Filtering by 'options' (subset) and 'allow_patterns' (wildcards)
  */
-export default function IconInput({ id, value, onChange, options, allow_patterns, defaultValue }) {
+export default function IconInput({ value, onChange, options, allow_patterns, defaultValue }) {
   const activeProject = useProjectStore((state) => state.activeProject);
   const { fetchIcons, getIcons, loading, error } = useIconsStore();
   const [searchTerm, setSearchTerm] = useState("");

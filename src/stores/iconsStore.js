@@ -75,6 +75,7 @@ const useIconsStore = create((set, get) => ({
    */
   clearCache: (projectId) => {
     set((state) => {
+      // eslint-disable-next-line no-unused-vars
       const { [projectId]: _, ...rest } = state.iconsCache;
       return { iconsCache: rest };
     });

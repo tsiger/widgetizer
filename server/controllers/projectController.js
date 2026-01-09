@@ -75,6 +75,7 @@ export async function getAllProjects(_, res) {
     const data = await readProjectsFile();
     res.json(data.projects);
   } catch (error) {
+    console.error("Error getting projects:", error);
     res.status(500).json({ error: "Failed to get projects" });
   }
 }
@@ -91,6 +92,7 @@ export async function getActiveProject(_, res) {
     // Return the active project or null if no active project
     res.json(activeProject || null);
   } catch (error) {
+    console.error("Error getting active project:", error);
     res.status(500).json({ error: "Failed to get active project" });
   }
 }
@@ -238,7 +240,7 @@ export async function createProject(req, res) {
               };
               // Overwrite the copied file with the enriched version
               await fs.outputFile(projectMenuPath, JSON.stringify(enrichedMenu, null, 2));
-            } catch (menuReadError) {
+            } catch {
               // Silently skip menu enrichment errors
             }
           }
@@ -293,6 +295,7 @@ export async function setActiveProject(req, res) {
 
     res.json({ success: true });
   } catch (error) {
+    console.error("Error setting active project:", error);
     res.status(500).json({ error: "Failed to set active project" });
   }
 }
@@ -331,7 +334,6 @@ export async function updateProject(req, res) {
     }
 
     let updatedProject = { ...currentProject };
-    let newProjectId = id;
 
     // Check if folderName is being updated and if it would be different
     if (updates.folderName && updates.folderName.trim() !== currentFolderName) {
@@ -509,7 +511,7 @@ export async function duplicateProject(req, res) {
       // If copy fails, clean up and throw error
       try {
         await fs.remove(newDir);
-      } catch (cleanupError) {
+      } catch {
         // Silently handle cleanup errors
       }
       throw new Error(`Failed to copy project files: ${copyError.message}`);
@@ -560,7 +562,7 @@ export async function getProjectWidgets(req, res) {
       if (themeJson.useCoreWidgets === false) {
         includeCoreWidgets = false;
       }
-    } catch (err) {
+    } catch {
       // If there's an error reading theme.json, default to including core widgets
     }
 
@@ -570,7 +572,7 @@ export async function getProjectWidgets(req, res) {
         const schemaPath = path.join(folderPath, "schema.json");
         const content = await fs.readFile(schemaPath, "utf8");
         return JSON.parse(content);
-      } catch (parseError) {
+      } catch {
         // Silently handle widget schema parsing errors
       }
       return null;
@@ -583,7 +585,7 @@ export async function getProjectWidgets(req, res) {
       try {
         const coreWidgets = await getCoreWidgets();
         allSchemas = allSchemas.concat(coreWidgets);
-      } catch (err) {
+      } catch {
         // Silently handle core widgets loading errors
       }
     }

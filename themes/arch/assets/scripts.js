@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     link.addEventListener('click', (e) => {
       // Only handle on mobile
       if (window.innerWidth >= 990) return;
-      
+
       e.preventDefault();
       const isExpanded = link.getAttribute('aria-expanded') === 'true';
 
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Close submenu when focus leaves the entire submenu branch
   const navItems = widgetElement.querySelectorAll('.nav-item');
   navItems.forEach((item) => {
-    item.addEventListener('focusout', (e) => {
+    item.addEventListener('focusout', () => {
       if (window.innerWidth < 990) {
         // Check if the new focus target is outside this nav item
         setTimeout(() => {

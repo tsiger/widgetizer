@@ -3,7 +3,7 @@ import { uploadProjectMedia, getProjectMedia } from "../../../queries/mediaManag
 import { API_URL } from "../../../config";
 import useProjectStore from "../../../stores/projectStore";
 import useToastStore from "../../../stores/toastStore";
-import { X, Edit, UploadCloud, FolderOpen, Play } from "lucide-react";
+import { X, Edit, UploadCloud, Play } from "lucide-react";
 import MediaDrawer from "../../../components/media/MediaDrawer";
 import MediaSelectorDrawer from "../../../components/media/MediaSelectorDrawer";
 import Button from "../../ui/Button";
@@ -100,13 +100,6 @@ export default function VideoInput({ id, value = "", onChange }) {
     } else {
       showToast("Please select a video file.", "error");
     }
-  };
-
-  const formatDuration = (duration) => {
-    if (!duration) return "";
-    const minutes = Math.floor(duration / 60);
-    const seconds = Math.floor(duration % 60);
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
   return (

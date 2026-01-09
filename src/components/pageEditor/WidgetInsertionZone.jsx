@@ -25,6 +25,7 @@ export default function WidgetInsertionZone({
       if (hoverTimerRef.current) {
         clearTimeout(hoverTimerRef.current);
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsVisible(false);
     }
 

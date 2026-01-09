@@ -128,7 +128,7 @@ export async function saveThemeSettings(data) {
 /**
  * Upload a theme zip file
  */
-export async function uploadThemeZip(zipFile, onProgress) {
+export async function uploadThemeZip(zipFile) {
   const formData = new FormData();
   formData.append("themeZip", zipFile);
 
