@@ -32,6 +32,7 @@ export default function PagesEdit() {
     // Reset navigation skip ref when page changes
     isNavigatingAfterSaveRef.current = false;
     loadPage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadPage = async () => {

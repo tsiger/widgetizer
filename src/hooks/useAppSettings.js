@@ -16,9 +16,9 @@ export default function useAppSettings() {
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
-
   useEffect(() => {
     fetchSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Check if settings have changed from original
@@ -46,7 +46,7 @@ export default function useAppSettings() {
         setOriginalSettings(JSON.parse(JSON.stringify(cachedSettings)));
         setLoading(false);
         return;
-      } catch (error) {
+      } catch {
         // If cached promise fails, continue to fetch
       }
     }

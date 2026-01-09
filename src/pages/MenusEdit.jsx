@@ -30,6 +30,7 @@ export default function MenusEdit() {
 
   useEffect(() => {
     loadMenu();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadMenu = async () => {
@@ -76,12 +77,14 @@ export default function MenusEdit() {
   if (!menu) return <PageLayout title={t("menusEdit.title")}>{t("menusEdit.notFound")}</PageLayout>;
 
   return (
-    <PageLayout title={
-      <span className="flex items-center gap-2">
-        {t("menusEdit.title")}
-        {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-      </span>
-    }>
+    <PageLayout
+      title={
+        <span className="flex items-center gap-2">
+          {t("menusEdit.title")}
+          {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
+        </span>
+      }
+    >
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/menus")} icon={<ChevronLeft size={18} />}>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Play, ExternalLink, Settings, Check, X, AlertCircle } from "lucide-react";
 import { validateYouTubeUrl, createYouTubeEmbed } from "../../../utils/youtubeHelpers";
 
@@ -11,17 +11,21 @@ export default function YouTubeInput({ id, label, description, value = null, onC
   const [error, setError] = useState("");
 
   // Default embed options from setting or fallback
-  const defaultOptions = {
-    autoplay: false,
-    controls: true,
-    mute: false,
-    loop: false,
-    modestbranding: true,
-    rel: false,
-    showinfo: false,
-    fs: true,
-    ...setting.embedOptions,
-  };
+  // Default embed options from setting or fallback
+  const defaultOptions = useMemo(
+    () => ({
+      autoplay: false,
+      controls: true,
+      mute: false,
+      loop: false,
+      modestbranding: true,
+      rel: false,
+      showinfo: false,
+      fs: true,
+      ...setting.embedOptions,
+    }),
+    [setting.embedOptions],
+  );
 
   // Process URL input and create embed data
   const processUrl = useCallback(
@@ -57,10 +61,10 @@ export default function YouTubeInput({ id, label, description, value = null, onC
           setError("Could not process YouTube URL");
           setIsValid(false);
           setEmbedData(null);
-        onChange(null);
-      }
-    } catch {
-      setError("Error processing YouTube URL");
+          onChange(null);
+        }
+      } catch {
+        setError("Error processing YouTube URL");
         setIsValid(false);
         setEmbedData(null);
         onChange(null);

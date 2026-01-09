@@ -53,6 +53,7 @@ export default function Pages() {
 
   useEffect(() => {
     loadPages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadPages = async () => {
@@ -140,12 +141,12 @@ export default function Pages() {
           <div className="flex flex-wrap justify-between mb-4 items-center">
             <div className="flex items-center mb-2 sm:mb-0">
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-slate-600">
-                  {t("pages.count", { count: pages.length })}
-                </span>
+                <span className="text-sm text-slate-600">{t("pages.count", { count: pages.length })}</span>
                 {selectedPages.length > 0 && (
                   <>
-                    <span className="text-sm text-slate-600">• {t("pages.selected", { count: selectedPages.length })}</span>
+                    <span className="text-sm text-slate-600">
+                      • {t("pages.selected", { count: selectedPages.length })}
+                    </span>
                     <Button
                       onClick={handleBulkDelete}
                       variant="danger"
@@ -195,9 +196,7 @@ export default function Pages() {
                 <div className="text-center py-4">
                   <FileText className="mx-auto mb-2 text-slate-400" size={32} />
                   <div className="font-medium">{t("pages.noPagesFound")}</div>
-                  <div className="text-sm text-slate-500">
-                    {t("pages.noPagesMatch", { term: searchTerm })}
-                  </div>
+                  <div className="text-sm text-slate-500">{t("pages.noPagesMatch", { term: searchTerm })}</div>
                 </div>
               ) : (
                 t("pages.noPagesAvailable")

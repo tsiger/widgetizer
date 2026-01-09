@@ -249,7 +249,7 @@ export default function SelectionOverlay({
 
       const widgetType = page?.widgets?.[sidebarHoveredWidgetId]?.type;
       const customName = page?.widgets?.[sidebarHoveredWidgetId]?.settings?.name;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setHoverWidgetDisplayName(customName || schemas[widgetType]?.displayName || widgetType || null);
     } else if (!previewHoveredWidgetId) {
       // Only clear widget hover if preview isn't also hovering

@@ -48,7 +48,7 @@ export default function ProjectForm({
   useEffect(() => {
     onDirtyChange?.(isDirty);
   }, [isDirty, onDirtyChange]);
-  
+
   // Track previous initialData to prevent infinite loops
   const prevInitialDataRef = useRef(JSON.stringify(initialData));
 
@@ -77,6 +77,7 @@ export default function ProjectForm({
   // Load themes and auto-select default
   useEffect(() => {
     loadThemes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadThemes = async () => {
@@ -101,7 +102,6 @@ export default function ProjectForm({
       setLoading(false);
     }
   };
-
 
   const onSubmitHandler = async (data) => {
     try {
@@ -143,9 +143,7 @@ export default function ProjectForm({
             className="form-input"
           />
           {errors.name && <p className="form-error">{errors.name.message}</p>}
-          <p className="form-description">
-            {t("forms.project.titleHelp")}
-          </p>
+          <p className="form-description">{t("forms.project.titleHelp")}</p>
         </div>
 
         {/* Theme field - shown for new projects before More Settings */}
@@ -204,21 +202,14 @@ export default function ProjectForm({
                 className="form-input"
               />
               {errors.folderName && <p className="form-error">{errors.folderName.message}</p>}
-              <p className="form-description">
-                {t("forms.project.folderNameHelp")}
-              </p>
+              <p className="form-description">{t("forms.project.folderNameHelp")}</p>
             </div>
 
             <div className="form-field">
               <label htmlFor="description" className="form-label-optional">
                 {t("forms.project.descriptionLabel")}
               </label>
-              <textarea
-                id="description"
-                {...register("description")}
-                rows="4"
-                className="form-textarea"
-              />
+              <textarea id="description" {...register("description")} rows="4" className="form-textarea" />
               <p className="form-description">{t("forms.project.descriptionHelp")}</p>
             </div>
 

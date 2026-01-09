@@ -20,6 +20,7 @@ export default function useMediaState() {
     if (activeProject) {
       loadMediaFiles();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeProject]);
 
   // Update localStorage when viewMode changes
