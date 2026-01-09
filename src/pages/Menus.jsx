@@ -29,13 +29,15 @@ export default function Menus() {
 
   useEffect(() => {
     loadMenus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadMenus = async () => {
     try {
       const menuData = await getAllMenus();
       setMenus(menuData);
-    } catch {
+    } catch (error) {
+      console.error("Failed to load menus:", error);
       showToast(t("menus.toasts.loadError"), "error");
     } finally {
       setLoading(false);
@@ -51,7 +53,8 @@ export default function Menus() {
       await deleteMenu(data.id);
       setMenus(menus.filter((menu) => menu.id !== data.id));
       showToast(t("menus.toasts.deleteSuccess", { name: data.name }), "success");
-    } catch {
+    } catch (error) {
+      console.error("Failed to delete menu:", error);
       showToast(t("menus.toasts.deleteError"), "error");
     }
   };
@@ -61,7 +64,8 @@ export default function Menus() {
       const newMenu = await duplicateMenu(menuId);
       setMenus([...menus, newMenu]);
       showToast(t("menus.toasts.duplicateSuccess"), "success");
-    } catch {
+    } catch (error) {
+      console.error("Failed to duplicate menu:", error);
       showToast(t("menus.toasts.duplicateError"), "error");
     }
   };

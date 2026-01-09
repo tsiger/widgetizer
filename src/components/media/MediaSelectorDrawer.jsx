@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { X, Search, Play } from "lucide-react";
 import { API_URL } from "../../config";
@@ -11,12 +11,26 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const loadMediaFiles = useCallback(async () => {
+    if (!activeProject) return;
+    setLoading(true);
+
+    try {
+      const data = await getProjectMedia(activeProject.id);
+      setMediaFiles(data.files || []);
+    } catch (error) {
+      console.error("Failed to load media files:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [activeProject]);
+
   // Load media files when drawer is opened
   useEffect(() => {
     if (visible && activeProject) {
       loadMediaFiles();
     }
-  }, [visible, activeProject]);
+  }, [visible, activeProject, loadMediaFiles]);
 
   // Prevent background scroll when drawer is open
   useEffect(() => {
@@ -30,20 +44,6 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
       document.body.style.overflow = "auto";
     };
   }, [visible]);
-
-  const loadMediaFiles = async () => {
-    if (!activeProject) return;
-    setLoading(true);
-
-    try {
-      const data = await getProjectMedia(activeProject.id);
-      setMediaFiles(data.files || []);
-    } catch (error) {
-      console.error("Failed to load media files:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Filter files based on search term and type
   const filteredFiles = mediaFiles.filter((file) => {

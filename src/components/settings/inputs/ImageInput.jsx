@@ -3,7 +3,7 @@ import { uploadProjectMedia, getProjectMedia } from "../../../queries/mediaManag
 import { API_URL } from "../../../config";
 import useProjectStore from "../../../stores/projectStore";
 import useToastStore from "../../../stores/toastStore";
-import { X, Edit, UploadCloud, FolderOpen } from "lucide-react";
+import { X, Edit, UploadCloud } from "lucide-react";
 import MediaDrawer from "../../../components/media/MediaDrawer";
 import MediaSelectorDrawer from "../../../components/media/MediaSelectorDrawer";
 import Button from "../../ui/Button";

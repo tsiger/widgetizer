@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import EmptyState from "../ui/EmptyState";

@@ -73,8 +73,8 @@ async function recordExport(projectId, version, outputDir, status = "success") {
     const { getSetting } = await import("./appSettingsController.js");
     const maxVersionsSetting = await getSetting("export.maxVersionsToKeep");
     maxExports = parseInt(maxVersionsSetting || "10", 10) || 10;
-  } catch {
-    console.warn("Could not load app settings for export limit, using default of 10");
+  } catch (error) {
+    console.warn("Could not load app settings for export limit, using default of 10. Error:", error.message);
   }
 
   // Clean up old exports if we exceed the limit
@@ -87,8 +87,8 @@ async function recordExport(projectId, version, outputDir, status = "success") {
         try {
           await fs.remove(exportToDelete.outputDir);
           console.log(`Cleaned up old export: ${exportToDelete.outputDir}`);
-        } catch {
-          console.warn(`Failed to delete old export directory: ${exportToDelete.outputDir}`);
+        } catch (error) {
+          console.warn(`Failed to delete old export directory: ${exportToDelete.outputDir}. Error: ${error.message}`);
         }
       }
     }
@@ -403,7 +403,7 @@ Sitemap: ${sitemapUrl}`;
         // console.log(`Project widgets directory not found (this may be normal): ${projectWidgetsDir}`);
       }
     } catch (findError) {
-      console.error("Error finding or copying widget assets:", findError);
+      console.warn("Error finding or copying widget assets:", findError.message);
     }
 
     // --- Copy Only Used Images ---
@@ -664,7 +664,8 @@ async function findEntryFile(exportDir) {
     }
 
     return "index.html"; // fallback
-  } catch {
+  } catch (error) {
+    console.warn("Error finding entry file in export directory:", error.message);
     return "index.html"; // fallback on error
   }
 }
@@ -785,8 +786,8 @@ export async function getExportHistory(req, res) {
       const { getSetting } = await import("./appSettingsController.js");
       const maxVersionsSetting = await getSetting("export.maxVersionsToKeep");
       maxExports = parseInt(maxVersionsSetting || "10", 10) || 10;
-    } catch {
-      console.warn("Could not load app settings for export display limit, using default of 10");
+    } catch (error) {
+      console.warn("Could not load app settings for export display limit, using default of 10. Error:", error.message);
     }
 
     // Return all available exports (they should already be limited by the cleanup process)

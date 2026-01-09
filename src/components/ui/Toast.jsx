@@ -20,6 +20,7 @@ export default function Toast({
   // Handle fade-in animation on mount
   useEffect(() => {
     // Start with entering state
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAnimationState("entering");
 
     // After a brief delay, transition to visible

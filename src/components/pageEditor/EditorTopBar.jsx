@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllPages } from "../../queries/pageManager";
@@ -22,32 +22,32 @@ export default function EditorTopBar({
 
   // Force re-render when undo/redo happens
   const [, forceUpdate] = useState(0);
-  
+
   // Subscribe to temporal store changes
   useEffect(() => {
     const unsubscribe = usePageStore.temporal.subscribe(() => {
-      forceUpdate(c => c + 1);
+      forceUpdate((c) => c + 1);
     });
     return unsubscribe;
   }, []);
 
   // Get undo/redo state
-  const { pastStates, futureStates, undo, redo } = usePageStore.temporal.getState();
+  const { pastStates, futureStates } = usePageStore.temporal.getState();
   const canUndo = pastStates.length > 0 && pastStates[pastStates.length - 1]?.page;
   const canRedo = futureStates.length > 0;
 
   // Safe undo - only undo if the previous state has a valid page
-  const safeUndo = () => {
+  const safeUndo = useCallback(() => {
     const { pastStates, undo } = usePageStore.temporal.getState();
     if (pastStates.length > 0 && pastStates[pastStates.length - 1]?.page) {
       undo();
     }
-  };
+  }, []);
 
-  const safeRedo = () => {
+  const safeRedo = useCallback(() => {
     const { redo } = usePageStore.temporal.getState();
     redo();
-  };
+  }, []);
 
   useEffect(() => {
     const loadPages = async () => {
@@ -70,7 +70,7 @@ export default function EditorTopBar({
   // Keyboard shortcuts for undo/redo
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      if ((e.ctrlKey || e.metaKey) && e.key === "z") {
         if (e.shiftKey) {
           e.preventDefault();
           safeRedo();
@@ -79,13 +79,13 @@ export default function EditorTopBar({
           safeUndo();
         }
       }
-      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+      if ((e.ctrlKey || e.metaKey) && e.key === "y") {
         e.preventDefault();
         safeRedo();
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [safeUndo, safeRedo]);
 
   // Handle click outside to close dropdown
@@ -132,7 +132,6 @@ export default function EditorTopBar({
       </div>
 
       <div className="flex items-center gap-3">
-
         <div className="relative" ref={dropdownRef}>
           {hasMultiplePages ? (
             <button

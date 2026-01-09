@@ -1,13 +1,12 @@
+/* eslint-disable react-hooks/incompatible-library */
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
-import useProjectStore from "../../stores/projectStore";
 import Button from "../ui/Button";
 import ImageInput from "../settings/inputs/ImageInput";
-import { API_URL } from "../../config";
 
 export default function PageForm({
   initialData = { name: "", slug: "" },
@@ -22,7 +21,6 @@ export default function PageForm({
   const isNew = !initialData.id;
   const [showMoreSettings, setShowMoreSettings] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
-  const activeProject = useProjectStore((state) => state.activeProject);
 
   const {
     register,
@@ -87,15 +85,12 @@ export default function PageForm({
     }
   });
 
-
   const handleSlugBlur = (e) => {
     const value = e.target.value;
     if (value) {
       setValue("slug", formatSlug(value));
     }
   };
-
-
 
   const onSubmitHandler = async (data) => {
     try {
@@ -167,86 +162,61 @@ export default function PageForm({
 
       {/* SEO Fields - Collapsible */}
       {showMoreSettings && (
-      <div className="form-section">
-        <h3 className="form-section-title">{t("forms.page.seoTitle")}</h3>
+        <div className="form-section">
+          <h3 className="form-section-title">{t("forms.page.seoTitle")}</h3>
 
-        <div className="form-field">
-          <label htmlFor="seo-description" className="form-label">
-            {t("forms.page.metaDescription")}
-          </label>
-          <textarea
-            id="seo-description"
-            {...register("seo.description")}
-            rows={3}
-            className="form-textarea"
-          />
-          <p className="form-description">
-            {t("forms.page.metaDescriptionHelp")}
-          </p>
-        </div>
+          <div className="form-field">
+            <label htmlFor="seo-description" className="form-label">
+              {t("forms.page.metaDescription")}
+            </label>
+            <textarea id="seo-description" {...register("seo.description")} rows={3} className="form-textarea" />
+            <p className="form-description">{t("forms.page.metaDescriptionHelp")}</p>
+          </div>
 
-        <div className="form-field">
-          <label htmlFor="seo-og-title" className="form-label-optional">
-            {t("forms.page.socialTitle")}
-          </label>
-          <input
-            type="text"
-            id="seo-og-title"
-            {...register("seo.og_title")}
-            className="form-input"
-          />
-          <p className="form-description">
-            {t("forms.page.socialTitleHelp")}
-          </p>
-        </div>
+          <div className="form-field">
+            <label htmlFor="seo-og-title" className="form-label-optional">
+              {t("forms.page.socialTitle")}
+            </label>
+            <input type="text" id="seo-og-title" {...register("seo.og_title")} className="form-input" />
+            <p className="form-description">{t("forms.page.socialTitleHelp")}</p>
+          </div>
 
-        <div className="form-field">
-          <label className="form-label-optional">{t("forms.page.socialImage")}</label>
-          <ImageInput
-            id="seo-og-image"
-            value={ogImage}
-            onChange={(value) =>
-              setValue("seo.og_image", value, {
-                shouldDirty: true,
-                shouldValidate: true,
-              })
-            }
-          />
-          <p className="form-description">{t("forms.page.socialImageHelp")}</p>
-        </div>
+          <div className="form-field">
+            <label className="form-label-optional">{t("forms.page.socialImage")}</label>
+            <ImageInput
+              id="seo-og-image"
+              value={ogImage}
+              onChange={(value) =>
+                setValue("seo.og_image", value, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+            />
+            <p className="form-description">{t("forms.page.socialImageHelp")}</p>
+          </div>
 
-        <div className="form-field">
-          <label htmlFor="seo-canonical-url" className="form-label-optional">
-            {t("forms.page.canonicalUrl")}
-          </label>
-          <input
-            type="url"
-            id="seo-canonical-url"
-            {...register("seo.canonical_url")}
-            className="form-input"
-          />
-          <p className="form-description">
-            {t("forms.page.canonicalUrlHelp")}
-          </p>
-        </div>
+          <div className="form-field">
+            <label htmlFor="seo-canonical-url" className="form-label-optional">
+              {t("forms.page.canonicalUrl")}
+            </label>
+            <input type="url" id="seo-canonical-url" {...register("seo.canonical_url")} className="form-input" />
+            <p className="form-description">{t("forms.page.canonicalUrlHelp")}</p>
+          </div>
 
-        <div className="form-field">
-          <label htmlFor="seo-robots" className="form-label">
-            {t("forms.page.robotsLabel")}
-          </label>
-          <select
-            id="seo-robots"
-            {...register("seo.robots")}
-            className="form-select"
-          >
-            <option value="index,follow">Index and Follow (Default)</option>
-            <option value="noindex,follow">Don't Index, but Follow Links</option>
-            <option value="index,nofollow">Index, but Don't Follow Links</option>
-            <option value="noindex,nofollow">Don't Index or Follow Links</option>
-          </select>
-          <p className="form-description">{t("forms.page.robotsHelp")}</p>
+          <div className="form-field">
+            <label htmlFor="seo-robots" className="form-label">
+              {t("forms.page.robotsLabel")}
+            </label>
+            <select id="seo-robots" {...register("seo.robots")} className="form-select">
+              <option value="index,follow">Index and Follow (Default)</option>
+              <option value="noindex,follow">Don&apos;t Index, but Follow Links</option>
+              <option value="index,nofollow">Index, but Don&apos;t Follow Links</option>
+              <option value="noindex,nofollow">Don&apos;t Index or Follow Links</option>
+            </select>
+            <p className="form-description">{t("forms.page.robotsHelp")}</p>
+          </div>
         </div>
-      </div>
       )}
 
       <div className="form-actions-separated">
@@ -260,7 +230,6 @@ export default function PageForm({
           </Button>
         )}
       </div>
-
     </form>
   );
 }

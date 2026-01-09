@@ -10,7 +10,10 @@ export default [
     files: ["**/*.{js,jsx}"],
     ignores: ["server/**/*.js"],
     languageOptions: {
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        __APP_VERSION__: "readonly",
+      },
       parserOptions: {
         ecmaVersion: "latest",
         ecmaFeatures: { jsx: true },

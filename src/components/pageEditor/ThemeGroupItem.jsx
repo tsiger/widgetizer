@@ -1,4 +1,4 @@
-export default function ThemeGroupItem({ groupKey, groupName, isSelected, onClick }) {
+export default function ThemeGroupItem({ groupName, isSelected, onClick }) {
   return (
     <button
       className={`w-full px-4 py-2 pl-12 text-left text-sm transition-colors ${

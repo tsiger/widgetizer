@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getProjectMedia, refreshMediaUsage } from "../queries/mediaManager";
+import { getProjectMedia, refreshMediaUsage, invalidateMediaCache } from "../queries/mediaManager";
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
 
@@ -20,6 +20,7 @@ export default function useMediaState() {
     if (activeProject) {
       loadMediaFiles();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeProject]);
 
   // Update localStorage when viewMode changes
@@ -27,12 +28,16 @@ export default function useMediaState() {
     localStorage.setItem("mediaViewMode", viewMode);
   }, [viewMode]);
 
-  const loadMediaFiles = async () => {
+  const loadMediaFiles = async (forceRefresh = false) => {
     if (!activeProject) return;
     setLoading(true);
 
     try {
-      const data = await getProjectMedia(activeProject.id);
+      // If forcing refresh, invalidate cache first
+      if (forceRefresh) {
+        invalidateMediaCache(activeProject.id);
+      }
+      const data = await getProjectMedia(activeProject.id, forceRefresh);
       // Ensure all files have a metadata object
       const filesWithMetadata = (data.files || []).map((file) => ({
         ...file,
@@ -51,7 +56,7 @@ export default function useMediaState() {
 
     try {
       await refreshMediaUsage(activeProject.id);
-      await loadMediaFiles(); // Reload to get updated usage data
+      await loadMediaFiles(true); // Force reload to get updated usage data
       showToast("Media usage tracking refreshed", "success");
     } catch {
       showToast("Failed to refresh media usage tracking", "error");

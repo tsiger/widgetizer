@@ -33,6 +33,7 @@ export default function ProjectsEdit() {
 
   useEffect(() => {
     loadProject();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadProject = async () => {
@@ -82,8 +83,6 @@ export default function ProjectsEdit() {
       setShowSuccessActions(true);
       setIsDirty(false); // Reset dirty state after successful save
       return false; // Don't reset the form on edit
-
-
     } catch (err) {
       showToast(err.message || t("projectsEdit.toasts.updateError"), "error");
       return false;

@@ -40,7 +40,7 @@ export async function getAllThemes(_, res) {
             widgets: theme.widgets,
             author: theme.author,
           };
-        } catch (error) {
+        } catch {
           return null;
         }
       }),
@@ -82,7 +82,7 @@ export async function getThemeWidgets(req, res) {
             return JSON.parse(content);
           }
           return null;
-        } catch (err) {
+        } catch {
           return null;
         }
       }),
@@ -202,7 +202,7 @@ export async function uploadTheme(req, res) {
 
   // Assuming the theme is contained within a single root folder in the zip
   // Determine the root folder name from the first *relevant* entry
-  const firstRelevantEntryPathParts = relevantEntries[0].entryName.split(/[\/]/);
+  const firstRelevantEntryPathParts = relevantEntries[0].entryName.split(/\//);
   const themeFolderName = firstRelevantEntryPathParts[0];
 
   // Check if a valid theme folder name was found (could be empty if zip structure is unexpected)
@@ -327,7 +327,7 @@ export async function saveProjectThemeSettings(req, res) {
     const projectDir = getProjectDir(projectFolderName);
     try {
       await fs.access(projectDir);
-    } catch (err) {
+    } catch {
       return res.status(404).json({ message: "Project not found" });
     }
 

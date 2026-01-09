@@ -29,7 +29,6 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     selectedBlockId,
     selectedGlobalWidgetId,
     widgets,
-    widgetSchemas,
     themeSettings,
     previewMode = "desktop",
     onWidgetSelect,
@@ -91,7 +90,16 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     }
 
     loadInitialPreview();
-  }, [page, initialLoadComplete, globalWidgets, themeSettings, widgets]);
+  }, [
+    page,
+    initialLoadComplete,
+    globalWidgets,
+    themeSettings,
+    widgets,
+    selectedWidgetId,
+    selectedBlockId,
+    selectedGlobalWidgetId,
+  ]);
 
   // We use a dual-update strategy: immediate postMessage for instant visual feedback
   // while typing, plus debounced full reload to ensure scripts execute fresh with

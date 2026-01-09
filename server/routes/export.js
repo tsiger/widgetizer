@@ -33,13 +33,13 @@ router.get("/files/:exportDir", getExportFiles);
 router.get("/download/:exportDir", downloadExport);
 
 // Route to serve exported files for viewing
-// GET /api/export/view/:exportDir/*
-router.get("/view/:exportDir/*", (req, res) => {
+// GET /api/export/view/:exportDir/*filePath
+router.get("/view/:exportDir/*filePath", (req, res) => {
   try {
-    const { exportDir } = req.params;
-    const filePath = req.params[0] || "index.html"; // Default to index.html
+    const { exportDir, filePath } = req.params;
+    const requestedPath = filePath || "index.html"; // Default to index.html
 
-    const fullPath = path.join(PUBLISH_DIR, exportDir, filePath);
+    const fullPath = path.join(PUBLISH_DIR, exportDir, requestedPath);
 
     // Security check: ensure the path is within the publish directory
     const resolvedPath = path.resolve(fullPath);

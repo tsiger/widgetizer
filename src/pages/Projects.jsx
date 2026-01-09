@@ -40,7 +40,8 @@ export default function Projects() {
       await deleteProject(data.projectId);
       await loadProjects();
       showToast(t("projects.toasts.deleteSuccess", { name: data.projectName }), "success");
-    } catch (err) {
+    } catch (error) {
+      console.error("Failed to delete project:", error);
       showToast(t("projects.toasts.deleteError"), "error");
     }
   };
@@ -49,6 +50,7 @@ export default function Projects() {
 
   useEffect(() => {
     loadProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadProjects = async () => {
@@ -88,17 +90,19 @@ export default function Projects() {
       if (project) {
         showToast(t("projects.toasts.setActiveSuccess", { name: project.name }), "success");
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("Failed to set active project:", error);
       showToast(t("projects.toasts.setActiveError"), "error");
     }
   };
 
   const handleDuplicate = async (projectId) => {
     try {
-      const newProject = await duplicateProject(projectId);
+      await duplicateProject(projectId);
       await loadProjects();
       showToast(t("projects.toasts.duplicateSuccess"), "success");
     } catch (error) {
+      console.error("Failed to duplicate project:", error);
       showToast(t("projects.toasts.duplicateError"), "error");
     }
   };

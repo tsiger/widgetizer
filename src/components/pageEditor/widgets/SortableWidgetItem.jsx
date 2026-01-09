@@ -1,7 +1,5 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import WidgetItem from "./WidgetItem";
 
 export default function SortableWidgetItem({
@@ -25,17 +23,6 @@ export default function SortableWidgetItem({
   onRenameWidget,
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: widgetId });
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 4,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
 
   const handleBlockDragEnd = (event) => {
     const { active, over } = event;

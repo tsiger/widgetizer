@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useId } from "react";
 
 /**
  * Form field wrapper component that provides consistent layout,
@@ -79,7 +79,8 @@ Select.displayName = "Select";
  * Checkbox component with label integration
  */
 export const Checkbox = forwardRef(({ label, error, className = "", id, ...props }, ref) => {
-  const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+  const generatedId = useId();
+  const checkboxId = id || `checkbox-${generatedId}`;
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
@@ -106,7 +107,8 @@ Checkbox.displayName = "Checkbox";
  * Radio button component with label integration
  */
 export const Radio = forwardRef(({ label, error, className = "", id, ...props }, ref) => {
-  const radioId = id || `radio-${Math.random().toString(36).substr(2, 9)}`;
+  const generatedId = useId();
+  const radioId = id || `radio-${generatedId}`;
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>

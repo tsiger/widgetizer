@@ -213,6 +213,7 @@ const useWidgetStore = create((set, get) => ({
 
     if (!page || !widgetId) return;
 
+    // eslint-disable-next-line no-unused-vars
     const { [widgetId]: deletedWidget, ...remainingWidgets } = page.widgets;
 
     const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
@@ -388,6 +389,7 @@ const useWidgetStore = create((set, get) => ({
     if (!page || !page.widgets[widgetId]) return;
 
     const widget = page.widgets[widgetId];
+    // eslint-disable-next-line no-unused-vars
     const { [blockId]: deletedBlock, ...remainingBlocks } = widget.blocks || {};
     const updatedBlocksOrder = (widget.blocksOrder || []).filter((id) => id !== blockId);
 

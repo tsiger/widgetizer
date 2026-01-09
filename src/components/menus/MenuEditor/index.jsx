@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   DndContext,
   closestCenter,
@@ -70,6 +70,7 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
     // Only update local state if the *contents* differ
     if (initialItems !== initialItemsRef.current) {
       if (!isEqual(initialItems, items)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setItems(ensureIds(initialItems));
       }
       initialItemsRef.current = initialItems;
@@ -77,13 +78,14 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
   }, [initialItems, items]);
 
   // Create a debounced version of onChange
-  const debouncedOnChange = useCallback(
-    debounce((newItems) => {
-      // Don't call onChange if we're in the middle of a drag operation
-      if (!activeId) {
-        onChange(newItems);
-      }
-    }, 300),
+  const debouncedOnChange = useMemo(
+    () =>
+      debounce((newItems) => {
+        // Don't call onChange if we're in the middle of a drag operation
+        if (!activeId) {
+          onChange(newItems);
+        }
+      }, 300),
     [onChange, activeId],
   );
 
@@ -148,14 +150,6 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
             activeParentPath.every((value, index) => value === overParentPath[index]);
 
           if (sameContainer) {
-            // Get the container
-            let container;
-            if (activeParentPath.length === 0) {
-              container = prevItems;
-            } else {
-              container = getItemAtPath(prevItems, activeParentPath);
-            }
-
             // Get the indices
             const oldIndex = activeResult.path[activeResult.path.length - 1];
             const newIndex = overResult.path[overResult.path.length - 1];
@@ -434,7 +428,7 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
         {items.length === 0 && (
           <div className="h-20 border-2 border-dashed rounded-md mb-2 flex items-center justify-center border-slate-300 bg-slate-50">
             <p className="text-slate-500 text-sm">
-              No menu items yet. Click "Add Item" to create your first menu item.
+              No menu items yet. Click &quot;Add Item&quot; to create your first menu item.
             </p>
           </div>
         )}

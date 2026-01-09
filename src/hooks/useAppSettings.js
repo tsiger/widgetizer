@@ -3,6 +3,12 @@ import { getAppSettings, saveAppSettings } from "../queries/appSettingsManager.j
 import useToastStore from "../stores/toastStore.js";
 import settingsSchema from "../config/appSettings.schema.json";
 
+// Cache for settings to prevent multiple simultaneous fetches
+let settingsCache = null;
+let settingsCachePromise = null;
+let settingsCacheTime = 0;
+const CACHE_DURATION = 60000; // 1 minute cache
+
 export default function useAppSettings() {
   const [settings, setSettings] = useState(null);
   const [originalSettings, setOriginalSettings] = useState(null);
@@ -10,9 +16,9 @@ export default function useAppSettings() {
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
-
   useEffect(() => {
     fetchSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Check if settings have changed from original
@@ -23,13 +29,52 @@ export default function useAppSettings() {
   }, [settings, originalSettings]);
 
   const fetchSettings = async () => {
+    // Check cache first
+    const now = Date.now();
+    if (settingsCache && now - settingsCacheTime < CACHE_DURATION) {
+      setSettings(settingsCache);
+      setOriginalSettings(JSON.parse(JSON.stringify(settingsCache)));
+      setLoading(false);
+      return;
+    }
+
+    // If there's already a fetch in progress, wait for it
+    if (settingsCachePromise) {
+      try {
+        const cachedSettings = await settingsCachePromise;
+        setSettings(cachedSettings);
+        setOriginalSettings(JSON.parse(JSON.stringify(cachedSettings)));
+        setLoading(false);
+        return;
+      } catch {
+        // If cached promise fails, continue to fetch
+      }
+    }
+
     setLoading(true);
+
+    // Create a shared promise for concurrent requests
+    settingsCachePromise = (async () => {
+      try {
+        const appSettings = await getAppSettings();
+
+        // Merge with defaults from schema
+        const settingsWithDefaults = mergeWithDefaults(appSettings, settingsSchema.settings);
+
+        // Update cache
+        settingsCache = settingsWithDefaults;
+        settingsCacheTime = Date.now();
+        settingsCachePromise = null;
+
+        return settingsWithDefaults;
+      } catch (error) {
+        settingsCachePromise = null;
+        throw error;
+      }
+    })();
+
     try {
-      const appSettings = await getAppSettings();
-
-      // Merge with defaults from schema
-      const settingsWithDefaults = mergeWithDefaults(appSettings, settingsSchema.settings);
-
+      const settingsWithDefaults = await settingsCachePromise;
       setSettings(settingsWithDefaults);
       setOriginalSettings(JSON.parse(JSON.stringify(settingsWithDefaults)));
     } catch (error) {
@@ -96,6 +141,10 @@ export default function useAppSettings() {
       setSettings(savedSettings);
       setOriginalSettings(JSON.parse(JSON.stringify(savedSettings)));
       setHasChanges(false);
+
+      // Invalidate cache so other components get fresh data
+      settingsCache = savedSettings;
+      settingsCacheTime = Date.now();
 
       // Update language if it changed
       if (savedSettings.general?.language) {

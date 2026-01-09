@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Search } from "lucide-react";
 
 export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelectWidget, position, triggerRef }) {
@@ -19,6 +19,7 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     };
 
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSearchTerm(""); // Reset search when opening
       // Add a small delay to ensure the dropdown is fully rendered
       const timer = setTimeout(() => {
@@ -49,17 +50,19 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     return name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
-  if (!isOpen) return null;
-
-  // Calculate position relative to trigger
-  let style = {
+  // Calculate position relative to trigger (using useLayoutEffect to avoid accessing refs during render)
+  const [style, setStyle] = useState({
     position: "fixed",
     top: 100,
     left: 100,
     zIndex: 1000,
-  };
+  });
 
-  if (triggerRef?.current) {
+  useLayoutEffect(() => {
+    if (!isOpen || !triggerRef?.current) {
+      return;
+    }
+
     const triggerRect = triggerRef.current.getBoundingClientRect();
     const dropdownWidth = 224; // w-56 = 224px
 
@@ -86,13 +89,16 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
       topPosition = triggerRect.top - estimatedDropdownHeight - 10;
     }
 
-    style = {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setStyle({
       position: "fixed",
       top: Math.max(12, topPosition), // Don't go above top of screen
       left: leftPosition,
       zIndex: 1000,
-    };
-  }
+    });
+  }, [isOpen, triggerRef]);
+
+  if (!isOpen) return null;
 
   return (
     <>

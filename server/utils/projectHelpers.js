@@ -15,7 +15,9 @@ export async function getProjectFolderName(projectId) {
       if (project) return project.folderName;
     }
   } catch (error) {
-    console.error(`Error resolving project folderName for ID ${projectId}:`, error);
+    console.warn(
+      `Warning: Could not resolve project folderName for ID ${projectId}, falling back to ID. Error: ${error.message}`,
+    );
   }
   return projectId; // Fallback
 }

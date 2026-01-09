@@ -54,7 +54,6 @@ export default function SelectionOverlay({
   onWidgetSelect,
   onBlockSelect,
   onGlobalWidgetSelect,
-  previewReadyKey,
 }) {
   const [selectionBounds, setSelectionBounds] = useState(null);
   const [blockBounds, setBlockBounds] = useState(null);
@@ -73,11 +72,8 @@ export default function SelectionOverlay({
 
   // Preview hover state (from iframe mouseover events)
   const [previewHoveredWidgetId, setPreviewHoveredWidgetId] = useState(null);
-  const [previewHoveredBlockId, setPreviewHoveredBlockId] = useState(null);
-
-  // Combined hover - sidebar takes priority, then preview
-  const hoveredWidgetId = sidebarHoveredWidgetId || previewHoveredWidgetId;
-  const hoveredBlockId = sidebarHoveredWidgetId ? sidebarHoveredBlockId : previewHoveredBlockId;
+  // eslint-disable-next-line no-unused-vars
+  const [_previewHoveredBlockId, setPreviewHoveredBlockId] = useState(null);
 
   // Get the effective widget ID (could be regular or global)
   const effectiveWidgetId = selectedWidgetId || selectedGlobalWidgetId;
@@ -157,10 +153,11 @@ export default function SelectionOverlay({
       if (iframeRef?.current) {
         scrollWidgetIntoView(iframeRef.current, effectiveWidgetId);
       }
-      
+
       // Update display name
       const customName = page?.widgets?.[effectiveWidgetId]?.settings?.name;
       const widgetType = page?.widgets?.[effectiveWidgetId]?.type;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWidgetDisplayName(customName || schemas[widgetType]?.displayName || widgetType || null);
     } else {
       setSelectionBounds(null);
@@ -210,13 +207,13 @@ export default function SelectionOverlay({
         case "WIDGET_HOVERED":
           setPreviewHoveredWidgetId(payload.widgetId);
           setPreviewHoveredBlockId(payload.blockId);
-          
+
           // Handle hover bounds from message
           if (payload.widgetId && payload.widgetId !== effectiveWidgetId) {
             // Hovering a different widget - show widget hover
             const translated = translateBoundsToOverlay(payload.bounds);
             setWidgetHoverBounds(translated);
-            
+
             // Get display name for hovered widget
             const widgetType = page?.widgets?.[payload.widgetId]?.type;
             const customName = page?.widgets?.[payload.widgetId]?.settings?.name;
@@ -226,7 +223,7 @@ export default function SelectionOverlay({
             setWidgetHoverBounds(null);
             setHoverWidgetDisplayName(null);
           }
-          
+
           // Block hover - works for any widget including the selected one
           if (payload.blockId && payload.blockId !== selectedBlockId) {
             const translatedBlock = translateBoundsToOverlay(payload.blockBounds);
@@ -247,10 +244,12 @@ export default function SelectionOverlay({
     // Widget hover: show when hovering a different widget than selected
     if (sidebarHoveredWidgetId && sidebarHoveredWidgetId !== effectiveWidgetId) {
       const bounds = getElementBounds(`[data-widget-id="${sidebarHoveredWidgetId}"]`);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWidgetHoverBounds(bounds);
 
       const widgetType = page?.widgets?.[sidebarHoveredWidgetId]?.type;
       const customName = page?.widgets?.[sidebarHoveredWidgetId]?.settings?.name;
+       
       setHoverWidgetDisplayName(customName || schemas[widgetType]?.displayName || widgetType || null);
     } else if (!previewHoveredWidgetId) {
       // Only clear widget hover if preview isn't also hovering

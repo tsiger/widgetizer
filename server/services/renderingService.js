@@ -164,7 +164,8 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
       if (!cachedData?.mtime || stats.mtimeMs > cachedData.mtime) {
         shouldReloadIcons = true;
       }
-    } catch {
+    } catch (error) {
+      console.warn(`Failed to check icon file mtime for project ${projectId} in preview mode:`, error.message);
       // File doesn't exist or can't be read, will handle below
     }
   }
@@ -281,9 +282,9 @@ async function renderWidget(
     let template;
     try {
       template = await fs.readFile(widgetPath, "utf-8");
-    } catch (readErr) {
+    } catch (error) {
       // If template not found, return an informative error message instead of crashing
-      console.error(`Widget template not found at ${widgetPath}`);
+      console.warn(`Widget template not found at ${widgetPath}. Error: ${error.message}`);
       return `<div class="widget-error">Widget template not found: ${type}.liquid</div>`;
     }
 
@@ -292,8 +293,8 @@ async function renderWidget(
     try {
       const schemaContent = await fs.readFile(schemaPath, "utf-8");
       schema = JSON.parse(schemaContent);
-    } catch (schemaErr) {
-      console.error(`Widget schema not found at ${schemaPath}`);
+    } catch (error) {
+      console.warn(`Widget schema not found or invalid at ${schemaPath}. Using empty schema. Error: ${error.message}`);
       schema = { settings: [], blocks: [] };
     }
 

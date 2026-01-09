@@ -15,7 +15,6 @@ export default function MenuForm({
   isDirty: isDirtyProp = false,
 }) {
   const { t } = useTranslation();
-  const isNew = !initialData.id;
   const showToast = useToastStore((state) => state.showToast);
 
   const {

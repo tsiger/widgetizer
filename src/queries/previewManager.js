@@ -117,7 +117,6 @@ export async function updatePreview(iframe, newState, oldState) {
     globalWidgets: newGlobalWidgets,
     themeSettings: newThemeSettings,
     selectedWidgetId: newSelectedWidgetId,
-    selectedBlockId: newSelectedBlockId,
     selectedGlobalWidgetId: newSelectedGlobalWidgetId,
     page: newPage,
   } = newState;

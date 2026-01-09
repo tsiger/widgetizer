@@ -13,7 +13,6 @@ export default function FileUploader({
   description,
   maxSizeText,
   uploadProgress = {},
-  variant = "default", // default | pink (for active drag) - handled by dropzone state mainly
 }) {
   const { t } = useTranslation();
 
@@ -62,12 +61,12 @@ export default function FileUploader({
         className={`relative p-8 border-2 border-dashed ${borderColor} ${bgColor} rounded-lg text-center cursor-pointer transition-all duration-200 hover:border-slate-400 focus:outline-none`}
       >
         <input {...getInputProps()} />
-        
+
         <div className="flex flex-col items-center justify-center gap-3">
           <div className={`p-3 rounded-full bg-white shadow-sm ${uploading ? "opacity-50" : ""}`}>
             <UploadCloud className={`h-8 w-8 ${iconColor}`} />
           </div>
-          
+
           <div className="space-y-1">
             <h3 className={`font-medium text-lg ${textColor}`}>
               {title || (isDragActive ? t("components.fileUploader.dropHere") : t("components.fileUploader.clickOrDrop"))}
@@ -103,8 +102,8 @@ export default function FileUploader({
                   <span className="text-slate-500">{progress}%</span>
                 </div>
                 <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
-                  <div 
-                    className="bg-pink-500 h-full rounded-full transition-all duration-300 ease-out" 
+                  <div
+                    className="bg-pink-500 h-full rounded-full transition-all duration-300 ease-out"
                     style={{ width: `${progress}%` }}
                   />
                 </div>

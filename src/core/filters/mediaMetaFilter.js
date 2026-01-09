@@ -29,7 +29,7 @@ export function registerMediaMetaFilter(engine) {
     try {
       // Try standard LiquidJS context access
       mediaFiles = context.get(["mediaFiles"]);
-    } catch (e) {
+    } catch {
       // Fallback or error logging
     }
 

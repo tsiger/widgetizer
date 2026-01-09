@@ -18,8 +18,10 @@ export default function LanguageInitializer() {
       }
     };
 
+    // Only run once on mount, not when i18n changes
     initLanguage();
-  }, [i18n]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return null;
 }

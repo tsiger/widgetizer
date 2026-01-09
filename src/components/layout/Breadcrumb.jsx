@@ -1,4 +1,4 @@
-import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
@@ -8,7 +8,6 @@ export default function Breadcrumb() {
   const { t } = useTranslation();
   const location = useLocation();
   const params = useParams();
-  const [searchParams] = useSearchParams();
   const activeProject = useProjectStore((state) => state.activeProject);
   const pages = usePageStore((state) => state.pages);
 
@@ -106,7 +105,7 @@ export default function Breadcrumb() {
     }
 
     return crumbs;
-  }, [location.pathname, params, searchParams, activeProject, pages, t]);
+  }, [location.pathname, params, activeProject, pages, t]);
 
   if (breadcrumbs.length === 0) {
     return null;
