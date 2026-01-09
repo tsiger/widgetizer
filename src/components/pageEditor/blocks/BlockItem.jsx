@@ -1,4 +1,5 @@
 import { GripVertical, Copy, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import useWidgetStore from "../../../stores/widgetStore";
 import useAutoSave from "../../../stores/saveStore";
 
@@ -13,6 +14,7 @@ export default function BlockItem({
   dragHandleProps = {},
   onHover,
 }) {
+  const { t } = useTranslation();
   const blockName = blockSchema?.displayName || block.type || "Block";
   const duplicateBlock = useWidgetStore((state) => state.duplicateBlock);
   const deleteBlock = useWidgetStore((state) => state.deleteBlock);
@@ -63,7 +65,7 @@ export default function BlockItem({
         <button
           className="p-1.5 text-slate-400 hover:text-blue-500 rounded-md hover:bg-white/80 transition-colors"
           onClick={handleDuplicate}
-          title="Duplicate block"
+          title={t("pageEditor.actions.duplicateBlock")}
         >
           <Copy size={12} />
         </button>
@@ -71,7 +73,7 @@ export default function BlockItem({
         <button
           className="p-1.5 text-slate-400 hover:text-red-500 rounded-md hover:bg-white/80 transition-colors"
           onClick={handleDelete}
-          title="Delete block"
+          title={t("pageEditor.actions.deleteBlock")}
         >
           <Trash2 size={12} />
         </button>

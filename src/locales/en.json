@@ -26,19 +26,16 @@
       "title": "No Active Project",
       "description": "Please create or select a project to continue.",
       "goToProjects": "Go to Projects"
+    },
+    "footer": {
+      "thankYou": "Thank you for creating with"
     }
   },
   "forms": {
     "common": {
-      "title": "Title",
-      "description": "Description",
       "saving": "Saving...",
       "cancel": "Cancel",
-      "selectImage": "Select Image",
-      "changeImage": "Change image",
-      "removeImage": "Remove image",
-      "formError": "An error occurred while submitting the form",
-      "selectImageFile": "Please select an image file."
+      "formError": "An error occurred while submitting the form"
     },
     "menu": {
       "titleLabel": "Title",
@@ -69,7 +66,13 @@
       "canonicalUrl": "Canonical URL",
       "canonicalUrlHelp": "The preferred URL for this page if it exists elsewhere.",
       "robotsLabel": "Search Engine Indexing",
-      "robotsHelp": "Controls if search engines can find this page."
+      "robotsHelp": "Controls if search engines can find this page.",
+      "robots": {
+        "indexFollow": "Index and Follow (Default)",
+        "noindexFollow": "Don't Index, but Follow Links",
+        "indexNofollow": "Index, but Don't Follow Links",
+        "noindexNofollow": "Don't Index or Follow Links"
+      }
     },
     "project": {
       "titleLabel": "Title",
@@ -101,18 +104,45 @@
       "altHelp": "Describes the {{type}} for screen readers.",
       "titleLabel": "Title",
       "titleHelp": "Sets the title attribute (often shown on hover).",
+      "descriptionLabel": "Description",
       "save": "Save Changes",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "types": {
+        "image": "Image",
+        "video": "Video",
+        "audio": "Audio"
+      },
+      "placeholders": {
+        "audioTitle": "Song or episode title",
+        "videoTitle": "Video title",
+        "audioDescription": "Artist, album, or notes about this audio",
+        "videoDescription": "Description or notes about this video"
+      },
+      "help": {
+        "audioTitle": "The title of the audio track or podcast episode.",
+        "videoTitle": "The title of the video.",
+        "audioDescription": "Optional notes about this audio file (artist, album, etc.).",
+        "videoDescription": "Optional description or notes about this video."
+      }
     }
   },
   "common": {
     "save": "Save",
+    "confirm": "Confirm",
+    "confirmAction": "Confirm Action",
+    "confirmProceed": "Are you sure you want to proceed?",
     "cancel": "Cancel",
     "reset": "Reset",
     "loading": "Loading...",
+    "search": "Search...",
     "error": "Error",
     "success": "Success",
-    "unsavedChanges": "You have unsaved changes"
+    "unsavedChanges": "You have unsaved changes",
+    "appTitle": "Widgetizer",
+    "aria": {
+      "dismiss": "Dismiss",
+      "close": "Close"
+    }
   },
   "components": {
     "mediaToolbar": {
@@ -320,13 +350,55 @@
     "loading": "Loading page...",
     "error": "Error: {{message}}",
     "noPageSelected": "No page selected. Please select a page from the Pages list.",
+    "noWidgetsFound": "No widgets found",
     "widgetName": {
       "label": "Widget Name",
       "description": "Optional custom name to identify this widget instance",
       "placeholder": "e.g., Main Hero, Featured Products"
+    },
+    "actions": {
+      "duplicateBlock": "Duplicate block",
+      "deleteBlock": "Delete block",
+      "moveWidgetUp": "Move widget up",
+      "moveWidgetDown": "Move widget down",
+      "unsavedChanges": "Unsaved changes",
+      "addBlock": "Add block",
+      "addWidget": "Add widget",
+      "duplicateWidget": "Duplicate widget",
+      "deleteWidget": "Delete widget",
+      "rename": "Double-click to rename"
+    },
+    "toolbar": {
+      "backToPages": "Back to Pages",
+      "back": "Back",
+      "desktopView": "Desktop View",
+      "mobileView": "Mobile View",
+      "preview": "Preview",
+      "undo": "Undo",
+      "redo": "Redo",
+      "saving": "Saving...",
+      "save": "Save"
+    },
+    "themeSelector": {
+      "button": "Theme",
+      "title": "Theme Settings"
+    },
+    "preview": {
+      "loading": "Loading Preview...",
+      "error": "Preview Error",
+      "reload": "Reload Preview",
+      "title": "Page Preview"
+    },
+    "settingsPanel": {
+      "emptyState": "Select a widget to edit its settings",
+      "blockSettings": "Block Settings",
+      "header": "Header",
+      "footer": "Footer",
+      "widgetSettings": "Widget Settings"
     }
   },
   "breadcrumb": {
+    "label": "Breadcrumb",
     "edit": "Edit",
     "structure": "Structure"
   },

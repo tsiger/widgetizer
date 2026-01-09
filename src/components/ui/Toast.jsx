@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const VARIANTS = {
   success: "bg-green-700 border-green-800 text-green-50",
@@ -15,6 +16,7 @@ export default function Toast({
   autoDismiss = false,
   autoDismissTimeout = 5000,
 }) {
+  const { t } = useTranslation();
   const [animationState, setAnimationState] = useState("entering"); // "entering", "visible", "exiting"
 
   // Handle fade-in animation on mount
@@ -79,7 +81,11 @@ export default function Toast({
     >
       <div>{message}</div>
       {onDismiss && (
-        <button className="ml-4 text-slate-400 hover:text-slate-600" onClick={handleDismiss} aria-label="Dismiss">
+        <button
+          className="ml-4 text-slate-400 hover:text-slate-600"
+          onClick={handleDismiss}
+          aria-label={t("common.aria.dismiss")}
+        >
           <X size={18} />
         </button>
       )}

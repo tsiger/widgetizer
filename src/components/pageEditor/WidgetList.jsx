@@ -15,6 +15,7 @@ import {
 } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import WidgetInsertionZone from "./WidgetInsertionZone";
 import SortableWidgetItem from "./widgets/SortableWidgetItem";
@@ -41,6 +42,7 @@ export default function WidgetList({
   onGlobalWidgetSelect,
   previewIframeRef, // Need this for scroll coordination
 }) {
+  const { t } = useTranslation();
   const [activeId, setActiveId] = useState(null);
 
   // WidgetSelector modal state
@@ -57,7 +59,8 @@ export default function WidgetList({
   const [blockInsertPosition, setBlockInsertPosition] = useState(null);
 
   const { globalWidgets } = usePageStore();
-  const { deleteWidget, duplicateWidget, reorderWidgets, reorderBlocks, setHoveredWidget, updateWidgetSettings } = useWidgetStore();
+  const { deleteWidget, duplicateWidget, reorderWidgets, reorderBlocks, setHoveredWidget, updateWidgetSettings } =
+    useWidgetStore();
   const { setStructureModified } = useAutoSave();
   const { header: headerWidget, footer: footerWidget } = globalWidgets;
 
@@ -128,7 +131,6 @@ export default function WidgetList({
     updateWidgetSettings(widgetId, "name", newName);
   };
 
-
   // Handle opening widget selector
   const handleAddWidgetClick = (position, triggerRef) => {
     setInsertPosition(position);
@@ -179,10 +181,10 @@ export default function WidgetList({
           const elRect = el.getBoundingClientRect();
           const elTop = elRect.top - containerRect.top + scrollContainer.scrollTop;
           const elCenter = elTop - containerRect.height / 2 + elRect.height / 2;
-          
+
           scrollContainer.scrollTo({
             top: Math.max(0, elCenter),
-            behavior: "smooth"
+            behavior: "smooth",
           });
         }
       }
@@ -303,7 +305,7 @@ export default function WidgetList({
               className="flex items-center justify-center w-full text-slate-500 hover:text-slate-700 hover:bg-slate-100 py-2 rounded-md"
             >
               <Plus size={16} className="mr-2" />
-              <span className="text-sm font-medium">Add Widget</span>
+              <span className="text-sm font-medium">{t("pageEditor.actions.addWidget")}</span>
             </button>
           </div>
         )}

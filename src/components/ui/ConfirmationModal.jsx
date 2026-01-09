@@ -1,16 +1,25 @@
 import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function ConfirmationModal({
   isOpen,
   onClose,
   onConfirm,
-  title = "Confirm Action",
-  message = "Are you sure you want to proceed?",
-  confirmText = "Confirm",
-  cancelText = "Cancel",
-  variant = "danger", // or "warning", "info" TODO: Add more variants
+  title,
+  message,
+  confirmText,
+  cancelText,
+  variant = "danger", // or "warning", "info"
 }) {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
+
+  // Use translations for defaults
+  const modalTitle = title || t("common.confirmAction");
+  const modalMessage = message || t("common.confirmProceed");
+  const modalConfirmText = confirmText || t("common.confirm");
+  const modalCancelText = cancelText || t("common.cancel");
 
   // Prevent clicks inside the modal from closing it
   const handleModalClick = (e) => {
@@ -25,16 +34,16 @@ export default function ConfirmationModal({
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full overflow-hidden" onClick={handleModalClick}>
         <div className={`p-4 ${variant === "danger" ? "bg-red-50" : "bg-yellow-50"} flex items-start gap-3`}>
           <AlertTriangle className={`${variant === "danger" ? "text-red-500" : "text-yellow-500"}`} />
-          <h3 className="text-lg font-semibold">{title}</h3>
+          <h3 className="text-lg font-semibold">{modalTitle}</h3>
         </div>
 
         <div className="p-4">
-          <div className="text-slate-600 whitespace-pre-line">{message}</div>
+          <div className="text-slate-600 whitespace-pre-line">{modalMessage}</div>
         </div>
 
         <div className="p-4 bg-slate-50 flex justify-end gap-2">
           <button onClick={onClose} className="px-4 py-2 border border-slate-300 rounded-sm hover:bg-slate-100">
-            {cancelText}
+            {modalCancelText}
           </button>
           <button
             onClick={() => {
@@ -45,7 +54,7 @@ export default function ConfirmationModal({
               variant === "danger" ? "bg-red-600 hover:bg-red-700" : "bg-pink-600 hover:bg-pink-700"
             }`}
           >
-            {confirmText}
+            {modalConfirmText}
           </button>
         </div>
       </div>

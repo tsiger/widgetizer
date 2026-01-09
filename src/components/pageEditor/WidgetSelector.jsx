@@ -1,7 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelectWidget, position, triggerRef }) {
+  const { t } = useTranslation();
   const dropdownRef = useRef(null);
   const inputRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -115,13 +117,13 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
         }}
       >
         <div className="px-3 py-2 border-b border-slate-100 bg-slate-50 rounded-t-lg">
-          <h3 className="text-sm font-medium text-slate-700 text-left mb-2">Add Widget</h3>
+          <h3 className="text-sm font-medium text-slate-700 text-left mb-2">{t("pageEditor.actions.addWidget")}</h3>
           <div className="relative">
             <Search size={14} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-slate-400" />
             <input
               ref={inputRef}
               type="text"
-              placeholder="Search..."
+              placeholder={t("common.search")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full text-sm pl-8 pr-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
@@ -146,7 +148,7 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
               </button>
             ))
           ) : (
-            <div className="px-3 py-4 text-center text-sm text-slate-500">No widgets found</div>
+            <div className="px-3 py-4 text-center text-sm text-slate-500">{t("pageEditor.noWidgetsFound")}</div>
           )}
         </div>
       </div>

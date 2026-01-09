@@ -63,16 +63,16 @@ export default function Sidebar() {
           <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block md:border-t md:border-slate-800 pt-4">
             {t(section.titleKey)}
           </h3>
-          <ul className="border-t border-slate-800 pt-4 md:pt-0 md:border-0">
-            {section.items.map(renderNavItem)}
-          </ul>
+          <ul className="border-t border-slate-800 pt-4 md:pt-0 md:border-0">{section.items.map(renderNavItem)}</ul>
         </div>
       );
     }
 
     return (
       <div key={section.id} className="border-b border-slate-800 pb-4 mb-4">
-        {section.titleKey && <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">{t(section.titleKey)}</h3>}
+        {section.titleKey && (
+          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">{t(section.titleKey)}</h3>
+        )}
         <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
       </div>
     );
@@ -85,8 +85,8 @@ export default function Sidebar() {
     <div className="w-[72px] md:w-48 bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto">
       <div className="pb-2 px-2 md:px-4 grow">
         <div className="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-4">
-          <img src="/widgetizer_logo.svg" alt="Widgetizer" className="hidden md:block w-40" />
-          <img src="/widgetizer_symbol.svg" alt="Widgetizer" className="md:hidden w-12 h-12 mx-auto" />
+          <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="hidden md:block w-40" />
+          <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="md:hidden w-12 h-12 mx-auto" />
         </div>
 
         {topSections.map(renderSection)}

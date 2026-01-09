@@ -26,19 +26,16 @@
       "title": "Ningún Proyecto Activo",
       "description": "Por favor, crea o selecciona un proyecto para continuar.",
       "goToProjects": "Ir a Proyectos"
+    },
+    "footer": {
+      "thankYou": "Gracias por crear con"
     }
   },
   "forms": {
     "common": {
-      "title": "Título",
-      "description": "Descripción",
       "saving": "Guardando...",
       "cancel": "Cancelar",
-      "selectImage": "Seleccionar Imagen",
-      "changeImage": "Cambiar imagen",
-      "removeImage": "Eliminar imagen",
-      "formError": "Ocurrió un error al enviar el formulario",
-      "selectImageFile": "Por favor, selecciona un archivo de imagen."
+      "formError": "Ocurrió un error al enviar el formulario"
     },
     "menu": {
       "titleLabel": "Título",
@@ -69,7 +66,13 @@
       "canonicalUrl": "URL Canónica",
       "canonicalUrlHelp": "La URL preferida para esta página si existe en otro lugar.",
       "robotsLabel": "Indexación de Motores de Búsqueda",
-      "robotsHelp": "Controla si los motores de búsqueda pueden encontrar esta página."
+      "robotsHelp": "Controla si los motores de búsqueda pueden encontrar esta página.",
+      "robots": {
+        "indexFollow": "Indexar y Seguir (Predeterminado)",
+        "noindexFollow": "No indexar, pero seguir enlaces",
+        "indexNofollow": "Indexar, pero no seguir enlaces",
+        "noindexNofollow": "No indexar y no seguir enlaces"
+      }
     },
     "project": {
       "titleLabel": "Título",
@@ -89,7 +92,9 @@
       "selectTheme": "Selecciona un tema",
       "siteUrlLabel": "URL del Sitio",
       "siteUrlHelp": "La URL de tu sitio web en vivo (ej., https://misitio.com).",
-      "loadingThemes": "Cargando temas..."
+      "loadingThemes": "Cargando temas...",
+      "loadThemesError": "Error al cargar los temas. Por favor, reinicia la aplicación.",
+      "moreSettings": "Más ajustes"
     },
     "media": {
       "editTitle": "Editar Metadatos de {{type}}",
@@ -99,18 +104,45 @@
       "altHelp": "Describe el/la {{type}} para lectores de pantalla.",
       "titleLabel": "Título",
       "titleHelp": "Establece el atributo de título (a menudo se muestra al pasar el cursor).",
+      "descriptionLabel": "Descripción",
       "save": "Guardar Cambios",
-      "saving": "Guardando..."
+      "saving": "Guardando...",
+      "types": {
+        "image": "Imagen",
+        "video": "Video",
+        "audio": "Audio"
+      },
+      "placeholders": {
+        "audioTitle": "Título de la canción o episodio",
+        "videoTitle": "Título del video",
+        "audioDescription": "Artista, álbum o notas sobre este audio",
+        "videoDescription": "Descripción o notas sobre este video"
+      },
+      "help": {
+        "audioTitle": "El título de la pista de audio o del episodio del podcast.",
+        "videoTitle": "El título del video.",
+        "audioDescription": "Notas opcionales sobre este archivo de audio (artista, álbum, etc.).",
+        "videoDescription": "Descripción o notas opcionales sobre este video."
+      }
     }
   },
   "common": {
     "save": "Guardar",
+    "confirm": "Confirmar",
+    "confirmAction": "Confirmar acción",
+    "confirmProceed": "¿Estás seguro de que quieres continuar?",
     "cancel": "Cancelar",
     "reset": "Restablecer",
     "loading": "Cargando...",
+    "search": "Buscar...",
     "error": "Error",
     "success": "Éxito",
-    "unsavedChanges": "Tienes cambios sin guardar"
+    "unsavedChanges": "Tienes cambios sin guardar",
+    "appTitle": "Widgetizer",
+    "aria": {
+      "dismiss": "Descartar",
+      "close": "Cerrar"
+    }
   },
   "components": {
     "mediaToolbar": {
@@ -320,13 +352,55 @@
     "loading": "Cargando página...",
     "error": "Error: {{message}}",
     "noPageSelected": "Ninguna página seleccionada. Por favor, selecciona una página de la lista de Páginas.",
+    "noWidgetsFound": "No se encontraron widgets",
     "widgetName": {
       "label": "Nombre del Widget",
       "description": "Nombre personalizado opcional para identificar esta instancia del widget",
       "placeholder": "ej. Hero Principal, Productos Destacados"
+    },
+    "actions": {
+      "duplicateBlock": "Duplicar bloque",
+      "deleteBlock": "Eliminar bloque",
+      "moveWidgetUp": "Mover widget hacia arriba",
+      "moveWidgetDown": "Mover widget hacia abajo",
+      "unsavedChanges": "Cambios sin guardar",
+      "addBlock": "Agregar bloque",
+      "addWidget": "Agregar widget",
+      "duplicateWidget": "Duplicar widget",
+      "deleteWidget": "Eliminar widget",
+      "rename": "Doble clic para renombrar"
+    },
+    "toolbar": {
+      "backToPages": "Volver a Páginas",
+      "back": "Volver",
+      "desktopView": "Vista de escritorio",
+      "mobileView": "Vista móvil",
+      "preview": "Vista previa",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "saving": "Guardando...",
+      "save": "Guardar"
+    },
+    "themeSelector": {
+      "button": "Tema",
+      "title": "Ajustes del tema"
+    },
+    "preview": {
+      "loading": "Cargando vista previa...",
+      "error": "Error de vista previa",
+      "reload": "Recargar vista previa",
+      "title": "Vista previa de la página"
+    },
+    "settingsPanel": {
+      "emptyState": "Selecciona un widget para editar sus ajustes",
+      "blockSettings": "Ajustes del bloque",
+      "header": "Encabezado",
+      "footer": "Pie de página",
+      "widgetSettings": "Ajustes del widget"
     }
   },
   "breadcrumb": {
+    "label": "Navegación de migas de pan",
     "edit": "Editar",
     "structure": "Estructura"
   },

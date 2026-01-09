@@ -57,7 +57,7 @@ export default function SettingsPanel({
     return (
       <div className="w-60 bg-white border-l border-slate-200">
         <div className="p-4">
-          <p className="text-slate-500 text-center mt-8">Select a widget to edit its settings</p>
+          <p className="text-slate-500 text-center mt-8">{t("pageEditor.settingsPanel.emptyState")}</p>
         </div>
       </div>
     );
@@ -83,10 +83,14 @@ export default function SettingsPanel({
   const displayName = isThemeSettings
     ? selectedThemeGroup.charAt(0).toUpperCase() + selectedThemeGroup.slice(1)
     : selectedBlockId && !isGlobalWidget
-      ? selectedBlockSchema?.displayName || "Block Settings"
+      ? selectedBlockSchema?.displayName || t("pageEditor.settingsPanel.blockSettings")
       : currentWidget?.settings?.name || // Use custom name if set
         currentWidgetSchema?.displayName ||
-        (isGlobalWidget ? (selectedGlobalWidgetId === "header" ? "Header" : "Footer") : "Widget Settings");
+        (isGlobalWidget
+          ? selectedGlobalWidgetId === "header"
+            ? t("pageEditor.settingsPanel.header")
+            : t("pageEditor.settingsPanel.footer")
+          : t("pageEditor.settingsPanel.widgetSettings"));
 
   // Inject "name" setting for widgets (not blocks)
   const widgetNameSetting = {
@@ -98,7 +102,8 @@ export default function SettingsPanel({
   };
 
   // Combine name setting with other settings for widgets (not global widgets, blocks, or theme settings)
-  const allSettings = !isThemeSettings && !selectedBlockId && !isGlobalWidget && settings ? [widgetNameSetting, ...settings] : settings;
+  const allSettings =
+    !isThemeSettings && !selectedBlockId && !isGlobalWidget && settings ? [widgetNameSetting, ...settings] : settings;
 
   return (
     <div className="w-60 bg-white border-l border-slate-200 flex flex-col h-full">
@@ -116,14 +121,16 @@ export default function SettingsPanel({
           )}
         </div>
 
-        <div 
-          key={isThemeSettings
-            ? `theme-${selectedThemeGroup}`
-            : selectedBlockId && !isGlobalWidget
-              ? `block-${selectedBlockId}`
-              : isGlobalWidget
-                ? `global-${selectedGlobalWidgetId}`
-                : `widget-${selectedWidgetId}`}
+        <div
+          key={
+            isThemeSettings
+              ? `theme-${selectedThemeGroup}`
+              : selectedBlockId && !isGlobalWidget
+                ? `block-${selectedBlockId}`
+                : isGlobalWidget
+                  ? `global-${selectedGlobalWidgetId}`
+                  : `widget-${selectedWidgetId}`
+          }
           className="space-y-6"
         >
           {allSettings?.map((setting, index) => {

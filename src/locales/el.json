@@ -26,19 +26,16 @@
       "title": "Κανένα ενεργό έργο",
       "description": "Παρακαλώ δημιουργήστε ή επιλέξτε ένα έργο για να συνεχίσετε.",
       "goToProjects": "Μετάβαση στα Έργα"
+    },
+    "footer": {
+      "thankYou": "Ευχαριστούμε που δημιουργείτε με το"
     }
   },
   "forms": {
     "common": {
-      "title": "Τίτλος",
-      "description": "Περιγραφή",
       "saving": "Αποθήκευση...",
       "cancel": "Ακύρωση",
-      "selectImage": "Επιλογή Εικόνας",
-      "changeImage": "Αλλαγή εικόνας",
-      "removeImage": "Αφαίρεση εικόνας",
-      "formError": "Παρουσιάστηκε σφάλμα κατά την υποβολή της φόρμας",
-      "selectImageFile": "Παρακαλώ επιλέξτε ένα αρχείο εικόνας."
+      "formError": "Παρουσιάστηκε σφάλμα κατά την υποβολή της φόρμας"
     },
     "menu": {
       "titleLabel": "Τίτλος",
@@ -69,7 +66,13 @@
       "canonicalUrl": "Canonical URL",
       "canonicalUrlHelp": "Το προτιμώμενο URL για αυτή τη σελίδα αν υπάρχει αλλού.",
       "robotsLabel": "Ευρετηρίαση Μηχανών Αναζήτησης",
-      "robotsHelp": "Ελέγχει αν οι μηχανές αναζήτησης μπορούν να βρουν αυτή τη σελίδα."
+      "robotsHelp": "Ελέγχει αν οι μηχανές αναζήτησης μπορούν να βρουν αυτή τη σελίδα.",
+      "robots": {
+        "indexFollow": "Ευρετηρίαση και Ακολούθηση Συνδέσμων (Προεπιλογή)",
+        "noindexFollow": "Χωρίς Ευρετηρίαση, με Ακολούθηση Συνδέσμων",
+        "indexNofollow": "Με Ευρετηρίαση, χωρίς Ακολούθηση Συνδέσμων",
+        "noindexNofollow": "Χωρίς Ευρετηρίαση και χωρίς Ακολούθηση Συνδέσμων"
+      }
     },
     "project": {
       "titleLabel": "Τίτλος",
@@ -89,7 +92,9 @@
       "selectTheme": "Επιλέξτε θέμα",
       "siteUrlLabel": "URL Ιστότοπου",
       "siteUrlHelp": "Η διεύθυνση URL του ιστότοπού σας (π.χ. https://mysite.com).",
-      "loadingThemes": "Φόρτωση θεμάτων..."
+      "loadingThemes": "Φόρτωση θεμάτων...",
+      "loadThemesError": "Αποτυχία φόρτωσης θεμάτων. Παρακαλώ επανεκκινήστε την εφαρμογή.",
+      "moreSettings": "Περισσότερες ρυθμίσεις"
     },
     "media": {
       "editTitle": "Επεξεργασία Metadata {{type}}",
@@ -99,18 +104,45 @@
       "altHelp": "Περιγράφει το {{type}} για προγράμματα ανάγνωσης οθόνης.",
       "titleLabel": "Τίτλος",
       "titleHelp": "Ορίζει το χαρακτηριστικό title (συχνά εμφανίζεται κατά την κατάδειξη).",
+      "descriptionLabel": "Περιγραφή",
       "save": "Αποθήκευση Αλλαγών",
-      "saving": "Αποθήκευση..."
+      "saving": "Αποθήκευση...",
+      "types": {
+        "image": "Εικόνα",
+        "video": "Βίντεο",
+        "audio": "Ήχος"
+      },
+      "placeholders": {
+        "audioTitle": "Τίτλος τραγουδιού ή επεισοδίου",
+        "videoTitle": "Τίτλος βίντεο",
+        "audioDescription": "Καλλιτέχνης, άλμπουμ ή σημειώσεις για αυτόν τον ήχο",
+        "videoDescription": "Περιγραφή ή σημειώσεις για αυτό το βίντεο"
+      },
+      "help": {
+        "audioTitle": "Ο τίτλος του κομματιού ή του επεισοδίου podcast.",
+        "videoTitle": "Ο τίτλος του βίντεο.",
+        "audioDescription": "Προαιρετικές σημειώσεις για αυτό το αρχείο ήχου (καλλιτέχνης, άλμπουμ κ.λπ.).",
+        "videoDescription": "Προαιρετική περιγραφή ή σημειώσεις για αυτό το βίντεο."
+      }
     }
   },
   "common": {
     "save": "Αποθήκευση",
+    "confirm": "Επιβεβαίωση",
+    "confirmAction": "Επιβεβαίωση ενέργειας",
+    "confirmProceed": "Είστε σίγουροι ότι θέλετε να συνεχίσετε;",
     "cancel": "Ακύρωση",
     "reset": "Επαναφορά",
     "loading": "Φόρτωση...",
+    "search": "Αναζήτηση...",
     "error": "Σφάλμα",
     "success": "Επιτυχία",
-    "unsavedChanges": "Έχετε μη αποθηκευμένες αλλαγές"
+    "unsavedChanges": "Έχετε μη αποθηκευμένες αλλαγές",
+    "appTitle": "Widgetizer",
+    "aria": {
+      "dismiss": "Παράβλεψη",
+      "close": "Κλείσιμο"
+    }
   },
   "components": {
     "mediaToolbar": {
@@ -310,13 +342,55 @@
     "loading": "Φόρτωση σελίδας...",
     "error": "Σφάλμα: {{message}}",
     "noPageSelected": "Δεν επιλέχθηκε σελίδα. Παρακαλώ επιλέξτε μια σελίδα από τη λίστα Σελίδων.",
+    "noWidgetsFound": "Δεν βρέθηκαν widgets",
     "widgetName": {
       "label": "Όνομα Widget",
       "description": "Προαιρετικό προσαρμοσμένο όνομα για την αναγνώριση αυτής της στιγμιότυπου widget",
       "placeholder": "π.χ. Κύριο Hero, Προτεινόμενα Προϊόντα"
+    },
+    "actions": {
+      "duplicateBlock": "Αντιγραφή block",
+      "deleteBlock": "Διαγραφή block",
+      "moveWidgetUp": "Μετακίνηση widget πάνω",
+      "moveWidgetDown": "Μετακίνηση widget κάτω",
+      "unsavedChanges": "Μη αποθηκευμένες αλλαγές",
+      "addBlock": "Προσθήκη block",
+      "addWidget": "Προσθήκη widget",
+      "duplicateWidget": "Αντιγραφή widget",
+      "deleteWidget": "Διαγραφή widget",
+      "rename": "Διπλό κλικ για μετονομασία"
+    },
+    "toolbar": {
+      "backToPages": "Επιστροφή στις Σελίδες",
+      "back": "Πίσω",
+      "desktopView": "Προβολή Υπολογιστή",
+      "mobileView": "Προβολή Κινητού",
+      "preview": "Προεπισκόπηση",
+      "undo": "Αναίρεση",
+      "redo": "Ακύρωση αναίρεσης",
+      "saving": "Αποθήκευση...",
+      "save": "Αποθήκευση"
+    },
+    "themeSelector": {
+      "button": "Θέμα",
+      "title": "Ρυθμίσεις Θέματος"
+    },
+    "preview": {
+      "loading": "Φόρτωση προεπισκόπησης...",
+      "error": "Σφάλμα προεπισκόπησης",
+      "reload": "Επαναφόρτωση προεπισκόπησης",
+      "title": "Προεπισκόπηση σελίδας"
+    },
+    "settingsPanel": {
+      "emptyState": "Επιλέξτε ένα widget για να επεξεργαστείτε τις ρυθμίσεις του",
+      "blockSettings": "Ρυθμίσεις block",
+      "header": "Κεφαλίδα",
+      "footer": "Υποσέλιδο",
+      "widgetSettings": "Ρυθμίσεις widget"
     }
   },
   "breadcrumb": {
+    "label": "Πλοήγηση Breadcrumb",
     "edit": "Επεξεργασία",
     "structure": "Δομή"
   },

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, useLayoutEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function BlockSelector({ isOpen, onClose, widgetSchema, onSelectBlock, triggerRef }) {
+  const { t } = useTranslation();
   const dropdownRef = useRef(null);
   const [positionStyle, setPositionStyle] = useState({});
 
@@ -102,7 +104,7 @@ export default function BlockSelector({ isOpen, onClose, widgetSchema, onSelectB
         style={positionStyle.top ? positionStyle : { visibility: "hidden", position: "fixed" }} // Hide until positioned
       >
         <div className="px-3 py-2 border-b border-slate-100 bg-slate-50 rounded-t-lg">
-          <h3 className="text-sm font-medium text-slate-700 text-left">Add Block</h3>
+          <h3 className="text-sm font-medium text-slate-700 text-left">{t("pageEditor.actions.addBlock")}</h3>
         </div>
 
         <div className="max-h-64 overflow-y-auto">

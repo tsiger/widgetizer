@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { GripVertical, Trash2, Copy, Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
@@ -29,6 +30,7 @@ export default function WidgetItem({
   onHover,
   onRenameWidget,
 }) {
+  const { t } = useTranslation();
   const widgetName = widget.settings?.name || widgetSchema.displayName || widget.type;
   const hasBlocks = widgetSchema.blocks && widgetSchema.blocks.length > 0;
   const blocks = widget.blocks || {};
@@ -124,19 +126,22 @@ export default function WidgetItem({
             <span
               className={`font-medium text-xs truncate text-slate-700 ${isSelected ? "cursor-text" : ""}`}
               onDoubleClick={handleDoubleClick}
-              title={isSelected ? "Double-click to rename" : undefined}
+              title={isSelected ? t("pageEditor.actions.rename") : undefined}
             >
               {widgetName}
             </span>
           )}
           {isModified && !isDragging && !isEditing && (
-            <div className="h-2 w-2 rounded-full bg-amber-500 ring-2 ring-amber-200" title="Unsaved changes"></div>
+            <div
+              className="h-2 w-2 rounded-full bg-amber-500 ring-2 ring-amber-200"
+              title={t("pageEditor.actions.unsavedChanges")}
+            ></div>
           )}
         </div>
         <div className="flex opacity-0 group-hover:opacity-100 transition-opacity duration-200 gap-1">
           <button
             className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-white/80 transition-colors"
-            title="Duplicate widget"
+            title={t("pageEditor.actions.duplicateWidget")}
             onClick={(e) => {
               e.stopPropagation();
               if (onHover) onHover(null); // Clear hover before action
@@ -147,7 +152,7 @@ export default function WidgetItem({
           </button>
           <button
             className="p-1.5 text-slate-400 hover:text-red-600 rounded-md hover:bg-white/80 transition-colors"
-            title="Delete widget"
+            title={t("pageEditor.actions.deleteWidget")}
             onClick={(e) => {
               e.stopPropagation();
               if (onHover) onHover(null); // Clear hover before action
@@ -235,7 +240,7 @@ export default function WidgetItem({
                   }}
                 >
                   <Plus size={16} className="mr-2" />
-                  <span className="text-sm font-medium">Add Block</span>
+                  <span className="text-sm font-medium">{t("pageEditor.actions.addBlock")}</span>
                 </button>
               </div>
             )}

@@ -26,19 +26,16 @@
       "title": "Kein aktives Projekt",
       "description": "Bitte erstellen oder wählen Sie ein Projekt aus, um fortzufahren.",
       "goToProjects": "Zu den Projekten"
+    },
+    "footer": {
+      "thankYou": "Vielen Dank für Ihre Arbeit mit"
     }
   },
   "forms": {
     "common": {
-      "title": "Titel",
-      "description": "Beschreibung",
       "saving": "Speichern...",
       "cancel": "Abbrechen",
-      "selectImage": "Bild auswählen",
-      "changeImage": "Bild ändern",
-      "removeImage": "Bild entfernen",
-      "formError": "Beim Senden des Formulars ist ein Fehler aufgetreten",
-      "selectImageFile": "Bitte wählen Sie eine Bilddatei aus."
+      "formError": "Beim Senden des Formulars ist ein Fehler aufgetreten"
     },
     "menu": {
       "titleLabel": "Titel",
@@ -69,7 +66,13 @@
       "canonicalUrl": "Canonical URL",
       "canonicalUrlHelp": "Bevorzugte URL für diese Seite, falls sie woanders existiert.",
       "robotsLabel": "Suchmaschinen-Indexierung",
-      "robotsHelp": "Steuert, ob Suchmaschinen diese Seite finden können."
+      "robotsHelp": "Steuert, ob Suchmaschinen diese Seite finden können.",
+      "robots": {
+        "indexFollow": "Indizieren und Links folgen (Standard)",
+        "noindexFollow": "Nicht indizieren, aber Links folgen",
+        "indexNofollow": "Indizieren, aber Links nicht folgen",
+        "noindexNofollow": "Nicht indizieren und Links nicht folgen"
+      }
     },
     "project": {
       "titleLabel": "Titel",
@@ -89,7 +92,9 @@
       "selectTheme": "Theme auswählen",
       "siteUrlLabel": "Website-URL",
       "siteUrlHelp": "Die URL Ihrer Live-Website (z.B. https://meineseite.com).",
-      "loadingThemes": "Themes werden geladen..."
+      "loadingThemes": "Themes werden geladen...",
+      "loadThemesError": "Fehler beim Laden der Themen. Bitte starten Sie die Anwendung neu.",
+      "moreSettings": "Weitere Einstellungen"
     },
     "media": {
       "editTitle": "Metadaten für {{type}} bearbeiten",
@@ -99,18 +104,45 @@
       "altHelp": "Beschreibt das {{type}} für Screenreader.",
       "titleLabel": "Titel",
       "titleHelp": "Setzt das title-Attribut (oft beim Überfahren mit der Maus angezeigt).",
+      "descriptionLabel": "Beschreibung",
       "save": "Änderungen speichern",
-      "saving": "Speichern..."
+      "saving": "Speichern...",
+      "types": {
+        "image": "Bild",
+        "video": "Video",
+        "audio": "Audio"
+      },
+      "placeholders": {
+        "audioTitle": "Titel des Titels oder der Episode",
+        "videoTitle": "Videotitel",
+        "audioDescription": "Künstler, Album oder Notizen zu diesem Audio",
+        "videoDescription": "Beschreibung oder Notizen zu diesem Video"
+      },
+      "help": {
+        "audioTitle": "Der Titel des Audiotracks oder der Podcast-Episode.",
+        "videoTitle": "Der Titel des Videos.",
+        "audioDescription": "Optionale Notizen zu dieser Audiodatei (Künstler, Album usw.).",
+        "videoDescription": "Optionale Beschreibung oder Notizen zu diesem Video."
+      }
     }
   },
   "common": {
     "save": "Speichern",
+    "confirm": "Bestätigen",
+    "confirmAction": "Aktion bestätigen",
+    "confirmProceed": "Sind Sie sicher, dass Sie fortfahren möchten?",
     "cancel": "Abbrechen",
     "reset": "Zurücksetzen",
     "loading": "Laden...",
+    "search": "Suchen...",
     "error": "Fehler",
     "success": "Erfolg",
-    "unsavedChanges": "Sie haben ungespeicherte Änderungen"
+    "unsavedChanges": "Sie haben ungespeicherte Änderungen",
+    "appTitle": "Widgetizer",
+    "aria": {
+      "dismiss": "Verwerfen",
+      "close": "Schließen"
+    }
   },
   "components": {
     "mediaToolbar": {
@@ -319,13 +351,55 @@
     "loading": "Seite wird geladen...",
     "error": "Fehler: {{message}}",
     "noPageSelected": "Keine Seite ausgewählt. Bitte wählen Sie eine Seite aus der Seitenliste.",
+    "noWidgetsFound": "Keine Widgets gefunden",
     "widgetName": {
       "label": "Widget-Name",
       "description": "Optionaler benutzerdefinierter Name zur Identifizierung dieser Widget-Instanz",
       "placeholder": "z.B. Haupt-Hero, Empfohlene Produkte"
+    },
+    "actions": {
+      "duplicateBlock": "Block duplizieren",
+      "deleteBlock": "Block löschen",
+      "moveWidgetUp": "Widget nach oben verschieben",
+      "moveWidgetDown": "Widget nach unten verschieben",
+      "unsavedChanges": "Ungespeicherte Änderungen",
+      "addBlock": "Block hinzufügen",
+      "addWidget": "Widget hinzufügen",
+      "duplicateWidget": "Widget duplizieren",
+      "deleteWidget": "Widget löschen",
+      "rename": "Doppelklicken zum Umbenennen"
+    },
+    "toolbar": {
+      "backToPages": "Zurück zu den Seiten",
+      "back": "Zurück",
+      "desktopView": "Desktop-Ansicht",
+      "mobileView": "Mobile Ansicht",
+      "preview": "Vorschau",
+      "undo": "Rückgängig machen",
+      "redo": "Wiederholen",
+      "saving": "Speichervorgang...",
+      "save": "Speichern"
+    },
+    "themeSelector": {
+      "button": "Design",
+      "title": "Design-Einstellungen"
+    },
+    "preview": {
+      "loading": "Vorschau wird geladen...",
+      "error": "Vorschau-Fehler",
+      "reload": "Vorschau neu laden",
+      "title": "Seitenvorschau"
+    },
+    "settingsPanel": {
+      "emptyState": "Wählen Sie ein Widget aus, um seine Einstellungen zu bearbeiten",
+      "blockSettings": "Block-Einstellungen",
+      "header": "Header",
+      "footer": "Footer",
+      "widgetSettings": "Widget-Einstellungen"
     }
   },
   "breadcrumb": {
+    "label": "Breadcrumb-Navigation",
     "edit": "Bearbeiten",
     "structure": "Struktur"
   },

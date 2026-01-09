@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Palette, ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
 
 export default function ThemeSelector() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { themeSettings: settings, originalThemeSettings: originalSettings, hasUnsavedThemeChanges } = usePageStore();
@@ -46,7 +48,7 @@ export default function ThemeSelector() {
         className="font-medium px-4 py-2 rounded-sm hover:bg-slate-100 flex items-center gap-2"
       >
         <Palette size={16} />
-        Theme
+        {t("pageEditor.themeSelector.button")}
         {hasAnyChanges && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
         <ChevronDown size={16} className={`transform transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
@@ -54,7 +56,9 @@ export default function ThemeSelector() {
       {isOpen && (
         <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
           <div className="px-3 py-2 border-b border-slate-100">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Theme Settings</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              {t("pageEditor.themeSelector.title")}
+            </p>
           </div>
           {themeGroups.map((group) => {
             const isChanged = hasGroupChanges(group);

@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function WidgetInsertionZone({
   position,
@@ -7,6 +8,7 @@ export default function WidgetInsertionZone({
   isWidgetSelectorOpen,
   activeWidgetTriggerPosition,
 }) {
+  const { t } = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const hoverTimerRef = useRef(null);
@@ -63,7 +65,7 @@ export default function WidgetInsertionZone({
         <button
           ref={triggerRef}
           className="flex items-center justify-center h-6 w-6 rounded-full bg-white border-2 border-pink-500 text-pink-500 shadow-sm hover:bg-pink-500 hover:text-white transform transition-all mx-2 flex-shrink-0 z-10 hover:scale-110"
-          aria-label="Add widget"
+          aria-label={t("pageEditor.actions.addWidget")}
         >
           <Plus size={12} />
         </button>

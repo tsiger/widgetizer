@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { getAllPages } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
 import usePageStore from "../../stores/pageStore";
@@ -11,6 +12,7 @@ export default function EditorTopBar({
   onPreviewModeChange, // Callback to notify parent of preview mode changes
   children,
 }) {
+  const { t } = useTranslation();
   const { hasUnsavedChanges, isSaving, save, startAutoSave, stopAutoSave } = useAutoSave();
   const [pages, setPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -124,10 +126,10 @@ export default function EditorTopBar({
         <button
           onClick={() => navigate("/pages")}
           className="flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm hover:bg-slate-100 text-slate-600 hover:text-slate-800"
-          title="Back to Pages"
+          title={t("pageEditor.toolbar.backToPages")}
         >
           <ArrowLeft size={18} />
-          Back
+          {t("pageEditor.toolbar.back")}
         </button>
       </div>
 
@@ -180,7 +182,7 @@ export default function EditorTopBar({
         <div className="flex gap-1 p-1 h-9 bg-slate-200 rounded-md items-center">
           <button
             onClick={() => handlePreviewModeChange("desktop")}
-            title="Desktop View"
+            title={t("pageEditor.toolbar.desktopView")}
             className={`p-1.5 rounded ${
               previewMode === "desktop" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
             }`}
@@ -189,7 +191,7 @@ export default function EditorTopBar({
           </button>
           <button
             onClick={() => handlePreviewModeChange("mobile")}
-            title="Mobile View"
+            title={t("pageEditor.toolbar.mobileView")}
             className={`p-1.5 rounded ${
               previewMode === "mobile" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
             }`}
@@ -205,7 +207,7 @@ export default function EditorTopBar({
           className="flex items-center gap-2 px-3 h-9 rounded-sm text-sm bg-slate-200 hover:bg-slate-300 text-slate-800"
         >
           <Eye size={18} />
-          Preview
+          {t("pageEditor.toolbar.preview")}
         </Link>
 
         {/* Vertical divider */}
@@ -216,7 +218,7 @@ export default function EditorTopBar({
           <button
             onClick={safeUndo}
             disabled={!canUndo}
-            title="Undo (Ctrl+Z)"
+            title={`${t("pageEditor.toolbar.undo")} (Ctrl+Z)`}
             className={`p-1.5 rounded ${
               canUndo ? "text-slate-600 hover:bg-white hover:text-slate-800" : "text-slate-400 cursor-not-allowed"
             }`}
@@ -226,7 +228,7 @@ export default function EditorTopBar({
           <button
             onClick={safeRedo}
             disabled={!canRedo}
-            title="Redo (Ctrl+Shift+Z)"
+            title={`${t("pageEditor.toolbar.redo")} (Ctrl+Shift+Z)`}
             className={`p-1.5 rounded ${
               canRedo ? "text-slate-600 hover:bg-white hover:text-slate-800" : "text-slate-400 cursor-not-allowed"
             }`}
@@ -245,7 +247,7 @@ export default function EditorTopBar({
           }`}
         >
           <Save size={18} />
-          {isSaving ? "Saving" : "Save"}
+          {isSaving ? t("pageEditor.toolbar.saving") : t("pageEditor.toolbar.save")}
         </button>
       </div>
     </div>

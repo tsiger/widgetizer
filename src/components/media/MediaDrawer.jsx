@@ -98,9 +98,9 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
 
   // Get the media type label for the drawer title
   const getMediaTypeLabel = () => {
-    if (isAudio) return "Audio";
-    if (isVideo) return "Video";
-    return "Image";
+    if (isAudio) return t("forms.media.types.audio");
+    if (isVideo) return t("forms.media.types.video");
+    return t("forms.media.types.image");
   };
 
   return (
@@ -140,13 +140,13 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
                   controls
                   preload="metadata"
                 >
-                  Your browser does not support the video tag.
+                  {t("common.error")}
                 </video>
               ) : isAudio ? (
                 <div className="flex flex-col items-center py-4">
                   <Music size={48} className="text-pink-500 mb-2" />
                   <audio src={fileUrl} controls preload="metadata" className="w-full max-w-xs">
-                    Your browser does not support the audio tag.
+                    {t("common.error")}
                   </audio>
                 </div>
               ) : (
@@ -173,7 +173,9 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
                   aria-required="true"
                 />
                 {errors.alt && <p className="form-error">{errors.alt.message}</p>}
-                <p className="form-description">{t("forms.media.altHelp", { type: "image" })}</p>
+                <p className="form-description">
+                  {t("forms.media.altHelp", { type: t("forms.media.types.image").toLowerCase() })}
+                </p>
               </div>
 
               <div className="form-field">
@@ -198,16 +200,18 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
                   id="title"
                   {...register("title")}
                   className="form-input"
-                  placeholder={isAudio ? "Song or episode title" : "Video title"}
+                  placeholder={
+                    isAudio ? t("forms.media.placeholders.audioTitle") : t("forms.media.placeholders.videoTitle")
+                  }
                 />
                 <p className="form-description">
-                  {isAudio ? "The title of the audio track or podcast episode." : "The title of the video."}
+                  {isAudio ? t("forms.media.help.audioTitle") : t("forms.media.help.videoTitle")}
                 </p>
               </div>
 
               <div className="form-field">
                 <label htmlFor="description" className="form-label-optional">
-                  {t("forms.media.descriptionLabel", { defaultValue: "Description" })}
+                  {t("forms.media.descriptionLabel")}
                 </label>
                 <textarea
                   id="description"
@@ -215,31 +219,23 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
                   className="form-input"
                   rows={3}
                   placeholder={
-                    isAudio ? "Artist, album, or notes about this audio" : "Description or notes about this video"
+                    isAudio
+                      ? t("forms.media.placeholders.audioDescription")
+                      : t("forms.media.placeholders.videoDescription")
                   }
                 />
                 <p className="form-description">
-                  {isAudio
-                    ? "Optional notes about this audio file (artist, album, etc.)."
-                    : "Optional description or notes about this video."}
+                  {isAudio ? t("forms.media.help.audioDescription") : t("forms.media.help.videoDescription")}
                 </p>
               </div>
             </>
           )}
 
           <div className="form-actions-separated">
-            <Button
-              type="button"
-              onClick={onClose}
-              variant="secondary"
-            >
+            <Button type="button" onClick={onClose} variant="secondary">
               {t("common.cancel")}
             </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              variant="primary"
-            >
+            <Button type="submit" disabled={loading} variant="primary">
               {loading ? t("forms.media.saving") : t("forms.media.save")}
             </Button>
           </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
+import { useTranslation } from "react-i18next";
 import { fetchPreview, scrollWidgetIntoView } from "../../queries/previewManager";
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
@@ -37,6 +38,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   },
   ref,
 ) {
+  const { t } = useTranslation();
   const [previewHtml, setPreviewHtml] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -280,26 +282,26 @@ const PreviewPanel = forwardRef(function PreviewPanel(
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            <p className="mt-2 text-sm text-slate-500">Loading Preview...</p>
+            <p className="mt-2 text-sm text-slate-500">{t("pageEditor.preview.loading")}</p>
           </div>
         </div>
       )}
       {error && (
         <div className="absolute inset-0 bg-red-50 p-4 text-red-700 z-20">
-          <p className="font-bold">Preview Error</p>
+          <p className="font-bold">{t("pageEditor.preview.error")}</p>
           <p className="text-sm">{error}</p>
           <button
             onClick={() => setInitialLoadComplete(false)}
             className="mt-2 px-2 py-1 bg-red-200 text-red-800 rounded text-xs hover:bg-red-300"
           >
-            Reload Preview
+            {t("pageEditor.preview.reload")}
           </button>
         </div>
       )}
       <iframe
         ref={iframeRef}
         srcDoc={iframeSrcDoc}
-        title="Page Preview"
+        title={t("pageEditor.preview.title")}
         sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
         className={`w-full h-full border-0 transition-all duration-300 ease-in-out mx-auto ${
           previewMode !== "desktop" ? "shadow-2xl" : ""

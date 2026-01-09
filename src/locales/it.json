@@ -26,19 +26,16 @@
       "title": "Nessun progetto attivo",
       "description": "Crea o seleziona un progetto per continuare.",
       "goToProjects": "Vai ai Progetti"
+    },
+    "footer": {
+      "thankYou": "Grazie per aver creato con"
     }
   },
   "forms": {
     "common": {
-      "title": "Titolo",
-      "description": "Descrizione",
       "saving": "Salvataggio...",
       "cancel": "Annulla",
-      "selectImage": "Seleziona immagine",
-      "changeImage": "Cambia immagine",
-      "removeImage": "Rimuovi immagine",
-      "formError": "Si è verificato un errore durante l'invio del modulo",
-      "selectImageFile": "Seleziona un file immagine."
+      "formError": "Si è verificato un errore durante l'invio del modulo"
     },
     "menu": {
       "titleLabel": "Titolo",
@@ -69,7 +66,13 @@
       "canonicalUrl": "URL Canonico",
       "canonicalUrlHelp": "L'URL preferito per questa pagina se esiste altrove.",
       "robotsLabel": "Indicizzazione Motori di Ricerca",
-      "robotsHelp": "Controlla se i motori di ricerca possono trovare questa pagina."
+      "robotsHelp": "Controlla se i motori di ricerca possono trovare questa pagina.",
+      "robots": {
+        "indexFollow": "Indicizza e Segui (Predefinito)",
+        "noindexFollow": "Non Indicizzare, ma Segui i Link",
+        "indexNofollow": "Indicizza, ma Non Seguire i Link",
+        "noindexNofollow": "Non Indicizzare e Non Seguire i Link"
+      }
     },
     "project": {
       "titleLabel": "Titolo",
@@ -89,7 +92,9 @@
       "selectTheme": "Seleziona un tema",
       "siteUrlLabel": "URL del Sito",
       "siteUrlHelp": "L'URL del tuo sito web live (es., https://miosito.com).",
-      "loadingThemes": "Caricamento temi..."
+      "loadingThemes": "Caricamento temi...",
+      "loadThemesError": "Caricamento dei temi fallito. Riavvia l'applicazione.",
+      "moreSettings": "Altre impostazioni"
     },
     "media": {
       "editTitle": "Modifica Metadati {{type}}",
@@ -99,18 +104,45 @@
       "altHelp": "Descrive il/la {{type}} per gli screen reader.",
       "titleLabel": "Titolo",
       "titleHelp": "Imposta l'attributo title (spesso mostrato al passaggio del mouse).",
+      "descriptionLabel": "Descrizione",
       "save": "Salva Modifiche",
-      "saving": "Salvataggio..."
+      "saving": "Salvataggio...",
+      "types": {
+        "image": "Immagine",
+        "video": "Video",
+        "audio": "Audio"
+      },
+      "placeholders": {
+        "audioTitle": "Titolo del brano o dell'episodio",
+        "videoTitle": "Titolo del video",
+        "audioDescription": "Artista, album o note su questo audio",
+        "videoDescription": "Descrizione o note su questo video"
+      },
+      "help": {
+        "audioTitle": "Il titolo della traccia audio o dell'episodio del podcast.",
+        "videoTitle": "Il titolo del video.",
+        "audioDescription": "Note opzionali su questo file audio (artista, album, ecc.).",
+        "videoDescription": "Descrizione o note opzionali su questo video."
+      }
     }
   },
   "common": {
     "save": "Salva",
+    "confirm": "Conferma",
+    "confirmAction": "Conferma azione",
+    "confirmProceed": "Sei sicuro di voler procedere?",
     "cancel": "Annulla",
     "reset": "Reimposta",
     "loading": "Caricamento...",
+    "search": "Cerca...",
     "error": "Errore",
     "success": "Successo",
-    "unsavedChanges": "Hai modifiche non salvate"
+    "unsavedChanges": "Hai modifiche non salvate",
+    "appTitle": "Widgetizer",
+    "aria": {
+      "dismiss": "Ignora",
+      "close": "Chiudi"
+    }
   },
   "components": {
     "mediaToolbar": {
@@ -319,13 +351,55 @@
     "loading": "Caricamento pagina...",
     "error": "Errore: {{message}}",
     "noPageSelected": "Nessuna pagina selezionata. Seleziona una pagina dall'elenco Pagine.",
+    "noWidgetsFound": "Nessun widget trovato",
     "widgetName": {
       "label": "Nome Widget",
       "description": "Nome personalizzato opzionale per identificare questa istanza del widget",
       "placeholder": "es. Hero Principale, Prodotti in Evidenza"
+    },
+    "actions": {
+      "duplicateBlock": "Duplica blocco",
+      "deleteBlock": "Elimina blocco",
+      "moveWidgetUp": "Sposta widget su",
+      "moveWidgetDown": "Sposta widget giù",
+      "unsavedChanges": "Modifiche non salvate",
+      "addBlock": "Aggiungi blocco",
+      "addWidget": "Aggiungi widget",
+      "duplicateWidget": "Duplica widget",
+      "deleteWidget": "Elimina widget",
+      "rename": "Doppio clic per rinominare"
+    },
+    "toolbar": {
+      "backToPages": "Torna alle Pagine",
+      "back": "Indietro",
+      "desktopView": "Vista Desktop",
+      "mobileView": "Vista Mobile",
+      "preview": "Anteprima",
+      "undo": "Annulla",
+      "redo": "Rifai",
+      "saving": "Salvataggio...",
+      "save": "Salva"
+    },
+    "themeSelector": {
+      "button": "Tema",
+      "title": "Impostazioni Tema"
+    },
+    "preview": {
+      "loading": "Caricamento anteprima...",
+      "error": "Errore anteprima",
+      "reload": "Ricarica anteprima",
+      "title": "Anteprima pagina"
+    },
+    "settingsPanel": {
+      "emptyState": "Seleziona un widget per modificarne le impostazioni",
+      "blockSettings": "Impostazioni blocco",
+      "header": "Intestazione",
+      "footer": "Piè di pagina",
+      "widgetSettings": "Impostazioni widget"
     }
   },
   "breadcrumb": {
+    "label": "Percorso di navigazione",
     "edit": "Modifica",
     "structure": "Struttura"
   },

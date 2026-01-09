@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function BlockInsertionZone({
   widgetId,
@@ -8,6 +9,7 @@ export default function BlockInsertionZone({
   isBlockSelectorOpen,
   activeBlockTriggerKey,
 }) {
+  const { t } = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const hoverTimerRef = useRef(null);
@@ -65,7 +67,7 @@ export default function BlockInsertionZone({
         <button
           ref={triggerRef}
           className="flex items-center justify-center h-5 w-5 rounded-full bg-white border-2 border-blue-500 text-blue-500 shadow-sm hover:bg-blue-500 hover:text-white transform transition-all mx-1.5 flex-shrink-0 z-10 hover:scale-110"
-          aria-label="Add block"
+          aria-label={t("pageEditor.actions.addBlock")}
         >
           <Plus size={10} />
         </button>

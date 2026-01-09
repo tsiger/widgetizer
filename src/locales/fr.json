@@ -26,19 +26,16 @@
       "title": "Aucun projet actif",
       "description": "Veuillez créer ou sélectionner un projet pour continuer.",
       "goToProjects": "Aller aux projets"
+    },
+    "footer": {
+      "thankYou": "Merci de créer avec"
     }
   },
   "forms": {
     "common": {
-      "title": "Titre",
-      "description": "Description",
       "saving": "Enregistrement...",
       "cancel": "Annuler",
-      "selectImage": "Sélectionner une image",
-      "changeImage": "Changer l'image",
-      "removeImage": "Supprimer l'image",
-      "formError": "Une erreur est survenue lors de la soumission du formulaire",
-      "selectImageFile": "Veuillez sélectionner un fichier image."
+      "formError": "Une erreur est survenue lors de la soumission du formulaire"
     },
     "menu": {
       "titleLabel": "Titre",
@@ -69,7 +66,13 @@
       "canonicalUrl": "URL Canonique",
       "canonicalUrlHelp": "L'URL préférée pour cette page si elle existe ailleurs.",
       "robotsLabel": "Indexation des moteurs de recherche",
-      "robotsHelp": "Contrôle si les moteurs de recherche peuvent trouver cette page."
+      "robotsHelp": "Contrôle si les moteurs de recherche peuvent trouver cette page.",
+      "robots": {
+        "indexFollow": "Indexer et suivre (Par défaut)",
+        "noindexFollow": "Ne pas indexer, mais suivre les liens",
+        "indexNofollow": "Indexer, mais ne pas suivre les liens",
+        "noindexNofollow": "Ne pas indexer et ne pas suivre les liens"
+      }
     },
     "project": {
       "titleLabel": "Titre",
@@ -89,7 +92,9 @@
       "selectTheme": "Sélectionnez un thème",
       "siteUrlLabel": "URL du site",
       "siteUrlHelp": "L'URL de votre site web (ex., https://monsite.com).",
-      "loadingThemes": "Chargement des thèmes..."
+      "loadingThemes": "Chargement des thèmes...",
+      "loadThemesError": "Échec du chargement des thèmes. Veuillez redémarrer l'application.",
+      "moreSettings": "Plus de paramètres"
     },
     "media": {
       "editTitle": "Modifier les métadonnées {{type}}",
@@ -99,18 +104,45 @@
       "altHelp": "Décrit le/la {{type}} pour les lecteurs d'écran.",
       "titleLabel": "Titre",
       "titleHelp": "Définit l'attribut title (souvent affiché au survol).",
+      "descriptionLabel": "Description",
       "save": "Enregistrer les modifications",
-      "saving": "Enregistrement..."
+      "saving": "Enregistrement...",
+      "types": {
+        "image": "Image",
+        "video": "Vidéo",
+        "audio": "Audio"
+      },
+      "placeholders": {
+        "audioTitle": "Titre du morceau ou de l'épisode",
+        "videoTitle": "Titre de la vidéo",
+        "audioDescription": "Artiste, album ou notes sur cet audio",
+        "videoDescription": "Description ou notes sur cette vidéo"
+      },
+      "help": {
+        "audioTitle": "Le titre de la piste audio ou de l'épisode de podcast.",
+        "videoTitle": "Le titre de la vidéo.",
+        "audioDescription": "Notes facultatives sur ce fichier audio (artiste, album, etc.).",
+        "videoDescription": "Description ou notes facultatives sur cette vidéo."
+      }
     }
   },
   "common": {
     "save": "Enregistrer",
+    "confirm": "Confirmer",
+    "confirmAction": "Confirmer l'action",
+    "confirmProceed": "Êtes-vous sûr de vouloir continuer ?",
     "cancel": "Annuler",
     "reset": "Réinitialiser",
     "loading": "Chargement...",
+    "search": "Rechercher...",
     "error": "Erreur",
     "success": "Succès",
-    "unsavedChanges": "Vous avez des modifications non enregistrées"
+    "unsavedChanges": "Vous avez des modifications non enregistrées",
+    "appTitle": "Widgetizer",
+    "aria": {
+      "dismiss": "Ignorer",
+      "close": "Fermer"
+    }
   },
   "components": {
     "mediaToolbar": {
@@ -319,13 +351,55 @@
     "loading": "Chargement de la page...",
     "error": "Erreur : {{message}}",
     "noPageSelected": "Aucune page sélectionnée. Veuillez sélectionner une page dans la liste des pages.",
+    "noWidgetsFound": "Aucun widget trouvé",
     "widgetName": {
       "label": "Nom du Widget",
       "description": "Nom personnalisé optionnel pour identifier cette instance de widget",
       "placeholder": "ex : Hero Principal, Produits en Vedette"
+    },
+    "actions": {
+      "duplicateBlock": "Dupliquer le bloc",
+      "deleteBlock": "Supprimer le bloc",
+      "moveWidgetUp": "Déplacer le widget vers le haut",
+      "moveWidgetDown": "Déplacer le widget vers le bas",
+      "unsavedChanges": "Modifications non enregistrées",
+      "addBlock": "Ajouter un bloc",
+      "addWidget": "Ajouter un widget",
+      "duplicateWidget": "Dupliquer le widget",
+      "deleteWidget": "Supprimer le widget",
+      "rename": "Double-cliquer pour renommer"
+    },
+    "toolbar": {
+      "backToPages": "Retour aux pages",
+      "back": "Retour",
+      "desktopView": "Vue ordinateur",
+      "mobileView": "Vue mobile",
+      "preview": "Aperçu",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "saving": "Enregistrement...",
+      "save": "Enregistrer"
+    },
+    "themeSelector": {
+      "button": "Thème",
+      "title": "Paramètres du thème"
+    },
+    "preview": {
+      "loading": "Chargement de l'aperçu...",
+      "error": "Erreur d'aperçu",
+      "reload": "Recharger l'aperçu",
+      "title": "Aperçu de la page"
+    },
+    "settingsPanel": {
+      "emptyState": "Sélectionnez un widget pour modifier ses paramètres",
+      "blockSettings": "Paramètres du bloc",
+      "header": "En-tête",
+      "footer": "Pied de page",
+      "widgetSettings": "Paramètres du widget"
     }
   },
   "breadcrumb": {
+    "label": "Fil d'Ariane",
     "edit": "Modifier",
     "structure": "Structure"
   },

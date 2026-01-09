@@ -209,10 +209,10 @@ export default function PageForm({
               {t("forms.page.robotsLabel")}
             </label>
             <select id="seo-robots" {...register("seo.robots")} className="form-select">
-              <option value="index,follow">Index and Follow (Default)</option>
-              <option value="noindex,follow">Don&apos;t Index, but Follow Links</option>
-              <option value="index,nofollow">Index, but Don&apos;t Follow Links</option>
-              <option value="noindex,nofollow">Don&apos;t Index or Follow Links</option>
+              <option value="index,follow">{t("forms.page.robots.indexFollow")}</option>
+              <option value="noindex,follow">{t("forms.page.robots.noindexFollow")}</option>
+              <option value="index,nofollow">{t("forms.page.robots.indexNofollow")}</option>
+              <option value="noindex,nofollow">{t("forms.page.robots.noindexNofollow")}</option>
             </select>
             <p className="form-description">{t("forms.page.robotsHelp")}</p>
           </div>

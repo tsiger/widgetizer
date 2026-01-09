@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import useWidgetStore from "../../stores/widgetStore";
 import usePageStore from "../../stores/pageStore";
 import { scrollWidgetIntoView } from "../../queries/previewManager";
@@ -55,6 +56,7 @@ export default function SelectionOverlay({
   onBlockSelect,
   onGlobalWidgetSelect,
 }) {
+  const { t } = useTranslation();
   const [selectionBounds, setSelectionBounds] = useState(null);
   const [blockBounds, setBlockBounds] = useState(null);
   const [widgetHoverBounds, setWidgetHoverBounds] = useState(null);
@@ -133,18 +135,21 @@ export default function SelectionOverlay({
   /**
    * Request bounds from iframe
    */
-  const requestBounds = useCallback((widgetId, blockId = null) => {
-    const iframe = iframeRef?.current;
-    if (!iframe?.contentWindow) return;
+  const requestBounds = useCallback(
+    (widgetId, blockId = null) => {
+      const iframe = iframeRef?.current;
+      if (!iframe?.contentWindow) return;
 
-    iframe.contentWindow.postMessage(
-      {
-        type: "UPDATE_SELECTION",
-        payload: { widgetId, blockId },
-      },
-      "*",
-    );
-  }, [iframeRef]);
+      iframe.contentWindow.postMessage(
+        {
+          type: "UPDATE_SELECTION",
+          payload: { widgetId, blockId },
+        },
+        "*",
+      );
+    },
+    [iframeRef],
+  );
 
   // Scroll and update display name when selection changes
   useEffect(() => {
@@ -237,7 +242,17 @@ export default function SelectionOverlay({
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [effectiveWidgetId, selectedBlockId, translateBoundsToOverlay, onWidgetSelect, onBlockSelect, onGlobalWidgetSelect, iframeRef, page, schemas]);
+  }, [
+    effectiveWidgetId,
+    selectedBlockId,
+    translateBoundsToOverlay,
+    onWidgetSelect,
+    onBlockSelect,
+    onGlobalWidgetSelect,
+    iframeRef,
+    page,
+    schemas,
+  ]);
 
   // Handle sidebar hover (calculated locally since it doesn't come from iframe)
   useEffect(() => {
@@ -249,7 +264,7 @@ export default function SelectionOverlay({
 
       const widgetType = page?.widgets?.[sidebarHoveredWidgetId]?.type;
       const customName = page?.widgets?.[sidebarHoveredWidgetId]?.settings?.name;
-       
+
       setHoverWidgetDisplayName(customName || schemas[widgetType]?.displayName || widgetType || null);
     } else if (!previewHoveredWidgetId) {
       // Only clear widget hover if preview isn't also hovering
@@ -263,13 +278,24 @@ export default function SelectionOverlay({
       // Use the hovered widget if available, otherwise use the selected widget
       const targetWidgetId = sidebarHoveredWidgetId || effectiveWidgetId;
       if (targetWidgetId) {
-        const blockBounds = getElementBounds(`[data-widget-id="${targetWidgetId}"] [data-block-id="${sidebarHoveredBlockId}"]`);
+        const blockBounds = getElementBounds(
+          `[data-widget-id="${targetWidgetId}"] [data-block-id="${sidebarHoveredBlockId}"]`,
+        );
         setBlockHoverBounds(blockBounds);
       }
     } else if (!previewHoveredWidgetId) {
       setBlockHoverBounds(null);
     }
-  }, [sidebarHoveredWidgetId, sidebarHoveredBlockId, effectiveWidgetId, selectedBlockId, previewHoveredWidgetId, getElementBounds, page, schemas]);
+  }, [
+    sidebarHoveredWidgetId,
+    sidebarHoveredBlockId,
+    effectiveWidgetId,
+    selectedBlockId,
+    previewHoveredWidgetId,
+    getElementBounds,
+    page,
+    schemas,
+  ]);
 
   // Sync on iframe load
   useEffect(() => {
@@ -381,28 +407,31 @@ export default function SelectionOverlay({
             style={{ pointerEvents: "auto" }}
           >
             {/* Reorder up button */}
-            {page?.widgetsOrder && page.widgetsOrder.length > 1 && selectedWidgetId && page.widgetsOrder.includes(selectedWidgetId) && (
-              <button
-                className={`p-0.5 rounded bg-white border border-slate-200 shadow-sm transition-all ${
-                  page.widgetsOrder.indexOf(selectedWidgetId) === 0
-                    ? "opacity-30 cursor-not-allowed"
-                    : "hover:bg-pink-50 hover:border-pink-300 cursor-pointer"
-                }`}
-                disabled={page.widgetsOrder.indexOf(selectedWidgetId) === 0}
-                onClick={() => {
-                  const currentOrder = page.widgetsOrder;
-                  const index = currentOrder.indexOf(selectedWidgetId);
-                  if (index > 0) {
-                    const newOrder = [...currentOrder];
-                    [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
-                    reorderWidgets(newOrder);
-                  }
-                }}
-                title="Move widget up"
-              >
-                <ChevronUp size={14} className="text-slate-600" />
-              </button>
-            )}
+            {page?.widgetsOrder &&
+              page.widgetsOrder.length > 1 &&
+              selectedWidgetId &&
+              page.widgetsOrder.includes(selectedWidgetId) && (
+                <button
+                  className={`p-0.5 rounded bg-white border border-slate-200 shadow-sm transition-all ${
+                    page.widgetsOrder.indexOf(selectedWidgetId) === 0
+                      ? "opacity-30 cursor-not-allowed"
+                      : "hover:bg-pink-50 hover:border-pink-300 cursor-pointer"
+                  }`}
+                  disabled={page.widgetsOrder.indexOf(selectedWidgetId) === 0}
+                  onClick={() => {
+                    const currentOrder = page.widgetsOrder;
+                    const index = currentOrder.indexOf(selectedWidgetId);
+                    if (index > 0) {
+                      const newOrder = [...currentOrder];
+                      [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+                      reorderWidgets(newOrder);
+                    }
+                  }}
+                  title={t("pageEditor.actions.moveWidgetUp")}
+                >
+                  <ChevronUp size={14} className="text-slate-600" />
+                </button>
+              )}
 
             {/* Widget displayName label */}
             {widgetDisplayName && (
@@ -415,28 +444,31 @@ export default function SelectionOverlay({
             )}
 
             {/* Reorder down button */}
-            {page?.widgetsOrder && page.widgetsOrder.length > 1 && selectedWidgetId && page.widgetsOrder.includes(selectedWidgetId) && (
-              <button
-                className={`p-0.5 rounded bg-white border border-slate-200 shadow-sm transition-all ${
-                  page.widgetsOrder.indexOf(selectedWidgetId) === page.widgetsOrder.length - 1
-                    ? "opacity-30 cursor-not-allowed"
-                    : "hover:bg-pink-50 hover:border-pink-300 cursor-pointer"
-                }`}
-                disabled={page.widgetsOrder.indexOf(selectedWidgetId) === page.widgetsOrder.length - 1}
-                onClick={() => {
-                  const currentOrder = page.widgetsOrder;
-                  const index = currentOrder.indexOf(selectedWidgetId);
-                  if (index < currentOrder.length - 1) {
-                    const newOrder = [...currentOrder];
-                    [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
-                    reorderWidgets(newOrder);
-                  }
-                }}
-                title="Move widget down"
-              >
-                <ChevronDown size={14} className="text-slate-600" />
-              </button>
-            )}
+            {page?.widgetsOrder &&
+              page.widgetsOrder.length > 1 &&
+              selectedWidgetId &&
+              page.widgetsOrder.includes(selectedWidgetId) && (
+                <button
+                  className={`p-0.5 rounded bg-white border border-slate-200 shadow-sm transition-all ${
+                    page.widgetsOrder.indexOf(selectedWidgetId) === page.widgetsOrder.length - 1
+                      ? "opacity-30 cursor-not-allowed"
+                      : "hover:bg-pink-50 hover:border-pink-300 cursor-pointer"
+                  }`}
+                  disabled={page.widgetsOrder.indexOf(selectedWidgetId) === page.widgetsOrder.length - 1}
+                  onClick={() => {
+                    const currentOrder = page.widgetsOrder;
+                    const index = currentOrder.indexOf(selectedWidgetId);
+                    if (index < currentOrder.length - 1) {
+                      const newOrder = [...currentOrder];
+                      [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+                      reorderWidgets(newOrder);
+                    }
+                  }}
+                  title={t("pageEditor.actions.moveWidgetDown")}
+                >
+                  <ChevronDown size={14} className="text-slate-600" />
+                </button>
+              )}
           </div>
         </div>
       )}
