@@ -43,6 +43,26 @@ A standard single-line text input.
 }
 ```
 
+### Number
+
+A numeric input field.
+
+**Additional Properties:**
+
+- **`min`** (number, optional): The minimum allowed value.
+- **`max`** (number, optional): The maximum allowed value.
+
+```json
+{
+  "id": "max_items",
+  "type": "number",
+  "label": "Max Items",
+  "default": 10,
+  "min": 1,
+  "max": 50
+}
+```
+
 ### Textarea
 
 A multi-line text input field.
@@ -249,6 +269,50 @@ A video uploader that includes a preview with placeholder icon, the ability to r
   "label": "Hero Background Video",
   "default": "/default-video.mp4",
   "description": "Upload a background video for the hero section."
+}
+```
+
+### Audio
+
+An audio uploader for selecting or uploading sound files. The value is the URL path to the audio file.
+
+**Features:**
+
+- **Upload**: Direct file upload (MP3 recommended)
+- **Preview**: Shows audio icon placeholder with filename and file size
+- **Browse**: Opens `MediaSelectorDrawer` to select from existing audio files
+- **Metadata Editing**: Edit button opens `MediaDrawer` for title and description editing
+
+```json
+{
+  "id": "background_music",
+  "type": "audio",
+  "label": "Background Music",
+  "description": "Select an audio file for the page background."
+}
+```
+
+### YouTube
+
+A specialized input for YouTube videos. It allows users to paste a YouTube URL or Video ID and configure embed options.
+
+**Features:**
+
+- **Preview**: Shows the video thumbnail and title once a valid URL/ID is entered
+- **Embed Options**: Toggle common YouTube embed parameters (controls, autoplay, loop, etc.)
+- **Validation**: Real-time validation of YouTube links and IDs
+
+```json
+{
+  "id": "hero_youtube_video",
+  "type": "youtube",
+  "label": "Hero Video (YouTube)",
+  "description": "Enter a YouTube URL or Video ID.",
+  "embedOptions": {
+    "autoplay": false,
+    "controls": true,
+    "mute": false
+  }
 }
 ```
 

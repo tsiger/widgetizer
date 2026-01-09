@@ -18,7 +18,7 @@ These layers are applied automatically to API endpoints and provide a robust bas
 - **Why it's important:** Prevents abuse and Denial-of-Service (DoS) attacks where a single actor could overwhelm the server, making it unavailable for legitimate users.
 - **Implementation:** Uses the `express-rate-limit` package. Two policies are in place:
   - **Editor routes** (`/api/projects`, `/api/themes`, `/api/pages`, `/api/preview`): 1500 requests per 15 minutes
-  - **Other API routes** (`/api/menus`, `/api/media`, `/api/export`, `/api/settings`): 1000 requests per 15 minutes
+  - **Other API routes** (`/api/menus`, `/api/media`, `/api/export`, `/api/settings`): 5000 requests per 15 minutes
 
 ### 3. HTTP Security Headers [PENDING]
 

@@ -502,6 +502,51 @@ The audio filter always returns just the path. You can explicitly use `'path'` o
 
 All three forms return the same audio file path.
 
+### YouTube Filter
+
+The `youtube` filter parses the data from a `youtube` setting type and renders a responsive YouTube embed.
+
+#### Basic Usage
+
+```liquid
+{{ widget.settings.myYoutubeVideo | youtube }}
+```
+
+#### Custom Class
+
+You can provide a custom CSS class for the wrapper element:
+
+```liquid
+{{ widget.settings.heroVideo | youtube: 'hero-youtube-wrapper' }}
+```
+
+#### Path-Only Mode
+
+If you need only the embed URL (e.g., for use in a custom `<iframe>` or JavaScript), use `'path'` or `'url'` as the first parameter:
+
+```liquid
+{{ widget.settings.introVideo | youtube: 'path' }}
+```
+
+#### Output Structure
+
+By default, the filter outputs a container with a responsive aspect ratio:
+
+```html
+<div
+  class="youtube-embed-wrapper [custom-class]"
+  style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden;"
+>
+  <iframe
+    src="https://www.youtube.com/embed/[videoId]?[options]"
+    style="position:absolute; top:0; left:0; width:100%; height:100%;"
+    frameborder="0"
+    allow="autoplay; encrypted-media"
+    allowfullscreen
+  ></iframe>
+</div>
+```
+
 ### Asset Management Tags
 
 These tags allow for efficient, deduplicated loading of assets (CSS and JS) in your theme with fine-grained control over placement and loading order. They are particularly useful when multiple widgets might require the same library (e.g., a slider plugin), ensuring it is only loaded once.

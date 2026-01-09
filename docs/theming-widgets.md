@@ -808,6 +808,26 @@ Ensure all interactive elements work with:
 
 **Image sizes**: `thumb`, `small`, `medium`, `large`
 
+### Videos
+
+```liquid
+<!-- Render video tag -->
+{{ block.settings.video | video: true, false, false, false, 'widget-video' }}
+
+<!-- Get video path only -->
+{{ block.settings.video | video: 'path' }}
+```
+
+### YouTube
+
+```liquid
+<!-- Render responsive YouTube embed -->
+{{ block.settings.youtube_video | youtube: 'widget-youtube-embed' }}
+
+<!-- Get embed URL only -->
+{{ block.settings.youtube_video | youtube: 'path' }}
+```
+
 ### Links
 
 ```liquid
