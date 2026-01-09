@@ -56,6 +56,8 @@ function scrollToWidget(widgetId) {
   if (!widgetId) return;
 
   currentSelectedWidgetId = widgetId;
+  // Attach resize observer to track dynamic size changes (e.g., accordion)
+  observeWidgetResize(widgetId);
 
   const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
   if (!widget) {
@@ -65,16 +67,17 @@ function scrollToWidget(widgetId) {
 
   const rect = widget.getBoundingClientRect();
   const padding = 40;
+  const viewportHeight = window.innerHeight;
 
-  const isTopNearTop = rect.top >= 0 && rect.top <= padding * 2;
+  // Check if widget is already fully visible in the viewport
+  const isFullyVisible = rect.top >= 0 && rect.bottom <= viewportHeight;
 
-  if (isTopNearTop) {
-    // Skip scrolling to avoid unnecessary movement when widget is already visible
+  if (isFullyVisible) {
+    // Skip scrolling - widget is already visible, just report bounds
     reportElementBounds(widgetId, currentSelectedBlockId);
     return;
   }
 
-  const viewportHeight = window.innerHeight;
   const documentHeight = document.documentElement.scrollHeight;
   let targetScroll = window.scrollY + rect.top - padding;
 
@@ -85,7 +88,7 @@ function scrollToWidget(widgetId) {
   // Scroll smoothly
   window.scrollTo({
     top: targetScroll,
-    behavior: "smooth"
+    behavior: "smooth",
   });
 
   // Report bounds after scroll animation
@@ -137,24 +140,44 @@ function reportElementBounds(widgetId, blockId = null) {
 // Report bounds on user scroll (debounced)
 let scrollDebounceTimer = null;
 function setupScrollBoundsReporting() {
-  window.addEventListener("scroll", () => {
-    if (scrollDebounceTimer) cancelAnimationFrame(scrollDebounceTimer);
-    scrollDebounceTimer = requestAnimationFrame(() => {
-      // Report selection bounds
-      if (currentSelectedWidgetId) {
-        reportElementBounds(currentSelectedWidgetId, currentSelectedBlockId);
-      }
-      // Report hover bounds
-      if (currentHoveredWidgetId) {
-        reportHoverBounds();
-      }
-    });
-  }, { passive: true });
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (scrollDebounceTimer) cancelAnimationFrame(scrollDebounceTimer);
+      scrollDebounceTimer = requestAnimationFrame(() => {
+        // Report selection bounds
+        if (currentSelectedWidgetId) {
+          reportElementBounds(currentSelectedWidgetId, currentSelectedBlockId);
+        }
+        // Report hover bounds
+        if (currentHoveredWidgetId) {
+          reportHoverBounds();
+        }
+      });
+    },
+    { passive: true },
+  );
 }
 
+// Update selection function
 function updateSelection(widgetId, blockId) {
   currentSelectedWidgetId = widgetId;
   currentSelectedBlockId = blockId;
+
+  // Re-attach resize observer when selection changes
+  observeWidgetResize(widgetId);
+
+  // Dispatch event so widgets can react to block selection (e.g., slideshow switching slides)
+  if (widgetId && blockId) {
+    const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
+    if (widget) {
+      const event = new CustomEvent("widget:block-select", {
+        detail: { blockId },
+        bubbles: true,
+      });
+      widget.dispatchEvent(event);
+    }
+  }
 }
 
 // Update widget settings in real-time for immediate feedback while typing
@@ -183,13 +206,20 @@ function updateWidgetSettings(widgetId, changes) {
 
 // Apply a setting value to elements within a container
 function applySettingToElement(container, settingId, value) {
-  const elements = container.querySelectorAll(`[data-setting="${settingId}"]`);
+  // Find elements with this data-setting inside the container
+  const childElements = [...container.querySelectorAll(`[data-setting="${settingId}"]`)];
+
+  // Also check if the container itself has the data-setting attribute
+  const elements = container.matches(`[data-setting="${settingId}"]`) ? [container, ...childElements] : childElements;
 
   elements.forEach((el) => {
     // Check if this element belongs to a nested block (prevent bleeding)
-    const closestBlock = el.closest("[data-block-id]");
-    if (closestBlock && closestBlock !== container) {
-      return;
+    // Skip if the element is the container itself (it's always valid)
+    if (el !== container) {
+      const closestBlock = el.closest("[data-block-id]");
+      if (closestBlock && closestBlock !== container) {
+        return;
+      }
     }
 
     const tagName = el.tagName.toLowerCase();
@@ -398,6 +428,39 @@ function setupHoverHandler() {
     },
     true,
   );
+}
+
+// ResizeObserver to detect widget size changes (e.g., accordion expansion)
+let widgetResizeObserver = null;
+let resizeDebounceTimer = null;
+
+function observeWidgetResize(widgetId) {
+  // Disconnect previous observer
+  if (widgetResizeObserver) {
+    widgetResizeObserver.disconnect();
+  }
+
+  if (!widgetId) return;
+
+  const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
+  if (!widget) return;
+
+  widgetResizeObserver = new ResizeObserver(() => {
+    // Debounce to avoid rapid-fire updates during animations
+    if (resizeDebounceTimer) cancelAnimationFrame(resizeDebounceTimer);
+    resizeDebounceTimer = requestAnimationFrame(() => {
+      reportElementBounds(currentSelectedWidgetId, currentSelectedBlockId);
+    });
+  });
+
+  // Observe the widget itself
+  widgetResizeObserver.observe(widget);
+
+  // Also observe all blocks within the widget for individual block size changes
+  const blocks = widget.querySelectorAll("[data-block-id]");
+  blocks.forEach((block) => {
+    widgetResizeObserver.observe(block);
+  });
 }
 
 // Initialize the preview runtime
