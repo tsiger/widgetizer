@@ -153,7 +153,20 @@
       "delete": "Διαγραφή",
       "refreshUsage": "Ανανέωση Χρήσης",
       "refreshUsageTitle": "Ανανέωση Παρακολούθησης Χρήσης",
-      "searchPlaceholder": "Αναζήτηση πολυμέσων..."
+      "searchPlaceholder": "Αναζήτηση πολυμέσων...",
+      "all": "Όλα",
+      "images": "Εικόνες",
+      "videos": "Βίντεο",
+      "audio": "Ήχος"
+    },
+    "mediaUploader": {
+      "dropActive": "Αφήστε τα αρχεία εδώ...",
+      "dropInactive": "Σύρετε και αποθέστε εικόνες και βίντεο εδώ ή",
+      "selectFiles": "Επιλογή Αρχείων",
+      "supportedImages": "Εικόνες: JPG, PNG, GIF, WebP, SVG",
+      "supportedVideos": "Βίντεο: MP4, WebM, MOV, AVI, MKV",
+      "supportedAudio": "Ήχος: MP3, WAV, OGG, M4A",
+      "uploading": "Μεταφόρτωση..."
     },
     "fileUploader": {
       "dropActive": "Αφήστε τα αρχεία εδώ...",
@@ -168,7 +181,11 @@
       "noMatch": "Δεν βρέθηκαν αρχεία πολυμέσων που να ταιριάζουν",
       "noFiles": "Δεν υπάρχουν διαθέσιμα αρχεία πολυμέσων",
       "video": "Βίντεο",
-      "closeLabel": "Κλείσιμο επιλογέα πολυμέσων"
+      "audio": "Ήχος",
+      "closeLabel": "Κλείσιμο επιλογέα πολυμέσων",
+      "upload": "Μεταφόρτωση",
+      "uploaderTitle": "Μεταφόρτωση Νέων Πολυμέσων",
+      "uploaderDesc": "Επιλέξτε αρχεία για προσθήκη στη βιβλιοθήκη"
     }
   },
   "settings": {

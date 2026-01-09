@@ -11,6 +11,8 @@ export default function MediaToolbar({
   selectedFiles,
   onBulkDelete,
   onRefreshUsage,
+  filterType,
+  onFilterTypeChange,
 }) {
   const { t } = useTranslation();
 
@@ -62,15 +64,28 @@ export default function MediaToolbar({
         </div>
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={16} />
-        <input
-          type="text"
-          placeholder={t("components.mediaToolbar.searchPlaceholder")}
-          className="form-input pl-10"
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
+      <div className="flex items-center space-x-2">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-slate-400" size={14} />
+          <input
+            type="text"
+            placeholder={t("components.mediaToolbar.searchPlaceholder")}
+            className="form-input py-1.5 pl-8 text-sm w-48 border-slate-200 rounded-md focus:ring-pink-500 focus:border-pink-500"
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
+        </div>
+        
+        <select
+          value={filterType}
+          onChange={(e) => onFilterTypeChange(e.target.value)}
+          className="form-select text-sm py-1.5 pl-3 pr-8 border-slate-200 rounded-md focus:ring-pink-500 focus:border-pink-500 bg-white"
+        >
+          <option value="all">{t("components.mediaToolbar.all")}</option>
+          <option value="image">{t("components.mediaToolbar.images")}</option>
+          <option value="video">{t("components.mediaToolbar.videos")}</option>
+          <option value="audio">{t("components.mediaToolbar.audio")}</option>
+        </select>
       </div>
     </div>
   );

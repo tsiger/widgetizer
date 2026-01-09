@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Image } from "lucide-react";
+import { MEDIA_TYPES } from "../config";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -55,13 +56,14 @@ export default function Media() {
         uploading={mediaUpload.uploading}
         uploadProgress={mediaUpload.uploadProgress}
         accept={{
-          "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp", ".svg"],
-          "video/*": [".mp4", ".webm", ".mov", ".avi", ".mkv"],
+          "image/*": MEDIA_TYPES.image,
+          "video/*": MEDIA_TYPES.video,
+          "audio/*": MEDIA_TYPES.audio,
         }}
         multiple={true}
         title={t("media.uploader.title")}
         description={t("media.uploader.description")}
-        maxSizeText={`${t("components.mediaUploader.supportedImages")} • ${t("components.mediaUploader.supportedVideos")}`}
+        maxSizeText={`${t("components.mediaUploader.supportedImages")} • ${t("components.mediaUploader.supportedVideos")} • ${t("components.mediaUploader.supportedAudio")}`}
       />
 
       {mediaState.files.length > 0 && (
@@ -74,6 +76,8 @@ export default function Media() {
             selectedFiles={mediaSelection.selectedFiles}
             onBulkDelete={mediaSelection.openBulkDeleteConfirmation}
             onRefreshUsage={mediaState.handleRefreshUsage}
+            filterType={mediaState.filterType}
+            onFilterTypeChange={mediaState.setFilterType}
           />
 
           {mediaState.viewMode === "grid" ? (

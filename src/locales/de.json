@@ -153,7 +153,11 @@
       "delete": "Löschen",
       "refreshUsage": "Verwendung aktualisieren",
       "refreshUsageTitle": "Nutzungsverfolgung aktualisieren",
-      "searchPlaceholder": "Medien suchen..."
+      "searchPlaceholder": "Medien suchen...",
+      "all": "Alle",
+      "images": "Bilder",
+      "videos": "Videos",
+      "audio": "Audio"
     },
     "mediaUploader": {
       "dropActive": "Lassen Sie die Dateien hier fallen...",
@@ -161,6 +165,7 @@
       "selectFiles": "Dateien auswählen",
       "supportedImages": "Bilder: JPG, PNG, GIF, WebP, SVG",
       "supportedVideos": "Videos: MP4, WebM, MOV, AVI, MKV",
+      "supportedAudio": "Audio: MP3, WAV, OGG, M4A",
       "uploading": "Wird hochgeladen..."
     },
     "fileUploader": {
@@ -177,7 +182,11 @@
       "noMatch": "Keine Mediendateien entsprechen Ihrer Suche",
       "noFiles": "Keine Mediendateien verfügbar",
       "video": "Video",
-      "closeLabel": "Medienauswahl schließen"
+      "audio": "Audio",
+      "closeLabel": "Medienauswahl schließen",
+      "upload": "Hochladen",
+      "uploaderTitle": "Neue Medien hochladen",
+      "uploaderDesc": "Wählen Sie Dateien aus, um sie Ihrer Bibliothek hinzuzufügen"
     }
   },
   "settings": {

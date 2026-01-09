@@ -10,6 +10,7 @@ export default function useMediaState() {
     return localStorage.getItem("mediaViewMode") || "grid";
   });
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
 
   // Get active project from the store
   const activeProject = useProjectStore((state) => state.activeProject);
@@ -63,8 +64,22 @@ export default function useMediaState() {
     }
   };
 
-  // Filter files based on search term
-  const filteredFiles = files.filter((file) => file.originalName.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Filter files based on search term and type
+  const filteredFiles = files.filter((file) => {
+    const matchesSearch = file.originalName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType =
+      filterType === "all"
+        ? true
+        : filterType === "image"
+        ? file.type.startsWith("image/")
+        : filterType === "video"
+        ? file.type.startsWith("video/")
+        : filterType === "audio"
+        ? file.type.startsWith("audio/")
+        : true;
+
+    return matchesSearch && matchesType;
+  });
 
   return {
     // State
@@ -75,6 +90,8 @@ export default function useMediaState() {
     setViewMode,
     searchTerm,
     setSearchTerm,
+    filterType,
+    setFilterType,
     filteredFiles,
     activeProject,
     showToast,

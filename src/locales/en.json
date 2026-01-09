@@ -153,7 +153,11 @@
       "delete": "Delete",
       "refreshUsage": "Refresh Usage",
       "refreshUsageTitle": "Refresh Usage Tracking",
-      "searchPlaceholder": "Search media..."
+      "searchPlaceholder": "Search media...",
+      "all": "All",
+      "images": "Images",
+      "videos": "Videos",
+      "audio": "Audio"
     },
     "mediaUploader": {
       "dropActive": "Drop the files here...",
@@ -161,6 +165,7 @@
       "selectFiles": "Select Files",
       "supportedImages": "Images: JPG, PNG, GIF, WebP, SVG",
       "supportedVideos": "Videos: MP4, WebM, MOV, AVI, MKV",
+      "supportedAudio": "Audio: MP3, WAV, OGG, M4A",
       "uploading": "Uploading..."
     },
     "fileUploader": {
@@ -176,7 +181,11 @@
       "noMatch": "No media files match your search",
       "noFiles": "No media files available",
       "video": "Video",
-      "closeLabel": "Close media selector"
+      "audio": "Audio",
+      "closeLabel": "Close media selector",
+      "upload": "Upload",
+      "uploaderTitle": "Upload New Media",
+      "uploaderDesc": "Select files to add to your library"
     }
   },
   "settings": {
