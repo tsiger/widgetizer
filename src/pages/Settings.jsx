@@ -28,7 +28,8 @@ export default function Settings() {
         const data = await getThemeSettings();
         setThemeData(data);
         setOriginalData(JSON.parse(JSON.stringify(data))); // Deep copy for comparison
-      } catch {
+      } catch (error) {
+        console.error("Failed to load theme settings:", error);
         showToast(t("themeSettings.toasts.loadError"), "error");
       } finally {
         setLoading(false);
@@ -96,7 +97,8 @@ export default function Settings() {
       setOriginalData(JSON.parse(JSON.stringify(themeData))); // Update original data
       setHasChanges(false);
       showToast(t("themeSettings.toasts.saveSuccess"), "success");
-    } catch {
+    } catch (error) {
+      console.error("Failed to save theme settings:", error);
       showToast(t("themeSettings.toasts.saveError"), "error");
     }
   };

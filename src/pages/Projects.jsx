@@ -40,7 +40,8 @@ export default function Projects() {
       await deleteProject(data.projectId);
       await loadProjects();
       showToast(t("projects.toasts.deleteSuccess", { name: data.projectName }), "success");
-    } catch {
+    } catch (error) {
+      console.error("Failed to delete project:", error);
       showToast(t("projects.toasts.deleteError"), "error");
     }
   };
@@ -89,7 +90,8 @@ export default function Projects() {
       if (project) {
         showToast(t("projects.toasts.setActiveSuccess", { name: project.name }), "success");
       }
-    } catch {
+    } catch (error) {
+      console.error("Failed to set active project:", error);
       showToast(t("projects.toasts.setActiveError"), "error");
     }
   };
@@ -99,7 +101,8 @@ export default function Projects() {
       await duplicateProject(projectId);
       await loadProjects();
       showToast(t("projects.toasts.duplicateSuccess"), "success");
-    } catch {
+    } catch (error) {
+      console.error("Failed to duplicate project:", error);
       showToast(t("projects.toasts.duplicateError"), "error");
     }
   };

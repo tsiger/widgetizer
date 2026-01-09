@@ -259,7 +259,7 @@ export async function refreshAllMediaUsage(projectId) {
           }
         });
       } catch (error) {
-        console.error(`Error processing page ${pageId}:`, error);
+        console.warn(`Error processing page ${pageId} for media usage:`, error.message);
       }
     }
 
@@ -287,7 +287,7 @@ export async function refreshAllMediaUsage(projectId) {
               }
             });
           } catch (error) {
-            console.error(`Error processing global widget ${fileName}:`, error);
+            console.warn(`Error processing global widget ${fileName} for media usage:`, error.message);
           }
         }
       }

@@ -20,8 +20,9 @@ export async function getProjectMedia(projectId, forceRefresh = false) {
   if (cached && cached.promise) {
     try {
       return await cached.promise;
-    } catch {
-      // If the cached promise fails, we'll try fetching again below
+    } catch (error) {
+      // If the cached promise fails, log it and try fetching again below
+      console.warn(`[MediaManager] Cached fetch promise failed, retrying. Reason: ${error.message}`);
     }
   }
 
