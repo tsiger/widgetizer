@@ -70,10 +70,13 @@ The backend handles the logic for listing the themes and processing uploads.
   1.  **Reception**: The `multer` middleware first receives the uploaded file and holds it in memory as a buffer.
   2.  **Validation**: The controller uses the `adm-zip` library to inspect the zip file _without_ extracting it to disk first. It performs several critical checks:
       - It rejects empty zip files.
-      - It ensures the zip file contains a single root directory (e.g., `my-cool-theme/`). It will reject zips that have files like `theme.json` at the top level instead of inside a folder.
+      - It ensures the zip file contains a single root directory.
+      - **Structural Validation**: It verifies the presence of mandatory files: `theme.json`, `layout.liquid`, and `screenshot.png`.
+      - **Directory Validation**: It ensures the `assets/`, `templates/`, and `widgets/` directories exist and are not empty.
+      - **Metadata Validation**: It parses `theme.json` and ensures `name`, `version`, and `author` fields are present.
       - It checks if a theme directory with the same name already exists in `/themes/` to prevent overwriting an existing theme.
   3.  **Extraction**: If all validation checks pass, the controller extracts the contents of the zip file's root folder into a new directory within `/themes/`.
-  4.  **Response**: It sends a success response to the client, including the `theme.json` data of the newly installed theme so the frontend can update its state.
+  4.  **Response**: It sends a success response to the client, including the programmatically calculated widget count.
 
 ## Security Considerations
 

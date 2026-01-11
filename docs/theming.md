@@ -61,6 +61,15 @@ A theme is organized as a directory with the following structure:
     └── icons.json          # Icon definitions (optional)
 ```
 
+> [!IMPORTANT] **Absolute Minimum Requirements:** For a theme to be recognized and functional, it MUST contain:
+>
+> - `theme.json`: Manifest with `name`, `version`, and `author`.
+> - `layout.liquid`: The main layout wrapper.
+> - `screenshot.png`: A 1280x720 preview image.
+> - `widgets/`: Directory containing at least one widget.
+> - `templates/`: Directory containing page templates.
+> - `assets/`: Directory for theme assets.
+
 > **Note:** Each widget lives in its own subdirectory containing a `schema.json` (widget configuration) and `widget.liquid` (template). For comprehensive widget authoring guidance, see the [Widget Authoring Guide](theming-widgets.md).
 
 ## 3. Theme Manifest (theme.json)
@@ -75,10 +84,11 @@ The `theme.json` file serves as the theme's manifest and defines global settings
   "version": "1.0.0",
   "description": "A beautiful, responsive theme",
   "author": "Your Name",
-  "widgets": 15,
   "useCoreWidgets": true
 }
 ```
+
+> [!NOTE] The `widgets` count is calculated programmatically by the system based on the contents of the `/widgets/` directory. You do not need to specify it in `theme.json`.
 
 ### Global Settings Schema
 
