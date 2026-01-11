@@ -69,9 +69,16 @@ export default function EditorTopBar({
     return () => stopAutoSave();
   }, [startAutoSave, stopAutoSave]);
 
-  // Keyboard shortcuts for undo/redo
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        // Prevent multiple simultaneous saves if one is already in progress
+        if (hasUnsavedChanges() && !isSaving) {
+          save(false);
+        }
+      }
+
       if ((e.ctrlKey || e.metaKey) && e.key === "z") {
         if (e.shiftKey) {
           e.preventDefault();
@@ -81,6 +88,7 @@ export default function EditorTopBar({
           safeUndo();
         }
       }
+
       if ((e.ctrlKey || e.metaKey) && e.key === "y") {
         e.preventDefault();
         safeRedo();
@@ -88,7 +96,7 @@ export default function EditorTopBar({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [safeUndo, safeRedo]);
+  }, [safeUndo, safeRedo, save, hasUnsavedChanges, isSaving]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -240,6 +248,7 @@ export default function EditorTopBar({
         <button
           onClick={() => save(false)}
           disabled={!hasUnsavedChanges() || isSaving}
+          title={`${t("pageEditor.toolbar.save")} (Ctrl+S)`}
           className={`flex items-center justify-center gap-2 px-3 h-9 min-w-24 rounded-sm text-sm ${
             hasUnsavedChanges() && !isSaving
               ? "bg-pink-600 hover:bg-pink-700 text-white"

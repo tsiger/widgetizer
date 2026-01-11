@@ -20,7 +20,26 @@ const useAutoSave = create((set, get) => ({
   // Computed
   hasUnsavedChanges: () => {
     const { modifiedWidgets, structureModified, themeSettingsModified } = get();
-    return modifiedWidgets.size > 0 || structureModified || themeSettingsModified;
+
+    // Check explicit modification flags first (fast path)
+    if (modifiedWidgets.size > 0 || structureModified || themeSettingsModified) {
+      return true;
+    }
+
+    // Check if page state differs from saved state (catches undo/redo changes)
+    const pageStore = usePageStore.getState();
+    const { page, originalPage, themeSettings, originalThemeSettings } = pageStore;
+
+    if (page && originalPage && JSON.stringify(page) !== JSON.stringify(originalPage)) {
+      return true;
+    }
+
+    if (themeSettings && originalThemeSettings &&
+        JSON.stringify(themeSettings) !== JSON.stringify(originalThemeSettings)) {
+      return true;
+    }
+
+    return false;
   },
 
   // Actions
