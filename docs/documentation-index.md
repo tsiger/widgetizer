@@ -2,6 +2,18 @@
 
 This document serves as a comprehensive index to all documentation in the Widgetizer project. Use this guide to quickly find the appropriate documentation for your needs, whether you're developing, troubleshooting, or understanding system architecture.
 
+## 🕒 Version History
+
+### **v0.7.0 - Page Editor & UX Refinement**
+
+- **Keyboard Shortcuts**: Added `Ctrl+S` / `Cmd+S` for manual saving in the page editor.
+- **Intelligent Auto-Save**: Implemented debounced auto-save that resets the 60s timer on every modification.
+- **Link Navigation Prevention**: Intercepts link clicks in the editor preview to prevent accidental navigation while editing.
+- **Undo / Save Synchronization**: Fixed state detection to ensure the "Save" button correctly reflects unsaved changes after undo/redo actions.
+- **API Cleanup**: Removed redundant `startAutoSave` functionality now that auto-save is modification-driven.
+
+---
+
 ## 📚 Core System Documentation
 
 ### **[theming.md](theming.md)** - Theme Development & Structure

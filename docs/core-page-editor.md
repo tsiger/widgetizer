@@ -13,13 +13,12 @@ The `PageEditor` is composed of several specialized child components, each with 
 - **`EditorTopBar`**: Located at the top of the page, this component displays the page name and provides global actions. It contains controls for manual saving, opening a live preview in a new tab, changing the preview mode (e.g., desktop, tablet, mobile), and shows the current save status (e.g., "All changes saved", "Saving..."). Fully localized.
 
 - **`WidgetList`**: The left-hand panel that displays the hierarchical structure of all widgets and their inner blocks for the current page. It's the main interface for:
-
   - Selecting widgets or blocks for editing.
   - Reordering widgets and blocks via drag-and-drop.
   - Adding, duplicating, and deleting widgets.
   - Adding blocks to a widget.
 
-- **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page. It has been refactored to work declaratively. Instead of being told _how_ to change, it simply receives the latest application state from the editor and uses a central `updatePreview` function to synchronize the `<iframe>`'s DOM. This makes it highly robust and less prone to rendering race conditions.
+- **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page. It has been refactored to work declaratively. Instead of being told _how_ to change, it simply receives the latest application state from the editor and uses a central `updatePreview` function to synchronize the `<iframe>`'s DOM. Navigation within the preview (clicking links) is automatically intercepted and prevented to avoid leaving the editor, while still allowing widget/block selection.
 
 - **`SettingsPanel`**: The right-hand panel. When a widget or block is selected, this panel dynamically displays the relevant configuration options based on its schema. All changes made here are immediately applied to the selected component and reflected in the preview.
 
@@ -76,9 +75,9 @@ The editor provides a way to see a true, live preview of the page, exactly as an
 The editor is designed to save changes automatically, providing a seamless user experience.
 
 1.  Most actions that alter page data—such as editing a setting, adding a widget, or reordering the list—also call a corresponding function on the `useAutoSave` store (e.g., `markWidgetModified`, `setStructureModified`).
-2.  These functions set an internal `hasUnsavedChanges` flag to `true`, which is reflected in the `EditorTopBar` UI (e.g., the "Save" button becomes enabled).
-3.  The `useAutoSave` hook contains logic (likely a debounced function) that automatically triggers a save to the backend API shortly after changes have been made. The `isAutoSaving` flag is used to show a visual indicator during this process.
-4.  For immediate persistence, the user can also click the "Save" button in the `EditorTopBar`, which directly invokes the `save()` action.
+2.  These functions set an internal `hasUnsavedChanges` flag to `true`, which is reflected in the `EditorTopBar` UI (e.g., the "Save" button becomes enabled). The system also performs deep comparison between current and original states to ensure the flag correctly reflects changes after undo/redo operations.
+3.  The `useAutoSave` store implements a **debounced auto-save** strategy. Instead of a fixed interval, a 60-second timer is reset on every modification. This ensures that auto-saving only occurs after a period of inactivity, providing a smoother experience.
+4.  For immediate persistence, the user can also click the "Save" button in the `EditorTopBar` (or use the `Ctrl+S` / `Cmd+S` shortcut), which directly invokes the `save()` action.
 
 ### Undo/Redo System
 
@@ -93,6 +92,7 @@ The Page Editor features a comprehensive undo/redo system powered by `zundo` (Zu
 - **Keyboard Shortcuts**:
   - `Ctrl+Z` (or `Cmd+Z`): Undo
   - `Ctrl+Shift+Z` (or `Cmd+Shift+Z`) / `Ctrl+Y`: Redo
+  - `Ctrl+S` (or `Cmd+S`): Save Changes
 - **History Management**:
   - The history is cleared whenever a new page is loaded to prevent cross-page undoing.
   - The system tracks up to 50 states by default.

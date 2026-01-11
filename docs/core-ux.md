@@ -10,6 +10,8 @@ This document provides a user experience (UX) audit of the application's core wo
 2.  **Go with the Flow:** Redirect users to the logical next step in their workflow. For example, after creating an item, take them to where they can use it or see it.
 3.  **Consistency is Key:** The pattern for creating, editing, and deleting different types of content (pages, menus, etc.) should be as similar as possible.
 4.  **Prevent Destructive Actions:** Use confirmation modals for deletions, and disable actions that would break things (e.g., deleting an active theme or project).
+5.  **Efficiency Through Shortcuts:** Provide standard keyboard shortcuts (Undo, Redo, Save) to speed up common workflows.
+6.  **Intelligent Auto-Save:** Auto-save should be "invisible" and respectful of user activity, triggering only after a period of inactivity (debounce) rather than at fixed intervals.
 
 ---
 
