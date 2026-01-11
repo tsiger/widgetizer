@@ -44,10 +44,11 @@ const useAutoSave = create((set, get) => ({
 
   // Actions
   markWidgetModified: (widgetId) => {
-    const { modifiedWidgets } = get();
+    const { modifiedWidgets, resetAutoSaveTimer } = get();
     const newSet = new Set(modifiedWidgets);
     newSet.add(widgetId);
     set({ modifiedWidgets: newSet });
+    resetAutoSaveTimer();
   },
 
   markWidgetUnmodified: (widgetId) => {
@@ -59,10 +60,16 @@ const useAutoSave = create((set, get) => ({
 
   setStructureModified: (modified) => {
     set({ structureModified: modified });
+    if (modified) {
+      get().resetAutoSaveTimer();
+    }
   },
 
   setThemeSettingsModified: (modified) => {
     set({ themeSettingsModified: modified });
+    if (modified) {
+      get().resetAutoSaveTimer();
+    }
   },
 
   save: async (isAuto = false) => {
@@ -138,24 +145,28 @@ const useAutoSave = create((set, get) => ({
     }
   },
 
-  startAutoSave: () => {
+  resetAutoSaveTimer: () => {
     const { autoSaveInterval } = get();
-    if (autoSaveInterval) return;
 
-    const interval = setInterval(() => {
+    if (autoSaveInterval) {
+      clearTimeout(autoSaveInterval);
+    }
+
+    const timeout = setTimeout(() => {
       const { hasUnsavedChanges } = get();
       if (hasUnsavedChanges()) {
         get().save(true);
       }
-    }, 60000); // 1 minute
+      set({ autoSaveInterval: null });
+    }, 60000);
 
-    set({ autoSaveInterval: interval });
+    set({ autoSaveInterval: timeout });
   },
 
   stopAutoSave: () => {
     const { autoSaveInterval } = get();
     if (autoSaveInterval) {
-      clearInterval(autoSaveInterval);
+      clearTimeout(autoSaveInterval);
       set({ autoSaveInterval: null });
     }
   },

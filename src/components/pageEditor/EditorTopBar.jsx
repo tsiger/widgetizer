@@ -13,7 +13,7 @@ export default function EditorTopBar({
   children,
 }) {
   const { t } = useTranslation();
-  const { hasUnsavedChanges, isSaving, save, startAutoSave, stopAutoSave } = useAutoSave();
+  const { hasUnsavedChanges, isSaving, save, stopAutoSave } = useAutoSave();
   const [pages, setPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(() => {
@@ -63,11 +63,10 @@ export default function EditorTopBar({
     loadPages();
   }, []);
 
-  // Setup auto-save lifecycle
+  // Cleanup auto-save timer when component unmounts
   useEffect(() => {
-    startAutoSave();
     return () => stopAutoSave();
-  }, [startAutoSave, stopAutoSave]);
+  }, [stopAutoSave]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
