@@ -292,12 +292,15 @@ function setupInteractionHandler() {
   document.addEventListener(
     "click",
     (event) => {
-      // Don't intercept clicks on interactive elements - let them work normally
-      const interactiveElement = event.target.closest('button, a, input, select, textarea, [role="button"]');
-      if (interactiveElement) {
-        // Still send selection message, but don't prevent the click
-        const blockEl = event.target.closest("[data-block-id]");
-        const widgetEl = event.target.closest("[data-widget-id]");
+      const blockEl = event.target.closest("[data-block-id]");
+      const widgetEl = event.target.closest("[data-widget-id]");
+
+      // Prevent all link navigation in editor mode to avoid leaving the editor
+      const linkElement = event.target.closest("a");
+      if (linkElement) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (widgetEl) {
           window.parent.postMessage(
             {
@@ -310,22 +313,35 @@ function setupInteractionHandler() {
             "*",
           );
         }
-        return; // Let the click proceed to the interactive element
+        return;
       }
 
-      // Find the closest widget or block element
-      const blockEl = event.target.closest("[data-block-id]");
-      const widgetEl = event.target.closest("[data-widget-id]");
+      // Allow other interactive elements (buttons, inputs, etc.) to work normally
+      const interactiveElement = event.target.closest('button, input, select, textarea, [role="button"]');
+      if (interactiveElement) {
+        if (widgetEl) {
+          window.parent.postMessage(
+            {
+              type: "WIDGET_SELECTED",
+              payload: {
+                widgetId: widgetEl.getAttribute("data-widget-id"),
+                blockId: blockEl ? blockEl.getAttribute("data-block-id") : null,
+              },
+            },
+            "*",
+          );
+        }
+        return;
+      }
 
+      // Non-interactive clicks: prevent default and select the widget/block
       if (widgetEl) {
-        // Prevent default behavior (e.g., following links) for non-interactive clicks
         event.preventDefault();
         event.stopPropagation();
 
         const widgetId = widgetEl.getAttribute("data-widget-id");
         const blockId = blockEl ? blockEl.getAttribute("data-block-id") : null;
 
-        // Send message to parent
         window.parent.postMessage(
           {
             type: "WIDGET_SELECTED",
@@ -336,7 +352,7 @@ function setupInteractionHandler() {
       }
     },
     true,
-  ); // Use capture phase to ensure we catch it before other handlers
+  );
 }
 
 // Setup hover handler to send hover events to parent
