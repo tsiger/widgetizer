@@ -7,7 +7,7 @@ This document explains the "Themes" management page, which is the user interface
 Themes are structured directories that define the layout, styles, and functionality of the application. Each theme contains:
 
 - `theme.json`: Theme metadata and configuration.
-- `screenshot.png`: A preview image of the theme, displayed on the card in the Themes UI.
+- `screenshot.png`: A 1280x720 preview image of the theme, displayed on the card in the Themes UI.
 
 ## 2. Frontend Implementation (`src/pages/Themes.jsx`)
 

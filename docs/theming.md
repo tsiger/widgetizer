@@ -30,7 +30,7 @@ A theme is organized as a directory with the following structure:
 /themes/my-theme/
 ├── theme.json              # Theme manifest and global settings schema
 ├── layout.liquid           # Main HTML layout template
-├── screenshot.png          # Preview image for the theme
+├── screenshot.png          # 1280x720 preview image for the theme
 ├── widgets/                # Widget templates
 │   ├── basic-text/         # Each widget in its own folder
 │   │   ├── schema.json     # Widget configuration schema

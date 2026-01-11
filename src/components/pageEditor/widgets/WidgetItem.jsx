@@ -124,7 +124,7 @@ export default function WidgetItem({
             />
           ) : (
             <span
-              className={`font-medium text-xs truncate text-slate-700 ${isSelected ? "cursor-text" : ""}`}
+              className={`font-medium text-xs truncate text-slate-700 px-1 py-0.5 rounded border border-transparent ${isSelected ? "cursor-text hover:border-slate-300" : ""}`}
               onDoubleClick={handleDoubleClick}
               title={isSelected ? t("pageEditor.actions.rename") : undefined}
             >

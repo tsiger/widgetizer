@@ -12,7 +12,7 @@
     {% if widget.settings.logoImage != blank %}
       {{ widget.settings.logoImage | image: 'medium', 'header-logo-image', false }}
     {% else %}
-      {{ widget.settings.logoText | default: 'Widgetizer' }}
+      <span data-setting="logoText">{{ widget.settings.logoText | default: 'Widgetizer' }}</span>
     {% endif %}
   </a>
 

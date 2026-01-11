@@ -182,6 +182,32 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           );
         }
       });
+
+      // Also handle global widgets (header/footer) for real-time updates
+      Object.entries(globalWidgets || {}).forEach(([globalWidgetKey, globalWidget]) => {
+        const oldGlobalWidget = previousState.globalWidgets?.[globalWidgetKey];
+        if (!globalWidget || !oldGlobalWidget) return;
+
+        const settingsChanged = JSON.stringify(globalWidget.settings) !== JSON.stringify(oldGlobalWidget.settings);
+
+        if (settingsChanged) {
+          const changes = { settings: {} };
+
+          Object.entries(globalWidget.settings || {}).forEach(([key, value]) => {
+            if (JSON.stringify(value) !== JSON.stringify(oldGlobalWidget.settings?.[key])) {
+              changes.settings[key] = value;
+            }
+          });
+
+          iframeRef.current.contentWindow.postMessage(
+            {
+              type: "UPDATE_WIDGET_SETTINGS",
+              payload: { widgetId: globalWidgetKey, changes },
+            },
+            "*",
+          );
+        }
+      });
     }
 
     // Content changed - debounce the reload

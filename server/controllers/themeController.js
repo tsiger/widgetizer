@@ -32,12 +32,27 @@ export async function getAllThemes(_, res) {
           const themeData = await fs.readFile(themeJsonPath, "utf8");
           const theme = JSON.parse(themeData);
 
+          // Count widgets programmatically from the widgets directory
+          let widgetCount = 0;
+          const widgetsDir = getThemeWidgetsDir(themeId);
+          
+          try {
+            const entries = await fs.readdir(widgetsDir, { withFileTypes: true });
+            // Count widget folders (excluding 'global' directory)
+            widgetCount = entries.filter(
+              (entry) => entry.isDirectory() && entry.name !== "global"
+            ).length;
+          } catch (widgetDirError) {
+            // If widgets directory doesn't exist or can't be read, count is 0
+            console.warn(`Could not read widgets directory for theme ${themeId}:`, widgetDirError.message);
+          }
+
           return {
             id: themeId,
             name: theme.name,
             description: theme.description,
             version: theme.version,
-            widgets: theme.widgets,
+            widgets: widgetCount, // Use programmatic count instead of theme.json value
             author: theme.author,
           };
         } catch {
@@ -228,6 +243,73 @@ export async function uploadTheme(req, res) {
       .status(400)
       .json({ message: "Zip file structure is invalid. Expecting a single root folder containing the theme." });
   }
+
+  // --- Start: Theme Validation ---
+  // Validate theme structure before extraction to prevent incomplete/broken themes
+  // from polluting the themes directory. We check for minimum required files and
+  // directories that make a theme functional in Widgetizer.
+  
+  const themeJsonEntryPath = `${themeFolderName}/theme.json`;
+  const screenshotEntryPath = `${themeFolderName}/screenshot.png`;
+
+  const themeJsonEntry = zip.getEntry(themeJsonEntryPath);
+  const screenshotEntry = zip.getEntry(screenshotEntryPath);
+
+  // Required files: theme.json, screenshot.png, layout.liquid
+  if (!themeJsonEntry) {
+    return res.status(400).json({ message: "Invalid theme: Missing 'theme.json' in the root directory." });
+  }
+
+  if (!screenshotEntry) {
+    return res.status(400).json({ message: "Invalid theme: Missing 'screenshot.png' in the root directory." });
+  }
+
+  const layoutEntryPath = `${themeFolderName}/layout.liquid`;
+  if (!zip.getEntry(layoutEntryPath)) {
+    return res.status(400).json({ message: "Invalid theme: Missing 'layout.liquid' in the root directory." });
+  }
+
+  // Required directories: assets/, templates/, widgets/
+  // We check for at least one file in each directory (empty dirs won't work)
+  const hasAssetsDir = relevantEntries.some((entry) => entry.entryName.startsWith(`${themeFolderName}/assets/`));
+  if (!hasAssetsDir) {
+    return res.status(400).json({ message: "Invalid theme: Missing 'assets' directory." });
+  }
+
+  const hasTemplatesDir = relevantEntries.some((entry) => entry.entryName.startsWith(`${themeFolderName}/templates/`));
+  if (!hasTemplatesDir) {
+    return res.status(400).json({ message: "Invalid theme: Missing 'templates' directory." });
+  }
+
+  // A theme without widgets is non-functional - reject it early
+  const hasWidgetsDir = relevantEntries.some((entry) => entry.entryName.startsWith(`${themeFolderName}/widgets/`));
+  if (!hasWidgetsDir) {
+    return res.status(400).json({ message: "Invalid theme: Missing 'widgets' directory." });
+  }
+
+  // Validate theme.json metadata before extraction
+  // We parse it from the ZIP buffer to avoid extracting broken themes
+  try {
+    const themeJsonContent = themeJsonEntry.getData().toString("utf8");
+    const themeJson = JSON.parse(themeJsonContent);
+
+    // Enforce required metadata fields for theme identification and display
+    const requiredFields = ["name", "version", "author"];
+    const missingFields = requiredFields.filter((field) => !themeJson[field]);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: `Invalid theme.json: Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return res.status(400).json({ message: "Invalid theme.json: Failed to parse JSON." });
+    }
+    console.error("Error validating theme.json:", error);
+    return res.status(500).json({ message: "Error validating theme configuration." });
+  }
+  // --- End: Theme Validation ---
 
   const targetThemePath = path.join(THEMES_DIR, themeFolderName);
 
