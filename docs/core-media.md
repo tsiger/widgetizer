@@ -148,6 +148,18 @@ The media library supports audio uploads alongside images and videos with the fo
 - Metadata includes `title` and `description` (both optional)
 - No additional metadata is extracted or stored for audio files
 
+### Media Type Configuration
+
+The system uses a centralized configuration for media types and allowed extensions.
+
+- **Location**: `src/config.js`
+- **Definition**: The `MEDIA_TYPES` constant defines the allowed file extensions for different categories:
+  - `image`: `.jpeg`, `.jpg`, `.png`, `.gif`, `.webp`, `.svg`
+  - `video`: `.mp4`, `.webm`, `.mov`, `.avi`, `.mkv`
+  - `audio`: `.mp3`, `.wav`, `.ogg`, `.m4a`
+
+This central definition ensures consistency across the application, from file upload validation to browser filtering.
+
 ## 2. Frontend Implementation (`src/pages/Media.jsx`)
 
 The Media page has been **refactored** into a clean, modular architecture with the main component acting as an orchestrator for several specialized hooks and UI components.
@@ -173,6 +185,7 @@ Manages core media state and data loading:
 - **State Management**: Files list, loading states, view mode, search filtering
 - **Data Loading**: Fetches project media on mount using `getProjectMedia`
 - **View Persistence**: Saves view mode preference to localStorage
+- **Type Filtering**: Supports filtering the media list by type (`all`, `image`, `video`, `audio`)
 - **Search Filtering**: Real-time filename filtering
 - **Usage Refresh**: Manual usage tracking refresh functionality
 
@@ -213,7 +226,7 @@ Handles metadata editing and drawer functionality:
 ### Core UI Components
 
 - `MediaUploader`: Drag-and-drop zone with real-time upload progress display (localized)
-- `MediaToolbar`: Contains view toggle, search bar, bulk actions, and usage refresh (localized)
+- `MediaToolbar`: Contains view toggle, search bar, media type filter dropdown, bulk actions, and usage refresh (localized)
 - `MediaGrid`: Responsive grid view with thumbnail cards and usage badges
 - `MediaList`: Table view with detailed file information and select-all functionality (localized)
 - `MediaDrawer`: Slide-out panel for editing file metadata (alt text and title, localized)
@@ -226,11 +239,13 @@ A specialized drawer component that allows users to browse and select existing m
 
 **Key Features:**
 
-- **File Type Filtering**: Supports filtering by file type (`image`, `video`, or `all`)
-- **Search Functionality**: Real-time search through media files by filename
-- **Grid Display**: Responsive grid layout with thumbnail previews
-- **Video Support**: Shows video placeholder icons for video files (since videos don't generate thumbnails)
-- **Click Selection**: Simple click-to-select workflow
+- **Direct Upload**: Includes an "Upload" button that triggers the OS file dialog, allowing users to add new files directly while browsing.
+- **Search Bar**: Integrated search functionality to quickly find files by name.
+- **File Type Filtering**: Supports filtering by file type (`image`, `video`, `audio`, or `all`). The filter can be pre-set via props.
+- **Visual Indicators**:
+  - **Images**: Displays the actual image thumbnail.
+  - **Videos**: Displays a play icon with a "Video" label.
+  - **Audio**: Displays a music icon with an "Audio" label.
 - **Keyboard Navigation**: Escape key support for closing the drawer
 - **Background Scroll Prevention**: Prevents body scrolling when drawer is open
 
