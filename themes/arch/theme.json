@@ -7,76 +7,126 @@
     "global": {
       "colors": [
         {
+          "type": "header",
+          "id": "colors_light_header",
+          "label": "Light Colors"
+        },
+        {
           "type": "color",
-          "id": "bg_primary",
+          "id": "light_bg_primary",
           "label": "Primary Background",
           "default": "#ffffff",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "bg_secondary",
+          "id": "light_bg_secondary",
           "label": "Secondary Background",
           "default": "#f9f9f9",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "text_content",
+          "id": "light_text_content",
           "label": "Content Text",
           "default": "#333333",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "text_heading",
+          "id": "light_text_heading",
           "label": "Heading Text",
           "default": "#000000",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "text_muted",
+          "id": "light_text_muted",
           "label": "Muted Text",
           "default": "#666666",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "border_color",
+          "id": "light_border_color",
           "label": "Border Color",
           "default": "#e0e0e0",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "accent",
+          "id": "light_accent",
           "label": "Accent Color",
           "default": "#0d47b7",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "accent_text",
+          "id": "light_accent_text",
           "label": "Accent Text Color",
           "default": "#ffffff",
           "outputAsCssVar": true
         },
         {
-          "type": "color",
-          "id": "inverse_bg",
-          "label": "Inverse Background",
-          "default": "#000000",
-          "outputAsCssVar": true,
-          "description": "Background color for widgets with dark background and light text"
+          "type": "header",
+          "id": "colors_dark_header",
+          "label": "Dark Colors"
         },
         {
           "type": "color",
-          "id": "inverse_text",
-          "label": "Inverse Text",
+          "id": "dark_bg_primary",
+          "label": "Primary Background",
+          "default": "#0a0a0a",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "dark_bg_secondary",
+          "label": "Secondary Background",
+          "default": "#1a1a1a",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "dark_text_content",
+          "label": "Content Text",
+          "default": "#e0e0e0",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "dark_text_heading",
+          "label": "Heading Text",
           "default": "#ffffff",
-          "outputAsCssVar": true,
-          "description": "Text color for widgets with dark background and light text"
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "dark_text_muted",
+          "label": "Muted Text",
+          "default": "#888888",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "dark_border_color",
+          "label": "Border Color",
+          "default": "#333333",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "dark_accent",
+          "label": "Accent Color",
+          "default": "#3b82f6",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "dark_accent_text",
+          "label": "Accent Text Color",
+          "default": "#ffffff",
+          "outputAsCssVar": true
         }
       ],
       "typography": [

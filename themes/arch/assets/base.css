@@ -83,24 +83,20 @@ img {
   --border-width-thick: 0.3rem; /* 3px */
 
   /* Border */
-  --border-color: var(--colors-border_color, #e0e0e0);
+  --border-color: var(--colors-light_border_color, #e0e0e0);
 
   /* Text Colors */
-  --text-content: var(--colors-text_content, #333);
-  --text-heading: var(--colors-text_heading, #000);
-  --text-muted: var(--colors-text_muted, #666);
+  --text-content: var(--colors-light_text_content, #333);
+  --text-heading: var(--colors-light_text_heading, #000);
+  --text-muted: var(--colors-light_text_muted, #666);
 
   /* Background Colors */
-  --bg-primary: var(--colors-bg_primary, #fff);
-  --bg-secondary: var(--colors-bg_secondary, #f9f9f9);
+  --bg-primary: var(--colors-light_bg_primary, #fff);
+  --bg-secondary: var(--colors-light_bg_secondary, #f9f9f9);
 
   /* Accent Colors */
-  --accent: var(--colors-accent, #000);
-  --accent-text: var(--colors-accent_text, #fff);
-
-  /* Inverse Colors */
-  --inverse-bg: var(--colors-inverse_bg, #000);
-  --inverse-text: var(--colors-inverse_text, #fff);
+  --accent: var(--colors-light_accent, #0d47b7);
+  --accent-text: var(--colors-light_accent_text, #fff);
 
   /* Primitive Colors */
   --color-white: #ffffff;
@@ -139,26 +135,28 @@ img {
    COLOR SCHEME SYSTEM
    ========================================================================== */
 
-/* Light-on-dark color scheme (uses inverse colors) */
-.color-scheme-dark {
-  --text-heading: var(--inverse-text);
-  --text-content: var(--inverse-text);
-  --text-muted: var(
-    --inverse-text
-  ); /* Fallback to inverse text with opacity controlled by opacity property if needed, or simple inheritance */
-  --border-color: var(--inverse-text); /* Will need opacity adjustment in components usually */
-  --bg-primary: var(--inverse-bg);
-  --bg-secondary: rgba(255, 255, 255, 0.1); /* Keep transparent white for secondary bg on dark */
+/* Light-on-light color scheme (default) */
+.color-scheme-light {
+  --text-heading: var(--colors-light_text_heading, #000);
+  --text-content: var(--colors-light_text_content, #333);
+  --text-muted: var(--colors-light_text_muted, #666);
+  --border-color: var(--colors-light_border_color, #e0e0e0);
+  --bg-primary: var(--colors-light_bg_primary, #fff);
+  --bg-secondary: var(--colors-light_bg_secondary, #f9f9f9);
+  --accent: var(--colors-light_accent, #0d47b7);
+  --accent-text: var(--colors-light_accent_text, #fff);
 }
 
-/* Dark-on-light color scheme (resets to main theme defaults) */
-.color-scheme-light {
-  --text-heading: var(--colors-text_heading, #000);
-  --text-content: var(--colors-text_content, #333);
-  --text-muted: var(--colors-text_muted, #666);
-  --border-color: var(--colors-border_color, #e0e0e0);
-  --bg-primary: var(--colors-bg_primary, #fff);
-  --bg-secondary: var(--colors-bg_secondary, #f9f9f9);
+/* Light-on-dark color scheme */
+.color-scheme-dark {
+  --text-heading: var(--colors-dark_text_heading, #fff);
+  --text-content: var(--colors-dark_text_content, #e0e0e0);
+  --text-muted: var(--colors-dark_text_muted, #888);
+  --border-color: var(--colors-dark_border_color, #333);
+  --bg-primary: var(--colors-dark_bg_primary, #0a0a0a);
+  --bg-secondary: var(--colors-dark_bg_secondary, #1a1a1a);
+  --accent: var(--colors-dark_accent, #3b82f6);
+  --accent-text: var(--colors-dark_accent_text, #fff);
 }
 
 /* ==========================================================================

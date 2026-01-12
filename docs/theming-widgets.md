@@ -434,49 +434,75 @@ These classes are semantic hooks (no default styling) for targeting in CSS:
 
 ### Color Scheme Classes
 
+Widgets support two color schemes defined in theme settings:
+
 ```liquid
-<!-- Dark background with light text -->
-<section class="widget color-scheme-dark">
-  <!-- Text uses --inverse-text -->
+<!-- Light color scheme (default) -->
+<section class="widget color-scheme-light">
+  <!-- Content -->
 </section>
 
-<!-- Light background (default) -->
-<section class="widget color-scheme-light">
-  <!-- Text uses theme defaults -->
+<!-- Dark color scheme -->
+<section class="widget color-scheme-dark">
+  <!-- Content -->
 </section>
 ```
+
+**Widget-Level Color Scheme Setting:**
+
+Add a color scheme setting to your widget schema:
+
+```json
+{
+  "type": "select",
+  "id": "color_scheme",
+  "label": "Color Scheme",
+  "default": "light",
+  "options": [
+    { "value": "light", "label": "Light" },
+    { "value": "dark", "label": "Dark" }
+  ]
+}
+```
+
+**Widget Template:**
+
+```liquid
+<section
+  class="widget widget-{name} widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  {% if widget.settings.color_scheme == 'dark' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endif %}
+>
+  <div class="widget-container {% if widget.settings.color_scheme == 'dark' %}widget-container-padded{% endif %}">
+    <!-- Content -->
+  </div>
+</section>
+```
+
+**How it works:**
+
+1. `color-scheme-{{ widget.settings.color_scheme }}` adds the appropriate class
+2. Dark scheme automatically sets dark background via inline style
+3. `widget-container-padded` adds padding for dark scheme widgets
+4. All text, borders, and accent colors automatically switch based on scheme
 
 ### Background System
 
 #### Widget-Level Background
 
+Color schemes handle the main background, but you can still override with custom backgrounds:
+
 ```liquid
 <section
-  class="widget {% if widget.settings.image != blank %}has-bg-image has-overlay{% elsif widget.settings.background_color != blank %}has-bg-color{% endif %}"
-  {% if widget.settings.image != blank %}
-    style="background-image: url('{{ widget.settings.image | image: 'path', 'large' }}'); --widget-overlay-color: rgba(0,0,0,0.5); --widget-overlay-opacity: 1;"
-  {% elsif widget.settings.background_color != blank %}
-    style="--widget-bg-color: {{ widget.settings.background_color }};"
-  {% endif %}
+  class="widget widget-{name} widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  style="--widget-bg-color: {{ widget.settings.background_color }};"
 >
-```
-
-#### Block-Level Background
-
-```liquid
-{% assign item_classes = 'your-item-class block-item' %}
-{% if block.settings.image != blank %}
-  {% assign item_classes = item_classes | append: ' has-bg-image has-overlay' %}
-  {% assign item_style = 'background-image: url(' | append: block.settings.image | image: 'path', 'large' | append: '); --widget-overlay-color: ' | append: block.settings.overlay_color | append: ';' %}
-{% elsif block.settings.background_color != blank %}
-  {% assign item_classes = item_classes | append: ' has-bg-color' %}
-  {% assign item_style = '--widget-bg-color: ' | append: block.settings.background_color | append: ';' %}
-{% endif %}
-
-<div class="{{ item_classes }}" style="{{ item_style }}">
   <!-- Content -->
-</div>
+</section>
 ```
+
+Note: Custom backgrounds override the color scheme background completely.
 
 ---
 

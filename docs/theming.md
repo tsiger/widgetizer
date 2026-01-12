@@ -1410,8 +1410,8 @@ Alternatively, access theme settings directly in your Liquid templates:
 
 ```liquid
 <div style="
-  background-color: {{ theme.colors.background }};
-  font-size: {{ theme.typography.base_font_size }}px;
+  background-color: var(--bg-primary);
+  font-size: {{ theme.typography.body_font_size }}px;
   {% if theme.layout.site_width == 'wide' %}max-width: 1400px;{% endif %}
 ">
   Content here
