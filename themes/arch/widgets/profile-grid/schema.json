@@ -1,7 +1,12 @@
 {
   "type": "profile-grid",
   "displayName": "Profile Grid",
-  "aliases": ["team", "members", "staff", "about us"],
+  "aliases": [
+    "team",
+    "members",
+    "staff",
+    "about us"
+  ],
   "settings": [
     {
       "type": "text",
@@ -26,8 +31,14 @@
       "label": "Color Scheme",
       "default": "light",
       "options": [
-        { "value": "light", "label": "Light" },
-        { "value": "dark", "label": "Dark" }
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
       ]
     }
   ],
@@ -87,6 +98,61 @@
           "type": "text",
           "id": "email",
           "label": "Email"
+        },
+        {
+          "type": "text",
+          "id": "github",
+          "label": "GitHub URL"
+        },
+        {
+          "type": "text",
+          "id": "youtube",
+          "label": "YouTube URL"
+        },
+        {
+          "type": "text",
+          "id": "tiktok",
+          "label": "TikTok URL"
+        },
+        {
+          "type": "text",
+          "id": "pinterest",
+          "label": "Pinterest URL"
+        },
+        {
+          "type": "text",
+          "id": "bluesky",
+          "label": "Bluesky URL"
+        },
+        {
+          "type": "text",
+          "id": "discord",
+          "label": "Discord URL"
+        },
+        {
+          "type": "text",
+          "id": "meta",
+          "label": "Meta URL"
+        },
+        {
+          "type": "text",
+          "id": "reddit",
+          "label": "Reddit URL"
+        },
+        {
+          "type": "text",
+          "id": "telegram",
+          "label": "Telegram URL"
+        },
+        {
+          "type": "text",
+          "id": "threads",
+          "label": "Threads URL"
+        },
+        {
+          "type": "text",
+          "id": "whatsapp",
+          "label": "WhatsApp URL"
         }
       ]
     }

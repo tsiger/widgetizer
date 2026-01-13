@@ -1,7 +1,12 @@
 {
   "type": "social-icons",
   "displayName": "Social Icons",
-  "aliases": ["links", "follow", "share", "connect"],
+  "aliases": [
+    "links",
+    "follow",
+    "share",
+    "connect"
+  ],
   "settings": [
     {
       "type": "text",
@@ -26,9 +31,18 @@
       "label": "Alignment",
       "default": "center",
       "options": [
-        { "value": "start", "label": "Left" },
-        { "value": "center", "label": "Center" },
-        { "value": "end", "label": "Right" }
+        {
+          "value": "start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "Right"
+        }
       ]
     },
     {
@@ -46,8 +60,14 @@
       "label": "Color Scheme",
       "default": "light",
       "options": [
-        { "value": "light", "label": "Light" },
-        { "value": "dark", "label": "Dark" }
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
       ]
     }
   ],
@@ -62,15 +82,70 @@
           "label": "Platform",
           "default": "facebook",
           "options": [
-            { "value": "facebook", "label": "Facebook" },
-            { "value": "instagram", "label": "Instagram" },
-            { "value": "twitter", "label": "X (Twitter)" },
-            { "value": "linkedin", "label": "LinkedIn" },
-            { "value": "youtube", "label": "YouTube" },
-            { "value": "tiktok", "label": "TikTok" },
-            { "value": "pinterest", "label": "Pinterest" },
-            { "value": "github", "label": "GitHub" },
-            { "value": "mail", "label": "Email" }
+            {
+              "value": "facebook",
+              "label": "Facebook"
+            },
+            {
+              "value": "instagram",
+              "label": "Instagram"
+            },
+            {
+              "value": "twitter",
+              "label": "X (Twitter)"
+            },
+            {
+              "value": "linkedin",
+              "label": "LinkedIn"
+            },
+            {
+              "value": "youtube",
+              "label": "YouTube"
+            },
+            {
+              "value": "tiktok",
+              "label": "TikTok"
+            },
+            {
+              "value": "pinterest",
+              "label": "Pinterest"
+            },
+            {
+              "value": "github",
+              "label": "GitHub"
+            },
+            {
+              "value": "bluesky",
+              "label": "Bluesky"
+            },
+            {
+              "value": "discord",
+              "label": "Discord"
+            },
+            {
+              "value": "meta",
+              "label": "Meta"
+            },
+            {
+              "value": "reddit",
+              "label": "Reddit"
+            },
+            {
+              "value": "telegram",
+              "label": "Telegram"
+            },
+            {
+              "value": "threads",
+              "label": "Threads"
+            },
+            {
+              "value": "whatsapp",
+              "label": "WhatsApp"
+            },
+            {
+              "value": "mail",
+              "label": "Email"
+            }
           ]
         },
         {
@@ -86,21 +161,30 @@
       "type": "social_link",
       "settings": {
         "platform": "facebook",
-        "link": { "href": "https://facebook.com", "text": "Facebook" }
+        "link": {
+          "href": "https://facebook.com",
+          "text": "Facebook"
+        }
       }
     },
     {
       "type": "social_link",
       "settings": {
         "platform": "instagram",
-        "link": { "href": "https://instagram.com", "text": "Instagram" }
+        "link": {
+          "href": "https://instagram.com",
+          "text": "Instagram"
+        }
       }
     },
     {
       "type": "social_link",
       "settings": {
         "platform": "twitter",
-        "link": { "href": "https://twitter.com", "text": "X" }
+        "link": {
+          "href": "https://twitter.com",
+          "text": "X"
+        }
       }
     }
   ]

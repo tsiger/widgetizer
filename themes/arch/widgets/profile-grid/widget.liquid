@@ -174,7 +174,7 @@
             {% endif %}
 
             {% assign has_social = false %}
-            {% if block.settings.linkedin != blank or block.settings.twitter != blank or block.settings.instagram != blank or block.settings.facebook != blank or block.settings.email != blank %}
+            {% if block.settings.linkedin != blank or block.settings.twitter != blank or block.settings.instagram != blank or block.settings.facebook != blank or block.settings.email != blank or block.settings.github != blank or block.settings.youtube != blank or block.settings.tiktok != blank or block.settings.pinterest != blank or block.settings.bluesky != blank or block.settings.discord != blank or block.settings.meta != blank or block.settings.reddit != blank or block.settings.telegram != blank or block.settings.threads != blank or block.settings.whatsapp != blank %}
               {% assign has_social = true %}
             {% endif %}
 
@@ -203,6 +203,61 @@
                 {% if block.settings.email != blank %}
                   <a href="mailto:{{ block.settings.email }}" class="profile-social-link" aria-label="Email" data-setting="email">
                     {% render 'icon', icon: 'mail' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.github != blank %}
+                  <a href="{{ block.settings.github }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="GitHub" data-setting="github">
+                    {% render 'icon', icon: 'github' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.youtube != blank %}
+                  <a href="{{ block.settings.youtube }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="YouTube" data-setting="youtube">
+                    {% render 'icon', icon: 'youtube' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.tiktok != blank %}
+                  <a href="{{ block.settings.tiktok }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="TikTok" data-setting="tiktok">
+                    {% render 'icon', icon: 'tiktok' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.pinterest != blank %}
+                  <a href="{{ block.settings.pinterest }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="Pinterest" data-setting="pinterest">
+                    {% render 'icon', icon: 'pinterest' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.bluesky != blank %}
+                  <a href="{{ block.settings.bluesky }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="Bluesky" data-setting="bluesky">
+                    {% render 'icon', icon: 'bluesky' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.discord != blank %}
+                  <a href="{{ block.settings.discord }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="Discord" data-setting="discord">
+                    {% render 'icon', icon: 'discord' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.meta != blank %}
+                  <a href="{{ block.settings.meta }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="Meta" data-setting="meta">
+                    {% render 'icon', icon: 'meta' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.reddit != blank %}
+                  <a href="{{ block.settings.reddit }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="Reddit" data-setting="reddit">
+                    {% render 'icon', icon: 'reddit' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.telegram != blank %}
+                  <a href="{{ block.settings.telegram }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="Telegram" data-setting="telegram">
+                    {% render 'icon', icon: 'telegram' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.threads != blank %}
+                  <a href="{{ block.settings.threads }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="Threads" data-setting="threads">
+                    {% render 'icon', icon: 'threads' %}
+                  </a>
+                {% endif %}
+                {% if block.settings.whatsapp != blank %}
+                  <a href="{{ block.settings.whatsapp }}" class="profile-social-link" target="_blank" rel="noopener" aria-label="WhatsApp" data-setting="whatsapp">
+                    {% render 'icon', icon: 'whatsapp' %}
                   </a>
                 {% endif %}
               </div>
