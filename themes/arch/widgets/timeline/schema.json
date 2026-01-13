@@ -32,13 +32,13 @@
     },
     {
       "type": "select",
-      "id": "background",
-      "label": "Background",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "light",
       "options": [
-        { "value": "primary", "label": "Primary" },
-        { "value": "secondary", "label": "Secondary" }
-      ],
-      "default": "primary"
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" }
+      ]
     }
   ],
   "blocks": [

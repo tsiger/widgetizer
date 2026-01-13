@@ -1,8 +1,8 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-bento-grid widget-{{ widget.id }}"
-  {% if widget.settings.background == 'secondary' %}
-    style="--widget-bg-color: var(--bg-secondary);"
+  class="widget widget-bento-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  {% if widget.settings.color_scheme == 'dark' %}
+    style="--widget-bg-color: var(--bg-primary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="bento-grid"
@@ -24,7 +24,7 @@
         overflow: hidden;
         border: var(--border-width-thin) solid var(--border-color);
         text-decoration: none;
-        transition: transform var(--transition-speed-normal), border-color var(--transition-speed-normal);
+        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s ease;
         min-height: 20rem;
         justify-content: flex-end;
 
@@ -67,7 +67,7 @@
     }
   </style>
 
-  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
+  <div class="widget-container {% if widget.settings.color_scheme == 'dark' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}

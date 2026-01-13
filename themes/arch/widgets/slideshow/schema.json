@@ -66,15 +66,10 @@
           "description": "Applies only if there is a background image."
         },
         {
-          "type": "color",
-          "id": "background_color",
-          "label": "Background color"
-        },
-        {
           "type": "select",
-          "id": "text_color",
-          "label": "Text color",
-          "default": "light",
+          "id": "color_scheme",
+          "label": "Color Scheme",
+          "default": "dark",
           "options": [
             { "value": "light", "label": "Light" },
             { "value": "dark", "label": "Dark" }
@@ -170,7 +165,7 @@
     {
       "type": "slide",
       "settings": {
-        "text_color": "light",
+        "color_scheme": "dark",
         "heading_text": "Your First Slide",
         "heading_size": "5xl",
         "text_content": "Add your content here",
@@ -186,7 +181,7 @@
     {
       "type": "slide",
       "settings": {
-        "text_color": "light",
+        "color_scheme": "dark",
         "heading_text": "Your Second Slide",
         "heading_size": "5xl",
         "text_content": "Add your content here",

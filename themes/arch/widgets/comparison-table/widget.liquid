@@ -1,8 +1,8 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-comparison-table widget-{{ widget.id }}"
-  {% if widget.settings.background == 'secondary' %}
-    style="--widget-bg-color: var(--bg-secondary);"
+  class="widget widget-comparison-table widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  {% if widget.settings.color_scheme == 'dark' %}
+    style="--widget-bg-color: var(--bg-primary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="comparison-table"
@@ -41,8 +41,9 @@
       }
 
       & .comparison-table-th-featured {
-        background-color: var(--accent);
-        color: var(--accent-text);
+        position: relative;
+        border: var(--border-width-medium) solid var(--accent);
+        border-block-end-color: var(--accent);
       }
 
       & .comparison-table-badge {
@@ -74,7 +75,13 @@
       }
 
       & .comparison-table-td-featured {
-        background-color: var(--bg-secondary);
+        border-inline-start: var(--border-width-medium) solid var(--accent);
+        border-inline-end: var(--border-width-medium) solid var(--accent);
+        border-block-end-color: var(--border-color);
+      }
+
+      & .comparison-table-body tr:last-child .comparison-table-td-featured {
+        border-block-end: var(--border-width-medium) solid var(--accent);
       }
 
       & .comparison-table-check {
@@ -152,7 +159,7 @@
   {% assign column_ids = columns | split: ',' %}
   {% assign feature_ids = features | split: ',' %}
 
-  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
+  <div class="widget-container {% if widget.settings.color_scheme == 'dark' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}

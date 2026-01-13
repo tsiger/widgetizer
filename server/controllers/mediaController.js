@@ -166,10 +166,32 @@ export async function writeMediaFile(projectId, data) {
     const projectFolderName = await getProjectFolderName(projectId);
     const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
 
+    // Ensure the parent directory exists
+    await fs.ensureDir(path.dirname(mediaFilePath));
+
     // Use atomic write: write to temp file first, then rename
     const tempFilePath = `${mediaFilePath}.tmp.${Date.now()}`;
-    await fs.writeFile(tempFilePath, JSON.stringify(data, null, 2), "utf8");
-    await fs.move(tempFilePath, mediaFilePath, { overwrite: true });
+
+    try {
+      await fs.writeFile(tempFilePath, JSON.stringify(data, null, 2), "utf8");
+
+      // Verify temp file was created successfully
+      if (!(await fs.pathExists(tempFilePath))) {
+        throw new Error(`Temp file was not created: ${tempFilePath}`);
+      }
+
+      await fs.move(tempFilePath, mediaFilePath, { overwrite: true });
+    } catch (error) {
+      // Clean up temp file if it exists
+      try {
+        if (await fs.pathExists(tempFilePath)) {
+          await fs.unlink(tempFilePath);
+        }
+      } catch (cleanupError) {
+        console.warn(`Failed to clean up temp file ${tempFilePath}:`, cleanupError.message);
+      }
+      throw error;
+    }
   } finally {
     releaseLock();
     writeLocks.delete(projectId);

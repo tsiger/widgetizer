@@ -22,8 +22,8 @@
     },
     {
       "type": "select",
-      "id": "text_color",
-      "label": "Text color",
+      "id": "color_scheme",
+      "label": "Color Scheme",
       "default": "light",
       "options": [
         { "value": "light", "label": "Light" },
@@ -52,12 +52,6 @@
       "default": "#00000080",
       "allow_alpha": true,
       "description": "Applies only if there is a background image."
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background color",
-      "default": "#000000"
     }
   ],
   "blocks": [

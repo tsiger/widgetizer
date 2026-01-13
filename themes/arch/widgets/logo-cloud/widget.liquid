@@ -1,8 +1,8 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-type-logo-cloud widget-{{ widget.id }}"
-  {% if widget.settings.background == 'secondary' %}
-    style="--widget-bg-color: var(--bg-secondary);"
+  class="widget widget-type-logo-cloud widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  {% if widget.settings.color_scheme == 'dark' %}
+    style="--widget-bg-color: var(--bg-primary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="logo-cloud"
@@ -26,15 +26,15 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: var(--space-lg);
+        padding: var(--space-md);
         background-color: var(--bg-primary);
         border: var(--border-width-thin) solid var(--border-color);
       }
 
       & .logo-image {
-        max-width: 12rem;
+        max-width: 18rem;
         height: auto;
-        max-height: 4.8rem;
+        max-height: 8rem;
         width: auto;
         filter: grayscale(100%);
         opacity: 0.6;
@@ -57,8 +57,8 @@
         }
 
         & .logo-image {
-          max-width: 14rem;
-          max-height: 5.6rem;
+          max-width: 20rem;
+          max-height: 9rem;
         }
       }
 
@@ -68,14 +68,14 @@
         }
 
         & .logo-image {
-          max-width: 16rem;
-          max-height: 6.4rem;
+          max-width: 22rem;
+          max-height: 10rem;
         }
       }
     }
   </style>
 
-  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
+  <div class="widget-container {% if widget.settings.color_scheme == 'dark' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}

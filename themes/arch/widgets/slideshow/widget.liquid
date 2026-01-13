@@ -3,7 +3,7 @@
 
 <section
   id="{{ widget.id }}"
-  class="widget widget-slideshow widget-{{ widget.id }} color-scheme-dark{% unless widget.settings.fullwidth %} slideshow-constrained{% endunless %}"
+  class="widget widget-slideshow widget-{{ widget.id }} {% unless widget.settings.fullwidth %} slideshow-constrained{% endunless %}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="slideshow"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
@@ -15,11 +15,11 @@
       {% assign block = widget.blocks[blockId] %}
       {% assign isFirst = forloop.first %}
       <div
-        class="slideshow-slide widget {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %} {% if block.settings.image != blank %}has-bg-image has-overlay{% elsif block.settings.background_color != blank %}has-bg-color{% endif %} {% if block.settings.text_color == 'light' %}color-scheme-dark{% else %}color-scheme-light{% endif %}{% if isFirst %} is-active{% endif %}"
+        class="slideshow-slide widget {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %} {% if block.settings.image != blank %}has-bg-image has-overlay{% endif %} color-scheme-{{ block.settings.color_scheme }}{% if isFirst %} is-active{% endif %}"
         {% if block.settings.image != blank %}
           style="background-image: url('{{ block.settings.image | image: 'path', 'large' }}'); --widget-overlay-color: {{ block.settings.overlay_color | default: 'rgba(0,0,0,0.5)' }}; --widget-overlay-opacity: 1;"
-        {% elsif block.settings.background_color != blank %}
-          style="--widget-bg-color: {{ block.settings.background_color }};"
+        {% elsif block.settings.color_scheme == 'dark' %}
+          style="--widget-bg-color: var(--bg-primary);"
         {% endif %}
         data-block-id="{{ blockId }}"
       >

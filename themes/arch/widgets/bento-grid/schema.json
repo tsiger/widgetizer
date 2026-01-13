@@ -1,7 +1,7 @@
 {
   "type": "bento-grid",
   "displayName": "Bento Grid",
-  "aliases": ["dashboard", "tiles", "highlights", "featured grid"],
+  "aliases": ["dashboard", "tiles", "highlights", "featured grid", "masonry"],
   "settings": [
     {
       "type": "text",
@@ -19,7 +19,6 @@
       "id": "description",
       "label": "Description"
     },
-
     {
       "type": "select",
       "id": "gap",
@@ -34,12 +33,12 @@
     },
     {
       "type": "select",
-      "id": "background",
-      "label": "Background",
-      "default": "primary",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "light",
       "options": [
-        { "value": "primary", "label": "Primary" },
-        { "value": "secondary", "label": "Secondary" }
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" }
       ]
     }
   ],
@@ -48,6 +47,10 @@
       "type": "item",
       "displayName": "Bento Item",
       "settings": [
+        {
+          "type": "header",
+          "content": "Content"
+        },
         {
           "type": "text",
           "id": "title",
@@ -66,18 +69,9 @@
           "label": "Background image"
         },
         {
-          "type": "color",
-          "id": "overlay_color",
-          "label": "Overlay color",
-          "default": "#00000080",
-          "allow_alpha": true,
-          "description": "Applies only if there is a background image."
-        },
-        {
-          "type": "color",
-          "id": "background_color",
-          "label": "Background color",
-          "default": "#f9f9f9"
+          "type": "link",
+          "id": "link",
+          "label": "Link"
         },
         {
           "type": "header",
@@ -106,6 +100,19 @@
           "content": "Style"
         },
         {
+          "type": "color",
+          "id": "background_color",
+          "label": "Block Background"
+        },
+        {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "Image Overlay",
+          "default": "#00000080",
+          "allow_alpha": true,
+          "description": "Applies only if there is a background image."
+        },
+        {
           "type": "select",
           "id": "text_color",
           "label": "Text Color",
@@ -124,11 +131,6 @@
             { "value": "start", "label": "Left" },
             { "value": "center", "label": "Center" }
           ]
-        },
-        {
-          "type": "link",
-          "id": "link",
-          "label": "Link"
         }
       ]
     }
@@ -138,8 +140,9 @@
       "type": "item",
       "settings": {
         "title": "Main Highlight",
-        "text": "This is a larger bento tile spanning multiple columns.",
+        "text": "The centerpiece of your grid.",
         "col_span": 2,
+        "row_span": 2,
         "background_color": "#000000",
         "text_color": "light"
       }
@@ -147,18 +150,28 @@
     {
       "type": "item",
       "settings": {
-        "title": "Sub Feature",
+        "title": "Feature 1",
+        "text": "Compact detail.",
         "col_span": 1,
-        "background_color": "#f9f9f9"
+        "background_color": "#f3f4f6"
       }
     },
     {
       "type": "item",
       "settings": {
-        "title": "Visual Entry",
+        "title": "Feature 2",
+        "text": "Compact detail.",
         "col_span": 1,
-        "row_span": 2,
-        "background_color": "#f0f0f0"
+        "background_color": "#e5e7eb"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Wide Strip",
+        "text": "Spanning across.",
+        "col_span": 2,
+        "background_color": "#d1d5db"
       }
     }
   ]

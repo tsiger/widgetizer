@@ -1,8 +1,8 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-type-embed widget-{{ widget.id }}"
-  {% if widget.settings.background == 'secondary' %}
-    style="--widget-bg-color: var(--bg-secondary);"
+  class="widget widget-type-embed widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  {% if widget.settings.color_scheme == 'dark' %}
+    style="--widget-bg-color: var(--bg-primary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="embed"
@@ -28,7 +28,7 @@
     }
   </style>
 
-  <div class="widget-container {% if widget.settings.background == 'secondary' %}widget-container-padded{% endif %}">
+  <div class="widget-container {% if widget.settings.color_scheme == 'dark' %}widget-container-padded{% endif %}">
     <div class="widget-content {% case widget.settings.max_width %}{% when 'small' %}widget-content-sm{% when 'medium' %}widget-content-md{% when 'large' %}widget-content-lg{% else %}{% endcase %}">      <div class="embed-container">
         {% if widget.settings.title != blank
           or widget.settings.description != blank

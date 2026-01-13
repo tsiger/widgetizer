@@ -23,7 +23,7 @@
       "type": "text",
       "id": "target_date",
       "label": "Target date (YYYY-MM-DD HH:MM)",
-      "default": "2025-01-01 00:00"
+      "default": "2027-01-01 00:00"
     },
     {
       "type": "text",
@@ -54,12 +54,12 @@
     },
     {
       "type": "select",
-      "id": "background",
-      "label": "Background",
-      "default": "primary",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "light",
       "options": [
-        { "value": "primary", "label": "Primary" },
-        { "value": "secondary", "label": "Secondary" }
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" }
       ]
     }
   ]

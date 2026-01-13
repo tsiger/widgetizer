@@ -117,7 +117,8 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
 
     return { success: true, mediaPaths };
   } catch (error) {
-    console.error("Error updating page media usage:", error);
+    console.error(`Error updating page media usage (projectId: ${projectId}, pageId: ${pageId}):`, error);
+    console.error("Error stack:", error.stack);
     throw error;
   }
 }
@@ -161,7 +162,8 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
 
     return { success: true, mediaPaths };
   } catch (error) {
-    console.error("Error updating global widget media usage:", error);
+    console.error(`Error updating global widget media usage (projectId: ${projectId}, globalId: ${globalId}):`, error);
+    console.error("Error stack:", error.stack);
     throw error;
   }
 }

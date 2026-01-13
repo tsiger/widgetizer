@@ -1,10 +1,10 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-banner widget-{{ widget.id }} {% if widget.settings.image != blank %}has-bg-image has-overlay{% elsif widget.settings.background_color != blank %}has-bg-color{% endif %} {% if widget.settings.text_color == 'light' %}color-scheme-dark{% else %}color-scheme-light{% endif %} {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %}"
+  class="widget widget-banner widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.image != blank %}has-bg-image has-overlay{% endif %} {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %}"
   {% if widget.settings.image != blank %}
     style="background-image: url('{{ widget.settings.image | image: 'path', 'large' }}'); --widget-overlay-color: {{ widget.settings.overlay_color | default: 'rgba(0,0,0,0.5)' }}; --widget-overlay-opacity: 1;"
-  {% elsif widget.settings.background_color != blank %}
-    style="--widget-bg-color: {{ widget.settings.background_color }};"
+  {% elsif widget.settings.color_scheme == 'dark' %}
+    style="--widget-bg-color: var(--bg-primary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="banner"
