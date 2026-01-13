@@ -32,11 +32,22 @@
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: var(--space-md);
+      }
+
+      & .widget-title {
+        margin-block-end: var(--space-lg);
+      }
+
+      & .widget-description {
+        margin-block-end: var(--space-lg);
+
+        &:last-child {
+          margin-block-end: 0;
+        }
       }
 
       & .widget-actions {
-        margin-block-start: var(--space-sm);
+        margin-block-start: var(--space-xl);
         display: flex;
         flex-wrap: wrap;
         gap: var(--space-md);
