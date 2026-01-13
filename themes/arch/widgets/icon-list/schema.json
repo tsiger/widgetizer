@@ -1,0 +1,149 @@
+{
+    "type": "icon-list",
+    "displayName": "Icon List",
+    "aliases": [
+        "amenities",
+        "features",
+        "icons",
+        "services list",
+        "facilities"
+    ],
+    "settings": [
+        {
+            "type": "text",
+            "id": "eyebrow",
+            "label": "Eyebrow Text"
+        },
+        {
+            "type": "text",
+            "id": "title",
+            "label": "Heading"
+        },
+        {
+            "type": "textarea",
+            "id": "description",
+            "label": "Description"
+        },
+        {
+            "type": "select",
+            "id": "color_scheme",
+            "label": "Color Scheme",
+            "default": "light",
+            "options": [
+                {
+                    "value": "light",
+                    "label": "Light"
+                },
+                {
+                    "value": "dark",
+                    "label": "Dark"
+                }
+            ]
+        }
+    ],
+    "blocks": [
+        {
+            "type": "item",
+            "displayName": "Item",
+            "settings": [
+                {
+                    "type": "icon",
+                    "id": "icon",
+                    "label": "Icon"
+                },
+                {
+                    "type": "text",
+                    "id": "title",
+                    "label": "Title",
+                    "default": "Feature"
+                }
+            ]
+        }
+    ],
+    "defaultBlocks": [
+        {
+            "type": "item",
+            "settings": {
+                "icon": "wifi",
+                "title": "Wi-Fi"
+            }
+        },
+        {
+            "type": "item",
+            "settings": {
+                "icon": "car",
+                "title": "Parking"
+            }
+        },
+        {
+            "type": "item",
+            "settings": {
+                "icon": "waves",
+                "title": "Pool"
+            }
+        },
+        {
+            "type": "item",
+            "settings": {
+                "icon": "dumbbell",
+                "title": "Gym"
+            }
+        },
+        {
+            "type": "item",
+            "settings": {
+                "icon": "utensils",
+                "title": "Restaurant"
+            }
+        },
+        {
+            "type": "item",
+            "settings": {
+                "icon": "bell",
+                "title": "Room Service"
+            }
+        },
+        {
+            "type": "item",
+            "settings": {
+                "icon": "spa",
+                "title": "Spa"
+            }
+        },
+        {
+            "type": "item",
+            "settings": {
+                "icon": "paw",
+                "title": "Pet Friendly"
+            }
+        },
+        {
+            "type": "item",
+            "settings": {
+                "icon": "wind",
+                "title": "Air Conditioning"
+            }
+        },
+        {
+            "type": "item",
+            "settings": {
+                "icon": "user",
+                "title": "Concierge"
+            }
+        },
+        {
+            "type": "item",
+            "settings": {
+                "icon": "shirt",
+                "title": "Laundry"
+            }
+        },
+        {
+            "type": "item",
+            "settings": {
+                "icon": "users",
+                "title": "Meeting Rooms"
+            }
+        }
+    ]
+}
