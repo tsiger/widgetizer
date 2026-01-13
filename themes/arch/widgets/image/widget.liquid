@@ -1,0 +1,75 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-image widget-{{ widget.id }}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="image"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      /* Reset default widget spacing for full-bleed layouts */
+      margin-block: 0;
+      padding-inline: 0;
+
+      {% unless widget.settings.fullwidth %}
+      max-width: var(--container-max-width);
+      margin-inline: auto;
+      {% endunless %}
+
+      {% if widget.settings.fullwidth %}
+      & .widget-container {
+        max-width: none;
+      }
+      {% endif %}
+
+      & .image-wrapper {
+        width: 100%;
+        display: block;
+
+        & img {
+          width: 100%;
+          height: auto;
+          display: block;
+        }
+      }
+
+      & .image-link {
+        display: block;
+        width: 100%;
+        text-decoration: none;
+
+        &:hover img {
+          opacity: 0.9;
+          transition: opacity 0.2s ease;
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    <div class="widget-content">
+      {% if widget.settings.image != blank %}
+        {% if widget.settings.link.href != blank %}
+          <a
+            href="{{ widget.settings.link.href }}"
+            class="image-link"
+            {% if widget.settings.link.target == '_blank' %}
+              target="_blank" rel="noopener"
+            {% endif %}
+            data-setting="link"
+          >
+            {{ widget.settings.image | image: 'large', 'widget-image' }}
+          </a>
+        {% else %}
+          <div class="image-wrapper">
+            {{ widget.settings.image | image: 'large', 'widget-image' }}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="image-wrapper">
+          {% placeholder_image %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
