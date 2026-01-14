@@ -116,9 +116,16 @@ For widgets with dynamic block ordering (text, headings, buttons), use the **con
     {% assign block = widget.blocks[blockId] %}
     {% case block.type %}
       {% when 'heading' %}
-        <h2 class="widget-headline block-text block-text-{{ block.settings.size }} block-text-bold block-text-heading">
-          {{ block.settings.text }}
-        </h2>
+        {% assign size_class = 'block-text-' | append: block.settings.size %}
+        {% if widget.index == 1 %}
+          <h1 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading">
+            {{ block.settings.text }}
+          </h1>
+        {% else %}
+          <h2 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading">
+            {{ block.settings.text }}
+          </h2>
+        {% endif %}
       {% when 'text' %}
         <p class="widget-description block-text block-text-{{ block.settings.size }}">
           {{ block.settings.text }}
@@ -136,16 +143,23 @@ For widgets with dynamic block ordering (text, headings, buttons), use the **con
 
 **How it works:**
 
-The `.content-flow` class applies automatic spacing between elements using the **owl selector** (`* + *`):
+The `.content-flow` utility class (defined in `base.css`) applies automatic spacing between elements using the **owl selector** (`* + *`):
 
 ```css
+/* Defined in base.css */
 .content-flow > * + * {
   margin-block-start: var(--space-md); /* 16px default */
 }
+```
 
-/* Extra spacing before actions when they're last */
-.content-flow > .widget-actions:last-child {
-  margin-block-start: var(--space-xl); /* 32px */
+For widgets that need custom spacing for specific elements (e.g., extra spacing before buttons), you can add widget-specific overrides in your `<style>` block:
+
+```css
+.widget-{{ widget.id }} {
+  /* Custom override for this widget */
+  & .content-flow > .widget-actions:last-child {
+    margin-block-start: var(--space-xl); /* 32px */
+  }
 }
 ```
 
@@ -826,9 +840,15 @@ To ensure consistency across widgets, use these standardized block definitions:
 
 ```liquid
 {% assign size_class = 'block-text-' | append: block.settings.size %}
-<h2 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading">
-  {{ block.settings.text }}
-</h2>
+{% if widget.index == 1 %}
+  <h1 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading">
+    {{ block.settings.text }}
+  </h1>
+{% else %}
+  <h2 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading">
+    {{ block.settings.text }}
+  </h2>
+{% endif %}
 ```
 
 ---
@@ -1022,7 +1042,47 @@ Ensure all interactive elements work with:
 
 ### Semantic HTML
 
-- Use proper heading hierarchy (`h2` for widget title, `h3` for items)
+**Heading Hierarchy Rules:**
+
+All widgets must follow this strict heading hierarchy for SEO and accessibility:
+
+1. **Widget Title (if `widget.settings.title` exists)**:
+   - `widget.index == 1` → `<h1>`
+   - `widget.index != 1` → `<h2>`
+
+2. **Block/Item Headings**:
+   - **If widget has a title**:
+     - `widget.index == 1` → Items use `<h2>`
+     - `widget.index != 1` → Items use `<h3>`
+   - **If widget has NO title**:
+     - `widget.index == 1` → First item `<h1>`, others `<h2>`
+     - `widget.index != 1` → All items `<h2>`
+
+Example implementation:
+
+```liquid
+{%- comment -%} Widget header {%- endcomment -%}
+{% if widget.settings.title != blank %}
+  {% if widget.index == 1 %}
+    <h1 class="widget-headline">{{ widget.settings.title }}</h1>
+  {% else %}
+    <h2 class="widget-headline">{{ widget.settings.title }}</h2>
+  {% endif %}
+{% endif %}
+
+{%- comment -%} Item headings {%- endcomment -%}
+{% assign item_heading_level = 'h3' %}
+{% if widget.settings.title == blank %}
+  {% assign item_heading_level = 'h2' %}
+{% endif %}
+
+{% for item in items %}
+  <{{ item_heading_level }} class="item-title">{{ item.title }}</{{ item_heading_level }}>
+{% endfor %}
+```
+
+**Other Semantic Requirements:**
+
 - Use semantic elements (`<nav>`, `<main>`, `<article>`, `<section>`)
 - Use `<button>` for actions, `<a>` for navigation
 
