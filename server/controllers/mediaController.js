@@ -160,41 +160,90 @@ export async function readMediaFile(projectId) {
 }
 
 // Write media metadata file (with write lock to prevent race conditions)
-export async function writeMediaFile(projectId, data) {
+export async function writeMediaFile(projectId, data, retryCount = 0) {
+  const MAX_RETRIES = 3;
   const releaseLock = await acquireWriteLock(projectId);
+
+  // Generate unique temp file name with process ID and random component to prevent collisions
+  const uniqueId = `${process.pid}.${Date.now()}.${Math.random().toString(36).substr(2, 9)}`;
+
   try {
     const projectFolderName = await getProjectFolderName(projectId);
     const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
+    const tempFilePath = `${mediaFilePath}.tmp.${uniqueId}`;
+
+    console.log(
+      `[writeMediaFile] Starting write for project ${projectId} (attempt ${retryCount + 1}/${MAX_RETRIES + 1})`,
+    );
+    console.log(`[writeMediaFile] Target: ${mediaFilePath}`);
+    console.log(`[writeMediaFile] Temp file: ${tempFilePath}`);
 
     // Ensure the parent directory exists
-    await fs.ensureDir(path.dirname(mediaFilePath));
-
-    // Use atomic write: write to temp file first, then rename
-    const tempFilePath = `${mediaFilePath}.tmp.${Date.now()}`;
+    const parentDir = path.dirname(mediaFilePath);
+    await fs.ensureDir(parentDir);
+    console.log(`[writeMediaFile] Parent directory verified: ${parentDir}`);
 
     try {
+      // Write to temp file
       await fs.writeFile(tempFilePath, JSON.stringify(data, null, 2), "utf8");
+      console.log(`[writeMediaFile] Temp file written successfully`);
 
       // Verify temp file was created successfully
-      if (!(await fs.pathExists(tempFilePath))) {
+      const tempExists = await fs.pathExists(tempFilePath);
+      console.log(`[writeMediaFile] Temp file exists: ${tempExists}`);
+
+      if (!tempExists) {
         throw new Error(`Temp file was not created: ${tempFilePath}`);
       }
 
+      // Verify directory still exists before move (defensive check)
+      const dirStillExists = await fs.pathExists(parentDir);
+      console.log(`[writeMediaFile] Parent directory still exists before move: ${dirStillExists}`);
+
+      if (!dirStillExists) {
+        await fs.ensureDir(parentDir);
+        console.log(`[writeMediaFile] Recreated parent directory`);
+      }
+
+      // Perform atomic move
       await fs.move(tempFilePath, mediaFilePath, { overwrite: true });
+      console.log(`[writeMediaFile] Successfully moved temp file to target`);
     } catch (error) {
+      console.error(`[writeMediaFile] Error during write operation:`, error);
+      console.error(`[writeMediaFile] Error code: ${error.code}, syscall: ${error.syscall}`);
+
       // Clean up temp file if it exists
       try {
         if (await fs.pathExists(tempFilePath)) {
           await fs.unlink(tempFilePath);
+          console.log(`[writeMediaFile] Cleaned up temp file after error`);
         }
       } catch (cleanupError) {
-        console.warn(`Failed to clean up temp file ${tempFilePath}:`, cleanupError.message);
+        console.warn(`[writeMediaFile] Failed to clean up temp file ${tempFilePath}:`, cleanupError.message);
       }
+
+      // Retry on transient file system errors
+      if (retryCount < MAX_RETRIES && (error.code === "ENOENT" || error.code === "EPERM" || error.code === "EBUSY")) {
+        const backoffMs = Math.pow(2, retryCount) * 100; // 100ms, 200ms, 400ms
+        console.warn(`[writeMediaFile] Retrying after ${backoffMs}ms due to transient error: ${error.code}`);
+
+        // Release lock before retry
+        writeLocks.delete(projectId);
+        releaseLock();
+
+        // Wait before retry
+        await new Promise((resolve) => setTimeout(resolve, backoffMs));
+
+        // Retry recursively
+        return writeMediaFile(projectId, data, retryCount + 1);
+      }
+
       throw error;
     }
   } finally {
-    releaseLock();
+    // CRITICAL FIX: Delete from map BEFORE releasing lock to prevent race conditions
     writeLocks.delete(projectId);
+    releaseLock();
   }
 }
 
