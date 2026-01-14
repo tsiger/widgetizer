@@ -1,5 +1,133 @@
 {
   "type": "footer",
   "displayName": "Footer",
-  "settings": []
+  "settings": [
+    {
+      "type": "image",
+      "id": "logo",
+      "label": "Logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "default": 100,
+      "unit": "px"
+    },
+    {
+      "type": "menu",
+      "id": "menu",
+      "label": "Menu"
+    },
+    {
+      "type": "textarea",
+      "id": "copyright",
+      "label": "Copyright text",
+      "default": "© 2025 Widgetizer. All rights reserved."
+    },
+    {
+      "type": "header",
+      "id": "social_header",
+      "label": "Social Media"
+    },
+    {
+      "type": "text",
+      "id": "facebook_url",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "text",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "text",
+      "id": "twitter_url",
+      "label": "Twitter / X URL"
+    },
+    {
+      "type": "text",
+      "id": "linkedin_url",
+      "label": "LinkedIn URL"
+    },
+    {
+      "type": "text",
+      "id": "youtube_url",
+      "label": "YouTube URL"
+    },
+    {
+      "type": "text",
+      "id": "tiktok_url",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "text",
+      "id": "pinterest_url",
+      "label": "Pinterest URL"
+    },
+    {
+      "type": "text",
+      "id": "github_url",
+      "label": "GitHub URL"
+    },
+    {
+      "type": "text",
+      "id": "mastodon_url",
+      "label": "Mastodon URL"
+    },
+    {
+      "type": "text",
+      "id": "bluesky_url",
+      "label": "Bluesky URL"
+    },
+    {
+      "type": "text",
+      "id": "discord_url",
+      "label": "Discord URL"
+    },
+    {
+      "type": "text",
+      "id": "reddit_url",
+      "label": "Reddit URL"
+    },
+    {
+      "type": "text",
+      "id": "telegram_url",
+      "label": "Telegram URL"
+    },
+    {
+      "type": "text",
+      "id": "threads_url",
+      "label": "Threads URL"
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_url",
+      "label": "WhatsApp URL"
+    },
+    {
+      "type": "text",
+      "id": "mail_url",
+      "label": "Email URL"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "light",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ]
+    }
+  ]
 }

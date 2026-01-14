@@ -338,10 +338,19 @@ async function renderWidget(
       });
     }
 
-    // Handle menu settings
+    // Handle menu settings - check schema for menu type settings
+    const menuSettingIds = new Set();
+    if (Array.isArray(schema.settings)) {
+      schema.settings.forEach((setting) => {
+        if (setting.type === "menu") {
+          menuSettingIds.add(setting.id);
+        }
+      });
+    }
+
     if (settings) {
       for (const [key, value] of Object.entries(settings)) {
-        if (key.toLowerCase().includes("navigation")) {
+        if (menuSettingIds.has(key)) {
           try {
             if (value) {
               // Use getMenuById instead of direct file access

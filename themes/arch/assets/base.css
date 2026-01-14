@@ -1224,51 +1224,6 @@ h6 {
    GLOBAL FOOTER
    ========================================================================== */
 
-.widget-footer {
-  padding-block: var(--space-3xl);
-  padding-inline: var(--space-xl);
-  border-block-start: var(--border-width-thin) solid var(--border-color);
-  background-color: var(--bg-secondary);
-
-  & .footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-lg);
-  }
-
-  & .footer-copyright {
-    color: var(--text-muted);
-    font-size: var(--font-size-sm);
-  }
-
-  & .social-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    gap: var(--space-lg);
-  }
-
-  & .social-item {
-    display: inline-block;
-
-    & a {
-      text-decoration: none;
-      color: var(--text-content);
-      font-weight: var(--font-weight-semibold);
-      padding: var(--space-xs);
-      display: block;
-      transition: color 0.2s;
-
-      &:hover {
-        color: var(--text-heading);
-      }
-    }
-  }
-}
-
 /* ==========================================================================
    UTILITY CLASSES
    ========================================================================== */
