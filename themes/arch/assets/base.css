@@ -281,11 +281,6 @@ h6 {
    LAYOUT UTILITIES
    ========================================================================== */
 
-/* Content Flow (Consistent vertical spacing) */
-.content-flow > * + * {
-  margin-block-start: var(--space-md);
-}
-
 /* Widget wrapper (handles background only, no spacing) */
 .widget {
   position: relative;
@@ -1277,6 +1272,14 @@ h6 {
 /* ==========================================================================
    UTILITY CLASSES
    ========================================================================== */
+
+.content-flow > * + * {
+  margin-block-start: var(--space-md);
+}
+
+.content-flow > .widget-actions:last-child {
+  margin-block-start: var(--space-xl);
+}
 
 /* Visually hidden (for accessibility) */
 .visually-hidden {
