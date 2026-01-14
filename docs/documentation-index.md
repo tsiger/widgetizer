@@ -277,6 +277,32 @@ Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`
 
 ---
 
+## 💻 Desktop Builds
+
+### **[build-windows.md](build-windows.md)** - Windows Portable Build
+
+**Purpose**: Step-by-step guide for creating the portable Windows distribution with system tray app **When to use**:
+
+- Building the Windows desktop version
+- Creating portable Windows distributions
+- Understanding the Windows tray app (C#)
+
+**Key topics**: Build process, portable Node.js, tray app compilation, packaging, distribution
+
+---
+
+### **[build-macos.md](build-macos.md)** - macOS Portable Build
+
+**Purpose**: Step-by-step guide for creating the portable macOS distribution with menu bar app **When to use**:
+
+- Building the macOS desktop version
+- Creating portable macOS distributions
+- Understanding the macOS menu bar app (Swift)
+
+**Key topics**: Build process, portable Node.js, Swift app compilation, .app bundle, packaging, distribution
+
+---
+
 ## 🔄 Maintenance Notes
 
 - **theming.md** – Most comprehensive, covers theme system architecture.
