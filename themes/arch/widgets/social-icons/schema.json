@@ -1,12 +1,7 @@
 {
   "type": "social-icons",
   "displayName": "Social Icons",
-  "aliases": [
-    "links",
-    "follow",
-    "share",
-    "connect"
-  ],
+  "aliases": ["links", "follow", "share", "connect"],
   "settings": [
     {
       "type": "text",
@@ -26,29 +21,9 @@
       "default": "Stay connected with us on social media."
     },
     {
-      "type": "select",
-      "id": "alignment",
-      "label": "Alignment",
-      "default": "center",
-      "options": [
-        {
-          "value": "start",
-          "label": "Left"
-        },
-        {
-          "value": "center",
-          "label": "Center"
-        },
-        {
-          "value": "end",
-          "label": "Right"
-        }
-      ]
-    },
-    {
       "type": "range",
       "id": "icon_size",
-      "label": "Icon Size (rem)",
+      "label": "Icon size",
       "default": 2.4,
       "min": 1.6,
       "max": 4.8,
@@ -92,7 +67,11 @@
             },
             {
               "value": "twitter",
-              "label": "X (Twitter)"
+              "label": "Twitter"
+            },
+            {
+              "value": "x",
+              "label": "X"
             },
             {
               "value": "linkedin",
@@ -113,6 +92,14 @@
             {
               "value": "github",
               "label": "GitHub"
+            },
+            {
+              "value": "github-copilot",
+              "label": "GitHub Copilot"
+            },
+            {
+              "value": "mastodon",
+              "label": "Mastodon"
             },
             {
               "value": "bluesky",
