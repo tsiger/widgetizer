@@ -15,7 +15,11 @@
           <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
         {% endif %}
         {% if widget.settings.description != blank %}
           <p class="widget-description" data-setting="description">
@@ -27,8 +31,41 @@
 
     <div class="widget-content">
       <ul class="widget-card-grid">
+        {% comment %} Determine heading levels {% endcomment %}
+        {% assign has_widget_title = false %}
+        {% if widget.settings.title != blank %}
+          {% assign has_widget_title = true %}
+        {% endif %}
+
+        {% assign card_heading_level = 'h2' %}
+
+        {% if has_widget_title %}
+          {% if widget.index == 1 %}
+             {% assign card_heading_level = 'h2' %}
+          {% else %}
+             {% assign card_heading_level = 'h3' %}
+          {% endif %}
+        {% else %}
+          {% if widget.index == 1 %}
+            {% assign card_heading_level = 'h1' %}
+          {% else %}
+             {% assign card_heading_level = 'h2' %}
+          {% endif %}
+        {% endif %}
+
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
+          
+          {% comment %} Per-card level logic for the NO-TITLE + INDEX-1 case {% endcomment %}
+          {% assign current_card_level = card_heading_level %}
+          {% if has_widget_title == false and widget.index == 1 %}
+            {% if forloop.first %}
+              {% assign current_card_level = 'h1' %}
+            {% else %}
+              {% assign current_card_level = 'h2' %}
+            {% endif %}
+          {% endif %}
+          
           <li class="widget-card" data-block-id="{{ blockId }}">
             {% if block.settings.icon != blank %}
               {% render 'icon', icon: block.settings.icon, class: 'widget-card-icon' %}
@@ -40,7 +77,7 @@
                 <span class="widget-card-subtitle" data-setting="subtitle">{{ block.settings.subtitle }}</span>
               {% endif %}
               {% if block.settings.title != blank %}
-                <h3 class="widget-card-title" data-setting="title">{{ block.settings.title }}</h3>
+                <{{ current_card_level }} class="widget-card-title" data-setting="title">{{ block.settings.title }}</{{ current_card_level }}>
               {% endif %}
               {% if block.settings.description != blank %}
                 <p class="widget-card-description" data-setting="description">

@@ -358,7 +358,11 @@
           <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
         {% endif %}
         {% if widget.settings.description != blank %}
           <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
@@ -382,10 +386,15 @@
           <!-- Info + Controls -->
           <div class="audio-player-info-controls">
             <div class="audio-player-info">
+              {% assign item_heading_level = 'h3' %}
+              {% if widget.settings.title == blank %}
+                 {% assign item_heading_level = 'h2' %}
+              {% endif %}
+
               {% if first_block.settings.episode_number != blank %}
                 <span class="block-text block-text-sm block-text-uppercase block-text-muted" id="ep-number-{{ widget.id }}">{{ first_block.settings.episode_number }}</span>
               {% endif %}
-              <h3 class="block-text block-text-xl block-text-bold block-text-heading" id="ep-title-{{ widget.id }}">{{ first_block.settings.title }}</h3>
+              <{{ item_heading_level }} class="block-text block-text-xl block-text-bold block-text-heading" id="ep-title-{{ widget.id }}">{{ first_block.settings.title }}</{{ item_heading_level }}>
               
               <div class="audio-player-episode-meta block-text block-text-sm block-text-muted">
                 {% if first_block.settings.duration != blank %}

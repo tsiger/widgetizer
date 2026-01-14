@@ -1,237 +1,249 @@
 {
-    "type": "rich-text",
-    "displayName": "Rich Text",
-    "aliases": [
-        "text content",
-        "content block",
-        "text section",
-        "content area"
-    ],
-    "settings": [
+  "type": "rich-text",
+  "displayName": "Rich Text",
+  "aliases": ["text content", "content block", "text section", "content area"],
+  "settings": [
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "default": "start",
+      "options": [
         {
-            "type": "select",
-            "id": "text_alignment",
-            "label": "Text alignment",
-            "default": "start",
-            "options": [
-                {
-                    "value": "start",
-                    "label": "Start"
-                },
-                {
-                    "value": "center",
-                    "label": "Center"
-                },
-                {
-                    "value": "end",
-                    "label": "End"
-                }
-            ]
+          "value": "start",
+          "label": "Start"
         },
         {
-            "type": "select",
-            "id": "content_width",
-            "label": "Content width",
-            "default": "md",
-            "options": [
-                {
-                    "value": "sm",
-                    "label": "Narrow (600px)"
-                },
-                {
-                    "value": "md",
-                    "label": "Medium (800px)"
-                },
-                {
-                    "value": "lg",
-                    "label": "Wide (900px)"
-                }
-            ]
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "End"
         }
-    ],
-    "blocks": [
+      ]
+    },
+    {
+      "type": "select",
+      "id": "content_width",
+      "label": "Content width",
+      "default": "md",
+      "options": [
         {
-            "type": "heading",
-            "displayName": "Heading",
-            "settings": [
-                {
-                    "type": "text",
-                    "id": "text",
-                    "label": "Text",
-                    "default": "Section Heading"
-                },
-                {
-                    "type": "select",
-                    "id": "size",
-                    "label": "Size",
-                    "default": "2xl",
-                    "options": [
-                        {
-                            "value": "lg",
-                            "label": "Large"
-                        },
-                        {
-                            "value": "xl",
-                            "label": "Extra Large"
-                        },
-                        {
-                            "value": "2xl",
-                            "label": "2X Large"
-                        },
-                        {
-                            "value": "3xl",
-                            "label": "3X Large"
-                        },
-                        {
-                            "value": "4xl",
-                            "label": "4X Large"
-                        }
-                    ]
-                }
-            ]
+          "value": "sm",
+          "label": "Narrow (600px)"
         },
         {
-            "type": "text",
-            "displayName": "Text",
-            "settings": [
-                {
-                    "type": "textarea",
-                    "id": "text",
-                    "label": "Text",
-                    "default": "Add your text content here."
-                },
-                {
-                    "type": "select",
-                    "id": "size",
-                    "label": "Size",
-                    "default": "base",
-                    "options": [
-                        {
-                            "value": "sm",
-                            "label": "Small"
-                        },
-                        {
-                            "value": "base",
-                            "label": "Base"
-                        },
-                        {
-                            "value": "lg",
-                            "label": "Large"
-                        },
-                        {
-                            "value": "xl",
-                            "label": "Extra Large"
-                        }
-                    ]
-                },
-                {
-                    "type": "checkbox",
-                    "id": "uppercase",
-                    "label": "Uppercase",
-                    "default": false
-                },
-                {
-                    "type": "checkbox",
-                    "id": "bold",
-                    "label": "Bold",
-                    "default": false
-                },
-                {
-                    "type": "checkbox",
-                    "id": "muted",
-                    "label": "Muted color",
-                    "default": false
-                }
-            ]
+          "value": "md",
+          "label": "Medium (800px)"
         },
         {
-            "type": "button",
-            "displayName": "Button Group",
-            "settings": [
-                {
-                    "type": "link",
-                    "id": "link",
-                    "label": "Button 1",
-                    "default": {
-                        "text": "Learn More",
-                        "href": "#",
-                        "target": "_self"
-                    }
-                },
-                {
-                    "type": "select",
-                    "id": "style",
-                    "label": "Button 1 style",
-                    "default": "primary",
-                    "options": [
-                        {
-                            "value": "primary",
-                            "label": "Primary"
-                        },
-                        {
-                            "value": "secondary",
-                            "label": "Secondary"
-                        }
-                    ]
-                },
-                {
-                    "type": "link",
-                    "id": "link_2",
-                    "label": "Button 2"
-                },
-                {
-                    "type": "select",
-                    "id": "style_2",
-                    "label": "Button 2 style",
-                    "default": "secondary",
-                    "options": [
-                        {
-                            "value": "primary",
-                            "label": "Primary"
-                        },
-                        {
-                            "value": "secondary",
-                            "label": "Secondary"
-                        }
-                    ]
-                }
-            ]
+          "value": "lg",
+          "label": "Wide (900px)"
         }
-    ],
-    "defaultBlocks": [
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "displayName": "Heading",
+      "settings": [
         {
-            "type": "heading",
-            "settings": {
-                "text": "Welcome to Our Platform",
-                "size": "3xl"
-            }
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Section Heading"
         },
         {
-            "type": "text",
-            "settings": {
-                "text": "We're building the future of digital experiences. Our platform empowers teams to create, collaborate, and deliver exceptional results.",
-                "size": "lg",
-                "uppercase": false,
-                "bold": false,
-                "muted": false
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "default": "2xl",
+          "options": [
+            {
+              "value": "lg",
+              "label": "Large"
+            },
+            {
+              "value": "xl",
+              "label": "Extra Large"
+            },
+            {
+              "value": "2xl",
+              "label": "2X Large"
+            },
+            {
+              "value": "3xl",
+              "label": "3X Large"
+            },
+            {
+              "value": "4xl",
+              "label": "4X Large"
+            },
+            {
+              "value": "5xl",
+              "label": "5X Large"
             }
-        },
-        {
-            "type": "button",
-            "settings": {
-                "link": {
-                    "text": "Get Started",
-                    "href": "#",
-                    "target": "_self"
-                },
-                "style": "primary",
-                "link_2": {
-                    "text": "Learn More",
-                    "href": "#",
-                    "target": "_self"
-                },
-                "style_2": "secondary"
-            }
+          ]
         }
-    ]
+      ]
+    },
+    {
+      "type": "text",
+      "displayName": "Text",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Add your text content here."
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "default": "base",
+          "options": [
+            {
+              "value": "sm",
+              "label": "Small"
+            },
+            {
+              "value": "base",
+              "label": "Base"
+            },
+            {
+              "value": "lg",
+              "label": "Large"
+            }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "uppercase",
+          "label": "Uppercase",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "muted",
+          "label": "Muted color",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "displayName": "Button Group",
+      "settings": [
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Button 1",
+          "default": {
+            "text": "Learn More",
+            "href": "#",
+            "target": "_self"
+          }
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Button 1 style",
+          "default": "primary",
+          "options": [
+            {
+              "value": "primary",
+              "label": "Primary"
+            },
+            {
+              "value": "secondary",
+              "label": "Secondary"
+            }
+          ]
+        },
+        {
+          "type": "link",
+          "id": "link_2",
+          "label": "Button 2"
+        },
+        {
+          "type": "select",
+          "id": "style_2",
+          "label": "Button 2 style",
+          "default": "secondary",
+          "options": [
+            {
+              "value": "primary",
+              "label": "Primary"
+            },
+            {
+              "value": "secondary",
+              "label": "Secondary"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Button size",
+          "default": "medium",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "medium",
+              "label": "Medium"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            },
+            {
+              "value": "xlarge",
+              "label": "Extra Large"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "heading",
+      "settings": {
+        "text": "Welcome to Our Platform",
+        "size": "3xl"
+      }
+    },
+    {
+      "type": "text",
+      "settings": {
+        "text": "We're building the future of digital experiences. Our platform empowers teams to create, collaborate, and deliver exceptional results.",
+        "size": "lg",
+        "uppercase": false,
+        "muted": false
+      }
+    },
+    {
+      "type": "button",
+      "settings": {
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        },
+        "style": "primary",
+        "link_2": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        },
+        "style_2": "secondary"
+      }
+    }
+  ]
 }

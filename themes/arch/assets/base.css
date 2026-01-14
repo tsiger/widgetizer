@@ -281,6 +281,11 @@ h6 {
    LAYOUT UTILITIES
    ========================================================================== */
 
+/* Content Flow (Consistent vertical spacing) */
+.content-flow > * + * {
+  margin-block-start: var(--space-md);
+}
+
 /* Widget wrapper (handles background only, no spacing) */
 .widget {
   position: relative;
@@ -639,11 +644,6 @@ h6 {
 
 .block-text-accent {
   color: var(--accent);
-}
-
-/* Spacing modifiers */
-.block-text-spaced {
-  margin-block-end: var(--space-md);
 }
 
 /* ==========================================================================

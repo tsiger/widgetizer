@@ -106,38 +106,55 @@ Every widget follows this structure:
 | `data-widget-id="{{ widget.id }}"`                    | For JavaScript targeting                                   |
 | `data-widget-type="{widget-name}"`                    | For debugging/identification                               |
 
-### Hero/Banner Pattern
+### Content Flow Spacing
 
-For hero sections, banners, and slideshows, elements render **directly in `.widget-content`** (no `.widget-header` wrapper):
+For widgets with dynamic block ordering (text, headings, buttons), use the **content-flow** pattern for automatic, order-agnostic spacing:
 
 ```liquid
-<div class="widget-content widget-content-lg {% if widget.settings.alignment == 'center' %}widget-content-align-center{% else %}widget-content-align-start{% endif %}">
-  {% if block.settings.heading_text != blank %}
-    <h1 class="widget-headline block-text block-text-5xl block-text-bold block-text-heading">
-      {{ block.settings.heading_text }}
-    </h1>
-  {% endif %}
-  {% if block.settings.text_content != blank %}
-    <p class="widget-description block-text block-text-lg">
-      {{ block.settings.text_content }}
-    </p>
-  {% endif %}
-  {% if block.settings.button_link.text != blank %}
-    <div class="widget-actions">
-      <a href="{{ block.settings.button_link.href }}" class="widget-button widget-button-primary">
-        {{ block.settings.button_link.text }}
-      </a>
-    </div>
-  {% endif %}
+<div class="widget-content content-flow widget-content-lg {% if widget.settings.alignment == 'center' %}widget-content-align-center{% else %}widget-content-align-start{% endif %}">
+  {% for blockId in widget.blocksOrder %}
+    {% assign block = widget.blocks[blockId] %}
+    {% case block.type %}
+      {% when 'heading' %}
+        <h2 class="widget-headline block-text block-text-{{ block.settings.size }} block-text-bold block-text-heading">
+          {{ block.settings.text }}
+        </h2>
+      {% when 'text' %}
+        <p class="widget-description block-text block-text-{{ block.settings.size }}">
+          {{ block.settings.text }}
+        </p>
+      {% when 'button' %}
+        <div class="widget-actions">
+          <a href="#" class="widget-button widget-button-{{ block.settings.size }} widget-button-primary">
+            Button Text
+          </a>
+        </div>
+    {% endcase %}
+  {% endfor %}
 </div>
 ```
 
-**Spacing hierarchy** (use individual margins, not gap):
+**How it works:**
 
-- `.widget-eyebrow`: `margin-block-end: var(--space-md)` (16px)
-- `.widget-headline`: `margin-block-end: var(--space-lg)` (24px)
-- `.widget-description`: `margin-block-end: var(--space-lg)` (24px)
-- `.widget-actions`: `margin-block-start: var(--space-xl)` (32px)
+The `.content-flow` class applies automatic spacing between elements using the **owl selector** (`* + *`):
+
+```css
+.content-flow > * + * {
+  margin-block-start: var(--space-md); /* 16px default */
+}
+
+/* Extra spacing before actions when they're last */
+.content-flow > .widget-actions:last-child {
+  margin-block-start: var(--space-xl); /* 32px */
+}
+```
+
+**Benefits:**
+
+- **Order-agnostic**: Works regardless of block order
+- **No manual spacing**: Spacing is automatic based on adjacency
+- **Flexible**: Handles any combination of blocks
+- **Consistent**: Same spacing rules across all widgets
 
 ---
 
@@ -765,6 +782,210 @@ These will be automatically rendered by `{% header_assets %}` (for styles) and `
 - Don't leave text fields empty
 - Omit image fields (handled gracefully when empty)
 - Provide enough blocks to show the layout (3-4 items)
+
+---
+
+## Standardized Block Types
+
+To ensure consistency across widgets, use these standardized block definitions:
+
+### Heading Block
+
+**Standard sizes**: Large, XL, 2XL, 3XL, 4XL, 5XL
+
+```json
+{
+  "type": "heading",
+  "displayName": "Heading",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Section Heading"
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Size",
+      "default": "2xl",
+      "options": [
+        { "value": "lg", "label": "Large" },
+        { "value": "xl", "label": "Extra Large" },
+        { "value": "2xl", "label": "2X Large" },
+        { "value": "3xl", "label": "3X Large" },
+        { "value": "4xl", "label": "4X Large" },
+        { "value": "5xl", "label": "5X Large" }
+      ]
+    }
+  ]
+}
+```
+
+**Template usage:**
+
+```liquid
+{% assign size_class = 'block-text-' | append: block.settings.size %}
+<h2 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading">
+  {{ block.settings.text }}
+</h2>
+```
+
+---
+
+### Text Block
+
+**Standard sizes**: Small, Base, Large  
+**Standard options**: Uppercase, Muted color
+
+```json
+{
+  "type": "text",
+  "displayName": "Text",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Add your text content here."
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Size",
+      "default": "base",
+      "options": [
+        { "value": "sm", "label": "Small" },
+        { "value": "base", "label": "Base" },
+        { "value": "lg", "label": "Large" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase",
+      "label": "Uppercase",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "muted",
+      "label": "Muted color",
+      "default": false
+    }
+  ]
+}
+```
+
+**Template usage:**
+
+```liquid
+{% assign size_class = 'block-text-' | append: block.settings.size %}
+{% assign style_class = '' %}
+{% if block.settings.uppercase %}{% assign style_class = style_class | append: ' block-text-uppercase' %}{% endif %}
+{% if block.settings.muted %}{% assign style_class = style_class | append: ' block-text-muted' %}{% endif %}
+<p class="widget-description block-text {{ size_class }}{{ style_class }}">
+  {{ block.settings.text }}
+</p>
+```
+
+---
+
+### Button Block
+
+**Display name**: "Button Group" (for 2 buttons) or "Button" (for 1 button)  
+**Standard sizes**: Small, Medium, Large, Extra Large
+
+```json
+{
+  "type": "button",
+  "displayName": "Button Group",
+  "settings": [
+    {
+      "type": "link",
+      "id": "link",
+      "label": "Button 1",
+      "default": {
+        "text": "Learn More",
+        "href": "#",
+        "target": "_self"
+      }
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Button 1 style",
+      "default": "secondary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
+    },
+    {
+      "type": "link",
+      "id": "link_2",
+      "label": "Button 2"
+    },
+    {
+      "type": "select",
+      "id": "style_2",
+      "label": "Button 2 style",
+      "default": "secondary",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Button size",
+      "default": "medium",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" },
+        { "value": "xlarge", "label": "Extra Large" }
+      ]
+    }
+  ]
+}
+```
+
+**Template usage:**
+
+```liquid
+{% assign size_class = '' %}
+{% if block.settings.size == 'medium' %}{% assign size_class = 'widget-button-medium' %}
+{% elsif block.settings.size == 'large' %}{% assign size_class = 'widget-button-large' %}
+{% elsif block.settings.size == 'xlarge' %}{% assign size_class = 'widget-button-xlarge' %}
+{% endif %}
+
+<div class="widget-actions">
+  {% if block.settings.link.text != blank %}
+    <a
+      href="{{ block.settings.link.href }}"
+      class="widget-button {{ size_class }} {% if block.settings.style == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
+    >
+      {{ block.settings.link.text }}
+    </a>
+  {% endif %}
+  {% if block.settings.link_2.text != blank %}
+    <a
+      href="{{ block.settings.link_2.href }}"
+      class="widget-button {{ size_class }} {% if block.settings.style_2 == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
+    >
+      {{ block.settings.link_2.text }}
+    </a>
+  {% endif %}
+</div>
+```
+
+**Button size reference:**
+
+- **Small** (default): `padding: 0.8rem 1.6rem; font-size: sm`
+- **Medium**: `padding: 1.2rem 2.4rem; font-size: base`
+- **Large**: `padding: 1.6rem 3.2rem; font-size: lg`
+- **Extra Large**: `padding: 2rem 4.8rem; font-size: xl`
 
 ---
 

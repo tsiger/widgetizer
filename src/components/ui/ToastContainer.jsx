@@ -13,8 +13,12 @@ export default function ToastContainer() {
     };
   }, [clearToasts]);
 
+  // Check if we are in the page editor to adjust position
+  const isPageEditor = typeof window !== "undefined" && window.location.pathname.includes("/page-editor");
+  const topClass = isPageEditor ? "top-16" : "top-4";
+
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2">
+    <div className={`fixed ${topClass} right-4 z-50 space-y-2`}>
       {toasts.map((toast) => (
         <Toast
           key={toast.id}

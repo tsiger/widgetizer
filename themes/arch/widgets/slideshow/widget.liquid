@@ -27,9 +27,15 @@
           <div class="widget-content widget-content-lg {% if widget.settings.alignment == 'center' %}widget-content-align-center{% else %}widget-content-align-start{% endif %}">
             {% if block.settings.heading_text != blank %}
               {% assign size_class = 'block-text-' | append: block.settings.heading_size %}
-              <h1 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="heading_text">
-                {{ block.settings.heading_text }}
-              </h1>
+              {% if widget.index == 1 and forloop.first %}
+                <h1 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="heading_text">
+                  {{ block.settings.heading_text }}
+                </h1>
+              {% else %}
+                <h2 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="heading_text">
+                  {{ block.settings.heading_text }}
+                </h2>
+              {% endif %}
             {% endif %}
             {% if block.settings.text_content != blank %}
               {% assign size_class = 'block-text-' | append: block.settings.text_size %}

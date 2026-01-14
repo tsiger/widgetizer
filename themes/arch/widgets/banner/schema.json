@@ -71,6 +71,8 @@
           "label": "Size",
           "default": "5xl",
           "options": [
+            { "value": "lg", "label": "Large" },
+            { "value": "xl", "label": "Extra Large" },
             { "value": "2xl", "label": "2X Large" },
             { "value": "3xl", "label": "3X Large" },
             { "value": "4xl", "label": "4X Large" },
@@ -97,8 +99,7 @@
           "options": [
             { "value": "sm", "label": "Small" },
             { "value": "base", "label": "Base" },
-            { "value": "lg", "label": "Large" },
-            { "value": "xl", "label": "Extra Large" }
+            { "value": "lg", "label": "Large" }
           ]
         },
         {
@@ -109,8 +110,8 @@
         },
         {
           "type": "checkbox",
-          "id": "bold",
-          "label": "Bold",
+          "id": "muted",
+          "label": "Muted color",
           "default": false
         }
       ]
@@ -153,6 +154,18 @@
             { "value": "primary", "label": "Primary" },
             { "value": "secondary", "label": "Secondary" }
           ]
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Button size",
+          "default": "large",
+          "options": [
+            { "value": "small", "label": "Small" },
+            { "value": "medium", "label": "Medium" },
+            { "value": "large", "label": "Large" },
+            { "value": "xlarge", "label": "Extra Large" }
+          ]
         }
       ]
     }
@@ -164,7 +177,7 @@
         "text": "Welcome",
         "size": "sm",
         "uppercase": true,
-        "bold": true
+        "muted": false
       }
     },
     {
@@ -178,7 +191,9 @@
       "type": "text",
       "settings": {
         "text": "Start your journey with our powerful platform. Scalable, secure, and ready for growth.",
-        "size": "lg"
+        "size": "lg",
+        "uppercase": false,
+        "muted": false
       }
     },
     {

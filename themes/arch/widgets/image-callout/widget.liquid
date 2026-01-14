@@ -162,9 +162,15 @@
           {% case block.type %}
             {% when 'heading' %}
               {% assign size_class = 'block-text-' | append: block.settings.size %}
-              <h3 class="widget-title block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="text">
-                {{ block.settings.text }}
-              </h3>
+              {% if widget.index == 1 %}
+                <h1 class="widget-title block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="text">
+                  {{ block.settings.text }}
+                </h1>
+              {% else %}
+                <h2 class="widget-title block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="text">
+                  {{ block.settings.text }}
+                </h2>
+              {% endif %}
 
             {% when 'text' %}
               {% assign size_class = 'block-text-' | append: block.settings.size %}

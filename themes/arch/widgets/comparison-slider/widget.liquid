@@ -212,7 +212,11 @@
           <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
         {% endif %}
         {% if widget.settings.description != blank %}
           <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>

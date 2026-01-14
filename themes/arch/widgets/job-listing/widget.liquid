@@ -143,7 +143,11 @@
           <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
         {% endif %}
         {% if widget.settings.description != blank %}
           <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
@@ -198,6 +202,11 @@
 
     <div class="widget-content">
       <ul class="job-list">
+        {% assign item_heading_level = 'h3' %}
+        {% if widget.settings.title == blank %}
+          {% assign item_heading_level = 'h2' %}
+        {% endif %}
+
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
           <li
@@ -207,7 +216,7 @@
           >
             <div class="widget-card-content">
               <div class="job-header">
-                <h3 class="widget-card-title block-text block-text-xl block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
+                <{{ item_heading_level }} class="widget-card-title block-text block-text-xl block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
                 <div class="job-meta block-text block-text-sm block-text-muted">
                   <span class="job-meta-item">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">

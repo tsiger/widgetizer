@@ -49,7 +49,9 @@
             { "value": "lg", "label": "Large" },
             { "value": "xl", "label": "Extra Large" },
             { "value": "2xl", "label": "2X Large" },
-            { "value": "3xl", "label": "3X Large" }
+            { "value": "3xl", "label": "3X Large" },
+            { "value": "4xl", "label": "4X Large" },
+            { "value": "5xl", "label": "5X Large" }
           ]
         }
       ]
@@ -103,12 +105,12 @@
     },
     {
       "type": "button",
-      "displayName": "Button",
+      "displayName": "Button Group",
       "settings": [
         {
           "type": "link",
           "id": "link",
-          "label": "Button",
+          "label": "Button 1",
           "default": {
             "text": "Learn More",
             "href": "#",
@@ -138,6 +140,18 @@
           "options": [
             { "value": "primary", "label": "Primary" },
             { "value": "secondary", "label": "Secondary" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Button size",
+          "default": "medium",
+          "options": [
+            { "value": "small", "label": "Small" },
+            { "value": "medium", "label": "Medium" },
+            { "value": "large", "label": "Large" },
+            { "value": "xlarge", "label": "Extra Large" }
           ]
         }
       ]

@@ -131,7 +131,11 @@
           <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
         {% endif %}
         {% if widget.settings.description != blank %}
           <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
@@ -150,6 +154,11 @@
         </div>
 
         <ul class="image-tabs-list" role="tablist">
+          {% assign tab_heading_level = 'h3' %}
+          {% if widget.settings.title == blank %}
+            {% assign tab_heading_level = 'h2' %}
+          {% endif %}
+
           {% assign first_tab = true %}
           {% for blockId in widget.blocksOrder %}
             {% assign block = widget.blocks[blockId] %}
@@ -166,7 +175,7 @@
                 data-image="{{ image_url }}"
               >
                 {% if block.settings.title != blank %}
-                  <h3 class="image-tabs-tab-title block-text block-text-lg block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
+                  <{{ tab_heading_level }} class="image-tabs-tab-title block-text block-text-lg block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</{{ tab_heading_level }}>
                 {% endif %}
                 {% if block.settings.description != blank %}
                   <p class="image-tabs-tab-description block-text block-text-sm block-text-muted" data-setting="description">{{ block.settings.description }}</p>
