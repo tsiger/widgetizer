@@ -1,7 +1,12 @@
 {
   "type": "content-switcher",
   "displayName": "Content Switcher",
-  "aliases": ["tabs", "toggle content", "switch", "selector"],
+  "aliases": [
+    "tabs",
+    "toggle content",
+    "switch",
+    "selector"
+  ],
   "settings": [
     {
       "type": "text",
@@ -27,13 +32,20 @@
       "label": "Switcher Style",
       "default": "toggle",
       "options": [
-        { "value": "toggle", "label": "Toggle (2 Options)" },
-        { "value": "tabs", "label": "Tabs (Up to 3 Options)" }
+        {
+          "value": "toggle",
+          "label": "Toggle (2 Options)"
+        },
+        {
+          "value": "tabs",
+          "label": "Tabs (Up to 3 Options)"
+        }
       ]
     },
     {
       "type": "header",
-      "content": "Labels"
+      "id": "labels_header",
+      "label": "Labels"
     },
     {
       "type": "text",
@@ -55,7 +67,8 @@
     },
     {
       "type": "header",
-      "content": "Layout"
+      "id": "layout_header",
+      "label": "Layout"
     },
     {
       "type": "select",
@@ -63,10 +76,22 @@
       "label": "Columns per state",
       "default": "3",
       "options": [
-        { "value": "1", "label": "1 Column" },
-        { "value": "2", "label": "2 Columns" },
-        { "value": "3", "label": "3 Columns" },
-        { "value": "4", "label": "4 Columns" }
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        },
+        {
+          "value": "3",
+          "label": "3 Columns"
+        },
+        {
+          "value": "4",
+          "label": "4 Columns"
+        }
       ]
     },
     {
@@ -75,8 +100,14 @@
       "label": "Color Scheme",
       "default": "light",
       "options": [
-        { "value": "light", "label": "Light" },
-        { "value": "dark", "label": "Dark" }
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
       ]
     }
   ],
@@ -118,9 +149,18 @@
           "label": "Assign to Option",
           "default": "1",
           "options": [
-            { "value": "1", "label": "Option 1" },
-            { "value": "2", "label": "Option 2" },
-            { "value": "3", "label": "Option 3" }
+            {
+              "value": "1",
+              "label": "Option 1"
+            },
+            {
+              "value": "2",
+              "label": "Option 2"
+            },
+            {
+              "value": "3",
+              "label": "Option 3"
+            }
           ]
         }
       ]

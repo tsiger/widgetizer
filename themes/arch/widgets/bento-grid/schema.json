@@ -1,7 +1,13 @@
 {
   "type": "bento-grid",
   "displayName": "Bento Grid",
-  "aliases": ["dashboard", "tiles", "highlights", "featured grid", "masonry"],
+  "aliases": [
+    "dashboard",
+    "tiles",
+    "highlights",
+    "featured grid",
+    "masonry"
+  ],
   "settings": [
     {
       "type": "text",
@@ -25,10 +31,22 @@
       "label": "Gap Size",
       "default": "var(--space-md)",
       "options": [
-        { "value": "var(--space-sm)", "label": "Small" },
-        { "value": "var(--space-md)", "label": "Medium" },
-        { "value": "var(--space-lg)", "label": "Large" },
-        { "value": "var(--space-xl)", "label": "Extra Large" }
+        {
+          "value": "var(--space-sm)",
+          "label": "Small"
+        },
+        {
+          "value": "var(--space-md)",
+          "label": "Medium"
+        },
+        {
+          "value": "var(--space-lg)",
+          "label": "Large"
+        },
+        {
+          "value": "var(--space-xl)",
+          "label": "Extra Large"
+        }
       ]
     },
     {
@@ -37,8 +55,14 @@
       "label": "Color Scheme",
       "default": "light",
       "options": [
-        { "value": "light", "label": "Light" },
-        { "value": "dark", "label": "Dark" }
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
       ]
     }
   ],
@@ -49,7 +73,8 @@
       "settings": [
         {
           "type": "header",
-          "content": "Content"
+          "id": "content_header",
+          "label": "Content"
         },
         {
           "type": "text",
@@ -75,7 +100,8 @@
         },
         {
           "type": "header",
-          "content": "Layout"
+          "id": "layout_header",
+          "label": "Layout"
         },
         {
           "type": "range",
@@ -97,7 +123,8 @@
         },
         {
           "type": "header",
-          "content": "Style"
+          "id": "style_header",
+          "label": "Style"
         },
         {
           "type": "color",
@@ -118,8 +145,14 @@
           "label": "Text Color",
           "default": "dark",
           "options": [
-            { "value": "dark", "label": "Dark" },
-            { "value": "light", "label": "Light" }
+            {
+              "value": "dark",
+              "label": "Dark"
+            },
+            {
+              "value": "light",
+              "label": "Light"
+            }
           ]
         },
         {
@@ -128,8 +161,14 @@
           "label": "Text Alignment",
           "default": "start",
           "options": [
-            { "value": "start", "label": "Left" },
-            { "value": "center", "label": "Center" }
+            {
+              "value": "start",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            }
           ]
         }
       ]

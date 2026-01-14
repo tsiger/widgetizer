@@ -46,16 +46,16 @@ export default function SettingsPanel({
 
   const currentValues = isThemeSettings
     ? (themeSettings?.settings?.global?.[selectedThemeGroup] || []).reduce(
-        (acc, s) => ({ ...acc, [s.id]: s.value }),
-        {},
-      )
+      (acc, s) => ({ ...acc, [s.id]: s.value }),
+      {},
+    )
     : selectedBlockId && !isGlobalWidget
       ? selectedBlock?.settings
       : currentWidget?.settings;
 
   if (!isThemeSettings && (!currentWidget || (!selectedWidgetId && !selectedGlobalWidgetId))) {
     return (
-      <div className="w-60 bg-white border-l border-slate-200">
+      <div className="w-70 bg-white border-l border-slate-200">
         <div className="p-4">
           <p className="text-slate-500 text-center mt-8">{t("pageEditor.settingsPanel.emptyState")}</p>
         </div>
@@ -85,12 +85,12 @@ export default function SettingsPanel({
     : selectedBlockId && !isGlobalWidget
       ? selectedBlockSchema?.displayName || t("pageEditor.settingsPanel.blockSettings")
       : currentWidget?.settings?.name || // Use custom name if set
-        currentWidgetSchema?.displayName ||
-        (isGlobalWidget
-          ? selectedGlobalWidgetId === "header"
-            ? t("pageEditor.settingsPanel.header")
-            : t("pageEditor.settingsPanel.footer")
-          : t("pageEditor.settingsPanel.widgetSettings"));
+      currentWidgetSchema?.displayName ||
+      (isGlobalWidget
+        ? selectedGlobalWidgetId === "header"
+          ? t("pageEditor.settingsPanel.header")
+          : t("pageEditor.settingsPanel.footer")
+        : t("pageEditor.settingsPanel.widgetSettings"));
 
   // Inject "name" setting for widgets (not blocks)
   const widgetNameSetting = {
@@ -106,21 +106,20 @@ export default function SettingsPanel({
     !isThemeSettings && !selectedBlockId && !isGlobalWidget && settings ? [widgetNameSetting, ...settings] : settings;
 
   return (
-    <div className="w-60 bg-white border-l border-slate-200 flex flex-col h-full">
-      <div className="p-4 flex-1 overflow-y-auto">
-        <div className="font-bold mb-4 sticky top-0 bg-white pb-2 border-b border-slate-100 z-10">
-          {selectedBlockId && !isGlobalWidget ? (
-            <div className="flex items-center gap-2">
-              <button onClick={onBackToWidget} className="p-1 hover:bg-slate-100 rounded-sm text-slate-500">
-                <ArrowLeft size={16} />
-              </button>
-              <span>{displayName}</span>
-            </div>
-          ) : (
+    <div className="w-70 bg-white border-l border-slate-200 flex flex-col h-full">
+      <div className="px-4 pt-4 pb-2 border-b border-slate-100 font-bold">
+        {selectedBlockId && !isGlobalWidget ? (
+          <div className="flex items-center gap-2">
+            <button onClick={onBackToWidget} className="p-1 hover:bg-slate-100 rounded-sm text-slate-500">
+              <ArrowLeft size={16} />
+            </button>
             <span>{displayName}</span>
-          )}
-        </div>
-
+          </div>
+        ) : (
+          <span>{displayName}</span>
+        )}
+      </div>
+      <div className="px-4 pb-4 flex-1 overflow-y-auto">
         <div
           key={
             isThemeSettings
@@ -131,7 +130,7 @@ export default function SettingsPanel({
                   ? `global-${selectedGlobalWidgetId}`
                   : `widget-${selectedWidgetId}`
           }
-          className="space-y-6"
+          className="page-editor-settings space-y-4"
         >
           {allSettings?.map((setting, index) => {
             // Create a unique key that includes widget/block/theme context to force React to remount on switch

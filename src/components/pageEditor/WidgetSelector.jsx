@@ -51,9 +51,9 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     const name = schema.displayName || schema.type;
     const aliases = schema.aliases || [];
     const searchLower = searchTerm.toLowerCase();
-    
-    return name.toLowerCase().includes(searchLower) || 
-           aliases.some(alias => alias.toLowerCase().includes(searchLower));
+
+    return name.toLowerCase().includes(searchLower) ||
+      aliases.some(alias => alias.toLowerCase().includes(searchLower));
   });
 
   // Calculate position relative to trigger (using useLayoutEffect to avoid accessing refs during render)
@@ -72,8 +72,8 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     const triggerRect = triggerRef.current.getBoundingClientRect();
     const dropdownWidth = 224; // w-56 = 224px
 
-    // Position the dropdown outside the sidebar (sidebar is w-60 = 240px)
-    const sidebarWidth = 240;
+    // Position the dropdown outside the sidebar (sidebar is w-70 = 280px)
+    const sidebarWidth = 280;
     let leftPosition = sidebarWidth - 24; // Position closer to sidebar edge
 
     // If it would go off the right edge of the screen, position to the left instead

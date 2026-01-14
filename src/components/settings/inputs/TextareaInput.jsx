@@ -2,7 +2,7 @@
  * TextareaInput component
  * Renders a multiline text input
  */
-export default function TextareaInput({ id, value = "", onChange, placeholder = "", rows = 4 }) {
+export default function TextareaInput({ id, value = "", onChange, placeholder = "", rows = 6 }) {
   return (
     <textarea
       id={id}

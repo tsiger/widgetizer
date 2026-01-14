@@ -42,8 +42,8 @@ export default function SettingsRenderer({ setting, value, onChange, error, isFi
     // We add a top border and padding to visually separate the new section,
     // but skip the border if this is the first setting to avoid duplicate borders.
     return (
-      <div className={isFirst ? "pt-2" : "border-t border-slate-300/70 pt-2"}>
-        {translatedLabel && <h2 className="text-base font-semibold leading-7 text-slate-800">{translatedLabel}</h2>}
+      <div className={`setting-type-header pt-2`}>
+        {translatedLabel && <h2 className="text-sm font-semibold leading-7 text-slate-800">{translatedLabel}</h2>}
         {translatedDescription && <p className="mt-1 text-sm text-slate-500">{translatedDescription}</p>}
       </div>
     );
@@ -113,8 +113,10 @@ export default function SettingsRenderer({ setting, value, onChange, error, isFi
   const displayLabel = translatedLabel || id;
 
   return (
-    <SettingsField id={id} label={displayLabel} description={translatedDescription} error={error} type={type}>
-      {renderInput()}
-    </SettingsField>
+    <div className={`setting-type-${type}`}>
+      <SettingsField id={id} label={displayLabel} description={translatedDescription} error={error} type={type}>
+        {renderInput()}
+      </SettingsField>
+    </div>
   );
 }
