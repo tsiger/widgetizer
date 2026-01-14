@@ -1,86 +1,16 @@
 <footer
   id="{{ widget.id }}"
-  class="widget-footer widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  class="widget-footer color-scheme-{{ widget.settings.color_scheme }}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="footer"
-  {% if widget.settings.color_scheme == 'dark' %}style="background-color: var(--bg-primary);"{% endif %}
+  {% if widget.settings.color_scheme == 'dark' %}style="background-color: var(--bg-primary);{% if widget.settings.logo_width %}--footer-logo-width: {{ widget.settings.logo_width }}px;{% endif %}"{% elsif widget.settings.logo_width %}style="--footer-logo-width: {{ widget.settings.logo_width }}px;"{% endif %}
 >
   <style>
-    .widget-{{ widget.id }} {
-      padding-block: var(--space-3xl);
-      padding-inline: var(--space-xl);
-      text-align: center;
-      border-block-start: var(--border-width-thin) solid var(--border-color);
-
-      & .footer-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--space-xl);
-      }
-
-      & .footer-logo {
-        display: inline-block;
-        max-width: {{ widget.settings.logo_width | default: 100 }}px;
-        height: auto;
-      }
-
-      & .footer-menu {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: var(--space-lg);
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-
-      & .footer-menu-link {
-        color: var(--text-content);
-        text-decoration: none;
-        font-weight: var(--font-weight-medium);
-        transition: color var(--transition-speed-fast);
-
-        &:hover {
-          color: var(--accent);
-        }
-      }
-
-      & .footer-social {
-        display: flex;
-        gap: var(--space-md);
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-
-      & .social-link {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-content);
-        transition: color var(--transition-speed-fast);
-        width: 2.4rem;
-        height: 2.4rem;
-
-        &:hover {
-          color: var(--accent);
-        }
-
-        & svg {
-          width: 100%;
-          height: 100%;
-        }
-      }
-
-      & .footer-copyright {
-        color: var(--text-muted);
-        font-size: var(--font-size-sm);
-        margin: 0;
-      }
+    #{{ widget.id }} .footer-logo {
+      max-width: var(--footer-logo-width, 100px);
     }
-
-
   </style>
+
 
   <div class="footer-content">
     {% if widget.settings.logo != blank %}
