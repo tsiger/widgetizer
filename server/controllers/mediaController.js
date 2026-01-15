@@ -173,24 +173,24 @@ export async function writeMediaFile(projectId, data, retryCount = 0) {
     const tempFilePath = `${mediaFilePath}.tmp.${uniqueId}`;
 
     console.log(
-      `[writeMediaFile] Starting write for project ${projectId} (attempt ${retryCount + 1}/${MAX_RETRIES + 1})`,
+      `[${new Date().toISOString()}] [writeMediaFile] Starting write for project ${projectId} (attempt ${retryCount + 1}/${MAX_RETRIES + 1})`,
     );
-    console.log(`[writeMediaFile] Target: ${mediaFilePath}`);
-    console.log(`[writeMediaFile] Temp file: ${tempFilePath}`);
+    console.log(`[${new Date().toISOString()}] [writeMediaFile] Target: ${mediaFilePath}`);
+    console.log(`[${new Date().toISOString()}] [writeMediaFile] Temp file: ${tempFilePath}`);
 
     // Ensure the parent directory exists
     const parentDir = path.dirname(mediaFilePath);
     await fs.ensureDir(parentDir);
-    console.log(`[writeMediaFile] Parent directory verified: ${parentDir}`);
+    console.log(`[${new Date().toISOString()}] [writeMediaFile] Parent directory verified: ${parentDir}`);
 
     try {
       // Write to temp file
       await fs.writeFile(tempFilePath, JSON.stringify(data, null, 2), "utf8");
-      console.log(`[writeMediaFile] Temp file written successfully`);
+      console.log(`[${new Date().toISOString()}] [writeMediaFile] Temp file written successfully`);
 
       // Verify temp file was created successfully
       const tempExists = await fs.pathExists(tempFilePath);
-      console.log(`[writeMediaFile] Temp file exists: ${tempExists}`);
+      console.log(`[${new Date().toISOString()}] [writeMediaFile] Temp file exists: ${tempExists}`);
 
       if (!tempExists) {
         throw new Error(`Temp file was not created: ${tempFilePath}`);
@@ -198,34 +198,34 @@ export async function writeMediaFile(projectId, data, retryCount = 0) {
 
       // Verify directory still exists before move (defensive check)
       const dirStillExists = await fs.pathExists(parentDir);
-      console.log(`[writeMediaFile] Parent directory still exists before move: ${dirStillExists}`);
+      console.log(`[${new Date().toISOString()}] [writeMediaFile] Parent directory still exists before move: ${dirStillExists}`);
 
       if (!dirStillExists) {
         await fs.ensureDir(parentDir);
-        console.log(`[writeMediaFile] Recreated parent directory`);
+        console.log(`[${new Date().toISOString()}] [writeMediaFile] Recreated parent directory`);
       }
 
       // Perform atomic move
       await fs.move(tempFilePath, mediaFilePath, { overwrite: true });
-      console.log(`[writeMediaFile] Successfully moved temp file to target`);
+      console.log(`[${new Date().toISOString()}] [writeMediaFile] Successfully moved temp file to target`);
     } catch (error) {
-      console.error(`[writeMediaFile] Error during write operation:`, error);
-      console.error(`[writeMediaFile] Error code: ${error.code}, syscall: ${error.syscall}`);
+      console.error(`[${new Date().toISOString()}] [writeMediaFile] Error during write operation:`, error);
+      console.error(`[${new Date().toISOString()}] [writeMediaFile] Error code: ${error.code}, syscall: ${error.syscall}`);
 
       // Clean up temp file if it exists
       try {
         if (await fs.pathExists(tempFilePath)) {
           await fs.unlink(tempFilePath);
-          console.log(`[writeMediaFile] Cleaned up temp file after error`);
+          console.log(`[${new Date().toISOString()}] [writeMediaFile] Cleaned up temp file after error`);
         }
       } catch (cleanupError) {
-        console.warn(`[writeMediaFile] Failed to clean up temp file ${tempFilePath}:`, cleanupError.message);
+        console.warn(`[${new Date().toISOString()}] [writeMediaFile] Failed to clean up temp file ${tempFilePath}:`, cleanupError.message);
       }
 
       // Retry on transient file system errors
       if (retryCount < MAX_RETRIES && (error.code === "ENOENT" || error.code === "EPERM" || error.code === "EBUSY")) {
         const backoffMs = Math.pow(2, retryCount) * 100; // 100ms, 200ms, 400ms
-        console.warn(`[writeMediaFile] Retrying after ${backoffMs}ms due to transient error: ${error.code}`);
+        console.warn(`[${new Date().toISOString()}] [writeMediaFile] Retrying after ${backoffMs}ms due to transient error: ${error.code}`);
 
         // Release lock before retry
         writeLocks.delete(projectId);

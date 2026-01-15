@@ -1,12 +1,12 @@
 <footer
   id="{{ widget.id }}"
-  class="widget-footer color-scheme-{{ widget.settings.color_scheme }}"
+  class="widget widget-footer widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="footer"
   {% if widget.settings.color_scheme == 'dark' %}style="background-color: var(--bg-primary);{% if widget.settings.logo_width %}--footer-logo-width: {{ widget.settings.logo_width }}px;{% endif %}"{% elsif widget.settings.logo_width %}style="--footer-logo-width: {{ widget.settings.logo_width }}px;"{% endif %}
 >
   <style>
-    #{{ widget.id }} .footer-logo {
+    .widget-{{ widget.id }} .footer-logo {
       max-width: var(--footer-logo-width, 100px);
     }
   </style>
@@ -17,9 +17,9 @@
       {{ widget.settings.logo | image: 'small', 'footer-logo', 'Footer Logo' }}
     {% endif %}
 
-    {% if widget.settings.menu %}
+    {% if widget.settings.footerNavigation %}
       {% render 'menu',
-        menu: widget.settings.menu,
+        menu: widget.settings.footerNavigation,
         class_list: 'footer-menu',
         class_item: 'footer-menu-item',
         class_link: 'footer-menu-link',
@@ -41,7 +41,7 @@
       {% endif %}
       {% if widget.settings.twitter_url != blank %}
         <a href="{{ widget.settings.twitter_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
-          {% render 'icon', icon: 'x' %}
+          {% render 'icon', icon: 'twitter' %}
         </a>
       {% endif %}
       {% if widget.settings.linkedin_url != blank %}

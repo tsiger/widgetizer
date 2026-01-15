@@ -1,105 +1,113 @@
 <header id="{{ widget.id }}" class="widget-site-header color-scheme-{{ widget.settings.color_scheme }}" data-widget-id="{{ widget.id }}" data-widget-type="header"{% if widget.settings.color_scheme == 'dark' %} style="background-color: var(--bg-primary);"{% endif %}>
 
   <style>
-    #{{ widget.id }} .header-logo-image {
+    .widget-site-header .header-logo-image {
       max-width: {{ widget.settings.logoMaxWidth | default: 150 }}px;
       height: auto;
       display: block;
     }
+    {% unless widget.settings.full_width %}
+    .widget-site-header .header-inner {
+      max-width: var(--container-max-width);
+      margin-inline: auto;
+    }
+    {% endunless %}
   </style>
 
-  <a href="/" class="header-logo">
-    {% if widget.settings.logoImage != blank %}
-      {{ widget.settings.logoImage | image: 'medium', 'header-logo-image', false }}
-    {% else %}
-      <span data-setting="logoText">{{ widget.settings.logoText | default: 'Widgetizer' }}</span>
-    {% endif %}
-  </a>
-
-  <div class="header-actions">
-    <nav class="header-nav" id="main-navigation">
-      <div class="nav-close">
-        <span class="nav-close-title">Menu</span>
-        <button class="nav-close-btn" aria-label="Close navigation menu">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M18 6l-12 12" />
-            <path d="M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-      {% if widget.settings.headerNavigation %}
-        {% render 'menu',
-          menu: widget.settings.headerNavigation,
-          class_list: 'nav-list',
-          class_item: 'nav-item',
-          class_link: '',
-          class_submenu: 'nav-submenu',
-          class_has_submenu: 'has-submenu'
-        %}
+  <div class="header-inner">
+    <a href="/" class="header-logo">
+      {% if widget.settings.logoImage != blank %}
+        {{ widget.settings.logoImage | image: 'medium', 'header-logo-image', false }}
+      {% else %}
+        <span data-setting="logoText">{{ widget.settings.logoText | default: 'Widgetizer' }}</span>
       {% endif %}
+    </a>
+
+    <div class="header-actions">
+      <nav class="header-nav" id="main-navigation">
+        <div class="nav-close">
+          <span class="nav-close-title">Menu</span>
+          <button class="nav-close-btn" aria-label="Close navigation menu">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M18 6l-12 12" />
+              <path d="M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        {% if widget.settings.headerNavigation %}
+          {% render 'menu',
+            menu: widget.settings.headerNavigation,
+            class_list: 'nav-list',
+            class_item: 'nav-item',
+            class_link: '',
+            class_submenu: 'nav-submenu',
+            class_has_submenu: 'has-submenu'
+          %}
+        {% endif %}
+        {% if widget.settings.ctaButtonLink.text != blank %}
+          <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button mobile-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
+            {{ widget.settings.ctaButtonLink.text }}
+          </a>
+        {% endif %}
+      </nav>
+
       {% if widget.settings.ctaButtonLink.text != blank %}
-        <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button mobile-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
+        <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button desktop-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
           {{ widget.settings.ctaButtonLink.text }}
         </a>
       {% endif %}
-    </nav>
 
-    {% if widget.settings.ctaButtonLink.text != blank %}
-      <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button desktop-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
-        {{ widget.settings.ctaButtonLink.text }}
-      </a>
-    {% endif %}
-
-    <button
-      class="menu-toggle"
-      aria-label="Toggle navigation menu"
-      aria-expanded="false"
-      aria-controls="main-navigation"
-    >
-      <svg
-        class="icon-menu"
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+      <button
+        class="menu-toggle"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+        aria-controls="main-navigation"
       >
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M4 6l16 0" />
-        <path d="M4 12l16 0" />
-        <path d="M4 18l16 0" />
-      </svg>
-      <svg
-        class="icon-close"
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M18 6l-12 12" />
-        <path d="M6 6l12 12" />
-      </svg>
-    </button>
+        <svg
+          class="icon-menu"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M4 6l16 0" />
+          <path d="M4 12l16 0" />
+          <path d="M4 18l16 0" />
+        </svg>
+        <svg
+          class="icon-close"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M18 6l-12 12" />
+          <path d="M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
   </div>
 </header>

@@ -32,6 +32,13 @@
       "default": "Widgetizer"
     },
     {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width",
+      "description": "When enabled, the header stretches across the full viewport. When disabled, it stays centered in a container.",
+      "default": true
+    },
+    {
       "type": "menu",
       "id": "headerNavigation",
       "label": "Navigation Menu",

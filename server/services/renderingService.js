@@ -348,21 +348,20 @@ async function renderWidget(
       });
     }
 
-    if (settings) {
-      for (const [key, value] of Object.entries(settings)) {
-        if (menuSettingIds.has(key)) {
-          try {
-            if (value) {
-              // Use getMenuById instead of direct file access
-              const menuData = await getMenuById(projectDir, value);
-              enhancedSettings[key] = menuData || { items: [] };
-            } else {
-              enhancedSettings[key] = { items: [] }; // Ensure empty menu if no value set
-            }
-          } catch (err) {
-            console.error(`Error loading menu data for setting ${key}:`, err);
-            enhancedSettings[key] = { items: [] }; // Fallback to empty menu on error
+    // Load menu data for any menu-type settings (using enhancedSettings which includes defaults)
+    for (const [key, value] of Object.entries(enhancedSettings)) {
+      if (menuSettingIds.has(key)) {
+        try {
+          if (value) {
+            // Use getMenuById instead of direct file access
+            const menuData = await getMenuById(projectDir, value);
+            enhancedSettings[key] = menuData || { items: [] };
+          } else {
+            enhancedSettings[key] = { items: [] }; // Ensure empty menu if no value set
           }
+        } catch (err) {
+          console.error(`Error loading menu data for setting ${key}:`, err);
+          enhancedSettings[key] = { items: [] }; // Fallback to empty menu on error
         }
       }
     }

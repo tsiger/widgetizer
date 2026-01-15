@@ -5,7 +5,7 @@
   "items": [
     {
       "label": "Home",
-      "link": "home.html",
+      "link": "index.html",
       "items": []
     },
     {

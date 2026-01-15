@@ -19,14 +19,16 @@
     },
     {
       "type": "menu",
-      "id": "menu",
-      "label": "Menu"
+      "id": "footerNavigation",
+      "label": "Navigation Menu",
+      "description": "Select the menu to display in the footer",
+      "default": "footer-menu"
     },
     {
       "type": "textarea",
       "id": "copyright",
       "label": "Copyright text",
-      "default": "© 2025 Widgetizer. All rights reserved."
+      "default": "© 2026 Widgetizer. All rights are yours to keep."
     },
     {
       "type": "header",

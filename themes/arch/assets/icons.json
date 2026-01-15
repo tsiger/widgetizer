@@ -4859,7 +4859,7 @@
         "body": "\u003cg fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"\u003e\u003cpath d=\"M4 8a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z\" /\u003e\u003cpath d=\"M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0\" /\u003e\u003cpath d=\"M16.5 7.5v.01\" /\u003e\u003c/g\u003e"
       },
       "twitter": {
-        "body": "\u003c g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"\u003e\u003cpath d=\"M4 4l11.733 16h4.267l-11.733 -16l-4.267 0\" /\u003e\u003cpath d=\"M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772\" /\u003e\u003c/g\u003e"
+        "body": "\u003cg fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"\u003e\u003cpath stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/\u003e\u003cpath d=\"M4 4l11.733 16h4.267l-11.733 -16l-4.267 0\" /\u003e\u003cpath d=\"M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772\" /\u003e\u003c/g\u003e"
       },
       "linkedin": {
         "body": "\u003cg fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"\u003e\u003cpath d=\"M8 11v5\" /\u003e\u003cpath d=\"M8 8v.01\" /\u003e\u003cpath d=\"M12 16v-5\" /\u003e\u003cpath d=\"M16 16v-3a2 2 0 1 0 -4 0\" /\u003e\u003cpath d=\"M3 7a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v10a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4l0 -10\" /\u003e\u003c/g\u003e"

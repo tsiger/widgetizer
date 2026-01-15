@@ -109,6 +109,11 @@ img {
   --icon-size-lg: 3.2rem; /* 32px */
   --icon-size-xl: 4.8rem; /* 48px */
 
+  /* Transition Speeds */
+  --transition-speed-fast: 0.15s;
+  --transition-speed-normal: 0.3s;
+  --transition-speed-slow: 0.5s;
+
   /* Widget Background System (defaults) */
   --widget-bg-color: transparent;
   /* Note: background-image is set inline on elements, not via CSS variable */
@@ -892,13 +897,20 @@ h6 {
    ========================================================================== */
 
 .widget-site-header {
+  /* Reset inherited .widget base styles */
+  background-color: transparent;
+  background-image: none;
+
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding-block: var(--space-md);
   padding-inline: var(--space-md);
   border-block-end: var(--border-width-thin) solid var(--border-color);
+
+  & .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
   & .header-logo {
     display: block;
@@ -960,11 +972,12 @@ h6 {
     padding-block-start: var(--space-md);
     padding-inline: var(--space-lg);
     overflow-y: auto;
-    transition: inset-inline-end 0.3s ease-in-out;
+    transition: inset-inline-end 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     z-index: 1000;
 
     &.nav-open {
       inset-inline-end: 0;
+      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.15);
     }
   }
 
@@ -1017,7 +1030,7 @@ h6 {
       text-decoration: none;
       color: var(--text-heading);
       font-weight: var(--font-weight-normal);
-      font-size: var(--font-size-base);
+      font-size: var(--font-size-lg);
       background: transparent;
       border: none;
       text-align: start;
@@ -1036,11 +1049,18 @@ h6 {
       height: 2rem;
       margin-inline-start: auto;
       flex-shrink: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6l-6 6'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6l-6 6'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
       transition: transform 0.3s;
+    }
+  }
+
+  /* Dark color scheme arrow */
+  &.color-scheme-dark .nav-item {
+    &.has-submenu > a::after {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6l-6 6'/%3E%3C/svg%3E");
     }
   }
 
@@ -1131,7 +1151,7 @@ h6 {
       & > button {
         padding-block: 1rem;
         padding-inline: var(--space-md);
-        font-size: var(--font-size-sm);
+        font-size: var(--font-size-base);
         transition: background-color 0.2s;
 
         &:hover {
@@ -1225,6 +1245,10 @@ h6 {
    ========================================================================== */
 
 .widget-footer {
+  /* Reset inherited .widget base styles */
+  background-color: transparent;
+  background-image: none;
+
   padding-block: var(--space-3xl);
   padding-inline: var(--space-xl);
   text-align: center;
@@ -1234,7 +1258,7 @@ h6 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-md);
+    gap: var(--space-sm);
   }
 
   & .footer-logo {
@@ -1255,7 +1279,8 @@ h6 {
   & .footer-menu-link {
     color: var(--text-content);
     text-decoration: none;
-    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
     transition: color var(--transition-speed-fast);
 
     &:hover {
@@ -1291,7 +1316,7 @@ h6 {
 
   & .footer-copyright {
     color: var(--text-muted);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     margin: 0;
   }
 }
