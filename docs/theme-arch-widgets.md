@@ -15,6 +15,13 @@ A versatile hero section for page introductions.
 - **Key Features**: Supports background images/colors, overlay adjustments, and flexible blocks for headings, text, and button groups.
 - **Best For**: Homepages, landing pages, and section headers.
 
+### Split Hero
+
+A full-width split layout with a background image on one side and content on the other.
+
+- **Key Features**: 50/50 image + content layout, left/right image position, overlay color, and the same flexible content blocks as Image + Text.
+- **Best For**: Hero sections that need a strong visual with supporting copy and CTAs.
+
 ### Slideshow
 
 An interactive carousel for cycling through multiple banners.
@@ -32,14 +39,14 @@ Widgets for displaying rich media and descriptive text content.
 
 A balanced layout pairing an image with text.
 
-- **Key Features**: Alternating image positions (left/right), multiple heading sizes, feature lists, and dual call-to-action buttons.
+- **Key Features**: Alternating image positions (left/right), multiple heading sizes, feature lists with `+`/`-` prefix icons, and dual call-to-action buttons.
 - **Best For**: Explaining features, company history, or services.
 
 ### Image Callout
 
 A focused media block with optional features list.
 
-- **Key Features**: Similar to Image + Text but optimized for smaller "callout" sections with a structured feature list block.
+- **Key Features**: Similar to Image + Text but optimized for smaller "callout" sections with a structured feature list block that supports `+`/`-` prefix icons.
 - **Best For**: Highlighting specific benefits or "Why Choose Us" sections.
 
 ### Image Hotspots

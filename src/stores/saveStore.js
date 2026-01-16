@@ -98,8 +98,11 @@ const useAutoSave = create((set, get) => ({
         savePromises.push(saveGlobalWidget("footer", globalWidgets.footer));
       }
 
-      // Save page content if there are page changes
-      if (page && (modifiedWidgets.size > 0 || structureModified)) {
+      // Save page content if there are page changes (including undo/redo)
+      const hasPageDiff = page && pageStore.originalPage
+        ? JSON.stringify(page) !== JSON.stringify(pageStore.originalPage)
+        : false;
+      if (page && (modifiedWidgets.size > 0 || structureModified || hasPageDiff)) {
         savePromises.push(savePageContent(page.id, page));
       }
 

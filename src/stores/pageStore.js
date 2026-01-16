@@ -4,6 +4,12 @@ import { getPage } from "../queries/pageManager";
 import { getGlobalWidgets } from "../queries/previewManager";
 import { getThemeSettings } from "../queries/themeManager";
 
+const selectTemporalState = (state) => ({
+  page: state.page,
+  globalWidgets: state.globalWidgets,
+  themeSettings: state.themeSettings,
+});
+
 const usePageStore = create(
   temporal(
     (set, get) => ({
@@ -198,20 +204,21 @@ const usePageStore = create(
     {
       // zundo options
       limit: 50, // Keep 50 undo states
-      partialize: (state) => ({
-        // Only track page content for undo, not loading/error states
-        page: state.page,
-        globalWidgets: state.globalWidgets,
-        themeSettings: state.themeSettings,
-      }),
+      // Only track page content for undo, not loading/error states
+      partialize: selectTemporalState,
       // Only track changes after page is loaded, skip initial load
       handleSet: (handleSet) => (state) => {
         // Get current state before the update
         const currentState = usePageStore.getState();
         // Only track if page was already loaded (not null)
-        if (currentState.page !== null) {
-          handleSet(state);
-        }
+        if (currentState.page === null) return;
+
+        // Avoid creating no-op history entries
+        const currentSnapshot = selectTemporalState(currentState);
+        const nextSnapshot = selectTemporalState(state);
+        if (JSON.stringify(currentSnapshot) === JSON.stringify(nextSnapshot)) return;
+
+        handleSet(state);
       },
     }
   )
