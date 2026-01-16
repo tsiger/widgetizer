@@ -531,22 +531,18 @@ h6 {
 /* Card Grid Container */
 .widget-card-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-lg);
   list-style: none;
   padding: 0;
   margin: 0;
 
+  grid-template-columns: 1fr;
+
   @media (min-width: 750px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   @media (min-width: 990px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  @media (min-width: 1200px) {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(var(--grid-cols-desktop, 3), minmax(0, 1fr));
   }
 }
 
@@ -885,35 +881,39 @@ h6 {
 
 .widget-grid {
   display: grid;
-  gap: var(--space-xl);
+  --grid-gap-auto: calc(
+    var(--space-xl) - (var(--grid-cols-desktop, 3) - 2) * var(--space-xs)
+  );
+  gap: clamp(
+    var(--space-xs),
+    var(--grid-gap, var(--grid-gap-auto)),
+    var(--space-xl)
+  );
+  grid-template-columns: 1fr;
+
+  @media (min-width: 750px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 990px) {
+    grid-template-columns: repeat(var(--grid-cols-desktop, 3), minmax(0, 1fr));
+  }
 }
 
 .widget-grid-2 {
-  grid-template-columns: repeat(2, 1fr);
+  --grid-cols-desktop: 2;
 }
 
 .widget-grid-3 {
-  grid-template-columns: repeat(3, 1fr);
+  --grid-cols-desktop: 3;
 }
 
 .widget-grid-4 {
-  grid-template-columns: repeat(4, 1fr);
+  --grid-cols-desktop: 4;
 }
 
-/* Responsive grid behavior */
-.widget-grid-2,
-.widget-grid-3,
-.widget-grid-4 {
-  @media (max-width: 749px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.widget-grid-3,
-.widget-grid-4 {
-  @media (min-width: 750px) and (max-width: 989px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.widget-grid-5 {
+  --grid-cols-desktop: 5;
 }
 
 /* ==========================================================================

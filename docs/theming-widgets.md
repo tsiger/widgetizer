@@ -424,22 +424,41 @@ These classes are semantic hooks (no default styling) for targeting in CSS:
 
 ### Grid System
 
+The grid utilities are CSS-variable driven for flexible column counts and consistent responsive behavior.
+
 ```liquid
 <div class="widget-grid widget-grid-2">  <!-- 2 columns -->
 <div class="widget-grid widget-grid-3">  <!-- 3 columns -->
 <div class="widget-grid widget-grid-4">  <!-- 4 columns -->
+<div class="widget-grid widget-grid-5">  <!-- 5 columns -->
+```
+
+Or set the desktop column count directly:
+
+```liquid
+<div class="widget-grid" style="--grid-cols-desktop: 4;">
 ```
 
 **Responsive behavior:**
 
 - Mobile (< 750px): 1 column
-- Tablet (750px+): 2 columns (for 3-4 column grids)
-- Desktop (990px+): Full columns
+- Tablet (750px+): 2 columns
+- Desktop (990px+): `--grid-cols-desktop`
+- Large (1200px+): same as desktop
+
+**Gap behavior:**
+
+- `gap` automatically tightens as `--grid-cols-desktop` increases.
+- Override with `--grid-gap` if needed:
+
+```liquid
+<div class="widget-grid" style="--grid-cols-desktop: 4; --grid-gap: var(--space-md);">
+```
 
 ### Card Grid
 
 ```liquid
-<ul class="widget-card-grid">
+<ul class="widget-card-grid widget-grid" style="--grid-cols-desktop: 4;">
   <li class="widget-card">
     <!-- Card content -->
   </li>
@@ -450,8 +469,7 @@ These classes are semantic hooks (no default styling) for targeting in CSS:
 
 - Mobile: 1 column
 - Tablet (750px+): 2 columns
-- Desktop (990px+): 3 columns
-- Large (1200px+): 4 columns
+- Desktop (990px+): `--grid-cols-desktop`
 
 ### Spacing Guidelines
 

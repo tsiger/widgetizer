@@ -35,6 +35,15 @@
         { "value": "light", "label": "Light" },
         { "value": "dark", "label": "Dark" }
       ]
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Desktop columns",
+      "default": 4,
+      "min": 2,
+      "max": 5,
+      "step": 1
     }
   ],
   "blocks": [
