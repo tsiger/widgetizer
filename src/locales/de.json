@@ -362,6 +362,7 @@
     "noPageSelected": "Keine Seite ausgewählt. Bitte wählen Sie eine Seite aus der Seitenliste.",
     "noWidgetsFound": "Keine Widgets gefunden",
     "widgetName": {
+      "header": "Widget-Einstellungen",
       "label": "Widget-Name",
       "description": "Optionaler benutzerdefinierter Name zur Identifizierung dieser Widget-Instanz",
       "placeholder": "z.B. Haupt-Hero, Empfohlene Produkte"

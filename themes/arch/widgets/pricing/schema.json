@@ -21,6 +21,11 @@
       "default": "Choose the plan that fits your needs."
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
@@ -36,6 +41,11 @@
       "type": "plan",
       "displayName": "Plan",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "text",
           "id": "title",
@@ -69,6 +79,11 @@
             "href": "#",
             "target": "_self"
           }
+        },
+        {
+          "type": "header",
+          "id": "options_header",
+          "label": "Options"
         },
         {
           "type": "checkbox",

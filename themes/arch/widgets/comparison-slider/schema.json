@@ -30,6 +30,11 @@
       "label": "After image"
     },
     {
+      "type": "header",
+      "id": "labels_header",
+      "label": "Labels"
+    },
+    {
       "type": "text",
       "id": "before_label",
       "label": "Before label",
@@ -40,6 +45,11 @@
       "id": "after_label",
       "label": "After label",
       "default": "After"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
     },
     {
       "type": "select",

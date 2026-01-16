@@ -3,6 +3,11 @@
   "displayName": "Footer",
   "settings": [
     {
+      "type": "header",
+      "id": "content_header",
+      "label": "Content"
+    },
+    {
       "type": "image",
       "id": "logo",
       "label": "Logo image"

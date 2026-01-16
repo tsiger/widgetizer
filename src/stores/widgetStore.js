@@ -149,7 +149,13 @@ const useWidgetStore = create((set, get) => ({
       widgetsOrder: newWidgetsOrder,
     });
 
-    set({ selectedWidgetId: newWidgetId });
+    // Clear other selection states and select the new widget (same as setSelectedWidgetId)
+    set({
+      selectedWidgetId: newWidgetId,
+      selectedBlockId: null,
+      selectedGlobalWidgetId: null,
+      selectedThemeGroup: null,
+    });
     useAutoSave.getState().setStructureModified(true);
     return newWidgetId;
   },

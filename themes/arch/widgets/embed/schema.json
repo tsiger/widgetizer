@@ -27,6 +27,11 @@
       "default": "<div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 3rem; border-radius: 1rem; color: white; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);\"><h3 style=\"margin: 0 0 1rem 0; font-size: 1.5rem;\">Sample Embedded Content</h3><p style=\"margin: 0 0 1.5rem 0; opacity: 0.9;\">This is a placeholder for your embedded content. Replace this with your own HTML, iframe, or third-party embed code.</p><button style=\"background: white; color: #667eea; border: none; padding: 0.75rem 2rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer;\">Learn More</button></div>"
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "max_width",
       "label": "Container Width",

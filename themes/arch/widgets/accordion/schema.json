@@ -22,6 +22,11 @@
       "default": "Everything you need to know about the product and billing."
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "style",
       "label": "Style",

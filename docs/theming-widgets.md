@@ -716,17 +716,149 @@ These will be automatically rendered by `{% header_assets %}` (for styles) and `
 
 ### Settings Order
 
-1. **Content settings** (image, title, description, etc.)
-2. **Layout settings** (columns, alignment, position, etc.)
-3. **Style settings** (gap, size, etc.)
-4. **Background setting** (LAST)
+Use `header` setting types to group related settings. Standard order:
+
+1. **Content settings** (image, title, description, etc.) - Use `content_header`
+2. **Display settings** (layout, alignment, color scheme, playback, options) - Use `display_header`
+3. **Background setting** (LAST) - Usually part of Display section
+
+**Note:** Layout, Style, Playback, and Options settings are typically consolidated under the Display header for consistency.
+
+### Header Setting Types
+
+Use `header` setting types to visually group related settings in the editor UI. Headers improve organization and make settings easier to navigate.
+
+#### Widget-Level Headers
+
+**Standard Header Structure:**
+
+```json
+{
+  "type": "header",
+  "id": "content_header",
+  "label": "Content"
+}
+```
+
+**Common Header Types:**
+
+1. **Content** (`content_header`)
+   - Use for: Text content, images, links, buttons, and other content-related settings
+   - Place at the beginning of content settings
+   - Example: eyebrow, title, description, image, link
+
+2. **Display** (`display_header`)
+   - Use for: Visual appearance and behavior settings
+   - Consolidates: Layout, Style, Playback, Options, and Color Scheme settings
+   - Example: layout, alignment, color_scheme, autoplay, show_volume, show_speed
+
+3. **Layout** (`layout_header`)
+   - Use sparingly: Only when layout settings are distinct from display
+   - Often consolidated into Display section
+   - Example: image_position, week_start_day, layout (cards/bar)
+
+4. **Options** (`options_header`)
+   - Use for: Feature flags, toggles, and option checkboxes
+   - Can be consolidated into Display if appropriate
+   - Example: featured, show_seconds, animate, dietary options (vegetarian, vegan, etc.)
+
+5. **Form** (`form_header`)
+   - Use for: Form-specific settings
+   - Example: form fields, validation settings
+
+6. **Social Media** (`social_header`)
+   - Use for: Social media link settings
+   - Example: linkedin, twitter, instagram, etc.
+
+#### Block-Level Headers
+
+Blocks should also use headers to organize their settings:
+
+**Common Block Header Types:**
+
+1. **Content** (`content_header`)
+   - All content-related block settings (text, images, links)
+
+2. **Layout** (`layout_header`)
+   - Block-specific layout settings (position, span, etc.)
+
+3. **Style** (`style_header`)
+   - Block-specific style settings (color, size, etc.)
+
+4. **Options** (`options_header`)
+   - Block-specific options (featured, closed, etc.)
+
+#### Header Consolidation Rules
+
+**Consolidate into Display:**
+- Layout settings → Display (unless layout is a primary widget feature)
+- Playback settings → Display (autoplay, loop, muted, controls)
+- Options settings → Display (show_volume, show_speed, animate, etc.)
+
+**Keep Separate:**
+- Content → Always separate (first section)
+- Social Media → Separate if there are many social links
+- Form → Separate if form has many settings
+
+#### Example: Proper Header Organization
+
+```json
+{
+  "settings": [
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading"
+    },
+    {
+      "type": "image",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "default": "cards"
+    },
+    {
+      "type": "checkbox",
+      "id": "animate",
+      "label": "Animate numbers",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "light"
+    }
+  ]
+}
+```
 
 ### Block Settings Order (for items with backgrounds)
 
-1. **Content** (title, text, link)
-2. **Background**: image → overlay_color (with description) → background_color
-3. **Layout** (col_span, row_span, etc.)
-4. **Style** (text_color, alignment)
+Use `header` setting types to organize block settings:
+
+1. **Content** (`content_header`) - title, text, link, image
+2. **Layout** (`layout_header`) - col_span, row_span, position, etc.
+3. **Style** (`style_header`) - text_color, alignment, rating, etc.
+4. **Options** (`options_header`) - featured, closed, dietary options, etc.
+
+**Background settings pattern:**
+- Background image → overlay_color (with description) → background_color
+- Usually part of Content or Style section depending on context
 
 ### Background Setting Pattern
 
@@ -855,7 +987,7 @@ To ensure consistency across widgets, use these standardized block definitions:
 
 ### Text Block
 
-**Standard sizes**: Small, Base, Large  
+**Standard sizes**: Small, Base, Large
 **Standard options**: Uppercase, Muted color
 
 ```json
@@ -912,7 +1044,7 @@ To ensure consistency across widgets, use these standardized block definitions:
 
 ### Button Block
 
-**Display name**: "Button Group" (for 2 buttons) or "Button" (for 1 button)  
+**Display name**: "Button Group" (for 2 buttons) or "Button" (for 1 button)
 **Standard sizes**: Small, Medium, Large, Extra Large
 
 ```json
@@ -1181,6 +1313,9 @@ Before submitting a widget:
 
 - [ ] Both `schema.json` and `widget.liquid` created in `widgets/{name}/`
 - [ ] Standard section settings (eyebrow, title, description) included
+- [ ] Settings organized with `header` types (Content, Display, etc.)
+- [ ] Layout/Playback/Options consolidated under Display header when appropriate
+- [ ] Block settings organized with appropriate headers (Content, Layout, Style, Options)
 - [ ] Default blocks provided with meaningful content
 - [ ] All CSS scoped with `.widget-{{ widget.id }}`
 - [ ] Logical properties used (not `left`, `right`, etc.)

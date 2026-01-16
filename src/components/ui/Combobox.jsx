@@ -13,7 +13,7 @@ export default function Combobox({ options, value, onChange, placeholder }) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplayValue(selectedOption.label);
     } else {
-       
+
       setDisplayValue(value || "");
     }
   }, [value, options]);

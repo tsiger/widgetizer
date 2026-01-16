@@ -732,6 +732,24 @@ h6 {
   stroke-width: var(--border-width-medium);
 }
 
+/* Button Actions Container */
+.widget-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+/* Make widget-actions respect parent alignment */
+.widget-content-align-center .widget-actions {
+  justify-content: center;
+}
+
+.widget-content-align-start .widget-actions {
+  justify-content: flex-start;
+}
+
 /* ==========================================================================
    FORM UTILITIES
    ========================================================================== */
@@ -972,7 +990,9 @@ h6 {
     padding-block-start: var(--space-md);
     padding-inline: var(--space-lg);
     overflow-y: auto;
-    transition: inset-inline-end 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    transition:
+      inset-inline-end 0.3s ease-in-out,
+      box-shadow 0.3s ease-in-out;
     z-index: 1000;
 
     &.nav-open {

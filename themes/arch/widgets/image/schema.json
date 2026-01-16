@@ -9,6 +9,11 @@
     ],
     "settings": [
         {
+            "type": "header",
+            "id": "content_header",
+            "label": "Content"
+        },
+        {
             "type": "image",
             "id": "image",
             "label": "Image"
@@ -18,6 +23,11 @@
             "id": "link",
             "label": "Link",
             "description": "Optional link when image is clicked."
+        },
+        {
+            "type": "header",
+            "id": "display_header",
+            "label": "Display"
         },
         {
             "type": "checkbox",

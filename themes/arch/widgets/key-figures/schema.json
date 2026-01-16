@@ -20,6 +20,11 @@
       "label": "Description"
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "layout",
       "label": "Layout",
@@ -51,6 +56,11 @@
       "type": "figure",
       "displayName": "Figure",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "text",
           "id": "number",

@@ -1,13 +1,7 @@
 {
   "type": "bento-grid",
   "displayName": "Bento Grid",
-  "aliases": [
-    "dashboard",
-    "tiles",
-    "highlights",
-    "featured grid",
-    "masonry"
-  ],
+  "aliases": ["dashboard", "tiles", "highlights", "featured grid", "masonry"],
   "settings": [
     {
       "type": "text",
@@ -24,6 +18,11 @@
       "type": "textarea",
       "id": "description",
       "label": "Description"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
     },
     {
       "type": "select",
@@ -123,8 +122,8 @@
         },
         {
           "type": "header",
-          "id": "style_header",
-          "label": "Style"
+          "id": "display_header",
+          "label": "Display"
         },
         {
           "type": "color",

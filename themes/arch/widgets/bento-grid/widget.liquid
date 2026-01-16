@@ -13,7 +13,7 @@
       & .bento-grid-container {
         display: grid;
         grid-template-columns: repeat(1, 1fr);
-        gap: var(--space-md);
+        gap: {{ widget.settings.gap | default: 'var(--space-md)' }};
       }
 
       & .bento-item {

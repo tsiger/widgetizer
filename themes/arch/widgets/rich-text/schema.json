@@ -4,6 +4,11 @@
   "aliases": ["text content", "content block", "text section", "content area"],
   "settings": [
     {
+      "type": "header",
+      "id": "layout_header",
+      "label": "Layout"
+    },
+    {
       "type": "select",
       "id": "text_alignment",
       "label": "Text alignment",

@@ -21,6 +21,11 @@
       "default": "Stay connected with us on social media."
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "range",
       "id": "icon_size",
       "label": "Icon size",
@@ -51,6 +56,11 @@
       "type": "social_link",
       "displayName": "Social Link",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "select",
           "id": "platform",

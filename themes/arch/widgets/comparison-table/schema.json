@@ -20,6 +20,11 @@
       "label": "Description"
     },
     {
+      "type": "header",
+      "id": "content_header",
+      "label": "Content"
+    },
+    {
       "type": "text",
       "id": "feature_column_label",
       "label": "Feature column label",
@@ -29,6 +34,11 @@
       "type": "link",
       "id": "cta_link",
       "label": "Footer CTA button"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
     },
     {
       "type": "select",
@@ -47,21 +57,31 @@
       "displayName": "Column",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
           "type": "text",
           "id": "name",
           "label": "Column name",
           "default": "Our Product"
         },
         {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge text (optional)"
+        },
+        {
+          "type": "header",
+          "id": "options_header",
+          "label": "Options"
+        },
+        {
           "type": "checkbox",
           "id": "featured",
           "label": "Featured (highlighted)",
           "default": false
-        },
-        {
-          "type": "text",
-          "id": "badge",
-          "label": "Badge text (optional)"
         }
       ]
     },
@@ -69,6 +89,11 @@
       "type": "feature",
       "displayName": "Feature Row",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "text",
           "id": "name",

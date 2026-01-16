@@ -49,7 +49,14 @@
             </p>
           {% when 'button' %}
             {% if block.settings.link.text != blank or block.settings.link_2.text != blank %}
-              <div class="widget-actions" data-block-id="{{ blockId }}">
+              {% assign gap_value = 'var(--space-md)' %}
+              {% case block.settings.size %}
+                {% when 'small' %}{% assign gap_value = 'var(--space-sm)' %}
+                {% when 'medium' %}{% assign gap_value = 'var(--space-md)' %}
+                {% when 'large' %}{% assign gap_value = 'var(--space-lg)' %}
+                {% when 'xlarge' %}{% assign gap_value = 'var(--space-xl)' %}
+              {% endcase %}
+              <div class="widget-actions" data-block-id="{{ blockId }}" style="gap: {{ gap_value }};">
                 {% if block.settings.link.text != blank %}
                   {% if block.settings.size != 'small' and block.settings.size != blank %}
                     {% assign size_class = 'widget-button-' | append: block.settings.size %}

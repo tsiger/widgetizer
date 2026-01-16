@@ -20,6 +20,11 @@
       "label": "Description"
     },
     {
+      "type": "header",
+      "id": "content_header",
+      "label": "Content"
+    },
+    {
       "type": "text",
       "id": "target_date",
       "label": "Target date (YYYY-MM-DD HH:MM)",
@@ -37,6 +42,22 @@
       "label": "Call-to-action button"
     },
     {
+      "type": "header",
+      "id": "options_header",
+      "label": "Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_seconds",
+      "label": "Show seconds",
+      "default": true
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "style",
       "label": "Style",
@@ -45,12 +66,6 @@
         { "value": "minimal", "label": "Minimal" }
       ],
       "default": "cards"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_seconds",
-      "label": "Show seconds",
-      "default": true
     },
     {
       "type": "select",

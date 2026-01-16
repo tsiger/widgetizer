@@ -21,6 +21,11 @@
       "label": "Description"
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "checkbox",
       "id": "show_filters",
       "label": "Show department filters",
@@ -42,6 +47,11 @@
       "type": "job",
       "displayName": "Job",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "text",
           "id": "title",

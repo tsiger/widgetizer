@@ -21,6 +21,11 @@
       "default": "Get the latest updates delivered to your inbox."
     },
     {
+      "type": "header",
+      "id": "form_header",
+      "label": "Form"
+    },
+    {
       "type": "text",
       "id": "placeholder",
       "label": "Email placeholder",
@@ -43,6 +48,11 @@
       "id": "success_message",
       "label": "Success message",
       "default": "Thank you for subscribing!"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
     },
     {
       "type": "select",

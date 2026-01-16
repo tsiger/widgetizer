@@ -21,6 +21,11 @@
       "label": "Section description"
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
@@ -36,6 +41,11 @@
       "type": "item",
       "displayName": "Menu Item",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "text",
           "id": "name",
@@ -58,6 +68,11 @@
           "type": "image",
           "id": "image",
           "label": "Photo (optional)"
+        },
+        {
+          "type": "header",
+          "id": "options_header",
+          "label": "Options"
         },
         {
           "type": "checkbox",

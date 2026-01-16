@@ -21,6 +21,11 @@
       "default": "A collection of our recent projects and creative work."
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
@@ -36,6 +41,11 @@
       "type": "item",
       "displayName": "Gallery Item",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "image",
           "id": "image",

@@ -21,6 +21,11 @@
       "label": "Description"
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
@@ -36,6 +41,11 @@
       "type": "logo",
       "displayName": "Logo",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "image",
           "id": "image",

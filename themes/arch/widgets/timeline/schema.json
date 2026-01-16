@@ -20,6 +20,11 @@
       "label": "Description"
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "layout",
       "label": "Layout",
@@ -46,6 +51,11 @@
       "type": "item",
       "displayName": "Timeline Item",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "text",
           "id": "date",

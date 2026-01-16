@@ -20,9 +20,19 @@
       "label": "Description"
     },
     {
+      "type": "header",
+      "id": "content_header",
+      "label": "Content"
+    },
+    {
       "type": "video",
       "id": "video",
       "label": "Video file"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
     },
     {
       "type": "checkbox",

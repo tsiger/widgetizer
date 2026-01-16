@@ -4,6 +4,11 @@
   "aliases": ["carousel", "slider", "banner slider", "rotating banners"],
   "settings": [
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "height",
       "label": "Height",
@@ -53,27 +58,14 @@
       "displayName": "Slide",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
           "type": "image",
           "id": "image",
           "label": "Background Image"
-        },
-        {
-          "type": "color",
-          "id": "overlay_color",
-          "label": "Overlay color",
-          "default": "#00000080",
-          "allow_alpha": true,
-          "description": "Applies only if there is a background image."
-        },
-        {
-          "type": "select",
-          "id": "color_scheme",
-          "label": "Color Scheme",
-          "default": "dark",
-          "options": [
-            { "value": "light", "label": "Light" },
-            { "value": "dark", "label": "Dark" }
-          ]
         },
         {
           "type": "text",
@@ -156,6 +148,29 @@
           "options": [
             { "value": "primary", "label": "Primary" },
             { "value": "secondary", "label": "Secondary" }
+          ]
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "Display"
+        },
+        {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "Overlay color",
+          "default": "#00000080",
+          "allow_alpha": true,
+          "description": "Applies only if there is a background image."
+        },
+        {
+          "type": "select",
+          "id": "color_scheme",
+          "label": "Color Scheme",
+          "default": "dark",
+          "options": [
+            { "value": "light", "label": "Light" },
+            { "value": "dark", "label": "Dark" }
           ]
         }
       ]

@@ -20,6 +20,11 @@
       "label": "Description"
     },
     {
+      "type": "header",
+      "id": "form_header",
+      "label": "Form"
+    },
+    {
       "type": "text",
       "id": "form_action",
       "label": "Form action URL",
@@ -34,6 +39,11 @@
         { "value": "POST", "label": "POST" },
         { "value": "GET", "label": "GET" }
       ]
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
     },
     {
       "type": "checkbox",
@@ -68,6 +78,11 @@
       "displayName": "Input Field",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
           "type": "text",
           "id": "label",
           "label": "Label",
@@ -99,6 +114,11 @@
           "label": "Placeholder"
         },
         {
+          "type": "header",
+          "id": "options_header",
+          "label": "Options"
+        },
+        {
           "type": "checkbox",
           "id": "required",
           "label": "Required",
@@ -110,6 +130,11 @@
       "type": "textarea",
       "displayName": "Textarea",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "text",
           "id": "label",
@@ -128,6 +153,11 @@
           "label": "Placeholder"
         },
         {
+          "type": "header",
+          "id": "options_header",
+          "label": "Options"
+        },
+        {
           "type": "checkbox",
           "id": "required",
           "label": "Required",
@@ -139,6 +169,11 @@
       "type": "dropdown",
       "displayName": "Dropdown",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "text",
           "id": "label",
@@ -158,6 +193,11 @@
           "default": "General Inquiry\\nSupport\\nSales\\nOther"
         },
         {
+          "type": "header",
+          "id": "options_header",
+          "label": "Options"
+        },
+        {
           "type": "checkbox",
           "id": "required",
           "label": "Required",
@@ -170,6 +210,11 @@
       "displayName": "Checkbox",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
           "type": "text",
           "id": "label",
           "label": "Label",
@@ -180,6 +225,11 @@
           "id": "name",
           "label": "Field name (for form submission)",
           "default": "agree"
+        },
+        {
+          "type": "header",
+          "id": "options_header",
+          "label": "Options"
         },
         {
           "type": "checkbox",
@@ -194,6 +244,11 @@
       "displayName": "Submit Button",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
           "type": "text",
           "id": "text",
           "label": "Button text",
@@ -205,6 +260,11 @@
       "type": "info",
       "displayName": "Contact Info",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "text",
           "id": "title",

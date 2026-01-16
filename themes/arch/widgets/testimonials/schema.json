@@ -20,6 +20,11 @@
       "label": "Description"
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
@@ -35,6 +40,11 @@
       "type": "quote",
       "displayName": "Testimonial",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "textarea",
           "id": "quote",
@@ -57,6 +67,11 @@
           "id": "title",
           "label": "Title / Company",
           "default": "CEO, Acme Inc."
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "Display"
         },
         {
           "type": "select",

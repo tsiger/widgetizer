@@ -362,6 +362,7 @@
     "noPageSelected": "Nessuna pagina selezionata. Seleziona una pagina dall'elenco Pagine.",
     "noWidgetsFound": "Nessun widget trovato",
     "widgetName": {
+      "header": "Impostazioni widget",
       "label": "Nome Widget",
       "description": "Nome personalizzato opzionale per identificare questa istanza del widget",
       "placeholder": "es. Hero Principale, Prodotti in Evidenza"

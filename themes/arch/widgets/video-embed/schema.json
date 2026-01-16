@@ -20,6 +20,11 @@
       "label": "Description"
     },
     {
+      "type": "header",
+      "id": "content_header",
+      "label": "Content"
+    },
+    {
       "type": "text",
       "id": "video_url",
       "label": "Video URL (YouTube or Vimeo)",
@@ -30,6 +35,11 @@
       "id": "video_title",
       "label": "Video title (for accessibility)",
       "default": "Video"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
     },
     {
       "type": "select",

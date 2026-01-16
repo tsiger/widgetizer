@@ -4,9 +4,19 @@
   "aliases": ["cta image", "visual lead", "promotion", "highlight image"],
   "settings": [
     {
+      "type": "header",
+      "id": "content_header",
+      "label": "Content"
+    },
+    {
       "type": "image",
       "id": "image",
       "label": "Image"
+    },
+    {
+      "type": "header",
+      "id": "layout_header",
+      "label": "Layout"
     },
     {
       "type": "select",
@@ -17,6 +27,11 @@
         { "value": "left", "label": "Left" },
         { "value": "right", "label": "Right" }
       ]
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
     },
     {
       "type": "select",

@@ -46,9 +46,9 @@ export default function SettingsPanel({
 
   const currentValues = isThemeSettings
     ? (themeSettings?.settings?.global?.[selectedThemeGroup] || []).reduce(
-      (acc, s) => ({ ...acc, [s.id]: s.value }),
-      {},
-    )
+        (acc, s) => ({ ...acc, [s.id]: s.value }),
+        {},
+      )
     : selectedBlockId && !isGlobalWidget
       ? selectedBlock?.settings
       : currentWidget?.settings;
@@ -85,14 +85,19 @@ export default function SettingsPanel({
     : selectedBlockId && !isGlobalWidget
       ? selectedBlockSchema?.displayName || t("pageEditor.settingsPanel.blockSettings")
       : currentWidget?.settings?.name || // Use custom name if set
-      currentWidgetSchema?.displayName ||
-      (isGlobalWidget
-        ? selectedGlobalWidgetId === "header"
-          ? t("pageEditor.settingsPanel.header")
-          : t("pageEditor.settingsPanel.footer")
-        : t("pageEditor.settingsPanel.widgetSettings"));
+        currentWidgetSchema?.displayName ||
+        (isGlobalWidget
+          ? selectedGlobalWidgetId === "header"
+            ? t("pageEditor.settingsPanel.header")
+            : t("pageEditor.settingsPanel.footer")
+          : t("pageEditor.settingsPanel.widgetSettings"));
 
-  // Inject "name" setting for widgets (not blocks)
+  // Inject "name" setting for widgets (not blocks) - shown at the end under "Widget settings" header
+  const widgetNameHeader = {
+    id: "widget_settings_header",
+    type: "header",
+    label: t("pageEditor.widgetName.header"),
+  };
   const widgetNameSetting = {
     id: "name",
     type: "text",
@@ -101,9 +106,11 @@ export default function SettingsPanel({
     placeholder: t("pageEditor.widgetName.placeholder"),
   };
 
-  // Combine name setting with other settings for widgets (not global widgets, blocks, or theme settings)
+  // Combine settings with name setting at the end for widgets (not global widgets, blocks, or theme settings)
   const allSettings =
-    !isThemeSettings && !selectedBlockId && !isGlobalWidget && settings ? [widgetNameSetting, ...settings] : settings;
+    !isThemeSettings && !selectedBlockId && !isGlobalWidget && settings
+      ? [...settings, widgetNameHeader, widgetNameSetting]
+      : settings;
 
   return (
     <div className="w-70 bg-white border-l border-slate-200 flex flex-col h-full">

@@ -4,6 +4,24 @@
   "aliases": ["hero", "intro", "cover", "billboard", "jumbotron", "header", "splash"],
   "settings": [
     {
+      "type": "image",
+      "id": "image",
+      "label": "Background image"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#00000080",
+      "allow_alpha": true,
+      "description": "Applies only if there is a background image."
+    },
+    {
       "type": "select",
       "id": "height",
       "label": "Height",
@@ -22,16 +40,6 @@
     },
     {
       "type": "select",
-      "id": "color_scheme",
-      "label": "Color Scheme",
-      "default": "light",
-      "options": [
-        { "value": "light", "label": "Light" },
-        { "value": "dark", "label": "Dark" }
-      ]
-    },
-    {
-      "type": "select",
       "id": "alignment",
       "label": "Content alignment",
       "default": "center",
@@ -41,17 +49,14 @@
       ]
     },
     {
-      "type": "image",
-      "id": "image",
-      "label": "Background image"
-    },
-    {
-      "type": "color",
-      "id": "overlay_color",
-      "label": "Overlay color",
-      "default": "#00000080",
-      "allow_alpha": true,
-      "description": "Applies only if there is a background image."
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "dark",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" }
+      ]
     }
   ],
   "blocks": [
@@ -159,7 +164,7 @@
           "type": "select",
           "id": "size",
           "label": "Button size",
-          "default": "large",
+          "default": "medium",
           "options": [
             { "value": "small", "label": "Small" },
             { "value": "medium", "label": "Medium" },

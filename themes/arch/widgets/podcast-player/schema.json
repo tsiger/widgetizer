@@ -20,6 +20,11 @@
       "label": "Description"
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "checkbox",
       "id": "show_volume",
       "label": "Show volume control",
@@ -47,6 +52,11 @@
       "type": "track",
       "displayName": "Track",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "text",
           "id": "title",

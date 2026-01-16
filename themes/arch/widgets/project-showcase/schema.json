@@ -22,6 +22,11 @@
       "default": "Browse through our collection of successful projects and client collaborations."
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
@@ -37,6 +42,11 @@
       "type": "project",
       "displayName": "Project",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "image",
           "id": "image",

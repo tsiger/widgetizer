@@ -22,6 +22,11 @@
       "default": "A responsive grid layout showcasing services with images, descriptions, and call-to-action buttons."
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
@@ -37,6 +42,11 @@
       "type": "card",
       "displayName": "Card",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "icon",
           "id": "icon",

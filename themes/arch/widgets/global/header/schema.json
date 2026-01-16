@@ -4,8 +4,8 @@
   "settings": [
     {
       "type": "header",
-      "id": "logo_settings_header",
-      "label": "Logo Settings"
+      "id": "logo_header",
+      "label": "Logo"
     },
     {
       "type": "image",
@@ -30,6 +30,11 @@
       "label": "Logo Text",
       "description": "Text to display in the header logo",
       "default": "Widgetizer"
+    },
+    {
+      "type": "header",
+      "id": "navigation_header",
+      "label": "Navigation"
     },
     {
       "type": "checkbox",

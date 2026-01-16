@@ -27,6 +27,11 @@
       "default": "Select the billing cycle that works best for you. All plans include our core features."
     },
     {
+      "type": "header",
+      "id": "switcher_header",
+      "label": "Switcher"
+    },
+    {
       "type": "select",
       "id": "switcher_type",
       "label": "Switcher Style",
@@ -95,6 +100,11 @@
       ]
     },
     {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
@@ -116,6 +126,11 @@
       "type": "item",
       "displayName": "Content Item",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
         {
           "type": "text",
           "id": "title",
@@ -142,6 +157,11 @@
           "type": "link",
           "id": "link",
           "label": "Link / CTA"
+        },
+        {
+          "type": "header",
+          "id": "layout_header",
+          "label": "Layout"
         },
         {
           "type": "select",
