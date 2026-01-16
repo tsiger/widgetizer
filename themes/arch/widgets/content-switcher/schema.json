@@ -1,12 +1,7 @@
 {
   "type": "content-switcher",
   "displayName": "Content Switcher",
-  "aliases": [
-    "tabs",
-    "toggle content",
-    "switch",
-    "selector"
-  ],
+  "aliases": ["tabs", "toggle content", "switch", "selector"],
   "settings": [
     {
       "type": "text",
@@ -76,28 +71,13 @@
       "label": "Layout"
     },
     {
-      "type": "select",
+      "type": "range",
       "id": "columns",
       "label": "Columns per state",
-      "default": "3",
-      "options": [
-        {
-          "value": "1",
-          "label": "1 Column"
-        },
-        {
-          "value": "2",
-          "label": "2 Columns"
-        },
-        {
-          "value": "3",
-          "label": "3 Columns"
-        },
-        {
-          "value": "4",
-          "label": "4 Columns"
-        }
-      ]
+      "default": 3,
+      "min": 2,
+      "max": 5,
+      "step": 1
     },
     {
       "type": "header",
