@@ -1359,6 +1359,43 @@ h6 {
   margin-block-start: var(--space-xl);
 }
 
+/* Feature list (shared across widgets) */
+.features-list {
+  list-style: none;
+  list-style-type: none;
+  padding: 0;
+  padding-inline-start: 0;
+  margin-inline-start: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0;
+  width: 100%;
+  color: var(--text-content);
+  list-style: none;
+}
+
+.feature-icon {
+  color: var(--text-content);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.feature-icon-svg {
+  width: 1em;
+  height: 1em;
+  display: block;
+}
+
 /* Visually hidden (for accessibility) */
 .visually-hidden {
   position: absolute;

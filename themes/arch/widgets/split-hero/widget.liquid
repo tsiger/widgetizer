@@ -1,122 +1,105 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-image-callout widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
+  class="widget widget-split-hero widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
   {% if widget.settings.color_scheme == 'dark' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
-  data-widget-type="image-callout"
+  data-widget-type="split-hero"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   <style>
     .widget-{{ widget.id }} {
-      & .callout-wrapper {
-        position: relative;
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: var(--space-lg);
-        overflow: hidden;
-      }
+      /* Full viewport width - break out of container constraints */
+      margin-block: 0;
+      padding-inline: 0;
+      position: relative;
+      width: 100%;
+      margin-left: calc(-50vw + 50%);
+      margin-right: calc(-50vw + 50%);
+      max-width: 100vw;
 
-      & .callout-image-wrapper {
-        position: relative;
+      & .split-hero-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 50rem; /* Minimum height for hero section */
         width: 100%;
-        height: 40rem;
-        overflow: hidden;
+        margin: 0;
+        padding: 0;
       }
 
-      & .callout-image {
+      & .split-hero-image {
+        width: 100%;
+        min-height: 30rem;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative;
+        margin: 0;
+        padding: 0;
+      }
+
+      & .split-hero-overlay {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        display: block;
-        border: var(--border-width-thin) solid var(--border-color);
       }
 
-      & .callout-content {
-        background-color: var(--bg-primary);
-        padding: var(--space-xl);
-        border: var(--border-width-thin) solid var(--border-color);
-        position: relative;
-        z-index: 2;
+      & .split-hero-content {
+        width: 100%;
+        padding: var(--space-xl) var(--space-md);
       }
 
-
-
-      @media (min-width: 750px) {
-        & .callout-image-wrapper {
-          height: 50rem;
-        }
-
-        & .callout-content {
-          padding: var(--space-3xl);
-        }
-      }
 
       @media (min-width: 990px) {
-        & .callout-wrapper {
-          grid-template-columns: repeat(12, 1fr);
+        & .split-hero-wrapper {
+          flex-direction: row;
+          min-height: 60rem;
+        }
+
+        & .split-hero-image {
+          width: 50%;
+          min-height: 60rem;
+          flex-shrink: 0;
+        }
+
+        & .split-hero-content {
+          width: 50%;
+          padding: var(--space-4xl) var(--space-3xl);
+          display: flex;
           align-items: center;
-          gap: 0;
+          flex-shrink: 0;
         }
 
-        & .callout-image-wrapper {
-          grid-column: 1 / 8;
-          grid-row: 1;
-          height: 60rem;
-        }
-
-        & .callout-content {
-          grid-column: 6 / 13;
-          grid-row: 1;
-          padding: var(--space-4xl);
-          margin-inline-start: -4rem;
-        }
-      }
-
-      @media (min-width: 1200px) {
-        & .callout-content {
-          padding: var(--space-5xl);
-          margin-inline-start: -6rem;
-        }
-      }
-
-      /* Variant: Image Right */
-      &.layout-image-right {
-        @media (min-width: 990px) {
-          & .callout-image-wrapper {
-            grid-column: 6 / 13;
-            grid-row: 1;
-          }
-
-          & .callout-content {
-            grid-column: 1 / 9;
-            grid-row: 1;
-            margin-inline-start: 0;
-            margin-inline-end: -4rem;
-          }
-        }
-
-        @media (min-width: 1200px) {
-          & .callout-content {
-            margin-inline-end: -6rem;
-          }
+        /* Image right variant */
+        &.layout-image-right .split-hero-wrapper {
+          flex-direction: row-reverse;
         }
       }
     }
   </style>
 
-  <div class="widget-container {% if widget.settings.color_scheme == 'dark' %}widget-container-padded{% endif %}">
-    <div class="callout-wrapper">
-      <div class="callout-image-wrapper">
-        {% if widget.settings.image != blank %}
-          {{ widget.settings.image | image: 'large', 'callout-image' }}
-        {% else %}
-          <div class="callout-image" style="background-image: url({% placeholder_image 'url' %}); background-size: cover; background-position: center;"></div>
+  <div class="split-hero-wrapper">
+    <!-- Background Image Section (50%) -->
+    {% if widget.settings.image != blank %}
+      {% assign image_path = widget.settings.image | image: 'path', 'large' %}
+      <div class="split-hero-image" style="background-image: url('{{ image_path }}');">
+        {% if widget.settings.overlay_color != blank %}
+          <div class="split-hero-overlay" style="background-color: {{ widget.settings.overlay_color }};"></div>
         {% endif %}
       </div>
+    {% else %}
+      <div class="split-hero-image" style="background-image: url({% placeholder_image 'landscape', 'url' %});">
+        {% if widget.settings.overlay_color != blank %}
+          <div class="split-hero-overlay" style="background-color: {{ widget.settings.overlay_color }};"></div>
+        {% endif %}
+      </div>
+    {% endif %}
 
-      <div class="callout-content content-flow widget-content-align-start">
+    <!-- Content Section (50%) -->
+    <div class="split-hero-content">
+      <div class="widget-content content-flow widget-content-align-start">
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
           {% case block.type %}
@@ -131,7 +114,6 @@
                   {{ block.settings.text }}
                 </h2>
               {% endif %}
-
             {% when 'text' %}
               {% assign size_class = 'block-text-' | append: block.settings.size %}
               {% assign style_class = '' %}
@@ -140,7 +122,6 @@
               <p class="widget-description block-text {{ size_class }}{{ style_class }}" data-block-id="{{ blockId }}" data-setting="text">
                 {{ block.settings.text }}
               </p>
-
             {% when 'features' %}
               {% if block.settings.features != blank %}
                 <ul class="features-list" data-block-id="{{ blockId }}">
@@ -149,16 +130,16 @@
                   {% for feature in features_list %}
                     {% assign trimmed_feature = feature | strip %}
                     {% if trimmed_feature != blank %}
-                      {% assign feature_text = trimmed_feature %}
-                      {% assign icon_name = '' %}
-                      {% assign first_char = trimmed_feature | slice: 0, 1 %}
-                      {% if first_char == '+' %}
-                        {% assign icon_name = 'check' %}
-                        {% assign feature_text = trimmed_feature | remove_first: '+' | strip %}
-                      {% elsif first_char == '-' %}
-                        {% assign icon_name = 'x' %}
-                        {% assign feature_text = trimmed_feature | remove_first: '-' | strip %}
-                      {% endif %}
+                        {% assign feature_text = trimmed_feature %}
+                        {% assign icon_name = '' %}
+                        {% assign first_char = trimmed_feature | slice: 0, 1 %}
+                        {% if first_char == '+' %}
+                          {% assign icon_name = 'check' %}
+                          {% assign feature_text = trimmed_feature | remove_first: '+' | strip %}
+                        {% elsif first_char == '-' %}
+                          {% assign icon_name = 'x' %}
+                          {% assign feature_text = trimmed_feature | remove_first: '-' | strip %}
+                        {% endif %}
                       <li class="feature-item block-text">
                         {% if icon_name != blank %}
                           <span class="feature-icon">
@@ -171,7 +152,6 @@
                   {% endfor %}
                 </ul>
               {% endif %}
-
             {% when 'button' %}
               {% if block.settings.link.text != blank or block.settings.link_2.text != blank %}
                 <div class="widget-actions" data-block-id="{{ blockId }}">
