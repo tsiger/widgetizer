@@ -228,6 +228,20 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+## 🔧 Troubleshooting
+
+### **[troubleshooting-media-race-condition.md](troubleshooting-media-race-condition.md)** - Media Write Race Condition
+
+**Purpose**: Diagnoses and resolves intermittent `ENOENT` errors during media file writes **When to use**:
+
+- Encountering `ENOENT: no such file or directory, rename` errors in media operations
+- Debugging concurrent file access issues during development (hot reload + autosave)
+- Understanding file locking mechanisms and retry strategies
+
+**Key topics**: Race condition analysis, lock order fixes, unique temp files, retry logic with exponential backoff, autosave interaction, development vs production considerations
+
+---
+
 ## 🎯 Quick Reference by Role
 
 ### **Theme Developers**

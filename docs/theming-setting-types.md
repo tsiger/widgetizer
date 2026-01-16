@@ -318,16 +318,32 @@ A specialized input for YouTube videos. It allows users to paste a YouTube URL o
 
 ### Menu
 
-A dropdown that is automatically populated with all available menus created in the system. The value is the ID of the selected menu.
+A dropdown that is automatically populated with all available menus created in the system. The value is the ID (filename without `.json`) of the selected menu.
+
+**ID Flexibility**: The `id` field can be any valid identifier (e.g., `headerNavigation`, `footerNavigation`, `main_menu`). The system will correctly handle menu selection regardless of the ID name used.
 
 ```json
 {
-  "id": "header_navigation_menu",
+  "id": "headerNavigation",
   "type": "menu",
   "label": "Header Navigation",
   "description": "Select the menu to display in the header."
 }
 ```
+
+**With Default Menu:**
+
+```json
+{
+  "id": "footerNavigation",
+  "type": "menu",
+  "label": "Footer Navigation",
+  "description": "Select the menu to display in the footer",
+  "default": "footer-menu"
+}
+```
+
+The `default` value should match a menu's filename (without the `.json` extension) from the theme's `menus/` directory.
 
 ### Link
 
