@@ -37,17 +37,11 @@
       "label": "Navigation"
     },
     {
-      "type": "checkbox",
-      "id": "full_width",
-      "label": "Full Width",
-      "description": "When enabled, the header stretches across the full viewport. When disabled, it stays centered in a container.",
-      "default": true
-    },
-    {
       "type": "menu",
       "id": "headerNavigation",
       "label": "Navigation Menu",
-      "description": "Select the menu to display in the header"
+      "description": "Select the menu to display in the header",
+      "default": "main-menu"
     },
     {
       "type": "link",
@@ -59,6 +53,18 @@
         "text": "Get Started",
         "target": "_self"
       }
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width",
+      "description": "When enabled, the header stretches across the full viewport. When disabled, it stays centered in a container.",
+      "default": true
     },
     {
       "type": "select",

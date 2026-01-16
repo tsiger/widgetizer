@@ -7,36 +7,7 @@
 >
   <style>
     .widget-{{ widget.id }} {
-      /* Add missing 'end' alignment support */
-      & .widget-content-align-end {
-        text-align: end;
-      }
-
-
-
-      /* Extra spacing before actions when they're last */
-      & .content-flow > .widget-actions:last-child {
-        margin-block-start: var(--space-xl);
-      }
-
-      & .widget-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--space-md);
-      }
-
-      /* Alignment inheritance for buttons */
-      & .widget-content-align-start .widget-actions {
-        justify-content: flex-start;
-      }
-
-      & .widget-content-align-center .widget-actions {
-        justify-content: center;
-      }
-
-      & .widget-content-align-end .widget-actions {
-        justify-content: flex-end;
-      }
+      /* Widget-specific styles only */
     }
   </style>
 

@@ -46,9 +46,6 @@
         flex-shrink: 0;
       }
 
-      & .widget-actions {
-        justify-content: flex-start;
-      }
 
       @media (min-width: 990px) {
         & .image-text-wrapper {
@@ -80,7 +77,7 @@
           {% endif %}
         </div>
 
-        <div class="text-content content-flow">
+        <div class="text-content content-flow widget-content-align-start">
           {% for blockId in widget.blocksOrder %}
             {% assign block = widget.blocks[blockId] %}
             {% case block.type %}
