@@ -5,8 +5,8 @@
   "settings": [
     {
       "type": "header",
-      "id": "layout_header",
-      "label": "Layout"
+      "id": "display_header",
+      "label": "Display"
     },
     {
       "type": "select",

@@ -15,8 +15,8 @@
     },
     {
       "type": "header",
-      "id": "layout_header",
-      "label": "Layout"
+      "id": "display_header",
+      "label": "Display"
     },
     {
       "type": "select",
@@ -27,11 +27,6 @@
         { "value": "left", "label": "Left" },
         { "value": "right", "label": "Right" }
       ]
-    },
-    {
-      "type": "header",
-      "id": "display_header",
-      "label": "Display"
     },
     {
       "type": "select",

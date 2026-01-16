@@ -67,8 +67,8 @@
     },
     {
       "type": "header",
-      "id": "layout_header",
-      "label": "Layout"
+      "id": "display_header",
+      "label": "Display"
     },
     {
       "type": "range",
@@ -78,11 +78,6 @@
       "min": 2,
       "max": 5,
       "step": 1
-    },
-    {
-      "type": "header",
-      "id": "display_header",
-      "label": "Display"
     },
     {
       "type": "select",
