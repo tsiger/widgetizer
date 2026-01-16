@@ -881,14 +881,8 @@ h6 {
 
 .widget-grid {
   display: grid;
-  --grid-gap-auto: calc(
-    var(--space-xl) - (var(--grid-cols-desktop, 3) - 2) * var(--space-xs)
-  );
-  gap: clamp(
-    var(--space-xs),
-    var(--grid-gap, var(--grid-gap-auto)),
-    var(--space-xl)
-  );
+  --grid-gap-auto: max(var(--space-xs), calc(var(--space-xl) - (var(--grid-cols-desktop, 3) - 2) * var(--space-xs)));
+  gap: clamp(var(--space-xs), var(--grid-gap, var(--grid-gap-auto)), var(--space-xl));
   grid-template-columns: 1fr;
 
   @media (min-width: 750px) {
@@ -914,6 +908,18 @@ h6 {
 
 .widget-grid-5 {
   --grid-cols-desktop: 5;
+}
+
+.widget-grid-6 {
+  --grid-cols-desktop: 6;
+}
+
+.widget-grid-7 {
+  --grid-cols-desktop: 7;
+}
+
+.widget-grid-8 {
+  --grid-cols-desktop: 8;
 }
 
 /* ==========================================================================

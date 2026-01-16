@@ -57,13 +57,7 @@
 
       @media (min-width: 990px) {
         & .masonry-grid {
-          column-count: 3;
-        }
-      }
-
-      @media (min-width: 1200px) {
-        & .masonry-grid {
-          column-count: 4;
+          column-count: var(--masonry-cols-desktop, 4);
         }
       }
     }
@@ -89,7 +83,10 @@
     {% endif %}
 
     <div class="widget-content">
-      <div class="masonry-grid">
+      <div
+        class="masonry-grid"
+        style="--masonry-cols-desktop: {{ widget.settings.columns_desktop }};"
+      >
         {% assign item_heading_level = 'h3' %}
         {% if widget.settings.title == blank %}
           {% assign item_heading_level = 'h2' %}

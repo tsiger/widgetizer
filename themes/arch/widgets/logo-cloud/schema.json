@@ -26,6 +26,15 @@
       "label": "Display"
     },
     {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns (Desktop)",
+      "default": 6,
+      "min": 2,
+      "max": 8,
+      "step": 1
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",

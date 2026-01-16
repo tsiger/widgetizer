@@ -809,11 +809,13 @@ Blocks should also use headers to organize their settings:
 #### Header Consolidation Rules
 
 **Consolidate into Display:**
+
 - Layout settings → Display (unless layout is a primary widget feature)
 - Playback settings → Display (autoplay, loop, muted, controls)
 - Options settings → Display (show_volume, show_speed, animate, etc.)
 
 **Keep Separate:**
+
 - Content → Always separate (first section)
 - Social Media → Separate if there are many social links
 - Form → Separate if form has many settings
@@ -875,6 +877,7 @@ Use `header` setting types to organize block settings:
 4. **Options** (`options_header`) - featured, closed, dietary options, etc.
 
 **Background settings pattern:**
+
 - Background image → overlay_color (with description) → background_color
 - Usually part of Content or Style section depending on context
 
@@ -1005,8 +1008,7 @@ To ensure consistency across widgets, use these standardized block definitions:
 
 ### Text Block
 
-**Standard sizes**: Small, Base, Large
-**Standard options**: Uppercase, Muted color
+**Standard sizes**: Small, Base, Large **Standard options**: Uppercase, Muted color
 
 ```json
 {
@@ -1062,8 +1064,7 @@ To ensure consistency across widgets, use these standardized block definitions:
 
 ### Button Block
 
-**Display name**: "Button Group" (for 2 buttons) or "Button" (for 1 button)
-**Standard sizes**: Small, Medium, Large, Extra Large
+**Display name**: "Button Group" (for 2 buttons) or "Button" (for 1 button) **Standard sizes**: Small, Medium, Large, Extra Large
 
 ```json
 {

@@ -133,7 +133,10 @@
     {% endif %}
 
     <div class="widget-content">
-      <ul class="widget-card-grid">
+      <ul
+        class="widget-card-grid widget-grid"
+        style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
+      >
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
           <li

@@ -1,159 +1,162 @@
 {
-    "type": "icon-list",
-    "displayName": "Icon List",
-    "aliases": [
-        "amenities",
-        "features",
-        "icons",
-        "services list",
-        "facilities"
-    ],
-    "settings": [
+  "type": "icon-list",
+  "displayName": "Icon List",
+  "aliases": ["amenities", "features", "icons", "services list", "facilities"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns (Desktop)",
+      "default": 4,
+      "min": 2,
+      "max": 8,
+      "step": 1
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "light",
+      "options": [
         {
-            "type": "text",
-            "id": "eyebrow",
-            "label": "Eyebrow Text"
+          "value": "light",
+          "label": "Light"
         },
         {
-            "type": "text",
-            "id": "title",
-            "label": "Heading"
-        },
-        {
-            "type": "textarea",
-            "id": "description",
-            "label": "Description"
-        },
-        {
-            "type": "header",
-            "id": "display_header",
-            "label": "Display"
-        },
-        {
-            "type": "select",
-            "id": "color_scheme",
-            "label": "Color Scheme",
-            "default": "light",
-            "options": [
-                {
-                    "value": "light",
-                    "label": "Light"
-                },
-                {
-                    "value": "dark",
-                    "label": "Dark"
-                }
-            ]
+          "value": "dark",
+          "label": "Dark"
         }
-    ],
-    "blocks": [
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "displayName": "Item",
+      "settings": [
         {
-            "type": "item",
-            "displayName": "Item",
-            "settings": [
-                {
-                    "type": "header",
-                    "id": "content_header",
-                    "label": "Content"
-                },
-                {
-                    "type": "icon",
-                    "id": "icon",
-                    "label": "Icon"
-                },
-                {
-                    "type": "text",
-                    "id": "title",
-                    "label": "Title",
-                    "default": "Feature"
-                }
-            ]
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
+          "type": "icon",
+          "id": "icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Feature"
         }
-    ],
-    "defaultBlocks": [
-        {
-            "type": "item",
-            "settings": {
-                "icon": "wifi",
-                "title": "Wi-Fi"
-            }
-        },
-        {
-            "type": "item",
-            "settings": {
-                "icon": "car",
-                "title": "Parking"
-            }
-        },
-        {
-            "type": "item",
-            "settings": {
-                "icon": "waves",
-                "title": "Pool"
-            }
-        },
-        {
-            "type": "item",
-            "settings": {
-                "icon": "dumbbell",
-                "title": "Gym"
-            }
-        },
-        {
-            "type": "item",
-            "settings": {
-                "icon": "utensils",
-                "title": "Restaurant"
-            }
-        },
-        {
-            "type": "item",
-            "settings": {
-                "icon": "bell",
-                "title": "Room Service"
-            }
-        },
-        {
-            "type": "item",
-            "settings": {
-                "icon": "spa",
-                "title": "Spa"
-            }
-        },
-        {
-            "type": "item",
-            "settings": {
-                "icon": "paw",
-                "title": "Pet Friendly"
-            }
-        },
-        {
-            "type": "item",
-            "settings": {
-                "icon": "wind",
-                "title": "Air Conditioning"
-            }
-        },
-        {
-            "type": "item",
-            "settings": {
-                "icon": "user",
-                "title": "Concierge"
-            }
-        },
-        {
-            "type": "item",
-            "settings": {
-                "icon": "shirt",
-                "title": "Laundry"
-            }
-        },
-        {
-            "type": "item",
-            "settings": {
-                "icon": "users",
-                "title": "Meeting Rooms"
-            }
-        }
-    ]
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "item",
+      "settings": {
+        "icon": "wifi",
+        "title": "Wi-Fi"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "icon": "car",
+        "title": "Parking"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "icon": "waves",
+        "title": "Pool"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "icon": "dumbbell",
+        "title": "Gym"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "icon": "utensils",
+        "title": "Restaurant"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "icon": "bell",
+        "title": "Room Service"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "icon": "spa",
+        "title": "Spa"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "icon": "paw",
+        "title": "Pet Friendly"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "icon": "wind",
+        "title": "Air Conditioning"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "icon": "user",
+        "title": "Concierge"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "icon": "shirt",
+        "title": "Laundry"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "icon": "users",
+        "title": "Meeting Rooms"
+      }
+    }
+  ]
 }

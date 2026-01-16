@@ -11,12 +11,24 @@
   <style>
     .widget-{{ widget.id }} {
       & .icon-list-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-2xl);
         list-style: none;
         padding: 0;
         margin: 0;
+        row-gap: var(--space-xl);
+        column-gap: var(--space-lg);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        @media (min-width: 750px) {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        @media (min-width: 990px) {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @media (min-width: 1200px) {
+          grid-template-columns: repeat(var(--grid-cols-desktop, 4), minmax(0, 1fr));
+        }
       }
 
       & .icon-list-item {
@@ -24,7 +36,7 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: var(--space-md);
+        gap: var(--space-sm);
       }
 
       & .icon-list-icon {
@@ -39,18 +51,6 @@
         font-weight: var(--font-weight-normal);
         color: var(--text-content);
         margin: 0;
-      }
-
-      @media (min-width: 750px) {
-        & .icon-list-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-      }
-
-      @media (min-width: 990px) {
-        & .icon-list-grid {
-          grid-template-columns: repeat(6, 1fr);
-        }
       }
     }
   </style>
@@ -77,7 +77,10 @@
     {% endif %}
 
     <div class="widget-content">
-      <ul class="icon-list-grid">
+      <ul
+        class="icon-list-grid widget-grid"
+        style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
+      >
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
           <li class="icon-list-item" data-block-id="{{ blockId }}">

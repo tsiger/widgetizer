@@ -35,6 +35,15 @@
       ]
     },
     {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns (Desktop)",
+      "default": 4,
+      "min": 2,
+      "max": 5,
+      "step": 1
+    },
+    {
       "type": "checkbox",
       "id": "animate",
       "label": "Animate numbers",
