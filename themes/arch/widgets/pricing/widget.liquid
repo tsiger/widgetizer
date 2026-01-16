@@ -47,46 +47,6 @@
       }
 
       /* Smart layout for different item counts */
-
-      /* 1 item: centered with grid column width */
-      & .widget-card-grid:has(> :nth-child(1):last-child) {
-        display: flex;
-        justify-content: center;
-      }
-
-      @media (min-width: 990px) {
-        & .widget-card-grid:has(> :nth-child(1):last-child) > .widget-card {
-          /* Match width of 1 column in 3-column grid */
-          width: calc((var(--container-max-width) - (2 * var(--space-lg))) / 3);
-          max-width: 100%;
-        }
-      }
-
-      /* 2 items: centered in constrained container */
-      & .widget-card-grid:has(> :nth-child(2):last-child) {
-        max-width: var(--content-width-md); /* 80rem = 800px */
-        margin-inline: auto;
-      }
-
-      @media (min-width: 750px) {
-        & .widget-card-grid:has(> :nth-child(2):last-child) {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-
-      /* 3 items: centered in constrained container */
-      & .widget-card-grid:has(> :nth-child(3):last-child) {
-        max-width: var(--content-width-lg); /* 90rem = 900px */
-        margin-inline: auto;
-      }
-
-      @media (min-width: 990px) {
-        & .widget-card-grid:has(> :nth-child(3):last-child) {
-          grid-template-columns: repeat(3, 1fr);
-        }
-      }
-
-      /* 4+ items: use full responsive grid (default behavior) */
     }
   </style>
 
@@ -110,7 +70,10 @@
     {% endif %}
 
     <div class="widget-content">
-      <ul class="widget-card-grid">
+      <ul
+        class="widget-card-grid widget-grid"
+        style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
+      >
         {% assign item_heading_level = 'h3' %}
         {% if widget.settings.title == blank %}
           {% assign item_heading_level = 'h2' %}

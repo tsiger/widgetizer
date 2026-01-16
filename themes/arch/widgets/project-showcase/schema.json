@@ -27,6 +27,15 @@
       "label": "Display"
     },
     {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns (Desktop)",
+      "default": 3,
+      "min": 2,
+      "max": 5,
+      "step": 1
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
@@ -98,6 +107,20 @@
       "settings": {
         "title": "Corporate Website",
         "description": "Professional web presence for a growing enterprise"
+      }
+    },
+    {
+      "type": "project",
+      "settings": {
+        "title": "SaaS Dashboard",
+        "description": "Analytics-driven control center for product teams"
+      }
+    },
+    {
+      "type": "project",
+      "settings": {
+        "title": "Restaurant Branding",
+        "description": "Visual identity and menu system for a modern bistro"
       }
     }
   ]

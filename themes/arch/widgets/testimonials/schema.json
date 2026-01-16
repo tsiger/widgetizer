@@ -25,6 +25,15 @@
       "label": "Display"
     },
     {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns (Desktop)",
+      "default": 4,
+      "min": 2,
+      "max": 5,
+      "step": 1
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
@@ -113,6 +122,51 @@
         "quote": "From start to finish, the experience was seamless. They truly understand what their customers need.",
         "name": "Emily Rodriguez",
         "title": "Operations Manager",
+        "rating": "5"
+      }
+    },
+    {
+      "type": "quote",
+      "settings": {
+        "quote": "Their team brought our vision to life with clarity and care. The outcome exceeded expectations.",
+        "name": "Daniel Nguyen",
+        "title": "Product Lead, BrightWave",
+        "rating": "5"
+      }
+    },
+    {
+      "type": "quote",
+      "settings": {
+        "quote": "Reliable, fast, and thoughtful. The partnership felt effortless from day one.",
+        "name": "Aisha Patel",
+        "title": "COO, Northbridge Labs",
+        "rating": "5"
+      }
+    },
+    {
+      "type": "quote",
+      "settings": {
+        "quote": "We saw immediate improvements after launch. The team handled every detail with precision.",
+        "name": "Lucas Martin",
+        "title": "Director of Growth, Vantage",
+        "rating": "5"
+      }
+    },
+    {
+      "type": "quote",
+      "settings": {
+        "quote": "Clear communication and outstanding results. It was one of our best project experiences.",
+        "name": "Priya Desai",
+        "title": "Founder, Studio Lumen",
+        "rating": "5"
+      }
+    },
+    {
+      "type": "quote",
+      "settings": {
+        "quote": "The quality of work and attention to detail set them apart. Highly recommended.",
+        "name": "Ethan Brooks",
+        "title": "Head of Design, Orion",
         "rating": "5"
       }
     }

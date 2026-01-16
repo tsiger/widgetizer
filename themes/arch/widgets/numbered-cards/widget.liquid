@@ -38,7 +38,10 @@
     {% endif %}
 
     <div class="widget-content">
-      <ul class="widget-card-grid">
+      <ul
+        class="widget-card-grid widget-grid"
+        style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
+      >
         {% assign item_heading_level = 'h3' %}
         {% if widget.settings.title == blank %}
           {% assign item_heading_level = 'h2' %}
