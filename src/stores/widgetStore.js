@@ -69,6 +69,17 @@ const useWidgetStore = create((set, get) => ({
     });
   },
 
+  resetSelection: () => {
+    set({
+      selectedWidgetId: null,
+      selectedBlockId: null,
+      selectedGlobalWidgetId: null,
+      selectedThemeGroup: null,
+      hoveredWidgetId: null,
+      hoveredBlockId: null,
+    });
+  },
+
   generateWidgetId: () => {
     return `widget_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   },

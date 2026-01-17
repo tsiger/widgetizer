@@ -41,6 +41,7 @@ export default function PageEditor() {
     const pageId = searchParams.get("pageId");
     // Always call loadPage, even with null pageId - it handles the null case properly
     usePageStore.getState().loadPage(pageId);
+    useWidgetStore.getState().resetSelection();
     if (pageId) {
       useWidgetStore.getState().loadSchemas();
     }
