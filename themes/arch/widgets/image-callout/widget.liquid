@@ -1,7 +1,7 @@
 <section
   id="{{ widget.id }}"
   class="widget widget-image-callout widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
-  {% if widget.settings.color_scheme == 'dark' %}
+  {% if widget.settings.color_scheme == 'highlight' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
@@ -106,7 +106,7 @@
     }
   </style>
 
-  <div class="widget-container {% if widget.settings.color_scheme == 'dark' %}widget-container-padded{% endif %}">
+  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
     <div class="callout-wrapper">
       <div class="callout-image-wrapper">
         {% if widget.settings.image != blank %}

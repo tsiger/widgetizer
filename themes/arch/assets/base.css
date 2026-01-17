@@ -139,8 +139,8 @@ img {
    COLOR SCHEME SYSTEM
    ========================================================================== */
 
-/* Light-on-light color scheme (default) */
-.color-scheme-light {
+/* Standard color scheme (default) */
+.color-scheme-standard {
   --text-heading: var(--colors-light_text_heading, #000);
   --text-content: var(--colors-light_text_content, #333);
   --text-muted: var(--colors-light_text_muted, #666);
@@ -151,8 +151,8 @@ img {
   --accent-text: var(--colors-light_accent_text, #fff);
 }
 
-/* Light-on-dark color scheme */
-.color-scheme-dark {
+/* Highlight color scheme (for emphasis) */
+.color-scheme-highlight {
   --text-heading: var(--colors-dark_text_heading, #fff);
   --text-content: var(--colors-dark_text_content, #e0e0e0);
   --text-muted: var(--colors-dark_text_muted, #888);

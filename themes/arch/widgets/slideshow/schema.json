@@ -180,10 +180,10 @@
           "type": "select",
           "id": "color_scheme",
           "label": "Color Scheme",
-          "default": "dark",
+          "default": "highlight",
           "options": [
-            { "value": "light", "label": "Light" },
-            { "value": "dark", "label": "Dark" }
+            { "value": "standard", "label": "Standard" },
+            { "value": "highlight", "label": "Highlight" }
           ]
         }
       ]
@@ -193,7 +193,7 @@
     {
       "type": "slide",
       "settings": {
-        "color_scheme": "dark",
+        "color_scheme": "highlight",
         "heading_text": "Your First Slide",
         "heading_size": "5xl",
         "text_content": "Add your content here",
@@ -209,7 +209,7 @@
     {
       "type": "slide",
       "settings": {
-        "color_scheme": "dark",
+        "color_scheme": "highlight",
         "heading_text": "Your Second Slide",
         "heading_size": "5xl",
         "text_content": "Add your content here",

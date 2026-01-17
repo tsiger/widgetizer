@@ -83,15 +83,15 @@
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
-      "default": "light",
+      "default": "standard",
       "options": [
         {
-          "value": "light",
-          "label": "Light"
+          "value": "standard",
+          "label": "Standard"
         },
         {
-          "value": "dark",
-          "label": "Dark"
+          "value": "highlight",
+          "label": "Highlight"
         }
       ]
     }
