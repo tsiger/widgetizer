@@ -127,6 +127,16 @@
           }
         },
         {
+          "type": "link",
+          "id": "button_link_2",
+          "label": "Button 2"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "Display"
+        },
+        {
           "type": "select",
           "id": "button_style",
           "label": "Button 1 style",
@@ -135,11 +145,6 @@
             { "value": "primary", "label": "Primary" },
             { "value": "secondary", "label": "Secondary" }
           ]
-        },
-        {
-          "type": "link",
-          "id": "button_link_2",
-          "label": "Button 2"
         },
         {
           "type": "select",
@@ -162,11 +167,6 @@
             { "value": "large", "label": "Large" },
             { "value": "xlarge", "label": "Extra Large" }
           ]
-        },
-        {
-          "type": "header",
-          "id": "display_header",
-          "label": "Display"
         },
         {
           "type": "color",

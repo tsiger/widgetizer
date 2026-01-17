@@ -63,12 +63,6 @@
     & .widget-actions-single {
       justify-content: center;
     }
-
-    /* Larger buttons */
-    & .widget-button {
-      padding: 1.6rem 3.2rem;
-      font-size: var(--font-size-lg);
-    }
   }
 
   /* Navigation */

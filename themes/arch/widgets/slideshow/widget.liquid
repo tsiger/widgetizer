@@ -1,5 +1,8 @@
 {% enqueue_style "slideshow.css", { "priority": 30 } %}
-{% enqueue_script "slideshow.js", { "priority": 30 } %}
+{% assign slide_count = widget.blocksOrder.size %}
+{% if slide_count > 1 %}
+  {% enqueue_script "slideshow.js", { "priority": 30 } %}
+{% endif %}
 
 <section
   id="{{ widget.id }}"
@@ -95,38 +98,40 @@
       </div>
     {% endfor %}
 
-    <!-- Navigation -->
-    <button class="slideshow-nav slideshow-prev" aria-label="Previous slide">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </button>
-    <button class="slideshow-nav slideshow-next" aria-label="Next slide">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </button>
-
-    {% if widget.settings.autoplay %}
-      <button
-        class="slideshow-toggle visually-hidden"
-        type="button"
-        aria-pressed="false"
-        aria-label="Pause autoplay"
-      >
-        Pause
+    {% if slide_count > 1 %}
+      <!-- Navigation -->
+      <button class="slideshow-nav slideshow-prev" aria-label="Previous slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </button>
-    {% endif %}
+      <button class="slideshow-nav slideshow-next" aria-label="Next slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
 
-    <!-- Pagination -->
-    <div class="slideshow-pagination">
-      {% for blockId in widget.blocksOrder %}
+      {% if widget.settings.autoplay %}
         <button
-          class="slideshow-dot{% if forloop.first %} is-active{% endif %}"
-          data-index="{{ forloop.index0 }}"
-          aria-label="Go to slide {{ forloop.index }}"
-        ></button>
-      {% endfor %}
-    </div>
+          class="slideshow-toggle visually-hidden"
+          type="button"
+          aria-pressed="false"
+          aria-label="Pause autoplay"
+        >
+          Pause
+        </button>
+      {% endif %}
+
+      <!-- Pagination -->
+      <div class="slideshow-pagination">
+        {% for blockId in widget.blocksOrder %}
+          <button
+            class="slideshow-dot{% if forloop.first %} is-active{% endif %}"
+            data-index="{{ forloop.index0 }}"
+            aria-label="Go to slide {{ forloop.index }}"
+          ></button>
+        {% endfor %}
+      </div>
+    {% endif %}
   </div>
 </section>

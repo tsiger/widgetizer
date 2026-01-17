@@ -201,13 +201,13 @@
           "href": "#",
           "target": "_self"
         },
-        "style": "secondary",
+        "style": "primary",
         "link_2": {
           "text": "Get Started",
           "href": "#",
           "target": "_self"
         },
-        "style_2": "primary"
+        "style_2": "secondary"
       }
     }
   ]
