@@ -21,9 +21,23 @@
     {
       "label": "Case Studies",
       "link": "case-studies.html",
-      "items": []
+      "items": [
+        {
+          "label": "Atlas Group",
+          "link": "case-study-atlas-growth.html",
+          "items": []
+        },
+        {
+          "label": "Momentum",
+          "link": "case-study-momentum-ops.html",
+          "items": []
+        },
+        {
+          "label": "Regency Health",
+          "link": "case-study-regency-entry.html",
+          "items": []
+        }
+      ]
     }
-  ],
-  "created": "2026-01-02T20:26:13.166Z",
-  "updated": "2026-01-02T20:26:36.345Z"
+  ]
 }
