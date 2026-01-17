@@ -721,11 +721,6 @@ h6 {
   background-color: var(--accent);
   color: var(--accent-text);
   border-color: var(--accent);
-
-  &:hover {
-    background-color: transparent;
-    color: var(--accent-text);
-  }
 }
 
 /* Secondary Button - Outlined with accent color */

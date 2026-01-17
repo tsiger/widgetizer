@@ -92,27 +92,6 @@
         }
       }
 
-      & .timeline-features {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        margin-block-start: var(--space-md);
-      }
-
-      & .feature-item {
-        padding-block: var(--space-xs);
-        padding-inline-start: var(--space-lg);
-        position: relative;
-
-        &::before {
-          content: "✓";
-          position: absolute;
-          inset-inline-start: 0;
-          inset-block-start: var(--space-xs);
-          color: var(--text-heading);
-        }
-      }
-
       @media (min-width: 750px) {
         & .timeline-item {
           padding-inline-start: 5rem;
@@ -188,8 +167,7 @@
             justify-content: center;
           }
 
-
-          & .timeline-features {
+          & .features-list {
             text-align: start;
           }
         }
@@ -317,13 +295,30 @@
               {% endif %}
 
               {% if block.settings.features != blank %}
-                <ul class="timeline-features">
-                  {% assign features = block.settings.features | split: '
-' %}
-                  {% for feature in features %}
+                <ul class="features-list" data-block-id="{{ blockId }}">
+                  {% assign normalized_features = block.settings.features | replace: '\r\n', '\n' %}
+                  {% assign features_list = normalized_features | split: '\n' %}
+                  {% for feature in features_list %}
                     {% assign trimmed_feature = feature | strip %}
                     {% if trimmed_feature != blank %}
-                      <li class="feature-item block-text block-text-sm block-text-muted">{{ trimmed_feature }}</li>
+                      {% assign feature_text = trimmed_feature %}
+                      {% assign icon_name = '' %}
+                      {% assign first_char = trimmed_feature | slice: 0, 1 %}
+                      {% if first_char == '+' %}
+                        {% assign icon_name = 'check' %}
+                        {% assign feature_text = trimmed_feature | remove_first: '+' | strip %}
+                      {% elsif first_char == '-' %}
+                        {% assign icon_name = 'x' %}
+                        {% assign feature_text = trimmed_feature | remove_first: '-' | strip %}
+                      {% endif %}
+                      <li class="feature-item block-text">
+                        {% if icon_name != blank %}
+                          <span class="feature-icon">
+                            {% render 'icon', icon: icon_name, class: 'feature-icon-svg' %}
+                          </span>
+                        {% endif %}
+                        <span>{{ feature_text }}</span>
+                      </li>
                     {% endif %}
                   {% endfor %}
                 </ul>
