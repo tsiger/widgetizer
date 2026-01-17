@@ -360,7 +360,7 @@ export default function IconInput({ value, onChange, options, allow_patterns, de
               onClick={() => onChange(defaultValue || "")}
               className="text-xs text-slate-500 hover:text-pink-600 hover:underline transition-colors"
             >
-              Reset to default
+              Clear selection
             </button>
           )}
         </>
