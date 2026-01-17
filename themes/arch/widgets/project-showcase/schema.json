@@ -90,7 +90,8 @@
         {
           "type": "link",
           "id": "link",
-          "label": "Project Link"
+          "label": "Project Link",
+          "hide_text": true
         }
       ]
     }

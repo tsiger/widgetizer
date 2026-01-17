@@ -148,7 +148,8 @@
         {
           "type": "link",
           "id": "link",
-          "label": "Link URL"
+          "label": "Link URL",
+          "hide_text": true
         }
       ]
     }

@@ -95,7 +95,8 @@
         {
           "type": "link",
           "id": "link",
-          "label": "Link"
+          "label": "Link",
+          "hide_text": true
         },
         {
           "type": "header",

@@ -6,14 +6,14 @@ import CheckboxInput from "./CheckboxInput";
 import SettingsField from "../SettingsField";
 import Combobox from "../../ui/Combobox";
 
-export default function LinkInput({ id, value = {}, onChange }) {
+export default function LinkInput({ id, value = {}, onChange, setting }) {
   const [pages, setPages] = useState([]);
 
   useEffect(() => {
     async function fetchPages() {
       try {
         const allPages = await getAllPages();
-        setPages(allPages.map((p) => ({ value: `/pages/${p.slug}`, label: p.name })));
+        setPages(allPages.map((p) => ({ value: `${p.slug}.html`, label: p.name })));
       } catch (error) {
         console.error("Failed to load pages:", error);
       }
@@ -28,6 +28,7 @@ export default function LinkInput({ id, value = {}, onChange }) {
 
   const { href = "", text = "", target = "_self" } = value;
   const openInNewTab = target === "_blank";
+  const hideText = Boolean(setting?.hide_text);
 
   return (
     <div className="space-y-4 rounded-md border border-slate-200 bg-slate-50 p-4">
@@ -41,15 +42,16 @@ export default function LinkInput({ id, value = {}, onChange }) {
         />
       </SettingsField>
 
-      {/* Text Input */}
-      <SettingsField id={`${id}-text`} label="Link Text">
-        <TextInput
-          id={`${id}-text-input`}
-          placeholder="e.g., Learn More"
-          value={text}
-          onChange={(val) => handleChange("text", val)}
-        />
-      </SettingsField>
+      {!hideText && (
+        <SettingsField id={`${id}-text`} label="Link Text">
+          <TextInput
+            id={`${id}-text-input`}
+            placeholder="e.g., Learn More"
+            value={text}
+            onChange={(val) => handleChange("text", val)}
+          />
+        </SettingsField>
+      )}
 
       {/* Target Checkbox */}
       <SettingsField id={`${id}-target`} label="Open in new tab">

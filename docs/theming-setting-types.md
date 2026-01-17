@@ -353,6 +353,10 @@ A compound control for creating links. This is useful for buttons, banners, or a
 - **`text`** (string): The display text for the link (e.g., "Learn More").
 - **`target`** (string): The link target, either `_self` to open in the same tab or `_blank` to open in a new tab.
 
+**Optional Properties:**
+
+- **`hide_text`** (boolean, optional): If `true`, hides the link text field in the editor UI. Useful for links that wrap entire cards or icons where no visible label is rendered.
+
 The UI for this setting type provides a choice between selecting from a list of existing pages or entering a custom URL, along with inputs for the link text and a toggle for the target.
 
 ```json
@@ -366,6 +370,17 @@ The UI for this setting type provides a choice between selecting from a list of 
     "target": "_self"
   },
   "description": "The primary call-to-action link in the hero section."
+}
+```
+
+**Example (link without text):**
+
+```json
+{
+  "id": "card_link",
+  "type": "link",
+  "label": "Card Link",
+  "hide_text": true
 }
 ```
 

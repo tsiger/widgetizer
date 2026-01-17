@@ -69,7 +69,8 @@
         {
           "type": "link",
           "id": "link",
-          "label": "Link (optional)"
+          "label": "Link (optional)",
+          "hide_text": true
         }
       ]
     }

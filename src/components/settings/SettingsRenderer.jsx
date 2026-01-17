@@ -93,7 +93,7 @@ export default function SettingsRenderer({ setting, value, onChange, error, isFi
       case "audio":
         return <AudioInput {...inputProps} />;
       case "link":
-        return <LinkInput {...inputProps} />;
+        return <LinkInput {...inputProps} setting={setting} />;
       case "youtube":
         return <YouTubeInput {...inputProps} setting={setting} />;
       case "icon":

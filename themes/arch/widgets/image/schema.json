@@ -22,7 +22,8 @@
             "type": "link",
             "id": "link",
             "label": "Link",
-            "description": "Optional link when image is clicked."
+            "description": "Optional link when image is clicked.",
+            "hide_text": true
         },
         {
             "type": "header",
