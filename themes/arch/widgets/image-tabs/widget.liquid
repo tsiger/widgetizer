@@ -192,10 +192,10 @@
                 tabindex="{% if first_tab %}0{% else %}-1{% endif %}"
               >
                 {% if block.settings.title != blank %}
-                  <{{ tab_heading_level }} class="image-tabs-tab-title block-text block-text-lg block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</{{ tab_heading_level }}>
+                  <{{ tab_heading_level }} class="image-tabs-tab-title block-text block-text-lg block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ tab_heading_level }}>
                 {% endif %}
                 {% if block.settings.description != blank %}
-                  <p class="image-tabs-tab-description block-text block-text-sm block-text-muted" data-setting="description">{{ block.settings.description }}</p>
+                  <p class="image-tabs-tab-description block-text block-text-sm" data-setting="description">{{ block.settings.description }}</p>
                 {% endif %}
               </button>
             </li>

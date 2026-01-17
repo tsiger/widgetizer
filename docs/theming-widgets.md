@@ -219,10 +219,9 @@ Your theme should define a consistent set of CSS custom properties (design token
 --line-height-normal: 1.5;
 --line-height-relaxed: 1.6;
 
---font-weight-normal: 400;
---font-weight-medium: 500;
---font-weight-semibold: 600;
---font-weight-bold: 700;
+--typography-heading_font-weight: 700;
+--typography-body_font-weight: 400;
+--typography-body_font_bold-weight: 700;
 ```
 
 ### Color Tokens

@@ -155,7 +155,7 @@
               aria-controls="accordion-content-{{ widget.id }}-{{ blockId }}"
               id="accordion-trigger-{{ widget.id }}-{{ blockId }}"
             >
-              <span class="accordion-question block-text block-text-lg block-text-medium" data-setting="question">{{ block.settings.question }}</span>
+              <span class="accordion-question block-text block-text-lg block-text-body-bold" data-setting="question">{{ block.settings.question }}</span>
               <span class="accordion-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -176,7 +176,7 @@
               role="region"
               aria-labelledby="accordion-trigger-{{ widget.id }}-{{ blockId }}"
             >
-              <p class="accordion-answer block-text block-text-muted" data-setting="answer">{{ block.settings.answer }}</p>
+              <p class="accordion-answer block-text" data-setting="answer">{{ block.settings.answer }}</p>
             </div>
           </li>
         {% endfor %}

@@ -174,7 +174,7 @@
         <li>
           <button
             type="button"
-            class="job-filter-btn block-text block-text-sm block-text-muted is-active"
+            class="job-filter-btn block-text block-text-sm is-active"
             data-filter="all"
             aria-pressed="true"
           >
@@ -186,7 +186,7 @@
             <li>
               <button
                 type="button"
-                class="job-filter-btn block-text block-text-sm block-text-muted"
+                class="job-filter-btn block-text block-text-sm"
                 data-filter="{{ dept }}"
                 aria-pressed="false"
               >
@@ -214,8 +214,8 @@
           >
             <div class="widget-card-content">
               <div class="job-header">
-                <{{ item_heading_level }} class="widget-card-title block-text block-text-xl block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
-                <div class="job-meta block-text block-text-sm block-text-muted">
+                <{{ item_heading_level }} class="widget-card-title block-text block-text-xl block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                <div class="job-meta block-text block-text-sm">
                   <span class="job-meta-item">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" />
@@ -229,7 +229,7 @@
                     </svg>
                     <span data-setting="location">{{ block.settings.location }}</span>
                   </span>
-                  <span class="job-badge block-text block-text-xs block-text-uppercase block-text-muted">
+                  <span class="job-badge block-text block-text-xs block-text-uppercase">
                     {% case block.settings.type %}
                       {% when 'full-time' -%}
                         Full-Time

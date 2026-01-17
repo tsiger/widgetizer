@@ -197,7 +197,6 @@
         cursor: pointer;
         display: flex;
         align-items: center;
-        color: var(--text-muted);
         transition: color 0.2s;
 
         &:hover {
@@ -281,7 +280,6 @@
 
       & .playlist-index {
         font-size: var(--font-size-sm);
-        color: var(--text-muted);
         min-width: 2rem;
       }
 
@@ -302,12 +300,10 @@
 
       & .playlist-meta {
         font-size: var(--font-size-sm);
-        color: var(--text-muted);
       }
 
       & .playlist-duration {
         font-size: var(--font-size-sm);
-        color: var(--text-muted);
         font-variant-numeric: tabular-nums;
       }
 
@@ -392,11 +388,11 @@
               {% endif %}
 
               {% if first_block.settings.episode_number != blank %}
-                <span class="block-text block-text-sm block-text-uppercase block-text-muted" id="ep-number-{{ widget.id }}">{{ first_block.settings.episode_number }}</span>
+                <span class="block-text block-text-sm block-text-uppercase" id="ep-number-{{ widget.id }}">{{ first_block.settings.episode_number }}</span>
               {% endif %}
-              <{{ item_heading_level }} class="block-text block-text-xl block-text-bold block-text-heading" id="ep-title-{{ widget.id }}">{{ first_block.settings.title }}</{{ item_heading_level }}>
-              
-              <div class="audio-player-episode-meta block-text block-text-sm block-text-muted">
+              <{{ item_heading_level }} class="block-text block-text-xl block-text-heading-weight block-text-heading" id="ep-title-{{ widget.id }}">{{ first_block.settings.title }}</{{ item_heading_level }}>
+
+              <div class="audio-player-episode-meta block-text block-text-sm">
                 {% if first_block.settings.duration != blank %}
                 <div class="audio-player-episode-meta-item">
                   <svg class="audio-player-episode-meta-icon" viewBox="0 0 24 24">
@@ -420,7 +416,7 @@
               </div>
 
               {% if first_block.settings.description != blank %}
-                <p class="block-text block-text-base block-text-muted" id="ep-desc-{{ widget.id }}">{{ first_block.settings.description }}</p>
+                <p class="block-text block-text-base" id="ep-desc-{{ widget.id }}">{{ first_block.settings.description }}</p>
               {% endif %}
             </div>
 
@@ -439,7 +435,7 @@
                 >
                   <div class="audio-player-progress-fill"></div>
                 </div>
-                <div class="audio-player-progress-time block-text block-text-sm block-text-muted">
+                <div class="audio-player-progress-time block-text block-text-sm">
                   <span class="audio-player-current-time">0:00</span>
                   <span class="audio-player-total-duration">{{ first_block.settings.duration | default: '0:00' }}</span>
                 </div>
@@ -518,8 +514,8 @@
         <div class="playlist">
           {% for blockId in widget.blocksOrder %}
             {% assign block = widget.blocks[blockId] %}
-            <button 
-              class="playlist-item {% if forloop.first %}active{% endif %}" 
+            <button
+              class="playlist-item {% if forloop.first %}active{% endif %}"
               data-block-id="{{ blockId }}"
               data-title="{{ block.settings.title | escape }}"
               data-number="{{ block.settings.episode_number | escape }}"
@@ -534,7 +530,7 @@
                 <div class="playlist-meta">{{ block.settings.date }}</div>
               </div>
               <div class="playlist-duration">{{ block.settings.duration }}</div>
-              
+
               <!-- Hidden artwork for JS -->
               <template class="hidden-artwork">
                 {% if block.settings.artwork != blank %}
@@ -583,7 +579,7 @@
       const playIcon = widget.querySelector('.audio-player-icon-play');
       const pauseIcon = widget.querySelector('.audio-player-icon-pause');
       const playlistItems = widget.querySelectorAll('.playlist-item');
-      
+
       const artworkEl = widget.querySelector('#artwork-{{ widget.id }}');
       const titleEl = widget.querySelector('#ep-title-{{ widget.id }}');
       const numberEl = widget.querySelector('#ep-number-{{ widget.id }}');
@@ -663,7 +659,7 @@
             audio.load();
             if (progressFill) progressFill.style.width = '0%';
             if (currentTimeEl) currentTimeEl.textContent = '0:00';
-            
+
             audio.play().then(() => setPlayingState(true)).catch(() => setPlayingState(false));
           }
         });

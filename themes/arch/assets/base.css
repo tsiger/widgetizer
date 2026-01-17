@@ -46,9 +46,7 @@ img {
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.6;
 
-  /* Font Weights - mapped to theme settings */
-  --font-weight-normal: var(--typography-body_font-weight, 400);
-  --font-weight-bold: var(--typography-body_font_bold-weight, 700);
+  /* Font Weights */
   --font-weight-medium: 500; /* Static utility */
   --font-weight-semibold: 600; /* Static utility */
 
@@ -201,7 +199,7 @@ body {
 /* Bold elements use smart bold weight */
 strong,
 b {
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--typography-body_font_bold-weight, 700);
 }
 
 /* Heading styles */
@@ -277,7 +275,7 @@ h6 {
 .widget-eyebrow {
   display: block;
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--typography-body_font_bold-weight, 700);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
@@ -470,7 +468,7 @@ h6 {
 /* Card Subtitle / Eyebrow */
 .widget-card-subtitle {
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--typography-body_font_bold-weight, 700);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
@@ -478,7 +476,7 @@ h6 {
 
 /* Card Description */
 .widget-card-description {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   line-height: var(--line-height-relaxed);
   color: var(--text-content);
   margin-block-end: var(--space-md);
@@ -622,7 +620,7 @@ h6 {
 
 /* Weight modifiers */
 .block-text-normal {
-  font-weight: var(--font-weight-normal);
+  font-weight: var(--typography-body_font-weight, 400);
 }
 
 .block-text-medium {
@@ -633,8 +631,16 @@ h6 {
   font-weight: var(--font-weight-semibold);
 }
 
-.block-text-bold {
-  font-weight: var(--font-weight-bold);
+.block-text-heading-weight {
+  font-weight: var(--typography-heading_font-weight, 700);
+}
+
+.block-text-body-weight {
+  font-weight: var(--typography-body_font_weight, 400);
+}
+
+.block-text-body-bold {
+  font-weight: var(--typography-body_font_bold-weight, 700);
 }
 
 /* Style modifiers */
@@ -667,7 +673,7 @@ h6 {
   gap: var(--space-sm);
   padding: 0.8rem 1.6rem;
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-normal);
+  font-weight: var(--typography-body_font-weight, 400);
   font-family: inherit;
   background-color: transparent;
   color: var(--text-content);
@@ -826,7 +832,7 @@ h6 {
 /* Legacy aliases for backwards compatibility */
 .widget-label {
   display: block;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--typography-body_font_bold-weight, 700);
   margin-block-end: var(--space-xs);
 }
 
@@ -944,7 +950,7 @@ h6 {
     display: block;
     text-decoration: none;
     font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--typography-body_font_bold-weight, 700);
     color: var(--text-heading);
     z-index: 1001;
   }
@@ -1062,7 +1068,7 @@ h6 {
       padding-inline: 0;
       text-decoration: none;
       color: var(--text-content);
-      font-weight: var(--font-weight-normal);
+      font-weight: var(--typography-body_font_weight, 400);
       font-size: var(--font-size-lg);
       background: transparent;
       border: none;
@@ -1113,7 +1119,7 @@ h6 {
       & > a,
       & > button {
         font-size: var(--font-size-sm);
-        font-weight: var(--font-weight-normal);
+        font-weight: var(--typography-body_font-weight, 400);
         padding-block: 1.2rem;
       }
     }
@@ -1310,7 +1316,7 @@ h6 {
     color: var(--text-content);
     text-decoration: none;
     font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-normal);
+    font-weight: var(--typography-body_font-weight, 400);
     transition: color var(--transition-speed-fast);
 
     &:hover {

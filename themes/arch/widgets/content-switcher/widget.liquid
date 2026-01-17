@@ -118,7 +118,7 @@
           {% if widget.settings.option_2_label != blank %}
             <button
               id="switcher-tab-{{ widget.id }}-2"
-              class="switcher-btn block-text block-text-sm block-text-muted"
+              class="switcher-btn block-text block-text-sm"
               data-target="2"
               role="tab"
               aria-selected="false"
@@ -131,7 +131,7 @@
           {% if widget.settings.switcher_type == 'tabs' and widget.settings.option_3_label != blank %}
             <button
               id="switcher-tab-{{ widget.id }}-3"
-              class="switcher-btn block-text block-text-sm block-text-muted"
+              class="switcher-btn block-text block-text-sm"
               data-target="3"
               role="tab"
               aria-selected="false"
@@ -349,13 +349,11 @@
         buttons.forEach((b) => {
           b.classList.remove('is-active');
           b.classList.remove('block-text-heading');
-          b.classList.add('block-text-muted');
           b.setAttribute('aria-selected', 'false');
           b.setAttribute('tabindex', '-1');
         });
 
         button.classList.add('is-active');
-        button.classList.remove('block-text-muted');
         button.classList.add('block-text-heading');
         button.setAttribute('aria-selected', 'true');
         button.setAttribute('tabindex', '0');

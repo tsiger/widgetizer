@@ -187,9 +187,9 @@
             <div class="bento-content">
               {% if block.settings.title != blank %}
                 {% if forloop.first %}
-                  <{{ first_item_level }} class="widget-title block-text block-text-xl block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</{{ first_item_level }}>
+                  <{{ first_item_level }} class="widget-title block-text block-text-xl block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ first_item_level }}>
                 {% else %}
-                  <{{ other_items_level }} class="widget-title block-text block-text-xl block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</{{ other_items_level }}>
+                  <{{ other_items_level }} class="widget-title block-text block-text-xl block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ other_items_level }}>
                 {% endif %}
               {% endif %}
               {% if block.settings.text != blank %}

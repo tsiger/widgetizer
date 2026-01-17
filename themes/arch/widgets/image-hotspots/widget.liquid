@@ -285,7 +285,7 @@
             >
               <div class="image-hotspot-tooltip-header">
                 {% if block.settings.title != blank %}
-                  <h3 class="image-hotspot-tooltip-title block-text block-text-lg block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
+                  <h3 class="image-hotspot-tooltip-title block-text block-text-lg block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
                 {% endif %}
                 <button type="button" class="image-hotspot-tooltip-close" aria-label="Close tooltip">
                   <svg class="image-hotspot-tooltip-close-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -295,7 +295,7 @@
               </div>
 
               {% if block.settings.description != blank %}
-                <p class="image-hotspot-tooltip-description block-text block-text-sm block-text-muted" data-setting="description">
+                <p class="image-hotspot-tooltip-description block-text block-text-sm" data-setting="description">
                   {{ block.settings.description }}
                 </p>
               {% endif %}

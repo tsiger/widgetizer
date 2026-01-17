@@ -110,10 +110,10 @@
             {% if block.settings.title != blank or block.settings.category != blank %}
               <div class="widget-card-content">
                 {% if block.settings.title != blank %}
-                  <{{ item_heading_level }} class="widget-card-title block-text block-text-base block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                  <{{ item_heading_level }} class="widget-card-title block-text block-text-base block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
                 {% endif %}
                 {% if block.settings.category != blank %}
-                  <p class="widget-card-category block-text block-text-sm block-text-muted" data-setting="category">{{ block.settings.category }}</p>
+                  <p class="widget-card-category block-text block-text-sm" data-setting="category">{{ block.settings.category }}</p>
                 {% endif %}
               </div>
             {% endif %}

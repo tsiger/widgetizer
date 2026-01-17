@@ -28,11 +28,11 @@
             {% if block.settings.heading_text != blank %}
               {% assign size_class = 'block-text-' | append: block.settings.heading_size %}
               {% if widget.index == 1 and forloop.first %}
-                <h1 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="heading_text">
+                <h1 class="widget-headline block-text {{ size_class }} block-text-heading-weight block-text-heading" data-block-id="{{ blockId }}" data-setting="heading_text">
                   {{ block.settings.heading_text }}
                 </h1>
               {% else %}
-                <h2 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading" data-block-id="{{ blockId }}" data-setting="heading_text">
+                <h2 class="widget-headline block-text {{ size_class }} block-text-heading-weight block-text-heading" data-block-id="{{ blockId }}" data-setting="heading_text">
                   {{ block.settings.heading_text }}
                 </h2>
               {% endif %}

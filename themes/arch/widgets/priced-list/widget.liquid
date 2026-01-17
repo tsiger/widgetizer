@@ -152,7 +152,7 @@
             <div class="priced-item-content">
               <div class="priced-item-header">
                 {% if block.settings.name != blank %}
-                  <{{ item_heading_level }} class="priced-item-name block-text block-text-lg block-text-bold block-text-heading" data-setting="name">{{ block.settings.name }}</{{ item_heading_level }}>
+                  <{{ item_heading_level }} class="priced-item-name block-text block-text-lg block-text-heading-weight block-text-heading" data-setting="name">{{ block.settings.name }}</{{ item_heading_level }}>
                 {% endif %}
                 <div class="priced-item-badges">
                   {% if block.settings.vegetarian %}
@@ -182,7 +182,7 @@
                 </div>
               </div>
               {% if block.settings.description != blank %}
-                <p class="priced-item-description block-text block-text-sm block-text-muted" data-setting="description">{{ block.settings.description }}</p>
+                <p class="priced-item-description block-text block-text-sm" data-setting="description">{{ block.settings.description }}</p>
               {% endif %}
             </div>
             <div class="priced-item-right">

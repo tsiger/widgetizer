@@ -309,7 +309,7 @@
                 {% if widget.settings.title == blank %}
                   {% assign item_heading_level = 'h2' %}
                 {% endif %}
-                <{{ item_heading_level }} class="timeline-title block-text block-text-xl block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                <{{ item_heading_level }} class="timeline-title block-text block-text-xl block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
               {% endif %}
 
               {% if block.settings.description != blank %}
