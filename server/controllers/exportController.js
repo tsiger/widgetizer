@@ -222,10 +222,21 @@ export async function exportProject(req, res) {
 
         // 2. Generate robots.txt
         const sitemapUrl = new URL("sitemap.xml", siteUrl).href;
-        const robotsContent = `User-agent: *
-Allow: /
-
-Sitemap: ${sitemapUrl}`;
+        const disallowPaths = Array.from(
+          new Set(
+            pagesDataArray
+              .filter((page) => page.seo?.robots?.includes("noindex"))
+              .map((page) => {
+                const pageId = page.id || page.slug;
+                if (!pageId) return null;
+                const filename = pageId === "index" || pageId === "home" ? "index.html" : `${pageId}.html`;
+                return `/${filename}`;
+              })
+              .filter(Boolean),
+          ),
+        );
+        const robotsLines = ["User-agent: *", "Allow: /", ...disallowPaths.map((path) => `Disallow: ${path}`), "", `Sitemap: ${sitemapUrl}`];
+        const robotsContent = robotsLines.join("\n");
 
         await fs.writeFile(path.join(outputDir, "robots.txt"), robotsContent);
       } catch (err) {

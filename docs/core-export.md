@@ -116,7 +116,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
 
     - If the project has a `siteUrl` defined, the system automatically generates:
       - **`sitemap.xml`**: A complete sitemap of all indexed pages (respecting SEO metadata).
-      - **`robots.txt`**: A standard instructions file for search engines, including the sitemap location.
+      - **`robots.txt`**: A standard instructions file for search engines, including the sitemap location and disallow rules for pages marked `noindex`.
 
 7.  **Format and Write HTML Files**:
 
