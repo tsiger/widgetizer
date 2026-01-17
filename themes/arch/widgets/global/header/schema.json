@@ -29,7 +29,7 @@
       "id": "logoText",
       "label": "Logo Text",
       "description": "Text to display in the header logo",
-      "default": "Widgetizer"
+      "default": "Arch"
     },
     {
       "type": "header",
@@ -49,8 +49,8 @@
       "label": "CTA Button",
       "description": "Call-to-action button (leave text empty to hide)",
       "default": {
-        "href": "/get-started",
-        "text": "Get Started",
+        "href": "contact.html",
+        "text": "Get in touch",
         "target": "_self"
       }
     },

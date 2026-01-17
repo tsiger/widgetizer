@@ -1,0 +1,292 @@
+{
+  "name": "Case Study: Atlas Group",
+  "slug": "case-study-atlas-growth",
+  "widgets": {
+    "case_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "case-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Case study",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "case-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Atlas Group: Growth strategy reset",
+            "size": "4xl"
+          }
+        },
+        "case-text": {
+          "type": "text",
+          "settings": {
+            "text": "Rebuilt positioning and pipeline to support the next stage of growth.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "case-eyebrow",
+        "case-heading",
+        "case-text"
+      ]
+    },
+    "case_overview": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "overview-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Engagement overview",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "overview-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Clarity on segments, offers, and pipeline",
+            "size": "3xl"
+          }
+        },
+        "overview-body": {
+          "type": "text",
+          "settings": {
+            "text": "Atlas Group had strong demand signals but inconsistent qualification and messaging. We realigned target segments, refreshed the value narrative, and built a consistent pipeline motion across sales and marketing.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "overview-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Segmented ICP and offer design\n+ Messaging framework and proof points\n+ Pipeline stages and qualification rules"
+          }
+        }
+      },
+      "blocksOrder": [
+        "overview-eyebrow",
+        "overview-heading",
+        "overview-body",
+        "overview-features"
+      ]
+    },
+    "case_metrics": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Impact",
+        "title": "Results delivered",
+        "description": "Measured changes after the repositioning and GTM relaunch.",
+        "columns_desktop": 3,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "metric-1": {
+          "type": "figure",
+          "settings": {
+            "number": "32",
+            "suffix": "%",
+            "label": "Qualified pipeline growth",
+            "description": "Within two quarters"
+          }
+        },
+        "metric-2": {
+          "type": "figure",
+          "settings": {
+            "number": "18",
+            "suffix": "%",
+            "label": "Win-rate lift",
+            "description": "After repositioning"
+          }
+        },
+        "metric-3": {
+          "type": "figure",
+          "settings": {
+            "number": "6",
+            "suffix": "weeks",
+            "label": "Time to new GTM",
+            "description": "From kickoff to launch"
+          }
+        }
+      },
+      "blocksOrder": [
+        "metric-1",
+        "metric-2",
+        "metric-3"
+      ]
+    },
+    "case_timeline": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "Approach",
+        "title": "Engagement timeline",
+        "description": "A focused sequence to align strategy and execution.",
+        "layout": "vertical",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "phase-1": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 1",
+            "duration": "Weeks 1-2",
+            "title": "Diagnose",
+            "description": "Interviewed leaders, reviewed funnel data, and mapped the current GTM system.",
+            "features": "+ Leadership interviews\n+ Pipeline analysis\n+ Segment review"
+          }
+        },
+        "phase-2": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 2",
+            "duration": "Weeks 3-4",
+            "title": "Reposition",
+            "description": "Refined ICP, clarified offers, and aligned proof points to buyer priorities.",
+            "features": "+ ICP definition\n+ Messaging framework\n+ Offer packaging"
+          }
+        },
+        "phase-3": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 3",
+            "duration": "Weeks 5-6",
+            "title": "Enable",
+            "description": "Equipped sales and marketing with a shared pipeline motion and qualification rules.",
+            "features": "+ Sales enablement\n+ Funnel stages\n+ Qualification guide"
+          }
+        },
+        "phase-4": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 4",
+            "duration": "Weeks 7-10",
+            "title": "Scale",
+            "description": "Launched new campaigns, improved reporting, and set monthly review cadence.",
+            "features": "+ Campaign rollout\n+ Metrics dashboard\n+ Executive reviews"
+          }
+        }
+      },
+      "blocksOrder": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4"
+      ]
+    },
+    "case_testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client feedback",
+        "title": "What leadership said",
+        "description": "Growth with clarity and accountability.",
+        "columns_desktop": 2,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "We finally had a crisp story and a pipeline we could trust. The team pushed us to focus and deliver fast.",
+            "name": "Sofia Grant",
+            "title": "CEO, Atlas Group",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "The repositioning work unlocked better opportunities and made our sales motion consistent.",
+            "name": "Marcus Hill",
+            "title": "VP Sales, Atlas Group",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": [
+        "quote-1",
+        "quote-2"
+      ]
+    },
+    "case_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "case-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to reset your growth strategy?",
+            "size": "4xl"
+          }
+        },
+        "case-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Let’s align on priorities and build the plan that delivers measurable outcomes.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "case-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "case-cta-heading",
+        "case-cta-text",
+        "case-cta-buttons"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "case_hero",
+    "case_overview",
+    "case_metrics",
+    "case_timeline",
+    "case_testimonials",
+    "case_cta"
+  ],
+  "id": "case-study-atlas-growth",
+  "created": "2026-01-17T16:13:19.594Z",
+  "updated": "2026-01-17T16:29:17.030Z"
+}

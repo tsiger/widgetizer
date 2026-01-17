@@ -1,5 +1,220 @@
 {
   "name": "About",
   "slug": "about",
-  "widgets": {}
+  "widgets": {
+    "about_intro": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "about-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Our story",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "about-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Consulting built for modern operators",
+            "size": "3xl"
+          }
+        },
+        "about-body": {
+          "type": "text",
+          "settings": {
+            "text": "Northbridge Consulting helps leadership teams turn complexity into clear decisions. We focus on strategy, operations, and growth so you can move faster with confidence.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "about-features": {
+          "type": "features",
+          "settings": {
+            "features": "Senior-led engagements\nClear deliverables every phase\nPractical, measurable outcomes"
+          }
+        },
+        "about-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "View services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Case studies",
+              "href": "case-studies.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "about-eyebrow",
+        "about-heading",
+        "about-body",
+        "about-features",
+        "about-buttons"
+      ]
+    },
+    "impact_figures": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Impact",
+        "title": "Trusted partners in growth",
+        "description": "We focus on outcomes that compound over time.",
+        "columns_desktop": 3,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "impact-1": {
+          "type": "figure",
+          "settings": {
+            "number": "12",
+            "suffix": "+",
+            "label": "Industries",
+            "description": "Cross-sector experience"
+          }
+        },
+        "impact-2": {
+          "type": "figure",
+          "settings": {
+            "number": "40",
+            "suffix": "%",
+            "label": "Faster Delivery",
+            "description": "Typical cycle reduction"
+          }
+        },
+        "impact-3": {
+          "type": "figure",
+          "settings": {
+            "number": "4.9",
+            "suffix": "/5",
+            "label": "Client Rating",
+            "description": "Based on surveys"
+          }
+        }
+      },
+      "blocksOrder": [
+        "impact-1",
+        "impact-2",
+        "impact-3"
+      ]
+    },
+    "team_profiles": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Team",
+        "title": "Meet the team",
+        "description": "Senior operators and strategists who lead every engagement.",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "profile-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Elena Morales",
+            "role": "Managing Partner",
+            "specialty": "Strategy & Growth",
+            "bio": "15+ years guiding B2B teams through strategic pivots and expansion."
+          }
+        },
+        "profile-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Jordan Lee",
+            "role": "Principal",
+            "specialty": "Operations",
+            "bio": "Former VP Ops focused on scalable systems, process design, and execution."
+          }
+        },
+        "profile-3": {
+          "type": "profile",
+          "settings": {
+            "name": "Priya Nandakumar",
+            "role": "Engagement Lead",
+            "specialty": "Transformation",
+            "bio": "Specializes in cross-functional alignment and digital enablement programs."
+          }
+        }
+      },
+      "blocksOrder": [
+        "profile-1",
+        "profile-2",
+        "profile-3"
+      ]
+    },
+    "about_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "about-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let’s define your next strategic move",
+            "size": "4xl"
+          }
+        },
+        "about-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Schedule a short call to discuss goals, timelines, and fit.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "about-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Talk to us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "about-cta-heading",
+        "about-cta-text",
+        "about-cta-buttons"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "about_intro",
+    "impact_figures",
+    "team_profiles",
+    "about_cta"
+  ],
+  "id": "about",
+  "created": "2026-01-17T16:13:19.588Z",
+  "updated": "2026-01-17T16:17:40.348Z"
 }

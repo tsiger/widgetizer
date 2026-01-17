@@ -1,0 +1,292 @@
+{
+  "name": "Case Study: Regency Health",
+  "slug": "case-study-regency-entry",
+  "widgets": {
+    "case_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "case-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Case study",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "case-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Regency Health: Market entry",
+            "size": "4xl"
+          }
+        },
+        "case-text": {
+          "type": "text",
+          "settings": {
+            "text": "Designed the GTM plan for a new outpatient service line.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "case-eyebrow",
+        "case-heading",
+        "case-text"
+      ]
+    },
+    "case_overview": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "overview-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Engagement overview",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "overview-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Launching a new service line with confidence",
+            "size": "3xl"
+          }
+        },
+        "overview-body": {
+          "type": "text",
+          "settings": {
+            "text": "Regency Health needed a clear market entry plan for a new outpatient offering. We sized demand, aligned stakeholders, and built the referral engine required to launch across multiple regions.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "overview-features": {
+          "type": "features",
+          "settings": {
+            "features": "Market sizing and demand model\nRegulatory and pricing strategy\nReferral and partner enablement"
+          }
+        }
+      },
+      "blocksOrder": [
+        "overview-eyebrow",
+        "overview-heading",
+        "overview-body",
+        "overview-features"
+      ]
+    },
+    "case_metrics": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Impact",
+        "title": "Launch outcomes",
+        "description": "Early results from the market entry plan.",
+        "columns_desktop": 3,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "metric-1": {
+          "type": "figure",
+          "settings": {
+            "number": "3",
+            "suffix": "",
+            "label": "Regions launched",
+            "description": "Phase 1 rollout"
+          }
+        },
+        "metric-2": {
+          "type": "figure",
+          "settings": {
+            "number": "27",
+            "suffix": "%",
+            "label": "Referral growth",
+            "description": "Within 90 days"
+          }
+        },
+        "metric-3": {
+          "type": "figure",
+          "settings": {
+            "number": "90",
+            "suffix": "days",
+            "label": "Time to launch",
+            "description": "From plan to opening"
+          }
+        }
+      },
+      "blocksOrder": [
+        "metric-1",
+        "metric-2",
+        "metric-3"
+      ]
+    },
+    "case_timeline": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "Approach",
+        "title": "Engagement timeline",
+        "description": "A coordinated plan from research to launch.",
+        "layout": "vertical",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "phase-1": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 1",
+            "duration": "Weeks 1-2",
+            "title": "Research",
+            "description": "Sized demand, mapped competitors, and validated the service line.",
+            "features": "+ Market sizing\n+ Competitive scan\n+ Patient demand"
+          }
+        },
+        "phase-2": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 2",
+            "duration": "Weeks 3-4",
+            "title": "Plan",
+            "description": "Built the GTM plan with pricing, channels, and operational requirements.",
+            "features": "+ GTM plan\n+ Pricing model\n+ Operational plan"
+          }
+        },
+        "phase-3": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 3",
+            "duration": "Weeks 5-8",
+            "title": "Build",
+            "description": "Aligned stakeholders and enabled referral partners and internal teams.",
+            "features": "+ Stakeholder alignment\n+ Referral enablement\n+ Launch playbook"
+          }
+        },
+        "phase-4": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 4",
+            "duration": "Weeks 9-12",
+            "title": "Launch",
+            "description": "Rolled out the service line with ongoing reporting and optimizations.",
+            "features": "+ Go-live\n+ Performance tracking\n+ Optimization"
+          }
+        }
+      },
+      "blocksOrder": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4"
+      ]
+    },
+    "case_testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client feedback",
+        "title": "What leadership said",
+        "description": "A clear plan for a complex launch.",
+        "columns_desktop": 2,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "The team built a plan that balanced compliance, growth, and patient experience.",
+            "name": "Avery Patel",
+            "title": "COO, Regency Health",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "We launched on time and had a referral engine in place from day one.",
+            "name": "Leah Morgan",
+            "title": "VP Strategy, Regency Health",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": [
+        "quote-1",
+        "quote-2"
+      ]
+    },
+    "case_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "case-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Planning a new market entry?",
+            "size": "4xl"
+          }
+        },
+        "case-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "We can help you build a launch plan that aligns teams and delivers results.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "case-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "case-cta-heading",
+        "case-cta-text",
+        "case-cta-buttons"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "case_hero",
+    "case_overview",
+    "case_metrics",
+    "case_timeline",
+    "case_testimonials",
+    "case_cta"
+  ],
+  "id": "case-study-regency-entry",
+  "created": "2026-01-17T16:13:19.600Z",
+  "updated": "2026-01-17T16:32:14.818Z"
+}

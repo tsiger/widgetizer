@@ -1,0 +1,213 @@
+{
+  "name": "Case Studies",
+  "slug": "case-studies",
+  "widgets": {
+    "case_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "case-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Case studies",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "case-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Proof from real engagements",
+            "size": "4xl"
+          }
+        },
+        "case-text": {
+          "type": "text",
+          "settings": {
+            "text": "Focused work, measurable outcomes, and lasting momentum.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "case-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Talk to us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "case-eyebrow",
+        "case-heading",
+        "case-text",
+        "case-buttons"
+      ]
+    },
+    "case_showcase": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "Featured work",
+        "title": "Recent client outcomes",
+        "description": "A sample of engagements across strategy, operations, and growth.",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "project-1": {
+          "type": "project",
+          "settings": {
+            "title": "Atlas Group Growth Reset",
+            "description": "Repositioned the portfolio and lifted qualified pipeline.",
+            "link": {
+              "text": "Read case study",
+              "href": "case-study-atlas-growth.html",
+              "target": "_self"
+            }
+          }
+        },
+        "project-2": {
+          "type": "project",
+          "settings": {
+            "title": "Momentum Ops Acceleration",
+            "description": "Standardized delivery workflows and cut cycle time.",
+            "link": {
+              "text": "Read case study",
+              "href": "case-study-momentum-ops.html",
+              "target": "_self"
+            }
+          }
+        },
+        "project-3": {
+          "type": "project",
+          "settings": {
+            "title": "Regency Health Market Entry",
+            "description": "Launched a new service line across three regions.",
+            "link": {
+              "text": "Read case study",
+              "href": "case-study-regency-entry.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "project-1",
+        "project-2",
+        "project-3"
+      ]
+    },
+    "case_testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client feedback",
+        "title": "What leaders say",
+        "description": "Outcomes backed by real teams.",
+        "columns_desktop": 2,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "case-quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Northbridge delivered a clear plan and stayed hands-on through execution.",
+            "name": "Sofia Grant",
+            "title": "CEO, Atlas Group",
+            "rating": "5"
+          }
+        },
+        "case-quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "We shipped faster, aligned better, and finally had the metrics we needed.",
+            "name": "Noah Kim",
+            "title": "VP Product, Momentum",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": [
+        "case-quote-1",
+        "case-quote-2"
+      ]
+    },
+    "case_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "case-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to create your next success story?",
+            "size": "4xl"
+          }
+        },
+        "case-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Tell us what you are working on, and we will help you map the path forward.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "case-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "case-cta-heading",
+        "case-cta-text",
+        "case-cta-buttons"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "case_hero",
+    "case_showcase",
+    "case_testimonials",
+    "case_cta"
+  ],
+  "id": "case-studies",
+  "created": "2026-01-17T16:13:19.591Z",
+  "updated": "2026-01-17T16:18:13.143Z"
+}

@@ -1,5 +1,287 @@
 {
   "name": "Services",
   "slug": "services",
-  "widgets": {}
+  "widgets": {
+    "services_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "services-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Services",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "services-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Consulting services that move the needle",
+            "size": "4xl"
+          }
+        },
+        "services-text": {
+          "type": "text",
+          "settings": {
+            "text": "Clarity, alignment, and execution support for leadership teams.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "services-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get a proposal",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View case studies",
+              "href": "case-studies.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "services-eyebrow",
+        "services-heading",
+        "services-text",
+        "services-buttons"
+      ]
+    },
+    "services_grid": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Capabilities",
+        "title": "What we deliver",
+        "description": "Practical, high-impact engagements tailored to your business.",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "service-1": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Strategy",
+            "title": "Strategic Planning",
+            "description": "Vision, priorities, and a measurable roadmap.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "target"
+          }
+        },
+        "service-2": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Operations",
+            "title": "Operating Model",
+            "description": "Structure teams and workflows for scale.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "chess-knight"
+          }
+        },
+        "service-3": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Growth",
+            "title": "Go-to-Market",
+            "description": "Positioning, pricing, and pipeline design.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "chart-covariate"
+          }
+        },
+        "service-4": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Transformation",
+            "title": "Digital Enablement",
+            "description": "Modern systems that unlock efficiency and insight.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "contrast-2"
+          }
+        },
+        "service-5": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Leadership",
+            "title": "Executive Alignment",
+            "description": "Facilitation and decision support for leaders.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "keyframe-align-center"
+          }
+        },
+        "service-6": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Analytics",
+            "title": "Performance Metrics",
+            "description": "Dashboards and KPIs that drive action.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "chart-arrows-vertical"
+          }
+        }
+      },
+      "blocksOrder": [
+        "service-1",
+        "service-2",
+        "service-3",
+        "service-4",
+        "service-5",
+        "service-6"
+      ]
+    },
+    "services_process": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "Engagement model",
+        "title": "How our engagements run",
+        "description": "Clear milestones and regular checkpoints for accountability.",
+        "layout": "vertical",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "item",
+          "settings": {
+            "date": "Step 1",
+            "duration": "Week 1",
+            "title": "Discovery",
+            "description": "Align on goals, constraints, and success metrics.",
+            "features": "Stakeholder interviews\nData review\nProblem framing"
+          }
+        },
+        "step-2": {
+          "type": "item",
+          "settings": {
+            "date": "Step 2",
+            "duration": "Weeks 2-3",
+            "title": "Plan",
+            "description": "Define scope, priorities, and a clear execution roadmap.",
+            "features": "Strategic options\nRoadmap\nTeam alignment"
+          }
+        },
+        "step-3": {
+          "type": "item",
+          "settings": {
+            "date": "Step 3",
+            "duration": "Weeks 4-8",
+            "title": "Execute",
+            "description": "Hands-on support to deliver outcomes and remove blockers.",
+            "features": "Workstream leadership\nCadence\nChange management"
+          }
+        },
+        "step-4": {
+          "type": "item",
+          "settings": {
+            "date": "Step 4",
+            "duration": "Ongoing",
+            "title": "Optimize",
+            "description": "Measure impact and refine for long-term gains.",
+            "features": "KPI tracking\nRetrospectives\nContinuous improvement"
+          }
+        }
+      },
+      "blocksOrder": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4"
+      ]
+    },
+    "services_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "services-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tell us what you are solving",
+            "size": "4xl"
+          }
+        },
+        "services-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "We will respond with a focused plan and a clear next step.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "services-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Request a proposal",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See case studies",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "services-cta-heading",
+        "services-cta-text",
+        "services-cta-buttons"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "services_hero",
+    "services_grid",
+    "services_process",
+    "services_cta"
+  ],
+  "id": "services",
+  "created": "2026-01-17T16:13:19.616Z",
+  "updated": "2026-01-17T16:44:43.543Z"
 }

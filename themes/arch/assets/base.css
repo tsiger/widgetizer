@@ -141,26 +141,26 @@ img {
 
 /* Standard color scheme (default) */
 .color-scheme-standard {
-  --text-heading: var(--colors-light_text_heading, #000);
-  --text-content: var(--colors-light_text_content, #333);
-  --text-muted: var(--colors-light_text_muted, #666);
-  --border-color: var(--colors-light_border_color, #e0e0e0);
-  --bg-primary: var(--colors-light_bg_primary, #fff);
-  --bg-secondary: var(--colors-light_bg_secondary, #f9f9f9);
-  --accent: var(--colors-light_accent, #0d47b7);
-  --accent-text: var(--colors-light_accent_text, #fff);
+  --text-heading: var(--colors-light_text_heading, #0f172a);
+  --text-content: var(--colors-light_text_content, #1f2937);
+  --text-muted: var(--colors-light_text_muted, #6b7280);
+  --border-color: var(--colors-light_border_color, #e2e8f0);
+  --bg-primary: var(--colors-light_bg_primary, #f8fafc);
+  --bg-secondary: var(--colors-light_bg_secondary, #f1f5f9);
+  --accent: var(--colors-light_accent, #1e3a8a);
+  --accent-text: var(--colors-light_accent_text, #ffffff);
 }
 
 /* Highlight color scheme (for emphasis) */
 .color-scheme-highlight {
-  --text-heading: var(--colors-dark_text_heading, #fff);
-  --text-content: var(--colors-dark_text_content, #e0e0e0);
-  --text-muted: var(--colors-dark_text_muted, #888);
-  --border-color: var(--colors-dark_border_color, #333);
-  --bg-primary: var(--colors-dark_bg_primary, #0a0a0a);
-  --bg-secondary: var(--colors-dark_bg_secondary, #1a1a1a);
-  --accent: var(--colors-dark_accent, #3b82f6);
-  --accent-text: var(--colors-dark_accent_text, #fff);
+  --text-heading: var(--colors-dark_text_heading, #111827);
+  --text-content: var(--colors-dark_text_content, #1f2937);
+  --text-muted: var(--colors-dark_text_muted, #64748b);
+  --border-color: var(--colors-dark_border_color, #d7dee7);
+  --bg-primary: var(--colors-dark_bg_primary, #eef2f6);
+  --bg-secondary: var(--colors-dark_bg_secondary, #e6ebf2);
+  --accent: var(--colors-dark_accent, #1d4ed8);
+  --accent-text: var(--colors-dark_accent_text, #ffffff);
   --rating-star-color: var(--colors-dark_rating_star, #fbbf24);
 }
 

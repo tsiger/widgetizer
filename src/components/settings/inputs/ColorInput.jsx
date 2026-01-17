@@ -81,15 +81,16 @@ export default function ColorInput({ id, value = "#000000", onChange, allow_alph
     <div className="relative" ref={popoverRef}>
       <div className="flex items-center gap-2">
         <button
-          id={id}
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="w-8 h-8 rounded-md border border-slate-300 shrink-0"
           style={{ backgroundColor: localColor }}
+          aria-label="Open color picker"
         />
         <div className="relative w-full">
           <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">#</span>
           <input
+            id={id}
             type="text"
             value={localColor.startsWith("#") ? localColor.substring(1) : localColor}
             onChange={(e) => handleColorChange(e.target.value)}
