@@ -82,10 +82,10 @@ This file contains functions that make API calls to the backend:
 4.  **Rendering**: The `ProjectForm.jsx` component is rendered with the `initialData` of the project being edited with several key features:
     - **Theme Restriction**: The "Theme" dropdown is disabled, as themes cannot be changed after creation to maintain consistency
     - **Project Folder Display**: Shows the current project folder name (based on the project title) with a note that it updates when the title changes
-    - **Site URL Field**: Allows setting the base URL for the project, used for generating absolute URLs in social media meta tags and SEO
+    - **Site URL Field**: Optional field for setting the base URL for the project, used for generating absolute URLs in social media meta tags and SEO
 5.  **Form Features**:
     - **Live Folder Preview**: The project folder name updates in real-time as the user types the project title
-    - **URL Validation**: The site URL field includes validation to ensure proper URL format (via react-hook-form)
+    - **URL Validation**: The site URL field is optional, but if provided, includes validation to ensure proper URL format (via react-hook-form)
     - **Conditional Fields**: Theme selection only appears when creating new projects, not when editing existing ones
     - **Localized Validation**: All error messages and help text are fully localized
 6.  **Submission & URL Management**: The user modifies the form and clicks "Save Changes":

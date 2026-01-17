@@ -92,6 +92,7 @@
       "selectTheme": "Sélectionnez un thème",
       "siteUrlLabel": "URL du site",
       "siteUrlHelp": "L'URL de votre site web (ex., https://monsite.com).",
+      "siteUrlInvalid": "Veuillez entrer une URL valide (ex., https://monsite.com)",
       "loadingThemes": "Chargement des thèmes...",
       "loadThemesError": "Échec du chargement des thèmes. Veuillez redémarrer l'application.",
       "moreSettings": "Plus de paramètres"

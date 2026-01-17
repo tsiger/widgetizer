@@ -144,7 +144,7 @@ export async function createProject(req, res) {
       name,
       description,
       theme,
-      siteUrl: siteUrl || "",
+      siteUrl: siteUrl && siteUrl.trim() !== "" ? siteUrl.trim() : "",
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
@@ -383,7 +383,12 @@ export async function updateProject(req, res) {
       slug: undefined, // Remove legacy slug if it exists
       name: updates.name || updatedProject.name,
       description: updates.description !== undefined ? updates.description : updatedProject.description,
-      siteUrl: updates.siteUrl !== undefined ? updates.siteUrl : updatedProject.siteUrl,
+      siteUrl:
+        updates.siteUrl !== undefined
+          ? updates.siteUrl && updates.siteUrl.trim() !== ""
+            ? updates.siteUrl.trim()
+            : ""
+          : updatedProject.siteUrl,
       updated: new Date().toISOString(),
     };
 

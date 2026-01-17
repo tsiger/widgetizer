@@ -92,6 +92,7 @@
       "selectTheme": "Selecciona un tema",
       "siteUrlLabel": "URL del Sitio",
       "siteUrlHelp": "La URL de tu sitio web en vivo (ej., https://misitio.com).",
+      "siteUrlInvalid": "Por favor, ingresa una URL válida (ej., https://misitio.com)",
       "loadingThemes": "Cargando temas...",
       "loadThemesError": "Error al cargar los temas. Por favor, reinicia la aplicación.",
       "moreSettings": "Más ajustes"

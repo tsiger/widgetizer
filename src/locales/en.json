@@ -92,6 +92,7 @@
       "selectTheme": "Select a theme",
       "siteUrlLabel": "Website Address",
       "siteUrlHelp": "The URL of your live website (e.g., https://mysite.com).",
+      "siteUrlInvalid": "Please enter a valid URL (e.g., https://mysite.com)",
       "loadingThemes": "Loading themes...",
       "loadThemesError": "Failed to load themes. Please restart the application.",
       "moreSettings": "More settings"

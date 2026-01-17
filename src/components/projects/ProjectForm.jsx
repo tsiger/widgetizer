@@ -37,7 +37,7 @@ export default function ProjectForm({
       folderName: initialData.folderName || initialData.id || "",
       description: initialData.description || "",
       theme: initialData.theme || "",
-      siteUrl: initialData.siteUrl || (isNew ? "https://" : ""),
+      siteUrl: initialData.siteUrl || "",
     },
   });
 
@@ -68,7 +68,7 @@ export default function ProjectForm({
         folderName: initialData.folderName || initialData.id || "",
         description: initialData.description || "",
         theme: initialData.theme || "",
-        siteUrl: initialData.siteUrl || (isNew ? "https://" : ""),
+        siteUrl: initialData.siteUrl || "",
       });
       prevInitialDataRef.current = currentInitialDataStr;
     }
@@ -105,7 +105,13 @@ export default function ProjectForm({
 
   const onSubmitHandler = async (data) => {
     try {
-      const result = await onSubmit(data);
+      // Normalize siteUrl: trim and convert empty/whitespace to empty string
+      const normalizedData = {
+        ...data,
+        siteUrl: data.siteUrl && data.siteUrl.trim() !== "" ? data.siteUrl.trim() : "",
+      };
+
+      const result = await onSubmit(normalizedData);
 
       // If the parent component signals to reset the form
       if (result === true) {
@@ -114,7 +120,7 @@ export default function ProjectForm({
           folderName: "",
           description: "",
           theme: "",
-          siteUrl: "https://",
+          siteUrl: "",
         });
       }
       return result;
@@ -220,10 +226,25 @@ export default function ProjectForm({
               <input
                 type="url"
                 id="siteUrl"
-                {...register("siteUrl")}
+                {...register("siteUrl", {
+                  validate: (value) => {
+                    // Allow empty values
+                    if (!value || value.trim() === "") {
+                      return true;
+                    }
+                    // If a value is provided, validate URL format
+                    try {
+                      new URL(value.trim());
+                      return true;
+                    } catch {
+                      return t("forms.project.siteUrlInvalid") || "Please enter a valid URL (e.g., https://mysite.com)";
+                    }
+                  },
+                })}
                 className="form-input"
                 placeholder="https://mysite.com"
               />
+              {errors.siteUrl && <p className="form-error">{errors.siteUrl.message}</p>}
               <p className="form-description">{t("forms.project.siteUrlHelp")}</p>
             </div>
           </>

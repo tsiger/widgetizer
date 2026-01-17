@@ -92,6 +92,7 @@
       "selectTheme": "Seleziona un tema",
       "siteUrlLabel": "URL del Sito",
       "siteUrlHelp": "L'URL del tuo sito web live (es., https://miosito.com).",
+      "siteUrlInvalid": "Inserisci un URL valido (es., https://miosito.com)",
       "loadingThemes": "Caricamento temi...",
       "loadThemesError": "Caricamento dei temi fallito. Riavvia l'applicazione.",
       "moreSettings": "Altre impostazioni"

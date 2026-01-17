@@ -92,6 +92,7 @@
       "selectTheme": "Επιλέξτε θέμα",
       "siteUrlLabel": "URL Ιστότοπου",
       "siteUrlHelp": "Η διεύθυνση URL του ιστότοπού σας (π.χ. https://mysite.com).",
+      "siteUrlInvalid": "Παρακαλώ εισάγετε μια έγκυρη διεύθυνση URL (π.χ. https://mysite.com)",
       "loadingThemes": "Φόρτωση θεμάτων...",
       "loadThemesError": "Αποτυχία φόρτωσης θεμάτων. Παρακαλώ επανεκκινήστε την εφαρμογή.",
       "moreSettings": "Περισσότερες ρυθμίσεις"
