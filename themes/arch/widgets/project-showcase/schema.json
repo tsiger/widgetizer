@@ -37,6 +37,21 @@
     },
     {
       "type": "select",
+      "id": "aspect_ratio",
+      "label": "Image Aspect Ratio",
+      "default": "4 / 3",
+      "options": [
+        { "value": "auto", "label": "Auto" },
+        { "value": "contain", "label": "Show Full Image" },
+        { "value": "1 / 1", "label": "Square (1:1)" },
+        { "value": "4 / 3", "label": "Standard (4:3)" },
+        { "value": "3 / 2", "label": "Landscape (3:2)" },
+        { "value": "3 / 4", "label": "Portrait (3:4)" },
+        { "value": "16 / 9", "label": "Widescreen (16:9)" }
+      ]
+    },
+    {
+      "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
       "default": "light",

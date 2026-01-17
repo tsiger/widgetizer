@@ -23,23 +23,60 @@
         border-radius: var(--border-radius-lg);
         overflow: hidden;
         border: var(--border-width-thin) solid var(--border-color);
+        position: relative;
         text-decoration: none;
-        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s ease;
+        transition: border-color 0.3s ease;
         min-height: 20rem;
         justify-content: flex-end;
 
         &.has-bg-color,
         &.has-bg-image {
           border: none;
+          background: none;
         }
 
         &.align-center { align-items: center; text-align: center; }
         &.align-start { align-items: flex-start; text-align: start; }
 
         &:hover {
-          transform: translateY(-0.4rem);
           border-color: var(--border-color);
         }
+      }
+
+      & .bento-item.has-bg-image::before,
+      & .bento-item.has-bg-color::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        z-index: 1;
+        transform: scale(1);
+        transition: transform 0.3s ease;
+      }
+
+      & .bento-item.has-bg-image::before {
+        background-image: var(--bento-bg-image);
+        background-size: cover;
+        background-position: center;
+      }
+
+      & .bento-item.has-bg-color::before {
+        background-color: var(--bento-bg-color);
+      }
+
+      & .bento-item.has-overlay::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background-color: var(--widget-overlay-color, rgba(0, 0, 0, 0.4));
+        opacity: 1;
+        z-index: 2;
+      }
+
+      & .bento-item.has-bg-image:hover::before,
+      & .bento-item.has-bg-color:hover::before {
+        transform: scale(1.05);
       }
 
       & .bento-content {
@@ -126,13 +163,13 @@
 
              {% assign overlay_val = block.settings.overlay_color | default: 'rgba(0,0,0,0.5)' %}
              {% capture item_style %}
-               {{ item_style }} --widget-overlay-color: {{ overlay_val }}; background-image: url('{{ block.settings.image | image: 'path', 'large' }}');
+               {{ item_style }} --widget-overlay-color: {{ overlay_val }}; --bento-bg-image: url('{{ block.settings.image | image: 'path', 'large' }}');
              {% endcapture %}
 
           {% elsif block.settings.background_color != blank %}
              {% assign item_classes = item_classes | append: ' has-bg-color' %}
              {% capture item_style %}
-               {{ item_style }} --widget-bg-color: {{ block.settings.background_color }};
+               {{ item_style }} --bento-bg-color: {{ block.settings.background_color }};
              {% endcapture %}
           {% endif %}
 

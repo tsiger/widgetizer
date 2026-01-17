@@ -29,13 +29,23 @@
       & .project-image {
         width: 100%;
         height: auto;
-        aspect-ratio: 16/9;
+        {% if widget.settings.aspect_ratio != 'auto' and widget.settings.aspect_ratio != 'contain' %}
+          aspect-ratio: {{ widget.settings.aspect_ratio | default: '4 / 3' }};
+        {% endif %}
         object-fit: cover;
         display: block;
         transition: transform var(--transition-speed-normal) ease;
         border-radius: 0;
         margin: 0;
       }
+
+      {% if widget.settings.aspect_ratio == 'contain' %}
+        & .project-image {
+          height: 24rem;
+          max-height: 60vh;
+          object-fit: contain;
+        }
+      {% endif %}
 
       & .project-overlay {
         position: absolute;
