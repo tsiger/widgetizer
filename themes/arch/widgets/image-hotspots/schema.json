@@ -73,11 +73,6 @@
           "label": "Tooltip description"
         },
         {
-          "type": "text",
-          "id": "button_text",
-          "label": "Button text"
-        },
-        {
           "type": "link",
           "id": "button_link",
           "label": "Button link"

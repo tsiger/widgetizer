@@ -23,10 +23,21 @@
 
       & .image-hotspot {
         position: absolute;
-        width: 3.2rem;
-        height: 3.2rem;
+        width: 2.6rem;
+        height: 2.6rem;
         transform: translate(-50%, -50%);
         z-index: 1;
+        pointer-events: none;
+      }
+
+      & .image-hotspot::after {
+        content: "";
+        position: absolute;
+        inset: -0.6rem;
+        border: var(--border-width-thin) solid var(--border-color);
+        border-radius: 50%;
+        animation: hotspot-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        pointer-events: none;
       }
 
       & .image-hotspot-button {
@@ -41,15 +52,7 @@
         align-items: center;
         justify-content: center;
         transition: transform 0.3s, background-color 0.3s;
-
-        &::before {
-          content: "";
-          position: absolute;
-          inset: calc(var(--space-xs) * -1);
-          border: var(--border-width-medium) solid var(--border-color);
-          border-radius: 50%;
-          animation: hotspot-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
+        pointer-events: auto;
 
         &:hover {
           transform: scale(1.1);
@@ -67,17 +70,13 @@
 
       & .image-hotspot-button.is-active {
         transform: scale(1.1);
-
-        &::before {
-          animation: none;
-        }
       }
 
       & .image-hotspot-icon {
-        width: 1.2rem;
-        height: 1.2rem;
+        width: 1rem;
+        height: 1rem;
         stroke: var(--bg-primary);
-        stroke-width: 2.5;
+        stroke-width: 2;
         fill: none;
       }
 
@@ -188,13 +187,17 @@
 
       @media (min-width: 750px) {
         & .image-hotspot {
-          width: 4rem;
-          height: 4rem;
+          width: 3.2rem;
+          height: 3.2rem;
+        }
+
+        & .image-hotspot::after {
+          inset: -0.8rem;
         }
 
         & .image-hotspot-icon {
-          width: 1.6rem;
-          height: 1.6rem;
+          width: 1.2rem;
+          height: 1.2rem;
         }
 
         & .image-hotspot-tooltip {
@@ -204,13 +207,17 @@
 
       @media (min-width: 990px) {
         & .image-hotspot {
-          width: 4.4rem;
-          height: 4.4rem;
+          width: 3.6rem;
+          height: 3.6rem;
+        }
+
+        & .image-hotspot::after {
+          inset: -1rem;
         }
 
         & .image-hotspot-icon {
-          width: 2rem;
-          height: 2rem;
+          width: 1.4rem;
+          height: 1.4rem;
         }
 
         & .image-hotspot-tooltip {
@@ -265,7 +272,8 @@
               aria-describedby="image-hotspot-tooltip-{{ widget.id }}-{{ blockId }}"
             >
               <svg class="image-hotspot-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M12 5v14" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M5 12h14" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>
 
@@ -292,14 +300,17 @@
                 </p>
               {% endif %}
 
-              {% if block.settings.button_text != blank and block.settings.button_link != blank %}
+              {% if block.settings.button_link.href != blank and block.settings.button_link.text != blank %}
                 <div class="image-hotspot-tooltip-footer">
                   <a
-                    href="{{ block.settings.button_link }}"
+                    href="{{ block.settings.button_link.href }}"
                     class="widget-button"
-                    data-setting="button_text"
+                    data-setting="button_link"
+                    {% if block.settings.button_link.target == '_blank' %}
+                      target="_blank" rel="noopener"
+                    {% endif %}
                   >
-                    {{ block.settings.button_text }}
+                    {{ block.settings.button_link.text }}
                   </a>
                 </div>
               {% endif %}
