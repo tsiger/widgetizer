@@ -165,8 +165,7 @@
                       {% endif %}
                     >
                       <option value="">Select an option</option>
-                      {% assign options = block.settings.options | split: '
-' %}
+                      {% assign options = block.settings.options | split: '\n' %}
                       {% for option in options %}
                         {% assign trimmed_option = option | strip %}
                         {% if trimmed_option != blank %}
