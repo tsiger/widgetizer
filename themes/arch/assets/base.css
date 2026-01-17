@@ -718,7 +718,7 @@ h6 {
 
   &:hover {
     background-color: transparent;
-    color: var(--accent);
+    color: var(--accent-text);
   }
 }
 
@@ -966,6 +966,7 @@ h6 {
     background: transparent;
     border: none;
     cursor: pointer;
+    color: var(--text-content);
 
     & .icon-menu,
     & .icon-close {
@@ -1022,6 +1023,7 @@ h6 {
     & .nav-close-title {
       font-size: var(--font-size-lg);
       font-weight: var(--font-weight-semibold);
+      color: var(--text-content);
     }
 
     & .nav-close-btn {
@@ -1034,6 +1036,7 @@ h6 {
       background: transparent;
       border: none;
       cursor: pointer;
+      color: var(--text-content);
 
       & svg {
         width: 2.4rem;
@@ -1058,7 +1061,7 @@ h6 {
       padding-block: 1.4rem;
       padding-inline: 0;
       text-decoration: none;
-      color: var(--text-heading);
+      color: var(--text-content);
       font-weight: var(--font-weight-normal);
       font-size: var(--font-size-lg);
       background: transparent;
@@ -1079,7 +1082,7 @@ h6 {
       height: 2rem;
       margin-inline-start: auto;
       flex-shrink: 0;
-      background-color: var(--text-heading);
+      background-color: var(--text-content);
       mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6l-6 6'/%3E%3C/svg%3E");
       mask-repeat: no-repeat;
       mask-position: center;
@@ -1184,7 +1187,7 @@ h6 {
 
         &:hover {
           background-color: var(--bg-secondary);
-          color: var(--text-heading);
+        color: var(--text-content);
         }
       }
 
@@ -1263,7 +1266,6 @@ h6 {
 
     & .desktop-cta {
       display: inline-block;
-      margin-inline-start: var(--space-md);
     }
   }
 }

@@ -56,14 +56,14 @@
           %}
         {% endif %}
         {% if widget.settings.ctaButtonLink.text != blank %}
-          <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button mobile-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
+          <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button widget-button-full widget-button-large mobile-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
             {{ widget.settings.ctaButtonLink.text }}
           </a>
         {% endif %}
       </nav>
 
       {% if widget.settings.ctaButtonLink.text != blank %}
-        <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button desktop-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
+        <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button widget-button-medium desktop-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
           {{ widget.settings.ctaButtonLink.text }}
         </a>
       {% endif %}
