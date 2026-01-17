@@ -245,7 +245,7 @@
         {% if widget.settings.image != blank %}
           {{ widget.settings.image | image: 'large', 'image-hotspots-image', false }}
         {% else %}
-          {% placeholder_image 'landscape', { "class": "image-hotspots-image", "alt": "Interactive image" } %}
+          {% placeholder_image 'landscape', { "class": "image-hotspots-image" } %}
         {% endif %}
 
         <!-- Hotspots -->
@@ -261,13 +261,20 @@
               class="image-hotspot-button"
               aria-label="{{ block.settings.title | default: 'View details' }}"
               aria-expanded="false"
+              aria-controls="image-hotspot-tooltip-{{ widget.id }}-{{ blockId }}"
+              aria-describedby="image-hotspot-tooltip-{{ widget.id }}-{{ blockId }}"
             >
               <svg class="image-hotspot-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>
 
-            <div class="image-hotspot-tooltip" role="tooltip">
+            <div
+              class="image-hotspot-tooltip"
+              role="tooltip"
+              id="image-hotspot-tooltip-{{ widget.id }}-{{ blockId }}"
+              aria-hidden="true"
+            >
               <div class="image-hotspot-tooltip-header">
                 {% if block.settings.title != blank %}
                   <h3 class="image-hotspot-tooltip-title block-text block-text-lg block-text-bold block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
@@ -325,6 +332,7 @@
           // Close all other tooltips first
           widget.querySelectorAll('.image-hotspot-tooltip.is-visible').forEach((t) => {
             t.classList.remove('is-visible');
+            t.setAttribute('aria-hidden', 'true');
             // Reset positioning
             t.style.insetInlineStart = '';
             t.style.insetInlineEnd = '';
@@ -337,8 +345,10 @@
 
           if (!isVisible) {
             tooltip.classList.add('is-visible');
+            tooltip.setAttribute('aria-hidden', 'false');
             button.classList.add('is-active');
             button.setAttribute('aria-expanded', 'true');
+            closeButton?.focus();
 
             // Smart positioning: check if tooltip would go off-screen
             setTimeout(() => {
@@ -380,6 +390,7 @@
           closeButton.addEventListener('click', (e) => {
             e.stopPropagation();
             tooltip.classList.remove('is-visible');
+            tooltip.setAttribute('aria-hidden', 'true');
             tooltip.style.insetInlineStart = '';
             tooltip.style.insetInlineEnd = '';
             tooltip.style.transform = '';
@@ -395,6 +406,7 @@
         if (!widget.contains(e.target)) {
           widget.querySelectorAll('.image-hotspot-tooltip.is-visible').forEach((tooltip) => {
             tooltip.classList.remove('is-visible');
+            tooltip.setAttribute('aria-hidden', 'true');
             tooltip.style.insetInlineStart = '';
             tooltip.style.insetInlineEnd = '';
             tooltip.style.transform = '';

@@ -89,19 +89,43 @@
 
     <div class="widget-content">
       <div class="switcher-ui-wrapper">
-        <div class="switcher-toggle" role="tablist">
+        <div class="switcher-toggle" role="tablist" aria-label="Content options">
           {% if widget.settings.option_1_label != blank %}
-            <button class="switcher-btn is-active block-text block-text-sm block-text-heading" data-target="1" role="tab" aria-selected="true">
+            <button
+              id="switcher-tab-{{ widget.id }}-1"
+              class="switcher-btn is-active block-text block-text-sm block-text-heading"
+              data-target="1"
+              role="tab"
+              aria-selected="true"
+              aria-controls="switcher-panel-{{ widget.id }}-1"
+              tabindex="0"
+            >
               {{ widget.settings.option_1_label }}
             </button>
           {% endif %}
           {% if widget.settings.option_2_label != blank %}
-            <button class="switcher-btn block-text block-text-sm block-text-muted" data-target="2" role="tab" aria-selected="false">
+            <button
+              id="switcher-tab-{{ widget.id }}-2"
+              class="switcher-btn block-text block-text-sm block-text-muted"
+              data-target="2"
+              role="tab"
+              aria-selected="false"
+              aria-controls="switcher-panel-{{ widget.id }}-2"
+              tabindex="-1"
+            >
               {{ widget.settings.option_2_label }}
             </button>
           {% endif %}
           {% if widget.settings.switcher_type == 'tabs' and widget.settings.option_3_label != blank %}
-            <button class="switcher-btn block-text block-text-sm block-text-muted" data-target="3" role="tab" aria-selected="false">
+            <button
+              id="switcher-tab-{{ widget.id }}-3"
+              class="switcher-btn block-text block-text-sm block-text-muted"
+              data-target="3"
+              role="tab"
+              aria-selected="false"
+              aria-controls="switcher-panel-{{ widget.id }}-3"
+              tabindex="-1"
+            >
               {{ widget.settings.option_3_label }}
             </button>
           {% endif %}
@@ -111,7 +135,14 @@
         <div class="switcher-content-reveal">
         {% for i in (1..3) %}
           {% assign option_str = i | append: '' %}
-          <div class="switcher-content-group {% if i == 1 %}is-active{% endif %}" data-option="{{ i }}" role="tabpanel">
+          <div
+            id="switcher-panel-{{ widget.id }}-{{ i }}"
+            class="switcher-content-group {% if i == 1 %}is-active{% endif %}"
+            data-option="{{ i }}"
+            role="tabpanel"
+            aria-labelledby="switcher-tab-{{ widget.id }}-{{ i }}"
+            aria-hidden="{% if i == 1 %}false{% else %}true{% endif %}"
+          >
             <ul
               class="widget-card-grid widget-grid"
               style="--grid-cols-desktop: {{ widget.settings.columns | default: 3 }};"
@@ -166,35 +197,65 @@
       if (!widget || widget.dataset.initialized) return;
       widget.dataset.initialized = 'true';
 
-      const buttons = widget.querySelectorAll('.switcher-btn');
+      const buttons = Array.from(widget.querySelectorAll('.switcher-btn'));
       const groups = widget.querySelectorAll('.switcher-content-group');
 
-        buttons.forEach((btn) => {
-          btn.addEventListener('click', function () {
-            const target = this.getAttribute('data-target');
+      const activateTab = (button) => {
+        const target = button.getAttribute('data-target');
 
-            // Update buttons
-            buttons.forEach((b) => {
-              b.classList.remove('is-active');
-              b.classList.remove('block-text-heading');
-              b.classList.add('block-text-muted');
-              b.setAttribute('aria-selected', 'false');
-            });
-            this.classList.add('is-active');
-            this.classList.remove('block-text-muted');
-            this.classList.add('block-text-heading');
-            this.setAttribute('aria-selected', 'true');
-
-            // Update groups
-            groups.forEach((group) => {
-              if (group.getAttribute('data-option') === target) {
-                group.classList.add('is-active');
-              } else {
-                group.classList.remove('is-active');
-              }
-            });
-          });
+        buttons.forEach((b) => {
+          b.classList.remove('is-active');
+          b.classList.remove('block-text-heading');
+          b.classList.add('block-text-muted');
+          b.setAttribute('aria-selected', 'false');
+          b.setAttribute('tabindex', '-1');
         });
+
+        button.classList.add('is-active');
+        button.classList.remove('block-text-muted');
+        button.classList.add('block-text-heading');
+        button.setAttribute('aria-selected', 'true');
+        button.setAttribute('tabindex', '0');
+
+        groups.forEach((group) => {
+          const isActive = group.getAttribute('data-option') === target;
+          group.classList.toggle('is-active', isActive);
+          group.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+        });
+      };
+
+      buttons.forEach((btn, index) => {
+        btn.addEventListener('click', function () {
+          activateTab(this);
+        });
+
+        btn.addEventListener('keydown', (event) => {
+          const currentIndex = buttons.indexOf(btn);
+          let nextIndex = null;
+
+          switch (event.key) {
+            case 'ArrowRight':
+              nextIndex = (currentIndex + 1) % buttons.length;
+              break;
+            case 'ArrowLeft':
+              nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+              break;
+            case 'Home':
+              nextIndex = 0;
+              break;
+            case 'End':
+              nextIndex = buttons.length - 1;
+              break;
+            default:
+              return;
+          }
+
+          event.preventDefault();
+          const nextButton = buttons[nextIndex];
+          nextButton.focus();
+          activateTab(nextButton);
+        });
+      });
     })();
   </script>
 </section>

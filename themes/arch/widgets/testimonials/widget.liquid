@@ -24,18 +24,6 @@
         position: relative;
       }
 
-      & .testimonial-quote::before {
-        content: """;
-        position: absolute;
-        top: -0.5em;
-        left: -0.3em;
-        font-size: 4rem;
-        color: var(--accent);
-        opacity: 0.2;
-        font-family: Georgia, serif;
-        line-height: 1;
-      }
-
       & .testimonial-rating {
         display: flex;
         gap: 0.2rem;
@@ -43,8 +31,8 @@
       }
 
       & .testimonial-star {
-        color: #fbbf24;
-        font-size: 1.8rem;
+        color: var(--rating-star-color);
+        font-size: var(--font-size-lg);
         line-height: 1;
       }
 

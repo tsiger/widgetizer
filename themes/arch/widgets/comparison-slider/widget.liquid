@@ -379,6 +379,39 @@
       document.addEventListener('touchmove', handleMove, { passive: false });
       document.addEventListener('touchend', stopDrag);
 
+      // Keyboard support
+      handle.addEventListener('keydown', (event) => {
+        let delta = 0;
+        switch (event.key) {
+          case 'ArrowRight':
+          case 'ArrowDown':
+            delta = 5;
+            break;
+          case 'ArrowLeft':
+          case 'ArrowUp':
+            delta = -5;
+            break;
+          case 'PageUp':
+            delta = 10;
+            break;
+          case 'PageDown':
+            delta = -10;
+            break;
+          case 'Home':
+            updatePosition(0);
+            event.preventDefault();
+            return;
+          case 'End':
+            updatePosition(100);
+            event.preventDefault();
+            return;
+          default:
+            return;
+        }
+        event.preventDefault();
+        updatePosition(position + delta);
+      });
+
       // Keyboard navigation
       handle.addEventListener('keydown', (event) => {
         let step = 1;

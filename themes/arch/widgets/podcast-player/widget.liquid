@@ -258,7 +258,7 @@
         align-items: center;
         cursor: pointer;
         transition: background-color 0.2s;
-        text-align: left;
+        text-align: start;
         border: none;
         border-block-end: var(--border-width-thin) solid var(--border-color);
         width: 100%;
@@ -280,7 +280,7 @@
       }
 
       & .playlist-index {
-        font-size: 0.85em;
+        font-size: var(--font-size-sm);
         color: var(--text-muted);
         min-width: 2rem;
       }
@@ -293,7 +293,7 @@
       }
 
       & .playlist-title {
-        font-weight: 600;
+        font-weight: var(--font-weight-semibold);
         color: var(--text-heading);
         white-space: nowrap;
         overflow: hidden;
@@ -301,12 +301,12 @@
       }
 
       & .playlist-meta {
-        font-size: 0.85em;
+        font-size: var(--font-size-sm);
         color: var(--text-muted);
       }
 
       & .playlist-duration {
-        font-size: 0.85em;
+        font-size: var(--font-size-sm);
         color: var(--text-muted);
         font-variant-numeric: tabular-nums;
       }
@@ -427,7 +427,16 @@
             <div class="audio-player-controls">
               <!-- Progress -->
               <div class="audio-player-progress">
-                <div class="audio-player-progress-bar" role="slider" aria-label="Seek" tabindex="0">
+                <div
+                  class="audio-player-progress-bar"
+                  role="slider"
+                  aria-label="Seek"
+                  aria-valuemin="0"
+                  aria-valuemax="0"
+                  aria-valuenow="0"
+                  aria-valuetext="0:00"
+                  tabindex="0"
+                >
                   <div class="audio-player-progress-fill"></div>
                 </div>
                 <div class="audio-player-progress-time block-text block-text-sm block-text-muted">
@@ -481,7 +490,16 @@
                       <line x1="17" y1="9" x2="23" y2="15" />
                     </svg>
                   </button>
-                  <div class="audio-player-volume-slider" role="slider" aria-label="Volume" tabindex="0">
+                  <div
+                    class="audio-player-volume-slider"
+                    role="slider"
+                    aria-label="Volume"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="100"
+                    aria-valuetext="100%"
+                    tabindex="0"
+                  >
                     <div class="audio-player-volume-fill"></div>
                   </div>
                 </div>
@@ -566,12 +584,12 @@
       const pauseIcon = widget.querySelector('.audio-player-icon-pause');
       const playlistItems = widget.querySelectorAll('.playlist-item');
       
-      const artworkEl = document.getElementById('artwork-{{ widget.id }}');
-      const titleEl = document.getElementById('ep-title-{{ widget.id }}');
-      const numberEl = document.getElementById('ep-number-{{ widget.id }}');
-      const durationEl = document.getElementById('ep-duration-{{ widget.id }}');
-      const dateEl = document.getElementById('ep-date-{{ widget.id }}');
-      const descEl = document.getElementById('ep-desc-{{ widget.id }}');
+      const artworkEl = widget.querySelector('#artwork-{{ widget.id }}');
+      const titleEl = widget.querySelector('#ep-title-{{ widget.id }}');
+      const numberEl = widget.querySelector('#ep-number-{{ widget.id }}');
+      const durationEl = widget.querySelector('#ep-duration-{{ widget.id }}');
+      const dateEl = widget.querySelector('#ep-date-{{ widget.id }}');
+      const descEl = widget.querySelector('#ep-desc-{{ widget.id }}');
 
       if (!playButton) return;
 
@@ -584,6 +602,23 @@
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins}:${secs.toString().padStart(2, '0')}`;
+      };
+
+      const updateProgressAria = () => {
+        if (!progressBar || !audio || !audio.duration) return;
+        progressBar.setAttribute('aria-valuemin', '0');
+        progressBar.setAttribute('aria-valuemax', String(Math.floor(audio.duration)));
+        progressBar.setAttribute('aria-valuenow', String(Math.floor(audio.currentTime)));
+        progressBar.setAttribute('aria-valuetext', formatTime(audio.currentTime));
+      };
+
+      const updateVolumeAria = () => {
+        if (!volumeSlider || !audio) return;
+        const volumePercent = Math.round((audio.volume || 0) * 100);
+        volumeSlider.setAttribute('aria-valuemin', '0');
+        volumeSlider.setAttribute('aria-valuemax', '100');
+        volumeSlider.setAttribute('aria-valuenow', String(volumePercent));
+        volumeSlider.setAttribute('aria-valuetext', `${volumePercent}%`);
       };
 
       const setPlayingState = (playing) => {
@@ -664,10 +699,12 @@
           const pct = (audio.currentTime / audio.duration) * 100;
           if (progressFill) progressFill.style.width = `${pct}%`;
           if (currentTimeEl) currentTimeEl.textContent = formatTime(audio.currentTime);
+          updateProgressAria();
         });
 
         audio.addEventListener('loadedmetadata', () => {
           if (totalDurationEl) totalDurationEl.textContent = formatTime(audio.duration);
+          updateProgressAria();
         });
 
         audio.addEventListener('ended', () => {
@@ -686,6 +723,37 @@
           const rect = progressBar.getBoundingClientRect();
           const pos = (e.clientX - rect.left) / rect.width;
           audio.currentTime = pos * (audio.duration || 0);
+          updateProgressAria();
+        });
+
+        progressBar.addEventListener('keydown', (e) => {
+          if (!audio.duration) return;
+          let nextTime = audio.currentTime;
+          switch (e.key) {
+            case 'ArrowRight':
+              nextTime += 5;
+              break;
+            case 'ArrowLeft':
+              nextTime -= 5;
+              break;
+            case 'PageUp':
+              nextTime += 10;
+              break;
+            case 'PageDown':
+              nextTime -= 10;
+              break;
+            case 'Home':
+              nextTime = 0;
+              break;
+            case 'End':
+              nextTime = audio.duration;
+              break;
+            default:
+              return;
+          }
+          e.preventDefault();
+          audio.currentTime = Math.max(0, Math.min(audio.duration, nextTime));
+          updateProgressAria();
         });
       }
 
@@ -705,10 +773,12 @@
             audio.volume = 0;
             if (volumeFill) volumeFill.style.width = '0%';
             updateVolumeIcon(0);
+            updateVolumeAria();
           } else {
             audio.volume = lastVolume || 1;
             if (volumeFill) volumeFill.style.width = `${audio.volume * 100}%`;
             updateVolumeIcon(audio.volume);
+            updateVolumeAria();
           }
         });
       }
@@ -721,6 +791,7 @@
           volumeFill.style.width = `${pos * 100}%`;
           updateVolumeIcon(pos);
           if (pos > 0) lastVolume = pos;
+          updateVolumeAria();
         };
 
         let dragging = false;
@@ -728,6 +799,41 @@
         document.addEventListener('mousemove', (e) => { if (dragging) updateVol(e); });
         document.addEventListener('mouseup', () => { dragging = false; });
         volumeSlider.addEventListener('click', updateVol);
+
+        volumeSlider.addEventListener('keydown', (e) => {
+          let next = audio.volume;
+          switch (e.key) {
+            case 'ArrowRight':
+            case 'ArrowUp':
+              next += 0.05;
+              break;
+            case 'ArrowLeft':
+            case 'ArrowDown':
+              next -= 0.05;
+              break;
+            case 'PageUp':
+              next += 0.1;
+              break;
+            case 'PageDown':
+              next -= 0.1;
+              break;
+            case 'Home':
+              next = 0;
+              break;
+            case 'End':
+              next = 1;
+              break;
+            default:
+              return;
+          }
+          e.preventDefault();
+          next = Math.max(0, Math.min(1, next));
+          audio.volume = next;
+          volumeFill.style.width = `${next * 100}%`;
+          updateVolumeIcon(next);
+          if (next > 0) lastVolume = next;
+          updateVolumeAria();
+        });
       }
     })();
   </script>

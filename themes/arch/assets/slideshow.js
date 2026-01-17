@@ -13,6 +13,7 @@
     const dots = widget.querySelectorAll(".slideshow-dot");
     const prevBtn = widget.querySelector(".slideshow-prev");
     const nextBtn = widget.querySelector(".slideshow-next");
+    const toggleBtn = widget.querySelector(".slideshow-toggle");
 
     if (slides.length === 0) return;
 
@@ -25,23 +26,34 @@
 
     const goToSlide = (index) => {
       slides[currentIndex]?.classList.remove("is-active");
+      slides[currentIndex]?.setAttribute("aria-hidden", "true");
       dots[currentIndex]?.classList.remove("is-active");
       currentIndex = (index + slides.length) % slides.length;
       slides[currentIndex]?.classList.add("is-active");
+      slides[currentIndex]?.setAttribute("aria-hidden", "false");
       dots[currentIndex]?.classList.add("is-active");
     };
 
     const nextSlide = () => goToSlide(currentIndex + 1);
     const prevSlide = () => goToSlide(currentIndex - 1);
 
+    let isAutoplaying = false;
     const startAutoplay = () => {
       if (autoplay) {
         autoplayInterval = setInterval(nextSlide, autoplaySpeed);
+        isAutoplaying = true;
+        toggleBtn?.setAttribute("aria-pressed", "false");
+        toggleBtn?.setAttribute("aria-label", "Pause autoplay");
+        if (toggleBtn) toggleBtn.textContent = "Pause";
       }
     };
 
     const stopAutoplay = () => {
       clearInterval(autoplayInterval);
+      isAutoplaying = false;
+      toggleBtn?.setAttribute("aria-pressed", "true");
+      toggleBtn?.setAttribute("aria-label", "Start autoplay");
+      if (toggleBtn) toggleBtn.textContent = "Play";
     };
 
     prevBtn?.addEventListener("click", () => {
@@ -62,6 +74,20 @@
         goToSlide(index);
         startAutoplay();
       });
+    });
+
+    toggleBtn?.addEventListener("click", () => {
+      if (!autoplay) return;
+      if (isAutoplaying) {
+        stopAutoplay();
+      } else {
+        startAutoplay();
+      }
+    });
+
+    // Initialize aria-hidden states
+    slides.forEach((slide, idx) => {
+      slide.setAttribute("aria-hidden", idx === currentIndex ? "false" : "true");
     });
 
     startAutoplay();

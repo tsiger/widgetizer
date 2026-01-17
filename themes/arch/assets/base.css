@@ -97,6 +97,7 @@ img {
   /* Accent Colors */
   --accent: var(--colors-light_accent, #0d47b7);
   --accent-text: var(--colors-light_accent_text, #fff);
+  --rating-star-color: var(--colors-light_rating_star, #fbbf24);
 
   /* Primitive Colors */
   --color-white: #ffffff;
@@ -162,6 +163,7 @@ img {
   --bg-secondary: var(--colors-dark_bg_secondary, #1a1a1a);
   --accent: var(--colors-dark_accent, #3b82f6);
   --accent-text: var(--colors-dark_accent_text, #fff);
+  --rating-star-color: var(--colors-dark_rating_star, #fbbf24);
 }
 
 /* ==========================================================================
@@ -924,7 +926,7 @@ h6 {
 
 .widget-site-header {
   /* Reset inherited .widget base styles */
-  background-color: transparent;
+  background-color: var(--widget-bg-color, transparent);
   background-image: none;
 
   position: relative;
@@ -1272,7 +1274,7 @@ h6 {
 
 .widget-footer {
   /* Reset inherited .widget base styles */
-  background-color: transparent;
+  background-color: var(--widget-bg-color, transparent);
   background-image: none;
 
   padding-block: var(--space-3xl);
@@ -1407,4 +1409,20 @@ h6 {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  position: absolute;
+  inset-block-start: var(--space-sm);
+  inset-inline-start: var(--space-sm);
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-primary);
+  color: var(--text-heading);
+  clip: auto;
+  white-space: normal;
+  z-index: 9999;
 }

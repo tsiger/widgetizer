@@ -106,7 +106,7 @@
             {% if block.settings.image != blank %}
               {{ block.settings.image | image: 'large', 'project-image' }}
             {% else %}
-              {% placeholder_image 'landscape', { "class": "project-image", "alt": "Project placeholder" } %}
+              {% placeholder_image 'landscape', { "class": "project-image" } %}
             {% endif %}
             <div class="project-overlay">
               <div class="project-content">

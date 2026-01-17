@@ -107,6 +107,17 @@
       </svg>
     </button>
 
+    {% if widget.settings.autoplay %}
+      <button
+        class="slideshow-toggle visually-hidden"
+        type="button"
+        aria-pressed="false"
+        aria-label="Pause autoplay"
+      >
+        Pause
+      </button>
+    {% endif %}
+
     <!-- Pagination -->
     <div class="slideshow-pagination">
       {% for blockId in widget.blocksOrder %}

@@ -170,27 +170,25 @@
       {% endfor %}
       {% assign dept_array = departments | split: ',' %}
 
-      <ul class="job-filter-list" role="tablist">
-        <li role="presentation">
+      <ul class="job-filter-list" role="group" aria-label="Job filters">
+        <li>
           <button
             type="button"
             class="job-filter-btn block-text block-text-sm block-text-muted is-active"
             data-filter="all"
-            role="tab"
-            aria-selected="true"
+            aria-pressed="true"
           >
             All Positions
           </button>
         </li>
         {% for dept in dept_array %}
           {% if dept != blank %}
-            <li role="presentation">
+            <li>
               <button
                 type="button"
                 class="job-filter-btn block-text block-text-sm block-text-muted"
                 data-filter="{{ dept }}"
-                role="tab"
-                aria-selected="false"
+                aria-pressed="false"
               >
                 {{ dept | capitalize }}
               </button>
@@ -294,11 +292,11 @@
 
             filterButtons.forEach((btn) => {
               btn.classList.remove('is-active');
-              btn.setAttribute('aria-selected', 'false');
+              btn.setAttribute('aria-pressed', 'false');
             });
 
             this.classList.add('is-active');
-            this.setAttribute('aria-selected', 'true');
+            this.setAttribute('aria-pressed', 'true');
 
             filterJobs(filter);
           });

@@ -147,7 +147,7 @@
             {% if block.settings.image != blank %}
               {{ block.settings.image | image: 'medium', 'widget-card-image' }}
             {% else %}
-              <img src="{% placeholder_image 'url' %}" alt="{{ block.settings.caption }}" class="widget-card-image">
+              {% placeholder_image 'landscape', { "class": "widget-card-image" } %}
             {% endif %}
             {% if block.settings.caption != blank %}
               <div class="gallery-overlay">
@@ -160,7 +160,14 @@
     </div>
 
     <!-- Lightbox Modal -->
-    <div class="gallery-modal" aria-hidden="true">
+    <div
+      class="gallery-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-label="Image preview"
+      aria-describedby="gallery-modal-caption-{{ widget.id }}"
+    >
       <div class="gallery-modal-content">
         <button class="gallery-modal-close" aria-label="Close lightbox">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -168,7 +175,7 @@
           </svg>
         </button>
         <img class="gallery-modal-image" src="" alt="">
-        <p class="gallery-modal-caption"></p>
+        <p class="gallery-modal-caption" id="gallery-modal-caption-{{ widget.id }}"></p>
       </div>
     </div>
   </div>
@@ -185,22 +192,28 @@
         const modalCaption = widget.querySelector('.gallery-modal-caption');
         const closeBtn = widget.querySelector('.gallery-modal-close');
         const galleryItems = widget.querySelectorAll('.widget-card');
+        let lastFocusedElement = null;
 
         if (!modal || !modalImage) return;
 
-        const openModal = (imageSrc, caption) => {
+        const openModal = (imageSrc, imageAlt, caption) => {
+          lastFocusedElement = document.activeElement;
           modalImage.src = imageSrc;
-          modalImage.alt = caption || '';
+          modalImage.alt = imageAlt || '';
           modalCaption.textContent = caption || '';
           modal.classList.add('is-open');
           modal.setAttribute('aria-hidden', 'false');
           document.body.style.overflow = 'hidden';
+          closeBtn?.focus();
         };
 
         const closeModal = () => {
           modal.classList.remove('is-open');
           modal.setAttribute('aria-hidden', 'true');
           document.body.style.overflow = '';
+          if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+            lastFocusedElement.focus();
+          }
         };
 
         galleryItems.forEach((item) => {
@@ -209,7 +222,8 @@
             const img = item.querySelector('.widget-card-image');
             const caption = item.dataset.caption;
             if (img) {
-              openModal(img.src, caption);
+              const altText = img.getAttribute('alt') || '';
+              openModal(img.src, altText, caption);
             }
           });
         });
@@ -231,6 +245,24 @@
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape' && modal.classList.contains('is-open')) {
             closeModal();
+          }
+        });
+
+        // Focus trap
+        modal.addEventListener('keydown', (e) => {
+          if (!modal.classList.contains('is-open') || e.key !== 'Tab') return;
+          const focusable = modal.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+          );
+          if (!focusable.length) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
           }
         });
       }, 0);

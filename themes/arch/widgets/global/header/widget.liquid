@@ -1,4 +1,4 @@
-<header id="{{ widget.id }}" class="widget-site-header color-scheme-{{ widget.settings.color_scheme }}" data-widget-id="{{ widget.id }}" data-widget-type="header"{% if widget.settings.color_scheme == 'dark' %} style="background-color: var(--bg-primary);"{% endif %}>
+<header id="{{ widget.id }}" class="widget widget-site-header color-scheme-{{ widget.settings.color_scheme }}" data-widget-id="{{ widget.id }}" data-widget-type="header"{% if widget.settings.color_scheme == 'dark' %} style="--widget-bg-color: var(--bg-primary);"{% endif %}>
 
   <style>
     .widget-site-header .header-logo-image {
@@ -24,7 +24,7 @@
     </a>
 
     <div class="header-actions">
-      <nav class="header-nav" id="main-navigation">
+      <nav class="header-nav" id="main-navigation" aria-label="Primary">
         <div class="nav-close">
           <span class="nav-close-title">Menu</span>
           <button class="nav-close-btn" aria-label="Close navigation menu">

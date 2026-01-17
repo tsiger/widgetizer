@@ -68,6 +68,13 @@
           "outputAsCssVar": true
         },
         {
+          "type": "color",
+          "id": "light_rating_star",
+          "label": "Rating Star Color",
+          "default": "#fbbf24",
+          "outputAsCssVar": true
+        },
+        {
           "type": "header",
           "id": "colors_dark_header",
           "label": "Dark Colors"
@@ -126,6 +133,13 @@
           "id": "dark_accent_text",
           "label": "Accent Text Color",
           "default": "#ffffff",
+          "outputAsCssVar": true
+        },
+        {
+          "type": "color",
+          "id": "dark_rating_star",
+          "label": "Rating Star Color",
+          "default": "#fbbf24",
           "outputAsCssVar": true
         }
       ],
