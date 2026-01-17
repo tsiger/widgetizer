@@ -19,27 +19,39 @@
       /* Toggle Style */
       & .switcher-toggle {
         display: flex;
-        background: var(--bg-secondary);
-        padding: var(--space-xs);
-        border-radius: var(--border-radius-full);
-        position: relative;
-        gap: var(--space-xs);
-        border: var(--border-width-thin) solid var(--border-color);
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--space-md);
+        padding: 0;
       }
 
       & .switcher-btn {
-        padding: var(--space-sm) var(--space-xl);
-        border-radius: var(--border-radius-full);
-        border: none;
-        background: transparent;
+        padding: var(--space-sm) var(--space-lg);
+        font-family: inherit;
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-color);
         cursor: pointer;
-        transition: all var(--transition-speed-normal);
-        z-index: 2;
+        transition:
+          background-color 0.3s,
+          color 0.3s,
+          border-color 0.3s;
       }
 
       & .switcher-btn.is-active {
-        background: var(--bg-primary);
-        border: var(--border-width-thin) solid var(--border-color);
+        background-color: var(--text-heading);
+        color: var(--bg-primary);
+        border-color: var(--text-heading);
+      }
+
+      & .switcher-btn:hover {
+        background-color: var(--text-heading);
+        color: var(--bg-primary);
+        border-color: var(--text-heading);
+      }
+
+      & .switcher-btn:focus {
+        outline: var(--border-width-medium) solid var(--border-color);
+        outline-offset: 0.2rem;
       }
 
       /* Content Display */
