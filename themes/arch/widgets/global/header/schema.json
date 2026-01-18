@@ -86,6 +86,13 @@
       "default": true
     },
     {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Sticky Header",
+      "description": "When enabled, the header stays fixed at the top when scrolling",
+      "default": false
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",

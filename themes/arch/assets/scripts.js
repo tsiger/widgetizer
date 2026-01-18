@@ -328,4 +328,26 @@ document.addEventListener("DOMContentLoaded", () => {
     // Re-check positions after resize
     requestAnimationFrame(initializeSubmenuPositions);
   });
+
+  // ============================================================================
+  // Sticky Header Scroll Behavior
+  // Adds shadow when header is sticky and user has scrolled
+  // ============================================================================
+
+  if (widgetElement.classList.contains("header-sticky")) {
+    const handleScroll = () => {
+      const scrollY = window.scrollY || window.pageYOffset;
+      if (scrollY > 10) {
+        widgetElement.classList.add("header-scrolled");
+      } else {
+        widgetElement.classList.remove("header-scrolled");
+      }
+    };
+
+    // Check initial scroll position
+    handleScroll();
+
+    // Listen for scroll events
+    window.addEventListener("scroll", handleScroll, { passive: true });
+  }
 });

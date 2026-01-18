@@ -1015,6 +1015,20 @@ h6 {
   padding-inline: var(--space-md);
   border-block-end: var(--border-width-thin) solid var(--border-color);
 
+  /* Sticky header styles */
+  &.header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    /* Use bg-primary from color scheme for proper background */
+    background-color: var(--bg-primary);
+    transition: box-shadow 0.2s ease-in-out;
+
+    &.header-scrolled {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
   & .header-inner {
     display: flex;
     align-items: center;
