@@ -12,11 +12,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Inject the runtime script
-function injectRuntimeScript(html) {
+function injectRuntimeScript(html, previewMode = "editor") {
   // Use the SERVER_URL environment variable or fallback to localhost
   const serverUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
   const scriptUrl = `${serverUrl}/runtime/previewRuntime.js`;
-  const script = `<script src="${scriptUrl}" type="module"></script>`;
+  const safeMode = previewMode === "standalone" ? "standalone" : "editor";
+  const script = `<script src="${scriptUrl}" type="module" data-preview-mode="${safeMode}"></script>`;
   // Ensure replacement happens even with attributes on body tag
   return html.replace(/<\/body>/i, `${script}\n</body>`);
 }
@@ -24,7 +25,7 @@ function injectRuntimeScript(html) {
 // Generate preview HTML
 export async function generatePreview(req, res) {
   try {
-    const { pageData, themeSettings: rawThemeSettings } = req.body;
+    const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
 
     const projectsData = await readProjectsFile();
     const activeProjectId = projectsData.activeProjectId;
@@ -173,7 +174,7 @@ export async function generatePreview(req, res) {
     );
 
     // Inject runtime script
-    renderedHtml = injectRuntimeScript(renderedHtml);
+    renderedHtml = injectRuntimeScript(renderedHtml, previewMode);
 
     res.send(renderedHtml);
   } catch (error) {

@@ -32,6 +32,9 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     widgets,
     themeSettings,
     previewMode = "desktop",
+    runtimeMode = "editor",
+    showSelectionOverlay = true,
+    includeBaseTag = true,
     onWidgetSelect,
     onBlockSelect,
     onGlobalWidgetSelect,
@@ -69,7 +72,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         setError(null);
 
         const enhancedPageData = { ...page, globalWidgets };
-        const html = await fetchPreview(enhancedPageData, themeSettings);
+        const html = await fetchPreview(enhancedPageData, themeSettings, runtimeMode);
         setPreviewHtml(html);
 
         // Store the initial state for future diffing
@@ -218,7 +221,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
         // Fetch fresh HTML
         const enhancedPageData = { ...page, globalWidgets };
-        const html = await fetchPreview(enhancedPageData, themeSettings);
+        const html = await fetchPreview(enhancedPageData, themeSettings, runtimeMode);
         setPreviewHtml(html);
 
         // Restore scroll position OR scroll to selected widget after structural changes
@@ -278,12 +281,13 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
   // Validate URLs for security (HTML comes from our own server, so no sanitization needed)
   const safeBaseUrl = getSafeBaseUrl(activeProject?.liveUrl, document.baseURI);
+  const baseTag = includeBaseTag ? `<base href="${safeBaseUrl}" target="_blank">` : "";
 
   const iframeSrcDoc = previewHtml.replace(
     "</head>",
     `<script src="${API_URL(
       "/runtime/previewRuntime.js",
-    )}"></script><base href="${safeBaseUrl}" target="_blank"></head>`,
+    )}" type="module" data-preview-mode="${runtimeMode}"></script>${baseTag}</head>`,
   );
 
   return (
@@ -328,7 +332,11 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         ref={iframeRef}
         srcDoc={iframeSrcDoc}
         title={t("pageEditor.preview.title")}
-        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+        sandbox={
+          runtimeMode === "standalone"
+            ? "allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation-by-user-activation"
+            : "allow-scripts allow-same-origin allow-popups allow-forms"
+        }
         className={`w-full h-full border-0 transition-all duration-300 ease-in-out mx-auto ${
           previewMode !== "desktop" ? "shadow-2xl" : ""
         }`}
@@ -340,16 +348,18 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           setInitialLoadComplete(true);
         }}
       />
-      <SelectionOverlay
-        iframeRef={iframeRef}
-        selectedWidgetId={selectedWidgetId}
-        selectedBlockId={selectedBlockId}
-        selectedGlobalWidgetId={selectedGlobalWidgetId}
-        onWidgetSelect={onWidgetSelect}
-        onBlockSelect={onBlockSelect}
-        onGlobalWidgetSelect={onGlobalWidgetSelect}
-        previewReadyKey={previewReadyKey}
-      />
+      {showSelectionOverlay && (
+        <SelectionOverlay
+          iframeRef={iframeRef}
+          selectedWidgetId={selectedWidgetId}
+          selectedBlockId={selectedBlockId}
+          selectedGlobalWidgetId={selectedGlobalWidgetId}
+          onWidgetSelect={onWidgetSelect}
+          onBlockSelect={onBlockSelect}
+          onGlobalWidgetSelect={onGlobalWidgetSelect}
+          previewReadyKey={previewReadyKey}
+        />
+      )}
     </div>
   );
 });

@@ -7,6 +7,46 @@ Note: Widget highlighting is now handled by the SelectionOverlay component
 in the parent window, not by this script.
 */
 
+// Detect preview mode for link behavior
+function getPreviewMode() {
+  const script = document.querySelector('script[src*="previewRuntime.js"][data-preview-mode]');
+  const mode = script?.dataset?.previewMode;
+  return mode === "standalone" ? "standalone" : "editor";
+}
+
+const PREVIEW_MODE = getPreviewMode();
+
+function getStandalonePreviewTarget(href) {
+  if (!href || typeof href !== "string") return null;
+  const trimmed = href.trim();
+  if (trimmed.startsWith("#")) return null;
+
+  const lower = trimmed.toLowerCase();
+  if (
+    lower.startsWith("http:") ||
+    lower.startsWith("https:") ||
+    lower.startsWith("mailto:") ||
+    lower.startsWith("tel:") ||
+    lower.startsWith("javascript:") ||
+    trimmed.startsWith("//")
+  ) {
+    return null;
+  }
+
+  const withoutQuery = trimmed.split("?")[0].split("#")[0];
+  const previewMatch = withoutQuery.match(/^\/?preview\/([^/]+)$/);
+  if (previewMatch) {
+    return `/preview/${previewMatch[1]}`;
+  }
+
+  const htmlMatch = withoutQuery.match(/^\/?([^/]+)\.html$/);
+  if (htmlMatch) {
+    return `/preview/${htmlMatch[1]}`;
+  }
+
+  return null;
+}
+
 // Handle CSS variable updates
 function updateCssVariables(variables) {
   const styleTag = document.getElementById("theme-settings-styles");
@@ -298,6 +338,22 @@ function setupInteractionHandler() {
       // Prevent all link navigation in editor mode to avoid leaving the editor
       const linkElement = event.target.closest("a");
       if (linkElement) {
+        if (PREVIEW_MODE === "standalone") {
+          const href = linkElement.getAttribute("href");
+          if (href?.trim().startsWith("#")) {
+            return;
+          }
+
+          const targetUrl = getStandalonePreviewTarget(href);
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (targetUrl) {
+            window.top.location.assign(targetUrl);
+          }
+          return;
+        }
+
         event.preventDefault();
         event.stopPropagation();
 
@@ -313,6 +369,10 @@ function setupInteractionHandler() {
             "*",
           );
         }
+        return;
+      }
+
+      if (PREVIEW_MODE === "standalone") {
         return;
       }
 

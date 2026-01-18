@@ -33,7 +33,7 @@ function extractFonts(settings) {
 /**
  * Fetch a preview of the page from the server
  */
-export async function fetchPreview(pageData, themeSettings) {
+export async function fetchPreview(pageData, themeSettings, previewMode = "editor") {
   try {
     const response = await fetch(API_URL("/api/preview"), {
       method: "POST",
@@ -43,6 +43,7 @@ export async function fetchPreview(pageData, themeSettings) {
       body: JSON.stringify({
         pageData,
         themeSettings,
+        previewMode,
       }),
     });
 
