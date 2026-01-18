@@ -16,6 +16,9 @@ function registerImageFilter(engine) {
       return `<!-- Image filter error: media file "${filename}" not found in media.json -->`;
     }
 
+    // Check if this is an SVG file - SVGs don't have sizes and should always use original path
+    const isSvg = mediaFile.type === "image/svg+xml" || filename.toLowerCase().endsWith(".svg");
+
     // Parse arguments - LiquidJS passes them as individual parameters
     // Usage: {{ image | image: 'small' }} or {{ image | image: 'large', 'hero-class', false }}
     // For path only: {{ image | image: 'path' }} or {{ image | image: 'url' }}
@@ -26,6 +29,12 @@ function registerImageFilter(engine) {
     const returnPathOnly = firstArg === "path" || firstArg === "url";
 
     if (returnPathOnly) {
+      // For SVG files, always use original path (no sizes available)
+      if (isSvg) {
+        const imageBasePath = this.context.get(["imagePath"]);
+        return `${imageBasePath}/${path.basename(mediaFile.path)}`;
+      }
+
       // For path-only mode, second argument can specify size
       const size = args[1] || "medium";
 
@@ -61,12 +70,22 @@ function registerImageFilter(engine) {
       title: titleOverride || mediaFile.metadata?.title || "",
     };
 
-    // Find the requested size, or fallback gracefully
-    const imageSize = mediaFile.sizes?.[opts.size] || {
-      path: mediaFile.path,
-      width: mediaFile.width,
-      height: mediaFile.height,
-    };
+    // For SVG files, always use original path (no sizes available)
+    let imageSize;
+    if (isSvg) {
+      imageSize = {
+        path: mediaFile.path,
+        width: null, // SVGs don't have fixed dimensions
+        height: null,
+      };
+    } else {
+      // Find the requested size, or fallback gracefully
+      imageSize = mediaFile.sizes?.[opts.size] || {
+        path: mediaFile.path,
+        width: mediaFile.width,
+        height: mediaFile.height,
+      };
+    }
 
     if (!imageSize || !imageSize.path) {
       return `<!-- Image filter error: size "${opts.size}" not found for "${filename}" -->`;
@@ -76,8 +95,9 @@ function registerImageFilter(engine) {
     const classAttr = opts.class ? `class="${opts.class}"` : "";
     const altAttr = `alt="${opts.alt.replace(/"/g, "&quot;")}"`; // Escape quotes
     const titleAttr = opts.title ? `title="${opts.title.replace(/"/g, "&quot;")}"` : "";
-    const widthAttr = imageSize.width ? `width="${imageSize.width}"` : "";
-    const heightAttr = imageSize.height ? `height="${imageSize.height}"` : "";
+    // Don't include width/height for SVG files (they're scalable)
+    const widthAttr = !isSvg && imageSize.width ? `width="${imageSize.width}"` : "";
+    const heightAttr = !isSvg && imageSize.height ? `height="${imageSize.height}"` : "";
     const lazyAttr = opts.lazy ? 'loading="lazy"' : "";
 
     // Get the base path from the context

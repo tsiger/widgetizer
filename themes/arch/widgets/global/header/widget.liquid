@@ -6,6 +6,21 @@
       height: auto;
       display: block;
     }
+    .widget-site-header .header-logo img[src$=".svg"],
+    .widget-site-header .header-logo-image[src$=".svg"] {
+      width: auto;
+      height: auto;
+      max-height: {{ widget.settings.logoMaxWidth | default: 150 }}px;
+      min-height: 40px;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+    .widget-site-header .header-logo {
+      line-height: 0;
+    }
+    .widget-site-header .header-logo img {
+      display: inline-block;
+    }
     {% unless widget.settings.full_width %}
     .widget-site-header .header-inner {
       max-width: var(--container-max-width);

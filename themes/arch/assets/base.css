@@ -1,42 +1,42 @@
 /* ==========================================================================
    WIDGETIZER DESIGN SYSTEM - ARCH THEME
-   ========================================================================== 
-   
+   ==========================================================================
+
    TABLE OF CONTENTS
    =================
-   
+
    1. FOUNDATIONS
       1.1 CSS Reset
       1.2 Design Tokens (CSS Custom Properties)
       1.3 Color Scheme System
-   
+
    2. BASE STYLES
       2.1 Document Defaults
       2.2 Typography Elements
-   
+
    3. TYPOGRAPHY UTILITIES
       3.1 Widget Text Classes
       3.2 Block Text Classes
-   
+
    4. LAYOUT SYSTEM
       4.1 Widget Container System
       4.2 Widget Header & Content
       4.3 Height Modifiers
       4.4 Grid System
-   
+
    5. COMPONENT UTILITIES
       5.1 Cards
       5.2 Buttons
       5.3 Forms
       5.4 Icons
-   
+
    6. BLOCK SYSTEM
       6.1 Block Item Background/Overlay
-   
+
    7. GLOBAL COMPONENTS
       7.1 Site Header
       7.2 Site Footer
-   
+
    8. UTILITY CLASSES
       8.1 Content Flow
       8.2 Feature Lists
@@ -734,7 +734,7 @@ h6 {
   width: var(--icon-size-lg);
   height: var(--icon-size-lg);
   margin-block-end: var(--space-md);
-  color: var(--text-heading);
+  color: var(--accent);
   stroke-width: 0.15rem;
 }
 

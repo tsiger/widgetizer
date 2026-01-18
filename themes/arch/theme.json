@@ -23,21 +23,24 @@
           "id": "light_bg_secondary",
           "label": "Secondary Background",
           "default": "#f1f5f9",
-          "outputAsCssVar": true
+          "outputAsCssVar": true,
+          "value": "#f6fbff"
         },
         {
           "type": "color",
           "id": "light_text_content",
           "label": "Content Text",
           "default": "#1f2937",
-          "outputAsCssVar": true
+          "outputAsCssVar": true,
+          "value": "#45637e"
         },
         {
           "type": "color",
           "id": "light_text_heading",
           "label": "Heading Text",
           "default": "#0f172a",
-          "outputAsCssVar": true
+          "outputAsCssVar": true,
+          "value": "#233C54"
         },
         {
           "type": "color",
@@ -45,7 +48,7 @@
           "label": "Muted Text",
           "default": "#6b7280",
           "outputAsCssVar": true,
-          "value": "#4f68ad"
+          "value": "#6e8ba5"
         },
         {
           "type": "color",
@@ -59,7 +62,8 @@
           "id": "light_accent",
           "label": "Accent Color",
           "default": "#1e3a8a",
-          "outputAsCssVar": true
+          "outputAsCssVar": true,
+          "value": "#DE1877"
         },
         {
           "type": "color",
@@ -102,7 +106,7 @@
           "label": "Content Text",
           "default": "#1f2937",
           "outputAsCssVar": true,
-          "value": "#dbe9f6"
+          "value": "#eaf3fc"
         },
         {
           "type": "color",
@@ -124,7 +128,8 @@
           "id": "dark_border_color",
           "label": "Border Color",
           "default": "#d7dee7",
-          "outputAsCssVar": true
+          "outputAsCssVar": true,
+          "value": "#526884"
         },
         {
           "type": "color",
@@ -132,7 +137,7 @@
           "label": "Accent Color",
           "default": "#1d4ed8",
           "outputAsCssVar": true,
-          "value": "#1c4ccf"
+          "value": "#DE1877"
         },
         {
           "type": "color",
