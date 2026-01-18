@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
+import { randomUUID } from "crypto";
 import prettier from "prettier";
 import archiver from "archiver";
 import { getProjectDir, PUBLISH_DIR } from "../config.js";
@@ -259,6 +260,34 @@ export async function exportProject(req, res) {
     let headerHtml = "";
     let footerHtml = "";
 
+    const cloneWidgetData = (widgetData) => JSON.parse(JSON.stringify(widgetData || {}));
+
+    const randomizeWidgetForExport = (widgetId, widgetData) => {
+      const cloned = cloneWidgetData(widgetData);
+      const randomizedWidgetId = `widget_${randomUUID()}`;
+
+      if (cloned.blocks && typeof cloned.blocks === "object") {
+        const originalBlocksOrder = Array.isArray(cloned.blocksOrder)
+          ? cloned.blocksOrder
+          : Object.keys(cloned.blocks);
+        const newBlocks = {};
+        const newBlocksOrder = [];
+
+        originalBlocksOrder.forEach((oldBlockId) => {
+          const newBlockId = `block_${randomUUID()}`;
+          if (cloned.blocks[oldBlockId]) {
+            newBlocks[newBlockId] = cloned.blocks[oldBlockId];
+          }
+          newBlocksOrder.push(newBlockId);
+        });
+
+        cloned.blocks = newBlocks;
+        cloned.blocksOrder = newBlocksOrder;
+      }
+
+      return { widgetId: randomizedWidgetId, widgetData: cloned };
+    };
+
     for (const pageData of pagesDataArray) {
       // Create shared globals for this page (each page gets fresh enqueue Maps)
       const sharedGlobals = {
@@ -272,10 +301,11 @@ export async function exportProject(req, res) {
 
       // Render header if exists (for each page to capture enqueued assets)
       if (headerData) {
+        const randomizedHeader = randomizeWidgetForExport("header_widget", headerData);
         headerHtml = await renderWidget(
           projectId,
-          "header_widget",
-          headerData,
+          randomizedHeader.widgetId,
+          randomizedHeader.widgetData,
           rawThemeSettings,
           "publish",
           sharedGlobals,
@@ -297,10 +327,11 @@ export async function exportProject(req, res) {
             continue;
           }
           widgetIndex += 1; // 1-based index (first widget = 1, second = 2, etc.)
+          const randomizedWidget = randomizeWidgetForExport(widgetId, widget);
           pageWidgetsHtml += await renderWidget(
             projectId,
-            widgetId,
-            widget,
+            randomizedWidget.widgetId,
+            randomizedWidget.widgetData,
             rawThemeSettings,
             "publish",
             sharedGlobals,
@@ -311,10 +342,11 @@ export async function exportProject(req, res) {
 
       // Render footer if exists
       if (footerData) {
+        const randomizedFooter = randomizeWidgetForExport("footer_widget", footerData);
         footerHtml = await renderWidget(
           projectId,
-          "footer_widget",
-          footerData,
+          randomizedFooter.widgetId,
+          randomizedFooter.widgetData,
           rawThemeSettings,
           "publish",
           sharedGlobals,

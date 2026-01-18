@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { v4 as uuidv4 } from "uuid";
 import { getProjectWidgets } from "../queries/previewManager";
 import usePageStore from "./pageStore";
 import useAutoSave from "./saveStore";
@@ -81,7 +82,11 @@ const useWidgetStore = create((set, get) => ({
   },
 
   generateWidgetId: () => {
-    return `widget_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    return `widget_${uuidv4()}`;
+  },
+
+  generateBlockId: () => {
+    return `block_${uuidv4()}`;
   },
 
   addWidget: (widgetType, position) => {
@@ -106,7 +111,7 @@ const useWidgetStore = create((set, get) => ({
 
     if (Array.isArray(schema.defaultBlocks)) {
       schema.defaultBlocks.forEach((defaultBlock) => {
-        const blockId = `block_${Date.now()}_${Math.floor(Math.random() * 1000)}_${blocksOrder.length}`;
+        const blockId = get().generateBlockId();
 
         // Get block schema for this block type to apply defaults
         const blockSchema = schema.blocks?.find((b) => b.type === defaultBlock.type);
@@ -184,7 +189,7 @@ const useWidgetStore = create((set, get) => ({
 
     if (originalWidget.blocks) {
       originalWidget.blocksOrder?.forEach((oldBlockId) => {
-        const newBlockId = `block_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+        const newBlockId = get().generateBlockId();
         newBlocks[newBlockId] = { ...originalWidget.blocks[oldBlockId] };
         newBlocksOrder.push(newBlockId);
       });
@@ -326,7 +331,7 @@ const useWidgetStore = create((set, get) => ({
 
     if (!blockSchema) return null;
 
-    const blockId = `block_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const blockId = get().generateBlockId();
 
     const defaultSettings = {};
     if (Array.isArray(blockSchema.settings)) {
@@ -477,7 +482,7 @@ const useWidgetStore = create((set, get) => ({
     if (!widget.blocks || !widget.blocks[blockId]) return null;
 
     const originalBlock = widget.blocks[blockId];
-    const newBlockId = `block_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const newBlockId = get().generateBlockId();
 
     const newBlock = JSON.parse(JSON.stringify(originalBlock));
 
