@@ -311,7 +311,7 @@
       "type": "testimonials",
       "settings": {
         "eyebrow": "Testimonials",
-        "title": "Leaders who chose Northbridge",
+        "title": "Leaders who chose Arch",
         "description": "Practical guidance, measurable impact.",
         "columns_desktop": 3,
         "color_scheme": "standard"
@@ -320,7 +320,7 @@
         "quote-1": {
           "type": "quote",
           "settings": {
-            "quote": "Northbridge helped us align our leadership team and unlock a clear growth plan in six weeks.",
+            "quote": "Arch helped us align our leadership team and unlock a clear growth plan in six weeks.",
             "name": "Ariana Patel",
             "title": "COO, BrightWave",
             "rating": "5"
