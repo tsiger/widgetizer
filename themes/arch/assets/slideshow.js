@@ -90,6 +90,66 @@
       slide.setAttribute("aria-hidden", idx === currentIndex ? "false" : "true");
     });
 
+    // ============================================================================
+    // Touch/Swipe Support for Mobile
+    // ============================================================================
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+    const minSwipeDistance = 50; // Minimum distance in pixels to trigger a swipe
+    const maxVerticalSwipe = 100; // Maximum vertical swipe to prevent scroll interference
+
+    const slideshowTrack = widget.querySelector(".slideshow-track");
+    if (slideshowTrack) {
+      slideshowTrack.addEventListener("touchstart", (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      slideshowTrack.addEventListener("touchmove", (e) => {
+        // Allow default scrolling behavior while tracking touch position
+        touchEndX = e.touches[0].clientX;
+        touchEndY = e.touches[0].clientY;
+      }, { passive: true });
+
+      slideshowTrack.addEventListener("touchend", (e) => {
+        if (!touchStartX || !touchEndX) return;
+
+        const deltaX = touchStartX - touchEndX;
+        const deltaY = touchStartY - touchEndY;
+        const absDeltaX = Math.abs(deltaX);
+        const absDeltaY = Math.abs(deltaY);
+
+        // Only trigger swipe if horizontal movement is greater than vertical
+        // and meets minimum distance threshold
+        if (absDeltaX > absDeltaY && absDeltaX > minSwipeDistance && absDeltaY < maxVerticalSwipe) {
+          e.preventDefault();
+          
+          // Stop autoplay when user interacts with swipe
+          stopAutoplay();
+
+          // Swipe left (next slide)
+          if (deltaX < 0) {
+            nextSlide();
+          }
+          // Swipe right (previous slide)
+          else {
+            prevSlide();
+          }
+
+          // Restart autoplay after swipe
+          startAutoplay();
+        }
+
+        // Reset touch coordinates
+        touchStartX = 0;
+        touchEndX = 0;
+        touchStartY = 0;
+        touchEndY = 0;
+      });
+    }
+
     startAutoplay();
   });
 })();

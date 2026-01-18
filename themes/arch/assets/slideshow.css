@@ -137,14 +137,23 @@
   }
 
   @media (max-width: 749px) {
-    & .slideshow-nav {
-      width: 4rem;
-      height: 4rem;
+    /* Add horizontal padding to content on mobile */
+    & .slideshow-slide .widget-container {
+      padding-inline: var(--space-md);
+    }
 
-      & svg {
-        width: 2rem;
-        height: 2rem;
-      }
+    /* Hide navigation arrows on mobile */
+    & .slideshow-nav {
+      display: none;
+    }
+
+    /* Position pagination container */
+    & .slideshow-pagination {
+      inset-block-end: var(--space-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
     }
   }
 }

@@ -21,6 +21,12 @@
       margin-inline: auto;
       {% endunless %}
     }
+
+    @media (max-width: 749px) {
+      .widget-{{ widget.id }} .widget-container {
+        padding-inline: var(--space-md);
+      }
+    }
   </style>
 
   <div class="widget-container">
