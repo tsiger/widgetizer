@@ -205,14 +205,16 @@ export default function WidgetItem({
                             if (onBlockSelect) onBlockSelect(clickedBlockId);
                           }}
                         />
-                        <BlockInsertionZone
-                          widgetId={widgetId}
-                          position={index + 1}
-                          onAddClick={(widgetId, triggerRef) => onAddBlockClick(widgetId, triggerRef, index + 1)}
-                          isBlockSelectorOpen={isBlockSelectorOpen}
-                          activeWidgetId={activeWidgetId}
-                          activeBlockTriggerKey={activeBlockTriggerKey}
-                        />
+                        {index < blockOrder.length - 1 && (
+                          <BlockInsertionZone
+                            widgetId={widgetId}
+                            position={index + 1}
+                            onAddClick={(widgetId, triggerRef) => onAddBlockClick(widgetId, triggerRef, index + 1)}
+                            isBlockSelectorOpen={isBlockSelectorOpen}
+                            activeWidgetId={activeWidgetId}
+                            activeBlockTriggerKey={activeBlockTriggerKey}
+                          />
+                        )}
                       </div>
                     );
                   })}
@@ -241,6 +243,22 @@ export default function WidgetItem({
                 >
                   <Plus size={16} className="mr-2" />
                   <span className="text-sm font-medium">{t("pageEditor.actions.addBlock")}</span>
+                </button>
+              </div>
+            )}
+
+            {blockOrder.length > 0 && (
+              <div className="pt-2">
+                <button
+                  className="w-full flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const triggerRef = { current: e.currentTarget };
+                    onAddBlockClick(widgetId, triggerRef, blockOrder.length);
+                  }}
+                >
+                  <Plus size={12} />
+                  <span>{t("pageEditor.actions.addBlock")}</span>
                 </button>
               </div>
             )}

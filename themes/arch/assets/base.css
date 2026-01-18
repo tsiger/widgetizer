@@ -1,15 +1,61 @@
 /* ==========================================================================
-   WIDGETIZER DESIGN SYSTEM - WIREFRAME MODE
+   WIDGETIZER DESIGN SYSTEM - ARCH THEME
+   ========================================================================== 
+   
+   TABLE OF CONTENTS
+   =================
+   
+   1. FOUNDATIONS
+      1.1 CSS Reset
+      1.2 Design Tokens (CSS Custom Properties)
+      1.3 Color Scheme System
+   
+   2. BASE STYLES
+      2.1 Document Defaults
+      2.2 Typography Elements
+   
+   3. TYPOGRAPHY UTILITIES
+      3.1 Widget Text Classes
+      3.2 Block Text Classes
+   
+   4. LAYOUT SYSTEM
+      4.1 Widget Container System
+      4.2 Widget Header & Content
+      4.3 Height Modifiers
+      4.4 Grid System
+   
+   5. COMPONENT UTILITIES
+      5.1 Cards
+      5.2 Buttons
+      5.3 Forms
+      5.4 Icons
+   
+   6. BLOCK SYSTEM
+      6.1 Block Item Background/Overlay
+   
+   7. GLOBAL COMPONENTS
+      7.1 Site Header
+      7.2 Site Footer
+   
+   8. UTILITY CLASSES
+      8.1 Content Flow
+      8.2 Feature Lists
+      8.3 Accessibility Helpers
+
    ========================================================================== */
+
+/* ==========================================================================
+   1. FOUNDATIONS
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1.1 CSS Reset
+   -------------------------------------------------------------------------- */
 
 /* Base: 62.5% = 10px, so 0.1rem = 1px */
 html {
   font-size: 62.5%;
 }
-
-/* ==========================================================================
-   CSS RESET
-   ========================================================================== */
 
 *,
 *::before,
@@ -24,9 +70,9 @@ img {
   display: block;
 }
 
-/* ==========================================================================
-   CSS CUSTOM PROPERTIES (DESIGN TOKENS)
-   ========================================================================== */
+/* --------------------------------------------------------------------------
+   1.2 Design Tokens (CSS Custom Properties)
+   -------------------------------------------------------------------------- */
 
 :root {
   /* Typography Scale (0.1rem = 1px) */
@@ -135,9 +181,9 @@ img {
   }
 }
 
-/* ==========================================================================
-   COLOR SCHEME SYSTEM
-   ========================================================================== */
+/* --------------------------------------------------------------------------
+   1.3 Color Scheme System
+   -------------------------------------------------------------------------- */
 
 /* Standard color scheme (default) */
 .color-scheme-standard {
@@ -165,8 +211,12 @@ img {
 }
 
 /* ==========================================================================
-   BASE STYLES
+   2. BASE STYLES
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   2.1 Document Defaults
+   -------------------------------------------------------------------------- */
 
 body {
   font-family: var(
@@ -202,7 +252,10 @@ b {
   font-weight: var(--typography-body_font_bold-weight, 700);
 }
 
-/* Heading styles */
+/* --------------------------------------------------------------------------
+   2.2 Typography Elements
+   -------------------------------------------------------------------------- */
+
 h1,
 h2,
 h3,
@@ -236,8 +289,12 @@ h6 {
 }
 
 /* ==========================================================================
-   TYPOGRAPHY UTILITIES
+   3. TYPOGRAPHY UTILITIES
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   3.1 Widget Text Classes
+   -------------------------------------------------------------------------- */
 
 /* Headlines (Section titles, usually centered) */
 /* .widget-headline - No default style, used for semantic hooking */
@@ -282,9 +339,108 @@ h6 {
   margin-block-end: var(--space-sm);
 }
 
+/* --------------------------------------------------------------------------
+   3.2 Block Text Classes
+   -------------------------------------------------------------------------- */
+
+/* Base block text - resets and default styling */
+.block-text {
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+  color: var(--text-content);
+}
+
+/* Size modifiers */
+.block-text-xs {
+  font-size: var(--font-size-xs);
+}
+
+.block-text-sm {
+  font-size: var(--font-size-sm);
+}
+
+.block-text-base {
+  font-size: var(--font-size-base);
+}
+
+.block-text-lg {
+  font-size: var(--font-size-lg);
+}
+
+.block-text-xl {
+  font-size: var(--font-size-xl);
+}
+
+.block-text-2xl {
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-tight);
+}
+
+.block-text-3xl {
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-tight);
+}
+
+.block-text-4xl {
+  font-size: var(--font-size-4xl);
+  line-height: var(--line-height-tight);
+}
+
+.block-text-5xl {
+  font-size: var(--font-size-5xl);
+  line-height: var(--line-height-tight);
+}
+
+/* Weight modifiers */
+.block-text-normal {
+  font-weight: var(--typography-body_font-weight, 400);
+}
+
+.block-text-medium {
+  font-weight: var(--font-weight-medium);
+}
+
+.block-text-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+.block-text-heading-weight {
+  font-weight: var(--typography-heading_font-weight, 700);
+}
+
+.block-text-body-weight {
+  font-weight: var(--typography-body_font_weight, 400);
+}
+
+.block-text-body-bold {
+  font-weight: var(--typography-body_font_bold-weight, 700);
+}
+
+/* Style modifiers */
+.block-text-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.block-text-muted {
+  color: var(--text-muted);
+}
+
+.block-text-heading {
+  color: var(--text-heading);
+}
+
+.block-text-accent {
+  color: var(--accent);
+}
+
 /* ==========================================================================
-   LAYOUT UTILITIES
+   4. LAYOUT SYSTEM
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   4.1 Widget Container System
+   -------------------------------------------------------------------------- */
 
 /* Widget wrapper (handles background only, no spacing) */
 .widget {
@@ -324,6 +480,10 @@ h6 {
   margin-block: 0;
   padding-block: var(--section-padding-block);
 }
+
+/* --------------------------------------------------------------------------
+   4.2 Widget Header & Content
+   -------------------------------------------------------------------------- */
 
 /* Widget header (centered section header) */
 .widget-header {
@@ -396,7 +556,10 @@ h6 {
   }
 }
 
-/* Widget Height Modifiers */
+/* --------------------------------------------------------------------------
+   4.3 Height Modifiers
+   -------------------------------------------------------------------------- */
+
 .widget-height-half,
 .widget-height-two-thirds,
 .widget-height-full {
@@ -418,9 +581,60 @@ h6 {
   min-height: 100dvh; /* Mobile viewport fix */
 }
 
+/* --------------------------------------------------------------------------
+   4.4 Grid System
+   -------------------------------------------------------------------------- */
+
+.widget-grid {
+  display: grid;
+  --grid-gap-auto: max(var(--space-xs), calc(var(--space-xl) - (var(--grid-cols-desktop, 3) - 2) * var(--space-xs)));
+  gap: clamp(var(--space-xs), var(--grid-gap, var(--grid-gap-auto)), var(--space-xl));
+  grid-template-columns: 1fr;
+
+  @media (min-width: 750px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 990px) {
+    grid-template-columns: repeat(var(--grid-cols-desktop, 3), minmax(0, 1fr));
+  }
+}
+
+.widget-grid-2 {
+  --grid-cols-desktop: 2;
+}
+
+.widget-grid-3 {
+  --grid-cols-desktop: 3;
+}
+
+.widget-grid-4 {
+  --grid-cols-desktop: 4;
+}
+
+.widget-grid-5 {
+  --grid-cols-desktop: 5;
+}
+
+.widget-grid-6 {
+  --grid-cols-desktop: 6;
+}
+
+.widget-grid-7 {
+  --grid-cols-desktop: 7;
+}
+
+.widget-grid-8 {
+  --grid-cols-desktop: 8;
+}
+
 /* ==========================================================================
-   CARD UTILITIES
+   5. COMPONENT UTILITIES
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   5.1 Cards
+   -------------------------------------------------------------------------- */
 
 /* Base Card */
 .widget-card {
@@ -542,128 +756,9 @@ h6 {
   }
 }
 
-/* ==========================================================================
-   BLOCK ITEM SYSTEM
-   Reusable background/overlay system for blocks within widgets.
-   Uses same CSS variables as .widget: --widget-bg-color, --widget-overlay-color
-   ========================================================================== */
-
-.block-item {
-  position: relative;
-  background-color: var(--widget-bg-color, transparent);
-  background-size: var(--widget-bg-size, cover);
-  background-position: var(--widget-bg-position, center);
-  background-repeat: var(--widget-bg-repeat, no-repeat);
-
-  /* Overlay pseudo-element (activated by .has-overlay class) */
-  &.has-overlay::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-color: var(--widget-overlay-color, transparent);
-    z-index: 1;
-    pointer-events: none;
-  }
-}
-
-/* ==========================================================================
-   BLOCK TEXT UTILITIES
-   ========================================================================== */
-
-/* Base block text - resets and default styling */
-.block-text {
-  margin: 0;
-  line-height: var(--line-height-relaxed);
-  color: var(--text-content);
-}
-
-/* Size modifiers */
-.block-text-xs {
-  font-size: var(--font-size-xs);
-}
-
-.block-text-sm {
-  font-size: var(--font-size-sm);
-}
-
-.block-text-base {
-  font-size: var(--font-size-base);
-}
-
-.block-text-lg {
-  font-size: var(--font-size-lg);
-}
-
-.block-text-xl {
-  font-size: var(--font-size-xl);
-}
-
-.block-text-2xl {
-  font-size: var(--font-size-2xl);
-  line-height: var(--line-height-tight);
-}
-
-.block-text-3xl {
-  font-size: var(--font-size-3xl);
-  line-height: var(--line-height-tight);
-}
-
-.block-text-4xl {
-  font-size: var(--font-size-4xl);
-  line-height: var(--line-height-tight);
-}
-
-.block-text-5xl {
-  font-size: var(--font-size-5xl);
-  line-height: var(--line-height-tight);
-}
-
-/* Weight modifiers */
-.block-text-normal {
-  font-weight: var(--typography-body_font-weight, 400);
-}
-
-.block-text-medium {
-  font-weight: var(--font-weight-medium);
-}
-
-.block-text-semibold {
-  font-weight: var(--font-weight-semibold);
-}
-
-.block-text-heading-weight {
-  font-weight: var(--typography-heading_font-weight, 700);
-}
-
-.block-text-body-weight {
-  font-weight: var(--typography-body_font_weight, 400);
-}
-
-.block-text-body-bold {
-  font-weight: var(--typography-body_font_bold-weight, 700);
-}
-
-/* Style modifiers */
-.block-text-uppercase {
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.block-text-muted {
-  color: var(--text-muted);
-}
-
-.block-text-heading {
-  color: var(--text-heading);
-}
-
-.block-text-accent {
-  color: var(--accent);
-}
-
-/* ==========================================================================
-   BUTTON UTILITIES
-   ========================================================================== */
+/* --------------------------------------------------------------------------
+   5.2 Buttons
+   -------------------------------------------------------------------------- */
 
 /* Base Button - Secondary style by default */
 .widget-button {
@@ -751,9 +846,9 @@ h6 {
   gap: var(--space-md);
 }
 
-/* ==========================================================================
-   FORM UTILITIES
-   ========================================================================== */
+/* --------------------------------------------------------------------------
+   5.3 Forms
+   -------------------------------------------------------------------------- */
 
 .form-group {
   display: flex;
@@ -852,9 +947,9 @@ h6 {
   }
 }
 
-/* ==========================================================================
-   ICON UTILITIES
-   ========================================================================== */
+/* --------------------------------------------------------------------------
+   5.4 Icons
+   -------------------------------------------------------------------------- */
 
 .widget-icon {
   width: var(--icon-size-lg);
@@ -875,55 +970,40 @@ h6 {
 }
 
 /* ==========================================================================
-   GRID UTILITIES
+   6. BLOCK SYSTEM
    ========================================================================== */
 
-.widget-grid {
-  display: grid;
-  --grid-gap-auto: max(var(--space-xs), calc(var(--space-xl) - (var(--grid-cols-desktop, 3) - 2) * var(--space-xs)));
-  gap: clamp(var(--space-xs), var(--grid-gap, var(--grid-gap-auto)), var(--space-xl));
-  grid-template-columns: 1fr;
+/* --------------------------------------------------------------------------
+   6.1 Block Item Background/Overlay
+   Reusable background/overlay system for blocks within widgets.
+   Uses same CSS variables as .widget: --widget-bg-color, --widget-overlay-color
+   -------------------------------------------------------------------------- */
 
-  @media (min-width: 750px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.block-item {
+  position: relative;
+  background-color: var(--widget-bg-color, transparent);
+  background-size: var(--widget-bg-size, cover);
+  background-position: var(--widget-bg-position, center);
+  background-repeat: var(--widget-bg-repeat, no-repeat);
+
+  /* Overlay pseudo-element (activated by .has-overlay class) */
+  &.has-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--widget-overlay-color, transparent);
+    z-index: 1;
+    pointer-events: none;
   }
-
-  @media (min-width: 990px) {
-    grid-template-columns: repeat(var(--grid-cols-desktop, 3), minmax(0, 1fr));
-  }
-}
-
-.widget-grid-2 {
-  --grid-cols-desktop: 2;
-}
-
-.widget-grid-3 {
-  --grid-cols-desktop: 3;
-}
-
-.widget-grid-4 {
-  --grid-cols-desktop: 4;
-}
-
-.widget-grid-5 {
-  --grid-cols-desktop: 5;
-}
-
-.widget-grid-6 {
-  --grid-cols-desktop: 6;
-}
-
-.widget-grid-7 {
-  --grid-cols-desktop: 7;
-}
-
-.widget-grid-8 {
-  --grid-cols-desktop: 8;
 }
 
 /* ==========================================================================
-   GLOBAL HEADER
+   7. GLOBAL COMPONENTS
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   7.1 Site Header
+   -------------------------------------------------------------------------- */
 
 .widget-site-header {
   /* Reset inherited .widget base styles */
@@ -944,10 +1024,37 @@ h6 {
   & .header-logo {
     display: block;
     text-decoration: none;
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-2xl);
     font-weight: var(--typography-body_font_bold-weight, 700);
     color: var(--text-heading);
     z-index: 1001;
+  }
+
+  & .header-branding {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  & .header-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding-inline-start: var(--space-lg);
+    border-inline-start: var(--border-width-thin) solid var(--border-color);
+  }
+
+  & .header-contact-mobile {
+    display: none;
+    padding-inline-start: 0;
+    border-inline-start: none;
+  }
+
+  & .header-contact-line {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    line-height: var(--line-height-normal);
+    white-space: nowrap;
   }
 
   & .header-actions {
@@ -1054,7 +1161,7 @@ h6 {
 
   & .nav-item {
     & > a,
-    & > button {
+    & > button:not(.submenu-toggle) {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -1076,23 +1183,45 @@ h6 {
       }
     }
 
-    &.has-submenu > a::after {
-      content: "";
-      display: inline-block;
-      width: 2rem;
-      height: 2rem;
-      margin-inline-start: auto;
+    &.has-submenu {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+
+      & > a {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+
+    & .submenu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 4.4rem;
+      height: 4.4rem;
+      padding: 0;
       flex-shrink: 0;
-      background-color: var(--text-content);
-      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6l-6 6'/%3E%3C/svg%3E");
-      mask-repeat: no-repeat;
-      mask-position: center;
-      mask-size: contain;
-      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6l-6 6'/%3E%3C/svg%3E");
-      -webkit-mask-repeat: no-repeat;
-      -webkit-mask-position: center;
-      -webkit-mask-size: contain;
-      transition: transform 0.3s;
+      background: transparent;
+      border: none;
+      border-inline-start: var(--border-width-thin) solid var(--border-color);
+      cursor: pointer;
+      color: var(--text-content);
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: var(--bg-secondary);
+      }
+
+      & svg {
+        width: 2rem;
+        height: 2rem;
+        transition: transform 0.3s;
+      }
+    }
+
+    &.submenu-open > .submenu-toggle svg {
+      transform: rotate(90deg);
     }
   }
 
@@ -1100,6 +1229,7 @@ h6 {
     list-style: none;
     padding: 0;
     margin: 0;
+    width: 100%;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-out;
@@ -1141,6 +1271,21 @@ h6 {
     display: none;
   }
 
+  /* Mobile contact details responsive */
+  @media (max-width: 989px) {
+    & .header-contact {
+      display: none;
+    }
+
+    & .header-contact-mobile {
+      display: flex;
+      margin-block-start: var(--space-md);
+      padding-block-start: var(--space-md);
+      border-block-start: var(--border-width-thin) solid var(--border-color);
+    }
+  }
+
+  /* Desktop styles */
   @media (min-width: 990px) {
     padding-inline: var(--space-xl);
 
@@ -1180,29 +1325,45 @@ h6 {
       position: relative;
 
       & > a,
-      & > button {
+      & > button:not(.submenu-toggle) {
         padding-block: 1rem;
         padding-inline: var(--space-md);
-        font-size: var(--font-size-base);
+        font-size: var(--font-size-sm);
         transition: background-color 0.2s;
 
         &:hover {
           background-color: var(--bg-secondary);
-        color: var(--text-content);
+          color: var(--text-content);
         }
       }
 
+      & .submenu-toggle {
+        display: none;
+      }
+
       &.has-submenu > a::after {
-        width: 1.6rem;
-        height: 1.6rem;
+        content: "";
+        display: inline-block;
+        width: 1.4rem;
+        height: 1.4rem;
         margin-inline-start: var(--space-xs);
-        transform: rotate(90deg);
+        flex-shrink: 0;
+        background-color: currentColor;
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6l6 -6'/%3E%3C/svg%3E");
+        mask-repeat: no-repeat;
+        mask-position: center;
+        mask-size: contain;
+        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6l6 -6'/%3E%3C/svg%3E");
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        -webkit-mask-size: contain;
       }
 
       &:hover > .nav-submenu,
       &:focus-within > .nav-submenu {
-        max-height: none;
-        display: block;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
       }
     }
 
@@ -1211,19 +1372,26 @@ h6 {
       inset-block-start: calc(100% - 0.4rem);
       inset-inline-start: 0;
       min-width: 22rem;
-      background-color: var(--bg-primary);
+      background-color: var(--color-white);
       border: var(--border-width-thin) solid var(--border-color);
-      display: none;
-      max-height: none;
-      overflow: visible;
+    max-height: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-0.5rem);
+      transition:
+        opacity var(--transition-speed-fast) ease,
+        visibility var(--transition-speed-fast) ease,
+        transform var(--transition-speed-fast) ease;
+    overflow: visible;
       padding-block: var(--space-xs);
       padding-inline: 0;
 
       & .nav-item {
+        position: static;
         padding: 0;
 
         & > a,
-        & > button {
+        & > button:not(.submenu-toggle) {
           padding-block: 1.2rem;
           padding-inline: var(--space-md);
           font-size: var(--font-size-sm);
@@ -1234,8 +1402,13 @@ h6 {
           }
         }
 
+        &.has-submenu {
+          position: relative;
+        }
+
         &.has-submenu > a::after {
-          transform: rotate(0deg);
+          mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6l-6 6'/%3E%3C/svg%3E");
+          -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6l-6 6'/%3E%3C/svg%3E");
         }
       }
 
@@ -1244,20 +1417,42 @@ h6 {
         inset-block-start: -0.8rem;
         inset-inline-start: calc(100% - 0.4rem);
         min-width: 22rem;
-        background-color: var(--bg-primary);
+        background-color: var(--color-white);
         border: var(--border-width-thin) solid var(--border-color);
         padding-block: var(--space-xs);
         padding-inline: 0;
-        display: none;
+        max-height: none;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-0.5rem);
+        transition:
+          opacity var(--transition-speed-fast) ease,
+          visibility var(--transition-speed-fast) ease,
+          transform var(--transition-speed-fast) ease;
 
         & .nav-item {
           padding: 0;
+        }
+
+        /* Flip submenu to left when it would overflow viewport */
+        &.submenu-flip {
+          inset-inline-start: auto;
+          inset-inline-end: calc(100% - 0.4rem);
+          transform: translateX(0.5rem);
         }
       }
 
       &:hover > .nav-submenu,
       &:focus-within > .nav-submenu {
-        display: block;
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+      }
+
+      /* Flip chevron when submenu is flipped */
+      &:has(> .nav-submenu.submenu-flip) > a::after {
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6l6 6'/%3E%3C/svg%3E");
+        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6l6 6'/%3E%3C/svg%3E");
       }
     }
 
@@ -1268,12 +1463,16 @@ h6 {
     & .desktop-cta {
       display: inline-block;
     }
+
+    & .header-contact-mobile {
+      display: none;
+    }
   }
 }
 
-/* ==========================================================================
-   GLOBAL FOOTER
-   ========================================================================== */
+/* --------------------------------------------------------------------------
+   7.2 Site Footer
+   -------------------------------------------------------------------------- */
 
 .widget-footer {
   /* Reset inherited .widget base styles */
@@ -1353,8 +1552,12 @@ h6 {
 }
 
 /* ==========================================================================
-   UTILITY CLASSES
+   8. UTILITY CLASSES
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   8.1 Content Flow
+   -------------------------------------------------------------------------- */
 
 .content-flow > * + * {
   margin-block-start: var(--space-md);
@@ -1364,7 +1567,11 @@ h6 {
   margin-block-start: var(--space-xl);
 }
 
-/* Feature list (shared across widgets) */
+/* --------------------------------------------------------------------------
+   8.2 Feature Lists
+   Shared across widgets for consistent feature/benefit presentation
+   -------------------------------------------------------------------------- */
+
 .features-list {
   list-style: none;
   list-style-type: none;
@@ -1400,6 +1607,10 @@ h6 {
   height: 1em;
   display: block;
 }
+
+/* --------------------------------------------------------------------------
+   8.3 Accessibility Helpers
+   -------------------------------------------------------------------------- */
 
 /* Visually hidden (for accessibility) */
 .visually-hidden {

@@ -260,15 +260,31 @@ export default function WidgetList({
                           onHover={handleHover}
                           onRenameWidget={handleRenameWidget}
                         />
-                        <WidgetInsertionZone
-                          position={index + 1}
-                          onAddClick={handleAddWidgetClick}
-                          isWidgetSelectorOpen={isWidgetSelectorOpen}
-                          activeWidgetTriggerPosition={activeWidgetTriggerPosition}
-                        />
+                        {index < sortableWidgets.length - 1 && (
+                          <WidgetInsertionZone
+                            position={index + 1}
+                            onAddClick={handleAddWidgetClick}
+                            isWidgetSelectorOpen={isWidgetSelectorOpen}
+                            activeWidgetTriggerPosition={activeWidgetTriggerPosition}
+                          />
+                        )}
                       </div>
                     );
                   })}
+
+                  <div className="pt-2">
+                    <button
+                      className="w-full flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-medium text-pink-600 hover:text-pink-700 hover:bg-pink-50 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const triggerRef = { current: e.currentTarget };
+                        handleAddWidgetClick(sortableWidgets.length, triggerRef);
+                      }}
+                    >
+                      <Plus size={12} />
+                      <span>{t("pageEditor.actions.addWidget")}</span>
+                    </button>
+                  </div>
                 </div>
               </SortableContext>
 

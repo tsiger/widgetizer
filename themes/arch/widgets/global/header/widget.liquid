@@ -15,13 +15,30 @@
   </style>
 
   <div class="header-inner">
-    <a href="index.html" class="header-logo">
-      {% if widget.settings.logoImage != blank %}
-        {{ widget.settings.logoImage | image: 'medium', 'header-logo-image', false }}
-      {% else %}
-        <span data-setting="logoText">{{ widget.settings.logoText | default: 'Widgetizer' }}</span>
+    <div class="header-branding">
+      <a href="index.html" class="header-logo">
+        {% if widget.settings.logoImage != blank %}
+          {{ widget.settings.logoImage | image: 'medium', 'header-logo-image', false }}
+        {% else %}
+          <span data-setting="logoText">{{ widget.settings.logoText | default: 'Widgetizer' }}</span>
+        {% endif %}
+      </a>
+
+      {% if widget.settings.contactDetailsLine1 != blank or widget.settings.contactDetailsLine2 != blank %}
+        <div class="header-contact">
+          {% if widget.settings.contactDetailsLine1 != blank %}
+            <span class="header-contact-line" data-setting="contactDetailsLine1">
+              {{ widget.settings.contactDetailsLine1 }}
+            </span>
+          {% endif %}
+          {% if widget.settings.contactDetailsLine2 != blank %}
+            <span class="header-contact-line" data-setting="contactDetailsLine2">
+              {{ widget.settings.contactDetailsLine2 }}
+            </span>
+          {% endif %}
+        </div>
       {% endif %}
-    </a>
+    </div>
 
     <div class="header-actions">
       <nav class="header-nav" id="main-navigation" aria-label="Primary">
@@ -60,12 +77,26 @@
             {{ widget.settings.ctaButtonLink.text }}
           </a>
         {% endif %}
+        {% if widget.settings.contactDetailsLine1 != blank or widget.settings.contactDetailsLine2 != blank %}
+          <div class="header-contact header-contact-mobile">
+            {% if widget.settings.contactDetailsLine1 != blank %}
+              <span class="header-contact-line" data-setting="contactDetailsLine1">
+                {{ widget.settings.contactDetailsLine1 }}
+              </span>
+            {% endif %}
+            {% if widget.settings.contactDetailsLine2 != blank %}
+              <span class="header-contact-line" data-setting="contactDetailsLine2">
+                {{ widget.settings.contactDetailsLine2 }}
+              </span>
+            {% endif %}
+          </div>
+        {% endif %}
       </nav>
 
       {% if widget.settings.ctaButtonLink.text != blank %}
-        <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button widget-button-medium desktop-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
-          {{ widget.settings.ctaButtonLink.text }}
-        </a>
+      <a href="{{ widget.settings.ctaButtonLink.href | default: '#' }}" class="widget-button desktop-cta" {% if widget.settings.ctaButtonLink.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}>
+        {{ widget.settings.ctaButtonLink.text }}
+      </a>
       {% endif %}
 
       <button

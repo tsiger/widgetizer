@@ -31,6 +31,25 @@
       "description": "Text to display in the header logo",
       "default": "Arch"
     },
+        {
+      "type": "header",
+      "id": "contact_header",
+      "label": "Contact Details"
+    },
+    {
+      "type": "text",
+      "id": "contactDetailsLine1",
+      "label": "Contact Details 1",
+      "description": "First line of contact info (e.g., phone)",
+      "default": "Call us: (555) 203-9844"
+    },
+    {
+      "type": "text",
+      "id": "contactDetailsLine2",
+      "label": "Contact Details 2",
+      "description": "Second line of contact info (e.g., address)",
+      "default": "1450 Market St, Suite 200"
+    },
     {
       "type": "header",
       "id": "navigation_header",

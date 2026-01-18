@@ -14,12 +14,12 @@
 {%- capture svg_open -%}<svg class="{{ class_attr }}" {%- endcapture -%}
 
 {%- if current_icon -%}
-  {%- assign icon_svg = current_icon.body | replace: '<svg ', svg_open -%}
+  {%- assign icon_svg = current_icon.body | replace: '<svg', svg_open -%}
   {{ icon_svg }}
 {%- else -%}
   {%- assign fallback_icon = icons['help-circle'] -%}
   {%- if fallback_icon -%}
-    {%- assign fallback_svg = fallback_icon.body | replace: '<svg ', svg_open -%}
+    {%- assign fallback_svg = fallback_icon.body | replace: '<svg', svg_open -%}
     {{ fallback_svg }}
   {%- else -%}
     {%- comment -%} Ultimate fallback: simple circle with question mark {%- endcomment -%}
