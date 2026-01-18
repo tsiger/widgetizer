@@ -353,6 +353,15 @@ export async function exportProject(req, res) {
       }
       // --- End Formatting ---
 
+      // Add easter egg ASCII art comment before doctype
+      const easterEggComment = `<!--
+Made with Widgetizer v0.8.3
+Per aspera ad astra
+-->
+`;
+      // Prepend easter egg at the very beginning of the HTML
+      processedHtml = easterEggComment + processedHtml;
+
       // Determine output filename (e.g., index.html for homepage, slug.html otherwise)
       const outputFilename = pageData.id === "index" || pageData.id === "home" ? "index.html" : `${pageData.id}.html`;
       const outputFilePath = path.join(outputDir, outputFilename);

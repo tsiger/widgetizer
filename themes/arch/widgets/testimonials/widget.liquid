@@ -114,13 +114,19 @@
             {% if block.settings.rating != blank %}
               <div class="testimonial-rating">
                 {% assign rating = block.settings.rating | plus: 0 %}
-                {% for i in (1..5) %}
-                  {% if i <= rating %}
-                    <span class="testimonial-star">★</span>
-                  {% else %}
-                    <span class="testimonial-star empty">★</span>
-                  {% endif %}
-                {% endfor %}
+                <span class="stars" aria-hidden="true">
+                  {% for i in (1..5) %}
+                    {% if i <= rating %}
+                      <span class="testimonial-star">★</span>
+                    {% else %}
+                      <span class="testimonial-star empty">★</span>
+                    {% endif %}
+                  {% endfor %}
+                </span>
+
+                <span class="visually-hidden">
+                  Rated {{ rating }} out of 5
+                </span>
               </div>
             {% endif %}
 

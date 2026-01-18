@@ -1,8 +1,8 @@
 {
   "type": "footer",
   "settings": {
-    "twitter_url": "https://twitter.com/widgetizer",
-    "github_url": "https://github.com/widgetizer",
-    "linkedin_url": "https://linkedin.com/company/widgetizer"
+    "twitter_url": "#",
+    "github_url": "#",
+    "linkedin_url": "#"
   }
 }
