@@ -341,6 +341,8 @@ Widgetizer provides powerful Liquid filters to simplify common tasks in your tem
 
 The `image` filter is the recommended way to render images in your theme. It automatically handles generating the correct `src` for different image sizes, adds important attributes like `width`, `height`, and `alt`, and enables lazy loading by default.
 
+**SVG behavior:** SVGs always render from the original file (no size variants). The `size` parameter is ignored for SVGs, and `width`/`height` attributes are omitted. In path-only mode, SVGs always return the original file path.
+
 #### Basic Usage
 
 ```liquid

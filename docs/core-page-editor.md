@@ -18,7 +18,7 @@ The `PageEditor` is composed of several specialized child components, each with 
   - Adding, duplicating, and deleting widgets.
   - Adding blocks to a widget.
 
-- **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page. It has been refactored to work declaratively. Instead of being told _how_ to change, it simply receives the latest application state from the editor and uses a central `updatePreview` function to synchronize the `<iframe>`'s DOM. Navigation within the preview (clicking links) is automatically intercepted and prevented to avoid leaving the editor, while still allowing widget/block selection.
+- **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page. It has been refactored to work declaratively. Instead of being told _how_ to change, it simply receives the latest application state from the editor and uses a central `updatePreview` function to synchronize the `<iframe>`'s DOM. In editor mode, link navigation is intercepted to avoid leaving the editor while still allowing widget/block selection. In standalone preview mode, internal `.html` links route to `/preview/:slug`, while external links remain disabled.
 
 - **`SettingsPanel`**: The right-hand panel. When a widget or block is selected, this panel dynamically displays the relevant configuration options based on its schema. All changes made here are immediately applied to the selected component and reflected in the preview.
 
@@ -69,6 +69,7 @@ The editor provides a way to see a true, live preview of the page, exactly as an
 3.  This route is handled by the `PagePreview` component, which is separate from the main editor layout.
 4.  `PagePreview` fetches the page data and its corresponding server-rendered HTML.
 5.  The raw HTML is then displayed within an `<iframe>`, providing an accurate representation of the final published page.
+6.  Internal `.html` links in the preview navigate to other `/preview/:slug` pages, while external links remain disabled.
 
 ### Saving Changes
 
