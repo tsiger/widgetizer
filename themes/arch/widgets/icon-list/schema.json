@@ -91,21 +91,21 @@
     {
       "type": "item",
       "settings": {
-        "icon": "waves",
+        "icon": "pool",
         "title": "Pool"
       }
     },
     {
       "type": "item",
       "settings": {
-        "icon": "dumbbell",
+        "icon": "barbell",
         "title": "Gym"
       }
     },
     {
       "type": "item",
       "settings": {
-        "icon": "utensils",
+        "icon": "coffee",
         "title": "Restaurant"
       }
     },
@@ -119,7 +119,7 @@
     {
       "type": "item",
       "settings": {
-        "icon": "spa",
+        "icon": "massage",
         "title": "Spa"
       }
     },
@@ -133,7 +133,7 @@
     {
       "type": "item",
       "settings": {
-        "icon": "wind",
+        "icon": "snowflake",
         "title": "Air Conditioning"
       }
     },
