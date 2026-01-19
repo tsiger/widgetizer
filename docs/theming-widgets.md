@@ -695,18 +695,68 @@ Available icon classes:
 4. **Scoped Queries**: Use `widget.querySelector()` - Never `document.querySelector()`
 5. **Proper `this`**: Use `function()` for event handlers, not arrow functions
 
-### External JavaScript Files
+### External Assets (CSS & JavaScript)
 
-For complex widgets, use external files:
+For complex widgets that need shared scripts or styles (like sliders, carousels, or interactive components), place reusable assets in the `assets/` folder and enqueue them:
 
 ```liquid
-{% enqueue_style "widget-name.css", { "priority": 30 } %}
-{% enqueue_script "widget-name.js", { "priority": 30 } %}
+{% enqueue_style "slideshow.css", { "priority": 30 } %}
+{% enqueue_script "slideshow.js", { "priority": 30 } %}
 ```
 
-File location: `assets/widget-name.css` and `assets/widget-name.js`
+**File location:** `assets/slideshow.css` and `assets/slideshow.js`
 
-These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority.
+These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority. The enqueue system **deduplicates** assets, so if multiple widgets on a page use the same file, it's only loaded once.
+
+#### Enqueue Script Options
+
+```liquid
+{% enqueue_script "filename.js" %}
+{% enqueue_script "slider.js", { "location": "footer", "priority": 30, "defer": true } %}
+```
+
+| Option     | Type    | Default    | Description                                          |
+| :--------- | :------ | :--------- | :--------------------------------------------------- |
+| `location` | String  | `"footer"` | Where to render: `"header"` or `"footer"`            |
+| `priority` | Number  | `50`       | Loading order (lower = earlier: 10 → 30 → 50 → 100)  |
+| `defer`    | Boolean | `false`    | Add `defer` attribute to script tag                  |
+| `async`    | Boolean | `false`    | Add `async` attribute to script tag                  |
+
+#### Enqueue Style Options
+
+```liquid
+{% enqueue_style "filename.css" %}
+{% enqueue_style "slideshow.css", { "location": "header", "priority": 30 } %}
+```
+
+| Option     | Type   | Default    | Description                                          |
+| :--------- | :----- | :--------- | :--------------------------------------------------- |
+| `location` | String | `"header"` | Where to render: `"header"` or `"footer"`            |
+| `priority` | Number | `50`       | Loading order (lower = earlier: 10 → 30 → 50 → 100)  |
+| `media`    | String | `null`     | Media query (e.g., `"print"`, `"screen"`)            |
+| `id`       | String | `null`     | ID attribute for the link tag                        |
+
+#### Priority Guidelines for Widgets
+
+- **10-20**: Critical/foundation assets
+- **30-40**: Widget-specific assets (recommended for most widgets)
+- **50**: Default priority
+- **60+**: Non-critical, decorative assets
+
+**Example: Slideshow widget**
+
+```liquid
+{%- comment -%} Enqueue shared assets at top of widget.liquid {%- endcomment -%}
+{% enqueue_style "slideshow.css", { "priority": 30 } %}
+{% assign slide_count = widget.blocksOrder.size %}
+{% if slide_count > 1 %}
+  {% enqueue_script "slideshow.js", { "priority": 30 } %}
+{% endif %}
+
+<section data-widget-id="{{ widget.id }}" data-widget-type="slideshow">
+  {%- comment -%} Widget HTML... {%- endcomment -%}
+</section>
+```
 
 ---
 
