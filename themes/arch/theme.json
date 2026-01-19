@@ -8,147 +8,136 @@
       "colors": [
         {
           "type": "header",
-          "id": "colors_light_header",
-          "label": "Light Colors"
+          "id": "colors_standard_header",
+          "label": "Standard Colors"
         },
         {
           "type": "color",
-          "id": "light_bg_primary",
+          "id": "standard_bg_primary",
           "label": "Primary Background",
           "default": "#ffffff",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "light_bg_secondary",
+          "id": "standard_bg_secondary",
           "label": "Secondary Background",
           "default": "#f1f5f9",
-          "outputAsCssVar": true,
-          "value": "#f6fbff"
+          "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "light_text_content",
+          "id": "standard_text_content",
           "label": "Content Text",
           "default": "#1f2937",
-          "outputAsCssVar": true,
-          "value": "#45637e"
+          "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "light_text_heading",
+          "id": "standard_text_heading",
           "label": "Heading Text",
           "default": "#0f172a",
-          "outputAsCssVar": true,
-          "value": "#233C54"
+          "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "light_text_muted",
+          "id": "standard_text_muted",
           "label": "Muted Text",
           "default": "#6b7280",
-          "outputAsCssVar": true,
-          "value": "#6e8ba5"
+          "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "light_border_color",
+          "id": "standard_border_color",
           "label": "Border Color",
           "default": "#e2e8f0",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "light_accent",
+          "id": "standard_accent",
           "label": "Accent Color",
           "default": "#1e3a8a",
-          "outputAsCssVar": true,
-          "value": "#DE1877"
+          "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "light_accent_text",
+          "id": "standard_accent_text",
           "label": "Accent Text Color",
           "default": "#ffffff",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "light_rating_star",
+          "id": "standard_rating_star",
           "label": "Rating Star Color",
           "default": "#fbbf24",
           "outputAsCssVar": true
         },
         {
           "type": "header",
-          "id": "colors_dark_header",
-          "label": "Dark Colors"
+          "id": "colors_highlight_header",
+          "label": "Highlight Colors"
         },
         {
           "type": "color",
-          "id": "dark_bg_primary",
+          "id": "highlight_bg_primary",
           "label": "Primary Background",
-          "default": "#eef2f6",
-          "outputAsCssVar": true,
-          "value": "#233c54"
+          "default": "#233c54",
+          "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "dark_bg_secondary",
+          "id": "highlight_bg_secondary",
           "label": "Secondary Background",
-          "default": "#e6ebf2",
-          "outputAsCssVar": true,
-          "value": "#152a3e"
+          "default": "#152a3e",
+          "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "dark_text_content",
+          "id": "highlight_text_content",
           "label": "Content Text",
-          "default": "#1f2937",
-          "outputAsCssVar": true,
-          "value": "#eaf3fc"
+          "default": "#eaf3fc",
+          "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "dark_text_heading",
+          "id": "highlight_text_heading",
           "label": "Heading Text",
-          "default": "#111827",
-          "outputAsCssVar": true,
-          "value": "#ffffff"
+          "default": "#ffffff",
+          "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "dark_text_muted",
+          "id": "highlight_text_muted",
           "label": "Muted Text",
           "default": "#64748b",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "dark_border_color",
+          "id": "highlight_border_color",
           "label": "Border Color",
-          "default": "#d7dee7",
-          "outputAsCssVar": true,
-          "value": "#526884"
+          "default": "#526884",
+          "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "dark_accent",
+          "id": "highlight_accent",
           "label": "Accent Color",
-          "default": "#1d4ed8",
-          "outputAsCssVar": true,
-          "value": "#DE1877"
+          "default": "#DE1877",
+          "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "dark_accent_text",
+          "id": "highlight_accent_text",
           "label": "Accent Text Color",
           "default": "#ffffff",
           "outputAsCssVar": true
         },
         {
           "type": "color",
-          "id": "dark_rating_star",
+          "id": "highlight_rating_star",
           "label": "Rating Star Color",
           "default": "#fbbf24",
           "outputAsCssVar": true
@@ -165,10 +154,6 @@
           "id": "heading_font",
           "label": "Heading Font",
           "default": {
-            "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
-            "weight": 700
-          },
-          "value": {
             "stack": "\"Fraunces\", serif",
             "weight": 600
           }
@@ -178,10 +163,6 @@
           "id": "body_font",
           "label": "Body Font",
           "default": {
-            "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
-            "weight": 400
-          },
-          "value": {
             "stack": "\"Inter\", sans-serif",
             "weight": 400
           }
