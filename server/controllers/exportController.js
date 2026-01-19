@@ -9,6 +9,25 @@ import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
 import { readProjectsFile } from "./projectController.js";
 
+const PACKAGE_JSON_PATH = path.join(process.cwd(), "package.json");
+let cachedAppVersion = null;
+
+async function getAppVersion() {
+  if (cachedAppVersion) {
+    return cachedAppVersion;
+  }
+
+  try {
+    const packageJson = await fs.readJson(PACKAGE_JSON_PATH);
+    cachedAppVersion = packageJson?.version || "unknown";
+  } catch (error) {
+    console.warn("Could not read package.json version:", error.message);
+    cachedAppVersion = "unknown";
+  }
+
+  return cachedAppVersion;
+}
+
 // Export history file path
 const EXPORT_HISTORY_FILE = path.join(PUBLISH_DIR, "export-history.json");
 
@@ -385,9 +404,11 @@ export async function exportProject(req, res) {
       }
       // --- End Formatting ---
 
+      const appVersion = await getAppVersion();
+
       // Add easter egg ASCII art comment before doctype
       const easterEggComment = `<!--
-Made with Widgetizer v0.8.3
+Made with Widgetizer v${appVersion}
 Per aspera ad astra
 -->
 `;
