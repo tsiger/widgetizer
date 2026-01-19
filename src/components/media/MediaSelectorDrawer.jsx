@@ -65,21 +65,28 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
   }, [visible]);
 
   // Filter files based on search term and type
-  const filteredFiles = mediaFiles.filter((file) => {
-    const matchesSearch = file.originalName.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredFiles = mediaFiles
+    .filter((file) => {
+      const matchesSearch = file.originalName.toLowerCase().includes(searchTerm.toLowerCase());
 
-    if (filterType === "all") {
+      if (filterType === "all") {
+        return matchesSearch;
+      } else if (filterType === "image") {
+        return matchesSearch && file.type && file.type.startsWith("image/");
+      } else if (filterType === "video") {
+        return matchesSearch && file.type && file.type.startsWith("video/");
+      } else if (filterType === "audio") {
+        return matchesSearch && file.type && file.type.startsWith("audio/");
+      }
+
       return matchesSearch;
-    } else if (filterType === "image") {
-      return matchesSearch && file.type && file.type.startsWith("image/");
-    } else if (filterType === "video") {
-      return matchesSearch && file.type && file.type.startsWith("video/");
-    } else if (filterType === "audio") {
-      return matchesSearch && file.type && file.type.startsWith("audio/");
-    }
-
-    return matchesSearch;
-  });
+    })
+    // Sort by upload date (newest first)
+    .sort((a, b) => {
+      const dateA = a.uploaded ? new Date(a.uploaded).getTime() : 0;
+      const dateB = b.uploaded ? new Date(b.uploaded).getTime() : 0;
+      return dateB - dateA; // Descending order (newest first)
+    });
 
   // Handle Escape key press to close the drawer
   useEffect(() => {
@@ -172,7 +179,7 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
               {searchTerm ? t("components.mediaSelector.noMatch") : t("components.mediaSelector.noFiles")}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {filteredFiles.map((file) => (
                 <div
                   key={file.id}
