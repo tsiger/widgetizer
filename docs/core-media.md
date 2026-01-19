@@ -9,8 +9,8 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
 ### Physical File Storage
 
 - **Location**: Uploaded files are physically stored on the server's filesystem:
-  - **Images**: `/data/projects/<projectId>/uploads/images/`
-  - **Videos**: `/data/projects/<projectId>/uploads/videos/`
+- **Images**: `/data/projects/<folderName>/uploads/images/`
+- **Videos**: `/data/projects/<folderName>/uploads/videos/`
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
 - **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original with prefixes (e.g., `thumb_`, `small_`, `medium_`, `large_`).
 - **Smart Size Generation**: The system only creates image sizes that are meaningfully smaller than the original. If an image is 800px wide and the "large" size is configured for 1920px, no "large" size will be generated since it would be identical to a smaller size. The image filter automatically falls back to the best available size or original image.
@@ -35,7 +35,7 @@ The system's image processing behavior is controlled through **App Settings**, m
 
 All metadata for the files in a project's media library is stored in a single JSON file.
 
-- **Location**: `/data/projects/<projectId>/uploads/media.json`
+- **Location**: `/data/projects/<folderName>/uploads/media.json`
 - **Structure**: This file contains a single object with a `files` array. Each object in the array represents one file and stores critical information.
 
 ```json
@@ -307,6 +307,8 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 | `POST` | `/api/media/projects/:projectId/refresh-usage` |  | `refreshMediaUsage` | Manually refreshes usage tracking for all media files in the project. |
 | `GET` | `/api/media/projects/:projectId/uploads/images/:filename` |  | `serveProjectMedia` | Serves a physical file for viewing. |
 
+**Identifier contract:** `:projectId` is always the project UUID in API routes. The backend resolves it to `folderName` for filesystem paths. If the UUID cannot be resolved, the request fails (no fallback directories are created). Errors use standardized codes (for example `PROJECT_NOT_FOUND`, `PROJECT_DIR_MISSING`) to keep responses consistent.
+
 ### Controller Logic (`server/controllers/mediaController.js`)
 
 - **Dynamic Image Processing Settings**: The system loads image processing configuration dynamically from App Settings:
@@ -316,7 +318,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
   // Returns only enabled sizes with their width and quality settings
   ```
 - **File Upload (`multer` + `uploadProjectMedia`)**:
-  1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (images: `/data/projects/<projectId>/uploads/images/`, videos: `/data/projects/<projectId>/uploads/videos/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type.
+  1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (images: `/data/projects/<folderName>/uploads/images/`, videos: `/data/projects/<folderName>/uploads/videos/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type.
   2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the appropriate size limit (`media.maxFileSizeMB` for images, `media.maxVideoSizeMB` for videos).
   3.  For each valid file, it generates a unique ID (`uuidv4`).
   4.  **SVG Sanitization**: If the file is an SVG, it's sanitized using `DOMPurify` with SVG profile to prevent XSS attacks before being saved.

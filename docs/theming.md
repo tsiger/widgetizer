@@ -762,8 +762,8 @@ Directly includes CSS, JavaScript, or image assets in your templates. Unlike `en
 
 Assets are loaded from different directories based on context:
 
-- **When used in a widget template**: Loads from `data/projects/{projectId}/widgets/{filename}`
-- **When used elsewhere (layout, snippets)**: Loads from `data/projects/{projectId}/assets/{filename}`
+- **When used in a widget template**: Loads from `data/projects/{folderName}/widgets/{filename}`
+- **When used elsewhere (layout, snippets)**: Loads from `data/projects/{folderName}/assets/{filename}`
 
 **Output:**
 
@@ -1483,7 +1483,7 @@ This theming system provides a powerful and flexible foundation for creating bea
 
 When a new project is created, the selected theme is copied into the project's data directory so it can be customized independently of the source theme:
 
-- **Destination**: `/data/projects/<projectId>/`
+- **Destination**: `/data/projects/<folderName>/`
 - **Copied items**: `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`
 
 After this copy, edits in the project affect only that project's files and do not modify the original theme in `/themes/`.

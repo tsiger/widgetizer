@@ -97,7 +97,8 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
 2.  **Create Output Directory**:
 
     - A new directory is created inside `/data/publish/`.
-    - To prevent overwriting previous exports, the directory is named with the project's **slug** (with ID as fallback) and version number (e.g., `my-project-slug-v1`, `my-project-slug-v2`, etc.).
+    - To prevent overwriting previous exports, the directory is named with the project's **folderName** and version number (e.g., `my-project-slug-v1`, `my-project-slug-v2`, etc.).
+    - If the project ID cannot be resolved, the export fails with a clear error.
 
 3.  **Load Project Data**:
 

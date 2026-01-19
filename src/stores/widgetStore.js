@@ -221,8 +221,15 @@ const useWidgetStore = create((set, get) => ({
       widgetsOrder: newWidgetsOrder,
     });
 
-    // Select the new widget, clear hover state, and mark changes for auto-save
-    set({ selectedWidgetId: newWidgetId, selectedBlockId: null, hoveredWidgetId: null, hoveredBlockId: null });
+    // Select the new widget, clear other selection + hover state, and mark changes for auto-save
+    set({
+      selectedWidgetId: newWidgetId,
+      selectedBlockId: null,
+      selectedGlobalWidgetId: null,
+      selectedThemeGroup: null,
+      hoveredWidgetId: null,
+      hoveredBlockId: null,
+    });
     useAutoSave.getState().setStructureModified(true);
 
     return newWidgetId;
@@ -250,14 +257,9 @@ const useWidgetStore = create((set, get) => ({
     useAutoSave.getState().setStructureModified(true);
 
     if (selectedWidgetId === widgetId) {
-      const widgetIds = Object.keys(remainingWidgets);
-      if (widgetIds.length > 0) {
-        const deletedIndex = Object.keys(page.widgets).indexOf(widgetId);
-        const nextIndex = Math.min(deletedIndex, widgetIds.length - 1);
-        set({ selectedWidgetId: widgetIds[nextIndex] });
-      } else {
-        set({ selectedWidgetId: null });
-      }
+      const deletedIndex = currentOrder.indexOf(widgetId);
+      const nextWidgetId = deletedIndex !== -1 ? newWidgetsOrder[deletedIndex] : null;
+      set({ selectedWidgetId: nextWidgetId || null });
     }
   },
 

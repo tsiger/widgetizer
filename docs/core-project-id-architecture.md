@@ -241,15 +241,31 @@ const projectDir = getProjectDir(projectFolderName);
 export async function getProjectFolderName(projectId) {
   const projectsPath = getProjectsFilePath();
   try {
-    if (await fs.pathExists(projectsPath)) {
-      const data = JSON.parse(await fs.readFile(projectsPath, "utf8"));
-      const project = data.projects.find((p) => p.id === projectId);
-      if (project) return project.folderName;
+    if (!(await fs.pathExists(projectsPath))) {
+      const error = new Error("Projects file not found");
+      error.code = PROJECT_ERROR_CODES.PROJECTS_FILE_MISSING;
+      throw error;
     }
+
+    const data = JSON.parse(await fs.readFile(projectsPath, "utf8"));
+    const project = data.projects.find((p) => p.id === projectId);
+    if (project) return project.folderName;
+
+    const error = new Error(`Project not found for ID ${projectId}`);
+    error.code = PROJECT_ERROR_CODES.PROJECT_NOT_FOUND;
+    throw error;
   } catch (error) {
-    console.error(`Error resolving project folderName for ID ${projectId}:`, error);
+    if (
+      error.code === PROJECT_ERROR_CODES.PROJECTS_FILE_MISSING ||
+      error.code === PROJECT_ERROR_CODES.PROJECT_NOT_FOUND
+    ) {
+      throw error;
+    }
+
+    const wrappedError = new Error(`Failed to resolve project folderName for ID ${projectId}: ${error.message}`);
+    wrappedError.code = PROJECT_ERROR_CODES.PROJECTS_FILE_READ_FAILED;
+    throw wrappedError;
   }
-  return projectId; // Fallback to ID if resolution fails
 }
 ```
 
@@ -257,7 +273,30 @@ export async function getProjectFolderName(projectId) {
 
 - Imported by controllers that need folderName resolution
 - Provides consistent error handling
-- Falls back to using the ID if folderName cannot be resolved
+- Throws if the project cannot be resolved so callers can respond with 404/500
+
+### Project Error Helpers (`server/utils/projectErrors.js`)
+
+Centralized error codes and helpers used by controllers/services to detect and respond to project resolution failures.
+
+```javascript
+export const PROJECT_ERROR_CODES = {
+  PROJECTS_FILE_MISSING: "PROJECTS_FILE_MISSING",
+  PROJECTS_FILE_READ_FAILED: "PROJECTS_FILE_READ_FAILED",
+  PROJECT_NOT_FOUND: "PROJECT_NOT_FOUND",
+  PROJECT_DIR_MISSING: "PROJECT_DIR_MISSING",
+};
+
+export function isProjectResolutionError(error) {
+  if (!error || !error.code) return false;
+  return Object.values(PROJECT_ERROR_CODES).includes(error.code);
+}
+```
+
+**Usage:**
+
+- Controllers use `handleProjectResolutionError(res, error)` to return consistent 404/500 responses.
+- Services use `isProjectResolutionError(error)` to propagate resolution failures without masking them.
 
 ---
 
@@ -381,7 +420,7 @@ if (updatedProject.folderName !== originalProject.folderName) {
 
 - Confirm you're using folderName, not UUID, for paths
 - Check `getProjectFolderName()` is being called
-- Verify fallback to `project.id` is working
+- If resolution fails, expect a 404/500 instead of a fallback
 
 ### FolderName conflicts
 

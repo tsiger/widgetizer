@@ -25,6 +25,7 @@ import { registerYouTubeFilter } from "../../src/core/filters/youtubeFilter.js";
 import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
+import { isProjectResolutionError } from "../utils/projectErrors.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -397,6 +398,9 @@ async function renderWidget(
     });
     return rendered;
   } catch (error) {
+    if (isProjectResolutionError(error)) {
+      throw error;
+    }
     console.error(`Error rendering widget ${widgetId} (Project: ${projectId}):`, error);
     // Return a more informative error message in the HTML
     return `<div class="widget-error" data-widget-id="${widgetId}" data-widget-type="${widgetData?.type || "unknown"}">
@@ -469,6 +473,9 @@ async function renderPageLayout(
     });
     return renderedHtml;
   } catch (error) {
+    if (isProjectResolutionError(error)) {
+      throw error;
+    }
     console.error(`Error rendering page layout for project ${projectId}:`, error);
     return `<html><body><h1>Error rendering page</h1><pre>${error.message}</pre></body></html>`;
   }

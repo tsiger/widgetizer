@@ -20,6 +20,7 @@ import {
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
+import { handleProjectResolutionError, PROJECT_ERROR_CODES } from "../utils/projectErrors.js";
 
 // Get image processing settings from app settings
 async function getImageProcessingSettings() {
@@ -90,6 +91,13 @@ async function acquireWriteLock(projectId) {
 // Read media.json metadata file
 export async function readMediaFile(projectId) {
   const projectFolderName = await getProjectFolderName(projectId);
+  const projectDir = getProjectDir(projectFolderName);
+
+  if (!(await fs.pathExists(projectDir))) {
+    const error = new Error(`Project directory not found for ${projectId}`);
+    error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
+    throw error;
+  }
   const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
 
   try {
@@ -169,6 +177,12 @@ export async function writeMediaFile(projectId, data, retryCount = 0) {
 
   try {
     const projectFolderName = await getProjectFolderName(projectId);
+    const projectDir = getProjectDir(projectFolderName);
+    if (!(await fs.pathExists(projectDir))) {
+      const error = new Error(`Project directory not found for ${projectId}`);
+      error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
+      throw error;
+    }
     const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
     const tempFilePath = `${mediaFilePath}.tmp.${uniqueId}`;
 
@@ -253,6 +267,13 @@ const storage = multer.diskStorage({
     try {
       const { projectId } = req.params;
       const projectFolderName = await getProjectFolderName(projectId);
+      const projectDir = getProjectDir(projectFolderName);
+
+      if (!(await fs.pathExists(projectDir))) {
+        const error = new Error(`Project directory not found for ${projectId}`);
+        error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
+        throw error;
+      }
       let targetDir;
 
       if (file.mimetype.startsWith("video/")) {
@@ -277,6 +298,13 @@ const storage = multer.diskStorage({
       let cleanName = slugify(nameWithoutExt, { lower: true, strict: true, trim: true });
       const { projectId } = req.params;
       const projectFolderName = await getProjectFolderName(projectId);
+      const projectDir = getProjectDir(projectFolderName);
+
+      if (!(await fs.pathExists(projectDir))) {
+        const error = new Error(`Project directory not found for ${projectId}`);
+        error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
+        throw error;
+      }
 
       let targetDir;
       if (file.mimetype.startsWith("video/")) {
@@ -348,6 +376,7 @@ export async function getProjectMedia(req, res) {
     res.json(mediaData);
   } catch (error) {
     console.error(`Error getting project media for project ${req.params.projectId}:`, error);
+    if (handleProjectResolutionError(res, error)) return;
     res.status(500).json({
       error: "Failed to get project media",
       message: error.message,
@@ -559,6 +588,7 @@ export async function uploadProjectMedia(req, res) {
   } catch (error) {
     // Handle errors like reading settings file, reading/writing media.json etc.
     console.error("Error during project media upload process:", error);
+    if (handleProjectResolutionError(res, error)) return;
     res.status(500).json({
       error: error.message || "Failed to process file upload.",
       details: process.env.NODE_ENV === "development" ? error.stack : undefined,
@@ -632,6 +662,7 @@ export async function updateMediaMetadata(req, res) {
     });
   } catch (error) {
     console.error("Error updating media metadata:", error);
+    if (handleProjectResolutionError(res, error)) return;
     res.status(500).json({ error: "Failed to update media metadata" });
   }
 }
@@ -712,6 +743,7 @@ export async function deleteProjectMedia(req, res) {
     res.json({ message: "File deleted successfully" });
   } catch (error) {
     console.error("Error deleting project media:", error);
+    if (handleProjectResolutionError(res, error)) return;
     res.status(500).json({ error: "Failed to delete project media" });
   }
 }
@@ -795,6 +827,7 @@ export async function serveProjectMedia(req, res) {
     fileStream.pipe(res);
   } catch (error) {
     console.error("Error serving project media:", error);
+    if (handleProjectResolutionError(res, error)) return;
     res.status(500).json({ error: "Failed to serve project media" });
   }
 }
@@ -914,6 +947,7 @@ export async function bulkDeleteProjectMedia(req, res) {
     res.status(200).json(response);
   } catch (error) {
     console.error("Error during bulk media deletion:", error);
+    if (handleProjectResolutionError(res, error)) return;
     res.status(500).json({
       error: "Failed to delete files.",
       details: process.env.NODE_ENV === "development" ? error.stack : undefined,
@@ -934,6 +968,7 @@ export async function getMediaFileUsage(req, res) {
     res.json(usage);
   } catch (error) {
     console.error("Error getting media usage:", error);
+    if (handleProjectResolutionError(res, error)) return;
     if (error.message === "File not found") {
       res.status(404).json({ error: error.message });
     } else {
@@ -955,6 +990,7 @@ export async function refreshMediaUsage(req, res) {
     res.json(result);
   } catch (error) {
     console.error("Error refreshing media usage:", error);
+    if (handleProjectResolutionError(res, error)) return;
     res.status(500).json({ error: "Failed to refresh media usage" });
   }
 }

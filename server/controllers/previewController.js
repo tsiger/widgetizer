@@ -7,6 +7,7 @@ import { dirname } from "path";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
+import { isProjectResolutionError } from "../utils/projectErrors.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -179,6 +180,11 @@ export async function generatePreview(req, res) {
     res.send(renderedHtml);
   } catch (error) {
     console.error("Error generating preview:", error);
+    if (isProjectResolutionError(error)) {
+      return res
+        .status(404)
+        .send(`<html><body><h1>Preview Error</h1><pre>${error.message}</pre></body></html>`);
+    }
     res.status(500).send(`<html><body><h1>Preview Error</h1><pre>${error.message}\n${error.stack}</pre></body></html>`);
   }
 }
@@ -202,6 +208,9 @@ export async function renderSingleWidget(req, res) {
     res.send(renderedWidget);
   } catch (error) {
     console.error("Widget rendering error:", error);
+    if (isProjectResolutionError(error)) {
+      return res.status(404).json({ error: "Project not found", message: error.message });
+    }
     res.status(500).json({
       error: "Failed to render widget",
       message: error.message,
@@ -263,6 +272,9 @@ export async function getGlobalWidgets(req, res) {
     res.json(globalWidgets);
   } catch (error) {
     console.error("Error getting global widgets:", error);
+    if (isProjectResolutionError(error)) {
+      return res.status(404).json({ error: "Project not found", message: error.message });
+    }
     res.status(500).json({
       error: "Failed to get global widgets data",
       message: error.message,
@@ -313,6 +325,9 @@ export async function saveGlobalWidget(req, res) {
     res.json({ success: true, data: widgetData });
   } catch (error) {
     console.error("Error saving global widget:", error);
+    if (isProjectResolutionError(error)) {
+      return res.status(404).json({ error: "Project not found", message: error.message });
+    }
     res.status(500).json({ error: "Failed to save global widget" });
   }
 }
@@ -363,6 +378,9 @@ export async function serveAsset(req, res) {
   } catch (error) {
     console.error(`Error serving asset: ${error.message}`);
     console.error(error.stack);
+    if (isProjectResolutionError(error)) {
+      return res.status(404).json({ error: "Project not found", message: error.message });
+    }
     return res.status(500).json({
       error: "Failed to serve asset",
       message: error.message,

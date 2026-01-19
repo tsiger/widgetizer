@@ -293,10 +293,10 @@ export async function updatePage(req, res) {
     try {
       // If slug changed, remove the old slug first
       if (oldSlug !== finalNewSlug) {
-        await removePageFromMediaUsage(projectFolderName, oldSlug);
+        await removePageFromMediaUsage(activeProjectId, oldSlug);
       }
       // Then update with the new slug (or refresh if slug didn't change)
-      await updatePageMediaUsage(projectFolderName, finalNewSlug, finalUpdatedPageData);
+      await updatePageMediaUsage(activeProjectId, finalNewSlug, finalUpdatedPageData);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for page ${finalNewSlug}:`, usageError);
       // Don't fail the request if usage tracking fails
@@ -422,7 +422,7 @@ export async function bulkDeletePages(req, res) {
 
       // Remove the page from media usage tracking
       try {
-        await removePageFromMediaUsage(projectFolderName, pageId);
+        await removePageFromMediaUsage(activeProjectId, pageId);
       } catch (usageError) {
         console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
         // Don't fail the deletion if usage tracking fails
@@ -585,10 +585,10 @@ export async function savePageContent(req, res) {
     try {
       // If slug changed, remove the old slug first
       if (id !== pageData.slug) {
-        await removePageFromMediaUsage(projectFolderName, id);
+        await removePageFromMediaUsage(activeProjectId, id);
       }
       // Then update with the new slug
-      await updatePageMediaUsage(projectFolderName, pageData.slug, updatedPageData);
+      await updatePageMediaUsage(activeProjectId, pageData.slug, updatedPageData);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for page ${pageData.slug}:`, usageError);
       // Don't fail the request if usage tracking fails
@@ -675,7 +675,7 @@ export async function duplicatePage(req, res) {
 
     // Update media usage tracking for the new page
     try {
-      await updatePageMediaUsage(projectFolderName, newSlug, newPage);
+      await updatePageMediaUsage(activeProjectId, newSlug, newPage);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for duplicated page ${newSlug}:`, usageError);
       // Don't fail the request if usage tracking fails

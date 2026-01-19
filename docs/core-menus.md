@@ -6,7 +6,7 @@ This document provides a comprehensive overview of the menu management system, f
 
 Each menu is stored as an individual JSON file within the active project's directory. This isolates menu data and keeps it organized per-project.
 
-- **Location**: `/data/projects/<projectId>/menus/`
+- **Location**: `/data/projects/<folderName>/menus/`
 - **Filename**: The filename is a "slugified" version of the menu's name (e.g., `main-menu.json`).
 
 A typical menu JSON file (`main-menu.json`) has the following structure:

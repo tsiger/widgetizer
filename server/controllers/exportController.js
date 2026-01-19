@@ -198,7 +198,7 @@ export async function exportProject(req, res) {
     await fs.ensureDir(outputImagesDir);
     await fs.ensureDir(outputVideosDir);
     await fs.ensureDir(outputAudiosDir);
-    const rawThemeSettings = await readProjectThemeData(projectFolderName);
+    const rawThemeSettings = await readProjectThemeData(projectId);
 
     // Fetch list of page data using the helper function
     const pagesDataArray = await listProjectPagesData(projectFolderName);

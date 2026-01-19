@@ -10,6 +10,7 @@ import {
   getProjectThemeJsonPath,
 } from "../config.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
+import { handleProjectResolutionError } from "../utils/projectErrors.js";
 
 export async function ensureThemesDirectory() {
   try {
@@ -168,7 +169,8 @@ export async function copyThemeToProject(themeName, projectDir, excludeDirs = []
  * @throws {Error} - If the theme file doesn't exist or cannot be read/parsed.
  */
 export async function readProjectThemeData(projectId) {
-  const themeFile = getProjectThemeJsonPath(projectId);
+  const projectFolderName = await getProjectFolderName(projectId);
+  const themeFile = getProjectThemeJsonPath(projectFolderName);
   try {
     // Check existence first to provide a clearer error if not found
     await fs.access(themeFile);
@@ -383,12 +385,12 @@ export async function uploadTheme(req, res) {
 export async function getProjectThemeSettings(req, res) {
   try {
     const { projectId } = req.params;
-    const projectFolderName = await getProjectFolderName(projectId);
     // Call the internal helper function
-    const themeData = await readProjectThemeData(projectFolderName);
+    const themeData = await readProjectThemeData(projectId);
     res.json(themeData);
   } catch (error) {
     // Handle errors appropriately for the API response
+    if (handleProjectResolutionError(res, error)) return;
     if (error.message.includes("not found")) {
       res.status(404).json({ message: error.message });
     } else {
@@ -418,6 +420,7 @@ export async function saveProjectThemeSettings(req, res) {
 
     res.json({ message: "Theme settings saved successfully" });
   } catch (error) {
+    if (handleProjectResolutionError(res, error)) return;
     console.error("Error saving project theme:", error);
     res.status(500).json({ message: "Error saving project theme" });
   }

@@ -6,7 +6,7 @@ This document outlines the complete workflow for creating, viewing, editing, and
 
 Unlike projects, which are managed in a central `projects.json` file, each page is stored as an individual JSON file within its project's directory. This approach keeps page data modular and directly tied to its parent project.
 
-- **Location**: `/data/projects/<projectId>/pages/`
+- **Location**: `/data/projects/<folderName>/pages/`
 - **Filename**: The filename is derived from the page's "slug" (e.g., `about-us.json`).
 
 A typical page JSON file (`about-us.json`) looks like this:
