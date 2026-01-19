@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
 import { useTranslation } from "react-i18next";
-import { fetchPreview, scrollWidgetIntoView } from "../../queries/previewManager";
+import { fetchPreview, scrollWidgetIntoView, updatePreview } from "../../queries/previewManager";
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
 import { API_URL } from "../../config";
@@ -21,6 +21,64 @@ function getSafeBaseUrl(liveUrl, fallback) {
     return fallback;
   }
   return fallback;
+}
+
+/**
+ * Detect if changes are structural (requiring full reload) or content-only (can be morphed)
+ * Structural: widgets added, removed, or reordered
+ * Content: widget settings or block settings changed
+ */
+function detectChangeType(newState, oldState) {
+  if (!oldState) {
+    return { isStructural: true, changedWidgetIds: [], changedGlobalWidgetIds: [] };
+  }
+
+  const newWidgetIds = new Set(Object.keys(newState.widgets || {}));
+  const oldWidgetIds = new Set(Object.keys(oldState.widgets || {}));
+
+  // Check for added widgets
+  const addedWidgets = [...newWidgetIds].filter((id) => !oldWidgetIds.has(id));
+  // Check for removed widgets
+  const removedWidgets = [...oldWidgetIds].filter((id) => !newWidgetIds.has(id));
+  // Check for reordering
+  const orderChanged =
+    JSON.stringify(newState.page?.widgetsOrder) !== JSON.stringify(oldState.page?.widgetsOrder);
+
+  const isStructural = addedWidgets.length > 0 || removedWidgets.length > 0 || orderChanged;
+
+  // Find widgets with content changes (settings, blocks)
+  const changedWidgetIds = [];
+  for (const id of newWidgetIds) {
+    if (oldWidgetIds.has(id)) {
+      const oldWidget = oldState.widgets[id];
+      const newWidget = newState.widgets[id];
+      if (oldWidget && newWidget) {
+        const settingsChanged = JSON.stringify(oldWidget.settings) !== JSON.stringify(newWidget.settings);
+        const blocksChanged = JSON.stringify(oldWidget.blocks) !== JSON.stringify(newWidget.blocks);
+        const blockOrderChanged = JSON.stringify(oldWidget.blocksOrder) !== JSON.stringify(newWidget.blocksOrder);
+        if (settingsChanged || blocksChanged || blockOrderChanged) {
+          changedWidgetIds.push(id);
+        }
+      }
+    }
+  }
+
+  // Check global widgets
+  const changedGlobalWidgetIds = [];
+  if (
+    newState.globalWidgets?.header &&
+    JSON.stringify(newState.globalWidgets.header) !== JSON.stringify(oldState.globalWidgets?.header)
+  ) {
+    changedGlobalWidgetIds.push("header");
+  }
+  if (
+    newState.globalWidgets?.footer &&
+    JSON.stringify(newState.globalWidgets.footer) !== JSON.stringify(oldState.globalWidgets?.footer)
+  ) {
+    changedGlobalWidgetIds.push("footer");
+  }
+
+  return { isStructural, changedWidgetIds, changedGlobalWidgetIds };
 }
 
 const PreviewPanel = forwardRef(function PreviewPanel(
@@ -104,18 +162,19 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     selectedWidgetId,
     selectedBlockId,
     selectedGlobalWidgetId,
+    runtimeMode,
   ]);
 
-  // We use a dual-update strategy: immediate postMessage for instant visual feedback
-  // while typing, plus debounced full reload to ensure scripts execute fresh with
-  // no stale state. See page-editor-preview.md for details.
+  // Handle updates after initial load
+  // Strategy:
+  // - Structural changes (add/remove/reorder widgets) → Full page reload
+  // - Content changes (settings only) → Morph individual widgets
   useEffect(() => {
-    if (!initialLoadComplete) return;
+    if (!initialLoadComplete || !iframeRef.current) return;
 
     const previousState = previousStateRef.current;
 
-    // Skip expensive reload if only selection changed - overlay handles highlighting
-    // without needing to re-render the entire preview
+    // Skip if only selection changed
     const contentChanged =
       JSON.stringify(page) !== JSON.stringify(previousState?.page) ||
       JSON.stringify(widgets) !== JSON.stringify(previousState?.widgets) ||
@@ -135,6 +194,18 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       return;
     }
 
+    const newState = { page, widgets, globalWidgets, themeSettings };
+    const { isStructural, changedWidgetIds, changedGlobalWidgetIds } = detectChangeType(newState, previousState);
+
+    // [DEBUG] Log change detection
+    console.log("[Preview] Change detected:", {
+      isStructural,
+      changedWidgetIds,
+      changedGlobalWidgetIds,
+    });
+
+    // Immediate visual feedback for simple setting changes (text/images)
+    // This runs regardless of structural vs content changes
     if (iframeRef.current?.contentWindow && previousState?.widgets) {
       Object.entries(widgets || {}).forEach(([widgetId, widget]) => {
         const oldWidget = previousState.widgets[widgetId];
@@ -177,16 +248,13 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           }
 
           iframeRef.current.contentWindow.postMessage(
-            {
-              type: "UPDATE_WIDGET_SETTINGS",
-              payload: { widgetId, changes },
-            },
+            { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId, changes } },
             "*",
           );
         }
       });
 
-      // Also handle global widgets (header/footer) for real-time updates
+      // Also handle global widgets for real-time feedback
       Object.entries(globalWidgets || {}).forEach(([globalWidgetKey, globalWidget]) => {
         const oldGlobalWidget = previousState.globalWidgets?.[globalWidgetKey];
         if (!globalWidget || !oldGlobalWidget) return;
@@ -195,7 +263,6 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
         if (settingsChanged) {
           const changes = { settings: {} };
-
           Object.entries(globalWidget.settings || {}).forEach(([key, value]) => {
             if (JSON.stringify(value) !== JSON.stringify(oldGlobalWidget.settings?.[key])) {
               changes.settings[key] = value;
@@ -203,55 +270,63 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           });
 
           iframeRef.current.contentWindow.postMessage(
-            {
-              type: "UPDATE_WIDGET_SETTINGS",
-              payload: { widgetId: globalWidgetKey, changes },
-            },
+            { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId: globalWidgetKey, changes } },
             "*",
           );
         }
       });
     }
 
-    // Content changed - debounce the reload
+    // Debounced update - either full reload or morph depending on change type
     const timeoutId = setTimeout(async () => {
       try {
-        // Save scroll position
         const scrollY = iframeRef.current?.contentWindow?.scrollY || 0;
 
-        // Fetch fresh HTML
-        const enhancedPageData = { ...page, globalWidgets };
-        const html = await fetchPreview(enhancedPageData, themeSettings, runtimeMode);
-        setPreviewHtml(html);
+        if (isStructural) {
+          // STRUCTURAL CHANGE: Full page reload
+          // This ensures enqueued scripts/styles are properly loaded for new widgets
+          console.log("[Preview] 🔄 FULL PAGE RELOAD (structural change)");
+          const enhancedPageData = { ...page, globalWidgets };
+          const html = await fetchPreview(enhancedPageData, themeSettings, runtimeMode);
+          setPreviewHtml(html);
 
-        // Restore scroll position OR scroll to selected widget after structural changes
-        const handleLoad = () => {
-          // Check if the widgets order changed (reordering)
-          const orderChanged = JSON.stringify(page?.widgetsOrder) !== JSON.stringify(previousState?.page?.widgetsOrder);
-          // Check if the selected widget is new (not in previous widgets)
-          const isNewWidget = selectedWidgetId && previousState?.widgets && !previousState.widgets[selectedWidgetId];
-
-          if ((isNewWidget || orderChanged) && selectedWidgetId && iframeRef.current) {
-            // First restore scroll position instantly (so scroll starts from where user was)
-            iframeRef.current.contentWindow?.scrollTo(0, scrollY);
-            // Then smooth scroll to the widget in its new position
-            setTimeout(() => {
+          // After reload, scroll to selected widget
+          setTimeout(() => {
+            if (selectedWidgetId && iframeRef.current) {
               scrollWidgetIntoView(iframeRef.current, selectedWidgetId);
-            }, 50);
-          } else {
-            // Restore scroll position for regular updates
+            }
+            setPreviewReadyKey((prev) => prev + 1);
+          }, 100);
+        } else {
+          // CONTENT CHANGE: Morph individual widgets
+          console.log("[Preview] ⚡ PARTIAL UPDATE (content change only)");
+          const updateState = {
+            widgets,
+            globalWidgets,
+            themeSettings,
+            selectedWidgetId,
+            selectedGlobalWidgetId,
+            page,
+          };
+
+          await updatePreview(iframeRef.current, updateState, previousState || {});
+
+          // Restore scroll position
+          setTimeout(() => {
             iframeRef.current?.contentWindow?.scrollTo(0, scrollY);
-          }
-
-          // Notify SelectionOverlay that content is ready
-          setPreviewReadyKey((prev) => prev + 1);
-        };
-
-        if (iframeRef.current) {
-          iframeRef.current.addEventListener("load", handleLoad, { once: true });
+            setPreviewReadyKey((prev) => prev + 1);
+          }, 100);
         }
       } catch (err) {
-        console.error("Preview reload error:", err);
+        console.error("Preview update error:", err);
+        // Fallback to full reload on any error
+        try {
+          const enhancedPageData = { ...page, globalWidgets };
+          const html = await fetchPreview(enhancedPageData, themeSettings, runtimeMode);
+          setPreviewHtml(html);
+        } catch (fallbackErr) {
+          console.error("Preview fallback reload error:", fallbackErr);
+        }
       }
 
       previousStateRef.current = {
@@ -263,7 +338,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         selectedBlockId,
         selectedGlobalWidgetId,
       };
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => clearTimeout(timeoutId);
   }, [
@@ -275,11 +350,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     selectedWidgetId,
     selectedBlockId,
     selectedGlobalWidgetId,
+    runtimeMode,
   ]);
 
-  // Message handler moved to SelectionOverlay component
-
-  // Validate URLs for security (HTML comes from our own server, so no sanitization needed)
+  // Validate URLs for security
   const safeBaseUrl = getSafeBaseUrl(activeProject?.liveUrl, document.baseURI);
   const baseTag = includeBaseTag ? `<base href="${safeBaseUrl}" target="_blank">` : "";
 
@@ -344,7 +418,6 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           maxWidth: previewMode === "desktop" ? "100%" : previewMode === "tablet" ? "48rem" : "24rem",
         }}
         onLoad={() => {
-          // This will be called after the initial srcDoc is loaded
           setInitialLoadComplete(true);
         }}
       />

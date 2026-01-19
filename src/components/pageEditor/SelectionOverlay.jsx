@@ -55,6 +55,7 @@ export default function SelectionOverlay({
   onWidgetSelect,
   onBlockSelect,
   onGlobalWidgetSelect,
+  previewReadyKey,
 }) {
   const { t } = useTranslation();
   const [selectionBounds, setSelectionBounds] = useState(null);
@@ -259,7 +260,6 @@ export default function SelectionOverlay({
     // Widget hover: show when hovering a different widget than selected
     if (sidebarHoveredWidgetId && sidebarHoveredWidgetId !== effectiveWidgetId) {
       const bounds = getElementBounds(`[data-widget-id="${sidebarHoveredWidgetId}"]`);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWidgetHoverBounds(bounds);
 
       const widgetType = page?.widgets?.[sidebarHoveredWidgetId]?.type;
@@ -292,6 +292,7 @@ export default function SelectionOverlay({
     effectiveWidgetId,
     selectedBlockId,
     previewHoveredWidgetId,
+    previewReadyKey, // Recalculate when content changes
     getElementBounds,
     page,
     schemas,
@@ -347,6 +348,26 @@ export default function SelectionOverlay({
       resizeObserver.disconnect();
     };
   }, [effectiveWidgetId, selectedBlockId, requestBounds]);
+
+  // Re-request bounds when preview content changes (after widget morph or reload)
+  // This ensures overlay dimensions update when widget content changes (e.g., image resize)
+  useEffect(() => {
+    if (previewReadyKey > 0) {
+      // Clear hover bounds - positions have changed, old bounds are stale
+      // User will get fresh hover on next mouse move
+      setWidgetHoverBounds(null);
+      setBlockHoverBounds(null);
+      setHoverWidgetDisplayName(null);
+
+      // Re-request selection bounds after DOM settles
+      if (effectiveWidgetId) {
+        const timeoutId = setTimeout(() => {
+          requestBounds(effectiveWidgetId, selectedBlockId);
+        }, 50);
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [previewReadyKey, effectiveWidgetId, selectedBlockId, requestBounds]);
 
   return (
     <div ref={overlayRef} className="absolute inset-0 pointer-events-none z-10">
