@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Image } from "lucide-react";
-import { MEDIA_TYPES } from "../config";
+import { MEDIA_TYPES, API_URL } from "../config";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -10,6 +11,7 @@ import MediaGrid from "../components/media/MediaGrid";
 import MediaList from "../components/media/MediaList";
 import MediaDrawer from "../components/media/MediaDrawer";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
+import Lightbox from "../components/ui/Lightbox";
 
 import useMediaState from "../hooks/useMediaState";
 import useMediaUpload from "../hooks/useMediaUpload";
@@ -20,6 +22,13 @@ export default function Media() {
   const { t } = useTranslation();
   // Use our custom hooks to manage different aspects of media functionality
   const mediaState = useMediaState();
+
+  // Lightbox state
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImageIndex, setLightboxImageIndex] = useState(-1);
+
+  // Get only image files for lightbox navigation
+  const imageFiles = mediaState.filteredFiles.filter((file) => file.type?.startsWith("image/"));
 
   const mediaUpload = useMediaUpload({
     activeProject: mediaState.activeProject,
@@ -39,6 +48,44 @@ export default function Media() {
     showToast: mediaState.showToast,
     setFiles: mediaState.setFiles,
   });
+
+  // Handle file view - open lightbox for images, new tab for videos/audio
+  const handleFileView = (file) => {
+    if (file.type?.startsWith("image/")) {
+      const imageIndex = imageFiles.findIndex((f) => f.id === file.id);
+      if (imageIndex !== -1) {
+        setLightboxImageIndex(imageIndex);
+        setLightboxOpen(true);
+      }
+    } else {
+      // For videos/audio, use the original behavior (open in new tab)
+      mediaMetadata.handleFileView(file);
+    }
+  };
+
+  // Lightbox navigation handlers
+  const handleLightboxPrevious = () => {
+    if (lightboxImageIndex > 0) {
+      setLightboxImageIndex(lightboxImageIndex - 1);
+    }
+  };
+
+  const handleLightboxNext = () => {
+    if (lightboxImageIndex < imageFiles.length - 1) {
+      setLightboxImageIndex(lightboxImageIndex + 1);
+    }
+  };
+
+  const handleLightboxClose = () => {
+    setLightboxOpen(false);
+    setLightboxImageIndex(-1);
+  };
+
+  // Get current lightbox image
+  const currentLightboxImage = lightboxImageIndex >= 0 ? imageFiles[lightboxImageIndex] : null;
+  const lightboxImageUrl = currentLightboxImage
+    ? API_URL(`/api/media/projects/${mediaState.activeProject?.id}${currentLightboxImage.path}`)
+    : null;
 
   // Early returns for various states
   if (mediaState.loading) {
@@ -86,7 +133,7 @@ export default function Media() {
               selectedFiles={mediaSelection.selectedFiles}
               onFileSelect={mediaSelection.handleFileSelect}
               onFileDelete={mediaSelection.openDeleteConfirmation}
-              onFileView={mediaMetadata.handleFileView}
+              onFileView={handleFileView}
               onFileEdit={mediaMetadata.handleEditMetadata}
               activeProject={mediaState.activeProject}
             />
@@ -97,7 +144,7 @@ export default function Media() {
               onFileSelect={mediaSelection.handleFileSelect}
               onSelectAll={mediaSelection.handleSelectAll}
               onFileDelete={mediaSelection.openDeleteConfirmation}
-              onFileView={mediaMetadata.handleFileView}
+              onFileView={handleFileView}
               onFileEdit={mediaMetadata.handleEditMetadata}
               activeProject={mediaState.activeProject}
             />
@@ -131,6 +178,17 @@ export default function Media() {
         onSave={mediaMetadata.handleSaveMetadata}
         loading={mediaMetadata.isSavingMetadata}
         activeProject={mediaState.activeProject}
+      />
+
+      <Lightbox
+        isOpen={lightboxOpen}
+        onClose={handleLightboxClose}
+        imageUrl={lightboxImageUrl}
+        imageAlt={currentLightboxImage?.metadata?.alt || currentLightboxImage?.originalName || "Image preview"}
+        onPrevious={handleLightboxPrevious}
+        onNext={handleLightboxNext}
+        hasPrevious={lightboxImageIndex > 0}
+        hasNext={lightboxImageIndex < imageFiles.length - 1}
       />
     </PageLayout>
   );
