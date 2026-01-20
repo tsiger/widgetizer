@@ -1,0 +1,143 @@
+{
+  "type": "shopify-products",
+  "displayName": "Shopify Products",
+  "aliases": ["products", "shop", "store", "ecommerce", "collection", "merchandise"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Featured Products"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Discover our curated selection of products."
+    },
+    {
+      "type": "header",
+      "id": "shopify_header",
+      "label": "Shopify Store"
+    },
+    {
+      "type": "text",
+      "id": "store_domain",
+      "label": "Store Domain",
+      "default": "mock.shop",
+      "description": "Your Shopify store domain (e.g., your-store.myshopify.com). Use 'mock.shop' for demo."
+    },
+    {
+      "type": "text",
+      "id": "public_access_token",
+      "label": "Public Access Token",
+      "description": "Optional. Get this from your Shopify Admin > Headless channel for full API access."
+    },
+    {
+      "type": "select",
+      "id": "country",
+      "label": "Market Country",
+      "default": "US",
+      "options": [
+        { "value": "US", "label": "United States" },
+        { "value": "CA", "label": "Canada" },
+        { "value": "GB", "label": "United Kingdom" },
+        { "value": "AU", "label": "Australia" },
+        { "value": "DE", "label": "Germany" },
+        { "value": "FR", "label": "France" },
+        { "value": "ES", "label": "Spain" },
+        { "value": "IT", "label": "Italy" },
+        { "value": "NL", "label": "Netherlands" },
+        { "value": "JP", "label": "Japan" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "language",
+      "label": "Language",
+      "default": "EN",
+      "options": [
+        { "value": "EN", "label": "English" },
+        { "value": "FR", "label": "French" },
+        { "value": "DE", "label": "German" },
+        { "value": "ES", "label": "Spanish" },
+        { "value": "IT", "label": "Italian" },
+        { "value": "NL", "label": "Dutch" },
+        { "value": "JA", "label": "Japanese" }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "products_header",
+      "label": "Product Source"
+    },
+    {
+      "type": "select",
+      "id": "source_type",
+      "label": "Source",
+      "default": "products",
+      "options": [
+        { "value": "products", "label": "All Products" },
+        { "value": "collection", "label": "Collection" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "collection_handle",
+      "label": "Collection Handle",
+      "default": "unisex",
+      "description": "The collection handle from your Shopify store URL. Only used if Source is 'Collection'."
+    },
+    {
+      "type": "range",
+      "id": "product_count",
+      "label": "Number of Products",
+      "default": 8,
+      "min": 4,
+      "max": 24,
+      "step": 4
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "standard",
+      "options": [
+        { "value": "standard", "label": "Standard" },
+        { "value": "highlight", "label": "Highlight" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Desktop columns",
+      "default": 4,
+      "min": 2,
+      "max": 5,
+      "step": 1
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show description in Quick View",
+      "default": true
+    }
+  ]
+}

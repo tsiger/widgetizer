@@ -1,0 +1,520 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-shopify-products widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  {% if widget.settings.color_scheme == 'highlight' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="shopify-products"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      /* Shopify component styling via CSS parts */
+      & shopify-variant-selector::part(form) {
+        gap: var(--space-md);
+      }
+
+      & shopify-variant-selector::part(label) {
+        font-weight: var(--typography-body_font_bold-weight, 700);
+        color: var(--text-heading);
+        margin-block-end: var(--space-xs);
+      }
+
+      & shopify-variant-selector::part(radio) {
+        border: var(--border-width-thin) solid var(--border-color);
+        border-radius: var(--border-radius-sm, 0.4rem);
+        padding: var(--space-xs) var(--space-sm);
+        background: var(--bg-primary);
+        color: var(--text-content);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      & shopify-variant-selector::part(radio):hover {
+        border-color: var(--accent);
+      }
+
+      & shopify-variant-selector::part(radio-selected) {
+        background: var(--accent);
+        color: var(--accent-text);
+        border-color: var(--accent);
+      }
+
+      & shopify-variant-selector::part(color-swatch) {
+        width: 3.2rem;
+        height: 3.2rem;
+        border-radius: 50%;
+        border: var(--border-width-medium) solid var(--border-color);
+        cursor: pointer;
+      }
+
+      & shopify-variant-selector::part(color-swatch-selected) {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent);
+      }
+
+      & shopify-cart::part(dialog) {
+        border-radius: var(--border-radius-lg, 1.2rem);
+        border: none;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      }
+
+      & shopify-cart::part(primary-button) {
+        background-color: var(--accent);
+        color: var(--accent-text);
+        border: none;
+        border-radius: var(--border-radius-sm, 0.4rem);
+        padding: var(--space-sm) var(--space-lg);
+        font-weight: var(--typography-body_font_bold-weight, 700);
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+      }
+
+      & shopify-cart::part(primary-button):hover {
+        opacity: 0.9;
+      }
+
+      & shopify-cart::part(secondary-button) {
+        background-color: var(--bg-primary);
+        color: var(--text-content);
+        fill: var(--text-content);
+        border: var(--border-width-thin) solid var(--border-color);
+        border-radius: var(--border-radius-sm, 0.4rem);
+        cursor: pointer;
+      }
+
+      & shopify-cart::part(line-heading) {
+        color: var(--text-heading);
+        font-weight: var(--typography-body_font_bold-weight, 700);
+      }
+
+      & shopify-cart::part(line-price) {
+        color: var(--text-content);
+      }
+
+      /* Product card container */
+      & .shopify-product-card {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-md, 0.8rem);
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      & .shopify-product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      & .shopify-product-image {
+        aspect-ratio: 1;
+        overflow: hidden;
+        background: var(--bg-secondary);
+
+        & img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+      }
+
+      & .shopify-product-card:hover .shopify-product-image img {
+        transform: scale(1.05);
+      }
+
+      & .shopify-product-details {
+        padding: var(--space-md);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+      }
+
+      & .shopify-product-vendor {
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      & .shopify-product-title {
+        margin: 0;
+      }
+
+      & .shopify-product-price {
+        display: flex;
+        gap: var(--space-xs);
+        align-items: center;
+      }
+
+      /* Quick view modal - CENTERED */
+      & .shopify-modal {
+        padding: 0;
+        border-radius: var(--border-radius-lg, 1.2rem);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border: none;
+        max-width: 90vw;
+        width: 80rem;
+        max-height: 90vh;
+        margin: auto;
+        position: fixed;
+        inset: 0;
+        height: fit-content;
+      }
+
+      & .shopify-modal::backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      & .shopify-modal-container {
+        padding: var(--space-xl);
+        position: relative;
+        max-height: 85vh;
+        overflow-y: auto;
+      }
+
+      & .shopify-modal-close {
+        position: absolute;
+        inset-block-start: var(--space-md);
+        inset-inline-end: var(--space-md);
+        width: 3.2rem;
+        height: 3.2rem;
+        border-radius: var(--border-radius-sm, 0.4rem);
+        border: none;
+        background: var(--bg-secondary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s ease;
+        z-index: 10;
+      }
+
+      & .shopify-modal-close:hover {
+        background: var(--border-color);
+      }
+
+      & .shopify-modal-layout {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xl);
+
+        @media (min-width: 750px) {
+          flex-direction: row;
+        }
+      }
+
+      & .shopify-modal-media {
+        flex: 1;
+
+        & img {
+          width: 100%;
+          border-radius: var(--border-radius-md, 0.8rem);
+        }
+      }
+
+      & .shopify-modal-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-lg);
+      }
+
+      & .shopify-modal-header {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+      }
+
+      & .shopify-modal-title {
+        margin: 0;
+      }
+
+      & .shopify-modal-price {
+        display: flex;
+        gap: var(--space-xs);
+        align-items: center;
+      }
+
+      & .shopify-modal-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      & .shopify-modal-description {
+        color: var(--text-muted);
+        line-height: var(--line-height-relaxed);
+
+        & p {
+          margin: 0;
+        }
+      }
+
+      /* Loading placeholder */
+      & [shopify-loading-placeholder] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-xl);
+        color: var(--text-muted);
+      }
+    }
+  </style>
+
+  <!-- Shopify Store Configuration -->
+  <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+  <shopify-store
+    store-domain="{{ widget.settings.store_domain }}"
+    {% if widget.settings.public_access_token != blank %}
+      public-access-token="{{ widget.settings.public_access_token }}"
+    {% endif %}
+    country="{{ widget.settings.country }}"
+    language="{{ widget.settings.language }}"
+  ></shopify-store>
+
+  <!-- Cart Component -->
+  <shopify-cart id="cart-{{ widget.id }}"></shopify-cart>
+
+  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description" data-setting="description">
+            {{ widget.settings.description }}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div
+        class="widget-card-grid widget-grid"
+        style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
+      >
+        {% comment %} Determine heading levels {% endcomment %}
+        {% assign has_widget_title = false %}
+        {% if widget.settings.title != blank %}
+          {% assign has_widget_title = true %}
+        {% endif %}
+
+        {% assign product_heading_level = 'h2' %}
+        {% if has_widget_title %}
+          {% if widget.index == 1 %}
+            {% assign product_heading_level = 'h2' %}
+          {% else %}
+            {% assign product_heading_level = 'h3' %}
+          {% endif %}
+        {% else %}
+          {% if widget.index == 1 %}
+            {% assign product_heading_level = 'h1' %}
+          {% else %}
+            {% assign product_heading_level = 'h2' %}
+          {% endif %}
+        {% endif %}
+
+        {% if widget.settings.source_type == 'collection' %}
+          {%- comment -%} Products from a collection {%- endcomment -%}
+          <shopify-context type="collection" handle="{{ widget.settings.collection_handle }}">
+            <template>
+              <shopify-list-context type="product" query="collection.products" first="{{ widget.settings.product_count }}">
+                <template>
+                  <div class="shopify-product-card">
+                    <div class="shopify-product-image">
+                      <shopify-media query="product.selectedOrFirstAvailableVariant.image" width="400" height="400"></shopify-media>
+                    </div>
+                    <div class="shopify-product-details">
+                      {% if widget.settings.show_vendor %}
+                        <span class="shopify-product-vendor block-text block-text-xs block-text-muted">
+                          <shopify-data query="product.vendor"></shopify-data>
+                        </span>
+                      {% endif %}
+                      <{{ product_heading_level }} class="shopify-product-title block-text block-text-lg block-text-bold block-text-heading">
+                        <shopify-data query="product.title"></shopify-data>
+                      </{{ product_heading_level }}>
+                      <div class="shopify-product-price block-text block-text-base">
+                        <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
+                      </div>
+                      <button
+                        class="widget-button widget-button-primary widget-button-full shopify-quick-view-btn"
+                        data-modal-id="product-modal-{{ widget.id }}"
+                        data-context-id="modal-context-{{ widget.id }}"
+                      >
+                        Quick View
+                      </button>
+                    </div>
+                  </div>
+                </template>
+              </shopify-list-context>
+            </template>
+            <div shopify-loading-placeholder>Loading collection...</div>
+          </shopify-context>
+
+        {% else %}
+          {%- comment -%} All products {%- endcomment -%}
+          <shopify-list-context type="product" query="products" first="{{ widget.settings.product_count }}">
+            <template>
+              <div class="shopify-product-card">
+                <div class="shopify-product-image">
+                  <shopify-media query="product.selectedOrFirstAvailableVariant.image" width="400" height="400"></shopify-media>
+                </div>
+                <div class="shopify-product-details">
+                  {% if widget.settings.show_vendor %}
+                    <span class="shopify-product-vendor block-text block-text-xs block-text-muted">
+                      <shopify-data query="product.vendor"></shopify-data>
+                    </span>
+                  {% endif %}
+                  <{{ product_heading_level }} class="shopify-product-title block-text block-text-lg block-text-bold block-text-heading">
+                    <shopify-data query="product.title"></shopify-data>
+                  </{{ product_heading_level }}>
+                  <div class="shopify-product-price block-text block-text-base">
+                    <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
+                  </div>
+                  <button
+                    class="widget-button widget-button-primary widget-button-full shopify-quick-view-btn"
+                    data-modal-id="product-modal-{{ widget.id }}"
+                    data-context-id="modal-context-{{ widget.id }}"
+                  >
+                    Quick View
+                  </button>
+                </div>
+              </div>
+            </template>
+            <div shopify-loading-placeholder>Loading products...</div>
+          </shopify-list-context>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick View Modal -->
+  <dialog id="product-modal-{{ widget.id }}" class="shopify-modal">
+    <shopify-context id="modal-context-{{ widget.id }}" type="product" wait-for-update>
+      <template>
+        <div class="shopify-modal-container">
+          <button class="shopify-modal-close" aria-label="Close">
+            &#10005;
+          </button>
+          <div class="shopify-modal-layout">
+            <div class="shopify-modal-media">
+              <shopify-media query="product.selectedOrFirstAvailableVariant.image" width="500" height="500"></shopify-media>
+            </div>
+            <div class="shopify-modal-details">
+              <div class="shopify-modal-header">
+                {% if widget.settings.show_vendor %}
+                  <span class="shopify-product-vendor block-text block-text-xs block-text-muted block-text-uppercase">
+                    <shopify-data query="product.vendor"></shopify-data>
+                  </span>
+                {% endif %}
+                <h3 class="shopify-modal-title block-text block-text-3xl block-text-bold block-text-heading">
+                  <shopify-data query="product.title"></shopify-data>
+                </h3>
+                <div class="shopify-modal-price block-text block-text-xl">
+                  <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
+                </div>
+              </div>
+
+              <shopify-variant-selector></shopify-variant-selector>
+
+              <div class="shopify-modal-buttons">
+                <button
+                  class="widget-button widget-button-primary widget-button-large widget-button-full shopify-add-to-cart-btn"
+                  data-cart-id="cart-{{ widget.id }}"
+                  shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
+                >
+                  Add to Cart
+                </button>
+                <button
+                  class="widget-button widget-button-secondary widget-button-large widget-button-full shopify-buy-now-btn"
+                  shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
+                >
+                  Buy Now
+                </button>
+              </div>
+
+              {% if widget.settings.show_description %}
+                <div class="shopify-modal-description block-text block-text-base block-text-muted">
+                  <shopify-data query="product.descriptionHtml"></shopify-data>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </template>
+      <div shopify-loading-placeholder>Loading product details...</div>
+    </shopify-context>
+  </dialog>
+
+  <script>
+    (function() {
+      const widget = document.getElementById('{{ widget.id }}');
+      if (!widget || widget.dataset.initialized) return;
+      widget.dataset.initialized = 'true';
+
+      const modal = widget.querySelector('.shopify-modal');
+      const modalContext = widget.querySelector('#modal-context-{{ widget.id }}');
+      const cart = widget.querySelector('#cart-{{ widget.id }}');
+
+      // Quick View button handler - using event delegation for dynamically rendered content
+      widget.addEventListener('click', function(e) {
+        // Quick View button
+        const quickViewBtn = e.target.closest('.shopify-quick-view-btn');
+        if (quickViewBtn && modal && modalContext) {
+          modal.showModal();
+          modalContext.update(e);
+          return;
+        }
+
+        // Modal close button
+        const closeBtn = e.target.closest('.shopify-modal-close');
+        if (closeBtn && modal) {
+          modal.close();
+          return;
+        }
+
+        // Add to Cart button
+        const addToCartBtn = e.target.closest('.shopify-add-to-cart-btn');
+        if (addToCartBtn && cart) {
+          cart.addLine(e);
+          cart.showModal();
+          return;
+        }
+
+        // Buy Now button
+        const buyNowBtn = e.target.closest('.shopify-buy-now-btn');
+        if (buyNowBtn) {
+          const store = document.querySelector('shopify-store');
+          if (store) {
+            store.buyNow(e);
+          }
+          return;
+        }
+      });
+
+      // Close modal when clicking backdrop
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          modal.close();
+        }
+      });
+
+      // Close modal with Escape key
+      modal.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          modal.close();
+        }
+      });
+    })();
+  </script>
+</section>
