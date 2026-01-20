@@ -15,9 +15,13 @@
       padding-inline: 0;
       position: relative;
       width: 100%;
-      margin-inline-start: calc(-50vw + 50%);
-      margin-inline-end: calc(-50vw + 50%);
-      max-width: 100vw;
+      margin-inline: 0;
+      max-width: none;
+
+      & .widget-container {
+        max-width: none;
+        margin-inline: 0;
+      }
 
       & .split-hero-wrapper {
         display: flex;
@@ -85,7 +89,8 @@
     }
   </style>
 
-  <div class="split-hero-wrapper">
+  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+    <div class="split-hero-wrapper">
     <!-- Background Image Section (50%) -->
     {% if widget.settings.image != blank %}
       {% assign image_path = widget.settings.image | image: 'path', 'large' %}
@@ -199,6 +204,7 @@
           {% endcase %}
         {% endfor %}
       </div>
+    </div>
     </div>
   </div>
 </section>

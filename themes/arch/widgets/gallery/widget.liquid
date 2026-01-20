@@ -91,8 +91,11 @@
 
       & .gallery-modal-content {
         width: fit-content;
-        max-width: min(var(--container-max-width), 90vw);
+        max-width: 90%;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
       & .gallery-modal-close {
@@ -184,6 +187,7 @@
         max-width: 90vw;
         object-fit: contain;
         display: block;
+        margin-inline: auto;
         border: var(--border-width-thin) solid var(--border-color);
       }
 

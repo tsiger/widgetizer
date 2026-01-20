@@ -1,0 +1,1177 @@
+# Enhanced Shopify Storefront Web Components Rules
+
+This file includes examples, guidelines, and documentation for building Storefront Web Components.
+
+## Purpose
+
+Create a beautiful, production-ready HTML storefront using Shopify's Storefront Web Components based on the user's specific requirements.
+
+## Core Requirements
+
+- Develop a responsive storefront using ONLY Shopify web components
+- Create a streamlined shopping experience with proper product display and cart functionality
+- Implement clean, minimal, production-ready code optimized for educational purposes
+
+## Design requirements
+
+Strictly follow WCAG color contrast guidelines:
+
+- All text and icons must have a minimum contrast ratio of 4.5:1 against their backgrounds (3:1 for large text/icons).
+- UI components (buttons, input fields, icons) must have at least a 3:1 contrast ratio with adjacent colors.
+- Use dark text/icons on light backgrounds or vice versa; avoid low-contrast pairs (e.g., light gray on white).
+- Validate all color choices with a contrast checker and ensure compliance.
+
+Maintain consistent and adequate whitespace between all elements:
+
+- Use a spacing scale (e.g., multiples of 8px) for margins and paddings.
+- Apply the law of proximity: group related elements together and separate unrelated elements with more space.
+- Add generous padding around buttons and interactive elements for easy touch/click.
+- Use a grid system for alignment and spacing consistency.
+- Increase whitespace around headings, CTAs, and key content to create visual hierarchy.
+- Ensure spacing adapts responsively across different screen sizes.
+
+Maintain consistent typography throughout the designs
+
+Product details modals must be aligned in the center of the page.
+
+Display full images on product cards; avoid cropping images to fit.
+
+## Implementation Specifications
+
+### Required Components
+
+- **Store Configuration**: Properly configured `<shopify-store>` element
+- **Product Display**: Complete product cards with images, titles, prices, and variants
+- **Cart Functionality**:
+  - Working "Add to Cart" buttons and "Open Cart" button
+  - Adding to cart should open the cart as well
+- **Responsive Design**: Layout that works across all device sizes
+
+### Technical Implementation
+
+```html
+<!-- Basic Structure (Expand Upon This) -->
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store
+  store-domain="mock.shop"
+  country="US"
+  language="en"
+>
+  <!-- Cart Component -->
+  <shopify-cart id="main-cart"></shopify-cart>
+  <button onclick="document.getElementById('main-cart').showModal()">
+    Open Cart
+  </button>
+
+  <!-- Product Grid -->
+  <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+    <shopify-context type="product" handle="hoodie">
+      <template>
+        <!-- Product card with image, title, price, variants, add-to-cart -->
+      </template>
+    </shopify-context>
+  </div>
+</shopify-store>
+```
+
+### Fully-functional example of embedded product card
+
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+<!-- Provide the token and set the market context -->
+<shopify-store store-domain="https://www.velasca.com" country="US" language="en"></shopify-store>
+
+<div class="product-layout">
+  <div class="product-card">
+    <!-- Set product you want to display -->
+    <shopify-context type="product" handle="brumista-tdm">
+      <template>
+        <div class="product-card__container">
+          <div class="product-card__media">
+            <div class="product-card__main-image">
+              <shopify-media width="280" height="280" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+            </div>
+          </div>
+          <div class="product-card__details">
+            <div class="product-card__info">
+              <h2 class="product-card__title">
+                <shopify-data query="product.title"></shopify-data>
+              </h2>
+              <div class="product-card__price">
+                <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
+              </div>
+            </div>
+
+            <button
+              class="product-card__view-button"
+              onclick="getElementById('product-modal').showModal(); getElementById('product-modal-context').update(event);"
+            >
+              View product
+            </button>
+          </div>
+        </div>
+      </template>
+    </shopify-context>
+  </div>
+</div>
+
+<shopify-cart id="cart"></shopify-cart>
+
+<dialog id="product-modal" class="product-modal">
+  <!-- The handle of this context is automatically set when the dialog is opened -->
+  <shopify-context id="product-modal-context" type="product" wait-for-update>
+    <template>
+      <div class="product-modal__container">
+        <div class="product-modal__close-container">
+          <button class="product-modal__close" onclick="getElementById('product-modal').close();">&#10005;</button>
+        </div>
+        <div class="product-modal__content">
+          <div class="product-modal__layout">
+            <div class="product-modal__media">
+              <shopify-media width="416" height="416" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+            </div>
+            <div class="product-modal__details">
+              <div class="product-modal__header">
+                <div>
+                  <span class="product-modal__vendor">
+                    <shopify-data query="product.vendor"></shopify-data>
+                  </span>
+                </div>
+                <h1 class="product-modal__title">
+                  <shopify-data query="product.title"></shopify-data>
+                </h1>
+                <div class="product-modal__price-container">
+                  <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
+                </div>
+              </div>
+              <shopify-variant-selector></shopify-variant-selector>
+
+              <div class="product-modal__buttons">
+                <button
+                  class="product-modal__add-button"
+                  onclick="getElementById('cart').addLine(event).showModal();"
+                  shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
+                >
+                  Add to cart
+                </button>
+                <button
+                  class="product-modal__buy-button"
+                  onclick="document.querySelector('shopify-store').buyNow(event)"
+                  shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"
+                >
+                  Buy now
+                </button>
+              </div>
+              <div class="product-modal__description">
+                <span class="product-modal__description-text">
+                  <shopify-data query="product.descriptionHtml"></shopify-data>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </shopify-context>
+</dialog>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+  body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  /** Product card style **/
+  .product-layout {
+    display: flex;
+  }
+  .product-card {
+    max-width: 80rem;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    border-radius: 12px;
+  }
+  .product-card__container {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+  .product-card__media {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .product-card__main-image img {
+    border-radius: 0.5rem;
+  }
+  .product-card__details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  .product-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .product-card__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  .product-card__price {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .product-card__view-button {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border: 2px solid black;
+    cursor: pointer;
+  }
+  .product-card__view-button:hover {
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid black;
+  }
+  /** Modal styles **/
+  .product-modal {
+    padding: 0;
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 0;
+  }
+  .product-modal::backdrop {
+    background-color: rgba(156, 163, 175, 0.5);
+  }
+  .product-modal__container {
+    position: relative;
+    overflow-x: hidden;
+    padding: 2rem;
+  }
+  .product-modal__close-container {
+    display: grid;
+    justify-items: end;
+    justify-content: end;
+    margin-left: 2rem;
+    padding-bottom: 1rem;
+  }
+  .product-modal__close {
+    border-radius: 12px;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    cursor: pointer;
+  }
+  .product-modal__content {
+    width: 100%;
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    max-width: 54rem;
+    min-width: 320px;
+  }
+  .product-modal__layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  @media (min-width: 768px) {
+    .product-modal__layout {
+      flex-direction: row;
+    }
+  }
+  .product-modal__media {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .product-modal__media img {
+    border-radius: 0.25rem;
+    width: 100%;
+  }
+  .product-modal__details {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+  }
+  .product-modal__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .product-modal__vendor {
+    opacity: 0.5;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+  }
+  .product-modal__title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  .product-modal__price-container {
+    display: flex;
+    gap: 0.5rem;
+    font-weight: 500;
+    font-size: 1.25rem;
+  }
+  .product-modal__compare-price {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+  .product-modal__buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .product-modal__buttons button {
+    font-size: 0.875rem;
+    font-weight: 800;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    border: 2px solid black;
+    text-transform: uppercase;
+  }
+  .product-modal__add-button {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    font-size: 18px;
+    font-weight: 500;
+    width: 100%;
+  }
+  .product-modal__add-button:hover {
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid black;
+  }
+  .product-modal__add-button:disabled {
+    opacity: 0.3;
+  }
+  .product-modal__buy-button {
+    background-color: #ffffff;
+    color: #000000;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    font-size: 18px;
+    font-weight: 500;
+    width: 100%;
+  }
+  .product-modal__buy-button:disabled {
+    opacity: 0.3;
+  }
+  .product-modal__buy-button:hover {
+    opacity: 0.3;
+  }
+  .product-modal__description-text {
+    font-weight: 400;
+    color: #717171;
+    letter-spacing: 0.05em;
+    font-size: 0.875rem;
+  }
+  .product-modal__description-text p {
+    margin: 0;
+  }
+</style>
+
+
+### Technical Tips
+
+- For cart modal after adding items: `document.getElementById('main-cart').showModal()`
+- In the `shopify-cart::part(secondary-button)` CSS block, always include a `fill` property.
+- For context updating in dialogs: `document.getElementById('context-id').updateContext(event)`
+- Default product handles if none specified: `hoodie`, `sweatpants`, `puffer`
+- For collection pages, use this handle if none specified: `unisex`
+- Include error handling for product variants and loading states
+- For grid css columns - don't use `auto-fill`
+- Don't add attributes on shopify elements that are not specified in the documentation
+- For product image, using `product.selectedOrFirstAvailableVariant.image` is better than `product.featuredImage` if you want it to change when a variant is selected
+- Always include this script tag: `<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>`
+
+## Example Steps Breakdown Ideas (if the user asks for something like this)
+
+### 1. A Minimal Product Card with Image and Price
+
+**Implementation Steps:**
+
+1. Set up the store configuration using `<shopify-store>` with a `store-domain` attribute 
+2. Create a product context using `<shopify-context type="product" handle="product-handle">`
+3. Inside the template:
+   - Add a `<shopify-media>` component to display the product image
+   - Add a heading with `<shopify-data>` to show the product title
+   - Add `<shopify-money>` to display the price
+4. Apply basic styling to create a card-like appearance
+
+### 2. A Cool Example Using the 'Buy Now' Button
+
+**Implementation Steps:**
+
+1. Set up store configuration with `<shopify-store>`
+2. Create a product context
+3. Inside the template:
+   - Add product details (title, description) using `<shopify-data>`
+   - Add variant selector with `<shopify-variant-selector>`
+   - Create a "Buy Now" button that references the cart component
+   - Set up a `<shopify-cart>` component with the buyNow method
+4. Configure the button's onclick event to use the cart's buyNow method
+5. Style the button for visual appeal
+
+### 3. A Grid Collection Page
+
+**Implementation Steps:**
+
+1. Set up store configuration
+2. Create a collection context: `<shopify-context type="collection" handle="collection-handle">`
+3. Display collection title and description
+4. Add a nested product context for the collection's products:
+   ```
+   <shopify-context type="product" query="collection.products" first="12">
+   ```
+5. Create a grid layout using CSS Grid or Flexbox
+6. Within the product template, create product cards with:
+   - Product image using `<shopify-media>`
+   - Product title using `<shopify-data>`
+   - Product price using `<shopify-money>`
+7. Add pagination or "load more" functionality if needed
+
+### 4. A Product Details Page Layout
+
+**Implementation Steps:**
+
+1. Set up store configuration
+2. Create a product context
+3. Design a two-column layout:
+   - Left column:
+     - Product images gallery using `<shopify-media>` for the featured image
+     - Additional image handling if needed
+   - Right column:
+     - Product title using `<shopify-data query="product.title">`
+     - Product description using `<shopify-data query="product.description">`
+     - Price using `<shopify-money>`
+     - Variant selector using `<shopify-variant-selector>`
+     - Add to cart button that calls a cart component
+4. Add a `<shopify-cart>` component for cart functionality
+5. Style with responsive design in mind
+
+### 5. A Blog Post Page Layout
+
+**Implementation Steps:**
+
+1. Set up store configuration
+2. Create a blog article context:
+   ```
+   <shopify-context type="article" handle="article-handle">
+   ```
+3. Design the blog post layout:
+   - Header section with:
+     - Article title using `<shopify-data query="article.title">`
+     - Published date using `<shopify-data query="article.publishedAt">`
+     - Author information if available
+   - Featured image section using `<shopify-media>`
+   - Content section using `<shopify-data query="article.content">`
+   - Tags or categories section if needed
+4. Add navigation for related articles or back to blog link
+5. Style appropriately for readability
+
+### 6. A Very Customized Variant Selector
+
+**Implementation Steps:**
+
+1. Set up store configuration
+2. Create a product context
+3. Add a basic `<shopify-variant-selector>` component
+4. Create a detailed CSS customization targeting parts:
+   ```css
+   shopify-variant-selector::part(form) {
+     /* Custom layout */
+   }
+   shopify-variant-selector::part(label) {
+     /* Custom label styling */
+   }
+   shopify-variant-selector::part(radio) {
+     /* Custom radio button styling */
+   }
+   shopify-variant-selector::part(radio-selected) {
+     /* Custom styling for selected options */
+   }
+   shopify-variant-selector::part(color-swatch) {
+     /* Custom color swatch styling */
+   }
+   shopify-variant-selector::part(color-swatch-selected) {
+     /* Custom styling for selected color swatches */
+   }
+   ```
+5. Add JavaScript to enhance interactivity if needed
+6. Ensure the variant selector updates product images and prices appropriately
+
+## Response Format
+
+- Return ONLY HTML code that goes between `<body>` and `</body>` tags
+- Prioritize any specific requirements from the user's prompt
+- No explanations or comments outside the HTML code
+- Code should be production-ready with proper component structure
+
+Remember: The user's specific requirements always take precedence over these general guidelines.
+
+------------
+
+# Shopify Storefront Components API Documentation
+
+## Table of Contents
+
+- [Attributes](#attributes)
+  - [shopify-attr](#shopify-attr)
+- [Components](#components)
+  - [shopify-cart](#shopify-cart)
+  - [shopify-context](#shopify-context)
+  - [shopify-list-context](#shopify-list-context)
+  - [shopify-data](#shopify-data)
+  - [shopify-media](#shopify-media)
+  - [shopify-money](#shopify-money)
+  - [shopify-store](#shopify-store)
+  - [shopify-variant-selector](#shopify-variant-selector)
+
+## Attributes
+
+### shopify-attr
+
+**Description**: Use the `shopify-attr` attribute to bind an attribute to data from Shopify. Anywhere within the template of a [shopify-context component](#shopify-context), you can use the `shopify-attr--attribute-name` attribute to bind an attribute to data from Shopify. For example, `shopify-attr--href="product.onlineStoreUrl"` can be used to bind the `href` attribute to the `onlineStoreUrl` field on a product context.
+
+See the [playground](https://webcomponents.shopify.dev/playground) for more complete examples.
+
+**Example**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store
+  store-domain="https://your-store.myshopify.com"
+  country="CA"
+  language="FR"
+>
+</shopify-store>
+<shopify-context type="product" handle="your-product-handle">
+  <template>
+    <!-- the href attribute is bound to the
+      product.onlineStoreUrl field -->
+    <a shopify-attr--href="product.onlineStoreUrl"> View product </a>
+  </template>
+</shopify-context>
+```
+
+## Components
+
+### shopify-cart
+
+**Description**: The cart component provides a mini shopping cart functionality for your website. Here's how it works:
+
+1. To add items to the cart:
+
+   - Use the `addLine()` method
+   - The method needs an event object
+   - The event's target must be inside a product [context component](#shopify-context)
+
+2. To display the cart:
+
+   - The cart uses a native [HTML `<dialog>` element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog).
+   - To show it as a popup modal, call the `showModal()` method.
+
+3. Customize the cart with CSS parts and slots.
+
+> Note:
+> The cart component does not support mixing products from multiple stores.
+
+**Example**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
+
+<!-- The context is bound to the store -->
+<shopify-context type="product" handle="handle-of-product">
+  <template>
+    <shopify-variant-selector></shopify-variant-selector>
+    <!-- The product added will be whatever
+  variant is selected for the context product handle -->
+    <button onclick="getElementById('cart').addLine(event).showModal();">
+      Add to cart
+    </button>
+  </template>
+</shopify-context>
+
+<shopify-cart id="cart"></shopify-cart>
+```
+
+#### Attributes and properties
+
+| Name      | Type                         | Description                                                                                                                                               | Optional |
+| --------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| addLine   | (e: Event) => CartAttributes | A method to add an item to the cart.                                                                                                                      | Yes      |
+| close     | () => CartAttributes         | A method to close the cart dialog.                                                                                                                        | Yes      |
+| open      | boolean                      | A property to get the open state of the cart. Example: `getElementById('cart').open`                                                                      | Yes      |
+| show      | () => CartAttributes         | A method to display the cart as a modal in a [`dialog` element modelessly](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/show).      | Yes      |
+| showModal | () => CartAttributes         | A method to display the underlying [cart as a modal](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal) in a `dialog` element. | Yes      |
+| target    | string                       | The [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#target) for the checkout link. Defaults to "\_top".                    | Yes      |
+
+#### CSS parts
+
+CSS parts allow you to target and override the default styling within the cart component.
+
+| Part Name        | Description                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| dialog           | The dialog element.                                                                   |
+| line-heading     | The cart line-item title element.                                                     |
+| line-image       | The cart line-item image element.                                                     |
+| line-options     | The cart line-item options element.                                                   |
+| line-price       | The cart line-item quantity element.                                                  |
+| primary-button   | The primary button element. Used to style the checkout link.                          |
+| secondary-button | The secondary button element. Used to style the buttons that modify a cart-line item. |
+
+#### Slots
+
+Slots allow you to override the default content of the cart component.
+
+| Slot Name       | Description                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------ |
+| checkout-button | The content to display in the checkout button. Useful to add a custom checkout button text.                        |
+| empty           | The content to display when the cart is empty.                                                                     |
+| extension       | Extend the cart with additional content below the checkout button. Useful to add upsell products or other content. |
+
+**Custom Cart Example**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-cart>
+  <!-- Override the empty state with translated text -->
+  <div slot="empty">Ihr Warenkorb ist leer</div>
+  <!-- Override the checkout button with translated text -->
+  <div slot="checkout-button">Zur Kasse</div>
+</shopify-cart>
+
+<style>
+  shopify-cart::part(dialog) {
+    border-radius: 0.5rem;
+  }
+  shopify-cart::part(primary-button) {
+    background-color: #627059;
+    border: 0;
+    border-radius: 0;
+    color: #ffffff;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  shopify-cart::part(secondary-button) {
+    background-color: #ffffff;
+    color: #000;
+    fill: #000;
+    border: 2px solid #000;
+    border-radius: 0;
+  }
+</style>
+```
+
+### shopify-context
+
+**Description**: The context component defines which Shopify data should be available in different parts of your page.
+
+Each `<shopify-context>` component requires two attributes:
+
+- `type`: Specifies what kind of data you want (for example, `product`).
+- `handle` or `gid`: Identifies the specific item. For example, the handle for the URL [`demostore.mock.shop/products/men-t-shirt`](https://demostore.mock.shop/products/men-t-shirt) is `men-t-shirt`. The `gid` attribute can be used to identify the item by its unique id, e.g. `gid://shopify/Product/7982853619734`.
+
+If you're working with a single storefront, then you can add the `<shopify-context>` component anywhere on your page (it doesn't need to be inside the `<shopify-store>` component). If you're working with multiple storefronts, then nest the context inside its corresponding store component.
+
+Every `<shopify-context>` component also requires a `<template>` component, which contains the data you want to display. That template won't be rendered until the context is loaded. Render placeholder content outside the template with an attribute `shopify-loading-placeholder`. This content will be displayed until the context is loaded.
+
+See the [playground](https://webcomponents.shopify.dev/playground) for complete examples.
+
+**Related**: [shopify-list-context](#shopify-list-context)
+
+**Example**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
+
+<!-- The context is bound to the store -->
+<shopify-context type="product" handle="handle-of-product">
+  <template>
+    <!-- The data component is bound to the product
+     context and queries the title field -->
+    <h1>
+      <shopify-data query="product.title"></shopify-data>
+    </h1>
+  </template>
+  <!-- Render placeholder content
+   until the context is loaded -->
+  <div shopify-loading-placeholder>Loading...</div>
+</shopify-context>
+```
+
+#### Attributes
+
+| Name            | Type               | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Optional |
+| --------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| handle          | string             | The handle for the context. Required on some objects, like products, collections, and blogs. The handle is required unless the `wait-for-update` attribute is included.                                                                                                                                                                                                                                                                                                                                                                 | Yes      |
+| query           | string             | The query path for accessing nested data within a parent context. Required when this context is nested inside another context. The query should specify the path to access the desired data from the parent. Example: If the parent context is a product, and you want to access its first available variant: query="product.selectedOrFirstAvailableVariant"                                                                                                                                                                           | Yes      |
+| type            | string             | The type of the context. This needs to match the [GraphQL Storefront API](https://shopify.dev/docs/api/storefront) type you are querying. For example, if you are querying a product, the type should be `type="product"`.                                                                                                                                                                                                                                                                                                              | No       |
+| update          | (e: Event) => void | Updates this context to match the data from another context of the same type. Common use case: When displaying a list of products, you might want to show a detailed view of a single product in a modal. This method allows you to update the modal's context to display the selected product's data. How it works: 1. The event target must be inside the source context you want to copy from 2. This context will update its handle to match the source context 3. The data will be automatically refreshed to show the new content | Yes      |
+| wait-for-update | boolean            | Wait to render the context until the update method is called. This is useful for dynamically rendering a context.                                                                                                                                                                                                                                                                                                                                                                                                                       | Yes      |
+
+**Example - Updating a context with a dialog**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store
+  store-domain="https://your-store.myshopify.com"
+  country="CA"
+  language="FR"
+>
+</shopify-store>
+
+<script>
+  function showProductDetails(event) {
+    // Update a dialog context with a selected product
+    document.getElementById("dialog-context").update(event);
+
+    // Show the dialog
+    document.getElementById("dialog").showModal();
+  }
+</script>
+
+<shopify-list-context type="product" query="products" first="10">
+  <!-- This template is repeated for each product-->
+  <template>
+    <button onclick="showProductDetails(event)">
+      <shopify-data query="product.title"></shopify-data>
+    </button>
+  </template>
+</shopify-list-context>
+
+<dialog id="dialog">
+  <shopify-context id="dialog-context" type="product" wait-for-update>
+    <template>
+      <div>
+        <shopify-data query="product.description"></shopify-data>
+      </div>
+    </template>
+    <div shopify-loading-placeholder>Loading...</div>
+  </shopify-context>
+</dialog>
+```
+
+**Example - Paginated list of products**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store
+  store-domain="https://your-store.myshopify.com"
+  country="CA"
+  language="FR"
+>
+</shopify-store>
+
+<shopify-list-context type="product" query="products" first="10">
+  <!-- This template is repeated for each product-->
+  <template>
+    <shopify-data query="product.title"></shopify-data>
+  </template>
+</shopify-list-context>
+<button id="previous" onclick="getElementById('list-context').previousPage();">
+  Previous
+</button>
+<button id="next" onclick="getElementById('list-context').nextPage();">
+  Next
+</button>
+
+<script>
+  // Listen for the list context to update
+  // and disable the next and previous buttons when
+  // the list is at the end or beginning
+  document
+    .querySelector("shopify-context")
+    .addEventListener("shopify-list-context-update", (event) => {
+      const { hasNextPage, hasPreviousPage } = event.detail;
+      if (!hasNextPage) {
+        document.getElementById("next").setAttribute("disabled", "true");
+      } else {
+        document.getElementById("next").removeAttribute("disabled");
+      }
+      if (!hasPreviousPage) {
+        document.getElementById("previous")?.setAttribute("disabled", "true");
+      } else {
+        document.getElementById("previous").removeAttribute("disabled");
+      }
+    });
+</script>
+```
+
+### shopify-list-context
+
+**Description**: The list context component allows you to display multiple items in a repeating format. To use it, you need three key attributes:
+
+1. `type`: Defines what you're listing (such as 'product' or 'collection')
+2. `query`: Specifies which data fields you want to display
+3. `first`: Sets the number of items to show in the list
+
+Inside the list context, a template component defines how each item should appear. This template will automatically repeat for each item in your list. When you reference data within the template (using shopify-data or other components), it will automatically pull from the current item being displayed.
+
+> Note:
+> The list context can be nested inside a context component or other list context components.
+
+See the [playground](https://webcomponents.shopify.dev/playground) for examples.
+
+**Related**: [shopify-context](#shopify-context)
+
+**Example**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
+
+<!-- The context is bound to the store -->
+<shopify-list-context type="product" query="products" first="10">
+  <!-- The template is repeated for each item
+    in the array -->
+  <template>
+    <h2>
+      <shopify-data query="product.title"></shopify-data>
+    </h2>
+  </template>
+</shopify-list-context>
+```
+
+#### Attributes
+
+| Name         | Type       | Description                                                                                                                                                                                                                                                                  | Optional |
+| ------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| first        | number     | The number of items to return.                                                                                                                                                                                                                                               | No       |
+| nextPage     | () => void | Load the next page of items in the list.                                                                                                                                                                                                                                     | Yes      |
+| previousPage | () => void | Load the previous page of items in the list.                                                                                                                                                                                                                                 | Yes      |
+| query        | string     | Defines where the list exists, either at the root or relative to a parent context. For example: 1. At the root, query a list of all products, `query="products"` 2. Within a parent collection context, query the products on that collection, `query="collection.products"` | No       |
+| reverse      | () => void | Reverse the order of the items in the list.                                                                                                                                                                                                                                  | Yes      |
+| type         | string     | The type of the context. This needs to match the [GraphQL Storefront API](https://shopify.dev/docs/api/storefront) type you are querying. For example, if you are querying a product, the type should be `type="product"`.                                                   | No       |
+
+### shopify-data
+
+**Description**: The shopify-data component is used to display Shopify data on your page. Here's how it works:
+
+- It requires a `query` attribute that specifies which data to display.
+- The query uses dot notation to access data fields (for example, `query="product.title"`).
+- It looks for the nearest matching context to find the data.
+- It outputs plain text that you can style with your own HTML elements.
+
+For example:
+`<shopify-data query="product.title">` will:
+
+1. Find the nearest product context.
+2. Access its title property.
+3. Display the result as text.
+
+Since the component outputs a text node, you can wrap it in any HTML elements to match your site's design. The component also supports rich text fields like `product.descriptionHtml`.
+
+See the [playground](https://webcomponents.shopify.dev/playground) for more complete examples.
+
+**Example**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
+
+<!-- The context is bound to the store -->
+<shopify-context type="product" handle="handle-of-product">
+  <template>
+    <h1>
+      <!-- Query the title of the product.
+        Renders a text node with display: contents  -->
+      <shopify-data query="product.title"></shopify-data>
+    </h1>
+  </template>
+</shopify-context>
+```
+
+#### Attributes
+
+| Name  | Type   | Description                                                                                                                            | Optional |
+| ----- | ------ | -------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| query | string | Defines the context to reference and field to query. For example `query="product.title"` would query the title of the product context. | No       |
+
+### shopify-media
+
+**Description**: Accepts a reference to an [Image](https://shopify.dev/docs/api/storefront/latest/objects/Image) or [Media](https://shopify.dev/docs/api/storefront/latest/interfaces/Media) reference and generates an image or video element with `srcset` and `sizes` attributes. This component must be a child of a `shopify-context` component. It takes a query attribute that defines the context it's a part of, and the field to query.
+
+If you want the media to automatically change based on which variant is selected on the [variant-selector component](#shopify-variant-selector), make sure to reference the product image on the `product.selectedOrFirstAvailableVariant.image` field.
+
+See the [playground](https://webcomponents.shopify.dev/playground) for more complete examples.
+
+> Note:
+> When rendering an image, the media component uses the [`unpic-img`](https://unpic.pics/img/lit/) element internally, so you can also pass `height`, `width`, `layout`, `aspect-ratio`, `priority`, `breakpoints`, and `sizes` attributes to control the scale and size of the image. Learn more about image props in the [Unpic documentation](https://unpic.pics/img/lit/#image-props).
+
+**Example**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
+
+<!-- The context is bound to the store -->
+<shopify-context type="product" handle="handle-of-product">
+  <template>
+    <h1>
+      <!-- Query the featured image of the product.
+        Renders an image element  -->
+      <shopify-media
+        width="200"
+        height="300"
+        query="product.featuredImage"
+      ></shopify-media>
+    </h1>
+  </template>
+</shopify-context>
+```
+
+#### Attributes
+
+| Name              | Type                                    | Description                                                                                                                                                                                                                                                                                                       | Optional |
+| ----------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| aspectRatio       | number                                  | Instead of providing a width and height, you can provide an aspect ratio. This is passed to the [`aspectRatio`](https://unpic.pics/img/webc/#aspect-ratio) attribute of an underlying `unpic-img` element.                                                                                                        | No       |
+| breakpoints       | string                                  | The breakpoints of the image. This is passed to the [breakpoints](https://unpic.pics/img/webc/#breakpoints) attribute of an underlying `unpic-img` element.                                                                                                                                                       | Yes      |
+| height            | number                                  | The height of the image. Required, unless width is provided with an aspectRatio.                                                                                                                                                                                                                                  | No       |
+| layout            | "fixed" \| "constrained" \| "fullWidth" | The resizing behavior of the image. This is passed to the [layout](https://unpic.pics/img/webc/#layout) attribute of an underlying `unpic-img` element.                                                                                                                                                           | Yes      |
+| priority          | boolean                                 | Whether to prioritize the image. This is passed to the [priority](https://unpic.pics/img/webc/#priority) attribute of an underlying `unpic-img` element.                                                                                                                                                          | Yes      |
+| query             | string                                  | Defines the context to reference and field to query. For example, `query="product.featuredImage"` queries the title of the product featured image, and `query="product.selectedOrFirstAvailableVariant.image"` queries the image of a specific product variant based on the `shopify-variant-selector` component. | No       |
+| role              | string \| null                          | The accessibility role of the image. This is set automatically by the media component, but you can override it if needed.                                                                                                                                                                                         | Yes      |
+| sizes             | string                                  | The sizes of the image. This is set automatically by the media component, but you can override it if needed.                                                                                                                                                                                                      | Yes      |
+| video-autoplay    | boolean                                 | Used for video media. By default, videos [autoplay](https://developer.mozilla.org/docs/Web/HTML/Element/video#autoplay). To disable autoplay, set to `video-autoplay="false"`.                                                                                                                                    | Yes      |
+| video-controls    | boolean                                 | Used for video media. By default, [video controls](https://developer.mozilla.org/docs/Web/HTML/Element/video#controls) are shown. To disable them, set to `video-controls="false"`.                                                                                                                               | Yes      |
+| video-loop        | boolean                                 | Used for video media. By default, videos [loop](https://developer.mozilla.org//docs/Web/HTML/Element/video#loop). To disable looping, set to `video-loop="false"`.                                                                                                                                                | Yes      |
+| video-muted       | boolean                                 | Used for video media. By default, videos are [muted](https://developer.mozilla.org/docs/Web/HTML/Element/video#muted). To enable audio, set to `video-muted="false"`.                                                                                                                                             | Yes      |
+| video-playsinline | boolean                                 | Used for video media. By default, videos [play inline](https://developer.mozilla.org/docs/Web/HTML/Element/video#playsinline). To disable inline playback, set to `video-playsinline="false"`.                                                                                                                    | Yes      |
+| width             | number                                  | The width of the image. Required, unless height is provided with an aspectRatio.                                                                                                                                                                                                                                  | No       |
+
+### shopify-money
+
+**Description**: Accepts query a reference to a [Money object](https://shopify.dev/docs/api/storefront/2024-04/objects/MoneyV2), and uses the store's country and language market to format it correctly. This component must be a child of a [`shopify-context`](#shopify-context) component. The component takes a query attribute that defines the context it's a part of, and the field to query. This component produces a text node with the formatted price.
+
+Usually you want a product price to update based on the selected variant, so make sure to reference the `product.selectedOrFirstAvailableVariant.price` field if you are using the [shopify-variant-selector](#shopify-variant-selector) component.
+
+See the [playground](https://webcomponents.shopify.dev/playground) for more complete examples.
+
+**Example**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
+
+<!-- The context is bound to the store -->
+<shopify-context type="product" handle="handle-of-product">
+  <template>
+    <h1>
+      <!-- Query the selected or first available variant's
+price. Renders a text node with the formatted price. -->
+      <shopify-money
+        format="money_with_currency"
+        query="product.selectedOrFirstAvailableVariant.price"
+      ></shopify-money>
+    </h1>
+  </template>
+</shopify-context>
+```
+
+#### Attributes
+
+| Name   | Type                                                         | Description                                                                                                                                                                                                                                                                                                                                                     | Optional |
+| ------ | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| format | "money" \| "money_without_currency" \| "money_with_currency" | The format of the price. Defaults to `money`. Options: `money` - Display the price in the store's currency. eg. `$100.00`; `money_without_currency` - Display the price in the store's currency, without the currency symbol. eg. `100.00`; `money_with_currency` - Display the price in the store's currency, including the currency symbol. eg. `$100.00 USD` | Yes      |
+| query  | string                                                       | Defines the context to reference and field to query. For example `query="product.title"` would query the title of the product context.                                                                                                                                                                                                                          | No       |
+
+### shopify-store
+
+**Description**: Use the `<shopify-store>` component to set up your credentials and market configuration for a storefront. You can optionally add a public access token, which gives you access to inventory, metafields, and metaobjects. You can get a public access token by adding the [Headless channel](/docs/storefronts/headless/building-with-the-storefront-api/manage-headless-channels) in your Shopify admin.
+
+See the [playground](https://webcomponents.shopify.dev/playground) for more complete examples.
+
+**Example**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<!-- Optionally define market configuration, which defaults
+ to US/EN. The public-access-token attribute is optional,
+ and only necessary to access inventory, metafields,
+ and metaobjects.
+-->
+<shopify-store
+  store-domain="https://your-store.myshopify.com"
+  public-access-token="optional-access-token"
+  country="CA"
+  language="FR"
+>
+</shopify-store>
+
+<!-- The context is bound to the store -->
+<shopify-context type="product" handle="handle-of-product">
+  <template> ... </template>
+</shopify-context>
+
+<!-- If you want to display products from multiple
+  storefronts on the same page, nest contexts inside
+  multiple store components-->
+<shopify-store
+  store-domain="https://your-other-store.myshopify.com"
+  country="CA"
+  language="FR"
+>
+  <shopify-context type="product" handle="handle-of-product">
+    <template> ... </template>
+  </shopify-context>
+</shopify-store>
+```
+
+#### Attributes
+
+| Name                | Type                               | Description                                                                                                                                              | Optional |
+| ------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| buyNow              | (e: Event, target: Target) => void | A method to open the checkout page with a selected product.                                                                                              | Yes      |
+| country             | CountryCode                        | The country of the store.                                                                                                                                | Yes      |
+| language            | LanguageCode                       | The language of the store.                                                                                                                               | Yes      |
+| public-access-token | string                             | The public access token from the [Headless channel](/docs/storefronts/headless/building-with-the-storefront-api/manage-headless-channels) for the store. | Yes      |
+| store-domain        | string                             | The myshopify.com domain of the store.                                                                                                                   | No       |
+
+### shopify-variant-selector
+
+**Description**: Use the `<shopify-variant-selector>` component to display a form for selecting product options. The variant selector must be a child of a product context. Any data, money, or media component that references `selectedOrFirstAvailableVariant` will automatically update when a variant is selected.
+
+See the [playground](https://webcomponents.shopify.dev/playground) for more complete examples.
+
+**Example**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
+
+<!-- The context is bound to the store -->
+<shopify-context type="product" handle="handle-of-product">
+  <template>
+    <shopify-variant-selector></shopify-variant-selector>
+
+    <!-- Fields on `selectedOrFirstAvailableVariant`
+     automatically update when a variant is selected -->
+    <shopify-money
+      query="product.selectedOrFirstAvailableVariant.price"
+    ></shopify-money>
+
+    <shopify-media
+      query="product.selectedOrFirstAvailableVariant.image"
+      width="200"
+      height="200"
+    ></shopify-media>
+  </template>
+</shopify-context>
+```
+
+#### Attributes
+
+| Name           | Type   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Optional |
+| -------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| visible-option | string | Only show a single option. Default all options are visible. This allows you to have multiple variant selectors, each rendering a single option, and arrange them as you like. Additionally, when calling `context.update(event)`, the selected options in the current context will be applied to the variant selector in the destination context. This allows you to have a card with only one option visible, and a modal where all options are visible, and the selected options in the card will be applied to the modal. | Yes      |
+
+#### CSS Parts
+
+| Part Name             | Description                                                                                                                               |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| color-swatch          | The color swatch element.                                                                                                                 |
+| color-swatch-disabled | A part for the color swatch it is unavailable for sale.                                                                                   |
+| color-swatch-label    | The color swatch label element.                                                                                                           |
+| color-swatch-selected | A part for the color swatch when it is selected.                                                                                          |
+| form                  | The form element. This element has a flex layout, so targeting the form element allows you to control the layout of the variant selector. |
+| label                 | The label element for each option group.                                                                                                  |
+| radio                 | The radio option element.                                                                                                                 |
+| radio-disabled        | A part for the radio option when it is unavailable for sale.                                                                              |
+| radio-selected        | The radio selected element.                                                                                                               |
+| select                | The select element.                                                                                                                       |
+
+**Custom Variant Selector Example**:
+
+```html
+<script
+  type="module"
+  src="https://cdn.shopify.com/storefront/web-components.js"
+></script>
+<shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
+
+<!-- The context is bound to the store -->
+<shopify-context type="product" handle="handle-of-product">
+  <template>
+    <shopify-variant-selector> </shopify-variant-selector>
+  </template>
+</shopify-context>
+
+<style>
+  shopify-variant-selector::part(form) {
+    /** Change the layout of the variant selector */
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  shopify-variant-selector::part(label) {
+    /** Change the label of the variant selector */
+    font-weight: bold;
+  }
+</style>
+```
