@@ -127,21 +127,21 @@ img {
   --border-width-thick: 0.3rem; /* 3px */
 
   /* Border */
-  --border-color: var(--colors-light_border_color, #e0e0e0);
+  --border-color: var(--colors-standard_border_color, #e0e0e0);
 
   /* Text Colors */
-  --text-content: var(--colors-light_text_content, #333);
-  --text-heading: var(--colors-light_text_heading, #000);
-  --text-muted: var(--colors-light_text_muted, #666);
+  --text-content: var(--colors-standard_text_content, #333);
+  --text-heading: var(--colors-standard_text_heading, #000);
+  --text-muted: var(--colors-standard_text_muted, #666);
 
   /* Background Colors */
-  --bg-primary: var(--colors-light_bg_primary, #fff);
-  --bg-secondary: var(--colors-light_bg_secondary, #f9f9f9);
+  --bg-primary: var(--colors-standard_bg_primary, #fff);
+  --bg-secondary: var(--colors-standard_bg_secondary, #f9f9f9);
 
   /* Accent Colors */
-  --accent: var(--colors-light_accent, #0d47b7);
-  --accent-text: var(--colors-light_accent_text, #fff);
-  --rating-star-color: var(--colors-light_rating_star, #fbbf24);
+  --accent: var(--colors-standard_accent, #0d47b7);
+  --accent-text: var(--colors-standard_accent_text, #fff);
+  --rating-star-color: var(--colors-standard_rating_star, #fbbf24);
 
   /* Primitive Colors */
   --color-white: #ffffff;
