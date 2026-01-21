@@ -1,15 +1,21 @@
 import path from "path";
 
 // Base directories with environment variable support.
-const BASE_DIR = process.cwd();
+// APP_ROOT is set by Electron to the app.asar path, or defaults to cwd for non-Electron use.
+const APP_ROOT = process.env.APP_ROOT
+  ? path.resolve(process.env.APP_ROOT)
+  : process.cwd();
+
 export const DATA_DIR = process.env.DATA_ROOT
   ? path.resolve(process.env.DATA_ROOT)
-  : path.join(BASE_DIR, "data");
+  : path.join(APP_ROOT, "data");
+
 export const THEMES_DIR = process.env.THEMES_ROOT
   ? path.resolve(process.env.THEMES_ROOT)
-  : path.join(BASE_DIR, "themes");
+  : path.join(APP_ROOT, "themes");
+
 export const PUBLISH_DIR = path.join(DATA_DIR, "publish");
-export const CORE_WIDGETS_DIR = path.join(BASE_DIR, "src", "core", "widgets");
+export const CORE_WIDGETS_DIR = path.join(APP_ROOT, "src", "core", "widgets");
 
 // App settings path
 export const getAppSettingsPath = () => path.join(DATA_DIR, "appSettings.json");
@@ -49,3 +55,12 @@ export const getImagePath = (projectId, filename) => path.join(getProjectImagesD
 export const getVideoPath = (projectId, filename) => path.join(getProjectVideosDir(projectId), filename);
 export const getAudioPath = (projectId, filename) => path.join(getProjectAudiosDir(projectId), filename);
 export const getThumbnailPath = (projectId, filename) => path.join(getProjectThumbnailsDir(projectId), filename);
+
+// Log configuration on startup (useful for debugging)
+if (process.env.NODE_ENV !== "test") {
+  console.log("Server config initialized:");
+  console.log(`  APP_ROOT: ${APP_ROOT}`);
+  console.log(`  DATA_DIR: ${DATA_DIR}`);
+  console.log(`  THEMES_DIR: ${THEMES_DIR}`);
+  console.log(`  CORE_WIDGETS_DIR: ${CORE_WIDGETS_DIR}`);
+}

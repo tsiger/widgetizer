@@ -1,8 +1,11 @@
 {
   "name": "widgetizer",
-  "private": true,
   "version": "0.8.4",
+  "description": "A visual website builder with theme support",
+  "author": "Widgetizer",
+  "private": true,
   "type": "module",
+  "main": "electron/main.js",
   "engines": {
     "node": ">=20.19.5"
   },
@@ -18,7 +21,48 @@
     "build:prod": "npm run build && cross-env NODE_ENV=production npm start",
     "start:prod": "cross-env NODE_ENV=production npm start",
     "build:windows": "npm run build && node desktop-apps/scripts/build-windows.js",
-    "build:mac": "npm run build && node desktop-apps/scripts/build-mac.js"
+    "build:mac": "npm run build && node desktop-apps/scripts/build-mac.js",
+    "electron:dev": "concurrently -k \"cross-env NODE_ENV=development npm run server\" \"cross-env NODE_ENV=development npm run dev\" \"wait-on http://localhost:3000 && cross-env ELECTRON_DEV=1 ELECTRON_DISABLE_INTERNAL_SERVER=1 VITE_DEV_SERVER_URL=http://localhost:3000 electron .\"",
+    "electron:build": "npm run build && electron-builder",
+    "electron:build:mac": "npm run build && electron-builder --mac",
+    "electron:build:win": "npm run build && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.widgetizer.app",
+    "productName": "Widgetizer",
+    "directories": {
+      "output": "desktop-apps/builds/electron"
+    },
+    "files": [
+      "dist/**/*",
+      "server/**/*",
+      "src/core/**/*",
+      "src/utils/**/*",
+      "src/config/**/*",
+      "themes/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [],
+    "asar": false,
+    "mac": {
+      "target": [
+        {
+          "target": "zip",
+          "arch": ["arm64", "x64"]
+        }
+      ],
+      "category": "public.app-category.productivity",
+      "identity": null
+    },
+    "win": {
+      "target": [
+        {
+          "target": "zip",
+          "arch": ["x64"]
+        }
+      ]
+    }
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -63,6 +107,8 @@
     "@vitejs/plugin-react": "^5.1.2",
     "concurrently": "^9.1.2",
     "cross-env": "^10.1.0",
+    "electron": "^40.0.0",
+    "electron-builder": "^26.0.0",
     "eslint": "^9.24.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
