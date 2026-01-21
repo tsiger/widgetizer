@@ -61,8 +61,12 @@ function initPaths() {
 
   userDataPath = app.getPath("userData");
   dataRoot = path.join(userDataPath, "data");
-  // Themes are bundled in app.asar (read-only) in production
-  themesRoot = path.join(appRoot, "themes");
+  // Themes need to be readable as real directories for fs.cp
+  if (!isDev && appRoot.endsWith(".asar")) {
+    themesRoot = path.join(unpackedRoot, "themes");
+  } else {
+    themesRoot = path.join(appRoot, "themes");
+  }
   logsDir = path.join(userDataPath, "logs");
 
   log(`Paths initialized:`);

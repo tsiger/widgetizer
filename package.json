@@ -46,6 +46,7 @@
     "extraResources": [],
     "asar": true,
     "asarUnpack": [
+      "themes/**",
       "node_modules/sharp/**",
       "node_modules/@img/sharp-*/**",
       "node_modules/@img/sharp-libvips-*/**"

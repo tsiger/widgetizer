@@ -4,6 +4,8 @@ This document defines the rules for generating page content programmatically usi
 
 ## File and Structure Rules
 
+In packaged Electron builds, `themes/<theme>/...` resolves to `app.asar.unpacked/themes/<theme>/...`.
+
 - **Page templates** live in `themes/<theme>/templates/*.json`.
 - Each template must include:
   - `name` (string)

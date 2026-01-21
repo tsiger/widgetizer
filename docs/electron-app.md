@@ -147,6 +147,6 @@ For public distribution, use Authenticode code signing certificate.
 
 ## Technical Notes
 
-- **asar enabled**: The app is packaged into `app.asar`, with native modules unpacked in `app.asar.unpacked` for compatibility.
+- **asar enabled**: The app is packaged into `app.asar`, with native modules and themes unpacked in `app.asar.unpacked` for compatibility.
 - **Server process**: Electron spawns the Express server as a child process with `ELECTRON_RUN_AS_NODE=1`.
 - **Startup flow**: A loading screen is shown immediately; the UI swaps in once `/health` is ready.

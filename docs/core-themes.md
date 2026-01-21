@@ -4,7 +4,7 @@ This document explains the "Themes" management page, which is the user interface
 
 ## 1. Overview
 
-Themes are structured directories that define the layout, styles, and functionality of the application. Each theme contains:
+Themes are structured directories that define the layout, styles, and functionality of the application. In packaged Electron builds, the themes directory is bundled under `app.asar.unpacked/themes/`. Each theme contains:
 
 - `theme.json`: Theme metadata and configuration.
 - `screenshot.png`: A 1280x720 preview image of the theme, displayed on the card in the Themes UI.
