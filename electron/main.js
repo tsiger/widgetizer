@@ -46,19 +46,23 @@ function initPaths() {
     unpackedRoot = appRoot;
     resourcesPath = appRoot;
   } else {
-    // Production: app is packaged (asar disabled, files in app/ directory)
-    // app.getAppPath() returns path to the app directory
+    // Production: app is packaged (asar enabled)
+    // app.getAppPath() returns path to app.asar (or app/ if asar disabled)
     appRoot = app.getAppPath();
-    // Without asar, all files are directly accessible
-    unpackedRoot = appRoot;
-    // Resources folder is parent of app directory
     resourcesPath = path.dirname(appRoot);
+    if (appRoot.endsWith(".asar")) {
+      // Unpacked files live alongside app.asar in app.asar.unpacked
+      unpackedRoot = path.join(resourcesPath, "app.asar.unpacked");
+    } else {
+      // Asar disabled
+      unpackedRoot = appRoot;
+    }
   }
 
   userDataPath = app.getPath("userData");
   dataRoot = path.join(userDataPath, "data");
-  // Themes are in the app directory
-  themesRoot = path.join(unpackedRoot, "themes");
+  // Themes are bundled in app.asar (read-only) in production
+  themesRoot = path.join(appRoot, "themes");
   logsDir = path.join(userDataPath, "logs");
 
   log(`Paths initialized:`);
@@ -121,13 +125,13 @@ function startServer() {
   }
 
   const isDev = getIsDev();
-  // Server files are in the unpacked directory (not inside asar)
-  const serverEntry = path.join(unpackedRoot, "server", "index.js");
+  // Server files live inside app.asar
+  const serverEntry = path.join(appRoot, "server", "index.js");
 
   log(`Starting server from: ${serverEntry}`);
   log(`Server will use DATA_ROOT: ${dataRoot}`);
   log(`Server will use THEMES_ROOT: ${themesRoot}`);
-  log(`Server will use APP_ROOT: ${unpackedRoot}`);
+  log(`Server will use APP_ROOT: ${appRoot}`);
 
   // Verify server entry exists
   try {
@@ -147,7 +151,7 @@ function startServer() {
     PORT: serverPort,
     DATA_ROOT: dataRoot,
     THEMES_ROOT: themesRoot,
-    APP_ROOT: unpackedRoot, // Server needs unpacked paths for fs access
+    APP_ROOT: appRoot, // Server reads bundled assets from app.asar
   };
 
   // Use userDataPath as cwd since appRoot may be inside an asar archive
@@ -287,6 +291,56 @@ function createWindow() {
   });
 
   return mainWindow;
+}
+
+// Show a lightweight loading page while services start
+function showLoadingScreen() {
+  if (!mainWindow) {
+    return;
+  }
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Widgetizer</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: #1a1a2e;
+          color: #eee;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+        }
+        .card {
+          text-align: center;
+        }
+        .spinner {
+          width: 42px;
+          height: 42px;
+          border: 4px solid #4a4a6a;
+          border-top-color: #8b8bd6;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 16px;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <div class="spinner"></div>
+        <div>Starting Widgetizer...</div>
+      </div>
+    </body>
+    </html>
+  `;
+  mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
 }
 
 // Load content into the window
@@ -482,11 +536,18 @@ app.whenReady().then(async () => {
     // Create window first so user sees something
     createWindow();
 
+    // Show a loading screen immediately
+    showLoadingScreen();
+
     // Start server (non-blocking)
     startServer();
 
     // Load content (may take time waiting for server)
-    await loadContent();
+    if (getIsDev()) {
+      await loadContent();
+    } else {
+      loadContent();
+    }
   } catch (err) {
     log(`Fatal error during startup: ${err.message}\n${err.stack}`);
     if (mainWindow) {

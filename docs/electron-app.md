@@ -33,6 +33,10 @@ npm run electron:build:win
 
 Output directory: `desktop-apps/builds/electron/`
 
+### Windows note
+
+If you build the Windows app on macOS, native modules like `sharp` may be missing. The `electron:build:win` script installs Windows optional dependencies before packaging. For best results, run Windows builds on Windows.
+
 ### macOS Output
 
 ```
@@ -143,6 +147,6 @@ For public distribution, use Authenticode code signing certificate.
 
 ## Technical Notes
 
-- **asar disabled**: Native modules (sharp) don't work well inside asar archives. The app bundles files directly for compatibility.
+- **asar enabled**: The app is packaged into `app.asar`, with native modules unpacked in `app.asar.unpacked` for compatibility.
 - **Server process**: Electron spawns the Express server as a child process with `ELECTRON_RUN_AS_NODE=1`.
-- **Health check**: Electron waits for `/health` endpoint before loading the UI.
+- **Startup flow**: A loading screen is shown immediately; the UI swaps in once `/health` is ready.

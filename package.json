@@ -25,7 +25,7 @@
     "electron:dev": "concurrently -k \"cross-env NODE_ENV=development npm run server\" \"cross-env NODE_ENV=development npm run dev\" \"wait-on http://localhost:3000 && cross-env ELECTRON_DEV=1 ELECTRON_DISABLE_INTERNAL_SERVER=1 VITE_DEV_SERVER_URL=http://localhost:3000 electron .\"",
     "electron:build": "npm run build && electron-builder",
     "electron:build:mac": "npm run build && electron-builder --mac",
-    "electron:build:win": "npm run build && electron-builder --win"
+    "electron:build:win": "npm run build && cross-env npm_config_platform=win32 npm_config_arch=x64 npm_config_include=optional npm install --no-save && cross-env npm_config_platform=win32 npm_config_arch=x64 npm_config_runtime=electron npm_config_disturl=https://electronjs.org/headers electron-builder install-app-deps --platform win32 --arch x64 && electron-builder --win"
   },
   "build": {
     "appId": "com.widgetizer.app",
@@ -44,7 +44,12 @@
       "package.json"
     ],
     "extraResources": [],
-    "asar": false,
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/sharp/**",
+      "node_modules/@img/sharp-*/**",
+      "node_modules/@img/sharp-libvips-*/**"
+    ],
     "mac": {
       "target": [
         {
