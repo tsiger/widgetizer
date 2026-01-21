@@ -59,11 +59,11 @@ export default function Sidebar() {
   const renderSection = (section) => {
     if (section.position === "bottom") {
       return (
-        <div key={section.id} className="pb-2 px-2 md:pl-4">
-          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block md:border-t md:border-slate-800 pt-4">
+        <div key={section.id} className="pt-4 border-t border-slate-800">
+          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">
             {t(section.titleKey)}
           </h3>
-          <ul className="border-t border-slate-800 pt-4 md:pt-0 md:border-0">{section.items.map(renderNavItem)}</ul>
+          <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
         </div>
       );
     }
@@ -92,7 +92,9 @@ export default function Sidebar() {
         {topSections.map(renderSection)}
       </div>
 
-      {bottomSections.map(renderSection)}
+      <div className="px-2 md:px-4 pb-2">
+        {bottomSections.map(renderSection)}
+      </div>
     </div>
   );
 }
