@@ -9,17 +9,11 @@ export default function MediaGridItem({ file, isSelected, onSelect, onDelete, on
       } rounded-lg overflow-hidden`}
     >
       <div className="aspect-square bg-slate-100 flex items-center justify-center">
-        {file.type === "image/svg+xml" ? (
+        {file.type?.startsWith("image/") ? (
           <img
-            src={API_URL(`/api/media/projects/${activeProject.id}${file.path}`)}
+            src={API_URL(`/api/media/projects/${activeProject.id}${file.type === "image/svg+xml" ? file.path : (file.sizes?.thumb?.path || file.thumbnail || file.path)}`)}
             alt={file.metadata?.alt || file.originalName}
-            className="w-full h-full object-contain p-2"
-          />
-        ) : file.sizes?.thumb ? (
-          <img
-            src={API_URL(`/api/media/projects/${activeProject.id}${file.sizes.thumb.path}`)}
-            alt={file.metadata?.alt || file.originalName}
-            className="w-full h-full object-contain"
+            className={`w-full h-full object-contain ${file.type === "image/svg+xml" ? "p-2" : ""}`}
           />
         ) : (
           <Image className="text-slate-400" size={48} />
