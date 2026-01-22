@@ -69,39 +69,43 @@
         transform: rotate(180deg);
       }
 
+      /* Grid-based collapse animation */
       & .accordion-content {
         display: grid;
         grid-template-rows: 0fr;
-        transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: grid-template-rows 0.3s ease-out;
       }
 
-      & .accordion-content.accordion-open {
+      & .accordion-content[aria-hidden="false"] {
         grid-template-rows: 1fr;
-
-        & .accordion-answer {
-          padding: 0 var(--space-lg) var(--space-lg) var(--space-lg);
-          opacity: 1;
-        }
       }
 
-      & .accordion-answer {
+      /* Inner wrapper handles overflow, padding stays constant */
+      & .accordion-inner {
         min-height: 0;
         overflow: hidden;
+      }
+
+      /* Answer has constant padding, opacity transitions */
+      & .accordion-answer {
+        padding: 0 var(--space-lg) var(--space-lg) var(--space-lg);
         margin: 0;
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transform: translateY(-0.8rem);
+        transition:
+          opacity 0.25s ease-out,
+          transform 0.25s ease-out;
+      }
+
+      & .accordion-content[aria-hidden="false"] .accordion-answer {
+        opacity: 1;
+        transform: translateY(0);
       }
 
       @media (min-width: 750px) {
         & .accordion-trigger {
           padding: var(--space-lg);
         }
-
-        & .accordion-content.accordion-open .accordion-answer {
-          padding: 0 var(--space-lg) var(--space-lg) var(--space-lg);
-        }
-
-
       }
 
       /* Variation: Connected/Bordered */
@@ -175,8 +179,11 @@
               id="accordion-content-{{ widget.id }}-{{ blockId }}"
               role="region"
               aria-labelledby="accordion-trigger-{{ widget.id }}-{{ blockId }}"
+              aria-hidden="true"
             >
-              <p class="accordion-answer block-text" data-setting="answer">{{ block.settings.answer }}</p>
+              <div class="accordion-inner">
+                <p class="accordion-answer block-text" data-setting="answer">{{ block.settings.answer }}</p>
+              </div>
             </div>
           </li>
         {% endfor %}
@@ -193,41 +200,26 @@
       const isMultiOpen = widget.dataset.multiOpen === 'true';
       const triggers = widget.querySelectorAll('.accordion-trigger');
 
-        triggers.forEach((trigger) => {
-          trigger.addEventListener('click', function () {
-            const isExpanded = this.getAttribute('aria-expanded') === 'true';
-            const content = this.nextElementSibling;
+      triggers.forEach(function (trigger) {
+        trigger.addEventListener('click', function () {
+          const isExpanded = this.getAttribute('aria-expanded') === 'true';
+          const content = this.nextElementSibling;
 
-            if (!isMultiOpen) {
-              // Close other items if not multi-open
-              const allTriggers = widget.querySelectorAll('.accordion-trigger');
-              const allContents = widget.querySelectorAll('.accordion-content');
+          if (!isMultiOpen) {
+            // Close other items if not multi-open
+            widget.querySelectorAll('.accordion-trigger').forEach(function (t) {
+              if (t !== trigger) {
+                t.setAttribute('aria-expanded', 'false');
+                t.nextElementSibling.setAttribute('aria-hidden', 'true');
+              }
+            });
+          }
 
-              allTriggers.forEach((t) => {
-                if (t !== this) t.setAttribute('aria-expanded', 'false');
-              });
-              allContents.forEach((c) => {
-                if (c !== content) c.classList.remove('accordion-open');
-              });
-            }
-
-            // Toggle current item
-            if (isExpanded) {
-              this.setAttribute('aria-expanded', 'false');
-              content.classList.remove('accordion-open');
-            } else {
-              this.setAttribute('aria-expanded', 'true');
-              content.classList.add('accordion-open');
-            }
-          });
-
-          trigger.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              this.click();
-            }
-          });
+          // Toggle current item
+          this.setAttribute('aria-expanded', !isExpanded);
+          content.setAttribute('aria-hidden', isExpanded);
         });
+      });
     })();
   </script>
 </section>
