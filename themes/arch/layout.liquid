@@ -20,6 +20,9 @@
     {{ footer }}
 
     {% asset "scripts.js" %}
+    {% if theme.layout.enable_reveal_animations %}
+      {% enqueue_script "reveal.js", { "defer": true, "priority": 50 } %}
+    {% endif %}
     {% footer_assets %}
   </body>
 </html>

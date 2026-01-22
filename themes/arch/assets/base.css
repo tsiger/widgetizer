@@ -1655,3 +1655,61 @@ h6 {
   white-space: normal;
   z-index: 9999;
 }
+
+/* --------------------------------------------------------------------------
+   8.4 Scroll Reveal Animations
+   -------------------------------------------------------------------------- */
+
+/* Base reveal class - hidden state */
+.reveal {
+  opacity: 0;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+  transition-delay: calc(var(--reveal-delay, 0) * 0.1s);
+}
+
+/* Reveal variants - different starting transforms */
+.reveal-up {
+  transform: translateY(2rem);
+}
+
+.reveal-down {
+  transform: translateY(-2rem);
+}
+
+.reveal-left {
+  transform: translateX(2rem);
+}
+
+.reveal-right {
+  transform: translateX(-2rem);
+}
+
+.reveal-scale {
+  transform: scale(0.95);
+}
+
+.reveal-fade {
+  /* No transform, just fade */
+}
+
+/* Revealed state - applied by JavaScript */
+.reveal.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .reveal.revealed {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -83,7 +83,7 @@
         <div class="testimonial-content">
           <div class="testimonial-content-top">
             {% if widget.settings.logo != blank %}
-              <div class="testimonial-logo-wrapper">
+              <div class="testimonial-logo-wrapper reveal reveal-fade">
                 {{ widget.settings.logo | image: 'medium', 'testimonial-logo', false }}
               </div>
             {% endif %}
@@ -96,11 +96,11 @@
                 {% when 'heading' %}
                   {% assign size_class = 'block-text-' | append: block.settings.size %}
                   {% if widget.index == 1 %}
-                    <h1 class="widget-title block-text {{ size_class }} block-text-heading-weight block-text-heading" data-block-id="{{ blockId }}" data-setting="text">
+                    <h1 class="widget-title block-text {{ size_class }} block-text-heading-weight block-text-heading reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
                       {{ block.settings.text }}
                     </h1>
                   {% else %}
-                    <h2 class="widget-title block-text {{ size_class }} block-text-heading-weight block-text-heading" data-block-id="{{ blockId }}" data-setting="text">
+                    <h2 class="widget-title block-text {{ size_class }} block-text-heading-weight block-text-heading reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
                       {{ block.settings.text }}
                     </h2>
                   {% endif %}
@@ -109,7 +109,7 @@
                   {% assign style_class = '' %}
                   {% if block.settings.uppercase %}{% assign style_class = style_class | append: ' block-text-uppercase' %}{% endif %}
                   {% if block.settings.muted %}{% assign style_class = style_class | append: ' block-text-muted' %}{% endif %}
-                  <p class="widget-description block-text {{ size_class }}{{ style_class }}" data-block-id="{{ blockId }}" data-setting="text">
+                  <p class="widget-description block-text {{ size_class }}{{ style_class }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
                     {{ block.settings.text }}
                   </p>
               {% endcase %}
@@ -118,11 +118,11 @@
         </div>
 
         {% if widget.settings.author_image != blank %}
-          <div class="testimonial-image-wrapper">
+          <div class="testimonial-image-wrapper reveal reveal-fade">
             {{ widget.settings.author_image | image: 'large', 'testimonial-author-image', false }}
           </div>
         {% else %}
-          <div class="testimonial-image-wrapper">
+          <div class="testimonial-image-wrapper reveal reveal-fade">
             {% placeholder_image %}
           </div>
         {% endif %}

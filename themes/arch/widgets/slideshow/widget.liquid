@@ -13,7 +13,7 @@
   data-autoplay="{{ widget.settings.autoplay | default: false }}"
   data-autoplay-speed="{{ widget.settings.autoplay_speed | default: 5000 }}"
 >
-  <div class="slideshow-track">
+  <div class="slideshow-track reveal reveal-fade">
     {% for blockId in widget.blocksOrder %}
       {% assign block = widget.blocks[blockId] %}
       {% assign isFirst = forloop.first %}

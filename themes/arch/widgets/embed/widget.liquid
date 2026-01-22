@@ -35,23 +35,26 @@
           or widget.settings.eyebrow != blank
         %}
           <div class="widget-header">
+            {% assign header_delay = 0 %}
             {% if widget.settings.eyebrow != blank %}
-              <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+              <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+              {% assign header_delay = header_delay | plus: 1 %}
             {% endif %}
             {% if widget.settings.title != blank %}
               {% if widget.index == 1 %}
-                <h1 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h1>
+                <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
               {% else %}
-                <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+                <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
               {% endif %}
+              {% assign header_delay = header_delay | plus: 1 %}
             {% endif %}
             {% if widget.settings.description != blank %}
-              <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+              <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
             {% endif %}
           </div>
         {% endif %}
 
-        <div class="embed-code-wrapper" role="region" aria-label="Embedded content">
+        <div class="embed-code-wrapper reveal reveal-fade" role="region" aria-label="Embedded content">
           {{ widget.settings.code }}
         </div>
       </div>

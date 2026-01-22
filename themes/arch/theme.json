@@ -5,6 +5,20 @@
   "author": "Widgetizer",
   "settings": {
     "global": {
+      "layout": [
+        {
+          "type": "header",
+          "id": "layout_header",
+          "label": "Animations"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_reveal_animations",
+          "label": "Enable scroll reveal animations",
+          "default": true,
+          "description": "Animate elements as they scroll into view"
+        }
+      ],
       "colors": [
         {
           "type": "header",

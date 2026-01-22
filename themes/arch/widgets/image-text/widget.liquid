@@ -52,7 +52,7 @@
   <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
     <div class="widget-content">
       <div class="image-text-wrapper">
-        <div class="image-wrapper">
+        <div class="image-wrapper reveal reveal-fade">
           {% if widget.settings.image != blank %}
             {{ widget.settings.image | image: 'large', 'image-text-image' }}
           {% else %}
@@ -67,11 +67,11 @@
               {% when 'heading' %}
                 {% assign size_class = 'block-text-' | append: block.settings.size %}
                 {% if widget.index == 1 %}
-                  <h1 class="widget-title block-text {{ size_class }} block-text-heading-weight block-text-heading" data-block-id="{{ blockId }}" data-setting="text">
+                  <h1 class="widget-title block-text {{ size_class }} block-text-heading-weight block-text-heading reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
                     {{ block.settings.text }}
                   </h1>
                 {% else %}
-                  <h2 class="widget-title block-text {{ size_class }} block-text-heading-weight block-text-heading" data-block-id="{{ blockId }}" data-setting="text">
+                  <h2 class="widget-title block-text {{ size_class }} block-text-heading-weight block-text-heading reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
                     {{ block.settings.text }}
                   </h2>
                 {% endif %}
@@ -80,12 +80,12 @@
                 {% assign style_class = '' %}
                 {% if block.settings.uppercase %}{% assign style_class = style_class | append: ' block-text-uppercase' %}{% endif %}
                 {% if block.settings.muted %}{% assign style_class = style_class | append: ' block-text-muted' %}{% endif %}
-                <p class="widget-description block-text {{ size_class }}{{ style_class }}" data-block-id="{{ blockId }}" data-setting="text">
+                <p class="widget-description block-text {{ size_class }}{{ style_class }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
                   {{ block.settings.text }}
                 </p>
               {% when 'features' %}
                 {% if block.settings.features != blank %}
-                  <ul class="features-list" data-block-id="{{ blockId }}">
+                  <ul class="features-list reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
                     {% assign normalized_features = block.settings.features | replace: '\r\n', '\n' %}
                     {% assign features_list = normalized_features | split: '\n' %}
                     {% for feature in features_list %}
@@ -115,7 +115,7 @@
                 {% endif %}
               {% when 'button' %}
                 {% if block.settings.link.text != blank or block.settings.link_2.text != blank %}
-                  <div class="widget-actions" data-block-id="{{ blockId }}">
+                  <div class="widget-actions reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
                     {% if block.settings.link.text != blank %}
                       {% if block.settings.size != 'small' and block.settings.size != blank %}
                         {% assign size_class = 'widget-button-' | append: block.settings.size %}
