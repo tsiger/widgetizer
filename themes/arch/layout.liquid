@@ -9,6 +9,9 @@
 
     {% theme_settings %}
     {% asset "base.css" %}
+    {% unless theme.layout.enable_reveal_animations %}
+      <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
+    {% endunless %}
     {% header_assets %}
   </head>
   <body class="{{ body_class }}">
@@ -21,7 +24,7 @@
 
     {% asset "scripts.js" %}
     {% if theme.layout.enable_reveal_animations %}
-      {% enqueue_script "reveal.js", { "defer": true, "priority": 50 } %}
+      {% enqueue_script "reveal.js", { "priority": 50 } %}
     {% endif %}
     {% footer_assets %}
   </body>
