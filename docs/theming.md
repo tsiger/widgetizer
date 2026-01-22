@@ -1422,6 +1422,93 @@ When exporting a project to static HTML:
 
 ## 11. Advanced Features
 
+### Scroll Reveal Animations
+
+The Arch theme includes a scroll reveal animation system that animates elements as they enter the viewport. This system respects user preferences for reduced motion and can be toggled on/off via theme settings.
+
+#### How It Works
+
+1. **CSS Classes**: Elements with the `.reveal` class start hidden (`opacity: 0`) and become visible when the `.revealed` class is added
+2. **JavaScript Observer**: The `reveal.js` script uses Intersection Observer to detect when elements enter the viewport
+3. **Theme Setting**: Users can enable/disable animations via the "Enable scroll reveal animations" setting in Theme Settings > Animations
+
+#### Available Animation Classes
+
+Add these classes to elements you want to animate:
+
+| Class | Effect |
+| :---- | :----- |
+| `.reveal` | Base class (required) - fades in |
+| `.reveal-up` | Slides up while fading in |
+| `.reveal-down` | Slides down while fading in |
+| `.reveal-left` | Slides from right to left while fading in |
+| `.reveal-right` | Slides from left to right while fading in |
+| `.reveal-scale` | Scales up from 95% while fading in |
+| `.reveal-fade` | Simple fade in (no transform) |
+
+#### Stagger Delays
+
+Use the `--reveal-delay` CSS variable to create staggered animations:
+
+```liquid
+{% for blockId in widget.blocksOrder %}
+  {% assign block = widget.blocks[blockId] %}
+  <div class="item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
+    {{ block.settings.text }}
+  </div>
+{% endfor %}
+```
+
+Each increment of `--reveal-delay` adds 0.1s to the animation delay.
+
+#### Implementation in layout.liquid
+
+The animation system requires two parts in `layout.liquid`:
+
+**1. CSS Override (in `<head>`)** - When animations are disabled, ensure elements remain visible:
+
+```liquid
+{% unless theme.layout.enable_reveal_animations %}
+  <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
+{% endunless %}
+```
+
+**2. Script Loading (in footer)** - Only load the animation script when enabled:
+
+```liquid
+{% if theme.layout.enable_reveal_animations %}
+  {% enqueue_script "reveal.js", { "priority": 50 } %}
+{% endif %}
+```
+
+#### Theme Setting Definition
+
+Add this to your `theme.json` under `settings.global`:
+
+```json
+"layout": [
+  {
+    "type": "header",
+    "id": "layout_header",
+    "label": "Animations"
+  },
+  {
+    "type": "checkbox",
+    "id": "enable_reveal_animations",
+    "label": "Enable scroll reveal animations",
+    "default": true,
+    "description": "Animate elements as they scroll into view"
+  }
+]
+```
+
+#### Accessibility
+
+The animation system automatically respects the user's `prefers-reduced-motion` preference:
+
+- **CSS**: Media query sets `.reveal` elements to visible with no transitions
+- **JavaScript**: Immediately adds `.revealed` class to all elements without animation
+
 ### Responsive Design
 
 Use CSS custom properties from global settings for consistent theming:

@@ -15,8 +15,9 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with Liquid templates and widgets
 - Implementing global components (header/footer)
 - Managing theme assets and CSS variables
+- Implementing scroll reveal animations
 
-**Key topics**: Theme manifest, layout templates, widgets, global settings, menu rendering, asset management, export behavior
+**Key topics**: Theme manifest, layout templates, widgets, global settings, menu rendering, asset management, scroll reveal animations, export behavior
 
 ---
 
@@ -29,9 +30,10 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing design tokens and CSS patterns
 - Working with typography and layout utilities
 - Adding JavaScript interactivity to widgets
+- Implementing scroll reveal animations
 - Following accessibility best practices
 
-**Key topics**: Widget structure, CSS design tokens, typography system, layout utilities, component patterns, JavaScript initialization, schema conventions, accessibility, blocks
+**Key topics**: Widget structure, CSS design tokens, typography system, layout utilities, component patterns, JavaScript initialization, scroll reveal animations, schema conventions, accessibility, blocks
 
 ---
 

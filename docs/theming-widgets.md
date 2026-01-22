@@ -118,20 +118,20 @@ For widgets with dynamic block ordering (text, headings, buttons), use the **con
       {% when 'heading' %}
         {% assign size_class = 'block-text-' | append: block.settings.size %}
         {% if widget.index == 1 %}
-          <h1 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading">
+          <h1 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
             {{ block.settings.text }}
           </h1>
         {% else %}
-          <h2 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading">
+          <h2 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
             {{ block.settings.text }}
           </h2>
         {% endif %}
       {% when 'text' %}
-        <p class="widget-description block-text block-text-{{ block.settings.size }}">
+        <p class="widget-description block-text block-text-{{ block.settings.size }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
           {{ block.settings.text }}
         </p>
       {% when 'button' %}
-        <div class="widget-actions">
+        <div class="widget-actions reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
           <a href="#" class="widget-button widget-button-{{ block.settings.size }} widget-button-primary">
             Button Text
           </a>
@@ -736,6 +736,68 @@ Multiple widgets can safely enqueue the same asset file. The enqueue system uses
 > - `accordion-scripts.js` instead of `scripts.js`
 >
 > In preview mode, there is no collision—each widget's assets are served from separate paths. The collision only occurs during export.
+
+---
+
+## Scroll Reveal Animations
+
+The theme includes a scroll reveal animation system. Add animation classes to elements to animate them as they enter the viewport.
+
+### Animation Classes
+
+| Class | Effect |
+| :---- | :----- |
+| `.reveal` | Base class (required) - fades in |
+| `.reveal-up` | Slides up while fading in |
+| `.reveal-down` | Slides down while fading in |
+| `.reveal-left` | Slides from right to left |
+| `.reveal-right` | Slides from left to right |
+| `.reveal-scale` | Scales up from 95% |
+| `.reveal-fade` | Simple fade (no transform) |
+
+### Basic Usage
+
+```liquid
+<div class="widget-card reveal reveal-up">
+  <!-- Card content -->
+</div>
+```
+
+### Staggered Animations
+
+Use the `--reveal-delay` CSS variable to stagger animations in loops:
+
+```liquid
+{% for blockId in widget.blocksOrder %}
+  {% assign block = widget.blocks[blockId] %}
+  <div class="item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+    <h3>{{ block.settings.title }}</h3>
+  </div>
+{% endfor %}
+```
+
+Each increment adds 0.1s delay. So `--reveal-delay: 0` has no delay, `--reveal-delay: 1` has 0.1s delay, `--reveal-delay: 2` has 0.2s delay, etc.
+
+### Grid Items Example
+
+```liquid
+<div class="widget-grid widget-grid-3">
+  {% for blockId in widget.blocksOrder %}
+    {% assign block = widget.blocks[blockId] %}
+    <div class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+      {{ block.settings.image | image: 'medium', 'widget-card-image' }}
+      <h3 class="widget-card-title">{{ block.settings.title }}</h3>
+      <p class="widget-card-description">{{ block.settings.description }}</p>
+    </div>
+  {% endfor %}
+</div>
+```
+
+### Important Notes
+
+1. **Graceful Degradation**: When animations are disabled in theme settings, elements remain visible via CSS override
+2. **Reduced Motion**: The system respects `prefers-reduced-motion` - animations are skipped automatically
+3. **One-Time Animation**: Elements animate once when entering viewport and don't re-animate on scroll up
 
 ---
 
@@ -1375,6 +1437,7 @@ Before submitting a widget:
 - [ ] Uses `block-text` utilities (no hardcoded typography CSS)
 - [ ] Background setting at END of settings array (if applicable)
 - [ ] No duplicate CSS properties from `base.css`
+- [ ] Scroll reveal animations added to content elements (`.reveal .reveal-up` with `--reveal-delay`)
 
 ---
 
