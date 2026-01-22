@@ -31,8 +31,8 @@ export const AssetTag = {
      *
      * File Location:
      * Assets are loaded from different directories based on context:
-     * - When used in a widget template: loads from "data/projects/{projectId}/widgets/{filename}"
-     * - When used elsewhere: loads from "data/projects/{projectId}/assets/{filename}"
+     * - When used in a widget template: loads from "widgets/{widgetType}/{filename}"
+     * - When used in layout/snippets: loads from "assets/{filename}"
      *
      * Available options:
      * - defer (boolean, default: false): For JS files, whether to add the defer attribute (opt-in)
@@ -77,12 +77,14 @@ export const AssetTag = {
       } else {
         // For preview mode, use the existing API route
         // Determine the source folder based on the current template context
-        let folder = "assets";
-        // Check if we're inside a widget template
-        if (context.environments.widget) {
-          folder = "widgets";
+        if (context.environments.widget && context.environments.widget.type) {
+          // Inside a widget template: load from widgets/{widgetType}/
+          const widgetType = context.environments.widget.type;
+          assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/widgets/${widgetType}/${this.filepath}`;
+        } else {
+          // In layout/snippets: load from assets/
+          assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/assets/${this.filepath}`;
         }
-        assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/${folder}/${this.filepath}`;
       }
 
       // Extract options with defaults (opt-in behavior)

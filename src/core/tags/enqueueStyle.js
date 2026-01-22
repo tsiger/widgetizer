@@ -49,12 +49,16 @@ export const EnqueueStyleTag = {
       // Parse priority option (default: 50)
       const priority = this.options.priority !== undefined ? this.options.priority : 50;
 
+      const widgetContext = context.environments?.widget || null;
+
       // Add to the Map (filepath as key for deduplication)
       context.globals.enqueuedStyles.set(this.filepath, {
         media: this.options.media || null,
         id: this.options.id || null,
         location: location,
         priority: priority,
+        source: widgetContext ? "widget" : "theme",
+        widgetType: widgetContext?.type || null,
       });
 
       // No output - just registers the asset

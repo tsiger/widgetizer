@@ -49,12 +49,16 @@ export const EnqueueScriptTag = {
       // Parse priority option (default: 50)
       const priority = this.options.priority !== undefined ? this.options.priority : 50;
 
+      const widgetContext = context.environments?.widget || null;
+
       // Add to the Map (filepath as key for deduplication)
       context.globals.enqueuedScripts.set(this.filepath, {
         defer: this.options.defer === true, // Opt-in
         async: this.options.async === true, // Opt-in
         location: location,
         priority: priority,
+        source: widgetContext ? "widget" : "theme",
+        widgetType: widgetContext?.type || null,
       });
 
       // No output - just registers the asset

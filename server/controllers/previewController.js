@@ -336,23 +336,35 @@ export async function saveGlobalWidget(req, res) {
  * Serve an asset file from a project folder
  */
 export async function serveAsset(req, res) {
-  const { projectId, folder, filename } = req.params;
+  const { projectId, folder, filepath } = req.params;
+  // Express 5 wildcard returns an array of path segments - join them
+  const assetSubpath = Array.isArray(filepath) ? filepath.join("/") : filepath;
+
+  if (!assetSubpath) {
+    return res.status(400).send("Asset path is required");
+  }
 
   // Build the path to the asset file
   const projectFolderName = await getProjectFolderName(projectId);
-  const filePath = path.join(getProjectDir(projectFolderName), folder, filename);
+  const baseDir = path.join(getProjectDir(projectFolderName), folder);
+  const normalizedSubpath = path.normalize(assetSubpath).replace(/^(\.\.(\/|\\|$))+/, "");
+  const filePath = path.resolve(baseDir, normalizedSubpath);
+
+  if (!filePath.startsWith(baseDir)) {
+    return res.status(400).send("Invalid asset path");
+  }
 
   try {
     // Check if file exists using fs-extra
     if (!(await fs.pathExists(filePath))) {
-      return res.status(404).send(`Asset ${filename} not found in ${folder}`);
+      return res.status(404).send(`Asset ${assetSubpath} not found in ${folder}`);
     }
 
     // File exists, read it (readFile is compatible)
     const fileContent = await fs.readFile(filePath);
 
     // Set content type based on file extension
-    const ext = path.extname(filename).toLowerCase();
+    const ext = path.extname(filePath).toLowerCase();
     const contentTypes = {
       ".css": "text/css",
       ".js": "application/javascript",

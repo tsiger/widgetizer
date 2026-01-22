@@ -563,6 +563,16 @@ By default, the filter outputs a container with a responsive aspect ratio:
 
 These tags allow for efficient, deduplicated loading of assets (CSS and JS) in your theme with fine-grained control over placement and loading order. They are particularly useful when multiple widgets might require the same library (e.g., a slider plugin), ensuring it is only loaded once.
 
+**Asset Resolution:**
+
+- **Inside widget templates**: `enqueue_*` loads assets from the widget's folder (`widgets/{widget-name}/`)
+- **Inside `layout.liquid` or snippets**: `enqueue_*` loads assets from the theme `assets/` folder
+
+> [!IMPORTANT]
+> **Asset Filename Collisions During Export**
+>
+> During export, all widget CSS and JS files are flattened into a single `assets/` folder. If two different widgets have files with the same name (e.g., both have `styles.css`), **the last one copied will overwrite the first**. Use unique, widget-prefixed filenames (e.g., `slideshow.css`, `accordion.js`) to avoid collisions.
+
 #### Enqueue Script
 
 Registers a JavaScript file for loading. By default, scripts are output in the footer, but you can specify header placement.
@@ -760,10 +770,12 @@ Directly includes CSS, JavaScript, or image assets in your templates. Unlike `en
 
 **File Location:**
 
-Assets are loaded from different directories based on context:
+Assets are loaded from different directories based on where the tag is used:
 
-- **When used in a widget template**: Loads from `data/projects/{folderName}/widgets/{filename}`
-- **When used elsewhere (layout, snippets)**: Loads from `data/projects/{folderName}/assets/{filename}`
+- **Inside a widget template** (e.g., `widgets/slideshow/widget.liquid`): Loads from that widget's folder (`widgets/{widgetType}/`)
+- **Inside layout or snippets**: Loads from the theme `assets/` folder
+
+This means `{% asset "styles.css" %}` in the slideshow widget loads from `widgets/slideshow/styles.css`, while the same tag in `layout.liquid` loads from `assets/styles.css`.
 
 **Output:**
 
@@ -786,10 +798,21 @@ Assets are loaded from different directories based on context:
   {% asset "analytics.js", { "async": true } %}
 </body>
 
-{# In widget template - loads from widgets/ folder #}
-{% asset "widget-specific.css" %}
-{% asset "widget-script.js", { "defer": true } %}
+{# In widgets/slideshow/widget.liquid - loads from widgets/slideshow/ folder #}
+{% asset "slideshow.css" %}
+{% asset "slideshow.js", { "defer": true } %}
 ```
+
+**Asset Tag vs Enqueue Tags:**
+
+| Feature | `{% asset %}` | `{% enqueue_* %}` |
+| :------ | :------------ | :---------------- |
+| Output location | Inline where placed | Via `{% header_assets %}` / `{% footer_assets %}` |
+| Deduplication | No (outputs every time) | Yes (same filename only loaded once) |
+| Priority control | No | Yes (`priority` option) |
+| Best for | Core theme assets in layout | Widget assets, shared libraries |
+
+Use `{% asset %}` for essential theme assets that must load in a specific order (like `base.css`). Use `{% enqueue_* %}` for widget assets and shared libraries where deduplication matters.
 
 #### Placeholder Image
 
@@ -1376,23 +1399,26 @@ Widget-specific CSS and JavaScript are typically **inline** within the `widget.l
 </section>
 ```
 
-For complex widgets that need shared scripts (like sliders or carousels), place reusable assets in the `assets/` folder and enqueue them:
+For complex widgets that need shared scripts (like sliders or carousels), place reusable assets in `widgets/{widget-name}/` and enqueue them:
 
 ```liquid
 {% enqueue_style "slideshow.css", { "priority": 30 } %}
 {% enqueue_script "slideshow.js", { "priority": 30 } %}
 ```
 
-These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority.
+These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority. When `enqueue_*` is called from a widget template, assets are loaded from that widget’s folder. When `enqueue_*` is called from `layout.liquid` or snippets, assets are loaded from the theme `assets/` folder.
 
 ### Assets During Export
 
 When exporting a project to static HTML:
 
 - **Theme Assets**: All files from `/assets/` are copied to the output directory
-- **Widget Assets**: All `.css` and `.js` files found in the `/widgets/` directory are copied to the output `/assets/` directory
+- **Widget Assets**: All `.css` and `.js` files found in the `/widgets/` directory are **flattened** into the output `/assets/` directory
 - **Uploaded Images**: All images from `/uploads/images/` are copied to maintain relative paths
 - **Path Optimization**: Asset paths are converted to relative URLs for optimal static hosting
+
+> [!WARNING]
+> Because widget assets are flattened during export, files with the same name from different widgets will collide. Always use unique, widget-prefixed filenames (e.g., `slideshow.css` instead of `styles.css`).
 
 ## 11. Advanced Features
 

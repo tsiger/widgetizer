@@ -695,18 +695,47 @@ Available icon classes:
 4. **Scoped Queries**: Use `widget.querySelector()` - Never `document.querySelector()`
 5. **Proper `this`**: Use `function()` for event handlers, not arrow functions
 
-### External JavaScript Files
+### External JavaScript and CSS Files
 
-For complex widgets, use external files:
+For complex widgets, use external files placed directly in the widget folder:
 
-```liquid
-{% enqueue_style "widget-name.css", { "priority": 30 } %}
-{% enqueue_script "widget-name.js", { "priority": 30 } %}
+```
+widgets/
+└── slideshow/
+    ├── schema.json
+    ├── widget.liquid
+    ├── slideshow.css      # Widget styles
+    └── slideshow.js       # Widget scripts
 ```
 
-File location: `assets/widget-name.css` and `assets/widget-name.js`
+Enqueue them in your widget template:
+
+```liquid
+{% enqueue_style "slideshow.css", { "priority": 30 } %}
+{% enqueue_script "slideshow.js", { "priority": 30 } %}
+```
 
 These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority.
+
+**Asset Resolution:**
+
+- **Inside widget templates**: Assets are loaded from that widget's folder (`widgets/{widget-name}/`)
+- **Inside `layout.liquid` or snippets**: Assets are loaded from the theme `assets/` folder
+
+**Deduplication:**
+
+Multiple widgets can safely enqueue the same asset file. The enqueue system uses the filename as a unique key, so if two widgets both call `{% enqueue_script "shared-lib.js" %}`, the script is only output once. This is useful when multiple widgets share a common library.
+
+> [!IMPORTANT]
+> **Asset Filename Collisions**
+>
+> During export, all widget CSS and JS files are flattened into a single `assets/` folder. If two different widgets have files with the same name (e.g., both have `styles.css`), **the last one copied will overwrite the first**, and one widget's styles/scripts will be broken in the exported site.
+>
+> **Best practice:** Use unique, widget-prefixed filenames for your assets:
+> - `slideshow.css` instead of `styles.css`
+> - `accordion-scripts.js` instead of `scripts.js`
+>
+> In preview mode, there is no collision—each widget's assets are served from separate paths. The collision only occurs during export.
 
 ---
 

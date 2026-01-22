@@ -53,6 +53,8 @@ export const RenderHeaderAssetsTag = {
         let assetUrl;
         if (renderMode === "publish") {
           assetUrl = `assets/${filepath}`;
+        } else if (options.source === "widget" && options.widgetType) {
+          assetUrl = `${apiUrl}/api/preview/assets/${projectId}/widgets/${options.widgetType}/${filepath}`;
         } else {
           assetUrl = `${apiUrl}/api/preview/assets/${projectId}/assets/${filepath}`;
         }
@@ -70,6 +72,8 @@ export const RenderHeaderAssetsTag = {
         let assetUrl;
         if (renderMode === "publish") {
           assetUrl = `assets/${filepath}`;
+        } else if (options.source === "widget" && options.widgetType) {
+          assetUrl = `${apiUrl}/api/preview/assets/${projectId}/widgets/${options.widgetType}/${filepath}`;
         } else {
           assetUrl = `${apiUrl}/api/preview/assets/${projectId}/assets/${filepath}`;
         }

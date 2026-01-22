@@ -21,7 +21,7 @@ router.get("/global-widgets", getGlobalWidgets);
 // POST /api/preview/global-widgets/:type - Save a global widget
 router.post("/global-widgets/:type", saveGlobalWidget);
 
-// GET /api/preview/assets/:projectId/:folder/:filename - Serve an asset
-router.get("/assets/:projectId/:folder/:filename", serveAsset);
+// GET /api/preview/assets/:projectId/:folder/*filepath - Serve assets (including nested paths)
+router.get("/assets/:projectId/:folder/*filepath", serveAsset);
 
 export default router;
