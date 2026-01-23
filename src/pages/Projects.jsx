@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Trash2, Star, Pencil, AlertCircle, CirclePlus, Copy } from "lucide-react";
+import { Trash2, Star, Pencil, AlertCircle, CirclePlus, Copy, Download, Upload } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import Tooltip from "../components/ui/Tooltip";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Table from "../components/ui/Table";
 import Badge from "../components/ui/Badge";
-import { IconButton } from "../components/ui/Button";
+import Button, { IconButton } from "../components/ui/Button";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
@@ -18,19 +18,24 @@ import {
   deleteProject,
   duplicateProject,
   setActiveProject as setActiveProjectInBackend,
+  exportProject,
 } from "../queries/projectManager";
 import { formatDate } from "../utils/dateFormatter";
 
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import useConfirmationModal from "../hooks/useConfirmationModal";
+import ProjectImportModal from "../components/projects/ProjectImportModal";
 
 export default function Projects() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [exportingProjectId, setExportingProjectId] = useState(null);
 
   const showToast = useToastStore((state) => state.showToast);
+  const dismissToast = useToastStore((state) => state.dismissToast);
   const activeProject = useProjectStore((state) => state.activeProject);
   const fetchActiveProject = useProjectStore((state) => state.fetchActiveProject);
   const { settings: appSettings } = useAppSettings();
@@ -107,6 +112,39 @@ export default function Projects() {
     }
   };
 
+  const handleExport = async (projectId) => {
+    let loadingToastId = null;
+    try {
+      setExportingProjectId(projectId);
+      
+      // Show loading toast immediately (persistent - no auto-dismiss)
+      loadingToastId = showToast(t("projects.toasts.exportInProgress"), "info", { duration: null });
+
+      await exportProject(projectId);
+      
+      // Dismiss loading toast before showing success
+      if (loadingToastId) {
+        dismissToast(loadingToastId);
+      }
+      showToast(t("projects.toasts.exportSuccess"), "success");
+    } catch (error) {
+      console.error("Failed to export project:", error);
+      // Dismiss loading toast before showing error
+      if (loadingToastId) {
+        dismissToast(loadingToastId);
+      }
+      showToast(error.message || t("projects.toasts.exportError"), "error");
+    } finally {
+      setExportingProjectId(null);
+    }
+  };
+
+  const handleImportSuccess = async (importedProject) => {
+    await loadProjects();
+    showToast(t("projects.toasts.importSuccess", { name: importedProject.name }), "success");
+    setImportModalOpen(false);
+  };
+
   if (loading) {
     return (
       <PageLayout title={t("projects.title")}>
@@ -142,6 +180,11 @@ export default function Projects() {
         children: t("projects.newProject"),
         icon: <CirclePlus size={18} />,
       }}
+      additionalButtons={
+        <Button variant="secondary" onClick={() => setImportModalOpen(true)} icon={<Download size={18} />}>
+          {t("projects.import")}
+        </Button>
+      }
     >
       <div>
         <Table
@@ -214,6 +257,16 @@ export default function Projects() {
                         <Copy size={18} />
                       </IconButton>
                     </Tooltip>
+                    <Tooltip content={t("projects.actions.export")}>
+                      <IconButton
+                        onClick={() => handleExport(project.id)}
+                        variant="neutral"
+                        size="sm"
+                        disabled={exportingProjectId === project.id}
+                      >
+                        <Upload size={18} />
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip
                       content={
                         activeProject && project.id === activeProject.id
@@ -247,6 +300,12 @@ export default function Projects() {
         confirmText={modalState.confirmText}
         cancelText={modalState.cancelText}
         variant={modalState.variant}
+      />
+
+      <ProjectImportModal
+        isOpen={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        onSuccess={handleImportSuccess}
       />
     </PageLayout>
   );

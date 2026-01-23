@@ -42,6 +42,13 @@ The App Settings system has been **refactored** to use a clean, modular architec
   - Range: 1-50 versions
   - Applies to all projects globally
 
+#### Project Import
+
+- **Maximum Project Import Size (MB)**: Controls the maximum file size for project import ZIP files (default: 500MB)
+  - Range: 10-2000 MB
+  - Increase this if you need to import large projects with many media files
+  - Enforced on both client and server side for security
+
 ## Architecture Overview
 
 The App Settings system uses a **schema-driven architecture** that is completely isolated from theme settings, providing better maintainability and extensibility.

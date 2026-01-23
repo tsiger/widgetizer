@@ -7,6 +7,8 @@ Edit project
 Clone project
 Delete project
 Set active project
+Export project (ZIP download for backup/transfer)
+Import project (ZIP upload from another installation)
 
 Pages:
 Identifier usage: page actions use projectId (UUID) in API; server resolves folderName for filesystem paths.

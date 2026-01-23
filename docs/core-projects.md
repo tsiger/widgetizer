@@ -45,6 +45,8 @@ This file contains functions that make API calls to the backend:
 - `duplicateProject(id)`: Creates a copy of a project.
 - `getActiveProject()`: Retrieves the currently active project.
 - `setActiveProject(id)`: Sets a project as the active one.
+- `exportProject(id)`: Exports a project as a downloadable ZIP file.
+- `importProject(file)`: Imports a project from a ZIP file.
 
 ---
 
@@ -74,7 +76,44 @@ This file contains functions that make API calls to the backend:
     - **Duplicate (`Copy` icon)**: Calls `handleDuplicate`, which uses `duplicateProject(id)` to make an API call. The project list is then reloaded.
     - **Delete (`Trash2` icon)**: Calls `openDeleteConfirmation`, which opens a localized confirmation modal. You cannot delete the currently active project. If confirmed, the `deleteProject(id)` function is called, and the list is reloaded.
 
-### 3. Editing a Project
+### 3. Exporting a Project
+
+Projects can be exported as ZIP files for backup or transfer to another installation.
+
+1.  **Action**: The user clicks the "Export" icon on a project row in the `Projects.jsx` page.
+2.  **Loading Feedback**: A persistent toast notification immediately appears showing "Exporting project..." and remains visible throughout the export process.
+3.  **Backend Processing**: The `exportProject(id)` function sends a `POST` request to `/api/projects/:projectId/export`.
+4.  **ZIP Creation**: The backend creates a ZIP archive containing:
+    - **`project-export.json`**: A manifest file with project metadata (name, description, theme, siteUrl, timestamps).
+    - **All project files**: Pages, menus, widgets, uploads, theme.json, collections, and other project assets.
+5.  **Download**: The ZIP file is streamed to the browser and automatically downloaded with a timestamped filename (e.g., `my-project-export-2024-01-15T10-30-00.zip`).
+6.  **Completion**: The loading toast is dismissed and replaced with a success toast.
+
+### 4. Importing a Project
+
+Projects can be imported from ZIP files previously exported from Widgetizer.
+
+1.  **Action**: The user clicks the "Import Project" button in the page header, which opens the `ProjectImportModal`.
+2.  **File Selection**: The user selects or drag-and-drops a ZIP file. Client-side validation checks:
+    - File type (must be `.zip` with proper MIME type)
+    - File size (must not exceed the configurable `maxImportSizeMB` limit from App Settings)
+3.  **Upload**: The user clicks "Import Project" to upload the ZIP file via `POST /api/projects/import`.
+4.  **Server-Side Validation**: The backend validates:
+    - ZIP structure contains `project-export.json` manifest
+    - Manifest contains required fields (name, theme)
+    - Referenced theme exists in the installation
+5.  **Isolation**: Files are extracted to a temporary directory first for validation before any permanent changes.
+6.  **Project Creation**: 
+    - A new UUID is generated for the imported project
+    - A unique `folderName` is generated (checking both `projects.json` and existing directories)
+    - Files are copied from the temp directory to the new project directory
+    - Project metadata is added to `projects.json` only after successful file copy
+7.  **Cleanup**: Temporary files are removed on both success and failure.
+8.  **Feedback**: Success modal shows the imported project name, then auto-closes after 2 seconds.
+
+**Note**: Imported projects receive new IDs and folder names to prevent conflicts. The original project's ID and folder structure are not preserved.
+
+### 5. Editing a Project
 
 1.  **Navigation**: From the project list, clicking the "Edit" icon navigates the user to `/projects/edit/:id`.
 2.  **Data Fetching**: `ProjectsEdit.jsx` loads. In its `useEffect` hook, it calls `getAllProjects()` and finds the specific project matching the `id` from the URL parameters to populate the form.
@@ -113,6 +152,8 @@ The frontend `projectManager.js` communicates with a set of backend API endpoint
 | `PUT` | `/api/projects/:id` | `updateProject` | Updates a specific project. |
 | `DELETE` | `/api/projects/:id` | `deleteProject` | Deletes a specific project. |
 | `POST` | `/api/projects/:id/duplicate` | `duplicateProject` | Creates a complete copy of a project. |
+| `POST` | `/api/projects/:projectId/export` | `exportProject` | Exports project as a downloadable ZIP file. |
+| `POST` | `/api/projects/import` | `importProject` | Imports a project from a ZIP file upload. |
 | `GET` | `/api/projects/:projectId/widgets` | `getProjectWidgets` | Retrieves all widget schemas for a project. |
 | `GET` | `/api/projects/:projectId/icons` | `getProjectIcons` | Retrieves all available icons for a project. |
 
@@ -125,6 +166,8 @@ All API endpoints described in this document are protected by the platform's cor
 **See also:**
 
 - [Page Management](core-pages.md) - Managing pages within projects
-- [Export System](core-export.md) - Exporting projects as static sites
+- [Site Export System](core-export.md) - Exporting projects as static HTML sites
 - [Media Library](core-media.md) - Managing project media files
 - [Theming Guide](theming.md) - Theme structure copied during project creation
+- [App Settings](core-appSettings.md) - Configure project import size limits
+- [Platform Security](core-security.md) - Security considerations for project import/export

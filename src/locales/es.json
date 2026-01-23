@@ -235,8 +235,27 @@
       "setActive": "Establecer como proyecto activo",
       "edit": "Editar proyecto",
       "duplicate": "Duplicar proyecto",
+      "export": "Exportar proyecto",
       "delete": "Eliminar proyecto",
       "cannotDeleteActive": "No se puede eliminar el proyecto activo"
+    },
+    "import": "Importar Proyecto",
+    "export": "Exportar Proyecto",
+    "importModal": {
+      "title": "Importar Proyecto",
+      "description": "Sube un archivo ZIP de proyecto exportado desde Widgetizer. El proyecto se importará con un nuevo ID y podrá usarse inmediatamente.",
+      "uploadTitle": "Suelta el archivo ZIP del proyecto aquí",
+      "uploadDescription": "Selecciona un archivo ZIP de exportación de proyecto para importar",
+      "maxSize": "Tamaño máximo de archivo: {{max}}MB",
+      "invalidFileType": "Por favor selecciona un archivo ZIP válido",
+      "noFileSelected": "Por favor selecciona un archivo para importar",
+      "fileTooLarge": "El tamaño del archivo ({{size}}MB) excede el tamaño máximo permitido de {{max}}MB. Por favor reduce el tamaño del proyecto o aumenta el límite en Configuración.",
+      "importing": "Importando proyecto...",
+      "importButton": "Importar Proyecto",
+      "importError": "Error al importar el proyecto",
+      "successTitle": "Proyecto Importado Exitosamente",
+      "successMessage": "El proyecto \"{{name}}\" ha sido importado exitosamente.",
+      "redirecting": "Cerrando diálogo..."
     },
     "toasts": {
       "deleteSuccess": "El proyecto \"{{name}}\" fue eliminado exitosamente",
@@ -245,7 +264,12 @@
       "setActiveSuccess": "\"{{name}}\" es ahora el proyecto activo",
       "setActiveError": "Error al establecer el proyecto activo",
       "duplicateSuccess": "Proyecto duplicado exitosamente",
-      "duplicateError": "Error al duplicar el proyecto"
+      "duplicateError": "Error al duplicar el proyecto",
+      "exportSuccess": "Proyecto exportado exitosamente",
+      "exportError": "Error al exportar el proyecto",
+      "exportInProgress": "Exportando proyecto... Esto puede tomar un momento para proyectos grandes.",
+      "importSuccess": "Proyecto \"{{name}}\" importado exitosamente",
+      "importError": "Error al importar el proyecto"
     },
     "deleteModal": {
       "title": "Eliminar Proyecto",
@@ -689,6 +713,10 @@
       "maxVersionsToKeep": {
         "label": "Máximo de Versiones de Exportación a Mantener",
         "description": "Número máximo de versiones de exportación a mantener por proyecto. Cuando se excede este límite, las exportaciones más antiguas se eliminan automáticamente para ahorrar espacio de almacenamiento."
+      },
+      "maxImportSizeMB": {
+        "label": "Tamaño Máximo de Importación de Proyecto (MB)",
+        "description": "Tamaño máximo de archivo para archivos ZIP de importación de proyecto. Aumenta esto si necesitas importar proyectos grandes con muchos archivos multimedia."
       }
     },
     "messages": {

@@ -3,6 +3,7 @@ import path from "path";
 import { validationResult } from "express-validator";
 import * as themeController from "./themeController.js";
 import slugify from "slugify";
+import archiver from "archiver";
 import {
   DATA_DIR,
   getProjectsFilePath,
@@ -11,6 +12,7 @@ import {
   getThemeTemplatesDir,
   getThemeDir,
   getProjectMenusDir,
+  THEMES_DIR,
 } from "../config.js";
 import { v4 as uuidv4 } from "uuid";
 
@@ -685,5 +687,287 @@ export async function getProjectIcons(req, res) {
   } catch (error) {
     console.error("Error getting project icons:", error);
     res.status(500).json({ error: "Failed to get project icons" });
+  }
+}
+
+// Export project as ZIP
+export async function exportProject(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { projectId } = req.params;
+    const data = await readProjectsFile();
+    const project = data.projects.find((p) => p.id === projectId);
+
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    const projectFolderName = project.folderName;
+    const projectDir = getProjectDir(projectFolderName);
+
+    if (!(await fs.pathExists(projectDir))) {
+      return res.status(404).json({ error: "Project directory not found" });
+    }
+
+    // Get app version for manifest
+    const PACKAGE_JSON_PATH = path.join(process.cwd(), "package.json");
+    let appVersion = "unknown";
+    try {
+      const packageJson = await fs.readJson(PACKAGE_JSON_PATH);
+      appVersion = packageJson?.version || "unknown";
+    } catch (error) {
+      console.warn("Could not read package.json version:", error.message);
+    }
+
+    // Create export manifest
+    const manifest = {
+      formatVersion: "1.0",
+      exportedAt: new Date().toISOString(),
+      widgetizerVersion: appVersion,
+      project: {
+        name: project.name,
+        description: project.description || "",
+        theme: project.theme,
+        siteUrl: project.siteUrl || "",
+        created: project.created,
+        updated: project.updated,
+      },
+    };
+
+    // Generate filename
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
+    const safeName = project.name.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+    const zipFilename = `${safeName}-export-${timestamp}.zip`;
+
+    // Set response headers
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", `attachment; filename="${zipFilename}"`);
+
+    // Create ZIP archive
+    const archive = archiver("zip", {
+      zlib: { level: 9 }, // Maximum compression
+    });
+
+    // Handle archiver errors
+    archive.on("error", (err) => {
+      console.error("Archive error:", err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: "Failed to create ZIP archive" });
+      }
+    });
+
+    // Pipe archive data to response
+    archive.pipe(res);
+
+    // Add manifest
+    archive.append(JSON.stringify(manifest, null, 2), { name: "project-export.json" });
+
+    // Add all project files recursively
+    // Exclude system files and directories
+    const excludePatterns = [/^\./, /node_modules/, /\.git/];
+    const shouldExclude = (filePath) => {
+      const relativePath = path.relative(projectDir, filePath);
+      return excludePatterns.some((pattern) => pattern.test(relativePath));
+    };
+
+    async function addDirectory(dir, baseDir = projectDir) {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (shouldExclude(fullPath)) continue;
+
+        if (entry.isDirectory()) {
+          await addDirectory(fullPath, baseDir);
+        } else if (entry.isFile()) {
+          const relativePath = path.relative(baseDir, fullPath);
+          archive.file(fullPath, { name: relativePath });
+        }
+      }
+    }
+
+    await addDirectory(projectDir);
+
+    // Finalize the archive
+    await archive.finalize();
+  } catch (error) {
+    console.error("Error exporting project:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: error.message || "Failed to export project" });
+    }
+  }
+}
+
+// Import project from ZIP
+export async function importProject(req, res) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No ZIP file uploaded" });
+    }
+
+    // Check file size against app settings (backup check)
+    const { readAppSettingsFile } = await import("./appSettingsController.js");
+    const settings = await readAppSettingsFile();
+    const maxSizeMB = settings.export?.maxImportSizeMB || 500;
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+
+    if (req.file.size > maxSizeBytes) {
+      return res.status(400).json({
+        error: `File size (${(req.file.size / 1024 / 1024).toFixed(2)}MB) exceeds the maximum allowed size of ${maxSizeMB}MB. Please reduce the project size or increase the limit in Settings.`,
+      });
+    }
+
+    const zipBuffer = req.file.buffer;
+    const AdmZip = await import("adm-zip");
+    const zip = new AdmZip.default(zipBuffer);
+    const zipEntries = zip.getEntries();
+
+    if (zipEntries.length === 0) {
+      return res.status(400).json({ error: "Uploaded ZIP file is empty" });
+    }
+
+    // Find and validate manifest
+    const manifestEntry = zipEntries.find((entry) => entry.entryName === "project-export.json");
+    if (!manifestEntry) {
+      return res.status(400).json({ error: "Invalid project export: missing project-export.json manifest" });
+    }
+
+    let manifest;
+    try {
+      const manifestContent = manifestEntry.getData().toString("utf8");
+      manifest = JSON.parse(manifestContent);
+    } catch (error) {
+      return res.status(400).json({ error: "Invalid project export: corrupted manifest file" });
+    }
+
+    // Validate manifest structure
+    if (!manifest.project || !manifest.project.name || !manifest.project.theme) {
+      return res.status(400).json({ error: "Invalid project export: incomplete manifest" });
+    }
+
+    // Check if theme exists
+    const themeDir = path.join(THEMES_DIR, manifest.project.theme);
+    if (!(await fs.pathExists(themeDir))) {
+      return res.status(400).json({
+        error: `Theme "${manifest.project.theme}" not found in this installation. Please install the theme first.`,
+      });
+    }
+
+    // Read projects file
+    const data = await readProjectsFile();
+
+    // Generate unique folderName (checking both projects.json and existing directories)
+    let folderName = await generateUniqueProjectId(manifest.project.name, data.projects);
+    
+    // Also check if directory already exists and generate unique name if needed
+    let projectDir = getProjectDir(folderName);
+    let counter = 1;
+    while (await fs.pathExists(projectDir)) {
+      const baseFolderName = folderName;
+      folderName = `${baseFolderName}-${counter}`;
+      projectDir = getProjectDir(folderName);
+      counter++;
+      if (counter > 1000) {
+        throw new Error("Unable to generate unique folder name after 1000 attempts");
+      }
+    }
+
+    // Create temporary extraction directory
+    const tempDir = path.join(DATA_DIR, "temp", `import-${Date.now()}`);
+    await fs.ensureDir(tempDir);
+
+    let newProject = null;
+    try {
+      // Extract ZIP to temporary directory
+      zip.extractAllTo(tempDir, true);
+
+      // Validate extracted structure
+      const extractedManifestPath = path.join(tempDir, "project-export.json");
+      if (!(await fs.pathExists(extractedManifestPath))) {
+        throw new Error("Manifest not found in extracted files");
+      }
+
+      // Create new project object (but don't add to projects.json yet)
+      newProject = {
+        id: uuidv4(),
+        folderName,
+        name: manifest.project.name,
+        description: manifest.project.description || "",
+        theme: manifest.project.theme,
+        siteUrl: manifest.project.siteUrl || "",
+        created: new Date().toISOString(),
+        updated: new Date().toISOString(),
+      };
+
+      // Create project directory
+      await fs.ensureDir(projectDir);
+
+      // Copy all files from temp directory to project directory (excluding manifest)
+      const entries = await fs.readdir(tempDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.name === "project-export.json") continue; // Skip manifest
+
+        const sourcePath = path.join(tempDir, entry.name);
+        const targetPath = path.join(projectDir, entry.name);
+
+        if (entry.isDirectory()) {
+          await fs.copy(sourcePath, targetPath);
+        } else {
+          await fs.copy(sourcePath, targetPath);
+        }
+      }
+
+      // Verify that files were actually copied
+      const copiedEntries = await fs.readdir(projectDir);
+      if (copiedEntries.length === 0) {
+        throw new Error("No files were copied to project directory");
+      }
+
+      // Only add project to projects.json AFTER successful file copy
+      data.projects.push(newProject);
+      await writeProjectsFile(data);
+
+      // Clean up temporary directory
+      await fs.remove(tempDir);
+
+      res.status(201).json({
+        ...newProject,
+        importedFrom: manifest.exportedAt,
+        widgetizerVersion: manifest.widgetizerVersion,
+      });
+    } catch (error) {
+      // Clean up on error - remove project from projects.json if it was added
+      if (newProject) {
+        try {
+          const currentData = await readProjectsFile();
+          const projectIndex = currentData.projects.findIndex((p) => p.id === newProject.id);
+          if (projectIndex !== -1) {
+            currentData.projects.splice(projectIndex, 1);
+            await writeProjectsFile(currentData);
+          }
+        } catch (cleanupError) {
+          console.warn("Failed to remove project from projects.json after error:", cleanupError);
+        }
+      }
+      
+      // Clean up directories
+      try {
+        if (await fs.pathExists(tempDir)) {
+          await fs.remove(tempDir);
+        }
+        if (projectDir && (await fs.pathExists(projectDir))) {
+          await fs.remove(projectDir);
+        }
+      } catch (cleanupError) {
+        console.warn("Failed to clean up directories after import error:", cleanupError);
+      }
+      throw error;
+    }
+  } catch (error) {
+    console.error("Error importing project:", error);
+    res.status(500).json({ error: error.message || "Failed to import project" });
   }
 }

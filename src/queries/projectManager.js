@@ -142,3 +142,72 @@ export async function duplicateProject(projectId) {
     throw new Error("Failed to duplicate project");
   }
 }
+
+/**
+ * Export project as ZIP
+ */
+export async function exportProject(projectId) {
+  try {
+    const response = await fetch(API_URL(`/api/projects/${projectId}/export`), {
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to export project");
+    }
+
+    // Get filename from Content-Disposition header or use default
+    const contentDisposition = response.headers.get("Content-Disposition");
+    let filename = "project-export.zip";
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+      if (filenameMatch) {
+        filename = filenameMatch[1];
+      }
+    }
+
+    // Create blob and trigger download
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  } catch (error) {
+    if (error.message && !error.message.includes("Failed to fetch")) {
+      throw error;
+    }
+    throw new Error("Failed to export project");
+  }
+}
+
+/**
+ * Import project from ZIP file
+ */
+export async function importProject(file) {
+  try {
+    const formData = new FormData();
+    formData.append("projectZip", file);
+
+    const response = await fetch(API_URL("/api/projects/import"), {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to import project");
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error.message && !error.message.includes("Failed to fetch")) {
+      throw error;
+    }
+    throw new Error("Failed to import project");
+  }
+}

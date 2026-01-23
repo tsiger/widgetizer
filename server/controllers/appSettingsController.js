@@ -27,6 +27,7 @@ const defaultSettings = {
   },
   export: {
     maxVersionsToKeep: 10, // Maximum number of export versions to keep per project
+    maxImportSizeMB: 500, // Maximum size for project import ZIP files (in MB)
   },
 };
 
@@ -34,7 +35,7 @@ const defaultSettings = {
  * Reads the application settings file.
  * @returns {Promise<object>} The settings object.
  */
-async function readAppSettingsFile() {
+export async function readAppSettingsFile() {
   try {
     // Ensure the file exists, create with defaults if not
     if (!(await fs.pathExists(settingsFilePath))) {

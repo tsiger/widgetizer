@@ -1,8 +1,10 @@
 # Site Exporting
 
-This document explains the process of exporting a project, which generates a complete, static HTML version of the website. This static version can be deployed to any standard web hosting service.
+This document explains the process of **site exporting**, which generates a complete, static HTML version of the website. This static version can be deployed to any standard web hosting service.
 
 The export system includes automatic version management, with configurable retention policies and comprehensive export history tracking.
+
+> **Note**: Site exporting is different from **project exporting**. Site export generates a deployable static HTML website, while project export creates a ZIP archive of all project source files for backup or transfer to another Widgetizer installation. See [Project Management](core-projects.md) for project import/export documentation.
 
 ## 1. Frontend Implementation (`src/pages/ExportSite.jsx`)
 

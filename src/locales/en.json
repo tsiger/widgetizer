@@ -234,8 +234,27 @@
       "setActive": "Set as active project",
       "edit": "Edit project",
       "duplicate": "Duplicate project",
+      "export": "Export project",
       "delete": "Delete project",
       "cannotDeleteActive": "Cannot delete active project"
+    },
+    "import": "Import Project",
+    "export": "Export Project",
+    "importModal": {
+      "title": "Import Project",
+      "description": "Upload a project ZIP file exported from Widgetizer. The project will be imported with a new ID and can be used immediately.",
+      "uploadTitle": "Drop project ZIP file here",
+      "uploadDescription": "Select a project export ZIP file to import",
+      "maxSize": "Maximum file size: {{max}}MB",
+      "invalidFileType": "Please select a valid ZIP file",
+      "noFileSelected": "Please select a file to import",
+      "fileTooLarge": "File size ({{size}}MB) exceeds the maximum allowed size of {{max}}MB. Please reduce the project size or increase the limit in Settings.",
+      "importing": "Importing project...",
+      "importButton": "Import Project",
+      "importError": "Failed to import project",
+      "successTitle": "Project Imported Successfully",
+      "successMessage": "Project \"{{name}}\" has been imported successfully.",
+      "redirecting": "Closing this dialog..."
     },
     "toasts": {
       "deleteSuccess": "Project \"{{name}}\" was deleted successfully",
@@ -244,7 +263,12 @@
       "setActiveSuccess": "\"{{name}}\" is now the active project",
       "setActiveError": "Failed to set active project",
       "duplicateSuccess": "Project duplicated successfully",
-      "duplicateError": "Failed to duplicate project"
+      "duplicateError": "Failed to duplicate project",
+      "exportSuccess": "Project exported successfully",
+      "exportError": "Failed to export project",
+      "exportInProgress": "Exporting project... This may take a moment for large projects.",
+      "importSuccess": "Project \"{{name}}\" imported successfully",
+      "importError": "Failed to import project"
     },
     "deleteModal": {
       "title": "Delete Project",
@@ -687,6 +711,10 @@
       "maxVersionsToKeep": {
         "label": "Max Export Versions to Keep",
         "description": "Maximum number of export versions to keep per project. When this limit is exceeded, the oldest exports are automatically deleted to save storage space."
+      },
+      "maxImportSizeMB": {
+        "label": "Max Project Import Size (MB)",
+        "description": "Maximum file size for project import ZIP files. Increase this if you need to import large projects with many media files."
       }
     },
     "messages": {

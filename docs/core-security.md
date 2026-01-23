@@ -160,6 +160,101 @@ Sensitive configuration and environment-specific settings are stored in a `.env`
 - **Fallback**: A catch-all route (`*`) ensures that React Router handles client-side routing correctly by serving `index.html` for unknown routes.
 - **Trust Proxy**: The `trust proxy` setting is enabled in production to ensure rate limiting works correctly behind reverse proxies (like Nginx or Heroku).
 
+### 8. Project Import/Export Security
+
+- **What it is:** Users can export projects as ZIP files containing all project source files and metadata, and import them into different installations.
+- **Why it's important:** Import functionality accepts ZIP files from external sources, which introduces security risks if not properly validated and isolated.
+
+#### Security Risks
+
+**1. File Upload Validation**
+- Malicious ZIP files could contain:
+  - Path traversal attacks (`../` sequences) to write files outside the project directory
+  - Extremely large files causing disk space exhaustion
+  - Malformed ZIP structures causing denial of service
+  - Executable files that could be executed if extracted incorrectly
+
+**2. Content Validation**
+- Imported projects may contain:
+  - Malicious Liquid template code in widget files
+  - Malicious JavaScript in custom theme settings
+  - Corrupted JSON files causing application errors
+  - Invalid file names with special characters
+
+**3. Resource Exhaustion**
+- Large ZIP files or many files could:
+  - Exhaust available disk space
+  - Cause memory issues during extraction
+  - Take excessive time to process, blocking other requests
+
+#### Mitigation Strategies
+
+**1. File Upload Validation**
+- **MIME Type Validation**: Validate ZIP file type using both MIME type (`application/zip`, `application/x-zip-compressed`) and file extension (`.zip`)
+- **File Size Limits**: Enforce maximum ZIP file size (500MB) using multer limits
+- **Path Traversal Protection**: 
+  - Extract to temporary directory first
+  - Validate all file paths before copying to project directory
+  - Use `path.resolve()` and check that resolved paths stay within allowed directories
+  - Reject any paths containing `..` sequences or absolute paths
+- **File Name Sanitization**: 
+  - Validate file names to prevent special characters that could cause issues
+  - Reject file names with null bytes, control characters, or reserved names
+
+**2. Import Isolation**
+- **Temporary Extraction**: Extract ZIP to isolated temporary directory first
+- **Validation Before Copy**: Validate all files and structure before copying to project directory
+- **FolderName Sanitization**: Generate new folderName from project name using `slugify()` to prevent directory traversal
+- **New UUID Generation**: Always generate new project UUID on import to prevent ID conflicts and ensure isolation
+
+**3. Content Validation**
+- **Manifest Validation**: Require and validate `project-export.json` manifest file
+- **JSON Structure Validation**: Validate JSON structure of all JSON files during import
+- **Theme Verification**: Verify that the project's theme exists in the target installation before import
+- **File Type Validation**: Only allow expected file types (JSON, Liquid, CSS, JS, images, videos, audio)
+
+**4. Resource Limits**
+- **ZIP Size Limits**: Maximum 500MB per ZIP file
+- **File Count Limits**: Consider limiting the number of files in a ZIP (currently unlimited, but monitored)
+- **Timeout Protection**: Set reasonable timeouts for import operations
+- **Disk Space Checks**: Verify sufficient disk space before starting import
+
+**5. Error Handling**
+- **Cleanup on Failure**: Always clean up temporary files and partial project directories on import failure
+- **Graceful Degradation**: Return clear error messages without exposing internal paths or system details
+- **Transaction-like Behavior**: Import should be atomic - either fully succeeds or fully fails with cleanup
+
+#### Implementation Details
+
+**Backend (`server/controllers/projectController.js`):**
+- Uses `multer` with memory storage and 500MB file size limit
+- Validates ZIP structure and manifest before extraction
+- Extracts to temporary directory (`data/temp/import-{timestamp}/`)
+- Validates all file paths using `path.resolve()` and directory checks
+- Generates new UUID and folderName for imported project
+- Cleans up temporary files on both success and failure
+
+**Frontend (`src/components/projects/ProjectImportModal.jsx`):**
+- Validates file type before upload (ZIP extension and MIME type)
+- Shows clear error messages for validation failures
+- Provides upload progress feedback
+
+#### Best Practices for Users
+
+1. **Source Verification**: Only import projects from trusted sources
+2. **Backup Before Import**: Maintain backups before importing projects
+3. **Review Imported Content**: Review imported project files, especially custom widgets and theme settings
+4. **Theme Compatibility**: Ensure required themes are installed before importing projects
+
+#### Future Considerations
+
+If the application evolves to support public project sharing or marketplaces:
+- Implement digital signatures for verified project exports
+- Add project export format versioning with migration paths
+- Implement content scanning for known malicious patterns
+- Add project reputation/rating system
+- Implement sandboxed import environment for untrusted sources
+
 ---
 
 **See also:**
