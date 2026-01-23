@@ -244,6 +244,8 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
     {% asset "base.css" %}      <!-- Load theme CSS -->
     {% header_assets %}         <!-- Render enqueued header styles and scripts (sorted by priority) -->
     {% theme_settings %}        <!-- Output CSS variables from global settings -->
+    {% custom_css %}            <!-- Custom CSS from theme settings (optional) -->
+    {% custom_head_scripts %}   <!-- Custom scripts for head (e.g., Google Analytics) (optional) -->
 </head>
 <body class="{{ body_class }}">
     {{ header }}                <!-- Global header widget -->
@@ -256,6 +258,7 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 
     {% asset "scripts.js" %}
     {% footer_assets %}         <!-- Render enqueued footer styles and scripts (sorted by priority) -->
+    {% custom_footer_scripts %} <!-- Custom scripts before closing body tag (optional) -->
 </body>
 </html>
 ```
@@ -268,6 +271,9 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 - `{% header_assets %}`: Renders all enqueued CSS and JS files marked for header, sorted by priority
 - `{% footer_assets %}`: Renders all enqueued CSS and JS files marked for footer, sorted by priority
 - `{% theme_settings %}`: Outputs CSS custom properties from global settings as `<style>` tags in the document head
+- `{% custom_css %}`: Outputs custom CSS from theme settings wrapped in a `<style>` tag. Should be placed in the `<head>` section.
+- `{% custom_head_scripts %}`: Outputs custom scripts from theme settings as raw HTML. Should be placed in the `<head>` section (e.g., for Google Analytics).
+- `{% custom_footer_scripts %}`: Outputs custom scripts from theme settings as raw HTML. Should be placed before the closing `</body>` tag.
 - `{{ header }}`: Renders the global header widget
 - `{{ main_content }}`: The insertion point for page content (widgets)
 - `{{ footer }}`: Renders the global footer widget
@@ -1572,6 +1578,128 @@ strong, b {
   font-weight: var(--typography-body_font_bold-weight, 700);
 }
 ```
+
+### Advanced Settings
+
+For advanced users who need to inject custom CSS or JavaScript, the theme system provides three special settings in the `advanced` group:
+
+- **Custom CSS** (`custom_css`): Add custom CSS that will be wrapped in a `<style>` tag
+- **Custom Head Scripts** (`custom_head_scripts`): Add raw HTML/JavaScript for the `<head>` section (e.g., Google Analytics)
+- **Custom Footer Scripts** (`custom_footer_scripts`): Add raw HTML/JavaScript before the closing `</body>` tag
+
+#### Usage in layout.liquid
+
+Theme authors can add these tags anywhere in their `layout.liquid` template:
+
+```liquid
+<head>
+  <!-- ... other head content ... -->
+  {% theme_settings %}
+  {% custom_css %}              <!-- Outputs custom CSS in <style> tag -->
+  {% custom_head_scripts %}     <!-- Outputs raw HTML (e.g., Google Analytics) -->
+</head>
+<body>
+  <!-- ... page content ... -->
+  {% custom_footer_scripts %}   <!-- Outputs raw HTML before </body> -->
+</body>
+```
+
+#### Example: Google Analytics
+
+Users can paste their Google Analytics code into the "Custom Head Scripts" setting:
+
+```html
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'GA_MEASUREMENT_ID');
+</script>
+```
+
+The `{% custom_head_scripts %}` tag will output this code exactly as entered.
+
+#### Example: Custom CSS
+
+Users can add custom CSS that overrides or extends theme styles:
+
+```css
+/* Custom button styling */
+.btn-custom {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50px;
+  padding: 12px 30px;
+}
+
+/* Hide specific elements */
+.hide-on-mobile {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hide-on-mobile {
+    display: block;
+  }
+}
+```
+
+The `{% custom_css %}` tag will wrap this in a `<style id="custom-theme-css">` tag.
+
+#### Security Considerations
+
+**Important:** These settings accept raw HTML, CSS, and JavaScript without sanitization. This provides maximum flexibility but requires careful use:
+
+- Only paste code from trusted sources
+- Verify the integrity of third-party scripts before adding them
+- Regularly audit custom code to ensure it hasn't been modified
+- Be aware that malicious code can steal user data, perform unauthorized actions, or compromise site security
+
+For detailed security information, see the [Platform Security](core-security.md) documentation.
+
+#### Theme Author Implementation
+
+To enable these features in your theme, add the `advanced` settings group to your `theme.json`:
+
+```json
+{
+  "settings": {
+    "global": {
+      "advanced": [
+        {
+          "type": "header",
+          "id": "advanced_header",
+          "label": "Advanced"
+        },
+        {
+          "type": "textarea",
+          "id": "custom_css",
+          "label": "Custom CSS",
+          "description": "Add custom CSS that will be injected in the <head> section. Use the {% custom_css %} tag in your layout.liquid to render it.",
+          "default": ""
+        },
+        {
+          "type": "textarea",
+          "id": "custom_head_scripts",
+          "label": "Custom Head Scripts",
+          "description": "Add custom scripts (e.g., Google Analytics) that will be injected in the <head> section. Use the {% custom_head_scripts %} tag in your layout.liquid to render them.",
+          "default": ""
+        },
+        {
+          "type": "textarea",
+          "id": "custom_footer_scripts",
+          "label": "Custom Footer Scripts",
+          "description": "Add custom scripts that will be injected before the closing </body> tag. Use the {% custom_footer_scripts %} tag in your layout.liquid to render them.",
+          "default": ""
+        }
+      ]
+    }
+  }
+}
+```
+
+Then add the corresponding tags in your `layout.liquid` where you want the content to appear.
 
 ## 13. Theme Development Workflow
 

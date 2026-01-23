@@ -44,6 +44,92 @@ These layers are applied automatically to API endpoints and provide a robust bas
 - **Why it's important:** Prevents the server from crashing due to unhandled exceptions. It also ensures that sensitive error details (like stack traces) are not leaked to the client in a production environment.
 - **Implementation:** A custom error-handling middleware (`server/middleware/errorHandler.js`) is registered as the final middleware in `server/index.js`.
 
+### 7. Advanced Theme Settings Security
+
+- **What it is:** Advanced theme settings allow users to inject custom CSS and JavaScript directly into their theme templates through the `custom_css`, `custom_head_scripts`, and `custom_footer_scripts` settings.
+- **Why it's important:** These settings provide powerful customization capabilities but introduce significant security risks if not properly understood and managed.
+- **Implementation:** These settings are rendered through custom Liquid tags (`{% custom_css %}`, `{% custom_head_scripts %}`, `{% custom_footer_scripts %}`) that output raw HTML/CSS content without sanitization.
+
+#### Security Risks
+
+**1. Cross-Site Scripting (XSS) Vulnerabilities**
+- The `custom_head_scripts` and `custom_footer_scripts` settings accept raw HTML/JavaScript that is rendered directly into the page without any sanitization or Content Security Policy (CSP) restrictions.
+- Malicious JavaScript injected through these settings can:
+  - Steal user session cookies and authentication tokens
+  - Perform unauthorized actions on behalf of users
+  - Redirect users to malicious websites
+  - Access and exfiltrate sensitive user data
+  - Modify page content to display phishing content
+
+**2. CSS Injection Attacks**
+- The `custom_css` setting allows arbitrary CSS to be injected into the page.
+- While CSS cannot directly execute JavaScript, it can be used for:
+  - UI redressing attacks (making malicious elements appear legitimate)
+  - Data exfiltration through CSS attribute selectors and `@import` directives
+  - Privacy violations by detecting visited links
+  - Clickjacking attacks by overlaying transparent elements
+
+**3. Content Security Policy (CSP) Bypass**
+- If a CSP is implemented, inline scripts and styles injected through these settings may bypass CSP restrictions, depending on the policy configuration.
+- This can undermine other security measures put in place.
+
+**4. Third-Party Script Risks**
+- Users may paste third-party scripts (e.g., Google Analytics, advertising scripts) that:
+  - Load additional scripts from external domains
+  - Track user behavior across sites
+  - May be compromised or replaced with malicious versions
+  - Can introduce supply chain vulnerabilities
+
+#### Mitigation Strategies
+
+**For Theme Authors:**
+1. **Documentation and Warnings**: Clearly document that these are advanced settings intended for trusted users only.
+2. **Placement Control**: Theme authors control where these tags are placed in `layout.liquid`, allowing them to position them appropriately (e.g., after other critical assets).
+3. **Optional Implementation**: Theme authors can choose not to include these tags in their themes if they don't want to expose this functionality.
+
+**For End Users:**
+1. **Trust and Verification**: Only paste code from trusted sources. Verify the integrity of third-party scripts before adding them.
+2. **Minimal Code**: Only include the minimum necessary code. Avoid pasting entire HTML documents or unnecessary scripts.
+3. **Regular Audits**: Periodically review and audit custom code to ensure it hasn't been modified or compromised.
+4. **Testing**: Test custom code in a development environment before deploying to production.
+
+**For Administrators:**
+1. **Access Control**: Consider restricting access to theme settings based on user roles or permissions if implementing a multi-user system.
+2. **Monitoring**: Implement logging and monitoring for changes to theme settings to detect unauthorized modifications.
+3. **Backup and Version Control**: Maintain backups and version history of theme settings to enable rollback if malicious code is detected.
+4. **Content Security Policy**: Consider implementing a strict CSP, but be aware that it may conflict with user-provided scripts. If CSP is implemented, users must ensure their custom scripts comply with the policy.
+
+#### Design Rationale
+
+These settings are intentionally unsanitized to provide maximum flexibility for advanced users who need to:
+- Integrate third-party analytics and tracking services
+- Add custom styling that cannot be achieved through standard theme settings
+- Implement custom functionality through JavaScript
+- Integrate with external services and APIs
+
+The security model assumes that:
+- Users have full control over their projects and are responsible for the content they add
+- The application is primarily used in a single-user or trusted multi-user environment
+- Users understand the security implications of injecting raw HTML/CSS/JavaScript
+
+This is similar to how content management systems like WordPress allow administrators to add custom CSS and JavaScript through theme customization panels, with the understanding that administrators are trusted users.
+
+#### Best Practices
+
+1. **Validate Input on Save**: While not sanitizing content, validate that the input is valid text and handle encoding issues appropriately.
+2. **Error Handling**: The tag implementations include error handling to prevent template rendering failures if settings are malformed.
+3. **Empty Value Handling**: Tags return empty strings when settings are not configured, preventing unnecessary empty tags in the output.
+4. **Documentation**: Comprehensive documentation in `docs/theming.md` and `docs/core-security.md` helps users understand the risks and proper usage.
+
+#### Future Considerations
+
+If the application evolves to support untrusted multi-user environments or public-facing theme marketplaces, consider:
+- Implementing optional sanitization modes (strict vs. permissive)
+- Adding CSP headers with nonce or hash-based validation
+- Providing a whitelist of allowed script sources
+- Implementing code review workflows for theme settings changes
+- Adding audit logging for all theme setting modifications
+
 ## ⚙️ Configuration
 
 ### Environment Variables (`.env`)

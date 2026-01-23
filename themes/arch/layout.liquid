@@ -8,10 +8,13 @@
     {% fonts %}
 
     {% theme_settings %}
+
     {% asset "base.css" %}
     {% unless theme.layout.enable_reveal_animations %}
       <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
     {% endunless %}
+    {% custom_css %}
+    {% custom_head_scripts %}
     {% header_assets %}
   </head>
   <body class="{{ body_class }}">
@@ -27,6 +30,7 @@
       {% enqueue_script "reveal.js", { "priority": 50 } %}
     {% endif %}
     {% footer_assets %}
+    {% custom_footer_scripts %}
   </body>
 </html>
 
