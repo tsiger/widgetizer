@@ -203,24 +203,30 @@
           "label": "Advanced"
         },
         {
-          "type": "textarea",
+          "type": "code",
           "id": "custom_css",
           "label": "Custom CSS",
           "description": "Add custom CSS that will be injected in the <head> section.",
+          "language": "css",
+          "rows": 12,
           "default": ""
         },
         {
-          "type": "textarea",
+          "type": "code",
           "id": "custom_head_scripts",
           "label": "Custom Head Scripts",
           "description": "Add custom scripts (e.g., Google Analytics) that will be injected in the <head> section.",
+          "language": "html",
+          "rows": 12,
           "default": ""
         },
         {
-          "type": "textarea",
+          "type": "code",
           "id": "custom_footer_scripts",
           "label": "Custom Footer Scripts",
           "description": "Add custom scripts that will be injected before the closing </body> tag.",
+          "language": "html",
+          "rows": 12,
           "default": ""
         }
       ]

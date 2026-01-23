@@ -77,6 +77,54 @@ A multi-line text input field.
 }
 ```
 
+### Code
+
+A code editor with syntax highlighting and line numbers. Ideal for editing CSS, JavaScript, HTML, or other code snippets.
+
+**Additional Properties:**
+
+- **`language`** (string, optional): The programming language for syntax highlighting. Supported values: `"css"`, `"html"`, `"javascript"` (or `"js"`). Defaults to `"html"`.
+- **`rows`** (number, optional): The number of visible rows in the editor. Defaults to `10`.
+
+```json
+{
+  "id": "custom_css",
+  "type": "code",
+  "label": "Custom CSS",
+  "description": "Add custom CSS that will be injected in the <head> section.",
+  "language": "css",
+  "rows": 12,
+  "default": ""
+}
+```
+
+**Example with HTML/JavaScript:**
+
+```json
+{
+  "id": "custom_head_scripts",
+  "type": "code",
+  "label": "Custom Head Scripts",
+  "description": "Add custom scripts (e.g., Google Analytics) that will be injected in the <head> section.",
+  "language": "html",
+  "rows": 12,
+  "default": ""
+}
+```
+
+**Features:**
+
+- Line numbers displayed on the left side
+- Syntax highlighting with color-coded tokens
+- Monospace font for better code readability
+- Scrollable editor with synchronized line number scrolling
+- Minimal design that matches other form inputs
+
+**When to use Code vs Textarea:**
+
+- Use `code` for CSS, JavaScript, HTML, or any code that benefits from syntax highlighting
+- Use `textarea` for plain text content, descriptions, or content that doesn't need code formatting
+
 ### Color
 
 A color picker with a hex input field and a pop-over color swatch.

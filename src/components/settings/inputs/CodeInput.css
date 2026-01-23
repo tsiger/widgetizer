@@ -1,0 +1,112 @@
+.code-input-wrapper {
+  position: relative;
+}
+
+.code-input-container {
+  display: flex;
+  border: 1px solid rgb(203 213 225);
+  border-radius: 0.125rem;
+  background: white;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.code-input-container:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 1px rgb(236 72 153);
+  border-color: rgb(236 72 153);
+}
+
+.code-line-numbers {
+  flex-shrink: 0;
+  padding: 0.5rem 0.75rem;
+  background: rgb(248 250 252);
+  border-right: 1px solid rgb(226 232 240);
+  text-align: right;
+  font-size: 0.75rem;
+  color: rgb(100 116 139);
+  font-family: "Fira Code", "Fira Mono", "Consolas", "Monaco", "Courier New", monospace;
+  user-select: none;
+  overflow: hidden;
+  min-width: 3rem;
+}
+
+.code-line-number {
+  line-height: 1.5rem;
+  min-height: 1.5rem;
+}
+
+.code-editor {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+}
+
+/* Code editor textarea styling */
+.code-textarea {
+  font-family: "Fira Code", "Fira Mono", "Consolas", "Monaco", "Courier New", monospace !important;
+  font-size: 13px !important;
+  line-height: 1.5rem !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  resize: none !important;
+  color: rgb(30 41 59) !important;
+}
+
+.code-pre {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+/* Prism theme overrides for better contrast */
+.code-input-wrapper :global(.token.comment),
+.code-input-wrapper :global(.token.prolog),
+.code-input-wrapper :global(.token.doctype),
+.code-input-wrapper :global(.token.cdata) {
+  color: #64748b;
+}
+
+.code-input-wrapper :global(.token.punctuation) {
+  color: #475569;
+}
+
+.code-input-wrapper :global(.token.property),
+.code-input-wrapper :global(.token.tag),
+.code-input-wrapper :global(.token.boolean),
+.code-input-wrapper :global(.token.number),
+.code-input-wrapper :global(.token.constant),
+.code-input-wrapper :global(.token.symbol),
+.code-input-wrapper :global(.token.deleted) {
+  color: #0ea5e9;
+}
+
+.code-input-wrapper :global(.token.selector),
+.code-input-wrapper :global(.token.attr-name),
+.code-input-wrapper :global(.token.string),
+.code-input-wrapper :global(.token.char),
+.code-input-wrapper :global(.token.builtin),
+.code-input-wrapper :global(.token.inserted) {
+  color: #10b981;
+}
+
+.code-input-wrapper :global(.token.operator),
+.code-input-wrapper :global(.token.entity),
+.code-input-wrapper :global(.token.url),
+.code-input-wrapper :global(.language-css .token.string),
+.code-input-wrapper :global(.style .token.string) {
+  color: #f59e0b;
+}
+
+.code-input-wrapper :global(.token.atrule),
+.code-input-wrapper :global(.token.attr-value),
+.code-input-wrapper :global(.token.keyword) {
+  color: #8b5cf6;
+}
+
+.code-input-wrapper :global(.token.function),
+.code-input-wrapper :global(.token.class-name) {
+  color: #ec4899;
+}

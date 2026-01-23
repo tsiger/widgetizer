@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import {
   TextInput,
   TextareaInput,
+  CodeInput,
   ColorInput,
   RangeInput,
   SelectInput,
@@ -28,7 +29,7 @@ export default function SettingsRenderer({ setting, value, onChange, error, isFi
     return <div>Error: Invalid setting configuration.</div>;
   }
 
-  const { type, id, label, description, options, min, max, step, unit, allow_alpha } = setting;
+  const { type, id, label, description, options, min, max, step, unit, allow_alpha, language } = setting;
 
   // Translate label and description if they are translation keys
   const translatedLabel = label?.startsWith("appSettings.") ? t(label) : label;
@@ -71,6 +72,8 @@ export default function SettingsRenderer({ setting, value, onChange, error, isFi
         return <TextInput {...inputProps} type="number" />;
       case "textarea":
         return <TextareaInput {...inputProps} />;
+      case "code":
+        return <CodeInput {...inputProps} language={language || "html"} rows={setting.rows || 10} />;
       case "color":
         return <ColorInput {...inputProps} />;
       case "range":
