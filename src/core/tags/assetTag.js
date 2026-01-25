@@ -1,24 +1,28 @@
+import { Tokenizer, evalToken } from "liquidjs";
+
 export const AssetTag = {
   parse(tagToken) {
-    this.args = tagToken.args;
     this.name = tagToken.name;
+    const tokenizer = new Tokenizer(tagToken.args);
 
-    // Parse the arguments
-    const argString = this.args.trim();
-    const matches = argString.match(/('|")([^'"]+)\1(?:\s*,\s*({[^}]+}))?/);
+    // Read the filepath token (not evaluated yet)
+    this.filepathToken = tokenizer.readValue();
 
-    if (matches) {
-      this.filepath = matches[2];
-      // If we have options JSON, parse it
-      this.options = matches[3] ? JSON.parse(matches[3]) : {};
-    } else {
-      // Fallback to the old format: just a filepath
-      this.filepath = argString.replace(/^['"]|['"]$/g, "");
-      this.options = {};
+    // Skip comma and whitespace
+    tokenizer.skipBlank();
+    if (tokenizer.peek() === ",") {
+      tokenizer.advance();
+      tokenizer.skipBlank();
+    }
+
+    // Read the options object token if present
+    this.optionsToken = null;
+    if (!tokenizer.end()) {
+      this.optionsToken = tokenizer.readValue();
     }
   },
 
-  render(context) {
+  *render(context) {
     /**
      * The asset tag is used to include CSS, JavaScript, and other assets in templates.
      *
@@ -55,7 +59,11 @@ export const AssetTag = {
      *   Example: {% asset "theme.css", { "id": "theme-stylesheet" } %}
      */
     try {
-      if (!this.filepath) {
+      // Evaluate tokens to get actual values
+      const filepath = yield evalToken(this.filepathToken, context);
+      const options = this.optionsToken ? yield evalToken(this.optionsToken, context) : {};
+
+      if (!filepath) {
         throw new Error("No file path provided to asset tag");
       }
 
@@ -66,24 +74,24 @@ export const AssetTag = {
       const renderMode = globals.renderMode || "preview"; // Default to preview
 
       // Determine file type from extension
-      const isCSS = this.filepath.endsWith(".css");
-      const isJS = this.filepath.endsWith(".js");
-      const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(this.filepath);
+      const isCSS = filepath.endsWith(".css");
+      const isJS = filepath.endsWith(".js");
+      const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(filepath);
 
       let assetUrl;
       if (renderMode === "publish") {
         // For publish mode, use a relative path assuming all assets are in a top-level 'assets' folder
-        assetUrl = `assets/${this.filepath}`;
+        assetUrl = `assets/${filepath}`;
       } else {
         // For preview mode, use the existing API route
         // Determine the source folder based on the current template context
         if (context.environments.widget && context.environments.widget.type) {
           // Inside a widget template: load from widgets/{widgetType}/
           const widgetType = context.environments.widget.type;
-          assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/widgets/${widgetType}/${this.filepath}`;
+          assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/widgets/${widgetType}/${filepath}`;
         } else {
           // In layout/snippets: load from assets/
-          assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/assets/${this.filepath}`;
+          assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/assets/${filepath}`;
         }
       }
 
@@ -95,7 +103,7 @@ export const AssetTag = {
         integrity = null,
         media = null,
         id = null,
-      } = this.options;
+      } = options;
 
       // Build attributes string
       let attributes = "";
@@ -104,8 +112,8 @@ export const AssetTag = {
       if (integrity) attributes += ` integrity="${integrity}"`;
 
       // For images, check if we have metadata in the context
-      if (isImage && context.mediaDimensions && context.mediaDimensions[this.filepath]) {
-        const imageData = context.mediaDimensions[this.filepath];
+      if (isImage && context.mediaDimensions && context.mediaDimensions[filepath]) {
+        const imageData = context.mediaDimensions[filepath];
         if (imageData.alt) attributes += ` alt="${imageData.alt}"`;
         if (imageData.title) attributes += ` title="${imageData.title}"`;
       }

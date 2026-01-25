@@ -1,3 +1,5 @@
+import { Tokenizer, evalToken } from "liquidjs";
+
 /**
  * {% enqueue_script %} Liquid Tag
  *
@@ -15,25 +17,32 @@
  */
 export const EnqueueScriptTag = {
   parse(tagToken) {
-    this.args = tagToken.args;
+    const tokenizer = new Tokenizer(tagToken.args);
 
-    // Parse the arguments
-    const argString = this.args.trim();
-    const matches = argString.match(/('|")([^'"]+)\1(?:\s*,\s*({[^}]+}))?/);
+    // Read the filepath token (not evaluated yet)
+    this.filepathToken = tokenizer.readValue();
 
-    if (matches) {
-      this.filepath = matches[2];
-      this.options = matches[3] ? JSON.parse(matches[3]) : {};
-    } else {
-      // Fallback: just a filepath
-      this.filepath = argString.replace(/^['"]|['"]$/g, "");
-      this.options = {};
+    // Skip comma and whitespace
+    tokenizer.skipBlank();
+    if (tokenizer.peek() === ",") {
+      tokenizer.advance();
+      tokenizer.skipBlank();
+    }
+
+    // Read the options object token if present
+    this.optionsToken = null;
+    if (!tokenizer.end()) {
+      this.optionsToken = tokenizer.readValue();
     }
   },
 
-  render(context) {
+  *render(context) {
     try {
-      if (!this.filepath) {
+      // Evaluate tokens to get actual values
+      const filepath = yield evalToken(this.filepathToken, context);
+      const options = this.optionsToken ? yield evalToken(this.optionsToken, context) : {};
+
+      if (!filepath) {
         console.warn("enqueue_script: No file path provided");
         return "";
       }
@@ -44,17 +53,17 @@ export const EnqueueScriptTag = {
       }
 
       // Parse location option (default: "footer")
-      const location = this.options.location || "footer";
+      const location = options.location || "footer";
 
       // Parse priority option (default: 50)
-      const priority = this.options.priority !== undefined ? this.options.priority : 50;
+      const priority = options.priority !== undefined ? options.priority : 50;
 
       const widgetContext = context.environments?.widget || null;
 
       // Add to the Map (filepath as key for deduplication)
-      context.globals.enqueuedScripts.set(this.filepath, {
-        defer: this.options.defer === true, // Opt-in
-        async: this.options.async === true, // Opt-in
+      context.globals.enqueuedScripts.set(filepath, {
+        defer: options.defer === true, // Opt-in
+        async: options.async === true, // Opt-in
         location: location,
         priority: priority,
         source: widgetContext ? "widget" : "theme",
