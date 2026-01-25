@@ -1,5 +1,5 @@
 import { app, BrowserWindow, dialog, Menu, shell } from "electron";
-import { spawn, fork } from "child_process";
+import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 import http from "http";
@@ -240,7 +240,7 @@ function waitForServerReady() {
         }
       );
 
-      req.on("error", (err) => {
+      req.on("error", () => {
         // Server not ready yet, retry
         setTimeout(check, SERVER_POLL_INTERVAL_MS);
       });
@@ -259,7 +259,6 @@ function waitForServerReady() {
 function createWindow() {
   log("Creating main window...");
 
-  const isDev = getIsDev();
   const preloadPath = path.join(appRoot, "electron", "preload.js");
 
   log(`Preload path: ${preloadPath}`);
@@ -589,6 +588,6 @@ process.on("uncaughtException", (err) => {
   dialog.showErrorBox("Widgetizer Error", `Uncaught exception: ${err.message}`);
 });
 
-process.on("unhandledRejection", (reason, promise) => {
+process.on("unhandledRejection", (reason) => {
   log(`Unhandled rejection: ${reason}`);
 });
