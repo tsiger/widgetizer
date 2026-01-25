@@ -1,7 +1,7 @@
 {
-  "type": "card-grid",
-  "displayName": "Card Grid",
-  "aliases": ["image grid", "image cards", "services", "grid", "blocks"],
+  "type": "icon-card-grid",
+  "displayName": "Icon Card Grid",
+  "aliases": ["features", "services", "icon grid", "icon blocks", "icon cards"],
   "settings": [
     {
       "type": "text",
@@ -13,13 +13,13 @@
       "type": "text",
       "id": "title",
       "label": "Heading",
-      "default": "Card Grid - Services Showcase"
+      "default": "What We Offer"
     },
     {
       "type": "textarea",
       "id": "description",
       "label": "Description",
-      "default": "A responsive grid layout showcasing services with images, descriptions, and call-to-action buttons."
+      "default": "A responsive grid layout showcasing services with icons, descriptions, and call-to-action buttons."
     },
     {
       "type": "header",
@@ -57,9 +57,9 @@
           "label": "Content"
         },
         {
-          "type": "image",
-          "id": "image",
-          "label": "Image"
+          "type": "icon",
+          "id": "icon",
+          "label": "Icon"
         },
         {
           "type": "text",

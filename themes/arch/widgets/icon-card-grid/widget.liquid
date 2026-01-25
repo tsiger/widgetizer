@@ -1,11 +1,11 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-type-card-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  class="widget widget-type-icon-card-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
   {% if widget.settings.color_scheme == 'highlight' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
-  data-widget-type="card-grid"
+  data-widget-type="icon-card-grid"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
@@ -75,8 +75,8 @@
           {% endif %}
 
           <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
-            {% if block.settings.image != blank %}
-              {{ block.settings.image | image: 'medium', 'widget-card-image' }}
+            {% if block.settings.icon != blank %}
+              {% render 'icon', icon: block.settings.icon, class: 'widget-card-icon' %}
             {% endif %}
             <div class="widget-card-content">
               {% if block.settings.subtitle != blank %}
