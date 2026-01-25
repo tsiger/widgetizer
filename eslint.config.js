@@ -5,10 +5,10 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 
 export default [
-  { ignores: ["dist"] },
+  { ignores: ["dist", "dist-electron"] },
+  // Frontend (React) - src/, components, pages, etc.
   {
-    files: ["**/*.{js,jsx}"],
-    ignores: ["server/**/*.js"],
+    files: ["src/**/*.{js,jsx}"],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -36,10 +36,28 @@ export default [
       "react/prop-types": "off",
     },
   },
+  // Server (Express backend)
   {
     files: ["server/**/*.js"],
     languageOptions: {
       globals: globals.node,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+    },
+  },
+  // Electron (main process + preload)
+  {
+    files: ["electron/**/*.js"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.browser, // preload has access to some browser APIs
+      },
       parserOptions: {
         ecmaVersion: "latest",
         sourceType: "module",

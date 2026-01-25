@@ -1,5 +1,6 @@
 node_modules
 dist
+dist-electron
 # Ignore the entire data folder
 data/*
 # But include the projects directory structure

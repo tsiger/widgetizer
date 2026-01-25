@@ -104,6 +104,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     selectedWidgetId,
     selectedBlockId,
     selectedGlobalWidgetId,
+    runtimeMode,
   ]);
 
   // We use a dual-update strategy: immediate postMessage for instant visual feedback
@@ -275,6 +276,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     selectedWidgetId,
     selectedBlockId,
     selectedGlobalWidgetId,
+    runtimeMode,
   ]);
 
   // Message handler moved to SelectionOverlay component

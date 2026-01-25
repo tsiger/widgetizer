@@ -12,16 +12,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint src server",
+    "lint:electron": "eslint electron",
+    "lint:all": "eslint .",
     "preview": "vite preview",
     "server": "nodemon server/index.js",
     "start": "node server/index.js",
     "dev:frontend": "wait-on http://localhost:3001/health && npm run dev",
     "dev:all": "concurrently \"npm run server\" \"npm run dev:frontend\"",
-    "build:prod": "npm run build && cross-env NODE_ENV=production npm start",
     "start:prod": "cross-env NODE_ENV=production npm start",
-    "build:windows": "npm run build && node desktop-apps/scripts/build-windows.js",
-    "build:mac": "npm run build && node desktop-apps/scripts/build-mac.js",
     "electron:dev": "concurrently -k \"cross-env NODE_ENV=development npm run server\" \"cross-env NODE_ENV=development npm run dev\" \"wait-on http://localhost:3000 && cross-env ELECTRON_DEV=1 ELECTRON_DISABLE_INTERNAL_SERVER=1 VITE_DEV_SERVER_URL=http://localhost:3000 electron .\"",
     "electron:build": "npm run build && electron-builder",
     "electron:build:mac": "npm run build && electron-builder --mac",
@@ -31,7 +30,8 @@
     "appId": "com.widgetizer.app",
     "productName": "Widgetizer",
     "directories": {
-      "output": "desktop-apps/builds/electron"
+      "output": "dist-electron",
+      "buildResources": "electron/resources"
     },
     "files": [
       "dist/**/*",

@@ -162,27 +162,30 @@ export default function IconInput({ value, onChange, options, allow_patterns, de
   const selectedIcon = value ? flatIconsMap[value] : null;
 
   const groupMeta = useMemo(() => {
-    let offset = 0;
+    const result = [];
+    let runningOffset = 0;
 
-    return filteredGroups.map((group, index) => {
+    for (let index = 0; index < filteredGroups.length; index++) {
+      const group = filteredGroups[index];
       const rows = Math.ceil(group.icons.length / columns);
       const contentHeight = rows > 0 ? rows * rowHeight + (rows - 1) * rowGap : 0;
       const headerHeight = isGrouped && group.name ? groupHeaderHeight : 0;
       const separatorHeight = isGrouped && index < filteredGroups.length - 1 ? groupSeparatorHeight : 0;
       const totalHeight = headerHeight + groupPadding * 2 + contentHeight + separatorHeight;
 
-      const meta = {
+      result.push({
         group,
         rows,
         headerHeight,
         separatorHeight,
-        startOffset: offset,
+        startOffset: runningOffset,
         totalHeight,
-      };
+      });
 
-      offset += totalHeight;
-      return meta;
-    });
+      runningOffset += totalHeight;
+    }
+
+    return result;
   }, [filteredGroups, isGrouped, columns, rowHeight, rowGap]);
 
   // Loading state

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs";
 import "prismjs/components/prism-css";
@@ -11,16 +11,14 @@ import "./CodeInput.css";
  * CodeInput component
  * Renders a code editor with syntax highlighting and line numbers
  */
-export default function CodeInput({ id, value = "", onChange, language = "html", placeholder = "", rows = 10 }) {
-  const [lineCount, setLineCount] = useState(1);
+export default function CodeInput({ value = "", onChange, language = "html", placeholder = "", rows = 10 }) {
   const editorRef = useRef(null);
   const lineNumbersRef = useRef(null);
   const editorContainerRef = useRef(null);
 
-  // Calculate line count from value
-  useEffect(() => {
-    const lines = value.split("\n").length || 1;
-    setLineCount(lines);
+  // Calculate line count from value (derived state)
+  const lineCount = useMemo(() => {
+    return value.split("\n").length || 1;
   }, [value]);
 
   // Sync scrolling between editor and line numbers

@@ -22,7 +22,7 @@ import SettingsField from "./SettingsField";
 /**
  * Renders the appropriate input component for a given setting
  */
-export default function SettingsRenderer({ setting, value, onChange, error, isFirst = false }) {
+export default function SettingsRenderer({ setting, value, onChange, error }) {
   const { t } = useTranslation();
 
   if (!setting || !setting.type) {

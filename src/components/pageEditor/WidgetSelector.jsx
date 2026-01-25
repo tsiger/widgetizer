@@ -10,6 +10,12 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
   const [searchTerm, setSearchTerm] = useState("");
   const [focusedIndex, setFocusedIndex] = useState(-1);
 
+  // Helper to update search and reset focus in one action
+  const updateSearch = useCallback((value) => {
+    setSearchTerm(value);
+    setFocusedIndex(-1);
+  }, []);
+
   const availableWidgets = Object.values(widgetSchemas)
     .filter((schema) => schema.type !== "header" && schema.type !== "footer")
     .sort((a, b) => (a.displayName || a.type).localeCompare(b.displayName || b.type));
@@ -22,11 +28,6 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     return name.toLowerCase().includes(searchLower) ||
       aliases.some(alias => alias.toLowerCase().includes(searchLower));
   });
-
-  // Reset focused index when search changes or dropdown opens
-  useEffect(() => {
-    setFocusedIndex(-1);
-  }, [searchTerm]);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((event) => {
@@ -94,10 +95,9 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     };
 
     if (isOpen) {
+      // Reset search and focus when dropdown opens (intentional UX behavior)
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSearchTerm(""); // Reset search when opening
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setFocusedIndex(-1); // Reset focused index when opening
+      updateSearch("");
       // Add a small delay to ensure the dropdown is fully rendered
       const timer = setTimeout(() => {
         document.addEventListener("mousedown", handleClickOutside);
@@ -116,7 +116,7 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen, onClose, triggerRef]);
+  }, [isOpen, onClose, triggerRef, updateSearch]);
 
   // Calculate position relative to trigger (using useLayoutEffect to avoid accessing refs during render)
   const [style, setStyle] = useState({
@@ -191,7 +191,7 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
               type="text"
               placeholder={t("common.search")}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => updateSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               className="w-full text-sm pl-8 pr-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
               role="combobox"

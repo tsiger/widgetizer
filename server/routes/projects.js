@@ -137,7 +137,7 @@ router.post("/import", async (req, res, next) => {
         next();
       }
     });
-  } catch (error) {
+  } catch {
     return res.status(500).json({ error: "Failed to configure file upload" });
   }
 }, projectController.importProject);

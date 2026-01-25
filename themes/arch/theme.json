@@ -15,7 +15,7 @@
           "type": "checkbox",
           "id": "enable_reveal_animations",
           "label": "Enable scroll reveal animations",
-          "default": true,
+          "default": false,
           "description": "Animate elements as they scroll into view"
         }
       ],

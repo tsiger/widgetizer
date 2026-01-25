@@ -31,7 +31,7 @@ npm run electron:build:mac
 npm run electron:build:win
 ```
 
-Output directory: `desktop-apps/builds/electron/`
+Output directory: `dist-electron/`
 
 ### Windows note
 
@@ -40,7 +40,7 @@ If you build the Windows app on macOS, native modules like `sharp` may be missin
 ### macOS Output
 
 ```
-desktop-apps/builds/electron/
+dist-electron/
 ├── mac-arm64/
 │   └── Widgetizer.app          # Apple Silicon (M1/M2/M3/M4)
 ├── mac/
@@ -52,7 +52,7 @@ desktop-apps/builds/electron/
 ### Windows Output
 
 ```
-desktop-apps/builds/electron/
+dist-electron/
 ├── win-unpacked/
 │   └── Widgetizer.exe
 └── Widgetizer-x.x.x-win.zip
@@ -92,7 +92,7 @@ sips -z 1024 1024 icon-1024.png --out icon.iconset/icon_512x512@2x.png
 iconutil -c icns icon.iconset -o icon.icns
 ```
 
-3. Place `icon.icns` in `build/` folder
+3. Place `icon.icns` in `electron/resources/` folder
 4. Rebuild the app
 
 ## Distribution
@@ -133,8 +133,8 @@ Update `package.json` build config:
 "mac": {
   "hardenedRuntime": true,
   "gatekeeperAssess": false,
-  "entitlements": "build/entitlements.mac.plist",
-  "entitlementsInherit": "build/entitlements.mac.plist",
+  "entitlements": "electron/resources/entitlements.mac.plist",
+  "entitlementsInherit": "electron/resources/entitlements.mac.plist",
   "notarize": true
 }
 ```

@@ -839,7 +839,7 @@ export async function importProject(req, res) {
     try {
       const manifestContent = manifestEntry.getData().toString("utf8");
       manifest = JSON.parse(manifestContent);
-    } catch (error) {
+    } catch {
       return res.status(400).json({ error: "Invalid project export: corrupted manifest file" });
     }
 
