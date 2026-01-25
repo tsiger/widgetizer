@@ -1,57 +1,110 @@
 # Widgetizer
 
-A dead simple static website builder for the rest of us.
+A powerful, yet simple, visual website builder for creating high-performance static websites. Build pages with drag-and-drop widgets, customize themes, and export blazing-fast static HTML—no database required.
 
-## Minimum Requirements
+## ✨ Features
 
-- **Node.js:** >= 18.0.0 (Recommended to use the latest LTS version)
-- **npm:** >= 8.0.0 (or compatible package manager like yarn)
+- **Visual Page Builder** – Compose pages using drag-and-drop widgets and blocks
+- **Theme System** – Choose from pre-built themes and customize colors, typography, and global styles
+- **Media Library** – Automatic image optimization with usage tracking
+- **File-Based Architecture** – No database; all content stored in portable, human-readable files
+- **Static Export** – Publish secure, lightning-fast static HTML sites
+- **Desktop App** – Available as an Electron app for offline use
+
+## Requirements
+
+- **Node.js:** >= 20.19.5 (LTS recommended)
+- **npm:** >= 8.0.0
 
 ## Getting Started
 
-Follow these steps to get the project running on your local machine for development and testing purposes.
-
-### Prerequisites
-
-Ensure you have Node.js and npm installed. You can download them from [https://nodejs.org/](https://nodejs.org/).
-
 ### Installation
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/tsiger/widgetizer.git
-    cd widgetizer
-    ```
-2.  Install the dependencies:
-    ```bash
-    npm install
-    ```
-3.  Create a `.env` file by copying the example file:
+```bash
+git clone https://github.com/tsiger/widgetizer.git
+cd widgetizer
+npm install
+```
 
-    ```bash
-    # On Windows (Command Prompt)
-    copy .env.example .env
+Create your environment file:
 
-    # On macOS/Linux
-    cp .env.example .env
-    ```
+```bash
+# Windows
+copy .env.example .env
 
-    The `.env` file is used to configure environment variables. The default settings point the frontend to the backend server running on port 3001. You generally won't need to modify this for local development.
+# macOS/Linux
+cp .env.example .env
+```
 
-### Running the Application
+### Development
 
-To run the application in development mode (which includes both the Vite frontend dev server and the backend Node.js server with live reload), use the following command:
+Run the full development environment (backend + frontend with hot reload):
 
 ```bash
 npm run dev:all
 ```
 
-This will typically start:
+This starts:
 
-- The frontend accessible at `http://localhost:3000`
+- **Backend server** at `http://localhost:3001`
+- **Frontend dev server** at `http://localhost:3000`
 
-Check the terminal output for the exact URLs.
+Other development commands:
 
-### Building for Production
+| Command          | Description                                     |
+| ---------------- | ----------------------------------------------- |
+| `npm run dev`    | Start Vite frontend only                        |
+| `npm run server` | Start backend server with nodemon (auto-reload) |
+| `npm start`      | Start backend server (no auto-reload)           |
 
-TBC
+### Production
+
+Build the frontend for production:
+
+```bash
+npm run build
+```
+
+Run in production mode:
+
+```bash
+npm run start:prod
+```
+
+Preview the production build locally:
+
+```bash
+npm run preview
+```
+
+### Electron (Desktop App)
+
+Run the desktop app in development mode:
+
+```bash
+npm run electron:dev
+```
+
+Build the desktop app:
+
+```bash
+npm run electron:build          # Current platform
+npm run electron:build:mac      # macOS
+npm run electron:build:win      # Windows
+```
+
+### Linting
+
+```bash
+npm run lint           # Lint src and server
+npm run lint:electron  # Lint electron folder
+npm run lint:all       # Lint entire project
+```
+
+## Documentation
+
+See the [docs](./docs) folder for detailed documentation on themes, widgets, media handling, and more.
+
+## License
+
+This project is licensed under the [GNU General Public License v3.0](./LICENSE).
