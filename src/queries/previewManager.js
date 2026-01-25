@@ -89,211 +89,109 @@ export async function fetchRenderedWidget(widgetId, widget, themeSettings) {
 }
 
 /**
- * The primary function to synchronize the preview iframe with the current application state.
- * This function is designed to be declarative. It compares the new state with the previous
- * state and performs the minimum necessary DOM manipulations to bring the iframe up to date.
+ * Update preview for CONTENT CHANGES ONLY (settings, blocks).
+ * This function should NOT be called for structural changes (add/remove/reorder widgets).
+ * Structural changes should trigger a full page reload instead.
  *
- * It handles:
- * - Adding, removing, and reordering widgets and their blocks.
- * - Updating the content of widgets when their settings or block structure changes.
- * - Applying global theme settings.
- * - Highlighting the selected widget/block and scrolling it into view.
- *
- * @param {HTMLIFrameElement} iframe The preview iframe element.
- * @param {object} newState The new, current state of the page from the stores.
- * @param {object} oldState The previous state of the page to compare against.
+ * Flow:
+ * 1. Find widgets whose content changed
+ * 2. Morph those widgets via MORPH_WIDGET message
+ * 3. Update theme CSS variables if changed
  */
 export async function updatePreview(iframe, newState, oldState) {
-  if (!iframe?.contentWindow || !newState || !oldState) {
-    return;
-  }
-  const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-  if (!iframeDoc.body) {
-    // Body not ready, abort
+  if (!iframe?.contentWindow || !newState) {
     return;
   }
 
+  const safeOldState = oldState || {};
   const {
-    widgets: newWidgets,
-    globalWidgets: newGlobalWidgets,
+    widgets: newWidgets = {},
+    globalWidgets: newGlobalWidgets = {},
     themeSettings: newThemeSettings,
-    selectedWidgetId: newSelectedWidgetId,
-    selectedGlobalWidgetId: newSelectedGlobalWidgetId,
-    page: newPage,
   } = newState;
 
   const {
-    widgets: oldWidgets,
-    globalWidgets: oldGlobalWidgets,
+    widgets: oldWidgets = {},
+    globalWidgets: oldGlobalWidgets = {},
     themeSettings: oldThemeSettings,
-    page: oldPage,
-  } = oldState;
+  } = safeOldState;
 
-  // --- 1. DETECT CHANGES ---
+  // Find widgets whose content changed (settings, blocks, block order)
+  const changedWidgetIds = [];
+  const newWidgetIds = new Set(Object.keys(newWidgets));
+  const oldWidgetIds = new Set(Object.keys(oldWidgets));
 
-  const newWidgetOrder = newPage?.widgetsOrder || [];
-  const oldWidgetOrder = oldPage?.widgetsOrder || [];
-
-  const newWidgetIds = new Set(Object.keys(newWidgets || {}));
-  const oldWidgetIds = new Set(Object.keys(oldWidgets || {}));
-
-  const addedWidgetIds = [...newWidgetIds].filter((id) => !oldWidgetIds.has(id));
-  const removedWidgetIds = [...oldWidgetIds].filter((id) => !newWidgetIds.has(id));
-  const orderChanged = JSON.stringify(newWidgetOrder) !== JSON.stringify(oldWidgetOrder);
-
-  // Find widgets whose settings or block structure have changed
-  const changedWidgets = new Map();
   for (const id of newWidgetIds) {
     if (oldWidgetIds.has(id)) {
       const oldWidget = oldWidgets[id];
       const newWidget = newWidgets[id];
-      const settingsChanged = JSON.stringify(oldWidget.settings) !== JSON.stringify(newWidget.settings);
-      const blocksChanged = JSON.stringify(oldWidget.blocks) !== JSON.stringify(newWidget.blocks);
-      const blockOrderChanged = JSON.stringify(oldWidget.blocksOrder) !== JSON.stringify(newWidget.blocksOrder);
-
-      if (settingsChanged || blocksChanged || blockOrderChanged) {
-        changedWidgets.set(id, { newWidget, oldWidget });
+      if (oldWidget && newWidget) {
+        const settingsChanged = JSON.stringify(oldWidget.settings) !== JSON.stringify(newWidget.settings);
+        const blocksChanged = JSON.stringify(oldWidget.blocks) !== JSON.stringify(newWidget.blocks);
+        const blockOrderChanged = JSON.stringify(oldWidget.blocksOrder) !== JSON.stringify(newWidget.blocksOrder);
+        if (settingsChanged || blocksChanged || blockOrderChanged) {
+          changedWidgetIds.push(id);
+        }
       }
     }
   }
 
-  // Find changed global widgets
-  if (
+  // Check global widgets
+  const headerChanged =
     newGlobalWidgets?.header &&
-    JSON.stringify(newGlobalWidgets.header) !== JSON.stringify(oldGlobalWidgets?.header)
-  ) {
-    changedWidgets.set("header", { newWidget: newGlobalWidgets.header });
-  }
-  if (
+    JSON.stringify(newGlobalWidgets.header) !== JSON.stringify(oldGlobalWidgets?.header);
+  const footerChanged =
     newGlobalWidgets?.footer &&
-    JSON.stringify(newGlobalWidgets.footer) !== JSON.stringify(oldGlobalWidgets?.footer)
-  ) {
-    changedWidgets.set("footer", { newWidget: newGlobalWidgets.footer });
-  }
+    JSON.stringify(newGlobalWidgets.footer) !== JSON.stringify(oldGlobalWidgets?.footer);
 
   const themeSettingsChanged = JSON.stringify(newThemeSettings) !== JSON.stringify(oldThemeSettings);
 
-  // If theme settings changed, we need to re-render ALL widgets because theme settings
-  // might affect the HTML structure (not just CSS variables)
-  if (themeSettingsChanged) {
-    // Mark all page widgets as changed
-    for (const id of newWidgetIds) {
-      if (!changedWidgets.has(id)) {
-        changedWidgets.set(id, { newWidget: newWidgets[id], oldWidget: oldWidgets[id] });
-      }
-    }
-    // Mark global widgets as changed
-    if (newGlobalWidgets?.header && !changedWidgets.has("header")) {
-      changedWidgets.set("header", { newWidget: newGlobalWidgets.header });
-    }
-    if (newGlobalWidgets?.footer && !changedWidgets.has("footer")) {
-      changedWidgets.set("footer", { newWidget: newGlobalWidgets.footer });
-    }
-  }
-
-  // --- 2. PERFORM DOM UPDATES ---
-
-  // Get the container for page widgets
-  const contentContainer =
-    iframeDoc.querySelector("[data-widgets-container]") || iframeDoc.querySelector("main") || iframeDoc.body;
-
-  // Handle widget removals
-  removedWidgetIds.forEach((widgetId) => {
-    const el = iframeDoc.querySelector(`[data-widget-id="${widgetId}"]`);
-    if (el) el.parentNode.removeChild(el);
-  });
-
-  // Handle widget additions and changes by re-rendering them
-  const widgetsToUpdate = [...addedWidgetIds, ...changedWidgets.keys()];
-  for (const widgetId of widgetsToUpdate) {
-    const widgetData = newWidgets[widgetId] || newGlobalWidgets[widgetId];
+  // Morph changed widgets
+  console.log("[PreviewManager] Morphing widgets:", changedWidgetIds);
+  for (const widgetId of changedWidgetIds) {
+    const widgetData = newWidgets[widgetId];
     if (widgetData) {
       try {
-        const renderedWidgetHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings);
-        const tempDiv = iframeDoc.createElement("div");
-        tempDiv.innerHTML = renderedWidgetHtml;
-        const newElement = tempDiv.firstChild;
-
-        const existingElement = iframeDoc.querySelector(`[data-widget-id="${widgetId}"]`);
-        if (existingElement) {
-          existingElement.parentNode.replaceChild(newElement, existingElement);
-        } else if (newElement) {
-          // This is a new widget, it will be placed by the reordering logic below
-        }
+        console.log(`[PreviewManager] → Morphing widget: ${widgetId}`);
+        const renderedHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings);
+        iframe.contentWindow.postMessage(
+          { type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } },
+          "*",
+        );
       } catch (error) {
-        console.error(`Error rendering widget ${widgetId}:`, error);
+        console.error(`Error updating widget ${widgetId}:`, error);
       }
     }
   }
 
-  // Handle reordering if necessary
-  if (orderChanged || addedWidgetIds.length > 0) {
-    const pageWidgetElements = new Map();
-    contentContainer.querySelectorAll("[data-widget-id]").forEach((el) => {
-      const id = el.getAttribute("data-widget-id");
-      if (id !== "header" && id !== "footer") {
-        pageWidgetElements.set(id, el);
-      }
-    });
-
-    // Detach all page widgets
-    pageWidgetElements.forEach((el) => el.parentNode.removeChild(el));
-
-    // Re-attach in the correct order
-    const headerEl = iframeDoc.querySelector('[data-widget-id="header"]');
-    const footerEl = iframeDoc.querySelector('[data-widget-id="footer"]');
-    let lastAttachedElement = headerEl;
-
-    // Use a for...of loop to handle async operations correctly
-    for (const widgetId of newWidgetOrder) {
-      let elementToInsert = pageWidgetElements.get(widgetId);
-
-      // If it's a new widget, it wasn't in the DOM, so we need to render it now.
-      if (!elementToInsert) {
-        try {
-          const widgetData = newWidgets[widgetId];
-          if (widgetData) {
-            const renderedWidgetHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings);
-            const tempDiv = iframeDoc.createElement("div");
-            tempDiv.innerHTML = renderedWidgetHtml;
-            elementToInsert = tempDiv.firstChild;
-          }
-        } catch (error) {
-          console.error(`Error rendering new widget ${widgetId} during reorder:`, error);
-          continue; // continue to next widget
-        }
-      }
-
-      if (!elementToInsert) continue;
-
-      if (lastAttachedElement) {
-        lastAttachedElement.insertAdjacentElement("afterend", elementToInsert);
-      } else if (footerEl) {
-        // If there's no header, insert before the footer
-        footerEl.insertAdjacentElement("beforebegin", elementToInsert);
-      } else {
-        // If no header or footer, just append to the main container
-        contentContainer.appendChild(elementToInsert);
-      }
-      lastAttachedElement = elementToInsert;
+  // Update global widgets if changed
+  if (headerChanged && newGlobalWidgets.header) {
+    try {
+      const renderedHtml = await fetchRenderedWidget("header", newGlobalWidgets.header, newThemeSettings);
+      iframe.contentWindow.postMessage(
+        { type: "MORPH_WIDGET", payload: { widgetId: "header", html: renderedHtml } },
+        "*",
+      );
+    } catch (error) {
+      console.error("Error updating header:", error);
+    }
+  }
+  if (footerChanged && newGlobalWidgets.footer) {
+    try {
+      const renderedHtml = await fetchRenderedWidget("footer", newGlobalWidgets.footer, newThemeSettings);
+      iframe.contentWindow.postMessage(
+        { type: "MORPH_WIDGET", payload: { widgetId: "footer", html: renderedHtml } },
+        "*",
+      );
+    } catch (error) {
+      console.error("Error updating footer:", error);
     }
   }
 
-  // --- 3. APPLY STYLES & SELECTION ---
-
-  // Update theme settings (CSS variables)
+  // Update theme CSS variables if changed
   if (themeSettingsChanged) {
     updateThemeSettings(iframe, newThemeSettings);
   }
-
-  // Scroll to selected widget after DOM updates
-  // Note: Highlighting is now handled by SelectionOverlay component
-  setTimeout(() => {
-    const finalSelectedWidgetId = newSelectedWidgetId || newSelectedGlobalWidgetId;
-    if (finalSelectedWidgetId) {
-      scrollWidgetIntoView(iframe, finalSelectedWidgetId);
-    }
-  }, 50);
 }
 
 /**
@@ -308,30 +206,22 @@ export function settingsToCssVariables(settings) {
 
   const { global } = settings.settings;
 
-  // Process each category
   Object.entries(global).forEach(([category, items]) => {
     if (Array.isArray(items)) {
       items.forEach((item) => {
-        // Handle font_picker type specifically (always output, no outputAsCssVar check)
         if (item.type === "font_picker") {
           const value = item.value !== undefined ? item.value : item.default;
-          // Ensure value is the expected object { stack, weight }
           if (value && typeof value === "object" && value.stack && value.weight !== undefined) {
             const cssVarBase = `--${category}-${item.id}`;
             variables[`${cssVarBase}-family`] = value.stack;
             variables[`${cssVarBase}-weight`] = value.weight;
           }
-        }
-        // Handle other types marked for CSS variable output
-        else if (item.id && item.outputAsCssVar === true) {
-          // Use value if present, otherwise use default
+        } else if (item.id && item.outputAsCssVar === true) {
           let value = item.value !== undefined ? item.value : item.default;
           if (value !== undefined) {
-            // For range inputs with units, append the unit to the value
             if (item.type === "range" && item.unit && typeof value === "number") {
               value = `${value}${item.unit}`;
             }
-            // Construct the CSS variable name
             variables[`--${category}-${item.id}`] = value;
           }
         }
@@ -345,9 +235,6 @@ export function settingsToCssVariables(settings) {
 /**
  * Update theme settings in the preview without reloading
  */
-/**
- * Update theme settings in the preview without reloading
- */
 function updateThemeSettings(iframe, settings) {
   if (!iframe?.contentWindow) {
     console.warn("Preview Manager: No iframe window available");
@@ -357,32 +244,15 @@ function updateThemeSettings(iframe, settings) {
   const variables = settingsToCssVariables(settings);
   const fontsMetadata = extractFonts(settings);
 
-  iframe.contentWindow.postMessage(
-    {
-      type: "UPDATE_CSS_VARIABLES",
-      payload: variables,
-    },
-    "*",
-  );
+  iframe.contentWindow.postMessage({ type: "UPDATE_CSS_VARIABLES", payload: variables }, "*");
 
   if (Object.keys(fontsMetadata).length > 0) {
-    // Convert Set to Array for JSON serialization
     const fontsPayload = Object.fromEntries(
       Object.entries(fontsMetadata).map(([name, weightsSet]) => [name, Array.from(weightsSet)]),
     );
-    iframe.contentWindow.postMessage(
-      {
-        type: "LOAD_FONTS",
-        payload: fontsPayload,
-      },
-      "*",
-    );
+    iframe.contentWindow.postMessage({ type: "LOAD_FONTS", payload: fontsPayload }, "*");
   }
 }
-
-// Note: highlightWidget and hoverWidget functions removed.
-// Widget highlighting is now handled by the SelectionOverlay component
-// in the parent window, not via iframe postMessage.
 
 /**
  * Update a widget setting in the preview without reloading
@@ -390,7 +260,6 @@ function updateThemeSettings(iframe, settings) {
 export function updateWidgetSetting(iframe, widgetId, settingId, value) {
   if (!iframe || !iframe.contentWindow) return false;
 
-  // Use the runtime to update the widget setting
   if (iframe.contentWindow.PreviewRuntime) {
     return iframe.contentWindow.PreviewRuntime.updateWidgetSetting(widgetId, settingId, value);
   }
@@ -474,13 +343,5 @@ export function scrollWidgetIntoView(iframe, widgetId) {
     return;
   }
 
-  iframe.contentWindow.postMessage(
-    {
-      type: "SCROLL_TO_WIDGET",
-      payload: {
-        widgetId,
-      },
-    },
-    "*",
-  );
+  iframe.contentWindow.postMessage({ type: "SCROLL_TO_WIDGET", payload: { widgetId } }, "*");
 }

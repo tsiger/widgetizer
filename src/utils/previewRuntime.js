@@ -1,7 +1,7 @@
 /*
 This is the runtime script that is injected into the preview iframe.
 It handles CSS variable updates, font loading, real-time settings updates,
-and click detection for widget selection.
+click detection for widget selection, and DOM morphing for widget updates.
 
 Note: Widget highlighting is now handled by the SelectionOverlay component
 in the parent window, not by this script.
@@ -96,7 +96,6 @@ function scrollToWidget(widgetId) {
   if (!widgetId) return;
 
   currentSelectedWidgetId = widgetId;
-  // Attach resize observer to track dynamic size changes (e.g., accordion)
   observeWidgetResize(widgetId);
 
   const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
@@ -108,30 +107,20 @@ function scrollToWidget(widgetId) {
   const rect = widget.getBoundingClientRect();
   const padding = 40;
   const viewportHeight = window.innerHeight;
-
-  // Check if widget is already fully visible in the viewport
   const isFullyVisible = rect.top >= 0 && rect.bottom <= viewportHeight;
 
   if (isFullyVisible) {
-    // Skip scrolling - widget is already visible, just report bounds
     reportElementBounds(widgetId, currentSelectedBlockId);
     return;
   }
 
   const documentHeight = document.documentElement.scrollHeight;
   let targetScroll = window.scrollY + rect.top - padding;
-
-  // Clamp to valid scroll range (prevent over-scroll)
   const maxScroll = documentHeight - viewportHeight;
   targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
 
-  // Scroll smoothly
-  window.scrollTo({
-    top: targetScroll,
-    behavior: "smooth",
-  });
+  window.scrollTo({ top: targetScroll, behavior: "smooth" });
 
-  // Report bounds after scroll animation
   setTimeout(() => {
     reportElementBounds(widgetId, currentSelectedBlockId);
   }, 400);
@@ -169,10 +158,7 @@ function reportElementBounds(widgetId, blockId = null) {
   }
 
   window.parent.postMessage(
-    {
-      type: "ELEMENT_BOUNDS",
-      payload: { widgetId, blockId, bounds, blockBounds },
-    },
+    { type: "ELEMENT_BOUNDS", payload: { widgetId, blockId, bounds, blockBounds } },
     "*",
   );
 }
@@ -185,11 +171,9 @@ function setupScrollBoundsReporting() {
     () => {
       if (scrollDebounceTimer) cancelAnimationFrame(scrollDebounceTimer);
       scrollDebounceTimer = requestAnimationFrame(() => {
-        // Report selection bounds
         if (currentSelectedWidgetId) {
           reportElementBounds(currentSelectedWidgetId, currentSelectedBlockId);
         }
-        // Report hover bounds
         if (currentHoveredWidgetId) {
           reportHoverBounds();
         }
@@ -203,11 +187,8 @@ function setupScrollBoundsReporting() {
 function updateSelection(widgetId, blockId) {
   currentSelectedWidgetId = widgetId;
   currentSelectedBlockId = blockId;
-
-  // Re-attach resize observer when selection changes
   observeWidgetResize(widgetId);
 
-  // Dispatch event so widgets can react to block selection (e.g., slideshow switching slides)
   if (widgetId && blockId) {
     const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
     if (widget) {
@@ -221,7 +202,6 @@ function updateSelection(widgetId, blockId) {
 }
 
 // Update widget settings in real-time for immediate feedback while typing
-// This avoids waiting for the debounced full reload
 function updateWidgetSettings(widgetId, changes) {
   const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
   if (!widget) return;
@@ -246,15 +226,10 @@ function updateWidgetSettings(widgetId, changes) {
 
 // Apply a setting value to elements within a container
 function applySettingToElement(container, settingId, value) {
-  // Find elements with this data-setting inside the container
   const childElements = [...container.querySelectorAll(`[data-setting="${settingId}"]`)];
-
-  // Also check if the container itself has the data-setting attribute
   const elements = container.matches(`[data-setting="${settingId}"]`) ? [container, ...childElements] : childElements;
 
   elements.forEach((el) => {
-    // Check if this element belongs to a nested block (prevent bleeding)
-    // Skip if the element is the container itself (it's always valid)
     if (el !== container) {
       const closestBlock = el.closest("[data-block-id]");
       if (closestBlock && closestBlock !== container) {
@@ -317,13 +292,16 @@ function handleMessage(event) {
       updateSelection(payload.widgetId, payload.blockId);
       reportElementBounds(payload.widgetId, payload.blockId);
       break;
-    // Legacy message types - no longer used but kept for compatibility
+    case "MORPH_WIDGET":
+      handleWidgetMorph(payload.widgetId, payload.html);
+      break;
     case "HIGHLIGHT_WIDGET":
     case "HOVER_WIDGET":
-      // Highlighting is now handled by SelectionOverlay in parent window
+      // Legacy - handled by SelectionOverlay
       break;
     default:
-      console.warn("Preview Runtime: Unknown message type:", type);
+      // Ignore unknown messages silently
+      break;
   }
 }
 
@@ -335,7 +313,6 @@ function setupInteractionHandler() {
       const blockEl = event.target.closest("[data-block-id]");
       const widgetEl = event.target.closest("[data-widget-id]");
 
-      // Prevent all link navigation in editor mode to avoid leaving the editor
       const linkElement = event.target.closest("a");
       if (linkElement) {
         if (PREVIEW_MODE === "standalone") {
@@ -376,7 +353,6 @@ function setupInteractionHandler() {
         return;
       }
 
-      // Allow other interactive elements (buttons, inputs, etc.) to work normally
       const interactiveElement = event.target.closest('button, input, select, textarea, [role="button"]');
       if (interactiveElement) {
         if (widgetEl) {
@@ -394,7 +370,6 @@ function setupInteractionHandler() {
         return;
       }
 
-      // Non-interactive clicks: prevent default and select the widget/block
       if (widgetEl) {
         event.preventDefault();
         event.stopPropagation();
@@ -403,10 +378,7 @@ function setupInteractionHandler() {
         const blockId = blockEl ? blockEl.getAttribute("data-block-id") : null;
 
         window.parent.postMessage(
-          {
-            type: "WIDGET_SELECTED",
-            payload: { widgetId, blockId },
-          },
+          { type: "WIDGET_SELECTED", payload: { widgetId, blockId } },
           "*",
         );
       }
@@ -422,10 +394,7 @@ let currentHoveredBlockId = null;
 function reportHoverBounds() {
   if (!currentHoveredWidgetId) {
     window.parent.postMessage(
-      {
-        type: "WIDGET_HOVERED",
-        payload: { widgetId: null, blockId: null, bounds: null, blockBounds: null },
-      },
+      { type: "WIDGET_HOVERED", payload: { widgetId: null, blockId: null, bounds: null, blockBounds: null } },
       "*",
     );
     return;
@@ -461,12 +430,7 @@ function reportHoverBounds() {
   window.parent.postMessage(
     {
       type: "WIDGET_HOVERED",
-      payload: {
-        widgetId: currentHoveredWidgetId,
-        blockId: currentHoveredBlockId,
-        bounds,
-        blockBounds,
-      },
+      payload: { widgetId: currentHoveredWidgetId, blockId: currentHoveredBlockId, bounds, blockBounds },
     },
     "*",
   );
@@ -482,7 +446,6 @@ function setupHoverHandler() {
       const widgetId = widgetEl?.getAttribute("data-widget-id") || null;
       const blockId = blockEl?.getAttribute("data-block-id") || null;
 
-      // Only send if changed
       if (widgetId !== currentHoveredWidgetId || blockId !== currentHoveredBlockId) {
         currentHoveredWidgetId = widgetId;
         currentHoveredBlockId = blockId;
@@ -492,7 +455,6 @@ function setupHoverHandler() {
     true,
   );
 
-  // Clear hover when mouse leaves the document
   document.addEventListener(
     "mouseleave",
     () => {
@@ -506,12 +468,11 @@ function setupHoverHandler() {
   );
 }
 
-// ResizeObserver to detect widget size changes (e.g., accordion expansion)
+// ResizeObserver to detect widget size changes
 let widgetResizeObserver = null;
 let resizeDebounceTimer = null;
 
 function observeWidgetResize(widgetId) {
-  // Disconnect previous observer
   if (widgetResizeObserver) {
     widgetResizeObserver.disconnect();
   }
@@ -522,17 +483,14 @@ function observeWidgetResize(widgetId) {
   if (!widget) return;
 
   widgetResizeObserver = new ResizeObserver(() => {
-    // Debounce to avoid rapid-fire updates during animations
     if (resizeDebounceTimer) cancelAnimationFrame(resizeDebounceTimer);
     resizeDebounceTimer = requestAnimationFrame(() => {
       reportElementBounds(currentSelectedWidgetId, currentSelectedBlockId);
     });
   });
 
-  // Observe the widget itself
   widgetResizeObserver.observe(widget);
 
-  // Also observe all blocks within the widget for individual block size changes
   const blocks = widget.querySelectorAll("[data-block-id]");
   blocks.forEach((block) => {
     widgetResizeObserver.observe(block);
@@ -546,20 +504,206 @@ function initializeRuntime() {
   setupScrollBoundsReporting();
   window.addEventListener("message", handleMessage);
 
-  // Notify parent that preview content is ready (wait for DOM to be fully parsed)
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       window.parent.postMessage({ type: "PREVIEW_READY" }, "*");
     });
   } else {
-    // DOM already loaded
     window.parent.postMessage({ type: "PREVIEW_READY" }, "*");
   }
 }
 
-// TODO: Implement safe widget initialization without eval()
+// Track widget timers and observers for cleanup
+const widgetTimers = new Map();
+const widgetObservers = new Map();
+
+// Extract all script tags from an element
+function extractScripts(element) {
+  if (!element) return [];
+  const scripts = Array.from(element.querySelectorAll("script"));
+  return scripts.map((script) => ({
+    type: script.type || "text/javascript",
+    src: script.src || null,
+    text: script.textContent || script.innerHTML || "",
+    async: script.async,
+    defer: script.defer,
+  }));
+}
+
+// Execute scripts in order
+function executeScripts(scripts, widgetElement) {
+  if (!scripts || scripts.length === 0) return;
+
+  scripts.forEach((scriptData) => {
+    if (scriptData.src) {
+      const script = document.createElement("script");
+      script.type = scriptData.type;
+      script.src = scriptData.src;
+      if (scriptData.async) script.async = true;
+      if (scriptData.defer) script.defer = true;
+      const target = widgetElement || document.head;
+      target.appendChild(script);
+    } else if (scriptData.text) {
+      try {
+        const widgetId = widgetElement?.getAttribute("data-widget-id");
+        const widget = widgetElement;
+        const func = new Function("widget", "widgetId", "document", "window", scriptData.text);
+        func(widget, widgetId, document, window);
+      } catch (error) {
+        console.error("[PreviewRuntime] Error executing script for widget:", error);
+      }
+    }
+  });
+}
+
+// Initialize a widget's scripts and mark it as initialized
 function initializeWidget(widgetId) {
-  console.log(`Widget ${widgetId} added - scripts may need manual initialization`);
+  const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
+  if (!widget) return;
+
+  if (widget.dataset.initialized === "true") {
+    return;
+  }
+
+  const scripts = extractScripts(widget);
+  widget.querySelectorAll("script").forEach((script) => script.remove());
+
+  executeScripts(scripts, widget);
+  widget.dataset.initialized = "true";
+
+  widget.dispatchEvent(
+    new CustomEvent("widget:updated", { bubbles: true, detail: { widgetId } }),
+  );
+}
+
+// Cleanup widget state (timers, observers)
+function cleanupWidget(widgetId) {
+  const timers = widgetTimers.get(widgetId);
+  if (timers) {
+    timers.forEach((timerId) => {
+      clearTimeout(timerId);
+      clearInterval(timerId);
+    });
+    widgetTimers.delete(widgetId);
+  }
+
+  const observers = widgetObservers.get(widgetId);
+  if (observers) {
+    observers.forEach((observer) => {
+      if (observer.disconnect) observer.disconnect();
+    });
+    widgetObservers.delete(widgetId);
+  }
+
+  const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
+  if (widget) {
+    widget.removeAttribute("data-initialized");
+  }
+}
+
+// Track timer for a widget (for cleanup)
+function trackWidgetTimer(widgetId, timerId) {
+  if (!widgetTimers.has(widgetId)) {
+    widgetTimers.set(widgetId, new Set());
+  }
+  widgetTimers.get(widgetId).add(timerId);
+}
+
+// Track observer for a widget (for cleanup)
+function trackWidgetObserver(widgetId, observer) {
+  if (!widgetObservers.has(widgetId)) {
+    widgetObservers.set(widgetId, new Set());
+  }
+  widgetObservers.get(widgetId).add(observer);
+}
+
+// Simple widget morphing - replace the widget element and re-run scripts
+// This is simpler and more reliable than complex DOM diffing
+function morphWidget(widgetId, newHtml) {
+  const existingElement = document.querySelector(`[data-widget-id="${widgetId}"]`);
+  if (!existingElement) {
+    console.warn(`[PreviewRuntime] Widget ${widgetId} not found for morphing`);
+    return false;
+  }
+
+  try {
+    // Parse new HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(newHtml, "text/html");
+    const newElement = doc.querySelector(`[data-widget-id="${widgetId}"]`);
+
+    if (!newElement) {
+      console.warn(`[PreviewRuntime] Widget ${widgetId} not found in new HTML`);
+      return false;
+    }
+
+    // Extract scripts before replacing
+    const newScripts = extractScripts(newElement);
+    newElement.querySelectorAll("script").forEach((script) => script.remove());
+
+    // Preserve some form state from old element
+    preserveFormState(existingElement, newElement);
+
+    // Cleanup old widget state
+    cleanupWidget(widgetId);
+
+    // Replace the element
+    existingElement.parentNode.replaceChild(newElement, existingElement);
+
+    // Execute scripts on the new element
+    if (newScripts.length > 0) {
+      executeScripts(newScripts, newElement);
+    }
+
+    // Mark as initialized
+    newElement.dataset.initialized = "true";
+
+    // Dispatch update event
+    newElement.dispatchEvent(
+      new CustomEvent("widget:updated", { bubbles: true, detail: { widgetId } }),
+    );
+
+    return true;
+  } catch (error) {
+    console.error(`[PreviewRuntime] Error morphing widget ${widgetId}:`, error);
+    return false;
+  }
+}
+
+// Preserve form state from old element to new element
+function preserveFormState(oldEl, newEl) {
+  // Preserve input values
+  const oldInputs = oldEl.querySelectorAll("input, textarea, select");
+  oldInputs.forEach((oldInput) => {
+    const name = oldInput.name || oldInput.id;
+    if (!name) return;
+
+    const newInput = newEl.querySelector(`[name="${name}"], #${name}`);
+    if (!newInput) return;
+
+    if (oldInput.type === "checkbox" || oldInput.type === "radio") {
+      newInput.checked = oldInput.checked;
+    } else if (oldInput.tagName === "SELECT") {
+      newInput.value = oldInput.value;
+    } else {
+      newInput.value = oldInput.value;
+    }
+  });
+}
+
+// Handle widget morphing via postMessage
+function handleWidgetMorph(widgetId, newHtml) {
+  console.log(`[Runtime] 🔧 Received MORPH_WIDGET for: ${widgetId}`);
+  const success = morphWidget(widgetId, newHtml);
+  if (success) {
+    console.log(`[Runtime] ✅ Successfully morphed widget: ${widgetId}`);
+  } else {
+    console.log(`[Runtime] ❌ Failed to morph widget: ${widgetId}`);
+    window.parent.postMessage(
+      { type: "WIDGET_MORPH_FAILED", payload: { widgetId } },
+      "*",
+    );
+  }
 }
 
 // Create global runtime object
@@ -568,6 +712,10 @@ window.PreviewRuntime = {
   updateCssVariables,
   initializeWidget,
   scrollToWidget,
+  morphWidget,
+  cleanupWidget,
+  trackWidgetTimer,
+  trackWidgetObserver,
 };
 
 // Auto-initialize when the script loads
