@@ -566,6 +566,11 @@ For blocks with dynamic order, use `content-flow`:
 
 ### 8.1 Widget Header (Centered Section Header)
 
+Use the `.widget-header` class for centered section headers. It provides:
+- `gap: var(--space-sm)` for consistent spacing between eyebrow, title, description
+- `& > * { margin-block: 0; }` to reset default margins (spacing comes from gap only)
+- Centered text alignment
+
 ```liquid
 {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
   <div class="widget-header">
@@ -588,6 +593,33 @@ For blocks with dynamic order, use `content-flow`:
   </div>
 {% endif %}
 ```
+
+### 8.1.1 Non-Centered Header Content
+
+When eyebrow/title/description appear in a **non-centered** layout (e.g., side-by-side with other content), you cannot use `.widget-header` since it centers everything. Instead, create a custom container that replicates the same spacing pattern:
+
+```css
+& .my-content-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);  /* Same as widget-header */
+
+  & > * {
+    margin-block: 0;  /* Reset margins, let gap handle spacing */
+  }
+}
+```
+
+This ensures consistent spacing between eyebrow, headline, and description regardless of alignment.
+
+### 8.1.2 Choosing Between Gap Pattern vs content-flow
+
+| Use Case | Pattern | Why |
+|----------|---------|-----|
+| Fixed structure (eyebrow, title, description) | `gap` + margin reset | Predictable, clean, modern |
+| Dynamic blocks (user-ordered content) | `.content-flow` | Handles varying element order gracefully |
+
+**content-flow** uses `> * + * { margin-block-start: var(--space-sm); }` and is ideal for widgets like `rich-text` or `split-hero` where users add/remove/reorder blocks freely.
 
 ### 8.2 Cards
 
