@@ -232,7 +232,10 @@ function applySettingToElement(container, settingId, value) {
   elements.forEach((el) => {
     if (el !== container) {
       const closestBlock = el.closest("[data-block-id]");
-      if (closestBlock && closestBlock !== container) {
+      // Skip only when the element belongs to a *nested* block (different block inside container).
+      // Do not skip when closestBlock === el: the element itself has data-block-id (e.g. slideshow
+      // headings), so we still update it.
+      if (closestBlock && closestBlock !== container && closestBlock !== el) {
         return;
       }
     }
