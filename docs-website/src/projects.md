@@ -15,22 +15,25 @@ At any given time, one project is marked as **active**. This is the project you'
 
 1. Click the **"New Project"** button
 2. Fill in the project details:
-   - **Project Name** (required): The name of your project
-   - **Description** (optional): A brief description of what this project is for
+   - **Title** (required): The display name for your project
    - **Theme** (required): Choose a design theme for your project
-   - **Site URL** (optional): The base URL where your site will be hosted (e.g., `https://example.com`)
-3. Click **"Create Project"**
+3. Expand **"More settings"** to configure additional options:
+   - **Folder Name** (required): Auto-generated from the title, but you can customize it
+   - **Notes** (optional): Personal notes about the project for your own reference
+   - **Website Address** (optional): The URL where your site will be hosted
+4. Click **"Create Project"**
 
 ### Understanding the Fields
 
-- **Project Name**: This is displayed throughout Widgetizer and also determines your project's folder name. For example, "My Awesome Site" becomes a folder named `my-awesome-site`.
-- **Description**: Helps you remember what each project is for, especially if you're managing multiple projects.
+- **Title**: The display name shown throughout Widgetizer.
 - **[Theme](themes.html)**: Defines the look and feel of your site. **Note:** You cannot change the theme after creating a project, so choose carefully!
-- **Site URL**: The base URL where your site will be hosted (e.g., `https://example.com`). This is used for:
+- **Folder Name**: The folder where your project files are stored and exported. This is automatically generated from the title as a URL-friendly slug (e.g., "My Site" becomes `my-site`).
+- **Notes**: Personal notes for your own reference. Useful for remembering what each project is for.
+- **Website Address**: The base URL where your site will be hosted (e.g., `https://example.com`). This is used for:
   - Generating absolute URLs in social media tags and SEO
   - **Automatically creating `sitemap.xml`** when you export your site
-  - **Automatically creating `robots.txt`** with sitemap location when you export your site
-  - If you're not sure yet, you can leave this empty and add it later. Note that sitemap and robots.txt will only be generated if you set a Site URL.
+  - **Automatically creating `robots.txt`** with sitemap location when you export
+  - If you're not sure yet, you can leave this empty and add it later.
 
 
 # Editing a Project
@@ -43,19 +46,11 @@ At any given time, one project is marked as **active**. This is the project you'
 
 ### What You Can Edit
 
-- **Project Name**: If you change this, the project folder will automatically be renamed
-- **Description**: Update this anytime
-- **Site URL**: Add or change your site's base URL
-- **Theme**:  Cannot be changed after creation
-
-### Project Folder Renaming
-
-When you change a project's name, Widgetizer automatically renames the project folder in the background. For example:
-
-- Original name: "My Site" → Folder: `my-site`
-- New name: "My Amazing Site" → Folder: `my-amazing-site`
-
-You don't need to do anything special—this happens automatically when you save your changes.
+- **Title**: The display name shown throughout Widgetizer
+- **Folder Name**: The folder where your project files are stored (can be changed independently of the title)
+- **Notes**: Personal notes about your project
+- **Website Address**: The base URL for your site
+- **Theme**: Cannot be changed after creation
 
 
 # Setting the Active Project

@@ -48,7 +48,9 @@ The frontend logic for page management is handled by three main React components
 - `src/pages/Pages.jsx`: The main dashboard for viewing all pages associated with the currently active project. It displays pages in a table and provides the primary UI for initiating actions like editing, deleting, or duplicating a page. Fully localized with `react-i18next`.
 - `src/pages/PagesAdd.jsx`: Contains the form for creating a new page. Integrates `useFormNavigationGuard` to prevent accidental navigation with unsaved changes.
 - `src/pages/PagesEdit.jsx`: Contains the form for modifying an existing page's details. Includes navigation guards and automatic redirection when page slugs change.
-- `src/components/pages/PageForm.jsx`: A reusable form component used by both `PagesAdd` and `PagesEdit` to capture page details like `Name`, `Slug`, and `Meta Title`.
+- `src/components/pages/PageForm.jsx`: A reusable form component used by both `PagesAdd` and `PagesEdit` to capture page details:
+  - **Main Fields**: `name` (Title), `slug` (Filename)
+  - **SEO Settings** (collapsible section): Meta Description, Social Media Title, Social Media Image, Canonical URL, Search Engine Indexing (robots)
   - Migrated to **react-hook-form** for improved validation and state management
   - Fully **localized** using `react-i18next` for all labels, errors, and help text
   - Exposes `isDirty` state to parent components for navigation guard integration

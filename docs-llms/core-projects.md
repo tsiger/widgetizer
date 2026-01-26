@@ -12,7 +12,7 @@ The project management UI is primarily handled by three pages:
 
 These pages rely on a central form component for handling user input:
 
-- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (name, description, theme)
+- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, notes, website address)
   - Migrated to **react-hook-form** for improved validation and state management
   - Fully **localized** using `react-i18next` for all labels, errors, and help text
   - Exposes `dirt` state to parent components for navigation guard integration
@@ -58,9 +58,9 @@ This file contains functions that make API calls to the backend:
 2.  **Rendering**: The `ProjectsAdd.jsx` page is rendered. It contains the `ProjectForm.jsx` component.
 3.  **Navigation Guard**: The page integrates `useFormNavigationGuard` to prevent accidental navigation with unsaved changes.
 4.  **Theme Loading**: `ProjectForm.jsx` makes an API call via `/api/themes` to fetch the list of available themes and populates the "Theme" dropdown.
-5.  **User Input**: The user fills in the project name, description, and selects a theme. The "Theme" dropdown is only enabled during project creation.
+5.  **User Input**: The user fills in the title and selects a theme. Additional fields (folder name, notes, website address) are available under "More settings". The "Theme" dropdown is only enabled during project creation.
 6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
-7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly `slug` from the project name and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
+7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
 8.  **API Call**: `ProjectsAdd.jsx`'s `handleSubmit` function calls `createProject(formData)` from `projectManager.js`, which sends a `POST` request to the backend API to create the new project.
 9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`. In packaged Electron builds, the source theme files live in `app.asar.unpacked/themes/`. These become the project's working theme files.
 10. **Setting Active Project**: If this is the very first project being created (i.e., there was no active project before), it is automatically set as the active project by calling `setActiveProject(newProject.id)`. The global state is updated via the `projectStore`.
@@ -120,16 +120,17 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 3.  **Navigation Guard**: `useFormNavigationGuard` is integrated to prevent accidental navigation with unsaved changes.
 4.  **Rendering**: The `ProjectForm.jsx` component is rendered with the `initialData` of the project being edited with several key features:
     - **Theme Restriction**: The "Theme" dropdown is disabled, as themes cannot be changed after creation to maintain consistency
-    - **Project Folder Display**: Shows the current project folder name (based on the project title) with a note that it updates when the title changes
-    - **Site URL Field**: Optional field for setting the base URL for the project, used for generating absolute URLs in social media meta tags and SEO
+    - **Project Folder Name**: Editable field for the project's folder name, independent of the project title
+    - **Notes Field**: Optional field for personal notes about the project
+    - **Website Address Field**: Optional field for setting the base URL for the project, used for generating absolute URLs in social media meta tags and SEO
 5.  **Form Features**:
-    - **Live Folder Preview**: The project folder name updates in real-time as the user types the project title
-    - **URL Validation**: The site URL field is optional, but if provided, includes validation to ensure proper URL format (via react-hook-form)
+    - **Independent Fields**: Project title and folder name can be edited independently
+    - **URL Validation**: The website address field is optional, but if provided, includes validation to ensure proper URL format (via react-hook-form)
     - **Conditional Fields**: Theme selection only appears when creating new projects, not when editing existing ones
     - **Localized Validation**: All error messages and help text are fully localized
-6.  **Submission & URL Management**: The user modifies the form and clicks "Save Changes":
-    - **Project Renaming**: If the project title changes, the system automatically generates a new project **slug** and renames the project directory.
-    - **URL Persistence**: Since the project ID is stable, the user is **not** redirected; the API and frontend routes remain valid even after a rename.
+6.  **Submission**: The user modifies the form and clicks "Save Changes":
+    - **Folder Renaming**: If the folder name changes, the system renames the project directory accordingly.
+    - **URL Persistence**: Since the project ID is stable, the user is **not** redirected; the API and frontend routes remain valid.
     - **State Synchronization**: Active project state is properly maintained as the ID remains constant.
 7.  **API Call**: The `handleSubmit` function calls `updateProject(id, formData)` using the `projectManager.js` utility functions for consistent API handling.
 8.  **State Updates**:
