@@ -1,0 +1,114 @@
+{
+  "title": "Widgetizer Documentation",
+  "logo": "widgetizer_logo.svg",
+  "navigation": [
+    {
+      "type": "page",
+      "title": "Overview",
+      "path": "index.md"
+    },
+    {
+      "type": "page",
+      "title": "Getting Started",
+      "path": "getting-started.md"
+    },
+    {
+      "type": "header",
+      "title": "Core Concepts"
+    },
+    {
+      "type": "page",
+      "title": "Projects",
+      "path": "projects.md"
+    },
+    {
+      "type": "page",
+      "title": "Pages",
+      "path": "pages.md"
+    },
+    {
+      "type": "page",
+      "title": "Menus",
+      "path": "menus.md"
+    },
+    {
+      "type": "page",
+      "title": "Media Library",
+      "path": "media.md"
+    },
+    {
+      "type": "page",
+      "title": "Themes",
+      "path": "themes.md"
+    },
+    {
+      "type": "page",
+      "title": "Plugins",
+      "path": "plugins.md"
+    },
+    {
+      "type": "page",
+      "title": "App Settings",
+      "path": "settings.md"
+    },
+    {
+      "type": "page",
+      "title": "Exporting",
+      "path": "export.md"
+    },
+    {
+      "type": "header",
+      "title": "Theme Development"
+    },
+    {
+      "type": "page",
+      "title": "Theme Structure",
+      "path": "theme-dev-structure.md"
+    },
+    {
+      "type": "page",
+      "title": "Theme Manifest & Settings",
+      "path": "theme-dev-manifest-settings.md"
+    },
+    {
+      "type": "page",
+      "title": "Setting Types",
+      "path": "theme-dev-setting-types.md"
+    },
+    {
+      "type": "page",
+      "title": "Layout & Templates",
+      "path": "theme-dev-layout-templates.md"
+    },
+    {
+      "type": "page",
+      "title": "Liquid Tags & Assets",
+      "path": "theme-dev-liquid-assets.md"
+    },
+    {
+      "type": "page",
+      "title": "Widgets & Blocks",
+      "path": "theme-dev-widgets-blocks.md"
+    },
+    {
+      "type": "page",
+      "title": "Theme Objects & Context",
+      "path": "theme-dev-objects-context.md"
+    },
+    {
+      "type": "page",
+      "title": "Menus & Snippets",
+      "path": "theme-dev-menus-snippets.md"
+    },
+    {
+      "type": "page",
+      "title": "Design System & Utilities",
+      "path": "theme-dev-design-system.md"
+    },
+    {
+      "type": "page",
+      "title": "Advanced & Accessibility",
+      "path": "theme-dev-advanced-accessibility.md"
+    }
+  ]
+}

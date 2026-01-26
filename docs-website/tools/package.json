@@ -1,0 +1,15 @@
+{
+  "name": "widgetizer-docs-builder",
+  "version": "1.0.0",
+  "description": "Static site generator for Widgetizer documentation",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "marked": "^11.1.1",
+    "marked-highlight": "^2.2.1",
+    "highlight.js": "^11.10.0",
+    "fs-extra": "^11.2.0"
+  }
+}

@@ -18,6 +18,13 @@ A typical page JSON file (`about-us.json`) looks like this:
   "title": "About Us | My Awesome Site",
   "created": "2023-10-27T10:00:00.000Z",
   "updated": "2023-10-27T12:30:00.000Z",
+  "seo": {
+    "description": "Learn more about our company and team",
+    "og_title": "About Us - Company Name",
+    "og_image": "uploads/images/about-social.jpg",
+    "robots": "index,follow",
+    "canonical_url": ""
+  },
   "widgets": {
     "main": [
       {
