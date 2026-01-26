@@ -303,7 +303,7 @@ A video uploader that includes a preview with placeholder icon, the ability to r
 
 **Features:**
 
-- **Upload**: Direct file upload with support for multiple video formats (MP4, WebM, MOV, AVI, MKV)
+- **Upload**: Direct file upload with support for MP4 video format
 - **Preview**: Shows video icon placeholder with filename and file size
 - **Browse**: Opens `MediaSelectorDrawer` to select from existing videos
 - **Metadata Editing**: Edit button opens `MediaDrawer` for alt text and title editing

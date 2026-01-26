@@ -139,7 +139,7 @@ export default function VideoInput({ id, value = "", onChange }) {
         >
           <UploadCloud size={32} />
           <p className="mt-2 text-sm font-semibold">Click to upload</p>
-          <p className="text-xs">MP4, WebM, MOV</p>
+          <p className="text-xs">MP4</p>
         </div>
       )}
 

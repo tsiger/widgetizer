@@ -125,7 +125,7 @@ For how settings map into templates and CSS variables, see [Theme Manifest & Set
 }
 ```
 
-**`video`** — Video picker for MP4, WebM, and other formats.
+**`video`** — Video picker for MP4 format.
 
 ```json
 {

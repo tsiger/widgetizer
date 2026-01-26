@@ -6,6 +6,6 @@ export const API_URL = (path) => `${BASE_URL}${path}`;
 
 export const MEDIA_TYPES = {
   image: [".jpeg", ".jpg", ".png", ".gif", ".webp", ".svg"],
-  video: [".mp4", ".webm", ".mov", ".avi", ".mkv"],
-  audio: [".mp3", ".wav", ".ogg", ".m4a"],
+  video: [".mp4"],
+  audio: [".mp3"],
 };

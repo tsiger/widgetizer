@@ -54,7 +54,7 @@ Sets the maximum size for individual image files (JPEG, PNG, GIF, WebP, SVG).
 
 #### Maximum Video Upload Size
 
-Sets the maximum size for individual video files (MP4, WebM, OGG, AVI, MOV).
+Sets the maximum size for individual video files (MP4).
 
 - **Default:** 50 MB
 - **Range:** 1 MB to 500 MB

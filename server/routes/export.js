@@ -107,7 +107,6 @@ function serveExportFile(req, res) {
       ".svg": "image/svg+xml",
       ".webp": "image/webp",
       ".mp4": "video/mp4",
-      ".webm": "video/webm",
       ".woff": "font/woff",
       ".woff2": "font/woff2",
       ".ttf": "font/ttf",

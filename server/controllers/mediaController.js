@@ -51,10 +51,6 @@ const ALLOWED_MIME_TYPES = [
   "image/webp",
   "image/svg+xml",
   "video/mp4",
-  "video/webm",
-  "video/ogg",
-  "video/avi",
-  "video/mov",
   "audio/mpeg", // MP3 audio files
 ];
 
@@ -764,7 +760,7 @@ export async function serveProjectMedia(req, res) {
     if (filename) {
       // Determine file type by extension to choose correct directory
       const ext = path.extname(filename).toLowerCase();
-      const videoExtensions = [".mp4", ".webm", ".ogg", ".avi", ".mov"];
+      const videoExtensions = [".mp4"];
       const audioExtensions = [".mp3"];
 
       const projectFolderName = await getProjectFolderName(projectId);
@@ -812,10 +808,6 @@ export async function serveProjectMedia(req, res) {
       ".webp": "image/webp",
       ".svg": "image/svg+xml",
       ".mp4": "video/mp4",
-      ".webm": "video/webm",
-      ".ogg": "video/ogg",
-      ".avi": "video/avi",
-      ".mov": "video/mov",
       ".mp3": "audio/mpeg",
     };
 

@@ -165,8 +165,8 @@
       "dropInactive": "Arrastre y suelte imágenes y videos aquí o",
       "selectFiles": "Seleccionar Archivos",
       "supportedImages": "Imágenes: JPG, PNG, GIF, WebP, SVG",
-      "supportedVideos": "Videos: MP4, WebM, MOV, AVI, MKV",
-      "supportedAudio": "Audio: MP3, WAV, OGG, M4A",
+      "supportedVideos": "Videos: MP4",
+      "supportedAudio": "Audio: MP3",
       "uploading": "Subiendo..."
     },
     "fileUploader": {

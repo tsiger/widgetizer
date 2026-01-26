@@ -106,11 +106,7 @@ The media library supports video uploads alongside images with the following fea
 
 **Supported Video Formats:**
 
-- MP4 (recommended for best browser compatibility)
-- WebM
-- OGG
-- AVI
-- MOV
+- MP4
 
 **Video Processing:**
 
@@ -155,8 +151,8 @@ The system uses a centralized configuration for media types and allowed extensio
 - **Location**: `src/config.js`
 - **Definition**: The `MEDIA_TYPES` constant defines the allowed file extensions for different categories:
   - `image`: `.jpeg`, `.jpg`, `.png`, `.gif`, `.webp`, `.svg`
-  - `video`: `.mp4`, `.webm`, `.mov`, `.avi`, `.mkv`
-  - `audio`: `.mp3`, `.wav`, `.ogg`, `.m4a`
+  - `video`: `.mp4`
+  - `audio`: `.mp3`
 
 This central definition ensures consistency across the application, from file upload validation to browser filtering.
 

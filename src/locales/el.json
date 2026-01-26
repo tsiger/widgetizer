@@ -165,8 +165,8 @@
       "dropInactive": "Σύρετε και αποθέστε εικόνες και βίντεο εδώ ή",
       "selectFiles": "Επιλογή Αρχείων",
       "supportedImages": "Εικόνες: JPG, PNG, GIF, WebP, SVG",
-      "supportedVideos": "Βίντεο: MP4, WebM, MOV, AVI, MKV",
-      "supportedAudio": "Ήχος: MP3, WAV, OGG, M4A",
+      "supportedVideos": "Βίντεο: MP4",
+      "supportedAudio": "Ήχος: MP3",
       "uploading": "Μεταφόρτωση..."
     },
     "fileUploader": {

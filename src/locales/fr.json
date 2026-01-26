@@ -165,8 +165,8 @@
       "dropInactive": "Glissez et déposez des images et des vidéos ici ou",
       "selectFiles": "Sélectionner des fichiers",
       "supportedImages": "Images : JPG, PNG, GIF, WebP, SVG",
-      "supportedVideos": "Vidéos : MP4, WebM, MOV, AVI, MKV",
-      "supportedAudio": "Audio : MP3, WAV, OGG, M4A",
+      "supportedVideos": "Vidéos : MP4",
+      "supportedAudio": "Audio : MP3",
       "uploading": "Téléchargement..."
     },
     "fileUploader": {
