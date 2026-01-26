@@ -1,3 +1,7 @@
+---
+description: Learn the folder structure for Widgetizer themes. Required files, directory layout, and how themes are discovered by the system.
+---
+
 A theme in Widgetizer is a complete package with a predictable folder structure. This page documents the default theme layout, the minimum required files, and how the system discovers theme content. Theme authoring is meant to be as expressive as it can be — you can build minimal themes or highly opinionated systems.
 
 # Technologies Used in Themes

@@ -1,3 +1,7 @@
+---
+description: Build layouts and page templates for Widgetizer themes. Learn how layout.liquid wraps pages and how template JSON structures widget placement.
+---
+
 The layout and templates system defines how pages are assembled. `layout.liquid` wraps every page, and `templates/*.json` files declare which widgets appear on each page. This page explains the layout contract and how template JSON is structured.
 
 # Layout Template (layout.liquid)

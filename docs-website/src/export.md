@@ -1,3 +1,7 @@
+---
+description: Export your Widgetizer project as static HTML files ready for deployment to any web host. Download or manage export versions.
+---
+
 Exporting generates a complete, static HTML version of your website that can be deployed to any web hosting service. This page explains how exporting works and what gets included.
 
 # How Exporting Works

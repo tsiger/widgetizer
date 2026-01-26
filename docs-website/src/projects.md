@@ -1,3 +1,7 @@
+---
+description: Learn how to create, manage, and organize projects in Widgetizer. Each project contains all pages, media, menus, and settings for a website.
+---
+
 In Widgetizer, a **Project** is a container for your entire website. Each project holds all your pages, images, menus, and design settings. You can create and manage multiple projects, switching between them as needed.
 
 # Understanding the Active Project

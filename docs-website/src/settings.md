@@ -1,3 +1,7 @@
+---
+description: Configure Widgetizer app settings including language, image optimization, upload limits, and export preferences.
+---
+
 App Settings control global preferences that apply across all your projects in Widgetizer. These settings affect how the application behaves, how files are processed, and how exports are managed. You can access App Settings from the main navigation menu.
 
 # General Settings

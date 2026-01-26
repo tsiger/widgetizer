@@ -1,3 +1,7 @@
+---
+description: Custom Liquid tags and filters in Widgetizer for assets, media, SEO, and theme settings. Complete reference with examples.
+---
+
 Widgetizer extends LiquidJS with custom tags and filters for assets, media, SEO, and theme settings. This page documents all available tags with usage examples. For where these tags belong in the document structure, see [Layout & Templates](theme-dev-layout-templates.html).
 
 # Asset Tags

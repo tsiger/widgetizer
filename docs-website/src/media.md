@@ -1,3 +1,7 @@
+---
+description: Manage images, videos, and audio in the Widgetizer Media Library. Automatic image optimization, usage tracking, and bulk operations.
+---
+
 The Media Library is your central hub for all the images, videos, and audio files used in your website. Widgetizer automatically optimizes your images and tracks where they're being used to help you manage your media efficiently.
 
 # Uploading Files

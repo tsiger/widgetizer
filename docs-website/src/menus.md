@@ -1,3 +1,7 @@
+---
+description: Build navigation menus in Widgetizer with drag-and-drop editing. Create hierarchical menus with dropdowns for headers, footers, and sidebars.
+---
+
 Menus are the navigation systems for your website. You can create multiple menus (for headers, footers, sidebars, etc.) and use them in your theme widgets. Each menu can have a hierarchical structure with dropdown sub-menus.
 
 

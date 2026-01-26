@@ -1,3 +1,7 @@
+---
+description: Create widgets and blocks for Widgetizer themes. Define schemas for the editor UI and Liquid templates for rendering.
+---
+
 Widgets are the building blocks of every page. Each widget has its own schema (for the editor UI) and template (for rendering). This page walks you through creating a widget from scratch, including blocks for repeatable content.
 
 # Creating a Widget

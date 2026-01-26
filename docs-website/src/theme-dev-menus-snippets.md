@@ -1,3 +1,7 @@
+---
+description: Create menus and snippets for Widgetizer themes. Reusable navigation structures and Liquid partials for clean, consistent code.
+---
+
 Menus and snippets are reusable building blocks that keep themes clean and consistent. Menus define navigation data, and snippets encapsulate reusable Liquid partials.
 
 # Menus

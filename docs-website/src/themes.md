@@ -1,3 +1,7 @@
+---
+description: Understand themes in Widgetizer. Themes provide the visual design, widgets, and layout structure for your website projects.
+---
+
 A **Theme** in Widgetizer is a starter kit that provides the foundation for your website. It defines the visual design, layout structure, available widgets, and overall functionality of your site. When you create a new project, you choose a theme that becomes the base for everything you build.
 
 # What is a Theme?

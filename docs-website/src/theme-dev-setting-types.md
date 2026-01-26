@@ -1,3 +1,7 @@
+---
+description: Reference for all setting field types in Widgetizer themes and widgets. Text, color, image, select, range, and more.
+---
+
 Theme and widget settings share the same field types. Use these types in `theme.json` (global settings) and in widget `schema.json`. This page summarizes the core types and their most useful properties.
 
 # Common Properties

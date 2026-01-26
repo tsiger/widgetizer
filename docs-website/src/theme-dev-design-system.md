@@ -1,3 +1,7 @@
+---
+description: Build a design system for Widgetizer themes with CSS tokens and utilities. Typography, spacing, colors, and responsive layout patterns.
+---
+
 Many themes include a design system in `assets/base.css`. This page summarizes the tokens and utilities that keep theme styles consistent and reusable. The Arch theme ships with a full design system, but you can build a lighter or more opinionated system depending on your goals.
 
 # Design Tokens (base.css)

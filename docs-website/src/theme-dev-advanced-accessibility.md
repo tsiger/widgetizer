@@ -1,3 +1,7 @@
+---
+description: Advanced Widgetizer theme development including JavaScript patterns, animations, export behavior, and accessibility best practices.
+---
+
 Advanced theme development covers JavaScript patterns, animations, export behavior, and accessibility rules. This page summarizes the essentials for production-ready themes.
 
 # JavaScript Patterns

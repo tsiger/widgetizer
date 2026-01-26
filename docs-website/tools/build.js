@@ -30,6 +30,34 @@ const version = packageJson.version;
 // Read sitemap
 const sitemap = JSON.parse(await fs.readFile(path.join(SRC_DIR, "sitemap.json"), "utf-8"));
 
+// Parse frontmatter from markdown content
+function parseFrontmatter(content) {
+  const frontmatterRegex = /^---\n([\s\S]*?)\n---\n/;
+  const match = content.match(frontmatterRegex);
+
+  if (!match) {
+    return { metadata: {}, content };
+  }
+
+  const frontmatter = match[1];
+  const metadata = {};
+
+  // Parse simple key: value pairs
+  frontmatter.split("\n").forEach((line) => {
+    const colonIndex = line.indexOf(":");
+    if (colonIndex > 0) {
+      const key = line.slice(0, colonIndex).trim();
+      const value = line.slice(colonIndex + 1).trim();
+      metadata[key] = value;
+    }
+  });
+
+  return {
+    metadata,
+    content: content.slice(match[0].length),
+  };
+}
+
 // Ensure dist directory exists
 await fs.ensureDir(DIST_DIR);
 
@@ -93,17 +121,30 @@ function generateMobileNav() {
 }
 
 // Generate HTML template
-function generateHTML(title, content, activePath) {
+function generateHTML(title, content, activePath, description = "") {
   const nav = generateNav()
     .replace(`{{ACTIVE_${activePath}}}`, "active")
     .replace(/\{\{ACTIVE_[^}]+\}\}/g, "");
 
-  return `<!DOCTYPE html>
+  const descriptionMeta = description ? `\n  <meta name="description" content="${description}">` : "";
+
+  return `<!--
+    __          ___     _            _   _              
+    \\ \\        / (_)   | |          | | (_)             
+     \\ \\  /\\  / / _  __| | __ _  ___| |_ _ _______ _ __ 
+      \\ \\/  \\/ / | |/ _\` |/ _\` |/ _ \\ __| |_  / _ \\ '__|
+       \\  /\\  /  | | (_| | (_| |  __/ |_| |/ /  __/ |   
+        \\/  \\/   |_|\\__,_|\\__, |\\___|\\__|_/___\\___|_|   
+                          __/ |                         
+                         |___/
+    Widgetizer.org - ${version}                          
+-->
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title} - ${sitemap.title}</title>
+  <title>${title} - ${sitemap.title}</title>${descriptionMeta}
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -143,7 +184,10 @@ for (const item of sitemap.navigation) {
     const htmlPath = path.join(DIST_DIR, item.path.replace(".md", ".html"));
 
     // Read markdown
-    const markdown = await fs.readFile(mdPath, "utf-8");
+    const rawMarkdown = await fs.readFile(mdPath, "utf-8");
+
+    // Parse frontmatter
+    const { metadata, content: markdown } = parseFrontmatter(rawMarkdown);
 
     // Convert to HTML
     let htmlContent = marked.parse(markdown);
@@ -174,7 +218,7 @@ for (const item of sitemap.navigation) {
     });
 
     // Generate full HTML page
-    const fullHTML = generateHTML(item.title, htmlContent, item.path);
+    const fullHTML = generateHTML(item.title, htmlContent, item.path, metadata.description);
 
     // Write HTML file
     try {

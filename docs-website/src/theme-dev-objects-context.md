@@ -1,3 +1,7 @@
+---
+description: Reference for theme objects and context in Widgetizer. Available data objects, attributes, and where they can be accessed.
+---
+
 Theme development relies on a shared set of data objects. Some are available everywhere, while others only exist in `layout.liquid`. This page documents the core objects and their attributes.
 
 # Context Overview

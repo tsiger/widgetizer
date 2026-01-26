@@ -1,3 +1,7 @@
+---
+description: Create and manage pages in Widgetizer. Configure page settings, SEO metadata, social sharing images, and organize your website structure.
+---
+
 Pages are the individual sections of your website. Each page can have its own content, layout, and SEO settings. You'll use the page editor to add widgets and build your content, but first you need to create the pages themselves.
 
 

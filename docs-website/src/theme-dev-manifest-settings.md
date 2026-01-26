@@ -1,3 +1,7 @@
+---
+description: Configure theme.json manifest for Widgetizer themes. Define metadata, global settings, and how settings flow into CSS and Liquid.
+---
+
 The `theme.json` file is the manifest for a Widgetizer theme. It defines theme metadata and the global settings users can edit in the Theme Settings panel. This page explains the schema, grouping, and how settings flow into CSS and Liquid.
 
 # Theme Manifest Overview
