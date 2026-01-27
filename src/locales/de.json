@@ -140,6 +140,7 @@
     "success": "Erfolg",
     "unsavedChanges": "Sie haben ungespeicherte Änderungen",
     "appTitle": "Widgetizer",
+    "close": "Schließen",
     "aria": {
       "dismiss": "Verwerfen",
       "close": "Schließen"
@@ -223,12 +224,14 @@
     "headers": {
       "title": "Titel",
       "folderName": "Ordnername",
+      "theme": "Theme",
       "created": "Erstellt",
       "updated": "Aktualisiert",
       "actions": "Aktionen"
     },
     "badges": {
-      "active": "Aktiv"
+      "active": "Aktiv",
+      "updateAvailable": "Update verfügbar"
     },
     "actions": {
       "currentActive": "Derzeit aktives Projekt",
@@ -502,13 +505,21 @@
     "noActiveProjectDesc": "Bitte wählen oder erstellen Sie ein Projekt, um Ihre Projekte zu verwalten.",
     "backToList": "Zurück zur Projektliste",
     "saveChanges": "Änderungen speichern",
+    "themeUpdate": {
+      "title": "Theme-Update verfügbar",
+      "description": "Eine neue Version Ihres Themes ist verfügbar. Ihre Seiten, Menüs und Uploads sind nicht betroffen.",
+      "apply": "Update anwenden",
+      "applying": "Wird angewendet..."
+    },
     "toasts": {
       "notFound": "Projekt nicht gefunden",
       "loadError": "Fehler beim Laden des Projekts",
       "updateSuccessRenamed": "Projekt \"{{name}}\" wurde erfolgreich aktualisiert und der Ordner wurde umbenannt.",
       "updateSuccess": "Projekt \"{{name}}\" wurde erfolgreich aktualisiert!",
       "updateError": "Fehler beim Aktualisieren des Projekts",
-      "noActiveProject": "Bitte wählen oder erstellen Sie ein Projekt, um Ihre Projekte zu verwalten"
+      "noActiveProject": "Bitte wählen oder erstellen Sie ein Projekt, um Ihre Projekte zu verwalten",
+      "updateApplied": "Theme von v{{from}} auf v{{to}} aktualisiert",
+      "noUpdateAvailable": "Kein Theme-Update verfügbar"
     }
   },
   "exportSite": {

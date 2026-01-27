@@ -140,6 +140,7 @@
     "success": "Éxito",
     "unsavedChanges": "Tienes cambios sin guardar",
     "appTitle": "Widgetizer",
+    "close": "Cerrar",
     "aria": {
       "dismiss": "Descartar",
       "close": "Cerrar"
@@ -223,12 +224,14 @@
     "headers": {
       "title": "Título",
       "folderName": "Nombre de Carpeta",
+      "theme": "Tema",
       "created": "Creado",
       "updated": "Actualizado",
       "actions": "Acciones"
     },
     "badges": {
-      "active": "Activo"
+      "active": "Activo",
+      "updateAvailable": "Actualización disponible"
     },
     "actions": {
       "currentActive": "Proyecto activo actual",
@@ -503,13 +506,21 @@
     "noActiveProjectDesc": "Por favor, selecciona o crea un proyecto para gestionar tus proyectos.",
     "backToList": "Volver a la lista de proyectos",
     "saveChanges": "Guardar Cambios",
+    "themeUpdate": {
+      "title": "Actualización de tema disponible",
+      "description": "Hay una nueva versión de tu tema. Tus páginas, menús y archivos subidos no se verán afectados.",
+      "apply": "Aplicar actualización",
+      "applying": "Aplicando..."
+    },
     "toasts": {
       "notFound": "Proyecto no encontrado",
       "loadError": "Error al cargar el proyecto",
       "updateSuccessRenamed": "El proyecto \"{{name}}\" fue actualizado exitosamente y la carpeta fue renombrada.",
       "updateSuccess": "¡El proyecto \"{{name}}\" fue actualizado exitosamente!",
       "updateError": "Error al actualizar el proyecto",
-      "noActiveProject": "Por favor, selecciona o crea un proyecto para gestionar tus proyectos"
+      "noActiveProject": "Por favor, selecciona o crea un proyecto para gestionar tus proyectos",
+      "updateApplied": "Tema actualizado de v{{from}} a v{{to}}",
+      "noUpdateAvailable": "No hay actualización de tema disponible"
     }
   },
   "exportSite": {
