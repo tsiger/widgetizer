@@ -1,0 +1,449 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-comparison-slider widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.orientation == 'vertical' %}variant-vertical{% endif %}"
+  {% if widget.settings.color_scheme == 'highlight' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="comparison-slider"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .comparison-slider-wrapper {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 16 / 9;
+        user-select: none;
+        border: var(--border-width-thin) solid var(--border-color);
+      }
+
+      & .comparison-slider-image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        pointer-events: none;
+      }
+
+      & .comparison-slider-before {
+        z-index: 1;
+      }
+
+      & .comparison-slider-after {
+        z-index: 2;
+        clip-path: inset(0 0 0 50%);
+      }
+
+      & .comparison-slider-divider {
+        position: absolute;
+        inset-block-start: 0;
+        inset-block-end: 0;
+        inset-inline-start: 50%;
+        width: 0.3rem;
+        background-color: var(--bg-primary);
+        z-index: 3;
+        transform: translateX(-50%);
+        cursor: ew-resize;
+      }
+
+      & .comparison-slider-handle {
+        position: absolute;
+        inset-block-start: 50%;
+        inset-inline-start: 50%;
+        width: 4.8rem;
+        height: 4.8rem;
+        background-color: var(--bg-primary);
+        border: 0.3rem solid var(--bg-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: ew-resize;
+        z-index: 4;
+        transform: translate(-50%, -50%);
+        transition: opacity 0.2s;
+
+        &:hover {
+          opacity: 0.9;
+        }
+
+        &:focus {
+          outline: var(--border-width-medium) solid var(--text-heading);
+          outline-offset: 0.3rem;
+        }
+
+        &:active {
+          opacity: 0.8;
+        }
+      }
+
+      & .comparison-slider-handle-icon {
+        width: 2.4rem;
+        height: 2.4rem;
+        color: var(--text-heading);
+      }
+
+      & .comparison-slider-label {
+        position: absolute;
+        padding: var(--space-sm) var(--space-md);
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-color);
+        z-index: 5;
+        pointer-events: none;
+      }
+
+      & .comparison-slider-label-before {
+        inset-block-start: var(--space-md);
+        inset-inline-start: var(--space-md);
+      }
+
+      & .comparison-slider-label-after {
+        inset-block-start: var(--space-md);
+        inset-inline-end: var(--space-md);
+      }
+
+      & .comparison-slider-instructions {
+        text-align: center;
+        margin-block-start: var(--space-lg);
+      }
+
+      @media (min-width: 750px) {
+        & .comparison-slider-handle {
+          width: 5.6rem;
+          height: 5.6rem;
+        }
+
+        & .comparison-slider-handle-icon {
+          width: 2.6rem;
+          height: 2.6rem;
+        }
+
+        & .comparison-slider-label {
+          padding: var(--space-sm) var(--space-lg);
+        }
+
+        & .comparison-slider-label-before {
+          inset-block-start: var(--space-lg);
+          inset-inline-start: var(--space-lg);
+        }
+
+        & .comparison-slider-label-after {
+          inset-block-start: var(--space-lg);
+          inset-inline-end: var(--space-lg);
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .comparison-slider-handle {
+          width: 6.4rem;
+          height: 6.4rem;
+        }
+
+        & .comparison-slider-handle-icon {
+          width: 2.8rem;
+          height: 2.8rem;
+        }
+      }
+
+      /* Vertical orientation variant */
+      &.variant-vertical {
+        & .widget-content {
+          max-width: var(--content-width-sm);
+          margin-inline: auto;
+        }
+
+        & .comparison-slider-wrapper {
+          aspect-ratio: 9 / 16;
+        }
+
+        & .comparison-slider-after {
+          clip-path: inset(50% 0 0 0);
+        }
+
+        & .comparison-slider-divider {
+          inset-inline-start: 0;
+          inset-inline-end: 0;
+          inset-block-start: 50%;
+          width: auto;
+          height: 0.3rem;
+          transform: translateY(-50%);
+          cursor: ns-resize;
+        }
+
+        & .comparison-slider-handle {
+          inset-inline-start: 50%;
+          inset-block-start: 50%;
+          cursor: ns-resize;
+        }
+
+        & .comparison-slider-label-before {
+          inset-block-start: auto;
+          inset-block-end: var(--space-md);
+          inset-inline-start: var(--space-md);
+        }
+
+        & .comparison-slider-label-after {
+          inset-block-start: var(--space-md);
+          inset-inline-end: var(--space-md);
+        }
+
+        @media (min-width: 750px) {
+          & .comparison-slider-label-before {
+            inset-block-end: var(--space-lg);
+            inset-inline-start: var(--space-lg);
+          }
+
+          & .comparison-slider-label-after {
+            inset-block-start: var(--space-lg);
+            inset-inline-end: var(--space-lg);
+          }
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content widget-content-lg">
+      <div class="comparison-slider-wrapper reveal reveal-fade">
+        <!-- Before Image -->
+        {% if widget.settings.before_image != blank %}
+          {{ widget.settings.before_image | image: 'large', 'comparison-slider-image comparison-slider-before', false }}
+        {% else %}
+          <div
+            class="comparison-slider-image comparison-slider-before"
+            style="background-color: var(--bg-tertiary);"
+          ></div>
+        {% endif %}
+
+        <!-- After Image -->
+        {% if widget.settings.after_image != blank %}
+          {{ widget.settings.after_image | image: 'large', 'comparison-slider-image comparison-slider-after', false }}
+        {% else %}
+          <div
+            class="comparison-slider-image comparison-slider-after"
+            style="background-color: var(--bg-secondary);"
+          ></div>
+        {% endif %}
+
+        <!-- Labels -->
+        {% if widget.settings.show_labels %}
+          <div class="comparison-slider-label comparison-slider-label-before block-text block-text-sm block-text-uppercase block-text-heading">
+            {{ widget.settings.before_label | default: 'Before' }}
+          </div>
+          <div class="comparison-slider-label comparison-slider-label-after block-text block-text-sm block-text-uppercase block-text-heading">
+            {{ widget.settings.after_label | default: 'After' }}
+          </div>
+        {% endif %}
+
+        <!-- Divider Line -->
+        <div class="comparison-slider-divider"></div>
+
+        <!-- Draggable Handle -->
+        <button
+          class="comparison-slider-handle"
+          type="button"
+          aria-label="Drag to compare before and after images"
+          role="slider"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="{{ widget.settings.initial_position | default: 50 }}"
+          aria-valuetext="{{ widget.settings.initial_position | default: 50 }}% of after image visible"
+          tabindex="0"
+        >
+          <svg
+            class="comparison-slider-handle-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M9 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+            <path d="M9 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+            <path d="M9 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+            <path d="M15 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+            <path d="M15 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+            <path d="M15 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const widget = document.getElementById('{{ widget.id }}');
+      if (!widget || widget.dataset.initialized) return;
+      widget.dataset.initialized = 'true';
+
+      const wrapper = widget.querySelector('.comparison-slider-wrapper');
+      const afterImage = widget.querySelector('.comparison-slider-after');
+      const divider = widget.querySelector('.comparison-slider-divider');
+      const handle = widget.querySelector('.comparison-slider-handle');
+      const isVertical = widget.classList.contains('variant-vertical');
+
+      if (!wrapper || !afterImage || !divider || !handle) return;
+
+      let isDragging = false;
+      let position = {{ widget.settings.initial_position | default: 50 }};
+
+      // Update the slider position
+      const updatePosition = (newPosition) => {
+        position = Math.max(0, Math.min(100, newPosition));
+
+        if (isVertical) {
+          afterImage.style.clipPath = `inset(${position}% 0 0 0)`;
+          divider.style.insetBlockStart = `${position}%`;
+          handle.style.insetBlockStart = `${position}%`;
+        } else {
+          afterImage.style.clipPath = `inset(0 0 0 ${position}%)`;
+          divider.style.insetInlineStart = `${position}%`;
+          handle.style.insetInlineStart = `${position}%`;
+        }
+
+        // Update ARIA attributes
+        handle.setAttribute('aria-valuenow', Math.round(position));
+        handle.setAttribute('aria-valuetext', `${Math.round(position)}% of after image visible`);
+      };
+
+      // Get position from mouse/touch event
+      const getPositionFromEvent = (event) => {
+        const rect = wrapper.getBoundingClientRect();
+        let clientPos;
+
+        if (event.type.startsWith('touch')) {
+          clientPos = isVertical ? event.touches[0].clientY : event.touches[0].clientX;
+        } else {
+          clientPos = isVertical ? event.clientY : event.clientX;
+        }
+
+        const rectStart = isVertical ? rect.top : rect.left;
+        const rectSize = isVertical ? rect.height : rect.width;
+        const offset = clientPos - rectStart;
+        return (offset / rectSize) * 100;
+      };
+
+      // Mouse/Touch move handler
+      const handleMove = (event) => {
+        if (!isDragging) return;
+        event.preventDefault();
+        const newPosition = getPositionFromEvent(event);
+        updatePosition(newPosition);
+      };
+
+      // Start dragging
+      const startDrag = (event) => {
+        isDragging = true;
+        handle.focus();
+        const newPosition = getPositionFromEvent(event);
+        updatePosition(newPosition);
+      };
+
+      // Stop dragging
+      const stopDrag = () => {
+        isDragging = false;
+      };
+
+      // Mouse events
+      wrapper.addEventListener('mousedown', startDrag);
+      document.addEventListener('mousemove', handleMove);
+      document.addEventListener('mouseup', stopDrag);
+
+      // Touch events
+      wrapper.addEventListener('touchstart', startDrag, { passive: false });
+      document.addEventListener('touchmove', handleMove, { passive: false });
+      document.addEventListener('touchend', stopDrag);
+
+      // Keyboard support
+      handle.addEventListener('keydown', (event) => {
+        let delta = 0;
+        switch (event.key) {
+          case 'ArrowRight':
+          case 'ArrowDown':
+            delta = 5;
+            break;
+          case 'ArrowLeft':
+          case 'ArrowUp':
+            delta = -5;
+            break;
+          case 'PageUp':
+            delta = 10;
+            break;
+          case 'PageDown':
+            delta = -10;
+            break;
+          case 'Home':
+            updatePosition(0);
+            event.preventDefault();
+            return;
+          case 'End':
+            updatePosition(100);
+            event.preventDefault();
+            return;
+          default:
+            return;
+        }
+        event.preventDefault();
+        updatePosition(position + delta);
+      });
+
+      // Keyboard navigation
+      handle.addEventListener('keydown', (event) => {
+        let step = 1;
+        if (event.shiftKey) step = 5; // Faster movement with Shift
+
+        switch (event.key) {
+          case 'ArrowLeft':
+          case 'ArrowUp':
+            event.preventDefault();
+            updatePosition(position - step);
+            break;
+          case 'ArrowRight':
+          case 'ArrowDown':
+            event.preventDefault();
+            updatePosition(position + step);
+            break;
+          case 'Home':
+            event.preventDefault();
+            updatePosition(0);
+            break;
+          case 'End':
+            event.preventDefault();
+            updatePosition(100);
+            break;
+        }
+      });
+
+      // Initialize position
+      updatePosition(position);
+    })();
+  </script>
+</section>

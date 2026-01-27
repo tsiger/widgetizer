@@ -1,0 +1,137 @@
+{
+  "type": "testimonial-hero",
+  "displayName": "Testimonial Hero",
+  "aliases": ["testimonial", "customer quote", "social proof"],
+  "settings": [
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "Content"
+    },
+    {
+      "type": "image",
+      "id": "logo",
+      "label": "Company Logo"
+    },
+    {
+      "type": "image",
+      "id": "author_image",
+      "label": "Author Image"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "default": "right",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "standard",
+      "options": [
+        { "value": "standard", "label": "Standard" },
+        { "value": "highlight", "label": "Highlight" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "displayName": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Megan Taylor"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "default": "lg",
+          "options": [
+            { "value": "lg", "label": "Large" },
+            { "value": "xl", "label": "Extra Large" },
+            { "value": "2xl", "label": "2X Large" },
+            { "value": "3xl", "label": "3X Large" },
+            { "value": "4xl", "label": "4X Large" },
+            { "value": "5xl", "label": "5X Large" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "displayName": "Text",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "They took our ideas and turned them into visuals and content that really connected with our audience. The results exceeded our expectations!"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "default": "lg",
+          "options": [
+            { "value": "sm", "label": "Small" },
+            { "value": "base", "label": "Base" },
+            { "value": "lg", "label": "Large" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "uppercase",
+          "label": "Uppercase",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "muted",
+          "label": "Muted color",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "text",
+      "settings": {
+        "text": "They took our ideas and turned them into visuals and content that really connected with our audience. The results exceeded our expectations!",
+        "size": "lg",
+        "uppercase": false,
+        "muted": false
+      }
+    },
+    {
+      "type": "heading",
+      "settings": {
+        "text": "Megan Taylor",
+        "size": "lg"
+      }
+    },
+    {
+      "type": "text",
+      "settings": {
+        "text": "Sales Director",
+        "size": "sm",
+        "uppercase": false,
+        "muted": true
+      }
+    }
+  ]
+}

@@ -753,6 +753,71 @@ export async function uploadTheme(req, res) {
   const uploadedVersion = uploadedThemeJson.version;
   const themeDir = getThemeDir(themeFolderName);
 
+  // --- Start: Scan for update versions in zip ---
+  // Check for updates/ folder in the zip and validate each version folder
+  const updateVersionsInZip = [];
+  const updatesPrefix = `${themeFolderName}/updates/`;
+  const latestPrefix = `${themeFolderName}/latest/`;
+
+  // Find all version folders under updates/
+  const updateFolderNames = new Set();
+  for (const entry of relevantEntries) {
+    if (entry.entryName.startsWith(updatesPrefix) && !entry.entryName.startsWith(latestPrefix)) {
+      // Extract version folder name: updates/{version}/...
+      const relativePath = entry.entryName.slice(updatesPrefix.length);
+      const versionFolder = relativePath.split("/")[0];
+      if (versionFolder && versionFolder !== "") {
+        updateFolderNames.add(versionFolder);
+      }
+    }
+  }
+
+  // Validate each update version folder
+  for (const versionFolder of updateFolderNames) {
+    // Must be valid semver
+    if (!isValidVersion(versionFolder)) {
+      return res.status(400).json({
+        message: `Invalid update folder name: '${versionFolder}'. Must be semantic version (e.g., 1.1.0)`,
+      });
+    }
+
+    // Must have theme.json
+    const updateThemeJsonPath = `${themeFolderName}/updates/${versionFolder}/theme.json`;
+    const updateThemeJsonEntry = zip.getEntry(updateThemeJsonPath);
+    if (!updateThemeJsonEntry) {
+      return res.status(400).json({
+        message: `Update folder '${versionFolder}' is missing required theme.json`,
+      });
+    }
+
+    // Parse and validate theme.json
+    let updateThemeJson;
+    try {
+      const content = updateThemeJsonEntry.getData().toString("utf8");
+      updateThemeJson = JSON.parse(content);
+    } catch (error) {
+      return res.status(400).json({
+        message: `Update folder '${versionFolder}' has invalid theme.json: Failed to parse JSON`,
+      });
+    }
+
+    // Version in theme.json must match folder name
+    if (!updateThemeJson.version) {
+      return res.status(400).json({
+        message: `Update folder '${versionFolder}' theme.json is missing 'version' field`,
+      });
+    }
+
+    if (updateThemeJson.version !== versionFolder) {
+      return res.status(400).json({
+        message: `Update folder '${versionFolder}' has version mismatch: theme.json says '${updateThemeJson.version}'`,
+      });
+    }
+
+    updateVersionsInZip.push(versionFolder);
+  }
+  // --- End: Scan for update versions in zip ---
+
   // Check if theme folder already exists
   let themeExists = false;
   try {
@@ -771,54 +836,64 @@ export async function uploadTheme(req, res) {
     existingVersions = await getThemeVersions(themeFolderName);
   }
 
-  // Check if this version already exists
-  if (existingVersions.includes(uploadedVersion)) {
-    return res.status(409).json({
-      message: `Version ${uploadedVersion} already exists for theme '${themeFolderName}'.`,
-    });
-  }
-
-  // Determine extraction target
-  let targetPath;
-  let isUpdate = false;
+  // Determine what to install
+  let isNewTheme = !themeExists;
+  let newUpdateVersions = [];
 
   if (themeExists) {
-    // This is an update - extract to updates/{version}/
-    isUpdate = true;
-    targetPath = getThemeVersionDir(themeFolderName, uploadedVersion);
-    console.log(`[uploadTheme] Uploading update v${uploadedVersion} for existing theme '${themeFolderName}'`);
+    // Theme already exists - check what's new in this zip
+    // Filter out update versions that are already installed
+    newUpdateVersions = updateVersionsInZip.filter((v) => !existingVersions.includes(v));
+
+    // If base version already exists and no new updates, reject
+    if (existingVersions.includes(uploadedVersion) && newUpdateVersions.length === 0) {
+      return res.status(409).json({
+        message: `Theme '${themeFolderName}' is already up to date. Base version ${uploadedVersion} and all update versions are already installed.`,
+      });
+    }
+
+    // If base version doesn't match, we can't safely merge
+    if (!existingVersions.includes(uploadedVersion)) {
+      return res.status(409).json({
+        message: `Cannot import updates: zip has base version ${uploadedVersion} but installed theme has base version ${existingVersions[0] || "unknown"}. Base versions must match.`,
+      });
+    }
+
+    console.log(
+      `[uploadTheme] Importing ${newUpdateVersions.length} new update(s) for existing theme '${themeFolderName}': ${newUpdateVersions.join(", ")}`,
+    );
   } else {
-    // This is a new theme - extract to root
-    targetPath = themeDir;
-    console.log(`[uploadTheme] Uploading new theme '${themeFolderName}' v${uploadedVersion}`);
+    console.log(`[uploadTheme] Installing new theme '${themeFolderName}' v${uploadedVersion}`);
   }
 
   try {
-    // Ensure parent directories exist
-    await fs.ensureDir(path.dirname(targetPath));
+    if (isNewTheme) {
+      // --- New theme installation ---
+      await fs.ensureDir(THEMES_DIR);
 
-    if (isUpdate) {
-      // For updates, we need to extract to a specific version directory
-      // Create a temp directory, extract there, then move contents
+      // Extract to temp directory first so we can skip latest/
       const tempDir = path.join(THEMES_DIR, `_temp_${Date.now()}`);
       await fs.ensureDir(tempDir);
 
       try {
-        // Extract to temp directory
         zip.extractAllTo(tempDir, /*overwrite*/ false);
 
-        // Move the extracted theme folder contents to the version directory
         const extractedThemeDir = path.join(tempDir, themeFolderName);
-        await fs.ensureDir(targetPath);
-        await fs.copy(extractedThemeDir, targetPath);
 
-        // Clean up .DS_Store files from the copied content
-        await removeDSStoreRecursive(targetPath);
+        // Remove latest/ if it exists in the extracted content (we'll rebuild it)
+        const extractedLatestDir = path.join(extractedThemeDir, "latest");
+        try {
+          await fs.remove(extractedLatestDir);
+        } catch {
+          // Ignore if doesn't exist
+        }
 
-        // Clean up temp directory
+        // Move to final location
+        await fs.copy(extractedThemeDir, themeDir);
+
+        // Clean up
         await fs.remove(tempDir);
       } catch (extractError) {
-        // Clean up temp directory on error
         try {
           await fs.remove(tempDir);
         } catch (cleanupError) {
@@ -827,22 +902,53 @@ export async function uploadTheme(req, res) {
         throw extractError;
       }
 
-      // Build the latest/ snapshot now that we have a new version
-      await buildLatestSnapshot(themeFolderName);
-    } else {
-      // For new themes, extract directly to THEMES_DIR
-      await fs.ensureDir(THEMES_DIR);
-      zip.extractAllTo(THEMES_DIR, /*overwrite*/ false);
-
-      // Clean up macOS artifacts that extractAllTo includes despite our filter
-      // (the filter is only used for validation, not extraction)
+      // Clean up macOS artifacts
       try {
         await fs.remove(path.join(THEMES_DIR, "__MACOSX"));
       } catch {
         // Ignore if doesn't exist
       }
-      // Remove .DS_Store files recursively from the extracted theme
       await removeDSStoreRecursive(themeDir);
+
+      // Build latest/ if there are update versions
+      if (updateVersionsInZip.length > 0) {
+        await buildLatestSnapshot(themeFolderName);
+      }
+    } else {
+      // --- Import new update versions into existing theme ---
+      const tempDir = path.join(THEMES_DIR, `_temp_${Date.now()}`);
+      await fs.ensureDir(tempDir);
+
+      try {
+        zip.extractAllTo(tempDir, /*overwrite*/ false);
+
+        const extractedThemeDir = path.join(tempDir, themeFolderName);
+        const extractedUpdatesDir = path.join(extractedThemeDir, "updates");
+
+        // Copy each new update version folder
+        for (const version of newUpdateVersions) {
+          const sourceVersionDir = path.join(extractedUpdatesDir, version);
+          const targetVersionDir = getThemeVersionDir(themeFolderName, version);
+
+          await fs.ensureDir(targetVersionDir);
+          await fs.copy(sourceVersionDir, targetVersionDir);
+          await removeDSStoreRecursive(targetVersionDir);
+
+          console.log(`[uploadTheme] Imported update v${version} for theme '${themeFolderName}'`);
+        }
+
+        await fs.remove(tempDir);
+      } catch (extractError) {
+        try {
+          await fs.remove(tempDir);
+        } catch (cleanupError) {
+          console.warn("Failed to clean up temp directory:", cleanupError);
+        }
+        throw extractError;
+      }
+
+      // Rebuild latest/ snapshot with the new versions
+      await buildLatestSnapshot(themeFolderName);
     }
 
     // Read the final theme data from the source directory
@@ -869,28 +975,37 @@ export async function uploadTheme(req, res) {
       latestVersion,
       widgets: widgetCount,
       author: uploadedThemeJson.author,
-      isUpdate,
+      isUpdate: !isNewTheme,
+      addedVersions: isNewTheme ? null : newUpdateVersions,
     };
 
-    console.log(`[uploadTheme] Theme '${themeFolderName}' v${uploadedVersion} uploaded successfully`);
+    console.log(`[uploadTheme] Theme '${themeFolderName}' processed successfully`);
+
+    // Build appropriate response message
+    let message;
+    if (isNewTheme) {
+      const updateCount = updateVersionsInZip.length;
+      message =
+        updateCount > 0
+          ? `Theme '${themeFolderName}' v${uploadedVersion} installed with ${updateCount} update(s).`
+          : `Theme '${themeFolderName}' v${uploadedVersion} installed successfully.`;
+    } else {
+      message = `Imported ${newUpdateVersions.length} update(s) for theme '${themeFolderName}': ${newUpdateVersions.join(", ")}`;
+    }
 
     res.status(201).json({
-      message: isUpdate
-        ? `Theme update '${themeFolderName}' v${uploadedVersion} uploaded successfully.`
-        : `Theme '${themeFolderName}' v${uploadedVersion} uploaded successfully.`,
+      message,
       theme: newThemeData,
     });
   } catch (error) {
     console.error("Error extracting theme zip:", error);
-    // Attempt cleanup if extraction failed partially
-    try {
-      if (isUpdate) {
-        await fs.remove(targetPath);
-      } else {
+    // Attempt cleanup if extraction failed partially for new themes
+    if (isNewTheme) {
+      try {
         await fs.remove(themeDir);
+      } catch (cleanupError) {
+        console.error("Error cleaning up failed theme extraction:", cleanupError);
       }
-    } catch (cleanupError) {
-      console.error("Error cleaning up failed theme extraction:", cleanupError);
     }
     res.status(500).json({ message: "Failed to extract theme zip file." });
   }

@@ -1,0 +1,208 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-bento-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  {% if widget.settings.color_scheme == 'highlight' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="bento-grid"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .bento-grid-container {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        gap: {{ widget.settings.gap | default: 'var(--space-md)' }};
+      }
+
+      & .bento-item {
+        display: flex;
+        flex-direction: column;
+        padding: var(--space-xl);
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        border: var(--border-width-thin) solid var(--border-color);
+        position: relative;
+        text-decoration: none;
+        transition: border-color 0.3s ease;
+        min-height: 20rem;
+        justify-content: flex-end;
+
+        &.has-bg-color,
+        &.has-bg-image {
+          border: none;
+          background: none;
+        }
+
+        &.align-center { align-items: center; text-align: center; }
+        &.align-start { align-items: flex-start; text-align: start; }
+
+        &:hover {
+          border-color: var(--border-color);
+        }
+      }
+
+      & .bento-item.has-bg-image::before,
+      & .bento-item.has-bg-color::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        z-index: 1;
+        transform: scale(1);
+        transition: transform 0.3s ease;
+      }
+
+      & .bento-item.has-bg-image::before {
+        background-image: var(--bento-bg-image);
+        background-size: cover;
+        background-position: center;
+      }
+
+      & .bento-item.has-bg-color::before {
+        background-color: var(--bento-bg-color);
+      }
+
+      & .bento-item.has-overlay::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background-color: var(--widget-overlay-color, rgba(0, 0, 0, 0.4));
+        opacity: 1;
+        z-index: 2;
+      }
+
+      & .bento-item.has-bg-image:hover::before,
+      & .bento-item.has-bg-color:hover::before {
+        transform: scale(1.05);
+      }
+
+      & .bento-content {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+        width: 100%;
+      }
+
+      @media (min-width: 990px) {
+        & .bento-grid-container {
+          grid-template-columns: repeat(4, 1fr);
+        }
+
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          & [data-block-id="{{ blockId }}"] {
+            grid-column: span {{ block.settings.col_span | default: 1 | min: 4 }};
+            grid-row: span {{ block.settings.row_span | default: 1 }};
+          }
+        {% endfor %}
+      }
+    }
+  </style>
+
+  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="bento-grid-container">
+        {% comment %} Determine heading levels {% endcomment %}
+        {% assign has_widget_title = false %}
+        {% if widget.settings.title != blank %}
+          {% assign has_widget_title = true %}
+        {% endif %}
+
+        {% assign first_item_level = 'h2' %}
+        {% assign other_items_level = 'h2' %}
+
+        {% if has_widget_title %}
+          {% if widget.index == 1 %}
+            {% assign first_item_level = 'h2' %}
+            {% assign other_items_level = 'h2' %}
+          {% else %}
+            {% assign first_item_level = 'h3' %}
+            {% assign other_items_level = 'h3' %}
+          {% endif %}
+        {% else %}
+          {% if widget.index == 1 %}
+            {% assign first_item_level = 'h1' %}
+            {% assign other_items_level = 'h2' %}
+          {% else %}
+            {% assign first_item_level = 'h2' %}
+            {% assign other_items_level = 'h2' %}
+          {% endif %}
+        {% endif %}
+
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+
+          {% assign item_classes = 'bento-item block-item' | append: ' align-' | append: block.settings.alignment %}
+          {% assign item_style = '' %}
+
+          {% if block.settings.image != blank %}
+             {% assign item_classes = item_classes | append: ' has-bg-image has-overlay' %}
+
+             {% assign overlay_val = block.settings.overlay_color | default: 'rgba(0,0,0,0.5)' %}
+             {% capture item_style %}
+               {{ item_style }} --widget-overlay-color: {{ overlay_val }}; --bento-bg-image: url('{{ block.settings.image | image: 'path', 'large' }}');
+             {% endcapture %}
+
+          {% elsif block.settings.background_color != blank %}
+             {% assign item_classes = item_classes | append: ' has-bg-color' %}
+             {% capture item_style %}
+               {{ item_style }} --bento-bg-color: {{ block.settings.background_color }};
+             {% endcapture %}
+          {% endif %}
+
+          {% if block.settings.text_color == 'light' %}
+             {% assign item_classes = item_classes | append: ' color-scheme-highlight' %}
+          {% elsif block.settings.text_color == 'dark' %}
+             {% assign item_classes = item_classes | append: ' color-scheme-standard' %}
+          {% endif %}
+
+          <{% if block.settings.link.href != blank %}a href="{{ block.settings.link.href }}"{% else %}div{% endif %}
+            class="{{ item_classes }} reveal reveal-scale"
+            style="{{ item_style }} --reveal-delay: {{ forloop.index0 }}"
+            data-block-id="{{ blockId }}"
+          >
+            <div class="bento-content">
+              {% if block.settings.title != blank %}
+                {% if forloop.first %}
+                  <{{ first_item_level }} class="widget-title block-text block-text-xl block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ first_item_level }}>
+                {% else %}
+                  <{{ other_items_level }} class="widget-title block-text block-text-xl block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ other_items_level }}>
+                {% endif %}
+              {% endif %}
+              {% if block.settings.text != blank %}
+                <p class="widget-description block-text block-text-sm" data-setting="text">{{ block.settings.text }}</p>
+              {% endif %}
+            </div>
+          </{% if block.settings.link.href != blank %}a{% else %}div{% endif %}>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+

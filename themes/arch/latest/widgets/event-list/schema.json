@@ -1,0 +1,137 @@
+{
+  "type": "event-list",
+  "displayName": "Event List",
+  "aliases": ["calendar", "schedule", "upcoming events", "agenda"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Upcoming Events"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "standard",
+      "options": [
+        { "value": "standard", "label": "Standard" },
+        { "value": "highlight", "label": "Highlight" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "event",
+      "displayName": "Event",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
+          "type": "text",
+          "id": "day",
+          "label": "Day (number)",
+          "default": "15"
+        },
+        {
+          "type": "text",
+          "id": "month",
+          "label": "Month (short)",
+          "default": "Dec"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Event title",
+          "default": "Event Name"
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "Location & time",
+          "default": "New York, NY • 6:00 PM"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "link",
+          "id": "button_link",
+          "label": "Button",
+          "default": {
+            "text": "Register Now",
+            "href": "#",
+            "target": "_self"
+          }
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "event",
+      "settings": {
+        "day": "15",
+        "month": "Jan",
+        "title": "Product Launch Webinar",
+        "location": "Online • 2:00 PM EST",
+        "description": "Join us for an exclusive first look at our latest product release.",
+        "button_link": {
+          "text": "Register Now",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "event",
+      "settings": {
+        "day": "22",
+        "month": "Jan",
+        "title": "Customer Workshop",
+        "location": "San Francisco, CA • 10:00 AM",
+        "description": "Hands-on workshop covering best practices and advanced features.",
+        "button_link": {
+          "text": "Register Now",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "event",
+      "settings": {
+        "day": "5",
+        "month": "Feb",
+        "title": "Annual Conference",
+        "location": "New York, NY • 9:00 AM",
+        "description": "Our biggest event of the year featuring speakers, workshops, and networking.",
+        "button_link": {
+          "text": "Get Tickets",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    }
+  ]
+}

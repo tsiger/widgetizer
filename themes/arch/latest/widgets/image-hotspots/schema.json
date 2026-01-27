@@ -1,0 +1,124 @@
+{
+  "type": "image-hotspots",
+  "displayName": "Image Hotspots",
+  "aliases": ["interactive image", "markers", "product details", "hotspots"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Interactive Image"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "Content"
+    },
+    {
+      "type": "image",
+      "id": "image",
+      "label": "Background image"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text",
+      "default": "Interactive image with hotspots"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "standard",
+      "options": [
+        { "value": "standard", "label": "Standard" },
+        { "value": "highlight", "label": "Highlight" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "displayName": "Hotspot",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Tooltip title",
+          "default": "Feature Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Tooltip description"
+        },
+        {
+          "type": "link",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "header",
+          "id": "layout_header",
+          "label": "Layout"
+        },
+        {
+          "type": "range",
+          "id": "position_x",
+          "label": "Horizontal position (%)",
+          "min": 0,
+          "max": 100,
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "position_y",
+          "label": "Vertical position (%)",
+          "min": 0,
+          "max": 100,
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "hotspot",
+      "settings": {
+        "position_x": 30,
+        "position_y": 40,
+        "title": "Premium Quality",
+        "description": "Crafted with the finest materials for lasting durability."
+      }
+    },
+    {
+      "type": "hotspot",
+      "settings": {
+        "position_x": 70,
+        "position_y": 30,
+        "title": "Advanced Technology",
+        "description": "Cutting-edge features that make your life easier."
+      }
+    }
+  ]
+}

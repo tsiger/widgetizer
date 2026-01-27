@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% seo %}
+    {% fonts %}
+
+    {% theme_settings %}
+
+    {% asset "base.css" %}
+    {% unless theme.layout.enable_reveal_animations %}
+      <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
+    {% endunless %}
+    {% custom_css %}
+    {% custom_head_scripts %}
+    {% header_assets %}
+  </head>
+  <body class="{{ body_class }}">
+    <a href="#main-content" class="visually-hidden skip-link">Skip to main content</a>
+    {{ header }}
+    <main id="main-content" class="main-content">
+      {{ main_content }}
+    </main>
+    {{ footer }}
+
+    {% asset "scripts.js" %}
+    {% if theme.layout.enable_reveal_animations %}
+      {% enqueue_script "reveal.js", { "priority": 50 } %}
+    {% endif %}
+    {% footer_assets %}
+    {% custom_footer_scripts %}
+  </body>
+</html>
+

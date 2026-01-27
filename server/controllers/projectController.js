@@ -835,13 +835,14 @@ export async function exportProject(req, res) {
 
     // Create export manifest
     const manifest = {
-      formatVersion: "1.0",
+      formatVersion: "1.1",
       exportedAt: new Date().toISOString(),
       widgetizerVersion: appVersion,
       project: {
         name: project.name,
         description: project.description || "",
         theme: project.theme,
+        themeVersion: project.themeVersion || null,
         siteUrl: project.siteUrl || "",
         created: project.created,
         updated: project.updated,
@@ -1006,6 +1007,21 @@ export async function importProject(req, res) {
         throw new Error("Manifest not found in extracted files");
       }
 
+      // Determine themeVersion: prefer manifest, fallback to project's theme.json
+      let themeVersion = manifest.project.themeVersion || null;
+      if (!themeVersion) {
+        // Fallback for older exports: read from project's theme.json
+        const projectThemeJsonPath = path.join(tempDir, "theme.json");
+        try {
+          if (await fs.pathExists(projectThemeJsonPath)) {
+            const projectThemeJson = await fs.readJson(projectThemeJsonPath);
+            themeVersion = projectThemeJson.version || null;
+          }
+        } catch (err) {
+          console.warn("Could not read theme.json for version fallback:", err.message);
+        }
+      }
+
       // Create new project object (but don't add to projects.json yet)
       newProject = {
         id: uuidv4(),
@@ -1013,6 +1029,7 @@ export async function importProject(req, res) {
         name: manifest.project.name,
         description: manifest.project.description || "",
         theme: manifest.project.theme,
+        themeVersion,
         siteUrl: manifest.project.siteUrl || "",
         created: new Date().toISOString(),
         updated: new Date().toISOString(),

@@ -1,0 +1,157 @@
+{
+  "type": "comparison-table",
+  "displayName": "Comparison Table",
+  "aliases": ["pricing table", "features comparison", "specs", "benchmark"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Compare Our Plans"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "Content"
+    },
+    {
+      "type": "text",
+      "id": "feature_column_label",
+      "label": "Feature column label",
+      "default": "Features"
+    },
+    {
+      "type": "link",
+      "id": "cta_link",
+      "label": "Footer CTA button"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "standard",
+      "options": [
+        { "value": "standard", "label": "Standard" },
+        { "value": "highlight", "label": "Highlight" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "displayName": "Column",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Column name",
+          "default": "Our Product"
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge text (optional)"
+        },
+        {
+          "type": "header",
+          "id": "options_header",
+          "label": "Options"
+        },
+        {
+          "type": "checkbox",
+          "id": "featured",
+          "label": "Featured (highlighted)",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "feature",
+      "displayName": "Feature Row",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Feature name",
+          "default": "Feature Name"
+        },
+        {
+          "type": "textarea",
+          "id": "values",
+          "label": "Values for each column (one per line: ✓, ✗, or custom text)",
+          "default": "✓\n✓\n✗"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "column",
+      "settings": {
+        "name": "Free",
+        "featured": false
+      }
+    },
+    {
+      "type": "column",
+      "settings": {
+        "name": "Pro",
+        "featured": true,
+        "badge": "Popular"
+      }
+    },
+    {
+      "type": "column",
+      "settings": {
+        "name": "Enterprise",
+        "featured": false
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "name": "Basic Features",
+        "values": "✓\n✓\n✓"
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "name": "Advanced Analytics",
+        "values": "✗\n✓\n✓"
+      }
+    },
+    {
+      "type": "feature",
+      "settings": {
+        "name": "Priority Support",
+        "values": "✗\n✗\n✓"
+      }
+    }
+  ]
+}

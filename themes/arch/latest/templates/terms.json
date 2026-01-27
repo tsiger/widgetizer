@@ -1,0 +1,257 @@
+{
+  "name": "Terms of Service",
+  "slug": "terms",
+  "widgets": {
+    "terms_content": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "md"
+      },
+      "blocks": {
+        "terms-title": {
+          "type": "heading",
+          "settings": {
+            "text": "Terms of Service",
+            "size": "4xl"
+          }
+        },
+        "terms-intro": {
+          "type": "text",
+          "settings": {
+            "text": "Last updated: January 18, 2026\n\nPlease read these Terms of Service carefully before using our website and services. By accessing or using our services, you agree to be bound by these terms. If you do not agree to these terms, please do not use our services.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-1-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "1. Acceptance of Terms",
+            "size": "2xl"
+          }
+        },
+        "section-1-content": {
+          "type": "text",
+          "settings": {
+            "text": "By accessing and using this website, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-2-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "2. Use License",
+            "size": "2xl"
+          }
+        },
+        "section-2-content": {
+          "type": "text",
+          "settings": {
+            "text": "Permission is granted to temporarily access the materials on our website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:\n\n• Modify or copy the materials\n• Use the materials for any commercial purpose or for any public display\n• Attempt to reverse engineer any software contained on the website\n• Remove any copyright or other proprietary notations from the materials",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-3-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "3. User Accounts",
+            "size": "2xl"
+          }
+        },
+        "section-3-content": {
+          "type": "text",
+          "settings": {
+            "text": "When you create an account with us, you must provide accurate, complete, and current information. You are responsible for safeguarding your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-4-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "4. Acceptable Use",
+            "size": "2xl"
+          }
+        },
+        "section-4-content": {
+          "type": "text",
+          "settings": {
+            "text": "You agree not to use our services to:\n\n• Violate any applicable laws or regulations\n• Infringe upon the rights of others\n• Transmit any harmful, offensive, or illegal content\n• Interfere with or disrupt the services\n• Attempt to gain unauthorized access to any systems\n• Use automated systems to access the services without permission",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-5-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "5. Intellectual Property",
+            "size": "2xl"
+          }
+        },
+        "section-5-content": {
+          "type": "text",
+          "settings": {
+            "text": "All content, features, and functionality of our services, including but not limited to text, graphics, logos, images, and software, are owned by us or our licensors and are protected by copyright, trademark, and other intellectual property laws.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-6-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "6. Disclaimer",
+            "size": "2xl"
+          }
+        },
+        "section-6-content": {
+          "type": "text",
+          "settings": {
+            "text": "The materials on our website are provided on an 'as is' basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-7-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "7. Limitations of Liability",
+            "size": "2xl"
+          }
+        },
+        "section-7-content": {
+          "type": "text",
+          "settings": {
+            "text": "In no event shall we or our suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on our website, even if we or an authorized representative has been notified orally or in writing of the possibility of such damage.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-8-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "8. Indemnification",
+            "size": "2xl"
+          }
+        },
+        "section-8-content": {
+          "type": "text",
+          "settings": {
+            "text": "You agree to indemnify, defend, and hold harmless our company, its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, and expenses, including reasonable attorneys' fees, arising out of or in any way connected with your use of our services or violation of these terms.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-9-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "9. Termination",
+            "size": "2xl"
+          }
+        },
+        "section-9-content": {
+          "type": "text",
+          "settings": {
+            "text": "We may terminate or suspend your access to our services immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. Upon termination, your right to use the services will cease immediately.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-10-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "10. Governing Law",
+            "size": "2xl"
+          }
+        },
+        "section-10-content": {
+          "type": "text",
+          "settings": {
+            "text": "These terms shall be governed by and construed in accordance with the laws of the State of California, United States, without regard to its conflict of law provisions. Any disputes arising under or in connection with these terms shall be subject to the exclusive jurisdiction of the courts located in San Francisco, California.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-11-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "11. Changes to Terms",
+            "size": "2xl"
+          }
+        },
+        "section-11-content": {
+          "type": "text",
+          "settings": {
+            "text": "We reserve the right to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion. Your continued use of the services after any changes constitutes acceptance of the new terms.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "section-12-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "12. Contact Information",
+            "size": "2xl"
+          }
+        },
+        "section-12-content": {
+          "type": "text",
+          "settings": {
+            "text": "If you have any questions about these Terms of Service, please contact us:\n\nEmail: legal@arch.co\nPhone: +1 (415) 555-0198\nAddress: 500 Market Street, San Francisco, CA 94105",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "terms-title",
+        "terms-intro",
+        "section-1-heading",
+        "section-1-content",
+        "section-2-heading",
+        "section-2-content",
+        "section-3-heading",
+        "section-3-content",
+        "section-4-heading",
+        "section-4-content",
+        "section-5-heading",
+        "section-5-content",
+        "section-6-heading",
+        "section-6-content",
+        "section-7-heading",
+        "section-7-content",
+        "section-8-heading",
+        "section-8-content",
+        "section-9-heading",
+        "section-9-content",
+        "section-10-heading",
+        "section-10-content",
+        "section-11-heading",
+        "section-11-content",
+        "section-12-heading",
+        "section-12-content"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "terms_content"
+  ],
+  "id": "terms",
+  "created": "2026-01-18T00:00:00.000Z",
+  "updated": "2026-01-18T00:00:00.000Z"
+}

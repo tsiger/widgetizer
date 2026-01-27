@@ -1,0 +1,427 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero_slideshow": {
+      "type": "slideshow",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "autoplay": true,
+        "autoplay_speed": 6000
+      },
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Strategy that clarifies your next move",
+            "heading_size": "5xl",
+            "text_content": "We help leadership teams align on priorities, simplify execution, and deliver measurable growth.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "Book a consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_link_2": {
+              "text": "View services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "button_style_2": "secondary",
+            "button_size": "medium",
+            "color_scheme": "highlight"
+          }
+        },
+        "slide-2": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "From insight to impact",
+            "heading_size": "5xl",
+            "text_content": "Partner with a team that turns complex challenges into focused action plans.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "See case studies",
+              "href": "case-studies.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_link_2": {
+              "text": "Meet the team",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "button_style_2": "secondary",
+            "button_size": "medium",
+            "color_scheme": "highlight"
+          }
+        }
+      },
+      "blocksOrder": [
+        "slide-1",
+        "slide-2"
+      ]
+    },
+    "logo_cloud": {
+      "type": "logo-cloud",
+      "settings": {
+        "eyebrow": "Trusted by teams at",
+        "title": "Consulting that scales with you",
+        "description": "Advising fast-moving companies across operations, growth, and transformation.",
+        "columns_desktop": 6,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "logo-1": {
+          "type": "logo",
+          "settings": {
+            "name": "Horizon Labs"
+          }
+        },
+        "logo-2": {
+          "type": "logo",
+          "settings": {
+            "name": "BrightWave"
+          }
+        },
+        "logo-3": {
+          "type": "logo",
+          "settings": {
+            "name": "Northwind"
+          }
+        },
+        "logo-4": {
+          "type": "logo",
+          "settings": {
+            "name": "Atlas Group"
+          }
+        },
+        "logo-5": {
+          "type": "logo",
+          "settings": {
+            "name": "Momentum"
+          }
+        },
+        "logo-6": {
+          "type": "logo",
+          "settings": {
+            "name": "Solstice"
+          }
+        }
+      },
+      "blocksOrder": [
+        "logo-1",
+        "logo-2",
+        "logo-3",
+        "logo-4",
+        "logo-5",
+        "logo-6"
+      ]
+    },
+    "key_figures": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Results",
+        "title": "Real outcomes, not vanity metrics",
+        "description": "Measurable wins across strategy, operations, and growth.",
+        "columns_desktop": 4,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "figure-1": {
+          "type": "figure",
+          "settings": {
+            "number": "120",
+            "suffix": "+",
+            "label": "Engagements",
+            "description": "Across 12 industries"
+          }
+        },
+        "figure-2": {
+          "type": "figure",
+          "settings": {
+            "number": "35",
+            "suffix": "%",
+            "label": "Avg. Growth",
+            "description": "Revenue uplift"
+          }
+        },
+        "figure-3": {
+          "type": "figure",
+          "settings": {
+            "number": "18",
+            "suffix": "mo",
+            "label": "Payback",
+            "description": "Typical ROI window"
+          }
+        },
+        "figure-4": {
+          "type": "figure",
+          "settings": {
+            "number": "98",
+            "suffix": "%",
+            "label": "Retention",
+            "description": "Long-term partners"
+          }
+        }
+      },
+      "blocksOrder": [
+        "figure-1",
+        "figure-2",
+        "figure-3",
+        "figure-4"
+      ]
+    },
+    "services_grid": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Services",
+        "title": "What we help with",
+        "description": "Focused consulting services for leadership teams that want clarity and momentum.",
+        "columns_desktop": 4,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "service-1": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Strategy",
+            "title": "Strategic Planning",
+            "description": "Align teams around a clear vision and measurable priorities.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "device-vision-pro"
+          }
+        },
+        "service-2": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Operations",
+            "title": "Operational Excellence",
+            "description": "Streamline workflows, reduce friction, and improve delivery.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "flower"
+          }
+        },
+        "service-3": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Growth",
+            "title": "Go-to-Market",
+            "description": "Identify growth levers and build a repeatable pipeline.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "home-move"
+          }
+        },
+        "service-4": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Transformation",
+            "title": "Digital Enablement",
+            "description": "Modernize systems and build scalable operating models.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "device-imac-up"
+          }
+        }
+      },
+      "blocksOrder": [
+        "service-1",
+        "service-2",
+        "service-3",
+        "service-4"
+      ]
+    },
+    "process_timeline": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "How we work",
+        "title": "A focused, collaborative process",
+        "description": "We keep the scope tight, the outcomes clear, and the team aligned.",
+        "layout": "centered",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "phase-1": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 1",
+            "duration": "Weeks 1-2",
+            "title": "Discovery",
+            "description": "Align on goals, constraints, and decision criteria.",
+            "features": "Leadership interviews\nData review\nSuccess metrics"
+          }
+        },
+        "phase-2": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 2",
+            "duration": "Weeks 3-4",
+            "title": "Strategy",
+            "description": "Define the plan, scope, and success path.",
+            "features": "Strategic options\nRoadmap\nExecutive alignment"
+          }
+        },
+        "phase-3": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 3",
+            "duration": "Weeks 5-8",
+            "title": "Execution",
+            "description": "Support delivery with hands-on facilitation and oversight.",
+            "features": "Workstream leadership\nOperating cadence\nRisk mitigation"
+          }
+        },
+        "phase-4": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 4",
+            "duration": "Ongoing",
+            "title": "Optimize",
+            "description": "Measure impact and improve continuously.",
+            "features": "KPI tracking\nPost-launch reviews\nContinuous improvement"
+          }
+        }
+      },
+      "blocksOrder": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4"
+      ]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Testimonials",
+        "title": "Leaders who chose Arch",
+        "description": "Practical guidance, measurable impact.",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Arch helped us align our leadership team and unlock a clear growth plan in six weeks.",
+            "name": "Ariana Patel",
+            "title": "COO, BrightWave",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Their approach is structured, focused, and refreshingly practical.",
+            "name": "Lucas Bennett",
+            "title": "Founder, Horizon Labs",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "We improved operational cadence and shipped faster within the first quarter.",
+            "name": "Mei Zhang",
+            "title": "VP Operations, Northwind",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": [
+        "quote-1",
+        "quote-2",
+        "quote-3"
+      ]
+    },
+    "cta_banner": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Ready for your next phase?",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Build a roadmap that aligns your team",
+            "size": "4xl"
+          }
+        },
+        "cta-body": {
+          "type": "text",
+          "settings": {
+            "text": "Let’s define the priorities, metrics, and execution plan that drive growth.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule a call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Download overview",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-text",
+        "cta-heading",
+        "cta-body",
+        "cta-buttons"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero_slideshow",
+    "logo_cloud",
+    "key_figures",
+    "services_grid",
+    "process_timeline",
+    "testimonials",
+    "cta_banner"
+  ],
+  "id": "index",
+  "created": "2026-01-17T16:13:19.613Z",
+  "updated": "2026-01-17T16:46:34.041Z"
+}

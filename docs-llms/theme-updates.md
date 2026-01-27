@@ -166,6 +166,30 @@ When updating `theme.json`, the system uses intelligent merging:
 4. Go to Themes page in Widgetizer
 5. Click "Update" button on the theme card
 6. System builds `latest/` snapshot
+7. Zip and distribute the entire theme folder (including `updates/`)
+
+### Distributing Theme Updates
+
+Theme authors can distribute updates by zipping the entire theme folder:
+
+```
+arch.zip
+  arch/
+    theme.json          # Base version (e.g., 1.0.0)
+    layout.liquid
+    ...
+    updates/
+      1.1.0/
+      1.2.0/
+```
+
+When a user uploads this zip:
+
+- **New installation**: Entire theme is installed, `latest/` is built automatically
+- **Existing theme**: Only new update versions are imported (existing versions are skipped)
+- **Up to date**: If all versions already exist, upload is rejected with a clear message
+
+**Note**: The `latest/` folder in the zip (if present) is ignored; it's always rebuilt from scratch.
 
 ### 2. User Receives Update Notification
 

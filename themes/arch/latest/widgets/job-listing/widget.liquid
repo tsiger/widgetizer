@@ -1,0 +1,311 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-job-listings widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  {% if widget.settings.color_scheme == 'highlight' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="job-listing"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .job-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      & .widget-card {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      & .widget-card.is-hidden {
+        display: none;
+      }
+
+      & .job-header {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      & .job-meta {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        flex-wrap: wrap;
+      }
+
+      & .job-meta-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+
+        & svg {
+          width: 1.6rem;
+          height: 1.6rem;
+          stroke: currentColor;
+          stroke-width: 0.2rem;
+          flex-shrink: 0;
+        }
+      }
+
+      & .job-badge {
+        padding: var(--space-2xs) var(--space-sm);
+        background-color: var(--bg-secondary);
+        border: var(--border-width-thin) solid var(--border-color);
+      }
+
+      @media (min-width: 750px) {
+        & .widget-card {
+          padding: var(--space-2xl);
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .widget-card-content {
+          flex-direction: row;
+          align-items: center;
+          gap: var(--space-xl);
+          display: flex;
+        }
+
+        & .job-header {
+          flex: 1;
+          flex-direction: row;
+          align-items: center;
+          gap: var(--space-xl);
+        }
+
+        & .widget-card-title {
+          min-width: 25rem;
+          flex-shrink: 0;
+        }
+
+        & .job-meta {
+          flex: 1;
+        }
+      }
+
+      /* Filter List */
+      & .job-filter-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        justify-content: center;
+        margin-block-end: var(--space-2xl);
+        padding: 0;
+        list-style: none;
+      }
+
+      /* Filter Button */
+      & .job-filter-btn {
+        padding: var(--space-sm) var(--space-lg);
+        font-family: inherit;
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-color);
+        cursor: pointer;
+        transition:
+          background-color 0.3s,
+          color 0.3s,
+          border-color 0.3s;
+
+        &:hover {
+          background-color: var(--text-heading);
+          color: var(--bg-primary);
+          border-color: var(--text-heading);
+        }
+
+        &:focus {
+          outline: var(--border-width-medium) solid var(--border-color);
+          outline-offset: 0.2rem;
+        }
+
+        &.is-active {
+          background-color: var(--text-heading);
+          color: var(--bg-primary);
+          border-color: var(--text-heading);
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if widget.settings.show_filters %}
+      {% assign departments = '' %}
+      {% for blockId in widget.blocksOrder %}
+        {% assign block = widget.blocks[blockId] %}
+        {% assign dept = block.settings.department | downcase | strip %}
+        {% unless departments contains dept %}
+          {% if departments == '' %}
+            {% assign departments = dept %}
+          {% else %}
+            {% assign departments = departments | append: ',' | append: dept %}
+          {% endif %}
+        {% endunless %}
+      {% endfor %}
+      {% assign dept_array = departments | split: ',' %}
+
+      <ul class="job-filter-list" role="group" aria-label="Job filters">
+        <li>
+          <button
+            type="button"
+            class="job-filter-btn block-text block-text-sm is-active"
+            data-filter="all"
+            aria-pressed="true"
+          >
+            All Positions
+          </button>
+        </li>
+        {% for dept in dept_array %}
+          {% if dept != blank %}
+            <li>
+              <button
+                type="button"
+                class="job-filter-btn block-text block-text-sm"
+                data-filter="{{ dept }}"
+                aria-pressed="false"
+              >
+                {{ dept | capitalize }}
+              </button>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <div class="widget-content">
+      <ul class="job-list">
+        {% assign item_heading_level = 'h3' %}
+        {% if widget.settings.title == blank %}
+          {% assign item_heading_level = 'h2' %}
+        {% endif %}
+
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <li
+            class="widget-card reveal reveal-up"
+            style="--reveal-delay: {{ forloop.index0 }}"
+            data-department="{{ block.settings.department | downcase }}"
+            data-block-id="{{ blockId }}"
+          >
+            <div class="widget-card-content">
+              <div class="job-header">
+                <{{ item_heading_level }} class="widget-card-title block-text block-text-xl block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                <div class="job-meta block-text block-text-sm">
+                  <span class="job-meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    <span data-setting="department">{{ block.settings.department }}</span>
+                  </span>
+                  <span class="job-meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2" />
+                      <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    <span data-setting="location">{{ block.settings.location }}</span>
+                  </span>
+                  <span class="job-badge block-text block-text-xs block-text-uppercase">
+                    {% case block.settings.type %}
+                      {% when 'full-time' -%}
+                        Full-Time
+                      {% when 'part-time' -%}
+                        Part-Time
+                      {% when 'contract' -%}
+                        Contract
+                      {% when 'internship' -%}
+                        Internship
+                    {% endcase %}
+                  </span>
+                </div>
+              </div>
+              {% if block.settings.apply_link.text != blank %}
+                <div class="widget-card-footer">
+                  <a
+                    href="{{ block.settings.apply_link.href }}"
+                    class="widget-button"
+                    data-setting="apply_link"
+                    {% if block.settings.apply_link.target == '_blank' %}
+                      target="_blank" rel="noopener"
+                    {% endif %}
+                  >
+                    {{ block.settings.apply_link.text }}
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  {% if widget.settings.show_filters %}
+    <script>
+      (function () {
+        const widgetElement = document.getElementById('{{ widget.id }}');
+        if (!widgetElement || widgetElement.dataset.initialized) return;
+        widgetElement.dataset.initialized = 'true';
+
+        const filterButtons = widgetElement.querySelectorAll('.job-filter-btn');
+        const jobItems = widgetElement.querySelectorAll('.widget-card');
+
+        const filterJobs = (filter) => {
+          jobItems.forEach((item) => {
+            const department = item.getAttribute('data-department');
+
+            if (filter === 'all' || department === filter) {
+              item.classList.remove('is-hidden');
+            } else {
+              item.classList.add('is-hidden');
+            }
+          });
+        };
+
+        filterButtons.forEach((button) => {
+          button.addEventListener('click', function () {
+            const filter = this.getAttribute('data-filter');
+
+            filterButtons.forEach((btn) => {
+              btn.classList.remove('is-active');
+              btn.setAttribute('aria-pressed', 'false');
+            });
+
+            this.classList.add('is-active');
+            this.setAttribute('aria-pressed', 'true');
+
+            filterJobs(filter);
+          });
+        });
+      })();
+    </script>
+  {% endif %}
+</section>

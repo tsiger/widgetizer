@@ -1,0 +1,214 @@
+{
+  "type": "image-text",
+  "displayName": "Image + Text",
+  "aliases": ["split layout", "visual content", "side by side", "media text"],
+  "settings": [
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "Content"
+    },
+    {
+      "type": "image",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "standard",
+      "options": [
+        { "value": "standard", "label": "Standard" },
+        { "value": "highlight", "label": "Highlight" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "displayName": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Built for Modern Teams"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "default": "2xl",
+          "options": [
+            { "value": "lg", "label": "Large" },
+            { "value": "xl", "label": "Extra Large" },
+            { "value": "2xl", "label": "2X Large" },
+            { "value": "3xl", "label": "3X Large" },
+            { "value": "4xl", "label": "4X Large" },
+            { "value": "5xl", "label": "5X Large" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "displayName": "Text",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "A paragraph of descriptive text goes here."
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "default": "base",
+          "options": [
+            { "value": "sm", "label": "Small" },
+            { "value": "base", "label": "Base" },
+            { "value": "lg", "label": "Large" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "uppercase",
+          "label": "Uppercase",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "muted",
+          "label": "Muted color",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "features",
+      "displayName": "Features",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "features",
+          "label": "Features (one per line)",
+          "default": "Feature 1\nFeature 2\nFeature 3"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "displayName": "Button Group",
+      "settings": [
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Button 1",
+          "default": {
+            "text": "Learn More",
+            "href": "#",
+            "target": "_self"
+          }
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Button 1 style",
+          "default": "secondary",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ]
+        },
+        {
+          "type": "link",
+          "id": "link_2",
+          "label": "Button 2"
+        },
+        {
+          "type": "select",
+          "id": "style_2",
+          "label": "Button 2 style",
+          "default": "secondary",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Button size",
+          "default": "medium",
+          "options": [
+            { "value": "small", "label": "Small" },
+            { "value": "medium", "label": "Medium" },
+            { "value": "large", "label": "Large" },
+            { "value": "xlarge", "label": "Extra Large" }
+          ]
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "text",
+      "settings": {
+        "text": "Our Approach",
+        "size": "sm",
+        "uppercase": true,
+        "muted": true
+      }
+    },
+    {
+      "type": "heading",
+      "settings": {
+        "text": "Built for Modern Teams",
+        "size": "2xl"
+      }
+    },
+    {
+      "type": "text",
+      "settings": {
+        "text": "We combine cutting-edge technology with proven methodologies to deliver exceptional results. Our platform is designed to help teams collaborate more effectively and achieve their goals faster.",
+        "size": "base",
+        "uppercase": false,
+        "muted": false
+      }
+    },
+    {
+      "type": "button",
+      "settings": {
+        "link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        },
+        "style": "primary",
+        "link_2": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        },
+        "style_2": "secondary"
+      }
+    }
+  ]
+}

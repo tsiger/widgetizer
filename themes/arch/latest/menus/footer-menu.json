@@ -1,0 +1,22 @@
+{
+  "id": "footer-menu",
+  "name": "Footer menu",
+  "description": "",
+  "items": [
+    {
+      "label": "Privacy Policy",
+      "link": "privacy.html",
+      "items": []
+    },
+    {
+      "label": "Terms of Service",
+      "link": "terms.html",
+      "items": []
+    },
+    {
+      "label": "Contact",
+      "link": "contact.html",
+      "items": []
+    }
+  ]
+}

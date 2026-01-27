@@ -1,0 +1,33 @@
+{
+  "id": "main-menu",
+  "name": "Main menu",
+  "description": "",
+  "items": [
+    {
+      "label": "Home",
+      "link": "index.html",
+      "items": []
+    },
+    {
+      "label": "About",
+      "link": "about.html",
+      "items": []
+    },
+    {
+      "label": "Services",
+      "link": "services.html",
+      "items": []
+    },
+    {
+      "label": "Case Studies",
+      "link": "case-studies.html",
+      "items": [
+        {
+          "label": "Atlas Group",
+          "link": "case-study-atlas-growth.html",
+          "items": []
+        }
+      ]
+    }
+  ]
+}

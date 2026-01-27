@@ -1,0 +1,164 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-type-key-figures widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.layout == 'bar' %}layout-bar{% endif %}"
+  {% if widget.settings.color_scheme == 'highlight' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="key-figures"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+  {% if widget.settings.animate %}
+    data-animate="true"
+  {% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .widget-card {
+        text-align: center;
+        padding: var(--space-xl) var(--space-lg);
+      }
+
+      & .stats-number {
+        line-height: 1;
+        margin-block-end: var(--space-sm);
+        font-variant-numeric: tabular-nums;
+      }
+
+      & .widget-card-title {
+        margin-block-end: var(--space-xs);
+      }
+
+      @media (min-width: 990px) {
+        & .widget-card {
+          padding: var(--space-3xl) var(--space-xl);
+        }
+      }
+
+      /* Variant: Bar (Horizontal) */
+      &.layout-bar {
+        & .widget-card-grid {
+          @media (min-width: 750px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          @media (min-width: 990px) {
+            grid-template-columns: repeat(var(--grid-cols-desktop, 4), minmax(0, 1fr));
+          }
+        }
+
+        & .widget-card {
+          background: transparent;
+          border: none;
+          padding: var(--space-lg);
+
+          &:hover {
+            border-color: transparent;
+          }
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <ul
+        class="widget-card-grid widget-grid"
+        style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
+      >
+        {% assign item_heading_level = 'h3' %}
+        {% if widget.settings.title == blank %}
+          {% assign item_heading_level = 'h2' %}
+        {% endif %}
+
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+            <div
+              class="stats-number block-text block-text-5xl block-text-heading"
+              {% if widget.settings.animate %}
+                data-count="{{ block.settings.number }}" data-suffix="{{ block.settings.suffix }}"
+              {% endif %}
+            >
+              {% if widget.settings.animate -%}
+                0
+              {%- else -%}
+                {{- block.settings.number -}}
+                {{- block.settings.suffix -}}
+              {%- endif %}
+            </div>
+            <div class="widget-card-content">
+              {% if block.settings.label != blank %}
+                <{{ item_heading_level }} class="widget-card-title block-text" data-setting="label">{{ block.settings.label }}</{{ item_heading_level }}>
+              {% endif %}
+              {% if block.settings.description != blank %}
+                <p class="widget-card-description" data-setting="description">{{ block.settings.description }}</p>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  {% if widget.settings.animate %}
+    <script>
+      (function () {
+        const widget = document.getElementById('{{ widget.id }}');
+        if (!widget || widget.dataset.initialized) return;
+        widget.dataset.initialized = 'true';
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const el = entry.target;
+                const target = parseFloat(el.getAttribute('data-count'));
+                const suffix = el.getAttribute('data-suffix') || '';
+                const duration = 2000;
+                const startTime = performance.now();
+
+                const animate = (currentTime) => {
+                  const elapsed = currentTime - startTime;
+                  const progress = Math.min(elapsed / duration, 1);
+                  const ease = 1 - Math.pow(1 - progress, 4); // Ease out quart
+
+                  el.textContent = Math.floor(ease * target) + suffix;
+
+                  if (progress < 1) requestAnimationFrame(animate);
+                  else el.textContent = target + suffix;
+                };
+
+                requestAnimationFrame(animate);
+                observer.unobserve(el);
+              }
+            });
+          },
+          { threshold: 0.2 },
+        );
+
+        widget.querySelectorAll('.stats-number').forEach((el) => observer.observe(el));
+      })();
+    </script>
+  {% endif %}
+</section>
