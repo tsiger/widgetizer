@@ -170,6 +170,42 @@ export default function ProjectsEdit() {
         </div>
       )}
 
+      {/* Theme Update Banner – inside white box, before the form */}
+      {project && updateStatus && updateStatus.hasUpdate && (
+        <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-lg border-l-4 border-l-amber-500">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <h3 className="font-semibold text-slate-800">
+                  {t("projectsEdit.themeUpdate.title", "Theme Update Available")}
+                </h3>
+                <Badge variant="neutral">
+                  v{updateStatus.currentVersion} → v{updateStatus.latestVersion}
+                </Badge>
+              </div>
+              <p className="text-sm text-slate-600">
+                {t(
+                  "projectsEdit.themeUpdate.description",
+                  "A new version of your theme is available. Your pages, menus, and uploads will not be affected."
+                )}
+              </p>
+            </div>
+            <Button
+              variant="primary"
+              size="md"
+              onClick={handleApplyUpdate}
+              disabled={isApplyingUpdate}
+              icon={<RefreshCw size={18} className={isApplyingUpdate ? "animate-spin" : ""} />}
+              className="shrink-0"
+            >
+              {isApplyingUpdate
+                ? t("projectsEdit.themeUpdate.applying", "Applying...")
+                : t("projectsEdit.themeUpdate.apply", "Apply Update")}
+            </Button>
+          </div>
+        </div>
+      )}
+
       {project && (
         <ProjectForm
           initialData={project}
@@ -183,40 +219,6 @@ export default function ProjectsEdit() {
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />
-      )}
-
-      {/* Theme Update Section */}
-      {project && updateStatus && updateStatus.hasUpdate && (
-        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-medium text-blue-900 dark:text-blue-100">
-                  {t("projectsEdit.themeUpdate.title", "Theme Update Available")}
-                </h3>
-                <Badge variant="blue">
-                  v{updateStatus.currentVersion} → v{updateStatus.latestVersion}
-                </Badge>
-              </div>
-              <p className="text-sm text-blue-700 dark:text-blue-300">
-                {t(
-                  "projectsEdit.themeUpdate.description",
-                  "A new version of your theme is available. Your pages, menus, and uploads will not be affected."
-                )}
-              </p>
-            </div>
-            <Button
-              variant="primary"
-              onClick={handleApplyUpdate}
-              disabled={isApplyingUpdate}
-              icon={<RefreshCw size={18} className={isApplyingUpdate ? "animate-spin" : ""} />}
-            >
-              {isApplyingUpdate
-                ? t("projectsEdit.themeUpdate.applying", "Applying...")
-                : t("projectsEdit.themeUpdate.apply", "Apply Update")}
-            </Button>
-          </div>
-        </div>
       )}
     </PageLayout>
   );
