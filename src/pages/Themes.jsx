@@ -1,22 +1,30 @@
 import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { ArrowUpCircle } from "lucide-react";
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import EmptyState from "../components/ui/EmptyState";
 import Badge from "../components/ui/Badge";
+import Button from "../components/ui/Button";
 
-import { getAllThemes, getThemeScreenshotUrl, uploadThemeZip } from "../queries/themeManager";
+import { getAllThemes, getThemeScreenshotUrl, uploadThemeZip, updateTheme } from "../queries/themeManager";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
+import useThemeUpdateStore from "../stores/themeUpdateStore";
 import FileUploader from "../components/ui/FileUploader";
 
 export default function Themes() {
   const { t } = useTranslation();
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({});
+  const [updatingThemeId, setUpdatingThemeId] = useState(null);
 
   const activeProject = useProjectStore((state) => state.activeProject);
+  const showToast = useToastStore((state) => state.showToast);
+  const fetchUpdateCount = useThemeUpdateStore((state) => state.fetchUpdateCount);
 
   const fetchThemes = useCallback(async () => {
     try {
@@ -36,14 +44,33 @@ export default function Themes() {
   }, [fetchThemes]);
 
   const handleUploadSuccess = (newTheme) => {
-    setThemes((prevThemes) => [...prevThemes, newTheme]);
+    if (newTheme.isUpdate) {
+      // Update existing theme in the list
+      setThemes((prevThemes) =>
+        prevThemes.map((theme) =>
+          theme.id === newTheme.id ? { ...theme, ...newTheme } : theme
+        )
+      );
+    } else {
+      // Add new theme to the list
+      setThemes((prevThemes) => [...prevThemes, newTheme]);
+    }
   };
 
-
-  // Re-implementing the upload logic from the deleted ThemeUploader inside the main component or a wrapper
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState({}); // FileUploader expects progress object
-  const showToast = useToastStore((state) => state.showToast);
+  const handleUpdateTheme = useCallback(async (themeId) => {
+    setUpdatingThemeId(themeId);
+    try {
+      const result = await updateTheme(themeId);
+      showToast(result.message || t("themes.toasts.updateSuccess", "Theme updated successfully"), "success");
+      // Refresh themes list and sidebar badge
+      await fetchThemes();
+      fetchUpdateCount();
+    } catch (error) {
+      showToast(error.message || t("themes.toasts.updateError", "Failed to update theme"), "error");
+    } finally {
+      setUpdatingThemeId(null);
+    }
+  }, [showToast, t, fetchThemes, fetchUpdateCount]);
 
   const onThemeDrop = useCallback(async (files) => {
     if (files.length !== 1) {
@@ -89,7 +116,10 @@ export default function Themes() {
   }
 
   return (
-    <PageLayout title={t("themes.title")} description={t("themes.description")}>
+    <PageLayout
+      title={t("themes.title")}
+      description={t("themes.description")}
+    >
       <div className="mb-6">
         <FileUploader
           onUpload={onThemeDrop}
@@ -124,13 +154,44 @@ export default function Themes() {
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h3 className="text-base font-semibold">{theme.name}</h3>
-                      <div className="text-xs text-slate-500">{t("themes.version", { version: theme.version })}</div>
+                      <div className="text-xs text-slate-500 flex items-center gap-2">
+                        <span>{t("themes.version", { version: theme.version })}</span>
+                        {theme.versions && theme.versions.length > 1 && (
+                          <span className="text-slate-400">
+                            ({theme.versions.length} {t("themes.versionsAvailable", "versions")})
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <Badge variant="neutral">{t("themes.widgets", { count: theme.widgets })}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-slate-500">{t("themes.by", { author: theme.author || "Unknown" })}</span>
                   </div>
+
+                  {/* Update available section */}
+                  {theme.hasPendingUpdate && (
+                    <div className="mt-3 pt-3 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-sm text-pink-600">
+                          <ArrowUpCircle size={16} />
+                          <span>
+                            {t("themes.updateAvailable", "Update available")}: v{theme.latestVersion}
+                          </span>
+                        </div>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleUpdateTheme(theme.id)}
+                          disabled={updatingThemeId === theme.id}
+                        >
+                          {updatingThemeId === theme.id
+                            ? t("themes.buttons.updating", "Updating...")
+                            : t("themes.buttons.update", "Update")}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {isActiveTheme && (

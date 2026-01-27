@@ -1,15 +1,22 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, RefreshCw } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import ProjectForm from "../components/projects/ProjectForm.jsx";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
+import Badge from "../components/ui/Badge";
 
 import useToastStore from "../stores/toastStore";
-import { updateProject, getAllProjects, getActiveProject } from "../queries/projectManager";
+import {
+  updateProject,
+  getAllProjects,
+  getActiveProject,
+  checkThemeUpdates,
+  applyThemeUpdate,
+} from "../queries/projectManager";
 import useProjectStore from "../stores/projectStore";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
@@ -22,6 +29,8 @@ export default function ProjectsEdit() {
   const [loading, setLoading] = useState(true);
   const [showSuccessActions, setShowSuccessActions] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState(null);
+  const [isApplyingUpdate, setIsApplyingUpdate] = useState(false);
   const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
@@ -45,10 +54,42 @@ export default function ProjectsEdit() {
         return;
       }
       setProject(project);
+
+      // Check for theme updates
+      try {
+        const status = await checkThemeUpdates(id);
+        setUpdateStatus(status);
+      } catch (updateErr) {
+        console.warn("Could not check for theme updates:", updateErr);
+      }
     } catch (err) {
       showToast(err.message || t("projectsEdit.toasts.loadError"), "error");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApplyUpdate = async () => {
+    setIsApplyingUpdate(true);
+    try {
+      const result = await applyThemeUpdate(id);
+      if (result.success) {
+        showToast(
+          t("projectsEdit.toasts.updateApplied", {
+            from: result.previousVersion,
+            to: result.newVersion,
+          }) || `Theme updated from v${result.previousVersion} to v${result.newVersion}`,
+          "success"
+        );
+        // Reload project to get updated version
+        await loadProject();
+      } else {
+        showToast(result.message || t("projectsEdit.toasts.noUpdateAvailable"), "info");
+      }
+    } catch (err) {
+      showToast(err.message || t("projectsEdit.toasts.updateError"), "error");
+    } finally {
+      setIsApplyingUpdate(false);
     }
   };
 
@@ -142,6 +183,40 @@ export default function ProjectsEdit() {
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />
+      )}
+
+      {/* Theme Update Section */}
+      {project && updateStatus && updateStatus.hasUpdate && (
+        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-medium text-blue-900 dark:text-blue-100">
+                  {t("projectsEdit.themeUpdate.title", "Theme Update Available")}
+                </h3>
+                <Badge variant="blue">
+                  v{updateStatus.currentVersion} → v{updateStatus.latestVersion}
+                </Badge>
+              </div>
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                {t(
+                  "projectsEdit.themeUpdate.description",
+                  "A new version of your theme is available. Your pages, menus, and uploads will not be affected."
+                )}
+              </p>
+            </div>
+            <Button
+              variant="primary"
+              onClick={handleApplyUpdate}
+              disabled={isApplyingUpdate}
+              icon={<RefreshCw size={18} className={isApplyingUpdate ? "animate-spin" : ""} />}
+            >
+              {isApplyingUpdate
+                ? t("projectsEdit.themeUpdate.applying", "Applying...")
+                : t("projectsEdit.themeUpdate.apply", "Apply Update")}
+            </Button>
+          </div>
+        </div>
       )}
     </PageLayout>
   );

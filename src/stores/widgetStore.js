@@ -4,6 +4,42 @@ import { getProjectWidgets } from "../queries/previewManager";
 import usePageStore from "./pageStore";
 import useAutoSave from "./saveStore";
 
+/**
+ * Zustand store for managing widget operations in the page editor.
+ * Handles widget schemas, selection state, and CRUD operations for widgets and blocks.
+ *
+ * @typedef {Object} WidgetStore
+ * @property {Object<string, Object>} schemas - Map of widget type to schema definition
+ * @property {string|null} selectedWidgetId - ID of the currently selected widget
+ * @property {string|null} selectedBlockId - ID of the currently selected block within a widget
+ * @property {string|null} selectedGlobalWidgetId - ID of selected global widget ('header' or 'footer')
+ * @property {string|null} selectedThemeGroup - Key of the selected theme settings group
+ * @property {string|null} hoveredWidgetId - ID of the widget being hovered over
+ * @property {string|null} hoveredBlockId - ID of the block being hovered over
+ * @property {boolean} loading - Whether widget schemas are being loaded
+ * @property {string|null} error - Error message if schema loading failed
+ * @property {Function} loadSchemas - Fetch widget schemas from the server
+ * @property {Function} setSelectedWidgetId - Select a page widget (clears other selections)
+ * @property {Function} setSelectedBlockId - Select a block within the current widget
+ * @property {Function} setSelectedGlobalWidgetId - Select a global widget (clears other selections)
+ * @property {Function} setSelectedThemeGroup - Select a theme settings group (clears other selections)
+ * @property {Function} setHoveredWidget - Set hover state for widget/block highlighting
+ * @property {Function} resetSelection - Clear all selection and hover states
+ * @property {Function} generateWidgetId - Generate a unique widget ID
+ * @property {Function} generateBlockId - Generate a unique block ID
+ * @property {Function} addWidget - Add a new widget at a specified position
+ * @property {Function} duplicateWidget - Create a copy of an existing widget
+ * @property {Function} deleteWidget - Remove a widget from the page
+ * @property {Function} updateWidgetSettings - Update a setting value for a widget
+ * @property {Function} updateGlobalWidgetSettings - Update a setting for a global widget
+ * @property {Function} reorderWidgets - Change the order of widgets on the page
+ * @property {Function} addBlock - Add a new block to a widget
+ * @property {Function} reorderBlocks - Change the order of blocks within a widget
+ * @property {Function} deleteBlock - Remove a block from a widget
+ * @property {Function} updateBlockSettings - Update a setting value for a block
+ * @property {Function} duplicateBlock - Create a copy of an existing block
+ */
+
 const useWidgetStore = create((set, get) => ({
   // State
   schemas: {},

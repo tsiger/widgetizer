@@ -2,19 +2,37 @@ import { create } from "zustand";
 import { API_URL } from "../config";
 
 /**
- * Icons Store
- * Caches icon data per project to avoid refetching on every IconInput mount.
+ * Zustand store for caching project icon sets.
+ * Prevents refetching icons on every IconInput mount by maintaining a per-project cache.
+ *
+ * @typedef {Object} IconsCache
+ * @property {Object<string, string>} icons - Map of icon names to SVG content
+ * @property {string} prefix - Icon prefix for the set
+ * @property {number} fetchedAt - Timestamp when icons were fetched
+ *
+ * @typedef {Object} IconsStore
+ * @property {Object<string, IconsCache>} iconsCache - Cached icons by project ID
+ * @property {Object<string, boolean>} loading - Loading state by project ID
+ * @property {Object<string, string|null>} error - Error messages by project ID
+ * @property {Function} fetchIcons - Fetch icons for a project
+ * @property {Function} getIcons - Get cached icons synchronously
+ * @property {Function} clearCache - Clear cache for a specific project
+ * @property {Function} clearAllCache - Clear all cached icons
  */
 const useIconsStore = create((set, get) => ({
-  // Map of projectId -> { icons: {}, prefix: string, fetchedAt: number }
+  /** @type {Object<string, IconsCache>} */
   iconsCache: {},
+  /** @type {Object<string, boolean>} */
   loading: {},
+  /** @type {Object<string, string|null>} */
   error: {},
 
   /**
-   * Fetch icons for a project if not already cached
-   * @param {string} projectId - The project ID
-   * @param {boolean} forceRefresh - Force a refresh even if cached
+   * Fetch icons for a project if not already cached.
+   * Returns cached data immediately if available and not forcing refresh.
+   * @param {string} projectId - The project ID to fetch icons for
+   * @param {boolean} [forceRefresh=false] - Force a refresh even if cached
+   * @returns {Promise<IconsCache>} Icon data with icons map and prefix
    */
   fetchIcons: async (projectId, forceRefresh = false) => {
     if (!projectId) return { icons: {} };
@@ -64,14 +82,18 @@ const useIconsStore = create((set, get) => ({
   },
 
   /**
-   * Get cached icons for a project (synchronous)
+   * Get cached icons for a project synchronously.
+   * Returns empty object if no cache exists.
+   * @param {string} projectId - The project ID
+   * @returns {IconsCache} Cached icon data or empty object
    */
   getIcons: (projectId) => {
     return get().iconsCache[projectId] || { icons: {} };
   },
 
   /**
-   * Clear cache for a project
+   * Clear cached icons for a specific project.
+   * @param {string} projectId - The project ID to clear cache for
    */
   clearCache: (projectId) => {
     set((state) => {
@@ -82,7 +104,8 @@ const useIconsStore = create((set, get) => ({
   },
 
   /**
-   * Clear all cached icons
+   * Clear all cached icons across all projects.
+   * Useful when switching users or resetting application state.
    */
   clearAllCache: () => {
     set({ iconsCache: {} });

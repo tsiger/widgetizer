@@ -23,7 +23,13 @@ function injectRuntimeScript(html, previewMode = "editor") {
   return html.replace(/<\/body>/i, `${script}\n</body>`);
 }
 
-// Generate preview HTML
+/**
+ * Generates a full HTML preview of a page with header, widgets, and footer.
+ * Injects the preview runtime script for live editing capabilities.
+ * @param {import('express').Request} req - Express request object with pageData, themeSettings, and previewMode in body
+ * @param {import('express').Response} res - Express response object (sends HTML)
+ * @returns {Promise<void>}
+ */
 export async function generatePreview(req, res) {
   try {
     const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
@@ -189,7 +195,12 @@ export async function generatePreview(req, res) {
   }
 }
 
-// Render a single widget (for real-time updates)
+/**
+ * Renders a single widget HTML for real-time preview updates.
+ * @param {import('express').Request} req - Express request object with widgetId, widget data, and themeSettings in body
+ * @param {import('express').Response} res - Express response object (sends HTML)
+ * @returns {Promise<void>}
+ */
 export async function renderSingleWidget(req, res) {
   try {
     const { widgetId, widget, themeSettings: rawThemeSettings } = req.body; // Expect themeSettings too
@@ -220,8 +231,11 @@ export async function renderSingleWidget(req, res) {
 }
 
 /**
- * Get global widgets (header and footer) data.
- * Note: This function fetches the *data*, not the rendered HTML.
+ * Retrieves global widgets (header and footer) data for the active project.
+ * Returns the raw JSON data, not rendered HTML.
+ * @param {import('express').Request} req - Express request object
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function getGlobalWidgets(req, res) {
   try {
@@ -284,7 +298,11 @@ export async function getGlobalWidgets(req, res) {
 }
 
 /**
- * Save a global widget (header or footer)
+ * Saves a global widget (header or footer) for the active project.
+ * Updates media usage tracking after saving.
+ * @param {import('express').Request} req - Express request object with widget type in params and widget data in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function saveGlobalWidget(req, res) {
   try {
@@ -333,7 +351,11 @@ export async function saveGlobalWidget(req, res) {
 }
 
 /**
- * Serve an asset file from a project folder
+ * Serves an asset file (CSS, JS, images, fonts) from a project folder.
+ * Validates paths to prevent directory traversal attacks.
+ * @param {import('express').Request} req - Express request object with projectId, folder, and filepath in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function serveAsset(req, res) {
   const { projectId, folder, filepath } = req.params;

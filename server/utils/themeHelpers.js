@@ -1,18 +1,16 @@
 /**
- * Transforms raw theme settings from theme.json into a more accessible object
- * keyed by category and setting ID. Also handles potential missing values.
- *
- * Example Input (themeData.settings.global):
- * {
- *   colors: [ { id: 'bg', value: '#fff', default: '#eee' }, ... ],
- *   layout: [ { id: 'boxed', value: true, default: false } ]
- * }
- *
- * Example Output:
- * {
- *   colors: { bg: '#fff', ... },
- *   layout: { boxed: true }
- * }
+ * Transforms raw theme settings from theme.json into a flattened object for Liquid templates.
+ * Converts array-based settings groups into key-value objects keyed by setting ID.
+ * Uses the current value if set, otherwise falls back to default value.
+ * @param {object} themeData - Raw theme data from theme.json
+ * @param {object} themeData.settings - Settings container
+ * @param {object} themeData.settings.global - Global settings groups
+ * @returns {object} Processed settings object keyed by category, then by setting ID
+ * @example
+ * // Input (themeData.settings.global):
+ * { colors: [{ id: 'bg', value: '#fff', default: '#eee' }] }
+ * // Output:
+ * { colors: { bg: '#fff' } }
  */
 export function preprocessThemeSettings(themeData) {
   const processed = {};

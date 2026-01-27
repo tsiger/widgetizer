@@ -242,14 +242,18 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
 }
 
 /**
- * Renders a specific widget template with given data.
- * @param {string} projectId
- * @param {string} widgetId
- * @param {object} widgetData
- * @param {object} rawThemeSettings
- * @param {string} renderMode
- * @param {object} sharedGlobals - Optional shared globals to preserve enqueued assets
- * @param {number} index - Optional 1-based index of the widget in the page (first widget = 1, second = 2, etc.)
+ * Renders a specific widget template with given data using LiquidJS.
+ * Handles core widgets, global widgets (header/footer), and theme widgets.
+ * Loads widget schema defaults, merges with provided settings, and resolves menu data.
+ * @param {string} projectId - The project's UUID
+ * @param {string} widgetId - Unique identifier for this widget instance
+ * @param {object} widgetData - Widget configuration containing type, settings, blocks, and blocksOrder
+ * @param {object} rawThemeSettings - Raw theme settings from theme.json
+ * @param {string} [renderMode='preview'] - Render mode: 'preview' for dev server URLs, 'publish' for relative paths
+ * @param {object} [sharedGlobals=null] - Optional shared globals to preserve enqueued assets across widgets
+ * @param {number} [index=null] - Optional 1-based index of the widget in the page
+ * @returns {Promise<string>} Rendered HTML string, or error HTML if rendering fails
+ * @throws {Error} If project resolution fails (re-throws project resolution errors)
  */
 async function renderWidget(
   projectId,
@@ -421,13 +425,19 @@ async function renderWidget(
 }
 
 /**
- * Renders a page layout with separated content sections
- * @param {string} projectId - The project ID
- * @param {object} contentSections - Object with { headerContent, mainContent, footerContent }
- * @param {object} pageData - Page metadata
- * @param {object} rawThemeSettings - Theme settings
- * @param {string} renderMode - Render mode ('preview' or 'publish')
- * @param {object} sharedGlobals - Optional shared globals with enqueued assets
+ * Renders a complete page layout by injecting content sections into layout.liquid template.
+ * Creates the full HTML document structure with header, main content, and footer.
+ * @param {string} projectId - The project's UUID
+ * @param {object} contentSections - Pre-rendered content sections
+ * @param {string} contentSections.headerContent - Rendered header HTML
+ * @param {string} contentSections.mainContent - Rendered main content HTML
+ * @param {string} contentSections.footerContent - Rendered footer HTML
+ * @param {object} pageData - Page metadata (title, slug, etc.)
+ * @param {object} rawThemeSettings - Raw theme settings from theme.json
+ * @param {string} [renderMode='preview'] - Render mode: 'preview' for dev server URLs, 'publish' for relative paths
+ * @param {object} [sharedGlobals=null] - Optional shared globals with enqueued styles/scripts
+ * @returns {Promise<string>} Complete rendered HTML document
+ * @throws {Error} If project resolution fails (re-throws project resolution errors)
  */
 async function renderPageLayout(
   projectId,

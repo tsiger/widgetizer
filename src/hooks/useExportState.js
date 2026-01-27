@@ -3,6 +3,29 @@ import { getActiveProject } from "../queries/projectManager";
 import { getExportHistory } from "../queries/exportManager";
 import useToastStore from "../stores/toastStore";
 
+/**
+ * Hook for managing site export state including active project, export history, and last export info.
+ * Automatically loads the active project and its export history on mount.
+ *
+ * @returns {{
+ *   activeProject: Object|null,
+ *   lastExport: Object|null,
+ *   setLastExport: Function,
+ *   exportHistory: Array,
+ *   setExportHistory: Function,
+ *   loadingHistory: boolean,
+ *   maxVersionsToKeep: number,
+ *   loadExportHistory: (projectId: string) => Promise<void>
+ * }} Export state and actions
+ * @property {Object|null} activeProject - The currently active project
+ * @property {Object|null} lastExport - The most recent export details
+ * @property {Function} setLastExport - Update the last export state
+ * @property {Array} exportHistory - List of previous exports for the project
+ * @property {Function} setExportHistory - Update the export history list
+ * @property {boolean} loadingHistory - Whether export history is being loaded
+ * @property {number} maxVersionsToKeep - Maximum number of export versions to retain
+ * @property {Function} loadExportHistory - Fetch export history for a given project ID
+ */
 export default function useExportState() {
   const [activeProject, setActiveProject] = useState(null);
   const [lastExport, setLastExport] = useState(null);

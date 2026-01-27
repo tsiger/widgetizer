@@ -20,11 +20,16 @@ export const CORE_WIDGETS_DIR = path.join(APP_ROOT, "src", "core", "widgets");
 // App settings path
 export const getAppSettingsPath = () => path.join(DATA_DIR, "appSettings.json");
 
-// Theme paths
+// Theme paths - base paths (for theme root)
 export const getThemeDir = (themeId) => path.join(THEMES_DIR, themeId);
 export const getThemeJsonPath = (themeId) => path.join(getThemeDir(themeId), "theme.json");
 export const getThemeWidgetsDir = (themeId) => path.join(getThemeDir(themeId), "widgets");
 export const getThemeTemplatesDir = (themeId) => path.join(getThemeDir(themeId), "templates");
+
+// Theme versioning paths
+export const getThemeUpdatesDir = (themeId) => path.join(getThemeDir(themeId), "updates");
+export const getThemeLatestDir = (themeId) => path.join(getThemeDir(themeId), "latest");
+export const getThemeVersionDir = (themeId, version) => path.join(getThemeUpdatesDir(themeId), version);
 
 // Project paths
 export const getProjectsFilePath = () => path.join(DATA_DIR, "projects", "projects.json");

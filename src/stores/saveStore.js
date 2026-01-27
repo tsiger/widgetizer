@@ -7,6 +7,30 @@ import usePageStore from "./pageStore";
 import useThemeStore from "./themeStore";
 import useProjectStore from "./projectStore";
 
+/**
+ * Zustand store for managing auto-save functionality in the page editor.
+ * Tracks modified widgets, structure changes, and theme settings modifications.
+ * Provides both manual and automatic (60-second debounced) saving capabilities.
+ *
+ * @typedef {Object} AutoSaveStore
+ * @property {boolean} isSaving - Whether a manual save is in progress
+ * @property {boolean} isAutoSaving - Whether an auto-save is in progress
+ * @property {Date|null} lastSaved - Timestamp of the last successful save
+ * @property {Set<string>} modifiedWidgets - Set of widget IDs that have been modified
+ * @property {boolean} structureModified - Whether page structure (widget order) has changed
+ * @property {boolean} themeSettingsModified - Whether theme settings have changed
+ * @property {number|null} autoSaveInterval - Timer ID for the auto-save debounce
+ * @property {Function} hasUnsavedChanges - Check if there are any unsaved changes
+ * @property {Function} markWidgetModified - Mark a widget as having unsaved changes
+ * @property {Function} markWidgetUnmodified - Remove a widget from the modified set
+ * @property {Function} setStructureModified - Set whether structure has changed
+ * @property {Function} setThemeSettingsModified - Set whether theme settings have changed
+ * @property {Function} save - Save all pending changes (manual or auto)
+ * @property {Function} resetAutoSaveTimer - Reset the 60-second auto-save timer
+ * @property {Function} stopAutoSave - Cancel any pending auto-save
+ * @property {Function} reset - Clear all save state and stop auto-save
+ */
+
 const useAutoSave = create((set, get) => ({
   // State
   isSaving: false,

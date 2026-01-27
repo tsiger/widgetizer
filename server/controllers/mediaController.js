@@ -84,7 +84,13 @@ async function acquireWriteLock(projectId) {
   return releaseLock;
 }
 
-// Read media.json metadata file
+/**
+ * Reads the media metadata file for a project.
+ * Creates a new file if it doesn't exist, and attempts to recover corrupted JSON.
+ * @param {string} projectId - The project UUID
+ * @returns {Promise<{files: Array<object>}>} The media metadata object
+ * @throws {Error} If the project directory doesn't exist
+ */
 export async function readMediaFile(projectId) {
   const projectFolderName = await getProjectFolderName(projectId);
   const projectDir = getProjectDir(projectFolderName);
@@ -163,7 +169,15 @@ export async function readMediaFile(projectId) {
   }
 }
 
-// Write media metadata file (with write lock to prevent race conditions)
+/**
+ * Writes media metadata to disk with write locking to prevent race conditions.
+ * Uses atomic write with temp file and automatic retry on transient errors.
+ * @param {string} projectId - The project UUID
+ * @param {{files: Array<object>}} data - The media metadata to save
+ * @param {number} [retryCount=0] - Internal retry counter
+ * @returns {Promise<void>}
+ * @throws {Error} If write fails after retries or project directory doesn't exist
+ */
 export async function writeMediaFile(projectId, data, retryCount = 0) {
   const MAX_RETRIES = 3;
   const releaseLock = await acquireWriteLock(projectId);
@@ -340,7 +354,12 @@ export const upload = multer({
   // No 'limits' object here anymore
 });
 
-// Get all media files for a project
+/**
+ * Retrieves all media files metadata for a project.
+ * @param {import('express').Request} req - Express request object with projectId in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function getProjectMedia(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -381,7 +400,13 @@ export async function getProjectMedia(req, res) {
   }
 }
 
-// Upload media files to a project (with dynamic size check inside)
+/**
+ * Uploads media files to a project with dynamic size validation.
+ * Processes images (generates thumbnails), sanitizes SVGs, and validates file types.
+ * @param {import('express').Request} req - Express request object with projectId in params and files in req.files
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function uploadProjectMedia(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -592,7 +617,12 @@ export async function uploadProjectMedia(req, res) {
   }
 }
 
-// Update media metadata
+/**
+ * Updates metadata (alt text, title, description) for a media file.
+ * @param {import('express').Request} req - Express request object with projectId and fileId in params, metadata in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function updateMediaMetadata(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -663,7 +693,13 @@ export async function updateMediaMetadata(req, res) {
   }
 }
 
-// Delete a media file
+/**
+ * Deletes a media file and all its generated sizes from a project.
+ * Prevents deletion if the file is currently in use.
+ * @param {import('express').Request} req - Express request object with projectId and fileId in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function deleteProjectMedia(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -744,7 +780,13 @@ export async function deleteProjectMedia(req, res) {
   }
 }
 
-// Serve a media file
+/**
+ * Serves a media file from a project's uploads directory.
+ * Supports lookup by file ID or filename, handles images, videos, and audio.
+ * @param {import('express').Request} req - Express request object with projectId and fileId/filename in params
+ * @param {import('express').Response} res - Express response object (streams file)
+ * @returns {Promise<void>}
+ */
 export async function serveProjectMedia(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -824,7 +866,13 @@ export async function serveProjectMedia(req, res) {
   }
 }
 
-// Bulk delete multiple media files from a project
+/**
+ * Deletes multiple media files from a project in a single operation.
+ * Skips files that are currently in use and reports them in the response.
+ * @param {import('express').Request} req - Express request object with projectId in params and fileIds array in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function bulkDeleteProjectMedia(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -947,7 +995,12 @@ export async function bulkDeleteProjectMedia(req, res) {
   }
 }
 
-// Get usage information for a specific media file
+/**
+ * Retrieves usage information showing which pages use a specific media file.
+ * @param {import('express').Request} req - Express request object with projectId and fileId in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function getMediaFileUsage(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -969,7 +1022,13 @@ export async function getMediaFileUsage(req, res) {
   }
 }
 
-// Refresh media usage tracking for all pages in a project
+/**
+ * Refreshes media usage tracking by scanning all pages in a project.
+ * Updates the usedIn field for all media files based on current page content.
+ * @param {import('express').Request} req - Express request object with projectId in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function refreshMediaUsage(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

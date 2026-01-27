@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
+import useThemeUpdateStore from "../../stores/themeUpdateStore";
 import { navigationSections } from "../../config/navigation";
 
 export default function Sidebar() {
@@ -8,6 +10,12 @@ export default function Sidebar() {
   const location = useLocation();
   const { activeProject } = useProjectStore();
   const hasActiveProject = !!activeProject;
+  const { updateCount: themeUpdateCount, fetchUpdateCount } = useThemeUpdateStore();
+
+  // Fetch theme update count on mount
+  useEffect(() => {
+    fetchUpdateCount();
+  }, [fetchUpdateCount]);
 
   const isActive = (path) => {
     if (path === "/") {
@@ -43,6 +51,7 @@ export default function Sidebar() {
   const renderNavItem = (item) => {
     const Icon = item.icon;
     const disabled = item.requiresProject && !hasActiveProject;
+    const showBadge = item.id === "themes" && themeUpdateCount > 0;
 
     return (
       <li key={item.id}>
@@ -51,6 +60,11 @@ export default function Sidebar() {
             <Icon size={20} />
           </div>
           <span className="hidden md:inline ml-1 text-sm">{t(item.labelKey)}</span>
+          {showBadge && (
+            <span className="ml-auto bg-pink-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {themeUpdateCount}
+            </span>
+          )}
         </NavLink>
       </li>
     );

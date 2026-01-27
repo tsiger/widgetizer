@@ -11,6 +11,9 @@ const upload = multer({ storage: multer.memoryStorage() });
 // GET /api/themes - Get all themes
 router.get("/", themeController.getAllThemes);
 
+// GET /api/themes/update-count - Get count of themes with updates available
+router.get("/update-count", themeController.getThemeUpdateCount);
+
 // GET /api/themes/:id - Get a specific theme
 router.get("/:id", themeController.getTheme);
 
@@ -19,6 +22,12 @@ router.get("/:id/widgets", themeController.getThemeWidgets);
 
 // GET /api/themes/:id/templates - Get theme templates
 router.get("/:id/templates", themeController.getThemeTemplates);
+
+// GET /api/themes/:id/versions - Get theme versions
+router.get("/:id/versions", themeController.getThemeVersionsHandler);
+
+// POST /api/themes/:id/update - Update a single theme (build latest/)
+router.post("/:id/update", themeController.updateTheme);
 
 // GET /api/themes/project/:projectId - Get project theme settings
 router.get("/project/:projectId", themeController.getProjectThemeSettings);

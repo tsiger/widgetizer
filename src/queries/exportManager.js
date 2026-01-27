@@ -1,7 +1,27 @@
 import { API_URL } from "../config";
 
 /**
- * Calls the backend API to trigger the exporting process for a project.
+ * @typedef {Object} ExportResult
+ * @property {boolean} success - Whether export completed successfully
+ * @property {string} message - Status message
+ * @property {string} outputDir - Directory name of the export
+ * @property {number} version - Export version number
+ */
+
+/**
+ * @typedef {Object} ExportHistoryEntry
+ * @property {number} version - Export version number
+ * @property {string} outputDir - Directory name
+ * @property {string} createdAt - ISO timestamp of export
+ * @property {number} size - Total export size in bytes
+ */
+
+/**
+ * Trigger the export process for a project.
+ * Generates static HTML/CSS/JS files from the project.
+ * @param {string} projectId - The ID of the project to export
+ * @returns {Promise<ExportResult>} Export result with output directory and version
+ * @throws {Error} If projectId is missing or export fails
  */
 export async function exportProjectAPI(projectId) {
   if (!projectId) {
@@ -28,7 +48,11 @@ export async function exportProjectAPI(projectId) {
 }
 
 /**
- * Gets the export history for a project.
+ * Fetch the export history for a project.
+ * Returns all previous exports with version numbers and timestamps.
+ * @param {string} projectId - The ID of the project
+ * @returns {Promise<{success: boolean, exports: ExportHistoryEntry[], totalExports: number}>} Export history
+ * @throws {Error} If projectId is missing or request fails
  */
 export async function getExportHistory(projectId) {
   if (!projectId) {
@@ -54,7 +78,11 @@ export async function getExportHistory(projectId) {
 }
 
 /**
- * Deletes a specific export version.
+ * Delete a specific export version from a project.
+ * @param {string} projectId - The ID of the project
+ * @param {number} version - The version number to delete
+ * @returns {Promise<{success: boolean, message: string}>} Deletion confirmation
+ * @throws {Error} If projectId/version missing or deletion fails
  */
 export async function deleteExportAPI(projectId, version) {
   if (!projectId || !version) {
@@ -80,7 +108,11 @@ export async function deleteExportAPI(projectId, version) {
 }
 
 /**
- * Gets the entry file for an export (smart detection of index.html or first HTML file).
+ * Get the entry file for an export directory.
+ * Uses smart detection to find index.html or the first HTML file.
+ * @param {string} exportDir - The export directory name
+ * @returns {Promise<{success: boolean, entryFile: string}>} Entry file information
+ * @throws {Error} If exportDir is missing or no entry file found
  */
 export async function getExportEntryFile(exportDir) {
   if (!exportDir) {
@@ -106,7 +138,11 @@ export async function getExportEntryFile(exportDir) {
 }
 
 /**
- * Downloads an export as a ZIP file.
+ * Trigger a browser download of an export as a ZIP file.
+ * Creates a temporary link and initiates the download.
+ * @param {string} exportDir - The export directory name to download
+ * @returns {void}
+ * @throws {Error} If exportDir is missing
  */
 export function downloadExportZip(exportDir) {
   if (!exportDir) {

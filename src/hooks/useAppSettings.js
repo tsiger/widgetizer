@@ -3,6 +3,30 @@ import { getAppSettings, saveAppSettings } from "../queries/appSettingsManager.j
 import useToastStore from "../stores/toastStore.js";
 import settingsSchema from "../config/appSettings.schema.json";
 
+/**
+ * Hook for managing application settings with caching, loading, and saving capabilities.
+ * Handles fetching settings from the server, merging with schema defaults, and persisting changes.
+ *
+ * @returns {{
+ *   settings: Object|null,
+ *   loading: boolean,
+ *   isSaving: boolean,
+ *   hasChanges: boolean,
+ *   schema: Object,
+ *   handleInputChange: (settingKey: string, value: any) => void,
+ *   handleSave: () => Promise<void>,
+ *   handleCancel: () => void
+ * }} Application settings state and handlers
+ * @property {Object|null} settings - Current settings object (merged with schema defaults)
+ * @property {boolean} loading - Whether settings are being fetched
+ * @property {boolean} isSaving - Whether settings are being saved
+ * @property {boolean} hasChanges - Whether settings differ from the original loaded values
+ * @property {Object} schema - The settings schema with field definitions and defaults
+ * @property {Function} handleInputChange - Update a setting value by key (supports dot notation)
+ * @property {Function} handleSave - Persist current settings to the server
+ * @property {Function} handleCancel - Revert settings to the original loaded values
+ */
+
 // Cache for settings to prevent multiple simultaneous fetches
 let settingsCache = null;
 let settingsCachePromise = null;

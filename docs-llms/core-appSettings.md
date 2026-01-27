@@ -49,6 +49,14 @@ The App Settings system has been **refactored** to use a clean, modular architec
   - Increase this if you need to import large projects with many media files
   - Enforced on both client and server side for security
 
+### Developer Tools
+
+These settings are intended for theme developers and advanced users.
+
+- **Enable Developer Mode**: When enabled, shows additional developer tools throughout the application
+  - Reserved for future developer-focused features
+  - Enables advanced debugging and development workflows
+
 ## Architecture Overview
 
 The App Settings system uses a **schema-driven architecture** that is completely isolated from theme settings, providing better maintainability and extensibility.

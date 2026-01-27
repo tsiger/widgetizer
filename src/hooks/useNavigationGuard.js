@@ -2,6 +2,17 @@ import { useEffect } from "react";
 import { useBlocker } from "react-router-dom";
 import useAutoSave from "../stores/saveStore";
 
+/**
+ * Hook for preventing navigation when there are unsaved changes in the page editor.
+ * Integrates with the auto-save store to check for pending changes.
+ *
+ * Features:
+ * - Blocks browser navigation (tab close, refresh) with native browser confirmation
+ * - Blocks internal React Router navigation with a custom confirmation dialog
+ * - Automatically resets unsaved changes state when user confirms leaving
+ *
+ * @returns {void} This hook has no return value; it manages side effects only
+ */
 export default function useNavigationGuard() {
   const { hasUnsavedChanges, reset } = useAutoSave();
 

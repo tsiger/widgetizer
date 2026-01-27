@@ -3,7 +3,9 @@ import useProjectStore from "../stores/projectStore";
 import fontDefinitions from "../core/config/fonts.json";
 
 /**
- * Extract used fonts from theme settings with their weights
+ * Extract Google fonts used in theme typography settings.
+ * @param {Object} settings - Theme settings object
+ * @returns {Object<string, Set<string>>} Map of font names to Sets of weight values
  */
 function extractFonts(settings) {
   const fontsToLoad = {}; // { FontName: Set(weights) }
@@ -31,7 +33,12 @@ function extractFonts(settings) {
 }
 
 /**
- * Fetch a preview of the page from the server
+ * Fetch a rendered HTML preview of the page from the server.
+ * @param {Object} pageData - Page content including widgets and metadata
+ * @param {Object} themeSettings - Current theme settings for rendering
+ * @param {string} [previewMode="editor"] - Preview mode: "editor" includes editing overlay, "preview" is clean
+ * @returns {Promise<string>} Rendered HTML string
+ * @throws {Error} If the preview request fails
  */
 export async function fetchPreview(pageData, themeSettings, previewMode = "editor") {
   try {
@@ -60,7 +67,13 @@ export async function fetchPreview(pageData, themeSettings, previewMode = "edito
 }
 
 /**
- * Fetch a rendered widget from the server
+ * Fetch a single rendered widget HTML from the server.
+ * Used for live preview updates without full page reload.
+ * @param {string} widgetId - Unique widget identifier
+ * @param {Object} widget - Widget data including type, settings, and blocks
+ * @param {Object} themeSettings - Current theme settings for rendering
+ * @returns {Promise<string>} Rendered widget HTML string
+ * @throws {Error} If widget rendering fails
  */
 export async function fetchRenderedWidget(widgetId, widget, themeSettings) {
   try {
@@ -97,6 +110,11 @@ export async function fetchRenderedWidget(widgetId, widget, themeSettings) {
  * 1. Find widgets whose content changed
  * 2. Morph those widgets via MORPH_WIDGET message
  * 3. Update theme CSS variables if changed
+ *
+ * @param {HTMLIFrameElement} iframe - Preview iframe element
+ * @param {Object} newState - New page state with widgets, globalWidgets, themeSettings
+ * @param {Object} [oldState] - Previous page state for comparison
+ * @returns {Promise<void>}
  */
 export async function updatePreview(iframe, newState, oldState) {
   if (!iframe?.contentWindow || !newState) {
@@ -195,7 +213,10 @@ export async function updatePreview(iframe, newState, oldState) {
 }
 
 /**
- * Convert a settings object to CSS variable format
+ * Convert theme settings to CSS custom properties (variables).
+ * Processes typography font pickers and settings with outputAsCssVar flag.
+ * @param {Object} settings - Theme settings object with global settings
+ * @returns {Object<string, string>} Map of CSS variable names to values
  */
 export function settingsToCssVariables(settings) {
   const variables = {};
@@ -233,7 +254,10 @@ export function settingsToCssVariables(settings) {
 }
 
 /**
- * Update theme settings in the preview without reloading
+ * Update theme settings in the preview without reloading.
+ * Sends CSS variables and font loading messages to the iframe.
+ * @param {HTMLIFrameElement} iframe - Preview iframe element
+ * @param {Object} settings - Theme settings to apply
  */
 function updateThemeSettings(iframe, settings) {
   if (!iframe?.contentWindow) {
@@ -255,7 +279,13 @@ function updateThemeSettings(iframe, settings) {
 }
 
 /**
- * Update a widget setting in the preview without reloading
+ * Update a widget setting in the preview without reloading.
+ * Uses the PreviewRuntime API if available in the iframe.
+ * @param {HTMLIFrameElement} iframe - Preview iframe element
+ * @param {string} widgetId - Widget identifier to update
+ * @param {string} settingId - Setting identifier within the widget
+ * @param {*} value - New value for the setting
+ * @returns {boolean} True if update succeeded, false otherwise
  */
 export function updateWidgetSetting(iframe, widgetId, settingId, value) {
   if (!iframe || !iframe.contentWindow) return false;
@@ -268,7 +298,9 @@ export function updateWidgetSetting(iframe, widgetId, settingId, value) {
 }
 
 /**
- * Get global widgets (header and footer)
+ * Fetch global widgets (header and footer) for the active project.
+ * @returns {Promise<{header: Object|null, footer: Object|null}>} Global widget data
+ * @throws {Error} If the request fails
  */
 export async function getGlobalWidgets() {
   try {
@@ -287,7 +319,11 @@ export async function getGlobalWidgets() {
 }
 
 /**
- * Save a global widget
+ * Save a global widget (header or footer) for the active project.
+ * @param {string} type - Widget type: "header" or "footer"
+ * @param {Object} widget - Widget data to save
+ * @returns {Promise<{success: boolean}>} Save confirmation
+ * @throws {Error} If save fails
  */
 export async function saveGlobalWidget(type, widget) {
   try {
@@ -312,7 +348,10 @@ export async function saveGlobalWidget(type, widget) {
 }
 
 /**
- * Get the project widgets
+ * Fetch all widget schemas available for the active project.
+ * Includes both core and theme-specific widgets.
+ * @returns {Promise<Array<Object>>} Array of widget schema definitions
+ * @throws {Error} If no active project or request fails
  */
 export async function getProjectWidgets() {
   try {
@@ -336,7 +375,10 @@ export async function getProjectWidgets() {
 }
 
 /**
- * Scroll a widget into view in the preview
+ * Scroll a widget into view in the preview iframe.
+ * Sends a SCROLL_TO_WIDGET message to the iframe.
+ * @param {HTMLIFrameElement} iframe - Preview iframe element
+ * @param {string} widgetId - Widget identifier to scroll to
  */
 export function scrollWidgetIntoView(iframe, widgetId) {
   if (!iframe?.contentWindow) {

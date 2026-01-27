@@ -1,5 +1,22 @@
 import { useState } from "react";
 
+/**
+ * Hook for managing page selection state in the pages list.
+ * Supports single and multi-select operations for bulk actions.
+ *
+ * @returns {{
+ *   selectedPages: Array<string>,
+ *   togglePageSelection: (pageId: string) => void,
+ *   selectAllPages: (pageIds: Array<string>) => void,
+ *   clearSelection: () => void,
+ *   isAllSelected: (pages: Array<{id: string}>) => boolean
+ * }} Page selection state and handlers
+ * @property {Array<string>} selectedPages - Array of selected page IDs
+ * @property {Function} togglePageSelection - Add or remove a page from selection
+ * @property {Function} selectAllPages - Select all pages by their IDs
+ * @property {Function} clearSelection - Deselect all pages
+ * @property {Function} isAllSelected - Check if all provided pages are selected
+ */
 export function usePageSelection() {
   const [selectedPages, setSelectedPages] = useState([]);
 

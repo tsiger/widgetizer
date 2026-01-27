@@ -1,6 +1,18 @@
 import { create } from "zustand";
 import { getActiveProject } from "../queries/projectManager";
 
+/**
+ * Zustand store for managing the active project state.
+ * Automatically fetches the active project on store initialization.
+ *
+ * @typedef {Object} ProjectStore
+ * @property {Object|null} activeProject - The currently active project object
+ * @property {boolean} loading - Whether the project is being fetched
+ * @property {string|null} error - Error message if fetch failed, null otherwise
+ * @property {Function} fetchActiveProject - Fetch and set the active project from the server
+ * @property {Function} setActiveProject - Manually set the active project
+ */
+
 // Create the store
 const useProjectStore = create((set) => ({
   // State

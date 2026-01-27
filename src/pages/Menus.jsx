@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Menu, Trash2, Pencil, CirclePlus, Copy } from "lucide-react";
 
@@ -15,6 +15,7 @@ import { getAllMenus, deleteMenu, duplicateMenu } from "../queries/menuManager";
 import { formatDate } from "../utils/dateFormatter";
 
 import useToastStore from "../stores/toastStore";
+import useProjectStore from "../stores/projectStore";
 import useAppSettings from "../hooks/useAppSettings";
 
 export default function Menus() {
@@ -22,15 +23,18 @@ export default function Menus() {
   const [menus, setMenus] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
   const showToast = useToastStore((state) => state.showToast);
+  const activeProject = useProjectStore((state) => state.activeProject);
 
   // Get app settings for date formatting
   const { settings: appSettings } = useAppSettings();
 
+  // Reload menus when navigating to this page or when active project changes
   useEffect(() => {
     loadMenus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [location.key, activeProject?.id]);
 
   const loadMenus = async () => {
     try {
