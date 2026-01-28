@@ -77,10 +77,23 @@ const SortableItem = memo(function SortableItem({
 
   const handleLinkChange = useCallback(
     (value) => {
-      // Accept whatever the user types. If they choose a page option, its value already contains .html.
-      onEdit(item.id, { ...item, link: value });
+      // Check if the value is a page uuid (matches one of our page options)
+      const page = pages.find((p) => p.value === value);
+
+      if (page) {
+        // User selected an internal page - store pageUuid and derive link from current slug
+        onEdit(item.id, {
+          ...item,
+          pageUuid: page.value,
+          link: `${page.slug}.html`,
+        });
+      } else {
+        // Custom URL - remove pageUuid if present, store link directly
+        const { pageUuid: _removed, ...rest } = item;
+        onEdit(item.id, { ...rest, link: value });
+      }
     },
-    [onEdit, item],
+    [onEdit, item, pages],
   );
 
   // Get background color based on depth for visual hierarchy
@@ -166,7 +179,7 @@ const SortableItem = memo(function SortableItem({
           <div className="w-64" onMouseDown={handleInputMouseDown} onClick={(e) => e.stopPropagation()}>
             <MenuCombobox
               options={pages}
-              value={item.link || ""}
+              value={item.pageUuid || item.link || ""}
               onChange={handleLinkChange}
               placeholder="Select page or type URL..."
               isOpen={openDropdownId === item.id}

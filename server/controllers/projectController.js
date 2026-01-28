@@ -268,6 +268,7 @@ export async function createProject(req, res) {
               // Only add metadata for non-global widgets (pages become editable templates)
               ...(templatePage.type !== "header" && templatePage.type !== "footer"
                 ? {
+                    uuid: uuidv4(), // Stable identifier for internal links
                     id: templateSlug, // Set ID to match the new filename/slug
                     slug: templateSlug,
                     created: new Date().toISOString(),

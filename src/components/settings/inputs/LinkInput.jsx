@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 import { getAllPages } from "../../../queries/pageManager";
 import TextInput from "./TextInput";
@@ -8,38 +8,161 @@ import Combobox from "../../ui/Combobox";
 
 export default function LinkInput({ id, value = {}, onChange, setting }) {
   const [pages, setPages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchPages() {
       try {
         const allPages = await getAllPages();
-        setPages(allPages.map((p) => ({ value: `${p.slug}.html`, label: p.name })));
+        setPages(allPages);
       } catch (error) {
         console.error("Failed to load pages:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchPages();
   }, []);
 
-  const handleChange = (field, fieldValue) => {
-    const updatedValue = { ...value, [field]: fieldValue };
-    onChange(updatedValue);
-  };
+  // Build combobox options using uuid as value
+  const pageOptions = useMemo(() => {
+    return pages.map((p) => ({ value: p.uuid, label: p.name }));
+  }, [pages]);
 
-  const { href = "", text = "", target = "_self" } = value;
+  // Create lookup maps for uuid -> page and slug -> page
+  const pagesByUuid = useMemo(() => {
+    const map = new Map();
+    pages.forEach((p) => map.set(p.uuid, p));
+    return map;
+  }, [pages]);
+
+  const pagesBySlug = useMemo(() => {
+    const map = new Map();
+    pages.forEach((p) => map.set(p.slug, p));
+    return map;
+  }, [pages]);
+
+  // Resolve the current value - if pageUuid exists, check if page still exists
+  // Also try to match by slug for legacy links without pageUuid
+  const resolvedValue = useMemo(() => {
+    if (isLoading) {
+      return value; // Don't resolve while loading
+    }
+
+    const { pageUuid, href = "", text = "", target = "_self" } = value;
+
+    // If we have a pageUuid, look up the page
+    if (pageUuid) {
+      const page = pagesByUuid.get(pageUuid);
+      if (page) {
+        // Page exists - derive href from current slug
+        return {
+          pageUuid,
+          href: `${page.slug}.html`,
+          text,
+          target,
+        };
+      } else {
+        // Page was deleted - clear the link
+        return {
+          href: "",
+          text: "",
+          target: "_self",
+        };
+      }
+    }
+
+    // No pageUuid - try to match by slug (for legacy links or initial load)
+    // Extract slug from href if it looks like an internal page link
+    if (href && href.endsWith(".html") && !href.includes("://") && !href.startsWith("#")) {
+      const slug = href.replace(".html", "");
+      const page = pagesBySlug.get(slug);
+      if (page) {
+        // Found a matching page - return with pageUuid so combobox shows page name
+        return {
+          pageUuid: page.uuid,
+          href,
+          text,
+          target,
+        };
+      }
+    }
+
+    // Custom URL or no match - pass through as-is
+    return { href, text, target };
+  }, [value, pagesByUuid, pagesBySlug, isLoading]);
+
+  // Notify parent if resolved value differs from original (e.g., page was deleted, slug changed, or pageUuid matched by slug)
+  useEffect(() => {
+    if (isLoading) return;
+
+    const { pageUuid, href = "" } = value;
+
+    if (pageUuid && !pagesByUuid.has(pageUuid)) {
+      // Page was deleted - update parent with cleared value
+      onChange({ href: "", text: "", target: "_self" });
+    } else if (pageUuid && pagesByUuid.has(pageUuid)) {
+      // Page exists but slug may have changed - update href
+      const page = pagesByUuid.get(pageUuid);
+      const expectedHref = `${page.slug}.html`;
+      if (value.href !== expectedHref) {
+        onChange({ ...value, href: expectedHref });
+      }
+    } else if (!pageUuid && href && href.endsWith(".html") && !href.includes("://") && !href.startsWith("#")) {
+      // No pageUuid but href looks like internal page - try to match and add pageUuid
+      const slug = href.replace(".html", "");
+      const page = pagesBySlug.get(slug);
+      if (page && page.uuid) {
+        // Found matching page - persist the pageUuid
+        onChange({ ...value, pageUuid: page.uuid });
+      }
+    }
+  }, [value, pagesByUuid, pagesBySlug, isLoading, onChange]);
+
+  // Handle combobox selection - could be a uuid or custom text
+  const handleLinkChange = useCallback(
+    (selectedValue) => {
+      // Check if the selected value matches a page uuid
+      const page = pagesByUuid.get(selectedValue);
+
+      if (page) {
+        // User selected an internal page
+        onChange({
+          ...resolvedValue,
+          pageUuid: page.uuid,
+          href: `${page.slug}.html`,
+        });
+      } else {
+        // User typed a custom URL - remove pageUuid if present
+        const { pageUuid: _removed, ...rest } = resolvedValue;
+        onChange({
+          ...rest,
+          href: selectedValue,
+        });
+      }
+    },
+    [pagesByUuid, resolvedValue, onChange],
+  );
+
+  const handleFieldChange = useCallback(
+    (field, fieldValue) => {
+      onChange({ ...resolvedValue, [field]: fieldValue });
+    },
+    [resolvedValue, onChange],
+  );
+
+  const { href = "", text = "", target = "_self", pageUuid } = resolvedValue;
   const openInNewTab = target === "_blank";
   const hideText = Boolean(setting?.hide_text);
+
+  // Determine combobox value: use pageUuid if we have one (for internal pages), otherwise href
+  const comboboxValue = pageUuid || href;
 
   return (
     <div className="space-y-4 rounded-md border border-slate-200 bg-slate-50 p-4">
       {/* Href Input with Combobox */}
       <SettingsField id={`${id}-href`} label="Link URL" description="Select a page or enter a custom URL.">
-        <Combobox
-          options={pages}
-          value={href}
-          onChange={(val) => handleChange("href", val)}
-          placeholder="Select a page or type a URL..."
-        />
+        <Combobox options={pageOptions} value={comboboxValue} onChange={handleLinkChange} placeholder="Select a page or type a URL..." />
       </SettingsField>
 
       {!hideText && (
@@ -48,7 +171,7 @@ export default function LinkInput({ id, value = {}, onChange, setting }) {
             id={`${id}-text-input`}
             placeholder="e.g., Learn More"
             value={text}
-            onChange={(val) => handleChange("text", val)}
+            onChange={(val) => handleFieldChange("text", val)}
           />
         </SettingsField>
       )}
@@ -58,7 +181,7 @@ export default function LinkInput({ id, value = {}, onChange, setting }) {
         <CheckboxInput
           id={`${id}-target-input`}
           value={openInNewTab}
-          onChange={(val) => handleChange("target", val ? "_blank" : "_self")}
+          onChange={(val) => handleFieldChange("target", val ? "_blank" : "_self")}
         />
       </SettingsField>
     </div>

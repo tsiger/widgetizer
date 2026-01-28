@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import slugify from "slugify";
+import { randomUUID } from "crypto";
 import { validationResult } from "express-validator";
 import { getProjectsFilePath, getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
 import path from "path";
@@ -259,12 +260,14 @@ export async function updatePage(req, res) {
 
     const newPath = getPagePath(projectFolderName, finalNewSlug);
 
-    // Read old file first to preserve original creation date
+    // Read old file first to preserve original creation date and uuid
     let originalCreationDate = new Date().toISOString();
+    let existingUuid = null;
     let existingWidgets = {};
     try {
       const oldData = JSON.parse(await fs.readFile(oldPath, "utf8"));
       originalCreationDate = oldData.created || originalCreationDate;
+      existingUuid = oldData.uuid || null; // Preserve stable uuid across renames
       existingWidgets = oldData.widgets || {}; // Preserve widgets if not included in request
     } catch (readError) {
       if (readError.code !== "ENOENT") {
@@ -277,6 +280,7 @@ export async function updatePage(req, res) {
     // Construct the final page data for saving
     const finalUpdatedPageData = {
       ...pageData, // Start with submitted data
+      uuid: existingUuid || randomUUID(), // Preserve existing uuid or generate new one if missing
       id: finalNewSlug, // Use the final unique slug as ID
       slug: finalNewSlug, // Use the final unique slug
       name: pageData.name || `Page ${finalNewSlug}`, // Ensure name exists
@@ -519,6 +523,7 @@ export async function createPage(req, res) {
 
     const newPage = {
       ...pageData, // Include all submitted data (name, seo, etc.)
+      uuid: randomUUID(), // Stable identifier that persists across renames
       id: slug,
       slug,
       widgets: {},
@@ -589,6 +594,7 @@ export async function savePageContent(req, res) {
     const updatedPageData = {
       ...existingData, // Start with existing data
       ...pageData, // Override with new data (including SEO)
+      uuid: existingData.uuid || randomUUID(), // Preserve existing uuid or generate if missing
       id: pageData.slug, // Use slug from request body as the ID
       created: existingData.created, // Always preserve original creation date
       updated: new Date().toISOString(), // Set new update timestamp
@@ -694,6 +700,7 @@ export async function duplicatePage(req, res) {
     // Create the new page data
     const newPage = {
       ...originalPageData,
+      uuid: randomUUID(), // Generate new uuid for the copy (don't inherit from original)
       id: newSlug,
       name: newName,
       slug: newSlug,

@@ -7,6 +7,7 @@ import { getProjectDir, CORE_WIDGETS_DIR } from "../config.js";
 import { readMediaFile } from "../controllers/mediaController.js";
 import { getMenuById } from "../controllers/menuController.js";
 import { readProjectsFile } from "../controllers/projectController.js";
+import { listProjectPagesData } from "../controllers/pageController.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { ThemeSettingsTag } from "../../src/core/tags/themeSettings.js";
@@ -97,6 +98,168 @@ async function getProjectData(projectId) {
   } catch (error) {
     console.warn(`Could not load project data for ${projectId}: ${error.message}`);
     return null;
+  }
+}
+
+/**
+ * Check if a value is a link object (has href property and is an object)
+ */
+function isLinkObject(value) {
+  return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
+}
+
+/**
+ * Resolve a single link object's pageUuid to current slug.
+ * If pageUuid exists but page is deleted, clears the link.
+ * @param {object} linkValue - The link object { pageUuid?, href, text, target }
+ * @param {Map} pagesByUuid - Map of uuid -> page data
+ * @returns {object} Resolved link object
+ */
+function resolveLinkValue(linkValue, pagesByUuid) {
+  if (!linkValue || typeof linkValue !== "object") {
+    return linkValue;
+  }
+
+  const { pageUuid, href, text, target } = linkValue;
+
+  // If no pageUuid, this is a custom URL - pass through unchanged
+  if (!pageUuid) {
+    return linkValue;
+  }
+
+  // Look up the page by uuid
+  const page = pagesByUuid.get(pageUuid);
+
+  if (page) {
+    // Page exists - update href to current slug
+    return {
+      ...linkValue,
+      href: `${page.slug}.html`,
+    };
+  } else {
+    // Page was deleted - clear the link
+    return {
+      href: "",
+      text: "",
+      target: "_self",
+    };
+  }
+}
+
+/**
+ * Recursively resolve all page links in widget settings and blocks.
+ * Walks through the widget data structure and resolves any link objects
+ * that have a pageUuid to their current slug.
+ * @param {object} widgetData - Widget data with settings and blocks
+ * @param {Map} pagesByUuid - Map of uuid -> page data
+ * @returns {object} Widget data with resolved links
+ */
+function resolveWidgetPageLinks(widgetData, pagesByUuid) {
+  if (!widgetData || !pagesByUuid || pagesByUuid.size === 0) {
+    return widgetData;
+  }
+
+  // Deep clone to avoid mutating original
+  const resolved = JSON.parse(JSON.stringify(widgetData));
+
+  // Resolve links in widget settings
+  if (resolved.settings && typeof resolved.settings === "object") {
+    for (const [key, value] of Object.entries(resolved.settings)) {
+      if (isLinkObject(value)) {
+        resolved.settings[key] = resolveLinkValue(value, pagesByUuid);
+      }
+    }
+  }
+
+  // Resolve links in blocks
+  if (resolved.blocks && typeof resolved.blocks === "object") {
+    for (const [blockId, block] of Object.entries(resolved.blocks)) {
+      if (block && block.settings && typeof block.settings === "object") {
+        for (const [key, value] of Object.entries(block.settings)) {
+          if (isLinkObject(value)) {
+            resolved.blocks[blockId].settings[key] = resolveLinkValue(value, pagesByUuid);
+          }
+        }
+      }
+    }
+  }
+
+  return resolved;
+}
+
+/**
+ * Recursively resolve page links in menu items.
+ * Each menu item may have a pageUuid that needs to be resolved to current slug.
+ * @param {Array} menuItems - Array of menu items
+ * @param {Map} pagesByUuid - Map of uuid -> page data
+ * @returns {Array} Menu items with resolved links
+ */
+function resolveMenuItemLinks(menuItems, pagesByUuid) {
+  if (!menuItems || !Array.isArray(menuItems) || pagesByUuid.size === 0) {
+    return menuItems;
+  }
+
+  return menuItems.map((item) => {
+    const resolved = { ...item };
+
+    // If item has pageUuid, resolve to current slug
+    if (item.pageUuid) {
+      const page = pagesByUuid.get(item.pageUuid);
+      if (page) {
+        // Page exists - update link to current slug
+        resolved.link = `${page.slug}.html`;
+      } else {
+        // Page was deleted - clear the link
+        resolved.link = "";
+        delete resolved.pageUuid;
+      }
+    }
+
+    // Recursively resolve children
+    if (item.items && Array.isArray(item.items) && item.items.length > 0) {
+      resolved.items = resolveMenuItemLinks(item.items, pagesByUuid);
+    }
+
+    return resolved;
+  });
+}
+
+/**
+ * Resolve page links in a menu object.
+ * @param {object} menuData - Menu data with items array
+ * @param {Map} pagesByUuid - Map of uuid -> page data
+ * @returns {object} Menu data with resolved links
+ */
+function resolveMenuPageLinks(menuData, pagesByUuid) {
+  if (!menuData || !menuData.items) {
+    return menuData;
+  }
+
+  return {
+    ...menuData,
+    items: resolveMenuItemLinks(menuData.items, pagesByUuid),
+  };
+}
+
+/**
+ * Load all pages for a project and return a map of uuid -> page data.
+ * Results are cached per projectId during a single render pass.
+ * @param {string} projectFolderName - The project folder name
+ * @returns {Promise<Map>} Map of uuid -> page data
+ */
+async function loadPagesByUuid(projectFolderName) {
+  try {
+    const pages = await listProjectPagesData(projectFolderName);
+    const map = new Map();
+    pages.forEach((page) => {
+      if (page.uuid) {
+        map.set(page.uuid, page);
+      }
+    });
+    return map;
+  } catch (error) {
+    console.warn(`Could not load pages for link resolution: ${error.message}`);
+    return new Map();
   }
 }
 
@@ -349,6 +512,18 @@ async function renderWidget(
       });
     }
 
+    // Load pages for resolving pageUuid -> current slug in links and menus
+    // Use cached pages from sharedGlobals if available, otherwise load and cache
+    let pagesByUuid;
+    if (sharedGlobals && sharedGlobals.pagesByUuid) {
+      pagesByUuid = sharedGlobals.pagesByUuid;
+    } else {
+      pagesByUuid = await loadPagesByUuid(projectFolderName);
+      if (sharedGlobals) {
+        sharedGlobals.pagesByUuid = pagesByUuid;
+      }
+    }
+
     // Handle menu settings - check schema for menu type settings
     const menuSettingIds = new Set();
     if (Array.isArray(schema.settings)) {
@@ -366,7 +541,8 @@ async function renderWidget(
           if (value) {
             // Use getMenuById instead of direct file access
             const menuData = await getMenuById(projectDir, value);
-            enhancedSettings[key] = menuData || { items: [] };
+            // Resolve page links in menu items (pageUuid -> current slug)
+            enhancedSettings[key] = resolveMenuPageLinks(menuData, pagesByUuid) || { items: [] };
           } else {
             enhancedSettings[key] = { items: [] }; // Ensure empty menu if no value set
           }
@@ -377,12 +553,19 @@ async function renderWidget(
       }
     }
 
+    // Resolve page links (pageUuid -> current slug) in widget settings and blocks
+    // This ensures internal links stay valid even after page renames
+    const resolvedWidgetData = resolveWidgetPageLinks(
+      { settings: enhancedSettings, blocks: enhancedBlocks },
+      pagesByUuid,
+    );
+
     // Create widget context for template
     const widgetContext = {
       id: widgetId,
       type,
-      settings: enhancedSettings,
-      blocks: enhancedBlocks,
+      settings: resolvedWidgetData.settings,
+      blocks: resolvedWidgetData.blocks,
       blocksOrder: blocksOrder || [],
       index: index, // 1-based index of widget in page (null for global widgets or when not provided)
     };

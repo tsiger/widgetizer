@@ -46,15 +46,16 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
     }),
   );
 
-  // Fetch pages for the link selector
+  // Fetch pages for the link selector - use uuid as value for stable references
   useEffect(() => {
     async function fetchPages() {
       try {
         const allPages = await getAllPages();
         setPages(
           allPages.map((p) => ({
-            value: `${p.slug}.html`,
+            value: p.uuid, // Use uuid as value for stable reference across renames
             label: p.name,
+            slug: p.slug, // Keep slug for deriving href
             isPage: true,
           })),
         );
@@ -64,6 +65,66 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
     }
     fetchPages();
   }, []);
+
+  // Resolve menu item pageUuids to current slugs (handles page renames, deletions, and legacy links)
+  useEffect(() => {
+    if (pages.length === 0) return; // Wait for pages to load
+
+    const pagesByUuid = new Map(pages.map((p) => [p.value, p]));
+    const pagesBySlug = new Map(pages.map((p) => [p.slug, p]));
+
+    // Recursively resolve links in menu items
+    function resolveMenuItems(menuItems) {
+      let hasChanges = false;
+      const resolved = menuItems.map((item) => {
+        let newItem = { ...item };
+
+        // If item has pageUuid, resolve to current slug
+        if (item.pageUuid) {
+          const page = pagesByUuid.get(item.pageUuid);
+          if (page) {
+            // Page exists - update link to current slug
+            const expectedLink = `${page.slug}.html`;
+            if (item.link !== expectedLink) {
+              newItem.link = expectedLink;
+              hasChanges = true;
+            }
+          } else {
+            // Page was deleted - clear the link
+            newItem = { ...newItem, link: "", pageUuid: undefined };
+            hasChanges = true;
+          }
+        } else if (item.link && item.link.endsWith(".html") && !item.link.includes("://") && !item.link.startsWith("#")) {
+          // No pageUuid but link looks like internal page - try to match by slug and add pageUuid
+          const slug = item.link.replace(".html", "");
+          const page = pagesBySlug.get(slug);
+          if (page) {
+            // Found matching page - add pageUuid so combobox shows page name
+            newItem.pageUuid = page.value;
+            hasChanges = true;
+          }
+        }
+
+        // Recursively resolve children
+        if (item.items && item.items.length > 0) {
+          const { items: resolvedChildren, changed } = resolveMenuItems(item.items);
+          if (changed) {
+            newItem.items = resolvedChildren;
+            hasChanges = true;
+          }
+        }
+
+        return newItem;
+      });
+
+      return { items: resolved, changed: hasChanges };
+    }
+
+    const { items: resolvedItems, changed } = resolveMenuItems(items);
+    if (changed) {
+      setItems(resolvedItems);
+    }
+  }, [pages]); // Only run when pages change (initial load)
 
   // Update items when initialItems change
   useEffect(() => {
