@@ -140,6 +140,7 @@
     "success": "Success",
     "unsavedChanges": "You have unsaved changes",
     "appTitle": "Widgetizer",
+    "close": "Close",
     "aria": {
       "dismiss": "Dismiss",
       "close": "Close"
@@ -222,6 +223,7 @@
     "headers": {
       "title": "Title",
       "folderName": "Folder Name",
+      "theme": "Theme",
       "created": "Created",
       "updated": "Updated",
       "actions": "Actions"
@@ -502,13 +504,21 @@
     "noActiveProjectDesc": "Please select or create a project to manage your projects.",
     "backToList": "Back to Projects List",
     "saveChanges": "Save Changes",
+    "themeUpdate": {
+      "title": "Theme Update Available",
+      "description": "A new version of your theme is available. Your pages, menus, and uploads will not be affected.",
+      "apply": "Apply Update",
+      "applying": "Applying..."
+    },
     "toasts": {
       "notFound": "Project not found",
       "loadError": "Failed to load project",
       "updateSuccessRenamed": "Project \"{{name}}\" was updated successfully and folder was renamed.",
       "updateSuccess": "Project \"{{name}}\" was updated successfully!",
       "updateError": "Failed to update project",
-      "noActiveProject": "Please select or create a project to manage your projects"
+      "noActiveProject": "Please select or create a project to manage your projects",
+      "updateApplied": "Theme updated from v{{from}} to v{{to}}",
+      "noUpdateAvailable": "No theme update available"
     }
   },
   "exportSite": {

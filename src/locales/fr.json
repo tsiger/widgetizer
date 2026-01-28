@@ -140,6 +140,7 @@
     "success": "Succès",
     "unsavedChanges": "Vous avez des modifications non enregistrées",
     "appTitle": "Widgetizer",
+    "close": "Fermer",
     "aria": {
       "dismiss": "Ignorer",
       "close": "Fermer"
@@ -223,12 +224,14 @@
     "headers": {
       "title": "Titre",
       "folderName": "Nom du Dossier",
+      "theme": "Thème",
       "created": "Créé le",
       "updated": "Mis à jour le",
       "actions": "Actions"
     },
     "badges": {
-      "active": "Actif"
+      "active": "Actif",
+      "updateAvailable": "Mise à jour disponible"
     },
     "actions": {
       "currentActive": "Projet actif actuel",
@@ -502,13 +505,21 @@
     "noActiveProjectDesc": "Veuillez sélectionner ou créer un projet pour gérer vos projets.",
     "backToList": "Retour à la liste des projets",
     "saveChanges": "Enregistrer les modifications",
+    "themeUpdate": {
+      "title": "Mise à jour du thème disponible",
+      "description": "Une nouvelle version de votre thème est disponible. Vos pages, menus et téléversements ne seront pas affectés.",
+      "apply": "Appliquer la mise à jour",
+      "applying": "Application..."
+    },
     "toasts": {
       "notFound": "Projet introuvable",
       "loadError": "Échec du chargement du projet",
       "updateSuccessRenamed": "Le projet \"{{name}}\" a été mis à jour avec succès et le dossier a été renommé.",
       "updateSuccess": "Le projet \"{{name}}\" a été mis à jour avec succès !",
       "updateError": "Échec de la mise à jour du projet",
-      "noActiveProject": "Veuillez sélectionner ou créer un projet pour gérer vos projets"
+      "noActiveProject": "Veuillez sélectionner ou créer un projet pour gérer vos projets",
+      "updateApplied": "Thème mis à jour de v{{from}} à v{{to}}",
+      "noUpdateAvailable": "Aucune mise à jour du thème disponible"
     }
   },
   "exportSite": {

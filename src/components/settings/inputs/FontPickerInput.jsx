@@ -24,6 +24,39 @@ const DEFAULT_FONTS_CATEGORIZED = {
 };
 const ALL_FONTS_LIST = [...SYSTEM_FONTS, ...GOOGLE_FONTS];
 const DEFAULT_FONT_OBJECT = SYSTEM_FONTS[0]; // System UI
+const FONT_PREVIEW_LINK_ID = "font-picker-preview-fonts";
+const FONT_PREVIEW_CACHE_KEY = "__fontPickerPreviewFonts";
+
+function loadFontPreview(fontName, weight) {
+  if (!fontName || !weight || typeof document === "undefined") return;
+
+  const cache = window[FONT_PREVIEW_CACHE_KEY] || {};
+  const weights = new Set(cache[fontName] || []);
+  weights.add(weight);
+  cache[fontName] = Array.from(weights);
+  window[FONT_PREVIEW_CACHE_KEY] = cache;
+
+  const families = Object.entries(cache)
+    .map(([name, fontWeights]) => {
+      const sorted = [...fontWeights].sort((a, b) => a - b);
+      return `${encodeURIComponent(name)}:wght@${sorted.join(";")}`;
+    })
+    .join("|");
+
+  if (!families) return;
+
+  const url = `https://fonts.bunny.net/css?family=${families}&display=swap`;
+
+  let link = document.getElementById(FONT_PREVIEW_LINK_ID);
+  if (!link) {
+    link = document.createElement("link");
+    link.id = FONT_PREVIEW_LINK_ID;
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+  }
+
+  link.href = url;
+}
 
 /**
  * FontPickerInput component
@@ -42,22 +75,31 @@ export default function FontPickerInput({
       ? value
       : { stack: DEFAULT_FONT_OBJECT.stack, weight: DEFAULT_FONT_OBJECT.defaultWeight };
 
-  // Find the full font object based on the stack in the current value
-  const selectedFontObject = ALL_FONTS_LIST.find((f) => f.stack === currentVal.stack) || DEFAULT_FONT_OBJECT;
-
-  // State for the selected weight UI component
+  // Local UI state so preview updates immediately on selection.
+  const [selectedStack, setSelectedStack] = useState(currentVal.stack);
+  const selectedFontObject = ALL_FONTS_LIST.find((f) => f.stack === selectedStack) || DEFAULT_FONT_OBJECT;
   const [selectedWeight, setSelectedWeight] = useState(currentVal.weight ?? selectedFontObject.defaultWeight);
 
-  // Sync local weight state if the value prop changes externally
+  // Sync local state if the value prop changes externally
   useEffect(() => {
+    setSelectedStack(currentVal.stack);
     const newFontObject = ALL_FONTS_LIST.find((f) => f.stack === currentVal.stack) || DEFAULT_FONT_OBJECT;
     setSelectedWeight(currentVal.weight ?? newFontObject.defaultWeight);
   }, [currentVal.stack, currentVal.weight]);
+
+  // Ensure Google Fonts are loaded for the preview text
+  useEffect(() => {
+    if (!selectedFontObject?.isGoogleFont) return;
+    const weight = selectedWeight ?? selectedFontObject.defaultWeight;
+    if (!weight) return;
+    loadFontPreview(selectedFontObject.name, weight);
+  }, [selectedFontObject, selectedWeight]);
 
   // Handle font stack selection
   const handleFontChange = (newFontStack) => {
     const newFontObject = ALL_FONTS_LIST.find((f) => f.stack === newFontStack) || DEFAULT_FONT_OBJECT;
     const newWeight = newFontObject.defaultWeight;
+    setSelectedStack(newFontStack);
     setSelectedWeight(newWeight); // Update local state for UI consistency
     onChange({ stack: newFontStack, weight: newWeight }); // Pass object up
   };
@@ -66,7 +108,7 @@ export default function FontPickerInput({
   const handleWeightChange = (newWeightString) => {
     const newWeight = parseInt(newWeightString, 10);
     setSelectedWeight(newWeight); // Update local state
-    onChange({ stack: currentVal.stack, weight: newWeight }); // Pass object up
+    onChange({ stack: selectedStack, weight: newWeight }); // Pass object up
   };
 
   return (
@@ -76,7 +118,7 @@ export default function FontPickerInput({
         <div className="w-full">
           <select
             id={id}
-            value={currentVal.stack}
+            value={selectedStack}
             onChange={(e) => handleFontChange(e.target.value)}
             className="form-select w-full"
           >
@@ -116,8 +158,8 @@ export default function FontPickerInput({
       <div
         className="text-lg"
         style={{
-          fontFamily: currentVal.stack,
-          fontWeight: currentVal.weight ?? selectedFontObject?.defaultWeight ?? "normal",
+          fontFamily: selectedStack,
+          fontWeight: selectedWeight ?? selectedFontObject?.defaultWeight ?? "normal",
         }}
       >
         The quick brown fox jumps over the lazy dog.
