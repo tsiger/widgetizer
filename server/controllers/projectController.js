@@ -287,6 +287,55 @@ export async function createProject(req, res) {
       await processTemplatesRecursive(themeTemplatesDir, pagesDir);
 
       const projectMenusDir = getProjectMenusDir(folderName);
+      
+      // Build a map of page slugs to UUIDs for menu item linking
+      const pageSlugToUuid = new Map();
+      try {
+        const pageFiles = await fs.readdir(pagesDir);
+        for (const pageFile of pageFiles) {
+          if (!pageFile.endsWith(".json")) continue;
+          try {
+            const pageContent = await fs.readFile(path.join(pagesDir, pageFile), "utf8");
+            const page = JSON.parse(pageContent);
+            if (page.slug && page.uuid) {
+              pageSlugToUuid.set(page.slug, page.uuid);
+            }
+          } catch {
+            // Skip pages that can't be read
+          }
+        }
+      } catch {
+        // If pages directory doesn't exist or can't be read, continue without linking
+      }
+
+      // Helper function to recursively add pageUuid to menu items
+      function addPageUuidToMenuItems(items) {
+        if (!Array.isArray(items)) return items;
+        return items.map(item => {
+          const updatedItem = { ...item };
+          
+          // Check if this is an internal page link (ends with .html, no protocol)
+          if (item.link && typeof item.link === 'string') {
+            const link = item.link;
+            if (link.endsWith('.html') && !link.includes('://') && !link.startsWith('#')) {
+              // Extract slug from link (e.g., "about.html" -> "about")
+              const slug = link.replace('.html', '');
+              const uuid = pageSlugToUuid.get(slug);
+              if (uuid) {
+                updatedItem.pageUuid = uuid;
+              }
+            }
+          }
+          
+          // Recursively process nested items
+          if (item.items && Array.isArray(item.items)) {
+            updatedItem.items = addPageUuidToMenuItems(item.items);
+          }
+          
+          return updatedItem;
+        });
+      }
+
       try {
         // Check if project has menus directory (copied from theme)
         if (await fs.pathExists(projectMenusDir)) {
@@ -302,9 +351,13 @@ export async function createProject(req, res) {
               const menu = JSON.parse(menuContent);
               const menuSlug = path.parse(menuFile).name;
 
+              // Add pageUuid to menu items that link to internal pages
+              const enrichedItems = addPageUuidToMenuItems(menu.items);
+
               const enrichedMenu = {
                 ...menu,
                 id: menuSlug,
+                items: enrichedItems,
                 created: new Date().toISOString(),
                 updated: new Date().toISOString(),
               };
