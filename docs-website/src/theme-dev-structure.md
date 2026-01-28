@@ -49,8 +49,16 @@ themes/my-theme/
 │   └── icons.json
 ├── menus/
 │   └── main-menu.json
-└── snippets/
-    └── icon.liquid
+├── snippets/
+│   └── icon.liquid
+├── updates/              # Version update folders (for distributing updates)
+│   ├── 1.1.0/
+│   │   ├── theme.json    # Required, version must match folder name
+│   │   └── widgets/      # Only changed files
+│   └── 1.2.0/
+│       ├── theme.json
+│       └── assets/
+└── latest/               # Auto-built snapshot (do not edit manually)
 ```
 
 # Required Files (Minimum Viable Theme)
@@ -122,3 +130,82 @@ When a new project is created, the selected theme is copied into the project’s
 - Copied items: `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`
 
 This ensures each project has its own theme files and can evolve independently.
+
+
+# Publishing Theme Updates
+
+Widgetizer supports a versioned update system that lets you distribute improvements to users of your theme.
+
+### Update Folder Structure
+
+Theme updates use a **partial update** (delta) approach. Each version folder in `updates/` contains only the files that changed:
+
+```
+themes/my-theme/
+├── theme.json              # Base version (e.g., 1.0.0)
+├── layout.liquid
+├── widgets/
+├── updates/
+│   ├── 1.1.0/
+│   │   ├── theme.json      # Required, version must be "1.1.0"
+│   │   └── widgets/
+│   │       └── new-widget/ # Only new/changed widgets
+│   └── 1.2.0/
+│       ├── theme.json      # Required, version must be "1.2.0"
+│       └── assets/
+│           └── base.css    # Only changed assets
+└── latest/                 # Auto-generated snapshot
+```
+
+### Creating an Update
+
+1. Create a version folder (e.g., `updates/1.1.0/`)
+2. Add a `theme.json` with the matching version number
+3. Add only the files that changed (new widgets, updated CSS, etc.)
+4. Go to the Themes page in Widgetizer and click "Update" on your theme
+5. The system builds the `latest/` snapshot by layering all versions
+
+### The `latest/` Folder
+
+The `latest/` folder is automatically generated—**do not edit it manually**. It's built by:
+
+1. Starting from the base theme files (root level)
+2. Applying each version folder in semver order
+3. For overlapping files, the latest version wins
+
+Projects read from `latest/` when it exists, ensuring they always get the most up-to-date theme.
+
+### Version Validation
+
+The system enforces:
+
+- Every version folder must contain a `theme.json`
+- The version in `theme.json` must match the folder name
+- Versions must be valid semver format (x.y.z)
+
+If validation fails, the build is aborted with an error message.
+
+### Distributing Updates
+
+To distribute your theme with updates:
+
+1. Zip the entire theme folder (including `updates/`)
+2. Share the zip file with users
+3. When users upload the zip, new versions are imported automatically
+4. The `latest/` folder in the zip is ignored—it's always rebuilt locally
+
+### What Gets Updated in Projects
+
+When users apply your theme update to their projects:
+
+| Path | Behavior |
+|------|----------|
+| `layout.liquid` | Replaced |
+| `widgets/` | Replaced |
+| `assets/` | Replaced |
+| `snippets/` | Replaced |
+| `theme.json` | Settings merged (user values preserved) |
+| `menus/` | New menus added, existing preserved |
+| `templates/` | New templates added, existing preserved |
+
+User content (`pages/`, `uploads/`) is never modified.

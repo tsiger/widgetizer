@@ -395,15 +395,24 @@ The `default` value should match a menu's filename (without the `.json` extensio
 
 ### Link
 
-A compound control for creating links. This is useful for buttons, banners, or any call-to-action element. It allows the user to select an internal page or specify a custom URL. The value is an object containing the link's `href`, `text`, and `target`.
+A compound control for creating links. This is useful for buttons, banners, or any call-to-action element. It allows the user to select an internal page or specify a custom URL. The value is an object containing the link's `href`, `text`, `target`, and optionally `pageUuid`.
 
-- **`href`** (string): The URL for the link. This can be a relative path to an internal page or an absolute URL.
+- **`href`** (string): The URL for the link. This can be a relative path to an internal page (e.g., `about.html`) or an absolute URL.
 - **`text`** (string): The display text for the link (e.g., "Learn More").
 - **`target`** (string): The link target, either `_self` to open in the same tab or `_blank` to open in a new tab.
+- **`pageUuid`** (string, optional): For internal page links, stores the page's stable UUID. This ensures links remain valid even when pages are renamed—the system automatically resolves the UUID to the current page slug at render time.
 
-**Optional Properties:**
+**Schema Properties:**
 
 - **`hide_text`** (boolean, optional): If `true`, hides the link text field in the editor UI. Useful for links that wrap entire cards or icons where no visible label is rendered.
+
+**How Internal Page Links Work:**
+
+When a user selects an internal page from the dropdown, the system stores both:
+1. The `pageUuid` - the stable identifier that never changes
+2. The `href` - the current slug-based filename (e.g., `services.html`)
+
+When rendering, the system resolves the `pageUuid` to the current page slug. If a page is renamed, links automatically point to the new filename. If the linked page is deleted, the link is cleared (set to empty).
 
 The UI for this setting type provides a choice between selecting from a list of existing pages or entering a custom URL, along with inputs for the link text and a toggle for the target.
 
@@ -421,7 +430,28 @@ The UI for this setting type provides a choice between selecting from a list of 
 }
 ```
 
-**Example (link without text):**
+**Example stored value (internal page link):**
+
+```json
+{
+  "href": "about.html",
+  "text": "Learn More",
+  "target": "_self",
+  "pageUuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+}
+```
+
+**Example stored value (custom URL):**
+
+```json
+{
+  "href": "https://example.com",
+  "text": "Visit Site",
+  "target": "_blank"
+}
+```
+
+**Example schema (link without text):**
 
 ```json
 {

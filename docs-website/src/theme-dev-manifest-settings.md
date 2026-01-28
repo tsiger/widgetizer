@@ -31,7 +31,7 @@ These fields are required for a theme to be valid:
 
 **`name`** — Human-friendly theme name shown in the UI.
 
-**`version`** — Semantic version string for the theme.
+**`version`** — Semantic version string for the theme (e.g., `1.0.0`). This version is used by the [theme update system](theme-dev-structure.html#publishing-theme-updates) to track which version users have installed and to determine when updates are available.
 
 **`author`** — Theme author or organization name.
 

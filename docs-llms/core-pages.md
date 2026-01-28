@@ -13,6 +13,7 @@ A typical page JSON file (`about-us.json`) looks like this:
 
 ```json
 {
+  "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "name": "About Us",
   "slug": "about-us",
   "title": "About Us | My Awesome Site",
@@ -38,6 +39,11 @@ A typical page JSON file (`about-us.json`) looks like this:
   }
 }
 ```
+
+**Key Fields:**
+
+- **`uuid`**: A stable, randomly-generated identifier (UUID v4) that never changes, even when the page is renamed or its slug changes. This identifier is used by [Link settings](theming-setting-types.md#link) and [menu items](core-menus.md) to reference pages resiliently. When a page is renamed, all links pointing to it via `uuid` automatically resolve to the new slug.
+- **`slug`**: The URL-friendly identifier derived from the page name, also used as the filename. This can change when the page is renamed.
 
 ## 2. Frontend Implementation
 
@@ -147,10 +153,11 @@ This is the core of the backend logic. The controller functions interact with th
   1.  It identifies the active project.
   2.  It sanitizes the incoming page `name` to generate a URL-friendly `slug` (e.g., "My New Page" becomes "my-new-page").
   3.  It checks for slug uniqueness within the project's `pages` directory to prevent filename collisions. If a slug already exists, it appends a number (e.g., `my-new-page-1`).
-  4.  It writes the complete page data to the corresponding `.json` file.
-  5.  **Media Usage Tracking**: Updates media file usage tracking to reflect which images are used by this page.
-- **Delete Operation**: The controller finds the correct file by its slug and deletes it from the filesystem. Also removes the page from all media usage tracking.
-- **Duplicate Operation**: The controller reads the source page's data, generates a new unique slug (e.g., by appending `-copy`), updates the `name` and `slug` fields in the data, and writes it to a new file. Updates media usage tracking for the duplicated page.
+  4.  **UUID Handling**: For new pages, a UUID v4 is generated. For updates, the existing UUID is preserved to maintain link integrity.
+  5.  It writes the complete page data to the corresponding `.json` file.
+  6.  **Media Usage Tracking**: Updates media file usage tracking to reflect which images are used by this page.
+- **Delete Operation**: The controller finds the correct file by its slug and deletes it from the filesystem. Also removes the page from all media usage tracking. Any links or menu items referencing the deleted page's UUID will be automatically cleared when edited or rendered.
+- **Duplicate Operation**: The controller reads the source page's data, generates a new unique slug (e.g., by appending `-copy`), **generates a new UUID** (to ensure the duplicate is a distinct entity), updates the `name` and `slug` fields, and writes it to a new file. Updates media usage tracking for the duplicated page.
 
 ### Security Considerations
 

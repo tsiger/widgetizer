@@ -6,20 +6,9 @@ You can use Widgetizer either as a standalone desktop application or by running 
 
 # Standalone Desktop Apps
 
-The easiest way to get started is to download the standalone app for your operating system from the [Releases page](https://github.com/tsiger/widgetizer/releases).
+> **Coming Soon!** We're putting the finishing touches on native desktop applications for **Windows** and **macOS**. These standalone apps will let you build websites without any setup—just download, install, and start creating. Check back soon or follow us on GitHub for release announcements!
 
-### Windows
-
-- **[Download for Windows 10/11 (x64)](https://github.com/tsiger/widgetizer/releases)** — For most Windows computers
-
-> **Note:** Windows users may experience a small delay when loading the app for the first time. We are aware of this and are working to improve startup performance in future updates.
-
-### macOS
-
-- **[Download for Mac (Apple Silicon)](https://github.com/tsiger/widgetizer/releases)** — For M1, M2, M3, and M4 Macs (2020 and newer)
-- **[Download for Mac (Intel)](https://github.com/tsiger/widgetizer/releases)** — For Intel-based Macs (2019 and older)
-
-> **Tip:** Not sure which Mac you have? Click the Apple menu () → **About This Mac**. If it says "Chip: Apple M1/M2/M3/M4", download Apple Silicon. If it says "Processor: Intel", download Intel.
+In the meantime, you can run Widgetizer using Node.js (see below).
 
 # Using Node.js
 

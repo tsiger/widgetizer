@@ -53,14 +53,56 @@ By locking the theme at project creation, Widgetizer keeps things simple and foc
 
 # Theme Updates
 
-Theme update functionality is currently under development. This feature will allow theme authors to release updates to their themes, and you'll be able to update your projects to use the latest version of your chosen theme.
+Widgetizer includes a theme update system that allows theme authors to release improvements, and you can apply those updates to your projects while keeping your content safe.
 
-**Planned features:**
-- Automatic notifications when theme updates are available
-- Safe update process that preserves your content
-- Version history and rollback capabilities
+### How Theme Updates Work
 
-> **Note:** Theme updates will only apply improvements and bug fixes. They will not change your theme to a different design system, maintaining compatibility with your existing content.
+When a theme author releases an update:
+
+1. **Notification**: The sidebar shows a badge indicating themes have updates available
+2. **Theme Page**: Visit the Themes page to see which themes have updates
+3. **Build Update**: Click "Update" on a theme to build the latest version
+4. **Apply to Projects**: Projects using that theme will show an update indicator
+
+### Applying Updates to Your Projects
+
+After a theme is updated:
+
+1. Go to the **Projects** page
+2. Look for the **update indicator** (arrow icon) next to projects using the updated theme
+3. Edit the project and click **"Apply Theme Update"**
+4. The system updates your project's theme files while preserving your content
+
+### What Gets Updated
+
+Theme updates can include:
+
+- **Layout template** (`layout.liquid`) - Replaced with new version
+- **Widgets** - Entire widget folder replaced with new versions
+- **Assets** (CSS, JS) - Replaced with new versions
+- **Snippets** - Replaced with new versions
+- **Theme settings schema** - New settings are added, your existing values are preserved
+
+### What's Protected (Never Changed)
+
+Your content is always safe:
+
+- **Pages** - Your page content is never modified
+- **Media** - Your uploaded images and videos are preserved
+- **Menus** - Existing menus are kept (new menus may be added)
+- **Templates** - Existing page templates are kept (new templates may be added)
+
+### Settings Merge
+
+When a theme update includes new settings:
+
+- **New settings** are added with their default values
+- **Your customized values** (colors, fonts, etc.) are preserved
+- **Removed settings** (deleted by theme author) are cleaned up
+
+This means your design choices stay intact while you get access to new features.
+
+> **Note:** Theme updates improve your existing theme—they don't change it to a different design system. Your content always remains compatible.
 
 # Choosing a Theme
 

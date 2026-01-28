@@ -95,3 +95,35 @@ You can export any project as a ZIP file for backup or to transfer to another Wi
 ### Importing a Project
 
 To import a previously exported project, click **"Import Project"** and select the ZIP file. The imported project will appear in your projects list with a new name to avoid conflicts.
+
+
+# Theme Updates for Projects
+
+When a theme author releases an update, projects using that theme can receive the improvements.
+
+### Identifying Projects with Available Updates
+
+- Projects with available theme updates show an **arrow icon** in the project list
+- The project card indicates the current version and the available version
+
+### Applying a Theme Update
+
+1. Go to the **Projects** page
+2. Find the project with the update indicator
+3. Click **Edit** to open the project settings
+4. Click **"Apply Theme Update"**
+5. The system updates your theme files while preserving your content
+
+### What's Updated vs. Protected
+
+**Updated:**
+- Layout template, widgets, assets, snippets
+- Theme settings schema (new settings are added)
+
+**Protected (never changed):**
+- Your pages and content
+- Your media files
+- Your existing menus and templates
+- Your customized theme settings values
+
+For more details on theme updates, see [Themes](themes.html#theme-updates).

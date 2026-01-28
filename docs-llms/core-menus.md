@@ -20,28 +20,27 @@ A typical menu JSON file (`main-menu.json`) has the following structure:
     {
       "id": "1",
       "label": "Home",
-      "type": "page",
-      "value": "home"
+      "link": "index.html",
+      "pageUuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
     },
     {
       "id": "2",
       "label": "About Us",
-      "type": "page",
-      "value": "about",
+      "link": "about.html",
+      "pageUuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
       "items": [
         {
           "id": "3",
           "label": "Our Team",
-          "type": "page",
-          "value": "team"
+          "link": "team.html",
+          "pageUuid": "c3d4e5f6-a7b8-9012-cdef-123456789012"
         }
       ]
     },
     {
       "id": "4",
       "label": "External Link",
-      "type": "url",
-      "value": "https://example.com"
+      "link": "https://example.com"
     }
   ],
   "created": "2023-10-28T10:00:00.000Z",
@@ -49,7 +48,17 @@ A typical menu JSON file (`main-menu.json`) has the following structure:
 }
 ```
 
+**Menu Item Fields:**
+
 - `items`: An array of menu item objects. Each item can contain a nested `items` array, allowing for up to 3 levels of hierarchy.
+- `id`: A unique identifier for the menu item within the menu.
+- `label`: The display text shown in the navigation.
+- `link`: The URL or page filename (e.g., `about.html` for internal pages, or a full URL for external links).
+- `pageUuid` (optional): For internal page links, stores the page's stable UUID. This ensures the link remains valid even if the page is renamed. When rendering, the system resolves the `pageUuid` to the current page slug. If the referenced page is deleted, the link is automatically cleared.
+
+**Link Resolution:**
+
+When a menu is rendered (in preview or export), the rendering service checks each item's `pageUuid` and resolves it to the current page slug, ensuring links stay up-to-date even after page renames.
 
 ## 2. Frontend Implementation
 
