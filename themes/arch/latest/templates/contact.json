@@ -1,0 +1,131 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_form": {
+      "type": "contact-form",
+      "settings": {
+        "eyebrow": "Contact",
+        "title": "Let us talk about your next move",
+        "description": "Share a few details and we will respond within two business days.",
+        "form_action": "/submit",
+        "form_method": "POST",
+        "show_sidebar": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "input-name": {
+          "type": "input",
+          "settings": {
+            "label": "Name",
+            "name": "name",
+            "input_type": "text",
+            "placeholder": "Your name",
+            "required": true
+          }
+        },
+        "input-email": {
+          "type": "input",
+          "settings": {
+            "label": "Work Email",
+            "name": "email",
+            "input_type": "email",
+            "placeholder": "you@company.com",
+            "required": true
+          }
+        },
+        "input-company": {
+          "type": "input",
+          "settings": {
+            "label": "Company",
+            "name": "company",
+            "input_type": "text",
+            "placeholder": "Company name",
+            "required": false
+          }
+        },
+        "dropdown-subject": {
+          "type": "dropdown",
+          "settings": {
+            "label": "What are you exploring?",
+            "name": "interest",
+            "options": "Strategy planning\nOperational improvement\nGo-to-market\nDigital transformation\nOther",
+            "required": true
+          }
+        },
+        "textarea-message": {
+          "type": "textarea",
+          "settings": {
+            "label": "Message",
+            "name": "message",
+            "placeholder": "Tell us about your goals and timeline...",
+            "required": true
+          }
+        },
+        "submit-button": {
+          "type": "submit",
+          "settings": {
+            "text": "Send message"
+          }
+        },
+        "info-email": {
+          "type": "info",
+          "settings": {
+            "title": "Email",
+            "text": "hello@arch.co"
+          }
+        },
+        "info-phone": {
+          "type": "info",
+          "settings": {
+            "title": "Phone",
+            "text": "+1 (415) 555-0198"
+          }
+        },
+        "info-address": {
+          "type": "info",
+          "settings": {
+            "title": "Office",
+            "text": "500 Market Street\nSan Francisco, CA"
+          }
+        }
+      },
+      "blocksOrder": [
+        "input-name",
+        "input-email",
+        "input-company",
+        "dropdown-subject",
+        "textarea-message",
+        "submit-button",
+        "info-email",
+        "info-phone",
+        "info-address"
+      ]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Location",
+        "title": "Visit our office",
+        "description": "We are in the heart of the financial district.",
+        "address": "500 Market Street, San Francisco, CA 94105",
+        "directions_link": {
+          "text": "Get directions",
+          "href": "https://maps.google.com/?q=500%20Market%20Street%20San%20Francisco%20CA",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "color_scheme": "standard"
+      }
+    }
+  },
+  "widgetsOrder": [
+    "contact_form",
+    "contact_map"
+  ],
+  "id": "contact",
+  "created": "2026-01-17T16:13:19.603Z",
+  "updated": "2026-01-17T16:33:35.716Z"
+}

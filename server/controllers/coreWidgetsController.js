@@ -3,7 +3,8 @@ import path from "path";
 import { CORE_WIDGETS_DIR } from "../config.js";
 
 /**
- * Get all available core widgets
+ * Retrieves all available core widget schemas from the core widgets directory.
+ * @returns {Promise<Array<object>>} Array of widget schema objects
  */
 export async function getCoreWidgets() {
   try {
@@ -40,7 +41,9 @@ export async function getCoreWidgets() {
 }
 
 /**
- * Get a specific core widget by name
+ * Retrieves a specific core widget schema by its folder name.
+ * @param {string} widgetName - The widget folder name
+ * @returns {Promise<object|null>} The widget schema or null if not found
  */
 export async function getCoreWidget(widgetName) {
   try {
@@ -59,7 +62,10 @@ export async function getCoreWidget(widgetName) {
 }
 
 /**
- * API endpoint to get all core widgets
+ * API endpoint to retrieve all core widget schemas.
+ * @param {import('express').Request} req - Express request object
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function getAllCoreWidgets(req, res) {
   try {

@@ -227,7 +227,8 @@
       "actions": "Actions"
     },
     "badges": {
-      "active": "Active"
+      "active": "Active",
+      "updateAvailable": "Update available"
     },
     "actions": {
       "currentActive": "Current active project",
@@ -594,15 +595,27 @@
       "supported": "Supported format: .zip"
     },
     "version": "Version {{version}}",
+    "versionsAvailable": "versions",
     "widgets": "{{count}} widgets",
     "by": "By {{author}}",
     "active": "Active",
     "emptyTitle": "No themes available",
     "emptyDesc": "Upload a theme using the area above to get started",
+    "updateAvailable": "Update available",
+    "buttons": {
+      "rebuildThemes": "Rebuild Themes",
+      "rebuilding": "Rebuilding...",
+      "update": "Update",
+      "updating": "Updating..."
+    },
     "toasts": {
       "singleFileError": "Please upload a single zip file.",
       "uploadSuccess": "Theme uploaded successfully!",
-      "uploadError": "Failed to upload theme."
+      "uploadError": "Failed to upload theme.",
+      "rebuildSuccess": "Rebuilt {{count}} theme(s) successfully",
+      "rebuildError": "Failed to rebuild themes",
+      "updateSuccess": "Theme updated successfully!",
+      "updateError": "Failed to update theme"
     }
   },
   "plugins": {
@@ -630,6 +643,11 @@
         "label": "Export & Versioning",
         "description": "Manage export settings and version control",
         "sectionTitle": "Export & Versioning Settings"
+      },
+      "developer": {
+        "label": "Developer Tools",
+        "description": "Tools for theme and widget development",
+        "sectionTitle": "Developer Tools"
       }
     },
     "groups": {
@@ -715,6 +733,12 @@
       "maxImportSizeMB": {
         "label": "Max Project Import Size (MB)",
         "description": "Maximum file size for project import ZIP files. Increase this if you need to import large projects with many media files."
+      }
+    },
+    "developer": {
+      "enabled": {
+        "label": "Enable Developer Mode",
+        "description": "Shows developer tools for theme development, such as the ability to rebuild theme versions."
       }
     },
     "messages": {

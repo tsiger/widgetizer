@@ -9,6 +9,8 @@ Delete project
 Set active project
 Export project (ZIP download for backup/transfer)
 Import project (ZIP upload from another installation)
+View theme update indicator (shows when theme's latest version > project's version)
+Apply theme update (copies updatable files from theme's latest/ to project)
 
 Pages:
 Identifier usage: page actions use projectId (UUID) in API; server resolves folderName for filesystem paths.
@@ -44,6 +46,8 @@ View themes
 Upload theme
 Activate theme (via project edit)
 Delete theme
+View pending update count (sidebar badge)
+Update theme (build latest/ snapshot from base + updates/)
 
 Export:
 Identifier usage: export API uses projectId (UUID); output directory uses folderName for filesystem paths.
@@ -59,6 +63,7 @@ View app settings
 Edit app settings
 Save app settings
 Cancel app settings changes
+Toggle developer mode (reserved for future developer tools)
 
 Dashboard:
 Identifier usage: displays active project (projectId UUID) and resolves folderName server-side as needed.

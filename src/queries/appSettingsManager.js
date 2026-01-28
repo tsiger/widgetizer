@@ -1,7 +1,19 @@
 import { API_URL } from "../config";
 
 /**
- * Get current application settings
+ * @typedef {Object} AppSettings
+ * @property {string} [language] - UI language code (e.g., 'en', 'de')
+ * @property {string} [theme] - UI theme ('light', 'dark', 'system')
+ * @property {boolean} [autoSave] - Whether to auto-save changes
+ * @property {number} [autoSaveInterval] - Auto-save interval in milliseconds
+ * @property {string} [exportPath] - Default export directory path
+ * @property {Object} [editor] - Editor-specific settings
+ */
+
+/**
+ * Fetch current application settings.
+ * @returns {Promise<AppSettings>} The current application settings
+ * @throws {Error} If the API request fails
  */
 export async function getAppSettings() {
   try {
@@ -18,7 +30,11 @@ export async function getAppSettings() {
 }
 
 /**
- * Save application settings
+ * Save application settings.
+ * Partial updates are supported - only provided fields will be updated.
+ * @param {Partial<AppSettings>} settingsData - The settings to save
+ * @returns {Promise<{message: string, settings: AppSettings}>} Save confirmation with updated settings
+ * @throws {Error} If the save fails
  */
 export async function saveAppSettings(settingsData) {
   try {

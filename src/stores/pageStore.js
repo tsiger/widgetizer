@@ -4,6 +4,31 @@ import { getPage } from "../queries/pageManager";
 import { getGlobalWidgets } from "../queries/previewManager";
 import { getThemeSettings } from "../queries/themeManager";
 
+/**
+ * Zustand store for managing page editor state with undo/redo support via zundo.
+ * Handles page data, global widgets (header/footer), and theme settings.
+ *
+ * @typedef {Object} PageStore
+ * @property {Object|null} page - The current page data being edited
+ * @property {Object|null} originalPage - Deep copy of page at load time for change detection
+ * @property {{header: Object|null, footer: Object|null}} globalWidgets - Global header and footer widget data
+ * @property {Object|null} themeSettings - Current theme settings (tracked for undo)
+ * @property {Object|null} originalThemeSettings - Deep copy of theme settings at load time
+ * @property {boolean} loading - Whether page data is being loaded
+ * @property {string|null} error - Error message if loading failed
+ * @property {Function} loadPage - Load a page by ID, including global widgets and theme settings
+ * @property {Function} loadThemeSettings - Load theme settings for undo tracking
+ * @property {Function} updateThemeSetting - Update a single theme setting value
+ * @property {Function} hasUnsavedThemeChanges - Check if theme settings differ from original
+ * @property {Function} markThemeSettingsSaved - Update original theme settings after save
+ * @property {Function} loadGlobalWidgets - Load header and footer widgets separately
+ * @property {Function} setPage - Update the page state
+ * @property {Function} updateGlobalWidget - Update a global widget's settings
+ * @property {Function} resetPage - Revert page to original loaded state
+ * @property {Function} clearPage - Reset all page state to initial values
+ * @property {Function} setOriginalPage - Update the original page reference
+ */
+
 const selectTemporalState = (state) => ({
   page: state.page,
   globalWidgets: state.globalWidgets,

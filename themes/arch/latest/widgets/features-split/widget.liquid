@@ -1,0 +1,154 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-features-split widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  {% if widget.settings.color_scheme == 'highlight' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="features-split"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .features-split-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-2xl);
+      }
+
+      & .features-split-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+
+        & > * {
+          margin-block: 0;
+        }
+      }
+
+      & .features-split-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xl);
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        {% if widget.settings.show_divider %}
+        padding-inline-start: var(--space-xl);
+        border-inline-start: var(--border-width-thin) solid var(--border-color);
+        {% endif %}
+      }
+
+      & .features-split-item {
+        display: flex;
+        gap: var(--space-md);
+      }
+
+      & .features-split-icon {
+        flex-shrink: 0;
+        width: var(--icon-size-xl);
+        height: var(--icon-size-xl);
+        color: var(--accent);
+        stroke-width: 0.15rem;
+      }
+
+      & .features-split-item-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+      }
+
+      & .features-split-item-title {
+        margin: 0;
+      }
+
+      & .features-split-item-description {
+        margin: 0;
+      }
+
+      @media (min-width: 750px) {
+        & .features-split-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: var(--space-3xl);
+          align-items: start;
+        }
+
+        {% if widget.settings.content_position == 'right' %}
+        & .features-split-content {
+          order: 2;
+        }
+
+        & .features-split-features {
+          order: 1;
+        }
+
+        & .features-split-list {
+          {% if widget.settings.show_divider %}
+          padding-inline-start: 0;
+          padding-inline-end: var(--space-xl);
+          border-inline-start: none;
+          border-inline-end: var(--border-width-thin) solid var(--border-color);
+          {% endif %}
+        }
+        {% endif %}
+      }
+
+      @media (min-width: 990px) {
+        & .features-split-grid {
+          gap: var(--space-4xl);
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+    <div class="features-split-grid">
+      <div class="features-split-content">
+        {% assign content_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign content_delay = content_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign content_delay = content_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description block-text reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+
+      <div class="features-split-features">
+        {% assign item_heading_level = 'h3' %}
+        {% if widget.settings.title == blank %}
+          {% assign item_heading_level = 'h2' %}
+        {% endif %}
+
+        <ul class="features-split-list">
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+            <li class="features-split-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+              {% if block.settings.icon != blank %}
+                {% render 'icon', icon: block.settings.icon, class: 'features-split-icon' %}
+              {% endif %}
+              <div class="features-split-item-content">
+                <{{ item_heading_level }} class="features-split-item-title block-text block-text-lg block-text-heading-weight block-text-heading" data-setting="title">
+                  {{ block.settings.title }}
+                </{{ item_heading_level }}>
+                {% if block.settings.description != blank %}
+                  <p class="features-split-item-description block-text block-text-sm block-text-muted" data-setting="description">
+                    {{ block.settings.description }}
+                  </p>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

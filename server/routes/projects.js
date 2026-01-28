@@ -142,4 +142,29 @@ router.post("/import", async (req, res, next) => {
   }
 }, projectController.importProject);
 
+// ============================================================================
+// Theme Update Routes
+// ============================================================================
+
+// GET /api/projects/:id/theme-updates/status - Check for theme updates
+router.get(
+  "/:id/theme-updates/status",
+  [param("id").notEmpty().withMessage("Project ID is required.")],
+  projectController.getThemeUpdateStatus,
+);
+
+// PUT /api/projects/:id/theme-updates - Toggle theme updates preference
+router.put(
+  "/:id/theme-updates",
+  [param("id").notEmpty().withMessage("Project ID is required.")],
+  projectController.toggleProjectThemeUpdates,
+);
+
+// POST /api/projects/:id/theme-updates/apply - Apply theme update
+router.post(
+  "/:id/theme-updates/apply",
+  [param("id").notEmpty().withMessage("Project ID is required.")],
+  projectController.applyProjectThemeUpdate,
+);
+
 export default router;

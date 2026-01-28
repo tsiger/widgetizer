@@ -1,5 +1,21 @@
 import { create } from "zustand";
 
+/**
+ * Zustand store for managing toast notifications.
+ * Supports multiple simultaneous toasts with auto-dismiss and manual dismissal.
+ *
+ * @typedef {Object} Toast
+ * @property {string} id - Unique identifier for the toast
+ * @property {string} message - The message to display
+ * @property {string} variant - Toast type: 'success', 'error', 'warning', or 'info'
+ *
+ * @typedef {Object} ToastStore
+ * @property {Array<Toast>} toasts - Array of currently visible toasts
+ * @property {Function} showToast - Display a new toast notification
+ * @property {Function} dismissToast - Remove a specific toast by ID
+ * @property {Function} clearToasts - Remove all visible toasts
+ */
+
 const useToastStore = create((set) => ({
   toasts: [],
 

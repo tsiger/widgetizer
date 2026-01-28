@@ -1,0 +1,213 @@
+{
+  "type": "profile-grid",
+  "displayName": "Profile Grid",
+  "aliases": [
+    "team",
+    "members",
+    "staff",
+    "about us"
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Our Team"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Meet Our Team"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns (Desktop)",
+      "default": 4,
+      "min": 2,
+      "max": 5,
+      "step": 1
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "profile",
+      "displayName": "Team Member",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
+          "type": "image",
+          "id": "photo",
+          "label": "Photo"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "John Doe"
+        },
+        {
+          "type": "text",
+          "id": "role",
+          "label": "Role / Title",
+          "default": "Team Member"
+        },
+        {
+          "type": "text",
+          "id": "specialty",
+          "label": "Specialty"
+        },
+        {
+          "type": "textarea",
+          "id": "bio",
+          "label": "Bio"
+        },
+        {
+          "type": "header",
+          "id": "social_header",
+          "label": "Social Media"
+        },
+        {
+          "type": "text",
+          "id": "linkedin",
+          "label": "LinkedIn URL"
+        },
+        {
+          "type": "text",
+          "id": "twitter",
+          "label": "Twitter URL"
+        },
+        {
+          "type": "text",
+          "id": "instagram",
+          "label": "Instagram URL"
+        },
+        {
+          "type": "text",
+          "id": "facebook",
+          "label": "Facebook URL"
+        },
+        {
+          "type": "text",
+          "id": "email",
+          "label": "Email"
+        },
+        {
+          "type": "text",
+          "id": "github",
+          "label": "GitHub URL"
+        },
+        {
+          "type": "text",
+          "id": "youtube",
+          "label": "YouTube URL"
+        },
+        {
+          "type": "text",
+          "id": "tiktok",
+          "label": "TikTok URL"
+        },
+        {
+          "type": "text",
+          "id": "pinterest",
+          "label": "Pinterest URL"
+        },
+        {
+          "type": "text",
+          "id": "bluesky",
+          "label": "Bluesky URL"
+        },
+        {
+          "type": "text",
+          "id": "discord",
+          "label": "Discord URL"
+        },
+        {
+          "type": "text",
+          "id": "meta",
+          "label": "Meta URL"
+        },
+        {
+          "type": "text",
+          "id": "reddit",
+          "label": "Reddit URL"
+        },
+        {
+          "type": "text",
+          "id": "telegram",
+          "label": "Telegram URL"
+        },
+        {
+          "type": "text",
+          "id": "threads",
+          "label": "Threads URL"
+        },
+        {
+          "type": "text",
+          "id": "whatsapp",
+          "label": "WhatsApp URL"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "profile",
+      "settings": {
+        "name": "Marco Rossi",
+        "role": "Executive Chef",
+        "specialty": "Italian & Mediterranean",
+        "bio": "With over 15 years of culinary experience, Chef Marco brings authentic Italian flavors to every dish."
+      }
+    },
+    {
+      "type": "profile",
+      "settings": {
+        "name": "Sofia Chen",
+        "role": "Pastry Chef",
+        "specialty": "French Pastries",
+        "bio": "Trained in Paris, Sofia crafts exquisite desserts that are as beautiful as they are delicious."
+      }
+    },
+    {
+      "type": "profile",
+      "settings": {
+        "name": "James Wilson",
+        "role": "Sous Chef",
+        "specialty": "Farm-to-Table",
+        "bio": "James sources the freshest local ingredients to create seasonal specialties."
+      }
+    }
+  ]
+}

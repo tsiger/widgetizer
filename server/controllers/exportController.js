@@ -121,7 +121,12 @@ async function recordExport(projectId, version, outputDir, status = "success") {
   return exportRecord;
 }
 
-// Helper function to clean up all exports for a deleted project
+/**
+ * Cleans up all export directories and history for a deleted project.
+ * @param {string} projectId - The project UUID
+ * @returns {Promise<{deletedDirs: number, deletedHistory: boolean}>} Cleanup results
+ * @throws {Error} If cleanup fails
+ */
 export async function cleanupProjectExports(projectId) {
   try {
     console.log(`Cleaning up exports for deleted project: ${projectId}`);
@@ -162,8 +167,13 @@ export async function cleanupProjectExports(projectId) {
   }
 }
 
-// Main function to handle the export request
-
+/**
+ * Exports a project to static HTML files with assets, sitemap, and robots.txt.
+ * Renders all pages with widgets, copies used media, and records the export in history.
+ * @param {import('express').Request} req - Express request object with projectId in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function exportProject(req, res) {
   const { projectId } = req.params;
 
@@ -743,7 +753,12 @@ async function findEntryFile(exportDir) {
   }
 }
 
-// Get export files info for frontend
+/**
+ * Retrieves information about an export directory, including the entry file.
+ * @param {import('express').Request} req - Express request object with exportDir in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function getExportFiles(req, res) {
   try {
     const { exportDir } = req.params;
@@ -781,7 +796,12 @@ export async function getExportFiles(req, res) {
   }
 }
 
-// Download export as ZIP
+/**
+ * Downloads an export directory as a ZIP archive.
+ * @param {import('express').Request} req - Express request object with exportDir in params
+ * @param {import('express').Response} res - Express response object (streams ZIP)
+ * @returns {Promise<void>}
+ */
 export async function downloadExport(req, res) {
   try {
     const { exportDir } = req.params;
@@ -841,7 +861,12 @@ export async function downloadExport(req, res) {
   }
 }
 
-// Get export history for a project
+/**
+ * Retrieves the export history for a project including all past export records.
+ * @param {import('express').Request} req - Express request object with projectId in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function getExportHistory(req, res) {
   try {
     const { projectId } = req.params;
@@ -881,7 +906,12 @@ export async function getExportHistory(req, res) {
   }
 }
 
-// Delete a specific export
+/**
+ * Deletes a specific export version and its directory from a project.
+ * @param {import('express').Request} req - Express request object with projectId and version in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function deleteExport(req, res) {
   try {
     const { projectId, version } = req.params;

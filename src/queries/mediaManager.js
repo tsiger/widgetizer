@@ -1,11 +1,45 @@
 import { API_URL } from "../config";
 
+/**
+ * @typedef {Object} MediaFile
+ * @property {string} id - Unique file identifier
+ * @property {string} filename - Original filename
+ * @property {string} mimeType - MIME type of the file
+ * @property {number} size - File size in bytes
+ * @property {number} [width] - Image width (for images)
+ * @property {number} [height] - Image height (for images)
+ * @property {string} [thumbnailUrl] - URL to thumbnail version
+ * @property {string} originalUrl - URL to original file
+ * @property {string[]} [usedIn] - Array of page/content IDs using this file
+ * @property {string} createdAt - ISO timestamp of upload
+ */
+
+/**
+ * @typedef {Object} MediaCollection
+ * @property {MediaFile[]} files - Array of media files
+ * @property {number} totalSize - Total size of all files in bytes
+ * @property {number} count - Total number of files
+ */
+
+/**
+ * @typedef {Object} UploadResult
+ * @property {boolean} success - Whether upload completed successfully
+ * @property {MediaFile[]} processedFiles - Array of successfully uploaded files
+ * @property {Array<{filename: string, error: string}>} [errors] - Any upload errors
+ * @property {number} status - HTTP status code
+ */
+
 // Per-project cache for media data to prevent redundant API calls
 const mediaCache = new Map(); // projectId -> { data, timestamp, promise }
 const CACHE_DURATION = 30000; // 30 seconds cache
 
 /**
- * Get all media files for a project (with caching and request deduplication)
+ * Fetch all media files for a project with caching and request deduplication.
+ * Subsequent calls within the cache duration return cached data.
+ * @param {string} projectId - The ID of the project
+ * @param {boolean} [forceRefresh=false] - Bypass cache and fetch fresh data
+ * @returns {Promise<MediaCollection>} Collection of media files with metadata
+ * @throws {Error} If the API request fails
  */
 export async function getProjectMedia(projectId, forceRefresh = false) {
   const now = Date.now();
@@ -67,14 +101,21 @@ export async function getProjectMedia(projectId, forceRefresh = false) {
 }
 
 /**
- * Invalidate the media cache for a project (call after uploads/deletes)
+ * Invalidate the media cache for a project.
+ * Call this after uploads or deletions to ensure fresh data on next fetch.
+ * @param {string} projectId - The ID of the project to invalidate cache for
+ * @returns {void}
  */
 export function invalidateMediaCache(projectId) {
   mediaCache.delete(projectId);
 }
 
 /**
- * Update the media cache with new data (optimistic update after uploads)
+ * Optimistically update the media cache with newly uploaded files.
+ * Used to immediately reflect uploads in the UI without a full refresh.
+ * @param {string} projectId - The ID of the project
+ * @param {MediaFile[]} newFiles - Array of newly uploaded file objects to add
+ * @returns {void}
  */
 export function updateMediaCache(projectId, newFiles) {
   const cached = mediaCache.get(projectId);
@@ -92,7 +133,13 @@ export function updateMediaCache(projectId, newFiles) {
 }
 
 /**
- * Upload media files to a project
+ * Upload one or more media files to a project.
+ * Supports progress tracking via callback for upload progress UI.
+ * @param {string} projectId - The ID of the project to upload to
+ * @param {FileList|File[]} files - Files to upload from file input or drag-drop
+ * @param {function(number): void} [onProgress] - Progress callback receiving percentage (0-100)
+ * @returns {Promise<UploadResult>} Upload result with processed files and any errors
+ * @throws {Error} If upload fails due to network error
  */
 export async function uploadProjectMedia(projectId, files, onProgress) {
   const formData = new FormData();
@@ -136,7 +183,12 @@ export async function uploadProjectMedia(projectId, files, onProgress) {
 }
 
 /**
- * Delete a media file from a project
+ * Permanently delete a single media file from a project.
+ * Automatically invalidates the media cache.
+ * @param {string} projectId - The ID of the project
+ * @param {string} fileId - The ID of the file to delete
+ * @returns {Promise<{success: boolean, message: string}>} Deletion confirmation
+ * @throws {Error} If the file cannot be deleted
  */
 export async function deleteProjectMedia(projectId, fileId) {
   try {
@@ -158,7 +210,12 @@ export async function deleteProjectMedia(projectId, fileId) {
 }
 
 /**
- * Delete multiple media files from a project
+ * Delete multiple media files from a project in a single operation.
+ * Automatically invalidates the media cache if files were deleted.
+ * @param {string} projectId - The ID of the project
+ * @param {string[]} fileIds - Array of file IDs to delete
+ * @returns {Promise<{success: boolean, deletedCount: number, errors?: string[]}>} Deletion result
+ * @throws {Error} If the bulk delete operation fails
  */
 export async function deleteMultipleMedia(projectId, fileIds) {
   try {
@@ -192,7 +249,12 @@ export async function deleteMultipleMedia(projectId, fileIds) {
 }
 
 /**
- * Get usage information for a media file
+ * Get usage information for a specific media file.
+ * Shows which pages and content blocks reference this file.
+ * @param {string} projectId - The ID of the project
+ * @param {string} fileId - The ID of the file to check
+ * @returns {Promise<{usedIn: Array<{type: string, id: string, title: string}>, usageCount: number}>} Usage details
+ * @throws {Error} If the usage check fails
  */
 export async function getMediaFileUsage(projectId, fileId) {
   try {
@@ -207,7 +269,11 @@ export async function getMediaFileUsage(projectId, fileId) {
 }
 
 /**
- * Refresh media usage tracking
+ * Refresh media usage tracking for a project.
+ * Scans all pages and content to rebuild the usage index.
+ * @param {string} projectId - The ID of the project to refresh
+ * @returns {Promise<{success: boolean, filesUpdated: number}>} Refresh result
+ * @throws {Error} If the refresh operation fails
  */
 export async function refreshMediaUsage(projectId) {
   try {
@@ -224,7 +290,11 @@ export async function refreshMediaUsage(projectId) {
 }
 
 /**
- * Get the URL for a media file
+ * Generate the URL for accessing a media file.
+ * @param {string} projectId - The ID of the project
+ * @param {string} fileId - The ID of the file
+ * @param {"original"|"thumbnail"} [type="original"] - Which version to get URL for
+ * @returns {string} The full URL to access the media file
  */
 export function getMediaUrl(projectId, fileId, type = "original") {
   const folder = type === "thumbnail" ? "thumbnails" : "originals";

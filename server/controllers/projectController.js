@@ -15,13 +15,19 @@ import {
   THEMES_DIR,
 } from "../config.js";
 import { v4 as uuidv4 } from "uuid";
+import { isNewerVersion } from "../utils/semver.js";
 
 // Make sure the projects directory exists
 async function ensureDirectories() {
   await fs.ensureDir(path.join(DATA_DIR, "projects"));
 }
 
-// Read the projects file
+/**
+ * Reads the projects metadata file from disk.
+ * Creates a new file with default structure if it doesn't exist.
+ * @returns {Promise<{projects: Array<object>, activeProjectId: string|null}>} The projects data object
+ * @throws {Error} If the file cannot be read or parsed
+ */
 export async function readProjectsFile() {
   const projectsFilePath = getProjectsFilePath();
   try {
@@ -39,8 +45,12 @@ export async function readProjectsFile() {
   }
 }
 
-// Write the projects file
-async function writeProjectsFile(data) {
+/**
+ * Writes the projects metadata to disk.
+ * @param {{projects: Array<object>, activeProjectId: string|null}} data - The projects data to save
+ * @returns {Promise<void>}
+ */
+export async function writeProjectsFile(data) {
   const projectsFilePath = getProjectsFilePath();
   await fs.outputFile(projectsFilePath, JSON.stringify(data, null, 2));
 }
@@ -70,19 +80,64 @@ async function generateUniqueProjectId(name, projects) {
   return uniqueId;
 }
 
-// Get all projects
+/**
+ * Retrieves all projects with enriched metadata including theme update status.
+ * @param {import('express').Request} _ - Express request object (unused)
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function getAllProjects(_, res) {
   try {
     await ensureDirectories();
     const data = await readProjectsFile();
-    res.json(data.projects);
+
+    // Enrich projects with hasThemeUpdate flag and theme display name
+    const enrichedProjects = await Promise.all(
+      data.projects.map(async (project) => {
+        let hasThemeUpdate = false;
+        let themeName = project.theme; // Fallback to folder ID
+
+        if (project.theme) {
+          try {
+            // Get theme display name from theme.json
+            const themeSourceDir = await themeController.getThemeSourceDir(project.theme);
+            const themeJsonPath = path.join(themeSourceDir, "theme.json");
+            const themeData = await fs.readJson(themeJsonPath);
+            themeName = themeData.name || project.theme;
+
+            // Check for updates - compare project version against theme's current source version
+            // (from latest/ snapshot or base), NOT against all available versions
+            if (project.themeVersion && themeData.version) {
+              if (isNewerVersion(project.themeVersion, themeData.version)) {
+                hasThemeUpdate = true;
+              }
+            }
+          } catch {
+            // If theme doesn't exist or can't be read, use folder ID as fallback
+          }
+        }
+
+        return {
+          ...project,
+          themeName,
+          hasThemeUpdate,
+        };
+      })
+    );
+
+    res.json(enrichedProjects);
   } catch (error) {
     console.error("Error getting projects:", error);
     res.status(500).json({ error: "Failed to get projects" });
   }
 }
 
-// Get the active project
+/**
+ * Retrieves the currently active project.
+ * @param {import('express').Request} _ - Express request object (unused)
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function getActiveProject(_, res) {
   try {
     // Read the projects file
@@ -99,7 +154,13 @@ export async function getActiveProject(_, res) {
   }
 }
 
-// Create a new project
+/**
+ * Creates a new project with the specified theme and configuration.
+ * Copies theme assets and initializes project structure including pages and menus.
+ * @param {import('express').Request} req - Express request object with project data in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function createProject(req, res) {
   // Validate incoming data
   const errors = validationResult(req);
@@ -108,7 +169,7 @@ export async function createProject(req, res) {
   }
 
   try {
-    const { name, folderName: providedFolderName, description, theme, siteUrl } = req.body;
+    const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates } = req.body;
     const data = await readProjectsFile();
 
     // Check for duplicate project names
@@ -140,17 +201,6 @@ export async function createProject(req, res) {
       folderName = await generateUniqueProjectId(name, data.projects);
     }
 
-    const newProject = {
-      id: uuidv4(), // ✅ Generate stable UUID
-      folderName, // Folder identifier
-      name,
-      description,
-      theme,
-      siteUrl: siteUrl && siteUrl.trim() !== "" ? siteUrl.trim() : "",
-      created: new Date().toISOString(),
-      updated: new Date().toISOString(),
-    };
-
     // Use the permanent folderName for directory creation
     const projectDir = getProjectDir(folderName);
     await fs.ensureDir(projectDir);
@@ -159,9 +209,30 @@ export async function createProject(req, res) {
       throw new Error("Theme is required");
     }
 
+    // Copy theme and get the version that was copied
+    let themeVersion;
     try {
       // First copy theme assets (excluding templates)
-      await themeController.copyThemeToProject(theme, projectDir, ["templates"]);
+      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"]);
+    } catch (error) {
+      await fs.remove(projectDir);
+      throw new Error(`Failed to copy theme: ${error.message}`);
+    }
+
+    const newProject = {
+      id: uuidv4(), // ✅ Generate stable UUID
+      folderName, // Folder identifier
+      name,
+      description,
+      theme,
+      themeVersion, // Version that was installed
+      receiveThemeUpdates: receiveThemeUpdates || false, // Opt-in flag (default: off)
+      siteUrl: siteUrl && siteUrl.trim() !== "" ? siteUrl.trim() : "",
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+    };
+
+    try {
 
       // Then handle templates separately, recursively
       const pagesDir = getProjectPagesDir(folderName);
@@ -214,22 +285,18 @@ export async function createProject(req, res) {
       // Start the recursive processing for templates
       await processTemplatesRecursive(themeTemplatesDir, pagesDir);
 
-      const themeMenusDir = path.join(getThemeDir(theme), "menus");
       const projectMenusDir = getProjectMenusDir(folderName);
       try {
-        // Check if theme has menus directory
-        if (await fs.pathExists(themeMenusDir)) {
-          // Ensure project menus directory exists
-          await fs.ensureDir(projectMenusDir);
-
-          // Process and enrich menu files already copied
-          const menuFiles = await fs.readdir(themeMenusDir); // Read from theme to know which files to process
+        // Check if project has menus directory (copied from theme)
+        if (await fs.pathExists(projectMenusDir)) {
+          // Process and enrich menu files that were copied from theme
+          const menuFiles = await fs.readdir(projectMenusDir);
           for (const menuFile of menuFiles) {
             if (!menuFile.endsWith(".json")) continue;
 
             const projectMenuPath = path.join(projectMenusDir, menuFile);
             try {
-              // Read the already copied menu file from the project dir
+              // Read the copied menu file from the project dir
               const menuContent = await fs.readFile(projectMenuPath, "utf8");
               const menu = JSON.parse(menuContent);
               const menuSlug = path.parse(menuFile).name;
@@ -248,16 +315,15 @@ export async function createProject(req, res) {
             }
           }
         }
-      } catch (themeMenuAccessError) {
-        // If theme menus directory doesn't exist, do nothing (no menus to enrich)
-        if (themeMenuAccessError.code !== "ENOENT") {
-          console.warn(`[ProjectController] Failed to access theme menus directory: ${themeMenuAccessError.message}`);
-          // Silently handle theme menus directory access errors
+      } catch (menuAccessError) {
+        // If project menus directory doesn't exist, do nothing
+        if (menuAccessError.code !== "ENOENT") {
+          console.warn(`[ProjectController] Failed to access project menus directory: ${menuAccessError.message}`);
         }
       }
     } catch (error) {
       await fs.remove(projectDir);
-      throw new Error(`Failed to copy theme: ${error.message}`);
+      throw new Error(`Failed to process templates: ${error.message}`);
     }
 
     // Track if we're setting this as active (only happens if no active project exists)
@@ -279,7 +345,12 @@ export async function createProject(req, res) {
   }
 }
 
-// Set the active project
+/**
+ * Sets a project as the active project.
+ * @param {import('express').Request} req - Express request object with project ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function setActiveProject(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -304,7 +375,12 @@ export async function setActiveProject(req, res) {
   }
 }
 
-// Update a project
+/**
+ * Updates an existing project's metadata and optionally renames its folder.
+ * @param {import('express').Request} req - Express request object with project ID in params and updates in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function updateProject(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -391,6 +467,11 @@ export async function updateProject(req, res) {
             ? updates.siteUrl.trim()
             : ""
           : updatedProject.siteUrl,
+      // Theme update preferences
+      receiveThemeUpdates:
+        updates.receiveThemeUpdates !== undefined
+          ? updates.receiveThemeUpdates
+          : updatedProject.receiveThemeUpdates,
       updated: new Date().toISOString(),
     };
 
@@ -405,7 +486,12 @@ export async function updateProject(req, res) {
   }
 }
 
-// Delete a project
+/**
+ * Deletes a project and all its associated files including exports.
+ * @param {import('express').Request} req - Express request object with project ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function deleteProject(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -457,7 +543,12 @@ export async function deleteProject(req, res) {
   }
 }
 
-// Duplicate a project
+/**
+ * Creates a duplicate of an existing project with a new unique name and folder.
+ * @param {import('express').Request} req - Express request object with project ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function duplicateProject(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -502,6 +593,10 @@ export async function duplicateProject(req, res) {
       folderName: newFolderName, // Permanent folder identifier
       slug: undefined, // Clear legacy slug
       name: newName,
+      // Preserve theme info from original
+      theme: originalProject.theme,
+      themeVersion: originalProject.themeVersion,
+      receiveThemeUpdates: originalProject.receiveThemeUpdates || false,
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
@@ -542,7 +637,12 @@ export async function duplicateProject(req, res) {
   }
 }
 
-// Get project widgets
+/**
+ * Retrieves all available widget schemas for a project, including core and theme widgets.
+ * @param {import('express').Request} req - Express request object with project ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function getProjectWidgets(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -653,7 +753,12 @@ export async function getProjectWidgets(req, res) {
   }
 }
 
-// Get project icons
+/**
+ * Retrieves the icon set available for a project from its theme.
+ * @param {import('express').Request} req - Express request object with project ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function getProjectIcons(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -690,7 +795,12 @@ export async function getProjectIcons(req, res) {
   }
 }
 
-// Export project as ZIP
+/**
+ * Exports a project as a downloadable ZIP archive including all files and metadata.
+ * @param {import('express').Request} req - Express request object with project ID in params
+ * @param {import('express').Response} res - Express response object (streams ZIP)
+ * @returns {Promise<void>}
+ */
 export async function exportProject(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -725,13 +835,14 @@ export async function exportProject(req, res) {
 
     // Create export manifest
     const manifest = {
-      formatVersion: "1.0",
+      formatVersion: "1.1",
       exportedAt: new Date().toISOString(),
       widgetizerVersion: appVersion,
       project: {
         name: project.name,
         description: project.description || "",
         theme: project.theme,
+        themeVersion: project.themeVersion || null,
         siteUrl: project.siteUrl || "",
         created: project.created,
         updated: project.updated,
@@ -801,7 +912,13 @@ export async function exportProject(req, res) {
   }
 }
 
-// Import project from ZIP
+/**
+ * Imports a project from an uploaded ZIP archive.
+ * Validates the archive structure and theme compatibility before import.
+ * @param {import('express').Request} req - Express request object with ZIP file in req.file
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function importProject(req, res) {
   try {
     if (!req.file) {
@@ -890,6 +1007,21 @@ export async function importProject(req, res) {
         throw new Error("Manifest not found in extracted files");
       }
 
+      // Determine themeVersion: prefer manifest, fallback to project's theme.json
+      let themeVersion = manifest.project.themeVersion || null;
+      if (!themeVersion) {
+        // Fallback for older exports: read from project's theme.json
+        const projectThemeJsonPath = path.join(tempDir, "theme.json");
+        try {
+          if (await fs.pathExists(projectThemeJsonPath)) {
+            const projectThemeJson = await fs.readJson(projectThemeJsonPath);
+            themeVersion = projectThemeJson.version || null;
+          }
+        } catch (err) {
+          console.warn("Could not read theme.json for version fallback:", err.message);
+        }
+      }
+
       // Create new project object (but don't add to projects.json yet)
       newProject = {
         id: uuidv4(),
@@ -897,6 +1029,7 @@ export async function importProject(req, res) {
         name: manifest.project.name,
         description: manifest.project.description || "",
         theme: manifest.project.theme,
+        themeVersion,
         siteUrl: manifest.project.siteUrl || "",
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
@@ -969,5 +1102,93 @@ export async function importProject(req, res) {
   } catch (error) {
     console.error("Error importing project:", error);
     res.status(500).json({ error: error.message || "Failed to import project" });
+  }
+}
+
+// ============================================================================
+// Theme Update API Handlers
+// ============================================================================
+
+/**
+ * Checks if a theme update is available for a project.
+ * @param {import('express').Request} req - Express request object with project ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+export async function getThemeUpdateStatus(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { id } = req.params;
+    const { checkForUpdates } = await import("../services/themeUpdateService.js");
+    const status = await checkForUpdates(id);
+    res.json(status);
+  } catch (error) {
+    console.error("Error checking theme update status:", error);
+    if (error.message.includes("not found")) {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: error.message || "Failed to check theme update status" });
+  }
+}
+
+/**
+ * Toggles the theme update preference for a project.
+ * @param {import('express').Request} req - Express request object with project ID in params and enabled flag in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+export async function toggleProjectThemeUpdates(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { id } = req.params;
+    const { enabled } = req.body;
+
+    if (typeof enabled !== "boolean") {
+      return res.status(400).json({ error: "'enabled' must be a boolean" });
+    }
+
+    const { toggleThemeUpdates } = await import("../services/themeUpdateService.js");
+    const result = await toggleThemeUpdates(id, enabled);
+    res.json(result);
+  } catch (error) {
+    console.error("Error toggling theme updates:", error);
+    if (error.message.includes("not found")) {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: error.message || "Failed to toggle theme updates" });
+  }
+}
+
+/**
+ * Applies available theme updates to a project.
+ * @param {import('express').Request} req - Express request object with project ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+export async function applyProjectThemeUpdate(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { id } = req.params;
+    const { applyThemeUpdate } = await import("../services/themeUpdateService.js");
+    const result = await applyThemeUpdate(id);
+    res.json(result);
+  } catch (error) {
+    console.error("Error applying theme update:", error);
+    if (error.message.includes("not found")) {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: error.message || "Failed to apply theme update" });
   }
 }

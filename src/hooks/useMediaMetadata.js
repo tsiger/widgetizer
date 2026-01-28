@@ -1,6 +1,31 @@
 import { useState } from "react";
 import { API_URL } from "../config";
 
+/**
+ * Hook for managing media file metadata editing via a drawer interface.
+ * Handles opening/closing the metadata drawer, saving metadata changes, and viewing files.
+ *
+ * @param {Object} params - Hook parameters
+ * @param {Object} params.activeProject - The currently active project containing the media
+ * @param {Function} params.showToast - Function to display toast notifications
+ * @param {Function} params.setFiles - State setter to update the files list after metadata changes
+ * @returns {{
+ *   drawerVisible: boolean,
+ *   selectedFileForEdit: Object|null,
+ *   isSavingMetadata: boolean,
+ *   handleEditMetadata: (file: Object) => void,
+ *   handleCloseDrawer: () => void,
+ *   handleSaveMetadata: (fileId: string, metadata: Object) => Promise<void>,
+ *   handleFileView: (file: Object) => void
+ * }} Metadata editing state and handlers
+ * @property {boolean} drawerVisible - Whether the metadata editing drawer is open
+ * @property {Object|null} selectedFileForEdit - The file currently being edited
+ * @property {boolean} isSavingMetadata - Whether metadata is being saved
+ * @property {Function} handleEditMetadata - Open the drawer to edit a file's metadata
+ * @property {Function} handleCloseDrawer - Close the metadata editing drawer
+ * @property {Function} handleSaveMetadata - Save updated metadata for a file
+ * @property {Function} handleFileView - Open a file in a new browser tab
+ */
 export default function useMediaMetadata({ activeProject, showToast, setFiles }) {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedFileForEdit, setSelectedFileForEdit] = useState(null);

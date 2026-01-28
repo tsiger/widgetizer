@@ -1,0 +1,226 @@
+{
+  "type": "slideshow",
+  "displayName": "Slideshow",
+  "aliases": ["carousel", "slider", "banner slider", "rotating banners"],
+  "settings": [
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Height",
+      "default": "medium",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth",
+      "label": "Full width",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Content alignment",
+      "default": "center",
+      "options": [
+        { "value": "center", "label": "Center" },
+        { "value": "start", "label": "Left" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Auto-rotate slides",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Change slides every",
+      "min": 3000,
+      "max": 10000,
+      "step": 1000,
+      "default": 5000,
+      "unit": "ms"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "displayName": "Slide",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Background Image"
+        },
+        {
+          "type": "text",
+          "id": "heading_text",
+          "label": "Heading Text",
+          "default": "Build your future"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Heading Size",
+          "default": "5xl",
+          "options": [
+            { "value": "lg", "label": "Large" },
+            { "value": "xl", "label": "Extra Large" },
+            { "value": "2xl", "label": "2X Large" },
+            { "value": "3xl", "label": "3X Large" },
+            { "value": "4xl", "label": "4X Large" },
+            { "value": "5xl", "label": "5X Large" }
+          ]
+        },
+        {
+          "type": "textarea",
+          "id": "text_content",
+          "label": "Text Content",
+          "default": "Start your journey with our powerful platform."
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "label": "Text Size",
+          "default": "lg",
+          "options": [
+            { "value": "sm", "label": "Small" },
+            { "value": "base", "label": "Base" },
+            { "value": "lg", "label": "Large" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "text_uppercase",
+          "label": "Uppercase",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "text_muted",
+          "label": "Muted color",
+          "default": false
+        },
+        {
+          "type": "link",
+          "id": "button_link",
+          "label": "Button 1",
+          "default": {
+            "text": "Get Started",
+            "href": "#",
+            "target": "_self"
+          }
+        },
+        {
+          "type": "link",
+          "id": "button_link_2",
+          "label": "Button 2"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "Display"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button 1 style",
+          "default": "primary",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "button_style_2",
+          "label": "Button 2 style",
+          "default": "secondary",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "button_size",
+          "label": "Button size",
+          "default": "medium",
+          "options": [
+            { "value": "small", "label": "Small" },
+            { "value": "medium", "label": "Medium" },
+            { "value": "large", "label": "Large" },
+            { "value": "xlarge", "label": "Extra Large" }
+          ]
+        },
+        {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "Overlay color",
+          "default": "#00000080",
+          "allow_alpha": true,
+          "description": "Applies only if there is a background image."
+        },
+        {
+          "type": "select",
+          "id": "color_scheme",
+          "label": "Color Scheme",
+          "default": "highlight",
+          "options": [
+            { "value": "standard", "label": "Standard" },
+            { "value": "highlight", "label": "Highlight" }
+          ]
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "slide",
+      "settings": {
+        "color_scheme": "highlight",
+        "heading_text": "Your First Slide",
+        "heading_size": "5xl",
+        "text_content": "Add your content here",
+        "text_size": "lg",
+        "button_link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        },
+        "button_style": "primary"
+      }
+    },
+    {
+      "type": "slide",
+      "settings": {
+        "color_scheme": "highlight",
+        "heading_text": "Your Second Slide",
+        "heading_size": "5xl",
+        "text_content": "Add your content here",
+        "text_size": "lg",
+        "button_link": {
+          "text": "Shop Now",
+          "href": "#",
+          "target": "_self"
+        },
+        "button_style": "primary"
+      }
+    }
+  ]
+}

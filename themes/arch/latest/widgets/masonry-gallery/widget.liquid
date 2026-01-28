@@ -1,0 +1,124 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-type-masonry-gallery widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  {% if widget.settings.color_scheme == 'highlight' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="masonry-gallery"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .masonry-grid {
+        column-count: 1;
+        column-gap: var(--space-lg);
+      }
+
+      & .widget-card {
+        break-inside: avoid;
+        margin-block-end: var(--space-lg);
+        padding: 0;
+        display: inline-block;
+        width: 100%;
+
+        &:hover .widget-card-image {
+          opacity: 0.9;
+        }
+      }
+
+      & .widget-card-image {
+        width: 100%;
+        height: auto;
+        aspect-ratio: auto;
+        display: block;
+        transition: opacity 0.3s;
+        margin-block-end: 0;
+        border-radius: 0;
+      }
+
+      & .widget-card-content {
+        padding: var(--space-md);
+      }
+
+      & .widget-card-title {
+        margin: 0;
+      }
+
+      @media (min-width: 750px) {
+        & .masonry-grid {
+          column-count: 2;
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .masonry-grid {
+          column-count: var(--masonry-cols-desktop, 4);
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div
+        class="masonry-grid"
+        style="--masonry-cols-desktop: {{ widget.settings.columns_desktop }};"
+      >
+        {% assign item_heading_level = 'h3' %}
+        {% if widget.settings.title == blank %}
+          {% assign item_heading_level = 'h2' %}
+        {% endif %}
+
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <div class="widget-card reveal reveal-fade" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+            {% if block.settings.image != blank %}
+              {{ block.settings.image | image: 'medium', 'widget-card-image' }}
+            {% else %}
+              {% assign aspect_index = forloop.index | modulo: 3 %}
+              {% if aspect_index == 1 %}
+                {% placeholder_image 'portrait', { "class": "widget-card-image" } %}
+              {% elsif aspect_index == 2 %}
+                {% placeholder_image 'landscape', { "class": "widget-card-image" } %}
+              {% else %}
+                {% placeholder_image 'square', { "class": "widget-card-image" } %}
+              {% endif %}
+            {% endif %}
+            {% if block.settings.title != blank or block.settings.category != blank %}
+              <div class="widget-card-content">
+                {% if block.settings.title != blank %}
+                  <{{ item_heading_level }} class="widget-card-title block-text block-text-base block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                {% endif %}
+                {% if block.settings.category != blank %}
+                  <p class="widget-card-category block-text block-text-sm" data-setting="category">{{ block.settings.category }}</p>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

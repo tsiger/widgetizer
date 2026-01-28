@@ -168,12 +168,27 @@ export default function ProjectForm({
               <option value="">{t("forms.project.selectTheme")}</option>
               {themes.map((theme) => (
                 <option key={theme.id} value={theme.id}>
-                  {theme.name}
+                  {theme.name} {theme.latestVersion && `(v${theme.latestVersion})`}
                 </option>
               ))}
             </select>
             {errors.theme && <p className="form-error">{errors.theme.message}</p>}
             <p className="form-description">{t("forms.project.themeHelp")}</p>
+          </div>
+        )}
+
+        {/* Theme info for existing projects */}
+        {!isNew && initialData.theme && (
+          <div className="form-field">
+            <label className="form-label">{t("forms.project.themeLabel")}</label>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span className="font-medium">{initialData.themeName || initialData.theme}</span>
+              {initialData.themeVersion && (
+                <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">
+                  v{initialData.themeVersion}
+                </span>
+              )}
+            </div>
           </div>
         )}
 

@@ -1,0 +1,292 @@
+{
+  "type": "content-switcher",
+  "displayName": "Content Switcher",
+  "aliases": ["tabs", "toggle content", "switch", "selector"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Pricing"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Choose Your Plan"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Select the billing cycle that works best for you. All plans include our core features."
+    },
+    {
+      "type": "header",
+      "id": "switcher_header",
+      "label": "Switcher"
+    },
+    {
+      "type": "select",
+      "id": "switcher_type",
+      "label": "Switcher Style",
+      "default": "toggle",
+      "options": [
+        {
+          "value": "toggle",
+          "label": "Toggle (2 Options)"
+        },
+        {
+          "value": "tabs",
+          "label": "Tabs (Up to 3 Options)"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "labels_header",
+      "label": "Labels"
+    },
+    {
+      "type": "text",
+      "id": "option_1_label",
+      "label": "Option 1 Label",
+      "default": "Monthly"
+    },
+    {
+      "type": "text",
+      "id": "option_2_label",
+      "label": "Option 2 Label",
+      "default": "Yearly"
+    },
+    {
+      "type": "text",
+      "id": "option_3_label",
+      "label": "Option 3 Label (Tabs only)",
+      "default": "Lifetime"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns per state",
+      "default": 3,
+      "min": 2,
+      "max": 5,
+      "step": 1
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "displayName": "Content Item",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Item Title"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Item description goes here."
+        },
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price / Value (Optional)"
+        },
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Link / CTA"
+        },
+        {
+          "type": "header",
+          "id": "layout_header",
+          "label": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "target_option",
+          "label": "Assign to Option",
+          "default": "1",
+          "options": [
+            {
+              "value": "1",
+              "label": "Option 1"
+            },
+            {
+              "value": "2",
+              "label": "Option 2"
+            },
+            {
+              "value": "3",
+              "label": "Option 3"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "item",
+      "settings": {
+        "title": "Starter",
+        "text": "Perfect for individuals and small projects just getting started.",
+        "price": "$12/mo",
+        "target_option": "1",
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Professional",
+        "text": "Ideal for growing teams and businesses with advanced needs.",
+        "price": "$29/mo",
+        "target_option": "1",
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Enterprise",
+        "text": "Comprehensive solution for large organizations and enterprises.",
+        "price": "$99/mo",
+        "target_option": "1",
+        "link": {
+          "text": "Contact Sales",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Starter",
+        "text": "Perfect for individuals and small projects just getting started.",
+        "price": "$120/yr",
+        "target_option": "2",
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Professional",
+        "text": "Ideal for growing teams and businesses with advanced needs.",
+        "price": "$290/yr",
+        "target_option": "2",
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Enterprise",
+        "text": "Comprehensive solution for large organizations and enterprises.",
+        "price": "$990/yr",
+        "target_option": "2",
+        "link": {
+          "text": "Contact Sales",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Starter",
+        "text": "Perfect for individuals and small projects just getting started.",
+        "price": "$499",
+        "target_option": "3",
+        "link": {
+          "text": "Buy Now",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Professional",
+        "text": "Ideal for growing teams and businesses with advanced needs.",
+        "price": "$999",
+        "target_option": "3",
+        "link": {
+          "text": "Buy Now",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Enterprise",
+        "text": "Comprehensive solution for large organizations and enterprises.",
+        "price": "$2,999",
+        "target_option": "3",
+        "link": {
+          "text": "Contact Sales",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    }
+  ]
+}

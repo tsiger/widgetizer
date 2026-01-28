@@ -50,6 +50,19 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[theme-updates.md](theme-updates.md)** - Theme Update System
+
+**Purpose**: Documents the theme versioning and update system for distributing theme improvements to projects **When to use**:
+
+- Understanding how theme updates work
+- Publishing new theme versions
+- Applying theme updates to projects
+- Understanding which files are updated vs. protected
+
+**Key topics**: Version folders, latest snapshot, update eligibility, settings merge, project update flow, developer tools
+
+---
+
 ### **[core-widgets.md](core-widgets.md)** - Core Widgets System
 
 **Purpose**: Explains the built-in, theme-agnostic widgets that ship with Widgetizer **When to use**:
@@ -230,17 +243,30 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-## 🔧 Troubleshooting
+## 🗺️ Architecture & Reference
 
-### **[troubleshooting-media-race-condition.md](troubleshooting-media-race-condition.md)** - Media Write Race Condition
+### **[app-architecture.md](app-architecture.md)** - Application Architecture
 
-**Purpose**: Diagnoses and resolves intermittent `ENOENT` errors during media file writes **When to use**:
+**Purpose**: Comprehensive documentation of the app's architecture across all major sections **When to use**:
 
-- Encountering `ENOENT: no such file or directory, rename` errors in media operations
-- Debugging concurrent file access issues during development (hot reload + autosave)
-- Understanding file locking mechanisms and retry strategies
+- Understanding how frontend, queries, routes, controllers, and services connect
+- Onboarding new developers to the codebase
+- Planning refactoring or improvements
+- Finding where specific functionality is implemented
 
-**Key topics**: Race condition analysis, lock order fixes, unique temp files, retry logic with exponential backoff, autosave interaction, development vs production considerations
+**Key topics**: Projects, Pages, Menus, Media, Themes, Export, App Settings, Preview, Page Editor architecture; improvement opportunities
+
+---
+
+### **[app-action-map.md](app-action-map.md)** - Functionality Action Map
+
+**Purpose**: Maps all user-facing functionality to implementation files **When to use**:
+
+- Finding where specific features are implemented
+- Understanding which files to modify for a feature
+- Quick reference for feature locations
+
+**Key topics**: Feature-to-file mapping across all application sections
 
 ---
 
@@ -248,7 +274,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **Theme Developers**
 
-Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md` Secondary: `core-export.md`, `core-menus.md`
+Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md`, `theme-updates.md` Secondary: `core-export.md`, `core-menus.md`
 
 ### **Frontend Developers**
 
@@ -260,7 +286,7 @@ Primary docs: `core-export.md`, `core-media.md`, `core-projects.md` Secondary: `
 
 ### **System Architects**
 
-Primary docs: `theming.md`, `core-projects.md`, `core-hooks.md` Secondary: All other documents for comprehensive understanding
+Primary docs: `theming.md`, `core-projects.md`, `core-hooks.md`, `app-architecture.md` Secondary: All other documents for comprehensive understanding
 
 ### **Content Managers / End-Users**
 
@@ -295,27 +321,16 @@ Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`
 
 ## 💻 Desktop Builds
 
-### **[build-windows.md](build-windows.md)** - Windows Portable Build
+### **[electron-app.md](electron-app.md)** - Electron Desktop App
 
-**Purpose**: Step-by-step guide for creating the portable Windows distribution with system tray app **When to use**:
+**Purpose**: Guide for developing, building, and distributing the Electron desktop application **When to use**:
 
-- Building the Windows desktop version
-- Creating portable Windows distributions
-- Understanding the Windows tray app (C#)
+- Running Electron in development mode
+- Building production distributions for macOS and Windows
+- Understanding runtime paths and app packaging
+- Code signing and distribution
 
-**Key topics**: Build process, portable Node.js, tray app compilation, packaging, distribution
-
----
-
-### **[build-macos.md](build-macos.md)** - macOS Portable Build
-
-**Purpose**: Step-by-step guide for creating the portable macOS distribution with menu bar app **When to use**:
-
-- Building the macOS desktop version
-- Creating portable macOS distributions
-- Understanding the macOS menu bar app (Swift)
-
-**Key topics**: Build process, portable Node.js, Swift app compilation, .app bundle, packaging, distribution
+**Key topics**: Development workflow, production build, runtime paths, app icons, distribution, code signing
 
 ---
 

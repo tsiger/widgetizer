@@ -4,6 +4,23 @@ import { uploadProjectMedia } from "../queries/mediaManager";
 
 const CHUNK_SIZE = 5; // Process 5 files at a time
 
+/**
+ * Hook for managing media file uploads with chunked processing, progress tracking, and SVG sanitization.
+ * Handles uploading multiple files in batches to avoid server overload.
+ *
+ * @param {Object} params - Hook parameters
+ * @param {Object} params.activeProject - The currently active project to upload files to
+ * @param {Function} params.showToast - Function to display toast notifications
+ * @param {Function} params.setFiles - State setter to add uploaded files to the media list
+ * @returns {{
+ *   uploading: boolean,
+ *   uploadProgress: Object<string, number>,
+ *   handleUpload: (acceptedFiles: Array<File>) => Promise<void>
+ * }} Upload state and handler
+ * @property {boolean} uploading - Whether an upload is in progress
+ * @property {Object<string, number>} uploadProgress - Map of filename to upload progress percentage (0-100)
+ * @property {Function} handleUpload - Process and upload an array of files
+ */
 export default function useMediaUpload({ activeProject, showToast, setFiles }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});

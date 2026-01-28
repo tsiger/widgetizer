@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Trash2, Star, Pencil, AlertCircle, CirclePlus, Copy, Download, Upload } from "lucide-react";
+import { Trash2, Star, Pencil, AlertCircle, CirclePlus, Copy, Download, Upload, ArrowUpCircle } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import Tooltip from "../components/ui/Tooltip";
@@ -191,6 +191,7 @@ export default function Projects() {
           headers={[
             t("projects.headers.title"),
             t("projects.headers.folderName"),
+            t("projects.headers.theme", "Theme"),
             t("projects.headers.created"),
             t("projects.headers.updated"),
             t("projects.headers.actions"),
@@ -212,6 +213,21 @@ export default function Projects() {
                 </td>
                 <td className="py-3 px-4">
                   <span className="font-mono text-slate-600">{project.folderName}</span>
+                </td>
+                <td className="py-3 px-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-600">
+                      {project.themeName || project.theme}
+                      {project.themeVersion && (
+                        <span className="ml-1 text-xs text-slate-400">v{project.themeVersion}</span>
+                      )}
+                    </span>
+                    {project.hasThemeUpdate && (
+                      <Tooltip content={t("projects.badges.updateAvailable", "Update available")}>
+                        <ArrowUpCircle size={16} className="text-pink-500" />
+                      </Tooltip>
+                    )}
+                  </div>
                 </td>
                 <td className="py-3 px-4">{formatDate(project.created, dateFormat)}</td>
                 <td className="py-3 px-4">{formatDate(project.updated, dateFormat)}</td>

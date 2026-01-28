@@ -1,0 +1,217 @@
+{
+  "type": "bento-grid",
+  "displayName": "Bento Grid",
+  "aliases": ["dashboard", "tiles", "highlights", "featured grid", "masonry"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Feature Spotlight"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "select",
+      "id": "gap",
+      "label": "Gap Size",
+      "default": "var(--space-md)",
+      "options": [
+        {
+          "value": "var(--space-sm)",
+          "label": "Small"
+        },
+        {
+          "value": "var(--space-md)",
+          "label": "Medium"
+        },
+        {
+          "value": "var(--space-lg)",
+          "label": "Large"
+        },
+        {
+          "value": "var(--space-xl)",
+          "label": "Extra Large"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "displayName": "Bento Item",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "Content"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Bento Tile"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Describe this featured item here."
+        },
+        {
+          "type": "image",
+          "id": "image",
+          "label": "Background image"
+        },
+        {
+          "type": "link",
+          "id": "link",
+          "label": "Link",
+          "hide_text": true
+        },
+        {
+          "type": "header",
+          "id": "layout_header",
+          "label": "Layout"
+        },
+        {
+          "type": "range",
+          "id": "col_span",
+          "label": "Column Span",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "row_span",
+          "label": "Row Span",
+          "min": 1,
+          "max": 2,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "Display"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Block Background"
+        },
+        {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "Image Overlay",
+          "default": "#00000080",
+          "allow_alpha": true,
+          "description": "Applies only if there is a background image."
+        },
+        {
+          "type": "select",
+          "id": "text_color",
+          "label": "Text Color",
+          "default": "dark",
+          "options": [
+            {
+              "value": "dark",
+              "label": "Dark"
+            },
+            {
+              "value": "light",
+              "label": "Light"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Text Alignment",
+          "default": "start",
+          "options": [
+            {
+              "value": "start",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "item",
+      "settings": {
+        "title": "Main Highlight",
+        "text": "The centerpiece of your grid.",
+        "col_span": 2,
+        "row_span": 2,
+        "background_color": "#000000",
+        "text_color": "light"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Feature 1",
+        "text": "Compact detail.",
+        "col_span": 1,
+        "background_color": "#f3f4f6"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Feature 2",
+        "text": "Compact detail.",
+        "col_span": 1,
+        "background_color": "#e5e7eb"
+      }
+    },
+    {
+      "type": "item",
+      "settings": {
+        "title": "Wide Strip",
+        "text": "Spanning across.",
+        "col_span": 2,
+        "background_color": "#d1d5db"
+      }
+    }
+  ]
+}

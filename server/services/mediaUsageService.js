@@ -5,7 +5,10 @@ import { readMediaFile, writeMediaFile } from "../controllers/mediaController.js
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 /**
- * Extract all media paths (images and videos) from page content (widgets and blocks)
+ * Extract all media paths (images, videos, audios) from page content.
+ * Scans all widget settings and block settings for upload paths.
+ * @param {object} pageData - Page data object containing widgets
+ * @returns {string[]} Array of unique media paths found (e.g., '/uploads/images/photo.jpg')
  */
 function extractMediaPathsFromPage(pageData) {
   const mediaPaths = new Set();
@@ -46,7 +49,9 @@ function extractMediaPathsFromPage(pageData) {
 }
 
 /**
- * Extract all media paths from a global widget
+ * Extract all media paths from a global widget (header/footer).
+ * @param {object} widgetData - Widget data object containing settings and blocks
+ * @returns {string[]} Array of unique media paths found
  */
 function extractMediaPathsFromGlobalWidget(widgetData) {
   const mediaPaths = new Set();
@@ -82,7 +87,14 @@ function extractMediaPathsFromGlobalWidget(widgetData) {
 }
 
 /**
- * Update usage tracking for a specific page
+ * Update media usage tracking for a specific page.
+ * Removes the page from all media files' usedIn arrays, then re-adds it
+ * only to files that are actually referenced in the page content.
+ * @param {string} projectId - The project's UUID
+ * @param {string} pageId - The page's slug/identifier
+ * @param {object} pageData - Page data object containing widgets
+ * @returns {Promise<{success: boolean, mediaPaths: string[]}>} Result with extracted media paths
+ * @throws {Error} If media file read/write fails
  */
 export async function updatePageMediaUsage(projectId, pageId, pageData) {
   try {
@@ -124,7 +136,13 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
 }
 
 /**
- * Update usage tracking for a global widget
+ * Update media usage tracking for a global widget (header/footer).
+ * Uses 'global:{id}' format for the usage identifier.
+ * @param {string} projectId - The project's UUID
+ * @param {string} globalId - Global widget identifier (e.g., 'header' or 'global:header')
+ * @param {object} widgetData - Widget data object containing settings and blocks
+ * @returns {Promise<{success: boolean, mediaPaths: string[]}>} Result with extracted media paths
+ * @throws {Error} If media file read/write fails
  */
 export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData) {
   try {
@@ -169,7 +187,12 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
 }
 
 /**
- * Remove a page from all media usage tracking
+ * Remove a page from all media usage tracking.
+ * Called when a page is deleted to clean up usage references.
+ * @param {string} projectId - The project's UUID
+ * @param {string} pageId - The page's slug/identifier to remove
+ * @returns {Promise<{success: boolean}>} Success result
+ * @throws {Error} If media file read/write fails
  */
 export async function removePageFromMediaUsage(projectId, pageId) {
   try {
@@ -193,7 +216,11 @@ export async function removePageFromMediaUsage(projectId, pageId) {
 }
 
 /**
- * Get pages that use a specific media file
+ * Get usage information for a specific media file.
+ * @param {string} projectId - The project's UUID
+ * @param {string} fileId - The media file's unique identifier
+ * @returns {Promise<{fileId: string, filename: string, usedIn: string[], isInUse: boolean}>} Usage details
+ * @throws {Error} If file not found or media file read fails
  */
 export async function getMediaUsage(projectId, fileId) {
   try {
@@ -217,7 +244,12 @@ export async function getMediaUsage(projectId, fileId) {
 }
 
 /**
- * Refresh media usage for all pages in a project
+ * Refresh media usage tracking for all pages and global widgets in a project.
+ * Resets all usedIn arrays and rebuilds them by scanning all page and global widget content.
+ * Useful for repairing corrupted usage data or after bulk operations.
+ * @param {string} projectId - The project's UUID
+ * @returns {Promise<{success: boolean, message: string}>} Result with summary message
+ * @throws {Error} If media file read/write fails
  */
 export async function refreshAllMediaUsage(projectId) {
   try {

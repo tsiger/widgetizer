@@ -1,0 +1,120 @@
+<footer
+  id="{{ widget.id }}"
+  class="widget widget-footer widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="footer"
+  {% if widget.settings.color_scheme == 'highlight' %}style="--widget-bg-color: var(--bg-primary);"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} .footer-logo {
+      max-width: {{ widget.settings.logo_width | default: 100 }}px;
+    }
+  </style>
+
+
+  <div class="footer-content">
+    {% if widget.settings.logo != blank %}
+      {{ widget.settings.logo | image: 'small', 'footer-logo', 'Footer Logo' }}
+    {% endif %}
+
+    {% if widget.settings.footerNavigation %}
+      {% render 'menu',
+        menu: widget.settings.footerNavigation,
+        class_list: 'footer-menu',
+        class_item: 'footer-menu-item',
+        class_link: 'footer-menu-link',
+        class_submenu: 'hidden',
+        class_has_submenu: 'hidden'
+      %}
+    {% endif %}
+
+    <div class="footer-social">
+      {% if widget.settings.facebook_url != blank %}
+        <a href="{{ widget.settings.facebook_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+          {% render 'icon', icon: 'facebook' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.instagram_url != blank %}
+        <a href="{{ widget.settings.instagram_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+          {% render 'icon', icon: 'instagram' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.twitter_url != blank %}
+        <a href="{{ widget.settings.twitter_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+          {% render 'icon', icon: 'twitter' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.linkedin_url != blank %}
+        <a href="{{ widget.settings.linkedin_url }}" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+          {% render 'icon', icon: 'linkedin' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.youtube_url != blank %}
+        <a href="{{ widget.settings.youtube_url }}" class="social-link" target="_blank" rel="noopener" aria-label="YouTube">
+          {% render 'icon', icon: 'youtube' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.tiktok_url != blank %}
+        <a href="{{ widget.settings.tiktok_url }}" class="social-link" target="_blank" rel="noopener" aria-label="TikTok">
+          {% render 'icon', icon: 'tiktok' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.pinterest_url != blank %}
+        <a href="{{ widget.settings.pinterest_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Pinterest">
+          {% render 'icon', icon: 'pinterest' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.github_url != blank %}
+        <a href="{{ widget.settings.github_url }}" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">
+          {% render 'icon', icon: 'github' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.mastodon_url != blank %}
+        <a href="{{ widget.settings.mastodon_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Mastodon">
+          {% render 'icon', icon: 'mastodon' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.bluesky_url != blank %}
+        <a href="{{ widget.settings.bluesky_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Bluesky">
+          {% render 'icon', icon: 'bluesky' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.discord_url != blank %}
+        <a href="{{ widget.settings.discord_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Discord">
+          {% render 'icon', icon: 'discord' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.reddit_url != blank %}
+        <a href="{{ widget.settings.reddit_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Reddit">
+          {% render 'icon', icon: 'reddit' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.telegram_url != blank %}
+        <a href="{{ widget.settings.telegram_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Telegram">
+          {% render 'icon', icon: 'telegram' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.threads_url != blank %}
+        <a href="{{ widget.settings.threads_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Threads">
+          {% render 'icon', icon: 'threads' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.whatsapp_url != blank %}
+        <a href="{{ widget.settings.whatsapp_url }}" class="social-link" target="_blank" rel="noopener" aria-label="WhatsApp">
+          {% render 'icon', icon: 'whatsapp' %}
+        </a>
+      {% endif %}
+      {% if widget.settings.mail_url != blank %}
+        <a href="{{ widget.settings.mail_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Email">
+          {% render 'icon', icon: 'mail' %}
+        </a>
+      {% endif %}
+    </div>
+
+    {% if widget.settings.copyright != blank %}
+      <p class="footer-copyright" data-setting="copyright">
+        {{ widget.settings.copyright }}
+      </p>
+    {% endif %}
+  </div>
+</footer>

@@ -5,7 +5,12 @@ import { validationResult } from "express-validator";
 import { getProjectMenusDir, getMenuPath } from "../config.js";
 import { readProjectsFile } from "./projectController.js";
 
-// Get all menus
+/**
+ * Retrieves all menus for the active project.
+ * @param {import('express').Request} req - Express request object
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function getAllMenus(req, res) {
   try {
     const { projects, activeProjectId } = await readProjectsFile();
@@ -59,7 +64,12 @@ async function generateUniqueMenuId(projectId, baseName) {
   return id;
 }
 
-// Create a new menu
+/**
+ * Creates a new menu in the active project with a unique ID.
+ * @param {import('express').Request} req - Express request object with menu data in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function createMenu(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -105,7 +115,12 @@ export async function createMenu(req, res) {
   }
 }
 
-// Delete a menu
+/**
+ * Deletes a menu from the active project.
+ * @param {import('express').Request} req - Express request object with menu ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function deleteMenu(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -131,7 +146,12 @@ export async function deleteMenu(req, res) {
   }
 }
 
-// Get a menu by id
+/**
+ * Retrieves a single menu by its ID from the active project.
+ * @param {import('express').Request} req - Express request object with menu ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function getMenu(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -161,7 +181,12 @@ export async function getMenu(req, res) {
   }
 }
 
-// Update a menu
+/**
+ * Updates an existing menu, handling ID changes when the name changes.
+ * @param {import('express').Request} req - Express request object with menu ID in params and menu data in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function updateMenu(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -235,7 +260,12 @@ export async function updateMenu(req, res) {
   }
 }
 
-// Get a menu by id (for rendering service)
+/**
+ * Retrieves a menu by ID for the rendering service.
+ * @param {string} projectIdOrDir - The project directory path
+ * @param {string} menuId - The menu identifier
+ * @returns {Promise<object>} The menu data or an object with empty items array
+ */
 export async function getMenuById(projectIdOrDir, menuId) {
   if (!menuId) {
     return null;
@@ -275,7 +305,13 @@ function generateNewMenuItemIds(items) {
   });
 }
 
-// Duplicate a menu
+/**
+ * Duplicates an existing menu with a new unique ID and "Copy of" prefix.
+ * Generates new IDs for all menu items to prevent conflicts.
+ * @param {import('express').Request} req - Express request object with menu ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function duplicateMenu(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

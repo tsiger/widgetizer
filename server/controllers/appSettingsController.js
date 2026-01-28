@@ -67,7 +67,12 @@ async function writeAppSettingsFile(settingsData) {
   }
 }
 
-// Controller function to get settings
+/**
+ * Retrieves all application settings.
+ * @param {import('express').Request} req - Express request object
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function getAppSettings(req, res) {
   try {
     const settings = await readAppSettingsFile();
@@ -78,7 +83,12 @@ export async function getAppSettings(req, res) {
   }
 }
 
-// Controller function to update settings
+/**
+ * Updates application settings with validation for media and export options.
+ * @param {import('express').Request} req - Express request object with settings in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
 export async function updateAppSettings(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -155,8 +165,12 @@ export async function updateAppSettings(req, res) {
   }
 }
 
-// Helper function to get a specific setting value (useful for other controllers)
-// Reads the file every time to ensure freshness, could be cached if needed
+/**
+ * Retrieves a specific setting value by key path (e.g., "media.maxFileSizeMB").
+ * Returns the default value if the key doesn't exist in settings.
+ * @param {string} key - The dot-notation path to the setting
+ * @returns {Promise<*>} The setting value or default
+ */
 export async function getSetting(key) {
   const settings = await readAppSettingsFile();
   // Basic dot notation access, could be made more robust

@@ -3,6 +3,41 @@ import { getProjectMedia, refreshMediaUsage, invalidateMediaCache } from "../que
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
 
+/**
+ * Hook for managing the media library state including files, view mode, filtering, and search.
+ * Automatically loads media files when the active project changes and persists view mode preference.
+ *
+ * @returns {{
+ *   files: Array,
+ *   setFiles: Function,
+ *   loading: boolean,
+ *   viewMode: string,
+ *   setViewMode: Function,
+ *   searchTerm: string,
+ *   setSearchTerm: Function,
+ *   filterType: string,
+ *   setFilterType: Function,
+ *   filteredFiles: Array,
+ *   activeProject: Object|null,
+ *   showToast: Function,
+ *   loadMediaFiles: (forceRefresh?: boolean) => Promise<void>,
+ *   handleRefreshUsage: () => Promise<void>
+ * }} Media state and actions
+ * @property {Array} files - All media files for the active project
+ * @property {Function} setFiles - Update the files array
+ * @property {boolean} loading - Whether media files are being loaded
+ * @property {string} viewMode - Current view mode ('grid' or 'list')
+ * @property {Function} setViewMode - Change the view mode
+ * @property {string} searchTerm - Current search filter text
+ * @property {Function} setSearchTerm - Update the search filter
+ * @property {string} filterType - Current type filter ('all', 'image', 'video', 'audio')
+ * @property {Function} setFilterType - Update the type filter
+ * @property {Array} filteredFiles - Files filtered by search term and type
+ * @property {Object|null} activeProject - The currently active project
+ * @property {Function} showToast - Function to display toast notifications
+ * @property {Function} loadMediaFiles - Reload media files, optionally forcing cache refresh
+ * @property {Function} handleRefreshUsage - Refresh media usage tracking data
+ */
 export default function useMediaState() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);

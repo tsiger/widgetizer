@@ -1,6 +1,24 @@
 import { create } from "zustand";
 import { getThemeSettings } from "../queries/themeManager";
 
+/**
+ * Zustand store for managing theme settings state.
+ * Used for the Settings page to display and modify global theme configuration.
+ *
+ * @typedef {Object} ThemeStore
+ * @property {Object|null} settings - Current theme settings object
+ * @property {Object|null} originalSettings - Deep copy of settings at load time for change detection
+ * @property {boolean} loading - Whether theme settings are being loaded
+ * @property {string|null} error - Error message if loading failed
+ * @property {Function} loadSettings - Fetch theme settings from the server
+ * @property {Function} setSettings - Directly update the settings object
+ * @property {Function} updateThemeSetting - Update a single setting within a group
+ * @property {Function} resetThemeSettings - Revert settings to original loaded state
+ * @property {Function} hasUnsavedThemeChanges - Check if settings differ from original
+ * @property {Function} markThemeSettingsSaved - Update original settings after successful save
+ * @property {Function} reset - Clear all state to initial values
+ */
+
 const useThemeStore = create((set, get) => ({
   // State
   settings: null,

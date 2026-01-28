@@ -66,6 +66,9 @@ async function ensureUniqueSlug(desiredSlug, projectId) {
 
 /**
  * Lists and reads data for all publishable pages in a project's pages directory.
+ * @param {string} projectId - The project folder name
+ * @returns {Promise<Array<object>>} Array of page data objects
+ * @throws {Error} If the pages directory cannot be read
  */
 export async function listProjectPagesData(projectId) {
   const pagesDir = getProjectPagesDir(projectId);
@@ -117,6 +120,9 @@ export async function listProjectPagesData(projectId) {
 
 /**
  * Reads the JSON data for a global widget (header or footer).
+ * @param {string} projectId - The project folder name
+ * @param {'header'|'footer'} widgetType - The type of global widget to read
+ * @returns {Promise<object|null>} The widget data or null if not found
  */
 export async function readGlobalWidgetData(projectId, widgetType) {
   if (widgetType !== "header" && widgetType !== "footer") {
@@ -146,7 +152,10 @@ export async function readGlobalWidgetData(projectId, widgetType) {
 }
 
 /**
- * Get a page by slug
+ * Retrieves a single page by its slug from the active project.
+ * @param {import('express').Request} req - Express request object with page slug in params.id
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function getPage(req, res) {
   const errors = validationResult(req);
@@ -179,7 +188,10 @@ export async function getPage(req, res) {
 }
 
 /**
- * Update a page
+ * Updates an existing page's metadata and content, handling slug changes and file renaming.
+ * @param {import('express').Request} req - Express request object with page slug in params.id and page data in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function updatePage(req, res) {
   const errors = validationResult(req);
@@ -314,7 +326,10 @@ export async function updatePage(req, res) {
 }
 
 /**
- * Get all pages
+ * Retrieves all pages for the active project.
+ * @param {import('express').Request} req - Express request object
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function getAllPages(req, res) {
   // No validation needed for this route
@@ -339,7 +354,10 @@ export async function getAllPages(req, res) {
 }
 
 /**
- * Delete a page
+ * Deletes a page from the active project and updates media usage tracking.
+ * @param {import('express').Request} req - Express request object with page ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function deletePage(req, res) {
   const errors = validationResult(req);
@@ -383,7 +401,11 @@ export async function deletePage(req, res) {
 }
 
 /**
- * Bulk delete pages
+ * Deletes multiple pages from the active project in a single operation.
+ * Returns detailed results including deleted, not found, and errored pages.
+ * @param {import('express').Request} req - Express request object with pageIds array in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function bulkDeletePages(req, res) {
   const errors = validationResult(req);
@@ -464,7 +486,10 @@ export async function bulkDeletePages(req, res) {
 }
 
 /**
- * Create a page
+ * Creates a new page in the active project with an auto-generated or provided slug.
+ * @param {import('express').Request} req - Express request object with page data in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function createPage(req, res) {
   const errors = validationResult(req);
@@ -515,7 +540,11 @@ export async function createPage(req, res) {
 }
 
 /**
- * Save page content from the page editor
+ * Saves page content from the page editor, including widgets and SEO data.
+ * Handles slug changes and updates media usage tracking.
+ * @param {import('express').Request} req - Express request object with page ID in params and page data in body
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function savePageContent(req, res) {
   const errors = validationResult(req);
@@ -602,8 +631,11 @@ export async function savePageContent(req, res) {
 }
 
 /**
- * Duplicate an existing page
- * Creates a copy of the page with a new unique slug and "Copy of" prefix
+ * Duplicates an existing page with a new unique slug and "Copy of" prefix.
+ * Preserves all page content including widgets and SEO settings.
+ * @param {import('express').Request} req - Express request object with page ID in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
  */
 export async function duplicatePage(req, res) {
   const errors = validationResult(req);

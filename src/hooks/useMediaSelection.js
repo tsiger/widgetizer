@@ -2,6 +2,36 @@ import { useState } from "react";
 import { deleteProjectMedia, deleteMultipleMedia } from "../queries/mediaManager";
 import useConfirmationModal from "./useConfirmationModal";
 
+/**
+ * Hook for managing media file selection and deletion operations.
+ * Supports single and bulk file selection, as well as delete confirmations with usage protection.
+ *
+ * @param {Object} params - Hook parameters
+ * @param {Object} params.activeProject - The currently active project
+ * @param {Function} params.showToast - Function to display toast notifications
+ * @param {Function} params.setFiles - State setter to update the files list after deletion
+ * @param {Array} params.filteredFiles - The current filtered list of media files
+ * @returns {{
+ *   selectedFiles: Array<string>,
+ *   setSelectedFiles: Function,
+ *   handleFileSelect: (fileId: string) => void,
+ *   handleSelectAll: () => void,
+ *   openDeleteConfirmation: (fileId: string, fileName: string) => void,
+ *   openBulkDeleteConfirmation: () => void,
+ *   modalState: Object,
+ *   closeModal: () => void,
+ *   handleConfirm: () => void
+ * }} Selection state and handlers
+ * @property {Array<string>} selectedFiles - Array of selected file IDs
+ * @property {Function} setSelectedFiles - Directly set the selected files array
+ * @property {Function} handleFileSelect - Toggle selection of a single file
+ * @property {Function} handleSelectAll - Select or deselect all filtered files
+ * @property {Function} openDeleteConfirmation - Show confirmation modal for single file deletion
+ * @property {Function} openBulkDeleteConfirmation - Show confirmation modal for bulk deletion
+ * @property {Object} modalState - Current state of the confirmation modal
+ * @property {Function} closeModal - Close the confirmation modal
+ * @property {Function} handleConfirm - Confirm and execute the delete operation
+ */
 export default function useMediaSelection({ activeProject, showToast, setFiles, filteredFiles }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
 

@@ -1,120 +1,278 @@
-## Theme Updates (Planned)
+# Theme Update System
 
-This document describes the planned theme update system that will be implemented next. It is a **design and workflow specification**, not a completed implementation.
+This document describes the theme update system that allows theme authors to distribute improvements to projects using their themes.
 
-### Goals
+## Overview
 
-- Allow projects to **opt in** to receive theme updates.
-- Keep multiple theme versions available and selectable.
-- Avoid overwriting user-edited files.
-- Keep the update workflow simple for theme authors.
+The theme update system enables:
 
-### Core Concept: Full Snapshot Updates
+- **Theme authors** to publish new versions of their themes
+- **Users** to receive and apply theme updates to their projects
+- **Safe updates** that preserve user content and customizations
 
-Each update release is a **full theme snapshot**, not a patch. This keeps authoring simple and avoids complex diff/merge rules.
+## Core Concepts
 
-Proposed theme layout:
+### Version Structure
+
+Themes use a versioned folder structure:
 
 ```
 themes/
   arch/
-    base/            # optional initial version (full)
-    updates/
-      1.0.0/         # full snapshot
-      1.1.0/         # full snapshot
-      1.2.0/         # full snapshot
-      1.3.0/         # full snapshot
-    latest/          # materialized snapshot (built by system)
+    theme.json          # Base version (e.g., 1.0.0)
+    layout.liquid
+    screenshot.png
+    widgets/
+    assets/
+    templates/
+    menus/
+    snippets/
+    updates/            # Version update folders (partial updates)
+      1.1.0/
+        theme.json      # Required, version must match folder name
+        widgets/
+          new-widget/
+      1.2.0/
+        theme.json
+        assets/
+          updated-file.css
+    latest/             # Materialized snapshot (auto-built)
 ```
 
-### "Latest" Build (Materialized Snapshot)
+### Partial Updates (Delta Updates)
 
-Whenever a new update is uploaded:
+Each version folder in `updates/` contains **only the files that changed** in that version, not a complete theme copy. This makes authoring updates simple:
 
-1. Start from `base/` (or the first update snapshot).
-2. Apply update snapshots in version order.
-3. Write the composed result to `latest/`.
+1. Create a new version folder (e.g., `1.1.0/`)
+2. Add a `theme.json` with the matching version number
+3. Add only the files that changed (new widgets, updated assets, etc.)
+4. The system layers these on top of previous versions
 
-Notes:
-- If a file changes in multiple updates, the **last version wins**.
-- The `latest/` folder is always a **ready-to-use** full snapshot.
-- Projects that opt in to updates can update directly from `latest/`.
+### Materialized Snapshot (`latest/`)
 
-### Update Eligibility
+The `latest/` folder is a **composed, ready-to-use snapshot** built by the system:
 
-We only apply updates to **theme files**, never to user content.
+1. Start from the base version (root theme files)
+2. Apply each version folder in `updates/` in semver order
+3. For each version, copy its files over the previous state
+4. Result: `latest/` contains the complete, up-to-date theme
 
-Never update:
-- `pages/`
-- `menus/`
-- `uploads/`
-- `collections/` (if present)
+**Key behaviors:**
+- If a file exists in multiple versions, the **latest version wins**
+- `latest/` is rebuilt when a theme author clicks "Update" on the Themes page
+- Projects read theme files from `latest/` (or base if `latest/` doesn't exist)
 
-Updatable theme areas (copied into project at creation):
-- `layout.liquid`
-- `assets/`
-- `widgets/`
-- `snippets/`
-- `templates/`
-- `theme.json` (schema updates only)
+## Update Eligibility
 
-### Theme Settings Rules
+### Updatable Paths
 
-`theme.json` stores user values after editing. Updates must:
+These theme files can be updated in projects:
 
-- **Add new settings** when they appear in newer versions.
-- **Never overwrite existing values**.
-- Ignore removals or renames (theme author responsibility).
+| Path | Behavior |
+|------|----------|
+| `layout.liquid` | Replaced with new version |
+| `assets/` | Entire folder replaced |
+| `widgets/` | Entire folder replaced |
+| `snippets/` | Entire folder replaced |
+| `theme.json` | **Merged** (see Settings Merge below) |
+| `screenshot.png` | Replaced with new version |
 
-### Project Metadata
+### Protected Paths (Never Updated)
 
-Each project will store:
+User content is never modified:
 
-- `themeName` (from `theme.json.name`)
-- `themeVersion` (installed version)
-- `receiveThemeUpdates` (boolean)
+| Path | Reason |
+|------|--------|
+| `pages/` | User's page content |
+| `uploads/` | User's media files |
+| `collections/` | User's collection data (if present) |
 
-Optional:
-- `lastThemeUpdateAt`
-- `lastThemeUpdateVersion`
+### Add-New-Only Paths
 
-### Update Workflow
+These paths receive additions but preserve existing files:
 
-1. Project created with version `x.y.z`.
-2. New theme versions uploaded.
-3. System builds `latest/`.
-4. Projects with `receiveThemeUpdates = true` can apply update.
-5. Project theme version is set to latest.
+| Path | Behavior |
+|------|----------|
+| `menus/` | New menus added, existing menus preserved |
+| `templates/` | New templates added, existing templates preserved |
 
-### UI/UX Requirements
+This allows theme authors to add new menus or page templates without overwriting user customizations.
 
-**Projects**
-- Show badge if `receiveThemeUpdates` is enabled.
-- Show "Update" action if a newer version exists.
+## Theme Settings Merge
 
-**Project Creation**
-- Theme selector shows name + version.
-- "Receive theme updates" toggle (default off).
+When updating `theme.json`, the system uses intelligent merging:
 
-**Themes Page**
-- Group by theme name.
-- List available versions.
-- Highlight latest.
+### Rules
 
-### API Requirements (Planned)
+1. **New settings** from the theme are **added** to the project
+2. **Existing user values** are **preserved** (not overwritten)
+3. **Removed settings** (deleted by theme author) are **removed** from the project
 
-- `GET /api/themes` should return all versions grouped by name.
-- `PUT /api/projects/:id/theme-updates` toggle updates.
-- `POST /api/projects/:id/theme-updates/apply` apply latest.
+### Example
 
-### Version Rules
+**Theme's new `theme.json`:**
+```json
+{
+  "settings": {
+    "global": {
+      "colors": [
+        { "id": "primary", "default": "#0000ff" },
+        { "id": "secondary", "default": "#ff0000" },
+        { "id": "accent", "default": "#00ff00" }  // NEW setting
+      ]
+    }
+  }
+}
+```
 
-- Use SemVer (`x.y.z`).
-- Compare versions numerically, not lexicographically.
+**User's current `theme.json`:**
+```json
+{
+  "settings": {
+    "global": {
+      "colors": [
+        { "id": "primary", "default": "#123456" },  // User changed this
+        { "id": "secondary", "default": "#ff0000" },
+        { "id": "old_color", "default": "#999999" }  // Removed by theme author
+      ]
+    }
+  }
+}
+```
 
-### Open Questions
+**Result after merge:**
+```json
+{
+  "settings": {
+    "global": {
+      "colors": [
+        { "id": "primary", "default": "#123456" },  // User value preserved
+        { "id": "secondary", "default": "#ff0000" },
+        { "id": "accent", "default": "#00ff00" }    // New setting added
+        // old_color removed (not in new theme)
+      ]
+    }
+  }
+}
+```
 
-- Should `latest/` always be written on upload, or built on demand?
-- Do we keep the `base/` folder, or treat the first update as base?
-- Do we allow skipping update application across multiple versions?
+## User Workflow
 
+### 1. Theme Author Publishes Update
+
+1. Create version folder in `themes/{name}/updates/` (e.g., `1.2.0/`)
+2. Add `theme.json` with matching version
+3. Add changed files only
+4. Go to Themes page in Widgetizer
+5. Click "Update" button on the theme card
+6. System builds `latest/` snapshot
+7. Zip and distribute the entire theme folder (including `updates/`)
+
+### Distributing Theme Updates
+
+Theme authors can distribute updates by zipping the entire theme folder:
+
+```
+arch.zip
+  arch/
+    theme.json          # Base version (e.g., 1.0.0)
+    layout.liquid
+    ...
+    updates/
+      1.1.0/
+      1.2.0/
+```
+
+When a user uploads this zip:
+
+- **New installation**: Entire theme is installed, `latest/` is built automatically
+- **Existing theme**: Only new update versions are imported (existing versions are skipped)
+- **Up to date**: If all versions already exist, upload is rejected with a clear message
+
+**Note**: The `latest/` folder in the zip (if present) is ignored; it's always rebuilt from scratch.
+
+### 2. User Receives Update Notification
+
+1. Sidebar shows badge with count of themes having updates
+2. User visits Themes page
+3. Theme card shows "Update available: v1.2.0"
+4. User clicks "Update" to build `latest/`
+
+### 3. User Applies Update to Projects
+
+After the theme is updated:
+
+1. Projects page shows update indicator (arrow icon) next to affected projects
+2. User edits the project
+3. User clicks "Apply Theme Update" (or similar action)
+4. System copies updated files, merges settings
+5. Project's `themeVersion` is updated
+
+## Version Validation
+
+The system enforces strict validation when building `latest/`:
+
+### Requirements
+
+1. **`theme.json` required**: Every version folder must contain a `theme.json`
+2. **Version match**: The version in `theme.json` must match the folder name
+3. **Valid semver**: Version must be valid semver format (x.y.z)
+
+### Error Handling
+
+If validation fails:
+- The build is aborted
+- An error message is shown to the user
+- Example: "Theme 'arch' has version mismatch: folder '1.1.0' has theme.json version '1.0.0'"
+
+## Project Metadata
+
+Projects track theme update information:
+
+```json
+{
+  "id": "project-uuid",
+  "name": "My Project",
+  "theme": "arch",
+  "themeVersion": "1.0.0",
+  // ... other fields
+}
+```
+
+- `theme`: Theme folder ID (unchanged)
+- `themeVersion`: Currently installed theme version
+
+**Note:** The `receiveThemeUpdates` toggle was removed. All projects can receive theme updates.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/themes` | Get all themes with `hasPendingUpdate` flag |
+| `GET` | `/api/themes/:id/versions` | Get all versions for a theme |
+| `POST` | `/api/themes/:id/update` | Build `latest/` for a single theme |
+| `GET` | `/api/themes/update-count` | Get count of themes with pending updates |
+| `GET` | `/api/projects/:id/theme-updates` | Check if project has theme update available |
+| `POST` | `/api/projects/:id/theme-updates/apply` | Apply theme update to project |
+
+## Implementation Files
+
+### Frontend
+
+- `src/pages/Themes.jsx` - Theme management UI with update buttons
+- `src/stores/themeUpdateStore.js` - Zustand store for sidebar badge
+- `src/queries/themeManager.js` - API client functions
+
+### Backend
+
+- `server/controllers/themeController.js` - Theme CRUD and snapshot building
+- `server/services/themeUpdateService.js` - Project update logic and settings merge
+- `server/utils/semver.js` - Version parsing and comparison
+
+---
+
+**See also:**
+
+- [Theme Management](core-themes.md) - Themes page and upload functionality
+- [Project Management](core-projects.md) - Project theme relationship
+- [Theming Guide](theming.md) - Theme structure and development

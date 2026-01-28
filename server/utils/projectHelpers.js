@@ -3,9 +3,13 @@ import { getProjectsFilePath } from "../config.js";
 import { PROJECT_ERROR_CODES } from "./projectErrors.js";
 
 /**
- * Helper to get project folderName from ID
- * @param {string} projectId - The project ID (UUID)
- * @returns {Promise<string>} - The project folderName
+ * Get the folder name for a project by its ID.
+ * Reads the projects.json file and finds the matching project.
+ * @param {string} projectId - The project's UUID
+ * @returns {Promise<string>} The project's folder name
+ * @throws {Error} If projects file not found (code: PROJECTS_FILE_MISSING)
+ * @throws {Error} If project not found (code: PROJECT_NOT_FOUND)
+ * @throws {Error} If file read fails (code: PROJECTS_FILE_READ_FAILED)
  */
 export async function getProjectFolderName(projectId) {
   const projectsPath = getProjectsFilePath();

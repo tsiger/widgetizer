@@ -1,0 +1,112 @@
+{
+  "type": "header",
+  "displayName": "Header",
+  "settings": [
+    {
+      "type": "header",
+      "id": "logo_header",
+      "label": "Logo"
+    },
+    {
+      "type": "image",
+      "id": "logoImage",
+      "label": "Logo Image",
+      "description": "Upload a logo image. If provided, this will be displayed instead of the text logo."
+    },
+    {
+      "type": "range",
+      "id": "logoMaxWidth",
+      "label": "Logo Max Width",
+      "description": "Maximum width of the logo image",
+      "default": 150,
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px"
+    },
+    {
+      "type": "text",
+      "id": "logoText",
+      "label": "Logo Text",
+      "description": "Text to display in the header logo",
+      "default": "Arch"
+    },
+        {
+      "type": "header",
+      "id": "contact_header",
+      "label": "Contact Details"
+    },
+    {
+      "type": "text",
+      "id": "contactDetailsLine1",
+      "label": "Contact Details 1",
+      "description": "First line of contact info (e.g., phone)",
+      "default": "Call us: (555) 203-9844"
+    },
+    {
+      "type": "text",
+      "id": "contactDetailsLine2",
+      "label": "Contact Details 2",
+      "description": "Second line of contact info (e.g., address)",
+      "default": "1450 Market St, Suite 200"
+    },
+    {
+      "type": "header",
+      "id": "navigation_header",
+      "label": "Navigation"
+    },
+    {
+      "type": "menu",
+      "id": "headerNavigation",
+      "label": "Navigation Menu",
+      "description": "Select the menu to display in the header",
+      "default": "main-menu"
+    },
+    {
+      "type": "link",
+      "id": "ctaButtonLink",
+      "label": "CTA Button",
+      "description": "Call-to-action button (leave text empty to hide)",
+      "default": {
+        "href": "contact.html",
+        "text": "Get in touch",
+        "target": "_self"
+      }
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "Display"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width",
+      "description": "When enabled, the header stretches across the full viewport. When disabled, it stays centered in a container.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Sticky Header",
+      "description": "When enabled, the header stays fixed at the top when scrolling",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
+      ]
+    }
+  ]
+}

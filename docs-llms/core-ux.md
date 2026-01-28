@@ -185,6 +185,30 @@ _(Excluding the Page Editor itself)_
   - Prevention of deleting the active theme (or warning if attempted).
   - Success toast: `Theme "[Theme Name]" has been deleted.`
 
+### **5.4. Update a Theme**
+
+- **Current State:**
+  1. Sidebar displays a badge with count of themes having pending updates.
+  2. User visits Themes page and sees "Update available: vX.Y.Z" on theme cards.
+  3. User clicks "Update" button on the theme card.
+  4. System builds the `latest/` snapshot by composing base + version folders.
+  5. Success toast: `Theme "[Theme Name]" updated to version X.Y.Z.`
+  6. Sidebar badge decrements automatically.
+  7. If validation fails (missing `theme.json`, version mismatch), error toast with details is shown.
+- **Status:** ✅ Fully implemented
+
+### **5.5. Apply Theme Update to Project**
+
+- **Current State:**
+  1. After a theme is updated (5.4), projects using that theme show an update indicator (arrow icon) on the Projects page.
+  2. User edits the project.
+  3. User clicks "Apply Theme Update" action.
+  4. System copies updated theme files to project, merges settings, adds new menus/templates.
+  5. Success toast confirms update applied.
+  6. Project's `themeVersion` is updated to match the theme's current version.
+- **Status:** ✅ Fully implemented
+- **Note:** Project update indicators only appear *after* the theme author has updated the theme (built `latest/`), not merely when new version folders exist.
+
 ---
 
 ## 6. Export Management (`/export`)
@@ -218,6 +242,9 @@ _(Excluding the Page Editor itself)_
 - Media upload (with progress and error handling)
 - Media deletion (with usage tracking, single and bulk)
 - Export creation (with processing state)
+- Theme upload (with validation and feedback)
+- Theme updates (sidebar badge, per-theme update buttons, validation)
+- Project theme updates (apply theme updates to projects)
 
 ### ⚠️ Partially Implemented / Needs Improvement
 
@@ -233,3 +260,4 @@ _(Excluding the Page Editor itself)_
 - Confirmation modals protect against destructive actions.
 - Bulk operations are supported for pages and media.
 - Active project protection prevents breaking the application state.
+- Theme update system includes sidebar badge for pending updates and detailed error feedback.
