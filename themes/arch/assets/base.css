@@ -436,14 +436,24 @@ h6 {
 }
 
 /* Rich text editor content */
-.block-rte a {
-  color: var(--accent);
-  text-decoration: none;
-  transition: text-decoration var(--transition-speed-fast);
-}
+.block-rte {
+  & p {
+    margin-block-end: var(--space-md);
 
-.block-rte a:hover {
-  text-decoration: underline;
+    &:last-child {
+      margin-block-end: 0;
+    }
+  }
+
+  & a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: text-decoration var(--transition-speed-fast);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 /* ==========================================================================

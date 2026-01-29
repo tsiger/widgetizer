@@ -157,10 +157,7 @@ function reportElementBounds(widgetId, blockId = null) {
     }
   }
 
-  window.parent.postMessage(
-    { type: "ELEMENT_BOUNDS", payload: { widgetId, blockId, bounds, blockBounds } },
-    "*",
-  );
+  window.parent.postMessage({ type: "ELEMENT_BOUNDS", payload: { widgetId, blockId, bounds, blockBounds } }, "*");
 }
 
 // Report bounds on user scroll (debounced)
@@ -224,6 +221,13 @@ function updateWidgetSettings(widgetId, changes) {
   }
 }
 
+// Check if a string value looks like HTML (richtext content)
+function isHtmlContent(value) {
+  if (typeof value !== "string") return false;
+  // Check for common HTML tags from richtext editor
+  return /<(p|strong|em|a|br|span|div)\b[^>]*>/i.test(value);
+}
+
 // Apply a setting value to elements within a container
 function applySettingToElement(container, settingId, value) {
   const childElements = [...container.querySelectorAll(`[data-setting="${settingId}"]`)];
@@ -263,7 +267,12 @@ function applySettingToElement(container, settingId, value) {
       }
     } else {
       if (typeof value === "string" || typeof value === "number") {
-        el.textContent = value;
+        // Use innerHTML for HTML content (richtext), textContent for plain text
+        if (isHtmlContent(value)) {
+          el.innerHTML = value;
+        } else {
+          el.textContent = value;
+        }
       } else if (value?.text) {
         el.textContent = value.text;
       }
@@ -380,10 +389,7 @@ function setupInteractionHandler() {
         const widgetId = widgetEl.getAttribute("data-widget-id");
         const blockId = blockEl ? blockEl.getAttribute("data-block-id") : null;
 
-        window.parent.postMessage(
-          { type: "WIDGET_SELECTED", payload: { widgetId, blockId } },
-          "*",
-        );
+        window.parent.postMessage({ type: "WIDGET_SELECTED", payload: { widgetId, blockId } }, "*");
       }
     },
     true,
@@ -574,9 +580,7 @@ function initializeWidget(widgetId) {
   executeScripts(scripts, widget);
   widget.dataset.initialized = "true";
 
-  widget.dispatchEvent(
-    new CustomEvent("widget:updated", { bubbles: true, detail: { widgetId } }),
-  );
+  widget.dispatchEvent(new CustomEvent("widget:updated", { bubbles: true, detail: { widgetId } }));
 }
 
 // Cleanup widget state (timers, observers)
@@ -662,9 +666,7 @@ function morphWidget(widgetId, newHtml) {
     newElement.dataset.initialized = "true";
 
     // Dispatch update event
-    newElement.dispatchEvent(
-      new CustomEvent("widget:updated", { bubbles: true, detail: { widgetId } }),
-    );
+    newElement.dispatchEvent(new CustomEvent("widget:updated", { bubbles: true, detail: { widgetId } }));
 
     return true;
   } catch (error) {
@@ -702,10 +704,7 @@ function handleWidgetMorph(widgetId, newHtml) {
     console.log(`[Runtime] ✅ Successfully morphed widget: ${widgetId}`);
   } else {
     console.log(`[Runtime] ❌ Failed to morph widget: ${widgetId}`);
-    window.parent.postMessage(
-      { type: "WIDGET_MORPH_FAILED", payload: { widgetId } },
-      "*",
-    );
+    window.parent.postMessage({ type: "WIDGET_MORPH_FAILED", payload: { widgetId } }, "*");
   }
 }
 
