@@ -52,7 +52,8 @@ export const RenderHeaderAssetsTag = {
       headerStyles.forEach(({ filepath, options }) => {
         let assetUrl;
         if (renderMode === "publish") {
-          assetUrl = `assets/${filepath}`;
+          const version = globals.exportVersion;
+          assetUrl = version ? `assets/${filepath}?v=${version}` : `assets/${filepath}`;
         } else if (options.source === "widget" && options.widgetType) {
           assetUrl = `${apiUrl}/api/preview/assets/${projectId}/widgets/${options.widgetType}/${filepath}`;
         } else {
@@ -71,7 +72,8 @@ export const RenderHeaderAssetsTag = {
       headerScripts.forEach(({ filepath, options }) => {
         let assetUrl;
         if (renderMode === "publish") {
-          assetUrl = `assets/${filepath}`;
+          const version = globals.exportVersion;
+          assetUrl = version ? `assets/${filepath}?v=${version}` : `assets/${filepath}`;
         } else if (options.source === "widget" && options.widgetType) {
           assetUrl = `${apiUrl}/api/preview/assets/${projectId}/widgets/${options.widgetType}/${filepath}`;
         } else {

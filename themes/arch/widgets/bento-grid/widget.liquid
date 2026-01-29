@@ -164,7 +164,7 @@
           {% if block.settings.image != blank %}
              {% assign item_classes = item_classes | append: ' has-bg-image has-overlay' %}
 
-             {% assign overlay_val = block.settings.overlay_color | default: 'rgba(0,0,0,0.5)' %}
+             {% assign overlay_val = block.settings.overlay_color | default: '#0a1e38bf' %}
              {% capture item_style %}
                {{ item_style }} --widget-overlay-color: {{ overlay_val }}; --bento-bg-image: url('{{ block.settings.image | image: 'path', 'large' }}');
              {% endcapture %}

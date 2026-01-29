@@ -265,7 +265,13 @@ export async function exportProject(req, res) {
               .filter(Boolean),
           ),
         );
-        const robotsLines = ["User-agent: *", "Allow: /", ...disallowPaths.map((path) => `Disallow: ${path}`), "", `Sitemap: ${sitemapUrl}`];
+        const robotsLines = [
+          "User-agent: *",
+          "Allow: /",
+          ...disallowPaths.map((path) => `Disallow: ${path}`),
+          "",
+          `Sitemap: ${sitemapUrl}`,
+        ];
         const robotsContent = robotsLines.join("\n");
 
         await fs.writeFile(path.join(outputDir, "robots.txt"), robotsContent);
@@ -296,9 +302,7 @@ export async function exportProject(req, res) {
       const randomizedWidgetId = `widget_${randomUUID()}`;
 
       if (cloned.blocks && typeof cloned.blocks === "object") {
-        const originalBlocksOrder = Array.isArray(cloned.blocksOrder)
-          ? cloned.blocksOrder
-          : Object.keys(cloned.blocks);
+        const originalBlocksOrder = Array.isArray(cloned.blocksOrder) ? cloned.blocksOrder : Object.keys(cloned.blocks);
         const newBlocks = {};
         const newBlocksOrder = [];
 
@@ -326,6 +330,7 @@ export async function exportProject(req, res) {
         themeSettingsRaw: rawThemeSettings,
         enqueuedStyles: new Map(),
         enqueuedScripts: new Map(),
+        exportVersion: version, // For cache busting
       };
 
       // Render header if exists (for each page to capture enqueued assets)

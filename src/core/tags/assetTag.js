@@ -81,7 +81,13 @@ export const AssetTag = {
       let assetUrl;
       if (renderMode === "publish") {
         // For publish mode, use a relative path assuming all assets are in a top-level 'assets' folder
-        assetUrl = `assets/${filepath}`;
+        // Add cache busting version for CSS and JS files
+        const version = globals.exportVersion;
+        if ((isCSS || isJS) && version) {
+          assetUrl = `assets/${filepath}?v=${version}`;
+        } else {
+          assetUrl = `assets/${filepath}`;
+        }
       } else {
         // For preview mode, use the existing API route
         // Determine the source folder based on the current template context
@@ -96,14 +102,7 @@ export const AssetTag = {
       }
 
       // Extract options with defaults (opt-in behavior)
-      const {
-        defer = false,
-        async = false,
-        crossorigin = null,
-        integrity = null,
-        media = null,
-        id = null,
-      } = options;
+      const { defer = false, async = false, crossorigin = null, integrity = null, media = null, id = null } = options;
 
       // Build attributes string
       let attributes = "";
