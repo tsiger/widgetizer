@@ -11,6 +11,10 @@ A powerful, yet simple, visual website builder for creating high-performance sta
 - **Static Export** – Publish secure, lightning-fast static HTML sites
 - **Desktop App** – Available as an Electron app for offline use
 
+## 📚 Documentation
+
+Visit **[docs.widgetizer.org](https://docs.widgetizer.org)** for comprehensive documentation, tutorials, and guides.
+
 ## Requirements
 
 - **Node.js:** >= 20.19.5 (LTS recommended)
@@ -146,10 +150,6 @@ npm run lint           # Lint src and server
 npm run lint:electron  # Lint electron folder
 npm run lint:all       # Lint entire project
 ```
-
-## Documentation
-
-See the [docs](./docs) folder for detailed documentation on themes, widgets, media handling, and more.
 
 ## License
 
