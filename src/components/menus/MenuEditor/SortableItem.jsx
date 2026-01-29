@@ -123,6 +123,21 @@ const SortableItem = memo(function SortableItem({
     }
   }, [depth]);
 
+  // Compute resolved value for the combobox - handles deleted pages
+  const resolvedLinkValue = useMemo(() => {
+    if (item.pageUuid) {
+      // Has pageUuid - check if page still exists
+      const page = pages.find((p) => p.value === item.pageUuid);
+      if (page) {
+        return item.pageUuid; // Page exists, use pageUuid
+      } else {
+        return ""; // Page was deleted, show empty
+      }
+    }
+    // No pageUuid - use link directly (custom URL or anchor)
+    return item.link || "";
+  }, [item.pageUuid, item.link, pages]);
+
   // Check if this item or any child has an open dropdown
   const hasActiveDropdown = useMemo(() => {
     if (openDropdownId === item.id) return true;
@@ -179,7 +194,7 @@ const SortableItem = memo(function SortableItem({
           <div className="w-64" onMouseDown={handleInputMouseDown} onClick={(e) => e.stopPropagation()}>
             <MenuCombobox
               options={pages}
-              value={item.pageUuid || item.link || ""}
+              value={resolvedLinkValue}
               onChange={handleLinkChange}
               placeholder="Select page or type URL..."
               isOpen={openDropdownId === item.id}

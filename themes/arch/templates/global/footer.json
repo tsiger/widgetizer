@@ -1,8 +1,11 @@
 {
   "type": "footer",
   "settings": {
+    "footerNavigation": "footer-menu",
+    "facebook_url": "#",
     "twitter_url": "#",
-    "github_url": "#",
-    "linkedin_url": "#"
+    "youtube_url": "#",
+    "linkedin_url": "#",
+    "copyright": "© 2026 Widgetizer. All rights are yours to keep."
   }
 }

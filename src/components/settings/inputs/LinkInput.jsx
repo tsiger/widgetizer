@@ -92,33 +92,6 @@ export default function LinkInput({ id, value = {}, onChange, setting }) {
     return { href, text, target };
   }, [value, pagesByUuid, pagesBySlug, isLoading]);
 
-  // Notify parent if resolved value differs from original (e.g., page was deleted, slug changed, or pageUuid matched by slug)
-  useEffect(() => {
-    if (isLoading) return;
-
-    const { pageUuid, href = "" } = value;
-
-    if (pageUuid && !pagesByUuid.has(pageUuid)) {
-      // Page was deleted - update parent with cleared value
-      onChange({ href: "", text: "", target: "_self" });
-    } else if (pageUuid && pagesByUuid.has(pageUuid)) {
-      // Page exists but slug may have changed - update href
-      const page = pagesByUuid.get(pageUuid);
-      const expectedHref = `${page.slug}.html`;
-      if (value.href !== expectedHref) {
-        onChange({ ...value, href: expectedHref });
-      }
-    } else if (!pageUuid && href && href.endsWith(".html") && !href.includes("://") && !href.startsWith("#")) {
-      // No pageUuid but href looks like internal page - try to match and add pageUuid
-      const slug = href.replace(".html", "");
-      const page = pagesBySlug.get(slug);
-      if (page && page.uuid) {
-        // Found matching page - persist the pageUuid
-        onChange({ ...value, pageUuid: page.uuid });
-      }
-    }
-  }, [value, pagesByUuid, pagesBySlug, isLoading, onChange]);
-
   // Handle combobox selection - could be a uuid or custom text
   const handleLinkChange = useCallback(
     (selectedValue) => {
@@ -162,7 +135,12 @@ export default function LinkInput({ id, value = {}, onChange, setting }) {
     <div className="space-y-4 rounded-md border border-slate-200 bg-slate-50 p-4">
       {/* Href Input with Combobox */}
       <SettingsField id={`${id}-href`} label="Link URL" description="Select a page or enter a custom URL.">
-        <Combobox options={pageOptions} value={comboboxValue} onChange={handleLinkChange} placeholder="Select a page or type a URL..." />
+        <Combobox
+          options={pageOptions}
+          value={comboboxValue}
+          onChange={handleLinkChange}
+          placeholder="Select a page or type a URL..."
+        />
       </SettingsField>
 
       {!hideText && (

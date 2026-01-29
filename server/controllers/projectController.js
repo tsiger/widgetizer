@@ -122,7 +122,7 @@ export async function getAllProjects(_, res) {
           themeName,
           hasThemeUpdate,
         };
-      })
+      }),
     );
 
     res.json(enrichedProjects);
@@ -233,7 +233,6 @@ export async function createProject(req, res) {
     };
 
     try {
-
       // Then handle templates separately, recursively
       const pagesDir = getProjectPagesDir(folderName);
       const themeTemplatesDir = getThemeTemplatesDir(theme);
@@ -287,7 +286,7 @@ export async function createProject(req, res) {
       await processTemplatesRecursive(themeTemplatesDir, pagesDir);
 
       const projectMenusDir = getProjectMenusDir(folderName);
-      
+
       // Build a map of page slugs to UUIDs for menu item linking
       const pageSlugToUuid = new Map();
       try {
@@ -311,29 +310,83 @@ export async function createProject(req, res) {
       // Helper function to recursively add pageUuid to menu items
       function addPageUuidToMenuItems(items) {
         if (!Array.isArray(items)) return items;
-        return items.map(item => {
+        return items.map((item) => {
           const updatedItem = { ...item };
-          
+
           // Check if this is an internal page link (ends with .html, no protocol)
-          if (item.link && typeof item.link === 'string') {
+          if (item.link && typeof item.link === "string") {
             const link = item.link;
-            if (link.endsWith('.html') && !link.includes('://') && !link.startsWith('#')) {
+            if (link.endsWith(".html") && !link.includes("://") && !link.startsWith("#")) {
               // Extract slug from link (e.g., "about.html" -> "about")
-              const slug = link.replace('.html', '');
+              const slug = link.replace(".html", "");
               const uuid = pageSlugToUuid.get(slug);
               if (uuid) {
                 updatedItem.pageUuid = uuid;
               }
             }
           }
-          
+
           // Recursively process nested items
           if (item.items && Array.isArray(item.items)) {
             updatedItem.items = addPageUuidToMenuItems(item.items);
           }
-          
+
           return updatedItem;
         });
+      }
+
+      // Helper to check if a value is a link object
+      function isLinkObject(value) {
+        return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
+      }
+
+      // Helper to add pageUuid to a link value
+      function enrichLinkValue(linkValue) {
+        if (!isLinkObject(linkValue)) return linkValue;
+
+        const { href, pageUuid } = linkValue;
+
+        // Skip if already has pageUuid or not an internal page link
+        if (pageUuid) return linkValue;
+        if (!href || !href.endsWith(".html") || href.includes("://") || href.startsWith("#")) {
+          return linkValue;
+        }
+
+        const slug = href.replace(".html", "");
+        const uuid = pageSlugToUuid.get(slug);
+
+        return uuid ? { ...linkValue, pageUuid: uuid } : linkValue;
+      }
+
+      // Enrich all link settings in a widget
+      function enrichWidgetLinks(widgetData) {
+        const enriched = { ...widgetData };
+
+        // Enrich widget-level settings
+        if (enriched.settings) {
+          enriched.settings = { ...enriched.settings };
+          for (const [key, value] of Object.entries(enriched.settings)) {
+            enriched.settings[key] = enrichLinkValue(value);
+          }
+        }
+
+        // Enrich block-level settings
+        if (enriched.blocks) {
+          enriched.blocks = { ...enriched.blocks };
+          for (const [blockId, block] of Object.entries(enriched.blocks)) {
+            if (block && block.settings) {
+              enriched.blocks[blockId] = {
+                ...block,
+                settings: { ...block.settings },
+              };
+              for (const [key, value] of Object.entries(block.settings)) {
+                enriched.blocks[blockId].settings[key] = enrichLinkValue(value);
+              }
+            }
+          }
+        }
+
+        return enriched;
       }
 
       try {
@@ -374,6 +427,56 @@ export async function createProject(req, res) {
         if (menuAccessError.code !== "ENOENT") {
           console.warn(`[ProjectController] Failed to access project menus directory: ${menuAccessError.message}`);
         }
+      }
+
+      // Enrich page widgets with pageUuid for internal links
+      try {
+        const allPageFiles = await fs.readdir(pagesDir);
+        for (const pageFile of allPageFiles) {
+          if (!pageFile.endsWith(".json")) continue;
+
+          const pagePath = path.join(pagesDir, pageFile);
+          const pageContent = await fs.readFile(pagePath, "utf8");
+          const page = JSON.parse(pageContent);
+
+          // Skip global widgets (they're in a subdirectory, but just in case)
+          if (page.type === "header" || page.type === "footer") continue;
+
+          let modified = false;
+          const enrichedWidgets = {};
+
+          for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
+            const enriched = enrichWidgetLinks(widget);
+            enrichedWidgets[widgetId] = enriched;
+            if (JSON.stringify(enriched) !== JSON.stringify(widget)) {
+              modified = true;
+            }
+          }
+
+          if (modified) {
+            page.widgets = enrichedWidgets;
+            await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
+          }
+        }
+
+        // Also enrich global widgets (header/footer)
+        const globalDir = path.join(pagesDir, "global");
+        if (await fs.pathExists(globalDir)) {
+          for (const widgetType of ["header", "footer"]) {
+            const widgetPath = path.join(globalDir, `${widgetType}.json`);
+            if (await fs.pathExists(widgetPath)) {
+              const content = await fs.readFile(widgetPath, "utf8");
+              const widget = JSON.parse(content);
+              const enriched = enrichWidgetLinks(widget);
+              if (JSON.stringify(enriched) !== JSON.stringify(widget)) {
+                await fs.outputFile(widgetPath, JSON.stringify(enriched, null, 2));
+              }
+            }
+          }
+        }
+      } catch (widgetEnrichError) {
+        console.warn(`[ProjectController] Failed to enrich widget links: ${widgetEnrichError.message}`);
+        // Continue without failing - widget links will be enriched on first edit
       }
     } catch (error) {
       await fs.remove(projectDir);
@@ -523,9 +626,7 @@ export async function updateProject(req, res) {
           : updatedProject.siteUrl,
       // Theme update preferences
       receiveThemeUpdates:
-        updates.receiveThemeUpdates !== undefined
-          ? updates.receiveThemeUpdates
-          : updatedProject.receiveThemeUpdates,
+        updates.receiveThemeUpdates !== undefined ? updates.receiveThemeUpdates : updatedProject.receiveThemeUpdates,
       updated: new Date().toISOString(),
     };
 
@@ -664,9 +765,159 @@ export async function duplicateProject(req, res) {
     try {
       await fs.copy(originalDir, newDir);
 
-      // Update any internal references that might contain the old project ID
-      // For now, most references are relative, so this might not be needed
-      // But we could add logic here to update media.json paths if needed
+      // Regenerate page UUIDs and update all references
+      const oldToNewUuid = new Map();
+      const newPageSlugToUuid = new Map();
+      const newPagesDir = getProjectPagesDir(newFolderName);
+
+      // Helper to check if a value is a link object
+      function isLinkObject(value) {
+        return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
+      }
+
+      // Helper to update pageUuid in a link value using old-to-new mapping
+      function updateLinkPageUuid(linkValue) {
+        if (!isLinkObject(linkValue) || !linkValue.pageUuid) return linkValue;
+        const newUuid = oldToNewUuid.get(linkValue.pageUuid);
+        return newUuid ? { ...linkValue, pageUuid: newUuid } : linkValue;
+      }
+
+      // Helper to update all link pageUuids in a widget
+      function updateWidgetLinkUuids(widgetData) {
+        const updated = { ...widgetData };
+
+        if (updated.settings) {
+          updated.settings = { ...updated.settings };
+          for (const [key, value] of Object.entries(updated.settings)) {
+            updated.settings[key] = updateLinkPageUuid(value);
+          }
+        }
+
+        if (updated.blocks) {
+          updated.blocks = { ...updated.blocks };
+          for (const [blockId, block] of Object.entries(updated.blocks)) {
+            if (block && block.settings) {
+              updated.blocks[blockId] = {
+                ...block,
+                settings: { ...block.settings },
+              };
+              for (const [key, value] of Object.entries(block.settings)) {
+                updated.blocks[blockId].settings[key] = updateLinkPageUuid(value);
+              }
+            }
+          }
+        }
+
+        return updated;
+      }
+
+      // Helper to recursively update pageUuid in menu items
+      function updateMenuItemUuids(items) {
+        if (!Array.isArray(items)) return items;
+        return items.map((item) => {
+          const updated = { ...item };
+          if (item.pageUuid) {
+            const newUuid = oldToNewUuid.get(item.pageUuid);
+            if (newUuid) {
+              updated.pageUuid = newUuid;
+            }
+          }
+          if (item.items && Array.isArray(item.items)) {
+            updated.items = updateMenuItemUuids(item.items);
+          }
+          return updated;
+        });
+      }
+
+      // Step 1: Regenerate page UUIDs and build mapping
+      try {
+        const pageFiles = await fs.readdir(newPagesDir);
+        for (const pageFile of pageFiles) {
+          if (!pageFile.endsWith(".json")) continue;
+
+          const pagePath = path.join(newPagesDir, pageFile);
+          const content = await fs.readFile(pagePath, "utf8");
+          const page = JSON.parse(content);
+
+          // Skip global widgets
+          if (page.type === "header" || page.type === "footer") continue;
+
+          const oldUuid = page.uuid;
+          const newUuid = uuidv4();
+
+          oldToNewUuid.set(oldUuid, newUuid);
+          newPageSlugToUuid.set(page.slug, newUuid);
+
+          page.uuid = newUuid;
+          await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
+        }
+
+        // Step 2: Update widget link pageUuids to new UUIDs
+        for (const pageFile of pageFiles) {
+          if (!pageFile.endsWith(".json")) continue;
+
+          const pagePath = path.join(newPagesDir, pageFile);
+          const content = await fs.readFile(pagePath, "utf8");
+          const page = JSON.parse(content);
+
+          // Skip global widgets (handled separately)
+          if (page.type === "header" || page.type === "footer") continue;
+
+          let modified = false;
+          const updatedWidgets = {};
+
+          for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
+            const updated = updateWidgetLinkUuids(widget);
+            updatedWidgets[widgetId] = updated;
+            if (JSON.stringify(updated) !== JSON.stringify(widget)) {
+              modified = true;
+            }
+          }
+
+          if (modified) {
+            page.widgets = updatedWidgets;
+            await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
+          }
+        }
+
+        // Update global widgets (header/footer)
+        const globalDir = path.join(newPagesDir, "global");
+        if (await fs.pathExists(globalDir)) {
+          for (const widgetType of ["header", "footer"]) {
+            const widgetPath = path.join(globalDir, `${widgetType}.json`);
+            if (await fs.pathExists(widgetPath)) {
+              const content = await fs.readFile(widgetPath, "utf8");
+              const widget = JSON.parse(content);
+              const updated = updateWidgetLinkUuids(widget);
+              if (JSON.stringify(updated) !== JSON.stringify(widget)) {
+                await fs.outputFile(widgetPath, JSON.stringify(updated, null, 2));
+              }
+            }
+          }
+        }
+
+        // Step 3: Update menu item pageUuids to new UUIDs
+        const newMenusDir = getProjectMenusDir(newFolderName);
+        if (await fs.pathExists(newMenusDir)) {
+          const menuFiles = await fs.readdir(newMenusDir);
+          for (const menuFile of menuFiles) {
+            if (!menuFile.endsWith(".json")) continue;
+
+            const menuPath = path.join(newMenusDir, menuFile);
+            const content = await fs.readFile(menuPath, "utf8");
+            const menu = JSON.parse(content);
+
+            const updatedItems = updateMenuItemUuids(menu.items);
+            if (JSON.stringify(updatedItems) !== JSON.stringify(menu.items)) {
+              menu.items = updatedItems;
+              await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
+            }
+          }
+        }
+      } catch (uuidUpdateError) {
+        console.warn(`[ProjectController] Failed to update UUIDs in cloned project: ${uuidUpdateError.message}`);
+        // Continue without failing - the cloned project will still work, just with old UUIDs
+      }
     } catch (copyError) {
       // If copy fails, clean up and throw error
       try {
@@ -1032,7 +1283,7 @@ export async function importProject(req, res) {
 
     // Generate unique folderName (checking both projects.json and existing directories)
     let folderName = await generateUniqueProjectId(manifest.project.name, data.projects);
-    
+
     // Also check if directory already exists and generate unique name if needed
     let projectDir = getProjectDir(folderName);
     let counter = 1;
@@ -1139,7 +1390,7 @@ export async function importProject(req, res) {
           console.warn("Failed to remove project from projects.json after error:", cleanupError);
         }
       }
-      
+
       // Clean up directories
       try {
         if (await fs.pathExists(tempDir)) {

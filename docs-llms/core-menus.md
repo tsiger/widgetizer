@@ -54,11 +54,19 @@ A typical menu JSON file (`main-menu.json`) has the following structure:
 - `id`: A unique identifier for the menu item within the menu.
 - `label`: The display text shown in the navigation.
 - `link`: The URL or page filename (e.g., `about.html` for internal pages, or a full URL for external links).
-- `pageUuid` (optional): For internal page links, stores the page's stable UUID. This ensures the link remains valid even if the page is renamed. When rendering, the system resolves the `pageUuid` to the current page slug. If the referenced page is deleted, the link is automatically cleared.
+- `pageUuid` (optional): For internal page links, stores the page's stable UUID. This ensures the link remains valid even if the page is renamed.
 
-**Link Resolution:**
+**Link Resolution & pageUuid Lifecycle:**
 
-When a menu is rendered (in preview or export), the rendering service checks each item's `pageUuid` and resolves it to the current page slug, ensuring links stay up-to-date even after page renames.
+1. **Project Creation**: When a project is created from a theme, all menu items linking to internal pages are automatically enriched with `pageUuid` based on matching page slugs.
+
+2. **User Selection**: When users select an internal page in the menu editor, both `link` and `pageUuid` are stored.
+
+3. **Rendering/Export**: The rendering service resolves each item's `pageUuid` to the current page slug, ensuring links stay up-to-date even after page renames. If a referenced page was deleted, the link is cleared during rendering.
+
+4. **Editor Display**: When editing a menu with items linking to deleted pages, those items display with empty link fields. The menu is not automatically saved—changes only persist when the user explicitly saves.
+
+5. **Project Cloning**: When a project is cloned, all page UUIDs are regenerated, and all menu item `pageUuid` references are updated to point to the new UUIDs.
 
 ## 2. Frontend Implementation
 

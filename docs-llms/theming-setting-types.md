@@ -408,11 +408,19 @@ A compound control for creating links. This is useful for buttons, banners, or a
 
 **How Internal Page Links Work:**
 
-When a user selects an internal page from the dropdown, the system stores both:
-1. The `pageUuid` - the stable identifier that never changes
-2. The `href` - the current slug-based filename (e.g., `services.html`)
+The `pageUuid` system ensures links remain valid even when pages are renamed or deleted:
 
-When rendering, the system resolves the `pageUuid` to the current page slug. If a page is renamed, links automatically point to the new filename. If the linked page is deleted, the link is cleared (set to empty).
+1. **Project Creation**: When a project is created from a theme, all internal page links in widget settings and menus are automatically enriched with `pageUuid`. This includes links defined in theme templates and schema defaults.
+
+2. **User Selection**: When a user selects an internal page from the dropdown, the system stores both:
+   - The `pageUuid` - the stable identifier that never changes
+   - The `href` - the current slug-based filename (e.g., `services.html`)
+
+3. **Rendering/Export**: The system resolves `pageUuid` to the current page slug. If a page was renamed, links automatically point to the new filename. If the linked page was deleted, the link is cleared.
+
+4. **Editor Display**: When editing a page with a link to a deleted page, the link fields display as empty. The link is not automatically saved as empty—it only updates if the user explicitly changes it.
+
+5. **Project Cloning**: When a project is cloned, all page UUIDs are regenerated, and all widget/menu `pageUuid` references are updated to point to the new UUIDs.
 
 The UI for this setting type provides a choice between selecting from a list of existing pages or entering a custom URL, along with inputs for the link text and a toggle for the target.
 

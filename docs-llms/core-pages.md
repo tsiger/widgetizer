@@ -156,7 +156,9 @@ This is the core of the backend logic. The controller functions interact with th
   4.  **UUID Handling**: For new pages, a UUID v4 is generated. For updates, the existing UUID is preserved to maintain link integrity.
   5.  It writes the complete page data to the corresponding `.json` file.
   6.  **Media Usage Tracking**: Updates media file usage tracking to reflect which images are used by this page.
-- **Delete Operation**: The controller finds the correct file by its slug and deletes it from the filesystem. Also removes the page from all media usage tracking. Any links or menu items referencing the deleted page's UUID will be automatically cleared when edited or rendered.
+- **Delete Operation**: The controller finds the correct file by its slug and deletes it from the filesystem. Also removes the page from all media usage tracking. Links and menu items referencing the deleted page's UUID are handled as follows:
+  - **Editor Display**: When a widget or menu item with a link to the deleted page is viewed in the editor, the link fields display as empty. However, the underlying data is not automatically modified—it only changes if the user explicitly saves.
+  - **Rendering/Export**: When the site is rendered or exported, the rendering service clears any links pointing to non-existent pages, ensuring the exported site has no broken internal links.
 - **Duplicate Operation**: The controller reads the source page's data, generates a new unique slug (e.g., by appending `-copy`), **generates a new UUID** (to ensure the duplicate is a distinct entity), updates the `name` and `slug` fields, and writes it to a new file. Updates media usage tracking for the duplicated page.
 
 ### Security Considerations

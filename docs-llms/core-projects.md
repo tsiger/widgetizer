@@ -63,8 +63,11 @@ This file contains functions that make API calls to the backend:
 7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
 8.  **API Call**: `ProjectsAdd.jsx`'s `handleSubmit` function calls `createProject(formData)` from `projectManager.js`, which sends a `POST` request to the backend API to create the new project.
 9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`. In packaged Electron builds, the source theme files live in `app.asar.unpacked/themes/`. These become the project's working theme files.
-10. **Setting Active Project**: If this is the very first project being created (i.e., there was no active project before), it is automatically set as the active project by calling `setActiveProject(newProject.id)`. The global state is updated via the `projectStore`.
-11. **Feedback**: A success toast notification is shown (localized), and the user is presented with buttons to either navigate to the project list or edit the newly created project.
+10. **Link Enrichment**: After copying theme files, the system enriches all internal page links with `pageUuid`:
+    - **Menus**: All menu items that link to internal pages (e.g., `index.html`, `about.html`) are enriched with the corresponding page's `pageUuid`. This ensures menu links remain valid even if pages are renamed.
+    - **Widgets**: All widget settings with link-type values (objects containing `href` pointing to internal `.html` pages) are enriched with `pageUuid`. This includes links in header, footer, and all page widgets.
+11. **Setting Active Project**: If this is the very first project being created (i.e., there was no active project before), it is automatically set as the active project by calling `setActiveProject(newProject.id)`. The global state is updated via the `projectStore`.
+12. **Feedback**: A success toast notification is shown (localized), and the user is presented with buttons to either navigate to the project list or edit the newly created project.
 
 ### 2. Listing and Managing Projects
 
@@ -73,7 +76,7 @@ This file contains functions that make API calls to the backend:
 3.  **Actions**: For each project in the list, a set of actions are available on hover:
     - **Set Active (`Star` icon)**: Calls `handleSetActive`, which uses `setActiveProjectInBackend(id)` to update the backend. It then re-fetches the active project information to update the global store and UI. You cannot deactivate the active project; you must set another as active.
     - **Edit (`Pencil` icon)**: Navigates the user to `/projects/edit/:id`.
-    - **Duplicate (`Copy` icon)**: Calls `handleDuplicate`, which uses `duplicateProject(id)` to make an API call. The project list is then reloaded.
+    - **Duplicate (`Copy` icon)**: Calls `handleDuplicate`, which uses `duplicateProject(id)` to make an API call. The duplication process includes UUID regeneration for all pages and automatic updating of all `pageUuid` references in widgets and menus to point to the new UUIDs. The project list is then reloaded.
     - **Delete (`Trash2` icon)**: Calls `openDeleteConfirmation`, which opens a localized confirmation modal. You cannot delete the currently active project. If confirmed, the `deleteProject(id)` function is called, and the list is reloaded.
 
 ### 3. Exporting a Project
@@ -103,7 +106,7 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
     - Manifest contains required fields (name, theme)
     - Referenced theme exists in the installation
 5.  **Isolation**: Files are extracted to a temporary directory first for validation before any permanent changes.
-6.  **Project Creation**: 
+6.  **Project Creation**:
     - A new UUID is generated for the imported project
     - A unique `folderName` is generated (checking both `projects.json` and existing directories)
     - Files are copied from the temp directory to the new project directory
