@@ -120,7 +120,7 @@ function resolveLinkValue(linkValue, pagesByUuid) {
     return linkValue;
   }
 
-  const { pageUuid, href, text, target } = linkValue;
+  const { pageUuid } = linkValue;
 
   // If no pageUuid, this is a custom URL - pass through unchanged
   if (!pageUuid) {

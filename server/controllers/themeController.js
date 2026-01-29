@@ -5,7 +5,6 @@ import {
   getThemeDir,
   getThemeJsonPath,
   getThemeWidgetsDir,
-  getThemeTemplatesDir,
   getThemeUpdatesDir,
   getThemeLatestDir,
   getThemeVersionDir,
@@ -135,7 +134,6 @@ export async function getThemeLatestVersion(themeId) {
 export async function buildLatestSnapshot(themeId) {
   const themeDir = getThemeDir(themeId);
   const latestDir = getThemeLatestDir(themeId);
-  const updatesDir = getThemeUpdatesDir(themeId);
 
   // Get all versions (base + updates)
   const versions = await getThemeVersions(themeId);
@@ -795,7 +793,7 @@ export async function uploadTheme(req, res) {
     try {
       const content = updateThemeJsonEntry.getData().toString("utf8");
       updateThemeJson = JSON.parse(content);
-    } catch (error) {
+    } catch {
       return res.status(400).json({
         message: `Update folder '${versionFolder}' has invalid theme.json: Failed to parse JSON`,
       });

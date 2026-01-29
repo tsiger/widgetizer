@@ -10,7 +10,6 @@ import {
   getProjectDir,
   getProjectPagesDir,
   getThemeTemplatesDir,
-  getThemeDir,
   getProjectMenusDir,
   THEMES_DIR,
 } from "../config.js";

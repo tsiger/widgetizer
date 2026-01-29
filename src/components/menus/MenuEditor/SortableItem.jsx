@@ -89,7 +89,8 @@ const SortableItem = memo(function SortableItem({
         });
       } else {
         // Custom URL - remove pageUuid if present, store link directly
-        const { pageUuid: _removed, ...rest } = item;
+        // eslint-disable-next-line no-unused-vars
+        const { pageUuid: _pageUuid, ...rest } = item;
         onEdit(item.id, { ...rest, link: value });
       }
     },

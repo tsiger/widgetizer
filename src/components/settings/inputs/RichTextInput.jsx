@@ -189,6 +189,7 @@ export default function RichTextInput({ id, value = "", onChange, placeholder = 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
       editor.commands.setContent(value, false);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing external value to source mode
       setSourceValue(value);
     }
   }, [value, editor]);

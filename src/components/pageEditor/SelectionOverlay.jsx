@@ -260,6 +260,7 @@ export default function SelectionOverlay({
     // Widget hover: show when hovering a different widget than selected
     if (sidebarHoveredWidgetId && sidebarHoveredWidgetId !== effectiveWidgetId) {
       const bounds = getElementBounds(`[data-widget-id="${sidebarHoveredWidgetId}"]`);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing hover state from sidebar
       setWidgetHoverBounds(bounds);
 
       const widgetType = page?.widgets?.[sidebarHoveredWidgetId]?.type;
@@ -355,6 +356,7 @@ export default function SelectionOverlay({
     if (previewReadyKey > 0) {
       // Clear hover bounds - positions have changed, old bounds are stale
       // User will get fresh hover on next mouse move
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clearing stale state after content reload
       setWidgetHoverBounds(null);
       setBlockHoverBounds(null);
       setHoverWidgetDisplayName(null);
