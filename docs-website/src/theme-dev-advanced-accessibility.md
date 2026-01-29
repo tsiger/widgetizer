@@ -10,12 +10,12 @@ Widget scripts must be scoped per widget instance. Use the standard pattern:
 
 ```javascript
 (function () {
-  const widget = document.getElementById('{{ widget.id }}');
+  const widget = document.getElementById("{{ widget.id }}");
   if (!widget || widget.dataset.initialized) return;
-  widget.dataset.initialized = 'true';
+  widget.dataset.initialized = "true";
 
-  const triggers = widget.querySelectorAll('.trigger');
-  const panels = widget.querySelectorAll('.panel');
+  const triggers = widget.querySelectorAll(".trigger");
+  const panels = widget.querySelectorAll(".panel");
 })();
 ```
 
@@ -24,6 +24,52 @@ Key points:
 - Always scope queries to `widget`
 - Guard against double initialization
 - Never use global `document.querySelector()` inside widgets
+
+## External Scripts and Partial Updates
+
+When using external JavaScript files (via `{% enqueue_script %}`), the script only runs once at page load. During partial DOM updates in the editor, the widget HTML is replaced but external scripts don't re-run, causing event listeners to be lost.
+
+**The Solution:** Listen for the `widget:updated` event, which fires after the editor morphs a widget:
+
+```javascript
+(function () {
+  "use strict";
+
+  function initMyWidget(widget) {
+    if (widget.dataset.initialized) return;
+    widget.dataset.initialized = "true";
+
+    // Setup event listeners
+    widget.querySelectorAll(".my-button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        /* handle click */
+      });
+    });
+  }
+
+  // Initial page load
+  document.querySelectorAll('[data-widget-type="my-widget"]').forEach(initMyWidget);
+
+  // Re-initialize after partial updates
+  document.addEventListener("widget:updated", (e) => {
+    const widget = e.target.closest('[data-widget-type="my-widget"]');
+    if (widget) {
+      widget.removeAttribute("data-initialized");
+      initMyWidget(widget);
+    }
+  });
+})();
+```
+
+**When to use this pattern:**
+
+- External `.js` files loaded via `{% enqueue_script %}`
+- Widgets with interactive JavaScript (sliders, tabs, etc.)
+
+**When NOT needed:**
+
+- Inline scripts in `widget.liquid` (automatically re-executed)
+- CSS-only widgets
 
 # Scroll Reveal Animations
 

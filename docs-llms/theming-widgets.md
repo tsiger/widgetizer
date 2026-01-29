@@ -726,16 +726,88 @@ These will be automatically rendered by `{% header_assets %}` (for styles) and `
 
 Multiple widgets can safely enqueue the same asset file. The enqueue system uses the filename as a unique key, so if two widgets both call `{% enqueue_script "shared-lib.js" %}`, the script is only output once. This is useful when multiple widgets share a common library.
 
-> [!IMPORTANT]
-> **Asset Filename Collisions**
+> [!IMPORTANT] **Asset Filename Collisions**
 >
 > During export, all widget CSS and JS files are flattened into a single `assets/` folder. If two different widgets have files with the same name (e.g., both have `styles.css`), **the last one copied will overwrite the first**, and one widget's styles/scripts will be broken in the exported site.
 >
 > **Best practice:** Use unique, widget-prefixed filenames for your assets:
+>
 > - `slideshow.css` instead of `styles.css`
 > - `accordion-scripts.js` instead of `scripts.js`
 >
 > In preview mode, there is no collision—each widget's assets are served from separate paths. The collision only occurs during export.
+
+### Re-initialization on Partial Updates (External Scripts)
+
+When using **external JavaScript files** (via `{% enqueue_script %}`), the script only runs once at page load. During partial DOM updates in the editor (when users edit widget settings), the widget's HTML is replaced but external scripts don't re-run—causing event listeners to be lost.
+
+**The Problem:**
+
+- Inline scripts (inside `widget.liquid`) are automatically re-executed after DOM updates
+- External scripts (loaded via `{% enqueue_script %}`) are NOT re-executed
+- After partial update, the widget appears but interactive features (buttons, sliders, etc.) stop working
+
+**The Solution:**
+
+External scripts must listen for the `widget:updated` custom event, which is dispatched by the preview runtime after morphing a widget. Use this pattern:
+
+```javascript
+/**
+ * Widget JavaScript with partial update support
+ */
+(function () {
+  "use strict";
+
+  /**
+   * Initialize a widget instance
+   * @param {HTMLElement} widget - The widget element
+   */
+  function initMyWidget(widget) {
+    if (widget.dataset.initialized) return;
+    widget.dataset.initialized = "true";
+
+    // Setup event listeners, state, etc.
+    const buttons = widget.querySelectorAll(".my-button");
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        // Handle click
+      });
+    });
+  }
+
+  // Initialize all widgets on page load
+  document.querySelectorAll('[data-widget-type="my-widget"]').forEach(initMyWidget);
+
+  // Re-initialize on partial DOM updates (editor morphing)
+  document.addEventListener("widget:updated", (e) => {
+    const widget = e.target.closest('[data-widget-type="my-widget"]');
+    if (widget) {
+      // Remove flag to allow re-initialization
+      widget.removeAttribute("data-initialized");
+      initMyWidget(widget);
+    }
+  });
+})();
+```
+
+**Key Points:**
+
+1. **Extract initialization into a function** - Makes it callable both on page load and after updates
+2. **Listen for `widget:updated`** - This event bubbles from the morphed widget element
+3. **Remove `data-initialized`** - Allows the init function to run again
+4. **Use `e.target.closest()`** - The event target is the widget element itself
+
+**When to use this pattern:**
+
+- External `.js` files loaded via `{% enqueue_script %}`
+- Widgets with interactive JavaScript (sliders, accordions, tabs, etc.)
+- Any widget that attaches event listeners
+
+**When NOT needed:**
+
+- Inline scripts (inside `<script>` tags in `widget.liquid`) - These are automatically re-executed
+- CSS-only widgets with no JavaScript
+- Widgets that only use declarative behavior (no event listeners)
 
 ---
 
@@ -745,15 +817,15 @@ The theme includes a scroll reveal animation system. Add animation classes to el
 
 ### Animation Classes
 
-| Class | Effect |
-| :---- | :----- |
-| `.reveal` | Base class (required) - fades in |
-| `.reveal-up` | Slides up while fading in |
-| `.reveal-down` | Slides down while fading in |
-| `.reveal-left` | Slides from right to left |
-| `.reveal-right` | Slides from left to right |
-| `.reveal-scale` | Scales up from 95% |
-| `.reveal-fade` | Simple fade (no transform) |
+| Class           | Effect                           |
+| :-------------- | :------------------------------- |
+| `.reveal`       | Base class (required) - fades in |
+| `.reveal-up`    | Slides up while fading in        |
+| `.reveal-down`  | Slides down while fading in      |
+| `.reveal-left`  | Slides from right to left        |
+| `.reveal-right` | Slides from left to right        |
+| `.reveal-scale` | Scales up from 95%               |
+| `.reveal-fade`  | Simple fade (no transform)       |
 
 ### Basic Usage
 

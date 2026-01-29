@@ -1,11 +1,16 @@
 /**
  * Slideshow Widget JavaScript
  * Uses querySelectorAll to support multiple instances
+ * Supports re-initialization on partial DOM updates via widget:updated event
  */
 (function () {
   "use strict";
 
-  document.querySelectorAll('[data-widget-type="slideshow"]').forEach((widget) => {
+  /**
+   * Initialize a slideshow widget instance
+   * @param {HTMLElement} widget - The slideshow widget element
+   */
+  function initSlideshow(widget) {
     if (widget.dataset.initialized) return;
     widget.dataset.initialized = "true";
 
@@ -102,16 +107,24 @@
 
     const slideshowTrack = widget.querySelector(".slideshow-track");
     if (slideshowTrack) {
-      slideshowTrack.addEventListener("touchstart", (e) => {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-      }, { passive: true });
+      slideshowTrack.addEventListener(
+        "touchstart",
+        (e) => {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        },
+        { passive: true },
+      );
 
-      slideshowTrack.addEventListener("touchmove", (e) => {
-        // Allow default scrolling behavior while tracking touch position
-        touchEndX = e.touches[0].clientX;
-        touchEndY = e.touches[0].clientY;
-      }, { passive: true });
+      slideshowTrack.addEventListener(
+        "touchmove",
+        (e) => {
+          // Allow default scrolling behavior while tracking touch position
+          touchEndX = e.touches[0].clientX;
+          touchEndY = e.touches[0].clientY;
+        },
+        { passive: true },
+      );
 
       slideshowTrack.addEventListener("touchend", (e) => {
         if (!touchStartX || !touchEndX) return;
@@ -125,7 +138,7 @@
         // and meets minimum distance threshold
         if (absDeltaX > absDeltaY && absDeltaX > minSwipeDistance && absDeltaY < maxVerticalSwipe) {
           e.preventDefault();
-          
+
           // Stop autoplay when user interacts with swipe
           stopAutoplay();
 
@@ -151,5 +164,18 @@
     }
 
     startAutoplay();
+  }
+
+  // Initialize all slideshow widgets on page load
+  document.querySelectorAll('[data-widget-type="slideshow"]').forEach(initSlideshow);
+
+  // Re-initialize on partial DOM updates (morphWidget dispatches this event)
+  document.addEventListener("widget:updated", (e) => {
+    const widget = e.target.closest('[data-widget-type="slideshow"]');
+    if (widget) {
+      // Remove initialized flag to allow re-initialization
+      widget.removeAttribute("data-initialized");
+      initSlideshow(widget);
+    }
   });
 })();
