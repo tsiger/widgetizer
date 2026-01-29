@@ -2,47 +2,6 @@
   "name": "Case Study: Atlas Group",
   "slug": "case-study-atlas-growth",
   "widgets": {
-    "case_hero": {
-      "type": "banner",
-      "settings": {
-        "height": "small",
-        "alignment": "center",
-        "color_scheme": "highlight",
-        "fullwidth": true
-      },
-      "blocks": {
-        "case-eyebrow": {
-          "type": "text",
-          "settings": {
-            "text": "Case study",
-            "size": "sm",
-            "uppercase": true,
-            "muted": false
-          }
-        },
-        "case-heading": {
-          "type": "heading",
-          "settings": {
-            "text": "Atlas Group: Growth strategy reset",
-            "size": "4xl"
-          }
-        },
-        "case-text": {
-          "type": "text",
-          "settings": {
-            "text": "Rebuilt positioning and pipeline to support the next stage of growth.",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
-          }
-        }
-      },
-      "blocksOrder": [
-        "case-eyebrow",
-        "case-heading",
-        "case-text"
-      ]
-    },
     "case_overview": {
       "type": "image-text",
       "settings": {
@@ -279,7 +238,6 @@
     }
   },
   "widgetsOrder": [
-    "case_hero",
     "case_overview",
     "case_metrics",
     "case_timeline",
