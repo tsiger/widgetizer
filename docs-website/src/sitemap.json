@@ -13,6 +13,11 @@
       "path": "getting-started.md"
     },
     {
+      "type": "page",
+      "title": "License",
+      "path": "license.md"
+    },
+    {
       "type": "header",
       "title": "Core Concepts"
     },
