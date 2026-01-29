@@ -678,6 +678,18 @@ Per aspera ad astra
       }
     }
 
+    // Write manifest.json with export metadata
+    const manifest = {
+      generator: "widgetizer",
+      widgetizerVersion: await getAppVersion(),
+      themeId: projectData.theme,
+      themeVersion: projectData.themeVersion || null,
+      exportVersion: version,
+      exportedAt: new Date().toISOString(),
+      projectName: projectData.name,
+    };
+    await fs.writeFile(path.join(outputDir, "manifest.json"), JSON.stringify(manifest, null, 2));
+
     // Record this export in history
     const exportRecord = await recordExport(projectId, version, outputDir, "success");
 
