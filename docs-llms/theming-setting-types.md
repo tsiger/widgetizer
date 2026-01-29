@@ -77,6 +77,62 @@ A multi-line text input field.
 }
 ```
 
+### Rich Text
+
+A rich text editor with basic formatting (bold, italic, link). The value is stored as HTML.
+
+**Additional Properties:**
+
+- **`placeholder`** (string, optional): Placeholder text shown when the editor is empty.
+- **`allow_source`** (boolean, optional): If `true`, shows an HTML source toggle button for advanced editing. Defaults to `false`.
+
+```json
+{
+  "id": "description",
+  "type": "richtext",
+  "label": "Description",
+  "placeholder": "Enter formatted text...",
+  "default": "<p>Welcome to our <strong>platform</strong>.</p>",
+  "description": "A formatted description with basic styling support."
+}
+```
+
+**With HTML Source Toggle:**
+
+```json
+{
+  "id": "content",
+  "type": "richtext",
+  "label": "Content",
+  "allow_source": true,
+  "description": "Content with access to raw HTML editing."
+}
+```
+
+**Features:**
+
+- Formatting toolbar with Bold, Italic, and Link buttons
+- Link editor with URL input (auto-prefixes `https://` if missing)
+- Expand button opens a larger modal for comfortable editing
+- Toolbar buttons highlight based on formatting at cursor position
+- Optional HTML source view for debugging or advanced editing
+
+**Usage in Templates:**
+
+Output directly in Liquid templates—the value is already HTML:
+
+```liquid
+<div class="content">
+  {{ widget.settings.description }}
+</div>
+```
+
+**When to use Rich Text vs Textarea:**
+
+- Use `richtext` when users need basic formatting (bold, italic, links)
+- Use `textarea` for plain text content without formatting needs
+- Use `code` for HTML/CSS/JS that requires syntax highlighting
+
 ### Code
 
 A code editor with syntax highlighting and line numbers. Ideal for editing CSS, JavaScript, HTML, or other code snippets.

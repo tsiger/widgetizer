@@ -99,10 +99,10 @@
       "displayName": "Text",
       "settings": [
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "text",
           "label": "Text",
-          "default": "Add your text content here."
+          "default": "<p>Add your text content here.</p>"
         },
         {
           "type": "select",
@@ -227,7 +227,7 @@
     {
       "type": "text",
       "settings": {
-        "text": "We're building the future of digital experiences. Our platform empowers teams to create, collaborate, and deliver exceptional results.",
+        "text": "<p>We're building the future of digital experiences. Our platform empowers teams to create, collaborate, and deliver exceptional results.</p>",
         "size": "lg",
         "uppercase": false,
         "muted": false

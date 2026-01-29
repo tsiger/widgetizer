@@ -8,6 +8,7 @@ export { default as AudioInput } from "./AudioInput";
 export { default as MenuSelectInput } from "./MenuSelectInput";
 export { default as RadioInput } from "./RadioInput";
 export { default as RangeInput } from "./RangeInput";
+export { default as RichTextInput } from "./RichTextInput";
 export { default as SelectInput } from "./SelectInput";
 export { default as TextareaInput } from "./TextareaInput";
 export { default as TextInput } from "./TextInput";

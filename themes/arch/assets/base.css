@@ -206,7 +206,7 @@ img {
   --border-color: var(--colors-highlight_border_color, #526884);
   --bg-primary: var(--colors-highlight_bg_primary, #233c54);
   --bg-secondary: var(--colors-highlight_bg_secondary, #152a3e);
-  --accent: var(--colors-highlight_accent, #DE1877);
+  --accent: var(--colors-highlight_accent, #de1877);
   --accent-text: var(--colors-highlight_accent_text, #ffffff);
   --rating-star-color: var(--colors-highlight_rating_star, #fbbf24);
 }
@@ -433,6 +433,17 @@ h6 {
 
 .block-text-accent {
   color: var(--accent);
+}
+
+/* Rich text editor content */
+.block-rte a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: text-decoration var(--transition-speed-fast);
+}
+
+.block-rte a:hover {
+  text-decoration: underline;
 }
 
 /* ==========================================================================
@@ -1389,7 +1400,7 @@ h6 {
       min-width: 22rem;
       background-color: var(--color-white);
       border: var(--border-width-thin) solid var(--border-color);
-    max-height: none;
+      max-height: none;
       opacity: 0;
       visibility: hidden;
       transform: translateY(-0.5rem);
@@ -1397,7 +1408,7 @@ h6 {
         opacity var(--transition-speed-fast) ease,
         visibility var(--transition-speed-fast) ease,
         transform var(--transition-speed-fast) ease;
-    overflow: visible;
+      overflow: visible;
       padding-block: var(--space-xs);
       padding-inline: 0;
 

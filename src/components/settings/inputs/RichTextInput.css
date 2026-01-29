@@ -1,0 +1,358 @@
+/* RichTextInput styles - using Tailwind slate/pink color scheme */
+
+.richtext-editor {
+  border: 1px solid #cbd5e1; /* slate-300 */
+  border-radius: 0.125rem; /* rounded-sm to match form inputs */
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-xs */
+}
+
+.richtext-editor:focus-within {
+  border-color: #ec4899; /* pink-500 */
+  outline: none;
+  box-shadow: 0 0 0 1px #ec4899; /* matches form-input focus */
+}
+
+.richtext-editor.is-hidden {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+  border: none;
+  margin: 0;
+}
+
+/* Menubar */
+.richtext-menubar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem;
+  border-bottom: 1px solid #e2e8f0; /* slate-200 */
+  background: #f8fafc; /* slate-50 */
+}
+
+.richtext-menubar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: #64748b; /* slate-500 */
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.richtext-menubar-button:hover {
+  background: #e2e8f0; /* slate-200 */
+  color: #334155; /* slate-700 */
+}
+
+.richtext-menubar-button.is-active {
+  background: #db2777; /* pink-600 */
+  color: #ffffff;
+}
+
+.richtext-menubar-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.richtext-menubar-divider {
+  width: 1px;
+  height: 1rem;
+  background: #cbd5e1; /* slate-300 */
+  margin: 0 0.25rem;
+}
+
+.richtext-menubar-spacer {
+  flex: 1;
+}
+
+.richtext-source-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #64748b; /* slate-500 */
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* Link input */
+.richtext-link-input {
+  flex: 1;
+  min-width: 0;
+  height: 1.75rem;
+  padding: 0 0.5rem;
+  border: 1px solid #cbd5e1; /* slate-300 */
+  border-radius: 0.125rem;
+  font-size: 0.75rem;
+  background: #ffffff;
+}
+
+.richtext-link-input:focus {
+  outline: none;
+  border-color: #ec4899; /* pink-500 */
+  box-shadow: 0 0 0 1px #ec4899;
+}
+
+.richtext-link-icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 0.25rem;
+  background: #db2777; /* pink-600 */
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.richtext-link-icon-button:hover {
+  background: #be185d; /* pink-700 */
+}
+
+.richtext-link-icon-button.richtext-link-cancel {
+  background: #e2e8f0; /* slate-200 */
+  color: #64748b; /* slate-500 */
+}
+
+.richtext-link-icon-button.richtext-link-cancel:hover {
+  background: #cbd5e1; /* slate-300 */
+  color: #334155; /* slate-700 */
+}
+
+/* Editor content area */
+.richtext-editor .tiptap {
+  padding: 0.5rem 0.75rem;
+  min-height: 5rem;
+  max-height: 12rem;
+  overflow-y: auto;
+  outline: none;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #1e293b; /* slate-800 */
+}
+
+.richtext-editor .tiptap p {
+  margin: 0;
+}
+
+.richtext-editor .tiptap p + p {
+  margin-top: 0.5em;
+}
+
+.richtext-editor .tiptap a {
+  color: #db2777; /* pink-600 */
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.richtext-editor .tiptap a:hover {
+  color: #be185d; /* pink-700 */
+}
+
+/* Placeholder */
+.richtext-editor .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #94a3b8; /* slate-400 */
+  pointer-events: none;
+  height: 0;
+}
+
+.richtext-editor-content.is-empty::before {
+  content: attr(data-placeholder);
+  color: #94a3b8; /* slate-400 */
+  pointer-events: none;
+}
+
+/* Source mode */
+.richtext-editor.is-source-mode .richtext-menubar {
+  background: #f1f5f9; /* slate-100 */
+}
+
+.richtext-source-editor {
+  width: 100%;
+  min-height: 5rem;
+  max-height: 12rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  outline: none;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: #1e293b; /* slate-800 */
+  background: #ffffff;
+}
+
+.richtext-source-editor::placeholder {
+  color: #94a3b8; /* slate-400 */
+}
+
+/* Expand button */
+.richtext-expand-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.625rem;
+  border: none;
+  border-radius: 0.125rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b; /* slate-500 */
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.richtext-expand-button:hover {
+  color: #334155; /* slate-700 */
+  background: #f1f5f9; /* slate-100 */
+}
+
+/* Overlay / Expanded mode */
+.richtext-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(15, 23, 42, 0.6); /* slate-900 with opacity */
+  animation: richtext-fade-in 0.15s ease;
+}
+
+@keyframes richtext-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.richtext-overlay-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 48rem;
+  max-height: calc(100vh - 4rem);
+  background: #ffffff;
+  border-radius: 0.375rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: richtext-slide-up 0.2s ease;
+}
+
+@keyframes richtext-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.richtext-overlay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0; /* slate-200 */
+}
+
+.richtext-overlay-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b; /* slate-800 */
+}
+
+.richtext-overlay-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: #64748b; /* slate-500 */
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.richtext-overlay-close:hover {
+  background: #f1f5f9; /* slate-100 */
+  color: #334155; /* slate-700 */
+}
+
+.richtext-overlay-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e2e8f0; /* slate-200 */
+}
+
+.richtext-done-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: #db2777; /* pink-600 */
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: all 0.2s ease;
+}
+
+.richtext-done-button:hover {
+  background: #be185d; /* pink-700 */
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Expanded editor styles */
+.richtext-editor-expanded {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.richtext-editor-expanded:focus-within {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.richtext-editor-expanded .tiptap {
+  flex: 1;
+  min-height: 20rem;
+  max-height: none;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.richtext-editor-expanded .richtext-source-editor {
+  flex: 1;
+  min-height: 20rem;
+  max-height: none;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  resize: none;
+}

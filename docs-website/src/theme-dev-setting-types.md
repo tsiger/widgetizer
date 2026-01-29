@@ -49,6 +49,45 @@ For how settings map into templates and CSS variables, see [Theme Manifest & Set
 }
 ```
 
+**`richtext`** — Rich text editor with bold, italic, and link formatting. Outputs HTML.
+
+```json
+{
+  "id": "description",
+  "type": "richtext",
+  "label": "Description",
+  "placeholder": "Enter formatted text...",
+  "default": "<p>Welcome to our <strong>platform</strong>.</p>"
+}
+```
+
+Features:
+
+- **Formatting toolbar** with Bold, Italic, and Link buttons
+- **Link editor** with URL input (auto-prefixes `https://` if missing)
+- **Expand button** opens a larger modal for comfortable editing
+- Active formatting is highlighted in the toolbar based on cursor position
+
+Optional properties:
+
+- `placeholder` (string): Placeholder text when empty
+- `allow_source` (boolean): Show HTML source toggle for advanced editing
+
+```json
+{
+  "id": "content",
+  "type": "richtext",
+  "label": "Content",
+  "allow_source": true
+}
+```
+
+In Liquid templates, output directly (it's already HTML):
+
+```liquid
+{{ widget.settings.description }}
+```
+
 **`code`** — Code editor with syntax highlighting.
 
 ```json

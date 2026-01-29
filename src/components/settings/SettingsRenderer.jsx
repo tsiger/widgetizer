@@ -5,6 +5,7 @@ import {
   CodeInput,
   ColorInput,
   RangeInput,
+  RichTextInput,
   SelectInput,
   CheckboxInput,
   RadioInput,
@@ -72,6 +73,8 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
         return <TextInput {...inputProps} type="number" />;
       case "textarea":
         return <TextareaInput {...inputProps} />;
+      case "richtext":
+        return <RichTextInput {...inputProps} placeholder={setting.placeholder} allowSource={setting.allow_source} />;
       case "code":
         return <CodeInput {...inputProps} language={language || "html"} rows={setting.rows || 10} />;
       case "color":
