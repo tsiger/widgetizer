@@ -25,20 +25,10 @@
       "label": "Form"
     },
     {
-      "type": "text",
-      "id": "form_action",
-      "label": "Form action URL",
-      "default": "/submit"
-    },
-    {
-      "type": "select",
-      "id": "form_method",
-      "label": "Form method",
-      "default": "POST",
-      "options": [
-        { "value": "POST", "label": "POST" },
-        { "value": "GET", "label": "GET" }
-      ]
+      "type": "textarea",
+      "id": "coming_soon_message",
+      "label": "Coming Soon",
+      "default": "Contact form functionality is coming soon."
     },
     {
       "type": "header",

@@ -105,8 +105,6 @@
         <!-- Contact Form -->
         <form
           class="contact-form reveal reveal-up"
-          action="{{ widget.settings.form_action }}"
-          method="{{ widget.settings.form_method }}"
         >
           {% for blockId in widget.blocksOrder %}
             {% assign block = widget.blocks[blockId] %}
