@@ -58,10 +58,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "slide-1",
-        "slide-2"
-      ]
+      "blocksOrder": ["slide-1", "slide-2"]
     },
     "logo_cloud": {
       "type": "logo-cloud",
@@ -110,14 +107,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "logo-1",
-        "logo-2",
-        "logo-3",
-        "logo-4",
-        "logo-5",
-        "logo-6"
-      ]
+      "blocksOrder": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5", "logo-6"]
     },
     "key_figures": {
       "type": "key-figures",
@@ -168,15 +158,63 @@
           }
         }
       },
-      "blocksOrder": [
-        "figure-1",
-        "figure-2",
-        "figure-3",
-        "figure-4"
-      ]
+      "blocksOrder": ["figure-1", "figure-2", "figure-3", "figure-4"]
+    },
+    "enterprise_callout": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "eyebrow-text": {
+          "type": "text",
+          "settings": {
+            "text": "Why choose us",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Enterprise-Grade Solutions",
+            "size": "2xl"
+          }
+        },
+        "description": {
+          "type": "text",
+          "settings": {
+            "text": "Scale your business with confidence using our proven platform trusted by industry leaders worldwide.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "features": {
+          "type": "features",
+          "settings": {
+            "features": "+ 99.9% uptime SLA guarantee\n+ 24/7 dedicated support team\n+ Enterprise security & compliance"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Request Demo",
+              "href": "#",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow-text", "heading", "description", "features", "button"]
     },
     "services_grid": {
-      "type": "card-grid",
+      "type": "icon-card-grid",
       "settings": {
         "eyebrow": "Services",
         "title": "What we help with",
@@ -242,12 +280,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "service-1",
-        "service-2",
-        "service-3",
-        "service-4"
-      ]
+      "blocksOrder": ["service-1", "service-2", "service-3", "service-4"]
     },
     "process_timeline": {
       "type": "timeline",
@@ -300,12 +333,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "phase-1",
-        "phase-2",
-        "phase-3",
-        "phase-4"
-      ]
+      "blocksOrder": ["phase-1", "phase-2", "phase-3", "phase-4"]
     },
     "testimonials": {
       "type": "testimonials",
@@ -345,11 +373,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "quote-1",
-        "quote-2",
-        "quote-3"
-      ]
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
     },
     "cta_banner": {
       "type": "banner",
@@ -404,18 +428,14 @@
           }
         }
       },
-      "blocksOrder": [
-        "cta-text",
-        "cta-heading",
-        "cta-body",
-        "cta-buttons"
-      ]
+      "blocksOrder": ["cta-text", "cta-heading", "cta-body", "cta-buttons"]
     }
   },
   "widgetsOrder": [
     "hero_slideshow",
     "logo_cloud",
     "key_figures",
+    "enterprise_callout",
     "services_grid",
     "process_timeline",
     "testimonials",
