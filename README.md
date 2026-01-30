@@ -89,11 +89,10 @@ The frontend dev server provides hot module replacement (HMR) for instant update
 
 Other development commands:
 
-| Command          | Description                                     |
-| ---------------- | ----------------------------------------------- |
+| Command          | Description                                                    |
+| ---------------- | -------------------------------------------------------------- |
 | `npm run dev`    | Start Vite frontend only (requires backend running separately) |
-| `npm run server` | Start backend server with nodemon (auto-reload) |
-| `npm start`      | Start backend server (no auto-reload)          |
+| `npm run server` | Start backend server with nodemon (auto-reload)                |
 
 ### Production
 

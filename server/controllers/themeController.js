@@ -99,19 +99,21 @@ export async function getThemeVersions(themeId) {
 
 /**
  * Get the source directory for reading theme files.
- * Returns latest/ if it exists (theme has updates), otherwise returns root.
+ * Returns latest/ if it exists AND contains theme.json (theme has updates), otherwise returns root.
  * @param {string} themeId - Theme identifier (folder name)
  * @returns {Promise<string>} - Path to the theme source directory
  */
 export async function getThemeSourceDir(themeId) {
   const latestDir = getThemeLatestDir(themeId);
+  const latestThemeJson = path.join(latestDir, "theme.json");
 
   try {
-    await fs.access(latestDir);
-    // latest/ exists, use it
+    // Check if latest/theme.json exists (not just the directory)
+    await fs.access(latestThemeJson);
+    // latest/ exists and has theme.json, use it
     return latestDir;
   } catch {
-    // latest/ doesn't exist, use root
+    // latest/ doesn't exist or is incomplete, use root
     return getThemeDir(themeId);
   }
 }
@@ -285,13 +287,11 @@ export async function getAllThemes(_, res) {
           // Count widgets programmatically from the widgets directory
           let widgetCount = 0;
           const widgetsDir = path.join(sourceDir, "widgets");
-          
+
           try {
             const entries = await fs.readdir(widgetsDir, { withFileTypes: true });
             // Count widget folders (excluding 'global' directory)
-            widgetCount = entries.filter(
-              (entry) => entry.isDirectory() && entry.name !== "global"
-            ).length;
+            widgetCount = entries.filter((entry) => entry.isDirectory() && entry.name !== "global").length;
           } catch (widgetDirError) {
             // If widgets directory doesn't exist or can't be read, count is 0
             console.warn(`Could not read widgets directory for theme ${themeId}:`, widgetDirError.message);
@@ -678,7 +678,7 @@ export async function uploadTheme(req, res) {
   // Validate theme structure before extraction to prevent incomplete/broken themes
   // from polluting the themes directory. We check for minimum required files and
   // directories that make a theme functional in Widgetizer.
-  
+
   const themeJsonEntryPath = `${themeFolderName}/theme.json`;
   const screenshotEntryPath = `${themeFolderName}/screenshot.png`;
 
