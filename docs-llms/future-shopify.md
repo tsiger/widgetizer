@@ -51,20 +51,11 @@ Display full images on product cards; avoid cropping images to fit.
 
 ```html
 <!-- Basic Structure (Expand Upon This) -->
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
-<shopify-store
-  store-domain="mock.shop"
-  country="US"
-  language="en"
->
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+<shopify-store store-domain="mock.shop" country="US" language="en">
   <!-- Cart Component -->
   <shopify-cart id="main-cart"></shopify-cart>
-  <button onclick="document.getElementById('main-cart').showModal()">
-    Open Cart
-  </button>
+  <button onclick="document.getElementById('main-cart').showModal()">Open Cart</button>
 
   <!-- Product Grid -->
   <div style="display: flex; flex-wrap: wrap; gap: 20px;">
@@ -79,6 +70,7 @@ Display full images on product cards; avoid cropping images to fit.
 
 ### Fully-functional example of embedded product card
 
+```html
 <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 <!-- Provide the token and set the market context -->
 <shopify-store store-domain="https://www.velasca.com" country="US" language="en"></shopify-store>
@@ -91,7 +83,11 @@ Display full images on product cards; avoid cropping images to fit.
         <div class="product-card__container">
           <div class="product-card__media">
             <div class="product-card__main-image">
-              <shopify-media width="280" height="280" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+              <shopify-media
+                width="280"
+                height="280"
+                query="product.selectedOrFirstAvailableVariant.image"
+              ></shopify-media>
             </div>
           </div>
           <div class="product-card__details">
@@ -130,7 +126,11 @@ Display full images on product cards; avoid cropping images to fit.
         <div class="product-modal__content">
           <div class="product-modal__layout">
             <div class="product-modal__media">
-              <shopify-media width="416" height="416" query="product.selectedOrFirstAvailableVariant.image"></shopify-media>
+              <shopify-media
+                width="416"
+                height="416"
+                query="product.selectedOrFirstAvailableVariant.image"
+              ></shopify-media>
             </div>
             <div class="product-modal__details">
               <div class="product-modal__header">
@@ -178,9 +178,9 @@ Display full images on product cards; avoid cropping images to fit.
 </dialog>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+  @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 400;
     font-style: normal;
   }
@@ -242,7 +242,9 @@ Display full images on product cards; avoid cropping images to fit.
     font-size: 0.875rem;
     font-weight: 700;
     text-transform: uppercase;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
     border: 2px solid black;
     cursor: pointer;
   }
@@ -348,7 +350,9 @@ Display full images on product cards; avoid cropping images to fit.
   .product-modal__buttons button {
     font-size: 0.875rem;
     font-weight: 800;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
     cursor: pointer;
     border: 2px solid black;
     text-transform: uppercase;
@@ -395,7 +399,7 @@ Display full images on product cards; avoid cropping images to fit.
     margin: 0;
   }
 </style>
-
+```
 
 ### Technical Tips
 
@@ -416,7 +420,7 @@ Display full images on product cards; avoid cropping images to fit.
 
 **Implementation Steps:**
 
-1. Set up the store configuration using `<shopify-store>` with a `store-domain` attribute 
+1. Set up the store configuration using `<shopify-store>` with a `store-domain` attribute
 2. Create a product context using `<shopify-context type="product" handle="product-handle">`
 3. Inside the template:
    - Add a `<shopify-media>` component to display the product image
@@ -535,7 +539,7 @@ Display full images on product cards; avoid cropping images to fit.
 
 Remember: The user's specific requirements always take precedence over these general guidelines.
 
-------------
+---
 
 # Shopify Storefront Components API Documentation
 
@@ -564,16 +568,8 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 **Example**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
-<shopify-store
-  store-domain="https://your-store.myshopify.com"
-  country="CA"
-  language="FR"
->
-</shopify-store>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+<shopify-store store-domain="https://your-store.myshopify.com" country="CA" language="FR"> </shopify-store>
 <shopify-context type="product" handle="your-product-handle">
   <template>
     <!-- the href attribute is bound to the
@@ -590,28 +586,22 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 **Description**: The cart component provides a mini shopping cart functionality for your website. Here's how it works:
 
 1. To add items to the cart:
-
    - Use the `addLine()` method
    - The method needs an event object
    - The event's target must be inside a product [context component](#shopify-context)
 
 2. To display the cart:
-
    - The cart uses a native [HTML `<dialog>` element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog).
    - To show it as a popup modal, call the `showModal()` method.
 
 3. Customize the cart with CSS parts and slots.
 
-> Note:
-> The cart component does not support mixing products from multiple stores.
+> Note: The cart component does not support mixing products from multiple stores.
 
 **Example**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 <shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
 
 <!-- The context is bound to the store -->
@@ -620,9 +610,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
     <shopify-variant-selector></shopify-variant-selector>
     <!-- The product added will be whatever
   variant is selected for the context product handle -->
-    <button onclick="getElementById('cart').addLine(event).showModal();">
-      Add to cart
-    </button>
+    <button onclick="getElementById('cart').addLine(event).showModal();">Add to cart</button>
   </template>
 </shopify-context>
 
@@ -631,14 +619,14 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 
 #### Attributes and properties
 
-| Name      | Type                         | Description                                                                                                                                               | Optional |
-| --------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| addLine   | (e: Event) => CartAttributes | A method to add an item to the cart.                                                                                                                      | Yes      |
-| close     | () => CartAttributes         | A method to close the cart dialog.                                                                                                                        | Yes      |
-| open      | boolean                      | A property to get the open state of the cart. Example: `getElementById('cart').open`                                                                      | Yes      |
-| show      | () => CartAttributes         | A method to display the cart as a modal in a [`dialog` element modelessly](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/show).      | Yes      |
-| showModal | () => CartAttributes         | A method to display the underlying [cart as a modal](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal) in a `dialog` element. | Yes      |
-| target    | string                       | The [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#target) for the checkout link. Defaults to "\_top".                    | Yes      |
+| Name | Type | Description | Optional |
+| --- | --- | --- | --- |
+| addLine | (e: Event) => CartAttributes | A method to add an item to the cart. | Yes |
+| close | () => CartAttributes | A method to close the cart dialog. | Yes |
+| open | boolean | A property to get the open state of the cart. Example: `getElementById('cart').open` | Yes |
+| show | () => CartAttributes | A method to display the cart as a modal in a [`dialog` element modelessly](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/show). | Yes |
+| showModal | () => CartAttributes | A method to display the underlying [cart as a modal](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal) in a `dialog` element. | Yes |
+| target | string | The [target attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#target) for the checkout link. Defaults to "\_top". | Yes |
 
 #### CSS parts
 
@@ -658,19 +646,16 @@ CSS parts allow you to target and override the default styling within the cart c
 
 Slots allow you to override the default content of the cart component.
 
-| Slot Name       | Description                                                                                                        |
-| --------------- | ------------------------------------------------------------------------------------------------------------------ |
-| checkout-button | The content to display in the checkout button. Useful to add a custom checkout button text.                        |
-| empty           | The content to display when the cart is empty.                                                                     |
-| extension       | Extend the cart with additional content below the checkout button. Useful to add upsell products or other content. |
+| Slot Name | Description |
+| --- | --- |
+| checkout-button | The content to display in the checkout button. Useful to add a custom checkout button text. |
+| empty | The content to display when the cart is empty. |
+| extension | Extend the cart with additional content below the checkout button. Useful to add upsell products or other content. |
 
 **Custom Cart Example**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 <shopify-cart>
   <!-- Override the empty state with translated text -->
   <div slot="empty">Ihr Warenkorb ist leer</div>
@@ -720,10 +705,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for complete 
 **Example**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 <shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
 
 <!-- The context is bound to the store -->
@@ -743,27 +725,19 @@ See the [playground](https://webcomponents.shopify.dev/playground) for complete 
 
 #### Attributes
 
-| Name            | Type               | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Optional |
-| --------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| handle          | string             | The handle for the context. Required on some objects, like products, collections, and blogs. The handle is required unless the `wait-for-update` attribute is included.                                                                                                                                                                                                                                                                                                                                                                 | Yes      |
-| query           | string             | The query path for accessing nested data within a parent context. Required when this context is nested inside another context. The query should specify the path to access the desired data from the parent. Example: If the parent context is a product, and you want to access its first available variant: query="product.selectedOrFirstAvailableVariant"                                                                                                                                                                           | Yes      |
-| type            | string             | The type of the context. This needs to match the [GraphQL Storefront API](https://shopify.dev/docs/api/storefront) type you are querying. For example, if you are querying a product, the type should be `type="product"`.                                                                                                                                                                                                                                                                                                              | No       |
-| update          | (e: Event) => void | Updates this context to match the data from another context of the same type. Common use case: When displaying a list of products, you might want to show a detailed view of a single product in a modal. This method allows you to update the modal's context to display the selected product's data. How it works: 1. The event target must be inside the source context you want to copy from 2. This context will update its handle to match the source context 3. The data will be automatically refreshed to show the new content | Yes      |
-| wait-for-update | boolean            | Wait to render the context until the update method is called. This is useful for dynamically rendering a context.                                                                                                                                                                                                                                                                                                                                                                                                                       | Yes      |
+| Name | Type | Description | Optional |
+| --- | --- | --- | --- |
+| handle | string | The handle for the context. Required on some objects, like products, collections, and blogs. The handle is required unless the `wait-for-update` attribute is included. | Yes |
+| query | string | The query path for accessing nested data within a parent context. Required when this context is nested inside another context. The query should specify the path to access the desired data from the parent. Example: If the parent context is a product, and you want to access its first available variant: query="product.selectedOrFirstAvailableVariant" | Yes |
+| type | string | The type of the context. This needs to match the [GraphQL Storefront API](https://shopify.dev/docs/api/storefront) type you are querying. For example, if you are querying a product, the type should be `type="product"`. | No |
+| update | (e: Event) => void | Updates this context to match the data from another context of the same type. Common use case: When displaying a list of products, you might want to show a detailed view of a single product in a modal. This method allows you to update the modal's context to display the selected product's data. How it works: 1. The event target must be inside the source context you want to copy from 2. This context will update its handle to match the source context 3. The data will be automatically refreshed to show the new content | Yes |
+| wait-for-update | boolean | Wait to render the context until the update method is called. This is useful for dynamically rendering a context. | Yes |
 
 **Example - Updating a context with a dialog**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
-<shopify-store
-  store-domain="https://your-store.myshopify.com"
-  country="CA"
-  language="FR"
->
-</shopify-store>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+<shopify-store store-domain="https://your-store.myshopify.com" country="CA" language="FR"> </shopify-store>
 
 <script>
   function showProductDetails(event) {
@@ -799,16 +773,8 @@ See the [playground](https://webcomponents.shopify.dev/playground) for complete 
 **Example - Paginated list of products**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
-<shopify-store
-  store-domain="https://your-store.myshopify.com"
-  country="CA"
-  language="FR"
->
-</shopify-store>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+<shopify-store store-domain="https://your-store.myshopify.com" country="CA" language="FR"> </shopify-store>
 
 <shopify-list-context type="product" query="products" first="10">
   <!-- This template is repeated for each product-->
@@ -816,32 +782,26 @@ See the [playground](https://webcomponents.shopify.dev/playground) for complete 
     <shopify-data query="product.title"></shopify-data>
   </template>
 </shopify-list-context>
-<button id="previous" onclick="getElementById('list-context').previousPage();">
-  Previous
-</button>
-<button id="next" onclick="getElementById('list-context').nextPage();">
-  Next
-</button>
+<button id="previous" onclick="getElementById('list-context').previousPage();">Previous</button>
+<button id="next" onclick="getElementById('list-context').nextPage();">Next</button>
 
 <script>
   // Listen for the list context to update
   // and disable the next and previous buttons when
   // the list is at the end or beginning
-  document
-    .querySelector("shopify-context")
-    .addEventListener("shopify-list-context-update", (event) => {
-      const { hasNextPage, hasPreviousPage } = event.detail;
-      if (!hasNextPage) {
-        document.getElementById("next").setAttribute("disabled", "true");
-      } else {
-        document.getElementById("next").removeAttribute("disabled");
-      }
-      if (!hasPreviousPage) {
-        document.getElementById("previous")?.setAttribute("disabled", "true");
-      } else {
-        document.getElementById("previous").removeAttribute("disabled");
-      }
-    });
+  document.querySelector("shopify-context").addEventListener("shopify-list-context-update", (event) => {
+    const { hasNextPage, hasPreviousPage } = event.detail;
+    if (!hasNextPage) {
+      document.getElementById("next").setAttribute("disabled", "true");
+    } else {
+      document.getElementById("next").removeAttribute("disabled");
+    }
+    if (!hasPreviousPage) {
+      document.getElementById("previous")?.setAttribute("disabled", "true");
+    } else {
+      document.getElementById("previous").removeAttribute("disabled");
+    }
+  });
 </script>
 ```
 
@@ -855,8 +815,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for complete 
 
 Inside the list context, a template component defines how each item should appear. This template will automatically repeat for each item in your list. When you reference data within the template (using shopify-data or other components), it will automatically pull from the current item being displayed.
 
-> Note:
-> The list context can be nested inside a context component or other list context components.
+> Note: The list context can be nested inside a context component or other list context components.
 
 See the [playground](https://webcomponents.shopify.dev/playground) for examples.
 
@@ -865,10 +824,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for examples.
 **Example**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 <shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
 
 <!-- The context is bound to the store -->
@@ -885,14 +841,14 @@ See the [playground](https://webcomponents.shopify.dev/playground) for examples.
 
 #### Attributes
 
-| Name         | Type       | Description                                                                                                                                                                                                                                                                  | Optional |
-| ------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| first        | number     | The number of items to return.                                                                                                                                                                                                                                               | No       |
-| nextPage     | () => void | Load the next page of items in the list.                                                                                                                                                                                                                                     | Yes      |
-| previousPage | () => void | Load the previous page of items in the list.                                                                                                                                                                                                                                 | Yes      |
-| query        | string     | Defines where the list exists, either at the root or relative to a parent context. For example: 1. At the root, query a list of all products, `query="products"` 2. Within a parent collection context, query the products on that collection, `query="collection.products"` | No       |
-| reverse      | () => void | Reverse the order of the items in the list.                                                                                                                                                                                                                                  | Yes      |
-| type         | string     | The type of the context. This needs to match the [GraphQL Storefront API](https://shopify.dev/docs/api/storefront) type you are querying. For example, if you are querying a product, the type should be `type="product"`.                                                   | No       |
+| Name | Type | Description | Optional |
+| --- | --- | --- | --- |
+| first | number | The number of items to return. | No |
+| nextPage | () => void | Load the next page of items in the list. | Yes |
+| previousPage | () => void | Load the previous page of items in the list. | Yes |
+| query | string | Defines where the list exists, either at the root or relative to a parent context. For example: 1. At the root, query a list of all products, `query="products"` 2. Within a parent collection context, query the products on that collection, `query="collection.products"` | No |
+| reverse | () => void | Reverse the order of the items in the list. | Yes |
+| type | string | The type of the context. This needs to match the [GraphQL Storefront API](https://shopify.dev/docs/api/storefront) type you are querying. For example, if you are querying a product, the type should be `type="product"`. | No |
 
 ### shopify-data
 
@@ -903,8 +859,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for examples.
 - It looks for the nearest matching context to find the data.
 - It outputs plain text that you can style with your own HTML elements.
 
-For example:
-`<shopify-data query="product.title">` will:
+For example: `<shopify-data query="product.title">` will:
 
 1. Find the nearest product context.
 2. Access its title property.
@@ -917,10 +872,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 **Example**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 <shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
 
 <!-- The context is bound to the store -->
@@ -937,9 +889,9 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 
 #### Attributes
 
-| Name  | Type   | Description                                                                                                                            | Optional |
-| ----- | ------ | -------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| query | string | Defines the context to reference and field to query. For example `query="product.title"` would query the title of the product context. | No       |
+| Name | Type | Description | Optional |
+| --- | --- | --- | --- |
+| query | string | Defines the context to reference and field to query. For example `query="product.title"` would query the title of the product context. | No |
 
 ### shopify-media
 
@@ -949,16 +901,12 @@ If you want the media to automatically change based on which variant is selected
 
 See the [playground](https://webcomponents.shopify.dev/playground) for more complete examples.
 
-> Note:
-> When rendering an image, the media component uses the [`unpic-img`](https://unpic.pics/img/lit/) element internally, so you can also pass `height`, `width`, `layout`, `aspect-ratio`, `priority`, `breakpoints`, and `sizes` attributes to control the scale and size of the image. Learn more about image props in the [Unpic documentation](https://unpic.pics/img/lit/#image-props).
+> Note: When rendering an image, the media component uses the [`unpic-img`](https://unpic.pics/img/lit/) element internally, so you can also pass `height`, `width`, `layout`, `aspect-ratio`, `priority`, `breakpoints`, and `sizes` attributes to control the scale and size of the image. Learn more about image props in the [Unpic documentation](https://unpic.pics/img/lit/#image-props).
 
 **Example**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 <shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
 
 <!-- The context is bound to the store -->
@@ -967,11 +915,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
     <h1>
       <!-- Query the featured image of the product.
         Renders an image element  -->
-      <shopify-media
-        width="200"
-        height="300"
-        query="product.featuredImage"
-      ></shopify-media>
+      <shopify-media width="200" height="300" query="product.featuredImage"></shopify-media>
     </h1>
   </template>
 </shopify-context>
@@ -979,22 +923,22 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 
 #### Attributes
 
-| Name              | Type                                    | Description                                                                                                                                                                                                                                                                                                       | Optional |
-| ----------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| aspectRatio       | number                                  | Instead of providing a width and height, you can provide an aspect ratio. This is passed to the [`aspectRatio`](https://unpic.pics/img/webc/#aspect-ratio) attribute of an underlying `unpic-img` element.                                                                                                        | No       |
-| breakpoints       | string                                  | The breakpoints of the image. This is passed to the [breakpoints](https://unpic.pics/img/webc/#breakpoints) attribute of an underlying `unpic-img` element.                                                                                                                                                       | Yes      |
-| height            | number                                  | The height of the image. Required, unless width is provided with an aspectRatio.                                                                                                                                                                                                                                  | No       |
-| layout            | "fixed" \| "constrained" \| "fullWidth" | The resizing behavior of the image. This is passed to the [layout](https://unpic.pics/img/webc/#layout) attribute of an underlying `unpic-img` element.                                                                                                                                                           | Yes      |
-| priority          | boolean                                 | Whether to prioritize the image. This is passed to the [priority](https://unpic.pics/img/webc/#priority) attribute of an underlying `unpic-img` element.                                                                                                                                                          | Yes      |
-| query             | string                                  | Defines the context to reference and field to query. For example, `query="product.featuredImage"` queries the title of the product featured image, and `query="product.selectedOrFirstAvailableVariant.image"` queries the image of a specific product variant based on the `shopify-variant-selector` component. | No       |
-| role              | string \| null                          | The accessibility role of the image. This is set automatically by the media component, but you can override it if needed.                                                                                                                                                                                         | Yes      |
-| sizes             | string                                  | The sizes of the image. This is set automatically by the media component, but you can override it if needed.                                                                                                                                                                                                      | Yes      |
-| video-autoplay    | boolean                                 | Used for video media. By default, videos [autoplay](https://developer.mozilla.org/docs/Web/HTML/Element/video#autoplay). To disable autoplay, set to `video-autoplay="false"`.                                                                                                                                    | Yes      |
-| video-controls    | boolean                                 | Used for video media. By default, [video controls](https://developer.mozilla.org/docs/Web/HTML/Element/video#controls) are shown. To disable them, set to `video-controls="false"`.                                                                                                                               | Yes      |
-| video-loop        | boolean                                 | Used for video media. By default, videos [loop](https://developer.mozilla.org//docs/Web/HTML/Element/video#loop). To disable looping, set to `video-loop="false"`.                                                                                                                                                | Yes      |
-| video-muted       | boolean                                 | Used for video media. By default, videos are [muted](https://developer.mozilla.org/docs/Web/HTML/Element/video#muted). To enable audio, set to `video-muted="false"`.                                                                                                                                             | Yes      |
-| video-playsinline | boolean                                 | Used for video media. By default, videos [play inline](https://developer.mozilla.org/docs/Web/HTML/Element/video#playsinline). To disable inline playback, set to `video-playsinline="false"`.                                                                                                                    | Yes      |
-| width             | number                                  | The width of the image. Required, unless height is provided with an aspectRatio.                                                                                                                                                                                                                                  | No       |
+| Name | Type | Description | Optional |
+| --- | --- | --- | --- |
+| aspectRatio | number | Instead of providing a width and height, you can provide an aspect ratio. This is passed to the [`aspectRatio`](https://unpic.pics/img/webc/#aspect-ratio) attribute of an underlying `unpic-img` element. | No |
+| breakpoints | string | The breakpoints of the image. This is passed to the [breakpoints](https://unpic.pics/img/webc/#breakpoints) attribute of an underlying `unpic-img` element. | Yes |
+| height | number | The height of the image. Required, unless width is provided with an aspectRatio. | No |
+| layout | "fixed" \| "constrained" \| "fullWidth" | The resizing behavior of the image. This is passed to the [layout](https://unpic.pics/img/webc/#layout) attribute of an underlying `unpic-img` element. | Yes |
+| priority | boolean | Whether to prioritize the image. This is passed to the [priority](https://unpic.pics/img/webc/#priority) attribute of an underlying `unpic-img` element. | Yes |
+| query | string | Defines the context to reference and field to query. For example, `query="product.featuredImage"` queries the title of the product featured image, and `query="product.selectedOrFirstAvailableVariant.image"` queries the image of a specific product variant based on the `shopify-variant-selector` component. | No |
+| role | string \| null | The accessibility role of the image. This is set automatically by the media component, but you can override it if needed. | Yes |
+| sizes | string | The sizes of the image. This is set automatically by the media component, but you can override it if needed. | Yes |
+| video-autoplay | boolean | Used for video media. By default, videos [autoplay](https://developer.mozilla.org/docs/Web/HTML/Element/video#autoplay). To disable autoplay, set to `video-autoplay="false"`. | Yes |
+| video-controls | boolean | Used for video media. By default, [video controls](https://developer.mozilla.org/docs/Web/HTML/Element/video#controls) are shown. To disable them, set to `video-controls="false"`. | Yes |
+| video-loop | boolean | Used for video media. By default, videos [loop](https://developer.mozilla.org//docs/Web/HTML/Element/video#loop). To disable looping, set to `video-loop="false"`. | Yes |
+| video-muted | boolean | Used for video media. By default, videos are [muted](https://developer.mozilla.org/docs/Web/HTML/Element/video#muted). To enable audio, set to `video-muted="false"`. | Yes |
+| video-playsinline | boolean | Used for video media. By default, videos [play inline](https://developer.mozilla.org/docs/Web/HTML/Element/video#playsinline). To disable inline playback, set to `video-playsinline="false"`. | Yes |
+| width | number | The width of the image. Required, unless height is provided with an aspectRatio. | No |
 
 ### shopify-money
 
@@ -1007,10 +951,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 **Example**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 <shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
 
 <!-- The context is bound to the store -->
@@ -1019,10 +960,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
     <h1>
       <!-- Query the selected or first available variant's
 price. Renders a text node with the formatted price. -->
-      <shopify-money
-        format="money_with_currency"
-        query="product.selectedOrFirstAvailableVariant.price"
-      ></shopify-money>
+      <shopify-money format="money_with_currency" query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
     </h1>
   </template>
 </shopify-context>
@@ -1030,10 +968,10 @@ price. Renders a text node with the formatted price. -->
 
 #### Attributes
 
-| Name   | Type                                                         | Description                                                                                                                                                                                                                                                                                                                                                     | Optional |
-| ------ | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| format | "money" \| "money_without_currency" \| "money_with_currency" | The format of the price. Defaults to `money`. Options: `money` - Display the price in the store's currency. eg. `$100.00`; `money_without_currency` - Display the price in the store's currency, without the currency symbol. eg. `100.00`; `money_with_currency` - Display the price in the store's currency, including the currency symbol. eg. `$100.00 USD` | Yes      |
-| query  | string                                                       | Defines the context to reference and field to query. For example `query="product.title"` would query the title of the product context.                                                                                                                                                                                                                          | No       |
+| Name | Type | Description | Optional |
+| --- | --- | --- | --- |
+| format | "money" \| "money_without_currency" \| "money_with_currency" | The format of the price. Defaults to `money`. Options: `money` - Display the price in the store's currency. eg. `$100.00`; `money_without_currency` - Display the price in the store's currency, without the currency symbol. eg. `100.00`; `money_with_currency` - Display the price in the store's currency, including the currency symbol. eg. `$100.00 USD` | Yes |
+| query | string | Defines the context to reference and field to query. For example `query="product.title"` would query the title of the product context. | No |
 
 ### shopify-store
 
@@ -1044,10 +982,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 **Example**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 <!-- Optionally define market configuration, which defaults
  to US/EN. The public-access-token attribute is optional,
  and only necessary to access inventory, metafields,
@@ -1069,11 +1004,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 <!-- If you want to display products from multiple
   storefronts on the same page, nest contexts inside
   multiple store components-->
-<shopify-store
-  store-domain="https://your-other-store.myshopify.com"
-  country="CA"
-  language="FR"
->
+<shopify-store store-domain="https://your-other-store.myshopify.com" country="CA" language="FR">
   <shopify-context type="product" handle="handle-of-product">
     <template> ... </template>
   </shopify-context>
@@ -1082,13 +1013,13 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 
 #### Attributes
 
-| Name                | Type                               | Description                                                                                                                                              | Optional |
-| ------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| buyNow              | (e: Event, target: Target) => void | A method to open the checkout page with a selected product.                                                                                              | Yes      |
-| country             | CountryCode                        | The country of the store.                                                                                                                                | Yes      |
-| language            | LanguageCode                       | The language of the store.                                                                                                                               | Yes      |
-| public-access-token | string                             | The public access token from the [Headless channel](/docs/storefronts/headless/building-with-the-storefront-api/manage-headless-channels) for the store. | Yes      |
-| store-domain        | string                             | The myshopify.com domain of the store.                                                                                                                   | No       |
+| Name | Type | Description | Optional |
+| --- | --- | --- | --- |
+| buyNow | (e: Event, target: Target) => void | A method to open the checkout page with a selected product. | Yes |
+| country | CountryCode | The country of the store. | Yes |
+| language | LanguageCode | The language of the store. | Yes |
+| public-access-token | string | The public access token from the [Headless channel](/docs/storefronts/headless/building-with-the-storefront-api/manage-headless-channels) for the store. | Yes |
+| store-domain | string | The myshopify.com domain of the store. | No |
 
 ### shopify-variant-selector
 
@@ -1099,10 +1030,7 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 **Example**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 <shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
 
 <!-- The context is bound to the store -->
@@ -1112,47 +1040,38 @@ See the [playground](https://webcomponents.shopify.dev/playground) for more comp
 
     <!-- Fields on `selectedOrFirstAvailableVariant`
      automatically update when a variant is selected -->
-    <shopify-money
-      query="product.selectedOrFirstAvailableVariant.price"
-    ></shopify-money>
+    <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
 
-    <shopify-media
-      query="product.selectedOrFirstAvailableVariant.image"
-      width="200"
-      height="200"
-    ></shopify-media>
+    <shopify-media query="product.selectedOrFirstAvailableVariant.image" width="200" height="200"></shopify-media>
   </template>
 </shopify-context>
 ```
 
 #### Attributes
 
-| Name           | Type   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Optional |
-| -------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| visible-option | string | Only show a single option. Default all options are visible. This allows you to have multiple variant selectors, each rendering a single option, and arrange them as you like. Additionally, when calling `context.update(event)`, the selected options in the current context will be applied to the variant selector in the destination context. This allows you to have a card with only one option visible, and a modal where all options are visible, and the selected options in the card will be applied to the modal. | Yes      |
+| Name | Type | Description | Optional |
+| --- | --- | --- | --- |
+| visible-option | string | Only show a single option. Default all options are visible. This allows you to have multiple variant selectors, each rendering a single option, and arrange them as you like. Additionally, when calling `context.update(event)`, the selected options in the current context will be applied to the variant selector in the destination context. This allows you to have a card with only one option visible, and a modal where all options are visible, and the selected options in the card will be applied to the modal. | Yes |
 
 #### CSS Parts
 
-| Part Name             | Description                                                                                                                               |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| color-swatch          | The color swatch element.                                                                                                                 |
-| color-swatch-disabled | A part for the color swatch it is unavailable for sale.                                                                                   |
-| color-swatch-label    | The color swatch label element.                                                                                                           |
-| color-swatch-selected | A part for the color swatch when it is selected.                                                                                          |
-| form                  | The form element. This element has a flex layout, so targeting the form element allows you to control the layout of the variant selector. |
-| label                 | The label element for each option group.                                                                                                  |
-| radio                 | The radio option element.                                                                                                                 |
-| radio-disabled        | A part for the radio option when it is unavailable for sale.                                                                              |
-| radio-selected        | The radio selected element.                                                                                                               |
-| select                | The select element.                                                                                                                       |
+| Part Name | Description |
+| --- | --- |
+| color-swatch | The color swatch element. |
+| color-swatch-disabled | A part for the color swatch it is unavailable for sale. |
+| color-swatch-label | The color swatch label element. |
+| color-swatch-selected | A part for the color swatch when it is selected. |
+| form | The form element. This element has a flex layout, so targeting the form element allows you to control the layout of the variant selector. |
+| label | The label element for each option group. |
+| radio | The radio option element. |
+| radio-disabled | A part for the radio option when it is unavailable for sale. |
+| radio-selected | The radio selected element. |
+| select | The select element. |
 
 **Custom Variant Selector Example**:
 
 ```html
-<script
-  type="module"
-  src="https://cdn.shopify.com/storefront/web-components.js"
-></script>
+<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 <shopify-store store-domain="https://your-store.myshopify.com"> </shopify-store>
 
 <!-- The context is bound to the store -->
