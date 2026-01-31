@@ -29,12 +29,12 @@ Every page in your project becomes an HTML file:
 
 The export includes all assets your site needs:
 
-| Source         | Destination                                          | Contents                                  |
-| :------------- | :--------------------------------------------------- | :---------------------------------------- |
-| `assets/`      | `assets/`                                            | Theme CSS, JS, icons                      |
-| `widgets/*/`   | `assets/`                                            | Widget CSS and JS files (flattened)       |
-| Media library  | `assets/images/`, `assets/videos/`, `assets/audios/` | Only media files actually used on pages   |
-| Core assets    | `assets/`                                            | Placeholder images                        |
+| Source        | Destination                                          | Contents                                |
+| :------------ | :--------------------------------------------------- | :-------------------------------------- |
+| `assets/`     | `assets/`                                            | Theme CSS, JS, icons                    |
+| `widgets/*/`  | `assets/`                                            | Widget CSS and JS files (flattened)     |
+| Media library | `assets/images/`, `assets/videos/`, `assets/audios/` | Only media files actually used on pages |
+| Core assets   | `assets/`                                            | Placeholder images                      |
 
 ### Optimized Media
 
@@ -68,6 +68,30 @@ From the Export page, you can:
 - **Download** — Downloads the complete export as a ZIP file
 - **Delete** — Removes an export version (with confirmation)
 
+# HTML Validation (Developer Mode)
+
+When [Developer Mode](settings.html#developer-settings) is enabled in App Settings, Widgetizer validates all exported HTML and generates a detailed issues report.
+
+### What Gets Validated
+
+The validator checks for common HTML issues including:
+
+- Missing required attributes (e.g., `alt` on images)
+- Invalid nesting of elements
+- Accessibility concerns
+- Deprecated or invalid HTML patterns
+
+### Issues Report
+
+If validation finds any issues, an `__export__issues.html` file is created in the export directory. This report includes:
+
+- A summary of total issues across all pages
+- Issues grouped by page
+- For each issue: line number, severity (error/warning), description, and the relevant source code
+- Links to documentation for each validation rule
+
+> **Note:** The issues report is only generated when Developer Mode is enabled. When disabled, validation is skipped entirely for faster exports.
+
 # Requirements
 
 For a successful export:
@@ -85,9 +109,9 @@ The exported folder contains static HTML, CSS, JS, and media files that can be d
 
 There are two types of exports in Widgetizer:
 
-| Type               | Purpose              | Output                                    |
-| :----------------- | :------------------- | :---------------------------------------- |
-| **Site Export**    | Deploy your website  | Static HTML, CSS, JS, and media           |
-| **Project Export** | Backup or transfer   | ZIP archive of all project source files   |
+| Type               | Purpose             | Output                                  |
+| :----------------- | :------------------ | :-------------------------------------- |
+| **Site Export**    | Deploy your website | Static HTML, CSS, JS, and media         |
+| **Project Export** | Backup or transfer  | ZIP archive of all project source files |
 
 Site export (this page) creates a deployable website. Project export creates a backup that can be imported into another Widgetizer installation. See [Projects](projects.html) for project import/export.

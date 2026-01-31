@@ -11,6 +11,7 @@ App Settings control global preferences that apply across all your projects in W
 Sets the language for the Widgetizer admin interface. This affects all menus, buttons, labels, and messages you see while using the application.
 
 **Available languages:**
+
 - English
 - French
 - German
@@ -25,6 +26,7 @@ Changing the language takes effect immediately after saving. You don't need to r
 Controls how dates are displayed throughout Widgetizer. This affects dates shown in the media library, project lists, and anywhere else dates appear in the interface.
 
 **Available formats:**
+
 - **MM/DD/YYYY** - 12/31/2024
 - **DD/MM/YYYY** - 31/12/2024
 - **YYYY-MM-DD** - 2024-12-31
@@ -40,7 +42,6 @@ Controls how dates are displayed throughout Widgetizer. This affects dates shown
 - **D MMM YYYY HH:mm** - 31 Dec 2024 14:15
 
 Choose the format that matches your region or preference. The format you select applies to all dates shown in Widgetizer.
-
 
 # Media & Upload Settings
 
@@ -73,7 +74,6 @@ Sets the maximum size for individual audio files (MP3).
 - **Default:** 25 MB
 - **Range:** 1 MB to 100 MB
 - **Applies to:** All audio uploads across all projects
-
 
 ### Image Processing Configuration
 
@@ -139,7 +139,6 @@ Widgetizer automatically determines which sizes to create:
 
 > **Note:** SVG images are never resized since they're vector graphics that scale perfectly at any size.
 
-
 # Export & Versioning Settings
 
 These settings control [site exporting](export.html) behavior.
@@ -164,6 +163,20 @@ Sets the maximum file size allowed when importing a project ZIP file.
 
 When importing a project, if the ZIP file exceeds this limit, the import will be rejected with an error message.
 
+# Developer Settings
+
+Settings for advanced users and theme developers.
+
+### Enable Developer Mode
+
+Activates additional developer tools and diagnostics throughout the application.
+
+- **Default:** Disabled
+- **When enabled:**
+  - **HTML Validation:** During [site export](export.html), all generated HTML is validated against best practices and accessibility standards
+  - **Issues Report:** If validation finds problems, an `__export__issues.html` file is created with detailed diagnostics including line numbers and source code snippets
+
+> **Tip:** Keep Developer Mode disabled for faster exports in production. Enable it when developing themes or troubleshooting HTML issues.
 
 # Tips & Best Practices
 
