@@ -29,6 +29,9 @@ const defaultSettings = {
     maxVersionsToKeep: 10, // Maximum number of export versions to keep per project
     maxImportSizeMB: 500, // Maximum size for project import ZIP files (in MB)
   },
+  developer: {
+    enabled: false, // Developer mode - enables HTML validation during export
+  },
 };
 
 /**

@@ -1,12 +1,12 @@
 import fs from "fs-extra";
 import path from "path";
-import prettier from "prettier";
 import archiver from "archiver";
 import { getProjectDir, PUBLISH_DIR } from "../config.js";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
 import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
 import { readProjectsFile } from "./projectController.js";
+import { formatHtml, formatXml, validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
 
 const PACKAGE_JSON_PATH = path.join(process.cwd(), "package.json");
 let cachedAppVersion = null;
@@ -246,8 +246,8 @@ export async function exportProject(req, res) {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${sitemapUrls.join("")}
 </urlset>`;
 
-        const formattedSitemap = await prettier.format(sitemapContent, { parser: "html" });
-        await fs.writeFile(path.join(outputDir, "sitemap.xml"), formattedSitemap);
+        const sitemapResult = await formatXml(sitemapContent);
+        await fs.writeFile(path.join(outputDir, "sitemap.xml"), sitemapResult.xml);
 
         // 2. Generate robots.txt
         const sitemapUrl = new URL("sitemap.xml", siteUrl).href;
@@ -294,6 +294,18 @@ export async function exportProject(req, res) {
     let headerHtml = "";
     let footerHtml = "";
 
+    // Check if developer mode is enabled for HTML validation
+    let devModeEnabled = false;
+    try {
+      const { getSetting } = await import("./appSettingsController.js");
+      devModeEnabled = await getSetting("developer.enabled");
+    } catch (error) {
+      console.warn("Could not check developer mode setting:", error.message);
+    }
+
+    // Track HTML validation issues across all pages (only when dev mode is on)
+    const validationIssues = [];
+
     for (const pageData of pagesDataArray) {
       // Create shared globals for this page (each page gets fresh enqueue Maps)
       const sharedGlobals = {
@@ -308,14 +320,7 @@ export async function exportProject(req, res) {
 
       // Render header if exists (for each page to capture enqueued assets)
       if (headerData) {
-        headerHtml = await renderWidget(
-          projectId,
-          "header",
-          headerData,
-          rawThemeSettings,
-          "publish",
-          sharedGlobals,
-        );
+        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals);
       }
 
       // Render page-specific widgets sequentially
@@ -347,14 +352,7 @@ export async function exportProject(req, res) {
 
       // Render footer if exists
       if (footerData) {
-        footerHtml = await renderWidget(
-          projectId,
-          "footer",
-          footerData,
-          rawThemeSettings,
-          "publish",
-          sharedGlobals,
-        );
+        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals);
       }
 
       // Pass separated content sections to layout
@@ -371,23 +369,24 @@ export async function exportProject(req, res) {
         sharedGlobals,
       );
 
-      let processedHtml = renderedHtml; // Start with the rendered HTML
-
-      // --- Format HTML using Prettier ---
-      try {
-        const formattedHtml = await prettier.format(processedHtml, {
-          parser: "html",
-          // Add any specific Prettier options here if needed
-          // e.g., printWidth: 100
-        });
-        processedHtml = formattedHtml; // Update processedHtml with formatted version
-      } catch (formatError) {
-        console.warn(
-          `Could not format HTML for ${pageData.id}.html: ${formatError.message}. Writing unformatted HTML.`,
-        );
-        // Keep the unformatted 'processedHtml'
+      // Format HTML using Prettier
+      const formatResult = await formatHtml(renderedHtml);
+      let processedHtml = formatResult.html;
+      if (!formatResult.success) {
+        console.warn(`Could not format HTML for ${pageData.id}.html: ${formatResult.error}. Writing unformatted HTML.`);
       }
-      // --- End Formatting ---
+
+      // Validate HTML (only when developer mode is enabled)
+      if (devModeEnabled) {
+        const validation = await validateHtml(processedHtml, pageData.id);
+        if (validation.issues.length > 0) {
+          validationIssues.push({
+            page: pageData.id,
+            filename: pageData.id === "index" || pageData.id === "home" ? "index.html" : `${pageData.id}.html`,
+            issues: validation.issues,
+          });
+        }
+      }
 
       const appVersion = await getAppVersion();
 
@@ -406,6 +405,18 @@ Per aspera ad astra
 
       // Write the processed (and potentially formatted) HTML file
       await fs.outputFile(outputFilePath, processedHtml);
+    }
+
+    // Generate validation issues report if any (only when developer mode is enabled)
+    if (devModeEnabled) {
+      if (validationIssues.length > 0) {
+        const totalIssues = validationIssues.reduce((sum, page) => sum + page.issues.length, 0);
+        const issuesHtml = generateIssuesReport(validationIssues);
+        await fs.outputFile(path.join(outputDir, "__export__issues.html"), issuesHtml);
+        console.log(`HTML validation: ${totalIssues} issue(s) found. See __export__issues.html`);
+      } else {
+        console.log("HTML validation: No issues found.");
+      }
     }
 
     // --- Copy Assets ---

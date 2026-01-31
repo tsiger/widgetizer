@@ -59,7 +59,7 @@
       <nav class="header-nav" id="main-navigation" aria-label="Primary">
         <div class="nav-close">
           <span class="nav-close-title">Menu</span>
-          <button class="nav-close-btn" aria-label="Close navigation menu">
+          <button type="button" class="nav-close-btn" aria-label="Close navigation menu">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -80,6 +80,7 @@
         {% if widget.settings.headerNavigation %}
           {% render 'menu',
             menu: widget.settings.headerNavigation,
+            skip_nav: true,
             class_list: 'nav-list',
             class_item: 'nav-item',
             class_link: '',
@@ -115,6 +116,7 @@
       {% endif %}
 
       <button
+        type="button"
         class="menu-toggle"
         aria-label="Toggle navigation menu"
         aria-expanded="false"

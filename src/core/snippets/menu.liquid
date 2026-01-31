@@ -2,7 +2,9 @@
 Menu Snippet
 Params:
   menu: Menu object containing items array
-  class_menu: Classes for the nav element
+  aria_label: Accessible label for the nav element (e.g., "Primary", "Footer")
+  skip_nav: Set to true if menu is already wrapped in a <nav> element
+  class_nav: Classes for the nav element (when not skipped)
   class_list: Classes for ul elements
   class_item: Classes for li elements
   class_link: Classes for a elements
@@ -11,10 +13,12 @@ Params:
 {%- endcomment -%}
 
 {%- if menu.items.size > 0 -%}
-  <nav class="{{ class_menu }}">
+  {%- unless skip_nav -%}
+    <nav class="{{ class_nav }}"{% if aria_label %} aria-label="{{ aria_label }}"{% endif %}>
+  {%- endunless -%}
     <ul class="{{ class_list }}">
       {%- for item in menu.items -%}
-        <li class="{{ class_item }} {% if item.items.size > 0 %}{{ class_has_submenu }}{% endif %}">
+        <li class="{{ class_item }}{% if item.items.size > 0 %} {{ class_has_submenu }}{% endif %}">
           <a href="{{ item.link }}" class="{{ class_link }}">
             {{ item.label }}
           </a>
@@ -22,7 +26,7 @@ Params:
           {%- if item.items.size > 0 -%}
             <ul class="{{ class_submenu }}">
               {%- for subitem in item.items -%}
-                <li class="{{ class_item }} {% if subitem.items.size > 0 %}{{ class_has_submenu }}{% endif %}">
+                <li class="{{ class_item }}{% if subitem.items.size > 0 %} {{ class_has_submenu }}{% endif %}">
                   <a href="{{ subitem.link }}" class="{{ class_link }}">
                     {{ subitem.label }}
                   </a>
@@ -45,5 +49,7 @@ Params:
         </li>
       {%- endfor -%}
     </ul>
-  </nav>
+  {%- unless skip_nav -%}
+    </nav>
+  {%- endunless -%}
 {%- endif -%}

@@ -446,7 +446,7 @@
 
               <!-- Buttons -->
               <div class="audio-player-buttons">
-                <button class="audio-player-button" aria-label="Rewind 15 seconds" data-action="rewind">
+                <button type="button" class="audio-player-button" aria-label="Rewind 15 seconds" data-action="rewind">
                   <svg class="audio-player-button-icon" viewBox="0 0 24 24">
                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
                     <path d="M3 3v5h5"/>
@@ -454,7 +454,7 @@
                   </svg>
                 </button>
 
-                <button class="audio-player-button audio-player-button-play" aria-label="Play" data-action="play">
+                <button type="button" class="audio-player-button audio-player-button-play" aria-label="Play" data-action="play">
                   <svg class="audio-player-button-icon audio-player-icon-play" viewBox="0 0 24 24">
                     <polygon points="6 4 18 12 6 20 6 4" />
                   </svg>
@@ -464,7 +464,7 @@
                   </svg>
                 </button>
 
-                <button class="audio-player-button" aria-label="Forward 15 seconds" data-action="forward">
+                <button type="button" class="audio-player-button" aria-label="Forward 15 seconds" data-action="forward">
                   <svg class="audio-player-button-icon" viewBox="0 0 24 24">
                     <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
                     <path d="M21 3v5h-5"/>
@@ -477,7 +477,7 @@
               <div class="audio-player-secondary-controls">
                 {% if widget.settings.show_volume %}
                 <div class="audio-player-volume">
-                  <button class="audio-player-volume-button" aria-label="Mute" data-action="mute">
+                  <button type="button" class="audio-player-volume-button" aria-label="Mute" data-action="mute">
                     <svg class="audio-player-volume-icon audio-player-icon-volume" viewBox="0 0 24 24">
                       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                       <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
@@ -505,7 +505,7 @@
                 {% endif %}
 
                 {% if widget.settings.show_speed %}
-                <button class="audio-player-speed-button block-text block-text-sm" aria-label="Playback speed" data-action="speed">1x</button>
+                <button type="button" class="audio-player-speed-button block-text block-text-sm" aria-label="Playback speed" data-action="speed">1x</button>
                 {% endif %}
               </div>
             </div>
@@ -518,6 +518,7 @@
           {% for blockId in widget.blocksOrder %}
             {% assign block = widget.blocks[blockId] %}
             <button
+              type="button"
               class="playlist-item {% if forloop.first %}active{% endif %}"
               data-block-id="{{ blockId }}"
               data-title="{{ block.settings.title | escape }}"

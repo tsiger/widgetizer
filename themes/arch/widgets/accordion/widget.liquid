@@ -157,6 +157,7 @@
           {% assign block = widget.blocks[blockId] %}
           <li class="accordion-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             <button
+              type="button"
               class="accordion-trigger"
               aria-expanded="false"
               aria-controls="accordion-content-{{ widget.id }}-{{ blockId }}"

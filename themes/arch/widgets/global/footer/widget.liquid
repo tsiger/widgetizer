@@ -1,6 +1,6 @@
 <footer
   id="{{ widget.id }}"
-  class="widget widget-footer widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  class="widget widget-site-footer color-scheme-{{ widget.settings.color_scheme }}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="footer"
   {% if widget.settings.color_scheme == 'highlight' %}style="--widget-bg-color: var(--bg-primary);"{% endif %}
@@ -20,6 +20,8 @@
     {% if widget.settings.footerNavigation %}
       {% render 'menu',
         menu: widget.settings.footerNavigation,
+        aria_label: 'Footer',
+        class_nav: 'footer-nav',
         class_list: 'footer-menu',
         class_item: 'footer-menu-item',
         class_link: 'footer-menu-link',

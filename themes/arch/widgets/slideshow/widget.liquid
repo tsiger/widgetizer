@@ -100,12 +100,12 @@
 
     {% if slide_count > 1 %}
       <!-- Navigation -->
-      <button class="slideshow-nav slideshow-prev" aria-label="Previous slide">
+      <button type="button" class="slideshow-nav slideshow-prev" aria-label="Previous slide">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
-      <button class="slideshow-nav slideshow-next" aria-label="Next slide">
+      <button type="button" class="slideshow-nav slideshow-next" aria-label="Next slide">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -126,6 +126,7 @@
       <div class="slideshow-pagination">
         {% for blockId in widget.blocksOrder %}
           <button
+            type="button"
             class="slideshow-dot{% if forloop.first %} is-active{% endif %}"
             data-index="{{ forloop.index0 }}"
             aria-label="Go to slide {{ forloop.index }}"

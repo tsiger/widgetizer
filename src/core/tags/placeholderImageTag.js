@@ -117,14 +117,15 @@ export const PlaceholderImageTag = {
         return assetUrl;
       }
 
-      // Build img tag (no alt tag - placeholders don't need it)
+      // Build img tag
       const classAttr = this.options.class ? ` class="${this.options.class}"` : "";
       const styleAttr = this.options.style ? ` style="${this.options.style}"` : "";
       const loading = this.options.loading ? ` loading="${this.options.loading}"` : "";
       const width = this.options.width ? ` width="${this.options.width}"` : "";
       const height = this.options.height ? ` height="${this.options.height}"` : "";
+      const altText = this.options.alt !== undefined ? this.options.alt : "Placeholder";
 
-      return `<img src="${assetUrl}"${classAttr}${styleAttr}${loading}${width}${height}>`;
+      return `<img src="${assetUrl}" alt="${altText}"${classAttr}${styleAttr}${loading}${width}${height}>`;
     } catch (error) {
       console.error("Error in placeholder_image tag:", error);
       return `<!-- Error in placeholder_image: ${error.message} -->`;

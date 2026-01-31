@@ -108,6 +108,7 @@
         <div class="switcher-toggle" role="tablist" aria-label="Content options">
           {% if widget.settings.option_1_label != blank %}
             <button
+              type="button"
               id="switcher-tab-{{ widget.id }}-1"
               class="switcher-btn is-active block-text block-text-sm block-text-heading"
               data-target="1"
@@ -121,6 +122,7 @@
           {% endif %}
           {% if widget.settings.option_2_label != blank %}
             <button
+              type="button"
               id="switcher-tab-{{ widget.id }}-2"
               class="switcher-btn block-text block-text-sm"
               data-target="2"
@@ -134,6 +136,7 @@
           {% endif %}
           {% if widget.settings.switcher_type == 'tabs' and widget.settings.option_3_label != blank %}
             <button
+              type="button"
               id="switcher-tab-{{ widget.id }}-3"
               class="switcher-btn block-text block-text-sm"
               data-target="3"

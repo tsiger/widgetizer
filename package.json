@@ -1,6 +1,6 @@
 {
   "name": "widgetizer",
-  "version": "0.8.8",
+  "version": "0.8.9",
   "description": "A visual website builder with theme support",
   "author": "Widgetizer",
   "private": true,
@@ -95,6 +95,7 @@
     "express-validator": "^7.2.1",
     "fs-extra": "^11.3.0",
     "helmet": "^8.1.0",
+    "html-validate": "^10.7.0",
     "i18next": "^25.6.3",
     "isomorphic-dompurify": "^2.25.0",
     "liquidjs": "^10.21.0",
