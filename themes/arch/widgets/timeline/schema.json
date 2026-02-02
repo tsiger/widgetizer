@@ -75,13 +75,13 @@
         },
         {
           "type": "textarea",
-          "id": "description",
-          "label": "Description"
-        },
-        {
-          "type": "textarea",
           "id": "features",
           "label": "Features/bullet points (one per line)"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Description"
         }
       ]
     }
@@ -93,7 +93,7 @@
         "date": "Phase 1",
         "duration": "Week 1-2",
         "title": "Discovery & Planning",
-        "description": "We analyze your requirements and create a detailed project roadmap.",
+        "description": "<p>We analyze your requirements and create a detailed project roadmap.</p>",
         "features": "Stakeholder interviews\nRequirements gathering\nProject timeline creation"
       }
     },
@@ -103,7 +103,7 @@
         "date": "Phase 2",
         "duration": "Week 3-5",
         "title": "Design & Prototyping",
-        "description": "Our designers create stunning mockups and interactive prototypes.",
+        "description": "<p>Our designers create stunning mockups and interactive prototypes.</p>",
         "features": "UI/UX design\nInteractive prototypes\nDesign review sessions"
       }
     },
@@ -113,7 +113,7 @@
         "date": "Phase 3",
         "duration": "Week 6-10",
         "title": "Development",
-        "description": "Our developers bring the designs to life with clean, efficient code.",
+        "description": "<p>Our developers bring the designs to life with clean, efficient code.</p>",
         "features": "Frontend development\nBackend integration\nQuality assurance"
       }
     },
@@ -123,7 +123,7 @@
         "date": "Phase 4",
         "duration": "Week 11-12",
         "title": "Launch & Support",
-        "description": "We deploy your project and provide ongoing support and maintenance.",
+        "description": "<p>We deploy your project and provide ongoing support and maintenance.</p>",
         "features": "Production deployment\nPerformance optimization\nOngoing support"
       }
     }

@@ -76,10 +76,10 @@
       "displayName": "Text",
       "settings": [
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "text",
           "label": "Text",
-          "default": "They took our ideas and turned them into visuals and content that really connected with our audience. The results exceeded our expectations!"
+          "default": "<p>They took our ideas and turned them into visuals and content that really connected with our audience. The results exceeded our expectations!</p>"
         },
         {
           "type": "select",
@@ -111,7 +111,7 @@
     {
       "type": "text",
       "settings": {
-        "text": "They took our ideas and turned them into visuals and content that really connected with our audience. The results exceeded our expectations!",
+        "text": "<p>They took our ideas and turned them into visuals and content that really connected with our audience. The results exceeded our expectations!</p>",
         "size": "lg",
         "uppercase": false,
         "muted": false

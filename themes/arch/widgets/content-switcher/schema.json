@@ -113,10 +113,10 @@
           "default": "Item Title"
         },
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "text",
           "label": "Text",
-          "default": "Item description goes here."
+          "default": "<p>Item description goes here.</p>"
         },
         {
           "type": "image",
@@ -166,7 +166,7 @@
       "type": "item",
       "settings": {
         "title": "Starter",
-        "text": "Perfect for individuals and small projects just getting started.",
+        "text": "<p>Perfect for individuals and small projects just getting started.</p>",
         "price": "$12/mo",
         "target_option": "1",
         "link": {
@@ -180,7 +180,7 @@
       "type": "item",
       "settings": {
         "title": "Professional",
-        "text": "Ideal for growing teams and businesses with advanced needs.",
+        "text": "<p>Ideal for growing teams and businesses with advanced needs.</p>",
         "price": "$29/mo",
         "target_option": "1",
         "link": {
@@ -194,7 +194,7 @@
       "type": "item",
       "settings": {
         "title": "Enterprise",
-        "text": "Comprehensive solution for large organizations and enterprises.",
+        "text": "<p>Comprehensive solution for large organizations and enterprises.</p>",
         "price": "$99/mo",
         "target_option": "1",
         "link": {
@@ -208,7 +208,7 @@
       "type": "item",
       "settings": {
         "title": "Starter",
-        "text": "Perfect for individuals and small projects just getting started.",
+        "text": "<p>Perfect for individuals and small projects just getting started.</p>",
         "price": "$120/yr",
         "target_option": "2",
         "link": {
@@ -222,7 +222,7 @@
       "type": "item",
       "settings": {
         "title": "Professional",
-        "text": "Ideal for growing teams and businesses with advanced needs.",
+        "text": "<p>Ideal for growing teams and businesses with advanced needs.</p>",
         "price": "$290/yr",
         "target_option": "2",
         "link": {
@@ -236,7 +236,7 @@
       "type": "item",
       "settings": {
         "title": "Enterprise",
-        "text": "Comprehensive solution for large organizations and enterprises.",
+        "text": "<p>Comprehensive solution for large organizations and enterprises.</p>",
         "price": "$990/yr",
         "target_option": "2",
         "link": {
@@ -250,7 +250,7 @@
       "type": "item",
       "settings": {
         "title": "Starter",
-        "text": "Perfect for individuals and small projects just getting started.",
+        "text": "<p>Perfect for individuals and small projects just getting started.</p>",
         "price": "$499",
         "target_option": "3",
         "link": {
@@ -264,7 +264,7 @@
       "type": "item",
       "settings": {
         "title": "Professional",
-        "text": "Ideal for growing teams and businesses with advanced needs.",
+        "text": "<p>Ideal for growing teams and businesses with advanced needs.</p>",
         "price": "$999",
         "target_option": "3",
         "link": {
@@ -278,7 +278,7 @@
       "type": "item",
       "settings": {
         "title": "Enterprise",
-        "text": "Comprehensive solution for large organizations and enterprises.",
+        "text": "<p>Comprehensive solution for large organizations and enterprises.</p>",
         "price": "$2,999",
         "target_option": "3",
         "link": {

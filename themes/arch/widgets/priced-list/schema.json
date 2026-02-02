@@ -53,10 +53,10 @@
           "default": "Dish Name"
         },
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "description",
           "label": "Description",
-          "default": "A delicious dish made with fresh ingredients."
+          "default": "<p>A delicious dish made with fresh ingredients.</p>"
         },
         {
           "type": "text",
@@ -136,7 +136,7 @@
       "type": "item",
       "settings": {
         "name": "Garden Bruschetta",
-        "description": "Toasted sourdough topped with fresh tomatoes, basil, garlic, and extra virgin olive oil.",
+        "description": "<p>Toasted sourdough topped with fresh tomatoes, basil, garlic, and extra virgin olive oil.</p>",
         "price": "$9",
         "vegetarian": true,
         "vegan": true
@@ -146,7 +146,7 @@
       "type": "item",
       "settings": {
         "name": "Crispy Calamari",
-        "description": "Lightly battered calamari rings served with lemon aioli and marinara sauce.",
+        "description": "<p>Lightly battered calamari rings served with lemon aioli and marinara sauce.</p>",
         "price": "$14",
         "gluten_free": false
       }
@@ -155,7 +155,7 @@
       "type": "item",
       "settings": {
         "name": "Spicy Buffalo Wings",
-        "description": "Crispy chicken wings tossed in our signature buffalo sauce. Served with blue cheese dip.",
+        "description": "<p>Crispy chicken wings tossed in our signature buffalo sauce. Served with blue cheese dip.</p>",
         "price": "$12",
         "spicy": true,
         "gluten_free": true,

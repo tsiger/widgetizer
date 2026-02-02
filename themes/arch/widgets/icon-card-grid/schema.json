@@ -74,10 +74,10 @@
           "default": "Card Title"
         },
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "description",
           "label": "Description",
-          "default": "Card description text goes here."
+          "default": "<p>Card description text goes here.</p>"
         },
         {
           "type": "link",
@@ -98,7 +98,7 @@
       "settings": {
         "subtitle": "Design",
         "title": "Web Design",
-        "description": "Beautiful, responsive websites that engage and convert visitors.",
+        "description": "<p>Beautiful, responsive websites that engage and convert visitors.</p>",
         "button_link": {
           "text": "Learn More",
           "href": "#",
@@ -111,7 +111,7 @@
       "settings": {
         "subtitle": "Development",
         "title": "Web Development",
-        "description": "Custom web applications built with modern technologies.",
+        "description": "<p>Custom web applications built with modern technologies.</p>",
         "button_link": {
           "text": "Learn More",
           "href": "#",
@@ -124,7 +124,7 @@
       "settings": {
         "subtitle": "Marketing",
         "title": "Digital Marketing",
-        "description": "Strategies that drive traffic and grow your business.",
+        "description": "<p>Strategies that drive traffic and grow your business.</p>",
         "button_link": {
           "text": "Learn More",
           "href": "#",
@@ -137,7 +137,7 @@
       "settings": {
         "subtitle": "Support",
         "title": "Customer Support",
-        "description": "24/7 dedicated support to help you succeed.",
+        "description": "<p>24/7 dedicated support to help you succeed.</p>",
         "button_link": {
           "text": "Contact Us",
           "href": "#",
@@ -150,7 +150,7 @@
       "settings": {
         "subtitle": "Analytics",
         "title": "Data Analytics",
-        "description": "Powerful insights to make informed decisions.",
+        "description": "<p>Powerful insights to make informed decisions.</p>",
         "button_link": {
           "text": "View Demo",
           "href": "#",
@@ -163,7 +163,7 @@
       "settings": {
         "subtitle": "Integration",
         "title": "API Integration",
-        "description": "Seamlessly connect with your existing tools.",
+        "description": "<p>Seamlessly connect with your existing tools.</p>",
         "button_link": {
           "text": "See Docs",
           "href": "#",
@@ -176,7 +176,7 @@
       "settings": {
         "subtitle": "Security",
         "title": "Enterprise Security",
-        "description": "Bank-level encryption and data protection.",
+        "description": "<p>Bank-level encryption and data protection.</p>",
         "button_link": {
           "text": "Learn More",
           "href": "#",
@@ -189,7 +189,7 @@
       "settings": {
         "subtitle": "Training",
         "title": "Team Training",
-        "description": "Comprehensive onboarding and training programs.",
+        "description": "<p>Comprehensive onboarding and training programs.</p>",
         "button_link": {
           "text": "Get Started",
           "href": "#",

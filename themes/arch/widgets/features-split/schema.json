@@ -16,10 +16,10 @@
       "default": "Optimal Solution For Every Business"
     },
     {
-      "type": "textarea",
+      "type": "richtext",
       "id": "description",
       "label": "Description",
-      "default": "We combine industry expertise with innovative technology to deliver solutions that drive real results. Our approach is tailored to meet the unique challenges of each market segment we serve."
+      "default": "<p>We combine industry expertise with innovative technology to deliver solutions that drive real results. Our approach is tailored to meet the unique challenges of each market segment we serve.</p>"
     },
     {
       "type": "header",
@@ -75,10 +75,10 @@
           "default": "Feature Title"
         },
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "description",
           "label": "Description",
-          "default": "Feature description goes here."
+          "default": "<p>Feature description goes here.</p>"
         }
       ]
     }
@@ -88,21 +88,21 @@
       "type": "feature",
       "settings": {
         "title": "Private entrepreneurs",
-        "description": "Tailored solutions for independent professionals looking to streamline operations and accelerate growth."
+        "description": "<p>Tailored solutions for independent professionals looking to streamline operations and accelerate growth.</p>"
       }
     },
     {
       "type": "feature",
       "settings": {
         "title": "Small & medium companies",
-        "description": "Scalable tools designed to help growing teams collaborate effectively and compete with larger organizations."
+        "description": "<p>Scalable tools designed to help growing teams collaborate effectively and compete with larger organizations.</p>"
       }
     },
     {
       "type": "feature",
       "settings": {
         "title": "Large companies",
-        "description": "Enterprise-grade features with dedicated support to meet the demands of complex organizational structures."
+        "description": "<p>Enterprise-grade features with dedicated support to meet the demands of complex organizational structures.</p>"
       }
     }
   ]

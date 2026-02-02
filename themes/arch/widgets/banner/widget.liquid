@@ -50,9 +50,9 @@
             {% assign style_class = '' %}
             {% if block.settings.uppercase %}{% assign style_class = style_class | append: ' block-text-uppercase' %}{% endif %}
             {% if block.settings.muted %}{% assign style_class = style_class | append: ' block-text-muted' %}{% endif %}
-            <p class="widget-description block-text {{ size_class }}{{ style_class }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
+            <div class="widget-description block-text block-rte {{ size_class }}{{ style_class }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
               {{ block.settings.text }}
-            </p>
+            </div>
           {% when 'button' %}
             {% if block.settings.link.text != blank or block.settings.link_2.text != blank %}
               {% assign gap_value = 'var(--space-md)' %}

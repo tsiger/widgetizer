@@ -79,10 +79,10 @@
       "displayName": "Text",
       "settings": [
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "text",
           "label": "Text",
-          "default": "A paragraph of descriptive text goes here."
+          "default": "<p>A paragraph of descriptive text goes here.</p>"
         },
         {
           "type": "select",
@@ -195,7 +195,7 @@
     {
       "type": "text",
       "settings": {
-        "text": "We combine cutting-edge technology with proven methodologies to deliver exceptional results. Our platform is designed to help teams collaborate more effectively and achieve their goals faster.",
+        "text": "<p>We combine cutting-edge technology with proven methodologies to deliver exceptional results. Our platform is designed to help teams collaborate more effectively and achieve their goals faster.</p>",
         "size": "base",
         "uppercase": false,
         "muted": false

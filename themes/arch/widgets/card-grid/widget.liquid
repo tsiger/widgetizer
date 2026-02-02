@@ -86,9 +86,9 @@
                 <{{ current_card_level }} class="widget-card-title" data-setting="title">{{ block.settings.title }}</{{ current_card_level }}>
               {% endif %}
               {% if block.settings.description != blank %}
-                <p class="widget-card-description" data-setting="description">
+                <div class="widget-card-description block-rte" data-setting="description">
                   {{ block.settings.description }}
-                </p>
+                </div>
               {% endif %}
               {% if block.settings.button_link.text != blank %}
                 <div class="widget-card-footer">

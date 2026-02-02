@@ -62,7 +62,7 @@
           "default": "Feature Name"
         },
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "description",
           "label": "Tab description"
         },
@@ -79,21 +79,21 @@
       "type": "tab",
       "settings": {
         "title": "Easy Integration",
-        "description": "Connect with all your favorite tools in minutes with our simple API"
+        "description": "<p>Connect with all your favorite tools in minutes with our simple API</p>"
       }
     },
     {
       "type": "tab",
       "settings": {
         "title": "Real-time Analytics",
-        "description": "Track performance with live dashboards and detailed reports"
+        "description": "<p>Track performance with live dashboards and detailed reports</p>"
       }
     },
     {
       "type": "tab",
       "settings": {
         "title": "Team Collaboration",
-        "description": "Work together seamlessly with built-in collaboration features"
+        "description": "<p>Work together seamlessly with built-in collaboration features</p>"
       }
     }
   ]

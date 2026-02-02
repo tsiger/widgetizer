@@ -61,10 +61,10 @@
           "default": "Step Title"
         },
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "description",
           "label": "Description",
-          "default": "Describe this step in the process."
+          "default": "<p>Describe this step in the process.</p>"
         }
       ]
     }
@@ -74,28 +74,28 @@
       "type": "step",
       "settings": {
         "title": "Consultation",
-        "description": "Schedule a free consultation to discuss your goals and requirements."
+        "description": "<p>Schedule a free consultation to discuss your goals and requirements.</p>"
       }
     },
     {
       "type": "step",
       "settings": {
         "title": "Planning",
-        "description": "We create a detailed plan tailored to your specific needs."
+        "description": "<p>We create a detailed plan tailored to your specific needs.</p>"
       }
     },
     {
       "type": "step",
       "settings": {
         "title": "Execution",
-        "description": "Our team implements the solution with precision and care."
+        "description": "<p>Our team implements the solution with precision and care.</p>"
       }
     },
     {
       "type": "step",
       "settings": {
         "title": "Delivery",
-        "description": "We launch, monitor results, and optimize for long-term success."
+        "description": "<p>We launch, monitor results, and optimize for long-term success.</p>"
       }
     }
   ]

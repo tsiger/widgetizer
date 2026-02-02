@@ -298,9 +298,9 @@
               </div>
 
               {% if block.settings.description != blank %}
-                <p class="image-hotspot-tooltip-description block-text block-text-sm" data-setting="description">
+                <div class="image-hotspot-tooltip-description block-text block-text-sm block-rte" data-setting="description">
                   {{ block.settings.description }}
-                </p>
+                </div>
               {% endif %}
 
               {% if block.settings.button_link.href != blank and block.settings.button_link.text != blank %}
