@@ -117,7 +117,8 @@
           "type": "textarea",
           "id": "features",
           "label": "Features (one per line)",
-          "default": "Feature 1\nFeature 2\nFeature 3"
+          "description": "Start a line with + for a checkmark or - for a cross.",
+          "default": "+ Feature 1\n+ Feature 2\n+ Feature 3"
         }
       ]
     },

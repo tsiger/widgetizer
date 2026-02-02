@@ -76,7 +76,8 @@
         {
           "type": "textarea",
           "id": "features",
-          "label": "Features/bullet points (one per line)"
+          "label": "Features/bullet points (one per line)",
+          "description": "Start a line with + for a checkmark or - for a cross."
         },
         {
           "type": "richtext",

@@ -77,7 +77,8 @@
           "type": "textarea",
           "id": "features",
           "label": "Features (one per line)",
-          "default": "Unlimited Projects\nPriority Support\n10GB Storage"
+          "description": "Start a line with + for a checkmark or - for a cross.",
+          "default": "+ Unlimited Projects\n+ Priority Support\n+ 10GB Storage"
         },
         {
           "type": "link",
@@ -110,7 +111,7 @@
         "title": "Starter",
         "price": "$19",
         "period": "per month",
-        "features": "5 Projects\nEmail Support\n2GB Storage\nBasic Analytics",
+        "features": "+ 5 Projects\n+ Email Support\n+ 2GB Storage\n+ Basic Analytics",
         "button_link": {
           "text": "Get Started",
           "href": "#",
@@ -125,7 +126,7 @@
         "title": "Professional",
         "price": "$49",
         "period": "per month",
-        "features": "Unlimited Projects\nPriority Support\n10GB Storage\nAdvanced Analytics\nCustom Domain",
+        "features": "+ Unlimited Projects\n+ Priority Support\n+ 10GB Storage\n+ Advanced Analytics\n+ Custom Domain",
         "button_link": {
           "text": "Get Started",
           "href": "#",
@@ -140,7 +141,7 @@
         "title": "Enterprise",
         "price": "$99",
         "period": "per month",
-        "features": "Unlimited Everything\n24/7 Phone Support\n100GB Storage\nAdvanced Analytics\nCustom Domain\nDedicated Manager",
+        "features": "+ Unlimited Everything\n+ 24/7 Phone Support\n+ 100GB Storage\n+ Advanced Analytics\n+ Custom Domain\n+ Dedicated Manager",
         "button_link": {
           "text": "Contact Sales",
           "href": "#",
