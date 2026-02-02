@@ -70,7 +70,7 @@
           "default": "New York, NY • 6:00 PM"
         },
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "description",
           "label": "Description"
         },
@@ -95,7 +95,7 @@
         "month": "Jan",
         "title": "Product Launch Webinar",
         "location": "Online • 2:00 PM EST",
-        "description": "Join us for an exclusive first look at our latest product release.",
+        "description": "<p>Join us for an exclusive first look at our latest product release.</p>",
         "button_link": {
           "text": "Register Now",
           "href": "#",
@@ -110,7 +110,7 @@
         "month": "Jan",
         "title": "Customer Workshop",
         "location": "San Francisco, CA • 10:00 AM",
-        "description": "Hands-on workshop covering best practices and advanced features.",
+        "description": "<p>Hands-on workshop covering best practices and advanced features.</p>",
         "button_link": {
           "text": "Register Now",
           "href": "#",
@@ -125,7 +125,7 @@
         "month": "Feb",
         "title": "Annual Conference",
         "location": "New York, NY • 9:00 AM",
-        "description": "Our biggest event of the year featuring speakers, workshops, and networking.",
+        "description": "<p>Our biggest event of the year featuring speakers, workshops, and networking.</p>",
         "button_link": {
           "text": "Get Tickets",
           "href": "#",

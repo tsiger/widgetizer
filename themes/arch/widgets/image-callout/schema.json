@@ -71,10 +71,10 @@
       "displayName": "Text",
       "settings": [
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "text",
           "label": "Text",
-          "default": "A paragraph of descriptive text goes here."
+          "default": "<p>A paragraph of descriptive text goes here.</p>"
         },
         {
           "type": "select",
@@ -109,7 +109,8 @@
           "type": "textarea",
           "id": "features",
           "label": "Features (one per line)",
-          "default": "Feature 1\nFeature 2\nFeature 3"
+          "description": "Start a line with + for a checkmark or - for a cross.",
+          "default": "+ Feature 1\n+ Feature 2\n+ Feature 3"
         }
       ]
     },
@@ -187,7 +188,7 @@
     {
       "type": "text",
       "settings": {
-        "text": "Scale your business with confidence using our proven platform trusted by industry leaders worldwide.",
+        "text": "<p>Scale your business with confidence using our proven platform trusted by industry leaders worldwide.</p>",
         "size": "base",
         "uppercase": false,
         "muted": false
@@ -196,7 +197,7 @@
     {
       "type": "features",
       "settings": {
-        "features": "99.9% uptime SLA guarantee\n24/7 dedicated support team\nEnterprise security & compliance"
+        "features": "+ 99.9% uptime SLA guarantee\n+ 24/7 dedicated support team\n+ Enterprise security & compliance"
       }
     },
     {

@@ -35,6 +35,9 @@
       & .pricing-feature {
         padding: var(--space-md) 0;
         border-block-end: var(--border-width-thin) solid var(--border-color);
+        display: flex;
+        gap: var(--space-sm);
+        align-items: center;
 
         &:first-child {
           border-block-start: var(--border-width-thin) solid var(--border-color);
@@ -44,6 +47,15 @@
           border-block-end: none;
           padding-block-end: var(--space-lg); /* Extra space before button */
         }
+      }
+
+      & .feature-icon {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        width: 1.25rem;
+        height: 1.25rem;
+        color: var(--accent);
       }
 
       /* Smart layout for different item counts */
@@ -99,12 +111,29 @@
             <div class="widget-card-content">
               {% if block.settings.features != blank %}
                 <ul class="pricing-features">
-                  {% assign features = block.settings.features | split: '
-' %}
+                  {% assign normalized_features = block.settings.features | replace: '\r\n', '\n' %}
+                  {% assign features = normalized_features | split: '\n' %}
                   {% for feature in features %}
                     {% assign trimmed_feature = feature | strip %}
                     {% if trimmed_feature != blank %}
-                      <li class="pricing-feature block-text block-text-base">{{ trimmed_feature }}</li>
+                      {% assign feature_text = trimmed_feature %}
+                      {% assign icon_name = '' %}
+                      {% assign first_char = trimmed_feature | slice: 0, 1 %}
+                      {% if first_char == '+' %}
+                        {% assign icon_name = 'check' %}
+                        {% assign feature_text = trimmed_feature | remove_first: '+' | strip %}
+                      {% elsif first_char == '-' %}
+                        {% assign icon_name = 'x' %}
+                        {% assign feature_text = trimmed_feature | remove_first: '-' | strip %}
+                      {% endif %}
+                      <li class="pricing-feature block-text block-text-base">
+                        {% if icon_name != blank %}
+                          <span class="feature-icon">
+                            {% render 'icon', icon: icon_name, class: 'feature-icon-svg' %}
+                          </span>
+                        {% endif %}
+                        <span>{{ feature_text }}</span>
+                      </li>
                     {% endif %}
                   {% endfor %}
                 </ul>

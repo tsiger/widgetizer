@@ -68,7 +68,7 @@
           "default": "Feature Title"
         },
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "description",
           "label": "Tooltip description"
         },
@@ -108,7 +108,7 @@
         "position_x": 30,
         "position_y": 40,
         "title": "Premium Quality",
-        "description": "Crafted with the finest materials for lasting durability."
+        "description": "<p>Crafted with the finest materials for lasting durability.</p>"
       }
     },
     {
@@ -117,7 +117,7 @@
         "position_x": 70,
         "position_y": 30,
         "title": "Advanced Technology",
-        "description": "Cutting-edge features that make your life easier."
+        "description": "<p>Cutting-edge features that make your life easier.</p>"
       }
     }
   ]

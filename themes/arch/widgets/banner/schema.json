@@ -91,10 +91,10 @@
       "displayName": "Text",
       "settings": [
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "text",
           "label": "Text",
-          "default": "Start your journey with our powerful platform."
+          "default": "<p>Start your journey with our powerful platform.</p>"
         },
         {
           "type": "select",
@@ -179,7 +179,7 @@
     {
       "type": "text",
       "settings": {
-        "text": "Welcome",
+        "text": "<p>Welcome</p>",
         "size": "sm",
         "uppercase": true,
         "muted": false
@@ -195,7 +195,7 @@
     {
       "type": "text",
       "settings": {
-        "text": "Start your journey with our powerful platform. Scalable, secure, and ready for growth.",
+        "text": "<p>Start your journey with our powerful platform. Scalable, secure, and ready for growth.</p>",
         "size": "lg",
         "uppercase": false,
         "muted": false

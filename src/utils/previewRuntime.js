@@ -126,6 +126,52 @@ function scrollToWidget(widgetId) {
   }, 400);
 }
 
+// Scroll to widget or block and report bounds when done
+function scrollToElement(widgetId, blockId = null) {
+  if (!widgetId) return;
+
+  currentSelectedWidgetId = widgetId;
+  currentSelectedBlockId = blockId;
+  observeWidgetResize(widgetId);
+
+  // Find the target element: block if specified, otherwise widget
+  const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
+  if (!widget) {
+    reportElementBounds(widgetId, blockId);
+    return;
+  }
+
+  let targetElement = widget;
+  if (blockId) {
+    const block = widget.querySelector(`[data-block-id="${blockId}"]`);
+    if (block) {
+      targetElement = block;
+    }
+  }
+
+  const rect = targetElement.getBoundingClientRect();
+  const padding = 40;
+  const viewportHeight = window.innerHeight;
+  const isFullyVisible = rect.top >= padding && rect.bottom <= viewportHeight - padding;
+
+  if (isFullyVisible) {
+    reportElementBounds(widgetId, blockId);
+    return;
+  }
+
+  const documentHeight = document.documentElement.scrollHeight;
+  // Center the element in the viewport if possible
+  let targetScroll = window.scrollY + rect.top - (viewportHeight / 2) + (rect.height / 2);
+  const maxScroll = documentHeight - viewportHeight;
+  targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+
+  window.scrollTo({ top: targetScroll, behavior: "smooth" });
+
+  setTimeout(() => {
+    reportElementBounds(widgetId, blockId);
+  }, 400);
+}
+
 // Calculate and report element bounds to parent
 function reportElementBounds(widgetId, blockId = null) {
   let bounds = null;
@@ -293,6 +339,9 @@ function handleMessage(event) {
       break;
     case "SCROLL_TO_WIDGET":
       scrollToWidget(payload.widgetId);
+      break;
+    case "SCROLL_TO_ELEMENT":
+      scrollToElement(payload.widgetId, payload.blockId);
       break;
     case "UPDATE_WIDGET_SETTINGS":
       updateWidgetSettings(payload.widgetId, payload.changes);

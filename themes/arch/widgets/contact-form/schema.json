@@ -262,10 +262,10 @@
           "default": "Email Us"
         },
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "text",
           "label": "Text/Details",
-          "default": "hello@example.com"
+          "default": "<p>hello@example.com</p>"
         }
       ]
     }
@@ -310,7 +310,7 @@
       "type": "info",
       "settings": {
         "title": "Email Us",
-        "text": "hello@example.com"
+        "text": "<p>hello@example.com</p>"
       }
     }
   ]

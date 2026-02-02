@@ -419,7 +419,7 @@
               </div>
 
               {% if first_block.settings.description != blank %}
-                <p class="block-text block-text-base" id="ep-desc-{{ widget.id }}">{{ first_block.settings.description }}</p>
+                <div class="block-text block-text-base block-rte" id="ep-desc-{{ widget.id }}">{{ first_block.settings.description }}</div>
               {% endif %}
             </div>
 
@@ -650,7 +650,7 @@
           if (numberEl) numberEl.textContent = item.dataset.number || '';
           if (durationEl) durationEl.textContent = item.dataset.duration || '';
           if (dateEl) dateEl.textContent = item.dataset.date || '';
-          if (descEl) descEl.textContent = item.dataset.description || '';
+          if (descEl) descEl.innerHTML = item.dataset.description || '';
           if (totalDurationEl) totalDurationEl.textContent = item.dataset.duration || '0:00';
 
           const artworkTemplate = item.querySelector('.hidden-artwork');

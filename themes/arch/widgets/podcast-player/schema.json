@@ -82,7 +82,7 @@
           "default": "Jan 15"
         },
         {
-          "type": "textarea",
+          "type": "richtext",
           "id": "description",
           "label": "Episode description"
         },
