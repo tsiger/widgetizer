@@ -42,8 +42,9 @@
 
       & .comparison-table-th-featured {
         position: relative;
-        border: var(--border-width-medium) solid var(--accent);
-        border-block-end-color: var(--accent);
+        border-inline-start: var(--border-width-medium) solid var(--accent);
+        border-inline-end: var(--border-width-medium) solid var(--accent);
+        border-block-start: var(--border-width-medium) solid var(--accent);
       }
 
       & .comparison-table-badge {
@@ -74,24 +75,30 @@
         }
       }
 
-      & .comparison-table-td-featured {
+      & .comparison-table-td.comparison-table-td-featured {
         border-inline-start: var(--border-width-medium) solid var(--accent);
         border-inline-end: var(--border-width-medium) solid var(--accent);
-        border-block-end-color: var(--border-color);
       }
 
-      & .comparison-table-body tr:last-child .comparison-table-td-featured {
+      & .comparison-table-body tr:last-child .comparison-table-td.comparison-table-td-featured {
         border-block-end: var(--border-width-medium) solid var(--accent);
       }
 
       & .comparison-table-check {
-        font-size: var(--font-size-2xl);
-        line-height: 1;
+        display: flex;
+        justify-content: center;
+        color: var(--accent);
       }
 
       & .comparison-table-cross {
-        font-size: var(--font-size-2xl);
-        line-height: 1;
+        display: flex;
+        justify-content: center;
+        color: var(--text-muted);
+      }
+
+      & .comparison-table-icon {
+        width: 1.5rem;
+        height: 1.5rem;
       }
 
       & .comparison-table-footer {
@@ -129,9 +136,9 @@
           }
         }
 
-        & .comparison-table-check,
-        & .comparison-table-cross {
-          font-size: var(--font-size-3xl);
+        & .comparison-table-icon {
+          width: 1.75rem;
+          height: 1.75rem;
         }
       }
     }
@@ -216,7 +223,9 @@
                   {% assign value = values[col_index] | strip %}
                   <td class="comparison-table-td {% if col.settings.featured %}comparison-table-td-featured{% endif %}">
                     {% if value == '✓' or value == 'yes' or value == 'Yes' or value == 'true' %}
-                      <span class="comparison-table-check block-text block-text-heading" aria-label="Included">✓</span>
+                      <span class="comparison-table-check" aria-label="Included">
+                        {% render 'icon', icon: 'check', class: 'comparison-table-icon' %}
+                      </span>
                     {% elsif value == '✗'
                       or value == 'no'
                       or value == 'No'
@@ -224,11 +233,15 @@
                       or value == 'x'
                       or value == 'X'
                     %}
-                      <span class="comparison-table-cross block-text block-text-muted" aria-label="Not included">✗</span>
+                      <span class="comparison-table-cross" aria-label="Not included">
+                        {% render 'icon', icon: 'x', class: 'comparison-table-icon' %}
+                      </span>
                     {% elsif value != blank %}
                       <span class="block-text">{{ value }}</span>
                     {% else %}
-                      <span class="comparison-table-cross block-text block-text-muted" aria-label="Not included">✗</span>
+                      <span class="comparison-table-cross" aria-label="Not included">
+                        {% render 'icon', icon: 'x', class: 'comparison-table-icon' %}
+                      </span>
                     {% endif %}
                   </td>
                 {% endfor %}
