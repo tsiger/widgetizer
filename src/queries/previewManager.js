@@ -375,15 +375,19 @@ export async function getProjectWidgets() {
 }
 
 /**
- * Scroll a widget into view in the preview iframe.
- * Sends a SCROLL_TO_WIDGET message to the iframe.
+ * Scroll a widget or block into view in the preview iframe.
+ * If blockId is provided, scrolls to the block; otherwise scrolls to the widget.
  * @param {HTMLIFrameElement} iframe - Preview iframe element
- * @param {string} widgetId - Widget identifier to scroll to
+ * @param {string} widgetId - Widget identifier
+ * @param {string|null} blockId - Optional block identifier to scroll to
  */
-export function scrollWidgetIntoView(iframe, widgetId) {
+export function scrollElementIntoView(iframe, widgetId, blockId = null) {
   if (!iframe?.contentWindow) {
     return;
   }
 
-  iframe.contentWindow.postMessage({ type: "SCROLL_TO_WIDGET", payload: { widgetId } }, "*");
+  iframe.contentWindow.postMessage(
+    { type: "SCROLL_TO_ELEMENT", payload: { widgetId, blockId } },
+    "*",
+  );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
 import { useTranslation } from "react-i18next";
-import { fetchPreview, scrollWidgetIntoView, updatePreview } from "../../queries/previewManager";
+import { fetchPreview, scrollElementIntoView, updatePreview } from "../../queries/previewManager";
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
 import { API_URL } from "../../config";
@@ -293,7 +293,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           // After reload, scroll to selected widget
           setTimeout(() => {
             if (selectedWidgetId && iframeRef.current) {
-              scrollWidgetIntoView(iframeRef.current, selectedWidgetId);
+              scrollElementIntoView(iframeRef.current, selectedWidgetId, selectedBlockId);
             }
             setPreviewReadyKey((prev) => prev + 1);
           }, 100);

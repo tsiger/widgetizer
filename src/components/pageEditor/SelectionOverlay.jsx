@@ -3,7 +3,7 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useWidgetStore from "../../stores/widgetStore";
 import usePageStore from "../../stores/pageStore";
-import { scrollWidgetIntoView } from "../../queries/previewManager";
+import { scrollElementIntoView } from "../../queries/previewManager";
 
 /**
  * SelectionOverlay - Renders selection and hover boxes on top of the preview iframe.
@@ -155,9 +155,10 @@ export default function SelectionOverlay({
   // Scroll and update display name when selection changes
   useEffect(() => {
     if (effectiveWidgetId) {
-      // Scroll to widget - iframe will report bounds after scroll settles
+      // Scroll to widget or block - iframe will report bounds after scroll settles
       if (iframeRef?.current) {
-        scrollWidgetIntoView(iframeRef.current, effectiveWidgetId);
+        // Use scrollElementIntoView to scroll to block if selected, otherwise widget
+        scrollElementIntoView(iframeRef.current, effectiveWidgetId, selectedBlockId);
       }
 
       // Update display name
@@ -166,8 +167,13 @@ export default function SelectionOverlay({
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setWidgetDisplayName(customName || schemas[widgetType]?.displayName || widgetType || null);
     } else {
+      // Clear all bounds when no widget is selected (e.g., after deleting last widget)
       setSelectionBounds(null);
+      setBlockBounds(null);
+      setWidgetHoverBounds(null);
+      setBlockHoverBounds(null);
       setWidgetDisplayName(null);
+      setHoverWidgetDisplayName(null);
     }
   }, [effectiveWidgetId, selectedBlockId, page, schemas, iframeRef]);
 
@@ -180,11 +186,14 @@ export default function SelectionOverlay({
         case "PREVIEW_READY":
           // On preview ready, scroll and request bounds
           if (effectiveWidgetId && iframeRef?.current) {
-            scrollWidgetIntoView(iframeRef.current, effectiveWidgetId);
+            scrollElementIntoView(iframeRef.current, effectiveWidgetId, selectedBlockId);
           }
           break;
 
         case "ELEMENT_BOUNDS":
+          // Ignore bounds when no widget is selected (prevents stale bounds after deletion)
+          if (!effectiveWidgetId) break;
+          
           // Received bounds from iframe - translate and apply
           if (payload.widgetId === effectiveWidgetId) {
             const translated = translateBoundsToOverlay(payload.bounds);
@@ -321,8 +330,8 @@ export default function SelectionOverlay({
 
     const resizeObserver = new ResizeObserver(() => {
       if (effectiveWidgetId) {
-        // Scroll to widget after layout change (desktop/mobile switch)
-        scrollWidgetIntoView(iframe, effectiveWidgetId);
+        // Scroll to widget/block after layout change (desktop/mobile switch)
+        scrollElementIntoView(iframe, effectiveWidgetId, selectedBlockId);
       }
     });
 

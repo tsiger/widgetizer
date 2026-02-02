@@ -25,7 +25,7 @@ import WidgetSection from "./widgets/WidgetSection";
 import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
 import useAutoSave from "../../stores/saveStore";
-import { scrollWidgetIntoView } from "../../queries/previewManager";
+import { scrollElementIntoView } from "../../queries/previewManager";
 import WidgetSelector from "./WidgetSelector";
 import BlockSelector from "./blocks/BlockSelector";
 
@@ -108,7 +108,7 @@ export default function WidgetList({
       reorderWidgets(newOrder);
       setStructureModified(true);
       if (previewIframeRef?.current) {
-        scrollWidgetIntoView(previewIframeRef.current, active.id);
+        scrollElementIntoView(previewIframeRef.current, active.id, null);
       }
     }
   };
