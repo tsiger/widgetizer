@@ -2,16 +2,7 @@ import fs from "fs-extra";
 import { getProjectsFilePath } from "../config.js";
 import { PROJECT_ERROR_CODES } from "./projectErrors.js";
 
-/**
- * Get the folder name for a project by its ID.
- * Reads the projects.json file and finds the matching project.
- * @param {string} projectId - The project's UUID
- * @returns {Promise<string>} The project's folder name
- * @throws {Error} If projects file not found (code: PROJECTS_FILE_MISSING)
- * @throws {Error} If project not found (code: PROJECT_NOT_FOUND)
- * @throws {Error} If file read fails (code: PROJECTS_FILE_READ_FAILED)
- */
-export async function getProjectFolderName(projectId) {
+async function readProjectById(projectId) {
   const projectsPath = getProjectsFilePath();
   try {
     if (!(await fs.pathExists(projectsPath))) {
@@ -22,7 +13,10 @@ export async function getProjectFolderName(projectId) {
 
     const data = JSON.parse(await fs.readFile(projectsPath, "utf8"));
     const project = data.projects.find((p) => p.id === projectId);
-    if (project) return project.folderName;
+
+    if (project) {
+      return project;
+    }
 
     const error = new Error(`Project not found for ID ${projectId}`);
     error.code = PROJECT_ERROR_CODES.PROJECT_NOT_FOUND;
@@ -35,8 +29,35 @@ export async function getProjectFolderName(projectId) {
       throw error;
     }
 
-    const wrappedError = new Error(`Failed to resolve project folderName for ID ${projectId}: ${error.message}`);
+    const wrappedError = new Error(`Failed to resolve project for ID ${projectId}: ${error.message}`);
     wrappedError.code = PROJECT_ERROR_CODES.PROJECTS_FILE_READ_FAILED;
     throw wrappedError;
   }
+}
+
+/**
+ * Get the folder name for a project by its ID.
+ * Reads the projects.json file and finds the matching project.
+ * @param {string} projectId - The project's UUID
+ * @returns {Promise<string>} The project's folder name
+ * @throws {Error} If projects file not found (code: PROJECTS_FILE_MISSING)
+ * @throws {Error} If project not found (code: PROJECT_NOT_FOUND)
+ * @throws {Error} If file read fails (code: PROJECTS_FILE_READ_FAILED)
+ */
+export async function getProjectFolderName(projectId) {
+  const project = await readProjectById(projectId);
+  return project.folderName;
+}
+
+/**
+ * Get the full project details by its ID.
+ * Reads the projects.json file and finds the matching project.
+ * @param {string} projectId - The project's UUID
+ * @returns {Promise<object>} The project object
+ * @throws {Error} If projects file not found (code: PROJECTS_FILE_MISSING)
+ * @throws {Error} If project not found (code: PROJECT_NOT_FOUND)
+ * @throws {Error} If file read fails (code: PROJECTS_FILE_READ_FAILED)
+ */
+export async function getProjectDetails(projectId) {
+  return readProjectById(projectId);
 }

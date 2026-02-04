@@ -16,28 +16,63 @@ import {
   getImagePath,
   getVideoPath,
   getAudioPath,
+  getThemeJsonPath,
 } from "../config.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
-import { getProjectFolderName } from "../utils/projectHelpers.js";
+import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError, PROJECT_ERROR_CODES } from "../utils/projectErrors.js";
 
 // Get image processing settings from app settings
-async function getImageProcessingSettings() {
+async function getImageProcessingSettings(projectId) {
   const quality = (await getSetting("media.imageProcessing.quality")) || 85;
-  const sizesConfig = (await getSetting("media.imageProcessing.sizes")) || {
+  const defaultSizesConfig = (await getSetting("media.imageProcessing.sizes")) || {
     thumb: { width: 150, enabled: true },
     small: { width: 480, enabled: true },
     medium: { width: 1024, enabled: true },
     large: { width: 1920, enabled: true },
   };
+  let sizesConfig = defaultSizesConfig;
+
+  // If projectId is provided, try to load theme-specific overrides
+  if (projectId) {
+    try {
+      const project = await getProjectDetails(projectId);
+      if (project && project.theme) {
+        const themeJsonPath = getThemeJsonPath(project.theme);
+        if (await fs.pathExists(themeJsonPath)) {
+          const themeConfig = await fs.readJson(themeJsonPath);
+          if (themeConfig.settings?.imageSizes) {
+            console.log(
+              `[getImageProcessingSettings] Using theme image sizes for project ${projectId} (theme: ${project.theme})`,
+            );
+            // When a theme defines image sizes, use them instead of app settings.
+            // Always ensure thumbnails are generated for the media library.
+            sizesConfig = {
+              ...themeConfig.settings.imageSizes,
+            };
+
+            const defaultThumb = defaultSizesConfig.thumb || { width: 150, enabled: true };
+            sizesConfig.thumb = {
+              ...defaultThumb,
+              ...(themeConfig.settings.imageSizes.thumb || {}),
+              enabled: true,
+            };
+          }
+        }
+      }
+    } catch (error) {
+      console.warn(`[getImageProcessingSettings] Failed to load theme settings for project ${projectId}:`, error.message);
+      // Fallback to global settings on error
+    }
+  }
 
   // Filter out disabled sizes and format for processing
   const enabledSizes = {};
   for (const [name, config] of Object.entries(sizesConfig)) {
     if (config.enabled !== false) {
       // enabled by default if not specified
-      enabledSizes[name] = { width: config.width, quality };
+      enabledSizes[name] = { width: config.width, quality: config.quality || quality };
     }
   }
 
@@ -426,7 +461,8 @@ export async function uploadProjectMedia(req, res) {
     const maxImageSizeMB = await getSetting("media.maxFileSizeMB");
     const maxVideoSizeMB = await getSetting("media.maxVideoSizeMB");
     const maxAudioSizeMB = await getSetting("media.maxAudioSizeMB");
-    const imageSizes = await getImageProcessingSettings();
+    // Pass projectId to allow theme overrides
+    const imageSizes = await getImageProcessingSettings(projectId);
 
     const mediaData = await readMediaFile(projectId);
 

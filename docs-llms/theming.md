@@ -90,6 +90,35 @@ The `theme.json` file serves as the theme's manifest and defines global settings
 
 > [!NOTE] The `widgets` count is calculated programmatically by the system based on the contents of the `/widgets/` directory. You do not need to specify it in `theme.json`.
 
+### Image Size Configuration (Optional)
+
+Themes can define custom image sizes that override the app-level settings. This is useful when your theme requires specific image dimensions for hero sections, galleries, or other components.
+
+```json
+{
+  "settings": {
+    "imageSizes": {
+      "thumb": { "width": 150, "enabled": true },
+      "small": { "width": 480, "enabled": true },
+      "medium": { "width": 1024, "enabled": true },
+      "hero": { "width": 1600, "enabled": true, "quality": 90 },
+      "large": { "enabled": false }
+    }
+  }
+}
+```
+
+**Properties for each size:**
+- `width` (number): Maximum width in pixels
+- `enabled` (boolean): Whether to generate this size (default: `true`)
+- `quality` (number, optional): JPEG/WebP quality 1-100 (falls back to app setting)
+
+**Key behaviors:**
+- When defined, theme sizes **replace** app settings entirely (not merged)
+- The `thumb` size is **always generated** for the media library, even if not defined
+- Users can reference these sizes in templates via the `image` filter: `{{ image | image: 'hero' }}`
+- The App Settings UI hides the Image Sizes controls when a theme defines them
+
 ### Global Settings Schema
 
 The `settings.global` object defines customizable options organized into logical groups. **You can create any groups you want** — each key in the `global` object becomes a group in the theme settings UI. Common groups include `colors`, `typography`, `layout`, and `privacy`, but you can add custom groups like `social`, `advanced`, or anything relevant to your theme:

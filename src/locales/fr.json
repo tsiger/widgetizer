@@ -730,6 +730,8 @@
       }
     },
     "messages": {
+      "imageSizesManagedByTheme": "Les tailles d’image sont gérées par le thème sélectionné ({{themeName}}). Les paramètres de l’application sont ignorés. Des vignettes sont toujours générées pour la bibliothèque média.",
+      "imageSizesManagedByThemeGeneric": "Les tailles d’image sont gérées par le thème sélectionné. Les paramètres de l’application sont ignorés. Des vignettes sont toujours générées pour la bibliothèque média.",
       "noSettings": "Aucun paramètre disponible"
     }
   }

@@ -6,8 +6,9 @@ import SettingsRenderer from "./SettingsRenderer";
  * AppSettingsPanel component
  * Renders app settings using JSON schema format with vertical tabs
  */
-export default function AppSettingsPanel({ schema, settings, onChange }) {
+export default function AppSettingsPanel({ schema, settings, onChange, hiddenGroups = [], groupMessages = {} }) {
   const { t } = useTranslation();
+  const hiddenGroupsSet = new Set(hiddenGroups);
 
   // Group settings by tab from the schema
   const settingsByTab = {};
@@ -40,10 +41,30 @@ export default function AppSettingsPanel({ schema, settings, onChange }) {
   const renderTabSettings = () => {
     const tabSettings = settingsByTab[activeTab] || [];
     let currentGroup = null;
+    const renderedHiddenGroups = new Set();
 
     return tabSettings
       .map(({ key, config }) => {
         const elements = [];
+
+        if (config.group && hiddenGroupsSet.has(config.group)) {
+          if (!renderedHiddenGroups.has(config.group)) {
+            const message = groupMessages[config.group];
+            if (message) {
+              elements.push(
+                <div
+                  key={`message_${config.group}`}
+                  className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+                >
+                  {message}
+                </div>,
+              );
+            }
+            renderedHiddenGroups.add(config.group);
+          }
+
+          return elements;
+        }
 
         // Add group header if this is a new group
         if (config.group && config.group !== currentGroup && config.group !== "general") {

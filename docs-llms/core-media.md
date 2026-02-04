@@ -31,6 +31,35 @@ The system's image processing behavior is controlled through **App Settings**, m
   - `large`: 1920px width
 - **Fallback Behavior**: If the `thumb` size is disabled, the system automatically uses the first available enabled size (or original image) for thumbnail previews.
 
+### Theme-Defined Image Sizes
+
+Themes can override the app-level image size configuration by defining `imageSizes` in their `theme.json`. This is useful when a theme requires specific image dimensions (e.g., a `hero` size at 1600px for hero banners).
+
+**How it works:**
+- When a theme defines `settings.imageSizes` in `theme.json`, those sizes **replace** the app settings entirely for that project
+- The `thumb` size is **always generated** regardless of theme configuration (required for the media library UI)
+- Each size can specify its own `quality` value, falling back to the app's global quality setting
+- Sizes can be disabled by setting `enabled: false`
+
+**Example theme.json configuration:**
+```json
+{
+  "settings": {
+    "imageSizes": {
+      "thumb": { "width": 150, "enabled": true },
+      "small": { "width": 480, "enabled": true },
+      "hero": { "width": 1600, "enabled": true, "quality": 90 },
+      "large": { "enabled": false }
+    }
+  }
+}
+```
+
+**App Settings UI behavior:**
+- When the active project's theme defines `imageSizes`, the Image Sizes controls in App Settings are hidden
+- A notice is displayed explaining that image sizes are managed by the theme
+- Other media settings (file size limits, image quality) remain visible and editable
+
 ### Metadata Storage
 
 All metadata for the files in a project's media library is stored in a single JSON file.

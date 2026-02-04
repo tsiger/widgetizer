@@ -730,6 +730,8 @@
       }
     },
     "messages": {
+      "imageSizesManagedByTheme": "Le dimensioni delle immagini sono gestite dal tema selezionato ({{themeName}}). Le impostazioni dell'app vengono ignorate. Le miniature vengono comunque generate per la libreria multimediale.",
+      "imageSizesManagedByThemeGeneric": "Le dimensioni delle immagini sono gestite dal tema selezionato. Le impostazioni dell'app vengono ignorate. Le miniature vengono comunque generate per la libreria multimediale.",
       "noSettings": "Nessuna impostazione disponibile"
     }
   }

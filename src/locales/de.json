@@ -730,6 +730,8 @@
       }
     },
     "messages": {
+      "imageSizesManagedByTheme": "Die Bildgrößen werden vom ausgewählten Theme ({{themeName}}) verwaltet. Die App-Einstellungen werden ignoriert. Vorschaubilder werden weiterhin für die Medienbibliothek erzeugt.",
+      "imageSizesManagedByThemeGeneric": "Die Bildgrößen werden vom ausgewählten Theme verwaltet. Die App-Einstellungen werden ignoriert. Vorschaubilder werden weiterhin für die Medienbibliothek erzeugt.",
       "noSettings": "Keine Einstellungen verfügbar"
     }
   }

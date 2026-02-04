@@ -752,6 +752,8 @@
       }
     },
     "messages": {
+      "imageSizesManagedByTheme": "Image sizes are managed by the selected theme ({{themeName}}). App settings are ignored. Thumbnails are still generated for the media library.",
+      "imageSizesManagedByThemeGeneric": "Image sizes are managed by the selected theme. App settings are ignored. Thumbnails are still generated for the media library.",
       "noSettings": "No settings available"
     }
   }
