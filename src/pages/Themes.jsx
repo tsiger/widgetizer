@@ -1,13 +1,13 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowUpCircle } from "lucide-react";
+import { ArrowUpCircle, Trash2, MoreVertical } from "lucide-react";
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import EmptyState from "../components/ui/EmptyState";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 
-import { getAllThemes, getThemeScreenshotUrl, uploadThemeZip, updateTheme } from "../queries/themeManager";
+import { getAllThemes, getThemeScreenshotUrl, uploadThemeZip, updateTheme, deleteTheme } from "../queries/themeManager";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
@@ -21,6 +21,19 @@ export default function Themes() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
   const [updatingThemeId, setUpdatingThemeId] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const menuRef = useRef(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenMenuId(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
@@ -47,9 +60,7 @@ export default function Themes() {
     if (newTheme.isUpdate) {
       // Update existing theme in the list
       setThemes((prevThemes) =>
-        prevThemes.map((theme) =>
-          theme.id === newTheme.id ? { ...theme, ...newTheme } : theme
-        )
+        prevThemes.map((theme) => (theme.id === newTheme.id ? { ...theme, ...newTheme } : theme)),
       );
     } else {
       // Add new theme to the list
@@ -57,35 +68,80 @@ export default function Themes() {
     }
   };
 
-  const handleUpdateTheme = useCallback(async (themeId) => {
-    setUpdatingThemeId(themeId);
-    try {
-      const result = await updateTheme(themeId);
-      showToast(result.message || t("themes.toasts.updateSuccess", "Theme updated successfully"), "success");
-      // Refresh themes list and sidebar badge
-      await fetchThemes();
-      fetchUpdateCount();
-    } catch (error) {
-      showToast(error.message || t("themes.toasts.updateError", "Failed to update theme"), "error");
-    } finally {
-      setUpdatingThemeId(null);
-    }
-  }, [showToast, t, fetchThemes, fetchUpdateCount]);
+  const handleUpdateTheme = useCallback(
+    async (themeId) => {
+      setUpdatingThemeId(themeId);
+      try {
+        const result = await updateTheme(themeId);
+        showToast(result.message || t("themes.toasts.updateSuccess", "Theme updated successfully"), "success");
+        // Refresh themes list and sidebar badge
+        await fetchThemes();
+        fetchUpdateCount();
+      } catch (error) {
+        showToast(error.message || t("themes.toasts.updateError", "Failed to update theme"), "error");
+      } finally {
+        setUpdatingThemeId(null);
+      }
+    },
+    [showToast, t, fetchThemes, fetchUpdateCount],
+  );
 
-  const onThemeDrop = useCallback(async (files) => {
-    if (files.length !== 1) {
-       showToast(t("themes.toasts.singleFileError"), "error");
-       return;
-    }
-    const file = files[0];
-    setIsUploading(true);
-    // Fake progress for now since uploadThemeZip doesn't support it yet match interface
-    setUploadProgress({ [file.name]: 0 });
+  const handleDeleteTheme = useCallback(
+    async (themeId, themeName) => {
+      if (
+        !window.confirm(
+          t("themes.delete.confirmMessage", {
+            themeName,
+            defaultValue: `Are you sure you want to delete "${themeName}"? This action cannot be undone.`,
+          }),
+        )
+      ) {
+        return;
+      }
 
-    try {
+      try {
+        await deleteTheme(themeId);
+        showToast(
+          t("themes.delete.success", { themeName, defaultValue: `Theme "${themeName}" deleted successfully` }),
+          "success",
+        );
+        await fetchThemes();
+      } catch (error) {
+        if (error.response?.status === 409) {
+          showToast(
+            t("themes.delete.inUse", {
+              themeName,
+              defaultValue: `Cannot delete "${themeName}" - it is currently used by one or more projects`,
+            }),
+            "error",
+            { duration: 5000 },
+          );
+        } else {
+          showToast(
+            t("themes.delete.error", { themeName, defaultValue: `Failed to delete theme "${themeName}"` }),
+            "error",
+          );
+        }
+      }
+    },
+    [showToast, t, fetchThemes],
+  );
+
+  const onThemeDrop = useCallback(
+    async (files) => {
+      if (files.length !== 1) {
+        showToast(t("themes.toasts.singleFileError"), "error");
+        return;
+      }
+      const file = files[0];
+      setIsUploading(true);
+      // Fake progress for now since uploadThemeZip doesn't support it yet match interface
+      setUploadProgress({ [file.name]: 0 });
+
+      try {
         // Simulate progress
         const interval = setInterval(() => {
-           setUploadProgress(prev => ({ ...prev, [file.name]: Math.min((prev[file.name] || 0) + 10, 90) }));
+          setUploadProgress((prev) => ({ ...prev, [file.name]: Math.min((prev[file.name] || 0) + 10, 90) }));
         }, 100);
 
         const result = await uploadThemeZip(file);
@@ -97,15 +153,16 @@ export default function Themes() {
           handleUploadSuccess(result.theme);
         }
         showToast(result.message || t("themes.toasts.uploadSuccess"), "success");
-    } catch (error) {
+      } catch (error) {
         console.error("Theme upload error:", error);
         showToast(error.message || t("themes.toasts.uploadError"), "error");
-    } finally {
+      } finally {
         setIsUploading(false);
         setUploadProgress({});
-    }
-  }, [showToast, t]);
-
+      }
+    },
+    [showToast, t],
+  );
 
   if (loading) {
     return (
@@ -116,10 +173,7 @@ export default function Themes() {
   }
 
   return (
-    <PageLayout
-      title={t("themes.title")}
-      description={t("themes.description")}
-    >
+    <PageLayout title={t("themes.title")} description={t("themes.description")}>
       <div className="mb-6">
         <FileUploader
           onUpload={onThemeDrop}
@@ -166,7 +220,9 @@ export default function Themes() {
                     <Badge variant="neutral">{t("themes.widgets", { count: theme.widgets })}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-500">{t("themes.by", { author: theme.author || "Unknown" })}</span>
+                    <span className="text-xs text-slate-500">
+                      {t("themes.by", { author: theme.author || "Unknown" })}
+                    </span>
                   </div>
 
                   {/* Update available section */}
@@ -194,11 +250,36 @@ export default function Themes() {
                   )}
                 </div>
 
-                {isActiveTheme && (
-                  <Badge variant="pink" className="absolute top-2 right-2">
-                    {t("themes.active")}
-                  </Badge>
-                )}
+                {/* Three-dot menu - positioned top-right corner */}
+                <div
+                  className="absolute top-2 right-2 flex items-center gap-2"
+                  ref={openMenuId === theme.id ? menuRef : null}
+                >
+                  {isActiveTheme && <Badge variant="pink">{t("themes.active")}</Badge>}
+                  <div className="relative">
+                    <button
+                      onClick={() => setOpenMenuId(openMenuId === theme.id ? null : theme.id)}
+                      className="p-1.5 rounded-md bg-white/90 hover:bg-white text-slate-600 hover:text-slate-800 shadow-sm"
+                      aria-label={t("themes.menuLabel", "Theme options")}
+                    >
+                      <MoreVertical size={16} />
+                    </button>
+                    {openMenuId === theme.id && (
+                      <div className="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg border border-slate-200 py-1 z-10">
+                        <button
+                          onClick={() => {
+                            setOpenMenuId(null);
+                            handleDeleteTheme(theme.id, theme.name);
+                          }}
+                          className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        >
+                          <Trash2 size={14} />
+                          {t("themes.buttons.delete", "Delete")}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             );
           })}

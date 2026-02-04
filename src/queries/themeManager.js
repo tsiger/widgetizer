@@ -277,3 +277,30 @@ export async function updateTheme(themeId) {
     throw error;
   }
 }
+
+/**
+ * Delete a theme from the system.
+ * Prevents deletion if the theme is currently in use by any projects.
+ * @param {string} themeId - The ID of the theme to delete
+ * @returns {Promise<{success: boolean, message: string}>} Deletion result
+ * @throws {Error} If theme is in use (409) or deletion fails
+ */
+export async function deleteTheme(themeId) {
+  try {
+    const response = await fetch(API_URL(`/api/themes/${themeId}`), {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const error = new Error(errorData.error || "Failed to delete theme");
+      error.response = { status: response.status, data: errorData };
+      throw error;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error deleting theme:", error);
+    throw error;
+  }
+}

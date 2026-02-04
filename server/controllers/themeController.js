@@ -10,6 +10,7 @@ import {
   getThemeVersionDir,
   getProjectDir,
   getProjectThemeJsonPath,
+  getProjectsFilePath,
 } from "../config.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
@@ -608,6 +609,62 @@ export async function readProjectThemeData(projectId) {
       console.error(`Error reading or parsing theme file ${themeFile}:`, error);
       throw new Error(`Failed to read or parse theme settings for project ${projectId}: ${error.message}`);
     }
+  }
+}
+
+/**
+ * Delete a theme if it's not currently in use by any projects.
+ * @param {import('express').Request} req - Express request with theme id param
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+export async function deleteTheme(req, res) {
+  try {
+    const { id } = req.params;
+    const themeDir = getThemeDir(id);
+
+    // 1. Check if theme exists
+    try {
+      await fs.access(themeDir);
+    } catch (error) {
+      if (error.code === "ENOENT") {
+        return res.status(404).json({ error: `Theme '${id}' not found.` });
+      }
+      throw error;
+    }
+
+    // 2. Check if theme is in use by any projects (via projects.json)
+    const projectsFilePath = getProjectsFilePath();
+    try {
+      const projectsData = await fs.readFile(projectsFilePath, "utf8");
+      const { projects } = JSON.parse(projectsData);
+
+      const projectsUsingTheme = projects.filter((p) => p.theme === id);
+
+      if (projectsUsingTheme.length > 0) {
+        return res.status(409).json({
+          error: "Theme is in use",
+          message: `Cannot delete theme "${id}" because it is used by ${projectsUsingTheme.length} project(s)`,
+          projectsUsingTheme: projectsUsingTheme.map((p) => ({
+            id: p.id,
+            name: p.name,
+          })),
+        });
+      }
+    } catch (error) {
+      // If projects.json doesn't exist, no projects use any theme
+      if (error.code !== "ENOENT") {
+        console.warn(`Could not read projects file: ${error.message}`);
+      }
+    }
+
+    // 3. Delete the theme directory
+    await fs.rm(themeDir, { recursive: true, force: true });
+
+    res.json({ success: true, message: `Theme "${id}" deleted successfully` });
+  } catch (error) {
+    console.error(`Error deleting theme: ${error.message}`);
+    res.status(500).json({ error: `Failed to delete theme: ${error.message}` });
   }
 }
 

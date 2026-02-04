@@ -38,4 +38,7 @@ router.post("/project/:projectId", themeController.saveProjectThemeSettings);
 // POST /api/themes/upload - Upload a new theme zip file
 router.post("/upload", upload.single("themeZip"), themeController.uploadTheme);
 
+// DELETE /api/themes/:id - Delete a theme if not in use
+router.delete("/:id", themeController.deleteTheme);
+
 export default router;
