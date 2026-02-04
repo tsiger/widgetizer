@@ -58,7 +58,7 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
     - It calls `updateWidgetSettings()` from the `useWidgetStore` to update the data.
     - It calls `useAutoSave.getState().markWidgetModified()` to notify the save store that a change has occurred.
 6.  The `PreviewPanel`, subscribed to all relevant stores, detects the state change.
-7.  It triggers a master `updatePreview` function located in `src/utils/previewManager.js`. This function intelligently diffs the new state against the previous state and applies only the necessary changes to the preview `<iframe>`. This ensures the preview is always a perfect, up-to-date reflection of the application state and resolves complex ordering and selection bugs.
+7.  It triggers a master `updatePreview` function located in `src/queries/previewManager.js`. This function intelligently diffs the new state against the previous state and applies only the necessary changes to the preview `<iframe>`. This ensures the preview is always a perfect, up-to-date reflection of the application state and resolves complex ordering and selection bugs.
 
 ### Previewing a Page
 
@@ -105,7 +105,7 @@ The page editor implements comprehensive navigation protection to prevent users 
 
 #### Implementation (`src/hooks/useNavigationGuard.js`)
 
-The `useNavigationGuard` hook provides a two-layer protection system:
+The `useNavigationGuard` hook provides a two-layer protection system and operates automatically via side effects:
 
 **Layer 1: Browser Navigation Protection**
 
@@ -115,17 +115,18 @@ The `useNavigationGuard` hook provides a two-layer protection system:
 
 **Layer 2: Internal Navigation Protection**
 
-- Provides a `guardedNavigate` function that replaces React Router's standard `navigate`
-- Shows a custom confirmation dialog before allowing internal navigation
-- Used in components like `EditorTopBar` for page switching and `Layout` for sidebar navigation
+- Uses React Router's `useBlocker` to intercept all navigation attempts
+- Automatically blocks navigation when unsaved changes are detected
+- Shows a custom confirmation dialog (`window.confirm`) before allowing navigation
+- Resets unsaved changes state if user confirms leaving
 
 #### Usage in Page Editor
 
-The page editor integrates navigation protection in several ways:
+The page editor integrates navigation protection automatically:
 
 1. **Automatic Setup**: The `PageEditor` component calls `useNavigationGuard()` to activate protection
-2. **Sidebar Integration**: The main `Layout` component passes `guardedNavigate` to the `Sidebar` when on the page editor route
-3. **Page Switching**: The `EditorTopBar` uses `guardedNavigate` for switching between pages in the dropdown
+2. **No Return Value**: The hook operates entirely through side effects - no functions are returned
+3. **Universal Protection**: Automatically protects against all navigation (sidebar clicks, page switching, browser back/forward)
 
 #### Key Features
 

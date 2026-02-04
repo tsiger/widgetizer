@@ -15,7 +15,7 @@ These pages rely on a central form component for handling user input:
 - **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, notes, website address)
   - Migrated to **react-hook-form** for improved validation and state management
   - Fully **localized** using `react-i18next` for all labels, errors, and help text
-  - Exposes `dirt` state to parent components for navigation guard integration
+  - Exposes `isDirty` state to parent components for navigation guard integration
   - Automatic slug generation from project name for new projects
 
 ## Client-Side Routing
@@ -32,7 +32,7 @@ The application uses `react-router-dom` to handle navigation between these pages
 
 Project state is managed by a central **Zustand store** defined in `src/stores/projectStore.js`. This store is the single source of truth for the currently active project and provides actions to interact with it.
 
-Data fetching and backend communication are handled by utility functions in `src/utils/projectManager.js`.
+Data fetching and backend communication are handled by utility functions in `src/queries/projectManager.js`.
 
 ### The `projectManager.js` Utility
 

@@ -92,42 +92,39 @@ The core of the exporting process is a multi-step, server-side operation handled
 When the `/api/export/:projectId` endpoint is called, the following steps are executed:
 
 1.  **Version Management**:
-
     - The system determines the next version number by reading the export history for the project.
     - Version numbers auto-increment starting from v1 (v1, v2, v3, etc.).
 
 2.  **Create Output Directory**:
-
     - A new directory is created inside `/data/publish/`.
     - To prevent overwriting previous exports, the directory is named with the project's **folderName** and version number (e.g., `my-project-slug-v1`, `my-project-slug-v2`, etc.).
     - If the project ID cannot be resolved, the export fails with a clear error.
 
 3.  **Load Project Data**:
-
     - The controller loads all necessary data for the project, including the theme settings (`theme.json`), a list of all pages, and the global header and footer data.
     - **Homepage Validation**: The system verifies that at least one page has the slug "index" to serve as the homepage. If no homepage exists, the export fails with a clear error message.
 
 4.  **Render Global Widgets**:
-
     - The header and footer widgets are rendered once into HTML strings using the `renderingService`. This is done in `"publish"` mode, which ensures that asset paths in the final HTML are relative (e.g., `uploads/images/logo.png`) instead of absolute API URLs.
 
 5.  **Iterate and Render Pages**:
-
     - The controller loops through each page of the project. For each page, it: a. Renders all the widgets assigned to that page into a single HTML string. b. Combines the rendered header, page widgets, and footer into the final page content. c. Passes this combined content to the main `layout.liquid` template via the `renderPageLayout` function. d. The final, complete HTML for the page is generated.
 
 6.  **Generate SEO Files**:
-
     - If the project has a `siteUrl` defined, the system automatically generates:
       - **`sitemap.xml`**: A complete sitemap of all indexed pages (respecting SEO metadata).
       - **`robots.txt`**: A standard instructions file for search engines, including the sitemap location and disallow rules for pages marked `noindex`.
 
-7.  **Format and Write HTML Files**:
-
+7.  **Format and Validate HTML Files**:
     - The generated HTML for each page is run through **Prettier** to ensure clean, readable formatting.
-    - The formatted HTML is saved as a file in the output directory (e.g., `about-us.html`). If a page's slug is "home" or "index", it is saved as `index.html`.
+    - **HTML Validation** (Developer Mode Only): When the `developer.enabled` setting is active, each page is validated using `html-validate` with relaxed rules suitable for widget-based HTML:
+      - Validation issues are collected across all pages with severity levels (errors/warnings)
+      - Issues include line numbers, column positions, rule IDs, and source code snippets
+      - A comprehensive `__export__issues.html` report is generated if any issues are found
+      - The report provides a visual, developer-friendly interface showing all validation issues
+    - The formatted (and potentially validated) HTML is saved as a file in the output directory (e.g., `about-us.html`). If a page's slug is "home" or "index", it is saved as `index.html`.
 
 8.  **Copy Static Assets**:
-
     - The system performs several copy operations to ensure the static site is self-contained:
       - **Theme Assets**: All files from the project's `/assets` directory (e.g., `base.css`, `scripts.js`) are copied to `/assets` in the output directory.
       - **Core Assets**: Placeholder images (SVG) from the core assets are copied to ensure widgets using placeholders work correctly.
@@ -147,7 +144,6 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
       - **Export Optimization**: Logs how many media files were copied vs. skipped, often reducing export size significantly
 
 9.  **Record Export History**:
-
     - The export metadata is recorded in `/data/publish/export-history.json` with version number, timestamp, output directory, and status.
     - **Automatic Cleanup**: If the number of exports exceeds the user's configured limit (from App Settings), the oldest exports are automatically deleted:
       - Physical export directories are removed from the file system
@@ -208,6 +204,47 @@ The system automatically manages storage by:
 - Removing the oldest exports when limits are exceeded
 - Cleaning up both file system directories and history records
 - Respecting user-configured retention policies
+
+## Developer Mode Features
+
+### HTML Validation
+
+When **Developer Mode** is enabled in App Settings (`developer.enabled`), the export process performs comprehensive HTML validation:
+
+- **Validation Library**: Uses `html-validate` with relaxed rules suitable for widget-based HTML generation
+- **Rule Configuration**: Custom ruleset that allows:
+  - Inline styles (common in widgets)
+  - Dynamic widget patterns
+  - Style tags within sections/headers
+  - Prettier-specific formatting (lowercase doctype, self-closing tags)
+- **Validation Process**:
+  1. Each exported HTML page is validated after formatting
+  2. Issues are collected with severity levels (errors/warnings)
+  3. Each issue includes line/column position, message, rule ID, and source snippet
+  4. A visual report (`__export__issues.html`) is generated if any issues are found
+
+### Validation Report
+
+The generated `__export__issues.html` provides:
+
+- **Summary**: Total issue count across all pages
+- **Per-Page Breakdown**: Issues grouped by page with filenames
+- **Issue Details**: For each issue:
+  - Severity badge (error/warning with color coding)
+  - Exact location (line and column)
+  - Clear error message
+  - Rule ID with clickable link to documentation
+  - Source code snippet with context (2 lines before/after)
+  - Highlighted error line in the snippet
+- **Developer-Friendly UI**: Dark theme with syntax highlighting and clear visual hierarchy
+
+### Performance Impact
+
+HTML validation only runs when developer mode is enabled, ensuring:
+
+- **Zero overhead** in production exports (disabled by default)
+- **Faster exports** for regular users
+- **Quality assurance** during development without affecting end-user experience
 
 ## Security Considerations
 

@@ -91,31 +91,28 @@ This hook implements a two-layer protection system for preventing accidental dat
 import useNavigationGuard from "../hooks/useNavigationGuard";
 
 function PageEditor() {
-  const { guardedNavigate, hasUnsavedChanges } = useNavigationGuard();
+  // Hook has no return value - it works automatically via side effects
+  useNavigationGuard();
 
-  const handlePageSwitch = (pageId) => {
-    // This will show confirmation if there are unsaved changes
-    guardedNavigate(`/page-editor?pageId=${pageId}`);
-  };
+  // The hook integrates with the saveStore to check for unsaved changes
+  // and blocks navigation automatically when there are pending changes
 
-  return (
-    <div>
-      {hasUnsavedChanges && <span>You have unsaved changes</span>}
-      {/* Component content */}
-    </div>
-  );
+  return <div>{/* Component content */}</div>;
 }
 ```
 
 #### API Reference
 
-**Returns:**
+**Parameters:** None
 
-- `guardedNavigate(to, options)` (function): Protected navigation function
-  - Returns `true` if navigation proceeded, `false` if cancelled
-  - Shows confirmation dialog if there are unsaved changes
-- `hasUnsavedChanges` (boolean): Current unsaved changes state
-- `checkUnsavedChanges()` (function): Function to check current unsaved state
+**Returns:** None (void) - Hook manages navigation protection via side effects only
+
+**How It Works:**
+
+- Integrates with `saveStore` to check for unsaved changes
+- Uses React Router's `useBlocker` to intercept navigation
+- Automatically shows confirmation dialogs when blocking navigation
+- Uses `beforeunload` event for browser navigation protection
 
 #### Integration Points
 
