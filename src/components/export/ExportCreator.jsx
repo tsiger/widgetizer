@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 export default function ExportCreator({ activeProject, lastExport, setLastExport, loadExportHistory }) {
   const { t } = useTranslation();
   const [isExporting, setIsExporting] = useState(false);
+  const [exportMarkdown, setExportMarkdown] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
 
   const formatDate = (isoString) => {
@@ -29,7 +30,7 @@ export default function ExportCreator({ activeProject, lastExport, setLastExport
     setLastExport(null);
 
     try {
-      const result = await exportProjectAPI(activeProject.id);
+      const result = await exportProjectAPI(activeProject.id, { exportMarkdown });
       if (result.success) {
         showToast(result.message || t("exportSite.toasts.exportSuccess"), "success");
         setLastExport(result.exportRecord);
@@ -59,6 +60,18 @@ export default function ExportCreator({ activeProject, lastExport, setLastExport
       >
         {isExporting ? t("exportSite.creator.exporting") : t("exportSite.creator.exportButton")}
       </Button>
+
+      <label className="flex items-center gap-2 mt-3 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={exportMarkdown}
+          onChange={(e) => setExportMarkdown(e.target.checked)}
+          className="w-4 h-4 text-pink-600 rounded border-slate-300 focus:ring-pink-500"
+        />
+        <span className="text-sm text-slate-600">
+          {t("exportSite.creator.exportMarkdown", "Also export pages as Markdown (.md)")}
+        </span>
+      </label>
 
       {lastExport && (
         <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-sm">

@@ -20,10 +20,12 @@ import { API_URL } from "../config";
  * Trigger the export process for a project.
  * Generates static HTML/CSS/JS files from the project.
  * @param {string} projectId - The ID of the project to export
+ * @param {Object} [options] - Export options
+ * @param {boolean} [options.exportMarkdown=false] - Also export pages as markdown
  * @returns {Promise<ExportResult>} Export result with output directory and version
  * @throws {Error} If projectId is missing or export fails
  */
-export async function exportProjectAPI(projectId) {
+export async function exportProjectAPI(projectId, options = {}) {
   if (!projectId) {
     throw new Error("Project ID is required to export.");
   }
@@ -32,8 +34,10 @@ export async function exportProjectAPI(projectId) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // Add any other necessary headers like authorization if needed
     },
+    body: JSON.stringify({
+      exportMarkdown: options.exportMarkdown || false,
+    }),
   });
 
   const result = await response.json();
@@ -44,7 +48,7 @@ export async function exportProjectAPI(projectId) {
     throw new Error(errorMessage);
   }
 
-  return result; // Should contain { success: true, message: "...", outputDir: "...", version: N }
+  return result;
 }
 
 /**

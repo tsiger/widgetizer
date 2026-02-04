@@ -7,6 +7,7 @@ import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
 import { readProjectsFile } from "./projectController.js";
 import { formatHtml, formatXml, validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
+import TurndownService from "turndown";
 
 const PACKAGE_JSON_PATH = path.join(process.cwd(), "package.json");
 let cachedAppVersion = null;
@@ -175,6 +176,7 @@ export async function cleanupProjectExports(projectId) {
  */
 export async function exportProject(req, res) {
   const { projectId } = req.params;
+  const { exportMarkdown = false } = req.body || {};
 
   try {
     if (!projectId) {
@@ -405,6 +407,44 @@ Per aspera ad astra
 
       // Write the processed (and potentially formatted) HTML file
       await fs.outputFile(outputFilePath, processedHtml);
+
+      // Generate markdown version (content only, no layout) - if enabled
+      if (exportMarkdown) {
+        try {
+          const turndown = new TurndownService({
+            headingStyle: "atx",
+            codeBlockStyle: "fenced",
+            bulletListMarker: "-",
+          });
+          // Remove non-content elements (they don't make sense in markdown)
+          turndown.remove(["style", "script", "noscript", "form", "input", "button", "select", "textarea"]);
+          // Strip style/script/form tags and placeholder images from HTML
+          const cleanHtml = pageWidgetsHtml
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+            .replace(/<form[^>]*>[\s\S]*?<\/form>/gi, "")
+            .replace(/<img[^>]*src=["'][^"']*placeholder[^"']*["'][^>]*>/gi, "");
+          const markdownContent = turndown.turndown(cleanHtml);
+          const mdFilename = pageData.id === "index" || pageData.id === "home" ? "index.md" : `${pageData.id}.md`;
+
+          // Add YAML frontmatter
+          const frontmatter = [
+            "---",
+            `title: ${pageData.name || pageData.id}`,
+            `description: ${pageData.seo?.description || pageData.description || ""}`,
+            "source_url:",
+            `  html: '${outputFilename}'`,
+            `  md: '${mdFilename}'`,
+            "---",
+            "",
+            "",
+          ].join("\n");
+
+          await fs.outputFile(path.join(outputDir, mdFilename), frontmatter + markdownContent);
+        } catch (mdError) {
+          console.warn(`Could not generate markdown for ${pageData.id}: ${mdError.message}`);
+        }
+      }
     }
 
     // Generate validation issues report if any (only when developer mode is enabled)
