@@ -253,9 +253,9 @@
       <div class="image-hotspots-wrapper reveal reveal-fade">
         <!-- Main Image -->
         {% if widget.settings.image != blank %}
-          {{ widget.settings.image | image: 'large', 'image-hotspots-image', false }}
+          {% image src: widget.settings.image, size: 'large', class: 'image-hotspots-image', loading: 'eager' %}
         {% else %}
-          {% placeholder_image 'landscape', { "class": "image-hotspots-image" } %}
+          {% placeholder_image aspect: 'landscape', class: 'image-hotspots-image' %}
         {% endif %}
 
         <!-- Hotspots -->

@@ -22,10 +22,11 @@ import { PlaceholderImageTag } from "../../src/core/tags/placeholderImageTag.js"
 import { CustomCssTag } from "../../src/core/tags/customCssTag.js";
 import { CustomHeadScriptsTag } from "../../src/core/tags/customHeadScriptsTag.js";
 import { CustomFooterScriptsTag } from "../../src/core/tags/customFooterScriptsTag.js";
-import { registerImageFilter } from "../../src/core/filters/imageFilter.js";
-import { registerVideoFilter } from "../../src/core/filters/videoFilter.js";
-import { registerAudioFilter } from "../../src/core/filters/audioFilter.js";
-import { registerYouTubeFilter } from "../../src/core/filters/youtubeFilter.js";
+import { ImageTag } from "../../src/core/tags/imageTag.js";
+import { VideoTag } from "../../src/core/tags/videoTag.js";
+import { AudioTag } from "../../src/core/tags/audioTag.js";
+import { YouTubeTag } from "../../src/core/tags/youtubeTag.js";
+import { EnqueuePreloadTag } from "../../src/core/tags/enqueuePreload.js";
 import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
@@ -76,12 +77,13 @@ function configureLiquidEngine(engine) {
   engine.registerTag("custom_css", CustomCssTag);
   engine.registerTag("custom_head_scripts", CustomHeadScriptsTag);
   engine.registerTag("custom_footer_scripts", CustomFooterScriptsTag);
+  engine.registerTag("image", ImageTag);
+  engine.registerTag("video", VideoTag);
+  engine.registerTag("audio", AudioTag);
+  engine.registerTag("youtube", YouTubeTag);
+  engine.registerTag("enqueue_preload", EnqueuePreloadTag);
 
   // Register custom filters
-  registerImageFilter(engine);
-  registerVideoFilter(engine);
-  registerAudioFilter(engine);
-  registerYouTubeFilter(engine);
   registerMediaMetaFilter(engine);
 }
 

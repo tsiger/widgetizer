@@ -88,7 +88,7 @@ Arch includes a reveal system controlled by `theme.layout.enable_reveal_animatio
   <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
 {% endunless %}
 {% if theme.layout.enable_reveal_animations %}
-  {% enqueue_script "reveal.js", { "priority": 50 } %}
+  {% enqueue_script src: "reveal.js", priority: 50 %}
 {% endif %}
 ```
 

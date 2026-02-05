@@ -235,9 +235,9 @@
             data-caption="{{ block.settings.caption }}"
           >
             {% if block.settings.image != blank %}
-              {{ block.settings.image | image: 'medium', 'widget-card-image' }}
+              {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
             {% else %}
-              {% placeholder_image 'landscape', { "class": "widget-card-image" } %}
+              {% placeholder_image aspect: 'landscape', class: 'widget-card-image' %}
             {% endif %}
             {% if block.settings.caption != blank %}
               <div class="gallery-overlay">

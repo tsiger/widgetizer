@@ -117,9 +117,9 @@
           {% assign block = widget.blocks[blockId] %}
           <li class="widget-card reveal reveal-scale" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             {% if block.settings.image != blank %}
-              {{ block.settings.image | image: 'large', 'project-image' }}
+              {% image src: block.settings.image, size: 'large', class: 'project-image' %}
             {% else %}
-              {% placeholder_image 'landscape', { "class": "project-image" } %}
+              {% placeholder_image aspect: 'landscape', class: 'project-image' %}
             {% endif %}
             <div class="project-overlay">
               <div class="project-content">

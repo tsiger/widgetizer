@@ -231,7 +231,7 @@
       <div class="comparison-slider-wrapper reveal reveal-fade">
         <!-- Before Image -->
         {% if widget.settings.before_image != blank %}
-          {{ widget.settings.before_image | image: 'large', 'comparison-slider-image comparison-slider-before', false }}
+          {% image src: widget.settings.before_image, size: 'large', class: 'comparison-slider-image comparison-slider-before', loading: 'eager' %}
         {% else %}
           <div
             class="comparison-slider-image comparison-slider-before"
@@ -241,7 +241,7 @@
 
         <!-- After Image -->
         {% if widget.settings.after_image != blank %}
-          {{ widget.settings.after_image | image: 'large', 'comparison-slider-image comparison-slider-after', false }}
+          {% image src: widget.settings.after_image, size: 'large', class: 'comparison-slider-image comparison-slider-after', loading: 'eager' %}
         {% else %}
           <div
             class="comparison-slider-image comparison-slider-after"

@@ -14,7 +14,7 @@ The layout and templates system defines how pages are assembled. `layout.liquid`
 
 - `{% seo %}` and `{% fonts %}` for meta and fonts
 - `{% theme_settings %}` to output CSS variables
-- `{% asset "base.css" %}` and `{% asset "scripts.js" %}` for theme assets
+- `{% asset src: "base.css" %}` and `{% asset src: "scripts.js" %}` for theme assets
 - `{% header_assets %}` and `{% footer_assets %}` for enqueued assets
 - `{{ header }}`, `{{ main_content }}`, and `{{ footer }}`
 - Optional `{% custom_css %}`, `{% custom_head_scripts %}`, `{% custom_footer_scripts %}`
@@ -33,7 +33,7 @@ Your layout must include:
 
 `{{ body_class }}` provides contextual classes (page type, template, settings) and should be applied to `<body>`.
 
-# Page Templates (templates/*.json)
+# Page Templates (templates/\*.json)
 
 Page templates define a page's widget instances, their settings, and block content. Each file represents a template you can assign to pages. See [Widgets & Blocks](theme-dev-widgets-blocks.html) for widget schema and block patterns.
 
@@ -66,7 +66,7 @@ Blocks live inside a widget definition:
 - `blocks`: object keyed by block ID
 - `blocksOrder`: array of block IDs in order
 
-# Global Templates (templates/global/*.json)
+# Global Templates (templates/global/\*.json)
 
 Global templates define default instances of global widgets like header and footer.
 

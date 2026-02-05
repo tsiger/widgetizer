@@ -126,9 +126,9 @@
           {% assign block = widget.blocks[blockId] %}
           <li class="profile-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             {% if block.settings.photo != blank and block.settings.photo != 'placeholder' %}
-              {{ block.settings.photo | image: 'medium', 'profile-image' }}
+              {% image src: block.settings.photo, size: 'medium', class: 'profile-image' %}
             {% else %}
-              <div class="profile-image-placeholder block-text block-text-4xl block-text-muted" style="background-image: url({% placeholder_image 'square', 'url' %}); background-size: cover; background-position: center;"></div>
+              <div class="profile-image-placeholder block-text block-text-4xl block-text-muted" style="background-image: url({% placeholder_image aspect: 'square', output: 'url' %}); background-size: cover; background-position: center;"></div>
             {% endif %}
 
             {% if block.settings.name != blank %}

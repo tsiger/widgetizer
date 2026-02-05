@@ -6,12 +6,11 @@ const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
 
 export const FontsTag = {
   // eslint-disable-next-line no-unused-vars
-  parse: function (tagToken, remainTokens) {
-    // No arguments expected
+  parse(tagToken) {
     this.tagName = tagToken.name;
   },
-  // eslint-disable-next-line no-unused-vars
-  render: function (context, hash) {
+
+  *render(context) {
     const rawSettings = context.globals?.themeSettingsRaw;
 
     if (!rawSettings || !rawSettings.settings || !rawSettings.settings.global) {
@@ -82,7 +81,7 @@ export const FontsTag = {
     // Check if user enabled privacy-friendly font CDN (Bunny Fonts)
     const privacySettings = rawSettings?.settings?.global?.privacy;
     const useBunnyFonts = Array.isArray(privacySettings)
-      ? privacySettings.find(s => s.id === 'use_bunny_fonts')?.value || false
+      ? privacySettings.find((s) => s.id === "use_bunny_fonts")?.value || false
       : false;
 
     // Build output: preconnect links + stylesheet link

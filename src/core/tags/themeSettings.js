@@ -4,12 +4,11 @@ const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
 
 export const ThemeSettingsTag = {
   // eslint-disable-next-line no-unused-vars
-  parse: function (tagToken, remainTokens) {
-    // No arguments expected for this tag
+  parse(tagToken) {
     this.tagName = tagToken.name;
   },
-  // eslint-disable-next-line no-unused-vars
-  render: function (context, hash) {
+
+  *render(context) {
     // Check context.globals for raw settings
     const rawSettings = context.globals?.themeSettingsRaw;
 

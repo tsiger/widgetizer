@@ -22,13 +22,13 @@ Immediately outputs a CSS, JS, or image asset inline where it's placed.
 
 ```liquid
 {# In layout.liquid — loads from assets/ #}
-{% asset "base.css" %}        {# → assets/base.css #}
-{% asset "scripts.js" %}      {# → assets/scripts.js #}
-{% asset "logo.svg" %}        {# → assets/logo.svg #}
+{% asset src: "base.css" %}        {# → assets/base.css #}
+{% asset src: "scripts.js" %}      {# → assets/scripts.js #}
+{% asset src: "logo.svg" %}        {# → assets/logo.svg #}
 
 {# In widgets/slideshow/widget.liquid — loads from widgets/slideshow/ #}
-{% asset "slideshow.css" %}   {# → widgets/slideshow/slideshow.css #}
-{% asset "slideshow.js" %}    {# → widgets/slideshow/slideshow.js #}
+{% asset src: "slideshow.css" %}   {# → widgets/slideshow/slideshow.css #}
+{% asset src: "slideshow.js" %}    {# → widgets/slideshow/slideshow.js #}
 ```
 
 Output depends on file type:
@@ -40,10 +40,10 @@ Output depends on file type:
 **Options:**
 
 ```liquid
-{% asset "scripts.js", { "defer": true } %}
-{% asset "vendor.js", { "async": true } %}
-{% asset "print.css", { "media": "print" } %}
-{% asset "theme.css", { "id": "theme-stylesheet" } %}
+{% asset src: "scripts.js", defer: true %}
+{% asset src: "vendor.js", async: true %}
+{% asset src: "print.css", media: "print" %}
+{% asset src: "theme.css", id: "theme-stylesheet" %}
 ```
 
 | Option        | Type    | Description                      |
@@ -61,9 +61,9 @@ Registers a stylesheet for deferred output via `{% header_assets %}` or `{% foot
 
 ```liquid
 {# In widgets/slideshow/widget.liquid — loads from widgets/slideshow/ #}
-{% enqueue_style "slideshow.css" %}
-{% enqueue_style "slideshow.css", { "priority": 10 } %}
-{% enqueue_style "print.css", { "media": "print", "location": "footer" } %}
+{% enqueue_style src: "slideshow.css" %}
+{% enqueue_style src: "slideshow.css", priority: 10 %}
+{% enqueue_style src: "print.css", media: "print", location: "footer" %}
 ```
 
 | Option     | Default    | Description                                   |
@@ -79,9 +79,9 @@ Registers a script for deferred output.
 
 ```liquid
 {# In widgets/slideshow/widget.liquid — loads from widgets/slideshow/ #}
-{% enqueue_script "slideshow.js" %}
-{% enqueue_script "slideshow.js", { "priority": 10 } %}
-{% enqueue_script "analytics.js", { "location": "header", "defer": true } %}
+{% enqueue_script src: "slideshow.js" %}
+{% enqueue_script src: "slideshow.js", priority: 10 %}
+{% enqueue_script src: "analytics.js", location: "header", defer: true %}
 ```
 
 | Option     | Default    | Description                               |
@@ -91,6 +91,17 @@ Registers a script for deferred output.
 | `defer`    | `false`    | Add `defer` attribute                     |
 | `async`    | `false`    | Add `async` attribute                     |
 
+`{% enqueue_preload %}`
+
+Registers a resource preload directive for the `<head>`.
+
+```liquid
+{% enqueue_preload src: "hero.jpg", as: "image", fetchpriority: "high" %}
+{% enqueue_preload src: "font.woff2", as: "font", type: "font/woff2", crossorigin: true %}
+```
+
+**Options:** `src`, `as`, `type`, `fetchpriority`, `media`, `imagesrcset`, `imagesizes`, `crossorigin`.
+
 `{% header_assets %}` and `{% footer_assets %}`
 
 Output all enqueued assets for that location, sorted by priority. Styles render first, then scripts.
@@ -99,12 +110,12 @@ Output all enqueued assets for that location, sorted by priority. Styles render 
 <!DOCTYPE html>
 <html>
 <head>
-  {% asset "base.css" %}       {# Immediate output from assets/base.css #}
+  {% asset src: "base.css" %}       {# Immediate output from assets/base.css #}
   {% header_assets %}          {# Outputs all enqueued header styles/scripts #}
 </head>
 <body>
   {{ main_content }}
-  {% asset "scripts.js" %}     {# Immediate output from assets/scripts.js #}
+  {% asset src: "scripts.js" %}     {# Immediate output from assets/scripts.js #}
   {% footer_assets %}          {# Outputs all enqueued footer styles/scripts #}
 </body>
 </html>
@@ -120,19 +131,19 @@ Outputs a placeholder image for development/preview. Placeholders come from:
 ```liquid
 {# Core placeholders (built-in) #}
 {% placeholder_image %}                    {# Landscape 16:9 as <img> #}
-{% placeholder_image 'portrait' %}         {# Portrait 9:16 as <img> #}
-{% placeholder_image 'square' %}           {# Square 1:1 as <img> #}
+{% placeholder_image aspect: 'portrait' %}         {# Portrait 9:16 as <img> #}
+{% placeholder_image aspect: 'square' %}           {# Square 1:1 as <img> #}
 
 {# URL only (for CSS backgrounds) #}
-{% placeholder_image 'url' %}              {# Landscape URL #}
-{% placeholder_image 'square', 'url' %}    {# Square URL #}
+{% placeholder_image output: 'url' %}              {# Landscape URL #}
+{% placeholder_image aspect: 'square', output: 'url' %}    {# Square URL #}
 
 {# Custom placeholder from assets/ folder #}
-{% placeholder_image 'my-placeholder.svg' %}
-{% placeholder_image 'my-placeholder.jpg', 'url' %}
+{% placeholder_image src: 'my-placeholder.svg' %}
+{% placeholder_image src: 'my-placeholder.jpg', output: 'url' %}
 
 {# With options #}
-{% placeholder_image 'landscape', { "class": "hero-placeholder", "loading": "lazy" } %}
+{% placeholder_image aspect: 'landscape', class: "hero-placeholder", loading: "lazy" %}
 ```
 
 **Aspect ratios:**
@@ -242,13 +253,14 @@ Renders an `<img>` tag or returns a path.
 
 ```liquid
 {# Full <img> tag #}
-{{ widget.settings.heroImage | image }}
-{{ widget.settings.heroImage | image: 'large' }}
-{{ widget.settings.heroImage | image: 'large', 'hero-image', false, 'Alt text' }}
+{# Full <img> tag #}
+{% image src: widget.settings.heroImage %}
+{% image src: widget.settings.heroImage, size: 'large' %}
+{% image src: widget.settings.heroImage, size: 'large', class: 'hero-image', lazy: false, alt: 'Alt text' %}
 
 {# Path only (for CSS backgrounds) #}
-{{ widget.settings.heroImage | image: 'path' }}
-{{ widget.settings.heroImage | image: 'path', 'large' }}
+{% image src: widget.settings.heroImage, output: 'path' %}
+{% image src: widget.settings.heroImage, size: 'large', output: 'path' %}
 ```
 
 **Parameters (for `<img>` output):**
@@ -274,11 +286,12 @@ Renders a `<video>` tag or returns a path.
 
 ```liquid
 {# Full <video> tag #}
-{{ widget.settings.bgVideo | video }}
-{{ widget.settings.bgVideo | video: true, true, true, true, 'bg-video' }}
+{# Full <video> tag #}
+{% video src: widget.settings.bgVideo %}
+{% video src: widget.settings.bgVideo, controls: true, autoplay: true, muted: true, loop: true, class: 'bg-video' %}
 
 {# Path only #}
-{{ widget.settings.bgVideo | video: 'path' }}
+{% video src: widget.settings.bgVideo, output: 'path' %}
 ```
 
 **Parameters (for `<video>` output):**
@@ -296,11 +309,11 @@ Renders a `<video>` tag or returns a path.
 Returns an audio file path (no HTML element).
 
 ```liquid
-{{ widget.settings.backgroundMusic | audio }}
+{% audio src: widget.settings.backgroundMusic %}
 
 {# Use with HTML5 audio #}
 <audio controls>
-  <source src="{{ widget.settings.music | audio }}" type="audio/mpeg">
+  <source src="{% audio src: widget.settings.music %}" type="audio/mpeg">
 </audio>
 ```
 
@@ -310,11 +323,12 @@ Renders a responsive YouTube embed or returns the embed URL.
 
 ```liquid
 {# Full embed #}
-{{ widget.settings.video | youtube }}
-{{ widget.settings.video | youtube: 'hero-video' }}
+{# Full embed #}
+{% youtube src: widget.settings.video %}
+{% youtube src: widget.settings.video, class: 'hero-video' %}
 
 {# Embed URL only #}
-{{ widget.settings.video | youtube: 'path' }}
+{% youtube src: widget.settings.video, output: 'path' %}
 ```
 
 # Export Behavior

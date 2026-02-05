@@ -228,7 +228,7 @@ Loop through `widget.blocksOrder` and look up each block in `widget.blocks`:
             <p class="quote-text" data-setting="text">{{ block.settings.text }}</p>
             <footer class="quote-attribution">
               {% if block.settings.avatar != blank %}
-                <img src="{{ block.settings.avatar | image: 'path', 'thumbnail' }}" alt="{{ block.settings.author }}" class="quote-avatar">
+                <img src="{% image src: block.settings.avatar, size: 'thumbnail', output: 'path' %}" alt="{{ block.settings.author }}" class="quote-avatar">
               {% endif %}
               <cite>
                 <span class="quote-author" data-setting="author">{{ block.settings.author }}</span>
@@ -318,23 +318,17 @@ Widgets can support multiple block types. For example, a banner might have headi
     {
       "type": "heading",
       "displayName": "Heading",
-      "settings": [
-        { "type": "text", "id": "text", "label": "Text", "default": "Welcome" }
-      ]
+      "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Welcome" }]
     },
     {
       "type": "text",
       "displayName": "Text",
-      "settings": [
-        { "type": "textarea", "id": "text", "label": "Text", "default": "Description here" }
-      ]
+      "settings": [{ "type": "textarea", "id": "text", "label": "Text", "default": "Description here" }]
     },
     {
       "type": "button",
       "displayName": "Button",
-      "settings": [
-        { "type": "link", "id": "link", "label": "Link" }
-      ]
+      "settings": [{ "type": "link", "id": "link", "label": "Link" }]
     }
   ]
 }

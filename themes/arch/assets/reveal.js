@@ -9,6 +9,7 @@
  * - Respects prefers-reduced-motion
  * - Configurable threshold (15% visibility triggers animation)
  * - Stagger support via --reveal-delay CSS variable
+ * - Optimized MutationObserver (scoped, debounced, early exit)
  */
 (function () {
   // Respect reduced motion preference
@@ -18,6 +19,15 @@
       el.classList.add("revealed");
     });
     return;
+  }
+
+  // Debounce utility
+  function debounce(fn, delay) {
+    var timer = null;
+    return function () {
+      clearTimeout(timer);
+      timer = setTimeout(fn, delay);
+    };
   }
 
   // Configuration
@@ -38,7 +48,7 @@
     {
       threshold: threshold,
       rootMargin: "0px 0px -50px 0px", // Trigger slightly before element is fully in view
-    }
+    },
   );
 
   // Observe all elements with the reveal class
@@ -48,32 +58,53 @@
     });
   }
 
-  // Initial observation
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", observeRevealElements);
-  } else {
-    observeRevealElements();
+  // Debounced version for MutationObserver calls
+  var debouncedObserve = debounce(observeRevealElements, 50);
+
+  // Check if a node or its descendants contain .reveal elements
+  function hasRevealElements(node) {
+    if (node.nodeType !== 1) return false;
+    if (node.classList && node.classList.contains("reveal")) return true;
+    if (node.querySelector && node.querySelector(".reveal")) return true;
+    return false;
   }
 
-  // Re-observe when new content is added (for dynamic content)
-  // This is useful if widgets are loaded asynchronously
-  var mutationObserver = new MutationObserver(function (mutations) {
-    var hasNewRevealElements = mutations.some(function (mutation) {
-      return Array.from(mutation.addedNodes).some(function (node) {
-        return (
-          node.nodeType === 1 &&
-          (node.classList.contains("reveal") || node.querySelector(".reveal"))
-        );
+  // Set up MutationObserver for dynamic content
+  function initMutationObserver() {
+    // Scope to main content area if available, fallback to body
+    var targetNode = document.getElementById("main-content") || document.querySelector("main") || document.body;
+
+    var mutationObserver = new MutationObserver(function (mutations) {
+      // Early exit: check if any nodes were added
+      var hasAddedNodes = mutations.some(function (m) {
+        return m.addedNodes.length > 0;
       });
+      if (!hasAddedNodes) return;
+
+      // Check if any added nodes contain .reveal elements
+      var hasNewRevealElements = mutations.some(function (m) {
+        return Array.prototype.some.call(m.addedNodes, hasRevealElements);
+      });
+      if (!hasNewRevealElements) return;
+
+      // Debounced call to avoid multiple triggers per batch
+      debouncedObserve();
     });
 
-    if (hasNewRevealElements) {
-      observeRevealElements();
-    }
-  });
+    mutationObserver.observe(targetNode, {
+      childList: true,
+      subtree: true,
+    });
+  }
 
-  mutationObserver.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+  // Initial observation
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      observeRevealElements();
+      initMutationObserver();
+    });
+  } else {
+    observeRevealElements();
+    initMutationObserver();
+  }
 })();

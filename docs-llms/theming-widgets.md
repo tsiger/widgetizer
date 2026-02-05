@@ -711,8 +711,8 @@ widgets/
 Enqueue them in your widget template:
 
 ```liquid
-{% enqueue_style "slideshow.css", { "priority": 30 } %}
-{% enqueue_script "slideshow.js", { "priority": 30 } %}
+{% enqueue_style src: "slideshow.css", priority: 30 %}
+{% enqueue_script src: "slideshow.js", priority: 30 %}
 ```
 
 These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority.
@@ -724,7 +724,7 @@ These will be automatically rendered by `{% header_assets %}` (for styles) and `
 
 **Deduplication:**
 
-Multiple widgets can safely enqueue the same asset file. The enqueue system uses the filename as a unique key, so if two widgets both call `{% enqueue_script "shared-lib.js" %}`, the script is only output once. This is useful when multiple widgets share a common library.
+Multiple widgets can safely enqueue the same asset file. The enqueue system uses the filename as a unique key, so if two widgets both call `{% enqueue_script src: "shared-lib.js" %}`, the script is only output once. This is useful when multiple widgets share a common library.
 
 > [!IMPORTANT] **Asset Filename Collisions**
 >
@@ -857,7 +857,7 @@ Each increment adds 0.1s delay. So `--reveal-delay: 0` has no delay, `--reveal-d
   {% for blockId in widget.blocksOrder %}
     {% assign block = widget.blocks[blockId] %}
     <div class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
-      {{ block.settings.image | image: 'medium', 'widget-card-image' }}
+      {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
       <h3 class="widget-card-title">{{ block.settings.title }}</h3>
       <p class="widget-card-description">{{ block.settings.description }}</p>
     </div>
@@ -1421,10 +1421,10 @@ Example implementation:
 
 ```liquid
 <!-- Render image tag -->
-{{ block.settings.image | image: 'medium', 'widget-card-image' }}
+{% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
 
 <!-- Get image path only (for CSS backgrounds) -->
-{{ block.settings.image | image: 'path', 'large' }}
+{% image src: block.settings.image, size: 'large', output: 'path' %}
 ```
 
 **Image sizes**: `thumb`, `small`, `medium`, `large`
@@ -1433,20 +1433,20 @@ Example implementation:
 
 ```liquid
 <!-- Render video tag -->
-{{ block.settings.video | video: true, false, false, false, 'widget-video' }}
+{% video src: block.settings.video, controls: true, class: 'widget-video' %}
 
 <!-- Get video path only -->
-{{ block.settings.video | video: 'path' }}
+{% video src: block.settings.video, output: 'path' %}
 ```
 
 ### YouTube
 
 ```liquid
 <!-- Render responsive YouTube embed -->
-{{ block.settings.youtube_video | youtube: 'widget-youtube-embed' }}
+{% youtube src: block.settings.youtube_video, class: 'widget-youtube-embed' %}
 
 <!-- Get embed URL only -->
-{{ block.settings.youtube_video | youtube: 'path' }}
+{% youtube src: block.settings.youtube_video, output: 'path' %}
 ```
 
 ### Links
@@ -1481,7 +1481,7 @@ Match `data-setting` value to setting `id` in schema.
 ### Placeholder Images
 
 ```liquid
-{% placeholder_image 'landscape', { "class": "widget-card-image" } %}
+{% placeholder_image aspect: 'landscape', class: 'widget-card-image' %}
 ```
 
 **Aspect ratios**: `square`, `portrait`, `landscape`

@@ -2,12 +2,11 @@
 
 export const SeoTag = {
   // eslint-disable-next-line no-unused-vars
-  parse: function (tagToken, remainTokens) {
-    // No arguments expected
+  parse(tagToken) {
     this.tagName = tagToken.name;
   },
-  // eslint-disable-next-line no-unused-vars
-  render: function (context, hash) {
+
+  *render(context) {
     try {
       const allVars = context.getAll();
       const page = allVars.page;

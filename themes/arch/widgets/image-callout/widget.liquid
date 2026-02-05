@@ -110,9 +110,9 @@
     <div class="callout-wrapper">
       <div class="callout-image-wrapper reveal reveal-fade">
         {% if widget.settings.image != blank %}
-          {{ widget.settings.image | image: 'large', 'callout-image' }}
+          {% image src: widget.settings.image, size: 'large', class: 'callout-image' %}
         {% else %}
-          <div class="callout-image" style="background-image: url({% placeholder_image 'url' %}); background-size: cover; background-position: center;"></div>
+          <div class="callout-image" style="background-image: url({% placeholder_image output: 'url' %}); background-size: cover; background-position: center;"></div>
         {% endif %}
       </div>
 

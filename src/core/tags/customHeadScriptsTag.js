@@ -11,11 +11,11 @@
  * Users can paste complete script tags (e.g., Google Analytics).
  */
 export const CustomHeadScriptsTag = {
-  parse() {
-    // No arguments expected for this tag
+  parse(tagToken) {
+    this.tagName = tagToken.name;
   },
 
-  render(context) {
+  *render(context) {
     try {
       const rawSettings = context.globals?.themeSettingsRaw;
 

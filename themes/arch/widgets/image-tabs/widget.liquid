@@ -160,9 +160,9 @@
               {% unless blockId == first_block_id %}hidden{% endunless %}
             >
               {% if block.settings.image != blank %}
-                {{ block.settings.image | image: 'large', 'image-tabs-image' }}
+                {% image src: block.settings.image, size: 'large', class: 'image-tabs-image' %}
               {% else %}
-                {% placeholder_image 'landscape', { "class": "image-tabs-image" } %}
+                {% placeholder_image aspect: 'landscape', class: 'image-tabs-image' %}
               {% endif %}
             </div>
           {% endfor %}

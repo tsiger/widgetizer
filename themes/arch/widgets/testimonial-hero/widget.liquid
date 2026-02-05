@@ -84,7 +84,7 @@
           <div class="testimonial-content-top">
             {% if widget.settings.logo != blank %}
               <div class="testimonial-logo-wrapper reveal reveal-fade">
-                {{ widget.settings.logo | image: 'medium', 'testimonial-logo', false }}
+                {% image src: widget.settings.logo, size: 'medium', class: 'testimonial-logo', loading: 'eager' %}
               </div>
             {% endif %}
           </div>
@@ -119,11 +119,11 @@
 
         {% if widget.settings.author_image != blank %}
           <div class="testimonial-image-wrapper reveal reveal-fade">
-            {{ widget.settings.author_image | image: 'large', 'testimonial-author-image', false }}
+            {% image src: widget.settings.author_image, size: 'large', class: 'testimonial-author-image', loading: 'eager' %}
           </div>
         {% else %}
           <div class="testimonial-image-wrapper reveal reveal-fade">
-            {% placeholder_image %}
+            {% placeholder_image aspect: 'landscape', class: 'testimonial-author-image' %}
           </div>
         {% endif %}
       </div>

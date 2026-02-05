@@ -93,14 +93,13 @@
     <div class="split-hero-wrapper">
     <!-- Background Image Section (50%) -->
     {% if widget.settings.image != blank %}
-      {% assign image_path = widget.settings.image | image: 'path', 'large' %}
-      <div class="split-hero-image reveal reveal-fade" style="background-image: url('{{ image_path }}');">
+      <div class="split-hero-image reveal reveal-fade" style="background-image: url('{% image src: widget.settings.image, size: 'large', output: 'url' %}');">
         {% if widget.settings.overlay_color != blank %}
           <div class="split-hero-overlay" style="background-color: {{ widget.settings.overlay_color }};"></div>
         {% endif %}
       </div>
     {% else %}
-      <div class="split-hero-image reveal reveal-fade" style="background-image: url({% placeholder_image 'landscape', 'url' %});">
+      <div class="split-hero-image reveal reveal-fade" style="background-image: url({% placeholder_image aspect: 'landscape', output: 'url' %});">
         {% if widget.settings.overlay_color != blank %}
           <div class="split-hero-overlay" style="background-color: {{ widget.settings.overlay_color }};"></div>
         {% endif %}

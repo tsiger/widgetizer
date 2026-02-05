@@ -376,9 +376,9 @@
           <!-- Artwork -->
           <div class="audio-player-artwork" id="artwork-{{ widget.id }}">
             {% if first_block.settings.artwork != blank %}
-              {{ first_block.settings.artwork | image: 'medium', 'audio-player-artwork-image', false }}
+              {% image src: first_block.settings.artwork, size: 'medium', class: 'audio-player-artwork-image', loading: 'eager' %}
             {% else %}
-              {% placeholder_image 'square', { "class": "audio-player-artwork-image" } %}
+              {% placeholder_image aspect: 'square', class: 'audio-player-artwork-image' %}
             {% endif %}
           </div>
 
@@ -526,7 +526,7 @@
               data-duration="{{ block.settings.duration | escape }}"
               data-date="{{ block.settings.date | escape }}"
               data-description="{{ block.settings.description | escape }}"
-              data-audio-src="{{ block.settings.audio_file | audio: 'path' }}"
+              data-audio-src="{% audio src: block.settings.audio_file, output: 'url' %}"
             >
               <div class="playlist-index">{{ forloop.index }}</div>
               <div class="playlist-info">
@@ -538,9 +538,9 @@
               <!-- Hidden artwork for JS -->
               <template class="hidden-artwork">
                 {% if block.settings.artwork != blank %}
-                  {{ block.settings.artwork | image: 'medium', 'audio-player-artwork-image', false }}
+                  {% image src: block.settings.artwork, size: 'medium', class: 'audio-player-artwork-image', loading: 'eager' %}
                 {% else %}
-                  {% placeholder_image 'square', { "class": "audio-player-artwork-image" } %}
+                  {% placeholder_image aspect: 'square', class: 'audio-player-artwork-image' %}
                 {% endif %}
               </template>
             </button>
@@ -553,7 +553,7 @@
 
   <!-- Audio Element -->
   {% if first_block.settings.audio_file != blank %}
-  <audio class="audio-player-audio" preload="metadata" src="{{ first_block.settings.audio_file | audio: 'path' }}">
+  <audio class="audio-player-audio" preload="metadata" src="{% audio src: first_block.settings.audio_file, output: 'url' %}">
     Your browser does not support the audio element.
   </audio>
   {% else %}

@@ -13,7 +13,7 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
 - **Videos**: `/data/projects/<folderName>/uploads/videos/`
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
 - **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original with prefixes (e.g., `thumb_`, `small_`, `medium_`, `large_`).
-- **Smart Size Generation**: The system only creates image sizes that are meaningfully smaller than the original. If an image is 800px wide and the "large" size is configured for 1920px, no "large" size will be generated since it would be identical to a smaller size. The image filter automatically falls back to the best available size or original image.
+- **Smart Size Generation**: The system only creates image sizes that are meaningfully smaller than the original. If an image is 800px wide and the "large" size is configured for 1920px, no "large" size will be generated since it would be identical to a smaller size. The image tag automatically falls back to the best available size or original image.
 - **Video Processing**: Videos are stored without any processing - no thumbnail generation or metadata extraction. This keeps the upload process simple and fast.
 
 ### Image Processing Configuration
@@ -36,12 +36,14 @@ The system's image processing behavior is controlled through **App Settings**, m
 Themes can override the app-level image size configuration by defining `imageSizes` in their `theme.json`. This is useful when a theme requires specific image dimensions (e.g., a `hero` size at 1600px for hero banners).
 
 **How it works:**
+
 - When a theme defines `settings.imageSizes` in `theme.json`, those sizes **replace** the app settings entirely for that project
 - The `thumb` size is **always generated** regardless of theme configuration (required for the media library UI)
 - Each size can specify its own `quality` value, falling back to the app's global quality setting
 - Sizes can be disabled by setting `enabled: false`
 
 **Example theme.json configuration:**
+
 ```json
 {
   "settings": {
@@ -56,6 +58,7 @@ Themes can override the app-level image size configuration by defining `imageSiz
 ```
 
 **App Settings UI behavior:**
+
 - When the active project's theme defines `imageSizes`, the Image Sizes controls in App Settings are hidden
 - A notice is displayed explaining that image sizes are managed by the theme
 - Other media settings (file size limits, image quality) remain visible and editable

@@ -1,7 +1,7 @@
-{% enqueue_style "slideshow.css", { "priority": 30 } %}
+{% enqueue_style src: "slideshow.css", priority: 30 %}
 {% assign slide_count = widget.blocksOrder.size %}
 {% if slide_count > 1 %}
-  {% enqueue_script "slideshow.js", { "priority": 30 } %}
+  {% enqueue_script src: "slideshow.js", priority: 30, defer: true %}
 {% endif %}
 
 <section
@@ -17,10 +17,17 @@
     {% for blockId in widget.blocksOrder %}
       {% assign block = widget.blocks[blockId] %}
       {% assign isFirst = forloop.first %}
+      
+      {% comment %} Preload LCP image for the first slide of the first widget {% endcomment %}
+      {% if widget.index == 1 and isFirst and block.settings.image != blank %}
+        {% capture lcp_image_url %}{% image src: block.settings.image, size: 'large', output: 'path' %}{% endcapture %}
+        {% enqueue_preload src: lcp_image_url, as: "image", fetchpriority: "high" %}
+      {% endif %}
+
       <div
         class="slideshow-slide widget {% if widget.settings.height == 'small' %}widget-height-half{% elsif widget.settings.height == 'medium' %}widget-height-two-thirds{% elsif widget.settings.height == 'large' %}widget-height-full{% endif %} {% if block.settings.image != blank %}has-bg-image has-overlay{% endif %} color-scheme-{{ block.settings.color_scheme }}{% if isFirst %} is-active{% endif %}"
         {% if block.settings.image != blank %}
-          style="background-image: url('{{ block.settings.image | image: 'path', 'large' }}'); --widget-overlay-color: {{ block.settings.overlay_color | default: '#0a1e38bf' }}; --widget-overlay-opacity: 1;"
+          style="background-image: url('{% image src: block.settings.image, size: 'large', output: 'url' %}'); --widget-overlay-color: {{ block.settings.overlay_color | default: '#0a1e38bf' }}; --widget-overlay-opacity: 1;"
         {% elsif block.settings.color_scheme == 'highlight' %}
           style="--widget-bg-color: var(--bg-primary);"
         {% endif %}

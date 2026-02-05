@@ -183,7 +183,7 @@
                 {% endif %}
                 <li class="widget-card" data-block-id="{{ blockId }}">
                   {% if block.settings.image != blank %}
-                    {{ block.settings.image | image: 'medium', 'widget-card-image' }}
+                    {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
                   {% endif %}
 
                   <div class="widget-card-content">
@@ -245,7 +245,7 @@
                 {% endif %}
                 <li class="widget-card" data-block-id="{{ blockId }}">
                   {% if block.settings.image != blank %}
-                    {{ block.settings.image | image: 'medium', 'widget-card-image' }}
+                    {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
                   {% endif %}
 
                   <div class="widget-card-content">
@@ -307,7 +307,7 @@
                 {% endif %}
                 <li class="widget-card" data-block-id="{{ blockId }}">
                   {% if block.settings.image != blank %}
-                    {{ block.settings.image | image: 'medium', 'widget-card-image' }}
+                    {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
                   {% endif %}
 
                   <div class="widget-card-content">

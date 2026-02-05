@@ -11,6 +11,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const widgetElement = document.querySelector('[data-widget-type="header"]');
   if (!widgetElement) return;
 
+  // Utility: Debounce function
+  const debounce = (fn, delay) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => fn.apply(this, args), delay);
+    };
+  };
+
   // Prevent duplicate initialization
   if (widgetElement.dataset.initialized === "true") return;
   widgetElement.dataset.initialized = "true";
@@ -239,18 +248,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Handle window resize
-  window.addEventListener("resize", () => {
-    if (window.innerWidth >= 990) {
-      // Reset mobile menu state on desktop
-      closeMobileMenu();
+  // Handle window resize (debounced)
+  window.addEventListener(
+    "resize",
+    debounce(() => {
+      if (window.innerWidth >= 990) {
+        // Reset mobile menu state on desktop
+        closeMobileMenu();
 
-      // Reset submenu states
-      submenuItems.forEach((item) => {
-        closeSubmenu(item);
-      });
-    }
-  });
+        // Reset submenu states
+        submenuItems.forEach((item) => {
+          closeSubmenu(item);
+        });
+      }
+    }, 150),
+  );
 
   // ============================================================================
   // Desktop Submenu Viewport Detection
@@ -319,15 +331,18 @@ document.addEventListener("DOMContentLoaded", () => {
     requestAnimationFrame(initializeSubmenuPositions);
   }
 
-  // Reset flipped submenus on resize; re-evaluated on next hover
-  window.addEventListener("resize", () => {
-    if (window.innerWidth < 990) return;
-    widgetElement
-      .querySelectorAll(".nav-submenu.submenu-flip")
-      .forEach((submenu) => submenu.classList.remove("submenu-flip"));
-    // Re-check positions after resize
-    requestAnimationFrame(initializeSubmenuPositions);
-  });
+  // Reset flipped submenus on resize; re-evaluated on next hover (debounced)
+  window.addEventListener(
+    "resize",
+    debounce(() => {
+      if (window.innerWidth < 990) return;
+      widgetElement
+        .querySelectorAll(".nav-submenu.submenu-flip")
+        .forEach((submenu) => submenu.classList.remove("submenu-flip"));
+      // Re-check positions after resize
+      requestAnimationFrame(initializeSubmenuPositions);
+    }, 150),
+  );
 
   // ============================================================================
   // Sticky Header Scroll Behavior

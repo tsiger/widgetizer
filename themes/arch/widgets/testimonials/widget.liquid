@@ -139,7 +139,7 @@
 
             <div class="testimonial-author{% if block.settings.avatar == blank %} testimonial-author-no-avatar{% endif %}">
               {% if block.settings.avatar != blank %}
-                {{ block.settings.avatar | image: 'small', 'testimonial-avatar' }}
+                {% image src: block.settings.avatar, size: 'small', class: 'testimonial-avatar' %}
               {% endif %}
 
               <div class="testimonial-info">

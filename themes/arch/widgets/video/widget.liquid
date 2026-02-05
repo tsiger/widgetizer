@@ -77,7 +77,7 @@
       {% if widget.settings.video != blank %}
         <div class="video-container reveal reveal-fade">
           <video
-            src="{{ widget.settings.video | video: 'path' }}"
+            src="{% video src: widget.settings.video, output: 'url' %}"
             title="{{ widget.settings.video | media_meta: 'title' }}"
             {% if widget.settings.controls %}controls{% endif %}
             {% if widget.settings.autoplay %}autoplay{% endif %}

@@ -8,11 +8,11 @@
  * {% header_assets %}
  */
 export const RenderHeaderAssetsTag = {
-  parse() {
-    // No arguments
+  parse(tagToken) {
+    this.tagName = tagToken.name;
   },
 
-  render(context) {
+  *render(context) {
     try {
       const styles = context.globals?.enqueuedStyles;
       const scripts = context.globals?.enqueuedScripts;
@@ -23,6 +23,30 @@ export const RenderHeaderAssetsTag = {
       const renderMode = globals.renderMode || "preview";
 
       let output = "";
+
+      // Render preloads first
+      const preloads = globals.enqueuedPreloads;
+      if (preloads && preloads.size > 0) {
+        preloads.forEach((options, src) => {
+          // Resolve URL based on type/location if needed, or assume src is absolute/relative
+          // For now, we'll treat it similar to assets but simpler since preloads can be anything
+          let assetUrl = src;
+
+          // Construct the link tag
+          const attrs = [`<link rel="preload" href="${assetUrl}"`];
+
+          if (options.as) attrs.push(`as="${options.as}"`);
+          if (options.type) attrs.push(`type="${options.type}"`);
+          if (options.fetchpriority) attrs.push(`fetchpriority="${options.fetchpriority}"`);
+          if (options.media) attrs.push(`media="${options.media}"`);
+          if (options.imagesrcset) attrs.push(`imagesrcset="${options.imagesrcset}"`);
+          if (options.imagesizes) attrs.push(`imagesizes="${options.imagesizes}"`);
+          if (options.crossorigin) attrs.push(`crossorigin`);
+
+          attrs.push(">");
+          output += attrs.join(" ") + "\n";
+        });
+      }
 
       // Collect header styles
       const headerStyles = [];

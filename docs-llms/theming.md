@@ -109,14 +109,16 @@ Themes can define custom image sizes that override the app-level settings. This 
 ```
 
 **Properties for each size:**
+
 - `width` (number): Maximum width in pixels
 - `enabled` (boolean): Whether to generate this size (default: `true`)
 - `quality` (number, optional): JPEG/WebP quality 1-100 (falls back to app setting)
 
 **Key behaviors:**
+
 - When defined, theme sizes **replace** app settings entirely (not merged)
 - The `thumb` size is **always generated** for the media library, even if not defined
-- Users can reference these sizes in templates via the `image` filter: `{{ image | image: 'hero' }}`
+- Users can reference these sizes in templates via the `image` tag: `{% image src: image, size: 'hero' %}`
 - The App Settings UI hides the Image Sizes controls when a theme defines them
 
 ### Global Settings Schema
@@ -270,7 +272,7 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 
     {% seo %}                    <!-- SEO meta tags -->
     {% fonts %}                  <!-- Font preconnect links and stylesheet (recommended) -->
-    {% asset "base.css" %}      <!-- Load theme CSS -->
+    {% asset src: "base.css" %}      <!-- Load theme CSS -->
     {% header_assets %}         <!-- Render enqueued header styles and scripts (sorted by priority) -->
     {% theme_settings %}        <!-- Output CSS variables from global settings -->
     {% custom_css %}            <!-- Custom CSS from theme settings (optional) -->
@@ -285,7 +287,7 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 
     {{ footer }}                <!-- Global footer widget -->
 
-    {% asset "scripts.js" %}
+    {% asset src: "scripts.js" %}
     {% footer_assets %}         <!-- Render enqueued footer styles and scripts (sorted by priority) -->
     {% custom_footer_scripts %} <!-- Custom scripts before closing body tag (optional) -->
 </body>
@@ -296,7 +298,7 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 
 - `{% seo %}`: Automatically generates SEO meta tags (title, description, Open Graph, etc.)
 - `{% fonts %}`: Outputs both font preconnect links and stylesheet in one tag. Automatically handles Google Fonts and Bunny Fonts based on theme settings.
-- `{% asset "filename" %}`: Loads and includes assets from the `/assets/` directory
+- `{% asset src: "filename" %}`: Loads and includes assets from the `/assets/` directory
 - `{% header_assets %}`: Renders all enqueued CSS and JS files marked for header, sorted by priority
 - `{% footer_assets %}`: Renders all enqueued CSS and JS files marked for footer, sorted by priority
 - `{% theme_settings %}`: Outputs CSS custom properties from global settings as `<style>` tags in the document head
@@ -381,13 +383,13 @@ The `image` filter is the recommended way to render images in your theme. It aut
 #### Basic Usage
 
 ```liquid
-{{ widget.settings.myImage | image }}
+{% image src: widget.settings.myImage %}
 ```
 
 #### Advanced Usage with Parameters
 
 ```liquid
-{{ widget.settings.myImage | image: 'large', 'hero-image', false, 'Custom alt text' }}
+{% image src: widget.settings.myImage, size: 'large', class: 'hero-image', lazy: false, alt: 'Custom alt text' %}
 ```
 
 #### Path-Only Mode (New)
@@ -396,18 +398,18 @@ For cases where you need just the image URL (e.g., CSS background images), use `
 
 ```liquid
 <!-- Get image path for CSS backgrounds -->
-{{ widget.settings.backgroundImage | image: 'path' }}
-{{ widget.settings.heroImage | image: 'path', 'large' }}
+{% image src: widget.settings.backgroundImage, size: 'medium', output: 'path' %}
+{% image src: widget.settings.heroImage, size: 'large', output: 'path' %}
 
 <!-- Use in inline CSS -->
-<div style="background-image: url('{{ widget.settings.bgImage | image: 'path', 'large' }}');">
+<div style="background-image: url('{% image src: widget.settings.bgImage, size: 'large', output: 'path' %}');">
   Content here
 </div>
 
 <!-- Use in CSS blocks -->
 <style>
   #{{ widget.id }} {
-    background-image: url('{{ widget.settings.backgroundImage | image: 'path' }}');
+    background-image: url('{% image src: widget.settings.backgroundImage, output: 'path' %}');
     background-size: cover;
     background-position: center;
   }
@@ -437,22 +439,22 @@ For cases where you need just the image URL (e.g., CSS background images), use `
 
 ```liquid
 <!-- Different sizes -->
-{{ widget.settings.heroImage | image: 'large' }}
-{{ widget.settings.thumbnail | image: 'thumb' }}
+{% image src: widget.settings.heroImage, size: 'large' %}
+{% image src: widget.settings.thumbnail, size: 'thumb' %}
 
 <!-- With CSS class -->
-{{ widget.settings.productImage | image: 'medium', 'product-photo' }}
+{% image src: widget.settings.productImage, size: 'medium', class: 'product-photo' %}
 
 <!-- Disable lazy loading -->
-{{ widget.settings.heroImage | image: 'large', 'hero-image', false }}
+{% image src: widget.settings.heroImage, size: 'large', class: 'hero-image', lazy: false %}
 
 <!-- Custom alt text -->
-{{ widget.settings.photo | image: 'medium', '', true, 'Custom description' }}
+{% image src: widget.settings.photo, size: 'medium', lazy: true, alt: 'Custom description' %}
 
 <!-- Path-only for CSS backgrounds -->
-{{ widget.settings.backgroundImage | image: 'path' }}
-{{ widget.settings.backgroundImage | image: 'path', 'large' }}
-{{ widget.settings.backgroundImage | image: 'url', 'medium' }}
+{% image src: widget.settings.backgroundImage, output: 'path' %}
+{% image src: widget.settings.backgroundImage, size: 'large', output: 'path' %}
+{% image src: widget.settings.backgroundImage, size: 'medium', output: 'url' %}
 ```
 
 ### Video Filter
@@ -462,13 +464,13 @@ The `video` filter renders HTML5 video elements with proper attributes and fallb
 #### Basic Usage
 
 ```liquid
-{{ widget.settings.heroVideo | video }}
+{% video src: widget.settings.heroVideo %}
 ```
 
 #### Advanced Usage with Parameters
 
 ```liquid
-{{ widget.settings.heroVideo | video: false, true, true, true, 'hero-video' }}
+{% video src: widget.settings.heroVideo, controls: false, autoplay: true, muted: true, loop: true, class: 'hero-video' %}
 ```
 
 #### Path-Only Mode
@@ -477,11 +479,11 @@ For cases where you need just the video URL (e.g., custom video players or JavaS
 
 ```liquid
 <!-- Get video path for custom player -->
-{{ widget.settings.backgroundVideo | video: 'path' }}
+{% video src: widget.settings.backgroundVideo, output: 'path' %}
 
 <!-- Use in JavaScript -->
 <script>
-  const videoSrc = '{{ widget.settings.heroVideo | video: "path" }}';
+  const videoSrc = '{% video src: widget.settings.heroVideo, output: "path" %}';
   // Use with custom video player
 </script>
 ```
@@ -508,17 +510,17 @@ For cases where you need just the video URL (e.g., custom video players or JavaS
 
 ```liquid
 <!-- Full video tag with controls -->
-{{ widget.settings.heroVideo | video }}
+{% video src: widget.settings.heroVideo %}
 
 <!-- Autoplay muted video -->
-{{ widget.settings.backgroundVideo | video: true, true, true }}
+{% video src: widget.settings.backgroundVideo, controls: true, autoplay: true, muted: true %}
 
 <!-- Custom CSS class -->
-{{ widget.settings.introVideo | video: true, false, false, false, 'intro-video' }}
+{% video src: widget.settings.introVideo, controls: true, autoplay: false, muted: false, loop: false, class: 'intro-video' %}
 
 <!-- Path-only for custom player -->
-{{ widget.settings.customVideo | video: 'path' }}
-{{ widget.settings.customVideo | video: 'url' }}
+{% video src: widget.settings.customVideo, output: 'path' %}
+{% video src: widget.settings.customVideo, output: 'url' %}
 ```
 
 ### Audio Filter
@@ -529,11 +531,11 @@ The `audio` filter returns the path to an audio file from the media library. Unl
 
 ```liquid
 <!-- Get audio path -->
-{{ widget.settings.backgroundMusic | audio }}
+{% audio src: widget.settings.backgroundMusic %}
 
 <!-- Use with HTML5 audio tag -->
 <audio controls>
-  <source src="{{ widget.settings.backgroundMusic | audio }}" type="audio/mpeg">
+  <source src="{% audio src: widget.settings.backgroundMusic %}" type="audio/mpeg">
 </audio>
 ```
 
@@ -542,9 +544,9 @@ The `audio` filter returns the path to an audio file from the media library. Unl
 The audio filter always returns just the path. You can explicitly use `'path'` or `'url'` for consistency with other filters:
 
 ```liquid
-{{ widget.settings.soundEffect | audio }}
-{{ widget.settings.soundEffect | audio: 'path' }}
-{{ widget.settings.soundEffect | audio: 'url' }}
+{% audio src: widget.settings.soundEffect %}
+{% audio src: widget.settings.soundEffect, output: 'path' %}
+{% audio src: widget.settings.soundEffect, output: 'url' %}
 ```
 
 All three forms return the same audio file path.
@@ -556,7 +558,7 @@ The `youtube` filter parses the data from a `youtube` setting type and renders a
 #### Basic Usage
 
 ```liquid
-{{ widget.settings.myYoutubeVideo | youtube }}
+{% youtube src: widget.settings.myYoutubeVideo %}
 ```
 
 #### Custom Class
@@ -564,7 +566,7 @@ The `youtube` filter parses the data from a `youtube` setting type and renders a
 You can provide a custom CSS class for the wrapper element:
 
 ```liquid
-{{ widget.settings.heroVideo | youtube: 'hero-youtube-wrapper' }}
+{% youtube src: widget.settings.heroVideo, class: 'hero-youtube-wrapper' %}
 ```
 
 #### Path-Only Mode
@@ -572,7 +574,7 @@ You can provide a custom CSS class for the wrapper element:
 If you need only the embed URL (e.g., for use in a custom `<iframe>` or JavaScript), use `'path'` or `'url'` as the first parameter:
 
 ```liquid
-{{ widget.settings.introVideo | youtube: 'path' }}
+{% youtube src: widget.settings.introVideo, output: 'path' %}
 ```
 
 #### Output Structure
@@ -603,8 +605,7 @@ These tags allow for efficient, deduplicated loading of assets (CSS and JS) in y
 - **Inside widget templates**: `enqueue_*` loads assets from the widget's folder (`widgets/{widget-name}/`)
 - **Inside `layout.liquid` or snippets**: `enqueue_*` loads assets from the theme `assets/` folder
 
-> [!IMPORTANT]
-> **Asset Filename Collisions During Export**
+> [!IMPORTANT] **Asset Filename Collisions During Export**
 >
 > During export, all widget CSS and JS files are flattened into a single `assets/` folder. If two different widgets have files with the same name (e.g., both have `styles.css`), **the last one copied will overwrite the first**. Use unique, widget-prefixed filenames (e.g., `slideshow.css`, `accordion.js`) to avoid collisions.
 
@@ -615,9 +616,9 @@ Registers a JavaScript file for loading. By default, scripts are output in the f
 **Usage:**
 
 ```liquid
-{% enqueue_script "filename.js" %}
-{% enqueue_script "vendor.js", { "defer": true, "async": false, "location": "footer", "priority": 30 } %}
-{% enqueue_script "analytics.js", { "location": "header", "priority": 10 } %}
+{% enqueue_script src: "filename.js" %}
+{% enqueue_script src: "vendor.js", defer: true, async: false, location: "footer", priority: 30 %}
+{% enqueue_script src: "analytics.js", location: "header", priority: 10 %}
 ```
 
 **Options:**
@@ -631,14 +632,36 @@ Registers a JavaScript file for loading. By default, scripts are output in the f
 
 ```liquid
 {# High priority - loads early #}
-{% enqueue_script "analytics.js", { "location": "header", "priority": 10 } %}
+{% enqueue_script src: "analytics.js", location: "header", priority: 10 %}
 
 {# Medium priority - default #}
-{% enqueue_script "widgets.js", { "priority": 50 } %}
+{% enqueue_script src: "widgets.js", priority: 50 %}
 
 {# Low priority - loads late #}
-{% enqueue_script "non-critical.js", { "priority": 100 } %}
+{% enqueue_script src: "non-critical.js", priority: 100 %}
 ```
+
+#### Enqueue Preload
+
+Registers a resource preload directive for the `<head>`. This is critical for optimizing LCP (Largest Contentful Paint) by preloading high-priority images, fonts, or scripts before they are discovered by the browser.
+
+**Usage:**
+
+```liquid
+{% enqueue_preload src: "hero.jpg", as: "image", fetchpriority: "high" %}
+{% enqueue_preload src: "font.woff2", as: "font", type: "font/woff2", crossorigin: true %}
+```
+
+**Options:**
+
+- `src`: (String, required) The URL of the resource to preload.
+- `as`: (String, required) The type of content (e.g., `"image"`, `"script"`, `"font"`, `"style"`).
+- `type`: (String, optional) The MIME type (e.g., `"image/jpeg"`, `"font/woff2"`).
+- `fetchpriority`: (String, optional) Priority hint: `"high"`, `"low"`, or `"auto"`.
+- `media`: (String, optional) Media query for responsive preloading.
+- `imagesrcset`: (String, optional) Srcset for responsive images.
+- `imagesizes`: (String, optional) Sizes attribute for responsive images.
+- `crossorigin`: (Boolean, optional) Whether to use CORS (required for fonts).
 
 #### Enqueue Style
 
@@ -647,9 +670,9 @@ Registers a CSS file for loading. By default, styles are output in the header, b
 **Usage:**
 
 ```liquid
-{% enqueue_style "filename.css" %}
-{% enqueue_style "print.css", { "media": "print", "location": "footer", "priority": 90 } %}
-{% enqueue_style "critical.css", { "location": "header", "priority": 10 } %}
+{% enqueue_style src: "filename.css" %}
+{% enqueue_style src: "print.css", media: "print", location: "footer", priority: 90 %}
+{% enqueue_style src: "critical.css", location: "header", priority: 10 %}
 ```
 
 **Options:**
@@ -663,16 +686,16 @@ Registers a CSS file for loading. By default, styles are output in the header, b
 
 ```liquid
 {# Critical CSS - loads first #}
-{% enqueue_style "critical.css", { "priority": 10 } %}
+{% enqueue_style src: "critical.css", priority: 10 %}
 
 {# Base styles #}
-{% enqueue_style "base.css", { "priority": 20 } %}
+{% enqueue_style src: "base.css", priority: 20 %}
 
 {# Widget styles - default priority #}
-{% enqueue_style "slideshow.css", { "priority": 50 } %}
+{% enqueue_style src: "slideshow.css", priority: 50 %}
 
 {# Print styles - loads last #}
-{% enqueue_style "print.css", { "location": "footer", "priority": 90, "media": "print" } %}
+{% enqueue_style src: "print.css", location: "footer", priority: 90, media: "print" %}
 ```
 
 #### Header Assets
@@ -686,7 +709,7 @@ Outputs all CSS and JS files marked for header, sorted by priority. Styles rende
   {% seo %}
   {% fonts %}
   {% theme_settings %}
-  {% asset "base.css" %}
+  {% asset src: "base.css" %}
   {% header_assets %}
 </head>
 ```
@@ -705,7 +728,7 @@ Outputs all CSS and JS files marked for footer, sorted by priority. Styles rende
 ```liquid
 <body>
   <!-- content -->
-  {% asset "scripts.js" %}
+  {% asset src: "scripts.js" %}
   {% footer_assets %}
 </body>
 ```
@@ -728,25 +751,25 @@ The priority system allows you to control the exact loading order of assets:
 
 ```liquid
 {# Foundation/Critical - Priority 10 #}
-{% enqueue_style "reset.css", { "priority": 10 } %}
-{% enqueue_script "analytics.js", { "location": "header", "priority": 10 } %}
+{% enqueue_style src: "reset.css", priority: 10 %}
+{% enqueue_script src: "analytics.js", location: "header", priority: 10 %}
 
 {# Base Styles - Priority 20 #}
-{% enqueue_style "base.css", { "priority": 20 } %}
+{% enqueue_style src: "base.css", priority: 20 %}
 
 {# Components - Priority 30 #}
-{% enqueue_style "components.css", { "priority": 30 } %}
-{% enqueue_script "components.js", { "priority": 30 } %}
+{% enqueue_style src: "components.css", priority: 30 %}
+{% enqueue_script src: "components.js", priority: 30 %}
 
 {# Widgets - Priority 40-50 #}
-{% enqueue_style "slideshow.css", { "priority": 40 } %}
-{% enqueue_script "slideshow.js", { "priority": 40 } %}
+{% enqueue_style src: "slideshow.css", priority: 40 %}
+{% enqueue_script src: "slideshow.js", priority: 40 %}
 
 {# Theme Overrides - Priority 50 (default) #}
 {% enqueue_style "theme.css" %}
 
 {# Non-critical/Print - Priority 90+ #}
-{% enqueue_style "print.css", { "location": "footer", "priority": 90, "media": "print" } %}
+{% enqueue_style src: "print.css", location: "footer", priority: 90, media: "print" %}
 ```
 
 #### Asset Tag
@@ -757,39 +780,39 @@ Directly includes CSS, JavaScript, or image assets in your templates. Unlike `en
 
 ```liquid
 {# Basic usage - CSS files #}
-{% asset "base.css" %}
-{% asset "theme.css" %}
+{% asset src: "base.css" %}
+{% asset src: "theme.css" %}
 
 {# Basic usage - JavaScript files #}
-{% asset "scripts.js" %}
+{% asset src: "scripts.js" %}
 
 {# Basic usage - Images #}
-{% asset "logo.svg" %}
+{% asset src: "logo.svg" %}
 ```
 
 **Advanced Usage with Options:**
 
 ```liquid
 {# JavaScript with defer attribute (opt-in) #}
-{% asset "scripts.js", { "defer": true } %}
+{% asset src: "scripts.js", defer: true %}
 
 {# JavaScript with async attribute (opt-in) #}
-{% asset "vendor.js", { "async": true } %}
+{% asset src: "vendor.js", async: true %}
 
 {# JavaScript with both defer and async #}
-{% asset "module.js", { "defer": true, "async": true } %}
+{% asset src: "module.js", defer: true, async: true %}
 
 {# CSS with media query #}
-{% asset "print.css", { "media": "print" } %}
+{% asset src: "print.css", media: "print" %}
 
 {# CSS with ID attribute #}
-{% asset "theme.css", { "id": "theme-stylesheet" } %}
+{% asset src: "theme.css", id: "theme-stylesheet" %}
 
 {# External resource with crossorigin #}
-{% asset "font.css", { "crossorigin": "anonymous" } %}
+{% asset src: "font.css", crossorigin: "anonymous" %}
 
 {# Resource with integrity hash #}
-{% asset "vendor.js", { "integrity": "sha384-..." } %}
+{% asset src: "vendor.js", integrity: "sha384-..." %}
 ```
 
 **Options:**
@@ -840,12 +863,12 @@ This means `{% asset "styles.css" %}` in the slideshow widget loads from `widget
 
 **Asset Tag vs Enqueue Tags:**
 
-| Feature | `{% asset %}` | `{% enqueue_* %}` |
-| :------ | :------------ | :---------------- |
-| Output location | Inline where placed | Via `{% header_assets %}` / `{% footer_assets %}` |
-| Deduplication | No (outputs every time) | Yes (same filename only loaded once) |
-| Priority control | No | Yes (`priority` option) |
-| Best for | Core theme assets in layout | Widget assets, shared libraries |
+| Feature          | `{% asset %}`               | `{% enqueue_* %}`                                 |
+| :--------------- | :-------------------------- | :------------------------------------------------ |
+| Output location  | Inline where placed         | Via `{% header_assets %}` / `{% footer_assets %}` |
+| Deduplication    | No (outputs every time)     | Yes (same filename only loaded once)              |
+| Priority control | No                          | Yes (`priority` option)                           |
+| Best for         | Core theme assets in layout | Widget assets, shared libraries                   |
 
 Use `{% asset %}` for essential theme assets that must load in a specific order (like `base.css`). Use `{% enqueue_* %}` for widget assets and shared libraries where deduplication matters.
 
@@ -1452,8 +1475,7 @@ When exporting a project to static HTML:
 - **Uploaded Images**: All images from `/uploads/images/` are copied to maintain relative paths
 - **Path Optimization**: Asset paths are converted to relative URLs for optimal static hosting
 
-> [!WARNING]
-> Because widget assets are flattened during export, files with the same name from different widgets will collide. Always use unique, widget-prefixed filenames (e.g., `slideshow.css` instead of `styles.css`).
+> [!WARNING] Because widget assets are flattened during export, files with the same name from different widgets will collide. Always use unique, widget-prefixed filenames (e.g., `slideshow.css` instead of `styles.css`).
 
 ## 11. Advanced Features
 
@@ -1471,15 +1493,15 @@ The Arch theme includes a scroll reveal animation system that animates elements 
 
 Add these classes to elements you want to animate:
 
-| Class | Effect |
-| :---- | :----- |
-| `.reveal` | Base class (required) - fades in |
-| `.reveal-up` | Slides up while fading in |
-| `.reveal-down` | Slides down while fading in |
-| `.reveal-left` | Slides from right to left while fading in |
+| Class           | Effect                                    |
+| :-------------- | :---------------------------------------- |
+| `.reveal`       | Base class (required) - fades in          |
+| `.reveal-up`    | Slides up while fading in                 |
+| `.reveal-down`  | Slides down while fading in               |
+| `.reveal-left`  | Slides from right to left while fading in |
 | `.reveal-right` | Slides from left to right while fading in |
-| `.reveal-scale` | Scales up from 95% while fading in |
-| `.reveal-fade` | Simple fade in (no transform) |
+| `.reveal-scale` | Scales up from 95% while fading in        |
+| `.reveal-fade`  | Simple fade in (no transform)             |
 
 #### Stagger Delays
 
@@ -1642,9 +1664,11 @@ Users can paste their Google Analytics code into the "Custom Head Scripts" setti
 <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'GA_MEASUREMENT_ID');
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+  gtag("config", "GA_MEASUREMENT_ID");
 </script>
 ```
 

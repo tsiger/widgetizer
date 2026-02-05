@@ -336,7 +336,7 @@ Enable widgets to access collection data.
 {% for item in portfolio_items %}
   <div class="portfolio-card">
     <h3>{{ item.title }}</h3>
-    {{ item.featured_image | image: 'medium' }}
+    {% image src: item.featured_image, size: 'medium' %}
   </div>
 {% endfor %}
 
@@ -372,7 +372,7 @@ If we want each collection item to have its own page (e.g., `/portfolio/project-
 
 <article class="portfolio-single">
   <h1>{{ item.settings.title }}</h1>
-  {{ item.settings.featured_image | image: 'large' }}
+  {% image src: item.settings.featured_image, size: 'large' %}
   <div class="content">
     {{ item.settings.description }}
   </div>
@@ -380,7 +380,7 @@ If we want each collection item to have its own page (e.g., `/portfolio/project-
   {% if item.settings.gallery.size > 0 %}
     <div class="gallery">
       {% for img in item.settings.gallery %}
-        {{ img | image: 'medium' }}
+        {% image src: img, size: 'medium' %}
       {% endfor %}
     </div>
   {% endif %}

@@ -9,7 +9,7 @@
 
     {% theme_settings %}
 
-    {% asset "base.css" %}
+    {% asset src: "base.css" %}
     {% unless theme.layout.enable_reveal_animations %}
       <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
     {% endunless %}
@@ -25,9 +25,9 @@
     </main>
     {{ footer }}
 
-    {% asset "scripts.js" %}
+    {% asset src: "scripts.js", defer: true %}
     {% if theme.layout.enable_reveal_animations %}
-      {% enqueue_script "reveal.js", { "priority": 50 } %}
+      {% asset src: "reveal.js", defer: true %}
     {% endif %}
     {% footer_assets %}
     {% custom_footer_scripts %}

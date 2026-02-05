@@ -64,11 +64,11 @@
             {% endif %}
             data-setting="link"
           >
-            {{ widget.settings.image | image: 'large', 'widget-image' }}
+            {% image src: widget.settings.image, size: 'large', class: 'widget-image' %}
           </a>
         {% else %}
           <div class="image-wrapper reveal reveal-fade">
-            {{ widget.settings.image | image: 'large', 'widget-image' }}
+            {% image src: widget.settings.image, size: 'large', class: 'widget-image' %}
           </div>
         {% endif %}
       {% else %}

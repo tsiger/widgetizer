@@ -76,7 +76,7 @@
 
           <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             {% if block.settings.image != blank %}
-              {{ block.settings.image | image: 'medium', 'widget-card-image' }}
+              {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
             {% endif %}
             <div class="widget-card-content">
               {% if block.settings.subtitle != blank %}

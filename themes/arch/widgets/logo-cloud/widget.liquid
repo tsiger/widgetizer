@@ -106,16 +106,16 @@
                 {% endif %}
               >
                 {% if block.settings.image != blank %}
-                  {{ block.settings.image | image: 'small', 'logo-image', block.settings.name }}
+                  {% image src: block.settings.image, size: 'small', class: 'logo-image', alt: block.settings.name %}
                 {% else %}
-                  {% placeholder_image 'landscape', { "class": "logo-image" } %}
+                  {% placeholder_image aspect: 'landscape', class: 'logo-image' %}
                 {% endif %}
               </a>
             {% else %}
               {% if block.settings.image != blank %}
-                {{ block.settings.image | image: 'small', 'logo-image', block.settings.name }}
+                {% image src: block.settings.image, size: 'small', class: 'logo-image', alt: block.settings.name %}
               {% else %}
-                {% placeholder_image 'landscape', { "class": "logo-image" } %}
+                {% placeholder_image aspect: 'landscape', class: 'logo-image' %}
               {% endif %}
             {% endif %}
           </li>
