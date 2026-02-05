@@ -476,5 +476,5 @@ Here's a minimal but complete testimonial widget:
 
 - [Setting Types](theme-dev-setting-types.html) — all available field types for settings
 - [Theme Objects & Context](theme-dev-objects-context.html) — what data is available in templates
-- [Liquid Tags & Assets](theme-dev-liquid-assets.html) — media filters, asset loading, and custom tags
+- [Liquid Tags & Assets](theme-dev-liquid-assets.html) — media tags, asset loading, and custom tags
 - [Design System & Utilities](theme-dev-design-system.html) — CSS tokens and utility classes

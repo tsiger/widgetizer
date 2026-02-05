@@ -33,7 +33,7 @@
     <div class="header-branding">
       <a href="index.html" class="header-logo">
         {% if widget.settings.logoImage != blank %}
-          {{ widget.settings.logoImage | image: 'medium', 'header-logo-image', false }}
+          {% image src: widget.settings.logoImage, size: 'medium', class: 'header-logo-image', lazy: false %}
         {% else %}
           <span data-setting="logoText">{{ widget.settings.logoText | default: 'Widgetizer' }}</span>
         {% endif %}

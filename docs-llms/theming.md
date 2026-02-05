@@ -370,13 +370,13 @@ Contains data from the main `projects.json` file:
 <link rel="canonical" href="{{ project.siteUrl }}{{ page.slug }}">
 ```
 
-## 5. Liquid Tags & Filters
+## 5. Liquid Tags
 
-Widgetizer provides powerful Liquid filters to simplify common tasks in your templates.
+Widgetizer provides powerful Liquid tags to simplify common tasks in your templates.
 
-### Image Filter
+### Image tag
 
-The `image` filter is the recommended way to render images in your theme. It automatically handles generating the correct `src` for different image sizes, adds important attributes like `width`, `height`, and `alt`, and enables lazy loading by default.
+The `{% image %}` tag is the recommended way to render images in your theme. It automatically handles generating the correct `src` for different image sizes, adds important attributes like `width`, `height`, and `alt`, and enables lazy loading by default.
 
 **SVG behavior:** SVGs always render from the original file (no size variants). The `size` parameter is ignored for SVGs, and `width`/`height` attributes are omitted. In path-only mode, SVGs always return the original file path.
 
@@ -392,9 +392,9 @@ The `image` filter is the recommended way to render images in your theme. It aut
 {% image src: widget.settings.myImage, size: 'large', class: 'hero-image', lazy: false, alt: 'Custom alt text' %}
 ```
 
-#### Path-Only Mode (New)
+#### Path-only output
 
-For cases where you need just the image URL (e.g., CSS background images), use `'path'` or `'url'` as the first parameter:
+For cases where you need just the image URL (e.g., CSS background images), use the `output` parameter with `'path'` or `'url'`:
 
 ```liquid
 <!-- Get image path for CSS backgrounds -->
@@ -416,24 +416,19 @@ For cases where you need just the image URL (e.g., CSS background images), use `
 </style>
 ```
 
-#### Parameter Order
+#### Parameters (named; order does not matter)
 
-**For HTML `<img>` tag output:**
+**For HTML `<img>` output:**
 
-| Position | Parameter | Type    | Default      | Description                                             |
-| :------- | :-------- | :------ | :----------- | :------------------------------------------------------ |
-| 1        | `size`    | String  | `'medium'`   | Image size: `'thumb'`, `'small'`, `'medium'`, `'large'` |
-| 2        | `class`   | String  | `''`         | CSS class to add to the `<img>` tag                     |
-| 3        | `lazy`    | Boolean | `true`       | Whether to add `loading="lazy"` attribute               |
-| 4        | `alt`     | String  | (from media) | Override alt text from media library                    |
-| 5        | `title`   | String  | (from media) | Override title text from media library                  |
+| Parameter | Type    | Default      | Description                                             |
+| :-------- | :------ | :----------- | :------------------------------------------------------ |
+| `size`    | String  | `'medium'`   | Image size: `'thumb'`, `'small'`, `'medium'`, `'large'` |
+| `class`   | String  | `''`         | CSS class to add to the `<img>` tag                     |
+| `lazy`    | Boolean | `true`       | Whether to add `loading="lazy"` attribute               |
+| `alt`     | String  | (from media) | Override alt text from media library                    |
+| `title`   | String  | (from media) | Override title text from media library                  |
 
-**For path-only output:**
-
-| Position | Parameter | Type   | Default    | Description                                             |
-| :------- | :-------- | :----- | :--------- | :------------------------------------------------------ |
-| 1        | `mode`    | String | (required) | Must be `'path'` or `'url'` to enable path-only mode    |
-| 2        | `size`    | String | `'medium'` | Image size: `'thumb'`, `'small'`, `'medium'`, `'large'` |
+**For path-only output:** use `output: 'path'` or `output: 'url'`. Optional: `size` (default `'medium'`).
 
 #### Usage Examples
 
@@ -457,9 +452,9 @@ For cases where you need just the image URL (e.g., CSS background images), use `
 {% image src: widget.settings.backgroundImage, size: 'medium', output: 'url' %}
 ```
 
-### Video Filter
+### Video tag
 
-The `video` filter renders HTML5 video elements with proper attributes and fallbacks.
+The `{% video %}` tag renders HTML5 video elements with proper attributes and fallbacks.
 
 #### Basic Usage
 
@@ -473,9 +468,9 @@ The `video` filter renders HTML5 video elements with proper attributes and fallb
 {% video src: widget.settings.heroVideo, controls: false, autoplay: true, muted: true, loop: true, class: 'hero-video' %}
 ```
 
-#### Path-Only Mode
+#### Path-only output
 
-For cases where you need just the video URL (e.g., custom video players or JavaScript), use `'path'` or `'url'` as the first parameter:
+For cases where you need just the video URL (e.g., custom video players or JavaScript), use the `output` parameter with `'path'` or `'url'`:
 
 ```liquid
 <!-- Get video path for custom player -->
@@ -488,23 +483,11 @@ For cases where you need just the video URL (e.g., custom video players or JavaS
 </script>
 ```
 
-#### Parameter Order
+#### Parameters (named; order does not matter)
 
-**For HTML `<video>` tag output:**
+**For HTML `<video>` output:** `controls`, `autoplay`, `muted`, `loop` (booleans), `class` (string).
 
-| Position | Parameter  | Type    | Default | Description                                     |
-| :------- | :--------- | :------ | :------ | :---------------------------------------------- |
-| 1        | `controls` | Boolean | `true`  | Show video controls. Pass `false` to hide.      |
-| 2        | `autoplay` | Boolean | `false` | Auto-play video on load. Pass `true` to enable. |
-| 3        | `muted`    | Boolean | `false` | Mute video by default. Pass `true` to enable.   |
-| 4        | `loop`     | Boolean | `false` | Loop video playback. Pass `true` to enable.     |
-| 5        | `class`    | String  | `''`    | CSS class for the `<video>` tag.                |
-
-**For path-only output:**
-
-| Position | Parameter | Type   | Default    | Description                                          |
-| :------- | :-------- | :----- | :--------- | :--------------------------------------------------- |
-| 1        | `mode`    | String | (required) | Must be `'path'` or `'url'` to enable path-only mode |
+**For path-only output:** use `output: 'path'` or `output: 'url'`.
 
 #### Usage Examples
 
@@ -523,9 +506,9 @@ For cases where you need just the video URL (e.g., custom video players or JavaS
 {% video src: widget.settings.customVideo, output: 'url' %}
 ```
 
-### Audio Filter
+### Audio tag
 
-The `audio` filter returns the path to an audio file from the media library. Unlike the `video` filter, it does not render a full HTML element by default, giving you flexibility to use custom audio players or HTML5 `<audio>` tags.
+The `{% audio %}` tag returns the path to an audio file from the media library. Unlike the `{% video %}` tag, it does not render a full HTML element by default, giving you flexibility to use custom audio players or HTML5 `<audio>` tags.
 
 #### Basic Usage
 
@@ -539,9 +522,9 @@ The `audio` filter returns the path to an audio file from the media library. Unl
 </audio>
 ```
 
-#### Path-Only Mode
+#### Path-only output
 
-The audio filter always returns just the path. You can explicitly use `'path'` or `'url'` for consistency with other filters:
+The `{% audio %}` tag always returns just the path. You can explicitly use `output: 'path'` or `output: 'url'` for consistency with other media tags:
 
 ```liquid
 {% audio src: widget.settings.soundEffect %}
@@ -551,9 +534,9 @@ The audio filter always returns just the path. You can explicitly use `'path'` o
 
 All three forms return the same audio file path.
 
-### YouTube Filter
+### YouTube tag
 
-The `youtube` filter parses the data from a `youtube` setting type and renders a responsive YouTube embed.
+The `{% youtube %}` tag parses the data from a `youtube` setting type and renders a responsive YouTube embed.
 
 #### Basic Usage
 
@@ -569,9 +552,9 @@ You can provide a custom CSS class for the wrapper element:
 {% youtube src: widget.settings.heroVideo, class: 'hero-youtube-wrapper' %}
 ```
 
-#### Path-Only Mode
+#### Path-only output
 
-If you need only the embed URL (e.g., for use in a custom `<iframe>` or JavaScript), use `'path'` or `'url'` as the first parameter:
+If you need only the embed URL (e.g., for use in a custom `<iframe>` or JavaScript), use the `output` parameter with `'path'` or `'url'`:
 
 ```liquid
 {% youtube src: widget.settings.introVideo, output: 'path' %}
@@ -579,7 +562,7 @@ If you need only the embed URL (e.g., for use in a custom `<iframe>` or JavaScri
 
 #### Output Structure
 
-By default, the filter outputs a container with a responsive aspect ratio:
+By default, the tag outputs a container with a responsive aspect ratio:
 
 ```html
 <div
@@ -883,22 +866,22 @@ Outputs a placeholder image for development and preview purposes. Theme authors 
 {% placeholder_image %}
 
 {# Specific aspect ratio as <img> tag #}
-{% placeholder_image 'landscape' %}
-{% placeholder_image 'portrait' %}
-{% placeholder_image 'square' %}
+{% placeholder_image aspect: 'landscape' %}
+{% placeholder_image aspect: 'portrait' %}
+{% placeholder_image aspect: 'square' %}
 
 {# URL only for inline styles #}
-{% placeholder_image 'url' %}
-{% placeholder_image 'landscape', 'url' %}
-{% placeholder_image 'square', 'url' %}
+{% placeholder_image output: 'url' %}
+{% placeholder_image aspect: 'landscape', output: 'url' %}
+{% placeholder_image aspect: 'square', output: 'url' %}
 
 {# With options #}
-{% placeholder_image 'landscape', { "class": "hero-image", "alt": "Hero placeholder" } %}
-{% placeholder_image 'square', { "class": "avatar", "alt": "Profile photo" } %}
+{% placeholder_image aspect: 'landscape', class: 'hero-image', alt: 'Hero placeholder' %}
+{% placeholder_image aspect: 'square', class: 'avatar', alt: 'Profile photo' %}
 
 {# Custom theme placeholder from assets/ folder #}
-{% placeholder_image 'my-placeholder.png' %}
-{% placeholder_image 'my-placeholder.jpg', 'url' %}
+{% placeholder_image src: 'my-placeholder.png' %}
+{% placeholder_image src: 'my-placeholder.jpg', output: 'url' %}
 ```
 
 **Aspect Ratios:**
@@ -910,7 +893,7 @@ Outputs a placeholder image for development and preview purposes. Theme authors 
 **Options (for `<img>` output):**
 
 ```liquid
-{% placeholder_image 'custom.svg', { "alt": "Add image here", "class": "placeholder", "loading": "lazy" } %}
+{% placeholder_image src: 'custom.svg', alt: 'Add image here', class: 'placeholder', loading: 'lazy' %}
 ```
 
 | Option    | Description                             |
@@ -1207,7 +1190,7 @@ For more complex block rendering, you can use conditional logic and include addi
 
           {% when 'image' %}
             {% if block.settings.image != blank %}
-              {{ block.settings.image | image: 'medium', 'block-image' }}
+              {% image src: block.settings.image, size: 'medium', class: 'block-image' %}
             {% endif %}
 
           {% when 'button' %}

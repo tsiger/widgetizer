@@ -1,8 +1,8 @@
 ---
-description: Custom Liquid tags and filters in Widgetizer for assets, media, SEO, and theme settings. Complete reference with examples.
+description: Custom Liquid tags in Widgetizer for assets, media, SEO, and theme settings. Complete reference with examples.
 ---
 
-Widgetizer extends LiquidJS with custom tags and filters for assets, media, SEO, and theme settings. This page documents all available tags with usage examples. For where these tags belong in the document structure, see [Layout & Templates](theme-dev-layout-templates.html).
+Widgetizer extends LiquidJS with custom tags for assets, media, SEO, and theme settings. This page documents all available tags with usage examples. For where these tags belong in the document structure, see [Layout & Templates](theme-dev-layout-templates.html).
 
 # Asset Tags
 
@@ -243,16 +243,15 @@ Renders a snippet from the `snippets/` folder.
 
 For menu structure and snippet conventions, see [Menus & Snippets](theme-dev-menus-snippets.html).
 
-# Media Filters
+# Media Tags
 
-Media filters render uploaded media from the media library.
+Media tags render uploaded media from the media library.
 
-`image`
+`{% image %}`
 
 Renders an `<img>` tag or returns a path.
 
 ```liquid
-{# Full <img> tag #}
 {# Full <img> tag #}
 {% image src: widget.settings.heroImage %}
 {% image src: widget.settings.heroImage, size: 'large' %}
@@ -263,29 +262,13 @@ Renders an `<img>` tag or returns a path.
 {% image src: widget.settings.heroImage, size: 'large', output: 'path' %}
 ```
 
-**Parameters (for `<img>` output):**
+**Parameters (named):** `size` (default `'medium'`), `class`, `lazy` (default `true`), `alt`, `title`. For path-only output use `output: 'path'` or `output: 'url'`.
 
-| Position | Parameter | Default      | Description                                 |
-| :------- | :-------- | :----------- | :------------------------------------------ |
-| 1        | `size`    | `'medium'`   | `'thumb'`, `'small'`, `'medium'`, `'large'` |
-| 2        | `class`   | `''`         | CSS class                                   |
-| 3        | `lazy`    | `true`       | Add `loading="lazy"`                        |
-| 4        | `alt`     | (from media) | Alt text override                           |
-| 5        | `title`   | (from media) | Title override                              |
-
-**Parameters (for path output):**
-
-| Position | Parameter | Description                                 |
-| :------- | :-------- | :------------------------------------------ |
-| 1        | `mode`    | `'path'` or `'url'`                         |
-| 2        | `size`    | `'thumb'`, `'small'`, `'medium'`, `'large'` |
-
-`video`
+`{% video %}`
 
 Renders a `<video>` tag or returns a path.
 
 ```liquid
-{# Full <video> tag #}
 {# Full <video> tag #}
 {% video src: widget.settings.bgVideo %}
 {% video src: widget.settings.bgVideo, controls: true, autoplay: true, muted: true, loop: true, class: 'bg-video' %}
@@ -294,17 +277,9 @@ Renders a `<video>` tag or returns a path.
 {% video src: widget.settings.bgVideo, output: 'path' %}
 ```
 
-**Parameters (for `<video>` output):**
+**Parameters (named):** `controls`, `autoplay`, `muted`, `loop`, `class`. For path-only output use `output: 'path'` or `output: 'url'`.
 
-| Position | Parameter  | Default | Description   |
-| :------- | :--------- | :------ | :------------ |
-| 1        | `controls` | `true`  | Show controls |
-| 2        | `autoplay` | `false` | Auto-play     |
-| 3        | `muted`    | `false` | Mute audio    |
-| 4        | `loop`     | `false` | Loop playback |
-| 5        | `class`    | `''`    | CSS class     |
-
-`audio`
+`{% audio %}`
 
 Returns an audio file path (no HTML element).
 
@@ -317,12 +292,11 @@ Returns an audio file path (no HTML element).
 </audio>
 ```
 
-`youtube`
+`{% youtube %}`
 
 Renders a responsive YouTube embed or returns the embed URL.
 
 ```liquid
-{# Full embed #}
 {# Full embed #}
 {% youtube src: widget.settings.video %}
 {% youtube src: widget.settings.video, class: 'hero-video' %}

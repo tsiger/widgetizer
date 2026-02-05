@@ -14,7 +14,7 @@
 
   <div class="footer-content">
     {% if widget.settings.logo != blank %}
-      {{ widget.settings.logo | image: 'small', 'footer-logo', 'Footer Logo' }}
+      {% image src: widget.settings.logo, size: 'small', class: 'footer-logo', alt: 'Footer Logo' %}
     {% endif %}
 
     {% if widget.settings.footerNavigation %}

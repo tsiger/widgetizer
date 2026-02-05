@@ -193,7 +193,7 @@
                 <span class="priced-item-price block-text block-text-lg block-text-heading" data-setting="price">{{ block.settings.price }}</span>
               {% endif %}
               {% if block.settings.image != blank %}
-                {{ block.settings.image | image: 'small', 'priced-item-image' }}
+                {% image src: block.settings.image, size: 'small', class: 'priced-item-image' %}
               {% endif %}
             </div>
           </div>
