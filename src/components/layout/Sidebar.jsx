@@ -74,9 +74,7 @@ export default function Sidebar() {
     if (section.position === "bottom") {
       return (
         <div key={section.id} className="pt-4 border-t border-slate-800">
-          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">
-            {t(section.titleKey)}
-          </h3>
+          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">{t(section.titleKey)}</h3>
           <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
         </div>
       );
@@ -99,16 +97,14 @@ export default function Sidebar() {
     <div className="w-[72px] md:w-48 bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto">
       <div className="pb-2 px-2 md:px-4 grow">
         <div className="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-4">
-          <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="hidden md:block w-40" />
+          <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="hidden md:block h-7" />
           <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="md:hidden w-12 h-12 mx-auto" />
         </div>
 
         {topSections.map(renderSection)}
       </div>
 
-      <div className="px-2 md:px-4 pb-2">
-        {bottomSections.map(renderSection)}
-      </div>
+      <div className="px-2 md:px-4 pb-2">{bottomSections.map(renderSection)}</div>
     </div>
   );
 }

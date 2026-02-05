@@ -18,79 +18,83 @@ A comprehensive guide to the visual design patterns, colors, typography, and com
 
 The primary brand color used for interactive elements, focus states, and highlights.
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `pink-50` | #fdf2f8 | Selected row backgrounds, error message backgrounds |
-| `pink-100` | #fce7f3 | Primary badge backgrounds |
-| `pink-200` | #fbcfe8 | Primary badge borders |
-| `pink-500` | #ec4899 | Icons, links, focus rings, checkmarks |
-| `pink-600` | #db2777 | Primary buttons, active sidebar items |
-| `pink-700` | #be185d | Button hover states, link hovers |
-| `pink-800` | #9d174d | Button active/pressed states |
+| Token      | Hex     | Usage                                               |
+| ---------- | ------- | --------------------------------------------------- |
+| `pink-50`  | #fdf2f8 | Selected row backgrounds, error message backgrounds |
+| `pink-100` | #fce7f3 | Primary badge backgrounds                           |
+| `pink-200` | #fbcfe8 | Primary badge borders                               |
+| `pink-500` | #ec4899 | Icons, links, focus rings, checkmarks               |
+| `pink-600` | #db2777 | Primary buttons, active sidebar items               |
+| `pink-700` | #be185d | Button hover states, link hovers                    |
+| `pink-800` | #9d174d | Button active/pressed states                        |
 
 ### Neutral — Slate
 
 The neutral palette for text, backgrounds, and UI chrome.
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `slate-900` | #0f172a | Sidebar background, dark buttons |
-| `slate-800` | #1e293b | Sidebar hover states, dark borders |
-| `slate-700` | #334155 | Form labels, table header text |
-| `slate-600` | #475569 | Secondary text, sidebar section titles |
-| `slate-500` | #64748b | Muted text, help text, disabled icons |
-| `slate-400` | #94a3b8 | Placeholders, subtle icons |
-| `slate-300` | #cbd5e1 | Input borders |
+| Token       | Hex     | Usage                                        |
+| ----------- | ------- | -------------------------------------------- |
+| `slate-900` | #0f172a | Sidebar background, dark buttons             |
+| `slate-800` | #1e293b | Sidebar hover states, dark borders           |
+| `slate-700` | #334155 | Form labels, table header text               |
+| `slate-600` | #475569 | Secondary text, sidebar section titles       |
+| `slate-500` | #64748b | Muted text, help text, disabled icons        |
+| `slate-400` | #94a3b8 | Placeholders, subtle icons                   |
+| `slate-300` | #cbd5e1 | Input borders                                |
 | `slate-200` | #e2e8f0 | Dividers, table row borders, section borders |
-| `slate-100` | #f1f5f9 | Subtle backgrounds, table row borders |
-| `slate-50` | #f8fafc | Table headers, section backgrounds |
+| `slate-100` | #f1f5f9 | Subtle backgrounds, table row borders        |
+| `slate-50`  | #f8fafc | Table headers, section backgrounds           |
 
 ### Page Background
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `gray-50` | #f9fafb | Main page background |
-| `gray-900` | #111827 | Primary body text |
+| Token      | Hex     | Usage                |
+| ---------- | ------- | -------------------- |
+| `gray-50`  | #f9fafb | Main page background |
+| `gray-900` | #111827 | Primary body text    |
 
 ### Semantic Colors
 
 #### Success — Green
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `green-50` | #f0fdf4 | Success badge background (light) |
-| `green-100` | #dcfce7 | Success badge background |
-| `green-200` | #bbf7d0 | Success badge border |
-| `green-600` | #16a34a | Success text |
+
+| Token       | Hex     | Usage                                |
+| ----------- | ------- | ------------------------------------ |
+| `green-50`  | #f0fdf4 | Success badge background (light)     |
+| `green-100` | #dcfce7 | Success badge background             |
+| `green-200` | #bbf7d0 | Success badge border                 |
+| `green-600` | #16a34a | Success text                         |
 | `green-700` | #15803d | Success badge text, toast background |
-| `green-800` | #166534 | Success toast border |
+| `green-800` | #166534 | Success toast border                 |
 
 #### Warning — Yellow/Amber
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `yellow-50` | #fefce8 | Warning toast/modal background |
-| `yellow-100` | #fef9c3 | Warning badge background |
-| `yellow-200` | #fef08a | Warning toast border |
-| `yellow-500` | #eab308 | Warning icons |
+
+| Token        | Hex     | Usage                          |
+| ------------ | ------- | ------------------------------ |
+| `yellow-50`  | #fefce8 | Warning toast/modal background |
+| `yellow-100` | #fef9c3 | Warning badge background       |
+| `yellow-200` | #fef08a | Warning toast border           |
+| `yellow-500` | #eab308 | Warning icons                  |
 | `yellow-700` | #a16207 | Warning badge text, toast text |
-| `amber-600` | #d97706 | Warning messages |
+| `amber-600`  | #d97706 | Warning messages               |
 
 #### Error/Danger — Red
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `red-50` | #fef2f2 | Error toast background, danger modal header |
-| `red-100` | #fee2e2 | Error badge background |
-| `red-200` | #fecaca | Error toast/badge border |
-| `red-500` | #ef4444 | Danger icons |
-| `red-600` | #dc2626 | Danger buttons, error badge text |
-| `red-700` | #b91c1c | Danger button hover |
-| `red-800` | #991b1b | Danger button active |
+
+| Token     | Hex     | Usage                                       |
+| --------- | ------- | ------------------------------------------- |
+| `red-50`  | #fef2f2 | Error toast background, danger modal header |
+| `red-100` | #fee2e2 | Error badge background                      |
+| `red-200` | #fecaca | Error toast/badge border                    |
+| `red-500` | #ef4444 | Danger icons                                |
+| `red-600` | #dc2626 | Danger buttons, error badge text            |
+| `red-700` | #b91c1c | Danger button hover                         |
+| `red-800` | #991b1b | Danger button active                        |
 
 #### Info — Blue
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `blue-50` | #eff6ff | Info toast background |
-| `blue-200` | #bfdbfe | Info toast border |
-| `blue-600` | #2563eb | Info toast text |
+
+| Token      | Hex     | Usage                 |
+| ---------- | ------- | --------------------- |
+| `blue-50`  | #eff6ff | Info toast background |
+| `blue-200` | #bfdbfe | Info toast border     |
+| `blue-600` | #2563eb | Info toast text       |
 
 ---
 
@@ -106,23 +110,23 @@ Use Tailwind's `font-sans` class.
 
 ### Type Scale
 
-| Class | Size | Usage |
-|-------|------|-------|
-| `text-xs` | 12px | Badges, hints, timestamps, sidebar section titles |
-| `text-sm` | 14px | Body text, form inputs, labels, table cells (default) |
-| `text-base` | 16px | Large buttons, section subtitles |
-| `text-lg` | 18px | Form section titles |
-| `text-xl` | 20px | Empty state headings |
-| `text-2xl` | 24px | Page titles |
+| Class       | Size | Usage                                                 |
+| ----------- | ---- | ----------------------------------------------------- |
+| `text-xs`   | 12px | Badges, hints, timestamps, sidebar section titles     |
+| `text-sm`   | 14px | Body text, form inputs, labels, table cells (default) |
+| `text-base` | 16px | Large buttons, section subtitles                      |
+| `text-lg`   | 18px | Form section titles                                   |
+| `text-xl`   | 20px | Empty state headings                                  |
+| `text-2xl`  | 24px | Page titles                                           |
 
 ### Font Weights
 
-| Class | Weight | Usage |
-|-------|--------|-------|
-| `font-normal` | 400 | Body text |
-| `font-medium` | 500 | Labels, section titles, table row text |
-| `font-semibold` | 600 | Buttons, empty state headings |
-| `font-bold` | 700 | Page titles |
+| Class           | Weight | Usage                                  |
+| --------------- | ------ | -------------------------------------- |
+| `font-normal`   | 400    | Body text                              |
+| `font-medium`   | 500    | Labels, section titles, table row text |
+| `font-semibold` | 600    | Buttons, empty state headings          |
+| `font-bold`     | 700    | Page titles                            |
 
 ### Special Typography
 
@@ -130,15 +134,15 @@ Use Tailwind's `font-sans` class.
 
 ### Text Colors
 
-| Class | Usage |
-|-------|-------|
-| `text-gray-900` | Primary body text |
-| `text-slate-800` | Section titles |
-| `text-slate-700` | Labels, table headers |
-| `text-slate-600` | Secondary text, optional labels |
+| Class            | Usage                                  |
+| ---------------- | -------------------------------------- |
+| `text-gray-900`  | Primary body text                      |
+| `text-slate-800` | Section titles                         |
+| `text-slate-700` | Labels, table headers                  |
+| `text-slate-600` | Secondary text, optional labels        |
 | `text-slate-500` | Help text, descriptions, muted content |
-| `text-slate-400` | Placeholders, subtle icons |
-| `text-white` | Text on dark/colored backgrounds |
+| `text-slate-400` | Placeholders, subtle icons             |
+| `text-white`     | Text on dark/colored backgrounds       |
 
 ---
 
@@ -148,17 +152,17 @@ Based on Tailwind's default spacing scale with 4px increments.
 
 ### Common Values
 
-| Class | Value | Usage |
-|-------|-------|-------|
-| `gap-1` / `space-y-1` | 4px | Tight spacing (label to input) |
-| `gap-2` / `space-y-2` | 8px | Standard spacing (between items) |
-| `gap-3` | 12px | Medium spacing |
-| `gap-4` / `space-y-4` | 16px | Section spacing |
-| `space-y-6` | 24px | Form container vertical spacing |
-| `p-2` | 8px | Small padding (icon buttons) |
-| `p-4` | 16px | Standard padding (cards, modals) |
-| `p-6` | 24px | Large padding (structured card body) |
-| `p-8` | 32px | Page container padding |
+| Class                 | Value | Usage                                |
+| --------------------- | ----- | ------------------------------------ |
+| `gap-1` / `space-y-1` | 4px   | Tight spacing (label to input)       |
+| `gap-2` / `space-y-2` | 8px   | Standard spacing (between items)     |
+| `gap-3`               | 12px  | Medium spacing                       |
+| `gap-4` / `space-y-4` | 16px  | Section spacing                      |
+| `space-y-6`           | 24px  | Form container vertical spacing      |
+| `p-2`                 | 8px   | Small padding (icon buttons)         |
+| `p-4`                 | 16px  | Standard padding (cards, modals)     |
+| `p-6`                 | 24px  | Large padding (structured card body) |
+| `p-8`                 | 32px  | Page container padding               |
 
 ### Form Spacing Patterns
 
@@ -171,29 +175,29 @@ Based on Tailwind's default spacing scale with 4px increments.
 
 ## Border Radius
 
-| Class | Value | Usage |
-|-------|-------|-------|
-| `rounded-sm` | 2px | Form inputs, small elements |
-| `rounded-md` | 6px | Buttons |
-| `rounded-lg` | 8px | Tables, cards |
-| `rounded-xl` | 12px | Page content containers |
-| `rounded-full` | 9999px | Badges, avatar circles |
+| Class          | Value  | Usage                       |
+| -------------- | ------ | --------------------------- |
+| `rounded-sm`   | 2px    | Form inputs, small elements |
+| `rounded-md`   | 6px    | Buttons                     |
+| `rounded-lg`   | 8px    | Tables, cards               |
+| `rounded-xl`   | 12px   | Page content containers     |
+| `rounded-full` | 9999px | Badges, avatar circles      |
 
 ---
 
 ## Shadows
 
-| Class | Usage |
-|-------|-------|
-| `shadow-xs` | Form inputs |
+| Class       | Usage                  |
+| ----------- | ---------------------- |
+| `shadow-xs` | Form inputs            |
 | `shadow-sm` | Buttons, tables, cards |
-| `shadow-md` | Feature cards |
-| `shadow-lg` | Modals, dropdowns |
+| `shadow-md` | Feature cards          |
+| `shadow-lg` | Modals, dropdowns      |
 
 ### Hover Shadow Effect
 
 ```css
-hover:shadow-[0_2px_0_rgba(0,0,0,0.1)]
+hover: shadow-[0_2px_0_rgba(0, 0, 0, 0.1)];
 ```
 
 Used on buttons to create a subtle "lift" effect on hover.
@@ -207,13 +211,15 @@ Used on buttons to create a subtle "lift" effect on hover.
 #### Primary Button
 
 ```html
-<button class="inline-flex items-center justify-center gap-2 px-4 py-2 
+<button
+  class="inline-flex items-center justify-center gap-2 px-4 py-2 
   bg-pink-600 text-white text-sm font-semibold rounded-md shadow-sm
   hover:bg-pink-700 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)]
   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500
   active:bg-pink-800
   disabled:opacity-50 disabled:cursor-not-allowed
-  transition-all duration-200">
+  transition-all duration-200"
+>
   Save Changes
 </button>
 ```
@@ -221,14 +227,16 @@ Used on buttons to create a subtle "lift" effect on hover.
 #### Secondary Button
 
 ```html
-<button class="inline-flex items-center justify-center gap-2 px-4 py-2 
+<button
+  class="inline-flex items-center justify-center gap-2 px-4 py-2 
   bg-white text-gray-700 text-sm font-semibold rounded-md shadow-sm
   border border-gray-300
   hover:bg-gray-50 hover:border-gray-400 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)]
   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500
   active:bg-gray-100
   disabled:opacity-50 disabled:cursor-not-allowed
-  transition-all duration-200">
+  transition-all duration-200"
+>
   Cancel
 </button>
 ```
@@ -236,13 +244,15 @@ Used on buttons to create a subtle "lift" effect on hover.
 #### Danger Button
 
 ```html
-<button class="inline-flex items-center justify-center gap-2 px-4 py-2 
+<button
+  class="inline-flex items-center justify-center gap-2 px-4 py-2 
   bg-red-600 text-white text-sm font-semibold rounded-md shadow-sm
   hover:bg-red-700 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)]
   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500
   active:bg-red-800
   disabled:opacity-50 disabled:cursor-not-allowed
-  transition-all duration-200">
+  transition-all duration-200"
+>
   Delete
 </button>
 ```
@@ -250,13 +260,15 @@ Used on buttons to create a subtle "lift" effect on hover.
 #### Dark Button
 
 ```html
-<button class="inline-flex items-center justify-center gap-2 px-4 py-2 
+<button
+  class="inline-flex items-center justify-center gap-2 px-4 py-2 
   bg-slate-900 text-white text-sm font-semibold rounded-md shadow-sm
   hover:bg-slate-800 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)]
   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500
   active:bg-slate-950
   disabled:opacity-50 disabled:cursor-not-allowed
-  transition-all duration-200">
+  transition-all duration-200"
+>
   Export
 </button>
 ```
@@ -264,23 +276,25 @@ Used on buttons to create a subtle "lift" effect on hover.
 #### Ghost Button
 
 ```html
-<button class="inline-flex items-center justify-center gap-2 px-4 py-2 
+<button
+  class="inline-flex items-center justify-center gap-2 px-4 py-2 
   bg-transparent text-gray-700 text-sm font-semibold rounded-md
   hover:bg-gray-100
   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500
   disabled:opacity-50 disabled:cursor-not-allowed
-  transition-all duration-200">
+  transition-all duration-200"
+>
   Learn More
 </button>
 ```
 
 #### Button Sizes
 
-| Size | Classes |
-|------|---------|
-| Small | `px-3 py-1.5 text-sm` |
-| Medium (default) | `px-4 py-2 text-sm` |
-| Large | `px-6 py-3 text-base` |
+| Size             | Classes               |
+| ---------------- | --------------------- |
+| Small            | `px-3 py-1.5 text-sm` |
+| Medium (default) | `px-4 py-2 text-sm`   |
+| Large            | `px-6 py-3 text-base` |
 
 ### Icon Buttons
 
@@ -289,10 +303,12 @@ Square buttons for icon-only actions.
 #### Neutral Icon Button
 
 ```html
-<button class="p-2 rounded-md text-gray-600
+<button
+  class="p-2 rounded-md text-gray-600
   hover:bg-gray-100 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)]
   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500
-  transition-all duration-200">
+  transition-all duration-200"
+>
   <svg><!-- icon --></svg>
 </button>
 ```
@@ -300,10 +316,12 @@ Square buttons for icon-only actions.
 #### Primary Icon Button
 
 ```html
-<button class="p-2 rounded-md text-pink-600
+<button
+  class="p-2 rounded-md text-pink-600
   hover:bg-pink-50 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)]
   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500
-  transition-all duration-200">
+  transition-all duration-200"
+>
   <svg><!-- icon --></svg>
 </button>
 ```
@@ -311,21 +329,23 @@ Square buttons for icon-only actions.
 #### Danger Icon Button
 
 ```html
-<button class="p-2 rounded-md text-red-600
+<button
+  class="p-2 rounded-md text-red-600
   hover:bg-red-50 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)]
   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500
-  transition-all duration-200">
+  transition-all duration-200"
+>
   <svg><!-- icon --></svg>
 </button>
 ```
 
 #### Icon Button Sizes
 
-| Size | Classes |
-|------|---------|
-| Small | `p-1.5` |
-| Medium (default) | `p-2` |
-| Large | `p-3` |
+| Size             | Classes |
+| ---------------- | ------- |
+| Small            | `p-1.5` |
+| Medium (default) | `p-2`   |
+| Large            | `p-3`   |
 
 ---
 
@@ -334,43 +354,53 @@ Square buttons for icon-only actions.
 #### Text Input
 
 ```html
-<input type="text" class="w-full px-3 py-2 
+<input
+  type="text"
+  class="w-full px-3 py-2 
   bg-white border border-slate-300 rounded-sm 
   text-sm shadow-xs placeholder-slate-400
   focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500
-  disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200" 
-  placeholder="Enter value..." />
+  disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200"
+  placeholder="Enter value..."
+/>
 ```
 
 #### Input with Error State
 
 ```html
-<input type="text" class="w-full px-3 py-2 
+<input
+  type="text"
+  class="w-full px-3 py-2 
   bg-white border border-pink-500 rounded-sm 
   text-sm text-pink-600 shadow-xs placeholder-slate-400
-  focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500" />
+  focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
+/>
 ```
 
 #### Textarea
 
 ```html
-<textarea class="w-full px-3 py-2 min-h-[80px]
+<textarea
+  class="w-full px-3 py-2 min-h-[80px]
   bg-white border border-slate-300 rounded-sm 
   text-sm shadow-xs placeholder-slate-400
   focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500
   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200"
-  placeholder="Enter description..."></textarea>
+  placeholder="Enter description..."
+></textarea>
 ```
 
 #### Select Dropdown
 
 ```html
-<select class="w-full px-3 py-2 pr-10
+<select
+  class="w-full px-3 py-2 pr-10
   bg-white border border-slate-300 rounded-sm 
   text-sm shadow-xs appearance-none
   bg-no-repeat bg-[right_0.75rem_center] bg-[length:1em_1em]
   bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E')]
-  focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500">
+  focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
+>
   <option>Option 1</option>
   <option>Option 2</option>
 </select>
@@ -380,58 +410,45 @@ Square buttons for icon-only actions.
 
 ```html
 <!-- Standard label -->
-<label class="block text-sm font-medium text-slate-700 mb-1">
-  Field Name
-</label>
+<label class="block text-sm font-medium text-slate-700 mb-1"> Field Name </label>
 
 <!-- Required field label -->
-<label class="block text-sm font-medium text-slate-700 mb-1">
-  Field Name <span class="text-pink-500">*</span>
-</label>
+<label class="block text-sm font-medium text-slate-700 mb-1"> Field Name <span class="text-pink-500">*</span> </label>
 
 <!-- Optional field label -->
-<label class="block text-sm font-medium text-slate-600 mb-1">
-  Field Name (optional)
-</label>
+<label class="block text-sm font-medium text-slate-600 mb-1"> Field Name (optional) </label>
 ```
 
 #### Help Text & Descriptions
 
 ```html
 <!-- Standard description -->
-<p class="text-sm text-slate-500 mt-1">
-  Helpful description text goes here.
-</p>
+<p class="text-sm text-slate-500 mt-1">Helpful description text goes here.</p>
 
 <!-- Hint text -->
-<p class="text-xs text-slate-400 mt-1 italic">
-  A subtle hint for the user.
-</p>
+<p class="text-xs text-slate-400 mt-1 italic">A subtle hint for the user.</p>
 ```
 
 #### Error Messages
 
 ```html
-<p class="text-sm font-medium bg-pink-50 py-1 px-2 rounded-sm text-pink-600 mt-1">
-  This field is required.
-</p>
+<p class="text-sm font-medium bg-pink-50 py-1 px-2 rounded-sm text-pink-600 mt-1">This field is required.</p>
 ```
 
 #### Complete Form Field Example
 
 ```html
 <div class="space-y-1">
-  <label class="block text-sm font-medium text-slate-700 mb-1">
-    Page Title <span class="text-pink-500">*</span>
-  </label>
-  <input type="text" class="w-full px-3 py-2 
+  <label class="block text-sm font-medium text-slate-700 mb-1"> Page Title <span class="text-pink-500">*</span> </label>
+  <input
+    type="text"
+    class="w-full px-3 py-2 
     bg-white border border-slate-300 rounded-sm 
     text-sm shadow-xs placeholder-slate-400
     focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
-    placeholder="Enter page title..." />
-  <p class="text-sm text-slate-500 mt-1">
-    The title that appears in the browser tab.
-  </p>
+    placeholder="Enter page title..."
+  />
+  <p class="text-sm text-slate-500 mt-1">The title that appears in the browser tab.</p>
 </div>
 ```
 
@@ -439,9 +456,7 @@ Square buttons for icon-only actions.
 
 ```html
 <div class="space-y-4">
-  <h3 class="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2 mb-4">
-    Section Title
-  </h3>
+  <h3 class="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2 mb-4">Section Title</h3>
   <!-- Form fields go here -->
 </div>
 ```
@@ -519,9 +534,7 @@ Square buttons for icon-only actions.
 
 ```html
 <tr>
-  <td colspan="4" class="text-center py-8 text-slate-500">
-    No items found.
-  </td>
+  <td colspan="4" class="text-center py-8 text-slate-500">No items found.</td>
 </tr>
 ```
 
@@ -568,8 +581,10 @@ Square buttons for icon-only actions.
 #### Neutral Badge
 
 ```html
-<span class="text-xs font-medium px-2 py-1 rounded-full border
-  bg-slate-100 text-slate-700 border-slate-200">
+<span
+  class="text-xs font-medium px-2 py-1 rounded-full border
+  bg-slate-100 text-slate-700 border-slate-200"
+>
   Default
 </span>
 ```
@@ -577,8 +592,10 @@ Square buttons for icon-only actions.
 #### Primary Badge
 
 ```html
-<span class="text-xs font-medium px-2 py-1 rounded-full border
-  bg-pink-100 text-pink-700 border-pink-200">
+<span
+  class="text-xs font-medium px-2 py-1 rounded-full border
+  bg-pink-100 text-pink-700 border-pink-200"
+>
   Active
 </span>
 ```
@@ -586,8 +603,10 @@ Square buttons for icon-only actions.
 #### Success Badge
 
 ```html
-<span class="text-xs font-medium px-2 py-1 rounded-full border
-  bg-green-100 text-green-700 border-green-200">
+<span
+  class="text-xs font-medium px-2 py-1 rounded-full border
+  bg-green-100 text-green-700 border-green-200"
+>
   Published
 </span>
 ```
@@ -595,8 +614,10 @@ Square buttons for icon-only actions.
 #### Warning Badge
 
 ```html
-<span class="text-xs font-medium px-2 py-1 rounded-full border
-  bg-yellow-100 text-yellow-700 border-yellow-200">
+<span
+  class="text-xs font-medium px-2 py-1 rounded-full border
+  bg-yellow-100 text-yellow-700 border-yellow-200"
+>
   Pending
 </span>
 ```
@@ -604,8 +625,10 @@ Square buttons for icon-only actions.
 #### Error Badge
 
 ```html
-<span class="text-xs font-medium px-2 py-1 rounded-full border
-  bg-red-100 text-red-700 border-red-200">
+<span
+  class="text-xs font-medium px-2 py-1 rounded-full border
+  bg-red-100 text-red-700 border-red-200"
+>
   Failed
 </span>
 ```
@@ -625,9 +648,11 @@ Square buttons for icon-only actions.
 #### Success Toast
 
 ```html
-<div class="mb-4 p-4 border rounded-sm flex justify-between items-start
+<div
+  class="mb-4 p-4 border rounded-sm flex justify-between items-start
   bg-green-700 border-green-800 text-green-50
-  transform transition-all duration-300 ease-in-out">
+  transform transition-all duration-300 ease-in-out"
+>
   <span>Changes saved successfully!</span>
   <button class="ml-4 text-green-200 hover:text-white">×</button>
 </div>
@@ -636,9 +661,11 @@ Square buttons for icon-only actions.
 #### Error Toast
 
 ```html
-<div class="mb-4 p-4 border rounded-sm flex justify-between items-start
+<div
+  class="mb-4 p-4 border rounded-sm flex justify-between items-start
   bg-red-50 border-red-200 text-red-600
-  transform transition-all duration-300 ease-in-out">
+  transform transition-all duration-300 ease-in-out"
+>
   <span>An error occurred. Please try again.</span>
   <button class="ml-4 text-slate-400 hover:text-slate-600">×</button>
 </div>
@@ -647,9 +674,11 @@ Square buttons for icon-only actions.
 #### Warning Toast
 
 ```html
-<div class="mb-4 p-4 border rounded-sm flex justify-between items-start
+<div
+  class="mb-4 p-4 border rounded-sm flex justify-between items-start
   bg-yellow-50 border-yellow-200 text-yellow-700
-  transform transition-all duration-300 ease-in-out">
+  transform transition-all duration-300 ease-in-out"
+>
   <span>Please review before continuing.</span>
   <button class="ml-4 text-slate-400 hover:text-slate-600">×</button>
 </div>
@@ -658,9 +687,11 @@ Square buttons for icon-only actions.
 #### Info Toast
 
 ```html
-<div class="mb-4 p-4 border rounded-sm flex justify-between items-start
+<div
+  class="mb-4 p-4 border rounded-sm flex justify-between items-start
   bg-blue-50 border-blue-200 text-blue-600
-  transform transition-all duration-300 ease-in-out">
+  transform transition-all duration-300 ease-in-out"
+>
   <span>New features are available.</span>
   <button class="ml-4 text-slate-400 hover:text-slate-600">×</button>
 </div>
@@ -692,20 +723,14 @@ Square buttons for icon-only actions.
       <p class="text-sm text-slate-600 mt-1">This action cannot be undone.</p>
     </div>
   </div>
-  
+
   <!-- Body (optional) -->
-  <div class="p-4 text-slate-600">
-    Additional context or details about the action.
-  </div>
-  
+  <div class="p-4 text-slate-600">Additional context or details about the action.</div>
+
   <!-- Footer -->
   <div class="p-4 bg-slate-50 flex justify-end gap-2">
-    <button class="px-4 py-2 border border-slate-300 rounded-sm hover:bg-slate-100 text-sm font-medium">
-      Cancel
-    </button>
-    <button class="px-4 py-2 bg-red-600 text-white rounded-sm hover:bg-red-700 text-sm font-medium">
-      Delete
-    </button>
+    <button class="px-4 py-2 border border-slate-300 rounded-sm hover:bg-slate-100 text-sm font-medium">Cancel</button>
+    <button class="px-4 py-2 bg-red-600 text-white rounded-sm hover:bg-red-700 text-sm font-medium">Delete</button>
   </div>
 </div>
 ```
@@ -713,6 +738,7 @@ Square buttons for icon-only actions.
 #### Confirmation Modal (Warning)
 
 Same structure but with:
+
 - Header: `bg-yellow-50`
 - Icon: `text-yellow-500`
 - Confirm button: `bg-pink-600 hover:bg-pink-700`
@@ -724,17 +750,18 @@ Same structure but with:
 ```html
 <div class="relative inline-block group">
   <button>Hover me</button>
-  <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2
+  <div
+    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2
     opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0
-    transition-all duration-150 pointer-events-none">
-    <div class="px-2 py-1 text-xs text-white bg-black/75 rounded whitespace-nowrap">
-      Tooltip text
-    </div>
-    <div class="absolute top-full left-1/2 -translate-x-1/2
+    transition-all duration-150 pointer-events-none"
+  >
+    <div class="px-2 py-1 text-xs text-white bg-black/75 rounded whitespace-nowrap">Tooltip text</div>
+    <div
+      class="absolute top-full left-1/2 -translate-x-1/2
       border-l-[6px] border-l-transparent 
       border-r-[6px] border-r-transparent 
-      border-t-[6px] border-t-black/75">
-    </div>
+      border-t-[6px] border-t-black/75"
+    ></div>
   </div>
 </div>
 ```
@@ -760,12 +787,8 @@ Same structure but with:
     <svg class="w-12 h-12 mx-auto"><!-- icon --></svg>
   </div>
   <h3 class="text-xl font-semibold text-slate-700 mb-2">No pages yet</h3>
-  <p class="text-sm text-slate-500 mb-4">
-    Create your first page to get started.
-  </p>
-  <button class="...primary button...">
-    Create Page
-  </button>
+  <p class="text-sm text-slate-500 mb-4">Create your first page to get started.</p>
+  <button class="...primary button...">Create Page</button>
 </div>
 ```
 
@@ -777,42 +800,39 @@ Same structure but with:
 
 ```html
 <div class="w-[72px] md:w-48 bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto">
-  
   <!-- Logo -->
   <div class="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-4 px-2 md:px-4">
-    <img src="/logo.svg" class="hidden md:block w-40" />
+    <img src="/logo.svg" class="hidden md:block" />
     <img src="/logo-symbol.svg" class="md:hidden w-12 h-12 mx-auto" />
   </div>
-  
+
   <!-- Navigation Sections -->
   <div class="pb-2 px-2 md:px-4 grow">
-    
     <!-- Section -->
     <div class="border-b border-slate-800 pb-4 mb-4">
-      <h4 class="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">
-        SECTION TITLE
-      </h4>
+      <h4 class="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">SECTION TITLE</h4>
       <ul class="space-y-2 md:space-y-1">
         <!-- Navigation items -->
       </ul>
     </div>
-    
   </div>
-  
+
   <!-- Bottom Section -->
   <div class="px-2 md:px-4 pb-2 border-t border-slate-800 pt-4">
     <!-- Settings, etc. -->
   </div>
-  
 </div>
 ```
 
 #### Sidebar Navigation Item (Inactive)
 
 ```html
-<a href="#" class="flex items-center justify-center md:justify-start p-2 rounded-sm
+<a
+  href="#"
+  class="flex items-center justify-center md:justify-start p-2 rounded-sm
   border border-slate-700 md:border-none
-  hover:bg-slate-800 transition-all duration-150">
+  hover:bg-slate-800 transition-all duration-150"
+>
   <span class="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-pink-600">
     <svg><!-- icon --></svg>
   </span>
@@ -823,8 +843,11 @@ Same structure but with:
 #### Sidebar Navigation Item (Active)
 
 ```html
-<a href="#" class="flex items-center justify-center md:justify-start p-2 rounded-sm
-  bg-pink-600 border-pink-600 transition-all duration-150">
+<a
+  href="#"
+  class="flex items-center justify-center md:justify-start p-2 rounded-sm
+  bg-pink-600 border-pink-600 transition-all duration-150"
+>
   <span class="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-white">
     <svg><!-- icon --></svg>
   </span>
@@ -835,8 +858,10 @@ Same structure but with:
 #### Sidebar Navigation Item (Disabled)
 
 ```html
-<span class="flex items-center justify-center md:justify-start p-2 rounded-sm
-  opacity-40 cursor-not-allowed">
+<span
+  class="flex items-center justify-center md:justify-start p-2 rounded-sm
+  opacity-40 cursor-not-allowed"
+>
   <span class="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-slate-500">
     <svg><!-- icon --></svg>
   </span>
@@ -858,16 +883,14 @@ Same structure but with:
 
 ```html
 <div class="flex h-screen overflow-hidden">
-  
   <!-- Sidebar -->
   <aside class="...sidebar classes...">
     <!-- sidebar content -->
   </aside>
-  
+
   <!-- Main Content -->
   <main class="flex-1 overflow-auto ml-[72px] md:ml-48 bg-gray-50">
     <div class="p-8 max-w-7xl mx-auto">
-      
       <!-- Page Header -->
       <div class="flex justify-between items-center mb-6">
         <div>
@@ -878,15 +901,13 @@ Same structure but with:
           <!-- Header actions -->
         </div>
       </div>
-      
+
       <!-- Page Content -->
       <div class="bg-white rounded-xl border border-gray-200 p-4">
         <!-- content -->
       </div>
-      
     </div>
   </main>
-  
 </div>
 ```
 
@@ -896,12 +917,11 @@ Same structure but with:
 
 ```html
 <div class="flex flex-wrap justify-between items-center mb-4">
-  
   <!-- Left side -->
   <div class="flex items-center gap-2 mb-2 sm:mb-0">
     <button class="...secondary button...">Action</button>
   </div>
-  
+
   <!-- Right side -->
   <div class="flex items-center gap-2">
     <!-- Search input with icon -->
@@ -909,13 +929,10 @@ Same structure but with:
       <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
         <svg><!-- search icon --></svg>
       </span>
-      <input type="text" 
-        class="form-input pl-10" 
-        placeholder="Search..." />
+      <input type="text" class="form-input pl-10" placeholder="Search..." />
     </div>
     <button class="...primary button...">Add New</button>
   </div>
-  
 </div>
 ```
 
@@ -925,12 +942,12 @@ Same structure but with:
 
 ### Standard Transitions
 
-| Use Case | Classes |
-|----------|---------|
-| Buttons & general | `transition-all duration-200` |
-| Table row hovers | `transition-colors duration-150` |
-| Action reveals | `transition-opacity duration-150` |
-| Toasts & modals | `transition-all duration-300 ease-in-out` |
+| Use Case          | Classes                                   |
+| ----------------- | ----------------------------------------- |
+| Buttons & general | `transition-all duration-200`             |
+| Table row hovers  | `transition-colors duration-150`          |
+| Action reveals    | `transition-opacity duration-150`         |
+| Toasts & modals   | `transition-all duration-300 ease-in-out` |
 
 ### Hover Reveal Pattern
 
@@ -968,6 +985,7 @@ Applied to all focusable elements via CSS:
 ```
 
 Tailwind classes:
+
 ```
 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-0
 ```
@@ -993,12 +1011,14 @@ focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500
 **Standard size:** 20px (`size={20}`)
 
 **Common icons used:**
+
 - Navigation: `Home`, `File`, `Folder`, `Menu`, `Image`, `Settings`, `Layers`
 - Actions: `Plus`, `Pencil`, `Trash2`, `Copy`, `Download`, `Upload`, `ExternalLink`
 - UI: `ChevronDown`, `ChevronUp`, `ChevronRight`, `X`, `Check`, `Search`
 - Status: `AlertTriangle`, `Info`, `CheckCircle`, `XCircle`
 
 **Icon colors follow text context:**
+
 - Default: `text-slate-400` or `text-slate-500`
 - Interactive: `text-pink-600`
 - On dark background: `text-white`
@@ -1055,6 +1075,7 @@ npm install tailwindcss @tailwindcss/postcss postcss
 ```
 
 **postcss.config.js:**
+
 ```javascript
 export default {
   plugins: {
@@ -1064,6 +1085,7 @@ export default {
 ```
 
 **Main CSS file:**
+
 ```css
 @import "tailwindcss";
 
@@ -1084,4 +1106,4 @@ export default {
 
 ---
 
-*This design system document is self-contained and includes all patterns needed to recreate the Widgetizer visual style in new applications.*
+_This design system document is self-contained and includes all patterns needed to recreate the Widgetizer visual style in new applications._
