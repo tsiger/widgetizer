@@ -37,6 +37,23 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[arch-design-system.md](arch-design-system.md)** - Arch Theme Design System
+
+**Purpose**: Complete reference for the Arch theme's visual design language, CSS custom properties, layout system, component patterns, and modifiers **When to use**:
+
+- Understanding the Arch theme's design tokens and CSS variables
+- Looking up spacing, typography, or color token values
+- Understanding the color scheme system (standard/highlight)
+- Working with layout containers, grids, and content width modifiers
+- Using component classes (cards, buttons, forms, icons)
+- Implementing scroll reveal animations
+- Understanding the CSS variable pipeline from theme.json to rendered CSS
+- Following widget template conventions
+
+**Key topics**: Design tokens, color schemes, typography system, spacing scale, layout containers, grid system, card/button/form/icon components, block system, header/footer globals, utility classes, reveal animations, responsive breakpoints, CSS variable pipeline, widget conventions
+
+---
+
 ### **[theming-setting-types.md](theming-setting-types.md)** - Setting Types Reference
 
 **Purpose**: Comprehensive reference for all available setting types in theme.json and widget schemas **When to use**:
