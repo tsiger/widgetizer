@@ -312,6 +312,10 @@ export async function updatePage(req, res) {
         await removePageFromMediaUsage(activeProjectId, oldSlug);
       }
       // Then update with the new slug (or refresh if slug didn't change)
+      console.log(
+        "[updatePage] Calling updatePageMediaUsage with SEO:",
+        JSON.stringify(finalUpdatedPageData.seo, null, 2),
+      );
       await updatePageMediaUsage(activeProjectId, finalNewSlug, finalUpdatedPageData);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for page ${finalNewSlug}:`, usageError);

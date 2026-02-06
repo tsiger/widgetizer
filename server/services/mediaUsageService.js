@@ -13,6 +13,17 @@ import { getProjectFolderName } from "../utils/projectHelpers.js";
 function extractMediaPathsFromPage(pageData) {
   const mediaPaths = new Set();
 
+  // Check SEO social media image (og_image)
+  if (pageData.seo?.og_image && typeof pageData.seo.og_image === "string") {
+    const ogImage = pageData.seo.og_image;
+    // Handle both absolute paths (/uploads/...) and relative paths (uploads/...)
+    if (ogImage.startsWith("/uploads/images/")) {
+      mediaPaths.add(ogImage);
+    } else if (ogImage.startsWith("uploads/images/")) {
+      mediaPaths.add("/" + ogImage);
+    }
+  }
+
   if (!pageData.widgets) return Array.from(mediaPaths);
 
   // Helper function to extract media from settings object

@@ -124,7 +124,7 @@ The media library automatically tracks which pages and global widgets are using 
 
 - **`usedIn` Array**: Each file object contains a `usedIn` array with the slugs of pages and IDs of global widgets that reference this file
 - **Automatic Updates**: Usage tracking is updated automatically when:
-  - Pages are saved or updated (scans widget and block settings for media paths)
+  - Pages are saved or updated (scans widget/block settings and SEO metadata for media paths)
   - Pages are deleted (removes the page slug from all media files)
   - Page slugs are changed (removes old slug, adds new slug to relevant files)
   - **Global widgets** (header/footer) are saved or updated (scans settings for media paths)
