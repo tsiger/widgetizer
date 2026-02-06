@@ -9,7 +9,7 @@ This document provides a user experience (UX) audit of the application's core wo
 1.  **Never Leave the User Guessing:** After any action (save, delete, etc.), the user should receive immediate and clear feedback (e.g., a "toast" notification).
 2.  **Go with the Flow:** Redirect users to the logical next step in their workflow. For example, after creating an item, take them to where they can use it or see it.
 3.  **Consistency is Key:** The pattern for creating, editing, and deleting different types of content (pages, menus, etc.) should be as similar as possible.
-4.  **Prevent Destructive Actions:** Use confirmation modals for deletions, and disable actions that would break things (e.g., deleting an active theme or project).
+4.  **Prevent Destructive Actions:** Use confirmation modals for deletions, and block or warn on actions that would break things (e.g., deleting a theme that is in use returns 409 and shows an error toast).
 5.  **Efficiency Through Shortcuts:** Provide standard keyboard shortcuts (Undo, Redo, Save) to speed up common workflows.
 6.  **Intelligent Auto-Save:** Auto-save should be "invisible" and respectful of user activity, triggering only after a period of inactivity (debounce) rather than at fixed intervals.
 
@@ -179,11 +179,13 @@ _(Excluding the Page Editor itself)_
 ### **5.3. Delete a Theme**
 
 - **Current State:**
-  - Theme deletion functionality is not currently implemented in the UI.
-- **Future Improvement:** Add delete functionality with:
-  - Confirmation modal before deletion.
-  - Prevention of deleting the active theme (or warning if attempted).
-  - Success toast: `Theme "[Theme Name]" has been deleted.`
+  1. User opens the three-dot menu (⋮) on a theme card on the Themes page.
+  2. User clicks "Delete".
+  3. Browser confirmation dialog: "Are you sure you want to delete \"[Theme Name]\"? This action cannot be undone."
+  4. On confirm, `DELETE /api/themes/:id` is called. Backend removes the theme directory.
+  5. If the theme is used by one or more projects, server returns 409; UI shows error toast: "Cannot delete \"[Theme Name]\" - it is currently used by one or more projects".
+  6. On success: success toast, theme list refreshes.
+- **Status:** ✅ Fully implemented
 
 ### **5.4. Update a Theme**
 
@@ -245,13 +247,13 @@ _(Excluding the Page Editor itself)_
 - Theme upload (with validation and feedback)
 - Theme updates (sidebar badge, per-theme update buttons, validation)
 - Project theme updates (apply theme updates to projects)
+- Theme deletion (three-dot menu, confirmation, 409 when theme in use)
 
 ### ⚠️ Partially Implemented / Needs Improvement
 
 - **Project creation:** Redirects to list instead of dashboard when auto-activated
 - **Page creation:** Redirects to list instead of page editor
 - **Theme activation:** Only available via project edit, not directly from themes page
-- **Theme deletion:** Not implemented in UI
 
 ### 📝 Notes
 

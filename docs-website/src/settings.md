@@ -129,6 +129,8 @@ High-resolution images for large desktop displays.
 - **Default:** Enabled
 - **Use case:** Large desktop screens, high-resolution displays
 
+**When a theme defines image sizes:** If the active project uses a theme that defines its own image sizes in its manifest, the Image Sizes controls above are hidden. A notice is shown that image sizes are managed by the theme. Other media settings (upload limits, image quality) remain available. See [Media Library](media.html#when-a-theme-defines-image-sizes) for details.
+
 #### Smart Size Generation
 
 Widgetizer automatically determines which sizes to create:

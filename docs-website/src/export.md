@@ -44,6 +44,10 @@ Widgetizer tracks which media files are actually used on your pages (see [Media 
 - For images, all size variants (thumb, small, medium, large) are included
 - Unused media is skipped, reducing export size
 
+### Optional Markdown Files
+
+If you enable **"Also export pages as Markdown (.md)"** when creating an export, Widgetizer also writes a `.md` file for each page (e.g. `index.md`, `about.md`). Each file has YAML frontmatter (title, description, source references) and the page content in Markdown. Layout, styles, and scripts are not included.
+
 ### SEO Files
 
 If your project has a Site URL configured, Widgetizer generates:
@@ -59,6 +63,12 @@ Widgetizer keeps a history of your exports:
 - You can view, download, or delete any previous export
 - The maximum number of versions to keep is configurable in [App Settings](settings.html)
 - When the limit is exceeded, the oldest exports are automatically deleted
+
+# Export Options
+
+When creating an export, you can enable:
+
+**Also export pages as Markdown (.md)** — In addition to HTML, each page is written as a Markdown (`.md`) file. The Markdown contains the page content only (no layout), converted from the rendered HTML. Each file includes YAML frontmatter with the page title, description, and source file references. Useful for documentation, static site generators that accept Markdown, or content reuse. The checkbox is on the Export page next to the export button.
 
 # Viewing and Downloading Exports
 

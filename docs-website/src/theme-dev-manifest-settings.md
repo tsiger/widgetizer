@@ -41,6 +41,36 @@ These fields are required for a theme to be valid:
 
 **`useCoreWidgets`** — When `true` (or absent), core widgets are included alongside theme widgets. If `false`, core widgets are not exposed in the editor.
 
+# Theme-Defined Image Sizes (Optional)
+
+Themes can override the app-level image size configuration by defining `settings.imageSizes` in `theme.json`. This is useful when your theme needs specific dimensions (e.g. a `hero` size at 1600px for hero banners).
+
+When present, theme image sizes **replace** the app settings entirely for projects using that theme. The App Settings UI hides the Image Sizes controls and shows a notice that sizes are managed by the theme. The `thumb` size is always generated for the media library, even if not listed.
+
+**Example:**
+
+```json
+{
+  "settings": {
+    "imageSizes": {
+      "thumb": { "width": 150, "enabled": true },
+      "small": { "width": 480, "enabled": true },
+      "medium": { "width": 1024, "enabled": true },
+      "hero": { "width": 1600, "enabled": true, "quality": 90 },
+      "large": { "enabled": false }
+    }
+  }
+}
+```
+
+**Per-size properties:**
+
+- **`width`** (number) — Maximum width in pixels
+- **`enabled`** (boolean) — Whether to generate this size (default: `true`)
+- **`quality`** (number, optional) — JPEG/WebP quality 1–100; falls back to app setting if omitted
+
+Templates can reference these sizes with the `{% image %}` tag, e.g. `{% image src: image, size: 'hero' %}`.
+
 # Global Settings Schema
 
 Global settings are defined in `settings.global`. Each key is a group that becomes a section in the Theme Settings UI.

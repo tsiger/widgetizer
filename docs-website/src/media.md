@@ -88,6 +88,17 @@ You can customize how images are processed in [App Settings](settings.html) → 
 - For example, set "Medium" to 768px instead of 1024px
 - Useful for matching your theme's design
 
+### When a Theme Defines Image Sizes
+
+If your project uses a theme that defines its own image sizes in its manifest, those sizes **replace** the app-level settings for that project. In that case:
+
+- The image sizes (and optional per-size quality) come from the theme
+- The **Image Sizes** controls in [App Settings](settings.html) are hidden for that project; a notice explains that image sizes are managed by the theme
+- Thumbnails for the media library are still generated
+- Other media settings (upload limits, global image quality) in App Settings still apply
+
+See [Themes](themes.html) for how themes work and [Settings](settings.html) for app-level options.
+
 # Viewing Your Media
 
 ### Grid View

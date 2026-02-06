@@ -59,10 +59,11 @@ Manages export history display and actions:
 ### Export Creation Workflow
 
 - **UI**: Clean interface with project name and "Export Project" button with loading states
+- **Markdown export option**: A checkbox "Also export pages as Markdown (.md)" sends `exportMarkdown: true` in the request body when checked. When enabled, the backend writes a `.md` file per page (content-only, with YAML frontmatter) alongside the HTML files (see step 8 in Backend Implementation).
 - **Export Triggering**:
   1. User clicks export button in `ExportCreator`
-  2. Component calls `exportProjectAPI(activeProject.id)` from `exportManager`
-  3. Manager sends `POST` request to `/api/export/:projectId` endpoint
+  2. Component calls `exportProjectAPI(activeProject.id, { exportMarkdown })` from `exportManager`
+  3. Manager sends `POST` request to `/api/export/:projectId` with optional `exportMarkdown` in body
 - **Feedback**: Success/error notifications with version information and automatic history refresh
 
 ### Export History Management
@@ -124,7 +125,13 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
       - The report provides a visual, developer-friendly interface showing all validation issues
     - The formatted (and potentially validated) HTML is saved as a file in the output directory (e.g., `about-us.html`). If a page's slug is "home" or "index", it is saved as `index.html`.
 
-8.  **Copy Static Assets**:
+8.  **Optional Markdown export** (when `exportMarkdown` is true in request body):
+    - For each page, after writing the HTML file, the controller converts the page content (widget HTML only, no layout) to Markdown using TurndownService (ATX headings, fenced code blocks, `-` list markers).
+    - Non-content elements are removed (style, script, noscript, form, input, button, select, textarea); inline style/script/form blocks and placeholder images are stripped from the HTML before conversion.
+    - Each `.md` file is written with YAML frontmatter: `title`, `description`, and `source_url` (with `html` and `md` filenames). Homepage is `index.md`, other pages use slug (e.g. `about.md`).
+    - Markdown write errors are logged and do not fail the export.
+
+9.  **Copy Static Assets**:
     - The system performs several copy operations to ensure the static site is self-contained:
       - **Theme Assets**: All files from the project's `/assets` directory (e.g., `base.css`, `scripts.js`) are copied to `/assets` in the output directory.
       - **Core Assets**: Placeholder images (SVG) from the core assets are copied to ensure widgets using placeholders work correctly.
@@ -143,14 +150,14 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
         - Audio files are copied to `assets/audios/`
       - **Export Optimization**: Logs how many media files were copied vs. skipped, often reducing export size significantly
 
-9.  **Record Export History**:
+10. **Record Export History**:
     - The export metadata is recorded in `/data/publish/export-history.json` with version number, timestamp, output directory, and status.
     - **Automatic Cleanup**: If the number of exports exceeds the user's configured limit (from App Settings), the oldest exports are automatically deleted:
       - Physical export directories are removed from the file system
       - Export history entries are cleaned up
       - The cleanup process respects the `export.maxVersionsToKeep` setting
 
-10. **Send Response**:
+11. **Send Response**:
     - Once all steps are complete, the server sends a success response to the client, including the export record with version information.
 
 ## 3. Export Management Features

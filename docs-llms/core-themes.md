@@ -53,6 +53,7 @@ The frontend component provides a clean interface for theme management.
 - **Active Theme Indicator**: Visual indication of which theme is currently active for the project.
 - **Update Indicators**: Shows when themes have pending updates available.
 - **Per-Theme Update Buttons**: Allows updating individual themes.
+- **Theme Deletion**: Three-dot menu on each card with "Delete"; confirmation dialog; deletion blocked with 409 + error toast when theme is used by any project.
 - **Localization**: Fully integrated with `react-i18next` for all user-facing text.
 
 ### Displaying Themes
@@ -115,6 +116,7 @@ The backend handles the logic for listing themes, processing uploads, and managi
 | `POST` | `/api/themes/upload` | `upload.single("themeZip")` | `uploadTheme` | Handles the upload and extraction of a new theme zip. |
 | `GET` | `/api/themes/:id/versions` |  | `getThemeVersions` | Gets all available versions for a theme. |
 | `POST` | `/api/themes/:id/update` |  | `updateTheme` | Builds `latest/` snapshot for a single theme. |
+| `DELETE` | `/api/themes/:id` |  | `deleteTheme` | Deletes a theme. Returns 409 if theme is used by any project. |
 | `GET` | `/api/themes/update-count` |  | `getThemeUpdateCount` | Gets count of themes with pending updates. |
 
 ### Controller Logic (`server/controllers/themeController.js`)
@@ -136,6 +138,10 @@ The backend handles the logic for listing themes, processing uploads, and managi
   - Ensures `theme.json`, `layout.liquid`, `screenshot.png` exist
   - Verifies `assets/`, `templates/`, `widgets/` directories
   - Prevents overwriting existing themes
+
+#### Theme Deletion
+
+- `deleteTheme`: Removes the theme directory from the filesystem. Before deletion, checks if any project in `projects.json` references this theme; if so, returns 409 with message that the theme is in use. On success, returns 200 with success message.
 
 #### Theme Updates
 

@@ -104,6 +104,16 @@ This means your design choices stay intact while you get access to new features.
 
 > **Note:** Theme updates improve your existing theme—they don't change it to a different design system. Your content always remains compatible.
 
+# Deleting a Theme
+
+You can remove a theme you no longer need from the Themes page:
+
+1. Open the **three-dot menu** (⋮) on the theme card.
+2. Choose **Delete**.
+3. Confirm in the dialog. Deletion cannot be undone.
+
+**Restriction:** You cannot delete a theme that is currently used by any project. If you try, Widgetizer shows an error explaining that the theme is in use. Remove or change the theme from those projects first (e.g. by deleting the projects or switching them to another theme), then delete the theme.
+
 # Choosing a Theme
 
 When creating a new project, consider:
