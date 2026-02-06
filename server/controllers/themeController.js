@@ -51,6 +51,54 @@ async function removeDSStoreRecursive(dir) {
   }
 }
 
+/**
+ * Recursively get all paths from a deleted/ folder.
+ * Returns paths relative to the deleted/ folder root.
+ *
+ * Logic:
+ * - Files are always deleted (they act as placeholders)
+ * - Empty directories mean "delete this entire folder"
+ * - Non-empty directories are just path containers (not deleted themselves)
+ *
+ * @param {string} deletedDir - The deleted/ directory to scan
+ * @param {string} relativePath - Current relative path (for recursion)
+ * @returns {Promise<string[]>} - Array of relative paths to delete
+ */
+async function getDeletedPaths(deletedDir, relativePath) {
+  const paths = [];
+  const currentDir = relativePath ? path.join(deletedDir, relativePath) : deletedDir;
+
+  try {
+    const entries = await fs.readdir(currentDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const entryRelativePath = relativePath ? path.join(relativePath, entry.name) : entry.name;
+
+      if (entry.isDirectory()) {
+        // Check if directory is empty
+        const subDir = path.join(currentDir, entry.name);
+        const subEntries = await fs.readdir(subDir);
+
+        if (subEntries.length === 0) {
+          // Empty directory = delete this entire folder
+          paths.push(entryRelativePath);
+        } else {
+          // Non-empty directory = recurse to find actual items to delete
+          const nestedPaths = await getDeletedPaths(deletedDir, entryRelativePath);
+          paths.push(...nestedPaths);
+        }
+      } else {
+        // Files: add the file path for deletion
+        paths.push(entryRelativePath);
+      }
+    }
+  } catch {
+    // Ignore errors
+  }
+
+  return paths;
+}
+
 // ============================================================================
 // Theme Versioning Functions
 // ============================================================================
@@ -232,11 +280,32 @@ export async function buildLatestSnapshot(themeId) {
       const versionEntries = await fs.readdir(versionDir, { withFileTypes: true });
 
       for (const entry of versionEntries) {
+        // Skip the deleted/ folder - it's processed separately
+        if (entry.name === "deleted") continue;
+
         const sourcePath = path.join(versionDir, entry.name);
         const targetPath = path.join(latestDir, entry.name);
 
         // Copy with overwrite (later versions win)
         await fs.copy(sourcePath, targetPath, { overwrite: true });
+      }
+
+      // Process deleted/ folder if it exists
+      const deletedDir = path.join(versionDir, "deleted");
+      if (await fs.pathExists(deletedDir)) {
+        const deletedPaths = await getDeletedPaths(deletedDir, "");
+        for (const deletedPath of deletedPaths) {
+          const targetPath = path.join(latestDir, deletedPath);
+          try {
+            await fs.remove(targetPath);
+            console.log(`[buildLatestSnapshot] Deleted ${deletedPath} (v${version})`);
+          } catch (deleteError) {
+            // Ignore if path doesn't exist
+            if (deleteError.code !== "ENOENT") {
+              console.warn(`[buildLatestSnapshot] Could not delete ${deletedPath}:`, deleteError.message);
+            }
+          }
+        }
       }
 
       console.log(`[buildLatestSnapshot] Applied version ${version} to latest/`);

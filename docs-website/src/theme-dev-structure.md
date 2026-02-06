@@ -131,7 +131,6 @@ When a new project is created, the selected theme is copied into the project’s
 
 This ensures each project has its own theme files and can evolve independently.
 
-
 # Publishing Theme Updates
 
 Widgetizer supports a versioned update system that lets you distribute improvements to users of your theme.
@@ -154,6 +153,11 @@ themes/my-theme/
 │       ├── theme.json      # Required, version must be "1.2.0"
 │       └── assets/
 │           └── base.css    # Only changed assets
+│   └── 1.3.0/
+│       ├── theme.json
+│       └── deleted/        # Deleted files
+│           └── assets/
+│               └── old.css
 └── latest/                 # Auto-generated snapshot
 ```
 
@@ -162,8 +166,19 @@ themes/my-theme/
 1. Create a version folder (e.g., `updates/1.1.0/`)
 2. Add a `theme.json` with the matching version number
 3. Add only the files that changed (new widgets, updated CSS, etc.)
-4. Go to the Themes page in Widgetizer and click "Update" on your theme
-5. The system builds the `latest/` snapshot by layering all versions
+4. (Optional) Add a `deleted/` folder to remove files from previous versions (see below)
+5. Go to the Themes page in Widgetizer and click "Update" on your theme
+6. The system builds the `latest/` snapshot by layering all versions
+
+### Deleting Files
+
+To remove files or folders from previous versions, add a `deleted/` folder to your update version. The structure inside `deleted/` mirrors the paths you want to remove:
+
+- **Files:** Add an empty file to mark it for deletion (e.g., `deleted/assets/old.css`)
+- **Folders:** Add an empty directory to delete the entire folder and its contents (e.g., `deleted/widgets/old-widget/`)
+- **Path Containers:** Non-empty directories in `deleted/` are treated as path containers and are not deleted themselves (only their key contents are).
+
+**Protected from Deletion:** User content (`pages/`, `uploads/`) and additive-only paths (`templates/`, `menus/`) cannot be deleted.
 
 ### The `latest/` Folder
 
@@ -198,14 +213,14 @@ To distribute your theme with updates:
 
 When users apply your theme update to their projects:
 
-| Path | Behavior |
-|------|----------|
-| `layout.liquid` | Replaced |
-| `widgets/` | Replaced |
-| `assets/` | Replaced |
-| `snippets/` | Replaced |
-| `theme.json` | Settings merged (user values preserved) |
-| `menus/` | New menus added, existing preserved |
-| `templates/` | New templates added, existing preserved |
+| Path            | Behavior                                |
+| --------------- | --------------------------------------- |
+| `layout.liquid` | Replaced                                |
+| `widgets/`      | Replaced                                |
+| `assets/`       | Replaced                                |
+| `snippets/`     | Replaced                                |
+| `theme.json`    | Settings merged (user values preserved) |
+| `menus/`        | New menus added, existing preserved     |
+| `templates/`    | New templates added, existing preserved |
 
 User content (`pages/`, `uploads/`) is never modified.

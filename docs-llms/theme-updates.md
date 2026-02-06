@@ -48,6 +48,42 @@ Each version folder in `updates/` contains **only the files that changed** in th
 3. Add only the files that changed (new widgets, updated assets, etc.)
 4. The system layers these on top of previous versions
 
+### File Deletions
+
+To **remove** files from previous versions, add a `deleted/` folder to your version update. The structure inside `deleted/` mirrors the paths you want to remove:
+
+```
+themes/
+  arch/
+    updates/
+      1.2.0/
+        theme.json
+        deleted/              # Files/folders to remove
+          widgets/
+            deprecated-widget/  # This widget will be deleted from latest/
+          assets/
+            old-style.css       # This file will be deleted from latest/
+```
+
+**How it works:**
+
+- Files inside `deleted/` are **placeholders** that mark specific files for deletion
+- **Empty directories** in `deleted/` mean "delete this entire folder"
+- **Non-empty directories** are just path containers (e.g., `deleted/assets/` won't delete `assets/`, only the files inside)
+
+**Deletion eligibility:**
+
+| Path            | Can be deleted? | Notes                  |
+| --------------- | --------------- | ---------------------- |
+| `assets/`       | ✅ Yes          | Theme infrastructure   |
+| `widgets/`      | ✅ Yes          | Theme infrastructure   |
+| `snippets/`     | ✅ Yes          | Theme infrastructure   |
+| `layout.liquid` | ✅ Yes          | Theme infrastructure   |
+| `templates/`    | ❌ No           | User content, add-only |
+| `menus/`        | ❌ No           | User content, add-only |
+| `pages/`        | ❌ No           | Protected user content |
+| `uploads/`      | ❌ No           | Protected user content |
+
 ### Materialized Snapshot (`latest/`)
 
 The `latest/` folder is a **composed, ready-to-use snapshot** built by the system:
@@ -55,9 +91,11 @@ The `latest/` folder is a **composed, ready-to-use snapshot** built by the syste
 1. Start from the base version (root theme files)
 2. Apply each version folder in `updates/` in semver order
 3. For each version, copy its files over the previous state
-4. Result: `latest/` contains the complete, up-to-date theme
+4. For each version, process `deleted/` folder removals
+5. Result: `latest/` contains the complete, up-to-date theme
 
 **Key behaviors:**
+
 - If a file exists in multiple versions, the **latest version wins**
 - `latest/` is rebuilt when a theme author clicks "Update" on the Themes page
 - Projects read theme files from `latest/` (or base if `latest/` doesn't exist)
@@ -68,32 +106,31 @@ The `latest/` folder is a **composed, ready-to-use snapshot** built by the syste
 
 These theme files can be updated in projects:
 
-| Path | Behavior |
-|------|----------|
-| `layout.liquid` | Replaced with new version |
-| `assets/` | Entire folder replaced |
-| `widgets/` | Entire folder replaced |
-| `snippets/` | Entire folder replaced |
-| `theme.json` | **Merged** (see Settings Merge below) |
-| `screenshot.png` | Replaced with new version |
+| Path             | Behavior                              |
+| ---------------- | ------------------------------------- |
+| `layout.liquid`  | Replaced with new version             |
+| `assets/`        | Entire folder replaced                |
+| `widgets/`       | Entire folder replaced                |
+| `snippets/`      | Entire folder replaced                |
+| `theme.json`     | **Merged** (see Settings Merge below) |
+| `screenshot.png` | Replaced with new version             |
 
 ### Protected Paths (Never Updated)
 
 User content is never modified:
 
-| Path | Reason |
-|------|--------|
-| `pages/` | User's page content |
-| `uploads/` | User's media files |
-| `collections/` | User's collection data (if present) |
+| Path       | Reason              |
+| ---------- | ------------------- |
+| `pages/`   | User's page content |
+| `uploads/` | User's media files  |
 
 ### Add-New-Only Paths
 
 These paths receive additions but preserve existing files:
 
-| Path | Behavior |
-|------|----------|
-| `menus/` | New menus added, existing menus preserved |
+| Path         | Behavior                                          |
+| ------------ | ------------------------------------------------- |
+| `menus/`     | New menus added, existing menus preserved         |
 | `templates/` | New templates added, existing templates preserved |
 
 This allows theme authors to add new menus or page templates without overwriting user customizations.
@@ -111,6 +148,7 @@ When updating `theme.json`, the system uses intelligent merging:
 ### Example
 
 **Theme's new `theme.json`:**
+
 ```json
 {
   "settings": {
@@ -118,7 +156,7 @@ When updating `theme.json`, the system uses intelligent merging:
       "colors": [
         { "id": "primary", "default": "#0000ff" },
         { "id": "secondary", "default": "#ff0000" },
-        { "id": "accent", "default": "#00ff00" }  // NEW setting
+        { "id": "accent", "default": "#00ff00" } // NEW setting
       ]
     }
   }
@@ -126,14 +164,15 @@ When updating `theme.json`, the system uses intelligent merging:
 ```
 
 **User's current `theme.json`:**
+
 ```json
 {
   "settings": {
     "global": {
       "colors": [
-        { "id": "primary", "default": "#123456" },  // User changed this
+        { "id": "primary", "default": "#123456" }, // User changed this
         { "id": "secondary", "default": "#ff0000" },
-        { "id": "old_color", "default": "#999999" }  // Removed by theme author
+        { "id": "old_color", "default": "#999999" } // Removed by theme author
       ]
     }
   }
@@ -141,14 +180,15 @@ When updating `theme.json`, the system uses intelligent merging:
 ```
 
 **Result after merge:**
+
 ```json
 {
   "settings": {
     "global": {
       "colors": [
-        { "id": "primary", "default": "#123456" },  // User value preserved
+        { "id": "primary", "default": "#123456" }, // User value preserved
         { "id": "secondary", "default": "#ff0000" },
-        { "id": "accent", "default": "#00ff00" }    // New setting added
+        { "id": "accent", "default": "#00ff00" } // New setting added
         // old_color removed (not in new theme)
       ]
     }
@@ -221,6 +261,7 @@ The system enforces strict validation when building `latest/`:
 ### Error Handling
 
 If validation fails:
+
 - The build is aborted
 - An error message is shown to the user
 - Example: "Theme 'arch' has version mismatch: folder '1.1.0' has theme.json version '1.0.0'"
@@ -234,7 +275,7 @@ Projects track theme update information:
   "id": "project-uuid",
   "name": "My Project",
   "theme": "arch",
-  "themeVersion": "1.0.0",
+  "themeVersion": "1.0.0"
   // ... other fields
 }
 ```
@@ -246,14 +287,14 @@ Projects track theme update information:
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/themes` | Get all themes with `hasPendingUpdate` flag |
-| `GET` | `/api/themes/:id/versions` | Get all versions for a theme |
-| `POST` | `/api/themes/:id/update` | Build `latest/` for a single theme |
-| `GET` | `/api/themes/update-count` | Get count of themes with pending updates |
-| `GET` | `/api/projects/:id/theme-updates` | Check if project has theme update available |
-| `POST` | `/api/projects/:id/theme-updates/apply` | Apply theme update to project |
+| Method | Endpoint                                | Description                                 |
+| ------ | --------------------------------------- | ------------------------------------------- |
+| `GET`  | `/api/themes`                           | Get all themes with `hasPendingUpdate` flag |
+| `GET`  | `/api/themes/:id/versions`              | Get all versions for a theme                |
+| `POST` | `/api/themes/:id/update`                | Build `latest/` for a single theme          |
+| `GET`  | `/api/themes/update-count`              | Get count of themes with pending updates    |
+| `GET`  | `/api/projects/:id/theme-updates`       | Check if project has theme update available |
+| `POST` | `/api/projects/:id/theme-updates/apply` | Apply theme update to project               |
 
 ## Implementation Files
 
