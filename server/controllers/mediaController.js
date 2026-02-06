@@ -306,6 +306,58 @@ export async function writeMediaFile(projectId, data, retryCount = 0) {
   }
 }
 
+/**
+ * Atomically reads media.json, applies a transform function, and writes it back.
+ * Holds the write lock across the entire read-modify-write cycle to prevent
+ * race conditions where concurrent callers read stale data.
+ * @param {string} projectId - The project UUID
+ * @param {function(Object): void} transformFn - Function that receives mediaData and mutates it in place
+ * @returns {Promise<Object>} The transformed media data
+ * @throws {Error} If project directory doesn't exist or file operations fail
+ */
+export async function atomicUpdateMediaFile(projectId, transformFn) {
+  const releaseLock = await acquireWriteLock(projectId);
+
+  try {
+    const projectFolderName = await getProjectFolderName(projectId);
+    const projectDir = getProjectDir(projectFolderName);
+    if (!(await fs.pathExists(projectDir))) {
+      const error = new Error(`Project directory not found for ${projectId}`);
+      error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
+      throw error;
+    }
+    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
+
+    // Read while holding the lock
+    let mediaData;
+    try {
+      const data = await fs.readFile(mediaFilePath, "utf8");
+      mediaData = JSON.parse(data);
+    } catch (error) {
+      if (error.code === "ENOENT") {
+        mediaData = { files: [] };
+      } else {
+        throw error;
+      }
+    }
+
+    // Apply the caller's transformation
+    transformFn(mediaData);
+
+    // Write while still holding the lock
+    const uniqueId = `${process.pid}.${Date.now()}.${Math.random().toString(36).substr(2, 9)}`;
+    const tempFilePath = `${mediaFilePath}.tmp.${uniqueId}`;
+    await fs.ensureDir(path.dirname(mediaFilePath));
+    await fs.writeFile(tempFilePath, JSON.stringify(mediaData, null, 2), "utf8");
+    await fs.move(tempFilePath, mediaFilePath, { overwrite: true });
+
+    return mediaData;
+  } finally {
+    writeLocks.delete(projectId);
+    releaseLock();
+  }
+}
+
 // Configure multer storage
 const storage = multer.diskStorage({
   destination: async function (req, file, cb) {

@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { getProjectPagesDir } from "../config.js";
-import { readMediaFile, writeMediaFile } from "../controllers/mediaController.js";
+import { readMediaFile, writeMediaFile, atomicUpdateMediaFile } from "../controllers/mediaController.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 /**
@@ -109,34 +109,30 @@ function extractMediaPathsFromGlobalWidget(widgetData) {
  */
 export async function updatePageMediaUsage(projectId, pageId, pageData) {
   try {
-    // Extract all media paths from the page
     const mediaPaths = extractMediaPathsFromPage(pageData);
 
-    // Read current media data
-    const mediaData = await readMediaFile(projectId);
-
-    // First, remove this page from all media files' usedIn arrays
-    mediaData.files.forEach((file) => {
-      if (file.usedIn) {
-        file.usedIn = file.usedIn.filter((slug) => slug !== pageId);
-      }
-    });
-
-    // Then, add this page to the usedIn array of files that are actually used
-    mediaPaths.forEach((mediaPath) => {
-      const file = mediaData.files.find((f) => f.path === mediaPath);
-      if (file) {
-        if (!file.usedIn) {
-          file.usedIn = [];
+    // Atomic read-modify-write to prevent race conditions with concurrent saves
+    await atomicUpdateMediaFile(projectId, (mediaData) => {
+      // First, remove this page from all media files' usedIn arrays
+      mediaData.files.forEach((file) => {
+        if (file.usedIn) {
+          file.usedIn = file.usedIn.filter((slug) => slug !== pageId);
         }
-        if (!file.usedIn.includes(pageId)) {
-          file.usedIn.push(pageId);
-        }
-      }
-    });
+      });
 
-    // Write updated media data (using locked write function to prevent race conditions)
-    await writeMediaFile(projectId, mediaData);
+      // Then, add this page to the usedIn array of files that are actually used
+      mediaPaths.forEach((mediaPath) => {
+        const file = mediaData.files.find((f) => f.path === mediaPath);
+        if (file) {
+          if (!file.usedIn) {
+            file.usedIn = [];
+          }
+          if (!file.usedIn.includes(pageId)) {
+            file.usedIn.push(pageId);
+          }
+        }
+      });
+    });
 
     return { success: true, mediaPaths };
   } catch (error) {
@@ -158,36 +154,30 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
 export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData) {
   try {
     const mediaPaths = extractMediaPathsFromGlobalWidget(widgetData);
-    const mediaData = await readMediaFile(projectId);
-
-    // Identifier for global widget, e.g. "global:header"
-    // globalId should be passed as "global:header" or just "header" depending on convention
-    // Let's standardized on "global:{id}"
-
     const usageId = globalId.startsWith("global:") ? globalId : `global:${globalId}`;
 
-    // Remove old usage
-    mediaData.files.forEach((file) => {
-      if (file.usedIn) {
-        file.usedIn = file.usedIn.filter((slug) => slug !== usageId);
-      }
-    });
-
-    // Add new usage
-    mediaPaths.forEach((mediaPath) => {
-      const file = mediaData.files.find((f) => f.path === mediaPath);
-      if (file) {
-        if (!file.usedIn) {
-          file.usedIn = [];
+    // Atomic read-modify-write to prevent race conditions with concurrent saves
+    await atomicUpdateMediaFile(projectId, (mediaData) => {
+      // Remove old usage
+      mediaData.files.forEach((file) => {
+        if (file.usedIn) {
+          file.usedIn = file.usedIn.filter((slug) => slug !== usageId);
         }
-        if (!file.usedIn.includes(usageId)) {
-          file.usedIn.push(usageId);
-        }
-      }
-    });
+      });
 
-    // Write updated media data (using locked write function to prevent race conditions)
-    await writeMediaFile(projectId, mediaData);
+      // Add new usage
+      mediaPaths.forEach((mediaPath) => {
+        const file = mediaData.files.find((f) => f.path === mediaPath);
+        if (file) {
+          if (!file.usedIn) {
+            file.usedIn = [];
+          }
+          if (!file.usedIn.includes(usageId)) {
+            file.usedIn.push(usageId);
+          }
+        }
+      });
+    });
 
     return { success: true, mediaPaths };
   } catch (error) {
@@ -207,17 +197,14 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
  */
 export async function removePageFromMediaUsage(projectId, pageId) {
   try {
-    const mediaData = await readMediaFile(projectId);
-
-    // Remove the page from all usedIn arrays
-    mediaData.files.forEach((file) => {
-      if (file.usedIn) {
-        file.usedIn = file.usedIn.filter((slug) => slug !== pageId);
-      }
+    // Atomic read-modify-write to prevent race conditions with concurrent saves
+    await atomicUpdateMediaFile(projectId, (mediaData) => {
+      mediaData.files.forEach((file) => {
+        if (file.usedIn) {
+          file.usedIn = file.usedIn.filter((slug) => slug !== pageId);
+        }
+      });
     });
-
-    // Write updated media data (using locked write function to prevent race conditions)
-    await writeMediaFile(projectId, mediaData);
 
     return { success: true };
   } catch (error) {
