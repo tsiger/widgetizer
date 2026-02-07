@@ -81,7 +81,7 @@
                 {% if block.settings.uppercase %}{% assign style_class = style_class | append: ' block-text-uppercase' %}{% endif %}
                 {% if block.settings.muted %}{% assign style_class = style_class | append: ' block-text-muted' %}{% endif %}
                 <div class="widget-description block-text {{ size_class }}{{ style_class }} block-rte reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
-                  {{ block.settings.text }}
+                  {{ block.settings.text | raw }}
                 </div>
               {% when 'features' %}
                 {% if block.settings.features != blank %}

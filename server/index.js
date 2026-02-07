@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import dotenv from "dotenv";
 import cors from "cors";
+import helmet from "helmet";
 
 import { apiLimiter, editorApiLimiter } from "./middleware/rateLimiters.js";
 import errorHandler from "./middleware/errorHandler.js";
@@ -34,6 +35,13 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.use(cors());
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Preview iframe needs inline styles/scripts from widgets
+    crossOriginEmbedderPolicy: false, // Widgets load cross-origin iframes (YouTube, Maps, etc.)
+    crossOriginResourcePolicy: { policy: "cross-origin" } // Allow SVGs and assets in preview iframe
+  }),
+);
 app.use(express.json());
 
 // Request logging removed

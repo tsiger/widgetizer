@@ -31,6 +31,7 @@ import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
+import { sanitizeWidgetData } from "./sanitizationService.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -54,6 +55,7 @@ function getOrCreateEngine(projectDir, themeSnippetsDir) {
     cache: process.env.NODE_ENV === "production",
     root: [themeSnippetsDir, coreSnippetsDir],
     partials: [themeSnippetsDir, coreSnippetsDir],
+    outputEscape: "escape",
   });
 
   configureLiquidEngine(engine);
@@ -561,6 +563,11 @@ async function renderWidget(
       { settings: enhancedSettings, blocks: enhancedBlocks },
       pagesByUuid,
     );
+
+    // Sanitize settings based on schema types (text, richtext, link, etc.)
+    // This runs after link resolution so resolved URLs are also validated.
+    // resolvedWidgetData is already a deep clone, safe to mutate in place.
+    sanitizeWidgetData(resolvedWidgetData, schema);
 
     // Create widget context for template
     const widgetContext = {

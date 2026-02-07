@@ -21,7 +21,7 @@
       "default": "Learn more about our product in this quick video overview."
     },
     {
-      "type": "textarea",
+      "type": "code",
       "id": "code",
       "label": "Embed Code (HTML/JS/Iframe)",
       "default": "<div style=\"background-color: var(--bg-secondary); border: var(--border-width-thin) solid var(--border-color); padding: var(--space-2xl); text-align: center;\"><h3 style=\"margin: 0 0 var(--space-md) 0; color: var(--text-heading); font-size: var(--font-size-xl);\">Sample Embedded Content</h3><p style=\"margin: 0 0 var(--space-lg) 0; color: var(--text-muted);\">This is a placeholder for your embedded content. Replace this with your own HTML, iframe, or third-party embed code.</p><button style=\"background-color: var(--accent); color: var(--accent-text); border: none; padding: var(--space-sm) var(--space-lg); font-weight: 600; cursor: pointer;\">Learn More</button></div>"

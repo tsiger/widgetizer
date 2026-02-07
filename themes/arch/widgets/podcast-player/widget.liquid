@@ -419,7 +419,7 @@
               </div>
 
               {% if first_block.settings.description != blank %}
-                <div class="block-text block-text-base block-rte" id="ep-desc-{{ widget.id }}">{{ first_block.settings.description }}</div>
+                <div class="block-text block-text-base block-rte" id="ep-desc-{{ widget.id }}">{{ first_block.settings.description | raw }}</div>
               {% endif %}
             </div>
 

@@ -60,7 +60,7 @@
                 <{{ item_heading_level }} class="widget-card-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
               {% endif %}
               {% if block.settings.description != blank %}
-                <div class="widget-card-description block-rte" data-setting="description">{{ block.settings.description }}</div>
+                <div class="widget-card-description block-rte" data-setting="description">{{ block.settings.description | raw }}</div>
               {% endif %}
             </div>
           </li>

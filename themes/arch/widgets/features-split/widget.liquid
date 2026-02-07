@@ -118,7 +118,7 @@
           {% assign content_delay = content_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <div class="widget-description block-text block-rte reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="description">{{ widget.settings.description }}</div>
+          <div class="widget-description block-text block-rte reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="description">{{ widget.settings.description | raw }}</div>
         {% endif %}
       </div>
 
@@ -141,7 +141,7 @@
                 </{{ item_heading_level }}>
                 {% if block.settings.description != blank %}
                   <div class="features-split-item-description block-text block-text-sm block-text-muted block-rte" data-setting="description">
-                    {{ block.settings.description }}
+                    {{ block.settings.description | raw }}
                   </div>
                 {% endif %}
               </div>

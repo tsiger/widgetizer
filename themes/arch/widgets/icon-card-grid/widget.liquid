@@ -87,7 +87,7 @@
               {% endif %}
               {% if block.settings.description != blank %}
                 <div class="widget-card-description block-rte" data-setting="description">
-                  {{ block.settings.description }}
+                  {{ block.settings.description | raw }}
                 </div>
               {% endif %}
               {% if block.settings.button_link.text != blank %}

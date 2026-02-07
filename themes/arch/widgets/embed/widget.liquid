@@ -55,7 +55,7 @@
         {% endif %}
 
         <div class="embed-code-wrapper reveal reveal-fade" role="region" aria-label="Embedded content">
-          {{ widget.settings.code }}
+          {{ widget.settings.code | raw }}
         </div>
       </div>
     </div>

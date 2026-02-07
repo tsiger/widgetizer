@@ -104,7 +104,7 @@
                 <p class="widget-card-subtitle" data-setting="location">{{ block.settings.location }}</p>
               {% endif %}
               {% if block.settings.description != blank %}
-                <div class="widget-card-description block-rte" data-setting="description">{{ block.settings.description }}</div>
+                <div class="widget-card-description block-rte" data-setting="description">{{ block.settings.description | raw }}</div>
               {% endif %}
               {% if block.settings.button_link.text != blank %}
                 <div class="widget-card-footer">

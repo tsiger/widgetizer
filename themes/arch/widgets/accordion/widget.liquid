@@ -146,7 +146,7 @@
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <div class="widget-description block-rte reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</div>
+          <div class="widget-description block-rte reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description | raw }}</div>
         {% endif %}
       </div>
     {% endif %}
@@ -186,7 +186,7 @@
               aria-hidden="true"
             >
               <div class="accordion-inner">
-                <div class="accordion-answer block-text block-rte" data-setting="answer">{{ block.settings.answer }}</div>
+                <div class="accordion-answer block-text block-rte" data-setting="answer">{{ block.settings.answer | raw }}</div>
               </div>
             </div>
           </li>
