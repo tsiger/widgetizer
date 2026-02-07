@@ -137,7 +137,6 @@ export async function readGlobalWidgetData(projectId, widgetType) {
   try {
     // pathExists check is cleaner than try/catch for ENOENT
     if (!(await fs.pathExists(globalWidgetPath))) {
-      console.log(`Global widget data file not found for type ${widgetType}, project ${projectId}.`);
       return null;
     }
     const widgetContent = await fs.readFile(globalWidgetPath, "utf-8");
@@ -312,10 +311,6 @@ export async function updatePage(req, res) {
         await removePageFromMediaUsage(activeProjectId, oldSlug);
       }
       // Then update with the new slug (or refresh if slug didn't change)
-      console.log(
-        "[updatePage] Calling updatePageMediaUsage with SEO:",
-        JSON.stringify(finalUpdatedPageData.seo, null, 2),
-      );
       await updatePageMediaUsage(activeProjectId, finalNewSlug, finalUpdatedPageData);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for page ${finalNewSlug}:`, usageError);
