@@ -5,7 +5,9 @@ import { useTranslation } from "react-i18next";
 import PageLayout from "../components/layout/PageLayout";
 import PageForm from "../components/pages/PageForm";
 import useToastStore from "../stores/toastStore";
+import useProjectStore from "../stores/projectStore";
 import { createPage } from "../queries/pageManager";
+import { invalidateMediaCache } from "../queries/mediaManager";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function PagesAdd() {
@@ -26,6 +28,12 @@ export default function PagesAdd() {
     try {
       await createPage(formData);
       showToast(t("pagesAdd.toasts.createSuccess", { name: formData.name }), "success");
+      
+      // Invalidate media cache since SEO images may have been set
+      const activeProject = useProjectStore.getState().activeProject;
+      if (activeProject) {
+        invalidateMediaCache(activeProject.id);
+      }
       
       // Redirect to list after successful creation
       skipNavigationGuardRef.current = true;

@@ -9,7 +9,9 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 
 import useToastStore from "../stores/toastStore";
+import useProjectStore from "../stores/projectStore";
 import { getPage, updatePage } from "../queries/pageManager";
+import { invalidateMediaCache } from "../queries/mediaManager";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function PagesEdit() {
@@ -72,6 +74,11 @@ export default function PagesEdit() {
         });
         setShowSuccessActions(true);
         setIsDirty(false);
+        // Invalidate media cache since SEO images may have changed
+        const activeProject = useProjectStore.getState().activeProject;
+        if (activeProject) {
+          invalidateMediaCache(activeProject.id);
+        }
         return true;
       } else {
         showToast(result.message || t("pagesEdit.toasts.unknownError"), "error");

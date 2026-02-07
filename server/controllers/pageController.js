@@ -541,6 +541,14 @@ export async function createPage(req, res) {
     const pagePath = getPagePath(projectFolderName, slug);
     await fs.outputFile(pagePath, JSON.stringify(newPage, null, 2));
 
+    // Update media usage tracking for SEO images
+    try {
+      await updatePageMediaUsage(activeProjectId, slug, newPage);
+    } catch (usageError) {
+      console.warn(`Failed to update media usage tracking for new page ${slug}:`, usageError);
+      // Don't fail the request if usage tracking fails
+    }
+
     res.status(201).json(newPage);
   } catch (error) {
     console.error("Error creating page:", error);
