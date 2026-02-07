@@ -231,16 +231,9 @@ export async function writeMediaFile(projectId, data, retryCount = 0) {
     const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
     const tempFilePath = `${mediaFilePath}.tmp.${uniqueId}`;
 
-    console.log(
-      `[${new Date().toISOString()}] [writeMediaFile] Starting write for project ${projectId} (attempt ${retryCount + 1}/${MAX_RETRIES + 1})`,
-    );
-    console.log(`[${new Date().toISOString()}] [writeMediaFile] Target: ${mediaFilePath}`);
-    console.log(`[${new Date().toISOString()}] [writeMediaFile] Temp file: ${tempFilePath}`);
-
     // Ensure the parent directory exists
     const parentDir = path.dirname(mediaFilePath);
     await fs.ensureDir(parentDir);
-    console.log(`[${new Date().toISOString()}] [writeMediaFile] Parent directory verified: ${parentDir}`);
 
     try {
       // Write to temp file

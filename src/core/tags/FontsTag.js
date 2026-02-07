@@ -5,12 +5,11 @@ import fontDefinitions from "../config/fonts.json" with { type: "json" };
 const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
 
 export const FontsTag = {
-  // eslint-disable-next-line no-unused-vars
   parse(tagToken) {
     this.tagName = tagToken.name;
   },
 
-  *render(context) {
+  render(context) {
     const rawSettings = context.globals?.themeSettingsRaw;
 
     if (!rawSettings || !rawSettings.settings || !rawSettings.settings.global) {

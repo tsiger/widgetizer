@@ -487,7 +487,7 @@ describe("duplicateMenu", () => {
   beforeEach(async () => {
     await resetMenus();
     // Create a menu with items for duplication tests
-    const res = await createTestMenu("Source Menu", "Original description");
+    await createTestMenu("Source Menu", "Original description");
     // Manually add items to the menu file for richer tests
     const menuPath = getMenuPath(activeProject.folderName, "source-menu");
     const menuData = JSON.parse(await fs.readFile(menuPath, "utf8"));

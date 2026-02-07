@@ -37,7 +37,6 @@ process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
 const {
-  getProjectsFilePath,
   getProjectDir,
   getProjectPagesDir,
   getProjectMediaJsonPath,
@@ -52,8 +51,6 @@ const {
   getMediaUsage,
   refreshAllMediaUsage,
 } = await import("../services/mediaUsageService.js");
-
-const { readMediaFile } = await import("../controllers/mediaController.js");
 
 // ============================================================================
 // Test helpers

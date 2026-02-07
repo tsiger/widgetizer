@@ -12,7 +12,7 @@ export const RenderHeaderAssetsTag = {
     this.tagName = tagToken.name;
   },
 
-  *render(context) {
+  render(context) {
     try {
       const styles = context.globals?.enqueuedStyles;
       const scripts = context.globals?.enqueuedScripts;

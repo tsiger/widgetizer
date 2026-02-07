@@ -3,12 +3,11 @@ import fontDefinitions from "../config/fonts.json" with { type: "json" };
 const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
 
 export const ThemeSettingsTag = {
-  // eslint-disable-next-line no-unused-vars
   parse(tagToken) {
     this.tagName = tagToken.name;
   },
 
-  *render(context) {
+  render(context) {
     // Check context.globals for raw settings
     const rawSettings = context.globals?.themeSettingsRaw;
 

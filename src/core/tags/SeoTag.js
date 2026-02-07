@@ -1,12 +1,11 @@
 // Purpose: Liquid tag to output SEO meta tags
 
 export const SeoTag = {
-  // eslint-disable-next-line no-unused-vars
   parse(tagToken) {
     this.tagName = tagToken.name;
   },
 
-  *render(context) {
+  render(context) {
     try {
       const allVars = context.getAll();
       const page = allVars.page;

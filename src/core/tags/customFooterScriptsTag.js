@@ -15,7 +15,7 @@ export const CustomFooterScriptsTag = {
     this.tagName = tagToken.name;
   },
 
-  *render(context) {
+  render(context) {
     try {
       const rawSettings = context.globals?.themeSettingsRaw;
 

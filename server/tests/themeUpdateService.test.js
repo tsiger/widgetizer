@@ -13,7 +13,7 @@
  * Run with: node --test server/tests/themeUpdateService.test.js
  */
 
-import { describe, it, before, after, beforeEach } from "node:test";
+import { describe, it, after, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
@@ -43,7 +43,6 @@ const {
   getProjectDir,
   getProjectThemeJsonPath,
   getThemeDir,
-  getProjectsFilePath,
 } = await import("../config.js");
 
 const { writeProjectsFile, readProjectsFile } = await import("../controllers/projectController.js");

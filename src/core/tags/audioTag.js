@@ -8,7 +8,7 @@ export const AudioTag = {
 
   *render(context) {
     const options = yield this.hash.render(context);
-    const { src, output = "url" } = options;
+    const { src } = options;
 
     if (!src) return "";
 

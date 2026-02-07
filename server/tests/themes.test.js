@@ -11,7 +11,7 @@
  * Run with: node --test server/tests/themes.test.js
  */
 
-import { describe, it, before, after, beforeEach, afterEach } from "node:test";
+import { describe, it, before, after, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
@@ -50,7 +50,7 @@ const {
   getProjectPagesDir,
 } = await import("../config.js");
 
-const { writeProjectsFile, readProjectsFile } = await import(
+const { writeProjectsFile } = await import(
   "../controllers/projectController.js"
 );
 
@@ -799,10 +799,7 @@ describe("uploadTheme validation", () => {
   });
 
   it("returns 400 when theme.json is missing", async () => {
-    const buffer = buildThemeZip("no-json-theme", {
-      themeJsonOverride: null, // We need to manually build this
-    });
-    // Actually, buildThemeZip always adds theme.json. Let's build manually:
+    // buildThemeZip always adds theme.json, so build manually:
     const zip = new AdmZip.default();
     zip.addFile("my-theme/screenshot.png", Buffer.from("png"));
     zip.addFile("my-theme/layout.liquid", Buffer.from("<html></html>"));
