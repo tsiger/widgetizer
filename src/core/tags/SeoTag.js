@@ -57,22 +57,7 @@ export const SeoTag = {
 
       // Open Graph image - only if specified
       if (hasImage) {
-        let ogImageUrl = seo.og_image;
-
-        // If it's a relative path, make it absolute using project site URL
-        if (!ogImageUrl.startsWith("http")) {
-          const siteUrl = project?.siteUrl;
-          if (siteUrl) {
-            // Remove trailing slash from siteUrl and leading slash from path
-            const cleanSiteUrl = siteUrl.replace(/\/$/, "");
-            const cleanImagePath = ogImageUrl.startsWith("/") ? ogImageUrl : `/${imagePath}/${ogImageUrl}`;
-            ogImageUrl = `${cleanSiteUrl}${cleanImagePath}`;
-          } else {
-            // Fallback to relative path if no site URL configured
-            ogImageUrl = ogImageUrl.startsWith("/") ? ogImageUrl : `/${imagePath}/${ogImageUrl}`;
-          }
-        }
-
+        const ogImageUrl = resolveImageUrl(seo.og_image, imagePath, project?.siteUrl);
         metaTags.push(`<meta property="og:image" content="${escapeHtml(ogImageUrl)}">`);
       }
 
@@ -88,24 +73,7 @@ export const SeoTag = {
 
       // Twitter image (use same as og:image) - only if image exists
       if (hasImage) {
-        let twitterImageUrl = seo.og_image;
-
-        // If it's a relative path, make it absolute using project site URL
-        if (!twitterImageUrl.startsWith("http")) {
-          const siteUrl = project?.siteUrl;
-          if (siteUrl) {
-            // Remove trailing slash from siteUrl and leading slash from path
-            const cleanSiteUrl = siteUrl.replace(/\/$/, "");
-            const cleanImagePath = twitterImageUrl.startsWith("/")
-              ? twitterImageUrl
-              : `/${imagePath}/${twitterImageUrl}`;
-            twitterImageUrl = `${cleanSiteUrl}${cleanImagePath}`;
-          } else {
-            // Fallback to relative path if no site URL configured
-            twitterImageUrl = twitterImageUrl.startsWith("/") ? twitterImageUrl : `/${imagePath}/${twitterImageUrl}`;
-          }
-        }
-
+        const twitterImageUrl = resolveImageUrl(seo.og_image, imagePath, project?.siteUrl);
         metaTags.push(`<meta name="twitter:image" content="${escapeHtml(twitterImageUrl)}">`);
       }
 
@@ -116,6 +84,34 @@ export const SeoTag = {
     }
   },
 };
+
+/**
+ * Resolves an og_image value to the correct URL using imagePath.
+ * Stored og_image values are typically "/uploads/images/file.jpg" — the
+ * filename is extracted and combined with the current imagePath so that
+ * preview mode uses the API URL and publish mode uses "assets/images".
+ * Fully-qualified URLs (http/https) are returned unchanged.
+ */
+function resolveImageUrl(rawValue, imagePath, siteUrl) {
+  if (!rawValue) return "";
+
+  // Already an absolute URL — use as-is
+  if (rawValue.startsWith("http")) {
+    return rawValue;
+  }
+
+  // Extract just the filename from the stored path
+  // e.g. "/uploads/images/hero.jpg" → "hero.jpg"
+  const filename = rawValue.split("/").pop();
+  const resolvedPath = `/${imagePath}/${filename}`;
+
+  if (siteUrl) {
+    const cleanSiteUrl = siteUrl.replace(/\/$/, "");
+    return `${cleanSiteUrl}${resolvedPath}`;
+  }
+
+  return resolvedPath;
+}
 
 // Helper function to escape HTML entities
 function escapeHtml(text) {

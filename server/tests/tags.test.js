@@ -72,7 +72,7 @@ const fixtures = {
     seo: {
       description: "A test page description",
       og_title: "Test OG Title",
-      og_image: "hero.jpg",
+      og_image: "/uploads/images/hero.jpg",
       robots: "index,follow",
     },
   },
@@ -222,8 +222,10 @@ describe("SeoTag", () => {
     assert.match(result, /<meta property="og:title" content="Test OG Title">/);
   });
 
-  it("generates og:image with absolute URL (no double slashes)", async () => {
+  it("generates og:image with absolute URL from stored /uploads/ path", async () => {
     const result = await render("{% seo %}", { page: fixtures.basicPage, project: fixtures.project });
+    // og_image is stored as "/uploads/images/hero.jpg" — SeoTag extracts filename
+    // and combines with imagePath ("/uploads/images" in preview mode)
     assert.match(result, /og:image" content="https:\/\/example\.com\/uploads\/images\/hero\.jpg"/);
     assert.doesNotMatch(result, /\/\/uploads/, "should not produce double slashes in path");
   });
@@ -277,6 +279,61 @@ describe("SeoTag", () => {
   it("generates robots meta tag", async () => {
     const result = await render("{% seo %}", { page: fixtures.basicPage, project: fixtures.project });
     assert.match(result, /<meta name="robots" content="index,follow">/);
+  });
+
+  // --- Publish mode (assets/images) path rewriting ---
+
+  it("rewrites og:image to assets/images in publish mode", async () => {
+    const page = {
+      name: "Published Page",
+      seo: { og_image: "/uploads/images/social-banner.jpg" },
+    };
+    const result = await render("{% seo %}", {
+      page,
+      project: fixtures.project,
+      imagePath: "assets/images",
+    });
+    assert.match(result, /og:image" content="https:\/\/example\.com\/assets\/images\/social-banner\.jpg"/);
+    assert.doesNotMatch(result, /\/uploads\//, "must not contain /uploads/ in publish mode");
+  });
+
+  it("rewrites twitter:image to assets/images in publish mode", async () => {
+    const page = {
+      name: "Published Page",
+      seo: { og_image: "/uploads/images/social-banner.jpg" },
+    };
+    const result = await render("{% seo %}", {
+      page,
+      project: fixtures.project,
+      imagePath: "assets/images",
+    });
+    assert.match(result, /twitter:image" content="https:\/\/example\.com\/assets\/images\/social-banner\.jpg"/);
+  });
+
+  it("uses relative path in publish mode when no siteUrl", async () => {
+    const page = {
+      name: "No Domain Page",
+      seo: { og_image: "/uploads/images/photo.png" },
+    };
+    const result = await render("{% seo %}", {
+      page,
+      project: {},
+      imagePath: "assets/images",
+    });
+    assert.match(result, /og:image" content="\/assets\/images\/photo\.png"/);
+  });
+
+  it("handles bare filename og_image (no path prefix)", async () => {
+    const page = {
+      name: "Bare Filename",
+      seo: { og_image: "banner.jpg" },
+    };
+    const result = await render("{% seo %}", {
+      page,
+      project: fixtures.project,
+      imagePath: "assets/images",
+    });
+    assert.match(result, /og:image" content="https:\/\/example\.com\/assets\/images\/banner\.jpg"/);
   });
 });
 
