@@ -11,7 +11,7 @@ export const SeoTag = {
       const allVars = context.getAll();
       const page = allVars.page;
       const project = allVars.project;
-      const imagePath = allVars.imagePath || "uploads/images";
+      const imagePath = (allVars.imagePath || "uploads/images").replace(/^\/+/, "");
 
       if (!page) {
         return "<!-- SEO Tag: No page data found -->";
