@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.9.2] - 2026-02-07
+
+### Added
+
+- Helmet security middleware for HTTP headers
+- HTML sanitization for widget content (DOMPurify + LiquidJS auto-escape)
+
+### Fixed
+
+- Media usage now tracked correctly for SEO images (og_image) on page create/update
+- Media library UI now refreshes after saving pages with SEO images
+
 ## [0.9.1] - 2026-2-06
 
 ## Added
