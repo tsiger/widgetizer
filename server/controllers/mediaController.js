@@ -245,11 +245,9 @@ export async function writeMediaFile(projectId, data, retryCount = 0) {
     try {
       // Write to temp file
       await fs.writeFile(tempFilePath, JSON.stringify(data, null, 2), "utf8");
-      console.log(`[${new Date().toISOString()}] [writeMediaFile] Temp file written successfully`);
 
       // Verify temp file was created successfully
       const tempExists = await fs.pathExists(tempFilePath);
-      console.log(`[${new Date().toISOString()}] [writeMediaFile] Temp file exists: ${tempExists}`);
 
       if (!tempExists) {
         throw new Error(`Temp file was not created: ${tempFilePath}`);
@@ -257,16 +255,13 @@ export async function writeMediaFile(projectId, data, retryCount = 0) {
 
       // Verify directory still exists before move (defensive check)
       const dirStillExists = await fs.pathExists(parentDir);
-      console.log(`[${new Date().toISOString()}] [writeMediaFile] Parent directory still exists before move: ${dirStillExists}`);
 
       if (!dirStillExists) {
         await fs.ensureDir(parentDir);
-        console.log(`[${new Date().toISOString()}] [writeMediaFile] Recreated parent directory`);
       }
 
       // Perform atomic move
       await fs.move(tempFilePath, mediaFilePath, { overwrite: true });
-      console.log(`[${new Date().toISOString()}] [writeMediaFile] Successfully moved temp file to target`);
     } catch (error) {
       console.error(`[${new Date().toISOString()}] [writeMediaFile] Error during write operation:`, error);
       console.error(`[${new Date().toISOString()}] [writeMediaFile] Error code: ${error.code}, syscall: ${error.syscall}`);
@@ -275,7 +270,6 @@ export async function writeMediaFile(projectId, data, retryCount = 0) {
       try {
         if (await fs.pathExists(tempFilePath)) {
           await fs.unlink(tempFilePath);
-          console.log(`[${new Date().toISOString()}] [writeMediaFile] Cleaned up temp file after error`);
         }
       } catch (cleanupError) {
         console.warn(`[${new Date().toISOString()}] [writeMediaFile] Failed to clean up temp file ${tempFilePath}:`, cleanupError.message);
