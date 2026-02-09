@@ -7,7 +7,19 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import { useEffect, useCallback, useState } from "react";
-import { Bold, Italic, Link as LinkIcon, Unlink, Code, Eye, Maximize2, X, Check } from "lucide-react";
+import {
+  Bold,
+  Italic,
+  Link as LinkIcon,
+  Unlink,
+  Code,
+  Eye,
+  Maximize2,
+  X,
+  Check,
+  List,
+  ListOrdered,
+} from "lucide-react";
 import "./RichTextInput.css";
 
 function MenuBar({ editor, isSourceMode, onToggleSource, allowSource }) {
@@ -40,102 +52,121 @@ function MenuBar({ editor, isSourceMode, onToggleSource, allowSource }) {
   }
 
   return (
-    <div className="richtext-menubar">
-      {!isSourceMode && (
-        <>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            disabled={!editor.can().chain().focus().toggleBold().run()}
-            className={`richtext-menubar-button ${editor.isActive("bold") ? "is-active" : ""}`}
-            title="Bold"
-          >
-            <Bold size={16} />
+    <>
+      {/* Link input row - appears above toolbar when active */}
+      {showLinkInput && (
+        <div className="richtext-link-row">
+          <input
+            type="text"
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                setLink();
+              }
+              if (e.key === "Escape") {
+                setShowLinkInput(false);
+                setLinkUrl("");
+              }
+            }}
+            placeholder="Enter URL..."
+            className="richtext-link-input"
+            autoFocus
+          />
+          <button type="button" onClick={setLink} className="richtext-link-icon-button" title="Apply">
+            <Check size={14} />
           </button>
           <button
             type="button"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            disabled={!editor.can().chain().focus().toggleItalic().run()}
-            className={`richtext-menubar-button ${editor.isActive("italic") ? "is-active" : ""}`}
-            title="Italic"
+            onClick={() => {
+              setShowLinkInput(false);
+              setLinkUrl("");
+            }}
+            className="richtext-link-icon-button richtext-link-cancel"
+            title="Cancel"
           >
-            <Italic size={16} />
+            <X size={14} />
           </button>
-          <div className="richtext-menubar-divider" />
-          {showLinkInput ? (
-            <>
-              <input
-                type="text"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    setLink();
-                  }
-                  if (e.key === "Escape") {
-                    setShowLinkInput(false);
-                    setLinkUrl("");
-                  }
-                }}
-                placeholder="URL..."
-                className="richtext-link-input"
-                autoFocus
-              />
-              <button type="button" onClick={setLink} className="richtext-link-icon-button" title="Apply">
-                <Check size={14} />
-              </button>
+        </div>
+      )}
+
+      {/* Main toolbar */}
+      <div className="richtext-menubar">
+        {!isSourceMode && (
+          <>
+            <button
+              type="button"
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              disabled={!editor.can().chain().focus().toggleBold().run()}
+              className={`richtext-menubar-button ${editor.isActive("bold") ? "is-active" : ""}`}
+              title="Bold"
+            >
+              <Bold size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              disabled={!editor.can().chain().focus().toggleItalic().run()}
+              className={`richtext-menubar-button ${editor.isActive("italic") ? "is-active" : ""}`}
+              title="Italic"
+            >
+              <Italic size={16} />
+            </button>
+            <div className="richtext-menubar-divider" />
+            <button
+              type="button"
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              className={`richtext-menubar-button ${editor.isActive("bulletList") ? "is-active" : ""}`}
+              title="Bullet List"
+            >
+              <List size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              className={`richtext-menubar-button ${editor.isActive("orderedList") ? "is-active" : ""}`}
+              title="Numbered List"
+            >
+              <ListOrdered size={16} />
+            </button>
+            <div className="richtext-menubar-divider" />
+            <button
+              type="button"
+              onClick={openLinkInput}
+              className={`richtext-menubar-button ${editor.isActive("link") ? "is-active" : ""}`}
+              title="Add Link"
+            >
+              <LinkIcon size={16} />
+            </button>
+            {editor.isActive("link") && (
               <button
                 type="button"
-                onClick={() => {
-                  setShowLinkInput(false);
-                  setLinkUrl("");
-                }}
-                className="richtext-link-icon-button richtext-link-cancel"
-                title="Cancel"
+                onClick={() => editor.chain().focus().unsetLink().run()}
+                className="richtext-menubar-button"
+                title="Remove Link"
               >
-                <X size={14} />
+                <Unlink size={16} />
               </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={openLinkInput}
-                className={`richtext-menubar-button ${editor.isActive("link") ? "is-active" : ""}`}
-                title="Add Link"
-              >
-                <LinkIcon size={16} />
-              </button>
-              {editor.isActive("link") && (
-                <button
-                  type="button"
-                  onClick={() => editor.chain().focus().unsetLink().run()}
-                  className="richtext-menubar-button"
-                  title="Remove Link"
-                >
-                  <Unlink size={16} />
-                </button>
-              )}
-            </>
-          )}
-        </>
-      )}
-      {isSourceMode && <span className="richtext-source-label">HTML Source</span>}
-      {allowSource && (
-        <>
-          <div className="richtext-menubar-spacer" />
-          <button
-            type="button"
-            onClick={onToggleSource}
-            className={`richtext-menubar-button ${isSourceMode ? "is-active" : ""}`}
-            title={isSourceMode ? "Rich Text View" : "HTML Source"}
-          >
-            {isSourceMode ? <Eye size={16} /> : <Code size={16} />}
-          </button>
-        </>
-      )}
-    </div>
+            )}
+          </>
+        )}
+        {isSourceMode && <span className="richtext-source-label">HTML Source</span>}
+        {allowSource && (
+          <>
+            <div className="richtext-menubar-spacer" />
+            <button
+              type="button"
+              onClick={onToggleSource}
+              className={`richtext-menubar-button ${isSourceMode ? "is-active" : ""}`}
+              title={isSourceMode ? "Rich Text View" : "HTML Source"}
+            >
+              {isSourceMode ? <Eye size={16} /> : <Code size={16} />}
+            </button>
+          </>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -149,11 +180,11 @@ export default function RichTextInput({ id, value = "", onChange, placeholder = 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // Only enable bold and italic from StarterKit
+        // Enable basic formatting and lists
         heading: false,
-        bulletList: false,
-        orderedList: false,
-        listItem: false,
+        bulletList: true,
+        orderedList: true,
+        listItem: true,
         blockquote: false,
         codeBlock: false,
         code: false,

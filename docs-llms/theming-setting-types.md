@@ -79,7 +79,7 @@ A multi-line text input field.
 
 ### Rich Text
 
-A rich text editor with basic formatting (bold, italic, link). The value is stored as HTML.
+A rich text editor with basic formatting (bold, italic, link, lists). The value is stored as HTML.
 
 **Additional Properties:**
 
@@ -111,11 +111,15 @@ A rich text editor with basic formatting (bold, italic, link). The value is stor
 
 **Features:**
 
-- Formatting toolbar with Bold, Italic, and Link buttons
+- Formatting toolbar with Bold, Italic, Link, Bullet List, and Numbered List buttons
 - Link editor with URL input (auto-prefixes `https://` if missing)
 - Expand button opens a larger modal for comfortable editing
 - Toolbar buttons highlight based on formatting at cursor position
 - Optional HTML source view for debugging or advanced editing
+- Keyboard shortcuts for quick formatting:
+  - Type `-` followed by space to start a bullet list
+  - Type `1.` followed by space to start a numbered list
+  - Press Enter on an empty list item to exit the list
 
 **Usage in Templates:**
 
@@ -125,6 +129,24 @@ Output directly in Liquid templates—the value is already HTML:
 <div class="content">
   {{ widget.settings.description }}
 </div>
+```
+
+**List Output Example:**
+
+Lists are rendered as standard HTML elements:
+
+```html
+<ul>
+  <li>First item</li>
+  <li>Second item</li>
+  <li>Third item</li>
+</ul>
+
+<ol>
+  <li>First step</li>
+  <li>Second step</li>
+  <li>Third step</li>
+</ol>
 ```
 
 **When to use Rich Text vs Textarea:**
