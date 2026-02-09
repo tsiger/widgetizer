@@ -62,7 +62,6 @@ export default function PageEditor() {
     setSelectedGlobalWidgetId(widgetType);
   };
 
-
   // Get the selected widget and its schema (needed by SettingsPanel)
   const selectedWidget = selectedWidgetId && page?.widgets[selectedWidgetId];
   const selectedWidgetSchema = selectedWidget ? widgetSchemas[selectedWidget.type] || {} : {};

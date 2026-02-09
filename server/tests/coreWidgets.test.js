@@ -39,11 +39,7 @@ console.log = () => {};
 console.warn = () => {};
 console.error = () => {};
 
-const {
-  getCoreWidgets,
-  getCoreWidget,
-  getAllCoreWidgets,
-} = await import("../controllers/coreWidgetsController.js");
+const { getCoreWidgets, getCoreWidget, getAllCoreWidgets } = await import("../controllers/coreWidgetsController.js");
 
 // ============================================================================
 // Mock helpers
@@ -135,10 +131,7 @@ describe("getCoreWidgets", () => {
     await fs.ensureDir(backupDir);
     const dirs = await fs.readdir(TEST_CORE_WIDGETS_DIR);
     for (const dir of dirs) {
-      await fs.move(
-        path.join(TEST_CORE_WIDGETS_DIR, dir),
-        path.join(backupDir, dir),
-      );
+      await fs.move(path.join(TEST_CORE_WIDGETS_DIR, dir), path.join(backupDir, dir));
     }
 
     const widgets = await getCoreWidgets();
@@ -148,10 +141,7 @@ describe("getCoreWidgets", () => {
     // Restore
     const backedUp = await fs.readdir(backupDir);
     for (const dir of backedUp) {
-      await fs.move(
-        path.join(backupDir, dir),
-        path.join(TEST_CORE_WIDGETS_DIR, dir),
-      );
+      await fs.move(path.join(backupDir, dir), path.join(TEST_CORE_WIDGETS_DIR, dir));
     }
     await fs.remove(backupDir);
   });

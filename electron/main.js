@@ -16,8 +16,8 @@ let serverProcess = null;
 let logFile = null;
 
 // Paths - computed after app is ready
-let appRoot = null;         // Path to app.asar (for Electron-loaded resources)
-let unpackedRoot = null;    // Path to app.asar.unpacked (for Node.js server resources)
+let appRoot = null; // Path to app.asar (for Electron-loaded resources)
+let unpackedRoot = null; // Path to app.asar.unpacked (for Node.js server resources)
 let resourcesPath = null;
 let userDataPath = null;
 let dataRoot = null;
@@ -237,7 +237,7 @@ function waitForServerReady() {
             log(`Server returned status ${res.statusCode}, retrying...`);
             setTimeout(check, SERVER_POLL_INTERVAL_MS);
           }
-        }
+        },
       );
 
       req.on("error", () => {
@@ -376,7 +376,7 @@ async function loadContent() {
       showError(
         `Failed to start the Widgetizer server.\n\n` +
           `Error: ${err.message}\n\n` +
-          `Check the log file at:\n${path.join(logsDir, "widgetizer.log")}`
+          `Check the log file at:\n${path.join(logsDir, "widgetizer.log")}`,
       );
     }
   }
@@ -486,11 +486,7 @@ function createAppMenu() {
         { role: "copy" },
         { role: "paste" },
         ...(isMac
-          ? [
-              { role: "pasteAndMatchStyle" },
-              { role: "delete" },
-              { role: "selectAll" },
-            ]
+          ? [{ role: "pasteAndMatchStyle" }, { role: "delete" }, { role: "selectAll" }]
           : [{ role: "delete" }, { type: "separator" }, { role: "selectAll" }]),
       ],
     },

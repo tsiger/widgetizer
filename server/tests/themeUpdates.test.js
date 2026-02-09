@@ -56,7 +56,10 @@ async function createBaseTheme() {
     { spaces: 2 },
   );
 
-  await fs.writeFile(path.join(testThemeDir, "layout.liquid"), "<!-- Base layout v1.0.0 -->\n<html><body>{{ content }}</body></html>");
+  await fs.writeFile(
+    path.join(testThemeDir, "layout.liquid"),
+    "<!-- Base layout v1.0.0 -->\n<html><body>{{ content }}</body></html>",
+  );
   await fs.writeFile(path.join(testThemeDir, "screenshot.png"), "PNG_PLACEHOLDER_V1");
 
   // assets/
@@ -71,11 +74,20 @@ async function createBaseTheme() {
   await fs.writeFile(path.join(testThemeDir, "widgets", "hero", "widget.liquid"), "<!-- Hero widget v1.0.0 -->");
 
   await fs.ensureDir(path.join(testThemeDir, "widgets", "deprecated-widget"));
-  await fs.writeJson(path.join(testThemeDir, "widgets", "deprecated-widget", "schema.json"), { name: "Deprecated", version: "1.0.0" });
-  await fs.writeFile(path.join(testThemeDir, "widgets", "deprecated-widget", "widget.liquid"), "<!-- Will be deleted -->");
+  await fs.writeJson(path.join(testThemeDir, "widgets", "deprecated-widget", "schema.json"), {
+    name: "Deprecated",
+    version: "1.0.0",
+  });
+  await fs.writeFile(
+    path.join(testThemeDir, "widgets", "deprecated-widget", "widget.liquid"),
+    "<!-- Will be deleted -->",
+  );
 
   await fs.ensureDir(path.join(testThemeDir, "widgets", "accordion"));
-  await fs.writeJson(path.join(testThemeDir, "widgets", "accordion", "schema.json"), { name: "Accordion", version: "1.0.0" });
+  await fs.writeJson(path.join(testThemeDir, "widgets", "accordion", "schema.json"), {
+    name: "Accordion",
+    version: "1.0.0",
+  });
   await fs.writeFile(path.join(testThemeDir, "widgets", "accordion", "widget.liquid"), "<!-- Accordion v1.0.0 -->");
 
   // snippets/
@@ -120,18 +132,33 @@ async function createUpdate110() {
     { spaces: 2 },
   );
 
-  await fs.writeFile(path.join(updateDir, "layout.liquid"), "<!-- Updated layout v1.1.0 -->\n<html><head><meta charset='utf-8'></head><body>{{ content }}</body></html>");
+  await fs.writeFile(
+    path.join(updateDir, "layout.liquid"),
+    "<!-- Updated layout v1.1.0 -->\n<html><head><meta charset='utf-8'></head><body>{{ content }}</body></html>",
+  );
 
   await fs.ensureDir(path.join(updateDir, "assets"));
   await fs.writeFile(path.join(updateDir, "assets", "new-feature.js"), "// New feature added in v1.1.0");
-  await fs.writeFile(path.join(updateDir, "assets", "base.css"), "/* Base CSS v1.1.0 - Updated */\nbody { margin: 0; padding: 0; }");
+  await fs.writeFile(
+    path.join(updateDir, "assets", "base.css"),
+    "/* Base CSS v1.1.0 - Updated */\nbody { margin: 0; padding: 0; }",
+  );
 
   await fs.ensureDir(path.join(updateDir, "widgets", "testimonials"));
-  await fs.writeJson(path.join(updateDir, "widgets", "testimonials", "schema.json"), { name: "Testimonials", version: "1.1.0" });
-  await fs.writeFile(path.join(updateDir, "widgets", "testimonials", "widget.liquid"), "<!-- Testimonials widget v1.1.0 -->");
+  await fs.writeJson(path.join(updateDir, "widgets", "testimonials", "schema.json"), {
+    name: "Testimonials",
+    version: "1.1.0",
+  });
+  await fs.writeFile(
+    path.join(updateDir, "widgets", "testimonials", "widget.liquid"),
+    "<!-- Testimonials widget v1.1.0 -->",
+  );
 
   await fs.ensureDir(path.join(updateDir, "widgets", "hero"));
-  await fs.writeFile(path.join(updateDir, "widgets", "hero", "widget.liquid"), "<!-- Hero widget v1.1.0 - Enhanced -->");
+  await fs.writeFile(
+    path.join(updateDir, "widgets", "hero", "widget.liquid"),
+    "<!-- Hero widget v1.1.0 - Enhanced -->",
+  );
 
   await fs.ensureDir(path.join(updateDir, "snippets"));
   await fs.writeFile(path.join(updateDir, "snippets", "footer.liquid"), "<!-- Footer snippet v1.1.0 -->");
@@ -184,8 +211,15 @@ async function createUpdate120() {
 
   // Updated accordion widget
   await fs.ensureDir(path.join(updateDir, "widgets", "accordion"));
-  await fs.writeFile(path.join(updateDir, "widgets", "accordion", "widget.liquid"), "<!-- Accordion widget v1.2.0 - Rewritten -->");
-  await fs.writeJson(path.join(updateDir, "widgets", "accordion", "schema.json"), { name: "Accordion", version: "1.2.0", enhanced: true });
+  await fs.writeFile(
+    path.join(updateDir, "widgets", "accordion", "widget.liquid"),
+    "<!-- Accordion widget v1.2.0 - Rewritten -->",
+  );
+  await fs.writeJson(path.join(updateDir, "widgets", "accordion", "schema.json"), {
+    name: "Accordion",
+    version: "1.2.0",
+    enhanced: true,
+  });
 }
 
 async function setup() {
@@ -245,7 +279,10 @@ describe("Version detection", () => {
     for (let i = 1; i < versions.length; i++) {
       const prev = versions[i - 1].split(".").map(Number);
       const curr = versions[i].split(".").map(Number);
-      const isAscending = prev[0] < curr[0] || (prev[0] === curr[0] && prev[1] < curr[1]) || (prev[0] === curr[0] && prev[1] === curr[1] && prev[2] < curr[2]);
+      const isAscending =
+        prev[0] < curr[0] ||
+        (prev[0] === curr[0] && prev[1] < curr[1]) ||
+        (prev[0] === curr[0] && prev[1] === curr[1] && prev[2] < curr[2]);
       assert.ok(isAscending, `${versions[i - 1]} should come before ${versions[i]}`);
     }
   });
@@ -377,19 +414,28 @@ describe("Settings accumulation", () => {
   it("has accent color added in v1.1.0", async () => {
     const theme = await readJsonFile("theme.json");
     const colors = theme.settings.global.colors;
-    assert.ok(colors.some((c) => c.id === "accent"), "accent color should exist");
+    assert.ok(
+      colors.some((c) => c.id === "accent"),
+      "accent color should exist",
+    );
   });
 
   it("has background color added in v1.2.0", async () => {
     const theme = await readJsonFile("theme.json");
     const colors = theme.settings.global.colors;
-    assert.ok(colors.some((c) => c.id === "background"), "background color should exist");
+    assert.ok(
+      colors.some((c) => c.id === "background"),
+      "background color should exist",
+    );
   });
 
   it("has container_padding added in v1.2.0", async () => {
     const theme = await readJsonFile("theme.json");
     const layout = theme.settings.global.layout;
-    assert.ok(layout.some((l) => l.id === "container_padding"), "container_padding should exist");
+    assert.ok(
+      layout.some((l) => l.id === "container_padding"),
+      "container_padding should exist",
+    );
   });
 
   it("primary color default was updated to #0000ff by v1.1.0", async () => {
@@ -469,7 +515,10 @@ describe("Error handling", () => {
 
       // Create update folder "1.1.0" but theme.json says "2.0.0"
       await fs.ensureDir(path.join(errorThemeDir, "updates", "1.1.0"));
-      await fs.writeJson(path.join(errorThemeDir, "updates", "1.1.0", "theme.json"), { name: "Error Theme", version: "2.0.0" });
+      await fs.writeJson(path.join(errorThemeDir, "updates", "1.1.0", "theme.json"), {
+        name: "Error Theme",
+        version: "2.0.0",
+      });
 
       await assert.rejects(
         () => buildLatestSnapshot(errorThemeId),

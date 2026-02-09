@@ -248,9 +248,7 @@
       ]
     }
   },
-  "widgetsOrder": [
-    "terms_content"
-  ],
+  "widgetsOrder": ["terms_content"],
   "id": "terms",
   "created": "2026-01-18T00:00:00.000Z",
   "updated": "2026-01-18T00:00:00.000Z"

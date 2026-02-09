@@ -122,11 +122,7 @@ export async function updatePreview(iframe, newState, oldState) {
   }
 
   const safeOldState = oldState || {};
-  const {
-    widgets: newWidgets = {},
-    globalWidgets: newGlobalWidgets = {},
-    themeSettings: newThemeSettings,
-  } = newState;
+  const { widgets: newWidgets = {}, globalWidgets: newGlobalWidgets = {}, themeSettings: newThemeSettings } = newState;
 
   const {
     widgets: oldWidgets = {},
@@ -156,11 +152,9 @@ export async function updatePreview(iframe, newState, oldState) {
 
   // Check global widgets
   const headerChanged =
-    newGlobalWidgets?.header &&
-    JSON.stringify(newGlobalWidgets.header) !== JSON.stringify(oldGlobalWidgets?.header);
+    newGlobalWidgets?.header && JSON.stringify(newGlobalWidgets.header) !== JSON.stringify(oldGlobalWidgets?.header);
   const footerChanged =
-    newGlobalWidgets?.footer &&
-    JSON.stringify(newGlobalWidgets.footer) !== JSON.stringify(oldGlobalWidgets?.footer);
+    newGlobalWidgets?.footer && JSON.stringify(newGlobalWidgets.footer) !== JSON.stringify(oldGlobalWidgets?.footer);
 
   const themeSettingsChanged = JSON.stringify(newThemeSettings) !== JSON.stringify(oldThemeSettings);
 
@@ -172,10 +166,7 @@ export async function updatePreview(iframe, newState, oldState) {
       try {
         console.log(`[PreviewManager] → Morphing widget: ${widgetId}`);
         const renderedHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings);
-        iframe.contentWindow.postMessage(
-          { type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } },
-          "*",
-        );
+        iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, "*");
       } catch (error) {
         console.error(`Error updating widget ${widgetId}:`, error);
       }
@@ -386,8 +377,5 @@ export function scrollElementIntoView(iframe, widgetId, blockId = null) {
     return;
   }
 
-  iframe.contentWindow.postMessage(
-    { type: "SCROLL_TO_ELEMENT", payload: { widgetId, blockId } },
-    "*",
-  );
+  iframe.contentWindow.postMessage({ type: "SCROLL_TO_ELEMENT", payload: { widgetId, blockId } }, "*");
 }

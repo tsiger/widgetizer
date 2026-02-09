@@ -59,13 +59,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "about-eyebrow",
-        "about-heading",
-        "about-body",
-        "about-features",
-        "about-buttons"
-      ]
+      "blocksOrder": ["about-eyebrow", "about-heading", "about-body", "about-features", "about-buttons"]
     },
     "impact_figures": {
       "type": "key-figures",
@@ -107,11 +101,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "impact-1",
-        "impact-2",
-        "impact-3"
-      ]
+      "blocksOrder": ["impact-1", "impact-2", "impact-3"]
     },
     "team_profiles": {
       "type": "profile-grid",
@@ -151,11 +141,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "profile-1",
-        "profile-2",
-        "profile-3"
-      ]
+      "blocksOrder": ["profile-1", "profile-2", "profile-3"]
     },
     "about_cta": {
       "type": "banner",
@@ -201,19 +187,10 @@
           }
         }
       },
-      "blocksOrder": [
-        "about-cta-heading",
-        "about-cta-text",
-        "about-cta-buttons"
-      ]
+      "blocksOrder": ["about-cta-heading", "about-cta-text", "about-cta-buttons"]
     }
   },
-  "widgetsOrder": [
-    "about_intro",
-    "impact_figures",
-    "team_profiles",
-    "about_cta"
-  ],
+  "widgetsOrder": ["about_intro", "impact_figures", "team_profiles", "about_cta"],
   "id": "about",
   "created": "2026-01-17T16:13:19.588Z",
   "updated": "2026-01-17T16:17:40.348Z"

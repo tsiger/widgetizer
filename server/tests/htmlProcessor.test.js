@@ -15,12 +15,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import {
-  formatHtml,
-  formatXml,
-  validateHtml,
-  generateIssuesReport,
-} from "../utils/htmlProcessor.js";
+import { formatHtml, formatXml, validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
 
 // ============================================================================
 // formatHtml
@@ -73,7 +68,8 @@ describe("formatHtml", () => {
   });
 
   it("handles meta tags and self-closing elements", async () => {
-    const input = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"></head><body></body></html>';
+    const input =
+      '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"></head><body></body></html>';
     const result = await formatHtml(input);
     assert.equal(result.success, true);
     assert.ok(result.html.includes("charset"));
@@ -107,7 +103,8 @@ describe("formatXml", () => {
   });
 
   it("formats sitemap-like XML with indentation", async () => {
-    const input = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://example.com/</loc><lastmod>2026-01-01</lastmod></url><url><loc>https://example.com/about</loc></url></urlset>';
+    const input =
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://example.com/</loc><lastmod>2026-01-01</lastmod></url><url><loc>https://example.com/about</loc></url></urlset>';
     const result = await formatXml(input);
     assert.equal(result.success, true);
     assert.ok(result.xml.includes("example.com/about"));
@@ -142,25 +139,25 @@ describe("validateHtml", () => {
   it("does not flag missing doctype (doctype-style is off)", async () => {
     // The validator config disables doctype-style, so missing doctype is not flagged.
     // Only element-required-attributes (like missing lang) should fire.
-    const html = '<html><head><title>Test</title></head><body></body></html>';
+    const html = "<html><head><title>Test</title></head><body></body></html>";
     const result = await validateHtml(html, "test-page");
-    const doctypeIssue = result.issues.find((i) => i.ruleId.includes("doctype") || i.message.toLowerCase().includes("doctype"));
+    const doctypeIssue = result.issues.find(
+      (i) => i.ruleId.includes("doctype") || i.message.toLowerCase().includes("doctype"),
+    );
     assert.equal(doctypeIssue, undefined, "doctype issues should be suppressed by config");
     // But missing lang should still fire
     assert.ok(result.issues.length > 0);
   });
 
   it("detects missing lang attribute on <html>", async () => {
-    const html = '<!DOCTYPE html><html><head><title>Test</title></head><body></body></html>';
+    const html = "<!DOCTYPE html><html><head><title>Test</title></head><body></body></html>";
     const result = await validateHtml(html, "test-page");
-    const langIssue = result.issues.find(
-      (i) => i.message.toLowerCase().includes("lang") || i.ruleId.includes("lang"),
-    );
+    const langIssue = result.issues.find((i) => i.message.toLowerCase().includes("lang") || i.ruleId.includes("lang"));
     assert.ok(langIssue, "should flag missing lang attribute");
   });
 
   it("returns structured issue objects", async () => {
-    const html = '<html><head><title>Test</title></head><body></body></html>';
+    const html = "<html><head><title>Test</title></head><body></body></html>";
     const result = await validateHtml(html, "test-page");
     assert.ok(result.issues.length > 0);
 
@@ -175,7 +172,7 @@ describe("validateHtml", () => {
   });
 
   it("includes source snippets with line numbers", async () => {
-    const html = '<html><head><title>Test</title></head><body></body></html>';
+    const html = "<html><head><title>Test</title></head><body></body></html>";
     const result = await validateHtml(html, "test-page");
     assert.ok(result.issues.length > 0);
 
@@ -205,7 +202,7 @@ describe("validateHtml", () => {
   });
 
   it("counts errors and warnings separately", async () => {
-    const html = '<html><body><p>No doctype, no head, no lang</p></body></html>';
+    const html = "<html><body><p>No doctype, no head, no lang</p></body></html>";
     const result = await validateHtml(html, "test-page");
     assert.equal(typeof result.errorCount, "number");
     assert.equal(typeof result.warningCount, "number");
@@ -222,7 +219,7 @@ describe("validateHtml", () => {
   });
 
   it("handles large multi-line HTML", async () => {
-    const lines = ['<!DOCTYPE html>', '<html lang="en">', "<head><title>Big</title></head>", "<body>"];
+    const lines = ["<!DOCTYPE html>", '<html lang="en">', "<head><title>Big</title></head>", "<body>"];
     for (let i = 0; i < 100; i++) {
       lines.push(`  <p>Paragraph ${i}</p>`);
     }
@@ -277,8 +274,16 @@ describe("generateIssuesReport", () => {
 
   it("shows page count in summary", () => {
     const issues = [
-      { page: "home", filename: "index.html", issues: [{ line: 1, column: 1, severity: "error", message: "Error", ruleId: "test", sourceSnippet: [] }] },
-      { page: "about", filename: "about.html", issues: [{ line: 1, column: 1, severity: "error", message: "Error", ruleId: "test", sourceSnippet: [] }] },
+      {
+        page: "home",
+        filename: "index.html",
+        issues: [{ line: 1, column: 1, severity: "error", message: "Error", ruleId: "test", sourceSnippet: [] }],
+      },
+      {
+        page: "about",
+        filename: "about.html",
+        issues: [{ line: 1, column: 1, severity: "error", message: "Error", ruleId: "test", sourceSnippet: [] }],
+      },
     ];
     const report = generateIssuesReport(issues);
     assert.ok(report.includes("2 pages"));
@@ -318,7 +323,14 @@ describe("generateIssuesReport", () => {
         page: "home",
         filename: "index.html",
         issues: [
-          { line: 42, column: 7, severity: "error", message: "Missing closing tag", ruleId: "close-tag", sourceSnippet: [] },
+          {
+            line: 42,
+            column: 7,
+            severity: "error",
+            message: "Missing closing tag",
+            ruleId: "close-tag",
+            sourceSnippet: [],
+          },
         ],
       },
     ];
@@ -402,7 +414,15 @@ describe("generateIssuesReport", () => {
         page: "home",
         filename: "index.html",
         issues: [
-          { line: 1, column: 1, severity: "error", message: "Error", ruleId: "no-link-rule", ruleUrl: null, sourceSnippet: [] },
+          {
+            line: 1,
+            column: 1,
+            severity: "error",
+            message: "Error",
+            ruleId: "no-link-rule",
+            ruleUrl: null,
+            sourceSnippet: [],
+          },
         ],
       },
     ];
@@ -421,7 +441,7 @@ describe("generateIssuesReport", () => {
       },
     ];
     const report = generateIssuesReport(issues);
-    assert.ok(!report.includes('<img src=x'));
+    assert.ok(!report.includes("<img src=x"));
     assert.ok(report.includes("&lt;img"));
   });
 
@@ -431,7 +451,14 @@ describe("generateIssuesReport", () => {
         page: "home",
         filename: "index.html",
         issues: [
-          { line: 1, column: 1, severity: "error", message: '<script>alert("xss")</script>', ruleId: "test", sourceSnippet: [] },
+          {
+            line: 1,
+            column: 1,
+            severity: "error",
+            message: '<script>alert("xss")</script>',
+            ruleId: "test",
+            sourceSnippet: [],
+          },
         ],
       },
     ];
@@ -459,9 +486,7 @@ describe("generateIssuesReport", () => {
       {
         page: "about",
         filename: "about.html",
-        issues: [
-          { line: 10, column: 1, severity: "error", message: "E2", ruleId: "r3", sourceSnippet: [] },
-        ],
+        issues: [{ line: 10, column: 1, severity: "error", message: "E2", ruleId: "r3", sourceSnippet: [] }],
       },
       {
         page: "contact",

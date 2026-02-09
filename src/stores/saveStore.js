@@ -58,8 +58,11 @@ const useAutoSave = create((set, get) => ({
       return true;
     }
 
-    if (themeSettings && originalThemeSettings &&
-        JSON.stringify(themeSettings) !== JSON.stringify(originalThemeSettings)) {
+    if (
+      themeSettings &&
+      originalThemeSettings &&
+      JSON.stringify(themeSettings) !== JSON.stringify(originalThemeSettings)
+    ) {
       return true;
     }
 
@@ -124,10 +127,9 @@ const useAutoSave = create((set, get) => ({
 
       // Save page content if there are page changes (including undo/redo)
       // Filter out global widget IDs - they are saved separately via saveGlobalWidget
-      const hasPageWidgetChanges = [...modifiedWidgets].some(id => id !== "header" && id !== "footer");
-      const hasPageDiff = page && pageStore.originalPage
-        ? JSON.stringify(page) !== JSON.stringify(pageStore.originalPage)
-        : false;
+      const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
+      const hasPageDiff =
+        page && pageStore.originalPage ? JSON.stringify(page) !== JSON.stringify(pageStore.originalPage) : false;
       if (page && (hasPageWidgetChanges || structureModified || hasPageDiff)) {
         savePromises.push(savePageContent(page.id, page));
       }

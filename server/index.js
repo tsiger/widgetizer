@@ -24,9 +24,7 @@ import coreWidgetsRoutes from "./routes/coreWidgets.js";
 import coreRoutes from "./routes/core.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const appRoot = process.env.APP_ROOT
-  ? path.resolve(process.env.APP_ROOT)
-  : path.resolve(__dirname, "..");
+const appRoot = process.env.APP_ROOT ? path.resolve(process.env.APP_ROOT) : path.resolve(__dirname, "..");
 const app = express();
 
 // Trust proxy in production (required for rate limiting behind reverse proxy)
@@ -39,7 +37,7 @@ app.use(
   helmet({
     contentSecurityPolicy: false, // Preview iframe needs inline styles/scripts from widgets
     crossOriginEmbedderPolicy: false, // Widgets load cross-origin iframes (YouTube, Maps, etc.)
-    crossOriginResourcePolicy: { policy: "cross-origin" } // Allow SVGs and assets in preview iframe
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow SVGs and assets in preview iframe
   }),
 );
 app.use(express.json());

@@ -2,14 +2,7 @@ import { useState, useEffect, useRef, useMemo, memo } from "react";
 import { ChevronDown } from "lucide-react";
 
 // Custom Combobox for menu editor with higher z-index and external control
-const MenuCombobox = memo(function MenuCombobox({
-  options,
-  value,
-  onChange,
-  placeholder,
-  isOpen,
-  onOpenChange,
-}) {
+const MenuCombobox = memo(function MenuCombobox({ options, value, onChange, placeholder, isOpen, onOpenChange }) {
   const [searchTerm, setSearchTerm] = useState("");
   const containerRef = useRef(null);
 

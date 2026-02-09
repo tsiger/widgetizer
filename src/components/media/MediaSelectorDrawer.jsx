@@ -149,10 +149,10 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
                 filterType === "image"
                   ? MEDIA_TYPES.image.join(",")
                   : filterType === "video"
-                  ? MEDIA_TYPES.video.join(",")
-                  : filterType === "audio"
-                  ? MEDIA_TYPES.audio.join(",")
-                  : [...MEDIA_TYPES.image, ...MEDIA_TYPES.video, ...MEDIA_TYPES.audio].join(",")
+                    ? MEDIA_TYPES.video.join(",")
+                    : filterType === "audio"
+                      ? MEDIA_TYPES.audio.join(",")
+                      : [...MEDIA_TYPES.image, ...MEDIA_TYPES.video, ...MEDIA_TYPES.audio].join(",")
               }
               onChange={handleFileInputChange}
             />
@@ -190,12 +190,16 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
                     {file.type && file.type.startsWith("video/") ? (
                       <div className="flex flex-col items-center justify-center text-slate-500 p-2">
                         <Play size={32} />
-                        <p className="text-xs text-center mt-1 font-medium truncate max-w-full">{t("components.mediaSelector.video")}</p>
+                        <p className="text-xs text-center mt-1 font-medium truncate max-w-full">
+                          {t("components.mediaSelector.video")}
+                        </p>
                       </div>
                     ) : file.type && file.type.startsWith("audio/") ? (
                       <div className="flex flex-col items-center justify-center text-slate-500 p-2">
                         <Music size={32} />
-                        <p className="text-xs text-center mt-1 font-medium truncate max-w-full">{t("components.mediaSelector.audio")}</p>
+                        <p className="text-xs text-center mt-1 font-medium truncate max-w-full">
+                          {t("components.mediaSelector.audio")}
+                        </p>
                       </div>
                     ) : (
                       <img

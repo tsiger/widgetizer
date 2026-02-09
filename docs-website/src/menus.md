@@ -4,7 +4,6 @@ description: Build navigation menus in Widgetizer with drag-and-drop editing. Cr
 
 Menus are the navigation systems for your website. You can create multiple menus (for headers, footers, sidebars, etc.) and use them in your theme widgets. Each menu can have a hierarchical structure with dropdown sub-menus.
 
-
 # Creating a New Menu
 
 1. Click the **"New Menu"** button
@@ -14,7 +13,6 @@ Menus are the navigation systems for your website. You can create multiple menus
 3. Click **"Create Menu"**
 
 You'll automatically be taken to the structure editor to start adding menu items.
-
 
 # Adding Menu Items
 
@@ -40,7 +38,6 @@ Links to any URL, internal or external.
 - **Label**: The text shown in the menu (e.g., "Google")
 - **URL**: The full URL (e.g., `https://google.com` or `/contact`)
 
-
 # Creating Sub-Menus (Nested Items)
 
 You can create dropdown menus with up to **3 total levels** (including the top-level menu items).
@@ -64,7 +61,6 @@ Contact               (Level 1)
 
 > **Important:** Widgetizer supports a maximum of **3 levels total**, including the top-level menu items. You cannot nest items deeper than this.
 
-
 # Reordering Menu Items
 
 Use **drag and drop** to rearrange your menu items:
@@ -76,14 +72,12 @@ Use **drag and drop** to rearrange your menu items:
 
 The menu automatically saves your changes.
 
-
 # Editing Menu Items
 
 1. Find the menu item in the structure editor
 2. Click the **pencil icon** (Edit)
 3. Update the label, page, or URL
 4. Click **"Save"**
-
 
 # Deleting Menu Items
 
@@ -92,7 +86,6 @@ The menu automatically saves your changes.
 3. Confirm the deletion
 
 > **Note:** Deleting a parent item will also delete all its children (sub-menu items).
-
 
 # Managing Menus
 
@@ -119,8 +112,7 @@ The duplicate will be named "Copy of [Original Name]".
 2. Click the **trash icon** (Delete)
 3. Confirm the deletion
 
->  **Warning:** Deletion is permanent. All menu items and structure will be removed.
-
+> **Warning:** Deletion is permanent. All menu items and structure will be removed.
 
 # Using Menus in Your Theme
 
@@ -131,7 +123,6 @@ After creating a menu, you can use it in your theme's header, footer, or any wid
 3. The menu will be rendered with your theme's styling
 
 For theme developers, see [Menus & Snippets](theme-dev-menus-snippets.html) for how to render menus in templates.
-
 
 # Tips & Best Practices
 

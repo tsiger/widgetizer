@@ -13,7 +13,7 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  
+
   const maxSizeMB = settings?.export?.maxImportSizeMB || 500;
 
   if (!isOpen) return null;
@@ -22,12 +22,16 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
     if (files.length > 0) {
       const file = files[0];
       // Validate file type
-      if (!file.name.endsWith(".zip") && file.type !== "application/zip" && file.type !== "application/x-zip-compressed") {
+      if (
+        !file.name.endsWith(".zip") &&
+        file.type !== "application/zip" &&
+        file.type !== "application/x-zip-compressed"
+      ) {
         setError(t("projects.importModal.invalidFileType"));
         setSelectedFile(null);
         return;
       }
-      
+
       // Validate file size
       const fileSizeMB = file.size / 1024 / 1024;
       if (fileSizeMB > maxSizeMB) {
@@ -35,12 +39,12 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
           t("projects.importModal.fileTooLarge", {
             size: fileSizeMB.toFixed(2),
             max: maxSizeMB,
-          })
+          }),
         );
         setSelectedFile(null);
         return;
       }
-      
+
       setSelectedFile(file);
       setError(null);
       setSuccess(null);
@@ -114,9 +118,7 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
             <div className="text-center py-4">
               <CheckCircle className="mx-auto mb-4 text-green-500" size={48} />
               <h4 className="text-lg font-semibold text-slate-800 mb-2">{t("projects.importModal.successTitle")}</h4>
-              <p className="text-slate-600 mb-2">
-                {t("projects.importModal.successMessage", { name: success.name })}
-              </p>
+              <p className="text-slate-600 mb-2">{t("projects.importModal.successMessage", { name: success.name })}</p>
               <p className="text-sm text-slate-500">{t("projects.importModal.redirecting")}</p>
             </div>
           ) : (
@@ -141,9 +143,7 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
                   <div className="flex items-center gap-2">
                     <Upload size={16} className="text-slate-500" />
                     <span className="text-sm font-medium text-slate-700">{selectedFile.name}</span>
-                    <span className="text-xs text-slate-500">
-                      ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
-                    </span>
+                    <span className="text-xs text-slate-500">({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)</span>
                   </div>
                 </div>
               )}

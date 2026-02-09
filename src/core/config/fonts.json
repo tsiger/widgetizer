@@ -4,30 +4,21 @@
       "name": "System UI",
       "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
       "isGoogleFont": false,
-      "availableWeights": [
-        400,
-        700
-      ],
+      "availableWeights": [400, 700],
       "defaultWeight": 400
     },
     {
       "name": "Sans Serif",
       "stack": "Arial, Helvetica, sans-serif",
       "isGoogleFont": false,
-      "availableWeights": [
-        400,
-        700
-      ],
+      "availableWeights": [400, 700],
       "defaultWeight": 400
     },
     {
       "name": "Serif",
       "stack": "Georgia, serif",
       "isGoogleFont": false,
-      "availableWeights": [
-        400,
-        700
-      ],
+      "availableWeights": [400, 700],
       "defaultWeight": 400
     }
   ],
@@ -36,1337 +27,686 @@
       "name": "Abel",
       "stack": "\"Abel\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Abril Fatface",
       "stack": "\"Abril Fatface\", display",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Alegreya",
       "stack": "\"Alegreya\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Alegreya Sans",
       "stack": "\"Alegreya Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        300,
-        400,
-        500,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 300, 400, 500, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Anton",
       "stack": "\"Anton\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Archivo",
       "stack": "\"Archivo\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Archivo Black",
       "stack": "\"Archivo Black\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Arimo",
       "stack": "\"Arimo\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Asap",
       "stack": "\"Asap\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Assistant",
       "stack": "\"Assistant\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
       "defaultWeight": 400
     },
     {
       "name": "Barlow",
       "stack": "\"Barlow\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Bebas Neue",
       "stack": "\"Bebas Neue\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Bitter",
       "stack": "\"Bitter\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Cabin",
       "stack": "\"Cabin\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Catamaran",
       "stack": "\"Catamaran\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Caveat",
       "stack": "\"Caveat\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Chakra Petch",
       "stack": "\"Chakra Petch\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Cinzel",
       "stack": "\"Cinzel\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Comfortaa",
       "stack": "\"Comfortaa\", display",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Cormorant Garamond",
       "stack": "\"Cormorant Garamond\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Crimson Text",
       "stack": "\"Crimson Text\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        600,
-        700
-      ],
+      "availableWeights": [400, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Dancing Script",
       "stack": "\"Dancing Script\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "DM Sans",
       "stack": "\"DM Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Dosis",
       "stack": "\"Dosis\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
       "defaultWeight": 400
     },
     {
       "name": "EB Garamond",
       "stack": "\"EB Garamond\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700,
-        800
-      ],
+      "availableWeights": [400, 500, 600, 700, 800],
       "defaultWeight": 400
     },
     {
       "name": "Encode Sans",
       "stack": "\"Encode Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Exo 2",
       "stack": "\"Exo 2\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Fira Sans",
       "stack": "\"Fira Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Fjalla One",
       "stack": "\"Fjalla One\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Fraunces",
       "stack": "\"Fraunces\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Heebo",
       "stack": "\"Heebo\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Hind",
       "stack": "\"Hind\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "IBM Plex Mono",
       "stack": "\"IBM Plex Mono\", monospace",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "IBM Plex Sans",
       "stack": "\"IBM Plex Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "IBM Plex Serif",
       "stack": "\"IBM Plex Serif\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Inconsolata",
       "stack": "\"Inconsolata\", monospace",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Indie Flower",
       "stack": "\"Indie Flower\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Inter",
       "stack": "\"Inter\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Josefin Sans",
       "stack": "\"Josefin Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Jost",
       "stack": "\"Jost\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Kanit",
       "stack": "\"Kanit\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Karla",
       "stack": "\"Karla\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
       "defaultWeight": 400
     },
     {
       "name": "Lato",
       "stack": "\"Lato\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        700
-      ],
+      "availableWeights": [300, 400, 700],
       "defaultWeight": 400
     },
     {
       "name": "Libre Baskerville",
       "stack": "\"Libre Baskerville\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Libre Franklin",
       "stack": "\"Libre Franklin\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Lobster",
       "stack": "\"Lobster\", display",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Lora",
       "stack": "\"Lora\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Manrope",
       "stack": "\"Manrope\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
       "defaultWeight": 400
     },
     {
       "name": "Material Icons",
       "stack": "\"Material Icons\", monospace",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Maven Pro",
       "stack": "\"Maven Pro\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Merriweather",
       "stack": "\"Merriweather\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Montserrat",
       "stack": "\"Montserrat\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Mukta",
       "stack": "\"Mukta\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
       "defaultWeight": 400
     },
     {
       "name": "Mulish",
       "stack": "\"Mulish\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Nanum Gothic",
       "stack": "\"Nanum Gothic\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        700,
-        800
-      ],
+      "availableWeights": [400, 700, 800],
       "defaultWeight": 400
     },
     {
       "name": "Noto Sans",
       "stack": "\"Noto Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Noto Sans KR",
       "stack": "\"Noto Sans KR\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Noto Sans TC",
       "stack": "\"Noto Sans TC\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Noto Serif",
       "stack": "\"Noto Serif\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Nunito",
       "stack": "\"Nunito\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Nunito Sans",
       "stack": "\"Nunito Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Open Sans",
       "stack": "\"Open Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Oswald",
       "stack": "\"Oswald\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Outfit",
       "stack": "\"Outfit\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Overpass",
       "stack": "\"Overpass\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Oxygen",
       "stack": "\"Oxygen\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        700
-      ],
+      "availableWeights": [300, 400, 700],
       "defaultWeight": 400
     },
     {
       "name": "Pacifico",
       "stack": "\"Pacifico\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Pathway Gothic One",
       "stack": "\"Pathway Gothic One\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Permanent Marker",
       "stack": "\"Permanent Marker\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Play",
       "stack": "\"Play\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        700
-      ],
+      "availableWeights": [400, 700],
       "defaultWeight": 400
     },
     {
       "name": "Playfair",
       "stack": "\"Playfair\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Playfair Display",
       "stack": "\"Playfair Display\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Plus Jakarta Sans",
       "stack": "\"Plus Jakarta Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
       "defaultWeight": 400
     },
     {
       "name": "Poppins",
       "stack": "\"Poppins\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Prompt",
       "stack": "\"Prompt\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "PT Sans",
       "stack": "\"PT Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        700
-      ],
+      "availableWeights": [400, 700],
       "defaultWeight": 400
     },
     {
       "name": "PT Sans Narrow",
       "stack": "\"PT Sans Narrow\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        700
-      ],
+      "availableWeights": [400, 700],
       "defaultWeight": 400
     },
     {
       "name": "PT Serif",
       "stack": "\"PT Serif\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        700
-      ],
+      "availableWeights": [400, 700],
       "defaultWeight": 400
     },
     {
       "name": "Quicksand",
       "stack": "\"Quicksand\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Raleway",
       "stack": "\"Raleway\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Red Hat Display",
       "stack": "\"Red Hat Display\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Righteous",
       "stack": "\"Righteous\", display",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Roboto",
       "stack": "\"Roboto\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 700],
       "defaultWeight": 400
     },
     {
       "name": "Roboto Mono",
       "stack": "\"Roboto Mono\", monospace",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Rubik",
       "stack": "\"Rubik\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Sarabun",
       "stack": "\"Sarabun\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800],
       "defaultWeight": 400
     },
     {
       "name": "Shadows Into Light",
       "stack": "\"Shadows Into Light\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Source Code Pro",
       "stack": "\"Source Code Pro\", monospace",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Space Grotesk",
       "stack": "\"Space Grotesk\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Space Mono",
       "stack": "\"Space Mono\", monospace",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        700
-      ],
+      "availableWeights": [400, 700],
       "defaultWeight": 400
     },
     {
       "name": "Teko",
       "stack": "\"Teko\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Titillium Web",
       "stack": "\"Titillium Web\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        600,
-        700,
-        900
-      ],
+      "availableWeights": [200, 300, 400, 600, 700, 900],
       "defaultWeight": 400
     },
     {
       "name": "Ubuntu",
       "stack": "\"Ubuntu\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 700],
       "defaultWeight": 400
     },
     {
       "name": "Varela Round",
       "stack": "\"Varela Round\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400
-      ],
+      "availableWeights": [400],
       "defaultWeight": 400
     },
     {
       "name": "Vollkorn",
       "stack": "\"Vollkorn\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Work Sans",
       "stack": "\"Work Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900
-      ],
+      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
       "defaultWeight": 400
     },
     {
       "name": "Yanone Kaffeesatz",
       "stack": "\"Yanone Kaffeesatz\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [200, 300, 400, 500, 600, 700],
       "defaultWeight": 400
     },
     {
       "name": "Zilla Slab",
       "stack": "\"Zilla Slab\", serif",
       "isGoogleFont": true,
-      "availableWeights": [
-        300,
-        400,
-        500,
-        600,
-        700
-      ],
+      "availableWeights": [300, 400, 500, 600, 700],
       "defaultWeight": 400
     }
   ]

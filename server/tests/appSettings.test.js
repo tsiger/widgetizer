@@ -27,12 +27,8 @@ process.env.NODE_ENV = "test";
 
 const { getAppSettingsPath } = await import("../config.js");
 
-const {
-  getAppSettings,
-  updateAppSettings,
-  readAppSettingsFile,
-  getSetting,
-} = await import("../controllers/appSettingsController.js");
+const { getAppSettings, updateAppSettings, readAppSettingsFile, getSetting } =
+  await import("../controllers/appSettingsController.js");
 
 // ============================================================================
 // Test helpers
@@ -108,20 +104,14 @@ describe("readAppSettingsFile", () => {
 
   it("returns saved settings when file exists", async () => {
     const settingsPath = getAppSettingsPath();
-    await fs.outputFile(
-      settingsPath,
-      JSON.stringify({ general: { language: "de" } }, null, 2),
-    );
+    await fs.outputFile(settingsPath, JSON.stringify({ general: { language: "de" } }, null, 2));
     const settings = await readAppSettingsFile();
     assert.equal(settings.general.language, "de");
   });
 
   it("merges saved settings with defaults (missing keys get defaults)", async () => {
     const settingsPath = getAppSettingsPath();
-    await fs.outputFile(
-      settingsPath,
-      JSON.stringify({ general: { language: "fr" } }, null, 2),
-    );
+    await fs.outputFile(settingsPath, JSON.stringify({ general: { language: "fr" } }, null, 2));
     const settings = await readAppSettingsFile();
     assert.equal(settings.general.language, "fr");
     // media should come from defaults
@@ -331,11 +321,15 @@ describe("getSetting", () => {
     const settingsPath = getAppSettingsPath();
     await fs.outputFile(
       settingsPath,
-      JSON.stringify({
-        general: { language: "en" },
-        media: { maxFileSizeMB: 20 },
-        developer: { enabled: true },
-      }, null, 2),
+      JSON.stringify(
+        {
+          general: { language: "en" },
+          media: { maxFileSizeMB: 20 },
+          developer: { enabled: true },
+        },
+        null,
+        2,
+      ),
     );
     const result = await getSetting("developer.enabled");
     assert.equal(result, true);

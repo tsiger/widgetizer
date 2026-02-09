@@ -15,7 +15,6 @@
 }
 
 @layer components {
-
   /* === FORM LABELS === */
   .form-label {
     @apply block text-sm font-medium text-slate-700 mb-1;
@@ -42,7 +41,8 @@
     @apply focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500;
     @apply disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none;
 
-    .page-editor-settings & {}
+    .page-editor-settings & {
+    }
   }
 
   /* Error state class that can be controlled by JavaScript */
@@ -137,12 +137,12 @@
   }
 
   /* First child header: no top margin, sits flush */
-  .page-editor-settings>.setting-type-header:first-child {
+  .page-editor-settings > .setting-type-header:first-child {
     @apply mt-0;
   }
 
   /* First child non-header: add top padding */
-  .page-editor-settings>*:first-child:not(.setting-type-header) {
+  .page-editor-settings > *:first-child:not(.setting-type-header) {
     @apply pt-4;
   }
 
@@ -151,9 +151,9 @@
   .space-y-6 .setting-type-header {
     @apply -mx-6 px-6 py-2 bg-slate-50 border-t border-slate-200 rounded-sm;
   }
-  
+
   /* Non-header as first element: add top padding for visual balance */
-  .space-y-6>*:first-child:not(.setting-type-header) {
+  .space-y-6 > *:first-child:not(.setting-type-header) {
     @apply pt-2;
   }
 }

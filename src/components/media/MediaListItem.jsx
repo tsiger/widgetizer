@@ -39,7 +39,9 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
         <div className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center">
           {file.type?.startsWith("image/") ? (
             <img
-              src={API_URL(`/api/media/projects/${activeProject.id}${file.type === "image/svg+xml" ? file.path : (file.sizes?.thumb?.path || file.thumbnail || file.path)}`)}
+              src={API_URL(
+                `/api/media/projects/${activeProject.id}${file.type === "image/svg+xml" ? file.path : file.sizes?.thumb?.path || file.thumbnail || file.path}`,
+              )}
               alt={file.metadata?.alt || file.originalName}
               className={`w-full h-full object-contain rounded ${file.type === "image/svg+xml" ? "p-1" : ""}`}
             />

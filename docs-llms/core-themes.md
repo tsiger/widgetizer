@@ -176,6 +176,7 @@ Handles applying theme updates to projects:
 #### Update Eligibility
 
 **Updatable paths** (copied from theme to project):
+
 - `layout.liquid`
 - `assets/`
 - `widgets/`
@@ -184,17 +185,20 @@ Handles applying theme updates to projects:
 - `screenshot.png`
 
 **Protected paths** (never modified):
+
 - `pages/`
 - `uploads/`
 - `collections/` (if present)
 
 **Add-new-only paths**:
+
 - `menus/`: New menus added, existing preserved
 - `templates/`: New templates added, existing preserved
 
 #### Theme Settings Merge
 
 `mergeThemeSettings(userThemeJson, newThemeJson)`:
+
 - **Adds** new settings that appear in newer version
 - **Preserves** user-edited values for existing settings
 - **Removes** settings deleted by theme author
@@ -203,6 +207,7 @@ Handles applying theme updates to projects:
 #### Project Update Flow
 
 `applyThemeUpdate(projectId)`:
+
 1. Checks for available updates
 2. Copies updatable files from theme's source directory
 3. Merges `theme.json` settings

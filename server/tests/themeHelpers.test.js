@@ -222,7 +222,7 @@ describe("preprocessThemeSettings — edge cases", () => {
         global: {
           colors: [
             { id: "bg", value: "#fff" },
-            { value: "#000" },              // no id — skipped
+            { value: "#000" }, // no id — skipped
             { id: "accent", value: "#00f" },
           ],
         },

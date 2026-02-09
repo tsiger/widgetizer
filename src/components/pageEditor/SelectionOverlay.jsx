@@ -193,7 +193,7 @@ export default function SelectionOverlay({
         case "ELEMENT_BOUNDS":
           // Ignore bounds when no widget is selected (prevents stale bounds after deletion)
           if (!effectiveWidgetId) break;
-          
+
           // Received bounds from iframe - translate and apply
           if (payload.widgetId === effectiveWidgetId) {
             const translated = translateBoundsToOverlay(payload.bounds);

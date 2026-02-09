@@ -36,11 +36,7 @@ process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
-const {
-  getProjectDir,
-  getProjectPagesDir,
-  getProjectMediaJsonPath,
-} = await import("../config.js");
+const { getProjectDir, getProjectPagesDir, getProjectMediaJsonPath } = await import("../config.js");
 
 const { writeProjectsFile } = await import("../controllers/projectController.js");
 
@@ -464,9 +460,9 @@ describe("removePageFromMediaUsage", () => {
   beforeEach(async () => {
     // Seed with some pre-existing usage
     const files = defaultMediaFiles();
-    files[0].usedIn = ["home", "about"];    // hero used on two pages
-    files[1].usedIn = ["home"];             // logo used on home
-    files[2].usedIn = ["about"];            // intro used on about
+    files[0].usedIn = ["home", "about"]; // hero used on two pages
+    files[1].usedIn = ["home"]; // logo used on home
+    files[2].usedIn = ["about"]; // intro used on about
     await seedMediaJson(files);
   });
 
@@ -543,8 +539,8 @@ describe("refreshAllMediaUsage", () => {
   beforeEach(async () => {
     // Seed media.json with stale/wrong usage data
     const files = defaultMediaFiles();
-    files[0].usedIn = ["deleted-page", "ghost"];  // stale
-    files[1].usedIn = ["home"];                   // will be verified
+    files[0].usedIn = ["deleted-page", "ghost"]; // stale
+    files[1].usedIn = ["home"]; // will be verified
     await seedMediaJson(files);
 
     // Create actual page files on disk

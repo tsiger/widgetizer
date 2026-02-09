@@ -27,8 +27,7 @@ process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
-const { getProjectDir, getProjectPagesDir, getProjectMediaJsonPath, getProjectMenusDir } =
-  await import("../config.js");
+const { getProjectDir, getProjectPagesDir, getProjectMediaJsonPath, getProjectMenusDir } = await import("../config.js");
 
 const { writeProjectsFile } = await import("../controllers/projectController.js");
 const { renderWidget, renderPageLayout } = await import("../services/renderingService.js");
@@ -44,9 +43,7 @@ const PROJECT_FOLDER = "render-test-project";
 const RAW_THEME_SETTINGS = {
   settings: {
     global: {
-      colors: [
-        { id: "primary_color", value: "#0066cc", default: "#000000" },
-      ],
+      colors: [{ id: "primary_color", value: "#0066cc", default: "#000000" }],
     },
   },
 };
@@ -84,12 +81,27 @@ before(async () => {
   // Create a minimal media.json
   const mediaJsonPath = getProjectMediaJsonPath(PROJECT_FOLDER);
   await fs.ensureDir(path.dirname(mediaJsonPath));
-  await fs.writeFile(mediaJsonPath, JSON.stringify({
-    files: [
-      { id: "img-1", filename: "hero.jpg", path: "/uploads/images/hero.jpg", type: "image/jpeg", width: 800, height: 600, usedIn: [],
-        sizes: { medium: { path: "/uploads/images/hero-medium.jpg", width: 400, height: 300 } } },
-    ],
-  }, null, 2));
+  await fs.writeFile(
+    mediaJsonPath,
+    JSON.stringify(
+      {
+        files: [
+          {
+            id: "img-1",
+            filename: "hero.jpg",
+            path: "/uploads/images/hero.jpg",
+            type: "image/jpeg",
+            width: 800,
+            height: 600,
+            usedIn: [],
+            sizes: { medium: { path: "/uploads/images/hero-medium.jpg", width: 400, height: 300 } },
+          },
+        ],
+      },
+      null,
+      2,
+    ),
+  );
 
   // Create test pages for link resolution
   const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
@@ -132,44 +144,52 @@ before(async () => {
   );
   await fs.writeFile(
     path.join(testWidgetDir, "schema.json"),
-    JSON.stringify({
-      type: "test-hero",
-      settings: [
-        { id: "heading", type: "text", default: "Default Heading" },
-        { id: "subtitle", type: "text", default: "" },
-        { id: "cta_link", type: "link", default: { href: "", text: "", target: "_self" } },
-        { id: "nav_menu", type: "menu", default: null },
-      ],
-      blocks: [
-        {
-          type: "feature",
-          settings: [
-            { id: "label", type: "text", default: "Feature" },
-            { id: "link", type: "link", default: { href: "", text: "" } },
-          ],
-        },
-      ],
-    }, null, 2),
+    JSON.stringify(
+      {
+        type: "test-hero",
+        settings: [
+          { id: "heading", type: "text", default: "Default Heading" },
+          { id: "subtitle", type: "text", default: "" },
+          { id: "cta_link", type: "link", default: { href: "", text: "", target: "_self" } },
+          { id: "nav_menu", type: "menu", default: null },
+        ],
+        blocks: [
+          {
+            type: "feature",
+            settings: [
+              { id: "label", type: "text", default: "Feature" },
+              { id: "link", type: "link", default: { href: "", text: "" } },
+            ],
+          },
+        ],
+      },
+      null,
+      2,
+    ),
   );
 
   // Create a test menu
   await fs.writeFile(
     path.join(getProjectMenusDir(PROJECT_FOLDER), "main-nav.json"),
-    JSON.stringify({
-      id: "main-nav",
-      name: "Main Navigation",
-      items: [
-        { id: "item_1", label: "Home", link: "/", pageUuid: "page-uuid-home" },
-        { id: "item_2", label: "About", link: "/about", pageUuid: "page-uuid-about" },
-        { id: "item_3", label: "External", link: "https://external.com" },
-        {
-          id: "item_4", label: "Parent", link: "#",
-          items: [
-            { id: "item_4_1", label: "Child", link: "/child", pageUuid: "page-uuid-home" },
-          ],
-        },
-      ],
-    }, null, 2),
+    JSON.stringify(
+      {
+        id: "main-nav",
+        name: "Main Navigation",
+        items: [
+          { id: "item_1", label: "Home", link: "/", pageUuid: "page-uuid-home" },
+          { id: "item_2", label: "About", link: "/about", pageUuid: "page-uuid-about" },
+          { id: "item_3", label: "External", link: "https://external.com" },
+          {
+            id: "item_4",
+            label: "Parent",
+            link: "#",
+            items: [{ id: "item_4_1", label: "Child", link: "/child", pageUuid: "page-uuid-home" }],
+          },
+        ],
+      },
+      null,
+      2,
+    ),
   );
 });
 
@@ -183,10 +203,15 @@ after(async () => {
 
 describe("renderWidget — core widgets", () => {
   it("renders core-spacer with default settings", async () => {
-    const html = await renderWidget(PROJECT_ID, "spacer-1", {
-      type: "core-spacer",
-      settings: {},
-    }, RAW_THEME_SETTINGS);
+    const html = await renderWidget(
+      PROJECT_ID,
+      "spacer-1",
+      {
+        type: "core-spacer",
+        settings: {},
+      },
+      RAW_THEME_SETTINGS,
+    );
 
     assert.ok(html.includes("core-spacer"));
     assert.ok(html.includes("spacer-1"));
@@ -195,10 +220,15 @@ describe("renderWidget — core widgets", () => {
   });
 
   it("renders core-spacer with custom settings", async () => {
-    const html = await renderWidget(PROJECT_ID, "spacer-2", {
-      type: "core-spacer",
-      settings: { height: 100, mobileHeight: 50, showOnMobile: true },
-    }, RAW_THEME_SETTINGS);
+    const html = await renderWidget(
+      PROJECT_ID,
+      "spacer-2",
+      {
+        type: "core-spacer",
+        settings: { height: 100, mobileHeight: 50, showOnMobile: true },
+      },
+      RAW_THEME_SETTINGS,
+    );
 
     assert.ok(html.includes("height: 100px"));
     assert.ok(html.includes("height: 50px"));
@@ -206,17 +236,27 @@ describe("renderWidget — core widgets", () => {
 
   it("passes widget index to template", async () => {
     const html = await renderWidget(
-      PROJECT_ID, "spacer-idx", { type: "core-spacer", settings: {} },
-      RAW_THEME_SETTINGS, "preview", null, 3,
+      PROJECT_ID,
+      "spacer-idx",
+      { type: "core-spacer", settings: {} },
+      RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      3,
     );
     assert.ok(html.includes('data-widget-index="3"'));
   });
 
   it("returns error HTML when widget template is missing", async () => {
-    const html = await renderWidget(PROJECT_ID, "missing-1", {
-      type: "nonexistent-widget",
-      settings: {},
-    }, RAW_THEME_SETTINGS);
+    const html = await renderWidget(
+      PROJECT_ID,
+      "missing-1",
+      {
+        type: "nonexistent-widget",
+        settings: {},
+      },
+      RAW_THEME_SETTINGS,
+    );
 
     assert.ok(html.includes("widget-error") || html.includes("not found"));
   });
@@ -228,30 +268,45 @@ describe("renderWidget — core widgets", () => {
 
 describe("renderWidget — theme widgets & schema defaults", () => {
   it("renders with schema default when setting not provided", async () => {
-    const html = await renderWidget(PROJECT_ID, "hero-1", {
-      type: "test-hero",
-      settings: {},
-    }, RAW_THEME_SETTINGS);
+    const html = await renderWidget(
+      PROJECT_ID,
+      "hero-1",
+      {
+        type: "test-hero",
+        settings: {},
+      },
+      RAW_THEME_SETTINGS,
+    );
 
     // Schema default for heading is "Default Heading"
     assert.ok(html.includes("Default Heading"));
   });
 
   it("overrides schema default with provided setting", async () => {
-    const html = await renderWidget(PROJECT_ID, "hero-2", {
-      type: "test-hero",
-      settings: { heading: "Custom Title" },
-    }, RAW_THEME_SETTINGS);
+    const html = await renderWidget(
+      PROJECT_ID,
+      "hero-2",
+      {
+        type: "test-hero",
+        settings: { heading: "Custom Title" },
+      },
+      RAW_THEME_SETTINGS,
+    );
 
     assert.ok(html.includes("Custom Title"));
     assert.ok(!html.includes("Default Heading"));
   });
 
   it("auto-escapes text settings (XSS protection)", async () => {
-    const html = await renderWidget(PROJECT_ID, "hero-xss", {
-      type: "test-hero",
-      settings: { heading: '<script>alert("xss")</script>' },
-    }, RAW_THEME_SETTINGS);
+    const html = await renderWidget(
+      PROJECT_ID,
+      "hero-xss",
+      {
+        type: "test-hero",
+        settings: { heading: '<script>alert("xss")</script>' },
+      },
+      RAW_THEME_SETTINGS,
+    );
 
     assert.ok(!html.includes("<script>alert"));
     assert.ok(html.includes("&lt;script&gt;") || html.includes("&amp;"));
@@ -264,18 +319,23 @@ describe("renderWidget — theme widgets & schema defaults", () => {
 
 describe("renderWidget — link resolution", () => {
   it("resolves pageUuid in link settings to current slug", async () => {
-    const html = await renderWidget(PROJECT_ID, "hero-link", {
-      type: "test-hero",
-      settings: {
-        heading: "Link Test",
-        cta_link: {
-          href: "/old-slug",
-          text: "Go to About",
-          target: "_self",
-          pageUuid: "page-uuid-about",
+    const html = await renderWidget(
+      PROJECT_ID,
+      "hero-link",
+      {
+        type: "test-hero",
+        settings: {
+          heading: "Link Test",
+          cta_link: {
+            href: "/old-slug",
+            text: "Go to About",
+            target: "_self",
+            pageUuid: "page-uuid-about",
+          },
         },
       },
-    }, RAW_THEME_SETTINGS);
+      RAW_THEME_SETTINGS,
+    );
 
     // Should resolve to "about-us.html" (current slug of page-uuid-about)
     assert.ok(html.includes("about-us.html"), "link should resolve to current slug");
@@ -283,35 +343,45 @@ describe("renderWidget — link resolution", () => {
   });
 
   it("clears link when pageUuid references a deleted page", async () => {
-    const html = await renderWidget(PROJECT_ID, "hero-deleted", {
-      type: "test-hero",
-      settings: {
-        heading: "Deleted Link",
-        cta_link: {
-          href: "/old-page",
-          text: "Click Me",
-          target: "_self",
-          pageUuid: "page-uuid-nonexistent",
+    const html = await renderWidget(
+      PROJECT_ID,
+      "hero-deleted",
+      {
+        type: "test-hero",
+        settings: {
+          heading: "Deleted Link",
+          cta_link: {
+            href: "/old-page",
+            text: "Click Me",
+            target: "_self",
+            pageUuid: "page-uuid-nonexistent",
+          },
         },
       },
-    }, RAW_THEME_SETTINGS);
+      RAW_THEME_SETTINGS,
+    );
 
     // Deleted page → link cleared (href="", text="")
     assert.ok(!html.includes("/old-page"));
   });
 
   it("passes through custom URL links (no pageUuid)", async () => {
-    const html = await renderWidget(PROJECT_ID, "hero-custom", {
-      type: "test-hero",
-      settings: {
-        heading: "Custom Link",
-        cta_link: {
-          href: "https://external.com",
-          text: "External",
-          target: "_blank",
+    const html = await renderWidget(
+      PROJECT_ID,
+      "hero-custom",
+      {
+        type: "test-hero",
+        settings: {
+          heading: "Custom Link",
+          cta_link: {
+            href: "https://external.com",
+            text: "External",
+            target: "_blank",
+          },
         },
       },
-    }, RAW_THEME_SETTINGS);
+      RAW_THEME_SETTINGS,
+    );
 
     assert.ok(html.includes("https://external.com"));
     assert.ok(html.includes("External"));
@@ -327,13 +397,18 @@ describe("renderWidget — menu resolution", () => {
     // We can't easily check the rendered output since the test-hero template
     // doesn't render menus, but we can verify it doesn't crash and the menu
     // setting gets resolved (not left as a string)
-    const html = await renderWidget(PROJECT_ID, "hero-menu", {
-      type: "test-hero",
-      settings: {
-        heading: "Menu Test",
-        nav_menu: "main-nav",
+    const html = await renderWidget(
+      PROJECT_ID,
+      "hero-menu",
+      {
+        type: "test-hero",
+        settings: {
+          heading: "Menu Test",
+          nav_menu: "main-nav",
+        },
       },
-    }, RAW_THEME_SETTINGS);
+      RAW_THEME_SETTINGS,
+    );
 
     // Should render without error
     assert.ok(html.includes("Menu Test"));
@@ -341,13 +416,18 @@ describe("renderWidget — menu resolution", () => {
   });
 
   it("handles non-existent menu gracefully", async () => {
-    const html = await renderWidget(PROJECT_ID, "hero-nomenu", {
-      type: "test-hero",
-      settings: {
-        heading: "No Menu",
-        nav_menu: "ghost-menu",
+    const html = await renderWidget(
+      PROJECT_ID,
+      "hero-nomenu",
+      {
+        type: "test-hero",
+        settings: {
+          heading: "No Menu",
+          nav_menu: "ghost-menu",
+        },
       },
-    }, RAW_THEME_SETTINGS);
+      RAW_THEME_SETTINGS,
+    );
 
     assert.ok(html.includes("No Menu"));
     assert.ok(!html.includes("widget-error"));
@@ -360,19 +440,30 @@ describe("renderWidget — menu resolution", () => {
 
 describe("renderWidget — render modes", () => {
   it("renders in preview mode by default", async () => {
-    const html = await renderWidget(PROJECT_ID, "spacer-prev", {
-      type: "core-spacer",
-      settings: { height: 30 },
-    }, RAW_THEME_SETTINGS);
+    const html = await renderWidget(
+      PROJECT_ID,
+      "spacer-prev",
+      {
+        type: "core-spacer",
+        settings: { height: 30 },
+      },
+      RAW_THEME_SETTINGS,
+    );
 
     assert.ok(html.includes("height: 30px"));
   });
 
   it("renders in publish mode", async () => {
-    const html = await renderWidget(PROJECT_ID, "spacer-pub", {
-      type: "core-spacer",
-      settings: { height: 60 },
-    }, RAW_THEME_SETTINGS, "publish");
+    const html = await renderWidget(
+      PROJECT_ID,
+      "spacer-pub",
+      {
+        type: "core-spacer",
+        settings: { height: 60 },
+      },
+      RAW_THEME_SETTINGS,
+      "publish",
+    );
 
     assert.ok(html.includes("height: 60px"));
   });
@@ -394,13 +485,29 @@ describe("renderWidget — shared globals", () => {
     };
 
     // Render two widgets with the same shared globals
-    await renderWidget(PROJECT_ID, "w1", {
-      type: "core-spacer", settings: {},
-    }, RAW_THEME_SETTINGS, "publish", sharedGlobals);
+    await renderWidget(
+      PROJECT_ID,
+      "w1",
+      {
+        type: "core-spacer",
+        settings: {},
+      },
+      RAW_THEME_SETTINGS,
+      "publish",
+      sharedGlobals,
+    );
 
-    await renderWidget(PROJECT_ID, "w2", {
-      type: "core-spacer", settings: {},
-    }, RAW_THEME_SETTINGS, "publish", sharedGlobals);
+    await renderWidget(
+      PROJECT_ID,
+      "w2",
+      {
+        type: "core-spacer",
+        settings: {},
+      },
+      RAW_THEME_SETTINGS,
+      "publish",
+      sharedGlobals,
+    );
 
     // Shared globals should have pagesByUuid cached after first render
     assert.ok(sharedGlobals.pagesByUuid instanceof Map, "should cache pagesByUuid");
@@ -417,7 +524,11 @@ describe("renderPageLayout", () => {
   it("renders a complete HTML document", async () => {
     const html = await renderPageLayout(
       PROJECT_ID,
-      { headerContent: "<header>Header</header>", mainContent: "<p>Content</p>", footerContent: "<footer>Footer</footer>" },
+      {
+        headerContent: "<header>Header</header>",
+        mainContent: "<p>Content</p>",
+        footerContent: "<footer>Footer</footer>",
+      },
       { name: "Test Page", slug: "test-page" },
       RAW_THEME_SETTINGS,
     );
@@ -431,7 +542,7 @@ describe("renderPageLayout", () => {
       PROJECT_ID,
       {
         headerContent: '<nav class="main-nav">Nav</nav>',
-        mainContent: '<article>Main article</article>',
+        mainContent: "<article>Main article</article>",
         footerContent: '<footer class="site-footer">Foot</footer>',
       },
       { name: "Injected Page", slug: "injected" },
@@ -467,7 +578,7 @@ describe("renderPageLayout", () => {
     );
 
     assert.ok(html.includes("<title>SEO Page</title>"));
-    assert.ok(html.includes('og:title'));
+    assert.ok(html.includes("og:title"));
     assert.ok(html.includes("SEO Title"));
     assert.ok(html.includes("A page with SEO"));
   });

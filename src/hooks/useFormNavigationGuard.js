@@ -3,15 +3,15 @@ import { useBlocker } from "react-router-dom";
 
 /**
  * Navigation guard hook to prevent users from leaving pages with unsaved changes
- * 
+ *
  * @param {boolean} hasUnsavedChanges - Whether there are unsaved changes
  * @param {React.RefObject<boolean>} skipRef - Optional ref to bypass the guard (for programmatic navigation after save)
- * 
+ *
  * Features:
  * - Blocks internal navigation (React Router) with confirmation dialog
  * - Blocks external navigation (tab close, refresh) with browser dialog
  * - Consistent with PageEditor's useNavigationGuard pattern
- * 
+ *
  * Usage:
  * ```javascript
  * const [isDirty, setIsDirty] = useState(false);
@@ -41,12 +41,11 @@ export default function useFormNavigationGuard(hasUnsavedChanges, skipRef = null
     if (skipRef?.current) {
       return false;
     }
-    
+
     // Block navigation if there are unsaved changes and the location is actually changing
     const isLocationChanging =
-      currentLocation.pathname !== nextLocation.pathname ||
-      currentLocation.search !== nextLocation.search;
-    
+      currentLocation.pathname !== nextLocation.pathname || currentLocation.search !== nextLocation.search;
+
     return hasUnsavedChanges && isLocationChanging;
   });
 
@@ -54,7 +53,7 @@ export default function useFormNavigationGuard(hasUnsavedChanges, skipRef = null
   useEffect(() => {
     if (blocker.state === "blocked") {
       const confirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to leave?\n\nClick "OK" to discard changes or "Cancel" to stay.'
+        'You have unsaved changes. Are you sure you want to leave?\n\nClick "OK" to discard changes or "Cancel" to stay.',
       );
 
       if (confirmed) {

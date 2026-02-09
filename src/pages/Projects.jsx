@@ -116,12 +116,12 @@ export default function Projects() {
     let loadingToastId = null;
     try {
       setExportingProjectId(projectId);
-      
+
       // Show loading toast immediately (persistent - no auto-dismiss)
       loadingToastId = showToast(t("projects.toasts.exportInProgress"), "info", { duration: null });
 
       await exportProject(projectId);
-      
+
       // Dismiss loading toast before showing success
       if (loadingToastId) {
         dismissToast(loadingToastId);

@@ -95,12 +95,7 @@ export default function MenuForm({
           <label htmlFor="description" className="form-label-optional">
             {t("forms.menu.descriptionLabel")}
           </label>
-          <textarea
-            id="description"
-            {...register("description")}
-            className="form-textarea"
-            rows={3}
-          />
+          <textarea id="description" {...register("description")} className="form-textarea" rows={3} />
           <p className="form-description">{t("forms.menu.descriptionHelp")}</p>
         </div>
       </div>

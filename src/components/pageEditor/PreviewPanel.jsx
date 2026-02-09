@@ -41,8 +41,7 @@ function detectChangeType(newState, oldState) {
   // Check for removed widgets
   const removedWidgets = [...oldWidgetIds].filter((id) => !newWidgetIds.has(id));
   // Check for reordering
-  const orderChanged =
-    JSON.stringify(newState.page?.widgetsOrder) !== JSON.stringify(oldState.page?.widgetsOrder);
+  const orderChanged = JSON.stringify(newState.page?.widgetsOrder) !== JSON.stringify(oldState.page?.widgetsOrder);
 
   const isStructural = addedWidgets.length > 0 || removedWidgets.length > 0 || orderChanged;
 

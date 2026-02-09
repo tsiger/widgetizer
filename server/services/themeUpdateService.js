@@ -40,7 +40,7 @@ export async function checkForUpdates(projectId) {
   // This is the version that was last built/published, NOT all available versions
   const themeSourceDir = await getThemeSourceDir(themeName);
   const themeJsonPath = path.join(themeSourceDir, "theme.json");
-  
+
   let sourceVersion = null;
   try {
     const themeData = await fs.readJson(themeJsonPath);
@@ -206,7 +206,9 @@ export async function applyThemeUpdate(projectId) {
   // Get theme source directory (latest/ if exists, otherwise root)
   const themeSourceDir = await getThemeSourceDir(themeName);
 
-  console.log(`[applyThemeUpdate] Updating project ${projectId} from ${previousVersion} to ${updateStatus.latestVersion}`);
+  console.log(
+    `[applyThemeUpdate] Updating project ${projectId} from ${previousVersion} to ${updateStatus.latestVersion}`,
+  );
 
   // 1. Copy updatable paths from theme to project
   for (const itemPath of UPDATABLE_PATHS) {

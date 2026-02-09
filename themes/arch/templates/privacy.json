@@ -194,9 +194,7 @@
       ]
     }
   },
-  "widgetsOrder": [
-    "privacy_content"
-  ],
+  "widgetsOrder": ["privacy_content"],
   "id": "privacy",
   "created": "2026-01-18T00:00:00.000Z",
   "updated": "2026-01-18T00:00:00.000Z"

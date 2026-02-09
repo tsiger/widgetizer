@@ -84,7 +84,7 @@ const usePageStore = create(
 
           // Load global widgets separately
           await get().loadGlobalWidgets();
-          
+
           // Load theme settings for undo tracking
           await get().loadThemeSettings();
 
@@ -102,7 +102,7 @@ const usePageStore = create(
           console.error("Failed to load page:", err);
         }
       },
-      
+
       // Load theme settings into pageStore for undo tracking
       loadThemeSettings: async () => {
         try {
@@ -116,7 +116,7 @@ const usePageStore = create(
           set({ themeSettings: null, originalThemeSettings: null });
         }
       },
-      
+
       // Update a single theme setting (tracked by undo)
       updateThemeSetting: (groupKey, settingId, value) => {
         const { themeSettings } = get();
@@ -134,14 +134,14 @@ const usePageStore = create(
 
         set({ themeSettings: updatedSettings });
       },
-      
+
       // Check if there are unsaved theme changes
       hasUnsavedThemeChanges: () => {
         const { themeSettings, originalThemeSettings } = get();
         if (!themeSettings || !originalThemeSettings) return false;
         return JSON.stringify(themeSettings) !== JSON.stringify(originalThemeSettings);
       },
-      
+
       // Mark theme settings as saved (update original)
       markThemeSettingsSaved: () => {
         const { themeSettings } = get();
@@ -245,8 +245,8 @@ const usePageStore = create(
 
         handleSet(state);
       },
-    }
-  )
+    },
+  ),
 );
 
 export default usePageStore;

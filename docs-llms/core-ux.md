@@ -209,7 +209,7 @@ _(Excluding the Page Editor itself)_
   5. Success toast confirms update applied.
   6. Project's `themeVersion` is updated to match the theme's current version.
 - **Status:** ✅ Fully implemented
-- **Note:** Project update indicators only appear *after* the theme author has updated the theme (built `latest/`), not merely when new version folders exist.
+- **Note:** Project update indicators only appear _after_ the theme author has updated the theme (built `latest/`), not merely when new version folders exist.
 
 ---
 

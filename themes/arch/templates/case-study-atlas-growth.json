@@ -41,12 +41,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "overview-eyebrow",
-        "overview-heading",
-        "overview-body",
-        "overview-features"
-      ]
+      "blocksOrder": ["overview-eyebrow", "overview-heading", "overview-body", "overview-features"]
     },
     "case_metrics": {
       "type": "key-figures",
@@ -88,11 +83,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "metric-1",
-        "metric-2",
-        "metric-3"
-      ]
+      "blocksOrder": ["metric-1", "metric-2", "metric-3"]
     },
     "case_timeline": {
       "type": "timeline",
@@ -145,12 +136,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "phase-1",
-        "phase-2",
-        "phase-3",
-        "phase-4"
-      ]
+      "blocksOrder": ["phase-1", "phase-2", "phase-3", "phase-4"]
     },
     "case_testimonials": {
       "type": "testimonials",
@@ -181,10 +167,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "quote-1",
-        "quote-2"
-      ]
+      "blocksOrder": ["quote-1", "quote-2"]
     },
     "case_cta": {
       "type": "banner",
@@ -230,20 +213,10 @@
           }
         }
       },
-      "blocksOrder": [
-        "case-cta-heading",
-        "case-cta-text",
-        "case-cta-buttons"
-      ]
+      "blocksOrder": ["case-cta-heading", "case-cta-text", "case-cta-buttons"]
     }
   },
-  "widgetsOrder": [
-    "case_overview",
-    "case_metrics",
-    "case_timeline",
-    "case_testimonials",
-    "case_cta"
-  ],
+  "widgetsOrder": ["case_overview", "case_metrics", "case_timeline", "case_testimonials", "case_cta"],
   "id": "case-study-atlas-growth",
   "created": "2026-01-17T16:13:19.594Z",
   "updated": "2026-01-17T16:29:17.030Z"

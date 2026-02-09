@@ -121,10 +121,7 @@
       }
     }
   },
-  "widgetsOrder": [
-    "contact_form",
-    "contact_map"
-  ],
+  "widgetsOrder": ["contact_form", "contact_map"],
   "id": "contact",
   "created": "2026-01-17T16:13:19.603Z",
   "updated": "2026-01-17T16:33:35.716Z"

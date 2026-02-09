@@ -21,7 +21,7 @@ export default function FileUploader({
       if (acceptedFiles.length === 0) return;
       onUpload(acceptedFiles);
     },
-    [onUpload]
+    [onUpload],
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
@@ -69,24 +69,21 @@ export default function FileUploader({
 
           <div className="space-y-1">
             <h3 className={`font-medium text-lg ${textColor}`}>
-              {title || (isDragActive ? t("components.fileUploader.dropHere") : t("components.fileUploader.clickOrDrop"))}
+              {title ||
+                (isDragActive ? t("components.fileUploader.dropHere") : t("components.fileUploader.clickOrDrop"))}
             </h3>
             {description && (
-              <p className={`text-sm ${uploading ? "text-slate-400" : "text-slate-500"}`}>
-                {description}
-              </p>
+              <p className={`text-sm ${uploading ? "text-slate-400" : "text-slate-500"}`}>{description}</p>
             )}
           </div>
 
           {!uploading && (
-             <Button variant="secondary" size="sm" className="mt-2 pointer-events-none" type="button">
-               {t("components.fileUploader.browseFiles")}
-             </Button>
+            <Button variant="secondary" size="sm" className="mt-2 pointer-events-none" type="button">
+              {t("components.fileUploader.browseFiles")}
+            </Button>
           )}
 
-          {maxSizeText && (
-            <p className="text-xs text-slate-400 mt-2">{maxSizeText}</p>
-          )}
+          {maxSizeText && <p className="text-xs text-slate-400 mt-2">{maxSizeText}</p>}
         </div>
       </div>
 

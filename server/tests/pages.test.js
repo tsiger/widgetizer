@@ -494,8 +494,8 @@ describe("savePageContent", () => {
   it("saves page content with widgets", async () => {
     const page = await createTestPage("Editor Page");
     const widgets = {
-      "w1": { type: "hero", settings: { title: "Hero Title" } },
-      "w2": { type: "text", settings: { body: "Hello world" } },
+      w1: { type: "hero", settings: { title: "Hero Title" } },
+      w2: { type: "text", settings: { body: "Hello world" } },
     };
 
     const res = await callController(savePageContent, {

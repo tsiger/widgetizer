@@ -39,20 +39,12 @@ console.log = () => {};
 console.warn = () => {};
 console.error = () => {};
 
-const {
-  getProjectDir,
-  getProjectThemeJsonPath,
-  getThemeDir,
-} = await import("../config.js");
+const { getProjectDir, getProjectThemeJsonPath, getThemeDir } = await import("../config.js");
 
 const { writeProjectsFile, readProjectsFile } = await import("../controllers/projectController.js");
 const { buildLatestSnapshot } = await import("../controllers/themeController.js");
-const {
-  checkForUpdates,
-  applyThemeUpdate,
-  mergeThemeSettings,
-  toggleThemeUpdates,
-} = await import("../services/themeUpdateService.js");
+const { checkForUpdates, applyThemeUpdate, mergeThemeSettings, toggleThemeUpdates } =
+  await import("../services/themeUpdateService.js");
 
 // ============================================================================
 // Test constants
@@ -75,20 +67,25 @@ async function createTheme(version, opts = {}) {
   await fs.ensureDir(themeDir);
 
   // Base theme.json
-  await fs.writeJson(path.join(themeDir, "theme.json"), {
-    name: "Test Update Theme",
-    version,
-    author: "Test",
-    settings: {
-      colors: [
-        { id: "primary_color", label: "Primary", type: "color", value: "#ff0000", default: "#ff0000" },
-      ],
-      ...extraSettings,
+  await fs.writeJson(
+    path.join(themeDir, "theme.json"),
+    {
+      name: "Test Update Theme",
+      version,
+      author: "Test",
+      settings: {
+        colors: [{ id: "primary_color", label: "Primary", type: "color", value: "#ff0000", default: "#ff0000" }],
+        ...extraSettings,
+      },
     },
-  }, { spaces: 2 });
+    { spaces: 2 },
+  );
 
   // Base files
-  await fs.writeFile(path.join(themeDir, "layout.liquid"), `<!DOCTYPE html><html><body>{{ main_content | raw }}</body></html>`);
+  await fs.writeFile(
+    path.join(themeDir, "layout.liquid"),
+    `<!DOCTYPE html><html><body>{{ main_content | raw }}</body></html>`,
+  );
   await fs.writeFile(path.join(themeDir, "screenshot.png"), "fake-screenshot");
   await fs.ensureDir(path.join(themeDir, "assets"));
   await fs.writeFile(path.join(themeDir, "assets", "base.css"), "body { margin: 0; }");
@@ -104,17 +101,21 @@ async function createTheme(version, opts = {}) {
   for (const update of updates) {
     const updateDir = path.join(themeDir, "updates", update.version);
     await fs.ensureDir(updateDir);
-    await fs.writeJson(path.join(updateDir, "theme.json"), {
-      name: "Test Update Theme",
-      version: update.version,
-      author: "Test",
-      settings: update.settings || {
-        colors: [
-          { id: "primary_color", label: "Primary", type: "color", value: "#0000ff", default: "#0000ff" },
-          { id: "accent_color", label: "Accent", type: "color", value: "#00ff00", default: "#00ff00" },
-        ],
+    await fs.writeJson(
+      path.join(updateDir, "theme.json"),
+      {
+        name: "Test Update Theme",
+        version: update.version,
+        author: "Test",
+        settings: update.settings || {
+          colors: [
+            { id: "primary_color", label: "Primary", type: "color", value: "#0000ff", default: "#0000ff" },
+            { id: "accent_color", label: "Accent", type: "color", value: "#00ff00", default: "#00ff00" },
+          ],
+        },
       },
-    }, { spaces: 2 });
+      { spaces: 2 },
+    );
 
     // Optional updated files
     if (update.files) {
@@ -162,30 +163,40 @@ async function createProject(themeVersion) {
   await fs.copy(path.join(themeDir, "widgets"), path.join(projectDir, "widgets"));
 
   // Project theme.json
-  await fs.writeJson(getProjectThemeJsonPath(PROJECT_FOLDER), {
-    name: "Test Update Theme",
-    version: themeVersion,
-    author: "Test",
-    settings: {
-      colors: [
-        { id: "primary_color", label: "Primary", type: "color", value: "#ff0000", default: "#ff0000" },
-      ],
+  await fs.writeJson(
+    getProjectThemeJsonPath(PROJECT_FOLDER),
+    {
+      name: "Test Update Theme",
+      version: themeVersion,
+      author: "Test",
+      settings: {
+        colors: [{ id: "primary_color", label: "Primary", type: "color", value: "#ff0000", default: "#ff0000" }],
+      },
     },
-  }, { spaces: 2 });
+    { spaces: 2 },
+  );
 
   // Create a user menu (should NOT be overwritten by update)
-  await fs.writeJson(path.join(projectDir, "menus", "main.json"), {
-    name: "Main (customized)",
-    items: [{ label: "My Custom Link", link: "/custom" }],
-  }, { spaces: 2 });
+  await fs.writeJson(
+    path.join(projectDir, "menus", "main.json"),
+    {
+      name: "Main (customized)",
+      items: [{ label: "My Custom Link", link: "/custom" }],
+    },
+    { spaces: 2 },
+  );
 
   // Create a user page (should NOT be overwritten by templates from update)
   await fs.ensureDir(path.join(projectDir, "pages"));
-  await fs.writeJson(path.join(projectDir, "pages", "index.json"), {
-    slug: "index",
-    name: "Home (customized)",
-    widgets: {},
-  }, { spaces: 2 });
+  await fs.writeJson(
+    path.join(projectDir, "pages", "index.json"),
+    {
+      slug: "index",
+      name: "Home (customized)",
+      widgets: {},
+    },
+    { spaces: 2 },
+  );
 }
 
 // ============================================================================
@@ -239,14 +250,16 @@ describe("checkForUpdates", () => {
   it("handles missing theme gracefully", async () => {
     // Create project referencing a theme that doesn't exist on disk
     await writeProjectsFile({
-      projects: [{
-        id: PROJECT_ID,
-        folderName: PROJECT_FOLDER,
-        name: "Test",
-        theme: "nonexistent-theme",
-        themeVersion: "1.0.0",
-        created: new Date().toISOString(),
-      }],
+      projects: [
+        {
+          id: PROJECT_ID,
+          folderName: PROJECT_FOLDER,
+          name: "Test",
+          theme: "nonexistent-theme",
+          themeVersion: "1.0.0",
+          created: new Date().toISOString(),
+        },
+      ],
       activeProjectId: PROJECT_ID,
     });
 
@@ -281,14 +294,16 @@ describe("applyThemeUpdate", () => {
 
   it("copies updatable paths from theme to project", async () => {
     await createTheme("1.0.0", {
-      updates: [{
-        version: "1.1.0",
-        files: {
-          "layout.liquid": "<html>UPDATED v1.1</html>",
-          "assets/new-feature.css": ".new { display: block; }",
-          "widgets/hero/widget.liquid": "<div class='hero'>v1.1</div>",
+      updates: [
+        {
+          version: "1.1.0",
+          files: {
+            "layout.liquid": "<html>UPDATED v1.1</html>",
+            "assets/new-feature.css": ".new { display: block; }",
+            "widgets/hero/widget.liquid": "<div class='hero'>v1.1</div>",
+          },
         },
-      }],
+      ],
     });
     await buildLatestSnapshot(THEME_NAME);
     await createProject("1.0.0");
@@ -312,13 +327,15 @@ describe("applyThemeUpdate", () => {
 
   it("adds new menus without overwriting existing user menus", async () => {
     await createTheme("1.0.0", {
-      updates: [{
-        version: "1.1.0",
-        files: {
-          // The update's theme source will include a new menu
-          "menus/footer.json": { name: "Footer", items: [{ label: "About", link: "/about" }] },
+      updates: [
+        {
+          version: "1.1.0",
+          files: {
+            // The update's theme source will include a new menu
+            "menus/footer.json": { name: "Footer", items: [{ label: "About", link: "/about" }] },
+          },
         },
-      }],
+      ],
     });
     await buildLatestSnapshot(THEME_NAME);
     await createProject("1.0.0");
@@ -339,12 +356,14 @@ describe("applyThemeUpdate", () => {
 
   it("adds new templates as pages without overwriting existing", async () => {
     await createTheme("1.0.0", {
-      updates: [{
-        version: "1.1.0",
-        files: {
-          "templates/contact.json": { slug: "contact", name: "Contact Page" },
+      updates: [
+        {
+          version: "1.1.0",
+          files: {
+            "templates/contact.json": { slug: "contact", name: "Contact Page" },
+          },
         },
-      }],
+      ],
     });
     await buildLatestSnapshot(THEME_NAME);
     await createProject("1.0.0");
@@ -364,17 +383,19 @@ describe("applyThemeUpdate", () => {
 
   it("merges theme.json settings preserving user values", async () => {
     await createTheme("1.0.0", {
-      updates: [{
-        version: "1.1.0",
-        settings: {
-          colors: [
-            // primary_color exists in user's settings — user value should be preserved
-            { id: "primary_color", label: "Primary", type: "color", value: "#0000ff", default: "#0000ff" },
-            // accent_color is NEW — should use the new default value
-            { id: "accent_color", label: "Accent", type: "color", value: "#00ff00", default: "#00ff00" },
-          ],
+      updates: [
+        {
+          version: "1.1.0",
+          settings: {
+            colors: [
+              // primary_color exists in user's settings — user value should be preserved
+              { id: "primary_color", label: "Primary", type: "color", value: "#0000ff", default: "#0000ff" },
+              // accent_color is NEW — should use the new default value
+              { id: "accent_color", label: "Accent", type: "color", value: "#00ff00", default: "#00ff00" },
+            ],
+          },
         },
-      }],
+      ],
     });
     await buildLatestSnapshot(THEME_NAME);
     await createProject("1.0.0");
@@ -425,10 +446,12 @@ describe("applyThemeUpdate", () => {
   it("handles missing updatable paths gracefully", async () => {
     // Create an update that only touches layout — no snippets dir exists
     await createTheme("1.0.0", {
-      updates: [{
-        version: "1.1.0",
-        files: { "layout.liquid": "updated layout" },
-      }],
+      updates: [
+        {
+          version: "1.1.0",
+          files: { "layout.liquid": "updated layout" },
+        },
+      ],
     });
     await buildLatestSnapshot(THEME_NAME);
     await createProject("1.0.0");
@@ -450,9 +473,7 @@ describe("mergeThemeSettings", () => {
       name: "My Theme",
       version: "1.0.0",
       settings: {
-        colors: [
-          { id: "primary", value: "#custom-red" },
-        ],
+        colors: [{ id: "primary", value: "#custom-red" }],
       },
     };
     const newTheme = {

@@ -50,9 +50,7 @@ const {
   getProjectPagesDir,
 } = await import("../config.js");
 
-const { writeProjectsFile } = await import(
-  "../controllers/projectController.js"
-);
+const { writeProjectsFile } = await import("../controllers/projectController.js");
 
 const {
   ensureThemesDirectory,
@@ -167,10 +165,7 @@ function buildThemeZip(themeName, opts = {}) {
 
   // templates/
   if (includeTemplates) {
-    zip.addFile(
-      `${themeName}/templates/home.json`,
-      Buffer.from(JSON.stringify({ id: "home", name: "Home Page" })),
-    );
+    zip.addFile(`${themeName}/templates/home.json`, Buffer.from(JSON.stringify({ id: "home", name: "Home Page" })));
   }
 
   // widgets/
@@ -256,22 +251,13 @@ after(async () => {
 // ============================================================================
 
 async function createThemeOnDisk(themeId, opts = {}) {
-  const {
-    version = "1.0.0",
-    author = "Disk Author",
-    name = themeId,
-    widgetCount = 1,
-    templateCount = 1,
-  } = opts;
+  const { version = "1.0.0", author = "Disk Author", name = themeId, widgetCount = 1, templateCount = 1 } = opts;
 
   const themeDir = getThemeDir(themeId);
   await fs.ensureDir(themeDir);
 
   // theme.json
-  await fs.outputFile(
-    getThemeJsonPath(themeId),
-    JSON.stringify({ name, version, author, description: "Disk theme" }),
-  );
+  await fs.outputFile(getThemeJsonPath(themeId), JSON.stringify({ name, version, author, description: "Disk theme" }));
 
   // screenshot, layout
   await fs.writeFile(path.join(themeDir, "screenshot.png"), "png");
@@ -333,17 +319,11 @@ describe("getThemeVersions", () => {
 
     const v110Dir = getThemeVersionDir(VERSIONED, "1.1.0");
     await fs.ensureDir(v110Dir);
-    await fs.writeFile(
-      path.join(v110Dir, "theme.json"),
-      JSON.stringify({ name: VERSIONED, version: "1.1.0" }),
-    );
+    await fs.writeFile(path.join(v110Dir, "theme.json"), JSON.stringify({ name: VERSIONED, version: "1.1.0" }));
 
     const v200Dir = getThemeVersionDir(VERSIONED, "2.0.0");
     await fs.ensureDir(v200Dir);
-    await fs.writeFile(
-      path.join(v200Dir, "theme.json"),
-      JSON.stringify({ name: VERSIONED, version: "2.0.0" }),
-    );
+    await fs.writeFile(path.join(v200Dir, "theme.json"), JSON.stringify({ name: VERSIONED, version: "2.0.0" }));
   });
 
   after(async () => {
@@ -467,18 +447,12 @@ describe("buildLatestSnapshot", () => {
     await createThemeOnDisk(SNAP_THEME, { version: "1.0.0" });
 
     // Add a file in base that we can verify gets copied
-    await fs.writeFile(
-      path.join(getThemeDir(SNAP_THEME), "base-file.txt"),
-      "base content",
-    );
+    await fs.writeFile(path.join(getThemeDir(SNAP_THEME), "base-file.txt"), "base content");
 
     // Add update v1.1.0 with an overriding file
     const v110 = getThemeVersionDir(SNAP_THEME, "1.1.0");
     await fs.ensureDir(v110);
-    await fs.writeFile(
-      path.join(v110, "theme.json"),
-      JSON.stringify({ name: SNAP_THEME, version: "1.1.0" }),
-    );
+    await fs.writeFile(path.join(v110, "theme.json"), JSON.stringify({ name: SNAP_THEME, version: "1.1.0" }));
     await fs.writeFile(path.join(v110, "base-file.txt"), "updated content");
     // Add a new file in the update
     await fs.writeFile(path.join(v110, "new-in-110.txt"), "new file");
@@ -530,10 +504,7 @@ describe("buildLatestSnapshot", () => {
     const v110 = getThemeVersionDir(badTheme, "1.1.0");
     await fs.ensureDir(v110);
     // Version in theme.json doesn't match folder name
-    await fs.writeFile(
-      path.join(v110, "theme.json"),
-      JSON.stringify({ version: "9.9.9" }),
-    );
+    await fs.writeFile(path.join(v110, "theme.json"), JSON.stringify({ version: "9.9.9" }));
 
     await assert.rejects(
       () => buildLatestSnapshot(badTheme),
@@ -671,10 +642,7 @@ describe("getThemeWidgets", () => {
     // Also create a global/ directory (should be excluded from count)
     const globalDir = path.join(getThemeWidgetsDir("widgets-test-theme"), "global");
     await fs.ensureDir(globalDir);
-    await fs.writeFile(
-      path.join(globalDir, "schema.json"),
-      JSON.stringify({ type: "global" }),
-    );
+    await fs.writeFile(path.join(globalDir, "schema.json"), JSON.stringify({ type: "global" }));
   });
 
   after(async () => {
@@ -987,9 +955,7 @@ describe("uploadTheme — new theme", () => {
   it("installs theme with update versions and builds latest/", async () => {
     const buffer = buildThemeZip("theme-with-updates", {
       version: "1.0.0",
-      updates: [
-        { version: "1.1.0", files: { "assets/new.css": "new style" } },
-      ],
+      updates: [{ version: "1.1.0", files: { "assets/new.css": "new style" } }],
     });
 
     const res = await callController(uploadTheme, { file: { buffer } });
@@ -1033,9 +999,7 @@ describe("uploadTheme — theme update", () => {
   it("imports new update versions into existing theme", async () => {
     const buffer = buildThemeZip(EXISTING_THEME, {
       version: "1.0.0",
-      updates: [
-        { version: "1.1.0", files: { "assets/patch.css": "patched" } },
-      ],
+      updates: [{ version: "1.1.0", files: { "assets/patch.css": "patched" } }],
     });
 
     const res = await callController(uploadTheme, { file: { buffer } });
@@ -1158,10 +1122,7 @@ describe("updateTheme", () => {
     // Add a pending update
     const v110 = getThemeVersionDir(UPD_THEME, "1.1.0");
     await fs.ensureDir(v110);
-    await fs.writeFile(
-      path.join(v110, "theme.json"),
-      JSON.stringify({ name: UPD_THEME, version: "1.1.0" }),
-    );
+    await fs.writeFile(path.join(v110, "theme.json"), JSON.stringify({ name: UPD_THEME, version: "1.1.0" }));
   });
 
   after(async () => {

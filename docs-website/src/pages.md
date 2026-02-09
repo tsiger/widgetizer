@@ -4,7 +4,6 @@ description: Create and manage pages in Widgetizer. Configure page settings, SEO
 
 Pages are the individual sections of your website. Each page can have its own content, layout, and SEO settings. You'll use the page editor to add widgets and build your content, but first you need to create the pages themselves.
 
-
 # Creating a New Page
 
 1. Click the **"New Page"** button
@@ -30,7 +29,6 @@ The filename is automatically generated from your page name, but you can edit it
 **Special filenames:**
 
 - **`index`** or **`home`**: These will be your homepage
-
 
 ### SEO Settings (Collapsible Section)
 
@@ -81,7 +79,6 @@ Controls whether search engines can find and index this page.
 
 > When you [export your site](export.html) with a Site URL set, pages marked as "No Index" will automatically be added to your `robots.txt` file's disallow rules.
 
-
 # Editing a Page
 
 1. Go to the **Pages** list
@@ -97,8 +94,7 @@ If you change a page's filename, the file will be renamed automatically when you
 - Old filename: `about` → `about.html`
 - New filename: `about-us` → `about-us.html`
 
->  **Warning:** If your page is already published and indexed by search engines, changing the filename will break existing links to that page.
-
+> **Warning:** If your page is already published and indexed by search engines, changing the filename will break existing links to that page.
 
 # Deleting Pages
 
@@ -115,15 +111,13 @@ You can delete multiple pages at once:
 2. Click **"Delete Selected"**
 3. Confirm the deletion
 
->  **Warning:** Deletion is permanent. All content and widgets on the page will be removed.
-
+> **Warning:** Deletion is permanent. All content and widgets on the page will be removed.
 
 # Other Page Actions
 
 ### Duplicating a Page
 
 Click the **copy icon** to duplicate a page. This creates an exact copy with all widgets and content, but with a new filename (usually the original with `-copy` appended).
-
 
 # Tips & Best Practices
 

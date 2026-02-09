@@ -55,12 +55,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "case-eyebrow",
-        "case-heading",
-        "case-text",
-        "case-buttons"
-      ]
+      "blocksOrder": ["case-eyebrow", "case-heading", "case-text", "case-buttons"]
     },
     "case_showcase": {
       "type": "project-showcase",
@@ -110,11 +105,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "project-1",
-        "project-2",
-        "project-3"
-      ]
+      "blocksOrder": ["project-1", "project-2", "project-3"]
     },
     "case_testimonials": {
       "type": "testimonials",
@@ -145,10 +136,7 @@
           }
         }
       },
-      "blocksOrder": [
-        "case-quote-1",
-        "case-quote-2"
-      ]
+      "blocksOrder": ["case-quote-1", "case-quote-2"]
     },
     "case_cta": {
       "type": "banner",
@@ -194,19 +182,10 @@
           }
         }
       },
-      "blocksOrder": [
-        "case-cta-heading",
-        "case-cta-text",
-        "case-cta-buttons"
-      ]
+      "blocksOrder": ["case-cta-heading", "case-cta-text", "case-cta-buttons"]
     }
   },
-  "widgetsOrder": [
-    "case_hero",
-    "case_showcase",
-    "case_testimonials",
-    "case_cta"
-  ],
+  "widgetsOrder": ["case_hero", "case_showcase", "case_testimonials", "case_cta"],
   "id": "case-studies",
   "created": "2026-01-17T16:13:19.591Z",
   "updated": "2026-01-17T16:18:13.143Z"

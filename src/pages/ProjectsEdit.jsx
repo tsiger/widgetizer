@@ -79,7 +79,7 @@ export default function ProjectsEdit() {
             from: result.previousVersion,
             to: result.newVersion,
           }) || `Theme updated from v${result.previousVersion} to v${result.newVersion}`,
-          "success"
+          "success",
         );
         // Reload project to get updated version
         await loadProject();
@@ -186,7 +186,7 @@ export default function ProjectsEdit() {
               <p className="text-sm text-slate-600">
                 {t(
                   "projectsEdit.themeUpdate.description",
-                  "A new version of your theme is available. Your pages, menus, and uploads will not be affected."
+                  "A new version of your theme is available. Your pages, menus, and uploads will not be affected.",
                 )}
               </p>
             </div>

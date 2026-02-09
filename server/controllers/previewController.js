@@ -187,9 +187,7 @@ export async function generatePreview(req, res) {
   } catch (error) {
     console.error("Error generating preview:", error);
     if (isProjectResolutionError(error)) {
-      return res
-        .status(404)
-        .send(`<html><body><h1>Preview Error</h1><pre>${error.message}</pre></body></html>`);
+      return res.status(404).send(`<html><body><h1>Preview Error</h1><pre>${error.message}</pre></body></html>`);
     }
     res.status(500).send(`<html><body><h1>Preview Error</h1><pre>${error.message}\n${error.stack}</pre></body></html>`);
   }

@@ -161,7 +161,7 @@ function scrollToElement(widgetId, blockId = null) {
 
   const documentHeight = document.documentElement.scrollHeight;
   // Center the element in the viewport if possible
-  let targetScroll = window.scrollY + rect.top - (viewportHeight / 2) + (rect.height / 2);
+  let targetScroll = window.scrollY + rect.top - viewportHeight / 2 + rect.height / 2;
   const maxScroll = documentHeight - viewportHeight;
   targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
 

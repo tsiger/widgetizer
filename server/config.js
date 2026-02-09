@@ -2,13 +2,9 @@ import path from "path";
 
 // Base directories with environment variable support.
 // APP_ROOT is set by Electron to the app.asar path, or defaults to cwd for non-Electron use.
-const APP_ROOT = process.env.APP_ROOT
-  ? path.resolve(process.env.APP_ROOT)
-  : process.cwd();
+const APP_ROOT = process.env.APP_ROOT ? path.resolve(process.env.APP_ROOT) : process.cwd();
 
-export const DATA_DIR = process.env.DATA_ROOT
-  ? path.resolve(process.env.DATA_ROOT)
-  : path.join(APP_ROOT, "data");
+export const DATA_DIR = process.env.DATA_ROOT ? path.resolve(process.env.DATA_ROOT) : path.join(APP_ROOT, "data");
 
 export const THEMES_DIR = process.env.THEMES_ROOT
   ? path.resolve(process.env.THEMES_ROOT)

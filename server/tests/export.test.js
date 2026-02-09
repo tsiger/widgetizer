@@ -55,17 +55,9 @@ const {
   CORE_WIDGETS_DIR,
 } = await import("../config.js");
 
-const { writeProjectsFile, readProjectsFile } = await import(
-  "../controllers/projectController.js"
-);
-const {
-  exportProject,
-  cleanupProjectExports,
-  getExportFiles,
-  downloadExport,
-  getExportHistory,
-  deleteExport,
-} = await import("../controllers/exportController.js");
+const { writeProjectsFile, readProjectsFile } = await import("../controllers/projectController.js");
+const { exportProject, cleanupProjectExports, getExportFiles, downloadExport, getExportHistory, deleteExport } =
+  await import("../controllers/exportController.js");
 
 // ============================================================================
 // Test constants
@@ -247,9 +239,7 @@ before(async () => {
         {
           type: "core-spacer",
           displayName: "Spacer",
-          settings: [
-            { type: "range", id: "height", label: "Height", default: 40 },
-          ],
+          settings: [{ type: "range", id: "height", label: "Height", default: 40 }],
         },
         null,
         2,
@@ -446,28 +436,16 @@ before(async () => {
   // -----------------------------------------------------------
   // 9. Project assets (CSS/JS)
   // -----------------------------------------------------------
-  await fs.writeFile(
-    path.join(projectDir, "assets", "css", "styles.css"),
-    "body { margin: 0; }",
-  );
-  await fs.writeFile(
-    path.join(projectDir, "assets", "js", "app.js"),
-    "console.log('hello');",
-  );
+  await fs.writeFile(path.join(projectDir, "assets", "css", "styles.css"), "body { margin: 0; }");
+  await fs.writeFile(path.join(projectDir, "assets", "js", "app.js"), "console.log('hello');");
 
   // -----------------------------------------------------------
   // 10. Widget assets (CSS/JS in widgets dir)
   // -----------------------------------------------------------
   const widgetAssetsDir = path.join(projectDir, "widgets", "hero-slider");
   await fs.ensureDir(widgetAssetsDir);
-  await fs.writeFile(
-    path.join(widgetAssetsDir, "hero-slider.css"),
-    ".hero { display: flex; }",
-  );
-  await fs.writeFile(
-    path.join(widgetAssetsDir, "hero-slider.js"),
-    "// slider init",
-  );
+  await fs.writeFile(path.join(widgetAssetsDir, "hero-slider.css"), ".hero { display: flex; }");
+  await fs.writeFile(path.join(widgetAssetsDir, "hero-slider.js"), "// slider init");
 
   // -----------------------------------------------------------
   // 11. Core assets (placeholder SVGs) — may already exist
@@ -786,10 +764,7 @@ describe("exportProject validation", () => {
     const pagesDir = getProjectPagesDir(tempFolder);
     await fs.ensureDir(pagesDir);
     // Create theme.json for the project
-    await fs.outputFile(
-      getProjectThemeJsonPath(tempFolder),
-      JSON.stringify({ settings: {} }, null, 2),
-    );
+    await fs.outputFile(getProjectThemeJsonPath(tempFolder), JSON.stringify({ settings: {} }, null, 2));
     // Only an "about" page, no index
     await fs.writeFile(
       path.join(pagesDir, "about.json"),
@@ -835,10 +810,7 @@ describe("exportProject without siteUrl", () => {
     const projDir = getProjectDir(NO_URL_FOLDER);
     const pagesDir = getProjectPagesDir(NO_URL_FOLDER);
     await fs.ensureDir(pagesDir);
-    await fs.outputFile(
-      getProjectThemeJsonPath(NO_URL_FOLDER),
-      JSON.stringify({ settings: {} }, null, 2),
-    );
+    await fs.outputFile(getProjectThemeJsonPath(NO_URL_FOLDER), JSON.stringify({ settings: {} }, null, 2));
     await fs.writeFile(
       path.join(pagesDir, "index.json"),
       JSON.stringify({
@@ -926,10 +898,7 @@ describe("getExportFiles", () => {
       params: { exportDir: "../../etc/passwd" },
     });
     // Should be 403 (access denied) or 404
-    assert.ok(
-      res._status === 403 || res._status === 404,
-      `Expected 403 or 404 for path traversal, got ${res._status}`,
-    );
+    assert.ok(res._status === 403 || res._status === 404, `Expected 403 or 404 for path traversal, got ${res._status}`);
   });
 
   it("prefers home.html when index.html is absent", async () => {
@@ -995,10 +964,7 @@ describe("downloadExport", () => {
       res._headers["Content-Disposition"].includes(testExportDir),
       "Content-Disposition should include dir name",
     );
-    assert.ok(
-      res._headers["Content-Disposition"].includes(".zip"),
-      "Should have .zip extension",
-    );
+    assert.ok(res._headers["Content-Disposition"].includes(".zip"), "Should have .zip extension");
   });
 
   it("returns 400 when exportDir is missing", async () => {
@@ -1019,10 +985,7 @@ describe("downloadExport", () => {
     const res = await callController(downloadExport, {
       params: { exportDir: "../../../etc" },
     });
-    assert.ok(
-      res._status === 403 || res._status === 404,
-      `Expected 403/404 for traversal, got ${res._status}`,
-    );
+    assert.ok(res._status === 403 || res._status === 404, `Expected 403/404 for traversal, got ${res._status}`);
   });
 });
 
@@ -1173,10 +1136,7 @@ describe("cleanupProjectExports", () => {
     const projDir = getProjectDir(CLEANUP_FOLDER);
     const pagesDir = getProjectPagesDir(CLEANUP_FOLDER);
     await fs.ensureDir(pagesDir);
-    await fs.outputFile(
-      getProjectThemeJsonPath(CLEANUP_FOLDER),
-      JSON.stringify({ settings: {} }, null, 2),
-    );
+    await fs.outputFile(getProjectThemeJsonPath(CLEANUP_FOLDER), JSON.stringify({ settings: {} }, null, 2));
     await fs.writeFile(
       path.join(pagesDir, "index.json"),
       JSON.stringify({
@@ -1305,10 +1265,7 @@ describe("home page slug mapping", () => {
     const projDir = getProjectDir(HOME_SLUG_FOLDER);
     const pagesDir = getProjectPagesDir(HOME_SLUG_FOLDER);
     await fs.ensureDir(pagesDir);
-    await fs.outputFile(
-      getProjectThemeJsonPath(HOME_SLUG_FOLDER),
-      JSON.stringify({ settings: {} }, null, 2),
-    );
+    await fs.outputFile(getProjectThemeJsonPath(HOME_SLUG_FOLDER), JSON.stringify({ settings: {} }, null, 2));
 
     // Create both index and home pages — "home" should map to index.html
     await fs.writeFile(

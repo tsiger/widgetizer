@@ -83,12 +83,14 @@ export default function AppSettings() {
   }
 
   return (
-    <PageLayout title={
-      <span className="flex items-center gap-2">
-        {t("settings.title")}
-        {hasChanges && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-      </span>
-    }>
+    <PageLayout
+      title={
+        <span className="flex items-center gap-2">
+          {t("settings.title")}
+          {hasChanges && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
+        </span>
+      }
+    >
       <>
         {/* App Settings panel */}
         <div className="bg-white rounded-md border border-t-0 border-slate-200">

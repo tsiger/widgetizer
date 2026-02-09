@@ -62,11 +62,7 @@ export default function CodeInput({ value = "", onChange, language = "html", pla
     <div className="code-input-wrapper">
       <div className="code-input-container">
         {/* Line numbers */}
-        <div
-          ref={lineNumbersRef}
-          className="code-line-numbers"
-          style={{ maxHeight: `${rows * 1.5}rem` }}
-        >
+        <div ref={lineNumbersRef} className="code-line-numbers" style={{ maxHeight: `${rows * 1.5}rem` }}>
           {Array.from({ length: lineCount }, (_, i) => (
             <div key={i} className="code-line-number">
               {i + 1}

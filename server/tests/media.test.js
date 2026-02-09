@@ -110,11 +110,21 @@ function mockRes() {
     },
     // For file streaming (serveProjectMedia pipes to res)
     write() {},
-    end() { res._piped = true; },
-    on() { return res; },
-    once() { return res; },
-    emit() { return res; },
-    removeListener() { return res; },
+    end() {
+      res._piped = true;
+    },
+    on() {
+      return res;
+    },
+    once() {
+      return res;
+    },
+    emit() {
+      return res;
+    },
+    removeListener() {
+      return res;
+    },
   };
   return res;
 }
@@ -218,9 +228,7 @@ describe("readMediaFile", () => {
   it("returns existing media data when file exists", async () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     const testData = {
-      files: [
-        { id: "test-1", filename: "photo.jpg", path: "/uploads/images/photo.jpg", type: "image/jpeg" },
-      ],
+      files: [{ id: "test-1", filename: "photo.jpg", path: "/uploads/images/photo.jpg", type: "image/jpeg" }],
     };
     await fs.outputFile(mediaPath, JSON.stringify(testData, null, 2));
 
@@ -268,9 +276,7 @@ describe("readMediaFile", () => {
 describe("writeMediaFile", () => {
   it("writes media data atomically", async () => {
     const testData = {
-      files: [
-        { id: "write-1", filename: "test.jpg", path: "/uploads/images/test.jpg", type: "image/jpeg" },
-      ],
+      files: [{ id: "write-1", filename: "test.jpg", path: "/uploads/images/test.jpg", type: "image/jpeg" }],
     };
     await writeMediaFile(PROJECT_ID, testData);
 
@@ -315,12 +321,16 @@ describe("atomicUpdateMediaFile", () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [
-          { id: "atomic-1", filename: "a.jpg", usedIn: [] },
-          { id: "atomic-2", filename: "b.jpg", usedIn: ["index"] },
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          files: [
+            { id: "atomic-1", filename: "a.jpg", usedIn: [] },
+            { id: "atomic-2", filename: "b.jpg", usedIn: ["index"] },
+          ],
+        },
+        null,
+        2,
+      ),
     );
   });
 
@@ -369,12 +379,22 @@ describe("getProjectMedia", () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [
-          { id: "get-1", filename: "hero.jpg", type: "image/jpeg", path: "/uploads/images/hero.jpg", usedIn: ["index"] },
-          { id: "get-2", filename: "logo.png", type: "image/png", path: "/uploads/images/logo.png", usedIn: [] },
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          files: [
+            {
+              id: "get-1",
+              filename: "hero.jpg",
+              type: "image/jpeg",
+              path: "/uploads/images/hero.jpg",
+              usedIn: ["index"],
+            },
+            { id: "get-2", filename: "logo.png", type: "image/png", path: "/uploads/images/logo.png", usedIn: [] },
+          ],
+        },
+        null,
+        2,
+      ),
     );
   });
 
@@ -735,13 +755,17 @@ describe("updateMediaMetadata", () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [
-          { id: "meta-img", filename: "photo.jpg", type: "image/jpeg", metadata: { alt: "", title: "" } },
-          { id: "meta-vid", filename: "video.mp4", type: "video/mp4", metadata: { title: "", description: "" } },
-          { id: "meta-aud", filename: "song.mp3", type: "audio/mpeg", metadata: { title: "", description: "" } },
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          files: [
+            { id: "meta-img", filename: "photo.jpg", type: "image/jpeg", metadata: { alt: "", title: "" } },
+            { id: "meta-vid", filename: "video.mp4", type: "video/mp4", metadata: { title: "", description: "" } },
+            { id: "meta-aud", filename: "song.mp3", type: "audio/mpeg", metadata: { title: "", description: "" } },
+          ],
+        },
+        null,
+        2,
+      ),
     );
   });
 
@@ -820,27 +844,31 @@ describe("deleteProjectMedia", () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [
-          {
-            id: "del-1",
-            filename: "deletable.jpg",
-            type: "image/jpeg",
-            path: "/uploads/images/deletable.jpg",
-            usedIn: [],
-            sizes: {
-              thumb: { path: "/uploads/images/deletable-thumb.jpg", width: 150, height: 100 },
+      JSON.stringify(
+        {
+          files: [
+            {
+              id: "del-1",
+              filename: "deletable.jpg",
+              type: "image/jpeg",
+              path: "/uploads/images/deletable.jpg",
+              usedIn: [],
+              sizes: {
+                thumb: { path: "/uploads/images/deletable-thumb.jpg", width: 150, height: 100 },
+              },
             },
-          },
-          {
-            id: "del-2",
-            filename: "in-use.jpg",
-            type: "image/jpeg",
-            path: "/uploads/images/in-use.jpg",
-            usedIn: ["index", "about"],
-          },
-        ],
-      }, null, 2),
+            {
+              id: "del-2",
+              filename: "in-use.jpg",
+              type: "image/jpeg",
+              path: "/uploads/images/in-use.jpg",
+              usedIn: ["index", "about"],
+            },
+          ],
+        },
+        null,
+        2,
+      ),
     );
   });
 
@@ -899,13 +927,35 @@ describe("bulkDeleteProjectMedia", () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [
-          { id: "bulk-1", filename: "bulk-a.jpg", type: "image/jpeg", path: "/uploads/images/bulk-a.jpg", usedIn: [] },
-          { id: "bulk-2", filename: "bulk-b.jpg", type: "image/jpeg", path: "/uploads/images/bulk-b.jpg", usedIn: ["index"] },
-          { id: "bulk-3", filename: "bulk-c.jpg", type: "image/jpeg", path: "/uploads/images/bulk-c.jpg", usedIn: [] },
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          files: [
+            {
+              id: "bulk-1",
+              filename: "bulk-a.jpg",
+              type: "image/jpeg",
+              path: "/uploads/images/bulk-a.jpg",
+              usedIn: [],
+            },
+            {
+              id: "bulk-2",
+              filename: "bulk-b.jpg",
+              type: "image/jpeg",
+              path: "/uploads/images/bulk-b.jpg",
+              usedIn: ["index"],
+            },
+            {
+              id: "bulk-3",
+              filename: "bulk-c.jpg",
+              type: "image/jpeg",
+              path: "/uploads/images/bulk-c.jpg",
+              usedIn: [],
+            },
+          ],
+        },
+        null,
+        2,
+      ),
     );
   });
 
@@ -988,16 +1038,20 @@ describe("serveProjectMedia", () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [
-          {
-            id: "serve-1",
-            filename: "serve-test.jpg",
-            type: "image/jpeg",
-            path: "/uploads/images/serve-test.jpg",
-          },
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          files: [
+            {
+              id: "serve-1",
+              filename: "serve-test.jpg",
+              type: "image/jpeg",
+              path: "/uploads/images/serve-test.jpg",
+            },
+          ],
+        },
+        null,
+        2,
+      ),
     );
   });
 
@@ -1064,17 +1118,21 @@ describe("getMediaFileUsage", () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [
-          {
-            id: "usage-1",
-            filename: "tracked.jpg",
-            type: "image/jpeg",
-            path: "/uploads/images/tracked.jpg",
-            usedIn: ["index"],
-          },
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          files: [
+            {
+              id: "usage-1",
+              filename: "tracked.jpg",
+              type: "image/jpeg",
+              path: "/uploads/images/tracked.jpg",
+              usedIn: ["index"],
+            },
+          ],
+        },
+        null,
+        2,
+      ),
     );
   });
 
@@ -1101,34 +1159,42 @@ describe("refreshMediaUsage", () => {
     await fs.ensureDir(pagesDir);
     await fs.writeFile(
       path.join(pagesDir, "index.json"),
-      JSON.stringify({
-        name: "Home",
-        slug: "index",
-        widgets: {
-          "w1": {
-            type: "test-widget",
-            settings: { image: "/uploads/images/tracked.jpg" },
+      JSON.stringify(
+        {
+          name: "Home",
+          slug: "index",
+          widgets: {
+            w1: {
+              type: "test-widget",
+              settings: { image: "/uploads/images/tracked.jpg" },
+            },
           },
+          widgetsOrder: ["w1"],
         },
-        widgetsOrder: ["w1"],
-      }, null, 2),
+        null,
+        2,
+      ),
     );
 
     // Create media.json with stale usedIn
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [
-          {
-            id: "refresh-1",
-            filename: "tracked.jpg",
-            type: "image/jpeg",
-            path: "/uploads/images/tracked.jpg",
-            usedIn: [], // <-- stale: should be ["index"] after refresh
-          },
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          files: [
+            {
+              id: "refresh-1",
+              filename: "tracked.jpg",
+              type: "image/jpeg",
+              path: "/uploads/images/tracked.jpg",
+              usedIn: [], // <-- stale: should be ["index"] after refresh
+            },
+          ],
+        },
+        null,
+        2,
+      ),
     );
   });
 
@@ -1186,9 +1252,13 @@ describe("media edge cases", () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [{ id: "edge-img", filename: "test.jpg", type: "image/jpeg", metadata: { alt: "", title: "" } }],
-      }, null, 2),
+      JSON.stringify(
+        {
+          files: [{ id: "edge-img", filename: "test.jpg", type: "image/jpeg", metadata: { alt: "", title: "" } }],
+        },
+        null,
+        2,
+      ),
     );
 
     const res = await callController(updateMediaMetadata, {
@@ -1203,11 +1273,20 @@ describe("media edge cases", () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [
-          { id: "edge-vid", filename: "v.mp4", type: "video/mp4", metadata: { alt: "stale", title: "", description: "" } },
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          files: [
+            {
+              id: "edge-vid",
+              filename: "v.mp4",
+              type: "video/mp4",
+              metadata: { alt: "stale", title: "", description: "" },
+            },
+          ],
+        },
+        null,
+        2,
+      ),
     );
 
     const res = await callController(updateMediaMetadata, {
@@ -1224,11 +1303,21 @@ describe("media edge cases", () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [
-          { id: "del-vid", filename: "to-delete.mp4", type: "video/mp4", path: "/uploads/videos/to-delete.mp4", usedIn: [] },
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          files: [
+            {
+              id: "del-vid",
+              filename: "to-delete.mp4",
+              type: "video/mp4",
+              path: "/uploads/videos/to-delete.mp4",
+              usedIn: [],
+            },
+          ],
+        },
+        null,
+        2,
+      ),
     );
 
     const res = await callController(deleteProjectMedia, {
@@ -1245,11 +1334,21 @@ describe("media edge cases", () => {
     const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
     await fs.outputFile(
       mediaPath,
-      JSON.stringify({
-        files: [
-          { id: "del-aud", filename: "to-delete.mp3", type: "audio/mpeg", path: "/uploads/audios/to-delete.mp3", usedIn: [] },
-        ],
-      }, null, 2),
+      JSON.stringify(
+        {
+          files: [
+            {
+              id: "del-aud",
+              filename: "to-delete.mp3",
+              type: "audio/mpeg",
+              path: "/uploads/audios/to-delete.mp3",
+              usedIn: [],
+            },
+          ],
+        },
+        null,
+        2,
+      ),
     );
 
     const res = await callController(deleteProjectMedia, {
@@ -1299,13 +1398,15 @@ describe("theme image size overrides", () => {
 
     return callController(uploadProjectMedia, {
       params: { projectId: PROJECT_ID },
-      files: [{
-        originalname: filename,
-        filename,
-        mimetype: "image/jpeg",
-        size: buf.length,
-        path: filePath,
-      }],
+      files: [
+        {
+          originalname: filename,
+          filename,
+          mimetype: "image/jpeg",
+          size: buf.length,
+          path: filePath,
+        },
+      ],
     });
   }
 
@@ -1368,7 +1469,7 @@ describe("theme image size overrides", () => {
 
   it("forces thumb to be enabled even when theme sets enabled: false", async () => {
     await setThemeImageSizes({
-      thumb: { width: 150, enabled: false },  // Theme tries to disable thumb
+      thumb: { width: 150, enabled: false }, // Theme tries to disable thumb
       small: { width: 480, enabled: true },
     });
 
@@ -1384,8 +1485,8 @@ describe("theme image size overrides", () => {
   it("supports per-size quality override from theme", async () => {
     // Two sizes with drastically different quality levels
     await setThemeImageSizes({
-      thumb: { width: 150, enabled: true, quality: 10 },   // Very low quality
-      small: { width: 480, enabled: true, quality: 95 },    // High quality
+      thumb: { width: 150, enabled: true, quality: 10 }, // Very low quality
+      small: { width: 480, enabled: true, quality: 95 }, // High quality
     });
 
     const res = await uploadLargeImage("quality-test.jpg");

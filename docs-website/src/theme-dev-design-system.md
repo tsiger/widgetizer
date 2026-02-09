@@ -131,4 +131,3 @@ Avoid hardcoded values. Use the token scale so widgets stay consistent across th
 Shared patterns (grids, buttons, forms) should live in `base.css`, not individual widgets.
 
 For how theme settings emit CSS variables, see [Theme Manifest & Settings](theme-dev-manifest-settings.html).
-

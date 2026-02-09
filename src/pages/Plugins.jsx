@@ -10,9 +10,7 @@ export default function Plugins() {
       <div className="p-8 text-center">
         <Puzzle className="mx-auto mb-4 text-slate-400" size={48} />
         <h2 className="text-xl font-semibold mb-2">{t("plugins.emptyTitle")}</h2>
-        <p className="text-slate-600 mb-4">
-          {t("plugins.emptyDesc")}
-        </p>
+        <p className="text-slate-600 mb-4">{t("plugins.emptyDesc")}</p>
       </div>
     </PageLayout>
   );

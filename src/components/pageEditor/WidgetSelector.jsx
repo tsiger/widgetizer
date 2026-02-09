@@ -25,52 +25,56 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     const aliases = schema.aliases || [];
     const searchLower = searchTerm.toLowerCase();
 
-    return name.toLowerCase().includes(searchLower) ||
-      aliases.some(alias => alias.toLowerCase().includes(searchLower));
+    return (
+      name.toLowerCase().includes(searchLower) || aliases.some((alias) => alias.toLowerCase().includes(searchLower))
+    );
   });
 
   // Handle keyboard navigation
-  const handleKeyDown = useCallback((event) => {
-    if (!isOpen) return;
+  const handleKeyDown = useCallback(
+    (event) => {
+      if (!isOpen) return;
 
-    switch (event.key) {
-      case "ArrowDown":
-        event.preventDefault();
-        setFocusedIndex((prev) => {
-          const nextIndex = prev < filteredWidgets.length - 1 ? prev + 1 : 0;
-          return nextIndex;
-        });
-        break;
-      case "ArrowUp":
-        event.preventDefault();
-        setFocusedIndex((prev) => {
-          const nextIndex = prev > 0 ? prev - 1 : filteredWidgets.length - 1;
-          return nextIndex;
-        });
-        break;
-      case "Enter":
-        event.preventDefault();
-        if (focusedIndex >= 0 && focusedIndex < filteredWidgets.length) {
-          onSelectWidget(filteredWidgets[focusedIndex].type, position);
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          setFocusedIndex((prev) => {
+            const nextIndex = prev < filteredWidgets.length - 1 ? prev + 1 : 0;
+            return nextIndex;
+          });
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          setFocusedIndex((prev) => {
+            const nextIndex = prev > 0 ? prev - 1 : filteredWidgets.length - 1;
+            return nextIndex;
+          });
+          break;
+        case "Enter":
+          event.preventDefault();
+          if (focusedIndex >= 0 && focusedIndex < filteredWidgets.length) {
+            onSelectWidget(filteredWidgets[focusedIndex].type, position);
+            onClose();
+          } else if (filteredWidgets.length === 1) {
+            // If only one result and nothing focused, select it
+            onSelectWidget(filteredWidgets[0].type, position);
+            onClose();
+          }
+          break;
+        case "Escape":
+          event.preventDefault();
           onClose();
-        } else if (filteredWidgets.length === 1) {
-          // If only one result and nothing focused, select it
-          onSelectWidget(filteredWidgets[0].type, position);
+          break;
+        case "Tab":
+          // Allow tab to close and move focus naturally
           onClose();
-        }
-        break;
-      case "Escape":
-        event.preventDefault();
-        onClose();
-        break;
-      case "Tab":
-        // Allow tab to close and move focus naturally
-        onClose();
-        break;
-      default:
-        break;
-    }
-  }, [isOpen, focusedIndex, filteredWidgets, onSelectWidget, position, onClose]);
+          break;
+        default:
+          break;
+      }
+    },
+    [isOpen, focusedIndex, filteredWidgets, onSelectWidget, position, onClose],
+  );
 
   // Scroll focused item into view
   useEffect(() => {
@@ -197,17 +201,14 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
               role="combobox"
               aria-expanded={isOpen}
               aria-controls="widget-selector-list"
-              aria-activedescendant={focusedIndex >= 0 ? `widget-option-${filteredWidgets[focusedIndex]?.type}` : undefined}
+              aria-activedescendant={
+                focusedIndex >= 0 ? `widget-option-${filteredWidgets[focusedIndex]?.type}` : undefined
+              }
             />
           </div>
         </div>
 
-        <div
-          ref={listRef}
-          id="widget-selector-list"
-          className="max-h-64 overflow-y-auto"
-          role="listbox"
-        >
+        <div ref={listRef} id="widget-selector-list" className="max-h-64 overflow-y-auto" role="listbox">
           {filteredWidgets.length > 0 ? (
             filteredWidgets.map((schema, index) => (
               <button
@@ -216,9 +217,7 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
                 role="option"
                 aria-selected={focusedIndex === index}
                 className={`w-full px-3 py-2 text-left transition-colors group border-b border-transparent last:border-0 ${
-                  focusedIndex === index
-                    ? "bg-pink-50 border-pink-100"
-                    : "hover:bg-slate-50 hover:border-slate-100"
+                  focusedIndex === index ? "bg-pink-50 border-pink-100" : "hover:bg-slate-50 hover:border-slate-100"
                 }`}
                 onClick={() => {
                   onSelectWidget(schema.type, position);
@@ -226,11 +225,11 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
                 }}
                 onMouseEnter={() => setFocusedIndex(index)}
               >
-                <div className={`text-sm font-medium ${
-                  focusedIndex === index
-                    ? "text-pink-600"
-                    : "text-slate-800 group-hover:text-pink-600"
-                }`}>
+                <div
+                  className={`text-sm font-medium ${
+                    focusedIndex === index ? "text-pink-600" : "text-slate-800 group-hover:text-pink-600"
+                  }`}
+                >
                   {schema.displayName || schema.type}
                 </div>
               </button>

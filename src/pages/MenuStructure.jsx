@@ -70,7 +70,9 @@ export default function MenuStructure() {
 
     // Show success message with subtle feedback
     showToast(
-      t("menuStructure.toasts.itemDeleted", { label: itemToDelete.label || t("menuStructure.toasts.defaultItemLabel") }),
+      t("menuStructure.toasts.itemDeleted", {
+        label: itemToDelete.label || t("menuStructure.toasts.defaultItemLabel"),
+      }),
       "success",
     );
   };

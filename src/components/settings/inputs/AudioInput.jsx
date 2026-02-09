@@ -148,7 +148,13 @@ export default function AudioInput({ id, value = "", onChange }) {
         <Button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="flex-1" type="button">
           {uploading ? "Uploading..." : "Upload"}
         </Button>
-        <Button onClick={handleOpenMediaSelector} disabled={uploading} variant="secondary" className="flex-1" type="button">
+        <Button
+          onClick={handleOpenMediaSelector}
+          disabled={uploading}
+          variant="secondary"
+          className="flex-1"
+          type="button"
+        >
           Browse
         </Button>
       </div>

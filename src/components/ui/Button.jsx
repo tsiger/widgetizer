@@ -45,8 +45,7 @@ const Button = forwardRef(
         "text-gray-600 hover:bg-gray-100 hover:text-gray-900 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)] focus:ring-pink-500 active:bg-gray-200",
       danger:
         "bg-red-600 text-white shadow-sm hover:bg-red-700 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)] focus:ring-red-500 active:bg-red-800",
-      dark:
-        "bg-slate-900 text-white shadow-sm hover:bg-slate-800 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)] focus:ring-slate-500 active:bg-slate-950",
+      dark: "bg-slate-900 text-white shadow-sm hover:bg-slate-800 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)] focus:ring-slate-500 active:bg-slate-950",
     };
 
     // Size classes

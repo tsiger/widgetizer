@@ -33,8 +33,7 @@ The App Settings system has been **refactored** to use a clean, modular architec
   - **Large** (default: 1920px) - High-resolution displays
   - Each size can be **enabled/disabled** and have its **width customized**
 
-**Theme Override Behavior:**
-When the active project's theme defines its own `imageSizes` in `theme.json`, the Image Sizes settings are hidden in the App Settings UI. A notice is displayed explaining that image sizes are managed by the theme. This ensures users understand that changing app settings won't affect projects using themes with custom image sizes. See [Media Library - Theme-Defined Image Sizes](core-media.md#theme-defined-image-sizes) for details.
+**Theme Override Behavior:** When the active project's theme defines its own `imageSizes` in `theme.json`, the Image Sizes settings are hidden in the App Settings UI. A notice is displayed explaining that image sizes are managed by the theme. This ensures users understand that changing app settings won't affect projects using themes with custom image sizes. See [Media Library - Theme-Defined Image Sizes](core-media.md#theme-defined-image-sizes) for details.
 
 ### Export Management Settings
 

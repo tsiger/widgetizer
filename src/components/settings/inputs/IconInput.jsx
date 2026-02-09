@@ -276,7 +276,10 @@ export default function IconInput({ value, onChange, options, allow_patterns, de
                 const groupTop = startOffset;
                 const groupBottom = startOffset + totalHeight;
 
-                if (groupBottom < viewTop - rowStride * overscanRows || groupTop > viewBottom + rowStride * overscanRows) {
+                if (
+                  groupBottom < viewTop - rowStride * overscanRows ||
+                  groupTop > viewBottom + rowStride * overscanRows
+                ) {
                   return <div key={group.name || `group-${groupIndex}`} style={{ height: totalHeight }} />;
                 }
 

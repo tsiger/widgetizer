@@ -52,21 +52,25 @@ data/                   # Runtime data (gitignored)
 ## Key Concepts
 
 ### Content Model
+
 - Pages are JSON files at `data/projects/<folder>/pages/<slug>.json`
 - Global widgets (header/footer) live at `pages/global/header.json` and `footer.json`
 - Media metadata in `data/projects/<folder>/uploads/media.json` with `usedIn` arrays tracking which pages reference each file
 
 ### Rendering Pipeline
+
 - LiquidJS with `outputEscape: "escape"` (autoescape enabled globally)
 - `| raw` filter required for: richtext output, SVG icons, embed code, layout variables (`{{ header | raw }}`, `{{ main_content | raw }}`, `{{ footer | raw }}`)
 - Widget schema field types: `text`/`textarea` (auto-escaped), `richtext` (DOMPurify + `| raw`), `code` (intentionally unescaped)
 
 ### Sanitization (3-layer defense)
+
 1. LiquidJS autoescape on all `{{ }}` output by default
 2. DOMPurify sanitizes richtext before `| raw` rendering
 3. Helmet security headers
 
 ### Save Flow
+
 - `saveStore.js` orchestrates parallel saves of page content, global widgets, and theme settings
 - `mediaController.js` uses write locks (Map-based) for serializing writes to `media.json`
 - `mediaUsageService.js` handles atomic read-modify-write for media usage tracking
@@ -95,6 +99,7 @@ npm run lint:all        # Everything
 ## Environment
 
 Copy `.env.example` to `.env`. Key variables:
+
 - `PORT` — Backend port (default 3001)
 - `VITE_API_URL` — Frontend API base URL
 - `SERVER_URL` — Server's self-referencing URL

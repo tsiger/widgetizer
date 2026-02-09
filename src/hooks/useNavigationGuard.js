@@ -36,9 +36,8 @@ export default function useNavigationGuard() {
     // Block navigation if there are unsaved changes and the location is actually changing
     // Check both pathname and search params (for page editor dropdown switching)
     const isLocationChanging =
-      currentLocation.pathname !== nextLocation.pathname ||
-      currentLocation.search !== nextLocation.search;
-    
+      currentLocation.pathname !== nextLocation.pathname || currentLocation.search !== nextLocation.search;
+
     return hasUnsavedChanges() && isLocationChanging;
   });
 

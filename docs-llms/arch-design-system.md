@@ -78,7 +78,9 @@ This order ensures that theme settings CSS variables are available before `base.
 The theme uses a `62.5%` base font size on `<html>`, making `1rem = 10px`. This means `0.1rem = 1px`, enabling clean rem values throughout:
 
 ```css
-html { font-size: 62.5%; }
+html {
+  font-size: 62.5%;
+}
 /* Now: 1.6rem = 16px, 2.4rem = 24px, etc. */
 ```
 
@@ -95,127 +97,127 @@ All tokens are defined on `:root` in `base.css`. They fall into two categories:
 
 #### Typography Scale
 
-| Token | Value | Pixels |
-|---|---|---|
-| `--font-size-xs` | `1.2rem` | 12px |
-| `--font-size-sm` | `1.4rem` | 14px |
-| `--font-size-base` | `1.6rem` | 16px |
-| `--font-size-lg` | `1.8rem` | 18px |
-| `--font-size-xl` | `2rem` | 20px |
-| `--font-size-2xl` | `2.4rem` | 24px |
-| `--font-size-3xl` | `2.8rem` | 28px |
-| `--font-size-4xl` | `3.2rem` | 32px |
-| `--font-size-5xl` | `3.6rem` | 36px |
-| `--font-size-6xl` | `4rem` | 40px |
+| Token              | Value    | Pixels |
+| ------------------ | -------- | ------ |
+| `--font-size-xs`   | `1.2rem` | 12px   |
+| `--font-size-sm`   | `1.4rem` | 14px   |
+| `--font-size-base` | `1.6rem` | 16px   |
+| `--font-size-lg`   | `1.8rem` | 18px   |
+| `--font-size-xl`   | `2rem`   | 20px   |
+| `--font-size-2xl`  | `2.4rem` | 24px   |
+| `--font-size-3xl`  | `2.8rem` | 28px   |
+| `--font-size-4xl`  | `3.2rem` | 32px   |
+| `--font-size-5xl`  | `3.6rem` | 36px   |
+| `--font-size-6xl`  | `4rem`   | 40px   |
 
 #### Line Heights
 
-| Token | Value |
-|---|---|
-| `--line-height-tight` | `1.2` |
-| `--line-height-normal` | `1.5` |
+| Token                   | Value |
+| ----------------------- | ----- |
+| `--line-height-tight`   | `1.2` |
+| `--line-height-normal`  | `1.5` |
 | `--line-height-relaxed` | `1.6` |
 
 #### Font Weights
 
-| Token | Value |
-|---|---|
-| `--font-weight-medium` | `500` |
+| Token                    | Value |
+| ------------------------ | ----- |
+| `--font-weight-medium`   | `500` |
 | `--font-weight-semibold` | `600` |
 
 These are static utilities. Actual heading/body weights come from the dynamic typography variables (see [Typography System](#typography-system)).
 
 #### Spacing Scale
 
-| Token | Value | Pixels |
-|---|---|---|
-| `--space-xs` | `0.8rem` | 8px |
-| `--space-sm` | `1.2rem` | 12px |
-| `--space-md` | `1.6rem` | 16px |
-| `--space-lg` | `2.4rem` | 24px |
-| `--space-xl` | `3.2rem` | 32px |
-| `--space-2xl` | `4rem` | 40px |
-| `--space-3xl` | `4.8rem` | 48px |
-| `--space-4xl` | `6.4rem` | 64px |
-| `--space-5xl` | `8rem` | 80px |
-| `--space-6xl` | `9.6rem` | 96px |
+| Token         | Value    | Pixels |
+| ------------- | -------- | ------ |
+| `--space-xs`  | `0.8rem` | 8px    |
+| `--space-sm`  | `1.2rem` | 12px   |
+| `--space-md`  | `1.6rem` | 16px   |
+| `--space-lg`  | `2.4rem` | 24px   |
+| `--space-xl`  | `3.2rem` | 32px   |
+| `--space-2xl` | `4rem`   | 40px   |
+| `--space-3xl` | `4.8rem` | 48px   |
+| `--space-4xl` | `6.4rem` | 64px   |
+| `--space-5xl` | `8rem`   | 80px   |
+| `--space-6xl` | `9.6rem` | 96px   |
 
 #### Section Spacing
 
-| Token | Default | @750px | @990px |
-|---|---|---|---|
-| `--section-padding-block` | `var(--space-4xl)` (64px) | `var(--space-5xl)` (80px) | `var(--space-6xl)` (96px) |
-| `--section-padding-inline` | `var(--space-lg)` (24px) | — | — |
+| Token                      | Default                   | @750px                    | @990px                    |
+| -------------------------- | ------------------------- | ------------------------- | ------------------------- |
+| `--section-padding-block`  | `var(--space-4xl)` (64px) | `var(--space-5xl)` (80px) | `var(--space-6xl)` (96px) |
+| `--section-padding-inline` | `var(--space-lg)` (24px)  | —                         | —                         |
 
 Section spacing scales automatically via nested media queries inside `:root`.
 
 #### Container & Content Widths
 
-| Token | Value | Pixels | Purpose |
-|---|---|---|---|
-| `--container-max-width` | `142rem` | 1420px | Outer container limit |
-| `--content-width-xs` | `40rem` | 400px | Schedules, narrow forms |
-| `--content-width-sm` | `60rem` | 600px | Forms, modals |
-| `--content-width-md` | `80rem` | 800px | Text-heavy sections |
-| `--content-width-lg` | `90rem` | 900px | Comfortable reading |
+| Token                   | Value    | Pixels | Purpose                 |
+| ----------------------- | -------- | ------ | ----------------------- |
+| `--container-max-width` | `142rem` | 1420px | Outer container limit   |
+| `--content-width-xs`    | `40rem`  | 400px  | Schedules, narrow forms |
+| `--content-width-sm`    | `60rem`  | 600px  | Forms, modals           |
+| `--content-width-md`    | `80rem`  | 800px  | Text-heavy sections     |
+| `--content-width-lg`    | `90rem`  | 900px  | Comfortable reading     |
 
 #### Border Tokens
 
-| Token | Value | Pixels |
-|---|---|---|
-| `--border-width-thin` | `0.1rem` | 1px |
-| `--border-width-medium` | `0.2rem` | 2px |
-| `--border-width-thick` | `0.3rem` | 3px |
+| Token                   | Value    | Pixels |
+| ----------------------- | -------- | ------ |
+| `--border-width-thin`   | `0.1rem` | 1px    |
+| `--border-width-medium` | `0.2rem` | 2px    |
+| `--border-width-thick`  | `0.3rem` | 3px    |
 
 #### Color Tokens (Dynamic)
 
 These reference the runtime-injected `--colors-*` variables from theme settings, with fallbacks:
 
-| Token | Source | Fallback |
-|---|---|---|
-| `--text-content` | `var(--colors-standard_text_content)` | `#333` |
-| `--text-heading` | `var(--colors-standard_text_heading)` | `#000` |
-| `--text-muted` | `var(--colors-standard_text_muted)` | `#666` |
-| `--bg-primary` | `var(--colors-standard_bg_primary)` | `#fff` |
-| `--bg-secondary` | `var(--colors-standard_bg_secondary)` | `#f9f9f9` |
-| `--accent` | `var(--colors-standard_accent)` | `#0d47b7` |
-| `--accent-text` | `var(--colors-standard_accent_text)` | `#fff` |
-| `--rating-star-color` | `var(--colors-standard_rating_star)` | `#fbbf24` |
-| `--border-color` | `var(--colors-standard_border_color)` | `#e0e0e0` |
-| `--color-white` | `#ffffff` | (static) |
-| `--color-black` | `#000000` | (static) |
+| Token                 | Source                                | Fallback  |
+| --------------------- | ------------------------------------- | --------- |
+| `--text-content`      | `var(--colors-standard_text_content)` | `#333`    |
+| `--text-heading`      | `var(--colors-standard_text_heading)` | `#000`    |
+| `--text-muted`        | `var(--colors-standard_text_muted)`   | `#666`    |
+| `--bg-primary`        | `var(--colors-standard_bg_primary)`   | `#fff`    |
+| `--bg-secondary`      | `var(--colors-standard_bg_secondary)` | `#f9f9f9` |
+| `--accent`            | `var(--colors-standard_accent)`       | `#0d47b7` |
+| `--accent-text`       | `var(--colors-standard_accent_text)`  | `#fff`    |
+| `--rating-star-color` | `var(--colors-standard_rating_star)`  | `#fbbf24` |
+| `--border-color`      | `var(--colors-standard_border_color)` | `#e0e0e0` |
+| `--color-white`       | `#ffffff`                             | (static)  |
+| `--color-black`       | `#000000`                             | (static)  |
 
 #### Icon Sizes
 
-| Token | Value | Pixels |
-|---|---|---|
-| `--icon-size-xs` | `1.6rem` | 16px |
-| `--icon-size-sm` | `2rem` | 20px |
-| `--icon-size-md` | `2.4rem` | 24px |
-| `--icon-size-lg` | `3.2rem` | 32px |
-| `--icon-size-xl` | `4.8rem` | 48px |
+| Token            | Value    | Pixels |
+| ---------------- | -------- | ------ |
+| `--icon-size-xs` | `1.6rem` | 16px   |
+| `--icon-size-sm` | `2rem`   | 20px   |
+| `--icon-size-md` | `2.4rem` | 24px   |
+| `--icon-size-lg` | `3.2rem` | 32px   |
+| `--icon-size-xl` | `4.8rem` | 48px   |
 
 #### Transition Speeds
 
-| Token | Value |
-|---|---|
-| `--transition-speed-fast` | `0.15s` |
-| `--transition-speed-normal` | `0.3s` |
-| `--transition-speed-slow` | `0.5s` |
+| Token                       | Value   |
+| --------------------------- | ------- |
+| `--transition-speed-fast`   | `0.15s` |
+| `--transition-speed-normal` | `0.3s`  |
+| `--transition-speed-slow`   | `0.5s`  |
 
 #### Widget Background System
 
 Default values for widget background control (overridden inline per-widget):
 
-| Token | Default |
-|---|---|
-| `--widget-bg-color` | `transparent` |
-| `--widget-bg-size` | `cover` |
-| `--widget-bg-position` | `center` |
-| `--widget-bg-repeat` | `no-repeat` |
-| `--widget-bg-attachment` | `scroll` |
-| `--widget-overlay-color` | `transparent` |
-| `--widget-overlay-opacity` | `0.5` |
+| Token                      | Default       |
+| -------------------------- | ------------- |
+| `--widget-bg-color`        | `transparent` |
+| `--widget-bg-size`         | `cover`       |
+| `--widget-bg-position`     | `center`      |
+| `--widget-bg-repeat`       | `no-repeat`   |
+| `--widget-bg-attachment`   | `scroll`      |
+| `--widget-overlay-color`   | `transparent` |
+| `--widget-overlay-opacity` | `0.5`         |
 
 ---
 
@@ -233,12 +235,12 @@ Remaps all shorthand tokens to `--colors-standard_*` variables:
 .color-scheme-standard {
   --text-heading: var(--colors-standard_text_heading, #0f172a);
   --text-content: var(--colors-standard_text_content, #1f2937);
-  --text-muted:   var(--colors-standard_text_muted, #6b7280);
+  --text-muted: var(--colors-standard_text_muted, #6b7280);
   --border-color: var(--colors-standard_border_color, #e2e8f0);
-  --bg-primary:   var(--colors-standard_bg_primary, #ffffff);
+  --bg-primary: var(--colors-standard_bg_primary, #ffffff);
   --bg-secondary: var(--colors-standard_bg_secondary, #f1f5f9);
-  --accent:       var(--colors-standard_accent, #1e3a8a);
-  --accent-text:  var(--colors-standard_accent_text, #ffffff);
+  --accent: var(--colors-standard_accent, #1e3a8a);
+  --accent-text: var(--colors-standard_accent_text, #ffffff);
   --rating-star-color: var(--colors-standard_rating_star, #fbbf24);
 }
 ```
@@ -251,12 +253,12 @@ Remaps all shorthand tokens to `--colors-highlight_*` variables:
 .color-scheme-highlight {
   --text-heading: var(--colors-highlight_text_heading, #ffffff);
   --text-content: var(--colors-highlight_text_content, #eaf3fc);
-  --text-muted:   var(--colors-highlight_text_muted, #64748b);
+  --text-muted: var(--colors-highlight_text_muted, #64748b);
   --border-color: var(--colors-highlight_border_color, #526884);
-  --bg-primary:   var(--colors-highlight_bg_primary, #233c54);
+  --bg-primary: var(--colors-highlight_bg_primary, #233c54);
   --bg-secondary: var(--colors-highlight_bg_secondary, #152a3e);
-  --accent:       var(--colors-highlight_accent, #de1877);
-  --accent-text:  var(--colors-highlight_accent_text, #ffffff);
+  --accent: var(--colors-highlight_accent, #de1877);
+  --accent-text: var(--colors-highlight_accent_text, #ffffff);
   --rating-star-color: var(--colors-highlight_rating_star, #fbbf24);
 }
 ```
@@ -283,31 +285,31 @@ When a widget uses the `highlight` scheme, it also sets its background:
 
 **Standard scheme defaults:**
 
-| Setting ID | Label | Default |
-|---|---|---|
-| `standard_bg_primary` | Primary Background | `#ffffff` |
+| Setting ID              | Label                | Default   |
+| ----------------------- | -------------------- | --------- |
+| `standard_bg_primary`   | Primary Background   | `#ffffff` |
 | `standard_bg_secondary` | Secondary Background | `#f1f5f9` |
-| `standard_text_content` | Content Text | `#1f2937` |
-| `standard_text_heading` | Heading Text | `#0f172a` |
-| `standard_text_muted` | Muted Text | `#6b7280` |
-| `standard_border_color` | Border Color | `#e2e8f0` |
-| `standard_accent` | Accent Color | `#DE1877` |
-| `standard_accent_text` | Accent Text Color | `#ffffff` |
-| `standard_rating_star` | Rating Star Color | `#fbbf24` |
+| `standard_text_content` | Content Text         | `#1f2937` |
+| `standard_text_heading` | Heading Text         | `#0f172a` |
+| `standard_text_muted`   | Muted Text           | `#6b7280` |
+| `standard_border_color` | Border Color         | `#e2e8f0` |
+| `standard_accent`       | Accent Color         | `#DE1877` |
+| `standard_accent_text`  | Accent Text Color    | `#ffffff` |
+| `standard_rating_star`  | Rating Star Color    | `#fbbf24` |
 
 **Highlight scheme defaults:**
 
-| Setting ID | Label | Default |
-|---|---|---|
-| `highlight_bg_primary` | Primary Background | `#233c54` |
+| Setting ID               | Label                | Default   |
+| ------------------------ | -------------------- | --------- |
+| `highlight_bg_primary`   | Primary Background   | `#233c54` |
 | `highlight_bg_secondary` | Secondary Background | `#152a3e` |
-| `highlight_text_content` | Content Text | `#eaf3fc` |
-| `highlight_text_heading` | Heading Text | `#ffffff` |
-| `highlight_text_muted` | Muted Text | `#64748b` |
-| `highlight_border_color` | Border Color | `#526884` |
-| `highlight_accent` | Accent Color | `#DE1877` |
-| `highlight_accent_text` | Accent Text Color | `#ffffff` |
-| `highlight_rating_star` | Rating Star Color | `#fbbf24` |
+| `highlight_text_content` | Content Text         | `#eaf3fc` |
+| `highlight_text_heading` | Heading Text         | `#ffffff` |
+| `highlight_text_muted`   | Muted Text           | `#64748b` |
+| `highlight_border_color` | Border Color         | `#526884` |
+| `highlight_accent`       | Accent Color         | `#DE1877` |
+| `highlight_accent_text`  | Accent Text Color    | `#ffffff` |
+| `highlight_rating_star`  | Rating Star Color    | `#fbbf24` |
 
 All 18 color settings have `"outputAsCssVar": true`, which causes the `{% theme_settings %}` tag to generate `--colors-{id}` CSS variables on `:root`.
 
@@ -319,10 +321,10 @@ All 18 color settings have `"outputAsCssVar": true`, which causes the `{% theme_
 
 Fonts are configured in `theme.json` via `font_picker` settings:
 
-| Setting ID | Label | Default Stack | Default Weight |
-|---|---|---|---|
-| `heading_font` | Heading Font | `"Fraunces", serif` | 600 |
-| `body_font` | Body Font | `"Inter", sans-serif` | 400 |
+| Setting ID     | Label        | Default Stack         | Default Weight |
+| -------------- | ------------ | --------------------- | -------------- |
+| `heading_font` | Heading Font | `"Fraunces", serif`   | 600            |
+| `body_font`    | Body Font    | `"Inter", sans-serif` | 400            |
 
 The `{% theme_settings %}` tag generates these CSS variables:
 
@@ -346,12 +348,13 @@ For `body_font` when the base weight is 400, the system looks up the font in `fo
 body {
   font-family: var(--typography-body_font-family, ...system-stack...);
   font-weight: var(--typography-body_font-weight, 400);
-  font-size: var(--font-size-base);     /* 16px */
+  font-size: var(--font-size-base); /* 16px */
   line-height: var(--line-height-normal); /* 1.5 */
   color: var(--text-content);
 }
 
-strong, b {
+strong,
+b {
   font-weight: var(--typography-body_font_bold-weight, 700);
 }
 
@@ -365,21 +368,21 @@ h1-h6 {
 
 #### Heading Size Scale
 
-| Element | Token | Size |
-|---|---|---|
-| `h1` | `--font-size-5xl` | 36px |
-| `h2` | `--font-size-4xl` | 32px |
-| `h3` | `--font-size-3xl` | 28px |
-| `h4` | `--font-size-2xl` | 24px |
-| `h5` | `--font-size-xl` | 20px |
-| `h6` | `--font-size-lg` | 18px |
+| Element | Token             | Size |
+| ------- | ----------------- | ---- |
+| `h1`    | `--font-size-5xl` | 36px |
+| `h2`    | `--font-size-4xl` | 32px |
+| `h3`    | `--font-size-3xl` | 28px |
+| `h4`    | `--font-size-2xl` | 24px |
+| `h5`    | `--font-size-xl`  | 20px |
+| `h6`    | `--font-size-lg`  | 18px |
 
 ### Widget Text Classes
 
 Semantic text classes for use in widget templates:
 
 | Class | Purpose | Styles |
-|---|---|---|
+| --- | --- | --- |
 | `.widget-headline` | Section titles | Semantic hook, no default styles |
 | `.widget-title` | Card/item titles | Semantic hook, no default styles |
 | `.widget-subtitle` | Subtitles | Semantic hook, no default styles |
@@ -395,45 +398,45 @@ Composable text utility classes used within widget blocks:
 
 #### Base
 
-| Class | Effect |
-|---|---|
+| Class         | Effect                                                             |
+| ------------- | ------------------------------------------------------------------ |
 | `.block-text` | Reset margins, set `line-height: relaxed`, `color: --text-content` |
 
 #### Size Modifiers
 
-| Class | Font Size Token |
-|---|---|
-| `.block-text-xs` | `--font-size-xs` (12px) |
-| `.block-text-sm` | `--font-size-sm` (14px) |
+| Class              | Font Size Token           |
+| ------------------ | ------------------------- |
+| `.block-text-xs`   | `--font-size-xs` (12px)   |
+| `.block-text-sm`   | `--font-size-sm` (14px)   |
 | `.block-text-base` | `--font-size-base` (16px) |
-| `.block-text-lg` | `--font-size-lg` (18px) |
-| `.block-text-xl` | `--font-size-xl` (20px) |
-| `.block-text-2xl` | `--font-size-2xl` (24px) |
-| `.block-text-3xl` | `--font-size-3xl` (28px) |
-| `.block-text-4xl` | `--font-size-4xl` (32px) |
-| `.block-text-5xl` | `--font-size-5xl` (36px) |
+| `.block-text-lg`   | `--font-size-lg` (18px)   |
+| `.block-text-xl`   | `--font-size-xl` (20px)   |
+| `.block-text-2xl`  | `--font-size-2xl` (24px)  |
+| `.block-text-3xl`  | `--font-size-3xl` (28px)  |
+| `.block-text-4xl`  | `--font-size-4xl` (32px)  |
+| `.block-text-5xl`  | `--font-size-5xl` (36px)  |
 
 Sizes 2xl and above also set `line-height: var(--line-height-tight)`.
 
 #### Weight Modifiers
 
-| Class | Weight Source |
-|---|---|
-| `.block-text-normal` | `var(--typography-body_font-weight, 400)` |
-| `.block-text-medium` | `var(--font-weight-medium)` (500) |
-| `.block-text-semibold` | `var(--font-weight-semibold)` (600) |
-| `.block-text-heading-weight` | `var(--typography-heading_font-weight, 700)` |
-| `.block-text-body-weight` | `var(--typography-body_font_weight, 400)` |
-| `.block-text-body-bold` | `var(--typography-body_font_bold-weight, 700)` |
+| Class                        | Weight Source                                  |
+| ---------------------------- | ---------------------------------------------- |
+| `.block-text-normal`         | `var(--typography-body_font-weight, 400)`      |
+| `.block-text-medium`         | `var(--font-weight-medium)` (500)              |
+| `.block-text-semibold`       | `var(--font-weight-semibold)` (600)            |
+| `.block-text-heading-weight` | `var(--typography-heading_font-weight, 700)`   |
+| `.block-text-body-weight`    | `var(--typography-body_font_weight, 400)`      |
+| `.block-text-body-bold`      | `var(--typography-body_font_bold-weight, 700)` |
 
 #### Style Modifiers
 
-| Class | Effect |
-|---|---|
+| Class                   | Effect                                                |
+| ----------------------- | ----------------------------------------------------- |
 | `.block-text-uppercase` | `text-transform: uppercase`, `letter-spacing: 0.05em` |
-| `.block-text-muted` | `color: var(--text-muted)` |
-| `.block-text-heading` | `color: var(--text-heading)` |
-| `.block-text-accent` | `color: var(--accent)` |
+| `.block-text-muted`     | `color: var(--text-muted)`                            |
+| `.block-text-heading`   | `color: var(--text-heading)`                          |
+| `.block-text-accent`    | `color: var(--accent)`                                |
 
 #### Rich Text Content
 
@@ -447,17 +450,17 @@ The spacing scale is based on a 4px/8px rhythm. All spacing values use rem with 
 
 ### Usage Patterns
 
-| Context | Typical Tokens |
-|---|---|
-| Tight gaps (inline items) | `--space-xs` (8px) |
-| Form label-to-input gaps | `--space-xs` (8px) |
-| General gaps | `--space-md` (16px) |
-| Card padding (mobile) | `--space-lg` (24px) |
-| Card padding (tablet) | `--space-xl` (32px) |
-| Card padding (desktop) | `--space-2xl` (40px) |
-| Section header bottom margin | `--space-2xl` (40px) |
-| Section vertical padding (mobile) | `--space-4xl` (64px) |
-| Section vertical padding (tablet) | `--space-5xl` (80px) |
+| Context                            | Typical Tokens       |
+| ---------------------------------- | -------------------- |
+| Tight gaps (inline items)          | `--space-xs` (8px)   |
+| Form label-to-input gaps           | `--space-xs` (8px)   |
+| General gaps                       | `--space-md` (16px)  |
+| Card padding (mobile)              | `--space-lg` (24px)  |
+| Card padding (tablet)              | `--space-xl` (32px)  |
+| Card padding (desktop)             | `--space-2xl` (40px) |
+| Section header bottom margin       | `--space-2xl` (40px) |
+| Section vertical padding (mobile)  | `--space-4xl` (64px) |
+| Section vertical padding (tablet)  | `--space-5xl` (80px) |
 | Section vertical padding (desktop) | `--space-6xl` (96px) |
 
 ---
@@ -523,41 +526,41 @@ Centered section header with flex column layout:
 
 Constrain content to narrower widths for readability:
 
-| Class | Max Width | Use Case |
-|---|---|---|
+| Class                | Max Width                         | Use Case                  |
+| -------------------- | --------------------------------- | ------------------------- |
 | `.widget-content-xs` | `var(--content-width-xs)` (400px) | Schedules, narrow content |
-| `.widget-content-sm` | `var(--content-width-sm)` (600px) | Forms, modals |
-| `.widget-content-md` | `var(--content-width-md)` (800px) | Text-heavy sections |
-| `.widget-content-lg` | `var(--content-width-lg)` (900px) | Comfortable reading |
+| `.widget-content-sm` | `var(--content-width-sm)` (600px) | Forms, modals             |
+| `.widget-content-md` | `var(--content-width-md)` (800px) | Text-heavy sections       |
+| `.widget-content-lg` | `var(--content-width-lg)` (900px) | Comfortable reading       |
 
 All apply `margin-inline: auto` for centering.
 
 ### Content Alignment Modifiers
 
-| Class | Effect |
-|---|---|
-| `.widget-content-align-center` | Centers text, centers `.widget-actions` |
-| `.widget-content-align-start` | Left-aligns text, left-aligns `.widget-actions` |
-| `.widget-content-align-end` | Right-aligns text, right-aligns `.widget-actions` |
+| Class                          | Effect                                            |
+| ------------------------------ | ------------------------------------------------- |
+| `.widget-content-align-center` | Centers text, centers `.widget-actions`           |
+| `.widget-content-align-start`  | Left-aligns text, left-aligns `.widget-actions`   |
+| `.widget-content-align-end`    | Right-aligns text, right-aligns `.widget-actions` |
 
 ### Height Modifiers
 
 For full-viewport or partial-viewport hero sections:
 
-| Class | Min Height |
-|---|---|
-| `.widget-height-half` | `50vh` |
-| `.widget-height-two-thirds` | `66vh` |
-| `.widget-height-full` | `100vh` / `100dvh` |
+| Class                       | Min Height         |
+| --------------------------- | ------------------ |
+| `.widget-height-half`       | `50vh`             |
+| `.widget-height-two-thirds` | `66vh`             |
+| `.widget-height-full`       | `100vh` / `100dvh` |
 
 All three also set `display: flex; flex-direction: column; justify-content: center;` to vertically center content.
 
 ### Layout Direction Modifiers
 
-| Class | Effect |
-|---|---|
+| Class                 | Effect                                                        |
+| --------------------- | ------------------------------------------------------------- |
 | `.layout-image-right` | Reverses flex direction at desktop to move image to the right |
-| `.layout-reverse` | General flex direction reversal |
+| `.layout-reverse`     | General flex direction reversal                               |
 
 ---
 
@@ -582,15 +585,15 @@ gap: clamp(var(--space-xs), var(--grid-gap, var(--grid-gap-auto)), var(--space-x
 
 ### Column Count Modifiers
 
-| Class | `--grid-cols-desktop` |
-|---|---|
-| `.widget-grid-2` | 2 |
-| `.widget-grid-3` | 3 |
-| `.widget-grid-4` | 4 |
-| `.widget-grid-5` | 5 |
-| `.widget-grid-6` | 6 |
-| `.widget-grid-7` | 7 |
-| `.widget-grid-8` | 8 |
+| Class            | `--grid-cols-desktop` |
+| ---------------- | --------------------- |
+| `.widget-grid-2` | 2                     |
+| `.widget-grid-3` | 3                     |
+| `.widget-grid-4` | 4                     |
+| `.widget-grid-5` | 5                     |
+| `.widget-grid-6` | 6                     |
+| `.widget-grid-7` | 7                     |
+| `.widget-grid-8` | 8                     |
 
 The column count can also be set inline from widget settings:
 
@@ -616,7 +619,7 @@ An alternative grid container with the same breakpoint behavior as `.widget-grid
   flex-direction: column;
   background-color: var(--bg-primary);
   border: var(--border-width-thin) solid var(--border-color);
-  padding: var(--space-lg);          /* 24px mobile */
+  padding: var(--space-lg); /* 24px mobile */
   /* Responsive: --space-xl @750px, --space-2xl @990px */
   transition: border-color var(--transition-speed-normal);
 }
@@ -624,17 +627,17 @@ An alternative grid container with the same breakpoint behavior as `.widget-grid
 
 #### Card Sub-Components
 
-| Class | Purpose | Key Styles |
-|---|---|---|
-| `.widget-card-flat` | No-border variant | `background: var(--bg-secondary)` |
-| `.widget-card-header` | Header section | `margin-block-end: var(--space-lg)` |
-| `.widget-card-title` | Title | `font-size: lg` (xl @990px), `color: --text-heading` |
-| `.widget-card-subtitle` | Uppercase eyebrow | `xs`, `bold`, `uppercase`, `0.05em tracking`, `--text-muted` |
-| `.widget-card-description` | Body text | `sm`, `relaxed line-height`, `--text-content` |
-| `.widget-card-content` | Main body | `flex: 1` (fills remaining space) |
-| `.widget-card-footer` | Bottom section | `margin-block-start: auto` (pushes to bottom) |
-| `.widget-card-image` | Cover image | `aspect-ratio: 16/9`, `object-fit: cover` |
-| `.widget-card-icon` | Accent icon | `--icon-size-lg`, `color: --accent` |
+| Class                      | Purpose           | Key Styles                                                   |
+| -------------------------- | ----------------- | ------------------------------------------------------------ |
+| `.widget-card-flat`        | No-border variant | `background: var(--bg-secondary)`                            |
+| `.widget-card-header`      | Header section    | `margin-block-end: var(--space-lg)`                          |
+| `.widget-card-title`       | Title             | `font-size: lg` (xl @990px), `color: --text-heading`         |
+| `.widget-card-subtitle`    | Uppercase eyebrow | `xs`, `bold`, `uppercase`, `0.05em tracking`, `--text-muted` |
+| `.widget-card-description` | Body text         | `sm`, `relaxed line-height`, `--text-content`                |
+| `.widget-card-content`     | Main body         | `flex: 1` (fills remaining space)                            |
+| `.widget-card-footer`      | Bottom section    | `margin-block-start: auto` (pushes to bottom)                |
+| `.widget-card-image`       | Cover image       | `aspect-ratio: 16/9`, `object-fit: cover`                    |
+| `.widget-card-icon`        | Accent icon       | `--icon-size-lg`, `color: --accent`                          |
 
 ### Buttons
 
@@ -662,25 +665,25 @@ The default button is a **secondary** (outlined) style:
 
 #### Button Variants
 
-| Class | Effect |
-|---|---|
-| `.widget-button-primary` | Filled with `--accent` background, `--accent-text` color |
-| `.widget-button-secondary` | Outlined with `--accent` border (default style) |
+| Class                      | Effect                                                   |
+| -------------------------- | -------------------------------------------------------- |
+| `.widget-button-primary`   | Filled with `--accent` background, `--accent-text` color |
+| `.widget-button-secondary` | Outlined with `--accent` border (default style)          |
 
 #### Button Sizes
 
-| Class | Padding | Font Size |
-|---|---|---|
-| (default) | `0.8rem 1.6rem` | `--font-size-sm` (14px) |
+| Class                   | Padding         | Font Size                 |
+| ----------------------- | --------------- | ------------------------- |
+| (default)               | `0.8rem 1.6rem` | `--font-size-sm` (14px)   |
 | `.widget-button-medium` | `1.2rem 2.4rem` | `--font-size-base` (16px) |
-| `.widget-button-large` | `1.6rem 3.2rem` | `--font-size-lg` (18px) |
-| `.widget-button-xlarge` | `2rem 4.8rem` | `--font-size-xl` (20px) |
+| `.widget-button-large`  | `1.6rem 3.2rem` | `--font-size-lg` (18px)   |
+| `.widget-button-xlarge` | `2rem 4.8rem`   | `--font-size-xl` (20px)   |
 
 #### Button Modifiers
 
-| Class | Effect |
-|---|---|
-| `.widget-button-full` | Full-width (`width: 100%`, centered text) |
+| Class                 | Effect                                                       |
+| --------------------- | ------------------------------------------------------------ |
+| `.widget-button-full` | Full-width (`width: 100%`, centered text)                    |
 | `.widget-button-icon` | Icon inside button (`1.6rem` square, `stroke: currentColor`) |
 
 #### Button Container
@@ -690,7 +693,7 @@ The default button is a **secondary** (outlined) style:
 ### Forms
 
 | Class | Purpose | Key Styles |
-|---|---|---|
+| --- | --- | --- |
 | `.form-group` | Vertical field container | `flex column`, `gap: --space-xs` |
 | `.form-label` | Field label | `font-size: sm`, `color: --text-content` |
 | `.form-input` | Text input | Full width, `padding: sm md`, `border: thin`, focus: `border-color: --text-heading` |
@@ -704,11 +707,11 @@ Legacy aliases `.widget-label` and `.widget-input` also exist for backwards comp
 
 ### Icons
 
-| Class | Size Token | Dimensions |
-|---|---|---|
-| `.widget-icon` | `--icon-size-lg` | 32px |
-| `.widget-icon-small` | `--icon-size-sm` | 20px |
-| `.widget-icon-large` | `--icon-size-xl` | 48px |
+| Class                | Size Token       | Dimensions |
+| -------------------- | ---------------- | ---------- |
+| `.widget-icon`       | `--icon-size-lg` | 32px       |
+| `.widget-icon-small` | `--icon-size-sm` | 20px       |
+| `.widget-icon-large` | `--icon-size-xl` | 48px       |
 
 All icons use `stroke: currentColor` for color inheritance.
 
@@ -750,12 +753,14 @@ When used, the `--widget-bg-*` and `--widget-overlay-*` variables are set inline
 The header is a global widget with responsive behavior:
 
 **Mobile (< 990px):**
+
 - Slide-out navigation panel from the right (`.header-nav`)
 - Hamburger toggle button (`.menu-toggle`)
 - Mobile CTA button visible
 - Contact info hidden (shown inside slide-out panel via `.header-contact-mobile`)
 
 **Desktop (990px+):**
+
 - Horizontal inline navigation
 - Dropdown submenus on hover
 - Desktop CTA button visible
@@ -763,10 +768,10 @@ The header is a global widget with responsive behavior:
 
 #### Header Modifiers
 
-| Class | Effect |
-|---|---|
-| `.header-sticky` | `position: sticky; top: 0; z-index: 999;` with `--bg-primary` background |
-| `.header-scrolled` | Adds `box-shadow: 0 2px 8px rgba(0,0,0,0.1)` — applied via JS on scroll |
+| Class              | Effect                                                                   |
+| ------------------ | ------------------------------------------------------------------------ |
+| `.header-sticky`   | `position: sticky; top: 0; z-index: 999;` with `--bg-primary` background |
+| `.header-scrolled` | Adds `box-shadow: 0 2px 8px rgba(0,0,0,0.1)` — applied via JS on scroll  |
 
 #### Navigation Structure
 
@@ -794,7 +799,7 @@ The header is a global widget with responsive behavior:
 #### Submenu Behavior
 
 | Viewport | Behavior |
-|---|---|
+| --- | --- |
 | Mobile | Accordion-style expand/collapse via `.submenu-open` class on `.nav-item` and `.nav-submenu`. Uses `max-height` transition. |
 | Desktop | Hover-triggered dropdown via `opacity`/`visibility`/`transform` transition. Submenus positioned absolutely. Third-level menus open to the side. `.submenu-flip` class flips direction when menus would overflow the viewport. |
 
@@ -834,19 +839,19 @@ Adds vertical spacing between adjacent sibling elements within a container:
 
 For displaying lists of features or benefits:
 
-| Class | Purpose |
-|---|---|
-| `.features-list` | Container — flex column, `gap: --space-xs`, resets list styles |
-| `.feature-item` | Row — flex, `gap: --space-xs`, `color: --text-content` |
-| `.feature-icon` | Icon wrapper — `flex-shrink: 0`, `color: --text-content` |
-| `.feature-icon-svg` | Icon SVG — `1em` square |
+| Class               | Purpose                                                        |
+| ------------------- | -------------------------------------------------------------- |
+| `.features-list`    | Container — flex column, `gap: --space-xs`, resets list styles |
+| `.feature-item`     | Row — flex, `gap: --space-xs`, `color: --text-content`         |
+| `.feature-icon`     | Icon wrapper — `flex-shrink: 0`, `color: --text-content`       |
+| `.feature-icon-svg` | Icon SVG — `1em` square                                        |
 
 ### Accessibility Helpers
 
-| Class | Purpose |
-|---|---|
-| `.visually-hidden` | Hides element visually but keeps it accessible to screen readers (1px clip rect) |
-| `.skip-link` | Hidden by default, becomes visible on focus — positioned absolute with z-index 9999 |
+| Class              | Purpose                                                                             |
+| ------------------ | ----------------------------------------------------------------------------------- |
+| `.visually-hidden` | Hides element visually but keeps it accessible to screen readers (1px clip rect)    |
+| `.skip-link`       | Hidden by default, becomes visible on focus — positioned absolute with z-index 9999 |
 
 ---
 
@@ -861,28 +866,28 @@ The reveal system animates elements into view as the user scrolls. It is **opt-i
 Add `.reveal` and a direction class to any element:
 
 ```html
-<div class="reveal reveal-up" style="--reveal-delay: 2">
-  Content appears from below with a 0.2s delay
-</div>
+<div class="reveal reveal-up" style="--reveal-delay: 2">Content appears from below with a 0.2s delay</div>
 ```
 
 ### Direction Variants
 
-| Class | Starting Transform |
-|---|---|
-| `.reveal-up` | `translateY(2rem)` — slides up from below |
-| `.reveal-down` | `translateY(-2rem)` — slides down from above |
-| `.reveal-left` | `translateX(2rem)` — slides in from right |
-| `.reveal-right` | `translateX(-2rem)` — slides in from left |
-| `.reveal-scale` | `scale(0.95)` — scales up |
-| `.reveal-fade` | (no transform) — fade only |
+| Class           | Starting Transform                           |
+| --------------- | -------------------------------------------- |
+| `.reveal-up`    | `translateY(2rem)` — slides up from below    |
+| `.reveal-down`  | `translateY(-2rem)` — slides down from above |
+| `.reveal-left`  | `translateX(2rem)` — slides in from right    |
+| `.reveal-right` | `translateX(-2rem)` — slides in from left    |
+| `.reveal-scale` | `scale(0.95)` — scales up                    |
+| `.reveal-fade`  | (no transform) — fade only                   |
 
 ### Hidden State (`.reveal`)
 
 ```css
 .reveal {
   opacity: 0;
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
   transition-delay: calc(var(--reveal-delay, 0) * 0.1s);
 }
 ```
@@ -920,25 +925,25 @@ Respects `prefers-reduced-motion: reduce` — all reveal elements become immedia
 
 The theme uses three breakpoints:
 
-| Breakpoint | Width | Purpose |
-|---|---|---|
-| Mobile | `< 750px` | Single column, mobile navigation |
-| Tablet | `750px+` | Two-column grids, increased spacing |
-| Desktop | `990px+` | Full grid columns, desktop navigation, max spacing |
+| Breakpoint | Width     | Purpose                                            |
+| ---------- | --------- | -------------------------------------------------- |
+| Mobile     | `< 750px` | Single column, mobile navigation                   |
+| Tablet     | `750px+`  | Two-column grids, increased spacing                |
+| Desktop    | `990px+`  | Full grid columns, desktop navigation, max spacing |
 
 An additional breakpoint at `1200px` exists in the documentation but is not used in Arch's `base.css`.
 
 ### Key Responsive Behaviors
 
-| Element | Mobile | Tablet (750px+) | Desktop (990px+) |
-|---|---|---|---|
-| Grid columns | 1 | 2 | `var(--grid-cols-desktop, 3)` |
-| Section padding | 64px | 80px | 96px |
-| Card padding | 24px | 32px | 40px |
-| Card title size | 18px | 18px | 20px |
-| Navigation | Slide-out panel | Slide-out panel | Horizontal dropdown |
-| Header contact | Hidden | Hidden | Visible |
-| Header CTA | Mobile CTA | Mobile CTA | Desktop CTA |
+| Element         | Mobile          | Tablet (750px+) | Desktop (990px+)              |
+| --------------- | --------------- | --------------- | ----------------------------- |
+| Grid columns    | 1               | 2               | `var(--grid-cols-desktop, 3)` |
+| Section padding | 64px            | 80px            | 96px                          |
+| Card padding    | 24px            | 32px            | 40px                          |
+| Card title size | 18px            | 18px            | 20px                          |
+| Navigation      | Slide-out panel | Slide-out panel | Horizontal dropdown           |
+| Header contact  | Hidden          | Hidden          | Visible                       |
+| Header CTA      | Mobile CTA      | Mobile CTA      | Desktop CTA                   |
 
 ---
 
@@ -971,17 +976,17 @@ The `{% theme_settings %}` Liquid tag reads all global settings, and for each on
 
 ```html
 <style id="theme-settings-styles">
-:root {
-  --colors-standard_bg_primary: #ffffff;
-  --colors-standard_accent: #DE1877;
-  --colors-highlight_bg_primary: #233c54;
-  --typography-heading_font-family: "Fraunces", serif;
-  --typography-heading_font-weight: 600;
-  --typography-body_font-family: "Inter", sans-serif;
-  --typography-body_font-weight: 400;
-  --typography-body_font_bold-weight: 700;
-  /* ... all 18 colors + typography variables */
-}
+  :root {
+    --colors-standard_bg_primary: #ffffff;
+    --colors-standard_accent: #de1877;
+    --colors-highlight_bg_primary: #233c54;
+    --typography-heading_font-family: "Fraunces", serif;
+    --typography-heading_font-weight: 600;
+    --typography-body_font-family: "Inter", sans-serif;
+    --typography-body_font-weight: 400;
+    --typography-body_font_bold-weight: 700;
+    /* ... all 18 colors + typography variables */
+  }
 </style>
 ```
 
@@ -1003,12 +1008,12 @@ body {
 
 ### Variable Naming Convention
 
-| Layer | Pattern | Example |
-|---|---|---|
-| Theme settings (injected) | `--{category}-{id}` | `--colors-standard_accent` |
-| Design tokens (base.css) | `--{semantic-name}` | `--accent`, `--text-heading` |
-| Component tokens | `--widget-{property}` | `--widget-bg-color` |
-| Grid tokens | `--grid-{property}` | `--grid-cols-desktop` |
+| Layer                     | Pattern               | Example                      |
+| ------------------------- | --------------------- | ---------------------------- |
+| Theme settings (injected) | `--{category}-{id}`   | `--colors-standard_accent`   |
+| Design tokens (base.css)  | `--{semantic-name}`   | `--accent`, `--text-heading` |
+| Component tokens          | `--widget-{property}` | `--widget-bg-color`          |
+| Grid tokens               | `--grid-{property}`   | `--grid-cols-desktop`        |
 
 ---
 
@@ -1114,13 +1119,4 @@ Apply `.reveal` + direction class to elements, with staggered delays using `--re
 
 The Arch theme ships with 43 widgets organized by purpose:
 
-**Heroes & Banners**: banner, slideshow, split-hero, image-callout
-**Content**: rich-text, image-text, features-split, content-switcher
-**Cards & Grids**: card-grid, icon-card-grid, numbered-cards, bento-grid, profile-grid, project-showcase
-**Data & Lists**: accordion, comparison-table, icon-list, key-figures, pricing, priced-list, schedule-table, job-listing, event-list
-**Media**: image, gallery, masonry-gallery, video, video-embed, comparison-slider, image-hotspots, image-tabs
-**Social & Trust**: testimonials, testimonial-hero, logo-cloud, trust-bar, social-icons
-**Interactive**: countdown, map, embed, podcast-player
-**Forms**: contact-form, newsletter
-**Timeline**: timeline
-**Global**: header (global), footer (global)
+**Heroes & Banners**: banner, slideshow, split-hero, image-callout **Content**: rich-text, image-text, features-split, content-switcher **Cards & Grids**: card-grid, icon-card-grid, numbered-cards, bento-grid, profile-grid, project-showcase **Data & Lists**: accordion, comparison-table, icon-list, key-figures, pricing, priced-list, schedule-table, job-listing, event-list **Media**: image, gallery, masonry-gallery, video, video-embed, comparison-slider, image-hotspots, image-tabs **Social & Trust**: testimonials, testimonial-hero, logo-cloud, trust-bar, social-icons **Interactive**: countdown, map, embed, podcast-player **Forms**: contact-form, newsletter **Timeline**: timeline **Global**: header (global), footer (global)

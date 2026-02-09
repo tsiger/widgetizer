@@ -175,7 +175,7 @@ describe("sanitizeRichText", () => {
   });
 
   it("preserves nested allowed tags", () => {
-    const input = "<ul><li><strong>Bold item</strong> with <a href=\"/about\">link</a></li></ul>";
+    const input = '<ul><li><strong>Bold item</strong> with <a href="/about">link</a></li></ul>';
     assert.equal(sanitizeRichText(input), input);
   });
 });
@@ -349,12 +349,12 @@ describe("sanitizeWidgetData — richtext in settings", () => {
     const data = {
       settings: {
         body: "<p>Content</p>",
-        heading: '<img src=x onerror=alert(1)>',
+        heading: "<img src=x onerror=alert(1)>",
       },
     };
     sanitizeWidgetData(data, schema);
     // text fields are NOT sanitized here — LiquidJS autoescape handles them
-    assert.equal(data.settings.heading, '<img src=x onerror=alert(1)>');
+    assert.equal(data.settings.heading, "<img src=x onerror=alert(1)>");
   });
 
   it("leaves code type settings untouched (intentionally raw)", () => {
@@ -420,7 +420,7 @@ describe("sanitizeWidgetData — block settings", () => {
         block_1: {
           type: "text_block",
           settings: {
-            content: '<p>Safe</p><script>evil()</script>',
+            content: "<p>Safe</p><script>evil()</script>",
             label: "My Label",
           },
         },
@@ -576,9 +576,9 @@ describe("sanitizeWidgetData — schema edge cases", () => {
     const schema = {
       settings: [
         { id: "body", type: "richtext" },
-        { id: "noType" },               // missing type
-        { type: "text" },               // missing id
-        {},                             // both missing
+        { id: "noType" }, // missing type
+        { type: "text" }, // missing id
+        {}, // both missing
       ],
       blocks: [],
     };

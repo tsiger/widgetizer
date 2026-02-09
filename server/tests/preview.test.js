@@ -34,19 +34,11 @@ console.log = () => {};
 console.warn = () => {};
 console.error = () => {};
 
-const {
-  getProjectDir,
-  getProjectPagesDir,
-  getProjectMediaJsonPath,
-} = await import("../config.js");
+const { getProjectDir, getProjectPagesDir, getProjectMediaJsonPath } = await import("../config.js");
 
 const { writeProjectsFile } = await import("../controllers/projectController.js");
 
-const {
-  getGlobalWidgets,
-  saveGlobalWidget,
-  serveAsset,
-} = await import("../controllers/previewController.js");
+const { getGlobalWidgets, saveGlobalWidget, serveAsset } = await import("../controllers/previewController.js");
 
 // ============================================================================
 // Test constants
@@ -319,7 +311,10 @@ describe("serveAsset", () => {
     await fs.writeFile(path.join(projectDir, "assets", "css", "main.css"), "body { color: red; }");
     await fs.writeFile(path.join(projectDir, "assets", "js", "app.js"), "console.log('hello');");
     await fs.writeFile(path.join(projectDir, "assets", "images", "icon.png"), "fake-png-data");
-    await fs.writeFile(path.join(projectDir, "assets", "images", "logo.svg"), '<svg xmlns="http://www.w3.org/2000/svg"></svg>');
+    await fs.writeFile(
+      path.join(projectDir, "assets", "images", "logo.svg"),
+      '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
+    );
     await fs.writeFile(path.join(projectDir, "assets", "fonts", "custom.woff2"), "fake-font-data");
 
     // Create a sensitive file outside assets to verify traversal protection

@@ -62,11 +62,11 @@ dist-electron/
 
 The Electron app stores user data separately from the application bundle:
 
-| Path | Location |
-|------|----------|
+| Path      | Location                                                |
+| --------- | ------------------------------------------------------- |
 | User data | `~/Library/Application Support/widgetizer/data` (macOS) |
-| Logs | `~/Library/Application Support/widgetizer/logs` |
-| Themes | Bundled inside the app |
+| Logs      | `~/Library/Application Support/widgetizer/logs`         |
+| Themes    | Bundled inside the app                                  |
 
 Access these from the app menu: **File → Open Data Folder** or **File → Open Logs Folder**.
 
@@ -99,11 +99,11 @@ iconutil -c icns icon.iconset -o icon.icns
 
 ### Sharing with others
 
-| Recipient's Mac | File to share |
-|-----------------|---------------|
+| Recipient's Mac             | File to share                    |
+| --------------------------- | -------------------------------- |
 | Apple Silicon (M1/M2/M3/M4) | `Widgetizer-x.x.x-arm64-mac.zip` |
-| Intel Mac | `Widgetizer-x.x.x-mac.zip` |
-| Windows | `Widgetizer-x.x.x-win.zip` |
+| Intel Mac                   | `Widgetizer-x.x.x-mac.zip`       |
+| Windows                     | `Widgetizer-x.x.x-win.zip`       |
 
 ### First-run instructions for recipients
 
@@ -113,6 +113,7 @@ iconutil -c icns icon.iconset -o icon.icns
 4. If Gatekeeper warning appears: right-click → Open → Open
 
 Or run in Terminal:
+
 ```bash
 xattr -cr /path/to/Widgetizer.app
 ```
@@ -124,11 +125,13 @@ xattr -cr /path/to/Widgetizer.app
 Unsigned apps trigger Gatekeeper warnings. For MVP/internal testing, this is acceptable with the workaround above.
 
 For public distribution, you need:
+
 - Apple Developer Program ($99/year)
 - Developer ID Application certificate
 - Notarization
 
 Update `package.json` build config:
+
 ```json
 "mac": {
   "hardenedRuntime": true,

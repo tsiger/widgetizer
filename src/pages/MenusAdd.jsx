@@ -26,7 +26,7 @@ export default function MenusAdd() {
     try {
       const newMenu = await createMenu(formData);
       showToast(t("menusAdd.toasts.createSuccess", { name: formData.name }), "success");
-      
+
       // Redirect to structure editor after successful creation
       skipNavigationGuardRef.current = true;
       navigate(`/menus/${newMenu.id}/structure`);
@@ -40,12 +40,14 @@ export default function MenusAdd() {
   };
 
   return (
-    <PageLayout title={
-      <span className="flex items-center gap-2">
-        {t("menusAdd.title")}
-        {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-      </span>
-    }>
+    <PageLayout
+      title={
+        <span className="flex items-center gap-2">
+          {t("menusAdd.title")}
+          {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
+        </span>
+      }
+    >
       <MenuForm
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}

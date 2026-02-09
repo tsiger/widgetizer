@@ -54,28 +54,30 @@ Consider what content blocks the industry needs:
 
 Colors communicate before words are read:
 
-| Feeling | Color Families |
-|---------|----------------|
-| Trust, stability, professionalism | Blues, deep navies, slate |
-| Warmth, comfort, approachability | Warm neutrals, earth tones, soft oranges |
-| Luxury, prestige, elegance | Gold, deep purples, black, rich browns |
-| Energy, urgency, passion | Reds, bright oranges |
-| Growth, health, nature | Greens, teals |
-| Innovation, creativity | Purples, magentas, electric blues |
-| Cleanliness, simplicity | Whites, light grays, minimal palettes |
-| Sophistication, boldness | High contrast, black + single accent |
+| Feeling                           | Color Families                           |
+| --------------------------------- | ---------------------------------------- |
+| Trust, stability, professionalism | Blues, deep navies, slate                |
+| Warmth, comfort, approachability  | Warm neutrals, earth tones, soft oranges |
+| Luxury, prestige, elegance        | Gold, deep purples, black, rich browns   |
+| Energy, urgency, passion          | Reds, bright oranges                     |
+| Growth, health, nature            | Greens, teals                            |
+| Innovation, creativity            | Purples, magentas, electric blues        |
+| Cleanliness, simplicity           | Whites, light grays, minimal palettes    |
+| Sophistication, boldness          | High contrast, black + single accent     |
 
 ### Building a Cohesive Palette
 
 The Widgetizer color system requires two schemes:
 
 **Standard Scheme (Light):**
+
 - Background colors should provide enough contrast for readability
 - Text colors must be accessible (WCAG AA minimum)
 - Accent color is the primary brand/action color
 - Use accent sparingly for CTAs and key elements
 
 **Highlight Scheme (Dark):**
+
 - Inverted for sections that need visual separation
 - Often used for heroes, CTAs, footers
 - Accent may shift to a lighter/brighter variant for visibility
@@ -111,14 +113,14 @@ standard_rating_star    → Star ratings (typically warm/gold)
 
 Typography sets the tone:
 
-| Character | Font Types |
-|-----------|------------|
-| Traditional, authoritative, established | Serif fonts (Libre Baskerville, Playfair Display, Lora) |
-| Modern, clean, professional | Geometric sans (Inter, DM Sans, Outfit) |
-| Friendly, approachable, warm | Rounded sans (Nunito, Poppins, Quicksand) |
-| Technical, precise, digital | Monospace or technical sans (Space Grotesk, IBM Plex) |
-| Elegant, refined, luxury | High-contrast serif (Playfair Display, Cormorant Garamond) |
-| Bold, impactful, contemporary | Display fonts (Bebas Neue, Oswald, Anton) |
+| Character                               | Font Types                                                 |
+| --------------------------------------- | ---------------------------------------------------------- |
+| Traditional, authoritative, established | Serif fonts (Libre Baskerville, Playfair Display, Lora)    |
+| Modern, clean, professional             | Geometric sans (Inter, DM Sans, Outfit)                    |
+| Friendly, approachable, warm            | Rounded sans (Nunito, Poppins, Quicksand)                  |
+| Technical, precise, digital             | Monospace or technical sans (Space Grotesk, IBM Plex)      |
+| Elegant, refined, luxury                | High-contrast serif (Playfair Display, Cormorant Garamond) |
+| Bold, impactful, contemporary           | Display fonts (Bebas Neue, Oswald, Anton)                  |
 
 ### Font Pairing Principles
 
@@ -130,6 +132,7 @@ Typography sets the tone:
 ### Available Fonts
 
 All fonts are defined in `src/core/config/fonts.json`. Each entry includes:
+
 - `name` - Display name
 - `stack` - CSS font-family value
 - `isGoogleFont` - Whether it loads from Google/Bunny Fonts
@@ -157,6 +160,7 @@ A typical page flows:
 ### Section Rhythm
 
 Vary the visual rhythm to maintain interest:
+
 - Alternate `color_scheme: "standard"` and `color_scheme: "highlight"`
 - Alternate image positions (left/right) in image-text widgets
 - Vary section density (full-width vs. contained)
@@ -175,45 +179,51 @@ The Widgetizer design system uses consistent spacing tokens. Widgets automatical
 These are all widgets available in the `arch` theme. Each widget serves specific purposes:
 
 #### Heroes & Banners
-| Widget | Purpose | Key Features |
-|--------|---------|--------------|
-| `banner` | Flexible hero/CTA sections | Text blocks, buttons, background options |
-| `slideshow` | Multiple rotating messages | Auto-play, multiple slides, transitions |
-| `split-hero` | Side-by-side hero layout | Image + content columns |
-| `testimonial-hero` | Lead with social proof | Featured testimonial as hero |
+
+| Widget             | Purpose                    | Key Features                             |
+| ------------------ | -------------------------- | ---------------------------------------- |
+| `banner`           | Flexible hero/CTA sections | Text blocks, buttons, background options |
+| `slideshow`        | Multiple rotating messages | Auto-play, multiple slides, transitions  |
+| `split-hero`       | Side-by-side hero layout   | Image + content columns                  |
+| `testimonial-hero` | Lead with social proof     | Featured testimonial as hero             |
 
 #### Content Sections
-| Widget | Purpose | Key Features |
-|--------|---------|--------------|
-| `image-text` | Image alongside text content | Alternating image position, feature lists |
-| `image-callout` | Feature highlight with image | Similar to image-text with callout styling |
-| `features-split` | Two-column feature layout | Side-by-side comparison |
-| `rich-text` | Long-form text content | Markdown-style formatting |
-| `bento-grid` | Modern grid layout | Flexible grid cells |
+
+| Widget           | Purpose                      | Key Features                               |
+| ---------------- | ---------------------------- | ------------------------------------------ |
+| `image-text`     | Image alongside text content | Alternating image position, feature lists  |
+| `image-callout`  | Feature highlight with image | Similar to image-text with callout styling |
+| `features-split` | Two-column feature layout    | Side-by-side comparison                    |
+| `rich-text`      | Long-form text content       | Markdown-style formatting                  |
+| `bento-grid`     | Modern grid layout           | Flexible grid cells                        |
 
 #### Cards & Grids
-| Widget | Purpose | Key Features |
-|--------|---------|--------------|
-| `card-grid` | Grid of content cards | Images, titles, descriptions, links |
-| `icon-card-grid` | Cards with icons | Icon + title + description |
-| `numbered-cards` | Sequential/numbered items | Numbers, steps, rankings |
-| `icon-list` | List items with icons | Compact feature lists |
+
+| Widget           | Purpose                   | Key Features                        |
+| ---------------- | ------------------------- | ----------------------------------- |
+| `card-grid`      | Grid of content cards     | Images, titles, descriptions, links |
+| `icon-card-grid` | Cards with icons          | Icon + title + description          |
+| `numbered-cards` | Sequential/numbered items | Numbers, steps, rankings            |
+| `icon-list`      | List items with icons     | Compact feature lists               |
 
 #### People & Teams
-| Widget | Purpose | Key Features |
-|--------|---------|--------------|
-| `profile-grid` | Team member profiles | Photo, name, role, bio |
-| `testimonials` | Customer reviews | Quote, name, title, rating |
+
+| Widget         | Purpose              | Key Features               |
+| -------------- | -------------------- | -------------------------- |
+| `profile-grid` | Team member profiles | Photo, name, role, bio     |
+| `testimonials` | Customer reviews     | Quote, name, title, rating |
 
 #### Data & Comparison
-| Widget | Purpose | Key Features |
-|--------|---------|--------------|
-| `key-figures` | Statistics display | Blocks: `figure` (value, label, description) |
-| `comparison-table` | Feature comparison | See detailed structure below |
-| `pricing` | Pricing tiers | Price, features, CTA |
-| `priced-list` | Menu/price list | Blocks: `item` (title, description, price) |
+
+| Widget             | Purpose            | Key Features                                 |
+| ------------------ | ------------------ | -------------------------------------------- |
+| `key-figures`      | Statistics display | Blocks: `figure` (value, label, description) |
+| `comparison-table` | Feature comparison | See detailed structure below                 |
+| `pricing`          | Pricing tiers      | Price, features, CTA                         |
+| `priced-list`      | Menu/price list    | Blocks: `item` (title, description, price)   |
 
 ##### comparison-table Widget Structure (IMPORTANT)
+
 This widget uses TWO block types that work together:
 
 1. **`column` blocks** - Define the columns/plans being compared
@@ -226,6 +236,7 @@ This widget uses TWO block types that work together:
    - `values`: One value per line, matching column order (use ✓, ✗, or custom text)
 
 Example structure:
+
 ```json
 "blocks": {
   "col_1": { "type": "column", "settings": { "name": "Basic", "featured": false } },
@@ -239,52 +250,58 @@ Example structure:
 ```
 
 #### Timeline & Process
-| Widget | Purpose | Key Features |
-|--------|---------|--------------|
-| `timeline` | Chronological events | Date, title, description |
-| `countdown` | Event countdown | Target date, time units |
+
+| Widget           | Purpose                | Key Features                                    |
+| ---------------- | ---------------------- | ----------------------------------------------- |
+| `timeline`       | Chronological events   | Date, title, description                        |
+| `countdown`      | Event countdown        | Target date, time units                         |
 | `schedule-table` | Hours/schedule display | Blocks: `day` (day name, hours, closed boolean) |
 
 #### Media
-| Widget | Purpose | Key Features |
-|--------|---------|--------------|
-| `gallery` | Image grid | Lightbox, captions |
-| `masonry-gallery` | Pinterest-style gallery | Variable height images |
-| `image` | Single image | Simple image display |
-| `video` | Self-hosted video | Controls, autoplay |
-| `video-embed` | YouTube/Vimeo | Responsive embed |
-| `image-hotspots` | Interactive image | Clickable hotspots |
-| `image-tabs` | Tabbed image content | Tab navigation |
-| `comparison-slider` | Before/after slider | Draggable comparison |
+
+| Widget              | Purpose                 | Key Features           |
+| ------------------- | ----------------------- | ---------------------- |
+| `gallery`           | Image grid              | Lightbox, captions     |
+| `masonry-gallery`   | Pinterest-style gallery | Variable height images |
+| `image`             | Single image            | Simple image display   |
+| `video`             | Self-hosted video       | Controls, autoplay     |
+| `video-embed`       | YouTube/Vimeo           | Responsive embed       |
+| `image-hotspots`    | Interactive image       | Clickable hotspots     |
+| `image-tabs`        | Tabbed image content    | Tab navigation         |
+| `comparison-slider` | Before/after slider     | Draggable comparison   |
 
 #### Navigation & Organization
-| Widget | Purpose | Key Features |
-|--------|---------|--------------|
-| `accordion` | Expandable content | FAQ, collapsible sections |
-| `content-switcher` | Tabbed content | Tab-based navigation |
+
+| Widget             | Purpose            | Key Features              |
+| ------------------ | ------------------ | ------------------------- |
+| `accordion`        | Expandable content | FAQ, collapsible sections |
+| `content-switcher` | Tabbed content     | Tab-based navigation      |
 
 #### Forms & Contact
-| Widget | Purpose | Key Features |
-|--------|---------|--------------|
-| `contact-form` | Lead capture | Configurable fields |
-| `newsletter` | Email signup | Simple subscription |
-| `map` | Location display | Address, embedded map |
+
+| Widget         | Purpose          | Key Features          |
+| -------------- | ---------------- | --------------------- |
+| `contact-form` | Lead capture     | Configurable fields   |
+| `newsletter`   | Email signup     | Simple subscription   |
+| `map`          | Location display | Address, embedded map |
 
 #### Trust & Social
-| Widget | Purpose | Key Features |
-|--------|---------|--------------|
-| `logo-cloud` | Client/partner logos | Logo grid |
-| `trust-bar` | Trust indicators | Compact trust strip |
-| `social-icons` | Social media links | Icon links |
+
+| Widget         | Purpose              | Key Features        |
+| -------------- | -------------------- | ------------------- |
+| `logo-cloud`   | Client/partner logos | Logo grid           |
+| `trust-bar`    | Trust indicators     | Compact trust strip |
+| `social-icons` | Social media links   | Icon links          |
 
 #### Specialty
-| Widget | Purpose | Key Features |
-|--------|---------|--------------|
+
+| Widget             | Purpose           | Key Features               |
+| ------------------ | ----------------- | -------------------------- |
 | `project-showcase` | Portfolio display | Project cards with details |
-| `event-list` | Upcoming events | Date, title, details |
-| `job-listing` | Career postings | Job cards |
-| `podcast-player` | Audio content | Player interface |
-| `embed` | External content | iFrame embed |
+| `event-list`       | Upcoming events   | Date, title, details       |
+| `job-listing`      | Career postings   | Job cards                  |
+| `podcast-player`   | Audio content     | Player interface           |
+| `embed`            | External content  | iFrame embed               |
 
 ---
 
@@ -337,6 +354,7 @@ themes/{theme-name}/
 ### Color Settings (All Required)
 
 Standard scheme (prefix `standard_`):
+
 - `standard_bg_primary`, `standard_bg_secondary`
 - `standard_text_content`, `standard_text_heading`, `standard_text_muted`
 - `standard_border_color`
@@ -344,6 +362,7 @@ Standard scheme (prefix `standard_`):
 - `standard_rating_star`
 
 Highlight scheme (prefix `highlight_`):
+
 - Same 9 settings with `highlight_` prefix
 
 ### Typography Settings (Required)
@@ -448,6 +467,7 @@ Highlight scheme (prefix `highlight_`):
 ### Step 4: Content Creation
 
 For each page template:
+
 1. Select appropriate widgets for the content needs
 2. Write industry-appropriate copy
 3. Use realistic data (names, statistics, addresses)
@@ -457,6 +477,7 @@ For each page template:
 ### Step 5: Validation
 
 Verify:
+
 - All required files exist
 - `theme.json` has all 18 color settings
 - Typography settings reference valid fonts from `fonts.json`
@@ -543,7 +564,7 @@ When specifying fonts in `theme.json`, use the exact stack format from `fonts.js
 "stack": "\"Libre Baskerville\", serif"
 "stack": "\"Lora\", serif"
 
-// Sans-serif examples  
+// Sans-serif examples
 "stack": "\"Inter\", sans-serif"
 "stack": "\"DM Sans\", sans-serif"
 "stack": "\"Poppins\", sans-serif"

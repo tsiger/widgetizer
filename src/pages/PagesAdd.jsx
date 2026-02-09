@@ -28,13 +28,13 @@ export default function PagesAdd() {
     try {
       await createPage(formData);
       showToast(t("pagesAdd.toasts.createSuccess", { name: formData.name }), "success");
-      
+
       // Invalidate media cache since SEO images may have been set
       const activeProject = useProjectStore.getState().activeProject;
       if (activeProject) {
         invalidateMediaCache(activeProject.id);
       }
-      
+
       // Redirect to list after successful creation
       skipNavigationGuardRef.current = true;
       navigate("/pages");

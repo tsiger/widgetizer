@@ -10,7 +10,6 @@ At any given time, one project is marked as **active**. This is the project you'
 
 > **Important:** Your first project is automatically set as active when you create it.
 
-
 # Creating a New Project
 
 1. Click the **"New Project"** button
@@ -35,7 +34,6 @@ At any given time, one project is marked as **active**. This is the project you'
   - **Automatically creating `robots.txt`** with sitemap location when you export
   - If you're not sure yet, you can leave this empty and add it later.
 
-
 # Editing a Project
 
 1. Go to the **Projects** page
@@ -52,7 +50,6 @@ At any given time, one project is marked as **active**. This is the project you'
 - **Website Address**: The base URL for your site
 - **Theme**: Cannot be changed after creation
 
-
 # Setting the Active Project
 
 To switch which project you're working on:
@@ -65,7 +62,6 @@ The active project will have a pink "Active" badge and a filled star icon.
 
 > **Note:** You can only have one active project at a time. Setting a new project as active automatically deactivates the previous one.
 
-
 # Deleting a Project
 
 1. Go to the **Projects** page
@@ -75,10 +71,9 @@ The active project will have a pink "Active" badge and a filled star icon.
 
 ### Important Notes
 
--  **You cannot delete the active project**. If you want to delete it, first set another project as active.
--  **Deletion is permanent**. All pages, media, and settings for that project will be removed.
+- **You cannot delete the active project**. If you want to delete it, first set another project as active.
+- **Deletion is permanent**. All pages, media, and settings for that project will be removed.
 - Consider exporting your project as a backup before deleting it.
-
 
 # Other Project Actions
 
@@ -95,7 +90,6 @@ You can export any project as a ZIP file for backup or to transfer to another Wi
 ### Importing a Project
 
 To import a previously exported project, click **"Import Project"** and select the ZIP file. The imported project will appear in your projects list with a new name to avoid conflicts.
-
 
 # Theme Updates for Projects
 
@@ -117,10 +111,12 @@ When a theme author releases an update, projects using that theme can receive th
 ### What's Updated vs. Protected
 
 **Updated:**
+
 - Layout template, widgets, assets, snippets
 - Theme settings schema (new settings are added)
 
 **Protected (never changed):**
+
 - Your pages and content
 - Your media files
 - Your existing menus and templates

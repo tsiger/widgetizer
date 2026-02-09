@@ -31,7 +31,7 @@
       "description": "Text to display in the header logo",
       "default": "Arch"
     },
-        {
+    {
       "type": "header",
       "id": "contact_header",
       "label": "Contact Details"

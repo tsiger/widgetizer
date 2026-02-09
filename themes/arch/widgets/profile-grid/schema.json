@@ -1,12 +1,7 @@
 {
   "type": "profile-grid",
   "displayName": "Profile Grid",
-  "aliases": [
-    "team",
-    "members",
-    "staff",
-    "about us"
-  ],
+  "aliases": ["team", "members", "staff", "about us"],
   "settings": [
     {
       "type": "text",

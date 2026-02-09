@@ -26,10 +26,7 @@ export function isProjectResolutionError(error) {
 export function handleProjectResolutionError(res, error) {
   if (!isProjectResolutionError(error)) return false;
 
-  if (
-    error.code === PROJECT_ERROR_CODES.PROJECT_NOT_FOUND ||
-    error.code === PROJECT_ERROR_CODES.PROJECT_DIR_MISSING
-  ) {
+  if (error.code === PROJECT_ERROR_CODES.PROJECT_NOT_FOUND || error.code === PROJECT_ERROR_CODES.PROJECT_DIR_MISSING) {
     res.status(404).json({
       error: "Project not found",
       message: error.message,

@@ -62,7 +62,10 @@ async function getImageProcessingSettings(projectId) {
         }
       }
     } catch (error) {
-      console.warn(`[getImageProcessingSettings] Failed to load theme settings for project ${projectId}:`, error.message);
+      console.warn(
+        `[getImageProcessingSettings] Failed to load theme settings for project ${projectId}:`,
+        error.message,
+      );
       // Fallback to global settings on error
     }
   }
@@ -257,7 +260,9 @@ export async function writeMediaFile(projectId, data, retryCount = 0) {
       await fs.move(tempFilePath, mediaFilePath, { overwrite: true });
     } catch (error) {
       console.error(`[${new Date().toISOString()}] [writeMediaFile] Error during write operation:`, error);
-      console.error(`[${new Date().toISOString()}] [writeMediaFile] Error code: ${error.code}, syscall: ${error.syscall}`);
+      console.error(
+        `[${new Date().toISOString()}] [writeMediaFile] Error code: ${error.code}, syscall: ${error.syscall}`,
+      );
 
       // Clean up temp file if it exists
       try {
@@ -265,13 +270,18 @@ export async function writeMediaFile(projectId, data, retryCount = 0) {
           await fs.unlink(tempFilePath);
         }
       } catch (cleanupError) {
-        console.warn(`[${new Date().toISOString()}] [writeMediaFile] Failed to clean up temp file ${tempFilePath}:`, cleanupError.message);
+        console.warn(
+          `[${new Date().toISOString()}] [writeMediaFile] Failed to clean up temp file ${tempFilePath}:`,
+          cleanupError.message,
+        );
       }
 
       // Retry on transient file system errors
       if (retryCount < MAX_RETRIES && (error.code === "ENOENT" || error.code === "EPERM" || error.code === "EBUSY")) {
         const backoffMs = Math.pow(2, retryCount) * 100; // 100ms, 200ms, 400ms
-        console.warn(`[${new Date().toISOString()}] [writeMediaFile] Retrying after ${backoffMs}ms due to transient error: ${error.code}`);
+        console.warn(
+          `[${new Date().toISOString()}] [writeMediaFile] Retrying after ${backoffMs}ms due to transient error: ${error.code}`,
+        );
 
         // Release lock before retry
         writeLocks.delete(projectId);

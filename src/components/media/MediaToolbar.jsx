@@ -75,7 +75,7 @@ export default function MediaToolbar({
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        
+
         <select
           value={filterType}
           onChange={(e) => onFilterTypeChange(e.target.value)}

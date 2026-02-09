@@ -18,7 +18,11 @@ async function getMulterConfig() {
       },
       fileFilter: (req, file, cb) => {
         // Only accept ZIP files
-        if (file.mimetype === "application/zip" || file.mimetype === "application/x-zip-compressed" || file.originalname.endsWith(".zip")) {
+        if (
+          file.mimetype === "application/zip" ||
+          file.mimetype === "application/x-zip-compressed" ||
+          file.originalname.endsWith(".zip")
+        ) {
           cb(null, true);
         } else {
           cb(new Error("Only ZIP files are allowed"), false);
@@ -34,7 +38,11 @@ async function getMulterConfig() {
         fileSize: 500 * 1024 * 1024,
       },
       fileFilter: (req, file, cb) => {
-        if (file.mimetype === "application/zip" || file.mimetype === "application/x-zip-compressed" || file.originalname.endsWith(".zip")) {
+        if (
+          file.mimetype === "application/zip" ||
+          file.mimetype === "application/x-zip-compressed" ||
+          file.originalname.endsWith(".zip")
+        ) {
           cb(null, true);
         } else {
           cb(new Error("Only ZIP files are allowed"), false);
@@ -111,36 +119,41 @@ router.post(
 );
 
 // POST /api/projects/import - Import project from ZIP
-router.post("/import", async (req, res, next) => {
-  try {
-    const upload = await getMulterConfig();
-    // Multer middleware with error handling
-    upload.single("projectZip")(req, res, async (err) => {
-      if (err) {
-        // Handle multer errors (file size, file type, etc.)
-        if (err.code === "LIMIT_FILE_SIZE") {
-          try {
-            const settings = await readAppSettingsFile();
-            const maxSizeMB = settings.export?.maxImportSizeMB || 500;
-            return res.status(400).json({
-              error: `File size exceeds the maximum allowed size of ${maxSizeMB}MB. Please reduce the project size or increase the limit in Settings.`,
-            });
-          } catch {
-            return res.status(400).json({
-              error: "File size exceeds the maximum allowed size. Please reduce the project size or increase the limit in Settings.",
-            });
+router.post(
+  "/import",
+  async (req, res, next) => {
+    try {
+      const upload = await getMulterConfig();
+      // Multer middleware with error handling
+      upload.single("projectZip")(req, res, async (err) => {
+        if (err) {
+          // Handle multer errors (file size, file type, etc.)
+          if (err.code === "LIMIT_FILE_SIZE") {
+            try {
+              const settings = await readAppSettingsFile();
+              const maxSizeMB = settings.export?.maxImportSizeMB || 500;
+              return res.status(400).json({
+                error: `File size exceeds the maximum allowed size of ${maxSizeMB}MB. Please reduce the project size or increase the limit in Settings.`,
+              });
+            } catch {
+              return res.status(400).json({
+                error:
+                  "File size exceeds the maximum allowed size. Please reduce the project size or increase the limit in Settings.",
+              });
+            }
+          } else {
+            return res.status(400).json({ error: err.message || "File upload error" });
           }
         } else {
-          return res.status(400).json({ error: err.message || "File upload error" });
+          next();
         }
-      } else {
-        next();
-      }
-    });
-  } catch {
-    return res.status(500).json({ error: "Failed to configure file upload" });
-  }
-}, projectController.importProject);
+      });
+    } catch {
+      return res.status(500).json({ error: "Failed to configure file upload" });
+    }
+  },
+  projectController.importProject,
+);
 
 // ============================================================================
 // Theme Update Routes

@@ -106,12 +106,12 @@ export default function useMediaState() {
       filterType === "all"
         ? true
         : filterType === "image"
-        ? file.type.startsWith("image/")
-        : filterType === "video"
-        ? file.type.startsWith("video/")
-        : filterType === "audio"
-        ? file.type.startsWith("audio/")
-        : true;
+          ? file.type.startsWith("image/")
+          : filterType === "video"
+            ? file.type.startsWith("video/")
+            : filterType === "audio"
+              ? file.type.startsWith("audio/")
+              : true;
 
     return matchesSearch && matchesType;
   });

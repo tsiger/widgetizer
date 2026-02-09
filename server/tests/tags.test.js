@@ -394,7 +394,11 @@ describe("AssetTag", () => {
   });
 
   it("uses relative path in publish mode", async () => {
-    const result = await render('{% asset src: "base.css" %}', {}, { renderMode: "publish", projectId: "test-project" });
+    const result = await render(
+      '{% asset src: "base.css" %}',
+      {},
+      { renderMode: "publish", projectId: "test-project" },
+    );
     assert.match(result, /href="assets\/base\.css"/);
   });
 
@@ -440,7 +444,11 @@ describe("CustomHeadScriptsTag", () => {
 
 describe("CustomFooterScriptsTag", () => {
   it("outputs footer scripts", async () => {
-    const result = await render("{% custom_footer_scripts %}", {}, { themeSettingsRaw: fixtures.themeWithCustomScripts });
+    const result = await render(
+      "{% custom_footer_scripts %}",
+      {},
+      { themeSettingsRaw: fixtures.themeWithCustomScripts },
+    );
     assert.match(result, /console\.log\("footer"\)/);
   });
 
@@ -669,29 +677,49 @@ describe("YouTubeTag", () => {
 
 describe("PlaceholderImageTag", () => {
   it("generates img tag with landscape placeholder by default", async () => {
-    const result = await render("{% placeholder_image %}", {}, { renderMode: "preview", apiUrl: "http://localhost:3001" });
+    const result = await render(
+      "{% placeholder_image %}",
+      {},
+      { renderMode: "preview", apiUrl: "http://localhost:3001" },
+    );
     assert.match(result, /<img /);
     assert.match(result, /placeholder\.svg/);
     assert.match(result, /alt="Placeholder"/);
   });
 
   it("uses portrait placeholder when specified", async () => {
-    const result = await render('{% placeholder_image aspect: "portrait" %}', {}, { renderMode: "preview", apiUrl: "http://localhost:3001" });
+    const result = await render(
+      '{% placeholder_image aspect: "portrait" %}',
+      {},
+      { renderMode: "preview", apiUrl: "http://localhost:3001" },
+    );
     assert.match(result, /placeholder-portrait\.svg/);
   });
 
   it("uses square placeholder when specified", async () => {
-    const result = await render('{% placeholder_image aspect: "square" %}', {}, { renderMode: "preview", apiUrl: "http://localhost:3001" });
+    const result = await render(
+      '{% placeholder_image aspect: "square" %}',
+      {},
+      { renderMode: "preview", apiUrl: "http://localhost:3001" },
+    );
     assert.match(result, /placeholder-square\.svg/);
   });
 
   it("falls back to landscape for invalid aspect ratio", async () => {
-    const result = await render('{% placeholder_image aspect: "invalid" %}', {}, { renderMode: "preview", apiUrl: "http://localhost:3001" });
+    const result = await render(
+      '{% placeholder_image aspect: "invalid" %}',
+      {},
+      { renderMode: "preview", apiUrl: "http://localhost:3001" },
+    );
     assert.match(result, /placeholder\.svg/, "should fall back to landscape placeholder");
   });
 
   it("returns URL only when output is 'url'", async () => {
-    const result = await render('{% placeholder_image output: "url" %}', {}, { renderMode: "preview", apiUrl: "http://localhost:3001" });
+    const result = await render(
+      '{% placeholder_image output: "url" %}',
+      {},
+      { renderMode: "preview", apiUrl: "http://localhost:3001" },
+    );
     assert.doesNotMatch(result, /<img/, "should not produce img tag in url mode");
     assert.match(result, /placeholder\.svg/);
   });

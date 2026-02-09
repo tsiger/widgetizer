@@ -29,18 +29,10 @@ process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
-const { getProjectsFilePath, getProjectMenusDir, getMenuPath, getProjectDir } =
-  await import("../config.js");
+const { getProjectsFilePath, getProjectMenusDir, getMenuPath, getProjectDir } = await import("../config.js");
 
-const {
-  createMenu,
-  getMenu,
-  getAllMenus,
-  getMenuById,
-  updateMenu,
-  deleteMenu,
-  duplicateMenu,
-} = await import("../controllers/menuController.js");
+const { createMenu, getMenu, getAllMenus, getMenuById, updateMenu, deleteMenu, duplicateMenu } =
+  await import("../controllers/menuController.js");
 
 const { writeProjectsFile } = await import("../controllers/projectController.js");
 
@@ -597,10 +589,7 @@ describe("Edge cases", () => {
     // Temporarily clear projects
     const projectsPath = getProjectsFilePath();
     const backup = await fs.readFile(projectsPath, "utf8");
-    await fs.writeFile(
-      projectsPath,
-      JSON.stringify({ projects: [], activeProjectId: null }),
-    );
+    await fs.writeFile(projectsPath, JSON.stringify({ projects: [], activeProjectId: null }));
 
     const res = await createTestMenu("Orphan Menu");
     assert.equal(res._status, 404);
@@ -613,10 +602,7 @@ describe("Edge cases", () => {
   it("returns 404 when no active project exists (getAllMenus)", async () => {
     const projectsPath = getProjectsFilePath();
     const backup = await fs.readFile(projectsPath, "utf8");
-    await fs.writeFile(
-      projectsPath,
-      JSON.stringify({ projects: [], activeProjectId: null }),
-    );
+    await fs.writeFile(projectsPath, JSON.stringify({ projects: [], activeProjectId: null }));
 
     const res = await callController(getAllMenus);
     assert.equal(res._status, 404);
@@ -628,10 +614,7 @@ describe("Edge cases", () => {
   it("returns 404 when no active project exists (deleteMenu)", async () => {
     const projectsPath = getProjectsFilePath();
     const backup = await fs.readFile(projectsPath, "utf8");
-    await fs.writeFile(
-      projectsPath,
-      JSON.stringify({ projects: [], activeProjectId: null }),
-    );
+    await fs.writeFile(projectsPath, JSON.stringify({ projects: [], activeProjectId: null }));
 
     const res = await callController(deleteMenu, { params: { id: "any" } });
     assert.equal(res._status, 404);
