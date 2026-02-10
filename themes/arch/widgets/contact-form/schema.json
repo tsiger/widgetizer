@@ -25,10 +25,17 @@
       "label": "Form"
     },
     {
-      "type": "textarea",
-      "id": "coming_soon_message",
-      "label": "Coming Soon",
-      "default": "Contact form functionality is coming soon."
+      "type": "text",
+      "id": "form_token",
+      "label": "Form Token",
+      "description": "Paste your form token from Widgetizer Publisher (starts with ft_)"
+    },
+    {
+      "type": "text",
+      "id": "form_name",
+      "label": "Form Name",
+      "default": "Contact Form",
+      "description": "Label to identify this form in your submissions dashboard"
     },
     {
       "type": "header",

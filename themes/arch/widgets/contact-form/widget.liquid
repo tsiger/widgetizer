@@ -52,6 +52,24 @@
         }
       }
 
+      & .form-status {
+        padding: var(--space-md) var(--space-lg);
+        border-radius: 8px;
+        font-size: var(--font-size-base);
+      }
+
+      & .form-status-success {
+        background: var(--bg-success, #f0fdf4);
+        color: var(--text-success, #166534);
+        border: 1px solid var(--border-success, #bbf7d0);
+      }
+
+      & .form-status-error {
+        background: var(--bg-error, #fef2f2);
+        color: var(--text-error, #991b1b);
+        border: 1px solid var(--border-error, #fecaca);
+      }
+
       @media (min-width: 750px) {
         & .contact-content:not(.no-sidebar) {
           grid-template-columns: 7fr 3fr;
@@ -103,108 +121,122 @@
     <div class="widget-content {% if widget.settings.show_sidebar %}widget-content-md{% else %}widget-content-sm{% endif %}">
       <div class="contact-content {% unless widget.settings.show_sidebar %}no-sidebar{% endunless %}">
         <!-- Contact Form -->
-        <form
-          class="contact-form reveal reveal-up"
-        >
-          {% for blockId in widget.blocksOrder %}
-            {% assign block = widget.blocks[blockId] %}
-            {% if block.type != 'info' %}
-              {% assign field_id = widget.id | append: '-' | append: block.settings.name %}
+        <div>
+          <form
+            class="contact-form reveal reveal-up"
+            {% if widget.settings.form_token != blank %}
+              data-form-token="{{ widget.settings.form_token }}"
+              data-form-name="{{ widget.settings.form_name }}"
+            {% endif %}
+          >
+            {% for blockId in widget.blocksOrder %}
+              {% assign block = widget.blocks[blockId] %}
+              {% if block.type != 'info' %}
+                {% assign field_id = widget.id | append: '-' | append: block.settings.name %}
 
-              {% case block.type %}
-                {% when 'input' %}
-                  <div class="form-group" data-block-id="{{ blockId }}">
-                    <label for="{{ field_id }}" class="form-label">
-                      {{ block.settings.label -}}
-                      {%- if block.settings.required %} *{% endif %}
-                    </label>
-                    <input
-                      type="{{ block.settings.input_type }}"
-                      id="{{ field_id }}"
-                      name="{{ block.settings.name }}"
-                      class="form-input"
-                      {% if block.settings.placeholder != blank %}
-                        placeholder="{{ block.settings.placeholder }}"
-                      {% endif %}
-                      {% if block.settings.required %}
-                        required aria-required="true"
-                      {% endif %}
-                    >
-                  </div>
-
-                {% when 'textarea' %}
-                  <div class="form-group" data-block-id="{{ blockId }}">
-                    <label for="{{ field_id }}" class="form-label">
-                      {{ block.settings.label -}}
-                      {%- if block.settings.required %} *{% endif %}
-                    </label>
-                    <textarea
-                      id="{{ field_id }}"
-                      name="{{ block.settings.name }}"
-                      class="form-textarea"
-                      {% if block.settings.placeholder != blank %}
-                        placeholder="{{ block.settings.placeholder }}"
-                      {% endif %}
-                      {% if block.settings.required %}
-                        required aria-required="true"
-                      {% endif %}
-                    ></textarea>
-                  </div>
-
-                {% when 'dropdown' %}
-                  <div class="form-group" data-block-id="{{ blockId }}">
-                    <label for="{{ field_id }}" class="form-label">
-                      {{ block.settings.label -}}
-                      {%- if block.settings.required %} *{% endif %}
-                    </label>
-                    <select
-                      id="{{ field_id }}"
-                      name="{{ block.settings.name }}"
-                      class="form-select"
-                      {% if block.settings.required %}
-                        required aria-required="true"
-                      {% endif %}
-                    >
-                      <option value="">Select an option</option>
-                      {% assign options = block.settings.options | split: '\n' %}
-                      {% for option in options %}
-                        {% assign trimmed_option = option | strip %}
-                        {% if trimmed_option != blank %}
-                          <option value="{{ trimmed_option | handleize }}">{{ trimmed_option }}</option>
-                        {% endif %}
-                      {% endfor %}
-                    </select>
-                  </div>
-
-                {% when 'checkbox' %}
-                  <div class="form-group" data-block-id="{{ blockId }}">
-                    <div class="form-checkbox-group">
+                {% case block.type %}
+                  {% when 'input' %}
+                    <div class="form-group" data-block-id="{{ blockId }}">
+                      <label for="{{ field_id }}" class="form-label">
+                        {{ block.settings.label -}}
+                        {%- if block.settings.required %} *{% endif %}
+                      </label>
                       <input
-                        type="checkbox"
+                        type="{{ block.settings.input_type }}"
                         id="{{ field_id }}"
                         name="{{ block.settings.name }}"
-                        class="form-checkbox"
+                        class="form-input"
+                        {% if block.settings.placeholder != blank %}
+                          placeholder="{{ block.settings.placeholder }}"
+                        {% endif %}
                         {% if block.settings.required %}
                           required aria-required="true"
                         {% endif %}
                       >
-                      <label for="{{ field_id }}" class="form-checkbox-label">
+                    </div>
+
+                  {% when 'textarea' %}
+                    <div class="form-group" data-block-id="{{ blockId }}">
+                      <label for="{{ field_id }}" class="form-label">
                         {{ block.settings.label -}}
                         {%- if block.settings.required %} *{% endif %}
                       </label>
+                      <textarea
+                        id="{{ field_id }}"
+                        name="{{ block.settings.name }}"
+                        class="form-textarea"
+                        {% if block.settings.placeholder != blank %}
+                          placeholder="{{ block.settings.placeholder }}"
+                        {% endif %}
+                        {% if block.settings.required %}
+                          required aria-required="true"
+                        {% endif %}
+                      ></textarea>
                     </div>
-                  </div>
 
-                {% when 'submit' %}
-                  <div class="form-group" data-block-id="{{ blockId }}">
-                    <button type="submit" class="widget-button widget-button-primary">
-                      {{ block.settings.text }}
-                    </button>
-                  </div>
-              {% endcase %}
-            {% endif %}
-          {% endfor %}
-        </form>
+                  {% when 'dropdown' %}
+                    <div class="form-group" data-block-id="{{ blockId }}">
+                      <label for="{{ field_id }}" class="form-label">
+                        {{ block.settings.label -}}
+                        {%- if block.settings.required %} *{% endif %}
+                      </label>
+                      <select
+                        id="{{ field_id }}"
+                        name="{{ block.settings.name }}"
+                        class="form-select"
+                        {% if block.settings.required %}
+                          required aria-required="true"
+                        {% endif %}
+                      >
+                        <option value="">Select an option</option>
+                        {% assign options = block.settings.options | split: '\n' %}
+                        {% for option in options %}
+                          {% assign trimmed_option = option | strip %}
+                          {% if trimmed_option != blank %}
+                            <option value="{{ trimmed_option | handleize }}">{{ trimmed_option }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+
+                  {% when 'checkbox' %}
+                    <div class="form-group" data-block-id="{{ blockId }}">
+                      <div class="form-checkbox-group">
+                        <input
+                          type="checkbox"
+                          id="{{ field_id }}"
+                          name="{{ block.settings.name }}"
+                          class="form-checkbox"
+                          {% if block.settings.required %}
+                            required aria-required="true"
+                          {% endif %}
+                        >
+                        <label for="{{ field_id }}" class="form-checkbox-label">
+                          {{ block.settings.label -}}
+                          {%- if block.settings.required %} *{% endif %}
+                        </label>
+                      </div>
+                    </div>
+
+                  {% when 'submit' %}
+                    <div class="form-group" data-block-id="{{ blockId }}">
+                      {% if widget.settings.form_token != blank %}
+                        <div class="cf-turnstile" data-sitekey="0x4AAAAAACaLwpWEkcnqtCRW" data-theme="auto"></div>
+                      {% endif %}
+                      <button type="submit" class="widget-button widget-button-primary" data-text="{{ block.settings.text }}">
+                        {{ block.settings.text }}
+                      </button>
+                    </div>
+                {% endcase %}
+              {% endif %}
+            {% endfor %}
+          </form>
+
+          {% if widget.settings.form_token != blank %}
+            <div class="form-status form-status-success" style="display:none;">Thank you! Your message has been sent.</div>
+            <div class="form-status form-status-error" style="display:none;"></div>
+          {% endif %}
+        </div>
 
         {% if widget.settings.show_sidebar %}
           <!-- Contact Information Sidebar -->
@@ -229,4 +261,76 @@
       </div>
     </div>
   </div>
+
+  {% if widget.settings.form_token != blank %}
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script>
+      (function() {
+        var widget = document.getElementById('{{ widget.id }}');
+        if (!widget || widget.dataset.initialized) return;
+        widget.dataset.initialized = 'true';
+
+        var form = widget.querySelector('.contact-form');
+        if (!form || !form.dataset.formToken) return;
+
+        var successEl = widget.querySelector('.form-status-success');
+        var errorEl = widget.querySelector('.form-status-error');
+
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+
+          // Disable submit button
+          var submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+          }
+
+          // Hide previous messages
+          successEl.style.display = 'none';
+          errorEl.style.display = 'none';
+
+          // Collect form data
+          var formData = new FormData(form);
+          var data = {};
+          formData.forEach(function(value, key) {
+            data[key] = value;
+          });
+
+          // Add system fields
+          data._form_token = form.dataset.formToken;
+          data._form_name = form.dataset.formName || '';
+
+          fetch('https://publisher.widgetizer.org/api/forms/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          })
+          .then(function(res) {
+            if (res.ok) {
+              form.style.display = 'none';
+              successEl.style.display = 'block';
+            } else {
+              return res.json().then(function(err) {
+                throw new Error(err.error || 'Something went wrong. Please try again.');
+              });
+            }
+          })
+          .catch(function(err) {
+            errorEl.textContent = err.message || 'Network error. Please try again.';
+            errorEl.style.display = 'block';
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = submitBtn.dataset.text || 'Send Message';
+            }
+            // Reset Turnstile
+            if (window.turnstile) {
+              var turnstileEl = form.querySelector('.cf-turnstile');
+              if (turnstileEl) window.turnstile.reset(turnstileEl);
+            }
+          });
+        });
+      })();
+    </script>
+  {% endif %}
 </section>
