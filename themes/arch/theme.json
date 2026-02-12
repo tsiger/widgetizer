@@ -19,6 +19,20 @@
           "description": "Animate elements as they scroll into view"
         }
       ],
+      "branding": [
+        {
+          "type": "header",
+          "id": "branding_header",
+          "label": "Branding"
+        },
+        {
+          "type": "image",
+          "id": "favicon",
+          "label": "Favicon",
+          "default": "",
+          "description": "Recommended size 180×180 px."
+        }
+      ],
       "colors": [
         {
           "type": "header",

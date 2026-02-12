@@ -36,13 +36,14 @@ process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
-const { getProjectDir, getProjectPagesDir, getProjectMediaJsonPath } = await import("../config.js");
+const { getProjectDir, getProjectPagesDir, getProjectMediaJsonPath, getProjectThemeJsonPath } = await import("../config.js");
 
 const { writeProjectsFile } = await import("../controllers/projectController.js");
 
 const {
   updatePageMediaUsage,
   updateGlobalWidgetMediaUsage,
+  updateThemeSettingsMediaUsage,
   removePageFromMediaUsage,
   getMediaUsage,
   refreshAllMediaUsage,
@@ -453,6 +454,55 @@ describe("updateGlobalWidgetMediaUsage", () => {
 });
 
 // ============================================================================
+// updateThemeSettingsMediaUsage
+// ============================================================================
+
+describe("updateThemeSettingsMediaUsage", () => {
+  beforeEach(async () => {
+    await seedMediaJson(defaultMediaFiles());
+  });
+
+  it("tracks media used in theme settings (e.g. favicon)", async () => {
+    const themeData = {
+      settings: {
+        global: {
+          branding: [
+            { type: "header", id: "branding_header", label: "Branding" },
+            { type: "image", id: "favicon", label: "Favicon", value: "/uploads/images/hero.jpg" },
+          ],
+        },
+      },
+    };
+    const result = await updateThemeSettingsMediaUsage(PROJECT_ID, themeData);
+    assert.equal(result.success, true);
+    assert.deepEqual(result.mediaPaths, ["/uploads/images/hero.jpg"]);
+
+    const media = await readMediaJson();
+    const hero = media.files.find((f) => f.id === "img-1");
+    assert.deepEqual(hero.usedIn, ["global:theme-settings"]);
+  });
+
+  it("removes stale theme settings usage on re-save", async () => {
+    await updateThemeSettingsMediaUsage(PROJECT_ID, {
+      settings: { global: { branding: [{ id: "favicon", value: "/uploads/images/logo.png" }] } },
+    });
+    await updateThemeSettingsMediaUsage(PROJECT_ID, {
+      settings: { global: { branding: [{ id: "favicon", value: "" }] } },
+    });
+
+    const media = await readMediaJson();
+    const logo = media.files.find((f) => f.id === "img-2");
+    assert.ok(!logo.usedIn.includes("global:theme-settings"));
+  });
+
+  it("handles empty or missing theme data", async () => {
+    const result = await updateThemeSettingsMediaUsage(PROJECT_ID, {});
+    assert.equal(result.success, true);
+    assert.deepEqual(result.mediaPaths, []);
+  });
+});
+
+// ============================================================================
 // removePageFromMediaUsage
 // ============================================================================
 
@@ -585,6 +635,22 @@ describe("refreshAllMediaUsage", () => {
         settings: { background: "/uploads/images/hero.jpg" },
       }),
     );
+
+    // theme.json — favicon (logo) so theme settings media is tracked
+    const themeJsonPath = getProjectThemeJsonPath(PROJECT_FOLDER);
+    await fs.writeFile(
+      themeJsonPath,
+      JSON.stringify({
+        settings: {
+          global: {
+            branding: [
+              { type: "header", id: "branding_header", label: "Branding" },
+              { type: "image", id: "favicon", label: "Favicon", value: "/uploads/images/logo.png" },
+            ],
+          },
+        },
+      }),
+    );
   });
 
   it("rebuilds all usedIn arrays from disk", async () => {
@@ -600,10 +666,11 @@ describe("refreshAllMediaUsage", () => {
     assert.ok(!hero.usedIn.includes("deleted-page"), "stale usage should be removed");
     assert.ok(!hero.usedIn.includes("ghost"), "stale usage should be removed");
 
-    // logo: home (widget) + global:header
+    // logo: home (widget) + global:header + global:theme-settings (favicon)
     const logo = media.files.find((f) => f.id === "img-2");
     assert.ok(logo.usedIn.includes("home"));
     assert.ok(logo.usedIn.includes("global:header"));
+    assert.ok(logo.usedIn.includes("global:theme-settings"), "favicon in theme settings should be tracked");
 
     // banner: about
     const banner = media.files.find((f) => f.id === "img-3");

@@ -1,8 +1,10 @@
 import fs from "fs-extra";
 import path from "path";
-import { getProjectPagesDir } from "../config.js";
+import { getProjectPagesDir, getProjectThemeJsonPath } from "../config.js";
 import { readMediaFile, writeMediaFile, atomicUpdateMediaFile } from "../controllers/mediaController.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
+
+const THEME_SETTINGS_USAGE_ID = "global:theme-settings";
 
 /**
  * Extract all media paths (images, videos, audios) from page content.
@@ -95,6 +97,76 @@ function extractMediaPathsFromGlobalWidget(widgetData) {
   }
 
   return Array.from(mediaPaths);
+}
+
+/**
+ * Extract all media paths from theme settings (e.g. favicon, any image type in settings.global).
+ * @param {object} themeData - Theme data object (theme.json shape) with settings.global
+ * @returns {string[]} Array of unique media paths found
+ */
+function extractMediaPathsFromThemeSettings(themeData) {
+  const mediaPaths = new Set();
+  const globalSettings = themeData?.settings?.global;
+  if (!globalSettings || typeof globalSettings !== "object") return Array.from(mediaPaths);
+
+  function addIfMediaPath(value) {
+    if (typeof value !== "string") return;
+    if (
+      value.startsWith("/uploads/images/") ||
+      value.startsWith("/uploads/videos/") ||
+      value.startsWith("/uploads/audios/")
+    ) {
+      mediaPaths.add(value);
+    } else if (
+      value.startsWith("uploads/images/") ||
+      value.startsWith("uploads/videos/") ||
+      value.startsWith("uploads/audios/")
+    ) {
+      mediaPaths.add("/" + value);
+    }
+  }
+
+  Object.values(globalSettings).forEach((items) => {
+    if (!Array.isArray(items)) return;
+    items.forEach((item) => {
+      if (item.value !== undefined) addIfMediaPath(item.value);
+      else if (item.default !== undefined && typeof item.default === "string") addIfMediaPath(item.default);
+    });
+  });
+
+  return Array.from(mediaPaths);
+}
+
+/**
+ * Update media usage tracking for theme settings (e.g. favicon).
+ * @param {string} projectId - The project's UUID
+ * @param {object} themeData - Theme data object (theme.json shape) with settings.global
+ * @returns {Promise<{success: boolean, mediaPaths: string[]}>}
+ */
+export async function updateThemeSettingsMediaUsage(projectId, themeData) {
+  try {
+    const mediaPaths = extractMediaPathsFromThemeSettings(themeData);
+
+    await atomicUpdateMediaFile(projectId, (mediaData) => {
+      mediaData.files.forEach((file) => {
+        if (file.usedIn) {
+          file.usedIn = file.usedIn.filter((slug) => slug !== THEME_SETTINGS_USAGE_ID);
+        }
+      });
+      mediaPaths.forEach((mediaPath) => {
+        const file = mediaData.files.find((f) => f.path === mediaPath);
+        if (file) {
+          if (!file.usedIn) file.usedIn = [];
+          if (!file.usedIn.includes(THEME_SETTINGS_USAGE_ID)) file.usedIn.push(THEME_SETTINGS_USAGE_ID);
+        }
+      });
+    });
+
+    return { success: true, mediaPaths };
+  } catch (error) {
+    console.error(`Error updating theme settings media usage (projectId: ${projectId}):`, error);
+    throw error;
+  }
 }
 
 /**
@@ -325,12 +397,32 @@ export async function refreshAllMediaUsage(projectId) {
       }
     }
 
+    // Also scan theme settings (e.g. favicon in settings.global.branding)
+    const themeJsonPath = getProjectThemeJsonPath(projectFolderName);
+    if (await fs.pathExists(themeJsonPath)) {
+      try {
+        const themeContent = await fs.readFile(themeJsonPath, "utf8");
+        const themeData = JSON.parse(themeContent);
+        const themeMediaPaths = extractMediaPathsFromThemeSettings(themeData);
+        themeMediaPaths.forEach((mediaPath) => {
+          const file = mediaData.files.find((f) => f.path === mediaPath);
+          if (file) {
+            if (!file.usedIn.includes(THEME_SETTINGS_USAGE_ID)) {
+              file.usedIn.push(THEME_SETTINGS_USAGE_ID);
+            }
+          }
+        });
+      } catch (error) {
+        console.warn("Error processing theme settings for media usage:", error.message);
+      }
+    }
+
     // Write updated media data (using locked write function to prevent race conditions)
     await writeMediaFile(projectId, mediaData);
 
     return {
       success: true,
-      message: `Refreshed usage tracking for ${pageFiles.length} pages and global widgets`,
+      message: `Refreshed usage tracking for ${pageFiles.length} pages, global widgets, and theme settings`,
     };
   } catch (error) {
     console.error("Error refreshing media usage:", error);

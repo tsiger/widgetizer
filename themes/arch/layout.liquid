@@ -6,6 +6,10 @@
 
     {% seo %}
     {% fonts %}
+    
+    {% if theme.branding and theme.branding.favicon != blank %}
+    <link rel="icon" href="{% image src: theme.branding.favicon, output: 'path' %}">
+    {% endif %}
 
     {% theme_settings %}
 

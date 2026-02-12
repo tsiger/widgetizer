@@ -15,6 +15,7 @@ import {
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
+import { updateThemeSettingsMediaUsage } from "../services/mediaUsageService.js";
 
 /**
  * Ensure the themes directory exists, creating it if necessary.
@@ -1181,6 +1182,13 @@ export async function saveProjectThemeSettings(req, res) {
 
     // Write theme data to file
     await fs.writeFile(themeFile, JSON.stringify(req.body, null, 2));
+
+    // Track media used in theme settings (e.g. favicon) for usage and export
+    try {
+      await updateThemeSettingsMediaUsage(projectId, req.body);
+    } catch (usageError) {
+      console.warn("Failed to update theme settings media usage:", usageError.message);
+    }
 
     res.json({ message: "Theme settings saved successfully" });
   } catch (error) {
