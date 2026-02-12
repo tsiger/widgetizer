@@ -282,3 +282,83 @@ If the application evolves to support public project sharing or marketplaces:
 
 - [Media Library](core-media.md) - SVG sanitization in media uploads
 - [Custom Hooks](core-hooks.md) - Client-side sanitization in `useMediaUpload`
+
+---
+
+## Security Review Addendum (2026-02-12)
+
+This section was added after an additional codebase security review, and is intentionally separated from the original document.
+
+### Recommended Changes (Prioritized)
+
+1. **Fix path boundary checks for export file access**
+   - Current checks in `server/routes/export.js` and `server/controllers/exportController.js` use `startsWith` on resolved paths.
+   - This pattern can be bypassed in edge cases where sibling directories share the same prefix.
+   - Recommendation: use `path.relative(allowedBase, target)` and reject when the result starts with `..` or is absolute.
+
+2. **Avoid in-memory ZIP buffering for imports/uploads**
+   - `multer.memoryStorage()` is currently used for large ZIP payloads in project/theme upload flows.
+   - Even for local use, large imports can cause high memory spikes and unstable behavior.
+   - Recommendation: switch ZIP handling to disk-backed temp storage plus strict size limits and cleanup.
+
+3. **Keep current permissive CORS/CSP for local-only mode, but document production defaults**
+   - Current settings are acceptable for local development workflows.
+   - Recommendation: add environment-based branching so production defaults are strict (CORS allowlist, stronger Helmet/CSP policy), while local mode remains flexible.
+
+### Scope Note (Current Project Context)
+
+- Because this app is currently local-only, the highest-value immediate work is correctness and resilience:
+  - Path validation hardening
+  - Upload memory safety
+- Internet-facing controls (auth model, strict CORS/CSP policy, multi-tenant hardening) can be deferred until remote hosting is introduced.
+
+### Accuracy Pass (2026-02-12)
+
+The items below map specific existing text to recommended replacements so the document stays aligned with the current codebase.
+
+1. Section: HTTP Security Headers [PENDING]
+   - Current text location: `docs-llms/core-security.md:23` to `docs-llms/core-security.md:28`
+   - Status: Update needed
+   - Recommended replacement text:
+     - `### 3. HTTP Security Headers`
+     - `- **What it is:** A collection of defensive HTTP headers sent with responses.`
+     - `- **Why it's important:** Helps reduce browser-side attack surface (clickjacking, MIME sniffing, unsafe cross-origin defaults).`
+     - `- **Implementation:** Implemented globally with \`helmet\` in \`server/index.js\`. Current configuration intentionally relaxes some protections for preview/runtime compatibility: \`contentSecurityPolicy: false\`, \`crossOriginEmbedderPolicy: false\`, and \`crossOriginResourcePolicy: { policy: "cross-origin" }\`.`
+
+2. Section: CORS implementation wording
+   - Current text location: `docs-llms/core-security.md:33`
+   - Status: Update needed (context clarification)
+   - Recommended replacement text:
+     - `- **Implementation:** The \`cors\` package is enabled globally (\`app.use(cors())\`) with permissive defaults for local-only usage. If deployed remotely, replace with an allowlist-based origin policy.`
+
+3. Section: Environment variables
+   - Current text location: `docs-llms/core-security.md:149` to `docs-llms/core-security.md:152`
+   - Status: Update needed (variable mismatch)
+   - Recommended replacement text:
+     - `- \`NODE_ENV\`: Controls whether the application runs in \`development\` or \`production\` mode.`
+     - `- \`PORT\`: The port number for the server (defaults to 3001).`
+     - `- \`VITE_API_URL\`: The backend API base URL used by the frontend.`
+     - `- \`SERVER_URL\`: The server's own base URL used when generating runtime/preview URLs.`
+     - `- Note: \`PRODUCTION_URL\` is not currently used by the active server CORS configuration.`
+
+4. Section: Path traversal protection wording in import/export
+   - Current text location: `docs-llms/core-security.md:212` to `docs-llms/core-security.md:213`
+   - Status: Update needed (implementation detail too generic)
+   - Recommended replacement text:
+     - `- Use \`path.resolve()\` + \`path.relative()\` boundary checks for all file/directory access validation.`
+     - `- Reject when \`relativePath.startsWith("..")\` or \`path.isAbsolute(relativePath)\`.`
+     - `- Avoid prefix-only checks such as \`startsWith(basePath)\`, which can be bypassed by similarly-prefixed sibling paths.`
+
+5. Section: Import backend implementation details
+   - Current text location: `docs-llms/core-security.md:249`
+   - Status: Accurate but risk should be explicit
+   - Recommended replacement text:
+     - `- Uses \`multer\` with memory storage and a configurable size limit (default 500MB).`
+     - `- Note: memory storage is acceptable for local workflows but can cause high RAM usage for large ZIP imports; disk-backed temp storage is recommended for robustness.`
+
+6. Section: Deployment assumptions
+   - Current text location: `docs-llms/core-security.md:160` onward
+   - Status: Mostly accurate, but assumption should be explicit
+   - Recommended replacement text:
+     - `- This deployment section describes production behavior, but the current project is intended for local-only use by default.`
+     - `- If remote/public deployment is introduced, tighten CORS policy, revisit CSP strategy for preview/runtime, and add authentication and role-based authorization before exposure.`
