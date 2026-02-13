@@ -42,6 +42,7 @@ const {
   getThemeDir,
   getThemeJsonPath,
   getThemeWidgetsDir,
+  getThemeTemplatesDir,
   getThemeUpdatesDir,
   getThemeLatestDir,
   getThemeVersionDir,
@@ -73,6 +74,8 @@ const {
   uploadTheme,
   getProjectThemeSettings,
   saveProjectThemeSettings,
+  resolvePresetPaths,
+  getThemePresets,
 } = await import("../controllers/themeController.js");
 
 // Lazy-load AdmZip for building test zip files
@@ -1180,5 +1183,215 @@ describe("getThemeUpdateCount", () => {
     assert.equal(res._status, 200);
     assert.ok(typeof res._json.count === "number");
     assert.ok(res._json.count >= 1, "Should count at least 1 theme with pending updates");
+  });
+});
+
+// ============================================================================
+// Theme Presets — resolvePresetPaths
+// ============================================================================
+
+describe("resolvePresetPaths", () => {
+  const PRESET_THEME = "preset-resolve-theme";
+
+  before(async () => {
+    await createThemeOnDisk(PRESET_THEME, { version: "1.0.0" });
+
+    const presetsDir = path.join(getThemeDir(PRESET_THEME), "presets");
+    await fs.ensureDir(presetsDir);
+
+    await fs.outputFile(
+      path.join(presetsDir, "presets.json"),
+      JSON.stringify({
+        default: "default",
+        presets: [
+          { id: "default", name: "Default" },
+          { id: "restaurant", name: "Restaurant" },
+          { id: "minimal", name: "Minimal" },
+        ],
+      }),
+    );
+
+    // restaurant: has templates, menus, and settings
+    const restaurantDir = path.join(presetsDir, "restaurant");
+    await fs.ensureDir(path.join(restaurantDir, "templates"));
+    await fs.outputFile(
+      path.join(restaurantDir, "templates", "index.json"),
+      JSON.stringify({ id: "index", name: "Home", slug: "index" }),
+    );
+    await fs.ensureDir(path.join(restaurantDir, "menus"));
+    await fs.outputFile(
+      path.join(restaurantDir, "menus", "main-menu.json"),
+      JSON.stringify({ id: "main-menu", name: "Main menu", items: [] }),
+    );
+    await fs.outputFile(
+      path.join(restaurantDir, "preset.json"),
+      JSON.stringify({ settings: { standard_bg_primary: "#fefbf6" } }),
+    );
+
+    // minimal: settings only (no templates/menus)
+    const minimalDir = path.join(presetsDir, "minimal");
+    await fs.ensureDir(minimalDir);
+    await fs.outputFile(
+      path.join(minimalDir, "preset.json"),
+      JSON.stringify({ settings: { standard_accent: "#000000" } }),
+    );
+  });
+
+  after(async () => {
+    await fs.remove(getThemeDir(PRESET_THEME));
+  });
+
+  it("returns root paths when no presetId", async () => {
+    const result = await resolvePresetPaths(PRESET_THEME, null);
+    assert.equal(result.templatesDir, getThemeTemplatesDir(PRESET_THEME));
+    assert.equal(result.menusDir, null);
+    assert.equal(result.settingsOverrides, null);
+  });
+
+  it("returns root paths for default preset with no physical dir", async () => {
+    const result = await resolvePresetPaths(PRESET_THEME, "default");
+    assert.equal(result.templatesDir, getThemeTemplatesDir(PRESET_THEME));
+    assert.equal(result.menusDir, null);
+    assert.equal(result.settingsOverrides, null);
+  });
+
+  it("returns preset templates/menus/settings for full preset", async () => {
+    const result = await resolvePresetPaths(PRESET_THEME, "restaurant");
+    const expectedTemplates = path.join(getThemeDir(PRESET_THEME), "presets", "restaurant", "templates");
+    const expectedMenus = path.join(getThemeDir(PRESET_THEME), "presets", "restaurant", "menus");
+    assert.equal(result.templatesDir, expectedTemplates);
+    assert.equal(result.menusDir, expectedMenus);
+    assert.deepEqual(result.settingsOverrides, { standard_bg_primary: "#fefbf6" });
+  });
+
+  it("returns root templates with settings for settings-only preset", async () => {
+    const result = await resolvePresetPaths(PRESET_THEME, "minimal");
+    assert.equal(result.templatesDir, getThemeTemplatesDir(PRESET_THEME));
+    assert.equal(result.menusDir, null);
+    assert.deepEqual(result.settingsOverrides, { standard_accent: "#000000" });
+  });
+
+  it("returns root paths for nonexistent preset", async () => {
+    const result = await resolvePresetPaths(PRESET_THEME, "nonexistent");
+    assert.equal(result.templatesDir, getThemeTemplatesDir(PRESET_THEME));
+    assert.equal(result.menusDir, null);
+    assert.equal(result.settingsOverrides, null);
+  });
+});
+
+// ============================================================================
+// Theme Presets — getThemePresets endpoint
+// ============================================================================
+
+describe("getThemePresets", () => {
+  const PRESET_EP_THEME = "preset-endpoint-theme";
+
+  before(async () => {
+    await createThemeOnDisk(PRESET_EP_THEME);
+    const presetsDir = path.join(getThemeDir(PRESET_EP_THEME), "presets");
+    await fs.ensureDir(presetsDir);
+    await fs.outputFile(
+      path.join(presetsDir, "presets.json"),
+      JSON.stringify({
+        default: "default",
+        presets: [
+          { id: "default", name: "Default", description: "Base style" },
+          { id: "dark", name: "Dark Mode", description: "Dark theme" },
+        ],
+      }),
+    );
+    // Add screenshot for dark preset
+    const darkDir = path.join(presetsDir, "dark");
+    await fs.ensureDir(darkDir);
+    await fs.writeFile(path.join(darkDir, "screenshot.png"), "fake-png");
+  });
+
+  after(async () => {
+    await fs.remove(getThemeDir(PRESET_EP_THEME));
+  });
+
+  it("returns presets with enriched data", async () => {
+    const res = await callController(getThemePresets, { params: { id: PRESET_EP_THEME } });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.default, "default");
+    assert.equal(res._json.presets.length, 2);
+
+    const defaultPreset = res._json.presets.find((p) => p.id === "default");
+    assert.ok(defaultPreset.isDefault);
+
+    const darkPreset = res._json.presets.find((p) => p.id === "dark");
+    assert.ok(!darkPreset.isDefault);
+    assert.ok(darkPreset.hasScreenshot);
+  });
+
+  it("returns empty presets for theme without presets dir", async () => {
+    const noPresetTheme = "no-presets-theme";
+    await createThemeOnDisk(noPresetTheme);
+
+    const res = await callController(getThemePresets, { params: { id: noPresetTheme } });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.presets.length, 0);
+
+    await fs.remove(getThemeDir(noPresetTheme));
+  });
+
+  it("returns 404 for nonexistent theme", async () => {
+    const res = await callController(getThemePresets, { params: { id: "ghost-theme" } });
+    assert.equal(res._status, 404);
+  });
+});
+
+// ============================================================================
+// copyThemeToProject excludes presets
+// ============================================================================
+
+describe("copyThemeToProject excludes presets", () => {
+  const COPY_PRESET_THEME = "copy-preset-theme";
+
+  before(async () => {
+    await createThemeOnDisk(COPY_PRESET_THEME);
+    const presetsDir = path.join(getThemeDir(COPY_PRESET_THEME), "presets");
+    await fs.ensureDir(presetsDir);
+    await fs.outputFile(path.join(presetsDir, "presets.json"), JSON.stringify({ presets: [] }));
+  });
+
+  after(async () => {
+    await fs.remove(getThemeDir(COPY_PRESET_THEME));
+  });
+
+  it("does not copy presets/ to project directory", async () => {
+    const targetDir = path.join(TEST_ROOT, "copy-no-presets-target");
+    await fs.ensureDir(targetDir);
+
+    await copyThemeToProject(COPY_PRESET_THEME, targetDir);
+    assert.ok(!(await fs.pathExists(path.join(targetDir, "presets"))));
+
+    await fs.remove(targetDir);
+  });
+});
+
+// ============================================================================
+// buildLatestSnapshot excludes presets
+// ============================================================================
+
+describe("buildLatestSnapshot excludes presets", () => {
+  it("excludes presets/ directory from snapshot", async () => {
+    const presetSnapTheme = "preset-snap-theme";
+    await createThemeOnDisk(presetSnapTheme, { version: "1.0.0" });
+
+    const presetsDir = path.join(getThemeDir(presetSnapTheme), "presets");
+    await fs.ensureDir(presetsDir);
+    await fs.outputFile(path.join(presetsDir, "presets.json"), "{}");
+
+    const v110 = getThemeVersionDir(presetSnapTheme, "1.1.0");
+    await fs.ensureDir(v110);
+    await fs.writeFile(path.join(v110, "theme.json"), JSON.stringify({ name: presetSnapTheme, version: "1.1.0" }));
+
+    await buildLatestSnapshot(presetSnapTheme);
+
+    const latestDir = getThemeLatestDir(presetSnapTheme);
+    assert.ok(!(await fs.pathExists(path.join(latestDir, "presets"))));
+
+    await fs.remove(getThemeDir(presetSnapTheme));
   });
 });

@@ -55,6 +55,22 @@ A theme is organized as a directory with the following structure:
 │       └── footer.json     # Global footer configuration
 ├── menus/                  # Navigation menu definitions
 │   └── main-nav.json       # Menu structure and items
+├── presets/                # Optional preset variants
+│   ├── presets.json        # Preset registry (names, descriptions, default)
+│   ├── warm/
+│   │   ├── preset.json     # Settings overrides (colors, fonts, etc.)
+│   │   └── screenshot.png  # Preset preview image
+│   └── hotel/
+│       ├── preset.json     # Settings overrides
+│       ├── screenshot.png
+│       ├── templates/      # Optional custom page templates
+│       │   ├── index.json
+│       │   └── global/
+│       │       ├── header.json
+│       │       └── footer.json
+│       └── menus/          # Optional custom navigation
+│           ├── main-menu.json
+│           └── footer-menu.json
 └── assets/                 # Static assets
     ├── base.css            # Theme base styles (design tokens, utilities)
     ├── scripts.js          # Theme scripts
@@ -1737,6 +1753,93 @@ To enable these features in your theme, add the `advanced` settings group to you
 
 Then add the corresponding tags in your `layout.liquid` where you want the content to appear.
 
+## 12. Theme Presets
+
+Presets are named variants of a theme that can override **settings** (colors, fonts, etc.) and/or **demo content** (templates, menus, global widgets) while sharing the same theme codebase (layout, widgets, assets, snippets). Users pick a preset when creating a project. Once a project is created, it is independent from the preset.
+
+### Preset Directory Structure
+
+The `presets/` directory is optional. When present, it lives at the root of the theme alongside `widgets/`, `templates/`, etc.
+
+```
+presets/
+  presets.json              # Registry of all presets
+  default/                  # Optional — if absent, root templates/menus are used
+    preset.json             # Settings overrides only
+  warm/
+    preset.json             # Settings overrides (colors, fonts)
+    screenshot.png          # Preview shown in preset selector UI
+  hotel/
+    preset.json             # Settings overrides
+    screenshot.png
+    templates/              # Full custom page templates
+      index.json
+      rooms.json
+      global/
+        header.json
+        footer.json
+    menus/                  # Custom navigation
+      main-menu.json
+      footer-menu.json
+```
+
+### presets.json (Preset Registry)
+
+```json
+{
+  "default": "default",
+  "presets": [
+    { "id": "default", "name": "Consulting Firm", "description": "Clean professional style with cool tones" },
+    { "id": "warm", "name": "Warm Studio", "description": "Warm earthy palette with elegant serif typography" },
+    { "id": "hotel", "name": "Boutique Hotel", "description": "Luxury hotel with rooms, dining, spa, and gallery pages" }
+  ]
+}
+```
+
+- `"default"` field specifies which preset is pre-selected in the UI
+- The `"default"` preset falls through to root `templates/`, `menus/`, and `theme.json` defaults when no `presets/default/` directory exists
+- Themes without a `presets/` directory work exactly as before (zero breaking changes)
+
+### preset.json (Per-Preset Settings Overrides)
+
+Each preset can include a `preset.json` with a flat map of `setting_id → value`:
+
+```json
+{
+  "settings": {
+    "standard_bg_primary": "#fdfbf7",
+    "standard_accent": "#8b6f4e",
+    "heading_font": { "stack": "\"Cormorant Garamond\", serif", "weight": 500 },
+    "body_font": { "stack": "\"Nunito Sans\", sans-serif", "weight": 400 },
+    "enable_reveal_animations": true
+  }
+}
+```
+
+At project creation, these values replace the `default` field of matching settings in the project's `theme.json`. Only settings that differ from the base need to be specified — the full schema stays in the base `theme.json`.
+
+### Fallback Chain
+
+For any preset, the system resolves content with this fallback order:
+
+- **Templates**: `presets/{id}/templates/` → root `templates/`
+- **Menus**: `presets/{id}/menus/` → root `menus/`
+- **Settings**: `presets/{id}/preset.json` overrides → `theme.json` defaults
+- **Screenshot**: `presets/{id}/screenshot.png` → root `screenshot.png`
+
+### Preset Types
+
+Presets can be as simple or comprehensive as needed:
+
+- **Settings-only preset**: Just `preset.json` + optional `screenshot.png`. Uses root templates and menus with overridden colors/fonts.
+- **Full preset**: Includes `templates/`, `menus/`, `preset.json`, and `screenshot.png`. Provides completely different page content, navigation, and visual style.
+
+### Frontend Integration
+
+When a user selects a theme with presets during project creation, a visual card grid appears below the theme dropdown. Each card shows the preset's screenshot, name, and description. The default preset is pre-selected. The selected preset ID is submitted with the form data.
+
+For detailed implementation information, see [Theme Presets](theme-presets.md).
+
 ## 13. Theme Development Workflow
 
 1. **Planning**: Define the theme's purpose, target audience, and key features
@@ -1747,10 +1850,11 @@ Then add the corresponding tags in your `layout.liquid` where you want the conte
 6. **Block System**: Design flexible block types for dynamic content within widgets
 7. **Page Templates**: Define pre-built page structures using your widgets
 8. **Navigation**: Create menu systems and navigation patterns
-9. **Styling**: Add comprehensive CSS for responsive design and visual polish
-10. **Assets**: Optimize and organize static files (CSS, JS, images)
-11. **Testing**: Test across devices, browsers, and different content scenarios
-12. **Documentation**: Document custom features, settings, and usage guidelines
+9. **Presets (Optional)**: Create preset variants with different settings, templates, and/or menus
+10. **Styling**: Add comprehensive CSS for responsive design and visual polish
+11. **Assets**: Optimize and organize static files (CSS, JS, images)
+12. **Testing**: Test across devices, browsers, and different content scenarios
+13. **Documentation**: Document custom features, settings, and usage guidelines
 
 This theming system provides a powerful and flexible foundation for creating beautiful, functional websites while maintaining consistency and ease of use. The combination of widgets and blocks allows for maximum flexibility while keeping the user interface intuitive and manageable.
 
@@ -1762,5 +1866,7 @@ When a new project is created, the selected theme is copied into the project's d
 
 - **Destination**: `/data/projects/<folderName>/`
 - **Copied items**: `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`
+
+If a preset was selected during creation, the system also applies preset overrides (custom templates, menus, and/or settings) after the theme copy. The `presets/` directory itself is never copied into projects. See [Project Management](core-projects.md) for the full creation workflow and [Theme Presets](theme-presets.md) for preset details.
 
 After this copy, edits in the project affect only that project's files and do not modify the original theme in `/themes/`.

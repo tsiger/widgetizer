@@ -5,9 +5,12 @@ import {
   getThemeDir,
   getThemeJsonPath,
   getThemeWidgetsDir,
+  getThemeTemplatesDir,
   getThemeUpdatesDir,
   getThemeLatestDir,
   getThemeVersionDir,
+  getThemePresetsJsonPath,
+  getThemePresetDir,
   getProjectDir,
   getProjectThemeJsonPath,
   getProjectsFilePath,
@@ -263,7 +266,7 @@ export async function buildLatestSnapshot(themeId) {
   // 1. Start with base (root) files, excluding updates/ and latest/ directories
   const baseEntries = await fs.readdir(themeDir, { withFileTypes: true });
   for (const entry of baseEntries) {
-    if (entry.name === "updates" || entry.name === "latest") continue;
+    if (entry.name === "updates" || entry.name === "latest" || entry.name === "presets") continue;
 
     const sourcePath = path.join(themeDir, entry.name);
     const targetPath = path.join(latestDir, entry.name);
@@ -329,6 +332,132 @@ export async function themeHasUpdates(themeId) {
 }
 
 // ============================================================================
+// Theme Preset Functions
+// ============================================================================
+
+/**
+ * Resolve template, menu, and settings override paths for a preset.
+ * If no presetId or preset directory doesn't exist, falls back to root.
+ * @param {string} themeId - Theme identifier
+ * @param {string|null} presetId - Preset identifier (null = use root defaults)
+ * @returns {Promise<{templatesDir: string, menusDir: string|null, settingsOverrides: object|null}>}
+ */
+export async function resolvePresetPaths(themeId, presetId) {
+  if (!presetId) {
+    return {
+      templatesDir: getThemeTemplatesDir(themeId),
+      menusDir: null,
+      settingsOverrides: null,
+    };
+  }
+
+  const presetDir = getThemePresetDir(themeId, presetId);
+
+  // Check if the preset directory actually exists
+  try {
+    await fs.access(presetDir);
+  } catch {
+    return {
+      templatesDir: getThemeTemplatesDir(themeId),
+      menusDir: null,
+      settingsOverrides: null,
+    };
+  }
+
+  // Resolve templates directory
+  let templatesDir = getThemeTemplatesDir(themeId);
+  const presetTemplatesDir = path.join(presetDir, "templates");
+  try {
+    await fs.access(presetTemplatesDir);
+    templatesDir = presetTemplatesDir;
+  } catch {
+    // No preset templates, use root
+  }
+
+  // Resolve menus directory (null = keep root menus already copied)
+  let menusDir = null;
+  const presetMenusDir = path.join(presetDir, "menus");
+  try {
+    await fs.access(presetMenusDir);
+    menusDir = presetMenusDir;
+  } catch {
+    // No preset menus, use root
+  }
+
+  // Read settings overrides
+  let settingsOverrides = null;
+  const presetJsonPath = path.join(presetDir, "preset.json");
+  try {
+    const content = await fs.readFile(presetJsonPath, "utf8");
+    const presetData = JSON.parse(content);
+    if (presetData.settings && Object.keys(presetData.settings).length > 0) {
+      settingsOverrides = presetData.settings;
+    }
+  } catch {
+    // No preset.json or invalid JSON, no overrides
+  }
+
+  return { templatesDir, menusDir, settingsOverrides };
+}
+
+/**
+ * Get all presets for a theme.
+ * Returns an empty array if the theme has no presets directory.
+ * @param {import('express').Request} req - Express request with theme id param
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+export async function getThemePresets(req, res) {
+  try {
+    const { id } = req.params;
+
+    const themeDir = getThemeDir(id);
+    try {
+      await fs.access(themeDir);
+    } catch {
+      return res.status(404).json({ error: `Theme '${id}' not found` });
+    }
+
+    const presetsJsonPath = getThemePresetsJsonPath(id);
+    try {
+      const content = await fs.readFile(presetsJsonPath, "utf8");
+      const presetsData = JSON.parse(content);
+
+      const enrichedPresets = await Promise.all(
+        (presetsData.presets || []).map(async (preset) => {
+          let hasScreenshot = false;
+          const presetDir = getThemePresetDir(id, preset.id);
+          try {
+            await fs.access(path.join(presetDir, "screenshot.png"));
+            hasScreenshot = true;
+          } catch {
+            // No preset screenshot, will fall back to root
+          }
+
+          return {
+            ...preset,
+            isDefault: preset.id === presetsData.default,
+            hasScreenshot,
+          };
+        }),
+      );
+
+      res.json({
+        default: presetsData.default,
+        presets: enrichedPresets,
+      });
+    } catch (error) {
+      if (error.code === "ENOENT") {
+        return res.json({ default: null, presets: [] });
+      }
+      throw error;
+    }
+  } catch (error) {
+    res.status(500).json({ error: `Failed to get theme presets: ${error.message}` });
+  }
+}
+
+// ============================================================================
 // Theme CRUD Operations
 // ============================================================================
 
@@ -368,6 +497,17 @@ export async function getAllThemes(_, res) {
             console.warn(`Could not read widgets directory for theme ${themeId}:`, widgetDirError.message);
           }
 
+          // Count presets if presets.json exists
+          let presetCount = 0;
+          try {
+            const presetsJsonPath = getThemePresetsJsonPath(themeId);
+            const presetsContent = await fs.readFile(presetsJsonPath, "utf8");
+            const presetsData = JSON.parse(presetsContent);
+            presetCount = (presetsData.presets || []).length;
+          } catch {
+            // No presets or invalid file
+          }
+
           // Check if theme has pending updates
           const hasPendingUpdate = latestVersion && isNewerVersion(theme.version, latestVersion);
 
@@ -380,6 +520,7 @@ export async function getAllThemes(_, res) {
             latestVersion, // Latest available version
             hasPendingUpdate, // True if newest version > current source version
             widgets: widgetCount,
+            presets: presetCount,
             author: theme.author,
           };
         } catch {
@@ -626,7 +767,7 @@ export async function copyThemeToProject(themeName, projectDir, excludeDirs = []
 
     // Remove excluded directories AFTER copying everything
     // Also remove versioning directories that shouldn't be in project
-    const allExcludes = [...excludeDirs, "updates", "latest"];
+    const allExcludes = [...excludeDirs, "updates", "latest", "presets"];
     for (const dirToExclude of allExcludes) {
       const projectExcludePath = path.join(projectDir, dirToExclude);
       try {

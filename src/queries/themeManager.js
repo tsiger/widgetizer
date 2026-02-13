@@ -304,3 +304,36 @@ export async function deleteTheme(themeId) {
     throw error;
   }
 }
+
+/**
+ * Fetch all presets for a theme.
+ * @param {string} themeId - The ID of the theme
+ * @returns {Promise<{default: string|null, presets: Array}>}
+ */
+export async function getThemePresets(themeId) {
+  try {
+    const response = await fetch(API_URL(`/api/themes/${themeId}/presets`));
+    if (!response.ok) {
+      throw new Error("Failed to fetch theme presets");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error getting theme presets:", error);
+    return { default: null, presets: [] };
+  }
+}
+
+/**
+ * Generate the URL for a preset's screenshot image.
+ * Falls back to the theme's root screenshot if the preset has no custom screenshot.
+ * @param {string} themeId - The ID of the theme
+ * @param {string} presetId - The preset identifier
+ * @param {boolean} hasScreenshot - Whether the preset has its own screenshot
+ * @returns {string} The full URL to the screenshot
+ */
+export function getPresetScreenshotUrl(themeId, presetId, hasScreenshot) {
+  if (hasScreenshot) {
+    return API_URL(`/themes/${themeId}/presets/${presetId}/screenshot.png`);
+  }
+  return API_URL(`/themes/${themeId}/screenshot.png`);
+}

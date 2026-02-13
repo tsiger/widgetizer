@@ -38,7 +38,7 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 | `writeProjectsFile(data)`   | Write projects.json                                        |
 | `getAllProjects()`          | Get all projects (enriched with themeName, hasThemeUpdate) |
 | `getActiveProject()`        | Get active project                                         |
-| `createProject()`           | Create project (copies theme, processes templates/menus)   |
+| `createProject()`           | Create project (copies theme, applies preset, processes templates/menus) |
 | `setActiveProject()`        | Set active project ID                                      |
 | `updateProject()`           | Update project (handles folderName rename)                 |
 | `deleteProject()`           | Delete project and cleanup exports                         |
@@ -262,6 +262,8 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 | Function                  | Method | Endpoint                         |
 | ------------------------- | ------ | -------------------------------- |
 | `getAllThemes()`          | GET    | `/api/themes`                    |
+| `getThemePresets(id)`     | GET    | `/api/themes/:id/presets`        |
+| `getPresetScreenshotUrl(themeId, presetId)` | -  | URL construction             |
 | `getTheme(id)`            | GET    | `/api/themes/:id`                |
 | `getThemeWidgets(id)`     | GET    | `/api/themes/:id/widgets`        |
 | `getThemeTemplates(id)`   | GET    | `/api/themes/:id/templates`      |
@@ -289,6 +291,8 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 | `uploadTheme()`              | Upload theme zip                  |
 | `getThemeUpdateCount()`      | Count themes with pending updates |
 | `updateTheme()`              | Build latest/ for single theme    |
+| `getThemePresets()`          | Get presets for a theme            |
+| `resolvePresetPaths()`       | Resolve preset templates/menus/settings with fallback |
 | `getProjectThemeSettings()`  | Get project theme settings        |
 | `saveProjectThemeSettings()` | Save project theme settings       |
 | `copyThemeToProject()`       | Copy theme to project directory   |

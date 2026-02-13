@@ -38,9 +38,27 @@ themes/
       layout.liquid
       widgets/
       ...
+    presets/             # Optional preset variants
+      presets.json       # Preset registry (names, descriptions, default)
+      warm/
+        preset.json      # Settings overrides (colors, fonts, etc.)
+        screenshot.png   # Preset preview image
+      hotel/
+        preset.json      # Settings overrides
+        screenshot.png
+        templates/       # Optional custom page templates
+          index.json
+          global/
+            header.json
+            footer.json
+        menus/           # Optional custom navigation
+          main-menu.json
+          footer-menu.json
 ```
 
 The `latest/` folder is automatically built by composing the base version with all updates in version order.
+
+The `presets/` directory is optional. When present, it provides named variants of the theme that can override settings, templates, and/or menus. Presets are only used at project creation time. See the [Theme Presets](theme-presets.md) spec for full details.
 
 ## 2. Frontend Implementation (`src/pages/Themes.jsx`)
 
@@ -117,6 +135,7 @@ The backend handles the logic for listing themes, processing uploads, and managi
 | `GET` | `/api/themes/:id/versions` |  | `getThemeVersions` | Gets all available versions for a theme. |
 | `POST` | `/api/themes/:id/update` |  | `updateTheme` | Builds `latest/` snapshot for a single theme. |
 | `DELETE` | `/api/themes/:id` |  | `deleteTheme` | Deletes a theme. Returns 409 if theme is used by any project. |
+| `GET` | `/api/themes/:id/presets` |  | `getThemePresets` | Gets all presets for a theme (names, descriptions, screenshots). |
 | `GET` | `/api/themes/update-count` |  | `getThemeUpdateCount` | Gets count of themes with pending updates. |
 
 ### Controller Logic (`server/controllers/themeController.js`)
@@ -128,6 +147,7 @@ The backend handles the logic for listing themes, processing uploads, and managi
   - `name`: Human-readable name from `theme.json`
   - `version`: Current source version (from `latest/` or base)
   - `author`, `description`, `widgets`: Standard metadata
+  - `presets`: Number of presets available (from `presets/presets.json`, 0 if none)
   - `hasPendingUpdate`: Boolean indicating if newer versions exist in `updates/`
   - `latestAvailableVersion`: Newest version available in `updates/`
 
@@ -143,6 +163,17 @@ The backend handles the logic for listing themes, processing uploads, and managi
 
 - `deleteTheme`: Removes the theme directory from the filesystem. Before deletion, checks if any project in `projects.json` references this theme; if so, returns 409 with message that the theme is in use. On success, returns 200 with success message.
 
+#### Theme Presets
+
+- `getThemePresets(req, res)`: Reads `presets/presets.json` for a theme and returns the list of presets, enriched with `isDefault` and `hasScreenshot` flags. Returns an empty array for themes without presets or a 404 for nonexistent themes.
+
+- `resolvePresetPaths(themeId, presetId)`: Returns `{ templatesDir, menusDir, settingsOverrides }` with fallback logic:
+  - **Templates**: Uses `presets/{id}/templates/` if it exists, otherwise falls back to root `templates/`
+  - **Menus**: Uses `presets/{id}/menus/` if it exists, otherwise `null` (meaning keep the root menus already copied)
+  - **Settings**: Reads `presets/{id}/preset.json` for a flat map of `{ setting_id: value }` overrides
+
+  This helper is called by `projectController.createProject()` during project creation to resolve which templates, menus, and settings to use for the selected preset.
+
 #### Theme Updates
 
 - `buildLatestSnapshot(themeId)`: Composes the `latest/` folder by:
@@ -152,7 +183,8 @@ The backend handles the logic for listing themes, processing uploads, and managi
      - Must contain `theme.json`
      - `theme.json` version must match folder name
   4. Layering files from each version in order (last wins)
-  5. Writing composed result to `latest/`
+  5. Excluding `presets/` directory from the snapshot
+  6. Writing composed result to `latest/`
 
 - `getThemeSourceDir(themeId)`: Returns the path to use for reading theme files:
   - Returns `latest/` if it exists
@@ -242,6 +274,7 @@ All API endpoints described in this document are protected by the platform's cor
 **See also:**
 
 - [Theme Updates](theme-updates.md) - Detailed theme update system documentation
+- [Theme Presets](theme-presets.md) - Preset variants for themes (settings, templates, menus overrides)
 - [Theming Guide](theming.md) - How to author themes (structure, settings, widgets)
 - [Widget Authoring Guide](theming-widgets.md) - Creating widgets for themes
 - [Project Management](core-projects.md) - How themes are copied to projects on creation

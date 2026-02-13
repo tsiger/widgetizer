@@ -95,7 +95,10 @@
       "siteUrlInvalid": "Please enter a valid URL (e.g., https://mysite.com)",
       "loadingThemes": "Loading themes...",
       "loadThemesError": "Failed to load themes. Please restart the application.",
-      "moreSettings": "More settings"
+      "moreSettings": "More settings",
+      "presetLabel": "Style Preset",
+      "presetHelp": "Choose a visual style and demo content layout.",
+      "loadingPresets": "Loading presets..."
     },
     "media": {
       "editTitle": "Edit {{type}} Metadata",

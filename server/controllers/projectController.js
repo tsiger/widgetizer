@@ -9,7 +9,6 @@ import {
   getProjectsFilePath,
   getProjectDir,
   getProjectPagesDir,
-  getThemeTemplatesDir,
   getProjectMenusDir,
   THEMES_DIR,
 } from "../config.js";
@@ -168,7 +167,7 @@ export async function createProject(req, res) {
   }
 
   try {
-    const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates } = req.body;
+    const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates, preset } = req.body;
     const data = await readProjectsFile();
 
     // Check for duplicate project names
@@ -218,6 +217,21 @@ export async function createProject(req, res) {
       throw new Error(`Failed to copy theme: ${error.message}`);
     }
 
+    // Resolve preset paths (templates, menus, settings overrides)
+    const { templatesDir: resolvedTemplatesDir, menusDir: presetMenusDir, settingsOverrides } =
+      await themeController.resolvePresetPaths(theme, preset);
+
+    // If preset has custom menus, replace root menus with preset menus
+    if (presetMenusDir) {
+      const projectMenusDir = getProjectMenusDir(folderName);
+      try {
+        await fs.remove(projectMenusDir);
+        await fs.copy(presetMenusDir, projectMenusDir);
+      } catch (error) {
+        console.warn(`[ProjectController] Failed to apply preset menus: ${error.message}`);
+      }
+    }
+
     const newProject = {
       id: uuidv4(), // ✅ Generate stable UUID
       folderName, // Folder identifier
@@ -225,6 +239,7 @@ export async function createProject(req, res) {
       description,
       theme,
       themeVersion, // Version that was installed
+      preset: preset || null, // Track which preset was used
       receiveThemeUpdates: receiveThemeUpdates || false, // Opt-in flag (default: off)
       siteUrl: siteUrl && siteUrl.trim() !== "" ? siteUrl.trim() : "",
       created: new Date().toISOString(),
@@ -234,7 +249,7 @@ export async function createProject(req, res) {
     try {
       // Then handle templates separately, recursively
       const pagesDir = getProjectPagesDir(folderName);
-      const themeTemplatesDir = getThemeTemplatesDir(theme);
+      const themeTemplatesDir = resolvedTemplatesDir;
 
       // Helper function to recursively find and process templates
       async function processTemplatesRecursive(sourceDir, targetDir) {
@@ -480,6 +495,30 @@ export async function createProject(req, res) {
     } catch (error) {
       await fs.remove(projectDir);
       throw new Error(`Failed to process templates: ${error.message}`);
+    }
+
+    // Apply preset settings overrides to project's theme.json
+    if (settingsOverrides) {
+      try {
+        const projectThemeJsonPath = path.join(projectDir, "theme.json");
+        const themeJsonStr = await fs.readFile(projectThemeJsonPath, "utf8");
+        const themeJson = JSON.parse(themeJsonStr);
+
+        if (themeJson.settings && themeJson.settings.global) {
+          for (const group of Object.values(themeJson.settings.global)) {
+            if (!Array.isArray(group)) continue;
+            for (const item of group) {
+              if (item.id && settingsOverrides[item.id] !== undefined) {
+                item.default = settingsOverrides[item.id];
+              }
+            }
+          }
+        }
+
+        await fs.writeFile(projectThemeJsonPath, JSON.stringify(themeJson, null, 2));
+      } catch (error) {
+        console.warn(`[ProjectController] Failed to apply preset settings overrides: ${error.message}`);
+      }
     }
 
     // Track if we're setting this as active (only happens if no active project exists)

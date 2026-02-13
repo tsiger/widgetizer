@@ -95,7 +95,10 @@
       "siteUrlInvalid": "Veuillez entrer une URL valide (ex., https://monsite.com)",
       "loadingThemes": "Chargement des thèmes...",
       "loadThemesError": "Échec du chargement des thèmes. Veuillez redémarrer l'application.",
-      "moreSettings": "Plus de paramètres"
+      "moreSettings": "Plus de paramètres",
+      "presetLabel": "Style Prédéfini",
+      "presetHelp": "Choisissez un style visuel et une mise en page.",
+      "loadingPresets": "Chargement des styles..."
     },
     "media": {
       "editTitle": "Modifier les métadonnées {{type}}",

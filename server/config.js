@@ -27,6 +27,11 @@ export const getThemeUpdatesDir = (themeId) => path.join(getThemeDir(themeId), "
 export const getThemeLatestDir = (themeId) => path.join(getThemeDir(themeId), "latest");
 export const getThemeVersionDir = (themeId, version) => path.join(getThemeUpdatesDir(themeId), version);
 
+// Theme preset paths
+export const getThemePresetsDir = (themeId) => path.join(getThemeDir(themeId), "presets");
+export const getThemePresetsJsonPath = (themeId) => path.join(getThemePresetsDir(themeId), "presets.json");
+export const getThemePresetDir = (themeId, presetId) => path.join(getThemePresetsDir(themeId), presetId);
+
 // Project paths
 export const getProjectsFilePath = () => path.join(DATA_DIR, "projects", "projects.json");
 export const getProjectDir = (projectId) => path.join(DATA_DIR, "projects", projectId);
