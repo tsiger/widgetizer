@@ -280,6 +280,7 @@ function createWindow() {
 
   mainWindow.on("ready-to-show", () => {
     log("Window ready to show");
+    mainWindow.maximize();
     mainWindow.show();
     mainWindow.focus();
   });
@@ -429,6 +430,7 @@ function showError(message) {
 // Create application menu
 function createAppMenu() {
   const isMac = process.platform === "darwin";
+  const isDev = getIsDev();
 
   const template = [
     // App menu (macOS only)
@@ -490,10 +492,9 @@ function createAppMenu() {
     {
       label: "View",
       submenu: [
-        { role: "reload" },
-        { role: "forceReload" },
-        { role: "toggleDevTools" },
-        { type: "separator" },
+        ...(isDev
+          ? [{ role: "reload" }, { role: "forceReload" }, { role: "toggleDevTools" }, { type: "separator" }]
+          : []),
         { role: "resetZoom" },
         { role: "zoomIn" },
         { role: "zoomOut" },
