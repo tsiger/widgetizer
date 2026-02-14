@@ -41,6 +41,7 @@
       "src/core/**/*",
       "src/utils/**/*",
       "src/config/**/*",
+      "src/locales/**/*",
       "themes/**/*",
       "electron/**/*",
       "package.json"
@@ -49,6 +50,9 @@
     "asar": true,
     "asarUnpack": [
       "themes/**",
+      "dist/**",
+      "src/core/assets/**",
+      "src/utils/previewRuntime.js",
       "node_modules/sharp/**",
       "node_modules/@img/sharp-*/**",
       "node_modules/@img/sharp-libvips-*/**"

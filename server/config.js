@@ -2,7 +2,15 @@ import path from "path";
 
 // Base directories with environment variable support.
 // APP_ROOT is set by Electron to the app.asar path, or defaults to cwd for non-Electron use.
-const APP_ROOT = process.env.APP_ROOT ? path.resolve(process.env.APP_ROOT) : process.cwd();
+export const APP_ROOT = process.env.APP_ROOT ? path.resolve(process.env.APP_ROOT) : process.cwd();
+
+// UNPACKED_ROOT points to app.asar.unpacked in packaged Electron builds.
+// Files that must be served via express.static() or res.sendFile() need to be on real disk
+// (not inside an asar archive), so they are unpacked and accessed via this path.
+// In non-Electron environments, this defaults to APP_ROOT (same directory).
+export const UNPACKED_ROOT = process.env.UNPACKED_ROOT
+  ? path.resolve(process.env.UNPACKED_ROOT)
+  : APP_ROOT;
 
 export const DATA_DIR = process.env.DATA_ROOT ? path.resolve(process.env.DATA_ROOT) : path.join(APP_ROOT, "data");
 
@@ -12,6 +20,17 @@ export const THEMES_DIR = process.env.THEMES_ROOT
 
 export const PUBLISH_DIR = path.join(DATA_DIR, "publish");
 export const CORE_WIDGETS_DIR = path.join(APP_ROOT, "src", "core", "widgets");
+
+// Static paths — served via express.static() or res.sendFile(), so must be real files on disk.
+// In packaged Electron builds these are unpacked from the asar archive.
+export const STATIC_DIST_DIR = path.join(UNPACKED_ROOT, "dist");
+export const STATIC_CORE_ASSETS_DIR = path.join(UNPACKED_ROOT, "src", "core", "assets");
+export const STATIC_UTILS_DIR = path.join(UNPACKED_ROOT, "src", "utils");
+
+// Helper to check if a path is inside an asar archive
+export function isAsarPath(p) {
+  return p.includes(".asar" + path.sep) || p.includes(".asar/");
+}
 
 // App settings path
 export const getAppSettingsPath = () => path.join(DATA_DIR, "appSettings.json");
@@ -66,6 +85,7 @@ export const getThumbnailPath = (projectId, filename) => path.join(getProjectThu
 if (process.env.NODE_ENV !== "test") {
   console.log("Server config initialized:");
   console.log(`  APP_ROOT: ${APP_ROOT}`);
+  console.log(`  UNPACKED_ROOT: ${UNPACKED_ROOT}`);
   console.log(`  DATA_DIR: ${DATA_DIR}`);
   console.log(`  THEMES_DIR: ${THEMES_DIR}`);
   console.log(`  CORE_WIDGETS_DIR: ${CORE_WIDGETS_DIR}`);

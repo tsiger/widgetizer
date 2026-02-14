@@ -1,5 +1,4 @@
-import { app, BrowserWindow, dialog, Menu, shell } from "electron";
-import { spawn } from "child_process";
+import { app, BrowserWindow, dialog, Menu, shell, utilityProcess } from "electron";
 import fs from "fs";
 import path from "path";
 import http from "http";
@@ -121,7 +120,9 @@ function ensureDataDirectories() {
   }
 }
 
-// Start the Express server as a child process
+// Start the Express server as a utility process.
+// utilityProcess.fork() runs with full Electron asar support, unlike spawn with ELECTRON_RUN_AS_NODE
+// which strips asar patching and causes fs operations on asar-internal paths to fail on Windows.
 function startServer() {
   if (process.env.ELECTRON_DISABLE_INTERNAL_SERVER === "1") {
     log("Internal server disabled by environment variable");
@@ -136,6 +137,7 @@ function startServer() {
   log(`Server will use DATA_ROOT: ${dataRoot}`);
   log(`Server will use THEMES_ROOT: ${themesRoot}`);
   log(`Server will use APP_ROOT: ${appRoot}`);
+  log(`Server will use UNPACKED_ROOT: ${unpackedRoot}`);
 
   // Verify server entry exists
   try {
@@ -150,24 +152,19 @@ function startServer() {
 
   const env = {
     ...process.env,
-    ELECTRON_RUN_AS_NODE: "1",
     NODE_ENV: isDev ? "development" : "production",
     PORT: serverPort,
     DATA_ROOT: dataRoot,
     THEMES_ROOT: themesRoot,
-    APP_ROOT: appRoot, // Server reads bundled assets from app.asar
+    APP_ROOT: appRoot,
+    UNPACKED_ROOT: unpackedRoot,
   };
 
-  // Use userDataPath as cwd since appRoot may be inside an asar archive
-  const serverCwd = userDataPath;
-  log(`Server cwd: ${serverCwd}`);
-
   try {
-    serverProcess = spawn(process.execPath, [serverEntry], {
-      cwd: serverCwd,
+    serverProcess = utilityProcess.fork(serverEntry, [], {
+      cwd: userDataPath,
       env,
-      stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
+      stdio: "pipe",
     });
 
     serverProcess.stdout.on("data", (data) => {
@@ -178,16 +175,15 @@ function startServer() {
       log(`[server stderr] ${data.toString().trim()}`);
     });
 
-    serverProcess.on("error", (err) => {
-      log(`Server process error: ${err.message}`);
-    });
-
-    serverProcess.on("exit", (code, signal) => {
-      log(`Server process exited with code ${code}, signal ${signal}`);
+    serverProcess.on("exit", (code) => {
+      log(`Server process exited with code ${code}`);
       serverProcess = null;
     });
 
-    log(`Server process spawned with PID: ${serverProcess.pid}`);
+    // PID is available after the 'spawn' event fires
+    serverProcess.on("spawn", () => {
+      log(`Server process spawned with PID: ${serverProcess.pid}`);
+    });
   } catch (err) {
     log(`Failed to spawn server process: ${err.message}`);
   }

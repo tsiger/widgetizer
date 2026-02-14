@@ -1,13 +1,11 @@
 import express from "express";
 import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
+import { STATIC_CORE_ASSETS_DIR } from "../config.js";
 
 const router = express.Router();
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Path to core assets directory
-const coreAssetsDir = path.join(__dirname, "../../src/core/assets");
+// Path to core assets directory (unpacked from asar in Electron builds for sendFile support)
+const coreAssetsDir = STATIC_CORE_ASSETS_DIR;
 
 /**
  * GET /api/core/assets/:filename

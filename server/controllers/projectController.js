@@ -6,6 +6,7 @@ import slugify from "slugify";
 import archiver from "archiver";
 import {
   DATA_DIR,
+  APP_ROOT,
   getProjectsFilePath,
   getProjectDir,
   getProjectPagesDir,
@@ -1167,7 +1168,7 @@ export async function exportProject(req, res) {
     }
 
     // Get app version for manifest
-    const PACKAGE_JSON_PATH = path.join(process.cwd(), "package.json");
+    const PACKAGE_JSON_PATH = path.join(APP_ROOT, "package.json");
     let appVersion = "unknown";
     try {
       const packageJson = await fs.readJson(PACKAGE_JSON_PATH);

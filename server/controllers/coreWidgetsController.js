@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
-import { CORE_WIDGETS_DIR } from "../config.js";
+import { CORE_WIDGETS_DIR, isAsarPath } from "../config.js";
 
 /**
  * Retrieves all available core widget schemas from the core widgets directory.
@@ -8,8 +8,13 @@ import { CORE_WIDGETS_DIR } from "../config.js";
  */
 export async function getCoreWidgets() {
   try {
-    // Ensure the core widgets directory exists
+    // Ensure the core widgets directory exists.
+    // In packaged Electron builds, CORE_WIDGETS_DIR is inside app.asar (read-only),
+    // so we cannot create directories there — just return empty.
     if (!(await fs.pathExists(CORE_WIDGETS_DIR))) {
+      if (isAsarPath(CORE_WIDGETS_DIR)) {
+        return [];
+      }
       await fs.ensureDir(CORE_WIDGETS_DIR);
       return [];
     }

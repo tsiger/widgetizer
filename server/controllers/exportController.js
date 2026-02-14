@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import archiver from "archiver";
-import { getProjectDir, PUBLISH_DIR } from "../config.js";
+import { getProjectDir, PUBLISH_DIR, APP_ROOT, STATIC_CORE_ASSETS_DIR } from "../config.js";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
 import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
@@ -9,7 +9,7 @@ import { readProjectsFile } from "./projectController.js";
 import { formatHtml, formatXml, validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
 import TurndownService from "turndown";
 
-const PACKAGE_JSON_PATH = path.join(process.cwd(), "package.json");
+const PACKAGE_JSON_PATH = path.join(APP_ROOT, "package.json");
 let cachedAppVersion = null;
 
 async function getAppVersion() {
@@ -473,7 +473,7 @@ Per aspera ad astra
 
     // --- Copy Core Assets (placeholder images) ---
     try {
-      const coreAssetsDir = path.join(process.cwd(), "src", "core", "assets");
+      const coreAssetsDir = STATIC_CORE_ASSETS_DIR;
       const placeholderFiles = [
         "placeholder.svg", // landscape (default)
         "placeholder-portrait.svg", // portrait
