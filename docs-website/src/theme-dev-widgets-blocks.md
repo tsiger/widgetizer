@@ -42,6 +42,7 @@ The schema tells Widgetizer what settings to show in the editor and what block t
 - `settings`: Array of widget-level settings (background color, layout options, etc.)
 - `blocks`: Array of block type definitions (for repeatable content)
 - `defaultBlocks`: Array of block instances to pre-populate when the widget is added
+- `maxBlocks`: Maximum number of blocks allowed (integer). When omitted or `0`, blocks are unlimited
 - `aliases`: Array of alternative names for AI/search ("quote", "review", "feedback")
 
 ## Adding Widget Settings
@@ -164,6 +165,27 @@ Each block type definition has:
 ```
 
 `defaultBlocks` pre-populates the widget with content when first added. Always include defaults so the widget looks complete out of the box.
+
+## Limiting the Number of Blocks (maxBlocks)
+
+Use `maxBlocks` to cap how many blocks a widget can contain. This is useful for slideshows, navigation bars, or any widget where too many items would break the design.
+
+```json
+{
+  "type": "slideshow",
+  "displayName": "Slideshow",
+  "maxBlocks": 10,
+  "blocks": [ ... ],
+  "defaultBlocks": [ ... ]
+}
+```
+
+**Behavior:**
+
+- When the limit is reached, the "Add block" button and insertion zones are hidden
+- A counter (e.g., "5/5") appears in the editor
+- Existing blocks are never removed — if a widget already has more blocks than the limit (e.g., the limit was added later), they are preserved but no new blocks can be added
+- Works for both page widgets and global widgets (header/footer)
 
 # Step 2: The Template (widget.liquid)
 
@@ -379,6 +401,31 @@ Global widgets appear on every page. Only two are supported:
 - Footer: `widgets/global/footer/` with template at `templates/global/footer.json`
 
 They work exactly like regular widgets but are rendered via `{{ header }}` and `{{ footer }}` in `layout.liquid`.
+
+Global widgets support the full blocks system — block types, `maxBlocks`, `defaultBlocks`, and `blocksOrder`/`blocks` data — identical to page widgets. This means your header can have repeatable blocks (e.g., announcement bars, top-bar buttons) and your footer can have repeatable blocks (e.g., link columns, text rows).
+
+**Example: header with announcement block**
+
+```json
+{
+  "type": "header",
+  "displayName": "Header",
+  "maxBlocks": 3,
+  "settings": [ ... ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "displayName": "Announcement",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Free shipping on orders over $50" }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    { "type": "announcement", "settings": { "text": "Free shipping on orders over $50" } }
+  ]
+}
+```
 
 # Complete Example
 

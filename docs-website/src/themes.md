@@ -114,16 +114,31 @@ You can remove a theme you no longer need from the Themes page:
 
 **Restriction:** You cannot delete a theme that is currently used by any project. If you try, Widgetizer shows an error explaining that the theme is in use. Remove or change the theme from those projects first (e.g. by deleting the projects or switching them to another theme), then delete the theme.
 
+# Theme Presets
+
+Some themes offer **presets** — named variants that provide different color schemes, typography, and optionally different demo content (pages, menus, and global widgets). Presets let a single theme serve multiple use cases without duplicating the entire theme.
+
+When you select a theme with presets during [project creation](projects.html), a visual card grid appears showing each preset's preview, name, and description. Pick the one that best fits your needs. The default preset is pre-selected.
+
+**Key points:**
+
+- Presets are applied only at project creation time
+- Once created, your project is independent — you can freely customize all settings
+- A "settings-only" preset changes colors and fonts but keeps the same demo pages
+- A "full" preset can provide completely different demo pages, menus, and navigation
+- Themes without presets work exactly the same as before
+
 # Choosing a Theme
 
 When creating a new project, consider:
 
 - **Design Style**: Does the theme match the aesthetic you want for your site?
+- **Presets**: Does the theme offer preset variants that match your use case?
 - **Widgets**: Does the theme include the types of widgets you need (forms, galleries, testimonials, etc.)?
 - **Flexibility**: Does the theme offer enough customization options for your needs?
 - **Purpose**: Is the theme designed for your type of site (portfolio, blog, business, etc.)?
 
-Once you've chosen a theme and created your project, you can customize it using the theme's global settings (colors, typography, etc.) and build your pages using the theme's widgets.
+Once you've chosen a theme (and optionally a preset) and created your project, you can customize it using the theme's global settings (colors, typography, etc.) and build your pages using the theme's widgets.
 
 # Customization Within a Theme
 

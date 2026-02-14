@@ -16,6 +16,7 @@ At any given time, one project is marked as **active**. This is the project you'
 2. Fill in the project details:
    - **Title** (required): The display name for your project
    - **Theme** (required): Choose a design theme for your project
+   - **Preset** (if available): Some themes offer preset variants — different color schemes, typography, or demo content. When you select a theme that has presets, a visual card grid appears below the theme dropdown. Pick the preset that best matches your needs, or keep the default.
 3. Expand **"More settings"** to configure additional options:
    - **Folder Name** (required): Auto-generated from the title, but you can customize it
    - **Notes** (optional): Personal notes about the project for your own reference
@@ -26,6 +27,7 @@ At any given time, one project is marked as **active**. This is the project you'
 
 - **Title**: The display name shown throughout Widgetizer.
 - **[Theme](themes.html)**: Defines the look and feel of your site. **Note:** You cannot change the theme after creating a project, so choose carefully!
+- **Preset**: A variant of the chosen theme with different colors, fonts, and/or demo content. Presets are only applied at project creation — once created, your project is independent and fully customizable.
 - **Folder Name**: The folder where your project files are stored and exported. This is automatically generated from the title as a URL-friendly slug (e.g., "My Site" becomes `my-site`).
 - **Notes**: Personal notes for your own reference. Useful for remembering what each project is for.
 - **Website Address**: The base URL where your site will be hosted (e.g., `https://example.com`). This is used for:

@@ -63,10 +63,11 @@ For how settings map into templates and CSS variables, see [Theme Manifest & Set
 
 Features:
 
-- **Formatting toolbar** with Bold, Italic, and Link buttons
+- **Formatting toolbar** with Bold, Italic, Link, Bullet List, and Numbered List buttons
 - **Link editor** with URL input (auto-prefixes `https://` if missing)
 - **Expand button** opens a larger modal for comfortable editing
 - Active formatting is highlighted in the toolbar based on cursor position
+- **Keyboard shortcuts**: Type `-` + space for bullet list, `1.` + space for numbered list, Enter on empty item to exit list
 
 Optional properties:
 
