@@ -20,17 +20,23 @@ These layers are applied automatically to API endpoints and provide a robust bas
   - **Editor routes** (`/api/projects`, `/api/themes`, `/api/pages`, `/api/preview`): 1500 requests per 15 minutes
   - **Other API routes** (`/api/menus`, `/api/media`, `/api/export`, `/api/settings`): 5000 requests per 15 minutes
 
-### 3. HTTP Security Headers [PENDING]
+### 3. HTTP Security Headers
 
-- **What it is:** A collection of special HTTP headers are sent with every response from the server.
-- **Why it's important:** These headers instruct the browser to enable its built-in security features, providing powerful protection against attacks like clickjacking, MIME-type sniffing, and cross-site scripting.
-- **Implementation:** The `helmet` package can be used as a global middleware to set these headers on all responses. _This is not currently implemented._
+- **What it is:** A collection of defensive HTTP headers sent with every response from the server.
+- **Why it's important:** Helps reduce browser-side attack surface (clickjacking, MIME sniffing, unsafe cross-origin defaults).
+- **Implementation:** Implemented globally with `helmet` in `server/index.js`. Current configuration intentionally relaxes some protections for preview/runtime compatibility:
+  - `contentSecurityPolicy: false` — Preview iframe needs inline styles/scripts from widgets
+  - `crossOriginEmbedderPolicy: false` — Widgets load cross-origin iframes (YouTube, Maps, etc.)
+  - `crossOriginResourcePolicy: { policy: "cross-origin" }` — Allow SVGs and assets in preview iframe
+  - `frameguard: false` — Preview renders in iframe via `/render/:token`
+  - `referrerPolicy: { policy: "strict-origin-when-cross-origin" }` — YouTube/Vimeo need the Referer header to validate embeds (helmet default `no-referrer` breaks them)
+  - `crossOriginOpenerPolicy: false` — YouTube player needs cross-origin popup communication
 
 ### 4. Cross-Origin Resource Sharing (CORS)
 
 - **What it is:** The server controls which domains are allowed to access the API.
 - **Why it's important:** Prevents unauthorized websites from making requests to your API.
-- **Implementation:** The `cors` package is enabled globally (`app.use(cors())`). In a production environment, this should be configured to whitelist specific domains.
+- **Implementation:** The `cors` package is enabled globally (`app.use(cors())`) with permissive defaults for local-only usage. When `PREVIEW_ISOLATION=true`, CORS switches to an allowlist-based origin policy using the `ALLOWED_ORIGINS` environment variable. If deployed remotely, replace with an allowlist-based origin policy.
 
 ### 5. Multi-layered SVG Sanitization
 
@@ -346,20 +352,9 @@ This section was added after an additional codebase security review, and is inte
 
 The items below map specific existing text to recommended replacements so the document stays aligned with the current codebase.
 
-1. Section: HTTP Security Headers [PENDING]
-   - Current text location: `docs-llms/core-security.md:23` to `docs-llms/core-security.md:28`
-   - Status: Update needed
-   - Recommended replacement text:
-     - `### 3. HTTP Security Headers`
-     - `- **What it is:** A collection of defensive HTTP headers sent with responses.`
-     - `- **Why it's important:** Helps reduce browser-side attack surface (clickjacking, MIME sniffing, unsafe cross-origin defaults).`
-     - `- **Implementation:** Implemented globally with \`helmet\` in \`server/index.js\`. Current configuration intentionally relaxes some protections for preview/runtime compatibility: \`contentSecurityPolicy: false\`, \`crossOriginEmbedderPolicy: false\`, and \`crossOriginResourcePolicy: { policy: "cross-origin" }\`.`
+1. Section: HTTP Security Headers — **DONE** (updated to reflect helmet implementation with full config details including referrerPolicy and crossOriginOpenerPolicy)
 
-2. Section: CORS implementation wording
-   - Current text location: `docs-llms/core-security.md:33`
-   - Status: Update needed (context clarification)
-   - Recommended replacement text:
-     - `- **Implementation:** The \`cors\` package is enabled globally (\`app.use(cors())\`) with permissive defaults for local-only usage. If deployed remotely, replace with an allowlist-based origin policy.`
+2. Section: CORS implementation wording — **DONE** (updated to mention PREVIEW_ISOLATION allowlist mode)
 
 3. Section: Environment variables
    - Current text location: `docs-llms/core-security.md:149` to `docs-llms/core-security.md:152`
