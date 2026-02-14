@@ -8,6 +8,7 @@ export default function SortableBlockItem({
   block,
   blockSchema,
   isSelected,
+  isAtMaxBlocks,
   onBlockSelect,
   onHover,
 }) {
@@ -26,6 +27,7 @@ export default function SortableBlockItem({
         block={block}
         blockSchema={blockSchema}
         isSelected={isSelected}
+        isAtMaxBlocks={isAtMaxBlocks}
         isDragging={isDragging}
         onBlockSelect={onBlockSelect}
         onHover={onHover}

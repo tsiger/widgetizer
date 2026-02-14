@@ -399,6 +399,7 @@
     "actions": {
       "duplicateBlock": "Duplicar bloque",
       "deleteBlock": "Eliminar bloque",
+      "maxBlocksReached": "Máximo de bloques alcanzado",
       "moveWidgetUp": "Mover widget hacia arriba",
       "moveWidgetDown": "Mover widget hacia abajo",
       "unsavedChanges": "Cambios sin guardar",

@@ -23,7 +23,7 @@ import FixedWidgetItem from "./widgets/FixedWidgetItem";
 import WidgetItem from "./widgets/WidgetItem";
 import WidgetSection from "./widgets/WidgetSection";
 import usePageStore from "../../stores/pageStore";
-import useWidgetStore from "../../stores/widgetStore";
+import useWidgetStore, { hasReachedMaxBlocks } from "../../stores/widgetStore";
 import useAutoSave from "../../stores/saveStore";
 import { scrollElementIntoView } from "../../queries/previewManager";
 import WidgetSelector from "./WidgetSelector";
@@ -141,10 +141,12 @@ export default function WidgetList({
 
   // Handle opening block selector
   const handleAddBlockClick = (widgetId, triggerRef, position = null) => {
-    // Check if widget has only one block type available
     const widget = widgets[widgetId] || (page?.widgets && page.widgets[widgetId]);
     const schema = widget && widgetSchemas[widget.type];
 
+    if (hasReachedMaxBlocks(widget, schema)) return;
+
+    // Check if widget has only one block type available
     if (schema && schema.blocks && schema.blocks.length === 1) {
       // Direct add
       const blockType = schema.blocks[0].type;

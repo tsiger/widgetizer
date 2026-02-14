@@ -1,6 +1,7 @@
 {
   "type": "slideshow",
   "displayName": "Slideshow",
+  "maxBlocks": 5,
   "aliases": ["carousel", "slider", "banner slider", "rotating banners"],
   "settings": [
     {

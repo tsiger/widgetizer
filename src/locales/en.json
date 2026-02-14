@@ -397,6 +397,7 @@
     "actions": {
       "duplicateBlock": "Duplicate block",
       "deleteBlock": "Delete block",
+      "maxBlocksReached": "Maximum blocks reached",
       "moveWidgetUp": "Move widget up",
       "moveWidgetDown": "Move widget down",
       "unsavedChanges": "Unsaved changes",

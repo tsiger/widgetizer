@@ -6,6 +6,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import SortableBlockItem from "../blocks/SortableBlockItem";
 import BlockInsertionZone from "../blocks/BlockInsertionZone";
+import { hasReachedMaxBlocks } from "../../../stores/widgetStore";
 
 export default function WidgetItem({
   widgetId,
@@ -35,6 +36,7 @@ export default function WidgetItem({
   const hasBlocks = widgetSchema.blocks && widgetSchema.blocks.length > 0;
   const blocks = widget.blocks || {};
   const blockOrder = widget.blocksOrder || [];
+  const atMaxBlocks = hasReachedMaxBlocks(widget, widgetSchema);
 
   // Inline editing state
   const [isEditing, setIsEditing] = useState(false);
@@ -174,7 +176,7 @@ export default function WidgetItem({
             >
               <SortableContext items={blockOrder} strategy={verticalListSortingStrategy}>
                 <div className="space-y-1">
-                  {blockOrder.length > 0 && (
+                  {blockOrder.length > 0 && !atMaxBlocks && (
                     <BlockInsertionZone
                       widgetId={widgetId}
                       position={0}
@@ -199,13 +201,14 @@ export default function WidgetItem({
                           block={block}
                           blockSchema={blockSchema}
                           isSelected={blockId === selectedBlockId && isSelected}
+                          isAtMaxBlocks={atMaxBlocks}
                           onHover={onHover}
                           onBlockSelect={(clickedBlockId) => {
                             if (onWidgetSelect) onWidgetSelect(widgetId);
                             if (onBlockSelect) onBlockSelect(clickedBlockId);
                           }}
                         />
-                        {index < blockOrder.length - 1 && (
+                        {index < blockOrder.length - 1 && !atMaxBlocks && (
                           <BlockInsertionZone
                             widgetId={widgetId}
                             position={index + 1}
@@ -247,7 +250,7 @@ export default function WidgetItem({
               </div>
             )}
 
-            {blockOrder.length > 0 && (
+            {blockOrder.length > 0 && !atMaxBlocks && (
               <div className="pt-2">
                 <button
                   className="w-full flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
@@ -260,6 +263,14 @@ export default function WidgetItem({
                   <Plus size={12} />
                   <span>{t("pageEditor.actions.addBlock")}</span>
                 </button>
+              </div>
+            )}
+
+            {widgetSchema.maxBlocks > 0 && blockOrder.length > 0 && (
+              <div className="text-center pt-1">
+                <span className={`text-xs ${atMaxBlocks ? "text-amber-600" : "text-slate-400"}`}>
+                  {blockOrder.length}/{widgetSchema.maxBlocks}
+                </span>
               </div>
             )}
           </div>

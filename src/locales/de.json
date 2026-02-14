@@ -398,6 +398,7 @@
     "actions": {
       "duplicateBlock": "Block duplizieren",
       "deleteBlock": "Block löschen",
+      "maxBlocksReached": "Maximale Blockanzahl erreicht",
       "moveWidgetUp": "Widget nach oben verschieben",
       "moveWidgetDown": "Widget nach unten verschieben",
       "unsavedChanges": "Ungespeicherte Änderungen",

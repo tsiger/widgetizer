@@ -397,6 +397,7 @@
     "actions": {
       "duplicateBlock": "Αντιγραφή block",
       "deleteBlock": "Διαγραφή block",
+      "maxBlocksReached": "Μέγιστος αριθμός blocks",
       "moveWidgetUp": "Μετακίνηση widget πάνω",
       "moveWidgetDown": "Μετακίνηση widget κάτω",
       "unsavedChanges": "Μη αποθηκευμένες αλλαγές",

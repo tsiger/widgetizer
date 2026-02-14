@@ -881,6 +881,7 @@ Each increment adds 0.1s delay. So `--reveal-delay: 0` has no delay, `--reveal-d
 {
   "type": "my-widget",
   "displayName": "My Widget",
+  "maxBlocks": 10,
   "aliases": ["alternative name", "keyword"],
   "settings": [
     // Widget settings here
@@ -891,6 +892,27 @@ Each increment adds 0.1s delay. So `--reveal-delay: 0` has no delay, `--reveal-d
   "defaultBlocks": [
     // Default block instances (if blocks are used)
   ]
+}
+```
+
+### Block Limits
+
+Use the `maxBlocks` property to limit how many blocks a widget can contain:
+
+- **Property**: `maxBlocks` (integer, optional)
+- **Location**: Top level of `schema.json`, same level as `type` and `displayName`
+- **Behavior**: When omitted or set to `0`, blocks are unlimited (backward compatible)
+- **UI effect**: When the limit is reached, the "Add block" buttons and insertion zones are hidden, the "Duplicate" button on existing blocks is disabled, and a counter (e.g., "5/5") appears
+- **Existing content**: If a widget already has more blocks than the limit (e.g., limit was added after content was created), existing blocks are preserved but no new blocks can be added
+
+**Example**: Limiting a slideshow to 10 slides:
+
+```json
+{
+  "type": "slideshow",
+  "maxBlocks": 10,
+  "displayName": "Slideshow",
+  ...
 }
 ```
 
@@ -1510,6 +1532,7 @@ Before submitting a widget:
 - [ ] Background setting at END of settings array (if applicable)
 - [ ] No duplicate CSS properties from `base.css`
 - [ ] Scroll reveal animations added to content elements (`.reveal .reveal-up` with `--reveal-delay`)
+- [ ] `maxBlocks` set for widgets where block count should be limited
 
 ---
 

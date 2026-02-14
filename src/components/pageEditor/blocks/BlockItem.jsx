@@ -9,6 +9,7 @@ export default function BlockItem({
   block,
   blockSchema,
   isSelected,
+  isAtMaxBlocks,
   isDragging,
   onBlockSelect,
   dragHandleProps = {},
@@ -63,9 +64,14 @@ export default function BlockItem({
 
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <button
-          className="p-1.5 text-slate-400 hover:text-blue-500 rounded-md hover:bg-white/80 transition-colors"
-          onClick={handleDuplicate}
-          title={t("pageEditor.actions.duplicateBlock")}
+          className={`p-1.5 rounded-md transition-colors ${
+            isAtMaxBlocks
+              ? "text-slate-300 cursor-not-allowed"
+              : "text-slate-400 hover:text-blue-500 hover:bg-white/80"
+          }`}
+          onClick={isAtMaxBlocks ? (e) => e.stopPropagation() : handleDuplicate}
+          disabled={isAtMaxBlocks}
+          title={isAtMaxBlocks ? t("pageEditor.actions.maxBlocksReached") : t("pageEditor.actions.duplicateBlock")}
         >
           <Copy size={12} />
         </button>

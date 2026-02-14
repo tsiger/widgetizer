@@ -3,6 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 import { getProjectWidgets } from "../queries/previewManager";
 import usePageStore from "./pageStore";
 import useAutoSave from "./saveStore";
+import { hasReachedMaxBlocks } from "../utils/blockLimits";
+
+export { hasReachedMaxBlocks };
 
 /**
  * Zustand store for managing widget operations in the page editor.
@@ -365,6 +368,9 @@ const useWidgetStore = create((set, get) => ({
 
     const widget = page.widgets[widgetId];
     const widgetSchema = schemas[widget.type];
+
+    if (hasReachedMaxBlocks(widget, widgetSchema)) return null;
+
     const blockSchema = widgetSchema.blocks?.find((block) => block.type === blockType);
 
     if (!blockSchema) return null;
@@ -517,6 +523,10 @@ const useWidgetStore = create((set, get) => ({
     if (!page || !page.widgets[widgetId]) return null;
 
     const widget = page.widgets[widgetId];
+    const { schemas } = get();
+    const widgetSchema = schemas[widget.type];
+    if (hasReachedMaxBlocks(widget, widgetSchema)) return null;
+
     if (!widget.blocks || !widget.blocks[blockId]) return null;
 
     const originalBlock = widget.blocks[blockId];
