@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.9.3] - 2026-02-14
+
+### Added
+
+- Global widgets (header/footer) can now host blocks
+- `maxBlocks` property to limit the number of blocks a widget can contain
+- Theme presets system for quick theme configuration
+- Responsive image support
+- Media usage tracking in theme settings (e.g. favicon)
+- Richtext UL and OL (list) support
+- Comprehensive backend test suite (page CRUD, project, and tag tests)
+
+### Changed
+
+- Electron server process refactored to use `utilityProcess`
+- Tests reorganized into logical groups
+
+### Fixed
+
+- ESLint generator function errors in core tag
+- SEO tag now handles image paths correctly
+
+### Security
+
+- Bumped `qs` and `markdown-it` dependencies
+
 ## [0.9.2] - 2026-02-07
 
 ### Added
