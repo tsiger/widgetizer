@@ -95,7 +95,10 @@
       "siteUrlInvalid": "Inserisci un URL valido (es., https://miosito.com)",
       "loadingThemes": "Caricamento temi...",
       "loadThemesError": "Caricamento dei temi fallito. Riavvia l'applicazione.",
-      "moreSettings": "Altre impostazioni"
+      "moreSettings": "Altre impostazioni",
+      "presetLabel": "Stile Predefinito",
+      "presetHelp": "Scegli uno stile visivo e un layout di contenuto.",
+      "loadingPresets": "Caricamento stili..."
     },
     "media": {
       "editTitle": "Modifica Metadati {{type}}",

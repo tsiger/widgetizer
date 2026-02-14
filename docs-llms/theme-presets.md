@@ -1,5 +1,7 @@
 # Theme Presets Feature
 
+> **Status: ✅ Implemented** — This feature has been fully implemented. The specification below reflects the current working implementation. See also: [Theming Guide — Presets](theming.md), [Core Themes](core-themes.md), [Core Projects](core-projects.md).
+
 ## Context
 
 Currently, each Widgetizer theme has a single set of demo content (templates, menus, global widgets) and a single set of default settings (colors, typography). If a theme author wants to showcase different visual styles or different page layouts (e.g., "restaurant site" vs. "agency site" vs. "portfolio"), they must create entirely separate themes — duplicating all widgets, layout, assets, and CSS.

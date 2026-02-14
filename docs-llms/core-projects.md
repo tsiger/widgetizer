@@ -17,6 +17,7 @@ These pages rely on a central form component for handling user input:
   - Fully **localized** using `react-i18next` for all labels, errors, and help text
   - Exposes `isDirty` state to parent components for navigation guard integration
   - Automatic slug generation from project name for new projects
+  - **Preset selection**: When a theme with presets is selected, fetches presets via `GET /api/themes/{themeId}/presets` and displays a visual card grid with preset screenshots, names, and descriptions. The default preset is pre-selected. The selected preset ID is included in the form data as `preset`.
 
 ## Client-Side Routing
 
@@ -59,10 +60,16 @@ This file contains functions that make API calls to the backend:
 3.  **Navigation Guard**: The page integrates `useFormNavigationGuard` to prevent accidental navigation with unsaved changes.
 4.  **Theme Loading**: `ProjectForm.jsx` makes an API call via `/api/themes` to fetch the list of available themes and populates the "Theme" dropdown.
 5.  **User Input**: The user fills in the title and selects a theme. Additional fields (folder name, notes, website address) are available under "More settings". The "Theme" dropdown is only enabled during project creation.
+5b. **Preset Selection**: If the selected theme has presets, a visual card grid appears below the theme dropdown showing available presets (screenshot, name, description). The default preset is pre-selected. The user can click a different preset card to switch. Presets are fetched from `GET /api/themes/{themeId}/presets` via `getThemePresets()` in `themeManager.js`.
 6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
 7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
 8.  **API Call**: `ProjectsAdd.jsx`'s `handleSubmit` function calls `createProject(formData)` from `projectManager.js`, which sends a `POST` request to the backend API to create the new project.
-9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`. In packaged Electron builds, the source theme files live in `app.asar.unpacked/themes/`. These become the project's working theme files.
+9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`. In packaged Electron builds, the source theme files live in `app.asar.unpacked/themes/`. The `presets/` directory is excluded from the copy. These become the project's working theme files.
+9b. **Preset Application**: If a preset was selected during creation, the system applies preset overrides after the theme copy:
+    - **Templates**: If the preset has its own `templates/` directory, those templates are used instead of the root theme templates for the `processTemplatesRecursive` step.
+    - **Menus**: If the preset has its own `menus/` directory, the root menus already copied into the project are removed and replaced with the preset's menus. This happens before menu enrichment (step 10).
+    - **Settings Overrides**: The preset's `preset.json` contains a flat map of `{ setting_id: value }` overrides. The system walks the project's `theme.json > settings.global` groups and updates the `default` field for any setting whose `id` matches a key in the overrides map. This applies colors, fonts, animations, and any other theme settings defined by the preset.
+    - The selected preset ID is stored in the project metadata as `preset`.
 10. **Link Enrichment**: After copying theme files, the system enriches all internal page links with `pageUuid`:
     - **Menus**: All menu items that link to internal pages (e.g., `index.html`, `about.html`) are enriched with the corresponding page's `pageUuid`. This ensures menu links remain valid even if pages are renamed.
     - **Widgets**: All widget settings with link-type values (objects containing `href` pointing to internal `.html` pages) are enriched with `pageUuid`. This includes links in header, footer, and all page widgets.
@@ -151,7 +158,7 @@ The frontend `projectManager.js` communicates with a set of backend API endpoint
 | :-- | :-- | :-- | :-- |
 | `GET` | `/api/projects` | `getAllProjects` | Retrieves a list of all projects. |
 | `GET` | `/api/projects/active` | `getActiveProject` | Gets the currently active project's data. |
-| `POST` | `/api/projects` | `createProject` | Creates a new project. |
+| `POST` | `/api/projects` | `createProject` | Creates a new project. Accepts optional `preset` field (string) to apply a theme preset. |
 | `PUT` | `/api/projects/active/:id` | `setActiveProject` | Sets the project with the given `id` as active. |
 | `PUT` | `/api/projects/:id` | `updateProject` | Updates a specific project. |
 | `DELETE` | `/api/projects/:id` | `deleteProject` | Deletes a specific project. |
@@ -175,3 +182,4 @@ All API endpoints described in this document are protected by the platform's cor
 - [Theming Guide](theming.md) - Theme structure copied during project creation
 - [App Settings](core-appSettings.md) - Configure project import size limits
 - [Platform Security](core-security.md) - Security considerations for project import/export
+- [Theme Presets](theme-presets.md) - Preset variants applied during project creation

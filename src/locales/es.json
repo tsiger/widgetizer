@@ -95,7 +95,10 @@
       "siteUrlInvalid": "Por favor, ingresa una URL válida (ej., https://misitio.com)",
       "loadingThemes": "Cargando temas...",
       "loadThemesError": "Error al cargar los temas. Por favor, reinicia la aplicación.",
-      "moreSettings": "Más ajustes"
+      "moreSettings": "Más ajustes",
+      "presetLabel": "Estilo Predefinido",
+      "presetHelp": "Elige un estilo visual y diseño de contenido.",
+      "loadingPresets": "Cargando estilos..."
     },
     "media": {
       "editTitle": "Editar Metadatos de {{type}}",

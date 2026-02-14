@@ -17,7 +17,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Managing theme assets and CSS variables
 - Implementing scroll reveal animations
 
-**Key topics**: Theme manifest, layout templates, widgets, global settings, menu rendering, asset management, scroll reveal animations, export behavior
+**Key topics**: Theme manifest, layout templates, widgets, global settings, menu rendering, asset management, scroll reveal animations, export behavior, theme presets
 
 ---
 
@@ -77,6 +77,19 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Understanding which files are updated vs. protected
 
 **Key topics**: Version folders, latest snapshot, update eligibility, settings merge, project update flow, developer tools
+
+---
+
+### **[theme-presets.md](theme-presets.md)** - Theme Presets
+
+**Purpose**: Specification for theme preset variants that override settings and/or demo content **When to use**:
+
+- Understanding how presets work (directory structure, fallback chain, settings overrides)
+- Creating preset variants for themes
+- Understanding the project creation flow with presets
+- Working with the preset selection UI
+
+**Key topics**: Preset registry, settings overrides, template/menu fallback chain, preset resolution, UI integration
 
 ---
 
@@ -143,7 +156,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Troubleshooting project state management
 - Working with the project store (Zustand)
 
-**Key topics**: Project CRUD operations, active project management, state management, backend API endpoints
+**Key topics**: Project CRUD operations, active project management, state management, backend API endpoints, preset selection during creation
 
 ---
 
@@ -213,7 +226,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing theme management UI
 - Troubleshooting theme installation
 
-**Key topics**: Theme display, upload process, validation, theme switching
+**Key topics**: Theme display, upload process, validation, theme switching, theme presets, preset API
 
 ---
 
@@ -291,7 +304,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **Theme Developers**
 
-Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md`, `theme-updates.md` Secondary: `core-export.md`, `core-menus.md`
+Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md`, `theme-updates.md`, `theme-presets.md` Secondary: `core-export.md`, `core-menus.md`
 
 ### **Frontend Developers**
 

@@ -95,7 +95,10 @@
       "siteUrlInvalid": "Παρακαλώ εισάγετε μια έγκυρη διεύθυνση URL (π.χ. https://mysite.com)",
       "loadingThemes": "Φόρτωση θεμάτων...",
       "loadThemesError": "Αποτυχία φόρτωσης θεμάτων. Παρακαλώ επανεκκινήστε την εφαρμογή.",
-      "moreSettings": "Περισσότερες ρυθμίσεις"
+      "moreSettings": "Περισσότερες ρυθμίσεις",
+      "presetLabel": "Στυλ Προτύπου",
+      "presetHelp": "Επιλέξτε ένα οπτικό στυλ και διάταξη περιεχομένου.",
+      "loadingPresets": "Φόρτωση προτύπων..."
     },
     "media": {
       "editTitle": "Επεξεργασία Metadata {{type}}",

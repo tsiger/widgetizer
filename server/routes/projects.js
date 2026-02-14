@@ -65,6 +65,7 @@ router.post(
     body("name").notEmpty().withMessage("Project name is required.").trim().escape(),
     body("description").trim().escape(),
     body("theme").notEmpty().withMessage("A theme is required to create a project."),
+    body("preset").optional().isString().trim(),
   ],
   projectController.createProject,
 );

@@ -7,6 +7,7 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import Button from "../ui/Button";
 import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
+import { getThemePresets, getPresetScreenshotUrl } from "../../queries/themeManager";
 
 export default function ProjectForm({
   initialData = { name: "", description: "", theme: "", siteUrl: "" },
@@ -24,6 +25,11 @@ export default function ProjectForm({
   const [showMoreSettings, setShowMoreSettings] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
 
+  // Preset state
+  const [presets, setPresets] = useState({ default: null, presets: [] });
+  const [selectedPreset, setSelectedPreset] = useState(null);
+  const [presetsLoading, setPresetsLoading] = useState(false);
+
   const {
     register,
     handleSubmit: rhfHandleSubmit,
@@ -38,11 +44,15 @@ export default function ProjectForm({
       description: initialData.description || "",
       theme: initialData.theme || "",
       siteUrl: initialData.siteUrl || "",
+      preset: "",
     },
   });
 
   // Watch name for auto-folder-name generation
   const name = watch("name");
+
+  // Watch theme selection for preset fetching
+  const selectedTheme = watch("theme");
 
   // Notify parent of dirty state changes
   useEffect(() => {
@@ -69,6 +79,7 @@ export default function ProjectForm({
         description: initialData.description || "",
         theme: initialData.theme || "",
         siteUrl: initialData.siteUrl || "",
+        preset: "",
       });
       prevInitialDataRef.current = currentInitialDataStr;
     }
@@ -79,6 +90,40 @@ export default function ProjectForm({
     loadThemes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Fetch presets when theme selection changes
+  useEffect(() => {
+    if (!isNew || !selectedTheme) {
+      setPresets({ default: null, presets: [] });
+      setSelectedPreset(null);
+      setValue("preset", "");
+      return;
+    }
+
+    const fetchPresets = async () => {
+      setPresetsLoading(true);
+      try {
+        const data = await getThemePresets(selectedTheme);
+        setPresets(data);
+
+        if (data.presets.length > 0) {
+          const defaultPresetId = data.default || data.presets[0].id;
+          setSelectedPreset(defaultPresetId);
+          setValue("preset", defaultPresetId);
+        } else {
+          setSelectedPreset(null);
+          setValue("preset", "");
+        }
+      } catch {
+        setPresets({ default: null, presets: [] });
+        setSelectedPreset(null);
+      } finally {
+        setPresetsLoading(false);
+      }
+    };
+
+    fetchPresets();
+  }, [selectedTheme, isNew, setValue]);
 
   const loadThemes = async () => {
     try {
@@ -121,7 +166,10 @@ export default function ProjectForm({
           description: "",
           theme: "",
           siteUrl: "",
+          preset: "",
         });
+        setPresets({ default: null, presets: [] });
+        setSelectedPreset(null);
       }
       return result;
     } catch (err) {
@@ -134,6 +182,7 @@ export default function ProjectForm({
 
   return (
     <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="form-container">
+      <input type="hidden" {...register("preset")} />
       <div className="form-section">
         <div className="form-field">
           <label htmlFor="name" className="form-label">
@@ -174,6 +223,47 @@ export default function ProjectForm({
             </select>
             {errors.theme && <p className="form-error">{errors.theme.message}</p>}
             <p className="form-description">{t("forms.project.themeHelp")}</p>
+          </div>
+        )}
+
+        {/* Preset selection - shown when theme has presets */}
+        {isNew && presets.presets.length > 0 && (
+          <div className="form-field">
+            <label className="form-label">{t("forms.project.presetLabel")}</label>
+            {presetsLoading ? (
+              <p className="text-sm text-gray-500">{t("forms.project.loadingPresets")}</p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {presets.presets.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedPreset(preset.id);
+                      setValue("preset", preset.id, { shouldDirty: true });
+                    }}
+                    className={`relative rounded-lg border-2 overflow-hidden text-left transition-all ${
+                      selectedPreset === preset.id
+                        ? "border-pink-500 ring-2 ring-pink-500/20"
+                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    }`}
+                  >
+                    <img
+                      src={getPresetScreenshotUrl(selectedTheme, preset.id, preset.hasScreenshot)}
+                      alt={preset.name}
+                      className="w-full aspect-video object-cover"
+                    />
+                    <div className="p-2">
+                      <p className="text-sm font-medium truncate">{preset.name}</p>
+                      {preset.description && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{preset.description}</p>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            <p className="form-description">{t("forms.project.presetHelp")}</p>
           </div>
         )}
 

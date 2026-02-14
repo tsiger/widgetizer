@@ -326,6 +326,13 @@ themes/{theme-name}/
 ├── menus/                  # Navigation menus
 │   ├── main-menu.json
 │   └── footer-menu.json
+├── presets/                # OPTIONAL: Preset variants
+│   ├── presets.json        # Preset registry
+│   └── {preset-id}/
+│       ├── preset.json     # Settings overrides (flat map of setting_id → value)
+│       ├── screenshot.png  # Preset preview (falls back to root screenshot.png)
+│       ├── templates/      # Optional: custom page templates for this preset
+│       └── menus/          # Optional: custom menus for this preset
 ├── assets/                 # Theme assets (CSS, JS, icons)
 ├── snippets/               # Reusable Liquid partials
 └── prompt-widget.md        # Widget generation prompt (optional)
@@ -474,7 +481,25 @@ For each page template:
 4. Include appropriate CTAs
 5. Add necessary disclaimers if required by industry
 
-### Step 5: Validation
+### Step 5: Create Presets (Optional)
+
+If the theme should support multiple visual styles or demo content variants:
+
+1. Create `presets/presets.json` with the preset registry (list of id, name, description; specify which is default)
+2. For each preset, create `presets/{preset-id}/`:
+   - **`preset.json`** (required): Flat map of `{ setting_id: value }` overrides for colors, fonts, animations, etc.
+   - **`screenshot.png`** (recommended): 1280×720 preview image shown in the preset selector
+   - **`templates/`** (optional): Full set of page templates if this preset needs different page content than root. Include `global/header.json` and `global/footer.json` if the preset has custom branding.
+   - **`menus/`** (optional): Custom navigation menus if the preset needs different page links
+3. The `"default"` preset can either have its own directory or fall through to root `templates/`, `menus/`, and `theme.json` defaults
+
+**Preset design tips:**
+- A settings-only preset (just `preset.json`) is the quickest way to offer a different visual style
+- A full preset with templates + menus lets you showcase completely different industries (e.g., hotel vs. agency vs. portfolio)
+- Each preset can use any widget available in the theme — use this to showcase different widget combinations
+- Preset menus should have links matching the preset's template slugs
+
+### Step 6: Validation
 
 Verify:
 
@@ -485,6 +510,7 @@ Verify:
 - All block types match widget schemas
 - Menu links match page slugs
 - No placeholder text remains
+- If presets exist: `presets.json` is valid JSON, each preset's `preset.json` has valid setting IDs, preset template slugs match preset menu links
 
 ---
 

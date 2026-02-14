@@ -26,6 +26,9 @@ router.get("/:id/templates", themeController.getThemeTemplates);
 // GET /api/themes/:id/versions - Get theme versions
 router.get("/:id/versions", themeController.getThemeVersionsHandler);
 
+// GET /api/themes/:id/presets - Get theme presets
+router.get("/:id/presets", themeController.getThemePresets);
+
 // POST /api/themes/:id/update - Update a single theme (build latest/)
 router.post("/:id/update", themeController.updateTheme);
 
