@@ -8,6 +8,51 @@ import { hasReachedMaxBlocks } from "../utils/blockLimits";
 export { hasReachedMaxBlocks };
 
 /**
+ * Check if a widgetId refers to a global widget (header or footer).
+ * @param {string} widgetId
+ * @returns {boolean}
+ */
+function isGlobalWidgetId(widgetId) {
+  return widgetId === "header" || widgetId === "footer";
+}
+
+/**
+ * Get widget data regardless of whether it's a page widget or global widget.
+ * @param {string} widgetId - Widget ID or global widget type ("header"/"footer")
+ * @returns {{ widget: Object|null, isGlobal: boolean }}
+ */
+function getWidgetData(widgetId) {
+  const pageStore = usePageStore.getState();
+  if (isGlobalWidgetId(widgetId)) {
+    return { widget: pageStore.globalWidgets[widgetId] || null, isGlobal: true };
+  }
+  const { page } = pageStore;
+  return { widget: page?.widgets?.[widgetId] || null, isGlobal: false };
+}
+
+/**
+ * Persist an updated widget back to the correct store location.
+ * @param {string} widgetId
+ * @param {Object} updatedWidget
+ * @param {boolean} isGlobal
+ */
+function setWidgetData(widgetId, updatedWidget, isGlobal) {
+  const pageStore = usePageStore.getState();
+  if (isGlobal) {
+    pageStore.updateGlobalWidget(widgetId, updatedWidget);
+  } else {
+    const { page } = pageStore;
+    pageStore.setPage({
+      ...page,
+      widgets: {
+        ...page.widgets,
+        [widgetId]: updatedWidget,
+      },
+    });
+  }
+}
+
+/**
  * Zustand store for managing widget operations in the page editor.
  * Handles widget schemas, selection state, and CRUD operations for widgets and blocks.
  *
@@ -360,13 +405,11 @@ const useWidgetStore = create((set, get) => ({
   },
 
   addBlock: (widgetId, blockType, position = null) => {
-    const pageStore = usePageStore.getState();
-    const { page } = pageStore;
     const { schemas } = get();
+    const { widget, isGlobal } = getWidgetData(widgetId);
 
-    if (!page || !page.widgets[widgetId]) return null;
+    if (!widget) return null;
 
-    const widget = page.widgets[widgetId];
     const widgetSchema = schemas[widget.type];
 
     if (hasReachedMaxBlocks(widget, widgetSchema)) return null;
@@ -411,50 +454,35 @@ const useWidgetStore = create((set, get) => ({
       blocksOrder: newBlocksOrder,
     };
 
-    const updatedPage = {
-      ...page,
-      widgets: {
-        ...page.widgets,
-        [widgetId]: updatedWidget,
-      },
-    };
-
-    pageStore.setPage(updatedPage);
+    setWidgetData(widgetId, updatedWidget, isGlobal);
     return blockId;
   },
 
   reorderBlocks: (widgetId, newOrder) => {
-    const pageStore = usePageStore.getState();
-    const { page } = pageStore;
+    const { widget, isGlobal } = getWidgetData(widgetId);
 
-    if (!page || !page.widgets[widgetId]) return;
+    if (!widget) return;
 
     const updatedWidget = {
-      ...page.widgets[widgetId],
+      ...widget,
       blocksOrder: newOrder,
     };
 
-    const updatedPage = {
-      ...page,
-      widgets: {
-        ...page.widgets,
-        [widgetId]: updatedWidget,
-      },
-    };
+    setWidgetData(widgetId, updatedWidget, isGlobal);
 
-    pageStore.setPage(updatedPage);
-
-    useAutoSave.getState().setStructureModified(true);
+    if (isGlobal) {
+      useAutoSave.getState().markWidgetModified(widgetId);
+    } else {
+      useAutoSave.getState().setStructureModified(true);
+    }
   },
 
   deleteBlock: (widgetId, blockId) => {
-    const pageStore = usePageStore.getState();
-    const { page } = pageStore;
     const { selectedBlockId } = get();
+    const { widget, isGlobal } = getWidgetData(widgetId);
 
-    if (!page || !page.widgets[widgetId]) return;
+    if (!widget) return;
 
-    const widget = page.widgets[widgetId];
     // eslint-disable-next-line no-unused-vars
     const { [blockId]: deletedBlock, ...remainingBlocks } = widget.blocks || {};
     const updatedBlocksOrder = (widget.blocksOrder || []).filter((id) => id !== blockId);
@@ -465,15 +493,7 @@ const useWidgetStore = create((set, get) => ({
       blocksOrder: updatedBlocksOrder,
     };
 
-    const updatedPage = {
-      ...page,
-      widgets: {
-        ...page.widgets,
-        [widgetId]: updatedWidget,
-      },
-    };
-
-    pageStore.setPage(updatedPage);
+    setWidgetData(widgetId, updatedWidget, isGlobal);
 
     if (selectedBlockId === blockId) {
       set({ selectedBlockId: null });
@@ -481,12 +501,9 @@ const useWidgetStore = create((set, get) => ({
   },
 
   updateBlockSettings: (widgetId, blockId, settingId, value) => {
-    const pageStore = usePageStore.getState();
-    const { page } = pageStore;
+    const { widget, isGlobal } = getWidgetData(widgetId);
 
-    if (!page || !page.widgets[widgetId]) return;
-
-    const widget = page.widgets[widgetId];
+    if (!widget) return;
     if (!widget.blocks?.[blockId]) return;
 
     const updatedBlock = {
@@ -505,24 +522,14 @@ const useWidgetStore = create((set, get) => ({
       },
     };
 
-    const updatedPage = {
-      ...page,
-      widgets: {
-        ...page.widgets,
-        [widgetId]: updatedWidget,
-      },
-    };
-
-    pageStore.setPage(updatedPage);
+    setWidgetData(widgetId, updatedWidget, isGlobal);
   },
 
   duplicateBlock: (widgetId, blockId) => {
-    const pageStore = usePageStore.getState();
-    const { page } = pageStore;
+    const { widget, isGlobal } = getWidgetData(widgetId);
 
-    if (!page || !page.widgets[widgetId]) return null;
+    if (!widget) return null;
 
-    const widget = page.widgets[widgetId];
     const { schemas } = get();
     const widgetSchema = schemas[widget.type];
     if (hasReachedMaxBlocks(widget, widgetSchema)) return null;
@@ -552,15 +559,7 @@ const useWidgetStore = create((set, get) => ({
       blocksOrder: newBlocksOrder,
     };
 
-    const updatedPage = {
-      ...page,
-      widgets: {
-        ...page.widgets,
-        [widgetId]: updatedWidget,
-      },
-    };
-
-    pageStore.setPage(updatedPage);
+    setWidgetData(widgetId, updatedWidget, isGlobal);
     return newBlockId;
   },
 }));

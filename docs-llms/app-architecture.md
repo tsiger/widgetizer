@@ -544,7 +544,8 @@ Manages widget operations:
 
 - `addWidget()`, `removeWidget()`, `duplicateWidget()`
 - `reorderWidgets()`, `updateWidgetSettings()`
-- `addBlock()`, `removeBlock()`, `reorderBlocks()`
+- `addBlock()`, `deleteBlock()`, `reorderBlocks()`, `updateBlockSettings()`, `duplicateBlock()`
+- Block operations work on both page widgets and global widgets (header/footer) via internal helpers: `isGlobalWidgetId()`, `getWidgetData()`, `setWidgetData()`
 - Selection state: `selectedWidgetId`, `selectedBlockId`, `selectedGlobalWidgetId`
 - Hover state: `hoveredWidgetId`, `hoveredBlockId`
 - Modification tracking: `modifiedWidgets`, `structureModified`

@@ -61,7 +61,7 @@ export default function WidgetList({
   const { globalWidgets } = usePageStore();
   const { deleteWidget, duplicateWidget, reorderWidgets, reorderBlocks, setHoveredWidget, updateWidgetSettings } =
     useWidgetStore();
-  const { setStructureModified } = useAutoSave();
+  const { setStructureModified, markWidgetModified } = useAutoSave();
   const { header: headerWidget, footer: footerWidget } = globalWidgets;
 
   // Handle widget/block hover from sidebar - now uses store state for overlay
@@ -141,7 +141,7 @@ export default function WidgetList({
 
   // Handle opening block selector
   const handleAddBlockClick = (widgetId, triggerRef, position = null) => {
-    const widget = widgets[widgetId] || (page?.widgets && page.widgets[widgetId]);
+    const widget = widgets[widgetId] || page?.widgets?.[widgetId] || globalWidgets[widgetId];
     const schema = widget && widgetSchemas[widget.type];
 
     if (hasReachedMaxBlocks(widget, schema)) return;
@@ -151,12 +151,16 @@ export default function WidgetList({
       // Direct add
       const blockType = schema.blocks[0].type;
 
-      const { addBlock, setSelectedWidgetId, setSelectedBlockId } = useWidgetStore.getState();
+      const { addBlock, setSelectedWidgetId, setSelectedGlobalWidgetId, setSelectedBlockId } =
+        useWidgetStore.getState();
       const newBlockId = addBlock(widgetId, blockType, position);
-      setStructureModified(true);
-
-      // Keep the widget selected and select the new block
-      setSelectedWidgetId(widgetId);
+      if (widgetId === "header" || widgetId === "footer") {
+        markWidgetModified(widgetId);
+        setSelectedGlobalWidgetId(widgetId);
+      } else {
+        setStructureModified(true);
+        setSelectedWidgetId(widgetId);
+      }
       setSelectedBlockId(newBlockId);
       return;
     }
@@ -210,6 +214,13 @@ export default function WidgetList({
                 isModified={modifiedWidgets.has("header")}
                 onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("header")}
                 onHover={handleHover}
+                selectedBlockId={selectedBlockId}
+                onBlockSelect={onBlockSelect}
+                onBlocksReorder={reorderBlocks}
+                onAddBlockClick={handleAddBlockClick}
+                isBlockSelectorOpen={isBlockSelectorOpen}
+                activeWidgetId={activeWidgetId}
+                activeBlockTriggerKey={activeBlockTriggerKey}
               />
             </div>
           </WidgetSection>
@@ -341,6 +352,13 @@ export default function WidgetList({
                 isModified={modifiedWidgets.has("footer")}
                 onWidgetSelect={() => onGlobalWidgetSelect && onGlobalWidgetSelect("footer")}
                 onHover={handleHover}
+                selectedBlockId={selectedBlockId}
+                onBlockSelect={onBlockSelect}
+                onBlocksReorder={reorderBlocks}
+                onAddBlockClick={handleAddBlockClick}
+                isBlockSelectorOpen={isBlockSelectorOpen}
+                activeWidgetId={activeWidgetId}
+                activeBlockTriggerKey={activeBlockTriggerKey}
               />
             </div>
           </WidgetSection>
@@ -373,15 +391,25 @@ export default function WidgetList({
           setActiveBlockTriggerKey(null);
           setBlockInsertPosition(null);
         }}
-        widgetSchema={activeWidgetId ? widgetSchemas[page?.widgets[activeWidgetId]?.type] : null}
+        widgetSchema={
+          activeWidgetId
+            ? widgetSchemas[page?.widgets?.[activeWidgetId]?.type || globalWidgets[activeWidgetId]?.type]
+            : null
+        }
         onSelectBlock={(blockType) => {
           if (activeWidgetId) {
-            const { addBlock, setSelectedWidgetId, setSelectedBlockId } = useWidgetStore.getState();
+            const { addBlock, setSelectedWidgetId, setSelectedGlobalWidgetId, setSelectedBlockId } =
+              useWidgetStore.getState();
             const newBlockId = addBlock(activeWidgetId, blockType, blockInsertPosition);
-            setStructureModified(true);
 
             // Keep the widget selected and select the new block
-            setSelectedWidgetId(activeWidgetId);
+            if (activeWidgetId === "header" || activeWidgetId === "footer") {
+              markWidgetModified(activeWidgetId);
+              setSelectedGlobalWidgetId(activeWidgetId);
+            } else {
+              setStructureModified(true);
+              setSelectedWidgetId(activeWidgetId);
+            }
             setSelectedBlockId(newBlockId);
           }
           setIsBlockSelectorOpen(false);

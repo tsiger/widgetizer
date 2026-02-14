@@ -897,7 +897,7 @@ Each increment adds 0.1s delay. So `--reveal-delay: 0` has no delay, `--reveal-d
 
 ### Block Limits
 
-Use the `maxBlocks` property to limit how many blocks a widget can contain:
+Use the `maxBlocks` property to limit how many blocks a widget can contain. This works for both page widgets and global widgets (header/footer).
 
 - **Property**: `maxBlocks` (integer, optional)
 - **Location**: Top level of `schema.json`, same level as `type` and `displayName`

@@ -1040,6 +1040,7 @@ Global widgets are special widgets that appear on every page of the website. Cur
 - Typically includes site branding, navigation, and search
 - Can reference menu systems via `{% render 'menu', menu: widget.settings.headerNavigation %}`
 - Supports responsive navigation patterns
+- Supports blocks — define block types in `schema.json` with a `blocks` array (e.g., announcement bars, top bar buttons)
 - Paired with `templates/global/header.json` for default configuration
 
 #### Footer Widget (`widgets/global/footer/`)
@@ -1047,13 +1048,16 @@ Global widgets are special widgets that appear on every page of the website. Cur
 - Located in `widgets/global/footer/` with `schema.json` and `widget.liquid`
 - Usually contains copyright, credits, and additional navigation
 - Often includes social links and contact information
+- Supports blocks — define block types in `schema.json` with a `blocks` array (e.g., text rows, link rows)
 - Paired with `templates/global/footer.json` for default configuration
 
-**Important:** Currently, header and footer are the only supported global widget types. Each global widget requires both a schema + template in `widgets/global/{name}/` and a corresponding JSON configuration in `templates/global/`.
+**Important:** Header and footer are the only supported global widget types. Each global widget requires both a schema + template in `widgets/global/{name}/` and a corresponding JSON configuration in `templates/global/`. Global widgets support the full blocks system — block types, `maxBlocks`, `defaultBlocks`, and `blocksOrder`/`blocks` data — identical to page widgets.
 
 ## 7. Widget Blocks System
 
 Blocks are sub-components that can be dynamically added to widgets, providing flexible content management within individual widgets. They allow users to build complex layouts by combining different block types within a single widget container.
+
+> **Note:** Blocks are available for both **page widgets** and **global widgets** (header/footer). The schema definitions, data structure, rendering patterns, and editor UI described in this section apply equally to both types.
 
 ### How Blocks Work
 
@@ -1350,6 +1354,22 @@ Global templates define default instances of global widgets that appear on every
     "headerTitle": "Default Site Title",
     "headerNavigation": "main-nav"
   }
+}
+```
+
+Global templates can also include default blocks (when the widget schema defines block types):
+
+```json
+{
+  "type": "header",
+  "settings": {
+    "headerTitle": "Default Site Title",
+    "headerNavigation": "main-nav"
+  },
+  "blocks": {
+    "block-1": { "type": "announcement", "settings": { "text": "Free shipping on orders over $50" } }
+  },
+  "blocksOrder": ["block-1"]
 }
 ```
 

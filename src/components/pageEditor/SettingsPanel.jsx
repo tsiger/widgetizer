@@ -32,15 +32,13 @@ export default function SettingsPanel({
       : null
     : selectedWidgetSchema;
 
-  const selectedBlock = !isGlobalWidget && selectedBlockId && selectedWidget?.blocks?.[selectedBlockId];
+  const selectedBlock = selectedBlockId && currentWidget?.blocks?.[selectedBlockId];
   const selectedBlockSchema =
-    !isGlobalWidget &&
-    selectedBlock &&
-    selectedWidgetSchema?.blocks?.find((block) => block.type === selectedBlock.type);
+    selectedBlock && currentWidgetSchema?.blocks?.find((block) => block.type === selectedBlock.type);
 
   const settings = isThemeSettings
     ? themeSettings?.settings?.global?.[selectedThemeGroup] || []
-    : selectedBlockId && !isGlobalWidget
+    : selectedBlockId
       ? selectedBlockSchema?.settings
       : currentWidgetSchema?.settings;
 
@@ -49,7 +47,7 @@ export default function SettingsPanel({
         (acc, s) => ({ ...acc, [s.id]: s.value }),
         {},
       )
-    : selectedBlockId && !isGlobalWidget
+    : selectedBlockId
       ? selectedBlock?.settings
       : currentWidget?.settings;
 
@@ -67,6 +65,9 @@ export default function SettingsPanel({
     if (isThemeSettings) {
       updateThemeSetting(selectedThemeGroup, settingId, value);
       setThemeSettingsModified(true);
+    } else if (isGlobalWidget && selectedBlockId) {
+      updateBlockSettings(selectedGlobalWidgetId, selectedBlockId, settingId, value);
+      markWidgetModified(selectedGlobalWidgetId);
     } else if (isGlobalWidget) {
       updateGlobalWidgetSettings(selectedGlobalWidgetId, settingId, value);
       markWidgetModified(selectedGlobalWidgetId);
@@ -82,7 +83,7 @@ export default function SettingsPanel({
   // Calculate display name with priority: custom name > block name > widget schema name > fallback
   const displayName = isThemeSettings
     ? selectedThemeGroup.charAt(0).toUpperCase() + selectedThemeGroup.slice(1)
-    : selectedBlockId && !isGlobalWidget
+    : selectedBlockId
       ? selectedBlockSchema?.displayName || t("pageEditor.settingsPanel.blockSettings")
       : currentWidget?.settings?.name || // Use custom name if set
         currentWidgetSchema?.displayName ||
@@ -115,7 +116,7 @@ export default function SettingsPanel({
   return (
     <div className="w-70 bg-white border-l border-slate-200 flex flex-col h-full">
       <div className="px-4 pt-4 pb-2 border-b border-slate-100 font-bold">
-        {selectedBlockId && !isGlobalWidget ? (
+        {selectedBlockId ? (
           <div className="flex items-center gap-2">
             <button onClick={onBackToWidget} className="p-1 hover:bg-slate-100 rounded-sm text-slate-500">
               <ArrowLeft size={16} />
@@ -131,7 +132,7 @@ export default function SettingsPanel({
           key={
             isThemeSettings
               ? `theme-${selectedThemeGroup}`
-              : selectedBlockId && !isGlobalWidget
+              : selectedBlockId
                 ? `block-${selectedBlockId}`
                 : isGlobalWidget
                   ? `global-${selectedGlobalWidgetId}`

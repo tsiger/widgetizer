@@ -160,8 +160,18 @@ When a global widget is selected:
 Global widgets are managed through the `usePageStore`:
 
 - **Loading**: Global widgets are loaded separately from page data using `loadGlobalWidgets()`
-- **Storage**: Global widget data is stored in `pageStore.globalWidgets` object with `header` and `footer` properties
+- **Storage**: Global widget data is stored in `pageStore.globalWidgets` object with `header` and `footer` properties (including `blocks` and `blocksOrder` when the widget schema defines block types)
 - **Updates**: Changes trigger `updateGlobalWidget()` which maintains separation from page widget data
+
+#### Block Support
+
+Global widgets support blocks with the same `blocks`/`blocksOrder` data model as page widgets. When a global widget's schema defines block types (via the `blocks` array in `schema.json`), the editor displays full block management UI:
+
+- **Rendering**: The `FixedWidgetItem` component renders blocks (add, reorder via drag-and-drop, delete, duplicate) when the widget schema has block definitions
+- **Settings**: The `SettingsPanel` shows block-specific settings when a block within a global widget is selected
+- **Store Operations**: All block operations (`addBlock`, `deleteBlock`, `reorderBlocks`, `updateBlockSettings`, `duplicateBlock`) in `widgetStore.js` work for both page widgets and global widgets via internal helpers (`isGlobalWidgetId()`, `getWidgetData()`, `setWidgetData()`)
+- **Save**: Block changes to global widgets are tracked via `markWidgetModified("header"/"footer")` and saved through the existing global widget save path
+- **Preview**: Block changes are reflected in the live preview immediately, same as page widget blocks
 
 #### Key Differences from Page Widgets
 
@@ -169,6 +179,7 @@ Global widgets are managed through the `usePageStore`:
 - **No Reordering**: Global widgets cannot be reordered or moved
 - **Fixed Position**: Header always appears first, footer always appears last
 - **Theme-wide**: Changes apply to the entire project, not just the current page
+- **Blocks**: Fully supported — same block add/edit/reorder/delete/duplicate capabilities as page widgets
 
 ---
 

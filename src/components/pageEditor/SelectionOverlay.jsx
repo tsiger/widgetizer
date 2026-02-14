@@ -72,6 +72,7 @@ export default function SelectionOverlay({
   const schemas = useWidgetStore((state) => state.schemas);
   const reorderWidgets = useWidgetStore((state) => state.reorderWidgets);
   const page = usePageStore((state) => state.page);
+  const globalWidgets = usePageStore((state) => state.globalWidgets);
 
   // Preview hover state (from iframe mouseover events)
   const [previewHoveredWidgetId, setPreviewHoveredWidgetId] = useState(null);
@@ -161,9 +162,10 @@ export default function SelectionOverlay({
         scrollElementIntoView(iframeRef.current, effectiveWidgetId, selectedBlockId);
       }
 
-      // Update display name
-      const customName = page?.widgets?.[effectiveWidgetId]?.settings?.name;
-      const widgetType = page?.widgets?.[effectiveWidgetId]?.type;
+      // Update display name (check both page widgets and global widgets)
+      const widgetData = page?.widgets?.[effectiveWidgetId] || globalWidgets?.[effectiveWidgetId];
+      const customName = widgetData?.settings?.name;
+      const widgetType = widgetData?.type;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setWidgetDisplayName(customName || schemas[widgetType]?.displayName || widgetType || null);
     } else {
@@ -175,7 +177,7 @@ export default function SelectionOverlay({
       setWidgetDisplayName(null);
       setHoverWidgetDisplayName(null);
     }
-  }, [effectiveWidgetId, selectedBlockId, page, schemas, iframeRef]);
+  }, [effectiveWidgetId, selectedBlockId, page, globalWidgets, schemas, iframeRef]);
 
   // Listen for all iframe messages
   useEffect(() => {
@@ -213,9 +215,9 @@ export default function SelectionOverlay({
             onGlobalWidgetSelect?.(payload.widgetId);
           } else {
             onWidgetSelect?.(payload.widgetId);
-            if (payload.blockId) {
-              onBlockSelect?.(payload.blockId);
-            }
+          }
+          if (payload.blockId) {
+            onBlockSelect?.(payload.blockId);
           }
           break;
 
@@ -229,9 +231,10 @@ export default function SelectionOverlay({
             const translated = translateBoundsToOverlay(payload.bounds);
             setWidgetHoverBounds(translated);
 
-            // Get display name for hovered widget
-            const widgetType = page?.widgets?.[payload.widgetId]?.type;
-            const customName = page?.widgets?.[payload.widgetId]?.settings?.name;
+            // Get display name for hovered widget (check both page widgets and global widgets)
+            const hoveredWidgetData = page?.widgets?.[payload.widgetId] || globalWidgets?.[payload.widgetId];
+            const widgetType = hoveredWidgetData?.type;
+            const customName = hoveredWidgetData?.settings?.name;
             setHoverWidgetDisplayName(customName || schemas[widgetType]?.displayName || widgetType || null);
           } else {
             // Hovering the selected widget or nothing - no widget hover
@@ -261,6 +264,7 @@ export default function SelectionOverlay({
     onGlobalWidgetSelect,
     iframeRef,
     page,
+    globalWidgets,
     schemas,
   ]);
 
@@ -272,8 +276,9 @@ export default function SelectionOverlay({
       // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing hover state from sidebar
       setWidgetHoverBounds(bounds);
 
-      const widgetType = page?.widgets?.[sidebarHoveredWidgetId]?.type;
-      const customName = page?.widgets?.[sidebarHoveredWidgetId]?.settings?.name;
+      const sidebarHoveredData = page?.widgets?.[sidebarHoveredWidgetId] || globalWidgets?.[sidebarHoveredWidgetId];
+      const widgetType = sidebarHoveredData?.type;
+      const customName = sidebarHoveredData?.settings?.name;
 
       setHoverWidgetDisplayName(customName || schemas[widgetType]?.displayName || widgetType || null);
     } else if (!previewHoveredWidgetId) {
@@ -305,6 +310,7 @@ export default function SelectionOverlay({
     previewReadyKey, // Recalculate when content changes
     getElementBounds,
     page,
+    globalWidgets,
     schemas,
   ]);
 
