@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
 import MenuEditor from "../components/menus/MenuEditor";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import Button from "../components/ui/Button";
 
 import { getMenu, updateMenu } from "../queries/menuManager";
 
@@ -14,11 +15,13 @@ import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 export default function MenuStructure() {
   const { t } = useTranslation();
   const { id } = useParams();
+  const navigate = useNavigate();
   const [menu, setMenu] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const initialMenuRef = useRef(null);
+  const isInitializedRef = useRef(false);
   const showToast = useToastStore((state) => state.showToast);
 
   // Add navigation guard for unsaved changes
@@ -85,6 +88,7 @@ export default function MenuStructure() {
         const data = await getMenu(id);
         setMenu(data);
         initialMenuRef.current = JSON.parse(JSON.stringify(data)); // Deep clone for comparison
+        isInitializedRef.current = false;
         setIsDirty(false);
       } catch (err) {
         showToast(err.message || t("menuStructure.toasts.loadError"), "error");
@@ -119,8 +123,17 @@ export default function MenuStructure() {
     setMenu((prev) => {
       if (prev.items === newItems) return prev; // no change → no update
       const updatedMenu = { ...prev, items: newItems };
-      // Check dirty state after update
-      setIsDirty(checkIfDirty(updatedMenu));
+
+      // MenuEditor normalizes items on mount (adds IDs via ensureIds).
+      // Absorb the first onChange as the new baseline so it doesn't mark dirty.
+      if (!isInitializedRef.current) {
+        isInitializedRef.current = true;
+        initialMenuRef.current = JSON.parse(JSON.stringify(updatedMenu));
+        setIsDirty(false);
+      } else {
+        setIsDirty(checkIfDirty(updatedMenu));
+      }
+
       return updatedMenu;
     });
   };
@@ -147,6 +160,11 @@ export default function MenuStructure() {
         </span>
       }
       description={t("menuStructure.description")}
+      additionalButtons={
+        <Button variant="secondary" onClick={() => navigate("/menus")}>
+          {t("forms.common.cancel")}
+        </Button>
+      }
       buttonProps={{
         onClick: handleSave,
         children: (
@@ -155,7 +173,7 @@ export default function MenuStructure() {
             {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
           </>
         ),
-        disabled: saving,
+        disabled: saving || !isDirty,
         variant: isDirty ? "dark" : "primary",
       }}
     >

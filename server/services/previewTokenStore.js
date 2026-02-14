@@ -56,4 +56,4 @@ setInterval(() => {
       store.delete(token);
     }
   }
-}, CLEANUP_INTERVAL_MS);
+}, CLEANUP_INTERVAL_MS).unref();

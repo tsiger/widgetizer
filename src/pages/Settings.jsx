@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -13,6 +14,7 @@ import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function Settings() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [themeData, setThemeData] = useState(null);
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -141,6 +143,9 @@ export default function Settings() {
 
         {/* Save button */}
         <div className="mt-6 flex justify-end gap-3">
+          <Button onClick={() => navigate(-1)} variant="secondary">
+            {t("forms.common.cancel")}
+          </Button>
           {hasChanges && (
             <Button onClick={handleCancel} variant="secondary">
               {t("common.reset")}

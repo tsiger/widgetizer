@@ -361,7 +361,7 @@ export default function ProjectForm({
           {isSubmitting ? t("forms.common.saving") : submitLabel}
           {isDirtyProp && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
         </Button>
-        {isDirtyProp && onCancel && (
+        {onCancel && (
           <Button type="button" onClick={onCancel} variant="secondary">
             {t("forms.common.cancel")}
           </Button>

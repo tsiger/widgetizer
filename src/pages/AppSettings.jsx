@@ -5,12 +5,14 @@ import AppSettingsPanel from "../components/settings/AppSettingsPanel.jsx";
 import useAppSettings from "../hooks/useAppSettings.js";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getTheme } from "../queries/themeManager";
 import useProjectStore from "../stores/projectStore";
 
 export default function AppSettings() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const activeProject = useProjectStore((state) => state.activeProject);
   const [themeConfig, setThemeConfig] = useState(null);
   const { settings, loading, isSaving, hasChanges, schema, handleInputChange, handleSave, handleCancel } =
@@ -111,6 +113,9 @@ export default function AppSettings() {
 
         {/* Save/Cancel buttons */}
         <div className="mt-6 flex justify-end gap-3">
+          <Button onClick={() => navigate(-1)} variant="secondary">
+            {t("forms.common.cancel")}
+          </Button>
           {hasChanges && (
             <Button onClick={handleCancel} disabled={isSaving} variant="secondary">
               {t("common.reset")}
