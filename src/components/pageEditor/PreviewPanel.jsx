@@ -1,26 +1,18 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
 import { useTranslation } from "react-i18next";
-import { fetchPreview, scrollElementIntoView, updatePreview } from "../../queries/previewManager";
-import useProjectStore from "../../stores/projectStore";
+import { fetchPreviewToken, scrollElementIntoView, updatePreview } from "../../queries/previewManager";
 import usePageStore from "../../stores/pageStore";
-import { API_URL } from "../../config";
+import useWidgetStore from "../../stores/widgetStore";
+import { BASE_URL, PREVIEW_ISOLATION, PREVIEW_ORIGIN } from "../../config";
 import SelectionOverlay from "./SelectionOverlay";
 
-/**
- * Validate liveUrl to prevent malicious base href injection.
- * Only allows http/https URLs.
- */
-function getSafeBaseUrl(liveUrl, fallback) {
-  if (!liveUrl) return fallback;
-  try {
-    const url = new URL(liveUrl);
-    if (url.protocol === "https:" || url.protocol === "http:") {
-      return liveUrl;
-    }
-  } catch {
-    return fallback;
-  }
-  return fallback;
+// PostMessage target origin: use preview origin when isolation is enabled
+const TARGET_ORIGIN = PREVIEW_ISOLATION ? PREVIEW_ORIGIN : "*";
+
+// Build the preview URL from a token
+const previewBaseUrl = PREVIEW_ISOLATION ? PREVIEW_ORIGIN : BASE_URL;
+function buildPreviewUrl(token) {
+  return `${previewBaseUrl}/render/${token}`;
 }
 
 /**
@@ -80,6 +72,35 @@ function detectChangeType(newState, oldState) {
   return { isStructural, changedWidgetIds, changedGlobalWidgetIds };
 }
 
+/**
+ * Build widget metadata map (widgetId → displayName) for the overlay labels.
+ */
+function buildWidgetMetadata(page, globalWidgets, schemas) {
+  const metadata = {};
+
+  // Page widgets
+  if (page?.widgets) {
+    for (const [widgetId, widgetData] of Object.entries(page.widgets)) {
+      const customName = widgetData?.settings?.name;
+      const widgetType = widgetData?.type;
+      metadata[widgetId] = customName || schemas[widgetType]?.displayName || widgetType || widgetId;
+    }
+  }
+
+  // Global widgets
+  if (globalWidgets) {
+    for (const [key, widgetData] of Object.entries(globalWidgets)) {
+      if (widgetData) {
+        const customName = widgetData?.settings?.name;
+        const widgetType = widgetData?.type;
+        metadata[key] = customName || schemas[widgetType]?.displayName || widgetType || key;
+      }
+    }
+  }
+
+  return metadata;
+}
+
 const PreviewPanel = forwardRef(function PreviewPanel(
   {
     page,
@@ -91,7 +112,6 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     previewMode = "desktop",
     runtimeMode = "editor",
     showSelectionOverlay = true,
-    includeBaseTag = true,
     onWidgetSelect,
     onBlockSelect,
     onGlobalWidgetSelect,
@@ -99,7 +119,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   ref,
 ) {
   const { t } = useTranslation();
-  const [previewHtml, setPreviewHtml] = useState("");
+  const [previewSrc, setPreviewSrc] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
@@ -109,8 +129,48 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   // A single ref to hold the entire previous state for comparison
   const previousStateRef = useRef(null);
 
-  const activeProject = useProjectStore((state) => state.activeProject);
+  // Track structural reload state to prevent SelectionOverlay from scrolling prematurely.
+  // The ref is set synchronously during render so child effects can read it immediately.
+  const structuralReloadRef = useRef(false);
+
+  // Store pending scroll info for after PREVIEW_READY
+  const pendingScrollRef = useRef(null);
+
   const { globalWidgets } = usePageStore();
+  const schemas = useWidgetStore((state) => state.schemas);
+
+  // Detect structural changes during render (before child effects fire).
+  // This sets the ref synchronously so SelectionOverlay can check it in its effects.
+  if (initialLoadComplete && previousStateRef.current) {
+    const prev = previousStateRef.current;
+    const contentChanged =
+      JSON.stringify(page) !== JSON.stringify(prev?.page) ||
+      JSON.stringify(widgets) !== JSON.stringify(prev?.widgets) ||
+      JSON.stringify(globalWidgets) !== JSON.stringify(prev?.globalWidgets) ||
+      JSON.stringify(themeSettings) !== JSON.stringify(prev?.themeSettings);
+
+    if (contentChanged) {
+      const newState = { page, widgets, globalWidgets, themeSettings };
+      const { isStructural } = detectChangeType(newState, prev);
+      if (isStructural && !structuralReloadRef.current) {
+        structuralReloadRef.current = true;
+        // Capture scrollY now while the old iframe content is still present
+        let scrollY = 0;
+        if (!PREVIEW_ISOLATION) {
+          try {
+            scrollY = iframeRef.current?.contentWindow?.scrollY || 0;
+          } catch {
+            scrollY = 0;
+          }
+        }
+        pendingScrollRef.current = {
+          scrollY,
+          widgetId: selectedWidgetId,
+          blockId: selectedBlockId,
+        };
+      }
+    }
+  }
 
   // Expose the iframe ref to the parent component
   useEffect(() => {
@@ -118,6 +178,55 @@ const PreviewPanel = forwardRef(function PreviewPanel(
       ref.current = iframeRef.current;
     }
   }, [ref]);
+
+  // Listen for PREVIEW_READY from the iframe to handle post-reload scroll restoration
+  useEffect(() => {
+    const handleMessage = (event) => {
+      const { type } = event.data || {};
+      if (type !== "PREVIEW_READY") return;
+
+      const pending = pendingScrollRef.current;
+      if (pending) {
+        pendingScrollRef.current = null;
+
+        // 1. Restore previous scroll position instantly (no animation)
+        if (iframeRef.current?.contentWindow) {
+          iframeRef.current.contentWindow.postMessage(
+            { type: "RESTORE_SCROLL", payload: { scrollY: pending.scrollY } },
+            TARGET_ORIGIN,
+          );
+        }
+
+        // 2. Jump to the selected widget (instant, no smooth scroll)
+        if (pending.widgetId && iframeRef.current) {
+          scrollElementIntoView(iframeRef.current, pending.widgetId, pending.blockId);
+        }
+
+        // 3. End structural reload gate
+        structuralReloadRef.current = false;
+        setPreviewReadyKey((prev) => prev + 1);
+      } else {
+        // Non-structural reload (initial load, etc.)
+        setPreviewReadyKey((prev) => prev + 1);
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  // Send widget metadata to iframe whenever widget data or schemas change
+  useEffect(() => {
+    if (!iframeRef.current?.contentWindow || !initialLoadComplete) return;
+
+    const metadata = buildWidgetMetadata(page, globalWidgets, schemas);
+    const widgetOrder = page?.widgetsOrder || [];
+
+    iframeRef.current.contentWindow.postMessage(
+      { type: "SET_WIDGET_METADATA", payload: { metadata, widgetOrder } },
+      TARGET_ORIGIN,
+    );
+  }, [page, globalWidgets, schemas, initialLoadComplete, previewReadyKey]);
 
   // Initial page load effect
   useEffect(() => {
@@ -129,8 +238,8 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         setError(null);
 
         const enhancedPageData = { ...page, globalWidgets };
-        const html = await fetchPreview(enhancedPageData, themeSettings, runtimeMode);
-        setPreviewHtml(html);
+        const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
+        setPreviewSrc(buildPreviewUrl(token));
 
         // Store the initial state for future diffing
         previousStateRef.current = {
@@ -165,9 +274,6 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   ]);
 
   // Handle updates after initial load
-  // Strategy:
-  // - Structural changes (add/remove/reorder widgets) → Full page reload
-  // - Content changes (settings only) → Morph individual widgets
   useEffect(() => {
     if (!initialLoadComplete || !iframeRef.current) return;
 
@@ -204,8 +310,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     });
 
     // Immediate visual feedback for simple setting changes (text/images)
-    // This runs regardless of structural vs content changes
-    if (iframeRef.current?.contentWindow && previousState?.widgets) {
+    if (!isStructural && iframeRef.current?.contentWindow && previousState?.widgets) {
       Object.entries(widgets || {}).forEach(([widgetId, widget]) => {
         const oldWidget = previousState.widgets[widgetId];
         if (!oldWidget) return;
@@ -248,7 +353,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
           iframeRef.current.contentWindow.postMessage(
             { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId, changes } },
-            "*",
+            TARGET_ORIGIN,
           );
         }
       });
@@ -270,7 +375,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
           iframeRef.current.contentWindow.postMessage(
             { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId: globalWidgetKey, changes } },
-            "*",
+            TARGET_ORIGIN,
           );
         }
       });
@@ -279,26 +384,28 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     // Debounced update - either full reload or morph depending on change type
     const timeoutId = setTimeout(async () => {
       try {
-        const scrollY = iframeRef.current?.contentWindow?.scrollY || 0;
-
         if (isStructural) {
           // STRUCTURAL CHANGE: Full page reload
-          // This ensures enqueued scripts/styles are properly loaded for new widgets
-          console.log("[Preview] 🔄 FULL PAGE RELOAD (structural change)");
-          const enhancedPageData = { ...page, globalWidgets };
-          const html = await fetchPreview(enhancedPageData, themeSettings, runtimeMode);
-          setPreviewHtml(html);
+          console.log("[Preview] FULL PAGE RELOAD (structural change)");
 
-          // After reload, scroll to selected widget
-          setTimeout(() => {
-            if (selectedWidgetId && iframeRef.current) {
-              scrollElementIntoView(iframeRef.current, selectedWidgetId, selectedBlockId);
-            }
-            setPreviewReadyKey((prev) => prev + 1);
-          }, 100);
+          const enhancedPageData = { ...page, globalWidgets };
+          const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
+          setPreviewSrc(buildPreviewUrl(token));
+          // PREVIEW_READY handler will restore scroll + ungate SelectionOverlay
         } else {
           // CONTENT CHANGE: Morph individual widgets
-          console.log("[Preview] ⚡ PARTIAL UPDATE (content change only)");
+          console.log("[Preview] PARTIAL UPDATE (content change only)");
+
+          // Capture scrollY before morph
+          let morphScrollY = 0;
+          if (!PREVIEW_ISOLATION) {
+            try {
+              morphScrollY = iframeRef.current?.contentWindow?.scrollY || 0;
+            } catch {
+              morphScrollY = 0;
+            }
+          }
+
           const updateState = {
             widgets,
             globalWidgets,
@@ -310,19 +417,23 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
           await updatePreview(iframeRef.current, updateState, previousState || {});
 
-          // Restore scroll position
-          setTimeout(() => {
-            iframeRef.current?.contentWindow?.scrollTo(0, scrollY);
-            setPreviewReadyKey((prev) => prev + 1);
-          }, 100);
+          // Restore scroll position after morph (cross-origin safe)
+          if (!PREVIEW_ISOLATION) {
+            try {
+              iframeRef.current?.contentWindow?.scrollTo(0, morphScrollY);
+            } catch {
+              // Cross-origin access denied — skip scroll restore
+            }
+          }
+          setPreviewReadyKey((prev) => prev + 1);
         }
       } catch (err) {
         console.error("Preview update error:", err);
         // Fallback to full reload on any error
         try {
           const enhancedPageData = { ...page, globalWidgets };
-          const html = await fetchPreview(enhancedPageData, themeSettings, runtimeMode);
-          setPreviewHtml(html);
+          const { token } = await fetchPreviewToken(enhancedPageData, themeSettings, runtimeMode);
+          setPreviewSrc(buildPreviewUrl(token));
         } catch (fallbackErr) {
           console.error("Preview fallback reload error:", fallbackErr);
         }
@@ -351,17 +462,6 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     selectedGlobalWidgetId,
     runtimeMode,
   ]);
-
-  // Validate URLs for security
-  const safeBaseUrl = getSafeBaseUrl(activeProject?.liveUrl, document.baseURI);
-  const baseTag = includeBaseTag ? `<base href="${safeBaseUrl}" target="_blank">` : "";
-
-  const iframeSrcDoc = previewHtml.replace(
-    "</head>",
-    `<script src="${API_URL(
-      "/runtime/previewRuntime.js",
-    )}" type="module" data-preview-mode="${runtimeMode}"></script>${baseTag}</head>`,
-  );
 
   return (
     <div
@@ -401,25 +501,32 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           </button>
         </div>
       )}
-      <iframe
-        ref={iframeRef}
-        srcDoc={iframeSrcDoc}
-        title={t("pageEditor.preview.title")}
-        sandbox={
-          runtimeMode === "standalone"
-            ? "allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation-by-user-activation"
-            : "allow-scripts allow-same-origin allow-popups allow-forms"
-        }
-        className={`w-full h-full border-0 transition-all duration-300 ease-in-out mx-auto ${
-          previewMode !== "desktop" ? "shadow-2xl" : ""
-        }`}
-        style={{
-          maxWidth: previewMode === "desktop" ? "100%" : previewMode === "tablet" ? "48rem" : "24rem",
-        }}
-        onLoad={() => {
-          setInitialLoadComplete(true);
-        }}
-      />
+      {previewSrc && (
+        <iframe
+          ref={iframeRef}
+          src={previewSrc}
+          title={t("pageEditor.preview.title")}
+          {...(runtimeMode === "standalone" || PREVIEW_ISOLATION
+            ? {
+                sandbox:
+                  runtimeMode === "standalone"
+                    ? "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation allow-top-navigation-by-user-activation"
+                    : "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation",
+              }
+            : {})}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+          allowFullScreen
+          className={`w-full h-full border-0 transition-all duration-300 ease-in-out mx-auto ${
+            previewMode !== "desktop" ? "shadow-2xl" : ""
+          }`}
+          style={{
+            maxWidth: previewMode === "desktop" ? "100%" : previewMode === "tablet" ? "48rem" : "24rem",
+          }}
+          onLoad={() => {
+            setInitialLoadComplete(true);
+          }}
+        />
+      )}
       {showSelectionOverlay && (
         <SelectionOverlay
           iframeRef={iframeRef}
@@ -430,6 +537,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           onBlockSelect={onBlockSelect}
           onGlobalWidgetSelect={onGlobalWidgetSelect}
           previewReadyKey={previewReadyKey}
+          structuralReloadRef={structuralReloadRef}
         />
       )}
     </div>

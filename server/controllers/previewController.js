@@ -8,24 +8,184 @@ import { renderWidget, renderPageLayout } from "../services/renderingService.js"
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
+import { generateToken, getToken } from "../services/previewTokenStore.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Inject the runtime script
+// Inject the runtime script and base tag into rendered HTML
 function injectRuntimeScript(html, previewMode = "editor") {
-  // Use the SERVER_URL environment variable or fallback to localhost
-  const serverUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
-  const scriptUrl = `${serverUrl}/runtime/previewRuntime.js`;
   const safeMode = previewMode === "standalone" ? "standalone" : "editor";
-  const script = `<script src="${scriptUrl}" type="module" data-preview-mode="${safeMode}"></script>`;
-  // Ensure replacement happens even with attributes on body tag
+  const builderOriginAttr =
+    process.env.PREVIEW_ISOLATION === "true" && process.env.BUILDER_ORIGIN
+      ? ` data-builder-origin="${process.env.BUILDER_ORIGIN}"`
+      : "";
+  const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}"${builderOriginAttr}></script>`;
   return html.replace(/<\/body>/i, `${script}\n</body>`);
+}
+
+// Inject base tag for relative URL resolution
+function injectBaseTag(html) {
+  const apiUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
+  const baseTag = `<base href="${apiUrl}">`;
+  return html.replace(/<\/head>/i, `${baseTag}\n</head>`);
+}
+
+/**
+ * Core rendering logic for preview HTML generation.
+ * Renders header, page widgets, footer, and injects runtime script.
+ * @param {Object} pageData - Page content including widgets and metadata
+ * @param {Object} rawThemeSettings - Theme settings for rendering
+ * @param {string} previewMode - "editor" or "standalone"
+ * @returns {Promise<string>} Rendered HTML string
+ */
+async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
+  const projectsData = await readProjectsFile();
+  const activeProjectId = projectsData.activeProjectId;
+
+  if (!activeProjectId) {
+    throw Object.assign(new Error("No active project found"), { status: 404 });
+  }
+
+  // Create shared globals for asset enqueue system
+  const apiUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
+  const sharedGlobals = {
+    projectId: activeProjectId,
+    apiUrl,
+    renderMode: "preview",
+    themeSettingsRaw: rawThemeSettings,
+    enqueuedStyles: new Map(),
+    enqueuedScripts: new Map(),
+  };
+
+  let headerContent = "";
+  let mainContent = "";
+  let footerContent = "";
+
+  // Render header widget first (if it exists)
+  if (pageData.globalWidgets?.header) {
+    try {
+      headerContent = await renderWidget(
+        activeProjectId,
+        "header",
+        pageData.globalWidgets.header,
+        rawThemeSettings,
+        "preview",
+        sharedGlobals,
+      );
+    } catch (error) {
+      console.error("Error rendering header widget:", error);
+    }
+  }
+
+  // Render page widgets in the middle
+  const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets || {});
+
+  if (widgetOrder.length > 0 && pageData.widgets) {
+    let widgetIndex = 0;
+    for (const widgetId of widgetOrder) {
+      const widget = pageData.widgets[widgetId];
+      if (!widget) continue;
+      widgetIndex += 1;
+      const renderedWidgetHtml = await renderWidget(
+        activeProjectId,
+        widgetId,
+        widget,
+        rawThemeSettings,
+        "preview",
+        sharedGlobals,
+        widgetIndex,
+      );
+      mainContent += renderedWidgetHtml;
+    }
+  } else {
+    // No page widgets - show empty state message
+    let emptyStateTitle = "No widgets yet";
+    let emptyStateDescription = "Start building your page by adding widgets from the sidebar";
+
+    try {
+      const appSettingsPath = getAppSettingsPath();
+      if (await fs.pathExists(appSettingsPath)) {
+        const appSettings = JSON.parse(await fs.readFile(appSettingsPath, "utf-8"));
+        const userLocale = appSettings?.general?.language || "en";
+        const localePath = path.join(__dirname, `../../src/locales/${userLocale}.json`);
+        if (await fs.pathExists(localePath)) {
+          const localeData = JSON.parse(await fs.readFile(localePath, "utf-8"));
+          emptyStateTitle = localeData?.preview?.emptyState?.title || emptyStateTitle;
+          emptyStateDescription = localeData?.preview?.emptyState?.description || emptyStateDescription;
+        }
+      }
+    } catch (error) {
+      console.warn("Could not load translations for empty state, using default:", error.message);
+    }
+
+    mainContent += `
+      <div class="preview-empty-state">
+        <style>
+          .preview-empty-state {
+            min-height: 30vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: var(--space-3xl, 3rem);
+            text-align: center;
+          }
+          .preview-empty-state-title {
+            font-size: var(--font-size-lg, 1.125rem);
+            color: var(--text-muted, #6b7280);
+            margin-bottom: 0.5rem;
+            font-weight: var(--font-weight-medium, 500);
+          }
+          .preview-empty-state-description {
+            font-size: var(--font-size-sm, 0.875rem);
+            color: var(--text-muted, #6b7280);
+            max-width: 28rem;
+          }
+        </style>
+        <p class="preview-empty-state-title">
+          ${emptyStateTitle}
+        </p>
+        <p class="preview-empty-state-description">
+          ${emptyStateDescription}
+        </p>
+      </div>
+    `;
+  }
+
+  // Render footer widget last (if it exists)
+  if (pageData.globalWidgets?.footer) {
+    try {
+      footerContent = await renderWidget(
+        activeProjectId,
+        "footer",
+        pageData.globalWidgets.footer,
+        rawThemeSettings,
+        "preview",
+        sharedGlobals,
+      );
+    } catch (error) {
+      console.error("Error rendering footer widget:", error);
+    }
+  }
+
+  let renderedHtml = await renderPageLayout(
+    activeProjectId,
+    { headerContent, mainContent, footerContent },
+    pageData,
+    rawThemeSettings,
+    "preview",
+    sharedGlobals,
+  );
+
+  renderedHtml = injectBaseTag(renderedHtml);
+  renderedHtml = injectRuntimeScript(renderedHtml, previewMode);
+
+  return renderedHtml;
 }
 
 /**
  * Generates a full HTML preview of a page with header, widgets, and footer.
- * Injects the preview runtime script for live editing capabilities.
  * @param {import('express').Request} req - Express request object with pageData, themeSettings, and previewMode in body
  * @param {import('express').Response} res - Express response object (sends HTML)
  * @returns {Promise<void>}
@@ -33,164 +193,53 @@ function injectRuntimeScript(html, previewMode = "editor") {
 export async function generatePreview(req, res) {
   try {
     const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
-
-    const projectsData = await readProjectsFile();
-    const activeProjectId = projectsData.activeProjectId;
-
-    if (!activeProjectId) {
-      return res.status(404).json({ error: "No active project found" });
-    }
-
-    // Create shared globals for asset enqueue system
-    // Each page gets fresh enqueue Maps to prevent cross-page asset pollution
-    const apiUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
-    const sharedGlobals = {
-      projectId: activeProjectId,
-      apiUrl,
-      renderMode: "preview",
-      themeSettingsRaw: rawThemeSettings,
-      enqueuedStyles: new Map(),
-      enqueuedScripts: new Map(),
-    };
-
-    let headerContent = "";
-    let mainContent = "";
-    let footerContent = "";
-
-    // Render header widget first (if it exists)
-    if (pageData.globalWidgets?.header) {
-      try {
-        headerContent = await renderWidget(
-          activeProjectId,
-          "header",
-          pageData.globalWidgets.header,
-          rawThemeSettings,
-          "preview",
-          sharedGlobals,
-        );
-      } catch (error) {
-        console.error("Error rendering header widget:", error);
-        // Continue without header rather than failing completely
-      }
-    }
-
-    // Render page widgets in the middle
-    const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets || {});
-
-    if (widgetOrder.length > 0 && pageData.widgets) {
-      // Render widgets sequentially to preserve enqueue order
-      let widgetIndex = 0;
-      for (const widgetId of widgetOrder) {
-        const widget = pageData.widgets[widgetId];
-        if (!widget) continue;
-        widgetIndex += 1; // 1-based index (first widget = 1, second = 2, etc.)
-        const renderedWidgetHtml = await renderWidget(
-          activeProjectId,
-          widgetId,
-          widget,
-          rawThemeSettings,
-          "preview",
-          sharedGlobals,
-          widgetIndex,
-        );
-        mainContent += renderedWidgetHtml;
-      }
-    } else {
-      // No page widgets - show empty state message
-      let emptyStateTitle = "No widgets yet";
-      let emptyStateDescription = "Start building your page by adding widgets from the sidebar";
-
-      try {
-        // Read app settings to get user's locale
-        const appSettingsPath = getAppSettingsPath();
-        if (await fs.pathExists(appSettingsPath)) {
-          const appSettings = JSON.parse(await fs.readFile(appSettingsPath, "utf-8"));
-          const userLocale = appSettings?.general?.language || "en";
-
-          // Load the corresponding locale file
-          const localePath = path.join(__dirname, `../../src/locales/${userLocale}.json`);
-          if (await fs.pathExists(localePath)) {
-            const localeData = JSON.parse(await fs.readFile(localePath, "utf-8"));
-            emptyStateTitle = localeData?.preview?.emptyState?.title || emptyStateTitle;
-            emptyStateDescription = localeData?.preview?.emptyState?.description || emptyStateDescription;
-          }
-        }
-      } catch (error) {
-        console.warn("Could not load translations for empty state, using default:", error.message);
-        // Fall back to English defaults
-      }
-
-      mainContent += `
-        <div class="preview-empty-state">
-          <style>
-            .preview-empty-state {
-              min-height: 30vh;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              flex-direction: column;
-              padding: var(--space-3xl, 3rem);
-              text-align: center;
-            }
-            .preview-empty-state-title {
-              font-size: var(--font-size-lg, 1.125rem);
-              color: var(--text-muted, #6b7280);
-              margin-bottom: 0.5rem;
-              font-weight: var(--font-weight-medium, 500);
-            }
-            .preview-empty-state-description {
-              font-size: var(--font-size-sm, 0.875rem);
-              color: var(--text-muted, #6b7280);
-              max-width: 28rem;
-            }
-          </style>
-          <p class="preview-empty-state-title">
-            ${emptyStateTitle}
-          </p>
-          <p class="preview-empty-state-description">
-            ${emptyStateDescription}
-          </p>
-        </div>
-      `;
-    }
-
-    // Render footer widget last (if it exists)
-    if (pageData.globalWidgets?.footer) {
-      try {
-        footerContent = await renderWidget(
-          activeProjectId,
-          "footer",
-          pageData.globalWidgets.footer,
-          rawThemeSettings,
-          "preview",
-          sharedGlobals,
-        );
-      } catch (error) {
-        console.error("Error rendering footer widget:", error);
-        // Continue without footer rather than failing completely
-      }
-    }
-
-    let renderedHtml = await renderPageLayout(
-      activeProjectId,
-      { headerContent, mainContent, footerContent }, // Pass separated content sections
-      pageData, // Pass the full page data
-      rawThemeSettings, // Pass the raw theme settings
-      "preview", // Render mode
-      sharedGlobals, // Pass shared globals with enqueued assets
-    );
-
-    // Inject runtime script
-    renderedHtml = injectRuntimeScript(renderedHtml, previewMode);
-
-    res.send(renderedHtml);
+    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode);
+    res.send(html);
   } catch (error) {
     console.error("Error generating preview:", error);
-    if (isProjectResolutionError(error)) {
+    if (error.status === 404 || isProjectResolutionError(error)) {
       return res.status(404).send(`<html><body><h1>Preview Error</h1><pre>${error.message}</pre></body></html>`);
     }
     res.status(500).send(`<html><body><h1>Preview Error</h1><pre>${error.message}\n${error.stack}</pre></body></html>`);
   }
+}
+
+/**
+ * Creates a preview token for token-based preview rendering.
+ * Generates the preview HTML and stores it behind a short-lived token.
+ * @param {import('express').Request} req - Express request object with pageData, themeSettings, and previewMode in body
+ * @param {import('express').Response} res - Express response object (sends { token })
+ * @returns {Promise<void>}
+ */
+export async function createPreviewToken(req, res) {
+  try {
+    const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
+    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode);
+    const token = generateToken(html);
+    res.json({ token });
+  } catch (error) {
+    console.error("Error creating preview token:", error);
+    if (error.status === 404 || isProjectResolutionError(error)) {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: "Failed to create preview token", message: error.message });
+  }
+}
+
+/**
+ * Renders a preview from a stored token.
+ * @param {import('express').Request} req - Express request object with token in params
+ * @param {import('express').Response} res - Express response object (sends HTML or 404)
+ * @returns {void}
+ */
+export function renderPreviewToken(req, res) {
+  const { token } = req.params;
+  const html = getToken(token);
+  if (!html) {
+    return res.status(404).send("<html><body><h1>Preview expired</h1><p>This preview token has expired or is invalid.</p></body></html>");
+  }
+  res.setHeader("Content-Type", "text/html");
+  res.send(html);
 }
 
 /**

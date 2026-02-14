@@ -1,13 +1,24 @@
 /*
 This is the runtime script that is injected into the preview iframe.
 It handles CSS variable updates, font loading, real-time settings updates,
-click detection for widget selection, and DOM morphing for widget updates.
+click detection for widget selection, DOM morphing for widget updates,
+and inline selection/hover overlay rendering.
 
-Note: Widget highlighting is now handled by the SelectionOverlay component
-in the parent window, not by this script.
+The selection overlay is rendered inside the iframe to eliminate scroll lag
+and cross-origin contentDocument access issues.
 */
 
-// Detect preview mode for link behavior
+// ── Origin-Aware PostMessage ────────────────────────────────────────────────
+
+const BUILDER_ORIGIN =
+  document.querySelector('script[src*="previewRuntime"]')?.dataset?.builderOrigin || "*";
+
+function postToParent(data) {
+  window.parent.postMessage(data, BUILDER_ORIGIN);
+}
+
+// ── Preview Mode ────────────────────────────────────────────────────────────
+
 function getPreviewMode() {
   const script = document.querySelector('script[src*="previewRuntime.js"][data-preview-mode]');
   const mode = script?.dataset?.previewMode;
@@ -47,7 +58,8 @@ function getStandalonePreviewTarget(href) {
   return null;
 }
 
-// Handle CSS variable updates
+// ── CSS Variables + Fonts ───────────────────────────────────────────────────
+
 function updateCssVariables(variables) {
   const styleTag = document.getElementById("theme-settings-styles");
   if (!styleTag) {
@@ -62,7 +74,6 @@ function updateCssVariables(variables) {
   styleTag.textContent = `:root {\n  ${cssString}\n}`;
 }
 
-// Load Google Fonts
 function loadFonts(fontsMetadata) {
   if (!fontsMetadata || typeof fontsMetadata !== "object" || Object.keys(fontsMetadata).length === 0) {
     return;
@@ -88,7 +99,8 @@ function loadFonts(fontsMetadata) {
   link.href = url;
 }
 
-// Scroll to widget and report bounds when done
+// ── Selection + Scroll State ────────────────────────────────────────────────
+
 let currentSelectedWidgetId = null;
 let currentSelectedBlockId = null;
 
@@ -111,6 +123,7 @@ function scrollToWidget(widgetId) {
 
   if (isFullyVisible) {
     reportElementBounds(widgetId, currentSelectedBlockId);
+    renderOverlay();
     return;
   }
 
@@ -119,14 +132,14 @@ function scrollToWidget(widgetId) {
   const maxScroll = documentHeight - viewportHeight;
   targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
 
-  window.scrollTo({ top: targetScroll, behavior: "smooth" });
+  window.scrollTo(0, targetScroll);
 
-  setTimeout(() => {
+  requestAnimationFrame(() => {
     reportElementBounds(widgetId, currentSelectedBlockId);
-  }, 400);
+    renderOverlay();
+  });
 }
 
-// Scroll to widget or block and report bounds when done
 function scrollToElement(widgetId, blockId = null) {
   if (!widgetId) return;
 
@@ -134,7 +147,6 @@ function scrollToElement(widgetId, blockId = null) {
   currentSelectedBlockId = blockId;
   observeWidgetResize(widgetId);
 
-  // Find the target element: block if specified, otherwise widget
   const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
   if (!widget) {
     reportElementBounds(widgetId, blockId);
@@ -152,27 +164,32 @@ function scrollToElement(widgetId, blockId = null) {
   const rect = targetElement.getBoundingClientRect();
   const padding = 40;
   const viewportHeight = window.innerHeight;
-  const isFullyVisible = rect.top >= padding && rect.bottom <= viewportHeight - padding;
 
-  if (isFullyVisible) {
+  // For blocks: check if fully visible. For widgets: check if top is visible.
+  const isVisible = blockId
+    ? rect.top >= padding && rect.bottom <= viewportHeight - padding
+    : rect.top >= 0 && rect.top <= viewportHeight - padding;
+
+  if (isVisible) {
     reportElementBounds(widgetId, blockId);
+    renderOverlay();
     return;
   }
 
   const documentHeight = document.documentElement.scrollHeight;
-  // Center the element in the viewport if possible
-  let targetScroll = window.scrollY + rect.top - viewportHeight / 2 + rect.height / 2;
+  // Scroll so the top of the element is near the top of the viewport (with padding)
+  let targetScroll = window.scrollY + rect.top - padding;
   const maxScroll = documentHeight - viewportHeight;
   targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
 
-  window.scrollTo({ top: targetScroll, behavior: "smooth" });
+  window.scrollTo(0, targetScroll);
 
-  setTimeout(() => {
+  requestAnimationFrame(() => {
     reportElementBounds(widgetId, blockId);
-  }, 400);
+    renderOverlay();
+  });
 }
 
-// Calculate and report element bounds to parent
 function reportElementBounds(widgetId, blockId = null) {
   let bounds = null;
   let blockBounds = null;
@@ -203,10 +220,10 @@ function reportElementBounds(widgetId, blockId = null) {
     }
   }
 
-  window.parent.postMessage({ type: "ELEMENT_BOUNDS", payload: { widgetId, blockId, bounds, blockBounds } }, "*");
+  postToParent({ type: "ELEMENT_BOUNDS", payload: { widgetId, blockId, bounds, blockBounds } });
 }
 
-// Report bounds on user scroll (debounced)
+// Scroll-triggered bounds reporting (debounced)
 let scrollDebounceTimer = null;
 function setupScrollBoundsReporting() {
   window.addEventListener(
@@ -220,13 +237,15 @@ function setupScrollBoundsReporting() {
         if (currentHoveredWidgetId) {
           reportHoverBounds();
         }
+        renderOverlay();
       });
     },
     { passive: true },
   );
 }
 
-// Update selection function
+// ── Selection Update ────────────────────────────────────────────────────────
+
 function updateSelection(widgetId, blockId) {
   currentSelectedWidgetId = widgetId;
   currentSelectedBlockId = blockId;
@@ -242,9 +261,12 @@ function updateSelection(widgetId, blockId) {
       widget.dispatchEvent(event);
     }
   }
+
+  renderOverlay();
 }
 
-// Update widget settings in real-time for immediate feedback while typing
+// ── Real-Time Widget Settings ───────────────────────────────────────────────
+
 function updateWidgetSettings(widgetId, changes) {
   const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
   if (!widget) return;
@@ -267,14 +289,11 @@ function updateWidgetSettings(widgetId, changes) {
   }
 }
 
-// Check if a string value looks like HTML (richtext content)
 function isHtmlContent(value) {
   if (typeof value !== "string") return false;
-  // Check for common HTML tags from richtext editor
   return /<(p|strong|em|a|br|span|div)\b[^>]*>/i.test(value);
 }
 
-// Apply a setting value to elements within a container
 function applySettingToElement(container, settingId, value) {
   const childElements = [...container.querySelectorAll(`[data-setting="${settingId}"]`)];
   const elements = container.matches(`[data-setting="${settingId}"]`) ? [container, ...childElements] : childElements;
@@ -282,9 +301,6 @@ function applySettingToElement(container, settingId, value) {
   elements.forEach((el) => {
     if (el !== container) {
       const closestBlock = el.closest("[data-block-id]");
-      // Skip only when the element belongs to a *nested* block (different block inside container).
-      // Do not skip when closestBlock === el: the element itself has data-block-id (e.g. slideshow
-      // headings), so we still update it.
       if (closestBlock && closestBlock !== container && closestBlock !== el) {
         return;
       }
@@ -313,7 +329,6 @@ function applySettingToElement(container, settingId, value) {
       }
     } else {
       if (typeof value === "string" || typeof value === "number") {
-        // Use innerHTML for HTML content (richtext), textContent for plain text
         if (isHtmlContent(value)) {
           el.innerHTML = value;
         } else {
@@ -326,135 +341,21 @@ function applySettingToElement(container, settingId, value) {
   });
 }
 
-// Message handler
-function handleMessage(event) {
-  const { type, payload } = event.data;
+// ── Hover State ─────────────────────────────────────────────────────────────
 
-  switch (type) {
-    case "UPDATE_CSS_VARIABLES":
-      updateCssVariables(payload);
-      break;
-    case "LOAD_FONTS":
-      loadFonts(payload);
-      break;
-    case "SCROLL_TO_WIDGET":
-      scrollToWidget(payload.widgetId);
-      break;
-    case "SCROLL_TO_ELEMENT":
-      scrollToElement(payload.widgetId, payload.blockId);
-      break;
-    case "UPDATE_WIDGET_SETTINGS":
-      updateWidgetSettings(payload.widgetId, payload.changes);
-      break;
-    case "GET_ELEMENT_BOUNDS":
-      reportElementBounds(payload.widgetId, payload.blockId);
-      break;
-    case "UPDATE_SELECTION":
-      updateSelection(payload.widgetId, payload.blockId);
-      reportElementBounds(payload.widgetId, payload.blockId);
-      break;
-    case "MORPH_WIDGET":
-      handleWidgetMorph(payload.widgetId, payload.html);
-      break;
-    case "HIGHLIGHT_WIDGET":
-    case "HOVER_WIDGET":
-      // Legacy - handled by SelectionOverlay
-      break;
-    default:
-      // Ignore unknown messages silently
-      break;
-  }
-}
-
-// Setup interaction handler for widget selection
-function setupInteractionHandler() {
-  document.addEventListener(
-    "click",
-    (event) => {
-      const blockEl = event.target.closest("[data-block-id]");
-      const widgetEl = event.target.closest("[data-widget-id]");
-
-      const linkElement = event.target.closest("a");
-      if (linkElement) {
-        if (PREVIEW_MODE === "standalone") {
-          const href = linkElement.getAttribute("href");
-          if (href?.trim().startsWith("#")) {
-            return;
-          }
-
-          const targetUrl = getStandalonePreviewTarget(href);
-          event.preventDefault();
-          event.stopPropagation();
-
-          if (targetUrl) {
-            window.top.location.assign(targetUrl);
-          }
-          return;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (widgetEl) {
-          window.parent.postMessage(
-            {
-              type: "WIDGET_SELECTED",
-              payload: {
-                widgetId: widgetEl.getAttribute("data-widget-id"),
-                blockId: blockEl ? blockEl.getAttribute("data-block-id") : null,
-              },
-            },
-            "*",
-          );
-        }
-        return;
-      }
-
-      if (PREVIEW_MODE === "standalone") {
-        return;
-      }
-
-      const interactiveElement = event.target.closest('button, input, select, textarea, [role="button"]');
-      if (interactiveElement) {
-        if (widgetEl) {
-          window.parent.postMessage(
-            {
-              type: "WIDGET_SELECTED",
-              payload: {
-                widgetId: widgetEl.getAttribute("data-widget-id"),
-                blockId: blockEl ? blockEl.getAttribute("data-block-id") : null,
-              },
-            },
-            "*",
-          );
-        }
-        return;
-      }
-
-      if (widgetEl) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const widgetId = widgetEl.getAttribute("data-widget-id");
-        const blockId = blockEl ? blockEl.getAttribute("data-block-id") : null;
-
-        window.parent.postMessage({ type: "WIDGET_SELECTED", payload: { widgetId, blockId } }, "*");
-      }
-    },
-    true,
-  );
-}
-
-// Setup hover handler to send hover events to parent
 let currentHoveredWidgetId = null;
 let currentHoveredBlockId = null;
 
+// Sidebar hover (sent from parent)
+let sidebarHoveredWidgetId = null;
+let sidebarHoveredBlockId = null;
+
 function reportHoverBounds() {
   if (!currentHoveredWidgetId) {
-    window.parent.postMessage(
-      { type: "WIDGET_HOVERED", payload: { widgetId: null, blockId: null, bounds: null, blockBounds: null } },
-      "*",
-    );
+    postToParent({
+      type: "WIDGET_HOVERED",
+      payload: { widgetId: null, blockId: null, bounds: null, blockBounds: null },
+    });
     return;
   }
 
@@ -485,19 +386,19 @@ function reportHoverBounds() {
     }
   }
 
-  window.parent.postMessage(
-    {
-      type: "WIDGET_HOVERED",
-      payload: { widgetId: currentHoveredWidgetId, blockId: currentHoveredBlockId, bounds, blockBounds },
-    },
-    "*",
-  );
+  postToParent({
+    type: "WIDGET_HOVERED",
+    payload: { widgetId: currentHoveredWidgetId, blockId: currentHoveredBlockId, bounds, blockBounds },
+  });
 }
 
 function setupHoverHandler() {
   document.addEventListener(
     "mouseover",
     (event) => {
+      // Ignore events on overlay elements
+      if (event.target.closest("#wz-selection-overlay")) return;
+
       const blockEl = event.target.closest("[data-block-id]");
       const widgetEl = event.target.closest("[data-widget-id]");
 
@@ -507,7 +408,11 @@ function setupHoverHandler() {
       if (widgetId !== currentHoveredWidgetId || blockId !== currentHoveredBlockId) {
         currentHoveredWidgetId = widgetId;
         currentHoveredBlockId = blockId;
+        // Clear sidebar hover when preview hover is active
+        sidebarHoveredWidgetId = null;
+        sidebarHoveredBlockId = null;
         reportHoverBounds();
+        renderOverlay();
       }
     },
     true,
@@ -520,13 +425,92 @@ function setupHoverHandler() {
         currentHoveredWidgetId = null;
         currentHoveredBlockId = null;
         reportHoverBounds();
+        renderOverlay();
       }
     },
     true,
   );
 }
 
-// ResizeObserver to detect widget size changes
+// ── Interaction Handler (Click) ─────────────────────────────────────────────
+
+function setupInteractionHandler() {
+  document.addEventListener(
+    "click",
+    (event) => {
+      // Ignore clicks on overlay elements (reorder buttons have pointer-events: auto)
+      if (event.target.closest("#wz-selection-overlay")) return;
+
+      const blockEl = event.target.closest("[data-block-id]");
+      const widgetEl = event.target.closest("[data-widget-id]");
+
+      const linkElement = event.target.closest("a");
+      if (linkElement) {
+        if (PREVIEW_MODE === "standalone") {
+          const href = linkElement.getAttribute("href");
+          if (href?.trim().startsWith("#")) {
+            return;
+          }
+
+          const targetUrl = getStandalonePreviewTarget(href);
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (targetUrl) {
+            window.top.location.assign(targetUrl);
+          }
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (widgetEl) {
+          postToParent({
+            type: "WIDGET_SELECTED",
+            payload: {
+              widgetId: widgetEl.getAttribute("data-widget-id"),
+              blockId: blockEl ? blockEl.getAttribute("data-block-id") : null,
+            },
+          });
+        }
+        return;
+      }
+
+      if (PREVIEW_MODE === "standalone") {
+        return;
+      }
+
+      const interactiveElement = event.target.closest('button, input, select, textarea, [role="button"]');
+      if (interactiveElement) {
+        if (widgetEl) {
+          postToParent({
+            type: "WIDGET_SELECTED",
+            payload: {
+              widgetId: widgetEl.getAttribute("data-widget-id"),
+              blockId: blockEl ? blockEl.getAttribute("data-block-id") : null,
+            },
+          });
+        }
+        return;
+      }
+
+      if (widgetEl) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const widgetId = widgetEl.getAttribute("data-widget-id");
+        const blockId = blockEl ? blockEl.getAttribute("data-block-id") : null;
+
+        postToParent({ type: "WIDGET_SELECTED", payload: { widgetId, blockId } });
+      }
+    },
+    true,
+  );
+}
+
+// ── ResizeObserver ──────────────────────────────────────────────────────────
+
 let widgetResizeObserver = null;
 let resizeDebounceTimer = null;
 
@@ -544,6 +528,7 @@ function observeWidgetResize(widgetId) {
     if (resizeDebounceTimer) cancelAnimationFrame(resizeDebounceTimer);
     resizeDebounceTimer = requestAnimationFrame(() => {
       reportElementBounds(currentSelectedWidgetId, currentSelectedBlockId);
+      renderOverlay();
     });
   });
 
@@ -555,27 +540,224 @@ function observeWidgetResize(widgetId) {
   });
 }
 
-// Initialize the preview runtime
-function initializeRuntime() {
-  setupInteractionHandler();
-  setupHoverHandler();
-  setupScrollBoundsReporting();
-  window.addEventListener("message", handleMessage);
+// ── Widget Metadata (display names from parent) ─────────────────────────────
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      window.parent.postMessage({ type: "PREVIEW_READY" }, "*");
-    });
-  } else {
-    window.parent.postMessage({ type: "PREVIEW_READY" }, "*");
+// Map of widgetId → displayName (sent from parent via SET_WIDGET_METADATA)
+let widgetMetadata = {};
+
+// ── Inline Selection Overlay ────────────────────────────────────────────────
+
+const CHEVRON_UP_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
+const CHEVRON_DOWN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
+let overlayContainer = null;
+
+function createOverlayContainer() {
+  if (PREVIEW_MODE === "standalone") return null;
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .wz-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 99999; }
+    .wz-selection-box { position: absolute; border: 2px solid #f472b6; box-shadow: 0 0 12px rgba(236,72,153,0.25); pointer-events: none; }
+    .wz-hover-box { position: absolute; border: 1px solid #f9a8d4; background: rgba(236,72,153,0.05); pointer-events: none; }
+    .wz-block-selection { position: absolute; border: 2px solid #60a5fa; box-shadow: 0 0 8px rgba(59,130,246,0.2); pointer-events: none; }
+    .wz-block-hover { position: absolute; border: 1px solid #93c5fd; background: rgba(59,130,246,0.05); pointer-events: none; }
+    .wz-widget-label { padding: 1px 8px; font-size: 11px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: white; background: #ec4899; border-radius: 4px; white-space: nowrap; pointer-events: none; line-height: 18px; }
+    .wz-hover-label { position: absolute; transform: translateX(-50%); left: 50%; padding: 1px 6px; font-size: 11px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #db2777; background: #fce7f3; border-radius: 4px; white-space: nowrap; pointer-events: none; line-height: 18px; }
+    .wz-reorder-btn { pointer-events: auto; padding: 2px; border-radius: 4px; background: white; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; display: flex; align-items: center; line-height: 0; }
+    .wz-reorder-btn:hover { background: #fdf2f8; border-color: #f9a8d4; }
+    .wz-reorder-btn[disabled] { opacity: 0.3; cursor: not-allowed; }
+    .wz-reorder-btn[disabled]:hover { background: white; border-color: #e2e8f0; }
+    .wz-controls { position: absolute; transform: translateX(-50%); left: 50%; display: flex; align-items: center; gap: 4px; pointer-events: auto; }
+  `;
+  document.head.appendChild(style);
+
+  const overlay = document.createElement("div");
+  overlay.className = "wz-overlay";
+  overlay.id = "wz-selection-overlay";
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+// Widget order info (sent from parent via SET_WIDGET_METADATA)
+let widgetOrder = []; // array of widgetIds in page order
+
+function renderOverlay() {
+  if (!overlayContainer) return;
+
+  // Determine effective hover: preview hover takes priority over sidebar hover
+  const hoverWidgetId = currentHoveredWidgetId || sidebarHoveredWidgetId;
+  const hoverBlockId = currentHoveredWidgetId ? currentHoveredBlockId : sidebarHoveredBlockId;
+
+  let html = "";
+
+  // 1. Widget hover box (render first so selection appears on top)
+  if (hoverWidgetId && hoverWidgetId !== currentSelectedWidgetId) {
+    const hoverEl = document.querySelector(`[data-widget-id="${hoverWidgetId}"]`);
+    if (hoverEl) {
+      const rect = hoverEl.getBoundingClientRect();
+      const displayName = widgetMetadata[hoverWidgetId] || "";
+      html += `<div class="wz-hover-box" style="top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;height:${rect.height}px;">`;
+      if (displayName) {
+        html += `<div class="wz-hover-label" style="top:-22px;">${escapeHtml(displayName)}</div>`;
+      }
+      html += `</div>`;
+    }
+  }
+
+  // 2. Block hover box
+  if (hoverBlockId && hoverBlockId !== currentSelectedBlockId) {
+    const targetWidgetId = hoverWidgetId || currentSelectedWidgetId;
+    if (targetWidgetId) {
+      const blockEl = document.querySelector(
+        `[data-widget-id="${targetWidgetId}"] [data-block-id="${hoverBlockId}"]`,
+      );
+      if (blockEl) {
+        const rect = blockEl.getBoundingClientRect();
+        html += `<div class="wz-block-hover" style="top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;height:${rect.height}px;"></div>`;
+      }
+    }
+  }
+
+  // 3. Widget selection box
+  if (currentSelectedWidgetId) {
+    const selEl = document.querySelector(`[data-widget-id="${currentSelectedWidgetId}"]`);
+    if (selEl) {
+      const rect = selEl.getBoundingClientRect();
+      const displayName = widgetMetadata[currentSelectedWidgetId] || "";
+      const isPageWidget = widgetOrder.includes(currentSelectedWidgetId);
+      const widgetIndex = widgetOrder.indexOf(currentSelectedWidgetId);
+      const canMoveUp = isPageWidget && widgetIndex > 0;
+      const canMoveDown = isPageWidget && widgetIndex < widgetOrder.length - 1;
+      const showReorder = isPageWidget && widgetOrder.length > 1;
+
+      html += `<div class="wz-selection-box" style="top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;height:${rect.height}px;">`;
+
+      // Controls bar above the selection box
+      html += `<div class="wz-controls" style="top:-24px;">`;
+
+      if (showReorder) {
+        html += `<button class="wz-reorder-btn" data-reorder="up" data-widget-reorder="${currentSelectedWidgetId}" ${!canMoveUp ? "disabled" : ""}>${CHEVRON_UP_SVG}</button>`;
+      }
+
+      if (displayName) {
+        html += `<div class="wz-widget-label">${escapeHtml(displayName)}</div>`;
+      }
+
+      if (showReorder) {
+        html += `<button class="wz-reorder-btn" data-reorder="down" data-widget-reorder="${currentSelectedWidgetId}" ${!canMoveDown ? "disabled" : ""}>${CHEVRON_DOWN_SVG}</button>`;
+      }
+
+      html += `</div>`; // .wz-controls
+      html += `</div>`; // .wz-selection-box
+    }
+  }
+
+  // 4. Block selection box
+  if (currentSelectedWidgetId && currentSelectedBlockId) {
+    const blockEl = document.querySelector(
+      `[data-widget-id="${currentSelectedWidgetId}"] [data-block-id="${currentSelectedBlockId}"]`,
+    );
+    if (blockEl) {
+      const rect = blockEl.getBoundingClientRect();
+      html += `<div class="wz-block-selection" style="top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;height:${rect.height}px;"></div>`;
+    }
+  }
+
+  overlayContainer.innerHTML = html;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Handle reorder button clicks via event delegation on the overlay
+function setupOverlayClickHandler() {
+  if (!overlayContainer) return;
+
+  overlayContainer.addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-widget-reorder]");
+    if (!btn || btn.disabled) return;
+
+    const widgetId = btn.getAttribute("data-widget-reorder");
+    const direction = btn.getAttribute("data-reorder");
+
+    postToParent({ type: "REORDER_WIDGET", payload: { widgetId, direction } });
+  });
+}
+
+// ── Message Handler ─────────────────────────────────────────────────────────
+
+function handleMessage(event) {
+  // Origin check when isolation is enabled
+  if (BUILDER_ORIGIN !== "*" && event.origin !== BUILDER_ORIGIN) return;
+
+  const { type, payload } = event.data;
+
+  switch (type) {
+    case "UPDATE_CSS_VARIABLES":
+      updateCssVariables(payload);
+      break;
+    case "LOAD_FONTS":
+      loadFonts(payload);
+      break;
+    case "SCROLL_TO_WIDGET":
+      scrollToWidget(payload.widgetId);
+      break;
+    case "SCROLL_TO_ELEMENT":
+      scrollToElement(payload.widgetId, payload.blockId);
+      renderOverlay();
+      break;
+    case "UPDATE_WIDGET_SETTINGS":
+      updateWidgetSettings(payload.widgetId, payload.changes);
+      break;
+    case "GET_ELEMENT_BOUNDS":
+      reportElementBounds(payload.widgetId, payload.blockId);
+      break;
+    case "UPDATE_SELECTION":
+      updateSelection(payload.widgetId, payload.blockId);
+      reportElementBounds(payload.widgetId, payload.blockId);
+      break;
+    case "MORPH_WIDGET":
+      handleWidgetMorph(payload.widgetId, payload.html);
+      break;
+    case "SET_WIDGET_METADATA":
+      // payload: { metadata: { widgetId: displayName, ... }, widgetOrder: [...] }
+      if (payload.metadata) {
+        widgetMetadata = payload.metadata;
+      }
+      if (payload.widgetOrder) {
+        widgetOrder = payload.widgetOrder;
+      }
+      renderOverlay();
+      break;
+    case "RESTORE_SCROLL":
+      // Instantly restore scroll position (no smooth animation)
+      window.scrollTo(0, payload.scrollY || 0);
+      break;
+    case "SIDEBAR_HOVER":
+      // payload: { widgetId, blockId }
+      sidebarHoveredWidgetId = payload.widgetId || null;
+      sidebarHoveredBlockId = payload.blockId || null;
+      // Clear preview hover when sidebar hover is active
+      if (sidebarHoveredWidgetId) {
+        currentHoveredWidgetId = null;
+        currentHoveredBlockId = null;
+      }
+      renderOverlay();
+      break;
+    default:
+      break;
   }
 }
 
-// Track widget timers and observers for cleanup
+// ── Widget Morphing ─────────────────────────────────────────────────────────
+
 const widgetTimers = new Map();
 const widgetObservers = new Map();
 
-// Extract all script tags from an element
 function extractScripts(element) {
   if (!element) return [];
   const scripts = Array.from(element.querySelectorAll("script"));
@@ -588,7 +770,6 @@ function extractScripts(element) {
   }));
 }
 
-// Execute scripts in order
 function executeScripts(scripts, widgetElement) {
   if (!scripts || scripts.length === 0) return;
 
@@ -614,7 +795,6 @@ function executeScripts(scripts, widgetElement) {
   });
 }
 
-// Initialize a widget's scripts and mark it as initialized
 function initializeWidget(widgetId) {
   const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
   if (!widget) return;
@@ -632,7 +812,6 @@ function initializeWidget(widgetId) {
   widget.dispatchEvent(new CustomEvent("widget:updated", { bubbles: true, detail: { widgetId } }));
 }
 
-// Cleanup widget state (timers, observers)
 function cleanupWidget(widgetId) {
   const timers = widgetTimers.get(widgetId);
   if (timers) {
@@ -657,7 +836,6 @@ function cleanupWidget(widgetId) {
   }
 }
 
-// Track timer for a widget (for cleanup)
 function trackWidgetTimer(widgetId, timerId) {
   if (!widgetTimers.has(widgetId)) {
     widgetTimers.set(widgetId, new Set());
@@ -665,7 +843,6 @@ function trackWidgetTimer(widgetId, timerId) {
   widgetTimers.get(widgetId).add(timerId);
 }
 
-// Track observer for a widget (for cleanup)
 function trackWidgetObserver(widgetId, observer) {
   if (!widgetObservers.has(widgetId)) {
     widgetObservers.set(widgetId, new Set());
@@ -673,8 +850,6 @@ function trackWidgetObserver(widgetId, observer) {
   widgetObservers.get(widgetId).add(observer);
 }
 
-// Simple widget morphing - replace the widget element and re-run scripts
-// This is simpler and more reliable than complex DOM diffing
 function morphWidget(widgetId, newHtml) {
   const existingElement = document.querySelector(`[data-widget-id="${widgetId}"]`);
   if (!existingElement) {
@@ -683,7 +858,6 @@ function morphWidget(widgetId, newHtml) {
   }
 
   try {
-    // Parse new HTML
     const parser = new DOMParser();
     const doc = parser.parseFromString(newHtml, "text/html");
     const newElement = doc.querySelector(`[data-widget-id="${widgetId}"]`);
@@ -693,29 +867,23 @@ function morphWidget(widgetId, newHtml) {
       return false;
     }
 
-    // Extract scripts before replacing
     const newScripts = extractScripts(newElement);
     newElement.querySelectorAll("script").forEach((script) => script.remove());
 
-    // Preserve some form state from old element
     preserveFormState(existingElement, newElement);
-
-    // Cleanup old widget state
     cleanupWidget(widgetId);
 
-    // Replace the element
     existingElement.parentNode.replaceChild(newElement, existingElement);
 
-    // Execute scripts on the new element
     if (newScripts.length > 0) {
       executeScripts(newScripts, newElement);
     }
 
-    // Mark as initialized
     newElement.dataset.initialized = "true";
-
-    // Dispatch update event
     newElement.dispatchEvent(new CustomEvent("widget:updated", { bubbles: true, detail: { widgetId } }));
+
+    // Re-render overlay after morph (element positions may have changed)
+    requestAnimationFrame(() => renderOverlay());
 
     return true;
   } catch (error) {
@@ -724,9 +892,7 @@ function morphWidget(widgetId, newHtml) {
   }
 }
 
-// Preserve form state from old element to new element
 function preserveFormState(oldEl, newEl) {
-  // Preserve input values
   const oldInputs = oldEl.querySelectorAll("input, textarea, select");
   oldInputs.forEach((oldInput) => {
     const name = oldInput.name || oldInput.id;
@@ -745,19 +911,38 @@ function preserveFormState(oldEl, newEl) {
   });
 }
 
-// Handle widget morphing via postMessage
 function handleWidgetMorph(widgetId, newHtml) {
-  console.log(`[Runtime] 🔧 Received MORPH_WIDGET for: ${widgetId}`);
+  console.log(`[Runtime] Received MORPH_WIDGET for: ${widgetId}`);
   const success = morphWidget(widgetId, newHtml);
-  if (success) {
-    console.log(`[Runtime] ✅ Successfully morphed widget: ${widgetId}`);
-  } else {
-    console.log(`[Runtime] ❌ Failed to morph widget: ${widgetId}`);
-    window.parent.postMessage({ type: "WIDGET_MORPH_FAILED", payload: { widgetId } }, "*");
+  if (!success) {
+    console.log(`[Runtime] Failed to morph widget: ${widgetId}`);
+    postToParent({ type: "WIDGET_MORPH_FAILED", payload: { widgetId } });
   }
 }
 
-// Create global runtime object
+// ── Initialization ──────────────────────────────────────────────────────────
+
+function initializeRuntime() {
+  overlayContainer = createOverlayContainer();
+  setupInteractionHandler();
+  setupHoverHandler();
+  setupScrollBoundsReporting();
+  setupOverlayClickHandler();
+  window.addEventListener("message", handleMessage);
+
+  // Re-render overlay on window resize
+  window.addEventListener("resize", () => renderOverlay());
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      postToParent({ type: "PREVIEW_READY" });
+    });
+  } else {
+    postToParent({ type: "PREVIEW_READY" });
+  }
+}
+
+// Global runtime object
 window.PreviewRuntime = {
   initializeRuntime,
   updateCssVariables,

@@ -50,7 +50,6 @@ export default function PagePreview() {
         themeSettings={themeSettings}
         previewMode="desktop"
         runtimeMode="standalone"
-        includeBaseTag={false}
         showSelectionOverlay={false}
         selectedWidgetId={null}
         selectedBlockId={null}

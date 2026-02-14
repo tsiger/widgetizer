@@ -28,7 +28,7 @@
       "type": "text",
       "id": "video_url",
       "label": "Video URL (YouTube or Vimeo)",
-      "default": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      "default": "https://www.youtube.com/watch?v=2PuFyjAs7JA"
     },
     {
       "type": "text",

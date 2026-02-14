@@ -1,6 +1,9 @@
-import { API_URL } from "../config";
+import { API_URL, PREVIEW_ISOLATION, PREVIEW_ORIGIN } from "../config";
 import useProjectStore from "../stores/projectStore";
 import fontDefinitions from "../core/config/fonts.json";
+
+// PostMessage target origin: use preview origin when isolation is enabled
+const TARGET_ORIGIN = PREVIEW_ISOLATION ? PREVIEW_ORIGIN : "*";
 
 /**
  * Extract Google fonts used in theme typography settings.
@@ -30,6 +33,40 @@ function extractFonts(settings) {
   });
 
   return fontsToLoad;
+}
+
+/**
+ * Fetch a preview token for src-based rendering.
+ * @param {Object} pageData - Page content including widgets and metadata
+ * @param {Object} themeSettings - Current theme settings for rendering
+ * @param {string} [previewMode="editor"] - Preview mode
+ * @returns {Promise<{token: string}>} Object with token property
+ * @throws {Error} If the request fails
+ */
+export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor") {
+  try {
+    const response = await fetch(API_URL("/api/preview/token"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        pageData,
+        themeSettings,
+        previewMode,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to create preview token");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Preview token error:", error);
+    throw error;
+  }
 }
 
 /**
@@ -166,7 +203,7 @@ export async function updatePreview(iframe, newState, oldState) {
       try {
         console.log(`[PreviewManager] → Morphing widget: ${widgetId}`);
         const renderedHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings);
-        iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, "*");
+        iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, TARGET_ORIGIN);
       } catch (error) {
         console.error(`Error updating widget ${widgetId}:`, error);
       }
@@ -179,7 +216,7 @@ export async function updatePreview(iframe, newState, oldState) {
       const renderedHtml = await fetchRenderedWidget("header", newGlobalWidgets.header, newThemeSettings);
       iframe.contentWindow.postMessage(
         { type: "MORPH_WIDGET", payload: { widgetId: "header", html: renderedHtml } },
-        "*",
+        TARGET_ORIGIN,
       );
     } catch (error) {
       console.error("Error updating header:", error);
@@ -190,7 +227,7 @@ export async function updatePreview(iframe, newState, oldState) {
       const renderedHtml = await fetchRenderedWidget("footer", newGlobalWidgets.footer, newThemeSettings);
       iframe.contentWindow.postMessage(
         { type: "MORPH_WIDGET", payload: { widgetId: "footer", html: renderedHtml } },
-        "*",
+        TARGET_ORIGIN,
       );
     } catch (error) {
       console.error("Error updating footer:", error);
@@ -259,33 +296,14 @@ function updateThemeSettings(iframe, settings) {
   const variables = settingsToCssVariables(settings);
   const fontsMetadata = extractFonts(settings);
 
-  iframe.contentWindow.postMessage({ type: "UPDATE_CSS_VARIABLES", payload: variables }, "*");
+  iframe.contentWindow.postMessage({ type: "UPDATE_CSS_VARIABLES", payload: variables }, TARGET_ORIGIN);
 
   if (Object.keys(fontsMetadata).length > 0) {
     const fontsPayload = Object.fromEntries(
       Object.entries(fontsMetadata).map(([name, weightsSet]) => [name, Array.from(weightsSet)]),
     );
-    iframe.contentWindow.postMessage({ type: "LOAD_FONTS", payload: fontsPayload }, "*");
+    iframe.contentWindow.postMessage({ type: "LOAD_FONTS", payload: fontsPayload }, TARGET_ORIGIN);
   }
-}
-
-/**
- * Update a widget setting in the preview without reloading.
- * Uses the PreviewRuntime API if available in the iframe.
- * @param {HTMLIFrameElement} iframe - Preview iframe element
- * @param {string} widgetId - Widget identifier to update
- * @param {string} settingId - Setting identifier within the widget
- * @param {*} value - New value for the setting
- * @returns {boolean} True if update succeeded, false otherwise
- */
-export function updateWidgetSetting(iframe, widgetId, settingId, value) {
-  if (!iframe || !iframe.contentWindow) return false;
-
-  if (iframe.contentWindow.PreviewRuntime) {
-    return iframe.contentWindow.PreviewRuntime.updateWidgetSetting(widgetId, settingId, value);
-  }
-
-  return false;
 }
 
 /**
@@ -377,5 +395,5 @@ export function scrollElementIntoView(iframe, widgetId, blockId = null) {
     return;
   }
 
-  iframe.contentWindow.postMessage({ type: "SCROLL_TO_ELEMENT", payload: { widgetId, blockId } }, "*");
+  iframe.contentWindow.postMessage({ type: "SCROLL_TO_ELEMENT", payload: { widgetId, blockId } }, TARGET_ORIGIN);
 }

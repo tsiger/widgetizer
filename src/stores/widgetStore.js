@@ -342,8 +342,21 @@ const useWidgetStore = create((set, get) => ({
 
     if (selectedWidgetId === widgetId) {
       const deletedIndex = currentOrder.indexOf(widgetId);
-      const nextWidgetId = deletedIndex !== -1 ? newWidgetsOrder[deletedIndex] : null;
-      set({ selectedWidgetId: nextWidgetId || null });
+      // Prefer previous widget; if none (was first), take next; if none (was only), null
+      let nextWidgetId = null;
+      if (newWidgetsOrder.length > 0) {
+        if (deletedIndex > 0) {
+          nextWidgetId = newWidgetsOrder[deletedIndex - 1];
+        } else {
+          nextWidgetId = newWidgetsOrder[0];
+        }
+      }
+      set({
+        selectedWidgetId: nextWidgetId,
+        selectedBlockId: null,
+        hoveredWidgetId: null,
+        hoveredBlockId: null,
+      });
     }
   },
 
@@ -483,9 +496,11 @@ const useWidgetStore = create((set, get) => ({
 
     if (!widget) return;
 
+    const currentBlocksOrder = widget.blocksOrder || [];
+
     // eslint-disable-next-line no-unused-vars
     const { [blockId]: deletedBlock, ...remainingBlocks } = widget.blocks || {};
-    const updatedBlocksOrder = (widget.blocksOrder || []).filter((id) => id !== blockId);
+    const updatedBlocksOrder = currentBlocksOrder.filter((id) => id !== blockId);
 
     const updatedWidget = {
       ...widget,
@@ -496,7 +511,20 @@ const useWidgetStore = create((set, get) => ({
     setWidgetData(widgetId, updatedWidget, isGlobal);
 
     if (selectedBlockId === blockId) {
-      set({ selectedBlockId: null });
+      const deletedIndex = currentBlocksOrder.indexOf(blockId);
+      // Prefer previous block; if none (was first), take next; if none (was only), null
+      let nextBlockId = null;
+      if (updatedBlocksOrder.length > 0) {
+        if (deletedIndex > 0) {
+          nextBlockId = updatedBlocksOrder[deletedIndex - 1];
+        } else {
+          nextBlockId = updatedBlocksOrder[0];
+        }
+      }
+      set({
+        selectedBlockId: nextBlockId,
+        hoveredBlockId: null,
+      });
     }
   },
 

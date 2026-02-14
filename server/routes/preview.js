@@ -1,6 +1,7 @@
 import express from "express";
 import {
   generatePreview,
+  createPreviewToken,
   renderSingleWidget,
   getGlobalWidgets,
   saveGlobalWidget,
@@ -11,6 +12,9 @@ const router = express.Router();
 
 // POST /api/preview - Generate a full page preview
 router.post("/", generatePreview);
+
+// POST /api/preview/token - Create a preview token for src-based rendering
+router.post("/token", createPreviewToken);
 
 // POST /api/preview/widget - Render a single widget
 router.post("/widget", renderSingleWidget);

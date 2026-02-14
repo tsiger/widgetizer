@@ -140,6 +140,36 @@ If the application evolves to support untrusted multi-user environments or publi
 - Implementing code review workflows for theme settings changes
 - Adding audit logging for all theme setting modifications
 
+### 9. Preview Isolation
+
+- **What it is:** An optional security boundary that runs the preview iframe on a separate origin from the builder app. When `PREVIEW_ISOLATION=true`, the preview loads via `<iframe src="https://preview.domain/render/:token">` instead of same-origin, preventing preview-injected scripts from accessing the builder's cookies, localStorage, or session tokens.
+- **Why it's important:** In multi-user or SaaS deployments, user-authored widget templates may contain arbitrary scripts (custom JavaScript, third-party integrations). Without origin isolation, these scripts run in the builder's origin and can access sensitive data. Isolation ensures the preview is sandboxed in a separate security context.
+
+#### Architecture
+
+**Token-based rendering:** The builder POSTs page data to `/api/preview/token`, which renders the full HTML server-side and stores it in an in-memory token store (`server/services/previewTokenStore.js`). The builder sets the iframe's `src` to `/render/:token` (on the preview origin when isolation is enabled). Tokens expire after 5 minutes and are limited to 1000 concurrent entries.
+
+**PostMessage origin verification:** All `postMessage` calls between the builder and preview use explicit target origins instead of `"*"`:
+- Builder → Preview: uses `VITE_PREVIEW_ORIGIN` (or `"*"` when isolation is off)
+- Preview → Builder: reads `data-builder-origin` attribute from the runtime script tag (or `"*"` when isolation is off)
+- The preview runtime (`previewRuntime.js`) rejects messages from unexpected origins when isolation is enabled.
+
+**Inline overlay rendering:** The selection/hover overlay (selection boxes, widget labels, reorder buttons) is rendered inside the iframe by `previewRuntime.js` using vanilla JS. This eliminates the need for cross-origin `contentDocument` access and removes scroll lag that occurred with the previous parent-side overlay approach. The parent sends widget metadata (display names, widget order) via `SET_WIDGET_METADATA` postMessage.
+
+#### Environment Variables
+
+| Variable | Side | Required | Description |
+|----------|------|----------|-------------|
+| `PREVIEW_ISOLATION` | Server | No | Set to `true` to enable preview isolation |
+| `BUILDER_ORIGIN` | Server | When isolation=true | Builder app origin (e.g., `https://builder.example.com`) |
+| `ALLOWED_ORIGINS` | Server | When isolation=true | Comma-separated CORS allowlist |
+| `VITE_PREVIEW_ISOLATION` | Client | No | Mirrors `PREVIEW_ISOLATION` |
+| `VITE_PREVIEW_ORIGIN` | Client | When isolation=true | Preview origin (e.g., `https://preview.example.com`) |
+
+#### Local Development
+
+When `PREVIEW_ISOLATION` is not set (default), the preview loads from the same origin as the builder using `src`-based rendering. PostMessage uses `"*"` as the target origin. This is the standard mode for single-user local development.
+
 ## ⚙️ Configuration
 
 ### Environment Variables (`.env`)

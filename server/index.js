@@ -21,6 +21,7 @@ import exportRoutes from "./routes/export.js";
 import appSettingsRoutes from "./routes/appSettings.js";
 import coreWidgetsRoutes from "./routes/coreWidgets.js";
 import coreRoutes from "./routes/core.js";
+import { renderPreviewToken } from "./controllers/previewController.js";
 
 const app = express();
 
@@ -29,12 +30,31 @@ if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
 
-app.use(cors());
+// CORS: use allowlist when preview isolation is enabled, permissive otherwise
+if (process.env.PREVIEW_ISOLATION === "true" && process.env.ALLOWED_ORIGINS) {
+  const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim());
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+    }),
+  );
+} else {
+  app.use(cors());
+}
 app.use(
   helmet({
     contentSecurityPolicy: false, // Preview iframe needs inline styles/scripts from widgets
     crossOriginEmbedderPolicy: false, // Widgets load cross-origin iframes (YouTube, Maps, etc.)
     crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow SVGs and assets in preview iframe
+    frameguard: false, // Preview renders in iframe via /render/:token
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" }, // YouTube/Vimeo need Referer header to validate embeds
+    crossOriginOpenerPolicy: false, // YouTube player needs cross-origin popup communication
   }),
 );
 app.use(express.json());
@@ -62,6 +82,9 @@ app.use("/themes", express.static(THEMES_DIR));
 // iFrame runtime script (MUST be before production catch-all)
 app.use("/runtime", express.static(STATIC_UTILS_DIR));
 
+// Token-based preview rendering (MUST be before production catch-all)
+app.get("/render/:token", renderPreviewToken);
+
 // --- Production-Only Logic ---
 if (process.env.NODE_ENV === "production") {
   // Serve static assets from the dist/assets directory
@@ -71,7 +94,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(STATIC_DIST_DIR));
 
   // Handles any requests that don't match the ones above
-  app.get(/^\/(?!api|health).*/, (req, res) => {
+  app.get(/^\/(?!api|health|render).*/, (req, res) => {
     res.sendFile(path.join(STATIC_DIST_DIR, "index.html"));
   });
 }
