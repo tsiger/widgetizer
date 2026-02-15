@@ -349,6 +349,19 @@ Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`
 
 ---
 
+### **[future-tests.md](future-tests.md)** - Testing Strategy & Implementation
+
+**Purpose**: Documents the testing infrastructure, what's been tested, and what remains **When to use**:
+
+- Running or adding frontend tests (Vitest)
+- Running or adding backend tests (Node test runner)
+- Understanding test conventions (file location, store testing pattern, theme widget pattern)
+- Planning next testing phases (hooks, browser tests)
+
+**Key topics**: Vitest config, Tier 1 (utility functions), Tier 2 (Zustand stores), theme widget rendering tests, future Tier 3 (React hooks) and Tier 4 (preview runtime)
+
+---
+
 ## 💻 Desktop Builds
 
 ### **[electron-app.md](electron-app.md)** - Electron Desktop App
