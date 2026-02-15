@@ -49,15 +49,17 @@ const {
   getProjectDir,
   getProjectPagesDir,
   getProjectMenusDir,
-  getProjectMediaJsonPath,
   getProjectThemeJsonPath,
   PUBLISH_DIR,
   CORE_WIDGETS_DIR,
 } = await import("../config.js");
 
 const { writeProjectsFile, readProjectsFile } = await import("../controllers/projectController.js");
+const { writeMediaFile } = await import("../controllers/mediaController.js");
 const { exportProject, cleanupProjectExports, getExportFiles, downloadExport, getExportHistory, deleteExport } =
   await import("../controllers/exportController.js");
+const { closeDb } = await import("../db/index.js");
+const exportRepo = await import("../db/repositories/exportRepository.js");
 
 // ============================================================================
 // Test constants
@@ -127,19 +129,14 @@ async function callController(fn, { params, body, file } = {}) {
 // Helpers to read export artefacts
 // ============================================================================
 
-async function readExportHistoryFile() {
-  const historyPath = path.join(PUBLISH_DIR, "export-history.json");
-  if (await fs.pathExists(historyPath)) {
-    return fs.readJson(historyPath);
-  }
-  return {};
+function readExportHistory(projectId) {
+  return exportRepo.getExports(projectId);
 }
 
-async function getLatestExportDir() {
-  const history = await readExportHistoryFile();
-  const projectHistory = history[PROJECT_ID];
-  if (!projectHistory || projectHistory.exports.length === 0) return null;
-  return projectHistory.exports[0].outputDir;
+function getLatestExportDir() {
+  const exports = exportRepo.getExports(PROJECT_ID);
+  if (exports.length === 0) return null;
+  return exports[0].outputDir;
 }
 
 // ============================================================================
@@ -356,9 +353,6 @@ before(async () => {
   // -----------------------------------------------------------
   // 8. Media files (images, videos, audios)
   // -----------------------------------------------------------
-  const mediaJsonPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-  await fs.ensureDir(path.dirname(mediaJsonPath));
-
   // Create actual media files on disk
   const uploadsDir = path.join(projectDir, "uploads");
   await fs.ensureDir(path.join(uploadsDir, "images"));
@@ -375,63 +369,56 @@ before(async () => {
   // Dummy audio
   await fs.writeFile(path.join(uploadsDir, "audios", "podcast.mp3"), "fake-mp3-data");
 
-  await fs.writeFile(
-    mediaJsonPath,
-    JSON.stringify(
+  await writeMediaFile(PROJECT_ID, {
+    files: [
       {
-        files: [
-          {
-            id: "img-1",
-            filename: "hero.jpg",
-            path: "/uploads/images/hero.jpg",
-            type: "image/jpeg",
-            width: 1920,
-            height: 1080,
-            usedIn: ["index"],
-            sizes: {
-              medium: {
-                path: "/uploads/images/hero-medium.jpg",
-                width: 1024,
-                height: 576,
-              },
-            },
+        id: "img-1",
+        filename: "hero.jpg",
+        path: "/uploads/images/hero.jpg",
+        type: "image/jpeg",
+        width: 1920,
+        height: 1080,
+        usedIn: ["index"],
+        sizes: {
+          medium: {
+            path: "/uploads/images/hero-medium.jpg",
+            width: 1024,
+            height: 576,
           },
-          {
-            id: "img-2",
-            filename: "unused.png",
-            path: "/uploads/images/unused.png",
-            type: "image/png",
-            width: 500,
-            height: 500,
-            usedIn: [], // <-- not used anywhere
-          },
-          {
-            id: "vid-1",
-            filename: "intro.mp4",
-            path: "/uploads/videos/intro.mp4",
-            type: "video/mp4",
-            usedIn: ["index"],
-          },
-          {
-            id: "vid-2",
-            filename: "unused.mp4",
-            path: "/uploads/videos/unused.mp4",
-            type: "video/mp4",
-            usedIn: [], // <-- not used
-          },
-          {
-            id: "aud-1",
-            filename: "podcast.mp3",
-            path: "/uploads/audios/podcast.mp3",
-            type: "audio/mpeg",
-            usedIn: ["about"],
-          },
-        ],
+        },
       },
-      null,
-      2,
-    ),
-  );
+      {
+        id: "img-2",
+        filename: "unused.png",
+        path: "/uploads/images/unused.png",
+        type: "image/png",
+        width: 500,
+        height: 500,
+        usedIn: [], // <-- not used anywhere
+      },
+      {
+        id: "vid-1",
+        filename: "intro.mp4",
+        path: "/uploads/videos/intro.mp4",
+        type: "video/mp4",
+        usedIn: ["index"],
+      },
+      {
+        id: "vid-2",
+        filename: "unused.mp4",
+        path: "/uploads/videos/unused.mp4",
+        type: "video/mp4",
+        usedIn: [], // <-- not used
+      },
+      {
+        id: "aud-1",
+        filename: "podcast.mp3",
+        path: "/uploads/audios/podcast.mp3",
+        type: "audio/mpeg",
+        usedIn: ["about"],
+      },
+    ],
+  });
 
   // -----------------------------------------------------------
   // 9. Project assets (CSS/JS)
@@ -471,6 +458,7 @@ after(async () => {
   console.warn = _origWarn;
   console.error = _origError;
 
+  closeDb();
   await fs.remove(TEST_ROOT);
   // Also clean up any publish dirs we created
   // (PUBLISH_DIR is under TEST_DATA_DIR which is under TEST_ROOT, so already handled)
@@ -478,12 +466,13 @@ after(async () => {
 
 // Clean export history before each test group that needs fresh state
 async function cleanExportHistory() {
-  const historyPath = path.join(PUBLISH_DIR, "export-history.json");
-  await fs.remove(historyPath);
+  // Delete all export records from all projects in the DB
+  const { getDb } = await import("../db/index.js");
+  getDb().prepare("DELETE FROM exports").run();
   // Also remove any export directories
   const publishContents = await fs.readdir(PUBLISH_DIR).catch(() => []);
   for (const entry of publishContents) {
-    if (entry.startsWith(PROJECT_FOLDER)) {
+    if (entry.startsWith(PROJECT_FOLDER) || entry.startsWith("cleanup-test") || entry.startsWith("no-url") || entry.startsWith("home-slug") || entry.startsWith("bad-theme")) {
       await fs.remove(path.join(PUBLISH_DIR, entry));
     }
   }
@@ -668,12 +657,13 @@ describe("exportProject", () => {
   });
 
   it("records export in history", async () => {
-    const history = await readExportHistoryFile();
-    assert.ok(history[PROJECT_ID], "Project should appear in export history");
-    assert.equal(history[PROJECT_ID].exports.length, 1);
-    assert.equal(history[PROJECT_ID].exports[0].version, 1);
-    assert.equal(history[PROJECT_ID].exports[0].status, "success");
-    assert.equal(history[PROJECT_ID].nextVersion, 2);
+    const exports = readExportHistory(PROJECT_ID);
+    assert.ok(exports.length > 0, "Project should have export history");
+    assert.equal(exports.length, 1);
+    assert.equal(exports[0].version, 1);
+    assert.equal(exports[0].status, "success");
+    // nextVersion is now derived, not stored
+    assert.equal(exportRepo.getNextVersion(PROJECT_ID), 2);
   });
 
   it("output directory follows naming convention: folderName-v{version}", async () => {
@@ -710,8 +700,7 @@ describe("export versioning", () => {
   });
 
   it("history records exports in reverse-chronological order (newest first)", async () => {
-    const history = await readExportHistoryFile();
-    const exports = history[PROJECT_ID].exports;
+    const exports = readExportHistory(PROJECT_ID);
     assert.ok(exports.length >= 3);
     assert.equal(exports[0].version, 3, "Newest version first");
     assert.equal(exports[1].version, 2);
@@ -719,8 +708,7 @@ describe("export versioning", () => {
   });
 
   it("nextVersion is always one more than the last exported version", async () => {
-    const history = await readExportHistoryFile();
-    assert.equal(history[PROJECT_ID].nextVersion, 4);
+    assert.equal(exportRepo.getNextVersion(PROJECT_ID), 4);
   });
 });
 
@@ -737,7 +725,7 @@ describe("exportProject validation", () => {
     assert.ok(res._json.error);
   });
 
-  it("returns 500 when project does not exist in projects.json", async () => {
+  it("returns 500 when project does not exist in the database", async () => {
     const res = await callController(exportProject, {
       params: { projectId: "nonexistent-uuid" },
     });
@@ -1070,8 +1058,8 @@ describe("deleteExport", () => {
     assert.ok(res._json.success);
 
     // Verify it's removed from history
-    const history = await readExportHistoryFile();
-    const versions = history[PROJECT_ID].exports.map((e) => e.version);
+    const exports = readExportHistory(PROJECT_ID);
+    const versions = exports.map((e) => e.version);
     assert.ok(!versions.includes(2), "Version 2 should be removed from history");
   });
 
@@ -1082,8 +1070,8 @@ describe("deleteExport", () => {
   });
 
   it("preserves other export versions", async () => {
-    const history = await readExportHistoryFile();
-    const versions = history[PROJECT_ID].exports.map((e) => e.version);
+    const exports = readExportHistory(PROJECT_ID);
+    const versions = exports.map((e) => e.version);
     assert.ok(versions.includes(1), "Version 1 should still exist");
     assert.ok(versions.includes(3), "Version 3 should still exist");
   });
@@ -1165,9 +1153,9 @@ describe("cleanupProjectExports", () => {
 
   it("removes all export directories for a project", async () => {
     // Verify exports exist first
-    const historyBefore = await readExportHistoryFile();
-    assert.ok(historyBefore[CLEANUP_ID], "Should have history before cleanup");
-    const exportDirs = historyBefore[CLEANUP_ID].exports.map((e) => e.outputDir);
+    const exportsBefore = readExportHistory(CLEANUP_ID);
+    assert.ok(exportsBefore.length > 0, "Should have history before cleanup");
+    const exportDirs = exportsBefore.map((e) => e.outputDir);
     for (const dir of exportDirs) {
       assert.ok(await fs.pathExists(dir), `${dir} should exist before cleanup`);
     }
@@ -1184,8 +1172,8 @@ describe("cleanupProjectExports", () => {
   });
 
   it("removes project entry from export history", async () => {
-    const historyAfter = await readExportHistoryFile();
-    assert.ok(!historyAfter[CLEANUP_ID], "Project should be removed from history");
+    const exportsAfter = readExportHistory(CLEANUP_ID);
+    assert.equal(exportsAfter.length, 0, "Project should have no export history");
   });
 
   it("handles project with no export history gracefully", async () => {
@@ -1221,7 +1209,7 @@ describe("exportProject with markdown", () => {
   });
 
   it("markdown files contain YAML frontmatter", async () => {
-    const exportDir = (await readExportHistoryFile())[PROJECT_ID].exports[0].outputDir;
+    const exportDir = readExportHistory(PROJECT_ID)[0].outputDir;
     const indexMd = await fs.readFile(path.join(exportDir, "index.md"), "utf8");
     assert.ok(indexMd.startsWith("---"), "Should start with YAML frontmatter");
     assert.ok(indexMd.includes("title:"), "Should have title in frontmatter");
@@ -1350,9 +1338,9 @@ describe("export failure recording", () => {
     assert.ok(res._status === 404 || res._status === 500, `Expected error status, got ${res._status}`);
 
     // Check that the failure was recorded in export history
-    const history = await readExportHistoryFile();
-    if (history[badId]) {
-      const failedExport = history[badId].exports.find((e) => e.status === "failed");
+    const exports = readExportHistory(badId);
+    if (exports.length > 0) {
+      const failedExport = exports.find((e) => e.status === "failed");
       assert.ok(failedExport, "Should have a failed export record");
     }
 

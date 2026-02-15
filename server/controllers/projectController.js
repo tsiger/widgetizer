@@ -7,7 +7,6 @@ import archiver from "archiver";
 import {
   DATA_DIR,
   APP_ROOT,
-  getProjectsFilePath,
   getProjectDir,
   getProjectPagesDir,
   getProjectMenusDir,
@@ -15,6 +14,10 @@ import {
 } from "../config.js";
 import { v4 as uuidv4 } from "uuid";
 import { isNewerVersion } from "../utils/semver.js";
+import {
+  readProjectsData,
+  writeProjectsData,
+} from "../db/repositories/projectRepository.js";
 
 // Make sure the projects directory exists
 async function ensureDirectories() {
@@ -22,36 +25,21 @@ async function ensureDirectories() {
 }
 
 /**
- * Reads the projects metadata file from disk.
- * Creates a new file with default structure if it doesn't exist.
- * @returns {Promise<{projects: Array<object>, activeProjectId: string|null}>} The projects data object
- * @throws {Error} If the file cannot be read or parsed
+ * Reads the projects metadata from SQLite.
+ * Backward-compatible wrapper that returns the same shape as the old JSON file.
+ * @returns {Promise<{projects: Array<object>, activeProjectId: string|null}>}
  */
 export async function readProjectsFile() {
-  const projectsFilePath = getProjectsFilePath();
-  try {
-    // Check existence first
-    if (!(await fs.pathExists(projectsFilePath))) {
-      const initialData = { projects: [], activeProjectId: null };
-      await writeProjectsFile(initialData);
-      return initialData;
-    }
-    const data = await fs.readFile(projectsFilePath, "utf8");
-    return JSON.parse(data);
-  } catch (error) {
-    console.error("Error reading projects file:", error);
-    throw error;
-  }
+  return readProjectsData();
 }
 
 /**
- * Writes the projects metadata to disk.
- * @param {{projects: Array<object>, activeProjectId: string|null}} data - The projects data to save
- * @returns {Promise<void>}
+ * Writes the projects metadata to SQLite.
+ * Backward-compatible wrapper that accepts the same shape as the old JSON file.
+ * @param {{projects: Array<object>, activeProjectId: string|null}} data
  */
 export async function writeProjectsFile(data) {
-  const projectsFilePath = getProjectsFilePath();
-  await fs.outputFile(projectsFilePath, JSON.stringify(data, null, 2));
+  writeProjectsData(data);
 }
 
 // Helper function to generate a unique project ID based on name
@@ -615,9 +603,15 @@ export async function updateProject(req, res) {
     if (updates.folderName && updates.folderName.trim() !== currentFolderName) {
       const newFolderName = updates.folderName.trim();
 
+      // Validate folderName format (must match create validation)
+      const folderNamePattern = /^[a-z0-9-]+$/;
+      if (!folderNamePattern.test(newFolderName)) {
+        return res.status(400).json({ error: "Folder Name can only contain lowercase letters, numbers, and hyphens" });
+      }
+
       // Check for duplicate folderNames (excluding current project)
       const duplicateFolderName = data.projects.find(
-        (p) => p.id !== id && (p.folderName === newFolderName || p.slug === newFolderName),
+        (p) => p.id !== id && p.folderName === newFolderName,
       );
       if (duplicateFolderName) {
         return res.status(400).json({
@@ -634,8 +628,6 @@ export async function updateProject(req, res) {
         await fs.copy(oldDir, newDir);
         await new Promise((resolve) => setTimeout(resolve, 100));
         await fs.remove(oldDir);
-
-        // ID remains the same! We only updated the slug/folder.
       } catch (renameError) {
         // If copy succeeded but remove failed, try to clean up the new directory
         try {
@@ -654,7 +646,6 @@ export async function updateProject(req, res) {
       ...updatedProject,
       id: id, // ID never changes
       folderName: updates.folderName || currentFolderName, // Ensure folderName is always set
-      slug: undefined, // Remove legacy slug if it exists
       name: updates.name || updatedProject.name,
       description: updates.description !== undefined ? updates.description : updatedProject.description,
       siteUrl:

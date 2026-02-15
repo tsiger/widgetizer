@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
-import { getProjectDir, getAppSettingsPath } from "../config.js";
+import { getProjectDir } from "../config.js";
+import { getSetting } from "../db/repositories/settingsRepository.js";
 import { readProjectsFile } from "./projectController.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -113,16 +114,12 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
     let emptyStateDescription = "Start building your page by adding widgets from the sidebar";
 
     try {
-      const appSettingsPath = getAppSettingsPath();
-      if (await fs.pathExists(appSettingsPath)) {
-        const appSettings = JSON.parse(await fs.readFile(appSettingsPath, "utf-8"));
-        const userLocale = appSettings?.general?.language || "en";
-        const localePath = path.join(__dirname, `../../src/locales/${userLocale}.json`);
-        if (await fs.pathExists(localePath)) {
-          const localeData = JSON.parse(await fs.readFile(localePath, "utf-8"));
-          emptyStateTitle = localeData?.preview?.emptyState?.title || emptyStateTitle;
-          emptyStateDescription = localeData?.preview?.emptyState?.description || emptyStateDescription;
-        }
+      const userLocale = getSetting("general.language") || "en";
+      const localePath = path.join(__dirname, `../../src/locales/${userLocale}.json`);
+      if (await fs.pathExists(localePath)) {
+        const localeData = JSON.parse(await fs.readFile(localePath, "utf-8"));
+        emptyStateTitle = localeData?.preview?.emptyState?.title || emptyStateTitle;
+        emptyStateDescription = localeData?.preview?.emptyState?.description || emptyStateDescription;
       }
     } catch (error) {
       console.warn("Could not load translations for empty state, using default:", error.message);

@@ -13,8 +13,8 @@ import {
   getThemePresetDir,
   getProjectDir,
   getProjectThemeJsonPath,
-  getProjectsFilePath,
 } from "../config.js";
+import { getAllProjects } from "../db/repositories/projectRepository.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
@@ -844,29 +844,19 @@ export async function deleteTheme(req, res) {
       throw error;
     }
 
-    // 2. Check if theme is in use by any projects (via projects.json)
-    const projectsFilePath = getProjectsFilePath();
-    try {
-      const projectsData = await fs.readFile(projectsFilePath, "utf8");
-      const { projects } = JSON.parse(projectsData);
+    // 2. Check if theme is in use by any projects
+    const projects = getAllProjects();
+    const projectsUsingTheme = projects.filter((p) => p.theme === id);
 
-      const projectsUsingTheme = projects.filter((p) => p.theme === id);
-
-      if (projectsUsingTheme.length > 0) {
-        return res.status(409).json({
-          error: "Theme is in use",
-          message: `Cannot delete theme "${id}" because it is used by ${projectsUsingTheme.length} project(s)`,
-          projectsUsingTheme: projectsUsingTheme.map((p) => ({
-            id: p.id,
-            name: p.name,
-          })),
-        });
-      }
-    } catch (error) {
-      // If projects.json doesn't exist, no projects use any theme
-      if (error.code !== "ENOENT") {
-        console.warn(`Could not read projects file: ${error.message}`);
-      }
+    if (projectsUsingTheme.length > 0) {
+      return res.status(409).json({
+        error: "Theme is in use",
+        message: `Cannot delete theme "${id}" because it is used by ${projectsUsingTheme.length} project(s)`,
+        projectsUsingTheme: projectsUsingTheme.map((p) => ({
+          id: p.id,
+          name: p.name,
+        })),
+      });
     }
 
     // 3. Delete the theme directory

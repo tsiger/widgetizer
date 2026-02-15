@@ -2,19 +2,13 @@ import fs from "fs-extra";
 import slugify from "slugify";
 import { randomUUID } from "crypto";
 import { validationResult } from "express-validator";
-import { getProjectsFilePath, getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
+import { getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
 import path from "path";
 import { updatePageMediaUsage, removePageFromMediaUsage } from "../services/mediaUsageService.js";
+import { readProjectsData } from "../db/repositories/projectRepository.js";
 
 async function readProjectsFile() {
-  const projectsPath = getProjectsFilePath();
-  if (!(await fs.pathExists(projectsPath))) {
-    const initialData = { projects: [], activeProjectId: null };
-    await fs.outputFile(projectsPath, JSON.stringify(initialData, null, 2));
-    return initialData;
-  }
-  const data = await fs.readFile(projectsPath, "utf8");
-  return JSON.parse(data);
+  return readProjectsData();
 }
 
 /**

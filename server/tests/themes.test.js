@@ -77,6 +77,7 @@ const {
   resolvePresetPaths,
   getThemePresets,
 } = await import("../controllers/themeController.js");
+const { closeDb } = await import("../db/index.js");
 
 // Lazy-load AdmZip for building test zip files
 let AdmZip;
@@ -246,6 +247,7 @@ after(async () => {
   console.log = _origLog;
   console.warn = _origWarn;
   console.error = _origError;
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 

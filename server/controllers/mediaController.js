@@ -12,7 +12,6 @@ import {
   getProjectImagesDir,
   getProjectVideosDir,
   getProjectAudiosDir,
-  getProjectMediaJsonPath,
   getImagePath,
   getVideoPath,
   getAudioPath,
@@ -22,6 +21,7 @@ import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError, PROJECT_ERROR_CODES } from "../utils/projectErrors.js";
+import * as mediaRepo from "../db/repositories/mediaRepository.js";
 
 // Get image processing settings from app settings
 async function getImageProcessingSettings(projectId) {
@@ -101,258 +101,40 @@ function decodeFileName(filename) {
   }
 }
 
-// Write lock to prevent concurrent writes to media.json files
-// Maps projectId -> Promise that resolves when write is complete
-const writeLocks = new Map();
-
-// Acquire write lock for a project
-async function acquireWriteLock(projectId) {
-  // Wait for any existing write to complete
-  while (writeLocks.has(projectId)) {
-    await writeLocks.get(projectId);
-  }
-
-  // Create a new lock promise
-  let releaseLock;
-  const lockPromise = new Promise((resolve) => {
-    releaseLock = resolve;
-  });
-  writeLocks.set(projectId, lockPromise);
-
-  return releaseLock;
-}
-
 /**
- * Reads the media metadata file for a project.
- * Creates a new file if it doesn't exist, and attempts to recover corrupted JSON.
+ * Reads media metadata from SQLite for a project.
+ * Backward-compatible wrapper returning the same shape as the old JSON file.
  * @param {string} projectId - The project UUID
  * @returns {Promise<{files: Array<object>}>} The media metadata object
- * @throws {Error} If the project directory doesn't exist
  */
 export async function readMediaFile(projectId) {
-  const projectFolderName = await getProjectFolderName(projectId);
-  const projectDir = getProjectDir(projectFolderName);
-
-  if (!(await fs.pathExists(projectDir))) {
-    const error = new Error(`Project directory not found for ${projectId}`);
-    error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
-    throw error;
-  }
-  const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
-
-  try {
-    await fs.access(mediaFilePath);
-    const data = await fs.readFile(mediaFilePath, "utf8");
-    try {
-      return JSON.parse(data);
-    } catch (parseError) {
-      // If JSON parsing fails, try to extract valid JSON
-      console.error(`JSON parse error in ${mediaFilePath}:`, parseError.message);
-
-      // Try to find the end of valid JSON by looking for the last closing brace/bracket
-      // This handles cases where extra content was accidentally appended
-      const lastBrace = data.lastIndexOf("}");
-      const lastBracket = data.lastIndexOf("]");
-      const lastValidPos = Math.max(lastBrace, lastBracket);
-
-      if (lastValidPos > 0) {
-        const validJson = data.substring(0, lastValidPos + 1);
-        try {
-          const parsed = JSON.parse(validJson);
-          // Backup corrupted file and write fixed version (with lock)
-          const releaseLock = await acquireWriteLock(projectId);
-          try {
-            const backupPath = `${mediaFilePath}.backup.${Date.now()}`;
-            await fs.copy(mediaFilePath, backupPath);
-            await fs.writeFile(mediaFilePath, JSON.stringify(parsed, null, 2));
-            console.log(`Fixed corrupted JSON in ${mediaFilePath}. Backup saved to ${backupPath}`);
-            return parsed;
-          } finally {
-            releaseLock();
-            writeLocks.delete(projectId);
-          }
-        } catch (recoveryError) {
-          console.error(`Could not recover JSON from ${mediaFilePath}:`, recoveryError.message);
-          // Fall through to create new file
-        }
-      }
-
-      // If recovery failed, create a new file (with lock)
-      console.warn(`Creating new media.json file for project ${projectId} due to corruption`);
-      const releaseLock = await acquireWriteLock(projectId);
-      try {
-        const initialData = { files: [] };
-        await fs.outputFile(mediaFilePath, JSON.stringify(initialData, null, 2));
-        return initialData;
-      } finally {
-        releaseLock();
-        writeLocks.delete(projectId);
-      }
-    }
-  } catch (error) {
-    // If file doesn't exist, create a new one
-    if (error.code === "ENOENT") {
-      const releaseLock = await acquireWriteLock(projectId);
-      try {
-        const initialData = { files: [] };
-        // Use outputFile which creates directories if needed
-        await fs.outputFile(mediaFilePath, JSON.stringify(initialData, null, 2));
-        return initialData;
-      } finally {
-        releaseLock();
-        writeLocks.delete(projectId);
-      }
-    }
-    throw error;
-  }
+  // Validate project exists (throws if not found)
+  await getProjectFolderName(projectId);
+  return mediaRepo.getMediaFiles(projectId);
 }
 
 /**
- * Writes media metadata to disk with write locking to prevent race conditions.
- * Uses atomic write with temp file and automatic retry on transient errors.
+ * Writes media metadata to SQLite for a project.
+ * Backward-compatible wrapper that replaces all media data for the project.
  * @param {string} projectId - The project UUID
  * @param {{files: Array<object>}} data - The media metadata to save
- * @param {number} [retryCount=0] - Internal retry counter
- * @returns {Promise<void>}
- * @throws {Error} If write fails after retries or project directory doesn't exist
  */
-export async function writeMediaFile(projectId, data, retryCount = 0) {
-  const MAX_RETRIES = 3;
-  const releaseLock = await acquireWriteLock(projectId);
-
-  // Generate unique temp file name with process ID and random component to prevent collisions
-  const uniqueId = `${process.pid}.${Date.now()}.${Math.random().toString(36).substr(2, 9)}`;
-
-  try {
-    const projectFolderName = await getProjectFolderName(projectId);
-    const projectDir = getProjectDir(projectFolderName);
-    if (!(await fs.pathExists(projectDir))) {
-      const error = new Error(`Project directory not found for ${projectId}`);
-      error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
-      throw error;
-    }
-    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
-    const tempFilePath = `${mediaFilePath}.tmp.${uniqueId}`;
-
-    // Ensure the parent directory exists
-    const parentDir = path.dirname(mediaFilePath);
-    await fs.ensureDir(parentDir);
-
-    try {
-      // Write to temp file
-      await fs.writeFile(tempFilePath, JSON.stringify(data, null, 2), "utf8");
-
-      // Verify temp file was created successfully
-      const tempExists = await fs.pathExists(tempFilePath);
-
-      if (!tempExists) {
-        throw new Error(`Temp file was not created: ${tempFilePath}`);
-      }
-
-      // Verify directory still exists before move (defensive check)
-      const dirStillExists = await fs.pathExists(parentDir);
-
-      if (!dirStillExists) {
-        await fs.ensureDir(parentDir);
-      }
-
-      // Perform atomic move
-      await fs.move(tempFilePath, mediaFilePath, { overwrite: true });
-    } catch (error) {
-      console.error(`[${new Date().toISOString()}] [writeMediaFile] Error during write operation:`, error);
-      console.error(
-        `[${new Date().toISOString()}] [writeMediaFile] Error code: ${error.code}, syscall: ${error.syscall}`,
-      );
-
-      // Clean up temp file if it exists
-      try {
-        if (await fs.pathExists(tempFilePath)) {
-          await fs.unlink(tempFilePath);
-        }
-      } catch (cleanupError) {
-        console.warn(
-          `[${new Date().toISOString()}] [writeMediaFile] Failed to clean up temp file ${tempFilePath}:`,
-          cleanupError.message,
-        );
-      }
-
-      // Retry on transient file system errors
-      if (retryCount < MAX_RETRIES && (error.code === "ENOENT" || error.code === "EPERM" || error.code === "EBUSY")) {
-        const backoffMs = Math.pow(2, retryCount) * 100; // 100ms, 200ms, 400ms
-        console.warn(
-          `[${new Date().toISOString()}] [writeMediaFile] Retrying after ${backoffMs}ms due to transient error: ${error.code}`,
-        );
-
-        // Release lock before retry
-        writeLocks.delete(projectId);
-        releaseLock();
-
-        // Wait before retry
-        await new Promise((resolve) => setTimeout(resolve, backoffMs));
-
-        // Retry recursively
-        return writeMediaFile(projectId, data, retryCount + 1);
-      }
-
-      throw error;
-    }
-  } finally {
-    // CRITICAL FIX: Delete from map BEFORE releasing lock to prevent race conditions
-    writeLocks.delete(projectId);
-    releaseLock();
-  }
+export async function writeMediaFile(projectId, data) {
+  mediaRepo.writeMediaData(projectId, data);
 }
 
 /**
- * Atomically reads media.json, applies a transform function, and writes it back.
- * Holds the write lock across the entire read-modify-write cycle to prevent
- * race conditions where concurrent callers read stale data.
+ * Atomically reads media data, applies a transform function, and writes it back.
+ * SQLite transactions handle atomicity natively — no write locks needed.
  * @param {string} projectId - The project UUID
  * @param {function(Object): void} transformFn - Function that receives mediaData and mutates it in place
  * @returns {Promise<Object>} The transformed media data
- * @throws {Error} If project directory doesn't exist or file operations fail
  */
 export async function atomicUpdateMediaFile(projectId, transformFn) {
-  const releaseLock = await acquireWriteLock(projectId);
-
-  try {
-    const projectFolderName = await getProjectFolderName(projectId);
-    const projectDir = getProjectDir(projectFolderName);
-    if (!(await fs.pathExists(projectDir))) {
-      const error = new Error(`Project directory not found for ${projectId}`);
-      error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
-      throw error;
-    }
-    const mediaFilePath = getProjectMediaJsonPath(projectFolderName);
-
-    // Read while holding the lock
-    let mediaData;
-    try {
-      const data = await fs.readFile(mediaFilePath, "utf8");
-      mediaData = JSON.parse(data);
-    } catch (error) {
-      if (error.code === "ENOENT") {
-        mediaData = { files: [] };
-      } else {
-        throw error;
-      }
-    }
-
-    // Apply the caller's transformation
-    transformFn(mediaData);
-
-    // Write while still holding the lock
-    const uniqueId = `${process.pid}.${Date.now()}.${Math.random().toString(36).substr(2, 9)}`;
-    const tempFilePath = `${mediaFilePath}.tmp.${uniqueId}`;
-    await fs.ensureDir(path.dirname(mediaFilePath));
-    await fs.writeFile(tempFilePath, JSON.stringify(mediaData, null, 2), "utf8");
-    await fs.move(tempFilePath, mediaFilePath, { overwrite: true });
-
-    return mediaData;
-  } finally {
-    writeLocks.delete(projectId);
-    releaseLock();
-  }
+  const mediaData = mediaRepo.getMediaFiles(projectId);
+  transformFn(mediaData);
+  mediaRepo.writeMediaData(projectId, mediaData);
+  return mediaData;
 }
 
 // Configure multer storage

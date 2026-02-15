@@ -56,7 +56,8 @@
       "src/utils/previewRuntime.js",
       "node_modules/sharp/**",
       "node_modules/@img/sharp-*/**",
-      "node_modules/@img/sharp-libvips-*/**"
+      "node_modules/@img/sharp-libvips-*/**",
+      "node_modules/better-sqlite3/**"
     ],
     "mac": {
       "target": [
@@ -94,6 +95,7 @@
     "@tiptap/starter-kit": "^3.18.0",
     "adm-zip": "^0.5.16",
     "archiver": "^7.0.1",
+    "better-sqlite3": "^12.6.2",
     "cors": "^2.8.5",
     "dompurify": "^3.3.1",
     "dotenv": "^17.2.3",

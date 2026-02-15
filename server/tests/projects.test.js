@@ -30,7 +30,7 @@ process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
 // Now import server modules — they'll use our overridden paths
-const { DATA_DIR, THEMES_DIR, getProjectsFilePath, getProjectDir, getProjectPagesDir, getProjectMenusDir } =
+const { DATA_DIR, THEMES_DIR, getProjectDir, getProjectPagesDir, getProjectMenusDir } =
   await import("../config.js");
 
 const {
@@ -44,6 +44,7 @@ const {
   deleteProject,
   duplicateProject,
 } = await import("../controllers/projectController.js");
+const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
 // Test helpers
@@ -161,7 +162,7 @@ async function callController(controllerFn, { params, body, file } = {}) {
   return res;
 }
 
-/** Reset the projects.json to a clean state */
+/** Reset projects to a clean state */
 async function resetProjects() {
   await fs.ensureDir(path.join(TEST_DATA_DIR, "projects"));
   await writeProjectsFile({ projects: [], activeProjectId: null });
@@ -191,6 +192,7 @@ before(async () => {
 });
 
 after(async () => {
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 
@@ -213,17 +215,28 @@ describe("readProjectsFile / writeProjectsFile", () => {
     assert.equal(data.activeProjectId, null);
   });
 
-  it("creates projects.json if missing", async () => {
-    await fs.remove(getProjectsFilePath());
+  it("returns empty data from a clean database", async () => {
     const data = await readProjectsFile();
     assert.deepEqual(data.projects, []);
-    // File should now exist
-    assert.ok(await fs.pathExists(getProjectsFilePath()));
+    assert.equal(data.activeProjectId, null);
   });
 
   it("round-trips data through write then read", async () => {
+    const now = new Date().toISOString();
     const testData = {
-      projects: [{ id: "abc", name: "Round Trip Test", folderName: "round-trip" }],
+      projects: [{
+        id: "abc",
+        name: "Round Trip Test",
+        folderName: "round-trip",
+        description: "",
+        theme: null,
+        themeVersion: null,
+        preset: null,
+        receiveThemeUpdates: false,
+        siteUrl: "",
+        created: now,
+        updated: now,
+      }],
       activeProjectId: "abc",
     };
     await writeProjectsFile(testData);
@@ -243,9 +256,7 @@ describe("createProject", () => {
     const projectsDir = path.join(TEST_DATA_DIR, "projects");
     const entries = await fs.readdir(projectsDir);
     for (const entry of entries) {
-      if (entry !== "projects.json") {
-        await fs.remove(path.join(projectsDir, entry));
-      }
+      await fs.remove(path.join(projectsDir, entry));
     }
   });
 
@@ -406,6 +417,11 @@ describe("createProject", () => {
     const project = await createTestProject("No Updates Flag");
     assert.equal(project.receiveThemeUpdates, false);
   });
+
+  it("does not include a 'slug' property in the response", async () => {
+    const project = await createTestProject("No Slug");
+    assert.equal("slug" in project, false, "created project should not have a slug property");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -419,7 +435,7 @@ describe("getAllProjects / getActiveProject", () => {
     const projectsDir = path.join(TEST_DATA_DIR, "projects");
     const entries = await fs.readdir(projectsDir);
     for (const entry of entries) {
-      if (entry !== "projects.json") await fs.remove(path.join(projectsDir, entry));
+      await fs.remove(path.join(projectsDir, entry));
     }
   });
 
@@ -468,7 +484,7 @@ describe("setActiveProject", () => {
     const projectsDir = path.join(TEST_DATA_DIR, "projects");
     const entries = await fs.readdir(projectsDir);
     for (const entry of entries) {
-      if (entry !== "projects.json") await fs.remove(path.join(projectsDir, entry));
+      await fs.remove(path.join(projectsDir, entry));
     }
   });
 
@@ -508,7 +524,7 @@ describe("updateProject", () => {
     const projectsDir = path.join(TEST_DATA_DIR, "projects");
     const entries = await fs.readdir(projectsDir);
     for (const entry of entries) {
-      if (entry !== "projects.json") await fs.remove(path.join(projectsDir, entry));
+      await fs.remove(path.join(projectsDir, entry));
     }
     project = await createTestProject("Original Name");
   });
@@ -637,6 +653,51 @@ describe("updateProject", () => {
     });
     assert.equal(res._json.receiveThemeUpdates, true);
   });
+
+  it("rejects invalid folderName characters on update", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "BAD_Folder!" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /lowercase/i);
+  });
+
+  it("rejects folderName with spaces on update", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "has spaces" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /lowercase/i);
+  });
+
+  it("rejects folderName with uppercase on update", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "HasUpperCase" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /lowercase/i);
+  });
+
+  it("allows keeping the same folderName on update (no-op rename)", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: project.folderName },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.folderName, project.folderName);
+  });
+
+  it("does not include a 'slug' property in the response", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Updated Name" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal("slug" in res._json, false, "project should not have a slug property");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -649,11 +710,11 @@ describe("deleteProject", () => {
     const projectsDir = path.join(TEST_DATA_DIR, "projects");
     const entries = await fs.readdir(projectsDir);
     for (const entry of entries) {
-      if (entry !== "projects.json") await fs.remove(path.join(projectsDir, entry));
+      await fs.remove(path.join(projectsDir, entry));
     }
   });
 
-  it("removes project from projects.json", async () => {
+  it("removes project from the database", async () => {
     const project = await createTestProject("To Delete");
 
     const res = await callController(deleteProject, { params: { id: project.id } });
@@ -722,7 +783,7 @@ describe("duplicateProject", () => {
     const projectsDir = path.join(TEST_DATA_DIR, "projects");
     const entries = await fs.readdir(projectsDir);
     for (const entry of entries) {
-      if (entry !== "projects.json") await fs.remove(path.join(projectsDir, entry));
+      await fs.remove(path.join(projectsDir, entry));
     }
     original = await createTestProject("Original Project");
   });
@@ -781,7 +842,7 @@ describe("duplicateProject", () => {
     assert.equal(third._json.name, "Copy 3 of Original Project");
   });
 
-  it("adds the duplicate to projects.json", async () => {
+  it("adds the duplicate to the database", async () => {
     await callController(duplicateProject, { params: { id: original.id } });
 
     const data = await readProjectsFile();

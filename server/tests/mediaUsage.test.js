@@ -36,9 +36,10 @@ process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
-const { getProjectDir, getProjectPagesDir, getProjectMediaJsonPath, getProjectThemeJsonPath } = await import("../config.js");
+const { getProjectDir, getProjectPagesDir, getProjectThemeJsonPath } = await import("../config.js");
 
 const { writeProjectsFile } = await import("../controllers/projectController.js");
+const { readMediaFile, writeMediaFile } = await import("../controllers/mediaController.js");
 
 const {
   updatePageMediaUsage,
@@ -48,6 +49,7 @@ const {
   getMediaUsage,
   refreshAllMediaUsage,
 } = await import("../services/mediaUsageService.js");
+const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
 // Test helpers
@@ -56,17 +58,14 @@ const {
 const PROJECT_ID = "media-usage-test-uuid";
 const PROJECT_FOLDER = "media-usage-test-project";
 
-/** Seed media.json with test files */
+/** Seed media data with test files */
 async function seedMediaJson(files) {
-  const mediaJsonPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-  await fs.ensureDir(path.dirname(mediaJsonPath));
-  await fs.writeFile(mediaJsonPath, JSON.stringify({ files }, null, 2));
+  await writeMediaFile(PROJECT_ID, { files });
 }
 
-/** Read current media.json from disk */
+/** Read current media data */
 async function readMediaJson() {
-  const mediaJsonPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-  return JSON.parse(await fs.readFile(mediaJsonPath, "utf8"));
+  return readMediaFile(PROJECT_ID);
 }
 
 /** Default set of media files for most tests */
@@ -137,6 +136,7 @@ before(async () => {
 });
 
 after(async () => {
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 
@@ -540,7 +540,7 @@ describe("removePageFromMediaUsage", () => {
 
     // Nothing should change
     const media = await readMediaJson();
-    assert.deepEqual(media.files.find((f) => f.id === "img-1").usedIn, ["home", "about"]);
+    assert.deepEqual([...media.files.find((f) => f.id === "img-1").usedIn].sort(), ["about", "home"]);
   });
 });
 
@@ -560,7 +560,7 @@ describe("getMediaUsage", () => {
     const usage = await getMediaUsage(PROJECT_ID, "img-1");
     assert.equal(usage.fileId, "img-1");
     assert.equal(usage.filename, "hero.jpg");
-    assert.deepEqual(usage.usedIn, ["home", "about", "global:header"]);
+    assert.deepEqual([...usage.usedIn].sort(), ["about", "global:header", "home"]);
     assert.equal(usage.isInUse, true);
   });
 

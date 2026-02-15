@@ -46,7 +46,6 @@ const {
   getProjectImagesDir,
   getProjectVideosDir,
   getProjectAudiosDir,
-  getProjectMediaJsonPath,
   getThemeJsonPath,
   getThemeDir,
 } = await import("../config.js");
@@ -66,6 +65,7 @@ const {
   getMediaFileUsage,
   refreshMediaUsage,
 } = await import("../controllers/mediaController.js");
+const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
 // Test constants
@@ -201,6 +201,7 @@ after(async () => {
   console.log = _origLog;
   console.warn = _origWarn;
   console.error = _origError;
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 
@@ -210,27 +211,20 @@ after(async () => {
 
 describe("readMediaFile", () => {
   beforeEach(async () => {
-    // Clean media.json before each test
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.remove(mediaPath);
+    // Clear media data before each test
+    await writeMediaFile(PROJECT_ID, { files: [] });
   });
 
-  it("creates media.json with empty files array when none exists", async () => {
+  it("returns empty files array when no media exists", async () => {
     const data = await readMediaFile(PROJECT_ID);
     assert.ok(Array.isArray(data.files));
     assert.equal(data.files.length, 0);
-
-    // Verify file was created on disk
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    assert.ok(await fs.pathExists(mediaPath));
   });
 
-  it("returns existing media data when file exists", async () => {
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    const testData = {
+  it("returns existing media data", async () => {
+    await writeMediaFile(PROJECT_ID, {
       files: [{ id: "test-1", filename: "photo.jpg", path: "/uploads/images/photo.jpg", type: "image/jpeg" }],
-    };
-    await fs.outputFile(mediaPath, JSON.stringify(testData, null, 2));
+    });
 
     const data = await readMediaFile(PROJECT_ID);
     assert.equal(data.files.length, 1);
@@ -238,27 +232,7 @@ describe("readMediaFile", () => {
     assert.equal(data.files[0].filename, "photo.jpg");
   });
 
-  it("recovers from corrupted JSON (extra content appended)", async () => {
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    const validJson = JSON.stringify({ files: [{ id: "recovered", filename: "saved.jpg" }] });
-    // Simulate corruption: valid JSON followed by garbage
-    await fs.outputFile(mediaPath, validJson + "\n\nGARBAGE_DATA_HERE!!!");
-
-    const data = await readMediaFile(PROJECT_ID);
-    assert.equal(data.files.length, 1);
-    assert.equal(data.files[0].id, "recovered");
-  });
-
-  it("creates new empty file when JSON is completely corrupted", async () => {
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(mediaPath, "THIS_IS_NOT_JSON_AT_ALL");
-
-    const data = await readMediaFile(PROJECT_ID);
-    assert.ok(Array.isArray(data.files));
-    assert.equal(data.files.length, 0);
-  });
-
-  it("throws when project directory does not exist", async () => {
+  it("throws when project does not exist", async () => {
     await assert.rejects(
       () => readMediaFile("nonexistent-project-uuid"),
       (err) => {
@@ -274,14 +248,13 @@ describe("readMediaFile", () => {
 // ============================================================================
 
 describe("writeMediaFile", () => {
-  it("writes media data atomically", async () => {
+  it("writes media data", async () => {
     const testData = {
       files: [{ id: "write-1", filename: "test.jpg", path: "/uploads/images/test.jpg", type: "image/jpeg" }],
     };
     await writeMediaFile(PROJECT_ID, testData);
 
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    const saved = await fs.readJson(mediaPath);
+    const saved = await readMediaFile(PROJECT_ID);
     assert.equal(saved.files.length, 1);
     assert.equal(saved.files[0].id, "write-1");
   });
@@ -290,14 +263,12 @@ describe("writeMediaFile", () => {
     await writeMediaFile(PROJECT_ID, { files: [{ id: "old" }] });
     await writeMediaFile(PROJECT_ID, { files: [{ id: "new-1" }, { id: "new-2" }] });
 
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    const saved = await fs.readJson(mediaPath);
+    const saved = await readMediaFile(PROJECT_ID);
     assert.equal(saved.files.length, 2);
-    assert.equal(saved.files[0].id, "new-1");
   });
 
   it("handles concurrent writes safely (no data corruption)", async () => {
-    // Fire multiple writes concurrently — the lock should serialize them
+    // Fire multiple writes concurrently — SQLite serializes them
     const writes = [];
     for (let i = 0; i < 5; i++) {
       writes.push(writeMediaFile(PROJECT_ID, { files: [{ id: `concurrent-${i}` }] }));
@@ -318,20 +289,12 @@ describe("writeMediaFile", () => {
 describe("atomicUpdateMediaFile", () => {
   beforeEach(async () => {
     // Seed with known state
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
-        {
-          files: [
-            { id: "atomic-1", filename: "a.jpg", usedIn: [] },
-            { id: "atomic-2", filename: "b.jpg", usedIn: ["index"] },
-          ],
-        },
-        null,
-        2,
-      ),
-    );
+    await writeMediaFile(PROJECT_ID, {
+      files: [
+        { id: "atomic-1", filename: "a.jpg", usedIn: [] },
+        { id: "atomic-2", filename: "b.jpg", usedIn: ["index"] },
+      ],
+    });
   });
 
   it("reads, transforms, and writes atomically", async () => {
@@ -358,9 +321,8 @@ describe("atomicUpdateMediaFile", () => {
     assert.deepEqual(file.usedIn, ["about", "contact"]);
   });
 
-  it("creates media.json if it does not exist", async () => {
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.remove(mediaPath);
+  it("works when no media exists yet", async () => {
+    await writeMediaFile(PROJECT_ID, { files: [] });
 
     const result = await atomicUpdateMediaFile(PROJECT_ID, (data) => {
       data.files.push({ id: "new-file" });
@@ -376,26 +338,18 @@ describe("atomicUpdateMediaFile", () => {
 
 describe("getProjectMedia", () => {
   before(async () => {
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
+    await writeMediaFile(PROJECT_ID, {
+      files: [
         {
-          files: [
-            {
-              id: "get-1",
-              filename: "hero.jpg",
-              type: "image/jpeg",
-              path: "/uploads/images/hero.jpg",
-              usedIn: ["index"],
-            },
-            { id: "get-2", filename: "logo.png", type: "image/png", path: "/uploads/images/logo.png", usedIn: [] },
-          ],
+          id: "get-1",
+          filename: "hero.jpg",
+          type: "image/jpeg",
+          path: "/uploads/images/hero.jpg",
+          usedIn: ["index"],
         },
-        null,
-        2,
-      ),
-    );
+        { id: "get-2", filename: "logo.png", type: "image/png", path: "/uploads/images/logo.png", usedIn: [] },
+      ],
+    });
   });
 
   it("returns 200 with media data", async () => {
@@ -431,9 +385,8 @@ describe("getProjectMedia", () => {
 
 describe("uploadProjectMedia", () => {
   beforeEach(async () => {
-    // Reset media.json
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(mediaPath, JSON.stringify({ files: [] }, null, 2));
+    // Reset media data
+    await writeMediaFile(PROJECT_ID, { files: [] });
     // Clean upload directories
     await fs.emptyDir(getProjectImagesDir(PROJECT_FOLDER));
     await fs.emptyDir(getProjectVideosDir(PROJECT_FOLDER));
@@ -752,21 +705,13 @@ describe("uploadProjectMedia", () => {
 
 describe("updateMediaMetadata", () => {
   before(async () => {
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
-        {
-          files: [
-            { id: "meta-img", filename: "photo.jpg", type: "image/jpeg", metadata: { alt: "", title: "" } },
-            { id: "meta-vid", filename: "video.mp4", type: "video/mp4", metadata: { title: "", description: "" } },
-            { id: "meta-aud", filename: "song.mp3", type: "audio/mpeg", metadata: { title: "", description: "" } },
-          ],
-        },
-        null,
-        2,
-      ),
-    );
+    await writeMediaFile(PROJECT_ID, {
+      files: [
+        { id: "meta-img", filename: "photo.jpg", type: "image/jpeg", metadata: { alt: "", title: "" } },
+        { id: "meta-vid", filename: "video.mp4", type: "video/mp4", metadata: { title: "", description: "" } },
+        { id: "meta-aud", filename: "song.mp3", type: "audio/mpeg", metadata: { title: "", description: "" } },
+      ],
+    });
   });
 
   it("updates image metadata (alt + title)", async () => {
@@ -835,41 +780,33 @@ describe("updateMediaMetadata", () => {
 
 describe("deleteProjectMedia", () => {
   beforeEach(async () => {
-    // Seed media.json with deletable and in-use files
+    // Create physical files and seed media data
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
     await fs.writeFile(path.join(imgDir, "deletable.jpg"), "fake-img");
     await fs.writeFile(path.join(imgDir, "deletable-thumb.jpg"), "fake-thumb");
     await fs.writeFile(path.join(imgDir, "in-use.jpg"), "fake-img");
 
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
+    await writeMediaFile(PROJECT_ID, {
+      files: [
         {
-          files: [
-            {
-              id: "del-1",
-              filename: "deletable.jpg",
-              type: "image/jpeg",
-              path: "/uploads/images/deletable.jpg",
-              usedIn: [],
-              sizes: {
-                thumb: { path: "/uploads/images/deletable-thumb.jpg", width: 150, height: 100 },
-              },
-            },
-            {
-              id: "del-2",
-              filename: "in-use.jpg",
-              type: "image/jpeg",
-              path: "/uploads/images/in-use.jpg",
-              usedIn: ["index", "about"],
-            },
-          ],
+          id: "del-1",
+          filename: "deletable.jpg",
+          type: "image/jpeg",
+          path: "/uploads/images/deletable.jpg",
+          usedIn: [],
+          sizes: {
+            thumb: { path: "/uploads/images/deletable-thumb.jpg", width: 150, height: 100 },
+          },
         },
-        null,
-        2,
-      ),
-    );
+        {
+          id: "del-2",
+          filename: "in-use.jpg",
+          type: "image/jpeg",
+          path: "/uploads/images/in-use.jpg",
+          usedIn: ["index", "about"],
+        },
+      ],
+    });
   });
 
   it("deletes unused file and its sizes from disk", async () => {
@@ -902,7 +839,7 @@ describe("deleteProjectMedia", () => {
     });
     assert.equal(res._status, 400);
     assert.ok(res._json.error.toLowerCase().includes("in use"));
-    assert.deepEqual(res._json.usedIn, ["index", "about"]);
+    assert.deepEqual([...res._json.usedIn].sort(), ["about", "index"]);
   });
 
   it("returns 404 for nonexistent file", async () => {
@@ -924,39 +861,31 @@ describe("bulkDeleteProjectMedia", () => {
     await fs.writeFile(path.join(imgDir, "bulk-b.jpg"), "b");
     await fs.writeFile(path.join(imgDir, "bulk-c.jpg"), "c");
 
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
+    await writeMediaFile(PROJECT_ID, {
+      files: [
         {
-          files: [
-            {
-              id: "bulk-1",
-              filename: "bulk-a.jpg",
-              type: "image/jpeg",
-              path: "/uploads/images/bulk-a.jpg",
-              usedIn: [],
-            },
-            {
-              id: "bulk-2",
-              filename: "bulk-b.jpg",
-              type: "image/jpeg",
-              path: "/uploads/images/bulk-b.jpg",
-              usedIn: ["index"],
-            },
-            {
-              id: "bulk-3",
-              filename: "bulk-c.jpg",
-              type: "image/jpeg",
-              path: "/uploads/images/bulk-c.jpg",
-              usedIn: [],
-            },
-          ],
+          id: "bulk-1",
+          filename: "bulk-a.jpg",
+          type: "image/jpeg",
+          path: "/uploads/images/bulk-a.jpg",
+          usedIn: [],
         },
-        null,
-        2,
-      ),
-    );
+        {
+          id: "bulk-2",
+          filename: "bulk-b.jpg",
+          type: "image/jpeg",
+          path: "/uploads/images/bulk-b.jpg",
+          usedIn: ["index"],
+        },
+        {
+          id: "bulk-3",
+          filename: "bulk-c.jpg",
+          type: "image/jpeg",
+          path: "/uploads/images/bulk-c.jpg",
+          usedIn: [],
+        },
+      ],
+    });
   });
 
   it("deletes multiple unused files at once", async () => {
@@ -1034,25 +963,17 @@ describe("serveProjectMedia", () => {
     await fs.writeFile(path.join(imgDir, "serve-test.jpg"), jpegBuffer);
     await fs.writeFile(path.join(vidDir, "serve-test.mp4"), "fake-video-data");
 
-    // Media.json with file by ID
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
+    // Media data with file by ID
+    await writeMediaFile(PROJECT_ID, {
+      files: [
         {
-          files: [
-            {
-              id: "serve-1",
-              filename: "serve-test.jpg",
-              type: "image/jpeg",
-              path: "/uploads/images/serve-test.jpg",
-            },
-          ],
+          id: "serve-1",
+          filename: "serve-test.jpg",
+          type: "image/jpeg",
+          path: "/uploads/images/serve-test.jpg",
         },
-        null,
-        2,
-      ),
-    );
+      ],
+    });
   });
 
   it("serves file by filename with correct Content-Type", async () => {
@@ -1114,26 +1035,18 @@ describe("serveProjectMedia", () => {
 
 describe("getMediaFileUsage", () => {
   before(async () => {
-    // Set up media.json and page that references a file
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
+    // Set up media data with a tracked file
+    await writeMediaFile(PROJECT_ID, {
+      files: [
         {
-          files: [
-            {
-              id: "usage-1",
-              filename: "tracked.jpg",
-              type: "image/jpeg",
-              path: "/uploads/images/tracked.jpg",
-              usedIn: ["index"],
-            },
-          ],
+          id: "usage-1",
+          filename: "tracked.jpg",
+          type: "image/jpeg",
+          path: "/uploads/images/tracked.jpg",
+          usedIn: ["index"],
         },
-        null,
-        2,
-      ),
-    );
+      ],
+    });
   });
 
   it("returns usage info for a media file", async () => {
@@ -1176,26 +1089,18 @@ describe("refreshMediaUsage", () => {
       ),
     );
 
-    // Create media.json with stale usedIn
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
+    // Create media data with stale usedIn
+    await writeMediaFile(PROJECT_ID, {
+      files: [
         {
-          files: [
-            {
-              id: "refresh-1",
-              filename: "tracked.jpg",
-              type: "image/jpeg",
-              path: "/uploads/images/tracked.jpg",
-              usedIn: [], // <-- stale: should be ["index"] after refresh
-            },
-          ],
+          id: "refresh-1",
+          filename: "tracked.jpg",
+          type: "image/jpeg",
+          path: "/uploads/images/tracked.jpg",
+          usedIn: [], // <-- stale: should be ["index"] after refresh
         },
-        null,
-        2,
-      ),
-    );
+      ],
+    });
   });
 
   it("refreshes media usage tracking", async () => {
@@ -1218,8 +1123,7 @@ describe("refreshMediaUsage", () => {
 describe("media edge cases", () => {
   it("handles multiple uploads sequentially without data loss", async () => {
     // Reset
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(mediaPath, JSON.stringify({ files: [] }, null, 2));
+    await writeMediaFile(PROJECT_ID, { files: [] });
 
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
 
@@ -1249,17 +1153,9 @@ describe("media edge cases", () => {
   });
 
   it("image metadata includes alt and title (not description)", async () => {
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
-        {
-          files: [{ id: "edge-img", filename: "test.jpg", type: "image/jpeg", metadata: { alt: "", title: "" } }],
-        },
-        null,
-        2,
-      ),
-    );
+    await writeMediaFile(PROJECT_ID, {
+      files: [{ id: "edge-img", filename: "test.jpg", type: "image/jpeg", metadata: { alt: "", title: "" } }],
+    });
 
     const res = await callController(updateMediaMetadata, {
       params: { projectId: PROJECT_ID, fileId: "edge-img" },
@@ -1270,24 +1166,16 @@ describe("media edge cases", () => {
   });
 
   it("video/audio metadata excludes alt", async () => {
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
+    await writeMediaFile(PROJECT_ID, {
+      files: [
         {
-          files: [
-            {
-              id: "edge-vid",
-              filename: "v.mp4",
-              type: "video/mp4",
-              metadata: { alt: "stale", title: "", description: "" },
-            },
-          ],
+          id: "edge-vid",
+          filename: "v.mp4",
+          type: "video/mp4",
+          metadata: { alt: "stale", title: "", description: "" },
         },
-        null,
-        2,
-      ),
-    );
+      ],
+    });
 
     const res = await callController(updateMediaMetadata, {
       params: { projectId: PROJECT_ID, fileId: "edge-vid" },
@@ -1300,25 +1188,17 @@ describe("media edge cases", () => {
     const vidDir = getProjectVideosDir(PROJECT_FOLDER);
     await fs.writeFile(path.join(vidDir, "to-delete.mp4"), "video-data");
 
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
+    await writeMediaFile(PROJECT_ID, {
+      files: [
         {
-          files: [
-            {
-              id: "del-vid",
-              filename: "to-delete.mp4",
-              type: "video/mp4",
-              path: "/uploads/videos/to-delete.mp4",
-              usedIn: [],
-            },
-          ],
+          id: "del-vid",
+          filename: "to-delete.mp4",
+          type: "video/mp4",
+          path: "/uploads/videos/to-delete.mp4",
+          usedIn: [],
         },
-        null,
-        2,
-      ),
-    );
+      ],
+    });
 
     const res = await callController(deleteProjectMedia, {
       params: { projectId: PROJECT_ID, fileId: "del-vid" },
@@ -1331,25 +1211,17 @@ describe("media edge cases", () => {
     const audDir = getProjectAudiosDir(PROJECT_FOLDER);
     await fs.writeFile(path.join(audDir, "to-delete.mp3"), "audio-data");
 
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(
-      mediaPath,
-      JSON.stringify(
+    await writeMediaFile(PROJECT_ID, {
+      files: [
         {
-          files: [
-            {
-              id: "del-aud",
-              filename: "to-delete.mp3",
-              type: "audio/mpeg",
-              path: "/uploads/audios/to-delete.mp3",
-              usedIn: [],
-            },
-          ],
+          id: "del-aud",
+          filename: "to-delete.mp3",
+          type: "audio/mpeg",
+          path: "/uploads/audios/to-delete.mp3",
+          usedIn: [],
         },
-        null,
-        2,
-      ),
-    );
+      ],
+    });
 
     const res = await callController(deleteProjectMedia, {
       params: { projectId: PROJECT_ID, fileId: "del-aud" },
@@ -1388,8 +1260,7 @@ describe("theme image size overrides", () => {
   /** Helper: upload a large image (2000x1500) and return the response. */
   async function uploadLargeImage(filename = "theme-test.jpg") {
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
-    const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-    await fs.outputFile(mediaPath, JSON.stringify({ files: [] }, null, 2));
+    await writeMediaFile(PROJECT_ID, { files: [] });
     await fs.emptyDir(imgDir);
 
     const buf = await createTestJpeg(2000, 1500);

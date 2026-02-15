@@ -40,6 +40,7 @@ console.warn = () => {};
 console.error = () => {};
 
 const { getCoreWidgets, getCoreWidget, getAllCoreWidgets } = await import("../controllers/coreWidgetsController.js");
+const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
 // Mock helpers
@@ -101,6 +102,7 @@ after(async () => {
   console.log = _origLog;
   console.warn = _origWarn;
   console.error = _origError;
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 

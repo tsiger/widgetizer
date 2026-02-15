@@ -25,9 +25,11 @@ process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = path.resolve("themes");
 process.env.NODE_ENV = "test";
 
-const { getProjectDir, getProjectPagesDir, getProjectMediaJsonPath, getProjectMenusDir } = await import("../config.js");
+const { getProjectDir, getProjectPagesDir, getProjectMenusDir } = await import("../config.js");
 const { writeProjectsFile } = await import("../controllers/projectController.js");
+const { writeMediaFile } = await import("../controllers/mediaController.js");
 const { renderWidget } = await import("../services/renderingService.js");
+const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
 // Helpers
@@ -103,9 +105,8 @@ before(async () => {
     );
   }
 
-  const mediaJsonPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-  await fs.ensureDir(path.dirname(mediaJsonPath));
-  await fs.writeFile(mediaJsonPath, JSON.stringify({ files: [] }, null, 2));
+  // Initialize empty media data
+  await writeMediaFile(PROJECT_ID, { files: [] });
 
   const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
   await fs.writeFile(
@@ -115,6 +116,7 @@ before(async () => {
 });
 
 after(async () => {
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 

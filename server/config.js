@@ -32,6 +32,9 @@ export function isAsarPath(p) {
   return p.includes(".asar" + path.sep) || p.includes(".asar/");
 }
 
+// Database path
+export const getDbPath = () => path.join(DATA_DIR, "widgetizer.db");
+
 // App settings path
 export const getAppSettingsPath = () => path.join(DATA_DIR, "appSettings.json");
 

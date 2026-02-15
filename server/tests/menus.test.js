@@ -29,12 +29,13 @@ process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
-const { getProjectsFilePath, getProjectMenusDir, getMenuPath, getProjectDir } = await import("../config.js");
+const { getProjectMenusDir, getMenuPath, getProjectDir } = await import("../config.js");
 
 const { createMenu, getMenu, getAllMenus, getMenuById, updateMenu, deleteMenu, duplicateMenu } =
   await import("../controllers/menuController.js");
 
-const { writeProjectsFile } = await import("../controllers/projectController.js");
+const { readProjectsFile, writeProjectsFile } = await import("../controllers/projectController.js");
+const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
 // Test helpers
@@ -118,6 +119,7 @@ before(async () => {
 });
 
 after(async () => {
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 
@@ -586,40 +588,37 @@ describe("duplicateMenu", () => {
 
 describe("Edge cases", () => {
   it("returns 404 when no active project exists (createMenu)", async () => {
-    // Temporarily clear projects
-    const projectsPath = getProjectsFilePath();
-    const backup = await fs.readFile(projectsPath, "utf8");
-    await fs.writeFile(projectsPath, JSON.stringify({ projects: [], activeProjectId: null }));
+    // Temporarily clear active project
+    const backup = await readProjectsFile();
+    await writeProjectsFile({ ...backup, activeProjectId: null });
 
     const res = await createTestMenu("Orphan Menu");
     assert.equal(res._status, 404);
     assert.match(res._json.error, /no active project/i);
 
     // Restore
-    await fs.writeFile(projectsPath, backup);
+    await writeProjectsFile(backup);
   });
 
   it("returns 404 when no active project exists (getAllMenus)", async () => {
-    const projectsPath = getProjectsFilePath();
-    const backup = await fs.readFile(projectsPath, "utf8");
-    await fs.writeFile(projectsPath, JSON.stringify({ projects: [], activeProjectId: null }));
+    const backup = await readProjectsFile();
+    await writeProjectsFile({ ...backup, activeProjectId: null });
 
     const res = await callController(getAllMenus);
     assert.equal(res._status, 404);
     assert.match(res._json.error, /no active project/i);
 
-    await fs.writeFile(projectsPath, backup);
+    await writeProjectsFile(backup);
   });
 
   it("returns 404 when no active project exists (deleteMenu)", async () => {
-    const projectsPath = getProjectsFilePath();
-    const backup = await fs.readFile(projectsPath, "utf8");
-    await fs.writeFile(projectsPath, JSON.stringify({ projects: [], activeProjectId: null }));
+    const backup = await readProjectsFile();
+    await writeProjectsFile({ ...backup, activeProjectId: null });
 
     const res = await callController(deleteMenu, { params: { id: "any" } });
     assert.equal(res._status, 404);
     assert.match(res._json.error, /no active project/i);
 
-    await fs.writeFile(projectsPath, backup);
+    await writeProjectsFile(backup);
   });
 });

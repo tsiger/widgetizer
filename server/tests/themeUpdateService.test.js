@@ -45,6 +45,7 @@ const { writeProjectsFile, readProjectsFile } = await import("../controllers/pro
 const { buildLatestSnapshot } = await import("../controllers/themeController.js");
 const { checkForUpdates, applyThemeUpdate, mergeThemeSettings, toggleThemeUpdates } =
   await import("../services/themeUpdateService.js");
+const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
 // Test constants
@@ -207,6 +208,7 @@ after(async () => {
   console.log = _origLog;
   console.warn = _origWarn;
   console.error = _origError;
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 
@@ -216,6 +218,7 @@ after(async () => {
 
 describe("checkForUpdates", () => {
   beforeEach(async () => {
+    closeDb();
     await fs.remove(TEST_DATA_DIR);
     await fs.remove(TEST_THEMES_DIR);
   });
@@ -288,6 +291,7 @@ describe("checkForUpdates", () => {
 
 describe("applyThemeUpdate", () => {
   beforeEach(async () => {
+    closeDb();
     await fs.remove(TEST_DATA_DIR);
     await fs.remove(TEST_THEMES_DIR);
   });
@@ -558,6 +562,7 @@ describe("mergeThemeSettings", () => {
 
 describe("toggleThemeUpdates", () => {
   beforeEach(async () => {
+    closeDb();
     await fs.remove(TEST_DATA_DIR);
     await fs.remove(TEST_THEMES_DIR);
     await createTheme("1.0.0");

@@ -25,10 +25,10 @@ const TEST_DATA_DIR = path.join(TEST_ROOT, "data");
 process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.NODE_ENV = "test";
 
-const { getAppSettingsPath } = await import("../config.js");
-
 const { getAppSettings, updateAppSettings, readAppSettingsFile, getSetting } =
   await import("../controllers/appSettingsController.js");
+const { saveSettings, defaultSettings } = await import("../db/repositories/settingsRepository.js");
+const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
 // Test helpers
@@ -75,12 +75,12 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  // Remove settings file before each test so defaults are used
-  const settingsPath = getAppSettingsPath();
-  await fs.remove(settingsPath);
+  // Reset settings to defaults before each test
+  saveSettings({ ...defaultSettings });
 });
 
 after(async () => {
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 
@@ -96,33 +96,18 @@ describe("readAppSettingsFile", () => {
     assert.equal(settings.developer.enabled, false);
   });
 
-  it("creates the settings file on first read", async () => {
-    await readAppSettingsFile();
-    const settingsPath = getAppSettingsPath();
-    assert.ok(await fs.pathExists(settingsPath));
-  });
-
-  it("returns saved settings when file exists", async () => {
-    const settingsPath = getAppSettingsPath();
-    await fs.outputFile(settingsPath, JSON.stringify({ general: { language: "de" } }, null, 2));
+  it("returns saved settings after update", async () => {
+    saveSettings({ ...defaultSettings, general: { ...defaultSettings.general, language: "de" } });
     const settings = await readAppSettingsFile();
     assert.equal(settings.general.language, "de");
   });
 
   it("merges saved settings with defaults (missing keys get defaults)", async () => {
-    const settingsPath = getAppSettingsPath();
-    await fs.outputFile(settingsPath, JSON.stringify({ general: { language: "fr" } }, null, 2));
+    saveSettings({ general: { language: "fr" } });
     const settings = await readAppSettingsFile();
     assert.equal(settings.general.language, "fr");
     // media should come from defaults
     assert.equal(settings.media.maxFileSizeMB, 5);
-  });
-
-  it("returns defaults on corrupted JSON", async () => {
-    const settingsPath = getAppSettingsPath();
-    await fs.outputFile(settingsPath, "{ broken json !!!");
-    const settings = await readAppSettingsFile();
-    assert.equal(settings.general.language, "en");
   });
 });
 
@@ -304,8 +289,7 @@ describe("getSetting", () => {
 
   it("returns default when key is missing from saved settings", async () => {
     // Save settings without media section
-    const settingsPath = getAppSettingsPath();
-    await fs.outputFile(settingsPath, JSON.stringify({ general: { language: "de" } }, null, 2));
+    saveSettings({ general: { language: "de" } });
 
     // media.maxFileSizeMB should fall back to default
     const maxSize = await getSetting("media.maxFileSizeMB");
@@ -318,19 +302,11 @@ describe("getSetting", () => {
   });
 
   it("returns saved value when it differs from default", async () => {
-    const settingsPath = getAppSettingsPath();
-    await fs.outputFile(
-      settingsPath,
-      JSON.stringify(
-        {
-          general: { language: "en" },
-          media: { maxFileSizeMB: 20 },
-          developer: { enabled: true },
-        },
-        null,
-        2,
-      ),
-    );
+    saveSettings({
+      general: { language: "en" },
+      media: { maxFileSizeMB: 20 },
+      developer: { enabled: true },
+    });
     const result = await getSetting("developer.enabled");
     assert.equal(result, true);
   });

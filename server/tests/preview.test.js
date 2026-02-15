@@ -34,11 +34,13 @@ console.log = () => {};
 console.warn = () => {};
 console.error = () => {};
 
-const { getProjectDir, getProjectPagesDir, getProjectMediaJsonPath } = await import("../config.js");
+const { getProjectDir, getProjectPagesDir } = await import("../config.js");
 
-const { writeProjectsFile } = await import("../controllers/projectController.js");
+const { readProjectsFile, writeProjectsFile } = await import("../controllers/projectController.js");
+const { writeMediaFile } = await import("../controllers/mediaController.js");
 
 const { getGlobalWidgets, saveGlobalWidget, serveAsset } = await import("../controllers/previewController.js");
+const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
 // Test constants
@@ -127,15 +129,15 @@ before(async () => {
   await fs.ensureDir(path.join(projectDir, "assets"));
   await fs.ensureDir(path.join(projectDir, "theme"));
 
-  // Create media.json for usage tracking
-  const mediaPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-  await fs.outputFile(mediaPath, JSON.stringify({ files: [] }, null, 2));
+  // Initialize empty media data
+  await writeMediaFile(PROJECT_ID, { files: [] });
 });
 
 after(async () => {
   console.log = _origLog;
   console.warn = _origWarn;
   console.error = _origError;
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 
@@ -190,7 +192,7 @@ describe("getGlobalWidgets", () => {
 
   it("returns 404 when no active project", async () => {
     // Temporarily clear active project
-    const original = await fs.readJson(path.join(TEST_DATA_DIR, "projects", "projects.json"));
+    const original = await readProjectsFile();
     await writeProjectsFile({ ...original, activeProjectId: null });
 
     const res = await callController(getGlobalWidgets);
@@ -281,7 +283,7 @@ describe("saveGlobalWidget", () => {
   });
 
   it("returns 404 when no active project", async () => {
-    const original = await fs.readJson(path.join(TEST_DATA_DIR, "projects", "projects.json"));
+    const original = await readProjectsFile();
     await writeProjectsFile({ ...original, activeProjectId: null });
 
     const res = await callController(saveGlobalWidget, {

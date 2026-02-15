@@ -30,7 +30,7 @@ process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
-const { getProjectsFilePath, getProjectPagesDir, getPagePath } = await import("../config.js");
+const { getProjectPagesDir, getPagePath } = await import("../config.js");
 
 const {
   createPage,
@@ -45,7 +45,8 @@ const {
   readGlobalWidgetData,
 } = await import("../controllers/pageController.js");
 
-const { writeProjectsFile } = await import("../controllers/projectController.js");
+const { readProjectsFile, writeProjectsFile } = await import("../controllers/projectController.js");
+const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
 // Test helpers
@@ -154,6 +155,7 @@ before(async () => {
 });
 
 after(async () => {
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 
@@ -224,7 +226,7 @@ describe("createPage", () => {
 
   it("returns 404 when no active project", async () => {
     // Temporarily clear the active project
-    const original = await fs.readJson(getProjectsFilePath());
+    const original = await readProjectsFile();
     await writeProjectsFile({ ...original, activeProjectId: null });
 
     const res = await callController(createPage, {

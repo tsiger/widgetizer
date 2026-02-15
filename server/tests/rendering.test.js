@@ -27,10 +27,12 @@ process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
-const { getProjectDir, getProjectPagesDir, getProjectMediaJsonPath, getProjectMenusDir } = await import("../config.js");
+const { getProjectDir, getProjectPagesDir, getProjectMenusDir } = await import("../config.js");
 
 const { writeProjectsFile } = await import("../controllers/projectController.js");
+const { writeMediaFile } = await import("../controllers/mediaController.js");
 const { renderWidget, renderPageLayout } = await import("../services/renderingService.js");
+const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
 // Test constants
@@ -78,30 +80,21 @@ before(async () => {
   await fs.ensureDir(path.join(projectDir, "widgets"));
   await fs.ensureDir(getProjectMenusDir(PROJECT_FOLDER));
 
-  // Create a minimal media.json
-  const mediaJsonPath = getProjectMediaJsonPath(PROJECT_FOLDER);
-  await fs.ensureDir(path.dirname(mediaJsonPath));
-  await fs.writeFile(
-    mediaJsonPath,
-    JSON.stringify(
+  // Create media data
+  await writeMediaFile(PROJECT_ID, {
+    files: [
       {
-        files: [
-          {
-            id: "img-1",
-            filename: "hero.jpg",
-            path: "/uploads/images/hero.jpg",
-            type: "image/jpeg",
-            width: 800,
-            height: 600,
-            usedIn: [],
-            sizes: { medium: { path: "/uploads/images/hero-medium.jpg", width: 400, height: 300 } },
-          },
-        ],
+        id: "img-1",
+        filename: "hero.jpg",
+        path: "/uploads/images/hero.jpg",
+        type: "image/jpeg",
+        width: 800,
+        height: 600,
+        usedIn: [],
+        sizes: { medium: { path: "/uploads/images/hero-medium.jpg", width: 400, height: 300 } },
       },
-      null,
-      2,
-    ),
-  );
+    ],
+  });
 
   // Create test pages for link resolution
   const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
@@ -194,6 +187,7 @@ before(async () => {
 });
 
 after(async () => {
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 
