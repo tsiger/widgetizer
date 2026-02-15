@@ -811,6 +811,83 @@ External scripts must listen for the `widget:updated` custom event, which is dis
 
 ---
 
+## Editor Lifecycle Events
+
+When a widget is displayed inside the Widgetizer editor, the preview runtime dispatches custom DOM events on widget elements as the user interacts with the sidebar. Theme JavaScript can listen for these events to synchronize visual state with the editor selection — for example, navigating a slideshow to the selected slide or opening an accordion panel.
+
+### Design Mode Detection
+
+Check whether the widget is running inside the editor:
+
+```javascript
+if (window.Widgetizer?.designMode) {
+  // Running inside the editor preview
+}
+```
+
+In production and standalone preview, `window.Widgetizer` is `undefined`.
+
+### Available Events
+
+All events are dispatched on the widget element (`[data-widget-id]`) and bubble up through the DOM.
+
+| Event                   | Fires When                                | `e.detail`     |
+| ----------------------- | ----------------------------------------- | -------------- |
+| `widget:select`         | This widget becomes selected              | `{}`           |
+| `widget:deselect`       | This widget is deselected                 | `{}`           |
+| `widget:block-select`   | A block within this widget is selected    | `{ blockId }`  |
+| `widget:block-deselect` | A block within this widget is deselected  | `{ blockId }`  |
+| `widget:updated`        | Widget DOM was replaced (morph/re-render) | `{ widgetId }` |
+
+### Event Order
+
+When selection changes, events fire in this order:
+
+1. `widget:block-deselect` (on previous widget, if a block was selected)
+2. `widget:deselect` (on previous widget, if widget changed)
+3. `widget:select` (on new widget, if widget changed)
+4. `widget:block-select` (on new widget, if a block is selected)
+
+### Example: Slideshow
+
+A slideshow with overlapping slides should show the correct slide when the user selects it in the sidebar:
+
+```javascript
+if (window.Widgetizer?.designMode) {
+  // Navigate to the selected slide
+  widget.addEventListener("widget:block-select", (e) => {
+    const { blockId } = e.detail;
+    const slides = widget.querySelectorAll(".slideshow-slide[data-block-id]");
+    slides.forEach((slide, idx) => {
+      if (slide.getAttribute("data-block-id") === blockId) {
+        stopAutoplay();
+        goToSlide(idx);
+      }
+    });
+  });
+
+  // Pause autoplay while the widget is selected
+  widget.addEventListener("widget:select", () => stopAutoplay());
+  widget.addEventListener("widget:deselect", () => startAutoplay());
+}
+```
+
+### When to Use
+
+- **Slideshows/Carousels**: Navigate to the selected slide, pause autoplay
+- **Tabs/Content Switchers**: Show the selected tab panel
+- **Accordions**: Open the selected accordion panel
+- **Any widget with hidden blocks**: Reveal the block the user is editing
+
+### Important Notes
+
+1. **Guard with `designMode`**: Always wrap event listeners in `if (window.Widgetizer?.designMode)` so they don't run in production
+2. **Events fire on the widget element**: Use `widget.addEventListener()`, not `document.addEventListener()`
+3. **Re-initialization safe**: Since these listeners are added inside the init function, they are re-attached after `widget:updated` re-initialization
+4. **Events only fire on state change**: Selecting the same block twice does not re-fire `widget:block-select`
+
+---
+
 ## Scroll Reveal Animations
 
 The theme includes a scroll reveal animation system. Add animation classes to elements to animate them as they enter the viewport.

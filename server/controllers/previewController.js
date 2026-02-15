@@ -21,7 +21,16 @@ function injectRuntimeScript(html, previewMode = "editor") {
       ? ` data-builder-origin="${process.env.BUILDER_ORIGIN}"`
       : "";
   const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}"${builderOriginAttr}></script>`;
-  return html.replace(/<\/body>/i, `${script}\n</body>`);
+  html = html.replace(/<\/body>/i, `${script}\n</body>`);
+
+  // Editor mode: inject designMode flag in <head> so it's available before
+  // any deferred widget scripts run (module scripts execute after defer scripts)
+  if (safeMode === "editor") {
+    const designModeScript = `<script>window.Widgetizer={designMode:true};</script>`;
+    html = html.replace(/<\/head>/i, `${designModeScript}\n</head>`);
+  }
+
+  return html;
 }
 
 // Inject base tag for relative URL resolution

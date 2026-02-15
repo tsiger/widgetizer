@@ -247,18 +247,62 @@ function setupScrollBoundsReporting() {
 // ── Selection Update ────────────────────────────────────────────────────────
 
 function updateSelection(widgetId, blockId) {
+  const prevWidgetId = currentSelectedWidgetId;
+  const prevBlockId = currentSelectedBlockId;
+
   currentSelectedWidgetId = widgetId;
   currentSelectedBlockId = blockId;
   observeWidgetResize(widgetId);
 
+  // --- Deselection events (fire on PREVIOUS widget) ---
+
+  if (prevWidgetId && prevBlockId && (prevWidgetId !== widgetId || prevBlockId !== blockId)) {
+    const prevWidget = document.querySelector(`[data-widget-id="${prevWidgetId}"]`);
+    if (prevWidget) {
+      prevWidget.dispatchEvent(
+        new CustomEvent("widget:block-deselect", {
+          detail: { blockId: prevBlockId },
+          bubbles: true,
+        }),
+      );
+    }
+  }
+
+  if (prevWidgetId && prevWidgetId !== widgetId) {
+    const prevWidget = document.querySelector(`[data-widget-id="${prevWidgetId}"]`);
+    if (prevWidget) {
+      prevWidget.dispatchEvent(
+        new CustomEvent("widget:deselect", {
+          detail: {},
+          bubbles: true,
+        }),
+      );
+    }
+  }
+
+  // --- Selection events (fire on NEW widget) ---
+
+  if (widgetId && widgetId !== prevWidgetId) {
+    const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
+    if (widget) {
+      widget.dispatchEvent(
+        new CustomEvent("widget:select", {
+          detail: {},
+          bubbles: true,
+        }),
+      );
+    }
+  }
+
   if (widgetId && blockId) {
     const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
     if (widget) {
-      const event = new CustomEvent("widget:block-select", {
-        detail: { blockId },
-        bubbles: true,
-      });
-      widget.dispatchEvent(event);
+      widget.dispatchEvent(
+        new CustomEvent("widget:block-select", {
+          detail: { blockId },
+          bubbles: true,
+        }),
+      );
     }
   }
 

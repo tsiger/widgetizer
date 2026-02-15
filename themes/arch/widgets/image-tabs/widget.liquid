@@ -277,6 +277,16 @@
           activateTab(nextButton);
         });
       });
+
+      if (window.Widgetizer?.designMode) {
+        widget.addEventListener('widget:block-select', (e) => {
+          const { blockId } = e.detail;
+          const tab = widget.querySelector(`.image-tabs-tab[data-block-id="${blockId}"]`);
+          if (!tab || tab.classList.contains('is-active')) return;
+          const btn = tab.querySelector('.image-tabs-tab-button');
+          if (btn) activateTab(btn);
+        });
+      }
     })();
   </script>
 </section>

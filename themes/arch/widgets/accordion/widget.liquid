@@ -224,6 +224,30 @@
           content.setAttribute('aria-hidden', isExpanded);
         });
       });
+
+      if (window.Widgetizer?.designMode) {
+        widget.addEventListener('widget:block-select', (e) => {
+          const { blockId } = e.detail;
+          const item = widget.querySelector(`.accordion-item[data-block-id="${blockId}"]`);
+          if (!item) return;
+          const trigger = item.querySelector('.accordion-trigger');
+          const content = item.querySelector('.accordion-content');
+          if (!trigger || !content) return;
+          if (trigger.getAttribute('aria-expanded') === 'true') return;
+
+          if (!isMultiOpen) {
+            widget.querySelectorAll('.accordion-trigger').forEach(function (t) {
+              if (t !== trigger) {
+                t.setAttribute('aria-expanded', 'false');
+                t.nextElementSibling.setAttribute('aria-hidden', 'true');
+              }
+            });
+          }
+
+          trigger.setAttribute('aria-expanded', 'true');
+          content.setAttribute('aria-hidden', 'false');
+        });
+      }
     })();
   </script>
 </section>

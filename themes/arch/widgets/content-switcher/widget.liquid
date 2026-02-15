@@ -404,6 +404,19 @@
           activateTab(nextButton);
         });
       });
+
+      if (window.Widgetizer?.designMode) {
+        widget.addEventListener('widget:block-select', (e) => {
+          const { blockId } = e.detail;
+          const blockEl = widget.querySelector(`.widget-card[data-block-id="${blockId}"]`);
+          if (!blockEl) return;
+          const group = blockEl.closest('.switcher-content-group');
+          if (!group || group.classList.contains('is-active')) return;
+          const option = group.getAttribute('data-option');
+          const btn = widget.querySelector(`.switcher-btn[data-target="${option}"]`);
+          if (btn) activateTab(btn);
+        });
+      }
     })();
   </script>
 </section>

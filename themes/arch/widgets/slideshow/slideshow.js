@@ -163,6 +163,34 @@
       });
     }
 
+    // ============================================================================
+    // Editor Design Mode: respond to block selection events
+    // ============================================================================
+    if (window.Widgetizer?.designMode) {
+      widget.addEventListener("widget:block-select", (e) => {
+        const { blockId } = e.detail;
+        const slideBlocks = widget.querySelectorAll(".slideshow-slide[data-block-id]");
+        let targetIndex = -1;
+        slideBlocks.forEach((slide, idx) => {
+          if (slide.getAttribute("data-block-id") === blockId) {
+            targetIndex = idx;
+          }
+        });
+        if (targetIndex !== -1 && targetIndex !== currentIndex) {
+          stopAutoplay();
+          goToSlide(targetIndex);
+        }
+      });
+
+      widget.addEventListener("widget:select", () => {
+        stopAutoplay();
+      });
+
+      widget.addEventListener("widget:deselect", () => {
+        startAutoplay();
+      });
+    }
+
     startAutoplay();
   }
 
