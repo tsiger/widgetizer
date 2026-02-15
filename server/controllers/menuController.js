@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
+import { randomUUID } from "crypto";
 import slugify from "slugify";
 import { validationResult } from "express-validator";
 import { getProjectMenusDir, getMenuPath } from "../config.js";
@@ -27,11 +28,20 @@ export async function getAllMenus(req, res) {
       return res.json([]);
     }
 
-    const menuFiles = await fs.readdir(menusDir);
+    const menuFiles = (await fs.readdir(menusDir)).filter((file) => file.endsWith(".json"));
     const menus = await Promise.all(
       menuFiles.map(async (file) => {
-        const menuData = await fs.readFile(path.join(menusDir, file), "utf8");
-        return JSON.parse(menuData);
+        const filePath = path.join(menusDir, file);
+        const menuData = await fs.readFile(filePath, "utf8");
+        const menu = JSON.parse(menuData);
+
+        // Lazy backfill: add uuid to existing menus that don't have one
+        if (!menu.uuid) {
+          menu.uuid = randomUUID();
+          await fs.outputFile(filePath, JSON.stringify(menu, null, 2));
+        }
+
+        return menu;
       }),
     );
 
@@ -99,6 +109,7 @@ export async function createMenu(req, res) {
 
     const newMenu = {
       id: menuId,
+      uuid: randomUUID(),
       name,
       description,
       items: [],
@@ -182,7 +193,8 @@ export async function getMenu(req, res) {
 }
 
 /**
- * Updates an existing menu, handling ID changes when the name changes.
+ * Updates an existing menu in place. The filename and ID stay stable
+ * regardless of name changes — widgets reference menus by UUID.
  * @param {import('express').Request} req - Express request object with menu ID in params and menu data in body
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
@@ -194,7 +206,7 @@ export async function updateMenu(req, res) {
   }
 
   try {
-    const currentMenuId = req.params.id;
+    const menuId = req.params.id;
     const menuData = req.body;
 
     const { projects, activeProjectId } = await readProjectsFile();
@@ -205,53 +217,23 @@ export async function updateMenu(req, res) {
     }
     const projectFolderName = activeProject.folderName;
 
-    const currentMenuPath = getMenuPath(projectFolderName, currentMenuId);
+    const menuPath = getMenuPath(projectFolderName, menuId);
 
-    // Check if current menu exists
-    if (!(await fs.pathExists(currentMenuPath))) {
+    if (!(await fs.pathExists(menuPath))) {
       return res.status(404).json({ error: "Menu not found" });
     }
 
-    // For updates, we'll keep the same ID unless the user explicitly changed the name
-    // and we need to generate a new ID
-    let finalMenuId = currentMenuId;
-    let finalMenuPath = currentMenuPath;
-
-    // If name changed and it would result in a different ID, we might need to rename
-    const expectedIdFromName = slugify(menuData.name, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
-
-    // Only rename if the expected ID is different from current AND the new path doesn't exist
-    if (expectedIdFromName !== currentMenuId) {
-      const newMenuPath = getMenuPath(projectFolderName, expectedIdFromName);
-
-      if (!(await fs.pathExists(newMenuPath))) {
-        // Safe to rename
-        finalMenuId = expectedIdFromName;
-        finalMenuPath = newMenuPath;
-      }
-      // If new path exists, keep the current ID (avoid conflicts)
-    }
+    // Read existing menu to preserve uuid
+    const existingMenu = JSON.parse(await fs.readFile(menuPath, "utf8"));
 
     const dataToSave = {
       ...menuData,
-      id: finalMenuId,
+      id: menuId,
+      uuid: existingMenu.uuid || randomUUID(),
       updated: new Date().toISOString(),
     };
 
-    await fs.outputFile(finalMenuPath, JSON.stringify(dataToSave, null, 2));
-
-    // If we renamed the file, delete the old one
-    if (finalMenuPath !== currentMenuPath) {
-      try {
-        await fs.remove(currentMenuPath);
-      } catch (unlinkError) {
-        console.warn(`Failed to delete old menu file ${currentMenuPath}: ${unlinkError.message}`);
-      }
-    }
+    await fs.outputFile(menuPath, JSON.stringify(dataToSave, null, 2));
 
     res.json(dataToSave);
   } catch (error) {
@@ -279,7 +261,15 @@ export async function getMenuById(projectIdOrDir, menuId) {
     }
 
     const menuData = await fs.readFile(menuPath, "utf8");
-    return JSON.parse(menuData);
+    const menu = JSON.parse(menuData);
+
+    // Lazy backfill: add uuid if missing
+    if (!menu.uuid) {
+      menu.uuid = randomUUID();
+      await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
+    }
+
+    return menu;
   } catch (error) {
     console.error(`Error reading menu by id (${menuId}):`, error);
     return { items: [] };
@@ -347,6 +337,7 @@ export async function duplicateMenu(req, res) {
     const duplicatedMenu = {
       ...JSON.parse(JSON.stringify(originalMenu)), // Deep clone
       id: newMenuId,
+      uuid: randomUUID(),
       name: baseName,
       items: generateNewMenuItemIds(originalMenu.items), // Generate new IDs for all items
       created: new Date().toISOString(),

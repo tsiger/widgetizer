@@ -44,7 +44,7 @@ router.post(
   pageController.duplicatePage,
 );
 
-// age editor content saving
+// Page editor content saving
 router.post(
   "/:id/content",
   [param("id").notEmpty().withMessage("Page ID is required.")],

@@ -22,17 +22,6 @@ export function getProjectById(id) {
 }
 
 /**
- * Get a project by its folder name.
- * @param {string} folderName
- * @returns {object|null}
- */
-export function getProjectByFolderName(folderName) {
-  const db = getDb();
-  const row = db.prepare("SELECT * FROM projects WHERE folder_name = ?").get(folderName);
-  return row ? rowToProject(row) : null;
-}
-
-/**
  * Get the folder name for a project by its UUID.
  * @param {string} projectId
  * @returns {string|null} Folder name or null if not found

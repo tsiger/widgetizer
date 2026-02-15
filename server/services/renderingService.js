@@ -5,7 +5,6 @@ import { getProjectDir, CORE_WIDGETS_DIR } from "../config.js";
 // TODO: Controllers shouldn't ideally be imported into services.
 // We might need to move readProjectsFile/readMediaFile to utils or their own services later.
 import { readMediaFile } from "../controllers/mediaController.js";
-import { getMenuById } from "../controllers/menuController.js";
 import { readProjectsFile } from "../controllers/projectController.js";
 import { listProjectPagesData } from "../controllers/pageController.js";
 import { fileURLToPath } from "url";
@@ -265,6 +264,46 @@ async function loadPagesByUuid(projectFolderName) {
     console.warn(`Could not load pages for link resolution: ${error.message}`);
     return new Map();
   }
+}
+
+/**
+ * Load all menus for a project and return maps for UUID and slug-based lookup.
+ * @param {string} projectFolderName - The project folder name
+ * @returns {Promise<{byUuid: Map, bySlug: Map}>} Maps for UUID and slug-based lookup
+ */
+async function loadMenuMaps(projectFolderName) {
+  const byUuid = new Map();
+  const bySlug = new Map();
+
+  try {
+    const menusDir = path.join(getProjectDir(projectFolderName), "menus");
+
+    let files;
+    try {
+      files = await fs.readdir(menusDir);
+    } catch {
+      return { byUuid, bySlug };
+    }
+
+    for (const file of files) {
+      if (!file.endsWith(".json")) continue;
+      try {
+        const content = await fs.readFile(path.join(menusDir, file), "utf8");
+        const menu = JSON.parse(content);
+        if (menu.uuid) {
+          byUuid.set(menu.uuid, menu);
+        }
+        const slugId = file.replace(".json", "");
+        bySlug.set(slugId, menu);
+      } catch {
+        // Skip unreadable menu files
+      }
+    }
+  } catch (error) {
+    console.warn(`Could not load menus for UUID resolution: ${error.message}`);
+  }
+
+  return { byUuid, bySlug };
 }
 
 /**
@@ -538,13 +577,23 @@ async function renderWidget(
       });
     }
 
-    // Load menu data for any menu-type settings (using enhancedSettings which includes defaults)
+    // Load menu maps (UUID and slug-based) — cached in sharedGlobals across widgets
+    let menuMaps;
+    if (sharedGlobals && sharedGlobals.menuMaps) {
+      menuMaps = sharedGlobals.menuMaps;
+    } else {
+      menuMaps = await loadMenuMaps(projectFolderName);
+      if (sharedGlobals) {
+        sharedGlobals.menuMaps = menuMaps;
+      }
+    }
+
+    // Resolve menu-type settings: try UUID first, fall back to slug-based ID
     for (const [key, value] of Object.entries(enhancedSettings)) {
       if (menuSettingIds.has(key)) {
         try {
           if (value) {
-            // Use getMenuById instead of direct file access
-            const menuData = await getMenuById(projectDir, value);
+            const menuData = menuMaps.byUuid.get(value) || menuMaps.bySlug.get(value);
             // Resolve page links in menu items (pageUuid -> current slug)
             enhancedSettings[key] = resolveMenuPageLinks(menuData, pagesByUuid) || { items: [] };
           } else {

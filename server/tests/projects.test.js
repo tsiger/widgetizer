@@ -43,8 +43,12 @@ const {
   updateProject,
   deleteProject,
   duplicateProject,
+  exportProject,
+  importProject,
 } = await import("../controllers/projectController.js");
 const { closeDb } = await import("../db/index.js");
+const { PassThrough } = await import("stream");
+const AdmZip = await import("adm-zip");
 
 // ============================================================================
 // Test helpers
@@ -608,6 +612,54 @@ describe("updateProject", () => {
     assert.ok(await fs.pathExists(getProjectDir("renamed-folder")), "new directory should exist");
   });
 
+  it("preserves project files after folder rename", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "renamed-files" },
+    });
+    assert.equal(res._status, 200);
+
+    const newDir = getProjectDir("renamed-files");
+    // Theme files should exist in the new folder
+    assert.ok(await fs.pathExists(path.join(newDir, "theme.json")), "theme.json should survive rename");
+    assert.ok(await fs.pathExists(path.join(newDir, "layout.liquid")), "layout.liquid should survive rename");
+    // Pages should exist
+    const pagesDir = getProjectPagesDir("renamed-files");
+    assert.ok(await fs.pathExists(path.join(pagesDir, "index.json")), "pages should survive rename");
+  });
+
+  it("preserves project ID and metadata after folder rename", async () => {
+    const originalId = project.id;
+    const originalTheme = project.theme;
+    const originalThemeVersion = project.themeVersion;
+
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "renamed-meta" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.id, originalId, "ID must not change after rename");
+    assert.equal(res._json.theme, originalTheme, "theme must survive rename");
+    assert.equal(res._json.themeVersion, originalThemeVersion, "themeVersion must survive rename");
+  });
+
+  it("active project still resolves after its folder is renamed", async () => {
+    // project is active (first project created in beforeEach)
+    const data = await readProjectsFile();
+    assert.equal(data.activeProjectId, project.id);
+
+    // Rename its folder
+    await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", folderName: "renamed-active" },
+    });
+
+    // getActiveProject should still return it
+    const activeRes = await callController(getActiveProject);
+    assert.equal(activeRes._json.id, project.id);
+    assert.equal(activeRes._json.folderName, "renamed-active");
+  });
+
   it("rejects duplicate names (case-insensitive)", async () => {
     await createTestProject("Other Project");
 
@@ -852,5 +904,361 @@ describe("duplicateProject", () => {
   it("returns 404 for non-existent project", async () => {
     const res = await callController(duplicateProject, { params: { id: "non-existent" } });
     assert.equal(res._status, 404);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// exportProject / importProject
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a mock Express response that behaves as a writable stream.
+ * `archiver` calls archive.pipe(res), so res must support write/end/on.
+ * After the stream ends, call getBuffer() to retrieve the full ZIP data.
+ */
+function mockStreamRes() {
+  const stream = new PassThrough();
+  const chunks = [];
+  stream.on("data", (chunk) => chunks.push(chunk));
+
+  const res = Object.assign(stream, {
+    _status: 200,
+    _json: null,
+    _headers: {},
+    headersSent: false,
+    status(code) {
+      res._status = code;
+      return res;
+    },
+    json(data) {
+      res._json = data;
+      res.headersSent = true;
+      return res;
+    },
+    setHeader(key, value) {
+      res._headers[key] = value;
+      return res;
+    },
+    getBuffer() {
+      return Buffer.concat(chunks);
+    },
+  });
+  return res;
+}
+
+/** Wait for a stream to finish (the archive pipes and then calls end) */
+function waitForStreamEnd(stream) {
+  return new Promise((resolve, reject) => {
+    stream.on("finish", resolve);
+    stream.on("error", reject);
+  });
+}
+
+/** Helper: export a project and return { res, zip, manifest } */
+async function exportTestProject(projectId) {
+  const req = mockReq({ params: { projectId } });
+  const res = mockStreamRes();
+  const done = waitForStreamEnd(res);
+  await exportProject(req, res);
+  await done;
+
+  const buffer = res.getBuffer();
+  const zip = new AdmZip.default(buffer);
+  const manifestEntry = zip.getEntry("project-export.json");
+  const manifest = manifestEntry ? JSON.parse(manifestEntry.getData().toString("utf8")) : null;
+  return { res, zip, manifest };
+}
+
+/** Helper: build an in-memory ZIP buffer with a manifest and optional extra files */
+function buildImportZip(manifestObj, extraFiles = {}) {
+  const zip = new AdmZip.default();
+  zip.addFile("project-export.json", Buffer.from(JSON.stringify(manifestObj, null, 2)));
+  for (const [name, content] of Object.entries(extraFiles)) {
+    zip.addFile(name, Buffer.from(typeof content === "string" ? content : JSON.stringify(content, null, 2)));
+  }
+  return zip.toBuffer();
+}
+
+describe("exportProject", () => {
+  let project;
+
+  before(async () => {
+    await resetProjects();
+    project = await createTestProject("Export Test");
+  });
+
+  it("exports a project as a ZIP with a valid manifest", async () => {
+    const { res, manifest } = await exportTestProject(project.id);
+
+    assert.equal(res._status, 200);
+    assert.equal(res._headers["Content-Type"], "application/zip");
+    assert.ok(res._headers["Content-Disposition"].includes(".zip"));
+
+    // Manifest structure
+    assert.ok(manifest);
+    assert.equal(manifest.formatVersion, "1.1");
+    assert.ok(manifest.exportedAt);
+    assert.ok(manifest.widgetizerVersion);
+    assert.equal(manifest.project.name, "Export Test");
+    assert.equal(manifest.project.theme, "__test_theme__");
+  });
+
+  it("manifest includes receiveThemeUpdates and preset", async () => {
+    // Create a project with receiveThemeUpdates enabled
+    const p = await createTestProject("Export Flags Test", { receiveThemeUpdates: true });
+    const { manifest } = await exportTestProject(p.id);
+
+    assert.equal(manifest.project.receiveThemeUpdates, true);
+    // preset is null by default for non-preset projects
+    assert.equal(manifest.project.preset, null);
+  });
+
+  it("includes project files in the ZIP", async () => {
+    const { zip } = await exportTestProject(project.id);
+    const entryNames = zip.getEntries().map((e) => e.entryName);
+
+    // Should contain the manifest
+    assert.ok(entryNames.includes("project-export.json"));
+
+    // Should contain project files (pages, theme.json, etc.)
+    assert.ok(entryNames.some((n) => n.startsWith("pages/")), "Expected pages/ directory in ZIP");
+    assert.ok(entryNames.includes("theme.json"), "Expected theme.json in ZIP");
+  });
+
+  it("returns 404 for non-existent project", async () => {
+    const req = mockReq({ params: { projectId: "non-existent-id" } });
+    const res = mockStreamRes();
+    await exportProject(req, res);
+
+    assert.equal(res._status, 404);
+    assert.ok(res._json.error);
+  });
+});
+
+describe("importProject", () => {
+  before(async () => {
+    await resetProjects();
+  });
+
+  beforeEach(async () => {
+    await resetProjects();
+  });
+
+  /** Base manifest for import tests */
+  const baseManifest = {
+    formatVersion: "1.1",
+    exportedAt: new Date().toISOString(),
+    widgetizerVersion: "1.0.0",
+    project: {
+      name: "Imported Project",
+      description: "Imported via test",
+      theme: "__test_theme__",
+      themeVersion: "1.0.0",
+      receiveThemeUpdates: false,
+      preset: null,
+      siteUrl: "https://example.com",
+      created: "2025-01-01T00:00:00.000Z",
+      updated: "2025-01-01T00:00:00.000Z",
+    },
+  };
+
+  it("imports a project from a valid ZIP", async () => {
+    const zipBuffer = buildImportZip(baseManifest, {
+      "theme.json": { name: "Test Theme", version: "1.0.0" },
+      "pages/index.json": { name: "Home", slug: "index", widgets: {} },
+    });
+
+    const res = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+
+    assert.equal(res._status, 201);
+    assert.equal(res._json.name, "Imported Project");
+    assert.equal(res._json.description, "Imported via test");
+    assert.equal(res._json.theme, "__test_theme__");
+    assert.equal(res._json.siteUrl, "https://example.com");
+    assert.ok(res._json.id, "Should have a generated ID");
+    assert.ok(res._json.folderName, "Should have a generated folderName");
+
+    // Verify project exists in DB
+    const data = await readProjectsFile();
+    assert.equal(data.projects.length, 1);
+    assert.equal(data.projects[0].name, "Imported Project");
+  });
+
+  it("preserves receiveThemeUpdates and preset from manifest", async () => {
+    const manifest = {
+      ...baseManifest,
+      project: {
+        ...baseManifest.project,
+        receiveThemeUpdates: true,
+        preset: "starter",
+      },
+    };
+    const zipBuffer = buildImportZip(manifest, {
+      "theme.json": { name: "Test Theme", version: "1.0.0" },
+    });
+
+    const res = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+
+    assert.equal(res._status, 201);
+    assert.equal(res._json.receiveThemeUpdates, true);
+    assert.equal(res._json.preset, "starter");
+
+    // Verify round-trip through DB
+    const data = await readProjectsFile();
+    const imported = data.projects.find((p) => p.id === res._json.id);
+    assert.equal(imported.receiveThemeUpdates, true);
+    assert.equal(imported.preset, "starter");
+  });
+
+  it("defaults receiveThemeUpdates/preset for older exports", async () => {
+    // Older exports won't have these fields in the manifest
+    const oldManifest = {
+      formatVersion: "1.1",
+      exportedAt: new Date().toISOString(),
+      widgetizerVersion: "0.9.0",
+      project: {
+        name: "Legacy Import",
+        description: "",
+        theme: "__test_theme__",
+        themeVersion: "1.0.0",
+        siteUrl: "",
+        created: "2024-01-01T00:00:00.000Z",
+        updated: "2024-01-01T00:00:00.000Z",
+        // no receiveThemeUpdates or preset
+      },
+    };
+    const zipBuffer = buildImportZip(oldManifest, {
+      "theme.json": { name: "Test Theme", version: "1.0.0" },
+    });
+
+    const res = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+
+    assert.equal(res._status, 201);
+    assert.equal(res._json.receiveThemeUpdates, false);
+    assert.equal(res._json.preset, null);
+  });
+
+  it("rejects ZIP without manifest", async () => {
+    const zip = new AdmZip.default();
+    zip.addFile("some-file.txt", Buffer.from("hello"));
+    const zipBuffer = zip.toBuffer();
+
+    const res = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+
+    assert.equal(res._status, 400);
+    assert.ok(res._json.error.includes("missing project-export.json"));
+  });
+
+  it("rejects ZIP with invalid manifest JSON", async () => {
+    const zip = new AdmZip.default();
+    zip.addFile("project-export.json", Buffer.from("{ invalid json !!!"));
+    const zipBuffer = zip.toBuffer();
+
+    const res = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+
+    assert.equal(res._status, 400);
+    assert.ok(res._json.error.includes("corrupted manifest"));
+  });
+
+  it("rejects ZIP with incomplete manifest (missing theme)", async () => {
+    const incompleteManifest = {
+      formatVersion: "1.1",
+      project: {
+        name: "No Theme",
+        // missing 'theme'
+      },
+    };
+    const zipBuffer = buildImportZip(incompleteManifest);
+
+    const res = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+
+    assert.equal(res._status, 400);
+    assert.ok(res._json.error.includes("incomplete manifest"));
+  });
+
+  it("rejects ZIP referencing a non-existent theme", async () => {
+    const manifest = {
+      ...baseManifest,
+      project: { ...baseManifest.project, theme: "non-existent-theme-xyz" },
+    };
+    const zipBuffer = buildImportZip(manifest);
+
+    const res = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+
+    assert.equal(res._status, 400);
+    assert.ok(res._json.error.includes("not found"));
+  });
+
+  it("rejects when no file is uploaded", async () => {
+    const res = await callController(importProject, { file: null });
+
+    assert.equal(res._status, 400);
+    assert.ok(res._json.error.includes("No ZIP file"));
+  });
+
+  it("cleans up on failure (no leftover project in DB)", async () => {
+    // Use a theme that doesn't exist to trigger failure after extraction
+    const manifest = {
+      ...baseManifest,
+      project: { ...baseManifest.project, theme: "ghost-theme-404" },
+    };
+    const zipBuffer = buildImportZip(manifest);
+
+    await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+
+    // Verify no project was left behind
+    const data = await readProjectsFile();
+    assert.equal(data.projects.length, 0);
+  });
+});
+
+describe("exportProject → importProject round-trip", () => {
+  before(async () => {
+    await resetProjects();
+  });
+
+  it("exports and re-imports a project preserving all metadata", async () => {
+    // Create a project
+    const original = await createTestProject("Round Trip", { receiveThemeUpdates: true });
+
+    // Export it
+    const { res: exportRes } = await exportTestProject(original.id);
+    assert.equal(exportRes._status, 200);
+    const zipBuffer = exportRes.getBuffer();
+
+    // Import it back
+    const importRes = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+    assert.equal(importRes._status, 201);
+
+    // Verify metadata is preserved
+    assert.equal(importRes._json.name, "Round Trip");
+    assert.equal(importRes._json.theme, "__test_theme__");
+    assert.equal(importRes._json.receiveThemeUpdates, true);
+
+    // Should have a different ID and folderName
+    assert.notEqual(importRes._json.id, original.id);
+    assert.notEqual(importRes._json.folderName, original.folderName);
+
+    // Both projects should exist
+    const data = await readProjectsFile();
+    assert.equal(data.projects.length, 2);
   });
 });

@@ -1,7 +1,7 @@
 const migrations = [
   {
     version: 1,
-    description: "Initial schema - projects, media_files, media_sizes, media_usage, app_settings",
+    description: "Initial schema - projects, app_settings, media, exports",
     up(db) {
       db.exec(`
         CREATE TABLE projects (
@@ -63,14 +63,7 @@ const migrations = [
         );
 
         CREATE INDEX idx_media_usage_used_in ON media_usage(used_in);
-      `);
-    },
-  },
-  {
-    version: 2,
-    description: "Export history table",
-    up(db) {
-      db.exec(`
+
         CREATE TABLE exports (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           project_id TEXT NOT NULL,
@@ -84,23 +77,6 @@ const migrations = [
         CREATE INDEX idx_exports_project ON exports(project_id);
         CREATE UNIQUE INDEX idx_exports_project_version ON exports(project_id, version);
       `);
-    },
-  },
-  {
-    version: 3,
-    description: "Add last_theme_update columns to projects (fixes v1 schema drift)",
-    up(db) {
-      // These columns were added to v1's source code after some databases
-      // had already run v1 without them. ALTER TABLE ADD COLUMN will fail
-      // if the column already exists, so we check the table info first.
-      const columns = db.prepare("PRAGMA table_info(projects)").all().map((c) => c.name);
-
-      if (!columns.includes("last_theme_update_at")) {
-        db.exec("ALTER TABLE projects ADD COLUMN last_theme_update_at TEXT");
-      }
-      if (!columns.includes("last_theme_update_version")) {
-        db.exec("ALTER TABLE projects ADD COLUMN last_theme_update_version TEXT");
-      }
     },
   },
 ];

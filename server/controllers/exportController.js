@@ -29,6 +29,15 @@ async function getAppVersion() {
   return cachedAppVersion;
 }
 
+// Resolve a stored outputDir to an absolute path.
+// New exports store just the directory name (e.g. "my-project-v1");
+// legacy data may still have full absolute paths.
+function resolveOutputDir(outputDir) {
+  if (!outputDir) return null;
+  if (path.isAbsolute(outputDir)) return outputDir;
+  return path.join(PUBLISH_DIR, outputDir);
+}
+
 // Helper function to record an export and trim old versions
 async function recordExport(projectId, version, outputDir, status = "success") {
   const exportRecord = exportRepo.recordExport(projectId, version, outputDir, status);
@@ -46,12 +55,13 @@ async function recordExport(projectId, version, outputDir, status = "success") {
   // Trim old exports beyond the limit
   const trimmed = exportRepo.trimExports(projectId, maxExports);
   for (const old of trimmed) {
-    if (old.outputDir && (await fs.pathExists(old.outputDir))) {
+    const dir = resolveOutputDir(old.outputDir);
+    if (dir && (await fs.pathExists(dir))) {
       try {
-        await fs.remove(old.outputDir);
-        console.log(`Cleaned up old export: ${old.outputDir}`);
+        await fs.remove(dir);
+        console.log(`Cleaned up old export: ${dir}`);
       } catch (error) {
-        console.warn(`Failed to delete old export directory: ${old.outputDir}. Error: ${error.message}`);
+        console.warn(`Failed to delete old export directory: ${dir}. Error: ${error.message}`);
       }
     }
   }
@@ -79,13 +89,14 @@ export async function cleanupProjectExports(projectId) {
     // Delete all physical export directories for this project
     const deletedDirs = [];
     for (const record of records) {
-      if (record.outputDir && (await fs.pathExists(record.outputDir))) {
+      const dir = resolveOutputDir(record.outputDir);
+      if (dir && (await fs.pathExists(dir))) {
         try {
-          await fs.remove(record.outputDir);
-          deletedDirs.push(record.outputDir);
-          console.log(`Deleted export directory: ${record.outputDir}`);
+          await fs.remove(dir);
+          deletedDirs.push(dir);
+          console.log(`Deleted export directory: ${dir}`);
         } catch (error) {
-          console.warn(`Failed to delete export directory: ${record.outputDir}`, error);
+          console.warn(`Failed to delete export directory: ${dir}`, error);
         }
       }
     }
@@ -647,8 +658,9 @@ Per aspera ad astra
     };
     await fs.writeFile(path.join(outputDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
-    // Record this export in history
-    const exportRecord = await recordExport(projectId, version, outputDir, "success");
+    // Record this export in history (store relative dir name, not absolute path)
+    const exportDirName = `${projectFolderName}-v${version}`;
+    const exportRecord = await recordExport(projectId, version, exportDirName, "success");
 
     res.json({
       success: true,
@@ -904,8 +916,9 @@ export async function deleteExport(req, res) {
     }
 
     // Delete the physical directory if it exists
-    if (deleted.outputDir && (await fs.pathExists(deleted.outputDir))) {
-      await fs.remove(deleted.outputDir);
+    const dir = resolveOutputDir(deleted.outputDir);
+    if (dir && (await fs.pathExists(dir))) {
+      await fs.remove(dir);
     }
 
     res.json({

@@ -59,7 +59,6 @@ const {
   getThemeSourceDir,
   getThemeLatestVersion,
   buildLatestSnapshot,
-  themeHasUpdates,
   getAllThemes,
   getTheme,
   getThemeWidgets,
@@ -416,27 +415,6 @@ describe("getThemeSourceDir", () => {
     const sourceDir = await getThemeSourceDir(theme);
     assert.equal(sourceDir, latestDir);
 
-    await fs.remove(getThemeDir(theme));
-  });
-});
-
-describe("themeHasUpdates", () => {
-  it("returns true when more than one version exists", async () => {
-    const theme = "multi-ver-theme";
-    await createThemeOnDisk(theme, { version: "1.0.0" });
-    const updDir = getThemeVersionDir(theme, "1.1.0");
-    await fs.ensureDir(updDir);
-    await fs.writeFile(path.join(updDir, "theme.json"), JSON.stringify({ version: "1.1.0" }));
-
-    assert.equal(await themeHasUpdates(theme), true);
-    await fs.remove(getThemeDir(theme));
-  });
-
-  it("returns false when only base version exists", async () => {
-    const theme = "base-only-theme";
-    await createThemeOnDisk(theme, { version: "1.0.0" });
-
-    assert.equal(await themeHasUpdates(theme), false);
     await fs.remove(getThemeDir(theme));
   });
 });

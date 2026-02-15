@@ -5,6 +5,7 @@
 
 import fs from "fs-extra";
 import path from "path";
+import { randomUUID } from "crypto";
 import { getProjectDir, getProjectThemeJsonPath } from "../config.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { readProjectsFile } from "../controllers/projectController.js";
@@ -256,6 +257,7 @@ export async function applyThemeUpdate(projectId) {
           const enrichedMenu = {
             ...menuContent,
             id: menuSlug,
+            uuid: menuContent.uuid || randomUUID(),
             created: new Date().toISOString(),
             updated: new Date().toISOString(),
           };

@@ -321,16 +321,6 @@ export async function buildLatestSnapshot(themeId) {
   console.log(`[buildLatestSnapshot] Successfully built latest/ for ${themeId}`);
 }
 
-/**
- * Check if a theme has any updates available beyond the base version.
- * @param {string} themeId - Theme identifier
- * @returns {Promise<boolean>}
- */
-export async function themeHasUpdates(themeId) {
-  const versions = await getThemeVersions(themeId);
-  return versions.length > 1;
-}
-
 // ============================================================================
 // Theme Preset Functions
 // ============================================================================

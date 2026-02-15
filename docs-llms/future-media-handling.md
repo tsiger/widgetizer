@@ -1,6 +1,6 @@
-# Image Handling: Research & Ideas Report
+# Image Handling: Optimizations
 
-> **Status: Brainstorming** — This document captures research and ideas for optimizing the image pipeline. Nothing here is implemented yet.
+> **Status: Ready for implementation** — Section 1 is a resolved finding (no changes needed). Sections 2 and 3 have concrete implementation plans.
 
 ## Context
 
@@ -8,8 +8,6 @@ Three questions about the image pipeline after introducing theme-defined image s
 1. How should presets interact with `imageSizes`?
 2. What to do with huge uploaded originals (6000x4000)?
 3. Can we track which sizes are used per image and only export those specific variants?
-
-This report is based on a thorough review of the codebase and docs-llms documentation.
 
 ---
 
@@ -19,59 +17,47 @@ This report is based on a thorough review of the codebase and docs-llms document
 
 `imageSizes` is defined at `theme.json > settings.imageSizes`. It's a special configuration block, not a regular setting item with an `id`. Presets override settings by matching `id` fields in the flat `preset.json` map, so they can't touch `imageSizes` — and they shouldn't.
 
-**Why?** Image sizes are a **structural** concern, not a **visual** one. All presets of a theme share the same widgets, templates, and CSS. A card grid widget always renders its image at `size: 'medium'`; a hero always uses `size: 'large'`. That's determined by the widget template, not by the preset's color palette or fonts. Changing presets from "Restaurant" to "Creative Agency" changes colors and demo content — it doesn't change what image dimensions the layout needs.
+Image sizes are a **structural** concern, not a **visual** one. All presets of a theme share the same widgets, templates, and CSS. A card grid widget always renders its image at `size: 'medium'`; a hero always uses `size: 'large'`. That's determined by the widget template, not by the preset's color palette or fonts.
 
-All presets inherit the root theme's `imageSizes` automatically. This is the correct behavior.
+All presets inherit the root theme's `imageSizes` automatically. No changes needed.
 
 ---
 
-## 2. What to do with huge originals
+## 2. Cap huge originals on upload
 
 **The problem**: A user uploads a 6000x4000 JPEG (~10+ MB). The system generates variants (thumb at 150px, small at 480px, medium at 1024px, large at 1920px). The 6000px original is stored permanently but nothing ever references it — the largest the `{% image %}` tag ever asks for is `large` (1920px).
 
-### Idea A: Cap the original on upload
+**Solution**: After generating all size variants, resize the stored "original" down to a configurable maximum width. The original file is overwritten; `width`/`height` in the DB are updated.
 
-After generating all size variants, resize the stored "original" down to a maximum width using Sharp. The original file is overwritten; `width`/`height` in `media.json` are updated.
+### Implementation
 
-**Sub-options for what the cap should be**:
+**File: `server/controllers/mediaController.js`** — In `uploadProjectMedia`, after the size-variant generation loop (~line 625):
 
-| Cap strategy | Value | Pros | Cons |
-|---|---|---|---|
-| Largest enabled size | e.g., 1920px | Zero waste — perfectly matches what's needed | If user later enables a bigger size or switches themes, the data is gone |
-| Fixed ceiling | e.g., 2560px | Simple to reason about, provides headroom for theme changes | Arbitrary number, still wastes some space |
-| Configurable in App Settings | `media.imageProcessing.maxOriginalWidth`, default 2560, 0 = no cap | Flexible — power users control it | One more setting to manage |
+```js
+// Cap the original if it exceeds the configured max width
+const maxOriginalWidth = appSettings?.media?.imageProcessing?.maxOriginalWidth ?? 2560;
+if (maxOriginalWidth > 0 && metadata.width > maxOriginalWidth) {
+  const tempCapped = originalPath + ".capped.tmp";
+  await sharp(originalPath)
+    .resize({ width: maxOriginalWidth, withoutEnlargement: true })
+    .toFile(tempCapped);
+  await fs.move(tempCapped, originalPath, { overwrite: true });
+  const cappedMeta = await sharp(originalPath).metadata();
+  metadata.width = cappedMeta.width;
+  metadata.height = cappedMeta.height;
+  metadata.size = (await fs.stat(originalPath)).size;
+}
+```
 
-**Implementation**: ~15 lines in `mediaController.js > uploadProjectMedia` (after the size-variant generation loop at ~line 625). Use `sharp(originalPath).resize({ width: maxWidth }).toFile(tempPath)`, then replace original. Update metadata.
+**File: `server/db/repositories/settingsRepository.js`** — Add to `defaultSettings.media.imageProcessing`:
 
-**Trade-off**: Capping is destructive. The raw upload is permanently lost. For a website builder, this is usually fine — nobody needs 6000px for web. But if someone uses the media library for print assets too, it's a problem.
+```js
+maxOriginalWidth: 2560,  // 0 = no cap
+```
 
-### Idea B: Don't store the original separately
+**Trade-off**: Capping is destructive — the raw upload is permanently lost. For a web-focused tool this is fine (nobody needs 6000px for web). The configurable setting (with 0 = disabled) lets power users opt out.
 
-If the original is larger than the biggest variant, the biggest variant effectively *is* the original. Don't keep a separate original file — just point `path` at the largest generated variant.
-
-**Downside**: Removes the conceptual distinction between "original" and "variants". Complicates the data model — today, `sizes` is a map of named variants, and `path` always points to the original. Collapsing these could introduce edge cases (what if someone disables the `large` size later?).
-
-### Idea C: Keep originals, optimize only at export time
-
-Don't touch uploaded files at all. Rely entirely on smart export (section 3) to avoid exporting the bloated original. The original stays on the server's disk but never makes it into the exported site.
-
-**Trade-off**: Server disk grows. For a desktop Electron app this might be acceptable (local disk). For a hosted web app, this costs storage money. But it's the safest option — no data loss, fully reversible.
-
-### Idea D: Lazy/on-demand variant generation
-
-Don't pre-generate all variants on upload. Store only the original + thumb. Generate other sizes on first request or at export time.
-
-**Trade-off**: Adds complexity to the preview pipeline. The Liquid rendering service would need to trigger on-the-fly resizing (or show originals scaled via CSS until variants are ready). First preview of a page would be slow. Probably over-engineering for the current architecture — pre-generation is simple and fast.
-
-### Idea E: Cap + archive
-
-Cap the stored original (idea A), but before capping, move the raw upload to an `archive/` directory that isn't served or exported. Users could recover the full original if ever needed.
-
-**Trade-off**: More disk than pure capping, less than keeping originals. Adds UX complexity (where do users find archived originals? how do they restore?). Might not be worth the complexity.
-
-### Recommendation
-
-For a web-focused tool, **Idea A (cap to a configurable max, default 2560px)** combined with **Idea C / section 3 (smart export)** gives the best balance. The cap reduces server disk usage substantially (a 6000x4000 JPEG capped to 2560px goes from ~10MB to ~3MB), while the smart export ensures the exported site only contains what's actually referenced. The configurable setting lets power users disable capping if they need full originals.
+**Expected savings**: A 6000x4000 JPEG (~10MB) capped to 2560px becomes ~3MB. For a project with 50 uploaded images, this can save ~350MB of disk.
 
 ---
 
@@ -79,76 +65,118 @@ For a web-focused tool, **Idea A (cap to a configurable max, default 2560px)** c
 
 **The problem**: Export currently copies the original file + ALL generated size variants for every used image. If a hero image has 4 variants, all 5 files (original + thumb + small + medium + large) are exported — even if the template only uses `size: 'large'`.
 
-### The key insight
+### Approach: Render-time size tracking
 
-The `{% image %}` tag (`src/core/tags/imageTag.js`) already knows exactly which size it resolves at render time:
+The export pipeline already renders every page before copying assets. The `{% image %}` tag already resolves exactly which size variant to use (including fallback to original). We piggyback a lightweight in-memory collector on that render pass to record which sizes were actually resolved — then use that data to selectively copy only the referenced variants.
 
-```liquid
-{% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
+**Why this approach over alternatives:**
+
+- **No schema changes, no migration, no DB writes** — purely in-memory during export
+- **Captures actual resolved behavior** including fallbacks (if a widget asks for `size: 'large'` but the image doesn't have a large variant, the tag falls back to the original — this captures that truth)
+- **Works for both `<img>` tags and `output: "url"` mode** (CSS backgrounds) — both code paths resolve a size variant
+- **~25 lines across 2 files**
+- **Memory footprint**: ~30KB for 500 images. The Map lives for one export request and is garbage collected after. No cross-request state, no shared memory, no contention in multitenant environments.
+
+### Implementation
+
+#### Step 1 — Create collector before the page render loop
+
+**File: `server/controllers/exportController.js`** — Before the page loop (before line 258):
+
+```js
+// Track which image size variants are actually referenced during rendering.
+// Map<filename, Set<sizeName | "original">>
+const usedImageSizes = new Map();
 ```
 
-Line 46 of `imageTag.js`:
+Then inside the loop, add it to each page's `sharedGlobals` (line 260):
+
 ```js
-imageSize = mediaFile.sizes?.[size] || { path: mediaFile.path, width: mediaFile.width, height: mediaFile.height };
+const sharedGlobals = {
+  projectId,
+  apiUrl: "",
+  renderMode: "publish",
+  themeSettingsRaw: rawThemeSettings,
+  enqueuedStyles: new Map(),
+  enqueuedScripts: new Map(),
+  exportVersion: version,
+  usedImageSizes,  // shared across all pages — same Map reference
+};
 ```
 
-The tag picks the named size if it exists, or falls back to the original. **It already knows the answer** — we just need to record it.
+The `usedImageSizes` Map is created **once** outside the loop. Each page's `sharedGlobals` gets a reference to the same Map, so entries accumulate across all pages.
 
-And the export pipeline (`exportController.js`) already renders every single page before copying assets (line 311-358). The rendering happens first, then the file copying happens. So we can piggyback a collector on the render pass.
+#### Step 2 — Record resolved sizes in the image tag
 
-### Proposed approach: Render-time size tracking
+**File: `src/core/tags/imageTag.js`** — After both size resolution points (the `output: "url"` path at line 31 and the full `<img>` path at line 46), record what was resolved:
 
-**Step 1 — Collector**: Before the page render loop in `exportController.js` (line 311), create a shared collector:
 ```js
-const usedImageSizes = new Map();  // Map<filename, Set<sizeName|"original">>
-```
-
-Pass it into `sharedGlobals`. Currently `sharedGlobals` is created fresh per page (line 312-321), but the `usedImageSizes` Map should be created **once** outside the loop and shared across all pages via a reference.
-
-**Step 2 — Recording**: In `imageTag.js`, after resolving the size variant, check for the collector on globals and record the resolved size:
-```js
+// Record resolved size for smart export (only present during export render)
 const usedImageSizes = context.get(["globals", "usedImageSizes"]);
 if (usedImageSizes) {
+  const resolvedSize = mediaFile.sizes?.[size] ? size : "original";
   if (!usedImageSizes.has(filename)) usedImageSizes.set(filename, new Set());
-  usedImageSizes.get(filename).add(mediaFile.sizes?.[size] ? size : "original");
+  usedImageSizes.get(filename).add(resolvedSize);
 }
 ```
 
-This works for both `output: "url"` (CSS backgrounds) and full `<img>` tag rendering — both code paths resolve a size variant.
+This must be added in **both** code paths:
+1. After line 31 (the `output: "url"/"path"` early return path)
+2. After line 46 (the full `<img>` tag path)
 
-**Step 3 — Selective copying**: In `exportController.js` (line 547-563), replace the "copy all sizes" logic:
+SVGs skip size resolution entirely, so no tracking is needed for them (they're already handled before the size resolution code).
 
+#### Step 3 — Selective image copying
+
+**File: `server/controllers/exportController.js`** — Replace the image copying section (lines 465-536). The current logic copies original + all sizes. The new logic:
+
+```js
+for (const imageFile of usedImages) {
+  const fileSizes = usedImageSizes.get(imageFile.filename);
+
+  // Safety: if no tracking data, copy everything (same as before)
+  if (!fileSizes) {
+    // ... copy original + all sizes (existing behavior)
+    continue;
+  }
+
+  // Copy original only if it was used as a fallback
+  if (fileSizes.has("original")) {
+    // ... copy original
+  }
+
+  // Copy only referenced size variants (+ always copy thumb as safety net)
+  if (imageFile.sizes) {
+    for (const [sizeName, sizeInfo] of Object.entries(imageFile.sizes)) {
+      if (fileSizes.has(sizeName) || sizeName === "thumb") {
+        // ... copy this size variant
+      }
+    }
+  }
+}
 ```
-Before: for every size variant → copy it
-After:  for every size variant → copy it ONLY IF it's in usedImageSizes for this file
-        copy original ONLY IF "original" is in the set (fallback case)
-        always copy thumb (safety net / future-proofing)
-```
 
-If a file has no entry in `usedImageSizes` (shouldn't happen, but safety), fall back to copying everything — same as today.
-
-### Why this approach wins
-
-| Approach | Pros | Cons |
-|---|---|---|
-| **Render-time tracking** | Zero schema changes. Zero template changes. Captures actual resolved behavior including fallbacks. ~25 lines across 2 files. | Only works at export time — can't answer "which sizes does this image need?" outside of an export render pass |
-| Schema-declared sizes (`"imageSize": "medium"` in schema.json) | Explicit, queryable at any time, works outside export context | Requires updating every widget schema. Doesn't capture fallback behavior. Theme authors must maintain it. Disconnected from actual template behavior. |
-| Template scanning at export time | No schema changes | Fragile Liquid regex parsing. Can't handle dynamic size values. Misses fallback logic. Doesn't capture `output: "url"` usage in inline styles. |
+**Thumb is always copied** as a safety net — it's tiny (~5KB) and useful for future features (search results, media library previews in exported admin panels, etc.).
 
 ### Expected savings
 
-For a site with 20 used images, each with 4 size variants:
-- **Before**: 20 originals + 80 variants = **100 files** exported
-- **After**: Only the specific variants referenced (~20-30) + 20 thumbs = **~40-50 files**
+For a site with 20 used images, each with 4 size variants + original:
 
-For large originals (6000px, ~10MB each), skipping originals alone saves **~200MB** on a 20-image site.
+| | Files exported | Disk (if originals are ~10MB, variants ~1-3MB) |
+|---|---|---|
+| **Before** | 20 originals + 80 variants = **100 files** | ~250MB |
+| **After** | ~20-30 referenced variants + 20 thumbs = **~40-50 files** | ~60-90MB |
 
-### Interaction with question 2
+Combined with capping (section 2), the original is never exported at all (templates reference named sizes, not the original), so even the capped 2560px version is skipped.
 
-If you also cap originals (idea A), the savings compound:
-- Capping shrinks the stored original from ~10MB to ~3MB
-- Smart export then avoids exporting even that ~3MB original entirely (since templates reference named sizes, not the original)
-- You get both smaller server storage AND dramatically smaller exports
+### Testing
+
+Add tests to `server/tests/export.test.js`:
+
+1. **Only referenced image sizes are exported** — Create a page that uses `{% image src: "photo.jpg", size: "medium" %}`, export, verify only `photo-medium.jpg` and `photo-thumb.jpg` are in the output (not `photo-small.jpg`, `photo-large.jpg`, or the original).
+2. **Fallback to original is tracked** — Create a page that uses `{% image src: "photo.jpg", size: "xlarge" %}` where `xlarge` doesn't exist, export, verify the original is copied (fallback behavior).
+3. **All sizes copied when no tracking data** — Safety net test: if `usedImageSizes` has no entry for an image, all sizes are copied (backward-compatible).
+4. **Thumb always copied** — Even if only `size: "large"` is referenced, `thumb` is still in the export.
 
 ---
 
@@ -156,18 +184,18 @@ If you also cap originals (idea A), the savings compound:
 
 ```
 Upload                          Storage                         Export
-──────                          ───────                         ──────
-6000x4000 JPEG ──→ Generate     thumb (150px)    ──→            ✓ Always copied
-                   variants     small (480px)    ──→            ✓ Only if referenced
-                                medium (1024px)  ──→            ✓ Only if referenced
-                                large (1920px)   ──→            ✓ Only if referenced
-                   Cap original original (2560px) ──→           ✗ Only if fallback needed
-                   (Idea A)     (was 6000px)
+------                          -------                         ------
+6000x4000 JPEG --> Generate     thumb (150px)    -->            Always copied
+                   variants     small (480px)    -->            Only if referenced
+                                medium (1024px)  -->            Only if referenced
+                                large (1920px)   -->            Only if referenced
+                   Cap original original (2560px) -->           Only if fallback needed
+                   (Section 2)  (was 6000px)
 ```
 
 The two optimizations are independent and complementary:
-- **Cap** reduces what's stored on disk
-- **Smart export** reduces what's in the exported site
+- **Cap** (section 2) reduces what's stored on disk
+- **Smart export** (section 3) reduces what's in the exported site
 - Either can be implemented alone; together they maximize savings
 
 ---

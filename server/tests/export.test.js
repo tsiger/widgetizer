@@ -136,7 +136,10 @@ function readExportHistory(projectId) {
 function getLatestExportDir() {
   const exports = exportRepo.getExports(PROJECT_ID);
   if (exports.length === 0) return null;
-  return exports[0].outputDir;
+  const dir = exports[0].outputDir;
+  if (!dir) return null;
+  // outputDir is now stored as a relative name; resolve against PUBLISH_DIR
+  return path.isAbsolute(dir) ? dir : path.join(PUBLISH_DIR, dir);
 }
 
 // ============================================================================
@@ -1155,7 +1158,9 @@ describe("cleanupProjectExports", () => {
     // Verify exports exist first
     const exportsBefore = readExportHistory(CLEANUP_ID);
     assert.ok(exportsBefore.length > 0, "Should have history before cleanup");
-    const exportDirs = exportsBefore.map((e) => e.outputDir);
+    const exportDirs = exportsBefore.map((e) =>
+      e.outputDir && !path.isAbsolute(e.outputDir) ? path.join(PUBLISH_DIR, e.outputDir) : e.outputDir,
+    );
     for (const dir of exportDirs) {
       assert.ok(await fs.pathExists(dir), `${dir} should exist before cleanup`);
     }
@@ -1209,7 +1214,8 @@ describe("exportProject with markdown", () => {
   });
 
   it("markdown files contain YAML frontmatter", async () => {
-    const exportDir = readExportHistory(PROJECT_ID)[0].outputDir;
+    const rawDir = readExportHistory(PROJECT_ID)[0].outputDir;
+    const exportDir = path.isAbsolute(rawDir) ? rawDir : path.join(PUBLISH_DIR, rawDir);
     const indexMd = await fs.readFile(path.join(exportDir, "index.md"), "utf8");
     assert.ok(indexMd.startsWith("---"), "Should start with YAML frontmatter");
     assert.ok(indexMd.includes("title:"), "Should have title in frontmatter");

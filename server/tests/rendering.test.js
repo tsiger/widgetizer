@@ -167,6 +167,7 @@ before(async () => {
     JSON.stringify(
       {
         id: "main-nav",
+        uuid: "menu-uuid-main-nav",
         name: "Main Navigation",
         items: [
           { id: "item_1", label: "Home", link: "/", pageUuid: "page-uuid-home" },
@@ -406,6 +407,44 @@ describe("renderWidget — menu resolution", () => {
 
     // Should render without error
     assert.ok(html.includes("Menu Test"));
+    assert.ok(!html.includes("widget-error"));
+  });
+
+  it("resolves menu by UUID", async () => {
+    const html = await renderWidget(
+      PROJECT_ID,
+      "hero-menu-uuid",
+      {
+        type: "test-hero",
+        settings: {
+          heading: "UUID Menu Test",
+          nav_menu: "menu-uuid-main-nav",
+        },
+      },
+      RAW_THEME_SETTINGS,
+    );
+
+    // Should render without error — menu resolved via UUID
+    assert.ok(html.includes("UUID Menu Test"));
+    assert.ok(!html.includes("widget-error"));
+  });
+
+  it("falls back to slug-based lookup for legacy menu references", async () => {
+    const html = await renderWidget(
+      PROJECT_ID,
+      "hero-menu-slug",
+      {
+        type: "test-hero",
+        settings: {
+          heading: "Slug Menu Test",
+          nav_menu: "main-nav",
+        },
+      },
+      RAW_THEME_SETTINGS,
+    );
+
+    // Should also render without error — menu resolved via slug fallback
+    assert.ok(html.includes("Slug Menu Test"));
     assert.ok(!html.includes("widget-error"));
   });
 

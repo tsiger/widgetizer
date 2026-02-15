@@ -413,6 +413,7 @@ export async function createProject(req, res) {
               const enrichedMenu = {
                 ...menu,
                 id: menuSlug,
+                uuid: menu.uuid || uuidv4(),
                 items: enrichedItems,
                 created: new Date().toISOString(),
                 updated: new Date().toISOString(),
@@ -432,7 +433,73 @@ export async function createProject(req, res) {
         }
       }
 
-      // Enrich page widgets with pageUuid for internal links
+      // Build a map of menu slugs to UUIDs for enriching widget menu settings
+      const menuSlugToUuid = new Map();
+      try {
+        if (await fs.pathExists(projectMenusDir)) {
+          const enrichedMenuFiles = await fs.readdir(projectMenusDir);
+          for (const menuFile of enrichedMenuFiles) {
+            if (!menuFile.endsWith(".json")) continue;
+            try {
+              const menuContent = await fs.readFile(path.join(projectMenusDir, menuFile), "utf8");
+              const menu = JSON.parse(menuContent);
+              const menuSlug = path.parse(menuFile).name;
+              if (menu.uuid) {
+                menuSlugToUuid.set(menuSlug, menu.uuid);
+              }
+            } catch {
+              // Skip unreadable menu files
+            }
+          }
+        }
+      } catch {
+        // Continue without menu enrichment
+      }
+
+      // Helper to convert a slug-based menu reference to UUID
+      function enrichMenuSettingValue(value) {
+        if (!value || typeof value !== "string") return value;
+        // If this value matches a menu slug, replace with its UUID
+        const uuid = menuSlugToUuid.get(value);
+        return uuid || value;
+      }
+
+      // Enrich all menu and link settings in a widget
+      function enrichWidgetSettings(widgetData) {
+        const enriched = enrichWidgetLinks(widgetData);
+
+        // Enrich widget-level settings
+        if (enriched.settings) {
+          enriched.settings = { ...enriched.settings };
+          for (const [key, value] of Object.entries(enriched.settings)) {
+            if (typeof value === "string" && menuSlugToUuid.has(value)) {
+              enriched.settings[key] = enrichMenuSettingValue(value);
+            }
+          }
+        }
+
+        // Enrich block-level settings
+        if (enriched.blocks) {
+          enriched.blocks = { ...enriched.blocks };
+          for (const [blockId, block] of Object.entries(enriched.blocks)) {
+            if (block && block.settings) {
+              enriched.blocks[blockId] = {
+                ...block,
+                settings: { ...block.settings },
+              };
+              for (const [key, value] of Object.entries(block.settings)) {
+                if (typeof value === "string" && menuSlugToUuid.has(value)) {
+                  enriched.blocks[blockId].settings[key] = enrichMenuSettingValue(value);
+                }
+              }
+            }
+          }
+        }
+
+        return enriched;
+      }
+
+      // Enrich page widgets with pageUuid for links and menuUuid for menu settings
       try {
         const allPageFiles = await fs.readdir(pagesDir);
         for (const pageFile of allPageFiles) {
@@ -449,7 +516,7 @@ export async function createProject(req, res) {
           const enrichedWidgets = {};
 
           for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
-            const enriched = enrichWidgetLinks(widget);
+            const enriched = enrichWidgetSettings(widget);
             enrichedWidgets[widgetId] = enriched;
             if (JSON.stringify(enriched) !== JSON.stringify(widget)) {
               modified = true;
@@ -470,7 +537,7 @@ export async function createProject(req, res) {
             if (await fs.pathExists(widgetPath)) {
               const content = await fs.readFile(widgetPath, "utf8");
               const widget = JSON.parse(content);
-              const enriched = enrichWidgetLinks(widget);
+              const enriched = enrichWidgetSettings(widget);
               if (JSON.stringify(enriched) !== JSON.stringify(widget)) {
                 await fs.outputFile(widgetPath, JSON.stringify(enriched, null, 2));
               }
@@ -795,8 +862,9 @@ export async function duplicateProject(req, res) {
     try {
       await fs.copy(originalDir, newDir);
 
-      // Regenerate page UUIDs and update all references
+      // Regenerate page and menu UUIDs and update all references
       const oldToNewUuid = new Map();
+      const oldToNewMenuUuid = new Map();
       const newPageSlugToUuid = new Map();
       const newPagesDir = getProjectPagesDir(newFolderName);
 
@@ -812,14 +880,19 @@ export async function duplicateProject(req, res) {
         return newUuid ? { ...linkValue, pageUuid: newUuid } : linkValue;
       }
 
-      // Helper to update all link pageUuids in a widget
-      function updateWidgetLinkUuids(widgetData) {
+      // Helper to update all link pageUuids and menu UUIDs in a widget
+      function updateWidgetUuids(widgetData) {
         const updated = { ...widgetData };
 
         if (updated.settings) {
           updated.settings = { ...updated.settings };
           for (const [key, value] of Object.entries(updated.settings)) {
+            // Update link pageUuids
             updated.settings[key] = updateLinkPageUuid(value);
+            // Update menu UUIDs (plain string values that match an old menu UUID)
+            if (typeof updated.settings[key] === "string" && oldToNewMenuUuid.has(updated.settings[key])) {
+              updated.settings[key] = oldToNewMenuUuid.get(updated.settings[key]);
+            }
           }
         }
 
@@ -833,6 +906,9 @@ export async function duplicateProject(req, res) {
               };
               for (const [key, value] of Object.entries(block.settings)) {
                 updated.blocks[blockId].settings[key] = updateLinkPageUuid(value);
+                if (typeof updated.blocks[blockId].settings[key] === "string" && oldToNewMenuUuid.has(updated.blocks[blockId].settings[key])) {
+                  updated.blocks[blockId].settings[key] = oldToNewMenuUuid.get(updated.blocks[blockId].settings[key]);
+                }
               }
             }
           }
@@ -882,7 +958,35 @@ export async function duplicateProject(req, res) {
           await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
         }
 
-        // Step 2: Update widget link pageUuids to new UUIDs
+        // Step 2: Regenerate menu UUIDs and build mapping
+        const newMenusDir = getProjectMenusDir(newFolderName);
+        if (await fs.pathExists(newMenusDir)) {
+          const menuFiles = await fs.readdir(newMenusDir);
+          for (const menuFile of menuFiles) {
+            if (!menuFile.endsWith(".json")) continue;
+
+            const menuPath = path.join(newMenusDir, menuFile);
+            const content = await fs.readFile(menuPath, "utf8");
+            const menu = JSON.parse(content);
+
+            if (menu.uuid) {
+              const newMenuUuid = uuidv4();
+              oldToNewMenuUuid.set(menu.uuid, newMenuUuid);
+              menu.uuid = newMenuUuid;
+            } else {
+              // Backfill UUID for menus that don't have one yet
+              menu.uuid = uuidv4();
+            }
+
+            // Also update menu item pageUuids while we're here
+            const updatedItems = updateMenuItemUuids(menu.items);
+            menu.items = updatedItems;
+
+            await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
+          }
+        }
+
+        // Step 3: Update widget link/menu UUIDs to new UUIDs
         for (const pageFile of pageFiles) {
           if (!pageFile.endsWith(".json")) continue;
 
@@ -897,7 +1001,7 @@ export async function duplicateProject(req, res) {
           const updatedWidgets = {};
 
           for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
-            const updated = updateWidgetLinkUuids(widget);
+            const updated = updateWidgetUuids(widget);
             updatedWidgets[widgetId] = updated;
             if (JSON.stringify(updated) !== JSON.stringify(widget)) {
               modified = true;
@@ -918,7 +1022,7 @@ export async function duplicateProject(req, res) {
             if (await fs.pathExists(widgetPath)) {
               const content = await fs.readFile(widgetPath, "utf8");
               const widget = JSON.parse(content);
-              const updated = updateWidgetLinkUuids(widget);
+              const updated = updateWidgetUuids(widget);
               if (JSON.stringify(updated) !== JSON.stringify(widget)) {
                 await fs.outputFile(widgetPath, JSON.stringify(updated, null, 2));
               }
@@ -926,24 +1030,6 @@ export async function duplicateProject(req, res) {
           }
         }
 
-        // Step 3: Update menu item pageUuids to new UUIDs
-        const newMenusDir = getProjectMenusDir(newFolderName);
-        if (await fs.pathExists(newMenusDir)) {
-          const menuFiles = await fs.readdir(newMenusDir);
-          for (const menuFile of menuFiles) {
-            if (!menuFile.endsWith(".json")) continue;
-
-            const menuPath = path.join(newMenusDir, menuFile);
-            const content = await fs.readFile(menuPath, "utf8");
-            const menu = JSON.parse(content);
-
-            const updatedItems = updateMenuItemUuids(menu.items);
-            if (JSON.stringify(updatedItems) !== JSON.stringify(menu.items)) {
-              menu.items = updatedItems;
-              await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
-            }
-          }
-        }
       } catch (uuidUpdateError) {
         console.warn(`[ProjectController] Failed to update UUIDs in cloned project: ${uuidUpdateError.message}`);
         // Continue without failing - the cloned project will still work, just with old UUIDs
@@ -1178,6 +1264,8 @@ export async function exportProject(req, res) {
         description: project.description || "",
         theme: project.theme,
         themeVersion: project.themeVersion || null,
+        receiveThemeUpdates: project.receiveThemeUpdates || false,
+        preset: project.preset || null,
         siteUrl: project.siteUrl || "",
         created: project.created,
         updated: project.updated,
@@ -1365,6 +1453,8 @@ export async function importProject(req, res) {
         description: manifest.project.description || "",
         theme: manifest.project.theme,
         themeVersion,
+        receiveThemeUpdates: manifest.project.receiveThemeUpdates || false,
+        preset: manifest.project.preset || null,
         siteUrl: manifest.project.siteUrl || "",
         created: new Date().toISOString(),
         updated: new Date().toISOString(),

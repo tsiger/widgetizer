@@ -215,6 +215,20 @@ describe("createMenu", () => {
     assert.ok(!res._json.id.includes("&"));
     assert.ok(!res._json.id.includes("!"));
   });
+
+  it("assigns a uuid on creation", async () => {
+    const res = await createTestMenu("UUID Menu");
+    assert.equal(res._status, 201);
+    assert.ok(res._json.uuid, "menu should have a uuid");
+    // UUID v4 format
+    assert.match(res._json.uuid, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+  });
+
+  it("generates unique uuids for different menus", async () => {
+    const res1 = await createTestMenu("Menu A");
+    const res2 = await createTestMenu("Menu B");
+    assert.notEqual(res1._json.uuid, res2._json.uuid);
+  });
 });
 
 // ============================================================================
@@ -356,19 +370,17 @@ describe("updateMenu", () => {
     assert.equal(res._json.description, "Updated desc");
   });
 
-  it("renames file when name changes to a different slug", async () => {
+  it("keeps filename and ID stable when name changes", async () => {
     const res = await callController(updateMenu, {
       params: { id: "original-name" },
       body: { name: "Renamed Menu" },
     });
     assert.equal(res._status, 200);
-    assert.equal(res._json.id, "renamed-menu");
+    assert.equal(res._json.id, "original-name", "ID should stay the same after rename");
     assert.equal(res._json.name, "Renamed Menu");
 
-    // Old file should be gone
-    assert.ok(!(await fs.pathExists(getMenuPath(activeProject.folderName, "original-name"))));
-    // New file should exist
-    assert.ok(await fs.pathExists(getMenuPath(activeProject.folderName, "renamed-menu")));
+    // File should still be at the original path
+    assert.ok(await fs.pathExists(getMenuPath(activeProject.folderName, "original-name")));
   });
 
   it("updates the 'updated' timestamp", async () => {
@@ -409,17 +421,18 @@ describe("updateMenu", () => {
     assert.equal(res._status, 404);
   });
 
-  it("keeps old ID when new slug would conflict", async () => {
-    // Create a second menu that would conflict on rename
+  it("allows two menus with the same display name (different IDs)", async () => {
     await createTestMenu("Conflicting Name");
 
+    // Rename original-name to have the same display name
     const res = await callController(updateMenu, {
       params: { id: "original-name" },
       body: { name: "Conflicting Name" },
     });
     assert.equal(res._status, 200);
-    // Should keep the old ID since "conflicting-name" already exists
+    // ID stays as original-name, only the display name changes
     assert.equal(res._json.id, "original-name");
+    assert.equal(res._json.name, "Conflicting Name");
   });
 
   it("persists changes to disk", async () => {
@@ -431,6 +444,34 @@ describe("updateMenu", () => {
     const menuPath = getMenuPath(activeProject.folderName, "original-name");
     const onDisk = JSON.parse(await fs.readFile(menuPath, "utf8"));
     assert.equal(onDisk.description, "Saved to disk");
+  });
+
+  it("preserves uuid when menu is renamed", async () => {
+    // Get the original uuid
+    const orig = await callController(getMenu, { params: { id: "original-name" } });
+    const originalUuid = orig._json.uuid;
+    assert.ok(originalUuid, "original menu should have a uuid");
+
+    // Rename the menu
+    const res = await callController(updateMenu, {
+      params: { id: "original-name" },
+      body: { name: "Totally Different Name" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.id, "original-name", "ID stays stable");
+    assert.equal(res._json.name, "Totally Different Name");
+    assert.equal(res._json.uuid, originalUuid, "uuid should be preserved after rename");
+  });
+
+  it("preserves uuid when only description is updated", async () => {
+    const orig = await callController(getMenu, { params: { id: "original-name" } });
+    const originalUuid = orig._json.uuid;
+
+    const res = await callController(updateMenu, {
+      params: { id: "original-name" },
+      body: { name: "Original Name", description: "New description" },
+    });
+    assert.equal(res._json.uuid, originalUuid);
   });
 });
 
@@ -565,6 +606,13 @@ describe("duplicateMenu", () => {
     assert.equal(original._json.items[0].id, "orig_item_1");
   });
 
+  it("generates a new uuid for the duplicate (different from original)", async () => {
+    const original = await callController(getMenu, { params: { id: "source-menu" } });
+    const res = await callController(duplicateMenu, { params: { id: "source-menu" } });
+    assert.ok(res._json.uuid, "duplicate should have a uuid");
+    assert.notEqual(res._json.uuid, original._json.uuid, "duplicate uuid must differ from original");
+  });
+
   it("returns 404 when duplicating a non-existent menu", async () => {
     const res = await callController(duplicateMenu, { params: { id: "no-such-menu" } });
     assert.equal(res._status, 404);
@@ -620,5 +668,60 @@ describe("Edge cases", () => {
     assert.match(res._json.error, /no active project/i);
 
     await writeProjectsFile(backup);
+  });
+
+});
+
+// ============================================================================
+// UUID backward compatibility (lazy backfill)
+// ============================================================================
+
+describe("UUID backward compatibility", () => {
+  it("backfills uuid for legacy menus without one (getAllMenus)", async () => {
+    await resetMenus();
+
+    // Write a legacy menu file without uuid
+    const menuPath = getMenuPath(activeProject.folderName, "legacy-menu");
+    const legacyMenu = {
+      id: "legacy-menu",
+      name: "Legacy Menu",
+      items: [],
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+    };
+    await fs.outputFile(menuPath, JSON.stringify(legacyMenu, null, 2));
+
+    // getAllMenus should backfill the uuid
+    const res = await callController(getAllMenus);
+    assert.equal(res._status, 200);
+    const menu = res._json.find((m) => m.id === "legacy-menu");
+    assert.ok(menu.uuid, "legacy menu should have been backfilled with a uuid");
+
+    // Verify it was persisted to disk
+    const onDisk = JSON.parse(await fs.readFile(menuPath, "utf8"));
+    assert.equal(onDisk.uuid, menu.uuid);
+  });
+
+  it("backfills uuid for legacy menus without one (getMenuById)", async () => {
+    await resetMenus();
+
+    // Write a legacy menu file without uuid
+    const menuPath = getMenuPath(activeProject.folderName, "legacy-by-id");
+    const legacyMenu = {
+      id: "legacy-by-id",
+      name: "Legacy By ID",
+      items: [{ id: "item_1", label: "Home", link: "/" }],
+    };
+    await fs.outputFile(menuPath, JSON.stringify(legacyMenu, null, 2));
+
+    // getMenuById should backfill the uuid
+    const projectDir = getProjectDir(activeProject.folderName);
+    const menu = await getMenuById(projectDir, "legacy-by-id");
+    assert.ok(menu.uuid, "legacy menu should have been backfilled with a uuid");
+    assert.equal(menu.items.length, 1);
+
+    // Verify it was persisted to disk
+    const onDisk = JSON.parse(await fs.readFile(menuPath, "utf8"));
+    assert.equal(onDisk.uuid, menu.uuid);
   });
 });
