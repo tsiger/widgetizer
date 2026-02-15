@@ -473,10 +473,12 @@ Injected into preview iframe, handles:
 - CSS variable updates
 - Font loading
 - Widget morphing
-- Selection detection
+- Selection detection and editor lifecycle events (`widget:select`, `widget:deselect`, `widget:block-select`, `widget:block-deselect`)
 - Scroll to widget
 - Real-time settings updates
 - Element bounds reporting
+
+Design mode detection is injected by `previewController.js` as an inline `<script>` in the `<head>` (`window.Widgetizer = { designMode: true }`) so it's available before deferred widget scripts run. Theme JS checks `window.Widgetizer?.designMode` to conditionally attach editor event listeners.
 
 ---
 

@@ -519,6 +519,84 @@ Here's a minimal but complete testimonial widget:
 </section>
 ```
 
+# Editor Lifecycle Events
+
+When your widget has blocks that aren't all visible at once — slides in a slideshow, panels in an accordion, tabs in a switcher — the editor needs a way to reveal the right block when a user selects it in the sidebar. Widgetizer dispatches custom DOM events on widget elements to make this possible.
+
+## Design Mode Detection
+
+The editor sets a global flag before any widget scripts run. Use it to guard editor-only code:
+
+```javascript
+if (window.Widgetizer?.designMode) {
+  // Only runs inside the editor preview
+}
+```
+
+In production and standalone preview, `window.Widgetizer` is `undefined`.
+
+## Available Events
+
+All events are dispatched on the widget element (`[data-widget-id]`) and bubble through the DOM.
+
+| Event | Fires When | `e.detail` |
+| --- | --- | --- |
+| `widget:select` | This widget becomes selected | `{}` |
+| `widget:deselect` | This widget is deselected | `{}` |
+| `widget:block-select` | A block within this widget is selected | `{ blockId }` |
+| `widget:block-deselect` | A block within this widget is deselected | `{ blockId }` |
+| `widget:updated` | Widget DOM was replaced (morph/re-render) | `{ widgetId }` |
+
+When selection changes, events fire in this order: `block-deselect` (old) → `deselect` (old) → `select` (new) → `block-select` (new). Events only fire when the state actually changes — selecting the same block twice does not re-fire.
+
+## Example: Slideshow
+
+Navigate to the selected slide and pause autoplay while editing:
+
+```javascript
+if (window.Widgetizer?.designMode) {
+  widget.addEventListener("widget:block-select", (e) => {
+    const { blockId } = e.detail;
+    widget.querySelectorAll(".slideshow-slide[data-block-id]").forEach((slide, idx) => {
+      if (slide.getAttribute("data-block-id") === blockId) {
+        stopAutoplay();
+        goToSlide(idx);
+      }
+    });
+  });
+
+  widget.addEventListener("widget:select", () => stopAutoplay());
+  widget.addEventListener("widget:deselect", () => startAutoplay());
+}
+```
+
+## Example: Accordion
+
+Expand the selected panel so its content is visible:
+
+```javascript
+if (window.Widgetizer?.designMode) {
+  widget.addEventListener('widget:block-select', (e) => {
+    const { blockId } = e.detail;
+    const item = widget.querySelector(`.accordion-item[data-block-id="${blockId}"]`);
+    if (!item) return;
+    const trigger = item.querySelector('.accordion-trigger');
+    const content = item.querySelector('.accordion-content');
+    if (!trigger || !content) return;
+    if (trigger.getAttribute('aria-expanded') === 'true') return;
+    trigger.setAttribute('aria-expanded', 'true');
+    content.setAttribute('aria-hidden', 'false');
+  });
+}
+```
+
+## Tips
+
+- **Guard with `designMode`**: Always wrap listeners in `if (window.Widgetizer?.designMode)` so they don't execute in production
+- **Events fire on the widget element**: Use `widget.addEventListener()`, not `document.addEventListener()`
+- **Re-initialization safe**: Inline scripts re-execute after DOM morphs, so listeners are re-attached automatically
+- **Use existing functions**: If your widget already has a `goToSlide()` or `activateTab()` function, just call it from the event handler
+
 # Related Pages
 
 - [Setting Types](theme-dev-setting-types.html) — all available field types for settings

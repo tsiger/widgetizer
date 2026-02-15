@@ -848,13 +848,12 @@ When selection changes, events fire in this order:
 3. `widget:select` (on new widget, if widget changed)
 4. `widget:block-select` (on new widget, if a block is selected)
 
-### Example: Slideshow
+### Examples
 
-A slideshow with overlapping slides should show the correct slide when the user selects it in the sidebar:
+#### Slideshow — navigate to selected slide
 
 ```javascript
 if (window.Widgetizer?.designMode) {
-  // Navigate to the selected slide
   widget.addEventListener("widget:block-select", (e) => {
     const { blockId } = e.detail;
     const slides = widget.querySelectorAll(".slideshow-slide[data-block-id]");
@@ -866,17 +865,51 @@ if (window.Widgetizer?.designMode) {
     });
   });
 
-  // Pause autoplay while the widget is selected
   widget.addEventListener("widget:select", () => stopAutoplay());
   widget.addEventListener("widget:deselect", () => startAutoplay());
+}
+```
+
+#### Tabs / Content Switcher — switch to the tab containing the block
+
+```javascript
+if (window.Widgetizer?.designMode) {
+  widget.addEventListener('widget:block-select', (e) => {
+    const { blockId } = e.detail;
+    const blockEl = widget.querySelector(`[data-block-id="${blockId}"]`);
+    if (!blockEl) return;
+    const group = blockEl.closest('.switcher-content-group');
+    if (!group || group.classList.contains('is-active')) return;
+    const option = group.getAttribute('data-option');
+    const btn = widget.querySelector(`.switcher-btn[data-target="${option}"]`);
+    if (btn) activateTab(btn);
+  });
+}
+```
+
+#### Accordion — expand the selected panel
+
+```javascript
+if (window.Widgetizer?.designMode) {
+  widget.addEventListener('widget:block-select', (e) => {
+    const { blockId } = e.detail;
+    const item = widget.querySelector(`.accordion-item[data-block-id="${blockId}"]`);
+    if (!item) return;
+    const trigger = item.querySelector('.accordion-trigger');
+    const content = item.querySelector('.accordion-content');
+    if (!trigger || !content) return;
+    if (trigger.getAttribute('aria-expanded') === 'true') return;
+    trigger.setAttribute('aria-expanded', 'true');
+    content.setAttribute('aria-hidden', 'false');
+  });
 }
 ```
 
 ### When to Use
 
 - **Slideshows/Carousels**: Navigate to the selected slide, pause autoplay
-- **Tabs/Content Switchers**: Show the selected tab panel
-- **Accordions**: Open the selected accordion panel
+- **Tabs/Content Switchers**: Switch to the tab group containing the selected block
+- **Accordions**: Expand the selected panel
 - **Any widget with hidden blocks**: Reveal the block the user is editing
 
 ### Important Notes
