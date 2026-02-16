@@ -224,7 +224,7 @@
 - [ ] Enter `<script>alert(1)</script>` in the **meta description** field. Save. Edit again — the script tags should be stripped, only plain text remains.
 - [ ] Enter `<script>alert(1)</script>` in the **social media title** field. Save. Edit again — the script tags should be stripped, only plain text remains.
 - [ ] Enter `<script>alert(1)</script>` in the **canonical URL** field. Should be rejected by URL validation.
-- [ ] Set a social media image on a page, then go to **Media** and delete that image. Go back and edit the page — what happens to the social media image field?
+- [ ] Set a social media image on a page, then go to **Media** and try to delete that image. Should be **blocked** — the image is in use and deletion should fail with a clear error.
 - [ ] Enter an invalid **canonical URL** (e.g., "not a url"). Does validation catch it?
 - [ ] Export the site. Open the HTML source of a page. Check the `<meta>` tags — all content attributes should be properly escaped (no raw HTML in `content="..."`).
 
@@ -275,14 +275,15 @@
 
 ### 3.7 Duplicate a Widget
 
-1. On a widget in the left panel, click the **three-dot menu** (or options).
-2. Click **"Duplicate"**.
+1. Hover over a widget in the left panel — action icons appear.
+2. Click the **copy icon** (blue on hover).
 3. **Expected**: A copy of the widget appears below it with identical settings.
 
 ### 3.8 Delete a Widget
 
-1. On a widget, click the three-dot menu → **"Delete"**.
-2. **Expected**: Confirmation dialog. Confirm. Widget gone from list and preview.
+1. Hover over a widget in the left panel — action icons appear.
+2. Click the **trash icon** (red on hover).
+3. **Expected**: Confirmation dialog. Confirm. Widget gone from list and preview.
 
 ### 3.9 Work with Blocks
 
@@ -294,8 +295,8 @@
 6. **Add a new block**: Click the "+" button on the widget or "Add Block".
 7. **Expected**: New block appears. Might show block type selection if multiple types available.
 8. **Reorder blocks** by dragging within the widget.
-9. **Duplicate a block**: Three-dot menu → Duplicate.
-10. **Delete a block**: Three-dot menu → Delete. Confirm.
+9. **Duplicate a block**: Hover over a block, click the **copy icon** (blue on hover).
+10. **Delete a block**: Hover over a block, click the **trash icon** (red on hover). Confirm.
 
 ### 3.10 Block Limits
 
@@ -642,7 +643,7 @@
 ### 6.3 Delete a Theme
 
 1. Find a theme that is NOT used by any project.
-2. Click the three-dot menu (or delete icon) → **"Delete"**.
+2. Click the **three-dot menu** on the theme card → **"Delete"**.
 3. **Expected**: Confirmation dialog. Confirm. Theme removed.
 
 ### 6.4 Try Deleting a Theme In Use
