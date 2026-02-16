@@ -10,7 +10,7 @@ These layers are applied automatically to API endpoints and provide a robust bas
 
 - **What it is:** All incoming data from the client (e.g., in `req.body` or `req.params`) is rigorously validated and sanitized before being processed by the controllers.
 - **Why it's important:** This is the primary defense against common web vulnerabilities like Cross-Site Scripting (XSS) and data integrity issues. It ensures that only well-formed data is accepted by the application.
-- **Implementation:** Achieved using the `express-validator` library on all API routes that accept input.
+- **Implementation:** Achieved using the `express-validator` library on all API routes that accept input. Plain-text fields (project/page/menu names and descriptions) use `stripHtmlTags()` — a DOMPurify-based sanitizer that strips all HTML tags while preserving special characters like `&`, `"`, and `'`. Widget/block settings use schema-aware sanitization via `sanitizationService.js` (DOMPurify for richtext, protocol blocking for links). Text/textarea fields rely on LiquidJS autoescape at render time.
 
 ### 2. API Rate Limiting
 

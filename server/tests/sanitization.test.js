@@ -14,7 +14,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { sanitizeRichText, sanitizeWidgetData } from "../services/sanitizationService.js";
+import { sanitizeRichText, sanitizeWidgetData, stripHtmlTags } from "../services/sanitizationService.js";
 
 // ============================================================================
 // sanitizeRichText
@@ -641,5 +641,62 @@ describe("sanitizeWidgetData — schema edge cases", () => {
     assert.doesNotMatch(data.blocks.card_1.settings.description, /<script/i);
     assert.doesNotMatch(data.blocks.card_2.settings.description, /<script/i);
     assert.match(data.blocks.card_3.settings.description, /<p>Three<\/p>/);
+  });
+});
+
+// ============================================================================
+// stripHtmlTags
+// ============================================================================
+
+describe("stripHtmlTags", () => {
+  it("strips <script> tags completely", () => {
+    assert.equal(stripHtmlTags('<script>alert("xss")</script>'), "");
+  });
+
+  it("strips <script> tags but keeps surrounding text", () => {
+    assert.equal(stripHtmlTags('Hello <script>alert("xss")</script> World'), "Hello  World");
+  });
+
+  it("preserves ampersands without encoding", () => {
+    assert.equal(stripHtmlTags("Tom & Jerry"), "Tom & Jerry");
+  });
+
+  it("preserves double quotes without encoding", () => {
+    assert.equal(stripHtmlTags('Say "Hello"'), 'Say "Hello"');
+  });
+
+  it("preserves single quotes without encoding", () => {
+    assert.equal(stripHtmlTags("O'Brien"), "O'Brien");
+  });
+
+  it("preserves special unicode characters", () => {
+    const input = "Test & Site #1 — \"Quotes\"";
+    assert.equal(stripHtmlTags(input), input);
+  });
+
+  it("strips all HTML tags but keeps text content", () => {
+    assert.equal(stripHtmlTags("Tom <b>Bold</b> Name"), "Tom Bold Name");
+  });
+
+  it("strips <img> tags including event handlers", () => {
+    assert.equal(stripHtmlTags('<img src=x onerror=alert("xss")>'), "");
+  });
+
+  it("strips nested HTML", () => {
+    assert.equal(stripHtmlTags("<div><p>Hello</p></div>"), "Hello");
+  });
+
+  it("returns non-string values as-is", () => {
+    assert.equal(stripHtmlTags(42), 42);
+    assert.equal(stripHtmlTags(null), null);
+    assert.equal(stripHtmlTags(undefined), undefined);
+  });
+
+  it("handles empty string", () => {
+    assert.equal(stripHtmlTags(""), "");
+  });
+
+  it("handles plain text without HTML", () => {
+    assert.equal(stripHtmlTags("Just plain text"), "Just plain text");
   });
 });

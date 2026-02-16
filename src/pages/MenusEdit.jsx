@@ -55,7 +55,7 @@ export default function MenusEdit() {
       });
 
       setMenu(updatedMenu);
-      showToast(t("menusEdit.toasts.updateSuccess", { name: formData.name }), "success");
+      showToast(t("menusEdit.toasts.updateSuccess", { name: updatedMenu.name }), "success");
       setShowSuccessActions(true);
       setIsDirty(false); // Reset dirty state after successful save
       return true;

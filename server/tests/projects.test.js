@@ -47,6 +47,7 @@ const {
   importProject,
 } = await import("../controllers/projectController.js");
 const { closeDb } = await import("../db/index.js");
+const mediaRepo = await import("../db/repositories/mediaRepository.js");
 const { PassThrough } = await import("stream");
 const AdmZip = await import("adm-zip");
 
@@ -179,6 +180,44 @@ async function createTestProject(name = "Test Project", extraBody = {}) {
   });
   assert.equal(res._status, 201, `Expected 201 creating "${name}", got ${res._status}: ${JSON.stringify(res._json)}`);
   return res._json;
+}
+
+/** Reusable media fixture for testing export/import/duplicate */
+function createTestMediaData() {
+  return {
+    files: [
+      {
+        id: "test-media-1",
+        filename: "photo.jpg",
+        originalName: "photo.jpg",
+        type: "image/jpeg",
+        size: 50000,
+        uploaded: "2025-01-01T00:00:00.000Z",
+        path: "/uploads/images/photo.jpg",
+        metadata: { alt: "A photo", title: "Photo" },
+        width: 800,
+        height: 600,
+        sizes: {
+          thumb: { path: "/uploads/images/photo-thumb.jpg", width: 150, height: 112 },
+        },
+        usedIn: ["index"],
+      },
+      {
+        id: "test-media-2",
+        filename: "banner.png",
+        originalName: "banner.png",
+        type: "image/png",
+        size: 120000,
+        uploaded: "2025-01-01T00:00:00.000Z",
+        path: "/uploads/images/banner.png",
+        metadata: { alt: "Banner", title: "Site Banner" },
+        width: 1920,
+        height: 400,
+        sizes: {},
+        usedIn: [],
+      },
+    ],
+  };
 }
 
 // ============================================================================
@@ -425,6 +464,30 @@ describe("createProject", () => {
   it("does not include a 'slug' property in the response", async () => {
     const project = await createTestProject("No Slug");
     assert.equal("slug" in project, false, "created project should not have a slug property");
+  });
+
+  it("preserves special characters in name without HTML-encoding", async () => {
+    const name = 'Test & Site #1 \u2014 "Quotes"';
+    const project = await createTestProject(name);
+    assert.equal(project.name, name, "name should not be HTML-encoded");
+    assert.ok(!project.name.includes("&amp;"), "ampersand should not be encoded");
+    assert.ok(!project.name.includes("&quot;"), "quotes should not be encoded");
+  });
+
+  it("rejects empty name (e.g. after HTML tags are stripped)", async () => {
+    const res = await callController(createProject, {
+      body: { name: "", description: "", theme: "__test_theme__" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /name.*required/i);
+  });
+
+  it("rejects whitespace-only name", async () => {
+    const res = await callController(createProject, {
+      body: { name: "   ", description: "", theme: "__test_theme__" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /name.*required/i);
   });
 });
 
@@ -750,6 +813,24 @@ describe("updateProject", () => {
     assert.equal(res._status, 200);
     assert.equal("slug" in res._json, false, "project should not have a slug property");
   });
+
+  it("rejects empty name on update", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /name.*required/i);
+  });
+
+  it("rejects whitespace-only name on update", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "   " },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /name.*required/i);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -820,6 +901,22 @@ describe("deleteProject", () => {
     const project = await createTestProject("Named Project");
     const res = await callController(deleteProject, { params: { id: project.id } });
     assert.match(res._json.message, /Named Project/);
+  });
+
+  it("cascades deletion to media metadata in SQLite", async () => {
+    const project = await createTestProject("Media Delete");
+    const mediaData = createTestMediaData();
+    mediaRepo.writeMediaData(project.id, mediaData);
+
+    // Verify media exists before delete
+    const beforeDelete = mediaRepo.getMediaFiles(project.id);
+    assert.equal(beforeDelete.files.length, 2);
+
+    await callController(deleteProject, { params: { id: project.id } });
+
+    // Media should be gone (cascade delete)
+    const afterDelete = mediaRepo.getMediaFiles(project.id);
+    assert.equal(afterDelete.files.length, 0);
   });
 });
 
@@ -904,6 +1001,36 @@ describe("duplicateProject", () => {
   it("returns 404 for non-existent project", async () => {
     const res = await callController(duplicateProject, { params: { id: "non-existent" } });
     assert.equal(res._status, 404);
+  });
+
+  it("copies media metadata to the duplicate with new IDs", async () => {
+    // Write media metadata for the original project
+    const mediaData = createTestMediaData();
+    mediaRepo.writeMediaData(original.id, mediaData);
+
+    const res = await callController(duplicateProject, { params: { id: original.id } });
+    assert.equal(res._status, 201);
+
+    // Duplicate should have media in SQLite
+    const dupMedia = mediaRepo.getMediaFiles(res._json.id);
+    assert.equal(dupMedia.files.length, 2);
+
+    // Metadata should match
+    const photo = dupMedia.files.find((f) => f.filename === "photo.jpg");
+    const banner = dupMedia.files.find((f) => f.filename === "banner.png");
+    assert.ok(photo, "photo.jpg should exist in duplicate");
+    assert.ok(banner, "banner.png should exist in duplicate");
+    assert.equal(photo.type, "image/jpeg");
+    assert.equal(photo.path, "/uploads/images/photo.jpg");
+    assert.ok(photo.sizes.thumb, "Size variants should be copied");
+    assert.deepEqual(photo.usedIn, ["index"]);
+
+    // IDs should be different from the original
+    const originalMedia = mediaRepo.getMediaFiles(original.id);
+    const originalIds = new Set(originalMedia.files.map((f) => f.id));
+    for (const file of dupMedia.files) {
+      assert.ok(!originalIds.has(file.id), `Duplicate media ID "${file.id}" should differ from original`);
+    }
   });
 });
 
@@ -1032,6 +1159,24 @@ describe("exportProject", () => {
 
     assert.equal(res._status, 404);
     assert.ok(res._json.error);
+  });
+
+  it("includes media metadata from SQLite in the ZIP", async () => {
+    const p = await createTestProject("Export Media Test");
+    const mediaData = createTestMediaData();
+    mediaRepo.writeMediaData(p.id, mediaData);
+
+    const { zip } = await exportTestProject(p.id);
+    const mediaEntry = zip.getEntry("uploads/media.json");
+    assert.ok(mediaEntry, "ZIP should contain uploads/media.json");
+
+    const exported = JSON.parse(mediaEntry.getData().toString("utf8"));
+    assert.equal(exported.files.length, 2);
+    assert.equal(exported.files[0].filename, "photo.jpg");
+    assert.equal(exported.files[0].type, "image/jpeg");
+    assert.deepEqual(exported.files[0].usedIn, ["index"]);
+    assert.ok(exported.files[0].sizes.thumb, "Should include size variants");
+    assert.equal(exported.files[1].filename, "banner.png");
   });
 });
 
@@ -1226,6 +1371,89 @@ describe("importProject", () => {
     const data = await readProjectsFile();
     assert.equal(data.projects.length, 0);
   });
+
+  it("restores media metadata from ZIP into SQLite", async () => {
+    const mediaData = createTestMediaData();
+    const zipBuffer = buildImportZip(baseManifest, {
+      "theme.json": { name: "Test Theme", version: "1.0.0" },
+      "uploads/media.json": mediaData,
+    });
+
+    const res = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+    assert.equal(res._status, 201);
+
+    // Media should be in SQLite
+    const imported = mediaRepo.getMediaFiles(res._json.id);
+    assert.equal(imported.files.length, 2);
+    assert.equal(imported.files[0].filename, "photo.jpg");
+    assert.equal(imported.files[1].filename, "banner.png");
+
+    // media.json should be cleaned up from disk
+    const mediaJsonPath = path.join(getProjectDir(res._json.folderName), "uploads", "media.json");
+    assert.ok(!(await fs.pathExists(mediaJsonPath)), "media.json should be removed after import");
+  });
+
+  it("regenerates media file IDs on import", async () => {
+    const mediaData = createTestMediaData();
+    const originalIds = mediaData.files.map((f) => f.id);
+
+    const zipBuffer = buildImportZip(baseManifest, {
+      "theme.json": { name: "Test Theme", version: "1.0.0" },
+      "uploads/media.json": mediaData,
+    });
+
+    const res = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+    assert.equal(res._status, 201);
+
+    const imported = mediaRepo.getMediaFiles(res._json.id);
+    assert.equal(imported.files.length, 2);
+
+    // IDs should be regenerated (not match originals)
+    for (const file of imported.files) {
+      assert.ok(!originalIds.includes(file.id), `Media file ID "${file.id}" should have been regenerated`);
+    }
+
+    // But metadata should be preserved
+    const photo = imported.files.find((f) => f.filename === "photo.jpg");
+    assert.ok(photo);
+    assert.equal(photo.type, "image/jpeg");
+    assert.equal(photo.path, "/uploads/images/photo.jpg");
+    assert.ok(photo.sizes.thumb, "Size variants should be preserved");
+  });
+
+  it("import media IDs don't collide with existing project", async () => {
+    // Create original project with media
+    const original = await createTestProject("Original With Media");
+    const mediaData = createTestMediaData();
+    mediaRepo.writeMediaData(original.id, mediaData);
+
+    // Export the original
+    const { res: exportRes } = await exportTestProject(original.id);
+    assert.equal(exportRes._status, 200);
+    const zipBuffer = exportRes.getBuffer();
+
+    // Import while original still exists
+    const importRes = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+    assert.equal(importRes._status, 201);
+
+    // Both projects should have media
+    const originalMedia = mediaRepo.getMediaFiles(original.id);
+    const importedMedia = mediaRepo.getMediaFiles(importRes._json.id);
+    assert.equal(originalMedia.files.length, 2);
+    assert.equal(importedMedia.files.length, 2);
+
+    // No ID overlap
+    const originalIds = new Set(originalMedia.files.map((f) => f.id));
+    for (const file of importedMedia.files) {
+      assert.ok(!originalIds.has(file.id), `Imported media ID "${file.id}" should not match any original ID`);
+    }
+  });
 });
 
 describe("exportProject → importProject round-trip", () => {
@@ -1260,5 +1488,43 @@ describe("exportProject → importProject round-trip", () => {
     // Both projects should exist
     const data = await readProjectsFile();
     assert.equal(data.projects.length, 2);
+  });
+
+  it("round-trips media metadata through export and import", async () => {
+    const original = await createTestProject("Media Round Trip");
+    const mediaData = createTestMediaData();
+    mediaRepo.writeMediaData(original.id, mediaData);
+
+    // Export
+    const { res: exportRes } = await exportTestProject(original.id);
+    assert.equal(exportRes._status, 200);
+    const zipBuffer = exportRes.getBuffer();
+
+    // Import
+    const importRes = await callController(importProject, {
+      file: { buffer: zipBuffer, size: zipBuffer.length },
+    });
+    assert.equal(importRes._status, 201);
+
+    // Imported project should have the same media files
+    const importedMedia = mediaRepo.getMediaFiles(importRes._json.id);
+    assert.equal(importedMedia.files.length, 2);
+
+    // Filenames, types, and paths preserved
+    const photo = importedMedia.files.find((f) => f.filename === "photo.jpg");
+    const banner = importedMedia.files.find((f) => f.filename === "banner.png");
+    assert.ok(photo, "photo.jpg should exist");
+    assert.ok(banner, "banner.png should exist");
+    assert.equal(photo.type, "image/jpeg");
+    assert.equal(photo.path, "/uploads/images/photo.jpg");
+    assert.ok(photo.sizes.thumb, "Sizes should be preserved");
+    assert.deepEqual(photo.usedIn, ["index"]);
+
+    // IDs should be different from originals
+    const originalMedia = mediaRepo.getMediaFiles(original.id);
+    const originalIds = new Set(originalMedia.files.map((f) => f.id));
+    for (const file of importedMedia.files) {
+      assert.ok(!originalIds.has(file.id), "Imported media IDs should be regenerated");
+    }
   });
 });

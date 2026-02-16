@@ -1,6 +1,7 @@
 import express from "express";
 import { body, param } from "express-validator";
 import * as menuController from "../controllers/menuController.js";
+import { stripHtmlTags } from "../services/sanitizationService.js";
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.get("/:id", [param("id").notEmpty().withMessage("Menu ID is required.")],
 // Create a new menu
 router.post(
   "/",
-  [body("name").notEmpty().withMessage("Menu name is required.").trim().escape()],
+  [body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required.")],
   menuController.createMenu,
 );
 
@@ -22,7 +23,7 @@ router.put(
   "/:id",
   [
     param("id").notEmpty().withMessage("Menu ID is required."),
-    body("name").notEmpty().withMessage("Menu name is required.").trim().escape(),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required."),
   ],
   menuController.updateMenu,
 );

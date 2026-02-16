@@ -58,13 +58,19 @@ export async function createMenu(menuData) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      // Handle express-validator format: { errors: [{msg, param}, ...] }
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
+      }
       throw new Error(errorData.error || "Failed to create menu");
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error creating menu:", error);
-    throw error;
+    if (error.message && !error.message.includes("Failed to fetch")) {
+      throw error;
+    }
+    throw new Error("Failed to create menu");
   }
 }
 
@@ -131,13 +137,20 @@ export async function updateMenu(id, menuData) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to update menu");
+      const errorData = await response.json();
+      // Handle express-validator format: { errors: [{msg, param}, ...] }
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
+      }
+      throw new Error(errorData.error || "Failed to update menu");
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error updating menu:", error);
-    throw error;
+    if (error.message && !error.message.includes("Failed to fetch")) {
+      throw error;
+    }
+    throw new Error("Failed to update menu");
   }
 }
 

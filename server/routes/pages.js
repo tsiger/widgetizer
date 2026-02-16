@@ -1,6 +1,7 @@
 import express from "express";
 import { body, param } from "express-validator";
 import * as pageController from "../controllers/pageController.js";
+import { stripHtmlTags } from "../services/sanitizationService.js";
 
 const router = express.Router();
 
@@ -13,7 +14,11 @@ router.get("/:id", [param("id").notEmpty().withMessage("Page ID is required.")],
 // Create a new page
 router.post(
   "/",
-  [body("name").notEmpty().withMessage("Page name is required.").trim().escape()],
+  [
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Page name is required."),
+    body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
+    body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
+  ],
   pageController.createPage,
 );
 
@@ -22,7 +27,9 @@ router.put(
   "/:id",
   [
     param("id").notEmpty().withMessage("Page ID is required."),
-    body("name").notEmpty().withMessage("Page name is required.").trim().escape(),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Page name is required."),
+    body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
+    body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
   ],
   pageController.updatePage,
 );
@@ -47,7 +54,11 @@ router.post(
 // Page editor content saving
 router.post(
   "/:id/content",
-  [param("id").notEmpty().withMessage("Page ID is required.")],
+  [
+    param("id").notEmpty().withMessage("Page ID is required."),
+    body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
+    body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
+  ],
   pageController.savePageContent,
 );
 

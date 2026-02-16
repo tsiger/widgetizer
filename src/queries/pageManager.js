@@ -118,6 +118,10 @@ export async function updatePage(id, pageData) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      // Handle express-validator format: { errors: [{msg, param}, ...] }
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
+      }
       throw new Error(errorData.message || errorData.error || "Failed to update page");
     }
 
@@ -150,12 +154,19 @@ export async function createPage(pageData) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to create page");
+      const errorData = await response.json();
+      // Handle express-validator format: { errors: [{msg, param}, ...] }
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
+      }
+      throw new Error(errorData.error || "Failed to create page");
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error creating page:", error);
+    if (error.message && !error.message.includes("Failed to fetch")) {
+      throw error;
+    }
     throw new Error("Failed to create page");
   }
 }

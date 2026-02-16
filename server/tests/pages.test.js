@@ -224,6 +224,34 @@ describe("createPage", () => {
     assert.deepEqual(page.seo, seo);
   });
 
+  it("preserves special characters in SEO fields without HTML-encoding", async () => {
+    const seo = {
+      description: 'About & "FAQ" \u2014 Company Info',
+      og_title: "Tom's Site \u2014 News & Updates",
+    };
+    const page = await createTestPage("SEO Special Chars", { seo });
+    assert.equal(page.seo.description, seo.description, "description should not be HTML-encoded");
+    assert.equal(page.seo.og_title, seo.og_title, "og_title should not be HTML-encoded");
+    assert.ok(!page.seo.description.includes("&amp;"), "ampersand should not be encoded in description");
+    assert.ok(!page.seo.og_title.includes("&#039;"), "apostrophe should not be encoded in og_title");
+  });
+
+  it("preserves full SEO round-trip with all fields", async () => {
+    const seo = {
+      description: "Full SEO test page",
+      og_title: "OG Full Title",
+      og_image: "/uploads/images/hero.jpg",
+      canonical_url: "https://example.com/full-seo",
+      robots: "noindex,follow",
+    };
+    const page = await createTestPage("Full SEO", { seo });
+    assert.equal(page.seo.description, seo.description);
+    assert.equal(page.seo.og_title, seo.og_title);
+    assert.equal(page.seo.og_image, seo.og_image);
+    assert.equal(page.seo.canonical_url, seo.canonical_url);
+    assert.equal(page.seo.robots, seo.robots);
+  });
+
   it("returns 404 when no active project", async () => {
     // Temporarily clear the active project
     const original = await readProjectsFile();
@@ -236,6 +264,30 @@ describe("createPage", () => {
 
     // Restore
     await writeProjectsFile(original);
+  });
+
+  it("preserves special characters in name without HTML-encoding", async () => {
+    const name = 'About & "FAQ" \u2014 Info';
+    const page = await createTestPage(name);
+    assert.equal(page.name, name, "name should not be HTML-encoded");
+    assert.ok(!page.name.includes("&amp;"), "ampersand should not be encoded");
+    assert.ok(!page.name.includes("&quot;"), "quotes should not be encoded");
+  });
+
+  it("rejects empty name (e.g. after HTML tags are stripped)", async () => {
+    const res = await callController(createPage, {
+      body: { name: "" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /name.*required/i);
+  });
+
+  it("rejects whitespace-only name", async () => {
+    const res = await callController(createPage, {
+      body: { name: "   " },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /name.*required/i);
   });
 });
 

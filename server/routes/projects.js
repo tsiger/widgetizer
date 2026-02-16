@@ -3,6 +3,7 @@ import { body, param } from "express-validator";
 import multer from "multer";
 import * as projectController from "../controllers/projectController.js";
 import { readAppSettingsFile } from "../controllers/appSettingsController.js";
+import { stripHtmlTags } from "../services/sanitizationService.js";
 
 const router = express.Router();
 
@@ -62,8 +63,8 @@ router.get("/active", projectController.getActiveProject);
 router.post(
   "/",
   [
-    body("name").notEmpty().withMessage("Project name is required.").trim().escape(),
-    body("description").trim().escape(),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required."),
+    body("description").trim().customSanitizer(stripHtmlTags),
     body("theme").notEmpty().withMessage("A theme is required to create a project."),
     body("preset").optional().isString().trim(),
   ],
@@ -82,8 +83,8 @@ router.put(
   "/:id",
   [
     param("id").notEmpty().withMessage("Project ID is required."),
-    body("name").notEmpty().withMessage("Project name is required.").trim().escape(),
-    body("description").trim().escape(),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required."),
+    body("description").trim().customSanitizer(stripHtmlTags),
   ],
   projectController.updateProject,
 );

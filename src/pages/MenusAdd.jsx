@@ -25,7 +25,7 @@ export default function MenusAdd() {
 
     try {
       const newMenu = await createMenu(formData);
-      showToast(t("menusAdd.toasts.createSuccess", { name: formData.name }), "success");
+      showToast(t("menusAdd.toasts.createSuccess", { name: newMenu.name }), "success");
 
       // Redirect to structure editor after successful creation
       skipNavigationGuardRef.current = true;

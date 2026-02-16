@@ -229,6 +229,27 @@ describe("createMenu", () => {
     const res2 = await createTestMenu("Menu B");
     assert.notEqual(res1._json.uuid, res2._json.uuid);
   });
+
+  it("preserves special characters in name without HTML-encoding", async () => {
+    const name = 'Nav & "Links" \u2014 Main';
+    const res = await createTestMenu(name);
+    assert.equal(res._status, 201);
+    assert.equal(res._json.name, name, "name should not be HTML-encoded");
+    assert.ok(!res._json.name.includes("&amp;"), "ampersand should not be encoded");
+    assert.ok(!res._json.name.includes("&quot;"), "quotes should not be encoded");
+  });
+
+  it("rejects empty name (e.g. after HTML tags are stripped)", async () => {
+    const res = await createTestMenu("");
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /name.*required/i);
+  });
+
+  it("rejects whitespace-only name", async () => {
+    const res = await createTestMenu("   ");
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /name.*required/i);
+  });
 });
 
 // ============================================================================
@@ -473,6 +494,24 @@ describe("updateMenu", () => {
     });
     assert.equal(res._json.uuid, originalUuid);
   });
+
+  it("rejects empty name on update", async () => {
+    const res = await callController(updateMenu, {
+      params: { id: "original-name" },
+      body: { name: "" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /name.*required/i);
+  });
+
+  it("rejects whitespace-only name on update", async () => {
+    const res = await callController(updateMenu, {
+      params: { id: "original-name" },
+      body: { name: "   " },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /name.*required/i);
+  });
 });
 
 // ============================================================================
@@ -569,9 +608,9 @@ describe("duplicateMenu", () => {
     // New IDs should not match the originals
     assert.notEqual(res._json.items[0].id, "orig_item_1");
     assert.notEqual(res._json.items[1].id, "orig_item_2");
-    // New IDs should follow the item_<timestamp>_<random> pattern
-    assert.match(res._json.items[0].id, /^item_\d+_\d+$/);
-    assert.match(res._json.items[1].id, /^item_\d+_\d+$/);
+    // New IDs should follow the item_<uuid> pattern
+    assert.match(res._json.items[0].id, /^item_[0-9a-f-]{36}$/);
+    assert.match(res._json.items[1].id, /^item_[0-9a-f-]{36}$/);
   });
 
   it("regenerates item IDs recursively (nested items)", async () => {
@@ -581,7 +620,7 @@ describe("duplicateMenu", () => {
     assert.equal(nestedItems.length, 2);
     assert.notEqual(nestedItems[0].id, "orig_sub_1");
     assert.notEqual(nestedItems[1].id, "orig_sub_2");
-    assert.match(nestedItems[0].id, /^item_\d+_\d+$/);
+    assert.match(nestedItems[0].id, /^item_[0-9a-f-]{36}$/);
   });
 
   it("sets new created and updated timestamps", async () => {

@@ -18,6 +18,7 @@ import {
   readProjectsData,
   writeProjectsData,
 } from "../db/repositories/projectRepository.js";
+import * as mediaRepo from "../db/repositories/mediaRepository.js";
 
 // Make sure the projects directory exists
 async function ensureDirectories() {
@@ -157,6 +158,12 @@ export async function createProject(req, res) {
 
   try {
     const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates, preset } = req.body;
+
+    // Defensive check: ensure name is not empty after sanitization
+    if (!name || typeof name !== "string" || name.trim() === "") {
+      return res.status(400).json({ error: "Project name is required." });
+    }
+
     const data = await readProjectsFile();
 
     // Check for duplicate project names
@@ -641,6 +648,12 @@ export async function updateProject(req, res) {
   try {
     const { id } = req.params;
     const updates = req.body;
+
+    // Defensive check: ensure name is not empty after sanitization
+    if (!updates.name || typeof updates.name !== "string" || updates.name.trim() === "") {
+      return res.status(400).json({ error: "Project name is required." });
+    }
+
     const data = await readProjectsFile();
 
     const projectIndex = data.projects.findIndex((p) => p.id === id);
@@ -763,6 +776,16 @@ export async function deleteProject(req, res) {
     const projectName = project.name;
     const projectFolderName = project.folderName;
 
+    // Clean up all exports for this project BEFORE removing from DB
+    // (writeProjectsFile triggers ON DELETE CASCADE which would delete export records first)
+    try {
+      const { cleanupProjectExports } = await import("./exportController.js");
+      await cleanupProjectExports(id);
+    } catch (exportCleanupError) {
+      console.warn(`Failed to clean up exports for project ${id}:`, exportCleanupError);
+      // Don't fail the project deletion if export cleanup fails
+    }
+
     // Remove from array AFTER we've captured the data we need
     data.projects.splice(projectIndex, 1);
     if (data.activeProjectId === id) {
@@ -774,15 +797,6 @@ export async function deleteProject(req, res) {
     // Delete project directory using the folderName we captured earlier
     const projectDir = getProjectDir(projectFolderName);
     await fs.remove(projectDir);
-
-    // Clean up all exports for this project
-    try {
-      const { cleanupProjectExports } = await import("./exportController.js");
-      await cleanupProjectExports(id);
-    } catch (exportCleanupError) {
-      console.warn(`Failed to clean up exports for project ${id}:`, exportCleanupError);
-      // Don't fail the project deletion if export cleanup fails
-    }
 
     res.json({
       success: true,
@@ -1050,6 +1064,21 @@ export async function duplicateProject(req, res) {
     // Add the new project to the list
     data.projects.push(newProject);
     await writeProjectsFile(data);
+
+    // Copy media metadata from original project to the duplicate in SQLite
+    try {
+      const originalMedia = mediaRepo.getMediaFiles(originalProjectId);
+      if (originalMedia.files && originalMedia.files.length > 0) {
+        // Regenerate media file IDs to avoid UNIQUE constraint conflicts
+        for (const file of originalMedia.files) {
+          file.id = uuidv4();
+        }
+        mediaRepo.writeMediaData(newProject.id, originalMedia);
+      }
+    } catch (mediaError) {
+      console.warn("Could not duplicate media metadata:", mediaError.message);
+      // Non-fatal: duplicated project files exist on disk
+    }
 
     res.status(201).json(newProject);
   } catch (error) {
@@ -1325,6 +1354,17 @@ export async function exportProject(req, res) {
 
     await addDirectory(projectDir);
 
+    // Serialize media metadata from SQLite into the ZIP
+    // (media metadata moved from uploads/media.json to SQLite, so it must be explicitly included)
+    try {
+      const mediaData = mediaRepo.getMediaFiles(project.id);
+      if (mediaData.files && mediaData.files.length > 0) {
+        archive.append(JSON.stringify(mediaData, null, 2), { name: "uploads/media.json" });
+      }
+    } catch (mediaError) {
+      console.warn("Could not export media metadata:", mediaError.message);
+    }
+
     // Finalize the archive
     await archive.finalize();
   } catch (error) {
@@ -1487,6 +1527,27 @@ export async function importProject(req, res) {
       // Only add project to projects.json AFTER successful file copy
       data.projects.push(newProject);
       await writeProjectsFile(data);
+
+      // Restore media metadata from the exported media.json into SQLite
+      const mediaJsonPath = path.join(projectDir, "uploads", "media.json");
+      try {
+        if (await fs.pathExists(mediaJsonPath)) {
+          const mediaData = await fs.readJson(mediaJsonPath);
+          if (mediaData.files && mediaData.files.length > 0) {
+            // Regenerate media file IDs to avoid UNIQUE constraint conflicts
+            // (the original project may still exist in the database)
+            for (const file of mediaData.files) {
+              file.id = uuidv4();
+            }
+            mediaRepo.writeMediaData(newProject.id, mediaData);
+          }
+          // Remove the media.json file — metadata now lives in SQLite
+          await fs.remove(mediaJsonPath);
+        }
+      } catch (mediaError) {
+        console.warn("Could not restore media metadata from export:", mediaError.message);
+        // Non-fatal: project is still usable, media files exist on disk
+      }
 
       // Clean up temporary directory
       await fs.remove(tempDir);

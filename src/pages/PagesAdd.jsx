@@ -26,8 +26,8 @@ export default function PagesAdd() {
     setIsSubmitting(true);
 
     try {
-      await createPage(formData);
-      showToast(t("pagesAdd.toasts.createSuccess", { name: formData.name }), "success");
+      const newPage = await createPage(formData);
+      showToast(t("pagesAdd.toasts.createSuccess", { name: newPage.name }), "success");
 
       // Invalidate media cache since SEO images may have been set
       const activeProject = useProjectStore.getState().activeProject;

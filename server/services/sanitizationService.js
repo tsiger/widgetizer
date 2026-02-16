@@ -1,6 +1,18 @@
 import DOMPurify from "isomorphic-dompurify";
 
 /**
+ * Strip all HTML tags from a string, keeping only the text content.
+ * Used for plain-text fields (names, descriptions) to prevent stored XSS
+ * without encoding special characters like & or ".
+ * @param {string} value - The input string
+ * @returns {string} Text with all HTML tags removed
+ */
+export function stripHtmlTags(value) {
+  if (typeof value !== "string") return value;
+  return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
+}
+
+/**
  * DOMPurify configuration for richtext fields.
  * Allows only the safe inline formatting tags produced by the Tiptap editor.
  * Text and textarea fields are handled by LiquidJS autoescape (outputEscape: "escape").

@@ -1,16 +1,4 @@
-# Widgetizer Beta Testing Script
-
 > **For beta testers.** Follow every step. Mark each one PASS or FAIL. If something breaks, write down exactly what you did, what you expected, and what happened instead. Screenshot everything that looks wrong.
-
----
-
-## Before You Start
-
-1. Open the app. You should see the main interface with a sidebar on the left.
-2. If this is a fresh install, the app should prompt you to create your first project.
-3. Keep a notepad open (or use the comment column in the spreadsheet) to log every issue.
-
----
 
 ## SECTION 1: PROJECTS
 
@@ -38,100 +26,182 @@
 
 1. On "Second Site" row, click the **star icon**.
 2. **Expected**: Toast says it's now active. Star fills in. First project's star unfills.
-3. Check the sidebar — the active project name at the top should now say "Second Site".
 
 ### 1.4 Edit a Project
 
 1. On "My Test Site" row, click the **pencil icon** (edit).
-2. Change the title to "My Renamed Site".
-3. Check that the **folder name** field updated (or is editable separately).
-4. Add a website URL like `https://example.com`.
-5. Click **"Save Changes"**.
-6. **Expected**: Success toast. Back on list, name shows "My Renamed Site".
+2. Themes cannot be changed after creation.
+3. Change the title to "My Renamed Site".
+4. Click on "More settings"
+5. Check that the **folder name** field did NOT change — folder name only changes if you edit it manually.
+6. Add a website URL like `https://example.com`.
+7. Add something to the **Notes** field (e.g., "Testing project").
+8. Click **"Save Changes"**.
+9. **Expected**: Success toast. Back on list, name shows "My Renamed Site".
+10. Click edit again. **Expected**: Notes and URL are still there.
 
-### 1.5 Duplicate a Project
+### 1.5 Edit a Project's Folder Name
 
-1. On "My Renamed Site" row, click the **copy icon**.
-2. **Expected**: Toast says project duplicated. A new project appears in the list (should have a similar name like "My Renamed Site (Copy)" or similar).
-3. Click edit on the duplicate. Verify it has the same theme, description, and URL as the original.
+1. Click the **pencil icon** on "My Renamed Site".
+2. Manually change the **folder name** to a new value (e.g., "renamed-site").
+3. Click **"Save Changes"**.
+4. **Expected**: Success toast. The backend renames the actual project directory.
+5. Click edit again. **Expected**: Folder name shows "renamed-site".
 
-### 1.6 Try to Delete the Active Project
+### 1.6 Upload Media to a Project
+
+1. Make sure "My Renamed Site" is the active project (click the star icon if it isn't already).
+2. Click **Media** in the sidebar.
+3. Upload 2-3 test images — drag-and-drop onto the upload area or click to browse.
+4. **Expected**: Images appear in the media library with thumbnails. File names, sizes, and types are shown.
+5. Go to **Pages**, open any page in the editor (e.g., "index"), and add or edit a widget that uses one of the uploaded images. Save the page.
+6. **Expected**: The image displays correctly in the widget preview.
+
+> This step ensures media exists for the duplicate, export, and import tests that follow.
+
+### 1.7 Duplicate a Project
+
+1. On "My Renamed Site" row, click the **Duplicate project** icon.
+2. **Expected**: Toast says project duplicated. A new project appears in the list with the title "Copy of My Renamed Site".
+3. Click edit on the duplicate. Verify the folder name has a "copy-of-" prefix (e.g., "copy-of-renamed-site"). Verify it has the same theme, notes, and URL as the original.
+4. Go to **Media** for the duplicate. **Expected**: Same media files as the original — all images you uploaded in step 1.6 should appear in the media library, not be missing.
+
+### 1.8 Try to Deactivate the Active Project
+
+1. The active project should have a filled star.
+2. Click the **star icon** on the active project.
+3. **Expected**: Nothing happens (or a message explaining you can't deactivate). You can only switch active to a different project.
+
+### 1.9 Try to Delete the Active Project
 
 1. The active project should have a filled star.
 2. Click the **trash icon** on the active project.
 3. **Expected**: You should NOT be able to delete it. Error message or disabled button. You should see something telling you it can't be deleted because it's active.
 
-### 1.7 Delete a Non-Active Project
+### 1.10 Delete a Non-Active Project
 
 1. Click the trash icon on a non-active project (like the duplicate you made).
 2. **Expected**: Confirmation dialog appears asking "Are you sure?"
 3. Click **"Delete"**.
 4. **Expected**: Toast confirms deletion. Project disappears from list.
 
-### 1.8 Export a Project
+### 1.11 Export a Project
 
-1. On any project row, click the **download/export icon**.
+1. On "My Renamed Site" row (which already has media from step 1.6), click the **download/export icon**.
 2. **Expected**: Toast says "Exporting project..." then a ZIP file downloads to your computer.
-3. Open the ZIP. It should contain a `project-export.json` file and folders with pages, menus, uploads, and theme files.
+3. Open the ZIP. It should contain:
+   - `project-export.json` manifest file
+   - `pages/` folder with page JSON files
+   - `menus/` folder (if menus exist)
+   - `uploads/media.json` with media metadata
+   - `uploads/images/` (or videos/audios) with the actual media files
+   - Theme files (`theme.json`, `layout.liquid`, etc.)
 
-### 1.9 Import a Project
+### 1.12 Import a Project
 
 1. Click **"Import Project"** button (should be in the page header area).
 2. An import modal should open.
 3. Drag the ZIP you just exported into the drop zone (or click to browse).
 4. **Expected**: Project imports successfully. Toast confirms. New project appears in the list with the original name.
-5. Open the imported project's pages/menus/media and verify the content matches the original.
+5. Open the imported project and verify:
+   - [ ] Pages list matches the original
+   - [ ] **Media library shows all uploaded images** (not empty!)
+   - [ ] Open a page in the editor — images used in widgets should display correctly
+   - [ ] Menus match the original structure
 
-### 1.10 Edge Cases to Try
+### 1.13 Navigation Guard on Edit
+
+1. Click **edit** on any project.
+2. Change the title but do **NOT** save.
+3. Try to navigate away (click Pages or Projects in the sidebar).
+4. **Expected**: Warning dialog about unsaved changes.
+5. Click Cancel/Stay. You should remain on the edit form.
+6. Save, then navigate away. No warning.
+
+### 1.14 Edge Cases to Try
 
 - [ ] Create a project with a very long name (100+ characters). Does it handle it?
-- [ ] Create a project with special characters in the name (`Test & Site #1 — "Quotes"`). Does it work?
-- [ ] Create two projects with the same name. Does it handle the conflict?
+- [ ] Create a project with special characters in the name (`Test & Site #1 — "Quotes"`). Does it work? The name should be stored exactly as typed — no `&amp;` or `&quot;` encoding.
+- [ ] Create a project with HTML in the name (`My Site <script>alert('xss')</script>`). The HTML tags should be stripped — stored name should be just `My Site`. No script tags in the database or UI.
+- [ ] Create a project with ONLY `<script>alert(1)</script>` as the name (no other text). Should be **rejected** — error toast says name is required.
+- [ ] Enter `<script>alert(1)</script>` in the **Notes/Description** field. Save, edit again — script tags should be stripped, only empty or no text remains.
+- [ ] Enter `<script>alert(1)</script>` in the **Website URL** field. Should be rejected by URL validation.
+- [ ] Enter `<script>alert(1)</script>` in the **Folder Name** field. Should be rejected — folder name only allows lowercase letters, numbers, and hyphens.
+- [ ] Create two projects with the same name. Does it handle the folder name conflict (should auto-append a number)?
+- [ ] Edit a project's folder name to match an existing project's folder. Does it prevent the conflict?
+- [ ] Enter an invalid website URL (e.g., "not a url"). Does validation catch it?
 - [ ] Try importing a random ZIP file that isn't a Widgetizer export. Does it show a clear error?
 - [ ] Try importing a ZIP that's too large (if you can). Does it respect the size limit in settings?
+- [ ] Import a project whose theme doesn't exist in this installation. Does it show a clear error?
+- [ ] Export a project with media, then import it twice (while the original still exists). Both imports should succeed — media should not collide.
+- [ ] Duplicate a project with media. Does the duplicate's media library show all files? Are images in widgets still working?
+- [ ] Delete a project that has media. Does everything clean up properly? (No orphaned data.)
 
 ---
 
 ## SECTION 2: PAGES
 
-### 2.1 Create a Page
+> The Arch theme ships with 8 pre-made pages: Home (index), About, Services, Case Studies, Case Study: Atlas Group, Contact, Privacy Policy, and Terms of Service. These tests work with those existing pages.
 
-1. Make sure you have an active project. Click **Pages** in the sidebar.
-2. Click **"New Page"** button.
-3. Fill in:
-   - **Name**: "About Us"
-   - The **slug** should auto-generate as "about-us". If you can edit it, leave it for now.
-4. Expand the **SEO Settings** section (if collapsible).
-5. Fill in a meta description.
-6. Click **"Create Page"**.
-7. **Expected**: Success toast. Page appears in the list.
+### 2.1 Verify Theme Pages Loaded
 
-### 2.2 Create More Pages
+1. Make sure you have an active project (created with the Arch theme). Click **Pages** in the sidebar.
+2. **Expected**: 8 pages are listed:
+   - Home (`index`)
+   - About (`about`)
+   - Services (`services`)
+   - Case Studies (`case-studies`)
+   - Case Study: Atlas Group (`case-study-atlas-growth`)
+   - Contact (`contact`)
+   - Privacy Policy (`privacy`)
+   - Terms of Service (`terms`)
+3. Verify each page has the correct slug shown above.
 
-1. Create pages with these names:
-   - "Services"
-   - "Contact"
-   - "Blog"
-   - "Home" (or check if one already exists as "index")
-2. **Expected**: All appear in the page list. Each has a unique slug.
+### 2.2 Create a New Page with Full SEO
 
-### 2.3 Edit a Page
+1. Click **"New Page"** button.
+2. Fill in:
+   - **Name**: "Blog"
+   - The **slug** should auto-generate as "blog".
+3. Click **"More Settings"** to expand the SEO section.
+4. Fill in **every** SEO field:
+   - **Meta description**: "Our latest articles and insights"
+   - **Social media title**: "Blog — My Renamed Site"
+   - **Social media image**: Click **Browse**, pick one of the images you uploaded in step 1.6
+   - **Canonical URL**: `https://example.com/blog`
+   - **Search engine indexing**: Change the dropdown to **"noindex, follow"**
+5. Click **"Create Page"**.
+6. **Expected**: Success toast. "Blog" appears in the page list alongside the 8 theme pages.
+7. Click the **pencil icon** on "Blog" to edit it again.
+8. **Expected**: All SEO fields you just set are still there — description, social media title, social media image, canonical URL, and indexing set to "noindex, follow".
+9. Go to **Media**. Find the image you selected as the social media image.
+10. **Expected**: That image shows as **"in use"** by the Blog page.
 
-1. Click the **pencil icon** on "About Us".
+### 2.3 Edit an Existing Page
+
+1. Click the **pencil icon** on "About".
 2. Change the name to "About Our Company".
-3. Change the slug to "about".
-4. Add SEO metadata if not already done.
+3. Change the slug to "about-us".
+4. Click **"More Settings"** and update SEO fields:
+   - **Meta description**: "Learn about our team and mission"
+   - **Social media title**: "About Us — My Renamed Site"
+   - **Social media image**: Click Browse and pick a **different** image than the one you used for Blog
+   - **Search engine indexing**: Set to **"index, follow"** (default)
 5. Click **"Save"**.
-6. **Expected**: Toast confirms. Slug updated.
+6. **Expected**: Toast confirms. Page list shows "About Our Company" with slug "about-us".
+7. Go to **Media**. Check the image you just set as the OG image.
+8. **Expected**: It shows as "in use" by the About page.
 
 ### 2.4 Duplicate a Page
 
-1. Click the **copy icon** on any page.
-2. **Expected**: New page appears with "-copy" appended to the slug (e.g., "about-copy"). New name visible.
+1. Click the **copy icon** on "Contact".
+2. **Expected**: New page appears with "Copy of Contact" as the name and "contact-copy" (or similar "-copy" suffix) as the slug.
+3. Click the **pencil icon** on the duplicate.
+4. **Expected**: SEO fields are copied from the original Contact page (if it had any set).
 
 ### 2.5 Delete a Single Page
 
-1. Click the **trash icon** on the duplicated page.
+1. Click the **trash icon** on the "Copy of Contact" duplicate you just made.
 2. **Expected**: Confirmation modal. Confirm. Page gone. Toast confirms.
 
 ### 2.6 Bulk Delete Pages
@@ -140,14 +210,23 @@
 2. Check the **checkboxes** on all three rows.
 3. A "Delete Selected" button should appear (with a count like "3 selected").
 4. Click **"Delete Selected"**.
-5. **Expected**: Confirmation modal showing the count. Confirm. All three gone.
+5. **Expected**: Confirmation modal showing the count. Confirm. All three gone. The theme pages should still be there.
 
 ### 2.7 Edge Cases to Try
 
-- [ ] Create a page with the same slug as an existing page. Does it auto-append a number?
-- [ ] Create a page with special characters in the name. Does the slug sanitize properly?
-- [ ] Edit a page slug to match another existing page. Does it prevent the conflict?
+- [ ] Create a page with the same slug as an existing theme page (e.g., name it "About" — slug would be `about`). Does it auto-append a number (e.g., `about-1`)?
+- [ ] Create a page with special characters in the name (e.g., `About & "FAQ" — Info`). Does the slug sanitize properly? Is the name stored without HTML-encoding?
+- [ ] Create a page with HTML in the name (`My Page <img src=x onerror=alert(1)>`). HTML tags should be stripped — name should be just `My Page`.
+- [ ] Create a page with ONLY `<script>alert(1)</script>` as the name (no other text). Should be **rejected** — error toast says name is required.
+- [ ] Enter `<script>alert(1)</script>` in the **slug** field. Should be rejected or sanitized to empty (slug only allows lowercase letters, numbers, and hyphens).
+- [ ] Edit a page slug to match another existing page's slug. Does it prevent the conflict?
 - [ ] Try to navigate away from the page form with unsaved changes. Does a warning appear?
+- [ ] Enter `<script>alert(1)</script>` in the **meta description** field. Save. Edit again — the script tags should be stripped, only plain text remains.
+- [ ] Enter `<script>alert(1)</script>` in the **social media title** field. Save. Edit again — the script tags should be stripped, only plain text remains.
+- [ ] Enter `<script>alert(1)</script>` in the **canonical URL** field. Should be rejected by URL validation.
+- [ ] Set a social media image on a page, then go to **Media** and delete that image. Go back and edit the page — what happens to the social media image field?
+- [ ] Enter an invalid **canonical URL** (e.g., "not a url"). Does validation catch it?
+- [ ] Export the site. Open the HTML source of a page. Check the `<meta>` tags — all content attributes should be properly escaped (no raw HTML in `content="..."`).
 
 ---
 
@@ -332,6 +411,12 @@
 - [ ] Clear all text from a required-looking field. What happens in the preview?
 - [ ] Paste very long text (5000+ characters) into a text field. Does it handle it?
 - [ ] Paste HTML into a plain text field. Is it escaped properly in the preview?
+- [ ] Enter `<script>alert(1)</script>` in a widget **title** field. The preview should escape it (show the text literally or strip it) — no alert box should pop up.
+- [ ] Enter `<script>alert(1)</script>` in a widget **description/text** field. Same behavior — escaped or stripped in preview, no script execution.
+- [ ] Enter `<script>alert(1)</script>` in a **link text** field. Should be escaped in preview — no script execution.
+- [ ] Enter `<script>alert(1)</script>` in a **link URL** field (external URL). Should be rejected or sanitized — no `javascript:` protocol, no script execution.
+- [ ] Paste `<script>alert(1)</script>` into a **rich text editor** field. DOMPurify should strip the script tags. Only safe formatting tags allowed.
+- [ ] Enter `<script>alert(1)</script>` in the **code editor** (CSS/HTML field). Code fields intentionally allow raw code — verify it does NOT execute in the preview (should be properly sandboxed).
 - [ ] Upload a very large image through the widget image browser. Does it work?
 - [ ] Rapidly click undo 50 times. Does it handle it without crashing?
 - [ ] Open the same page in two browser tabs. Edit in both. Save both. What happens?
@@ -435,6 +520,8 @@
 - [ ] Upload a potentially malicious SVG (one with JavaScript inside). Is it sanitized?
 - [ ] Upload a 0-byte file. What happens?
 - [ ] Try to upload while offline / with network disconnected. Error handling?
+- [ ] Enter `<script>alert(1)</script>` in the **alt text** field of a media file. Save. Edit again — should be escaped or stripped. Check the exported HTML — alt attribute must not contain executable script.
+- [ ] Enter `<script>alert(1)</script>` in the **title** field of a media file. Save. Edit again — should be escaped or stripped.
 
 ---
 
@@ -528,6 +615,11 @@
 
 - [ ] Create a menu with 50+ items. Performance?
 - [ ] Create deeply nested items (3+ levels). Does the UI handle it?
+- [ ] Create a menu with special characters in the name (e.g., `Nav & "Links"`). Is the name stored without HTML-encoding?
+- [ ] Create a menu with HTML in the name (`Menu <script>alert(1)</script>`). HTML tags should be stripped — name should be just `Menu`.
+- [ ] Create a menu with ONLY `<script>alert(1)</script>` as the name (no other text). Should be **rejected** — error toast says name is required.
+- [ ] Enter `<script>alert(1)</script>` as a **menu item label**. Save. Edit again — should be escaped or stripped. Check the preview and exported HTML — no script execution.
+- [ ] Enter `<script>alert(1)</script>` as a **menu item external URL**. Save. Check the preview — the link should not execute scripts. Exported HTML href should be escaped or removed.
 - [ ] Add a menu item with no label. What happens?
 - [ ] Add a menu item with no link. What happens?
 - [ ] Save menu, delete it, try to use it in a header widget. What shows?
@@ -626,6 +718,16 @@ Go through each setting type you find and test it:
 3. Navigate to a DIFFERENT page in the editor.
 4. **Expected**: Same theme color applies (theme settings are global).
 5. Close the editor. Reopen. **Expected**: Setting still there.
+
+### 7.4 Edge Cases to Try
+
+- [ ] Enter `<script>alert(1)</script>` in a theme **text input** setting. Save. Preview should escape it — no alert box. Exported HTML should have it escaped in the output.
+- [ ] Enter `<script>alert(1)</script>` in a theme **textarea** setting. Save. Same behavior — escaped in preview, no execution.
+- [ ] Enter `<script>alert(1)</script>` in a theme **color picker** (typed as hex value). Should be rejected or ignored — not a valid color.
+- [ ] Paste `<script>alert(1)</script>` into a theme **rich text editor** setting. DOMPurify should strip the script tags. Only safe formatting tags remain.
+- [ ] Enter `<script>alert(1)</script>` in a theme **code editor** (CSS/HTML) setting. Code fields allow raw code — verify it renders correctly without breaking the page layout (CSS context) or that it's properly sandboxed.
+- [ ] Enter `<script>alert(1)</script>` as a **YouTube URL** in a YouTube input. Should not execute — should be rejected or show an error/empty embed.
+- [ ] Enter `<script>alert(1)</script>` in a theme **link URL** field. Should be rejected or sanitized.
 
 ---
 
@@ -776,6 +878,10 @@ Open an exported site and check:
 - [ ] Set max file size to a negative number. Does it validate?
 - [ ] Set max versions to keep to 0. Does it validate?
 - [ ] Set all image sizes to disabled. Upload an image. Does thumb still get generated?
+- [ ] Enter `<script>alert(1)</script>` in the **image quality** field (numeric input). Should be rejected — not a valid number.
+- [ ] Enter `<script>alert(1)</script>` in the **max file size** field. Should be rejected — not a valid number.
+- [ ] Enter `<script>alert(1)</script>` in the **max versions to keep** field. Should be rejected — not a valid number.
+- [ ] Enter `<script>alert(1)</script>` in the **max import size** field. Should be rejected — not a valid number.
 
 ---
 
@@ -805,11 +911,13 @@ These tests verify that different features work together correctly.
    - [ ] Pages list matches original
    - [ ] Page editor widgets and settings match
    - [ ] Menus match (with all items and nesting)
-   - [ ] Media links in widgets still work
+   - [ ] **Media library shows all files from the original** (not empty!)
+   - [ ] Media links in widgets still work (images display correctly)
    - [ ] Menu links in header/footer still work
    - [ ] Internal page links in widgets still work
 4. Edit something in the duplicate.
 5. Go back to the original. **Expected**: Original unchanged.
+6. Delete media from the duplicate. **Expected**: Original's media is NOT affected.
 
 ### 10.3 Page Rename Ripple Effect
 
@@ -845,16 +953,19 @@ These tests verify that different features work together correctly.
 ### 10.6 Import → Export Round-Trip
 
 1. Create a fully-built project (pages, widgets, media, menus, settings).
-2. Export the project as a ZIP (project export, not site export).
-3. Delete the project.
-4. Import the ZIP.
-5. Compare: Does the imported project match the original?
+2. **Upload several images** and use them in widget settings on different pages.
+3. Export the project as a ZIP (project export, not site export).
+4. Delete the project.
+5. Import the ZIP.
+6. Compare: Does the imported project match the original?
    - [ ] Same pages with same content
    - [ ] Same menus with same structure
-   - [ ] Same media files
+   - [ ] **Media library shows all uploaded files** (not empty!)
+   - [ ] **Images in widgets display correctly** (not broken)
    - [ ] Same theme settings
    - [ ] Same widget configurations
-6. Export the imported project as a site. View it. Does it match what the original would have produced?
+7. Export the imported project as a site. View it. Does it match what the original would have produced?
+8. **Bonus**: Import the same ZIP again (without deleting the first import). Both imported projects should work independently with their own media.
 
 ### 10.7 Concurrent Editing Stress Test
 
@@ -892,6 +1003,7 @@ Test each keyboard shortcut:
 ### 12.1 Browser Compatibility
 
 Test the entire app in:
+
 - [ ] Chrome (latest)
 - [ ] Firefox (latest)
 - [ ] Safari (latest, if on Mac)
@@ -973,6 +1085,7 @@ NOTES: [anything extra]
 ```
 
 **Severity guide:**
+
 - **Critical**: App crashes, data loss, can't complete a core task
 - **Major**: Feature broken, ugly workaround needed
 - **Minor**: Feature works but something is off (wrong message, slow, weird behavior)

@@ -75,6 +75,10 @@ export async function createProject(projectData) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      // Handle express-validator format: { errors: [{msg, param}, ...] }
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
+      }
       throw new Error(errorData.error || "Failed to create project");
     }
 
@@ -130,6 +134,10 @@ export async function updateProject(projectId, updates) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      // Handle express-validator format: { errors: [{msg, param}, ...] }
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
+      }
       throw new Error(errorData.error || "Failed to update project");
     }
 

@@ -496,6 +496,12 @@ export async function createPage(req, res) {
 
   try {
     const pageData = req.body; // Get all data including SEO
+
+    // Defensive check: ensure name is not empty after sanitization
+    if (!pageData.name || typeof pageData.name !== "string" || pageData.name.trim() === "") {
+      return res.status(400).json({ error: "Page name is required." });
+    }
+
     const { projects, activeProjectId } = await readProjectsFile();
     const activeProject = projects.find((p) => p.id === activeProjectId);
 

@@ -88,6 +88,12 @@ export async function createMenu(req, res) {
 
   try {
     const { name, description, id: requestedId } = req.body;
+
+    // Defensive check: ensure name is not empty after sanitization
+    if (!name || typeof name !== "string" || name.trim() === "") {
+      return res.status(400).json({ error: "Menu name is required." });
+    }
+
     const { projects, activeProjectId } = await readProjectsFile();
     const activeProject = projects.find((p) => p.id === activeProjectId);
 
@@ -209,6 +215,11 @@ export async function updateMenu(req, res) {
     const menuId = req.params.id;
     const menuData = req.body;
 
+    // Defensive check: ensure name is not empty after sanitization
+    if (!menuData.name || typeof menuData.name !== "string" || menuData.name.trim() === "") {
+      return res.status(400).json({ error: "Menu name is required." });
+    }
+
     const { projects, activeProjectId } = await readProjectsFile();
     const activeProject = projects.find((p) => p.id === activeProjectId);
 
@@ -283,7 +294,7 @@ function generateNewMenuItemIds(items) {
   return items.map((item) => {
     const newItem = {
       ...item,
-      id: `item_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      id: `item_${randomUUID()}`,
     };
 
     // Recursively handle nested items
