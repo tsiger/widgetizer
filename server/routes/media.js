@@ -1,5 +1,6 @@
 import express from "express";
 import { param, body } from "express-validator";
+import { stripHtmlTags } from "../services/sanitizationService.js";
 import {
   getProjectMedia,
   uploadProjectMedia,
@@ -39,7 +40,13 @@ router.post(
 // Update media metadata
 router.put(
   "/projects/:projectId/media/:fileId/metadata",
-  [param("projectId").notEmpty(), param("fileId").notEmpty()],
+  [
+    param("projectId").notEmpty(),
+    param("fileId").notEmpty(),
+    body("alt").optional().trim().customSanitizer(stripHtmlTags),
+    body("title").optional().trim().customSanitizer(stripHtmlTags),
+    body("description").optional().trim().customSanitizer(stripHtmlTags),
+  ],
   updateMediaMetadata,
 );
 

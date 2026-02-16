@@ -752,4 +752,48 @@ describe("ThemeSettingsTag", () => {
     const result = await render("{% theme_settings %}", {}, {});
     assert.equal(result, "");
   });
+
+  it("escapes <> in CSS variable values to prevent style tag breakout", async () => {
+    const maliciousTheme = {
+      settings: {
+        global: {
+          colors: [
+            {
+              id: "bg",
+              type: "color",
+              outputAsCssVar: true,
+              value: '</style><script>alert(1)</script>',
+            },
+          ],
+        },
+      },
+    };
+    const result = await render("{% theme_settings %}", {}, { themeSettingsRaw: maliciousTheme });
+    // The value should have < and > stripped, preventing script injection
+    assert.doesNotMatch(result, /<script/i);
+    // The CSS variable value should not contain angle brackets
+    assert.match(result, /--colors-bg: \/stylescriptalert\(1\)\/script;/);
+  });
+
+  it("escapes {} in CSS variable values to prevent CSS injection", async () => {
+    const maliciousTheme = {
+      settings: {
+        global: {
+          custom: [
+            {
+              id: "val",
+              type: "text",
+              outputAsCssVar: true,
+              value: "red; } body { display: none; } :root {",
+            },
+          ],
+        },
+      },
+    };
+    const result = await render("{% theme_settings %}", {}, { themeSettingsRaw: maliciousTheme });
+    // The CSS variable value should not contain any braces
+    const valueMatch = result.match(/--custom-val:\s*([^;]+);/);
+    assert.ok(valueMatch, "CSS variable should be present");
+    assert.doesNotMatch(valueMatch[1], /[{}]/, "CSS variable value should not contain braces");
+  });
 });

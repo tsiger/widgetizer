@@ -14,7 +14,10 @@ router.get("/:id", [param("id").notEmpty().withMessage("Menu ID is required.")],
 // Create a new menu
 router.post(
   "/",
-  [body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required.")],
+  [
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required."),
+    body("description").optional().trim().customSanitizer(stripHtmlTags),
+  ],
   menuController.createMenu,
 );
 
@@ -24,6 +27,7 @@ router.put(
   [
     param("id").notEmpty().withMessage("Menu ID is required."),
     body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required."),
+    body("description").optional().trim().customSanitizer(stripHtmlTags),
   ],
   menuController.updateMenu,
 );

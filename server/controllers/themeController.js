@@ -19,6 +19,7 @@ import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
 import { updateThemeSettingsMediaUsage } from "../services/mediaUsageService.js";
+import { sanitizeThemeSettings } from "../services/sanitizationService.js";
 
 /**
  * Ensure the themes directory exists, creating it if necessary.
@@ -1301,17 +1302,22 @@ export async function saveProjectThemeSettings(req, res) {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Write theme data to file
-    await fs.writeFile(themeFile, JSON.stringify(req.body, null, 2));
+    // Validate and sanitize theme settings before writing
+    const { data: sanitizedThemeData, warnings } = sanitizeThemeSettings(req.body);
+    await fs.writeFile(themeFile, JSON.stringify(sanitizedThemeData, null, 2));
 
     // Track media used in theme settings (e.g. favicon) for usage and export
     try {
-      await updateThemeSettingsMediaUsage(projectId, req.body);
+      await updateThemeSettingsMediaUsage(projectId, sanitizedThemeData);
     } catch (usageError) {
       console.warn("Failed to update theme settings media usage:", usageError.message);
     }
 
-    res.json({ message: "Theme settings saved successfully" });
+    const response = { message: "Theme settings saved successfully" };
+    if (warnings.length > 0) {
+      response.warnings = warnings;
+    }
+    res.json(response);
   } catch (error) {
     if (handleProjectResolutionError(res, error)) return;
     console.error("Error saving project theme:", error);

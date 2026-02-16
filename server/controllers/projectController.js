@@ -19,6 +19,7 @@ import {
   writeProjectsData,
 } from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
+import { stripHtmlTags } from "../services/sanitizationService.js";
 
 // Make sure the projects directory exists
 async function ensureDirectories() {
@@ -237,7 +238,7 @@ export async function createProject(req, res) {
       themeVersion, // Version that was installed
       preset: preset || null, // Track which preset was used
       receiveThemeUpdates: receiveThemeUpdates || false, // Opt-in flag (default: off)
-      siteUrl: siteUrl && siteUrl.trim() !== "" ? siteUrl.trim() : "",
+      siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlTags(siteUrl.trim()) : "",
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
@@ -731,7 +732,7 @@ export async function updateProject(req, res) {
       siteUrl:
         updates.siteUrl !== undefined
           ? updates.siteUrl && updates.siteUrl.trim() !== ""
-            ? updates.siteUrl.trim()
+            ? stripHtmlTags(updates.siteUrl.trim())
             : ""
           : updatedProject.siteUrl,
       // Theme update preferences

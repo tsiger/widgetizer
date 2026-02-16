@@ -45,7 +45,7 @@
 1. Click the **pencil icon** on "My Renamed Site".
 2. Manually change the **folder name** to a new value (e.g., "renamed-site").
 3. Click **"Save Changes"**.
-4. **Expected**: Success toast. The backend renames the actual project directory.
+4. **Expected**: Success toast. The project's folder is renamed behind the scenes.
 5. Click edit again. **Expected**: Folder name shows "renamed-site".
 
 ### 1.6 Upload Media to a Project
@@ -120,22 +120,22 @@
 
 ### 1.14 Edge Cases to Try
 
-- [ ] Create a project with a very long name (100+ characters). Does it handle it?
-- [ ] Create a project with special characters in the name (`Test & Site #1 — "Quotes"`). Does it work? The name should be stored exactly as typed — no `&amp;` or `&quot;` encoding.
-- [ ] Create a project with HTML in the name (`My Site <script>alert('xss')</script>`). The HTML tags should be stripped — stored name should be just `My Site`. No script tags in the database or UI.
-- [ ] Create a project with ONLY `<script>alert(1)</script>` as the name (no other text). Should be **rejected** — error toast says name is required.
-- [ ] Enter `<script>alert(1)</script>` in the **Notes/Description** field. Save, edit again — script tags should be stripped, only empty or no text remains.
-- [ ] Enter `<script>alert(1)</script>` in the **Website URL** field. Should be rejected by URL validation.
-- [ ] Enter `<script>alert(1)</script>` in the **Folder Name** field. Should be rejected — folder name only allows lowercase letters, numbers, and hyphens.
-- [ ] Create two projects with the same name. Does it handle the folder name conflict (should auto-append a number)?
-- [ ] Edit a project's folder name to match an existing project's folder. Does it prevent the conflict?
-- [ ] Enter an invalid website URL (e.g., "not a url"). Does validation catch it?
-- [ ] Try importing a random ZIP file that isn't a Widgetizer export. Does it show a clear error?
-- [ ] Try importing a ZIP that's too large (if you can). Does it respect the size limit in settings?
-- [ ] Import a project whose theme doesn't exist in this installation. Does it show a clear error?
-- [ ] Export a project with media, then import it twice (while the original still exists). Both imports should succeed — media should not collide.
-- [ ] Duplicate a project with media. Does the duplicate's media library show all files? Are images in widgets still working?
-- [ ] Delete a project that has media. Does everything clean up properly? (No orphaned data.)
+- [ ] Create a project with a very long name (100+ characters). **Expected**: It should handle it without errors.
+- [ ] Create a project with special characters in the name (`Test & Site #1 — "Quotes"`). **Expected**: It works and the name is stored exactly as you typed it — no weird characters like `&amp;` appearing instead.
+- [ ] Create a project with code in the name (`My Site <script>alert('xss')</script>`). **Expected**: The code part is removed — the stored name should be just "My Site".
+- [ ] Create a project with ONLY `<script>alert(1)</script>` as the name (no other text). **Expected**: Rejected — error toast says the name is required (since the code gets stripped, nothing is left).
+- [ ] Enter `<script>alert(1)</script>` in the **Notes/Description** field. Save, edit again. **Expected**: The code is removed — the field should be empty or contain only plain text.
+- [ ] Enter `<script>alert(1)</script>` in the **Website URL** field. **Expected**: Rejected — it's not a valid URL.
+- [ ] Enter `<script>alert(1)</script>` in the **Folder Name** field. **Expected**: Rejected — folder names only allow lowercase letters, numbers, and hyphens.
+- [ ] Create two projects with the same name. **Expected**: The second project gets a slightly different folder name (e.g., with a number added) to avoid conflict.
+- [ ] Edit a project's folder name to match an existing project's folder. **Expected**: It should prevent the conflict.
+- [ ] Enter an invalid website URL (e.g., "not a url"). **Expected**: Validation catches it and shows an error.
+- [ ] Try importing a random ZIP file that isn't a Widgetizer export. **Expected**: A clear error message appears.
+- [ ] Try importing a ZIP that's too large (if you can). **Expected**: It respects the size limit set in Settings and shows an error.
+- [ ] Import a project whose theme doesn't exist in this installation. **Expected**: A clear error message appears.
+- [ ] Export a project with media, then import it twice (while the original still exists). **Expected**: Both imports should succeed — no file conflicts.
+- [ ] Duplicate a project with media. **Expected**: The duplicate's media library shows all files and images in widgets still display correctly.
+- [ ] Delete a project that has media. **Expected**: Everything is cleaned up properly — no leftover files or data.
 
 ---
 
@@ -189,7 +189,7 @@
    - **Search engine indexing**: Set to **"index, follow"** (default)
 5. Click **"Save"**.
 6. **Expected**: Toast confirms. Page list shows "About Our Company" with slug "about-us".
-7. Go to **Media**. Check the image you just set as the OG image.
+7. Go to **Media**. Check the image you just set as the social media image.
 8. **Expected**: It shows as "in use" by the About page.
 
 ### 2.4 Duplicate a Page
@@ -214,19 +214,19 @@
 
 ### 2.7 Edge Cases to Try
 
-- [ ] Create a page with the same slug as an existing theme page (e.g., name it "About" — slug would be `about`). Does it auto-append a number (e.g., `about-1`)?
-- [ ] Create a page with special characters in the name (e.g., `About & "FAQ" — Info`). Does the slug sanitize properly? Is the name stored without HTML-encoding?
-- [ ] Create a page with HTML in the name (`My Page <img src=x onerror=alert(1)>`). HTML tags should be stripped — name should be just `My Page`.
-- [ ] Create a page with ONLY `<script>alert(1)</script>` as the name (no other text). Should be **rejected** — error toast says name is required.
-- [ ] Enter `<script>alert(1)</script>` in the **slug** field. Should be rejected or sanitized to empty (slug only allows lowercase letters, numbers, and hyphens).
-- [ ] Edit a page slug to match another existing page's slug. Does it prevent the conflict?
-- [ ] Try to navigate away from the page form with unsaved changes. Does a warning appear?
-- [ ] Enter `<script>alert(1)</script>` in the **meta description** field. Save. Edit again — the script tags should be stripped, only plain text remains.
-- [ ] Enter `<script>alert(1)</script>` in the **social media title** field. Save. Edit again — the script tags should be stripped, only plain text remains.
-- [ ] Enter `<script>alert(1)</script>` in the **canonical URL** field. Should be rejected by URL validation.
-- [ ] Set a social media image on a page, then go to **Media** and try to delete that image. Should be **blocked** — the image is in use and deletion should fail with a clear error.
-- [ ] Enter an invalid **canonical URL** (e.g., "not a url"). Does validation catch it?
-- [ ] Export the site. Open the HTML source of a page. Check the `<meta>` tags — all content attributes should be properly escaped (no raw HTML in `content="..."`).
+- [ ] Create a page with the same slug as an existing theme page (e.g., name it "About" — slug would be `about`). **Expected**: It auto-adds a number to the slug (e.g., `about-1`) to avoid a conflict.
+- [ ] Create a page with special characters in the name (e.g., `About & "FAQ" — Info`). **Expected**: The slug is cleaned up to only use simple characters. The name is stored exactly as typed — no weird characters like `&amp;` appearing instead.
+- [ ] Create a page with code in the name (`My Page <img src=x onerror=alert(1)>`). **Expected**: The code part is removed — name should be just "My Page".
+- [ ] Create a page with ONLY `<script>alert(1)</script>` as the name (no other text). **Expected**: Rejected — error toast says the name is required (since the code gets stripped, nothing is left).
+- [ ] Enter `<script>alert(1)</script>` in the **slug** field. **Expected**: Rejected or cleaned up to empty — slugs only allow lowercase letters, numbers, and hyphens.
+- [ ] Edit a page slug to match another existing page's slug. **Expected**: It prevents the conflict.
+- [ ] Try to navigate away from the page form with unsaved changes. **Expected**: A warning dialog appears.
+- [ ] Enter `<script>alert(1)</script>` in the **meta description** field. Save. Edit again. **Expected**: The code is removed, only plain text remains.
+- [ ] Enter `<script>alert(1)</script>` in the **social media title** field. Save. Edit again. **Expected**: The code is removed, only plain text remains.
+- [ ] Enter `<script>alert(1)</script>` in the **canonical URL** field. **Expected**: Rejected — it's not a valid URL.
+- [ ] Set a social media image on a page, then go to **Media** and try to delete that image. **Expected**: Deletion is blocked — you should see an error saying the image is in use by that page.
+- [ ] Enter an invalid **canonical URL** (e.g., "not a url"). **Expected**: Validation catches it and shows an error.
+- [ ] Export the site. Open the exported page in a browser and view the page source. **Expected**: No raw code appears in the page metadata — everything should look clean and properly formatted.
 
 ---
 
@@ -235,7 +235,7 @@
 ### 3.1 Open the Editor
 
 1. Go to **Pages**.
-2. Click the **"Design"** button on any page (or the widget icon).
+2. Click the **"Design"** button on any page.
 3. **Expected**: Page editor loads with three panels:
    - **Left**: Widget list
    - **Center**: Live preview
@@ -300,7 +300,7 @@
 
 ### 3.10 Block Limits
 
-1. If a widget has a block limit (check if a counter like "3/5" appears):
+1. If a widget has a block limit, like the Slideshow (check if a counter like "3/5" appears):
    - Add blocks until you hit the limit.
    - **Expected**: "Add Block" button disappears or disables. Duplicate option also disabled.
    - Try to add one more anyway if possible. Should be prevented.
@@ -326,7 +326,7 @@
    - Setting link text
    - Setting target (same tab / new tab)
 4. Select an internal page.
-5. **Expected**: Link populated with the page's slug. Page UUID stored internally.
+5. **Expected**: Link is filled in with the page you selected.
 6. Switch to an external URL. Type `https://google.com`.
 7. **Expected**: Link updates to the external URL.
 
@@ -377,20 +377,18 @@
 
 ### 3.18 Preview Modes
 
-1. In the top bar, find the **preview mode toggle** (Desktop / Tablet / Mobile).
-2. Switch to **Tablet**.
-3. **Expected**: Preview area narrows to tablet width. Content reflows.
-4. Switch to **Mobile**.
-5. **Expected**: Even narrower. Content stacks vertically.
-6. Switch back to **Desktop**.
-7. **Expected**: Full width restored.
+1. In the top bar, find the **preview mode toggle** (Desktop / Mobile).
+2. Switch to **Mobile**.
+3. **Expected**: Preview area narrows to mobile width. Content reflows.
+4. Switch to **Desktop**.
+5. **Expected**: Full width restored.
 
 ### 3.19 Standalone Preview
 
 1. Click the **Preview button** (new tab icon) in the top bar.
 2. **Expected**: A new browser tab opens with the full page preview — no editor UI.
 3. Click internal links in the preview.
-4. **Expected**: They navigate to other preview pages (e.g., `/preview/about`).
+4. **Expected**: They navigate to other preview pages correctly.
 5. External links should be disabled or handled safely.
 
 ### 3.20 Navigation Protection
@@ -406,22 +404,41 @@
 9. Now click **Save**, then navigate away.
 10. **Expected**: No warning. Clean navigation.
 
-### 3.21 Edge Cases to Try
+### 3.21 Image Upload & Media Tracking in the Editor
 
-- [ ] Add 20+ widgets to a single page. Does the editor remain responsive?
-- [ ] Clear all text from a required-looking field. What happens in the preview?
-- [ ] Paste very long text (5000+ characters) into a text field. Does it handle it?
-- [ ] Paste HTML into a plain text field. Is it escaped properly in the preview?
-- [ ] Enter `<script>alert(1)</script>` in a widget **title** field. The preview should escape it (show the text literally or strip it) — no alert box should pop up.
-- [ ] Enter `<script>alert(1)</script>` in a widget **description/text** field. Same behavior — escaped or stripped in preview, no script execution.
-- [ ] Enter `<script>alert(1)</script>` in a **link text** field. Should be escaped in preview — no script execution.
-- [ ] Enter `<script>alert(1)</script>` in a **link URL** field (external URL). Should be rejected or sanitized — no `javascript:` protocol, no script execution.
-- [ ] Paste `<script>alert(1)</script>` into a **rich text editor** field. DOMPurify should strip the script tags. Only safe formatting tags allowed.
-- [ ] Enter `<script>alert(1)</script>` in the **code editor** (CSS/HTML field). Code fields intentionally allow raw code — verify it does NOT execute in the preview (should be properly sandboxed).
-- [ ] Upload a very large image through the widget image browser. Does it work?
-- [ ] Rapidly click undo 50 times. Does it handle it without crashing?
-- [ ] Open the same page in two browser tabs. Edit in both. Save both. What happens?
-- [ ] Resize the browser window very small. Does the editor layout adapt?
+These tests verify that images uploaded and used through the editor are properly tracked in the Media library.
+
+1. Open a page in the editor. Find a widget with an image setting.
+2. Click **"Browse"**, then click **"Upload"** in the media drawer. Upload a new image.
+3. Select the image you just uploaded for the widget. Save the page.
+4. Go to **Media** in the sidebar. Find the image you just uploaded.
+5. **Expected**: The image shows as **"in use"** by the page you edited.
+6. Go back to the editor. Change the widget's image to a **different** image (or remove it). Save the page.
+7. Go to **Media** again. Check the first image.
+8. **Expected**: The first image should NO LONGER show as "in use" by that page (unless another widget on the same page still uses it).
+9. Now set images on **two different widgets** on the same page — use the same image for both. Save.
+10. Go to **Media**. **Expected**: The image shows as "in use" by that page.
+11. Remove the image from one of the two widgets. Save.
+12. Go to **Media**. **Expected**: The image STILL shows as "in use" (because the other widget still uses it).
+13. Remove the image from the second widget too. Save.
+14. Go to **Media**. **Expected**: The image now shows as NOT in use.
+
+### 3.22 Edge Cases to Try
+
+- [ ] Add 20+ widgets to a single page. **Expected**: The editor should still feel fast and responsive.
+- [ ] Paste very long text (5000+ characters) into a text field. **Expected**: It handles it without crashing or freezing.
+- [ ] Paste code into a plain text field. **Expected**: The code should show as plain text in the preview, not actually run.
+- [ ] Enter `<script>alert(1)</script>` in a widget **title** field. **Expected**: The preview should show the text literally or strip it — no popup box should appear.
+- [ ] Enter `<script>alert(1)</script>` in a widget **description/text** field. **Expected**: Same as above — shown as text or stripped, no popup.
+- [ ] Enter `<script>alert(1)</script>` in a **link text** field. **Expected**: Shown as text or stripped in the preview — no popup.
+- [ ] Enter `<script>alert(1)</script>` in a **link URL** field (external URL). **Expected**: Rejected or cleaned up — the link should not run any code when clicked.
+- [ ] Paste `<script>alert(1)</script>` into a **rich text editor** field. **Expected**: The code part is automatically removed. Only normal formatting (bold, links, etc.) is kept.
+- [ ] Enter `<script>alert(1)</script>` in the **code editor** (CSS/HTML field). **Expected**: Code editors allow raw code, but verify it does NOT cause any popups or run in the preview — the preview should remain safe.
+- [ ] Upload a very large image through the widget image browser. **Expected**: It either uploads successfully or shows a clear error about file size.
+- [ ] Rapidly click undo 50 times. **Expected**: It handles it without crashing.
+- [ ] Open the same page in two browser tabs. Edit in both. Save both. **Expected**: The last save wins. No crashes or corrupted data.
+- [ ] Upload an image through the widget browser, use it in a widget, save the page, then go to **Media** and try to delete that image. **Expected**: Deletion is blocked — error says the image is in use.
+- [ ] Use the same image in widgets on **two different pages**. Go to **Media**. **Expected**: The image shows as "in use" by both pages. Deleting it should be blocked.
 
 ---
 
@@ -519,8 +536,6 @@
 - [ ] Upload a file with spaces and special characters in the name. Does it sanitize?
 - [ ] Upload the same filename twice. Does it handle the conflict (e.g., append `-1`)?
 - [ ] Upload a potentially malicious SVG (one with JavaScript inside). Is it sanitized?
-- [ ] Upload a 0-byte file. What happens?
-- [ ] Try to upload while offline / with network disconnected. Error handling?
 - [ ] Enter `<script>alert(1)</script>` in the **alt text** field of a media file. Save. Edit again — should be escaped or stripped. Check the exported HTML — alt attribute must not contain executable script.
 - [ ] Enter `<script>alert(1)</script>` in the **title** field of a media file. Save. Edit again — should be escaped or stripped.
 

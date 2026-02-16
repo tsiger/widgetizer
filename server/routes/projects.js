@@ -65,6 +65,7 @@ router.post(
   [
     body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required."),
     body("description").trim().customSanitizer(stripHtmlTags),
+    body("siteUrl").optional().trim().customSanitizer(stripHtmlTags),
     body("theme").notEmpty().withMessage("A theme is required to create a project."),
     body("preset").optional().isString().trim(),
   ],
@@ -85,6 +86,7 @@ router.put(
     param("id").notEmpty().withMessage("Project ID is required."),
     body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required."),
     body("description").trim().customSanitizer(stripHtmlTags),
+    body("siteUrl").optional().trim().customSanitizer(stripHtmlTags),
   ],
   projectController.updateProject,
 );

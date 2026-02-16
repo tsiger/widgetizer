@@ -95,10 +95,19 @@ export default function Settings() {
    */
   const handleSave = async () => {
     try {
-      await saveThemeSettings(themeData);
-      setOriginalData(JSON.parse(JSON.stringify(themeData))); // Update original data
-      setHasChanges(false);
-      showToast(t("themeSettings.toasts.saveSuccess"), "success");
+      const result = await saveThemeSettings(themeData);
+      if (result.warnings?.length) {
+        // Refetch to show the corrected values in the UI
+        const freshData = await getThemeSettings();
+        setThemeData(freshData);
+        setOriginalData(JSON.parse(JSON.stringify(freshData)));
+        setHasChanges(false);
+        showToast(result.warnings.join(" "), "warning");
+      } else {
+        setOriginalData(JSON.parse(JSON.stringify(themeData)));
+        setHasChanges(false);
+        showToast(t("themeSettings.toasts.saveSuccess"), "success");
+      }
     } catch (error) {
       console.error("Failed to save theme settings:", error);
       showToast(t("themeSettings.toasts.saveError"), "error");

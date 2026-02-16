@@ -5,6 +5,7 @@ import slugify from "slugify";
 import { validationResult } from "express-validator";
 import { getProjectMenusDir, getMenuPath } from "../config.js";
 import { readProjectsFile } from "./projectController.js";
+import { stripHtmlTags } from "../services/sanitizationService.js";
 
 /**
  * Retrieves all menus for the active project.
@@ -87,7 +88,10 @@ export async function createMenu(req, res) {
   }
 
   try {
-    const { name, description, id: requestedId } = req.body;
+    // Defensive sanitization: strip HTML (route validator also does this,
+    // but the controller must be safe even when called directly)
+    const name = stripHtmlTags(req.body.name);
+    const safeDescription = stripHtmlTags(req.body.description) || "";
 
     // Defensive check: ensure name is not empty after sanitization
     if (!name || typeof name !== "string" || name.trim() === "") {
@@ -105,19 +109,15 @@ export async function createMenu(req, res) {
     const menusDir = getProjectMenusDir(projectFolderName);
     await fs.ensureDir(menusDir);
 
-    // Generate unique ID from name (or use requested ID if provided)
-    const menuId = requestedId || (await generateUniqueMenuId(projectFolderName, name));
-
+    // Generate unique ID from the sanitized name (server-side only)
+    const menuId = await generateUniqueMenuId(projectFolderName, name);
     const menuPath = getMenuPath(projectFolderName, menuId);
-    if (await fs.pathExists(menuPath)) {
-      return res.status(400).json({ error: "A menu with this name already exists" });
-    }
 
     const newMenu = {
       id: menuId,
       uuid: randomUUID(),
       name,
-      description,
+      description: safeDescription,
       items: [],
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
@@ -214,6 +214,15 @@ export async function updateMenu(req, res) {
   try {
     const menuId = req.params.id;
     const menuData = req.body;
+
+    // Defensive sanitization: strip HTML (route validator also does this,
+    // but the controller must be safe even when called directly)
+    if (menuData.name != null) {
+      menuData.name = stripHtmlTags(menuData.name);
+    }
+    if (menuData.description != null) {
+      menuData.description = stripHtmlTags(menuData.description) || "";
+    }
 
     // Defensive check: ensure name is not empty after sanitization
     if (!menuData.name || typeof menuData.name !== "string" || menuData.name.trim() === "") {

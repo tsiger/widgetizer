@@ -282,6 +282,15 @@ describe("createPage", () => {
     assert.match(res._json.error, /name.*required/i);
   });
 
+  it("strips HTML from canonical_url", async () => {
+    const seo = {
+      canonical_url: 'https://example.com/<script>alert(1)</script>',
+    };
+    const page = await createTestPage("Canonical Sanitize", { seo });
+    assert.ok(!page.seo.canonical_url.includes("<script>"), "canonical_url should not contain script tags");
+    assert.ok(page.seo.canonical_url.includes("https://example.com/"), "canonical_url should preserve the valid URL part");
+  });
+
   it("rejects whitespace-only name", async () => {
     const res = await callController(createPage, {
       body: { name: "   " },

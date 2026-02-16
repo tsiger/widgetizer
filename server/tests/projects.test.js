@@ -489,6 +489,14 @@ describe("createProject", () => {
     assert.equal(res._status, 400);
     assert.match(res._json.error, /name.*required/i);
   });
+
+  it("strips HTML from siteUrl", async () => {
+    const project = await createTestProject("SiteUrl Sanitize", {
+      siteUrl: 'https://example.com/<script>alert(1)</script>',
+    });
+    assert.ok(!project.siteUrl.includes("<script>"), "siteUrl should not contain script tags");
+    assert.ok(project.siteUrl.includes("https://example.com/"), "siteUrl should preserve the valid URL part");
+  });
 });
 
 // ---------------------------------------------------------------------------

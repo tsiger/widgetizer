@@ -6,6 +6,7 @@ import { getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
 import path from "path";
 import { updatePageMediaUsage, removePageFromMediaUsage } from "../services/mediaUsageService.js";
 import { readProjectsData } from "../db/repositories/projectRepository.js";
+import { stripHtmlTags } from "../services/sanitizationService.js";
 
 async function readProjectsFile() {
   return readProjectsData();
@@ -197,6 +198,13 @@ export async function updatePage(req, res) {
     const oldSlug = req.params.id; // The slug used to identify the file to update
     const pageData = req.body; // Contains potentially new name and slug
     let desiredNewSlug = pageData.slug; // The slug the user wants
+
+    // Defensive sanitization for SEO fields
+    if (pageData.seo) {
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
+    }
 
     const { projects, activeProjectId } = await readProjectsFile();
     const activeProject = projects.find((p) => p.id === activeProjectId);
@@ -497,6 +505,13 @@ export async function createPage(req, res) {
   try {
     const pageData = req.body; // Get all data including SEO
 
+    // Defensive sanitization for SEO fields
+    if (pageData.seo) {
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
+    }
+
     // Defensive check: ensure name is not empty after sanitization
     if (!pageData.name || typeof pageData.name !== "string" || pageData.name.trim() === "") {
       return res.status(400).json({ error: "Page name is required." });
@@ -567,6 +582,14 @@ export async function savePageContent(req, res) {
   const { id } = req.params;
   try {
     const pageData = req.body; // Get all data including SEO
+
+    // Defensive sanitization for SEO fields
+    if (pageData.seo) {
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
+    }
+
     const { projects, activeProjectId } = await readProjectsFile();
     const activeProject = projects.find((p) => p.id === activeProjectId);
 

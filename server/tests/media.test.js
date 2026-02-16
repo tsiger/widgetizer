@@ -772,6 +772,26 @@ describe("updateMediaMetadata", () => {
     const file = mediaData.files.find((f) => f.id === "meta-img");
     assert.equal(file.metadata.alt, "Persisted alt text");
   });
+
+  it("strips HTML from alt text", async () => {
+    const res = await callController(updateMediaMetadata, {
+      params: { projectId: PROJECT_ID, fileId: "meta-img" },
+      body: { alt: 'Photo <script>alert(1)</script> alt', title: "Clean" },
+    });
+    assert.equal(res._status, 200);
+    assert.ok(!res._json.file.metadata.alt.includes("<script>"), "alt should not contain script tags");
+    assert.ok(res._json.file.metadata.alt.includes("Photo"), "alt should preserve text content");
+  });
+
+  it("strips HTML from title", async () => {
+    const res = await callController(updateMediaMetadata, {
+      params: { projectId: PROJECT_ID, fileId: "meta-img" },
+      body: { alt: "Clean alt", title: '<img onerror="alert(1)">My Title' },
+    });
+    assert.equal(res._status, 200);
+    assert.ok(!res._json.file.metadata.title.includes("<img"), "title should not contain img tags");
+    assert.ok(res._json.file.metadata.title.includes("My Title"), "title should preserve text content");
+  });
 });
 
 // ============================================================================

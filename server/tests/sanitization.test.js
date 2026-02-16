@@ -14,7 +14,13 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { sanitizeRichText, sanitizeWidgetData, stripHtmlTags } from "../services/sanitizationService.js";
+import {
+  sanitizeRichText,
+  sanitizeWidgetData,
+  stripHtmlTags,
+  sanitizeCssValue,
+  sanitizeThemeSettings,
+} from "../services/sanitizationService.js";
 
 // ============================================================================
 // sanitizeRichText
@@ -698,5 +704,438 @@ describe("stripHtmlTags", () => {
 
   it("handles plain text without HTML", () => {
     assert.equal(stripHtmlTags("Just plain text"), "Just plain text");
+  });
+});
+
+// ============================================================================
+// sanitizeCssValue
+// ============================================================================
+
+describe("sanitizeCssValue", () => {
+  it("strips < from string", () => {
+    assert.equal(sanitizeCssValue("</style>"), "/style");
+  });
+
+  it("strips > from string", () => {
+    assert.equal(sanitizeCssValue("<script>"), "script");
+  });
+
+  it("strips { from string", () => {
+    assert.equal(sanitizeCssValue("red; } body {"), "red;  body ");
+  });
+
+  it("strips } from string", () => {
+    assert.equal(sanitizeCssValue("} .evil { display: none"), " .evil  display: none");
+  });
+
+  it("strips all dangerous chars from style tag breakout", () => {
+    assert.equal(sanitizeCssValue('</style><script>alert(1)</script>'), "/stylescriptalert(1)/script");
+  });
+
+  it("leaves hex colors intact", () => {
+    assert.equal(sanitizeCssValue("#DE1877"), "#DE1877");
+  });
+
+  it("leaves font stacks intact", () => {
+    assert.equal(sanitizeCssValue('"Inter", sans-serif'), '"Inter", sans-serif');
+  });
+
+  it("leaves pixel values intact", () => {
+    assert.equal(sanitizeCssValue("16px"), "16px");
+  });
+
+  it("returns non-strings unchanged", () => {
+    assert.equal(sanitizeCssValue(42), 42);
+    assert.equal(sanitizeCssValue(null), null);
+    assert.equal(sanitizeCssValue(true), true);
+  });
+});
+
+// ============================================================================
+// sanitizeThemeSettings
+// ============================================================================
+
+describe("sanitizeThemeSettings", () => {
+  // Helper to build a minimal theme data structure
+  function makeTheme(category, items) {
+    return { settings: { global: { [category]: items } } };
+  }
+
+  // --- Color validation ---
+
+  describe("color validation", () => {
+    it("passes valid 6-digit hex color", () => {
+      const theme = makeTheme("colors", [
+        { type: "color", id: "bg", default: "#ffffff", value: "#DE1877" },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.colors[0].value, "#DE1877");
+    });
+
+    it("passes valid 8-digit hex color (with alpha)", () => {
+      const theme = makeTheme("colors", [
+        { type: "color", id: "bg", default: "#ffffff", value: "#DE1877FF" },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.colors[0].value, "#DE1877FF");
+    });
+
+    it("rejects non-hex string — falls back to default", () => {
+      const theme = makeTheme("colors", [
+        { type: "color", id: "bg", default: "#ffffff", value: "red" },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.colors[0].value, "#ffffff");
+    });
+
+    it("rejects HTML injection — falls back to default", () => {
+      const theme = makeTheme("colors", [
+        { type: "color", id: "bg", default: "#ffffff", value: '#<script>alert(1)</script>' },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.colors[0].value, "#ffffff");
+    });
+
+    it("rejects non-string value — falls back to default", () => {
+      const theme = makeTheme("colors", [
+        { type: "color", id: "bg", default: "#ffffff", value: 12345 },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.colors[0].value, "#ffffff");
+    });
+  });
+
+  // --- Number / Range validation ---
+
+  describe("number and range validation", () => {
+    it("passes valid number", () => {
+      const theme = makeTheme("layout", [
+        { type: "range", id: "spacing", min: 0, max: 100, default: 16, value: 24 },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.layout[0].value, 24);
+    });
+
+    it("clamps to min", () => {
+      const theme = makeTheme("layout", [
+        { type: "range", id: "spacing", min: 0, max: 100, default: 16, value: -5 },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.layout[0].value, 0);
+    });
+
+    it("clamps to max", () => {
+      const theme = makeTheme("layout", [
+        { type: "range", id: "spacing", min: 0, max: 100, default: 16, value: 999 },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.layout[0].value, 100);
+    });
+
+    it("rejects non-numeric string — falls back to default", () => {
+      const theme = makeTheme("layout", [
+        { type: "number", id: "cols", min: 1, max: 12, default: 3, value: "abc" },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.layout[0].value, 3);
+    });
+
+    it("coerces numeric string to number", () => {
+      const theme = makeTheme("layout", [
+        { type: "range", id: "spacing", min: 0, max: 100, default: 16, value: "50" },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.layout[0].value, 50);
+    });
+  });
+
+  // --- Checkbox validation ---
+
+  describe("checkbox validation", () => {
+    it("passes true", () => {
+      const theme = makeTheme("privacy", [
+        { type: "checkbox", id: "bunny", default: false, value: true },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.privacy[0].value, true);
+    });
+
+    it("passes false", () => {
+      const theme = makeTheme("privacy", [
+        { type: "checkbox", id: "bunny", default: true, value: false },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.privacy[0].value, false);
+    });
+
+    it("rejects non-boolean — falls back to default", () => {
+      const theme = makeTheme("privacy", [
+        { type: "checkbox", id: "bunny", default: false, value: "yes" },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.privacy[0].value, false);
+    });
+  });
+
+  // --- Select / Radio validation ---
+
+  describe("select and radio validation", () => {
+    it("passes valid option", () => {
+      const theme = makeTheme("layout", [
+        {
+          type: "select",
+          id: "style",
+          default: "rounded",
+          options: [{ label: "Rounded", value: "rounded" }, { label: "Sharp", value: "sharp" }],
+          value: "sharp",
+        },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.layout[0].value, "sharp");
+    });
+
+    it("rejects value not in options — falls back to default", () => {
+      const theme = makeTheme("layout", [
+        {
+          type: "select",
+          id: "style",
+          default: "rounded",
+          options: [{ label: "Rounded", value: "rounded" }, { label: "Sharp", value: "sharp" }],
+          value: '<script>alert(1)</script>',
+        },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.layout[0].value, "rounded");
+    });
+
+    it("radio: rejects invalid value — falls back to default", () => {
+      const theme = makeTheme("layout", [
+        {
+          type: "radio",
+          id: "alignment",
+          default: "left",
+          options: [{ label: "Left", value: "left" }, { label: "Center", value: "center" }],
+          value: "hacked",
+        },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.layout[0].value, "left");
+    });
+  });
+
+  // --- Font picker validation ---
+
+  describe("font_picker validation", () => {
+    it("passes valid font picker value", () => {
+      const theme = makeTheme("typography", [
+        {
+          type: "font_picker",
+          id: "heading_font",
+          default: { stack: '"Inter", sans-serif', weight: 400 },
+          value: { stack: '"Fraunces", serif', weight: 600 },
+        },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.deepEqual(result.data.settings.global.typography[0].value, {
+        stack: '"Fraunces", serif',
+        weight: 600,
+      });
+    });
+
+    it("strips <> from font stack", () => {
+      const theme = makeTheme("typography", [
+        {
+          type: "font_picker",
+          id: "heading_font",
+          default: { stack: '"Inter", sans-serif', weight: 400 },
+          value: { stack: '</style><script>alert(1)</script>', weight: 400 },
+        },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.doesNotMatch(result.data.settings.global.typography[0].value.stack, /[<>]/);
+    });
+
+    it("rejects missing stack — falls back to default", () => {
+      const theme = makeTheme("typography", [
+        {
+          type: "font_picker",
+          id: "heading_font",
+          default: { stack: '"Inter", sans-serif', weight: 400 },
+          value: { weight: 600 },
+        },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.deepEqual(result.data.settings.global.typography[0].value, {
+        stack: '"Inter", sans-serif',
+        weight: 400,
+      });
+    });
+
+    it("rejects non-numeric weight — falls back to default", () => {
+      const theme = makeTheme("typography", [
+        {
+          type: "font_picker",
+          id: "heading_font",
+          default: { stack: '"Inter", sans-serif', weight: 400 },
+          value: { stack: '"Fraunces", serif', weight: "bold" },
+        },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.deepEqual(result.data.settings.global.typography[0].value, {
+        stack: '"Inter", sans-serif',
+        weight: 400,
+      });
+    });
+  });
+
+  // --- Text/textarea with outputAsCssVar ---
+
+  describe("text with outputAsCssVar", () => {
+    it("passes plain text through", () => {
+      const theme = makeTheme("custom", [
+        { type: "text", id: "val", default: "", outputAsCssVar: true, value: "16px" },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.data.settings.global.custom[0].value, "16px");
+    });
+
+    it("strips style tag breakout from CSS var text", () => {
+      const theme = makeTheme("custom", [
+        {
+          type: "text",
+          id: "val",
+          default: "",
+          outputAsCssVar: true,
+          value: '</style><script>alert(1)</script>',
+        },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.doesNotMatch(result.data.settings.global.custom[0].value, /[<>]/);
+    });
+
+    it("strips CSS injection braces from CSS var text", () => {
+      const theme = makeTheme("custom", [
+        {
+          type: "text",
+          id: "val",
+          default: "",
+          outputAsCssVar: true,
+          value: "red; } body { display: none; } :root {",
+        },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.doesNotMatch(result.data.settings.global.custom[0].value, /[{}]/);
+    });
+
+    it("text without outputAsCssVar is left as-is", () => {
+      const theme = makeTheme("custom", [
+        { type: "text", id: "val", default: "", value: '<script>alert(1)</script>' },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      // Left for LiquidJS autoescape to handle at render time
+      assert.equal(result.data.settings.global.custom[0].value, '<script>alert(1)</script>');
+    });
+  });
+
+  // --- Full theme data walkthrough ---
+
+  describe("full theme data", () => {
+    it("sanitizes a realistic theme structure without mutating input", () => {
+      const original = {
+        name: "Test Theme",
+        version: "1.0.0",
+        settings: {
+          global: {
+            colors: [
+              { type: "header", id: "h1", label: "Colors" },
+              { type: "color", id: "bg", default: "#ffffff", outputAsCssVar: true, value: "#DE1877" },
+              { type: "color", id: "bad", default: "#000000", outputAsCssVar: true, value: "not-a-color" },
+            ],
+            typography: [
+              {
+                type: "font_picker",
+                id: "body_font",
+                default: { stack: '"Inter", sans-serif', weight: 400 },
+                value: { stack: '"Fraunces", serif', weight: 600 },
+              },
+            ],
+            advanced: [
+              { type: "code", id: "custom_css", default: "", value: "body { color: red; }" },
+            ],
+          },
+        },
+      };
+
+      const result = sanitizeThemeSettings(original);
+
+      // Does not mutate original
+      assert.equal(original.settings.global.colors[2].value, "not-a-color");
+
+      // Preserves valid color
+      assert.equal(result.data.settings.global.colors[1].value, "#DE1877");
+      // Invalid color falls back to default
+      assert.equal(result.data.settings.global.colors[2].value, "#000000");
+      // Font picker preserved
+      assert.deepEqual(result.data.settings.global.typography[0].value, {
+        stack: '"Fraunces", serif',
+        weight: 600,
+      });
+      // Code left raw
+      assert.equal(result.data.settings.global.advanced[0].value, "body { color: red; }");
+      // Non-settings fields preserved
+      assert.equal(result.data.name, "Test Theme");
+      assert.equal(result.data.version, "1.0.0");
+      // Warnings reported for invalid color
+      assert.ok(result.warnings.length > 0);
+    });
+
+    it("handles missing settings.global gracefully", () => {
+      const theme = { name: "Empty" };
+      const result = sanitizeThemeSettings(theme);
+      assert.deepEqual(result.data, { name: "Empty" });
+      assert.deepEqual(result.warnings, []);
+    });
+
+    it("handles null input", () => {
+      const result = sanitizeThemeSettings(null);
+      assert.equal(result.data, null);
+      assert.deepEqual(result.warnings, []);
+    });
+
+    it("skips header type items", () => {
+      const theme = makeTheme("colors", [
+        { type: "header", id: "h1", label: "Colors" },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      // Header items don't have value, should not throw
+      assert.equal(result.data.settings.global.colors[0].type, "header");
+    });
+
+    it("skips items without value", () => {
+      const theme = makeTheme("colors", [
+        { type: "color", id: "bg", default: "#ffffff" },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      // No value set — should remain undefined
+      assert.equal(result.data.settings.global.colors[0].value, undefined);
+    });
+
+    it("returns warnings for corrected values", () => {
+      const theme = makeTheme("colors", [
+        { type: "color", id: "bg", label: "Background", default: "#ffffff", value: "<script>alert(1)</script>" },
+        { type: "color", id: "fg", label: "Text", default: "#000000", value: "#DE1877" },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.equal(result.warnings.length, 1);
+      assert.match(result.warnings[0], /Background/);
+    });
+
+    it("returns empty warnings when all values are valid", () => {
+      const theme = makeTheme("colors", [
+        { type: "color", id: "bg", default: "#ffffff", value: "#DE1877" },
+      ]);
+      const result = sanitizeThemeSettings(theme);
+      assert.deepEqual(result.warnings, []);
+    });
   });
 });

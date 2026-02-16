@@ -22,6 +22,7 @@ import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageServi
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError, PROJECT_ERROR_CODES } from "../utils/projectErrors.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
+import { stripHtmlTags } from "../services/sanitizationService.js";
 
 // Get image processing settings from app settings
 async function getImageProcessingSettings(projectId) {
@@ -498,7 +499,9 @@ export async function updateMediaMetadata(req, res) {
 
   try {
     const { projectId, fileId } = req.params;
-    const { alt, title, description } = req.body;
+    const alt = stripHtmlTags(req.body.alt);
+    const title = stripHtmlTags(req.body.title);
+    const description = stripHtmlTags(req.body.description);
 
     // Read media metadata
     const mediaData = await readMediaFile(projectId);

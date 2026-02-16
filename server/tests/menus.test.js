@@ -80,10 +80,8 @@ async function callController(controllerFn, { params, body } = {}) {
 }
 
 /** Helper to create a menu via controller and return response */
-async function createTestMenu(name, description = "", id = undefined) {
-  const body = { name, description };
-  if (id) body.id = id;
-  return callController(createMenu, { body });
+async function createTestMenu(name, description = "") {
+  return callController(createMenu, { body: { name, description } });
 }
 
 /** Reset menus directory between test groups */
@@ -182,29 +180,12 @@ describe("createMenu", () => {
     assert.equal(res2._json.name, "Duplicate");
   });
 
-  it("rejects when explicit requestedId already exists", async () => {
-    await createTestMenu("First", "", "shared-id");
-    const res2 = await createTestMenu("Second", "", "shared-id");
-    assert.equal(res2._status, 400);
-    assert.match(res2._json.error, /already exists/i);
-  });
-
   it("auto-increments ID when slug collides", async () => {
     await createTestMenu("Nav");
-    // Create another with a different name that could collide
-    // Actually, the controller rejects same-ID menus, so let's test
-    // the generateUniqueMenuId by using a different name that slugifies
-    // the same. Instead, we can use the requestedId feature:
-    const res = await createTestMenu("Nav Alt", "", undefined);
+    const res = await createTestMenu("Nav Alt");
     // "Nav Alt" -> "nav-alt", shouldn't collide with "nav"
     assert.equal(res._status, 201);
     assert.equal(res._json.id, "nav-alt");
-  });
-
-  it("accepts an explicit requested ID", async () => {
-    const res = await createTestMenu("Custom ID Menu", "", "my-custom-id");
-    assert.equal(res._status, 201);
-    assert.equal(res._json.id, "my-custom-id");
   });
 
   it("handles special characters in menu name", async () => {
@@ -237,6 +218,30 @@ describe("createMenu", () => {
     assert.equal(res._json.name, name, "name should not be HTML-encoded");
     assert.ok(!res._json.name.includes("&amp;"), "ampersand should not be encoded");
     assert.ok(!res._json.name.includes("&quot;"), "quotes should not be encoded");
+  });
+
+  it("strips HTML from description", async () => {
+    const res = await createTestMenu("Clean Menu", '<script>alert(1)</script>');
+    assert.equal(res._status, 201);
+    assert.equal(res._json.description, "", "script tags should be stripped from description");
+  });
+
+  it("generates clean ID when name contains HTML", async () => {
+    const res = await createTestMenu('s1<script>alert(1)</script>');
+    assert.equal(res._status, 201);
+    assert.equal(res._json.name, "s1");
+    assert.equal(res._json.id, "s1", "ID should be generated from sanitized name");
+    assert.ok(!res._json.id.includes("less"), "ID should not contain slugified angle brackets");
+    assert.ok(!res._json.id.includes("greater"), "ID should not contain slugified angle brackets");
+    assert.ok(!res._json.id.includes("script"), "ID should not contain script artifacts");
+  });
+
+  it("ignores client-supplied id field", async () => {
+    const res = await callController(createMenu, {
+      body: { name: "Server ID Menu", id: "client-generated-id" },
+    });
+    assert.equal(res._status, 201);
+    assert.equal(res._json.id, "server-id-menu", "ID should be generated server-side, not from client");
   });
 
   it("rejects empty name (e.g. after HTML tags are stripped)", async () => {
@@ -493,6 +498,15 @@ describe("updateMenu", () => {
       body: { name: "Original Name", description: "New description" },
     });
     assert.equal(res._json.uuid, originalUuid);
+  });
+
+  it("strips HTML from description on update", async () => {
+    const res = await callController(updateMenu, {
+      params: { id: "original-name" },
+      body: { name: "Original Name", description: '<script>alert(1)</script>' },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.description, "", "script tags should be stripped from description");
   });
 
   it("rejects empty name on update", async () => {

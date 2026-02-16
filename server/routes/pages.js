@@ -18,6 +18,7 @@ router.post(
     body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Page name is required."),
     body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
     body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
+    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlTags),
   ],
   pageController.createPage,
 );
@@ -30,6 +31,7 @@ router.put(
     body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Page name is required."),
     body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
     body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
+    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlTags),
   ],
   pageController.updatePage,
 );
@@ -58,6 +60,7 @@ router.post(
     param("id").notEmpty().withMessage("Page ID is required."),
     body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
     body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
+    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlTags),
   ],
   pageController.savePageContent,
 );
