@@ -10,26 +10,19 @@ The server codebase has grown organically with significant duplication across co
 
 ## Current Issues
 
-### 1. Duplicate `readProjectsFile()` Function
+### 1. Duplicate project metadata reader wrapper
 
-Defined twice - in both `projectController.js` AND `pageController.js`:
+Defined in both `projectController.js` and `pageController.js` as compatibility wrappers:
 
 **pageController.js (lines 9-18):**
 
 ```javascript
 async function readProjectsFile() {
-  const projectsPath = getProjectsFilePath();
-  if (!(await fs.pathExists(projectsPath))) {
-    const initialData = { projects: [], activeProjectId: null };
-    await fs.outputFile(projectsPath, JSON.stringify(initialData, null, 2));
-    return initialData;
-  }
-  const data = await fs.readFile(projectsPath, "utf8");
-  return JSON.parse(data);
+  return readProjectsData(); // SQLite-backed repository
 }
 ```
 
-**projectController.js (lines 31-46):** Similar implementation exists and is exported.
+**projectController.js:** Similar wrapper exists and is exported.
 
 **Fix:** Remove from `pageController.js` and import from `projectController.js` (as `menuController.js` already does).
 

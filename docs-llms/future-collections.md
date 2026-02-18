@@ -457,7 +457,7 @@ output/
    - Others (testimonials) might only be used in widgets
 
 3. **Media tracking for collection items?**
-   - Should collection images be tracked in `media.json` like page images?
+   - Should collection images be tracked in SQLite media usage like page images?
    - Required for optimized export
 
 4. **Phase priority?**

@@ -4,7 +4,7 @@
 
 ## Context
 
-The `{% image %}` tag (`src/core/tags/imageTag.js`) currently renders a single `<img>` element with one `src` pointing to a hardcoded size variant. The upload pipeline already generates multiple size variants (thumb, small, medium, large) via Sharp and stores their paths/dimensions in `media.json` — but there's no way for theme authors to leverage `srcset`/`sizes` to let the browser pick the optimal image for the viewport.
+The `{% image %}` tag (`src/core/tags/imageTag.js`) currently renders a single `<img>` element with one `src` pointing to a hardcoded size variant. The upload pipeline already generates multiple size variants (thumb, small, medium, large) via Sharp and stores their paths/dimensions in SQLite-backed media metadata — but there's no way for theme authors to leverage `srcset`/`sizes` to let the browser pick the optimal image for the viewport.
 
 **Goal**: Give theme authors opt-in, un-opinionated building blocks for responsive images. Provide data and primitives — don't dictate markup patterns.
 
@@ -28,7 +28,7 @@ The `{% image %}` tag (`src/core/tags/imageTag.js`) currently renders a single `
 **What's missing**: No `srcset`, no `sizes`, no `<picture>` support. The browser always downloads exactly the size hardcoded in the template, regardless of viewport width.
 
 **What already exists**:
-- All size variants are pre-generated at upload time with paths/dimensions in `media.json`
+- All size variants are pre-generated at upload time with paths/dimensions in media metadata returned by `readMediaFile()`
 - `mediaFiles` context object provides full size data during rendering
 - `enqueue_preload` tag already supports `imagesrcset` and `imagesizes` for link preloads
 - `media_meta` filter exists as a pattern for custom filters
@@ -140,7 +140,7 @@ A `picture: true` param on the image tag that wraps output in `<picture>` with `
 
 Extend the Sharp upload pipeline to also generate WebP (and optionally AVIF) variants alongside the existing JPEG/PNG variants.
 
-**Media.json addition**:
+**Media metadata addition (SQLite-backed)**:
 ```json
 {
   "sizes": {
@@ -170,7 +170,7 @@ Extend the Sharp upload pipeline to also generate WebP (and optionally AVIF) var
 
 **Pros**: Best performance — modern browsers use WebP/AVIF (30-50% smaller files).
 
-**Cons**: Significantly larger scope — changes the upload pipeline, `media.json` schema, disk usage (more variants), and export logic. Should be its own project, not bundled with responsive `srcset` support.
+**Cons**: Significantly larger scope — changes the upload pipeline, media metadata schema, disk usage (more variants), and export logic. Should be its own project, not bundled with responsive `srcset` support.
 
 **Verdict**: Valuable but separate concern. Implement Options A+B first. Format generation can be added later and will naturally compose with the filter/srcset infrastructure.
 

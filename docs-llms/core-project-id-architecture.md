@@ -18,14 +18,14 @@ This architecture decouples the project's identity from its filesystem represent
 - Used for:
   - API endpoints (`/api/projects/:projectId`)
   - Frontend routing (`/projects/edit/:id`)
-  - Database/JSON references
+  - SQLite-backed metadata references
   - Cross-referencing between entities
 
 ### 2. Mutable Filesystem Path (Project FolderName)
 
 - Generated from the project name using `slugify()`
 - Can change when the project is renamed
-- Stored as `project.folderName` in `projects.json`
+- Stored as `project.folderName` in the SQLite `projects` table
 - Used for:
   - Directory names (`data/projects/{folderName}/`)
   - File path construction
@@ -131,7 +131,7 @@ const imagePath = getImagePath(projectFolderName, filename);
 **Key Functions:**
 
 - `uploadProjectMedia()`: Stores files in `{folderName}/uploads/images/` or `{folderName}/uploads/videos/`
-- `getProjectMedia()`: Reads media metadata from `{folderName}/uploads/media.json`
+- `getProjectMedia()`: Reads media metadata from SQLite; media binaries still come from `{folderName}/uploads/*`
 - `deleteProjectMedia()`: Removes files from correct project directory
 - `serveProjectMedia()`: Serves files from `{folderName}/uploads/`
 
@@ -239,33 +239,13 @@ const projectDir = getProjectDir(projectFolderName);
 
 ```javascript
 export async function getProjectFolderName(projectId) {
-  const projectsPath = getProjectsFilePath();
-  try {
-    if (!(await fs.pathExists(projectsPath))) {
-      const error = new Error("Projects file not found");
-      error.code = PROJECT_ERROR_CODES.PROJECTS_FILE_MISSING;
-      throw error;
-    }
-
-    const data = JSON.parse(await fs.readFile(projectsPath, "utf8"));
-    const project = data.projects.find((p) => p.id === projectId);
-    if (project) return project.folderName;
-
+  const folderName = repoGetFolderName(projectId); // from projectRepository
+  if (!folderName) {
     const error = new Error(`Project not found for ID ${projectId}`);
     error.code = PROJECT_ERROR_CODES.PROJECT_NOT_FOUND;
     throw error;
-  } catch (error) {
-    if (
-      error.code === PROJECT_ERROR_CODES.PROJECTS_FILE_MISSING ||
-      error.code === PROJECT_ERROR_CODES.PROJECT_NOT_FOUND
-    ) {
-      throw error;
-    }
-
-    const wrappedError = new Error(`Failed to resolve project folderName for ID ${projectId}: ${error.message}`);
-    wrappedError.code = PROJECT_ERROR_CODES.PROJECTS_FILE_READ_FAILED;
-    throw wrappedError;
   }
+  return folderName;
 }
 ```
 
@@ -281,8 +261,6 @@ Centralized error codes and helpers used by controllers/services to detect and r
 
 ```javascript
 export const PROJECT_ERROR_CODES = {
-  PROJECTS_FILE_MISSING: "PROJECTS_FILE_MISSING",
-  PROJECTS_FILE_READ_FAILED: "PROJECTS_FILE_READ_FAILED",
   PROJECT_NOT_FOUND: "PROJECT_NOT_FOUND",
   PROJECT_DIR_MISSING: "PROJECT_DIR_MISSING",
 };
@@ -412,7 +390,7 @@ if (updatedProject.folderName !== originalProject.folderName) {
 
 ### "Project not found" errors
 
-- Verify project UUID exists in `projects.json`
+- Verify project UUID exists in SQLite (`projects` table)
 - Check if folderName resolution is working
 - Ensure directory exists with correct folderName
 
@@ -517,7 +495,7 @@ An alternative architecture would use **UUIDs exclusively** for all filesystem o
 
 #### 1. Metadata Dependency
 
-- **Single point of failure**: `projects.json` becomes critical
+- **Single point of failure**: project metadata store (SQLite) must remain healthy
 - **Orphaned directories**: Lost metadata makes UUIDs meaningless
 - **Recovery difficulty**: Disaster recovery requires metadata reconstruction
 - **Backup strategy**: Must always backup metadata with projects

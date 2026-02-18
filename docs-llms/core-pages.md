@@ -4,7 +4,7 @@ This document outlines the complete workflow for creating, viewing, editing, and
 
 ## 1. Data Structure & Storage
 
-Unlike projects, which are managed in a central `projects.json` file, each page is stored as an individual JSON file within its project's directory. This approach keeps page data modular and directly tied to its parent project.
+Unlike project metadata (which is stored in SQLite), each page is stored as an individual JSON file within its project's directory. This hybrid approach keeps page content modular while allowing fast metadata lookups and relationships for projects/media/exports/settings.
 
 - **Location**: `/data/projects/<folderName>/pages/`
 - **Filename**: The filename is derived from the page's "slug" (e.g., `about-us.json`).

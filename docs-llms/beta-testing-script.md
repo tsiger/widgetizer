@@ -93,7 +93,7 @@
    - `project-export.json` manifest file
    - `pages/` folder with page JSON files
    - `menus/` folder (if menus exist)
-   - `uploads/media.json` with media metadata
+   - `uploads/media.json` with media metadata (compatibility artifact in export ZIP; runtime source of truth is SQLite)
    - `uploads/images/` (or videos/audios) with the actual media files
    - Theme files (`theme.json`, `layout.liquid`, etc.)
 

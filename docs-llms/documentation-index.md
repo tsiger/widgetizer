@@ -288,15 +288,15 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[app-action-map.md](app-action-map.md)** - Functionality Action Map
+### **[core-database.md](core-database.md)** - Database & Storage Architecture
 
-**Purpose**: Maps all user-facing functionality to implementation files **When to use**:
+**Purpose**: Documents the SQLite schema, legacy JSON import path, and the hybrid storage model (DB metadata + filesystem content) **When to use**:
 
-- Finding where specific features are implemented
-- Understanding which files to modify for a feature
-- Quick reference for feature locations
+- Understanding where data is stored now
+- Tracing legacy import behavior and compatibility wrappers
+- Planning changes to repositories/controllers that touch persisted metadata
 
-**Key topics**: Feature-to-file mapping across all application sections
+**Key topics**: Tables and relationships, migrations, import/backups, repository pattern, DB vs filesystem boundaries
 
 ---
 
@@ -335,19 +335,6 @@ Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`
 ---
 
 ## 🎨 Code Quality & Standards
-
-### **[rules-comments.md](rules-comments.md)** - Code Comments Guidelines
-
-**Purpose**: Guidelines for writing effective code comments that help new contributors understand complex logic **When to use**:
-
-- Writing new code and deciding what to comment
-- Reviewing code for comment quality
-- Understanding when comments are helpful vs. noise
-- Refactoring code with better documentation
-
-**Key topics**: Comment philosophy, when to comment, explaining complex logic, anti-patterns, best practices
-
----
 
 ### **[future-tests.md](future-tests.md)** - Testing Strategy & Implementation
 

@@ -137,7 +137,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
       - **Core Assets**: Placeholder images (SVG) from the core assets are copied to ensure widgets using placeholders work correctly.
       - **Widget Assets**: The controller recursively searches the project's `/widgets` directory for any `.css` or `.js` files and copies them into the output `/assets` directory.
       - **Optimized Image Copying**: Uses media usage tracking to selectively copy only images that are actually used:
-        - Reads the project's `media.json` file to identify which images have a non-empty `usedIn` array
+        - Reads project media metadata from SQLite (via `readMediaFile` compatibility wrapper) to identify images with non-empty `usedIn`
         - Only copies images that are referenced in at least one page
         - For each used image, copies the original file plus all generated sizes (thumb, small, medium, large)
         - Images are copied to `assets/images/` (not `uploads/images/`)
@@ -151,7 +151,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
       - **Export Optimization**: Logs how many media files were copied vs. skipped, often reducing export size significantly
 
 10. **Record Export History**:
-    - The export metadata is recorded in `/data/publish/export-history.json` with version number, timestamp, output directory, and status.
+    - The export metadata is recorded in the SQLite `exports` table with version number, timestamp, output directory, and status.
     - **Automatic Cleanup**: If the number of exports exceeds the user's configured limit (from App Settings), the oldest exports are automatically deleted:
       - Physical export directories are removed from the file system
       - Export history entries are cleaned up
@@ -165,7 +165,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
 ### Version Control System
 
 - **Automatic Versioning**: Each export is assigned an incrementing version number (v1, v2, v3, etc.)
-- **History Tracking**: All exports are tracked in `/data/publish/export-history.json` with metadata:
+- **History Tracking**: All exports are tracked in SQLite (`exports` table) with metadata:
   - Project ID
   - Version number
   - Creation timestamp

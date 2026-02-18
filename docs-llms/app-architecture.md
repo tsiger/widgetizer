@@ -34,8 +34,8 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 
 | Function                    | Purpose                                                    |
 | --------------------------- | ---------------------------------------------------------- |
-| `readProjectsFile()`        | Read projects.json                                         |
-| `writeProjectsFile(data)`   | Write projects.json                                        |
+| `readProjectsFile()`        | Read project metadata via SQLite (legacy shape wrapper)    |
+| `writeProjectsFile(data)`   | Write project metadata via SQLite (legacy shape wrapper)   |
 | `getAllProjects()`          | Get all projects (enriched with themeName, hasThemeUpdate) |
 | `getActiveProject()`        | Get active project                                         |
 | `createProject()`           | Create project (copies theme, applies preset, processes templates/menus) |
@@ -211,8 +211,8 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 
 | Function                          | Purpose                                    |
 | --------------------------------- | ------------------------------------------ |
-| `readMediaFile(projectId)`        | Read media.json (with corruption recovery) |
-| `writeMediaFile(projectId, data)` | Write media.json (with locks/retries)      |
+| `readMediaFile(projectId)`        | Read media metadata from SQLite (legacy shape wrapper) |
+| `writeMediaFile(projectId, data)` | Write media metadata to SQLite                        |
 | `getProjectMedia()`               | Get all media files                        |
 | `uploadProjectMedia()`            | Upload and process files                   |
 | `updateMediaMetadata()`           | Update alt/title/description               |
@@ -244,7 +244,7 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 ### Features
 
 - 30-second cache with request deduplication
-- Write locks prevent race conditions
+- SQLite transactions provide atomic media metadata updates
 - Usage tracking prevents deletion of in-use files
 - Image processing (multiple sizes, quality)
 - SVG sanitization with DOMPurify
@@ -710,7 +710,7 @@ Save button / Auto-save timer
 
 ### 4. Active Project Resolution
 
-**Problem:** Many controllers read `projects.json` just to get the active project.
+**Problem:** Many controllers resolve active project context repeatedly (now via SQLite-backed project metadata), creating repeated boilerplate.
 
 **Locations:**
 

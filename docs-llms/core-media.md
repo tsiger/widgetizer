@@ -65,10 +65,17 @@ Themes can override the app-level image size configuration by defining `imageSiz
 
 ### Metadata Storage
 
-All metadata for the files in a project's media library is stored in a single JSON file.
+Media metadata is stored in SQLite, while the uploaded binary files remain on disk under each project folder.
 
-- **Location**: `/data/projects/<folderName>/uploads/media.json`
-- **Structure**: This file contains a single object with a `files` array. Each object in the array represents one file and stores critical information.
+- **Database**: `/data/widgetizer.db`
+- **Tables**:
+  - `media_files`: core file records (id, project_id, filename, type, path, dimensions, metadata)
+  - `media_sizes`: generated image variants (thumb/small/medium/etc.)
+  - `media_usage`: usage relationships (`used_in`) for pages, globals, and theme settings
+- **Filesystem**: original uploads and generated image variants still live in:
+  - `/data/projects/<folderName>/uploads/images/`
+  - `/data/projects/<folderName>/uploads/videos/`
+  - `/data/projects/<folderName>/uploads/audios/`
 
 ```json
 {
@@ -116,7 +123,7 @@ All metadata for the files in a project's media library is stored in a single JS
 }
 ```
 
-_Note: The `sizes` object only contains entries for enabled image sizes. Disabled sizes are not generated or stored._
+_Note: API responses still return a `files` array shape for backward compatibility, but it is assembled from SQLite rows (not read from `uploads/media.json`)._
 
 ### Usage Tracking
 
@@ -326,7 +333,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 
 | Method | Endpoint | Middleware | Controller Function | Description |
 | --- | --- | --- | --- | --- |
-| `GET` | `/api/media/projects/:projectId/media` |  | `getProjectMedia` | Reads and returns the `media.json`. |
+| `GET` | `/api/media/projects/:projectId/media` |  | `getProjectMedia` | Reads and returns media metadata from SQLite (legacy JSON response shape). |
 | `POST` | `/api/media/projects/:projectId/media` | `upload.array("files")` | `uploadProjectMedia` | Handles file uploads. |
 | `DELETE` | `/api/media/projects/:projectId/media/:fileId` |  | `deleteProjectMedia` | Deletes a single file and its metadata. Prevents deletion if file is in use. |
 | `POST` | `/api/media/projects/:projectId/media/bulk-delete` |  | `bulkDeleteProjectMedia` | Deletes multiple files and their metadata. Prevents deletion if any files are in use. |
@@ -357,7 +364,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
       - Apply the configured maximum widths for each enabled size
       - **Skip sizes larger than original**: Only creates sizes that are smaller than the original image dimensions to avoid storage waste
   6.  If the file is a video, no processing is performed - it's simply stored as-is.
-  7.  It creates a new metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants (images only)—and adds it to the `files` array in `media.json`.
+  7.  It creates a metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants (images only)—and persists it to SQLite.
   8.  **Thumbnail Assignment**: The system ensures there's always a thumbnail for previews:
       - If `thumb` size is enabled: uses the thumb image
       - If `thumb` is disabled: uses the first available enabled size
@@ -366,23 +373,23 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
   10. **Parallel Processing**: All files are processed in parallel using `Promise.allSettled` for optimal performance.
   11. It returns a JSON response to the client with arrays of successfully processed and rejected files.
 - **Deletion Logic (`deleteProjectMedia`, `bulkDeleteProjectMedia`)**:
-  1.  The controller reads `media.json`.
+  1.  The controller reads media metadata via the SQLite-backed repository wrapper.
   2.  It finds the file entry (or entries) by ID.
   3.  **Usage Check**: It verifies that the file(s) are not currently in use by checking the `usedIn` array. If any files are in use, deletion is prevented with an error response.
   4.  It uses `fs.remove` to delete the original physical file and **all** of its generated sizes from the filesystem.
   5.  It removes the metadata object(s) from the `files` array.
-  6.  It overwrites `media.json` with the updated data.
+  6.  It writes the updated media state back to SQLite.
 - **Metadata Update (`updateMediaMetadata`)**:
-  1.  The controller reads `media.json`.
+  1.  The controller reads media metadata from SQLite.
   2.  It finds the file to update in the `files` array by its `fileId`.
   3.  It updates the `alt` and `title` properties within the `metadata` object for that file.
-  4.  It overwrites `media.json` with the updated data and returns the updated file object.
+  4.  It persists the update to SQLite and returns the updated file object.
 
 ### Usage Tracking Service (`server/services/mediaUsageService.js`)
 
 The media usage tracking is handled by a dedicated service that provides automated tracking of which pages and global widgets use which media files:
 
-- **`updatePageMediaUsage(projectId, pageId, pageData)`**: Scans a page's content for media references and updates the `usedIn` arrays in `media.json`. First removes the page from all existing `usedIn` arrays, then adds it to files that are actually referenced.
+- **`updatePageMediaUsage(projectId, pageId, pageData)`**: Scans a page's content for media references and updates `usedIn` in SQLite. First removes the page from all existing usage links, then adds it to files that are actually referenced.
 - **`updateGlobalWidgetMediaUsage(projectId, globalId, widgetData)`**: Scans a global widget (header/footer) for media references and updates the `usedIn` arrays. Works the same way as page tracking but for global widgets.
 - **`removePageFromMediaUsage(projectId, pageId)`**: Removes a page from all media files' `usedIn` arrays when the page is deleted.
 - **`getMediaUsage(projectId, fileId)`**: Returns usage information for a specific media file, including which pages and global widgets use it.

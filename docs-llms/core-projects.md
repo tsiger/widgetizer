@@ -115,9 +115,9 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 5.  **Isolation**: Files are extracted to a temporary directory first for validation before any permanent changes.
 6.  **Project Creation**:
     - A new UUID is generated for the imported project
-    - A unique `folderName` is generated (checking both `projects.json` and existing directories)
+    - A unique `folderName` is generated (checking existing project metadata in SQLite and existing directories)
     - Files are copied from the temp directory to the new project directory
-    - Project metadata is added to `projects.json` only after successful file copy
+    - Project metadata is written to SQLite only after successful file copy
 7.  **Cleanup**: Temporary files are removed on both success and failure.
 8.  **Feedback**: Success modal shows the imported project name, then auto-closes after 2 seconds.
 
