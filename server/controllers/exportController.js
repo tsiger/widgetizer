@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import archiver from "archiver";
 import { getProjectDir, PUBLISH_DIR, APP_ROOT, STATIC_CORE_ASSETS_DIR } from "../config.js";
+import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
 import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
@@ -759,7 +760,7 @@ export async function getExportFiles(req, res) {
     const resolvedPath = path.resolve(fullPath);
     const publishPath = path.resolve(PUBLISH_DIR);
 
-    if (!resolvedPath.startsWith(publishPath)) {
+    if (!isWithinDirectory(resolvedPath, publishPath)) {
       return res.status(403).json({ error: "Access denied" });
     }
 
@@ -802,7 +803,7 @@ export async function downloadExport(req, res) {
     const resolvedPath = path.resolve(fullPath);
     const publishPath = path.resolve(PUBLISH_DIR);
 
-    if (!resolvedPath.startsWith(publishPath)) {
+    if (!isWithinDirectory(resolvedPath, publishPath)) {
       return res.status(403).json({ error: "Access denied" });
     }
 

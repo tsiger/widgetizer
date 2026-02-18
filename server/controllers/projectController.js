@@ -842,22 +842,34 @@ function isZipFile(file) {
   return ZIP_MIMETYPES.includes(file.mimetype) || file.originalname.endsWith(".zip");
 }
 
+const UPLOAD_TEMP_DIR = path.join(DATA_DIR, "temp");
+
+/**
+ * Read the max upload size from app settings (shared by project import + theme upload).
+ * Falls back to 500 MB when the setting is unavailable.
+ * @returns {Promise<number>} size limit in megabytes
+ */
+export async function getMaxUploadSizeMB() {
+  try {
+    const settings = await readAppSettingsFile();
+    return settings.export?.maxImportSizeMB || 500;
+  } catch {
+    return 500;
+  }
+}
+
 /**
  * Express middleware that configures multer for project ZIP import,
- * reading the max size from app settings.
+ * reading the max size from app settings. Files are written to disk
+ * (data/temp/) instead of buffered in memory.
  */
 export async function handleImportUpload(req, res, next) {
   try {
-    let maxSizeMB = 500;
-    try {
-      const settings = await readAppSettingsFile();
-      maxSizeMB = settings.export?.maxImportSizeMB || 500;
-    } catch {
-      // Fall back to default 500MB
-    }
+    const maxSizeMB = await getMaxUploadSizeMB();
+    await fs.ensureDir(UPLOAD_TEMP_DIR);
 
     const upload = multer({
-      storage: multer.memoryStorage(),
+      dest: UPLOAD_TEMP_DIR,
       limits: { fileSize: maxSizeMB * 1024 * 1024 },
       fileFilter: (_req, file, cb) => {
         if (isZipFile(file)) {
@@ -891,14 +903,14 @@ export async function handleImportUpload(req, res, next) {
  * @returns {Promise<void>}
  */
 export async function importProject(req, res) {
+  const uploadedFilePath = req.file?.path;
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No ZIP file uploaded" });
     }
 
     // Check file size against app settings (backup check)
-    const settings = await readAppSettingsFile();
-    const maxSizeMB = settings.export?.maxImportSizeMB || 500;
+    const maxSizeMB = await getMaxUploadSizeMB();
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     if (req.file.size > maxSizeBytes) {
@@ -907,9 +919,8 @@ export async function importProject(req, res) {
       });
     }
 
-    const zipBuffer = req.file.buffer;
     const AdmZip = await import("adm-zip");
-    const zip = new AdmZip.default(zipBuffer);
+    const zip = new AdmZip.default(uploadedFilePath);
     const zipEntries = zip.getEntries();
 
     if (zipEntries.length === 0) {
@@ -1056,8 +1067,9 @@ export async function importProject(req, res) {
         // Non-fatal: project is still usable, media files exist on disk
       }
 
-      // Clean up temporary directory
+      // Clean up temporary files (extraction dir + uploaded ZIP)
       await fs.remove(tempDir);
+      if (uploadedFilePath) await fs.remove(uploadedFilePath).catch(() => {});
 
       res.status(201).json({
         ...newProject,
@@ -1093,6 +1105,8 @@ export async function importProject(req, res) {
       throw error;
     }
   } catch (error) {
+    // Always clean up the uploaded temp file
+    if (uploadedFilePath) await fs.remove(uploadedFilePath).catch(() => {});
     console.error("Error importing project:", error);
     res.status(500).json({ error: error.message || "Failed to import project" });
   }

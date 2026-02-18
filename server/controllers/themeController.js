@@ -1,6 +1,8 @@
 import fs from "fs-extra";
 import path from "path";
+import multer from "multer";
 import {
+  DATA_DIR,
   THEMES_DIR,
   getThemeDir,
   getThemeJsonPath,
@@ -20,6 +22,7 @@ import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
 import { updateThemeSettingsMediaUsage } from "../services/mediaUsageService.js";
 import { sanitizeThemeSettings } from "../services/sanitizationService.js";
+import { readAppSettingsFile } from "./appSettingsController.js";
 
 /**
  * Ensure the themes directory exists, creating it if necessary.
@@ -860,22 +863,70 @@ export async function deleteTheme(req, res) {
   }
 }
 
+const UPLOAD_TEMP_DIR = path.join(DATA_DIR, "temp");
+
+const ZIP_MIMETYPES = ["application/zip", "application/x-zip-compressed"];
+
+/**
+ * Express middleware that configures multer for theme ZIP upload,
+ * reading the max size from app settings (shared with project import).
+ */
+export async function handleThemeUpload(req, res, next) {
+  try {
+    let maxSizeMB = 500;
+    try {
+      const settings = await readAppSettingsFile();
+      maxSizeMB = settings.export?.maxImportSizeMB || 500;
+    } catch {
+      // Fall back to default 500MB
+    }
+
+    await fs.ensureDir(UPLOAD_TEMP_DIR);
+
+    const upload = multer({
+      dest: UPLOAD_TEMP_DIR,
+      limits: { fileSize: maxSizeMB * 1024 * 1024 },
+      fileFilter: (_req, file, cb) => {
+        if (ZIP_MIMETYPES.includes(file.mimetype) || file.originalname.endsWith(".zip")) {
+          cb(null, true);
+        } else {
+          cb(new Error("Only ZIP files are allowed"), false);
+        }
+      },
+    });
+
+    upload.single("themeZip")(req, res, async (err) => {
+      if (!err) return next();
+
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({
+          message: `File size exceeds the maximum allowed size of ${maxSizeMB}MB.`,
+        });
+      }
+      return res.status(400).json({ message: err.message || "File upload error" });
+    });
+  } catch {
+    return res.status(500).json({ message: "Failed to configure file upload" });
+  }
+}
+
 /**
  * Upload a theme zip file. Supports both new themes and version updates.
  * For new themes: extracts to themes/{name}/
  * For updates: extracts to themes/{name}/updates/{version}/ and builds latest/
- * @param {import('express').Request} req - Express request with file buffer
+ * @param {import('express').Request} req - Express request with file on disk (req.file.path)
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
 export async function uploadTheme(req, res) {
-  if (!req.file) {
-    return res.status(400).json({ message: "No theme zip file uploaded." });
-  }
+  const uploadedFilePath = req.file?.path;
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No theme zip file uploaded." });
+    }
 
-  const zipBuffer = req.file.buffer;
-  const AdmZip = await import("adm-zip");
-  const zip = new AdmZip.default(zipBuffer);
+    const AdmZip = await import("adm-zip");
+    const zip = new AdmZip.default(uploadedFilePath);
   const zipEntries = zip.getEntries();
 
   if (zipEntries.length === 0) {
@@ -1255,6 +1306,9 @@ export async function uploadTheme(req, res) {
       }
     }
     res.status(500).json({ message: "Failed to extract theme zip file." });
+  }
+  } finally {
+    if (uploadedFilePath) await fs.remove(uploadedFilePath).catch(() => {});
   }
 }
 

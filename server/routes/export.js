@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { PUBLISH_DIR } from "../config.js";
+import { isWithinDirectory } from "../utils/pathSecurity.js";
 import {
   exportProject,
   getExportHistory,
@@ -68,7 +69,7 @@ function serveExportFile(req, res) {
     const resolvedPath = path.resolve(fullPath);
     const publishPath = path.resolve(PUBLISH_DIR);
 
-    if (!resolvedPath.startsWith(publishPath)) {
+    if (!isWithinDirectory(resolvedPath, publishPath)) {
       console.error(`Security check failed: ${resolvedPath} not within ${publishPath}`);
       return res.status(403).json({ error: "Access denied" });
     }
@@ -86,7 +87,7 @@ function serveExportFile(req, res) {
       const indexPath = path.join(resolvedPath, "index.html");
       if (fs.existsSync(indexPath)) {
         const resolvedIndexPath = path.resolve(indexPath);
-        if (!resolvedIndexPath.startsWith(publishPath)) {
+        if (!isWithinDirectory(resolvedIndexPath, publishPath)) {
           return res.status(403).json({ error: "Access denied" });
         }
         return res.sendFile(resolvedIndexPath);

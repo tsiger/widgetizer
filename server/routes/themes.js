@@ -1,12 +1,7 @@
 import express from "express";
 import * as themeController from "../controllers/themeController.js";
-import multer from "multer"; // Import multer for file uploads
 
 const router = express.Router();
-
-// Configure multer for temporary storage of the zip file
-// Store in memory for simplicity, as we'll extract and delete it quickly
-const upload = multer({ storage: multer.memoryStorage() });
 
 // GET /api/themes - Get all themes
 router.get("/", themeController.getAllThemes);
@@ -39,7 +34,7 @@ router.get("/project/:projectId", themeController.getProjectThemeSettings);
 router.post("/project/:projectId", themeController.saveProjectThemeSettings);
 
 // POST /api/themes/upload - Upload a new theme zip file
-router.post("/upload", upload.single("themeZip"), themeController.uploadTheme);
+router.post("/upload", themeController.handleThemeUpload, themeController.uploadTheme);
 
 // DELETE /api/themes/:id - Delete a theme if not in use
 router.delete("/:id", themeController.deleteTheme);

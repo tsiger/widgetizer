@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { getProjectDir } from "../config.js";
+import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { getSetting } from "../db/repositories/settingsRepository.js";
 import { readProjectsFile } from "./projectController.js";
 import { fileURLToPath } from "url";
@@ -425,7 +426,7 @@ export async function serveAsset(req, res) {
   const normalizedSubpath = path.normalize(assetSubpath).replace(/^(\.\.(\/|\\|$))+/, "");
   const filePath = path.resolve(baseDir, normalizedSubpath);
 
-  if (!filePath.startsWith(baseDir)) {
+  if (!isWithinDirectory(filePath, baseDir)) {
     return res.status(400).send("Invalid asset path");
   }
 

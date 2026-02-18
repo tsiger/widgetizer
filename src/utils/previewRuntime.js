@@ -501,7 +501,7 @@ function setupInteractionHandler() {
           event.stopPropagation();
 
           if (targetUrl) {
-            window.top.location.assign(targetUrl);
+            postToParent({ type: "NAVIGATE_PREVIEW", payload: { url: targetUrl } });
           }
           return;
         }

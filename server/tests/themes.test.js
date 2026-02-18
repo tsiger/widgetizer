@@ -203,7 +203,16 @@ function buildThemeZip(themeName, opts = {}) {
     zip.addFile(`${themeName}/${filePath}`, Buffer.from(content));
   }
 
-  return zip.toBuffer();
+  const buf = zip.toBuffer();
+  return zipBufferToTempFile(buf);
+}
+
+/** Write a ZIP buffer to a temp file and return a multer-like file descriptor */
+function zipBufferToTempFile(buf) {
+  const tmpPath = path.join(TEST_DATA_DIR, "temp", `test-theme-${Date.now()}-${Math.random().toString(36).slice(2)}.zip`);
+  fs.ensureDirSync(path.dirname(tmpPath));
+  fs.writeFileSync(tmpPath, buf);
+  return { path: tmpPath, size: buf.length };
 }
 
 // ============================================================================
@@ -743,7 +752,7 @@ describe("uploadTheme validation", () => {
   it("returns 400 for empty zip", async () => {
     const zip = new AdmZip.default();
     const res = await callController(uploadTheme, {
-      file: { buffer: zip.toBuffer() },
+      file: zipBufferToTempFile(zip.toBuffer()),
     });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("empty"));
@@ -759,7 +768,7 @@ describe("uploadTheme validation", () => {
     zip.addFile("my-theme/widgets/hero/schema.json", Buffer.from("{}"));
 
     const res = await callController(uploadTheme, {
-      file: { buffer: zip.toBuffer() },
+      file: zipBufferToTempFile(zip.toBuffer()),
     });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("theme.json"));
@@ -767,35 +776,35 @@ describe("uploadTheme validation", () => {
 
   it("returns 400 when screenshot.png is missing", async () => {
     const buffer = buildThemeZip("no-screenshot", { includeScreenshot: false });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("screenshot.png"));
   });
 
   it("returns 400 when layout.liquid is missing", async () => {
     const buffer = buildThemeZip("no-layout", { includeLayout: false });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("layout.liquid"));
   });
 
   it("returns 400 when assets/ directory is missing", async () => {
     const buffer = buildThemeZip("no-assets", { includeAssets: false });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("assets"));
   });
 
   it("returns 400 when templates/ directory is missing", async () => {
     const buffer = buildThemeZip("no-templates", { includeTemplates: false });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("templates"));
   });
 
   it("returns 400 when widgets/ directory is missing", async () => {
     const buffer = buildThemeZip("no-widgets", { includeWidgets: false });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("widgets"));
   });
@@ -809,7 +818,7 @@ describe("uploadTheme validation", () => {
     zip.addFile("bad-json-theme/templates/h.json", Buffer.from("{}"));
     zip.addFile("bad-json-theme/widgets/w/s.json", Buffer.from("{}"));
 
-    const res = await callController(uploadTheme, { file: { buffer: zip.toBuffer() } });
+    const res = await callController(uploadTheme, { file: zipBufferToTempFile(zip.toBuffer()) });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("parse JSON"));
   });
@@ -818,7 +827,7 @@ describe("uploadTheme validation", () => {
     const buffer = buildThemeZip("missing-fields", {
       themeJsonOverride: { version: "1.0.0" }, // missing name and author
     });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("Missing required fields"));
     assert.ok(res._json.message.includes("name"));
@@ -827,7 +836,7 @@ describe("uploadTheme validation", () => {
 
   it("returns 400 for invalid semver version", async () => {
     const buffer = buildThemeZip("bad-version", { version: "not-a-version" });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("Invalid version format"));
   });
@@ -837,7 +846,7 @@ describe("uploadTheme validation", () => {
     zip.addFile("theme.json", Buffer.from(JSON.stringify({ name: "test", version: "1.0.0", author: "a" })));
     zip.addFile("layout.liquid", Buffer.from("<html></html>"));
 
-    const res = await callController(uploadTheme, { file: { buffer: zip.toBuffer() } });
+    const res = await callController(uploadTheme, { file: zipBufferToTempFile(zip.toBuffer()) });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("structure is invalid") || res._json.message.includes("root folder"));
   });
@@ -859,7 +868,7 @@ describe("uploadTheme update validation", () => {
     zip.addFile(`${n}/widgets/w/s.json`, Buffer.from("{}"));
     zip.addFile(`${n}/updates/bad-name/theme.json`, Buffer.from(JSON.stringify({ version: "bad-name" })));
 
-    const res = await callController(uploadTheme, { file: { buffer: zip.toBuffer() } });
+    const res = await callController(uploadTheme, { file: zipBufferToTempFile(zip.toBuffer()) });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("Invalid update folder name"));
   });
@@ -876,7 +885,7 @@ describe("uploadTheme update validation", () => {
     // Update folder with no theme.json
     zip.addFile(`${n}/updates/1.1.0/assets/new.css`, Buffer.from(""));
 
-    const res = await callController(uploadTheme, { file: { buffer: zip.toBuffer() } });
+    const res = await callController(uploadTheme, { file: zipBufferToTempFile(zip.toBuffer()) });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("missing required theme.json"));
   });
@@ -887,7 +896,7 @@ describe("uploadTheme update validation", () => {
       updates: [{ version: "1.1.0", themeJsonVersion: "9.9.9" }],
     });
 
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("version mismatch"));
   });
@@ -912,7 +921,7 @@ describe("uploadTheme — new theme", () => {
       author: "Test Author",
     });
 
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 201, `Expected 201, got ${res._status}: ${JSON.stringify(res._json)}`);
     assert.ok(res._json.message.includes("installed"));
     assert.equal(res._json.theme.id, "fresh-theme");
@@ -924,7 +933,7 @@ describe("uploadTheme — new theme", () => {
 
   it("creates theme directory with all required files", async () => {
     const buffer = buildThemeZip("fresh-theme");
-    await callController(uploadTheme, { file: { buffer } });
+    await callController(uploadTheme, { file: buffer });
 
     const themeDir = getThemeDir("fresh-theme");
     assert.ok(await fs.pathExists(path.join(themeDir, "theme.json")));
@@ -941,7 +950,7 @@ describe("uploadTheme — new theme", () => {
       updates: [{ version: "1.1.0", files: { "assets/new.css": "new style" } }],
     });
 
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 201);
     assert.ok(res._json.theme.versions.includes("1.0.0"));
     assert.ok(res._json.theme.versions.includes("1.1.0"));
@@ -952,11 +961,12 @@ describe("uploadTheme — new theme", () => {
   });
 
   it("returns 409 when theme is already installed and up to date", async () => {
-    const buffer = buildThemeZip("fresh-theme", { version: "1.0.0" });
-    await callController(uploadTheme, { file: { buffer } });
+    const firstUpload = buildThemeZip("fresh-theme", { version: "1.0.0" });
+    await callController(uploadTheme, { file: firstUpload });
 
-    // Upload again — same version, no new updates
-    const res = await callController(uploadTheme, { file: { buffer } });
+    // Upload again — same version, no new updates (need a new temp file)
+    const secondUpload = buildThemeZip("fresh-theme", { version: "1.0.0" });
+    const res = await callController(uploadTheme, { file: secondUpload });
     assert.equal(res._status, 409);
     assert.ok(res._json.message.includes("already up to date"));
   });
@@ -972,7 +982,7 @@ describe("uploadTheme — theme update", () => {
   before(async () => {
     // Install the base theme first
     const buffer = buildThemeZip(EXISTING_THEME, { version: "1.0.0" });
-    await callController(uploadTheme, { file: { buffer } });
+    await callController(uploadTheme, { file: buffer });
   });
 
   after(async () => {
@@ -985,7 +995,7 @@ describe("uploadTheme — theme update", () => {
       updates: [{ version: "1.1.0", files: { "assets/patch.css": "patched" } }],
     });
 
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 201);
     assert.ok(res._json.theme.isUpdate);
     assert.deepEqual(res._json.theme.addedVersions, ["1.1.0"]);
@@ -998,7 +1008,7 @@ describe("uploadTheme — theme update", () => {
       updates: [{ version: "2.1.0" }],
     });
 
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 409);
     assert.ok(res._json.message.includes("base version"));
   });

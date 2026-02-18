@@ -1104,14 +1104,26 @@ async function exportTestProject(projectId) {
   return { res, zip, manifest };
 }
 
-/** Helper: build an in-memory ZIP buffer with a manifest and optional extra files */
+/** Write a ZIP buffer to a temp file and return a multer-like file descriptor */
+function zipBufferToTempFile(buf) {
+  const tmpPath = path.join(TEST_DATA_DIR, "temp", `test-import-${Date.now()}-${Math.random().toString(36).slice(2)}.zip`);
+  fs.ensureDirSync(path.dirname(tmpPath));
+  fs.writeFileSync(tmpPath, buf);
+  return { path: tmpPath, size: buf.length };
+}
+
+/** Helper: build a ZIP with a manifest and optional extra files, written to a temp file */
 function buildImportZip(manifestObj, extraFiles = {}) {
   const zip = new AdmZip.default();
   zip.addFile("project-export.json", Buffer.from(JSON.stringify(manifestObj, null, 2)));
   for (const [name, content] of Object.entries(extraFiles)) {
     zip.addFile(name, Buffer.from(typeof content === "string" ? content : JSON.stringify(content, null, 2)));
   }
-  return zip.toBuffer();
+  const buf = zip.toBuffer();
+  const tmpPath = path.join(TEST_DATA_DIR, "temp", `test-import-${Date.now()}-${Math.random().toString(36).slice(2)}.zip`);
+  fs.ensureDirSync(path.dirname(tmpPath));
+  fs.writeFileSync(tmpPath, buf);
+  return { path: tmpPath, size: buf.length };
 }
 
 describe("exportProject", () => {
@@ -1216,13 +1228,13 @@ describe("importProject", () => {
   };
 
   it("imports a project from a valid ZIP", async () => {
-    const zipBuffer = buildImportZip(baseManifest, {
+    const zipFile = buildImportZip(baseManifest, {
       "theme.json": { name: "Test Theme", version: "1.0.0" },
       "pages/index.json": { name: "Home", slug: "index", widgets: {} },
     });
 
     const res = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
 
     assert.equal(res._status, 201);
@@ -1248,12 +1260,12 @@ describe("importProject", () => {
         preset: "starter",
       },
     };
-    const zipBuffer = buildImportZip(manifest, {
+    const zipFile = buildImportZip(manifest, {
       "theme.json": { name: "Test Theme", version: "1.0.0" },
     });
 
     const res = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
 
     assert.equal(res._status, 201);
@@ -1284,12 +1296,12 @@ describe("importProject", () => {
         // no receiveThemeUpdates or preset
       },
     };
-    const zipBuffer = buildImportZip(oldManifest, {
+    const zipFile = buildImportZip(oldManifest, {
       "theme.json": { name: "Test Theme", version: "1.0.0" },
     });
 
     const res = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
 
     assert.equal(res._status, 201);
@@ -1300,10 +1312,10 @@ describe("importProject", () => {
   it("rejects ZIP without manifest", async () => {
     const zip = new AdmZip.default();
     zip.addFile("some-file.txt", Buffer.from("hello"));
-    const zipBuffer = zip.toBuffer();
+    const zipFile = zipBufferToTempFile(zip.toBuffer());
 
     const res = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
 
     assert.equal(res._status, 400);
@@ -1313,10 +1325,10 @@ describe("importProject", () => {
   it("rejects ZIP with invalid manifest JSON", async () => {
     const zip = new AdmZip.default();
     zip.addFile("project-export.json", Buffer.from("{ invalid json !!!"));
-    const zipBuffer = zip.toBuffer();
+    const zipFile = zipBufferToTempFile(zip.toBuffer());
 
     const res = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
 
     assert.equal(res._status, 400);
@@ -1331,10 +1343,10 @@ describe("importProject", () => {
         // missing 'theme'
       },
     };
-    const zipBuffer = buildImportZip(incompleteManifest);
+    const zipFile = buildImportZip(incompleteManifest);
 
     const res = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
 
     assert.equal(res._status, 400);
@@ -1346,10 +1358,10 @@ describe("importProject", () => {
       ...baseManifest,
       project: { ...baseManifest.project, theme: "non-existent-theme-xyz" },
     };
-    const zipBuffer = buildImportZip(manifest);
+    const zipFile = buildImportZip(manifest);
 
     const res = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
 
     assert.equal(res._status, 400);
@@ -1369,10 +1381,10 @@ describe("importProject", () => {
       ...baseManifest,
       project: { ...baseManifest.project, theme: "ghost-theme-404" },
     };
-    const zipBuffer = buildImportZip(manifest);
+    const zipFile = buildImportZip(manifest);
 
     await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
 
     // Verify no project was left behind
@@ -1382,13 +1394,13 @@ describe("importProject", () => {
 
   it("restores media metadata from ZIP into SQLite", async () => {
     const mediaData = createTestMediaData();
-    const zipBuffer = buildImportZip(baseManifest, {
+    const zipFile = buildImportZip(baseManifest, {
       "theme.json": { name: "Test Theme", version: "1.0.0" },
       "uploads/media.json": mediaData,
     });
 
     const res = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
     assert.equal(res._status, 201);
 
@@ -1407,13 +1419,13 @@ describe("importProject", () => {
     const mediaData = createTestMediaData();
     const originalIds = mediaData.files.map((f) => f.id);
 
-    const zipBuffer = buildImportZip(baseManifest, {
+    const zipFile = buildImportZip(baseManifest, {
       "theme.json": { name: "Test Theme", version: "1.0.0" },
       "uploads/media.json": mediaData,
     });
 
     const res = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
     assert.equal(res._status, 201);
 
@@ -1442,11 +1454,11 @@ describe("importProject", () => {
     // Export the original
     const { res: exportRes } = await exportTestProject(original.id);
     assert.equal(exportRes._status, 200);
-    const zipBuffer = exportRes.getBuffer();
+    const zipFile = zipBufferToTempFile(exportRes.getBuffer());
 
     // Import while original still exists
     const importRes = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
     assert.equal(importRes._status, 201);
 
@@ -1476,11 +1488,11 @@ describe("exportProject → importProject round-trip", () => {
     // Export it
     const { res: exportRes } = await exportTestProject(original.id);
     assert.equal(exportRes._status, 200);
-    const zipBuffer = exportRes.getBuffer();
+    const zipFile = zipBufferToTempFile(exportRes.getBuffer());
 
     // Import it back
     const importRes = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
     assert.equal(importRes._status, 201);
 
@@ -1506,11 +1518,11 @@ describe("exportProject → importProject round-trip", () => {
     // Export
     const { res: exportRes } = await exportTestProject(original.id);
     assert.equal(exportRes._status, 200);
-    const zipBuffer = exportRes.getBuffer();
+    const zipFile = zipBufferToTempFile(exportRes.getBuffer());
 
     // Import
     const importRes = await callController(importProject, {
-      file: { buffer: zipBuffer, size: zipBuffer.length },
+      file: zipFile,
     });
     assert.equal(importRes._status, 201);
 
