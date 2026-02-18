@@ -39,8 +39,7 @@ export function getMediaFiles(projectId) {
 }
 
 /**
- * Write the full media data from the legacy shape (for backward compatibility).
- * Replaces all media files for a project.
+ * Write the full media data for a project (replaces all existing media files).
  * @param {string} projectId
  * @param {{files: Array<object>}} mediaData
  */
@@ -73,7 +72,7 @@ export function writeMediaData(projectId, mediaData) {
 /**
  * Add a new media file with its sizes.
  * @param {string} projectId
- * @param {object} fileData - File info from controller (same shape as the old JSON entry)
+ * @param {object} fileData - File info from controller
  */
 function addMediaFile(projectId, fileData) {
   const db = getDb();

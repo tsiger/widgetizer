@@ -141,8 +141,7 @@ export function setActiveProjectId(id) {
 }
 
 /**
- * Read the projects data in the legacy shape (for backward compatibility).
- * Returns { projects: [...], activeProjectId: "..." }
+ * Read all projects data as a single object.
  * @returns {{projects: Array<object>, activeProjectId: string|null}}
  */
 export function readProjectsData() {
@@ -153,8 +152,7 @@ export function readProjectsData() {
 }
 
 /**
- * Write the full projects data from the legacy shape (for backward compatibility).
- * Replaces all projects and updates activeProjectId.
+ * Write the full projects data (replaces all projects and updates activeProjectId).
  * @param {{projects: Array<object>, activeProjectId: string|null}} data
  */
 export function writeProjectsData(data) {

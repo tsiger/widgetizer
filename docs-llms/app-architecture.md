@@ -34,8 +34,8 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 
 | Function                    | Purpose                                                    |
 | --------------------------- | ---------------------------------------------------------- |
-| `readProjectsFile()`        | Read project metadata via SQLite (legacy shape wrapper)    |
-| `writeProjectsFile(data)`   | Write project metadata via SQLite (legacy shape wrapper)   |
+| `readProjectsFile()`        | Read project metadata from SQLite                          |
+| `writeProjectsFile(data)`   | Write project metadata to SQLite                           |
 | `getAllProjects()`          | Get all projects (enriched with themeName, hasThemeUpdate) |
 | `getActiveProject()`        | Get active project                                         |
 | `createProject()`           | Create project (copies theme, applies preset, processes templates/menus) |
@@ -211,7 +211,7 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 
 | Function                          | Purpose                                    |
 | --------------------------------- | ------------------------------------------ |
-| `readMediaFile(projectId)`        | Read media metadata from SQLite (legacy shape wrapper) |
+| `readMediaFile(projectId)`        | Read media metadata from SQLite                        |
 | `writeMediaFile(projectId, data)` | Write media metadata to SQLite                        |
 | `getProjectMedia()`               | Get all media files                        |
 | `uploadProjectMedia()`            | Upload and process files                   |

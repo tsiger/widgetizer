@@ -6,16 +6,15 @@ import multer from "multer";
 import sharp from "sharp";
 import slugify from "slugify";
 import DOMPurify from "isomorphic-dompurify";
-import { validationResult } from "express-validator";
 import {
   getProjectDir,
   getProjectImagesDir,
-  getProjectVideosDir,
-  getProjectAudiosDir,
   getImagePath,
   getVideoPath,
   getAudioPath,
   getThemeJsonPath,
+  getMediaCategory,
+  getMediaDir,
 } from "../config.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
@@ -104,7 +103,6 @@ function decodeFileName(filename) {
 
 /**
  * Reads media metadata from SQLite for a project.
- * Backward-compatible wrapper returning the same shape as the old JSON file.
  * @param {string} projectId - The project UUID
  * @returns {Promise<{files: Array<object>}>} The media metadata object
  */
@@ -115,8 +113,7 @@ export async function readMediaFile(projectId) {
 }
 
 /**
- * Writes media metadata to SQLite for a project.
- * Backward-compatible wrapper that replaces all media data for the project.
+ * Writes media metadata to SQLite for a project (full replacement).
  * @param {string} projectId - The project UUID
  * @param {{files: Array<object>}} data - The media metadata to save
  */
@@ -151,15 +148,7 @@ const storage = multer.diskStorage({
         error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
         throw error;
       }
-      let targetDir;
-
-      if (file.mimetype.startsWith("video/")) {
-        targetDir = getProjectVideosDir(projectFolderName);
-      } else if (file.mimetype.startsWith("audio/")) {
-        targetDir = getProjectAudiosDir(projectFolderName);
-      } else {
-        targetDir = getProjectImagesDir(projectFolderName);
-      }
+      const targetDir = getMediaDir(projectFolderName, file.mimetype);
 
       await fs.ensureDir(targetDir);
       cb(null, targetDir);
@@ -183,14 +172,7 @@ const storage = multer.diskStorage({
         throw error;
       }
 
-      let targetDir;
-      if (file.mimetype.startsWith("video/")) {
-        targetDir = getProjectVideosDir(projectFolderName);
-      } else if (file.mimetype.startsWith("audio/")) {
-        targetDir = getProjectAudiosDir(projectFolderName);
-      } else {
-        targetDir = getProjectImagesDir(projectFolderName);
-      }
+      const targetDir = getMediaDir(projectFolderName, file.mimetype);
 
       let finalName = `${cleanName}${extension}`;
       let counter = 1;
@@ -228,15 +210,6 @@ export const upload = multer({
  * @returns {Promise<void>}
  */
 export async function getProjectMedia(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.error("Validation errors in getProjectMedia:", errors.array());
-    return res.status(400).json({
-      error: "Validation failed",
-      errors: errors.array(),
-    });
-  }
-
   try {
     const { projectId } = req.params;
 
@@ -275,11 +248,6 @@ export async function getProjectMedia(req, res) {
  * @returns {Promise<void>}
  */
 export async function uploadProjectMedia(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { projectId } = req.params;
     const files = req.files;
@@ -302,19 +270,11 @@ export async function uploadProjectMedia(req, res) {
     const filePromises = files.map(async (file) => {
       try {
         // Check file size against the appropriate limit
-        const isVideo = file.mimetype.startsWith("video/");
-        const isAudio = file.mimetype.startsWith("audio/");
-        let maxSizeMB, fileType;
-        if (isVideo) {
-          maxSizeMB = maxVideoSizeMB || 50;
-          fileType = "video";
-        } else if (isAudio) {
-          maxSizeMB = maxAudioSizeMB || 25;
-          fileType = "audio";
-        } else {
-          maxSizeMB = maxImageSizeMB || 5;
-          fileType = "image";
-        }
+        const fileType = getMediaCategory(file.mimetype);
+        const maxSizeMB =
+          fileType === "video" ? (maxVideoSizeMB || 50) :
+          fileType === "audio" ? (maxAudioSizeMB || 25) :
+          (maxImageSizeMB || 5);
         const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
         if (file.size > maxSizeBytes) {
@@ -336,14 +296,8 @@ export async function uploadProjectMedia(req, res) {
 
         // --- File is within size limit, proceed with processing ---
         const fileId = uuidv4();
-        let uploadPath;
-        if (isVideo) {
-          uploadPath = `/uploads/videos/${file.filename}`;
-        } else if (isAudio) {
-          uploadPath = `/uploads/audios/${file.filename}`;
-        } else {
-          uploadPath = `/uploads/images/${file.filename}`;
-        }
+        const uploadSubdir = fileType === "video" ? "videos" : fileType === "audio" ? "audios" : "images";
+        const uploadPath = `/uploads/${uploadSubdir}/${file.filename}`;
 
         const fileInfo = {
           id: fileId,
@@ -353,7 +307,7 @@ export async function uploadProjectMedia(req, res) {
           size: file.size,
           uploaded: new Date().toISOString(),
           path: uploadPath,
-          metadata: isVideo || isAudio ? { title: "", description: "" } : { alt: "", title: "" },
+          metadata: fileType === "image" ? { alt: "", title: "" } : { title: "", description: "" },
           sizes: {}, // Initialize sizes object
         };
 
@@ -492,11 +446,6 @@ export async function uploadProjectMedia(req, res) {
  * @returns {Promise<void>}
  */
 export async function updateMediaMetadata(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { projectId, fileId } = req.params;
     const alt = stripHtmlTags(req.body.alt);
@@ -571,11 +520,6 @@ export async function updateMediaMetadata(req, res) {
  * @returns {Promise<void>}
  */
 export async function deleteProjectMedia(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { projectId, fileId } = req.params;
 
@@ -600,15 +544,8 @@ export async function deleteProjectMedia(req, res) {
     }
 
     // Remove the physical files from storage
-    let fileDir;
     const projectFolderName = await getProjectFolderName(projectId);
-    if (fileToDelete.type && fileToDelete.type.startsWith("video/")) {
-      fileDir = getProjectVideosDir(projectFolderName);
-    } else if (fileToDelete.type && fileToDelete.type.startsWith("audio/")) {
-      fileDir = getProjectAudiosDir(projectFolderName);
-    } else {
-      fileDir = getProjectImagesDir(projectFolderName);
-    }
+    const fileDir = getMediaDir(projectFolderName, fileToDelete.type);
 
     // 1. Delete the original file
     const originalFilePath = path.join(fileDir, fileToDelete.filename);
@@ -658,11 +595,6 @@ export async function deleteProjectMedia(req, res) {
  * @returns {Promise<void>}
  */
 export async function serveProjectMedia(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { projectId, fileId, filename } = req.params;
 
@@ -744,11 +676,6 @@ export async function serveProjectMedia(req, res) {
  * @returns {Promise<void>}
  */
 export async function bulkDeleteProjectMedia(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { projectId } = req.params;
     const { fileIds } = req.body; // Expect an array of file IDs
@@ -803,15 +730,8 @@ export async function bulkDeleteProjectMedia(req, res) {
     // Asynchronously delete all associated physical files
     const deletePromises = filesToDelete.map(async (file) => {
       // 1. Delete the original file
-      let fileDir;
       const projectFolderName = await getProjectFolderName(projectId);
-      if (file.type && file.type.startsWith("video/")) {
-        fileDir = getProjectVideosDir(projectFolderName);
-      } else if (file.type && file.type.startsWith("audio/")) {
-        fileDir = getProjectAudiosDir(projectFolderName);
-      } else {
-        fileDir = getProjectImagesDir(projectFolderName);
-      }
+      const fileDir = getMediaDir(projectFolderName, file.type);
 
       const originalFilePath = path.join(fileDir, file.filename);
       try {
@@ -872,11 +792,6 @@ export async function bulkDeleteProjectMedia(req, res) {
  * @returns {Promise<void>}
  */
 export async function getMediaFileUsage(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { projectId, fileId } = req.params;
     const usage = await getMediaUsage(projectId, fileId);
@@ -900,11 +815,6 @@ export async function getMediaFileUsage(req, res) {
  * @returns {Promise<void>}
  */
 export async function refreshMediaUsage(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { projectId } = req.params;
     const result = await refreshAllMediaUsage(projectId);

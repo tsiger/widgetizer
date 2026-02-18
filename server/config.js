@@ -35,9 +35,6 @@ export function isAsarPath(p) {
 // Database path
 export const getDbPath = () => path.join(DATA_DIR, "widgetizer.db");
 
-// App settings path
-export const getAppSettingsPath = () => path.join(DATA_DIR, "appSettings.json");
-
 // Theme paths - base paths (for theme root)
 export const getThemeDir = (themeId) => path.join(THEMES_DIR, themeId);
 export const getThemeJsonPath = (themeId) => path.join(getThemeDir(themeId), "theme.json");
@@ -55,7 +52,6 @@ export const getThemePresetsJsonPath = (themeId) => path.join(getThemePresetsDir
 export const getThemePresetDir = (themeId, presetId) => path.join(getThemePresetsDir(themeId), presetId);
 
 // Project paths
-export const getProjectsFilePath = () => path.join(DATA_DIR, "projects", "projects.json");
 export const getProjectDir = (projectId) => path.join(DATA_DIR, "projects", projectId);
 
 // Project Page paths
@@ -77,10 +73,30 @@ export const getProjectUploadsDir = (projectId) => path.join(getProjectDir(proje
 export const getProjectImagesDir = (projectId) => path.join(getProjectUploadsDir(projectId), "images");
 export const getProjectVideosDir = (projectId) => path.join(getProjectUploadsDir(projectId), "videos");
 export const getProjectAudiosDir = (projectId) => path.join(getProjectUploadsDir(projectId), "audios");
-export const getProjectMediaJsonPath = (projectId) => path.join(getProjectUploadsDir(projectId), "media.json");
 export const getImagePath = (projectId, filename) => path.join(getProjectImagesDir(projectId), filename);
 export const getVideoPath = (projectId, filename) => path.join(getProjectVideosDir(projectId), filename);
 export const getAudioPath = (projectId, filename) => path.join(getProjectAudiosDir(projectId), filename);
+
+/**
+ * Classify a MIME type into a media category.
+ * @param {string} mimeType
+ * @returns {"video"|"audio"|"image"}
+ */
+export function getMediaCategory(mimeType) {
+  if (mimeType && mimeType.startsWith("video/")) return "video";
+  if (mimeType && mimeType.startsWith("audio/")) return "audio";
+  return "image";
+}
+
+/**
+ * Resolve the upload directory for a given project and MIME type.
+ */
+export function getMediaDir(projectFolderName, mimeType) {
+  const category = getMediaCategory(mimeType);
+  if (category === "video") return getProjectVideosDir(projectFolderName);
+  if (category === "audio") return getProjectAudiosDir(projectFolderName);
+  return getProjectImagesDir(projectFolderName);
+}
 
 // Log configuration on startup (useful for debugging)
 if (process.env.NODE_ENV !== "test") {

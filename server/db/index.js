@@ -2,7 +2,6 @@ import Database from "better-sqlite3";
 import fs from "fs-extra";
 import { getDbPath, DATA_DIR } from "../config.js";
 import { runMigrations } from "./migrations.js";
-import { importLegacyDataIfNeeded } from "./importLegacyData.js";
 
 let db = null;
 
@@ -23,7 +22,6 @@ export function getDb() {
   db.pragma("busy_timeout = 5000");
 
   runMigrations(db);
-  importLegacyDataIfNeeded(db);
 
   return db;
 }

@@ -1,6 +1,7 @@
 import express from "express";
 import { param, body } from "express-validator";
 import { stripHtmlTags } from "../services/sanitizationService.js";
+import { validateRequest } from "../middleware/validateRequest.js";
 import {
   getProjectMedia,
   uploadProjectMedia,
@@ -26,6 +27,7 @@ router.get(
       .isLength({ min: 1 })
       .withMessage("Project ID cannot be empty"),
   ],
+  validateRequest,
   getProjectMedia,
 );
 
@@ -33,6 +35,7 @@ router.get(
 router.post(
   "/projects/:projectId/media",
   [param("projectId").notEmpty()],
+  validateRequest,
   upload.array("files", 10),
   uploadProjectMedia,
 );
@@ -47,6 +50,7 @@ router.put(
     body("title").optional().trim().customSanitizer(stripHtmlTags),
     body("description").optional().trim().customSanitizer(stripHtmlTags),
   ],
+  validateRequest,
   updateMediaMetadata,
 );
 
@@ -54,6 +58,7 @@ router.put(
 router.delete(
   "/projects/:projectId/media/:fileId",
   [param("projectId").notEmpty(), param("fileId").notEmpty()],
+  validateRequest,
   deleteProjectMedia,
 );
 
@@ -61,6 +66,7 @@ router.delete(
 router.post(
   "/projects/:projectId/media/bulk-delete",
   [param("projectId").notEmpty(), body("fileIds").isArray({ min: 1 })],
+  validateRequest,
   bulkDeleteProjectMedia,
 );
 
@@ -68,16 +74,18 @@ router.post(
 router.get(
   "/projects/:projectId/media/:fileId/usage",
   [param("projectId").notEmpty(), param("fileId").notEmpty()],
+  validateRequest,
   getMediaFileUsage,
 );
 
 // Refresh media usage tracking
-router.post("/projects/:projectId/refresh-usage", [param("projectId").notEmpty()], refreshMediaUsage);
+router.post("/projects/:projectId/refresh-usage", [param("projectId").notEmpty()], validateRequest, refreshMediaUsage);
 
 // Serve a media file by ID
 router.get(
   "/projects/:projectId/media/:fileId",
   [param("projectId").notEmpty(), param("fileId").notEmpty()],
+  validateRequest,
   serveProjectMedia,
 );
 
@@ -85,6 +93,7 @@ router.get(
 router.get(
   "/projects/:projectId/uploads/images/:filename",
   [param("projectId").notEmpty(), param("filename").notEmpty()],
+  validateRequest,
   (req, res) => {
     const { filename } = req.params;
     req.params.filename = filename;
@@ -96,6 +105,7 @@ router.get(
 router.get(
   "/projects/:projectId/uploads/videos/:filename",
   [param("projectId").notEmpty(), param("filename").notEmpty()],
+  validateRequest,
   (req, res) => {
     const { filename } = req.params;
     req.params.filename = filename;
@@ -107,6 +117,7 @@ router.get(
 router.get(
   "/projects/:projectId/uploads/audios/:filename",
   [param("projectId").notEmpty(), param("filename").notEmpty()],
+  validateRequest,
   (req, res) => {
     const { filename } = req.params;
     req.params.filename = filename;

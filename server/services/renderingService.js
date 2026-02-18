@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import { getProjectDir, CORE_WIDGETS_DIR } from "../config.js";
 // TODO: Controllers shouldn't ideally be imported into services.
-// We might need to move readProjectsFile/readMediaFile to utils or their own services later.
+// Consider moving readProjectsFile/readMediaFile to a shared module.
 import { readMediaFile } from "../controllers/mediaController.js";
 import { readProjectsFile } from "../controllers/projectController.js";
 import { listProjectPagesData } from "../controllers/pageController.js";

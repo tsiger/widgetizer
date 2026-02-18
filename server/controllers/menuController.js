@@ -1,11 +1,10 @@
 import fs from "fs-extra";
 import path from "path";
 import { randomUUID } from "crypto";
-import slugify from "slugify";
-import { validationResult } from "express-validator";
 import { getProjectMenusDir, getMenuPath } from "../config.js";
-import { readProjectsFile } from "./projectController.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
+import { generateUniqueSlug } from "../utils/slugHelpers.js";
+import { generateCopyName } from "../utils/namingHelpers.js";
 
 /**
  * Retrieves all menus for the active project.
@@ -15,12 +14,7 @@ import { stripHtmlTags } from "../services/sanitizationService.js";
  */
 export async function getAllMenus(req, res) {
   try {
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     const menusDir = getProjectMenusDir(projectFolderName);
@@ -53,28 +47,6 @@ export async function getAllMenus(req, res) {
   }
 }
 
-// Helper function to generate unique menu ID
-async function generateUniqueMenuId(projectId, baseName) {
-  const generateId = (name) => {
-    return slugify(name, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
-  };
-
-  let id = generateId(baseName);
-  let counter = 1;
-
-  // Check if the ID already exists
-  while (await fs.pathExists(getMenuPath(projectId, id))) {
-    id = generateId(`${baseName} ${counter}`);
-    counter++;
-  }
-
-  return id;
-}
-
 /**
  * Creates a new menu in the active project with a unique ID.
  * @param {import('express').Request} req - Express request object with menu data in body
@@ -82,11 +54,6 @@ async function generateUniqueMenuId(projectId, baseName) {
  * @returns {Promise<void>}
  */
 export async function createMenu(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     // Defensive sanitization: strip HTML (route validator also does this,
     // but the controller must be safe even when called directly)
@@ -98,19 +65,14 @@ export async function createMenu(req, res) {
       return res.status(400).json({ error: "Menu name is required." });
     }
 
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     const menusDir = getProjectMenusDir(projectFolderName);
     await fs.ensureDir(menusDir);
 
     // Generate unique ID from the sanitized name (server-side only)
-    const menuId = await generateUniqueMenuId(projectFolderName, name);
+    const menuId = await generateUniqueSlug(name, (slug) => fs.pathExists(getMenuPath(projectFolderName, slug)));
     const menuPath = getMenuPath(projectFolderName, menuId);
 
     const newMenu = {
@@ -139,19 +101,9 @@ export async function createMenu(req, res) {
  * @returns {Promise<void>}
  */
 export async function deleteMenu(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     const menuPath = getMenuPath(projectFolderName, id);
@@ -170,19 +122,9 @@ export async function deleteMenu(req, res) {
  * @returns {Promise<void>}
  */
 export async function getMenu(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     const menuPath = getMenuPath(projectFolderName, id);
@@ -206,11 +148,6 @@ export async function getMenu(req, res) {
  * @returns {Promise<void>}
  */
 export async function updateMenu(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const menuId = req.params.id;
     const menuData = req.body;
@@ -229,12 +166,7 @@ export async function updateMenu(req, res) {
       return res.status(400).json({ error: "Menu name is required." });
     }
 
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     const menuPath = getMenuPath(projectFolderName, menuId);
@@ -323,19 +255,9 @@ function generateNewMenuItemIds(items) {
  * @returns {Promise<void>}
  */
 export async function duplicateMenu(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     const originalMenuPath = getMenuPath(projectFolderName, id);
@@ -349,16 +271,24 @@ export async function duplicateMenu(req, res) {
     const originalMenuData = await fs.readFile(originalMenuPath, "utf8");
     const originalMenu = JSON.parse(originalMenuData);
 
-    // Generate new unique name and ID
-    const baseName = `Copy of ${originalMenu.name}`;
-    const newMenuId = await generateUniqueMenuId(projectFolderName, baseName);
+    // Gather existing menu names for copy-number logic
+    const menusDir = getProjectMenusDir(projectFolderName);
+    const menuFiles = (await fs.readdir(menusDir)).filter((f) => f.endsWith(".json"));
+    const existingMenuNames = await Promise.all(
+      menuFiles.map(async (f) => {
+        const data = JSON.parse(await fs.readFile(path.join(menusDir, f), "utf8"));
+        return data.name;
+      }),
+    );
+    const newName = generateCopyName(originalMenu.name, existingMenuNames);
+    const newMenuId = await generateUniqueSlug(newName, (slug) => fs.pathExists(getMenuPath(projectFolderName, slug)));
 
     // Create the duplicated menu with new data
     const duplicatedMenu = {
       ...JSON.parse(JSON.stringify(originalMenu)), // Deep clone
       id: newMenuId,
       uuid: randomUUID(),
-      name: baseName,
+      name: newName,
       items: generateNewMenuItemIds(originalMenu.items), // Generate new IDs for all items
       created: new Date().toISOString(),
       updated: new Date().toISOString(),

@@ -1,6 +1,7 @@
 import express from "express";
 import { body } from "express-validator";
 import * as appSettingsController from "../controllers/appSettingsController.js";
+import { validateRequest } from "../middleware/validateRequest.js";
 
 const router = express.Router();
 
@@ -11,6 +12,7 @@ router.get("/", appSettingsController.getAppSettings);
 router.put(
   "/",
   [body().isObject().withMessage("Request body must be an object.")],
+  validateRequest,
   appSettingsController.updateAppSettings,
 );
 

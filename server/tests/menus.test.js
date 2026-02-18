@@ -48,6 +48,7 @@ function mockReq({ params = {}, body = {} } = {}) {
   return {
     params,
     body,
+    activeProject,
     [Symbol.for("express-validator#contexts")]: [],
   };
 }
@@ -674,12 +675,11 @@ describe("duplicateMenu", () => {
   it("handles duplicate of a duplicate (incremental naming)", async () => {
     // First duplicate
     await callController(duplicateMenu, { params: { id: "source-menu" } });
-    // Second duplicate of original — "Copy of Source Menu" slug exists, so it gets incremented
+    // Second duplicate of original — "Copy of Source Menu" exists, so it becomes "Copy 2 of Source Menu"
     const res2 = await callController(duplicateMenu, { params: { id: "source-menu" } });
     assert.equal(res2._status, 201);
-    // Should get "copy-of-source-menu-1" since "copy-of-source-menu" is taken
-    assert.equal(res2._json.id, "copy-of-source-menu-1");
-    assert.equal(res2._json.name, "Copy of Source Menu");
+    assert.equal(res2._json.id, "copy-2-of-source-menu");
+    assert.equal(res2._json.name, "Copy 2 of Source Menu");
   });
 });
 
@@ -689,36 +689,57 @@ describe("duplicateMenu", () => {
 
 describe("Edge cases", () => {
   it("returns 404 when no active project exists (createMenu)", async () => {
+    const { resolveActiveProject } = await import("../middleware/resolveActiveProject.js");
+
     // Temporarily clear active project
     const backup = await readProjectsFile();
     await writeProjectsFile({ ...backup, activeProjectId: null });
 
-    const res = await createTestMenu("Orphan Menu");
+    const req = {};
+    const res = mockRes();
+    let nextCalled = false;
+    await resolveActiveProject(req, res, () => { nextCalled = true; });
+
     assert.equal(res._status, 404);
     assert.match(res._json.error, /no active project/i);
+    assert.equal(nextCalled, false);
 
     // Restore
     await writeProjectsFile(backup);
   });
 
   it("returns 404 when no active project exists (getAllMenus)", async () => {
+    const { resolveActiveProject } = await import("../middleware/resolveActiveProject.js");
+
     const backup = await readProjectsFile();
     await writeProjectsFile({ ...backup, activeProjectId: null });
 
-    const res = await callController(getAllMenus);
+    const req = {};
+    const res = mockRes();
+    let nextCalled = false;
+    await resolveActiveProject(req, res, () => { nextCalled = true; });
+
     assert.equal(res._status, 404);
     assert.match(res._json.error, /no active project/i);
+    assert.equal(nextCalled, false);
 
     await writeProjectsFile(backup);
   });
 
   it("returns 404 when no active project exists (deleteMenu)", async () => {
+    const { resolveActiveProject } = await import("../middleware/resolveActiveProject.js");
+
     const backup = await readProjectsFile();
     await writeProjectsFile({ ...backup, activeProjectId: null });
 
-    const res = await callController(deleteMenu, { params: { id: "any" } });
+    const req = {};
+    const res = mockRes();
+    let nextCalled = false;
+    await resolveActiveProject(req, res, () => { nextCalled = true; });
+
     assert.equal(res._status, 404);
     assert.match(res._json.error, /no active project/i);
+    assert.equal(nextCalled, false);
 
     await writeProjectsFile(backup);
   });

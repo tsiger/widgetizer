@@ -123,7 +123,7 @@ Media metadata is stored in SQLite, while the uploaded binary files remain on di
 }
 ```
 
-_Note: API responses still return a `files` array shape for backward compatibility, but it is assembled from SQLite rows (not read from `uploads/media.json`)._
+_Note: API responses return a `files` array assembled from SQLite rows._
 
 ### Usage Tracking
 
@@ -333,7 +333,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 
 | Method | Endpoint | Middleware | Controller Function | Description |
 | --- | --- | --- | --- | --- |
-| `GET` | `/api/media/projects/:projectId/media` |  | `getProjectMedia` | Reads and returns media metadata from SQLite (legacy JSON response shape). |
+| `GET` | `/api/media/projects/:projectId/media` |  | `getProjectMedia` | Reads and returns media metadata from SQLite. |
 | `POST` | `/api/media/projects/:projectId/media` | `upload.array("files")` | `uploadProjectMedia` | Handles file uploads. |
 | `DELETE` | `/api/media/projects/:projectId/media/:fileId` |  | `deleteProjectMedia` | Deletes a single file and its metadata. Prevents deletion if file is in use. |
 | `POST` | `/api/media/projects/:projectId/media/bulk-delete` |  | `bulkDeleteProjectMedia` | Deletes multiple files and their metadata. Prevents deletion if any files are in use. |

@@ -11,6 +11,7 @@ import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { readProjectsFile } from "../controllers/projectController.js";
 import { getThemeSourceDir } from "../controllers/themeController.js";
 import { isNewerVersion } from "../utils/semver.js";
+import { processTemplatesRecursive } from "../utils/templateHelpers.js";
 
 /**
  * Updatable paths - these are copied from theme to project during updates.
@@ -276,43 +277,18 @@ export async function applyThemeUpdate(projectId) {
     const themeTemplatesDir = path.join(themeSourceDir, "templates");
     const projectPagesDir = path.join(projectDir, "pages");
 
-    // Recursively process templates
-    async function addNewTemplatesRecursive(sourceDir, targetDir) {
-      if (!(await fs.pathExists(sourceDir))) return;
-
-      await fs.ensureDir(targetDir);
-      const entries = await fs.readdir(sourceDir, { withFileTypes: true });
-
-      for (const entry of entries) {
-        const sourcePath = path.join(sourceDir, entry.name);
-        const targetPath = path.join(targetDir, entry.name);
-
-        if (entry.isDirectory()) {
-          await addNewTemplatesRecursive(sourcePath, targetPath);
-        } else if (entry.isFile() && entry.name.endsWith(".json")) {
-          const templateContent = await fs.readJson(sourcePath);
-          const templateSlug = templateContent.slug || path.basename(entry.name, ".json");
-          const targetFilename = `${templateSlug}.json`;
-          const targetPathWithSlug = path.join(targetDir, targetFilename);
-
-          // Only add if it doesn't exist in project (preserve user pages)
-          if (!(await fs.pathExists(targetPathWithSlug))) {
-            const newPage = {
-              ...templateContent,
-              id: templateSlug,
-              slug: templateSlug,
-              created: new Date().toISOString(),
-              updated: new Date().toISOString(),
-            };
-
-            await fs.writeJson(targetPathWithSlug, newPage, { spaces: 2 });
-            console.log(`[applyThemeUpdate] Added new page from template: ${templateSlug}`);
-          }
-        }
-      }
-    }
-
-    await addNewTemplatesRecursive(themeTemplatesDir, projectPagesDir);
+    await processTemplatesRecursive(themeTemplatesDir, projectPagesDir, async (template, slug, targetPath) => {
+      if (await fs.pathExists(targetPath)) return;
+      const newPage = {
+        ...template,
+        id: slug,
+        slug,
+        created: new Date().toISOString(),
+        updated: new Date().toISOString(),
+      };
+      await fs.writeJson(targetPath, newPage, { spaces: 2 });
+      console.log(`[applyThemeUpdate] Added new page from template: ${slug}`);
+    });
   } catch (error) {
     console.warn(`[applyThemeUpdate] Failed to add new templates: ${error.message}`);
   }

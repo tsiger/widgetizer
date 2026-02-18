@@ -60,6 +60,7 @@ function mockReq({ params = {}, body = {} } = {}) {
   return {
     params,
     body,
+    activeProject,
     [Symbol.for("express-validator#contexts")]: [],
   };
 }
@@ -253,14 +254,20 @@ describe("createPage", () => {
   });
 
   it("returns 404 when no active project", async () => {
+    const { resolveActiveProject } = await import("../middleware/resolveActiveProject.js");
+
     // Temporarily clear the active project
     const original = await readProjectsFile();
     await writeProjectsFile({ ...original, activeProjectId: null });
 
-    const res = await callController(createPage, {
-      body: { name: "No Project Page" },
-    });
+    const req = {};
+    const res = mockRes();
+    let nextCalled = false;
+    await resolveActiveProject(req, res, () => { nextCalled = true; });
+
     assert.equal(res._status, 404);
+    assert.match(res._json.error, /no active project/i);
+    assert.equal(nextCalled, false);
 
     // Restore
     await writeProjectsFile(original);

@@ -1,4 +1,3 @@
-import { validationResult } from "express-validator";
 import {
   getSettings,
   saveSettings,
@@ -8,7 +7,6 @@ import {
 
 /**
  * Reads the application settings (merged with defaults).
- * Kept as an async function for backward compatibility with existing callers.
  * @returns {Promise<object>} The settings object
  */
 export async function readAppSettingsFile() {
@@ -35,11 +33,6 @@ export async function getAppSettings(req, res) {
  * @param {import('express').Response} res
  */
 export async function updateAppSettings(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const settings = req.body;
     const currentSettings = getSettings();
@@ -103,7 +96,6 @@ export async function updateAppSettings(req, res) {
 
 /**
  * Retrieves a specific setting value by key path (e.g., "media.maxFileSizeMB").
- * Kept as async for backward compatibility.
  * @param {string} key
  * @returns {Promise<*>}
  */

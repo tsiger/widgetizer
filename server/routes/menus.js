@@ -2,14 +2,17 @@ import express from "express";
 import { body, param } from "express-validator";
 import * as menuController from "../controllers/menuController.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
+import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
+import { validateRequest } from "../middleware/validateRequest.js";
 
 const router = express.Router();
+router.use(resolveActiveProject);
 
 // Get all menus
 router.get("/", menuController.getAllMenus);
 
 // Get a menu by id
-router.get("/:id", [param("id").notEmpty().withMessage("Menu ID is required.")], menuController.getMenu);
+router.get("/:id", [param("id").notEmpty().withMessage("Menu ID is required.")], validateRequest, menuController.getMenu);
 
 // Create a new menu
 router.post(
@@ -18,6 +21,7 @@ router.post(
     body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required."),
     body("description").optional().trim().customSanitizer(stripHtmlTags),
   ],
+  validateRequest,
   menuController.createMenu,
 );
 
@@ -29,6 +33,7 @@ router.put(
     body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required."),
     body("description").optional().trim().customSanitizer(stripHtmlTags),
   ],
+  validateRequest,
   menuController.updateMenu,
 );
 
@@ -36,10 +41,11 @@ router.put(
 router.post(
   "/:id/duplicate",
   [param("id").notEmpty().withMessage("Menu ID is required.")],
+  validateRequest,
   menuController.duplicateMenu,
 );
 
 // Delete a menu by id
-router.delete("/:id", [param("id").notEmpty().withMessage("Menu ID is required.")], menuController.deleteMenu);
+router.delete("/:id", [param("id").notEmpty().withMessage("Menu ID is required.")], validateRequest, menuController.deleteMenu);
 
 export default router;

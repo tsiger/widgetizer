@@ -73,37 +73,19 @@ SQLite does **not** replace project content files. These remain file-based:
 
 ---
 
-## 4. Compatibility Wrappers
+## 4. Controller Wrappers
 
-Several controller functions keep legacy names/shapes for call-site stability, but are now SQLite-backed:
+Controller-level convenience functions that delegate to SQLite repositories:
 
-- `readProjectsFile()` / `writeProjectsFile(data)`
-- `readMediaFile(projectId)` / `writeMediaFile(projectId, data)`
-- `readAppSettingsFile()`
-
-These wrappers return the expected legacy object shapes while reading/writing repository-backed data.
+- `readProjectsFile()` / `writeProjectsFile(data)` — project metadata
+- `readMediaFile(projectId)` / `writeMediaFile(projectId, data)` — media metadata
+- `readAppSettingsFile()` — application settings
 
 ---
 
-## 5. Legacy JSON Import on First Run
+## 5. Export/Import
 
-Startup path (`server/db/importLegacyData.js`) supports one-time migration when DB is empty:
-
-- imports from legacy files if present:
-  - `data/projects/projects.json`
-  - `data/appSettings.json`
-  - `data/publish/export-history.json`
-  - `data/projects/<folderName>/uploads/media.json`
-- writes imported records into SQLite tables
-- renames legacy files to `*.pre-sqlite-backup`
-
-This enables old installations to move forward without manual migration steps.
-
----
-
-## 6. Export/Import Compatibility
-
-Runtime metadata source is SQLite, but project ZIP workflows keep compatibility behavior:
+Runtime metadata source is SQLite, but project ZIP workflows include serialized metadata:
 
 - project export includes `uploads/media.json` in ZIP
 - project import restores that media metadata into SQLite
