@@ -16,6 +16,7 @@
     "lint:electron": "eslint electron",
     "lint:all": "eslint .",
     "preview": "vite preview",
+    "predev:all": "npm rebuild better-sqlite3",
     "server": "nodemon server/index.js",
     "start": "node server/index.js",
     "dev:frontend": "wait-on http://localhost:3001/health && npm run dev",
