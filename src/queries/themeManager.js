@@ -1,4 +1,5 @@
 import { API_URL } from "../config";
+import { apiFetch } from "../lib/apiFetch";
 import { getActiveProject } from "./projectManager";
 
 /**
@@ -45,7 +46,7 @@ import { getActiveProject } from "./projectManager";
  */
 export async function getAllThemes() {
   try {
-    const response = await fetch(API_URL("/api/themes"));
+    const response = await apiFetch("/api/themes");
     if (!response.ok) {
       throw new Error("Failed to fetch themes");
     }
@@ -73,7 +74,7 @@ export function getThemeScreenshotUrl(themeId) {
  */
 export async function getTheme(themeId) {
   try {
-    const response = await fetch(API_URL(`/api/themes/${themeId}`));
+    const response = await apiFetch(`/api/themes/${themeId}`);
     if (!response.ok) {
       throw new Error("Failed to fetch theme");
     }
@@ -94,7 +95,7 @@ export async function getTheme(themeId) {
 export async function getThemeWidgets(themeId) {
   try {
     // If no themeId is provided, use the active project's theme
-    const response = await fetch(API_URL(`/api/themes/${themeId || "default"}/widgets`));
+    const response = await apiFetch(`/api/themes/${themeId || "default"}/widgets`);
     if (!response.ok) {
       throw new Error("Failed to fetch theme widgets");
     }
@@ -114,7 +115,7 @@ export async function getThemeWidgets(themeId) {
  */
 export async function getThemeTemplates(themeId) {
   try {
-    const response = await fetch(API_URL(`/api/themes/${themeId || "default"}/templates`));
+    const response = await apiFetch(`/api/themes/${themeId || "default"}/templates`);
     if (!response.ok) {
       throw new Error("Failed to fetch theme templates");
     }
@@ -139,7 +140,7 @@ export async function getThemeSettings() {
       throw new Error("No active project");
     }
 
-    const response = await fetch(API_URL(`/api/themes/project/${activeProject.id}`));
+    const response = await apiFetch(`/api/themes/project/${activeProject.id}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch theme settings");
@@ -166,7 +167,7 @@ export async function saveThemeSettings(data) {
       throw new Error("No active project");
     }
 
-    const response = await fetch(API_URL(`/api/themes/project/${activeProject.id}`), {
+    const response = await apiFetch(`/api/themes/project/${activeProject.id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -197,7 +198,7 @@ export async function uploadThemeZip(zipFile) {
   formData.append("themeZip", zipFile);
 
   try {
-    const response = await fetch(API_URL("/api/themes/upload"), {
+    const response = await apiFetch("/api/themes/upload", {
       method: "POST",
       body: formData,
       // Note: Don't set Content-Type header when using FormData,
@@ -226,7 +227,7 @@ export async function uploadThemeZip(zipFile) {
  */
 export async function getThemeVersions(themeId) {
   try {
-    const response = await fetch(API_URL(`/api/themes/${themeId}/versions`));
+    const response = await apiFetch(`/api/themes/${themeId}/versions`);
     if (!response.ok) {
       throw new Error("Failed to fetch theme versions");
     }
@@ -244,7 +245,7 @@ export async function getThemeVersions(themeId) {
  */
 export async function getThemeUpdateCount() {
   try {
-    const response = await fetch(API_URL("/api/themes/update-count"));
+    const response = await apiFetch("/api/themes/update-count");
     if (!response.ok) {
       throw new Error("Failed to fetch theme update count");
     }
@@ -264,7 +265,7 @@ export async function getThemeUpdateCount() {
  */
 export async function updateTheme(themeId) {
   try {
-    const response = await fetch(API_URL(`/api/themes/${themeId}/update`), {
+    const response = await apiFetch(`/api/themes/${themeId}/update`, {
       method: "POST",
     });
     if (!response.ok) {
@@ -287,7 +288,7 @@ export async function updateTheme(themeId) {
  */
 export async function deleteTheme(themeId) {
   try {
-    const response = await fetch(API_URL(`/api/themes/${themeId}`), {
+    const response = await apiFetch(`/api/themes/${themeId}`, {
       method: "DELETE",
     });
 
@@ -312,7 +313,7 @@ export async function deleteTheme(themeId) {
  */
 export async function getThemePresets(themeId) {
   try {
-    const response = await fetch(API_URL(`/api/themes/${themeId}/presets`));
+    const response = await apiFetch(`/api/themes/${themeId}/presets`);
     if (!response.ok) {
       throw new Error("Failed to fetch theme presets");
     }

@@ -87,13 +87,13 @@ before(async () => {
     activeProjectId: PROJECT_ID,
   });
 
-  const projectDir = getProjectDir(PROJECT_FOLDER);
+  const projectDir = getProjectDir(PROJECT_FOLDER, "local");
   await fs.ensureDir(projectDir);
-  await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER));
-  await fs.ensureDir(path.join(getProjectPagesDir(PROJECT_FOLDER), "global"));
+  await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER, "local"));
+  await fs.ensureDir(path.join(getProjectPagesDir(PROJECT_FOLDER, "local"), "global"));
   await fs.ensureDir(path.join(projectDir, "snippets"));
   await fs.ensureDir(path.join(projectDir, "widgets"));
-  await fs.ensureDir(getProjectMenusDir(PROJECT_FOLDER));
+  await fs.ensureDir(getProjectMenusDir(PROJECT_FOLDER, "local"));
 
   // Copy arch theme widgets into the test project so the renderer can find them
   const ARCH_WIDGETS_DIR = path.resolve("themes", "arch", "widgets");
@@ -108,7 +108,7 @@ before(async () => {
   // Initialize empty media data
   await writeMediaFile(PROJECT_ID, { files: [] });
 
-  const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
+  const pagesDir = getProjectPagesDir(PROJECT_FOLDER, "local");
   await fs.writeFile(
     path.join(pagesDir, "home.json"),
     JSON.stringify({ name: "Home", slug: "home", uuid: "page-uuid-home", widgets: {} }),
@@ -139,6 +139,10 @@ describe("slideshow widget", () => {
         blocksOrder: ["slide-a", "slide-b"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.match(html, /data-block-id="slide-a"/);
@@ -161,6 +165,10 @@ describe("slideshow widget", () => {
         blocksOrder: ["s1", "s2"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // Extract slide divs using data-block-id to find each slide's classes
@@ -190,6 +198,10 @@ describe("slideshow widget", () => {
         blocksOrder: ["s1", "s2"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("slideshow-prev"), "should have prev button");
@@ -211,6 +223,10 @@ describe("slideshow widget", () => {
         blocksOrder: ["only"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(!html.includes("slideshow-prev"), "no prev button for single slide");
@@ -234,6 +250,7 @@ describe("slideshow widget", () => {
       "preview",
       null,
       1,
+      "local",
     );
 
     assert.ok(html.includes("<h1"), "first widget on page should use h1");
@@ -255,6 +272,7 @@ describe("slideshow widget", () => {
       "preview",
       null,
       3,
+      "local",
     );
 
     assert.ok(html.includes("<h2"), "non-first widget should use h2");
@@ -280,6 +298,10 @@ describe("slideshow widget", () => {
         blocksOrder: ["xss"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(!html.includes('<script>alert'), "script tags must be escaped");
@@ -308,6 +330,10 @@ describe("accordion widget", () => {
         blocksOrder: ["q1", "q2"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.match(html, /data-block-id="q1"/);
@@ -329,6 +355,10 @@ describe("accordion widget", () => {
         blocksOrder: ["q1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // The answer uses | raw so the HTML should render unescaped
@@ -349,6 +379,10 @@ describe("accordion widget", () => {
         blocksOrder: ["q1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("accordion-bordered"), "connected style should add bordered class");
@@ -367,6 +401,10 @@ describe("accordion widget", () => {
         blocksOrder: ["q1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // Check the root <section> class attribute (not the <style> block which always has CSS)
@@ -387,6 +425,10 @@ describe("accordion widget", () => {
         blocksOrder: ["q1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("widget-header"), "should render header section");
@@ -408,6 +450,10 @@ describe("accordion widget", () => {
         blocksOrder: ["q1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes('data-multi-open="true"'), "should set multi-open data attribute");
@@ -427,6 +473,10 @@ describe("accordion widget", () => {
         blocksOrder: ["q1", "q2"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // Strip <script> blocks which contain aria attribute string literals in JS code
@@ -459,6 +509,10 @@ describe("rich-text widget", () => {
         blocksOrder: ["h1", "t1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.match(html, /data-block-id="h1"/);
@@ -480,6 +534,10 @@ describe("rich-text widget", () => {
         blocksOrder: ["t1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("<em>italic</em>"), "richtext should render HTML via | raw");
@@ -499,6 +557,10 @@ describe("rich-text widget", () => {
         blocksOrder: ["h1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("widget-content-sm"), "should apply content width class");
@@ -525,6 +587,10 @@ describe("rich-text widget", () => {
         blocksOrder: ["b1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("Get Started"), "should render button text");
@@ -548,6 +614,7 @@ describe("rich-text widget", () => {
       "preview",
       null,
       1,
+      "local",
     );
 
     assert.ok(html.includes("<h1"), "first widget on page should use h1");
@@ -569,6 +636,7 @@ describe("rich-text widget", () => {
       "preview",
       null,
       2,
+      "local",
     );
 
     assert.ok(html.includes("<h2"), "non-first widget should use h2");
@@ -595,6 +663,10 @@ describe("image-tabs widget", () => {
         blocksOrder: ["tab-a", "tab-b"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.match(html, /data-block-id="tab-a"/);
@@ -617,6 +689,10 @@ describe("image-tabs widget", () => {
         blocksOrder: ["t1", "t2"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // First tab list item should have is-active
@@ -641,6 +717,10 @@ describe("image-tabs widget", () => {
         blocksOrder: ["t1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes('role="tablist"'), "should have tablist role");
@@ -662,6 +742,10 @@ describe("image-tabs widget", () => {
         blocksOrder: ["t1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("layout-image-right"), "should add image-right layout class");
@@ -680,6 +764,10 @@ describe("image-tabs widget", () => {
         blocksOrder: ["t1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // Check root <section> class (not the <style> block which always has CSS for layout-image-right)
@@ -700,6 +788,10 @@ describe("image-tabs widget", () => {
         blocksOrder: ["t1"],
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("<strong>content</strong>"), "richtext description should not be escaped");

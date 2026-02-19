@@ -8,9 +8,10 @@ import {
   getProjectDir,
   getProjectPagesDir,
   getProjectMenusDir,
-  THEMES_DIR,
+  getThemeDir,
 } from "../config.js";
 import { v4 as uuidv4 } from "uuid";
+import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { isNewerVersion } from "../utils/semver.js";
 import {
   readProjectsData,
@@ -32,18 +33,20 @@ async function ensureDirectories() {
 
 /**
  * Reads the projects metadata from SQLite.
+ * @param {string} userId
  * @returns {Promise<{projects: Array<object>, activeProjectId: string|null}>}
  */
-export async function readProjectsFile() {
-  return readProjectsData();
+export async function readProjectsFile(userId = "local") {
+  return readProjectsData(userId);
 }
 
 /**
  * Writes the projects metadata to SQLite.
  * @param {{projects: Array<object>, activeProjectId: string|null}} data
+ * @param {string} userId
  */
-export async function writeProjectsFile(data) {
-  writeProjectsData(data);
+export async function writeProjectsFile(data, userId = "local") {
+  writeProjectsData(data, userId);
 }
 
 /**
@@ -52,10 +55,10 @@ export async function writeProjectsFile(data) {
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
-export async function getAllProjects(_, res) {
+export async function getAllProjects(req, res) {
   try {
     await ensureDirectories();
-    const data = await readProjectsFile();
+    const data = await readProjectsFile(req.userId);
 
     // Enrich projects with hasThemeUpdate flag and theme display name
     const enrichedProjects = await Promise.all(
@@ -104,10 +107,10 @@ export async function getAllProjects(_, res) {
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
-export async function getActiveProject(_, res) {
+export async function getActiveProject(req, res) {
   try {
     // Read the projects file
-    const data = await readProjectsFile();
+    const data = await readProjectsFile(req.userId);
 
     // Find the active project
     const activeProject = data.projects.find((p) => p.id === data.activeProjectId);
@@ -136,7 +139,7 @@ export async function createProject(req, res) {
       return res.status(400).json({ error: "Project name is required." });
     }
 
-    const data = await readProjectsFile();
+    const data = await readProjectsFile(req.userId);
 
     // Check for duplicate project names
     const duplicateName = data.projects.find((p) => p.name.toLowerCase() === name.trim().toLowerCase());
@@ -168,7 +171,7 @@ export async function createProject(req, res) {
     }
 
     // Use the permanent folderName for directory creation
-    const projectDir = getProjectDir(folderName);
+    const projectDir = getProjectDir(folderName, req.userId);
     await fs.ensureDir(projectDir);
 
     if (!theme) {
@@ -179,7 +182,7 @@ export async function createProject(req, res) {
     let themeVersion;
     try {
       // First copy theme assets (excluding templates)
-      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"]);
+      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"], req.userId);
     } catch (error) {
       await fs.remove(projectDir);
       throw new Error(`Failed to copy theme: ${error.message}`);
@@ -187,11 +190,11 @@ export async function createProject(req, res) {
 
     // Resolve preset paths (templates, menus, settings overrides)
     const { templatesDir: resolvedTemplatesDir, menusDir: presetMenusDir, settingsOverrides } =
-      await themeController.resolvePresetPaths(theme, preset);
+      await themeController.resolvePresetPaths(theme, preset, req.userId);
 
     // If preset has custom menus, replace root menus with preset menus
     if (presetMenusDir) {
-      const projectMenusDir = getProjectMenusDir(folderName);
+      const projectMenusDir = getProjectMenusDir(folderName, req.userId);
       try {
         await fs.remove(projectMenusDir);
         await fs.copy(presetMenusDir, projectMenusDir);
@@ -216,7 +219,7 @@ export async function createProject(req, res) {
 
     try {
       // Then handle templates separately, recursively
-      const pagesDir = getProjectPagesDir(folderName);
+      const pagesDir = getProjectPagesDir(folderName, req.userId);
       const themeTemplatesDir = resolvedTemplatesDir;
 
       await processTemplatesRecursive(themeTemplatesDir, pagesDir, async (template, slug, targetPath) => {
@@ -235,7 +238,7 @@ export async function createProject(req, res) {
         await fs.outputFile(targetPath, JSON.stringify(initializedPage, null, 2));
       });
 
-      await enrichNewProjectReferences(folderName);
+      await enrichNewProjectReferences(folderName, req.userId);
     } catch (error) {
       await fs.remove(projectDir);
       throw new Error(`Failed to process templates: ${error.message}`);
@@ -272,7 +275,7 @@ export async function createProject(req, res) {
     if (!data.activeProjectId) {
       data.activeProjectId = newProject.id;
     }
-    await writeProjectsFile(data);
+    await writeProjectsFile(data, req.userId);
 
     res.status(201).json({
       ...newProject,
@@ -293,14 +296,14 @@ export async function createProject(req, res) {
 export async function setActiveProject(req, res) {
   try {
     const { id } = req.params;
-    const data = await readProjectsFile();
+    const data = await readProjectsFile(req.userId);
 
     if (!data.projects.some((p) => p.id === id)) {
       return res.status(404).json({ error: "Project not found" });
     }
 
     data.activeProjectId = id;
-    await writeProjectsFile(data);
+    await writeProjectsFile(data, req.userId);
 
     res.json({ success: true });
   } catch (error) {
@@ -325,7 +328,7 @@ export async function updateProject(req, res) {
       return res.status(400).json({ error: "Project name is required." });
     }
 
-    const data = await readProjectsFile();
+    const data = await readProjectsFile(req.userId);
 
     const projectIndex = data.projects.findIndex((p) => p.id === id);
     if (projectIndex === -1) {
@@ -371,8 +374,8 @@ export async function updateProject(req, res) {
       }
 
       // Rename the project directory
-      const oldDir = getProjectDir(currentFolderName);
-      const newDir = getProjectDir(newFolderName);
+      const oldDir = getProjectDir(currentFolderName, req.userId);
+      const newDir = getProjectDir(newFolderName, req.userId);
 
       try {
         // Use copy + remove instead of rename for better Windows compatibility
@@ -414,7 +417,7 @@ export async function updateProject(req, res) {
     // Replace the project in the array
     data.projects[projectIndex] = updatedProject;
 
-    await writeProjectsFile(data);
+    await writeProjectsFile(data, req.userId);
     res.json(updatedProject);
   } catch (error) {
     console.error("Error updating project:", error);
@@ -431,7 +434,7 @@ export async function updateProject(req, res) {
 export async function deleteProject(req, res) {
   try {
     const { id } = req.params;
-    const data = await readProjectsFile();
+    const data = await readProjectsFile(req.userId);
 
     const projectIndex = data.projects.findIndex((p) => p.id === id);
     if (projectIndex === -1) {
@@ -446,7 +449,7 @@ export async function deleteProject(req, res) {
     // (writeProjectsFile triggers ON DELETE CASCADE which would delete export records first)
     try {
       const { cleanupProjectExports } = await import("./exportController.js");
-      await cleanupProjectExports(id);
+      await cleanupProjectExports(id, req.userId);
     } catch (exportCleanupError) {
       console.warn(`Failed to clean up exports for project ${id}:`, exportCleanupError);
       // Don't fail the project deletion if export cleanup fails
@@ -458,10 +461,10 @@ export async function deleteProject(req, res) {
       data.activeProjectId = data.projects[0]?.id || null;
     }
 
-    await writeProjectsFile(data);
+    await writeProjectsFile(data, req.userId);
 
     // Delete project directory using the folderName we captured earlier
-    const projectDir = getProjectDir(projectFolderName);
+    const projectDir = getProjectDir(projectFolderName, req.userId);
     await fs.remove(projectDir);
 
     res.json({
@@ -484,7 +487,7 @@ export async function deleteProject(req, res) {
 export async function duplicateProject(req, res) {
   try {
     const originalProjectId = req.params.id;
-    const data = await readProjectsFile();
+    const data = await readProjectsFile(req.userId);
 
     // Find the original project
     const originalProject = data.projects.find((p) => p.id === originalProjectId);
@@ -513,14 +516,14 @@ export async function duplicateProject(req, res) {
     // Copy the entire project directory
     // Use folderName for directory path, not ID
     const originalFolderName = originalProject.folderName;
-    const originalDir = getProjectDir(originalFolderName);
-    const newDir = getProjectDir(newFolderName);
+    const originalDir = getProjectDir(originalFolderName, req.userId);
+    const newDir = getProjectDir(newFolderName, req.userId);
 
     try {
       await fs.copy(originalDir, newDir);
 
       try {
-        await remapDuplicatedProjectUuids(newFolderName);
+        await remapDuplicatedProjectUuids(newFolderName, req.userId);
       } catch (uuidUpdateError) {
         console.warn(`[ProjectController] Failed to update UUIDs in cloned project: ${uuidUpdateError.message}`);
       }
@@ -539,7 +542,7 @@ export async function duplicateProject(req, res) {
 
     // Add the new project to the list
     data.projects.push(newProject);
-    await writeProjectsFile(data);
+    await writeProjectsFile(data, req.userId);
 
     // Copy media metadata from original project to the duplicate in SQLite
     try {
@@ -574,7 +577,7 @@ export async function getProjectWidgets(req, res) {
     const { projectId } = req.params;
 
     // Need to look up project to get the slug/folder name
-    const data = await readProjectsFile();
+    const data = await readProjectsFile(req.userId);
     const project = data.projects.find((p) => p.id === projectId);
 
     if (!project) {
@@ -582,7 +585,7 @@ export async function getProjectWidgets(req, res) {
     }
 
     const projectFolderName = project.folderName;
-    const projectRootDir = getProjectDir(projectFolderName);
+    const projectRootDir = getProjectDir(projectFolderName, req.userId);
     const widgetsBaseDir = path.join(projectRootDir, "widgets");
     const globalWidgetsDir = path.join(widgetsBaseDir, "global");
 
@@ -685,7 +688,7 @@ export async function getProjectIcons(req, res) {
     const { projectId } = req.params;
 
     // Need to look up project to get the folderName/folder name
-    const data = await readProjectsFile();
+    const data = await readProjectsFile(req.userId);
     const project = data.projects.find((p) => p.id === projectId);
 
     if (!project) {
@@ -693,7 +696,7 @@ export async function getProjectIcons(req, res) {
     }
 
     const projectFolderName = project.folderName;
-    const projectRootDir = getProjectDir(projectFolderName);
+    const projectRootDir = getProjectDir(projectFolderName, req.userId);
     const iconsPath = path.join(projectRootDir, "assets", "icons.json");
 
     if (await fs.pathExists(iconsPath)) {
@@ -720,7 +723,7 @@ export async function getProjectIcons(req, res) {
 export async function exportProject(req, res) {
   try {
     const { projectId } = req.params;
-    const data = await readProjectsFile();
+    const data = await readProjectsFile(req.userId);
     const project = data.projects.find((p) => p.id === projectId);
 
     if (!project) {
@@ -728,7 +731,7 @@ export async function exportProject(req, res) {
     }
 
     const projectFolderName = project.folderName;
-    const projectDir = getProjectDir(projectFolderName);
+    const projectDir = getProjectDir(projectFolderName, req.userId);
 
     if (!(await fs.pathExists(projectDir))) {
       return res.status(404).json({ error: "Project directory not found" });
@@ -836,10 +839,8 @@ export async function exportProject(req, res) {
   }
 }
 
-const ZIP_MIMETYPES = ["application/zip", "application/x-zip-compressed"];
-
 function isZipFile(file) {
-  return ZIP_MIMETYPES.includes(file.mimetype) || file.originalname.endsWith(".zip");
+  return ZIP_MIME_TYPES.includes(file.mimetype) || file.originalname.endsWith(".zip");
 }
 
 const UPLOAD_TEMP_DIR = path.join(DATA_DIR, "temp");
@@ -947,7 +948,7 @@ export async function importProject(req, res) {
     }
 
     // Check if theme exists
-    const themeDir = path.join(THEMES_DIR, manifest.project.theme);
+    const themeDir = getThemeDir(manifest.project.theme, req.userId);
     if (!(await fs.pathExists(themeDir))) {
       return res.status(400).json({
         error: `Theme "${manifest.project.theme}" not found in this installation. Please install the theme first.`,
@@ -955,18 +956,18 @@ export async function importProject(req, res) {
     }
 
     // Read projects file
-    const data = await readProjectsFile();
+    const data = await readProjectsFile(req.userId);
 
     // Generate unique folderName (checking both projects.json and existing directories)
     let folderName = await generateUniqueSlug(manifest.project.name, (slug) => data.projects.some((p) => p.id === slug), { fallback: "project" });
 
     // Also check if directory already exists and generate unique name if needed
-    let projectDir = getProjectDir(folderName);
+    let projectDir = getProjectDir(folderName, req.userId);
     let counter = 1;
     while (await fs.pathExists(projectDir)) {
       const baseFolderName = folderName;
       folderName = `${baseFolderName}-${counter}`;
-      projectDir = getProjectDir(folderName);
+      projectDir = getProjectDir(folderName, req.userId);
       counter++;
       if (counter > 1000) {
         throw new Error("Unable to generate unique folder name after 1000 attempts");
@@ -1044,7 +1045,7 @@ export async function importProject(req, res) {
 
       // Only add project to projects.json AFTER successful file copy
       data.projects.push(newProject);
-      await writeProjectsFile(data);
+      await writeProjectsFile(data, req.userId);
 
       // Restore media metadata from the exported media.json into SQLite
       const mediaJsonPath = path.join(projectDir, "uploads", "media.json");
@@ -1080,11 +1081,11 @@ export async function importProject(req, res) {
       // Clean up on error - remove project from projects.json if it was added
       if (newProject) {
         try {
-          const currentData = await readProjectsFile();
+          const currentData = await readProjectsFile(req.userId);
           const projectIndex = currentData.projects.findIndex((p) => p.id === newProject.id);
           if (projectIndex !== -1) {
             currentData.projects.splice(projectIndex, 1);
-            await writeProjectsFile(currentData);
+            await writeProjectsFile(currentData, req.userId);
           }
         } catch (cleanupError) {
           console.warn("Failed to remove project from projects.json after error:", cleanupError);
@@ -1126,7 +1127,7 @@ export async function getThemeUpdateStatus(req, res) {
   try {
     const { id } = req.params;
     const { checkForUpdates } = await import("../services/themeUpdateService.js");
-    const status = await checkForUpdates(id);
+    const status = await checkForUpdates(id, req.userId);
     res.json(status);
   } catch (error) {
     console.error("Error checking theme update status:", error);
@@ -1153,7 +1154,7 @@ export async function toggleProjectThemeUpdates(req, res) {
     }
 
     const { toggleThemeUpdates } = await import("../services/themeUpdateService.js");
-    const result = await toggleThemeUpdates(id, enabled);
+    const result = await toggleThemeUpdates(id, enabled, req.userId);
     res.json(result);
   } catch (error) {
     console.error("Error toggling theme updates:", error);
@@ -1174,7 +1175,7 @@ export async function applyProjectThemeUpdate(req, res) {
   try {
     const { id } = req.params;
     const { applyThemeUpdate } = await import("../services/themeUpdateService.js");
-    const result = await applyThemeUpdate(id);
+    const result = await applyThemeUpdate(id, req.userId);
     res.json(result);
   } catch (error) {
     console.error("Error applying theme update:", error);

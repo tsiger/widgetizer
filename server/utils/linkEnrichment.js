@@ -122,9 +122,9 @@ function processMenuItems(items, itemTransformer) {
  * - Replaces menu slug references in widget settings with menu UUIDs
  * - Adds pageUuid to widget link settings based on slug-to-UUID mapping
  */
-export async function enrichNewProjectReferences(projectFolderName) {
-  const pagesDir = getProjectPagesDir(projectFolderName);
-  const menusDir = getProjectMenusDir(projectFolderName);
+export async function enrichNewProjectReferences(projectFolderName, userId) {
+  const pagesDir = getProjectPagesDir(projectFolderName, userId);
+  const menusDir = getProjectMenusDir(projectFolderName, userId);
 
   // Step 1: Build page slug → UUID map
   const pageSlugToUuid = new Map();
@@ -245,9 +245,9 @@ export async function enrichNewProjectReferences(projectFolderName) {
  * Regenerates page and menu UUIDs, then remaps all pageUuid and
  * menu UUID references in widgets and menu items to use the new values.
  */
-export async function remapDuplicatedProjectUuids(projectFolderName) {
-  const pagesDir = getProjectPagesDir(projectFolderName);
-  const menusDir = getProjectMenusDir(projectFolderName);
+export async function remapDuplicatedProjectUuids(projectFolderName, userId) {
+  const pagesDir = getProjectPagesDir(projectFolderName, userId);
+  const menusDir = getProjectMenusDir(projectFolderName, userId);
 
   const oldToNewUuid = new Map();
   const oldToNewMenuUuid = new Map();

@@ -152,7 +152,7 @@ async function createProject(themeVersion) {
     activeProjectId: PROJECT_ID,
   });
 
-  const projectDir = getProjectDir(PROJECT_FOLDER);
+  const projectDir = getProjectDir(PROJECT_FOLDER, "local");
   await fs.ensureDir(projectDir);
   await fs.ensureDir(path.join(projectDir, "pages"));
   await fs.ensureDir(path.join(projectDir, "menus"));
@@ -165,7 +165,7 @@ async function createProject(themeVersion) {
 
   // Project theme.json
   await fs.writeJson(
-    getProjectThemeJsonPath(PROJECT_FOLDER),
+    getProjectThemeJsonPath(PROJECT_FOLDER, "local"),
     {
       name: "Test Update Theme",
       version: themeVersion,
@@ -312,13 +312,13 @@ describe("applyThemeUpdate", () => {
     await buildLatestSnapshot(THEME_NAME);
     await createProject("1.0.0");
 
-    const result = await applyThemeUpdate(PROJECT_ID);
+    const result = await applyThemeUpdate(PROJECT_ID, "local");
     assert.ok(result.success);
     assert.equal(result.previousVersion, "1.0.0");
     assert.equal(result.newVersion, "1.1.0");
 
     // Verify updated files in project
-    const projectDir = getProjectDir(PROJECT_FOLDER);
+    const projectDir = getProjectDir(PROJECT_FOLDER, "local");
     const layout = await fs.readFile(path.join(projectDir, "layout.liquid"), "utf8");
     assert.ok(layout.includes("UPDATED v1.1"), "Layout should be updated to v1.1");
 
@@ -344,9 +344,9 @@ describe("applyThemeUpdate", () => {
     await buildLatestSnapshot(THEME_NAME);
     await createProject("1.0.0");
 
-    await applyThemeUpdate(PROJECT_ID);
+    await applyThemeUpdate(PROJECT_ID, "local");
 
-    const projectDir = getProjectDir(PROJECT_FOLDER);
+    const projectDir = getProjectDir(PROJECT_FOLDER, "local");
 
     // User's main.json should be PRESERVED (not overwritten)
     const mainMenu = await fs.readJson(path.join(projectDir, "menus", "main.json"));
@@ -372,9 +372,9 @@ describe("applyThemeUpdate", () => {
     await buildLatestSnapshot(THEME_NAME);
     await createProject("1.0.0");
 
-    await applyThemeUpdate(PROJECT_ID);
+    await applyThemeUpdate(PROJECT_ID, "local");
 
-    const projectDir = getProjectDir(PROJECT_FOLDER);
+    const projectDir = getProjectDir(PROJECT_FOLDER, "local");
 
     // index.json (mapped from home template) should be PRESERVED
     const homePage = await fs.readJson(path.join(projectDir, "pages", "index.json"));
@@ -404,9 +404,9 @@ describe("applyThemeUpdate", () => {
     await buildLatestSnapshot(THEME_NAME);
     await createProject("1.0.0");
 
-    await applyThemeUpdate(PROJECT_ID);
+    await applyThemeUpdate(PROJECT_ID, "local");
 
-    const projectTheme = await fs.readJson(getProjectThemeJsonPath(PROJECT_FOLDER));
+    const projectTheme = await fs.readJson(getProjectThemeJsonPath(PROJECT_FOLDER, "local"));
 
     // Version should be updated
     assert.equal(projectTheme.version, "1.1.0");
@@ -428,7 +428,7 @@ describe("applyThemeUpdate", () => {
     await buildLatestSnapshot(THEME_NAME);
     await createProject("1.0.0");
 
-    await applyThemeUpdate(PROJECT_ID);
+    await applyThemeUpdate(PROJECT_ID, "local");
 
     const projectsData = await readProjectsFile();
     const project = projectsData.projects.find((p) => p.id === PROJECT_ID);
@@ -441,7 +441,7 @@ describe("applyThemeUpdate", () => {
     await createTheme("1.0.0"); // No updates
     await createProject("1.0.0");
 
-    const result = await applyThemeUpdate(PROJECT_ID);
+    const result = await applyThemeUpdate(PROJECT_ID, "local");
     assert.equal(result.success, false);
     assert.ok(result.message.includes("No update"));
     assert.equal(result.previousVersion, "1.0.0");
@@ -461,7 +461,7 @@ describe("applyThemeUpdate", () => {
     await createProject("1.0.0");
 
     // Should not throw even though snippets/ doesn't exist in theme
-    const result = await applyThemeUpdate(PROJECT_ID);
+    const result = await applyThemeUpdate(PROJECT_ID, "local");
     assert.ok(result.success);
     assert.equal(result.newVersion, "1.1.0");
   });

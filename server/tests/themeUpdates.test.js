@@ -16,17 +16,27 @@ import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
+import os from "os";
 
-// Import the functions we're testing
+// Isolated test environment
+const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-theme-updates-test-${Date.now()}`);
+const TEST_DATA_DIR = path.join(TEST_ROOT, "data");
+const TEST_THEMES_DIR = path.join(TEST_ROOT, "themes");
+
+process.env.DATA_ROOT = TEST_DATA_DIR;
+process.env.THEMES_ROOT = TEST_THEMES_DIR;
+process.env.NODE_ENV = "test";
+
+// Import the functions we're testing (after env setup)
 const { buildLatestSnapshot, getThemeVersions } = await import("../controllers/themeController.js");
-const { THEMES_DIR } = await import("../config.js");
+const { getThemeDir } = await import("../config.js");
 
 // ============================================================================
 // Test Configuration
 // ============================================================================
 
 const TEST_THEME_ID = "__test_theme_updates__";
-const testThemeDir = path.join(THEMES_DIR, TEST_THEME_ID);
+const testThemeDir = getThemeDir(TEST_THEME_ID, "local");
 
 // ============================================================================
 // Test Fixture Setup
@@ -262,6 +272,7 @@ before(async () => {
 
 after(async () => {
   await cleanup();
+  await fs.remove(TEST_ROOT);
 });
 
 // ---------------------------------------------------------------------------
@@ -482,7 +493,7 @@ describe("Deletions from v1.2.0", () => {
 describe("Error handling", () => {
   it("throws when update folder is missing theme.json", async () => {
     const errorThemeId = "__test_theme_error_missing__";
-    const errorThemeDir = path.join(THEMES_DIR, errorThemeId);
+    const errorThemeDir = getThemeDir(errorThemeId, "local");
 
     try {
       // Create a base theme
@@ -507,7 +518,7 @@ describe("Error handling", () => {
 
   it("throws when theme.json version doesn't match folder name", async () => {
     const errorThemeId = "__test_theme_error_mismatch__";
-    const errorThemeDir = path.join(THEMES_DIR, errorThemeId);
+    const errorThemeDir = getThemeDir(errorThemeId, "local");
 
     try {
       await fs.ensureDir(errorThemeDir);
@@ -534,7 +545,7 @@ describe("Error handling", () => {
 
   it("does not create latest/ when no updates exist", async () => {
     const baseOnlyId = "__test_theme_base_only__";
-    const baseOnlyDir = path.join(THEMES_DIR, baseOnlyId);
+    const baseOnlyDir = getThemeDir(baseOnlyId, "local");
 
     try {
       await fs.ensureDir(baseOnlyDir);

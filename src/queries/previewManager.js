@@ -1,4 +1,5 @@
-import { API_URL, PREVIEW_ISOLATION, PREVIEW_ORIGIN } from "../config";
+import { PREVIEW_ISOLATION, PREVIEW_ORIGIN } from "../config";
+import { apiFetch } from "../lib/apiFetch";
 import useProjectStore from "../stores/projectStore";
 import fontDefinitions from "../core/config/fonts.json";
 
@@ -45,7 +46,7 @@ function extractFonts(settings) {
  */
 export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor") {
   try {
-    const response = await fetch(API_URL("/api/preview/token"), {
+    const response = await apiFetch("/api/preview/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -79,7 +80,7 @@ export async function fetchPreviewToken(pageData, themeSettings, previewMode = "
  */
 export async function fetchPreview(pageData, themeSettings, previewMode = "editor") {
   try {
-    const response = await fetch(API_URL("/api/preview"), {
+    const response = await apiFetch("/api/preview", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -114,7 +115,7 @@ export async function fetchPreview(pageData, themeSettings, previewMode = "edito
  */
 export async function fetchRenderedWidget(widgetId, widget, themeSettings) {
   try {
-    const response = await fetch(API_URL("/api/preview/widget"), {
+    const response = await apiFetch("/api/preview/widget", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -313,7 +314,7 @@ function updateThemeSettings(iframe, settings) {
  */
 export async function getGlobalWidgets() {
   try {
-    const response = await fetch(API_URL("/api/preview/global-widgets"));
+    const response = await apiFetch("/api/preview/global-widgets");
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -336,7 +337,7 @@ export async function getGlobalWidgets() {
  */
 export async function saveGlobalWidget(type, widget) {
   try {
-    const response = await fetch(API_URL(`/api/preview/global-widgets/${type}`), {
+    const response = await apiFetch(`/api/preview/global-widgets/${type}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -370,7 +371,7 @@ export async function getProjectWidgets() {
       throw new Error("No active project");
     }
 
-    const response = await fetch(API_URL(`/api/projects/${activeProject.id}/widgets`));
+    const response = await apiFetch(`/api/projects/${activeProject.id}/widgets`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch project widgets");

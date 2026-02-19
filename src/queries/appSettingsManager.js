@@ -1,4 +1,4 @@
-import { API_URL } from "../config";
+import { apiFetch } from "../lib/apiFetch";
 
 /**
  * @typedef {Object} AppSettings
@@ -17,7 +17,7 @@ import { API_URL } from "../config";
  */
 export async function getAppSettings() {
   try {
-    const response = await fetch(API_URL("/api/settings"));
+    const response = await apiFetch("/api/settings");
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Failed to fetch application settings");
@@ -38,7 +38,7 @@ export async function getAppSettings() {
  */
 export async function saveAppSettings(settingsData) {
   try {
-    const response = await fetch(API_URL("/api/settings"), {
+    const response = await apiFetch("/api/settings", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

@@ -155,26 +155,34 @@ No outstanding security tasks. All protections listed above are active.
 
 ---
 
-## Pending: Hosted / Multi-user
+## Implemented: Hosted / Multi-user (Phase 2)
 
-These items need to be addressed before deploying as a multi-user or SaaS application:
+### Authentication
 
-### Authentication & Authorization
+- [x] Auth middleware (`server/middleware/auth.js`) — unconditionally sets `req.userId`. Open-source mode: `"local"`. Hosted mode: verifies Clerk JWT and extracts user ID; returns 401 on failure.
+- [x] `apiFetch` wrapper (`src/lib/apiFetch.js`) — attaches Clerk Bearer token when `window.Clerk?.session` exists. No-op in open-source mode.
+- [x] Feature flag: `HOSTED_MODE` from `server/hostedMode.js` controls whether auth is enforced.
 
-- [ ] Add authentication model (session-based or JWT)
+### Multi-tenant Data Isolation
+
+- [x] All data is scoped per user: `data/users/{userId}/projects/`, `data/users/{userId}/themes/`, `data/users/{userId}/publish/`
+- [x] All path helpers in `server/config.js` take a `userId` parameter (default `"local"`)
+- [x] All controller functions thread `req.userId` through to path helpers and repository calls
+- [x] SQLite `projects` table has a `user_id` column; all queries are filtered by `user_id`
+- [x] `getProjectFolderName(projectId, userId)` validates project ownership (throws if the project doesn't belong to the user)
+- [x] Theme operations are per-user — each user has their own installed themes in `data/users/{userId}/themes/`
+- [x] Default themes are provisioned from a read-only seed directory (`THEMES_SEED_DIR`) on first access
+
+### Pending: Authorization & Hardening
+
 - [ ] Add role-based access control (admin, editor, viewer)
 - [ ] Restrict theme settings (custom CSS/JS) to admin role only
 
-### CORS & CSP Hardening
+### Pending: CORS & CSP Hardening
 
 - [ ] Environment-based CORS branching: strict allowlist in production, permissive in local dev
 - [ ] Implement Content Security Policy with nonce or hash-based validation for inline scripts
 - [ ] Provide a whitelist of allowed external script sources
-
-### Multi-tenant Isolation
-
-- [ ] Isolate project data per user/tenant
-- [ ] Scope all API routes and file access to the authenticated user's projects
 
 ### Theme Settings Security (multi-user context)
 

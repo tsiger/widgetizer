@@ -1,8 +1,10 @@
 import fs from "fs-extra";
 import path from "path";
 import archiver from "archiver";
-import { getProjectDir, PUBLISH_DIR, APP_ROOT, STATIC_CORE_ASSETS_DIR } from "../config.js";
+import { getProjectDir, getUserPublishDir, APP_ROOT, STATIC_CORE_ASSETS_DIR } from "../config.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
+import { getProjectFolderName } from "../utils/projectHelpers.js";
+import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
 import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
@@ -33,14 +35,14 @@ async function getAppVersion() {
 // Resolve a stored outputDir to an absolute path.
 // New exports store just the directory name (e.g. "my-project-v1");
 // legacy data may still have full absolute paths.
-function resolveOutputDir(outputDir) {
+function resolveOutputDir(outputDir, userId = "local") {
   if (!outputDir) return null;
   if (path.isAbsolute(outputDir)) return outputDir;
-  return path.join(PUBLISH_DIR, outputDir);
+  return path.join(getUserPublishDir(userId), outputDir);
 }
 
 // Helper function to record an export and trim old versions
-async function recordExport(projectId, version, outputDir, status = "success") {
+async function recordExport(projectId, version, outputDir, status = "success", userId = "local") {
   const exportRecord = exportRepo.recordExport(projectId, version, outputDir, status);
 
   // Get the max exports setting from app settings
@@ -56,7 +58,7 @@ async function recordExport(projectId, version, outputDir, status = "success") {
   // Trim old exports beyond the limit
   const trimmed = exportRepo.trimExports(projectId, maxExports);
   for (const old of trimmed) {
-    const dir = resolveOutputDir(old.outputDir);
+    const dir = resolveOutputDir(old.outputDir, userId);
     if (dir && (await fs.pathExists(dir))) {
       try {
         await fs.remove(dir);
@@ -76,8 +78,10 @@ async function recordExport(projectId, version, outputDir, status = "success") {
  * @returns {Promise<{deletedDirs: number, deletedHistory: boolean}>} Cleanup results
  * @throws {Error} If cleanup fails
  */
-export async function cleanupProjectExports(projectId) {
+export async function cleanupProjectExports(projectId, userId = "local") {
   try {
+    // Validate project belongs to this user
+    await getProjectFolderName(projectId, userId);
     console.log(`Cleaning up exports for deleted project: ${projectId}`);
 
     const records = exportRepo.getExports(projectId);
@@ -90,7 +94,7 @@ export async function cleanupProjectExports(projectId) {
     // Delete all physical export directories for this project
     const deletedDirs = [];
     for (const record of records) {
-      const dir = resolveOutputDir(record.outputDir);
+      const dir = resolveOutputDir(record.outputDir, userId);
       if (dir && (await fs.pathExists(dir))) {
         try {
           await fs.remove(dir);
@@ -132,7 +136,7 @@ export async function exportProject(req, res) {
     }
 
     // Read projects file to resolve UUID to folderName (slug) for filesystem paths
-    const projectsData = await readProjectsFile();
+    const projectsData = await readProjectsFile(req.userId);
     const projectData = projectsData.projects.find((p) => p.id === projectId);
 
     if (!projectData) {
@@ -140,11 +144,11 @@ export async function exportProject(req, res) {
     }
 
     const projectFolderName = projectData.folderName;
-    const projectDir = getProjectDir(projectFolderName);
+    const projectDir = getProjectDir(projectFolderName, req.userId);
     const siteUrl = projectData.siteUrl || "";
 
     const version = exportRepo.getNextVersion(projectId);
-    const outputBaseDir = PUBLISH_DIR;
+    const outputBaseDir = getUserPublishDir(req.userId);
     const outputDir = path.join(outputBaseDir, `${projectFolderName}-v${version}`);
     const outputAssetsDir = path.join(outputDir, "assets");
     const outputImagesDir = path.join(outputAssetsDir, "images"); // Images now in assets/images/
@@ -157,10 +161,10 @@ export async function exportProject(req, res) {
     await fs.ensureDir(outputImagesDir);
     await fs.ensureDir(outputVideosDir);
     await fs.ensureDir(outputAudiosDir);
-    const rawThemeSettings = await readProjectThemeData(projectId);
+    const rawThemeSettings = await readProjectThemeData(projectId, req.userId);
 
     // Fetch list of page data using the helper function
-    const pagesDataArray = await listProjectPagesData(projectFolderName);
+    const pagesDataArray = await listProjectPagesData(projectFolderName, req.userId);
 
     // Validate that at least one page has the "index" slug (required for homepage)
     // Note: page.id is derived from filename, which is the authoritative slug
@@ -232,8 +236,8 @@ export async function exportProject(req, res) {
     }
     // --- End of new SEO file generation ---
 
-    const headerData = await readGlobalWidgetData(projectFolderName, "header");
-    const footerData = await readGlobalWidgetData(projectFolderName, "footer");
+    const headerData = await readGlobalWidgetData(projectFolderName, "header", req.userId);
+    const footerData = await readGlobalWidgetData(projectFolderName, "footer", req.userId);
 
     // Handle case where no pages are found (except for theme files etc)
     if (pagesDataArray.length === 0) {
@@ -270,7 +274,7 @@ export async function exportProject(req, res) {
 
       // Render header if exists (for each page to capture enqueued assets)
       if (headerData) {
-        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals);
+        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null, req.userId);
       }
 
       // Render page-specific widgets sequentially
@@ -296,13 +300,14 @@ export async function exportProject(req, res) {
             "publish",
             sharedGlobals,
             widgetIndex,
+            req.userId,
           );
         }
       }
 
       // Render footer if exists
       if (footerData) {
-        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals);
+        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null, req.userId);
       }
 
       // Pass separated content sections to layout
@@ -317,6 +322,7 @@ export async function exportProject(req, res) {
         rawThemeSettings,
         "publish",
         sharedGlobals,
+        req.userId,
       );
 
       // Format HTML using Prettier
@@ -466,7 +472,7 @@ Per aspera ad astra
     // --- Copy Only Used Images ---
     try {
       const { readMediaFile } = await import("./mediaController.js");
-      const mediaData = await readMediaFile(projectId);
+      const mediaData = await readMediaFile(projectId, req.userId);
 
       if (mediaData && mediaData.files) {
         const usedImages = mediaData.files.filter(
@@ -539,7 +545,7 @@ Per aspera ad astra
     // --- Copy Only Used Videos ---
     try {
       const { readMediaFile } = await import("./mediaController.js");
-      const mediaData = await readMediaFile(projectId);
+      const mediaData = await readMediaFile(projectId, req.userId);
 
       if (mediaData && mediaData.files) {
         const usedVideos = mediaData.files.filter(
@@ -595,7 +601,7 @@ Per aspera ad astra
     // Copy used audio files to assets/audios/
     try {
       const { readMediaFile } = await import("./mediaController.js");
-      const mediaData = await readMediaFile(projectId);
+      const mediaData = await readMediaFile(projectId, req.userId);
 
       if (mediaData && mediaData.files) {
         const usedAudios = mediaData.files.filter(
@@ -661,7 +667,7 @@ Per aspera ad astra
 
     // Record this export in history (store relative dir name, not absolute path)
     const exportDirName = `${projectFolderName}-v${version}`;
-    const exportRecord = await recordExport(projectId, version, exportDirName, "success");
+    const exportRecord = await recordExport(projectId, version, exportDirName, "success", req.userId);
 
     res.json({
       success: true,
@@ -674,7 +680,7 @@ Per aspera ad astra
     // Try to record failed export
     try {
       const version = exportRepo.getNextVersion(projectId);
-      await recordExport(projectId, version, null, "failed");
+      await recordExport(projectId, version, null, "failed", req.userId);
     } catch (recordError) {
       console.error("Failed to record export failure:", recordError);
     }
@@ -754,11 +760,12 @@ export async function getExportFiles(req, res) {
       return res.status(400).json({ error: "Export directory is required" });
     }
 
-    const fullPath = path.join(PUBLISH_DIR, exportDir);
+    const userPublishDir = getUserPublishDir(req.userId);
+    const fullPath = path.join(userPublishDir, exportDir);
 
     // Security check
     const resolvedPath = path.resolve(fullPath);
-    const publishPath = path.resolve(PUBLISH_DIR);
+    const publishPath = path.resolve(userPublishDir);
 
     if (!isWithinDirectory(resolvedPath, publishPath)) {
       return res.status(403).json({ error: "Access denied" });
@@ -797,11 +804,12 @@ export async function downloadExport(req, res) {
       return res.status(400).json({ error: "Export directory is required" });
     }
 
-    const fullPath = path.join(PUBLISH_DIR, exportDir);
+    const userPublishDir = getUserPublishDir(req.userId);
+    const fullPath = path.join(userPublishDir, exportDir);
 
     // Security check
     const resolvedPath = path.resolve(fullPath);
-    const publishPath = path.resolve(PUBLISH_DIR);
+    const publishPath = path.resolve(userPublishDir);
 
     if (!isWithinDirectory(resolvedPath, publishPath)) {
       return res.status(403).json({ error: "Access denied" });
@@ -862,6 +870,9 @@ export async function getExportHistory(req, res) {
       return res.status(400).json({ error: "Project ID is required" });
     }
 
+    // Validate project belongs to this user
+    await getProjectFolderName(projectId, req.userId);
+
     const exports = exportRepo.getExports(projectId);
 
     // Get the configured limit for exports to show
@@ -881,6 +892,7 @@ export async function getExportHistory(req, res) {
       maxVersionsToKeep: maxExports,
     });
   } catch (error) {
+    if (handleProjectResolutionError(res, error)) return;
     console.error("Error getting export history:", error);
     res.status(500).json({
       error: "Failed to get export history",
@@ -903,6 +915,9 @@ export async function deleteExport(req, res) {
       return res.status(400).json({ error: "Project ID and version are required" });
     }
 
+    // Validate project belongs to this user
+    await getProjectFolderName(projectId, req.userId);
+
     const exports = exportRepo.getExports(projectId);
 
     if (exports.length === 0) {
@@ -917,7 +932,7 @@ export async function deleteExport(req, res) {
     }
 
     // Delete the physical directory if it exists
-    const dir = resolveOutputDir(deleted.outputDir);
+    const dir = resolveOutputDir(deleted.outputDir, req.userId);
     if (dir && (await fs.pathExists(dir))) {
       await fs.remove(dir);
     }
@@ -927,6 +942,7 @@ export async function deleteExport(req, res) {
       message: `Export version ${version} deleted successfully`,
     });
   } catch (error) {
+    if (handleProjectResolutionError(res, error)) return;
     console.error("Error deleting export:", error);
     res.status(500).json({
       error: "Failed to delete export",

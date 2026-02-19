@@ -49,6 +49,7 @@ function mockReq({ params = {}, body = {} } = {}) {
     params,
     body,
     activeProject,
+    userId: "local",
     [Symbol.for("express-validator#contexts")]: [],
   };
 }
@@ -87,7 +88,7 @@ async function createTestMenu(name, description = "") {
 
 /** Reset menus directory between test groups */
 async function resetMenus() {
-  const menusDir = getProjectMenusDir(activeProject.folderName);
+  const menusDir = getProjectMenusDir(activeProject.folderName, "local");
   await fs.remove(menusDir);
   await fs.ensureDir(menusDir);
 }
@@ -112,9 +113,9 @@ before(async () => {
   });
 
   // Create project directory and menus subfolder
-  const projectDir = getProjectDir(activeProject.folderName);
+  const projectDir = getProjectDir(activeProject.folderName, "local");
   await fs.ensureDir(projectDir);
-  await fs.ensureDir(getProjectMenusDir(activeProject.folderName));
+  await fs.ensureDir(getProjectMenusDir(activeProject.folderName, "local"));
 });
 
 after(async () => {
@@ -165,7 +166,7 @@ describe("createMenu", () => {
 
   it("writes a JSON file to the menus directory", async () => {
     const res = await createTestMenu("Persisted Menu");
-    const menuPath = getMenuPath(activeProject.folderName, res._json.id);
+    const menuPath = getMenuPath(activeProject.folderName, res._json.id, "local");
     assert.ok(await fs.pathExists(menuPath));
 
     const onDisk = JSON.parse(await fs.readFile(menuPath, "utf8"));
@@ -329,7 +330,7 @@ describe("getAllMenus", () => {
   });
 
   it("returns empty array when menus directory does not exist", async () => {
-    const menusDir = getProjectMenusDir(activeProject.folderName);
+    const menusDir = getProjectMenusDir(activeProject.folderName, "local");
     await fs.remove(menusDir);
     const res = await callController(getAllMenus);
     assert.equal(res._status, 200);
@@ -350,7 +351,7 @@ describe("getMenuById", () => {
   });
 
   it("returns menu data by project directory and menu ID", async () => {
-    const projectDir = getProjectDir(activeProject.folderName);
+    const projectDir = getProjectDir(activeProject.folderName, "local");
     const menu = await getMenuById(projectDir, "render-menu");
     assert.ok(menu);
     assert.equal(menu.name, "Render Menu");
@@ -358,14 +359,14 @@ describe("getMenuById", () => {
   });
 
   it("returns { items: [] } for a non-existent menu", async () => {
-    const projectDir = getProjectDir(activeProject.folderName);
+    const projectDir = getProjectDir(activeProject.folderName, "local");
     const menu = await getMenuById(projectDir, "ghost-menu");
     assert.ok(menu);
     assert.deepEqual(menu.items, []);
   });
 
   it("returns null when menuId is falsy", async () => {
-    const projectDir = getProjectDir(activeProject.folderName);
+    const projectDir = getProjectDir(activeProject.folderName, "local");
     const result1 = await getMenuById(projectDir, null);
     assert.equal(result1, null);
     const result2 = await getMenuById(projectDir, undefined);
@@ -407,7 +408,7 @@ describe("updateMenu", () => {
     assert.equal(res._json.name, "Renamed Menu");
 
     // File should still be at the original path
-    assert.ok(await fs.pathExists(getMenuPath(activeProject.folderName, "original-name")));
+    assert.ok(await fs.pathExists(getMenuPath(activeProject.folderName, "original-name", "local")));
   });
 
   it("updates the 'updated' timestamp", async () => {
@@ -468,7 +469,7 @@ describe("updateMenu", () => {
       body: { name: "Original Name", description: "Saved to disk" },
     });
 
-    const menuPath = getMenuPath(activeProject.folderName, "original-name");
+    const menuPath = getMenuPath(activeProject.folderName, "original-name", "local");
     const onDisk = JSON.parse(await fs.readFile(menuPath, "utf8"));
     assert.equal(onDisk.description, "Saved to disk");
   });
@@ -547,7 +548,7 @@ describe("deleteMenu", () => {
 
   it("removes the file from disk", async () => {
     await callController(deleteMenu, { params: { id: "doomed-menu" } });
-    const menuPath = getMenuPath(activeProject.folderName, "doomed-menu");
+    const menuPath = getMenuPath(activeProject.folderName, "doomed-menu", "local");
     assert.ok(!(await fs.pathExists(menuPath)));
   });
 
@@ -578,7 +579,7 @@ describe("duplicateMenu", () => {
     // Create a menu with items for duplication tests
     await createTestMenu("Source Menu", "Original description");
     // Manually add items to the menu file for richer tests
-    const menuPath = getMenuPath(activeProject.folderName, "source-menu");
+    const menuPath = getMenuPath(activeProject.folderName, "source-menu", "local");
     const menuData = JSON.parse(await fs.readFile(menuPath, "utf8"));
     menuData.items = [
       {
@@ -649,7 +650,7 @@ describe("duplicateMenu", () => {
 
   it("writes the duplicate to disk", async () => {
     const res = await callController(duplicateMenu, { params: { id: "source-menu" } });
-    const dupPath = getMenuPath(activeProject.folderName, res._json.id);
+    const dupPath = getMenuPath(activeProject.folderName, res._json.id, "local");
     assert.ok(await fs.pathExists(dupPath));
   });
 
@@ -755,7 +756,7 @@ describe("UUID backward compatibility", () => {
     await resetMenus();
 
     // Write a legacy menu file without uuid
-    const menuPath = getMenuPath(activeProject.folderName, "legacy-menu");
+    const menuPath = getMenuPath(activeProject.folderName, "legacy-menu", "local");
     const legacyMenu = {
       id: "legacy-menu",
       name: "Legacy Menu",
@@ -780,7 +781,7 @@ describe("UUID backward compatibility", () => {
     await resetMenus();
 
     // Write a legacy menu file without uuid
-    const menuPath = getMenuPath(activeProject.folderName, "legacy-by-id");
+    const menuPath = getMenuPath(activeProject.folderName, "legacy-by-id", "local");
     const legacyMenu = {
       id: "legacy-by-id",
       name: "Legacy By ID",
@@ -789,7 +790,7 @@ describe("UUID backward compatibility", () => {
     await fs.outputFile(menuPath, JSON.stringify(legacyMenu, null, 2));
 
     // getMenuById should backfill the uuid
-    const projectDir = getProjectDir(activeProject.folderName);
+    const projectDir = getProjectDir(activeProject.folderName, "local");
     const menu = await getMenuById(projectDir, "legacy-by-id");
     assert.ok(menu.uuid, "legacy menu should have been backfilled with a uuid");
     assert.equal(menu.items.length, 1);

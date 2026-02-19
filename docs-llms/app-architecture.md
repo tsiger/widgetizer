@@ -613,10 +613,15 @@ Save button / Auto-save timer
 
 | File | Functions |
 | --- | --- |
-| `server/config.js` | Path helpers: `getProjectDir()`, `getProjectPagesDir()`, `getThemeDir()`, etc. |
+| `server/config.js` | Path helpers (`getProjectDir()`, `getUserPublishDir()`, `getThemeDir()`, `getUserThemesDir()`, etc.), `getMediaDir()`, `getMediaCategory()` (re-exported from mimeTypes.js) |
+| `server/utils/mimeTypes.js` | `ALLOWED_MIME_TYPES`, `ZIP_MIME_TYPES`, `getContentType()`, `getMediaCategory()` |
 | `server/utils/semver.js` | `parseVersion()`, `compareVersions()`, `isNewerVersion()`, `sortVersions()`, `getLatestVersion()` |
 | `server/utils/themeHelpers.js` | `preprocessThemeSettings()` |
-| `server/utils/projectHelpers.js` | Project-related utilities |
+| `server/utils/projectHelpers.js` | `getProjectFolderName(projectId, userId)`, `getProjectDetails()` |
+| `server/utils/pathSecurity.js` | `isWithinDirectory()` |
+| `server/utils/projectErrors.js` | `PROJECT_ERROR_CODES`, `handleProjectResolutionError()`, `isProjectResolutionError()` |
+| `server/hostedMode.js` | `HOSTED_MODE`, `PUBLISHER_API_URL` feature flags |
+| `server/middleware/auth.js` | Auth middleware — sets `req.userId` on every request |
 
 ### Shared Hooks
 

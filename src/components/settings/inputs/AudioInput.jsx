@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { uploadProjectMedia, getProjectMedia } from "../../../queries/mediaManager";
-import { API_URL } from "../../../config";
+import { apiFetch } from "../../../lib/apiFetch";
 import useProjectStore from "../../../stores/projectStore";
 import useToastStore from "../../../stores/toastStore";
 import { X, Edit, UploadCloud, Music } from "lucide-react";
@@ -74,7 +74,7 @@ export default function AudioInput({ id, value = "", onChange }) {
   const handleSaveMetadata = async (fileId, metadata) => {
     setIsSavingMetadata(true);
     try {
-      const response = await fetch(API_URL(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata`), {
+      const response = await apiFetch(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(metadata),

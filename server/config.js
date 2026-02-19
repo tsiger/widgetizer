@@ -1,4 +1,5 @@
 import path from "path";
+import { getMediaCategory } from "./utils/mimeTypes.js";
 
 // Base directories with environment variable support.
 // APP_ROOT is set by Electron to the app.asar path, or defaults to cwd for non-Electron use.
@@ -14,11 +15,22 @@ export const UNPACKED_ROOT = process.env.UNPACKED_ROOT
 
 export const DATA_DIR = process.env.DATA_ROOT ? path.resolve(process.env.DATA_ROOT) : path.join(APP_ROOT, "data");
 
-export const THEMES_DIR = process.env.THEMES_ROOT
+// Legacy global themes dir — used as the seed directory for provisioning default themes
+// to new users. Production code should use getUserThemesDir(userId) instead.
+export const THEMES_SEED_DIR = process.env.THEMES_ROOT
   ? path.resolve(process.env.THEMES_ROOT)
   : path.join(APP_ROOT, "themes");
 
+// Keep THEMES_DIR as an alias for backward compat in tests that set THEMES_ROOT
+export const THEMES_DIR = THEMES_SEED_DIR;
+
+// Legacy global publish dir — kept for backward compat in tests.
+// Production code should use getUserPublishDir(userId) instead.
 export const PUBLISH_DIR = path.join(DATA_DIR, "publish");
+
+// User-scoped publish directory for exports
+export const getUserPublishDir = (userId = "local") => path.join(getUserDataDir(userId), "publish");
+
 export const CORE_WIDGETS_DIR = path.join(APP_ROOT, "src", "core", "widgets");
 
 // Static paths — served via express.static() or res.sendFile(), so must be real files on disk.
@@ -35,67 +47,73 @@ export function isAsarPath(p) {
 // Database path
 export const getDbPath = () => path.join(DATA_DIR, "widgetizer.db");
 
-// Theme paths - base paths (for theme root)
-export const getThemeDir = (themeId) => path.join(THEMES_DIR, themeId);
-export const getThemeJsonPath = (themeId) => path.join(getThemeDir(themeId), "theme.json");
-export const getThemeWidgetsDir = (themeId) => path.join(getThemeDir(themeId), "widgets");
-export const getThemeTemplatesDir = (themeId) => path.join(getThemeDir(themeId), "templates");
+// User data paths
+export const getUserDataDir = (userId) => path.join(DATA_DIR, "users", userId);
+
+// User-scoped themes directory
+export const getUserThemesDir = (userId = "local") => path.join(getUserDataDir(userId), "themes");
+
+// Theme paths — user-scoped (each user has their own installed themes)
+export const getThemeDir = (themeId, userId = "local") => path.join(getUserThemesDir(userId), themeId);
+export const getThemeJsonPath = (themeId, userId = "local") => path.join(getThemeDir(themeId, userId), "theme.json");
+export const getThemeWidgetsDir = (themeId, userId = "local") => path.join(getThemeDir(themeId, userId), "widgets");
+export const getThemeTemplatesDir = (themeId, userId = "local") => path.join(getThemeDir(themeId, userId), "templates");
 
 // Theme versioning paths
-export const getThemeUpdatesDir = (themeId) => path.join(getThemeDir(themeId), "updates");
-export const getThemeLatestDir = (themeId) => path.join(getThemeDir(themeId), "latest");
-export const getThemeVersionDir = (themeId, version) => path.join(getThemeUpdatesDir(themeId), version);
+export const getThemeUpdatesDir = (themeId, userId = "local") => path.join(getThemeDir(themeId, userId), "updates");
+export const getThemeLatestDir = (themeId, userId = "local") => path.join(getThemeDir(themeId, userId), "latest");
+export const getThemeVersionDir = (themeId, version, userId = "local") => path.join(getThemeUpdatesDir(themeId, userId), version);
 
 // Theme preset paths
-export const getThemePresetsDir = (themeId) => path.join(getThemeDir(themeId), "presets");
-export const getThemePresetsJsonPath = (themeId) => path.join(getThemePresetsDir(themeId), "presets.json");
-export const getThemePresetDir = (themeId, presetId) => path.join(getThemePresetsDir(themeId), presetId);
+export const getThemePresetsDir = (themeId, userId = "local") => path.join(getThemeDir(themeId, userId), "presets");
+export const getThemePresetsJsonPath = (themeId, userId = "local") => path.join(getThemePresetsDir(themeId, userId), "presets.json");
+export const getThemePresetDir = (themeId, presetId, userId = "local") => path.join(getThemePresetsDir(themeId, userId), presetId);
 
 // Project paths
-export const getProjectDir = (projectId) => path.join(DATA_DIR, "projects", projectId);
+export const getProjectDir = (projectId, userId) => path.join(getUserDataDir(userId), "projects", projectId);
 
 // Project Page paths
-export const getProjectPagesDir = (projectId) => path.join(getProjectDir(projectId), "pages");
-export const getPagePath = (projectId, pageId) => path.join(getProjectPagesDir(projectId), `${pageId}.json`);
+export const getProjectPagesDir = (projectId, userId) => path.join(getProjectDir(projectId, userId), "pages");
+export const getPagePath = (projectId, pageId, userId) =>
+  path.join(getProjectPagesDir(projectId, userId), `${pageId}.json`);
 
 // Project Menu paths
-export const getProjectMenusDir = (projectId) => path.join(getProjectDir(projectId), "menus");
-export const getMenuPath = (projectId, menuId) => path.join(getProjectMenusDir(projectId), `${menuId}.json`);
+export const getProjectMenusDir = (projectId, userId) => path.join(getProjectDir(projectId, userId), "menus");
+export const getMenuPath = (projectId, menuId, userId) =>
+  path.join(getProjectMenusDir(projectId, userId), `${menuId}.json`);
 
 // Project theme paths
-export const getProjectThemeDir = (projectId) => path.join(getProjectDir(projectId), "theme");
-export const getProjectThemeJsonPath = (projectId) => path.join(getProjectDir(projectId), "theme.json");
-export const getProjectThemeTemplatesDir = (projectId) => path.join(getProjectThemeDir(projectId), "templates");
-export const getProjectThemeWidgetsDir = (projectId) => path.join(getProjectThemeDir(projectId), "widgets");
+export const getProjectThemeDir = (projectId, userId) => path.join(getProjectDir(projectId, userId), "theme");
+export const getProjectThemeJsonPath = (projectId, userId) =>
+  path.join(getProjectDir(projectId, userId), "theme.json");
+export const getProjectThemeTemplatesDir = (projectId, userId) =>
+  path.join(getProjectThemeDir(projectId, userId), "templates");
+export const getProjectThemeWidgetsDir = (projectId, userId) =>
+  path.join(getProjectThemeDir(projectId, userId), "widgets");
 
 // Project Media paths
-export const getProjectUploadsDir = (projectId) => path.join(getProjectDir(projectId), "uploads");
-export const getProjectImagesDir = (projectId) => path.join(getProjectUploadsDir(projectId), "images");
-export const getProjectVideosDir = (projectId) => path.join(getProjectUploadsDir(projectId), "videos");
-export const getProjectAudiosDir = (projectId) => path.join(getProjectUploadsDir(projectId), "audios");
-export const getImagePath = (projectId, filename) => path.join(getProjectImagesDir(projectId), filename);
-export const getVideoPath = (projectId, filename) => path.join(getProjectVideosDir(projectId), filename);
-export const getAudioPath = (projectId, filename) => path.join(getProjectAudiosDir(projectId), filename);
+export const getProjectUploadsDir = (projectId, userId) => path.join(getProjectDir(projectId, userId), "uploads");
+export const getProjectImagesDir = (projectId, userId) => path.join(getProjectUploadsDir(projectId, userId), "images");
+export const getProjectVideosDir = (projectId, userId) => path.join(getProjectUploadsDir(projectId, userId), "videos");
+export const getProjectAudiosDir = (projectId, userId) => path.join(getProjectUploadsDir(projectId, userId), "audios");
+export const getImagePath = (projectId, filename, userId) =>
+  path.join(getProjectImagesDir(projectId, userId), filename);
+export const getVideoPath = (projectId, filename, userId) =>
+  path.join(getProjectVideosDir(projectId, userId), filename);
+export const getAudioPath = (projectId, filename, userId) =>
+  path.join(getProjectAudiosDir(projectId, userId), filename);
 
-/**
- * Classify a MIME type into a media category.
- * @param {string} mimeType
- * @returns {"video"|"audio"|"image"}
- */
-export function getMediaCategory(mimeType) {
-  if (mimeType && mimeType.startsWith("video/")) return "video";
-  if (mimeType && mimeType.startsWith("audio/")) return "audio";
-  return "image";
-}
+// Re-export from centralized MIME utils so existing importers keep working
+export { getMediaCategory };
 
 /**
  * Resolve the upload directory for a given project and MIME type.
  */
-export function getMediaDir(projectFolderName, mimeType) {
+export function getMediaDir(projectFolderName, mimeType, userId) {
   const category = getMediaCategory(mimeType);
-  if (category === "video") return getProjectVideosDir(projectFolderName);
-  if (category === "audio") return getProjectAudiosDir(projectFolderName);
-  return getProjectImagesDir(projectFolderName);
+  if (category === "video") return getProjectVideosDir(projectFolderName, userId);
+  if (category === "audio") return getProjectAudiosDir(projectFolderName, userId);
+  return getProjectImagesDir(projectFolderName, userId);
 }
 
 // Log configuration on startup (useful for debugging)

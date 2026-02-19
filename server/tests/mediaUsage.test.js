@@ -129,10 +129,10 @@ before(async () => {
   });
 
   // Create project directory structure
-  const projectDir = getProjectDir(PROJECT_FOLDER);
+  const projectDir = getProjectDir(PROJECT_FOLDER, "local");
   await fs.ensureDir(projectDir);
-  await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER));
-  await fs.ensureDir(path.join(getProjectPagesDir(PROJECT_FOLDER), "global"));
+  await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER, "local"));
+  await fs.ensureDir(path.join(getProjectPagesDir(PROJECT_FOLDER, "local"), "global"));
 });
 
 after(async () => {
@@ -594,7 +594,7 @@ describe("refreshAllMediaUsage", () => {
     await seedMediaJson(files);
 
     // Create actual page files on disk
-    const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
+    const pagesDir = getProjectPagesDir(PROJECT_FOLDER, "local");
     await fs.ensureDir(pagesDir);
 
     // home.json — uses hero and logo
@@ -637,7 +637,7 @@ describe("refreshAllMediaUsage", () => {
     );
 
     // theme.json — favicon (logo) so theme settings media is tracked
-    const themeJsonPath = getProjectThemeJsonPath(PROJECT_FOLDER);
+    const themeJsonPath = getProjectThemeJsonPath(PROJECT_FOLDER, "local");
     await fs.writeFile(
       themeJsonPath,
       JSON.stringify({
@@ -654,7 +654,7 @@ describe("refreshAllMediaUsage", () => {
   });
 
   it("rebuilds all usedIn arrays from disk", async () => {
-    const result = await refreshAllMediaUsage(PROJECT_ID);
+    const result = await refreshAllMediaUsage(PROJECT_ID, "local");
     assert.equal(result.success, true);
 
     const media = await readMediaJson();
@@ -682,7 +682,7 @@ describe("refreshAllMediaUsage", () => {
   });
 
   it("clears stale usage from deleted pages", async () => {
-    const result = await refreshAllMediaUsage(PROJECT_ID);
+    const result = await refreshAllMediaUsage(PROJECT_ID, "local");
     assert.equal(result.success, true);
 
     const media = await readMediaJson();
@@ -692,18 +692,18 @@ describe("refreshAllMediaUsage", () => {
   });
 
   it("returns message with page count", async () => {
-    const result = await refreshAllMediaUsage(PROJECT_ID);
+    const result = await refreshAllMediaUsage(PROJECT_ID, "local");
     assert.match(result.message, /2 pages/); // home.json + about.json
   });
 
   it("handles project with no pages directory", async () => {
     // Temporarily move pages dir out of the way
-    const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
+    const pagesDir = getProjectPagesDir(PROJECT_FOLDER, "local");
     const backupDir = pagesDir + ".backup";
     await fs.move(pagesDir, backupDir);
 
     try {
-      const result = await refreshAllMediaUsage(PROJECT_ID);
+      const result = await refreshAllMediaUsage(PROJECT_ID, "local");
       assert.equal(result.success, true);
       assert.match(result.message, /no pages directory/i);
     } finally {

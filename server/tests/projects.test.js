@@ -30,7 +30,7 @@ process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
 // Now import server modules — they'll use our overridden paths
-const { DATA_DIR, THEMES_DIR, getProjectDir, getProjectPagesDir, getProjectMenusDir } =
+const { DATA_DIR, THEMES_DIR, getThemeDir, getProjectDir, getProjectPagesDir, getProjectMenusDir } =
   await import("../config.js");
 
 const {
@@ -57,7 +57,7 @@ const AdmZip = await import("adm-zip");
 
 /** Create a minimal theme with templates and menus for project creation */
 async function createTestTheme(themeId = "__test_theme__") {
-  const themeDir = path.join(TEST_THEMES_DIR, themeId);
+  const themeDir = getThemeDir(themeId, "local");
   await fs.ensureDir(themeDir);
 
   // theme.json
@@ -126,6 +126,7 @@ function mockReq({ params = {}, body = {}, file = null } = {}) {
     params,
     body,
     file,
+    userId: "local",
     // express-validator needs these to exist
     [Symbol.for("express-validator#contexts")]: [],
   };
@@ -327,13 +328,13 @@ describe("createProject", () => {
 
   it("creates the project directory on disk", async () => {
     const project = await createTestProject("Disk Check");
-    const dir = getProjectDir(project.folderName);
+    const dir = getProjectDir(project.folderName, "local");
     assert.ok(await fs.pathExists(dir));
   });
 
   it("copies theme files to project directory", async () => {
     const project = await createTestProject("Theme Copy");
-    const dir = getProjectDir(project.folderName);
+    const dir = getProjectDir(project.folderName, "local");
 
     // theme.json should be copied
     assert.ok(await fs.pathExists(path.join(dir, "theme.json")));
@@ -347,20 +348,20 @@ describe("createProject", () => {
 
   it("creates pages from templates (NOT a copy of templates/)", async () => {
     const project = await createTestProject("Pages Check");
-    const pagesDir = getProjectPagesDir(project.folderName);
+    const pagesDir = getProjectPagesDir(project.folderName, "local");
 
     // Pages should exist
     assert.ok(await fs.pathExists(path.join(pagesDir, "index.json")));
     assert.ok(await fs.pathExists(path.join(pagesDir, "about.json")));
 
     // templates/ directory should NOT exist in the project
-    const dir = getProjectDir(project.folderName);
+    const dir = getProjectDir(project.folderName, "local");
     assert.ok(!(await fs.pathExists(path.join(dir, "templates"))), "templates/ should be excluded from project");
   });
 
   it("pages have UUIDs and timestamps", async () => {
     const project = await createTestProject("UUID Check");
-    const pagesDir = getProjectPagesDir(project.folderName);
+    const pagesDir = getProjectPagesDir(project.folderName, "local");
 
     const indexPage = await fs.readJson(path.join(pagesDir, "index.json"));
     assert.ok(indexPage.uuid, "page should have a uuid");
@@ -371,7 +372,7 @@ describe("createProject", () => {
 
   it("copies global widgets (header/footer)", async () => {
     const project = await createTestProject("Globals Check");
-    const pagesDir = getProjectPagesDir(project.folderName);
+    const pagesDir = getProjectPagesDir(project.folderName, "local");
 
     assert.ok(await fs.pathExists(path.join(pagesDir, "global", "header.json")));
     assert.ok(await fs.pathExists(path.join(pagesDir, "global", "footer.json")));
@@ -379,7 +380,7 @@ describe("createProject", () => {
 
   it("copies menus and enriches with pageUuid", async () => {
     const project = await createTestProject("Menus Check");
-    const menusDir = getProjectMenusDir(project.folderName);
+    const menusDir = getProjectMenusDir(project.folderName, "local");
 
     assert.ok(await fs.pathExists(path.join(menusDir, "main-menu.json")));
 
@@ -667,7 +668,7 @@ describe("updateProject", () => {
   });
 
   it("renames project folder when folderName changes", async () => {
-    const oldDir = getProjectDir(project.folderName);
+    const oldDir = getProjectDir(project.folderName, "local");
     assert.ok(await fs.pathExists(oldDir), "old directory should exist before rename");
 
     const res = await callController(updateProject, {
@@ -680,7 +681,7 @@ describe("updateProject", () => {
     // Old directory should be gone
     assert.ok(!(await fs.pathExists(oldDir)), "old directory should be removed");
     // New directory should exist
-    assert.ok(await fs.pathExists(getProjectDir("renamed-folder")), "new directory should exist");
+    assert.ok(await fs.pathExists(getProjectDir("renamed-folder", "local")), "new directory should exist");
   });
 
   it("preserves project files after folder rename", async () => {
@@ -690,12 +691,12 @@ describe("updateProject", () => {
     });
     assert.equal(res._status, 200);
 
-    const newDir = getProjectDir("renamed-files");
+    const newDir = getProjectDir("renamed-files", "local");
     // Theme files should exist in the new folder
     assert.ok(await fs.pathExists(path.join(newDir, "theme.json")), "theme.json should survive rename");
     assert.ok(await fs.pathExists(path.join(newDir, "layout.liquid")), "layout.liquid should survive rename");
     // Pages should exist
-    const pagesDir = getProjectPagesDir("renamed-files");
+    const pagesDir = getProjectPagesDir("renamed-files", "local");
     assert.ok(await fs.pathExists(path.join(pagesDir, "index.json")), "pages should survive rename");
   });
 
@@ -868,7 +869,7 @@ describe("deleteProject", () => {
 
   it("removes project directory from disk", async () => {
     const project = await createTestProject("Disk Delete");
-    const dir = getProjectDir(project.folderName);
+    const dir = getProjectDir(project.folderName, "local");
     assert.ok(await fs.pathExists(dir), "directory should exist before delete");
 
     await callController(deleteProject, { params: { id: project.id } });
@@ -963,7 +964,7 @@ describe("duplicateProject", () => {
 
   it("copies the project directory to a new location", async () => {
     const res = await callController(duplicateProject, { params: { id: original.id } });
-    const newDir = getProjectDir(res._json.folderName);
+    const newDir = getProjectDir(res._json.folderName, "local");
     assert.ok(await fs.pathExists(newDir));
     assert.ok(await fs.pathExists(path.join(newDir, "theme.json")));
   });
@@ -977,8 +978,8 @@ describe("duplicateProject", () => {
   it("regenerates page UUIDs in the copy", async () => {
     const res = await callController(duplicateProject, { params: { id: original.id } });
 
-    const originalPagesDir = getProjectPagesDir(original.folderName);
-    const copyPagesDir = getProjectPagesDir(res._json.folderName);
+    const originalPagesDir = getProjectPagesDir(original.folderName, "local");
+    const copyPagesDir = getProjectPagesDir(res._json.folderName, "local");
 
     const origIndex = await fs.readJson(path.join(originalPagesDir, "index.json"));
     const copyIndex = await fs.readJson(path.join(copyPagesDir, "index.json"));
@@ -1411,7 +1412,7 @@ describe("importProject", () => {
     assert.equal(imported.files[1].filename, "banner.png");
 
     // media.json should be cleaned up from disk
-    const mediaJsonPath = path.join(getProjectDir(res._json.folderName), "uploads", "media.json");
+    const mediaJsonPath = path.join(getProjectDir(res._json.folderName, "local"), "uploads", "media.json");
     assert.ok(!(await fs.pathExists(mediaJsonPath)), "media.json should be removed after import");
   });
 

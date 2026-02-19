@@ -17,7 +17,7 @@ export async function getAllMenus(req, res) {
     const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const menusDir = getProjectMenusDir(projectFolderName);
+    const menusDir = getProjectMenusDir(projectFolderName, req.userId);
 
     if (!(await fs.pathExists(menusDir))) {
       return res.json([]);
@@ -68,12 +68,12 @@ export async function createMenu(req, res) {
     const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const menusDir = getProjectMenusDir(projectFolderName);
+    const menusDir = getProjectMenusDir(projectFolderName, req.userId);
     await fs.ensureDir(menusDir);
 
     // Generate unique ID from the sanitized name (server-side only)
-    const menuId = await generateUniqueSlug(name, (slug) => fs.pathExists(getMenuPath(projectFolderName, slug)));
-    const menuPath = getMenuPath(projectFolderName, menuId);
+    const menuId = await generateUniqueSlug(name, (slug) => fs.pathExists(getMenuPath(projectFolderName, slug, req.userId)));
+    const menuPath = getMenuPath(projectFolderName, menuId, req.userId);
 
     const newMenu = {
       id: menuId,
@@ -106,7 +106,7 @@ export async function deleteMenu(req, res) {
     const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const menuPath = getMenuPath(projectFolderName, id);
+    const menuPath = getMenuPath(projectFolderName, id, req.userId);
     await fs.remove(menuPath);
     res.json({ success: true });
   } catch (error) {
@@ -127,7 +127,7 @@ export async function getMenu(req, res) {
     const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const menuPath = getMenuPath(projectFolderName, id);
+    const menuPath = getMenuPath(projectFolderName, id, req.userId);
     if (!(await fs.pathExists(menuPath))) {
       return res.status(404).json({ error: "Menu not found" });
     }
@@ -169,7 +169,7 @@ export async function updateMenu(req, res) {
     const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const menuPath = getMenuPath(projectFolderName, menuId);
+    const menuPath = getMenuPath(projectFolderName, menuId, req.userId);
 
     if (!(await fs.pathExists(menuPath))) {
       return res.status(404).json({ error: "Menu not found" });
@@ -260,7 +260,7 @@ export async function duplicateMenu(req, res) {
     const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const originalMenuPath = getMenuPath(projectFolderName, id);
+    const originalMenuPath = getMenuPath(projectFolderName, id, req.userId);
 
     // Check if original menu exists
     if (!(await fs.pathExists(originalMenuPath))) {
@@ -272,7 +272,7 @@ export async function duplicateMenu(req, res) {
     const originalMenu = JSON.parse(originalMenuData);
 
     // Gather existing menu names for copy-number logic
-    const menusDir = getProjectMenusDir(projectFolderName);
+    const menusDir = getProjectMenusDir(projectFolderName, req.userId);
     const menuFiles = (await fs.readdir(menusDir)).filter((f) => f.endsWith(".json"));
     const existingMenuNames = await Promise.all(
       menuFiles.map(async (f) => {
@@ -281,7 +281,7 @@ export async function duplicateMenu(req, res) {
       }),
     );
     const newName = generateCopyName(originalMenu.name, existingMenuNames);
-    const newMenuId = await generateUniqueSlug(newName, (slug) => fs.pathExists(getMenuPath(projectFolderName, slug)));
+    const newMenuId = await generateUniqueSlug(newName, (slug) => fs.pathExists(getMenuPath(projectFolderName, slug, req.userId)));
 
     // Create the duplicated menu with new data
     const duplicatedMenu = {
@@ -295,7 +295,7 @@ export async function duplicateMenu(req, res) {
     };
 
     // Save the new menu
-    const newMenuPath = getMenuPath(projectFolderName, newMenuId);
+    const newMenuPath = getMenuPath(projectFolderName, newMenuId, req.userId);
     await fs.outputFile(newMenuPath, JSON.stringify(duplicatedMenu, null, 2));
 
     res.status(201).json(duplicatedMenu);

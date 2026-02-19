@@ -1,4 +1,4 @@
-import { API_URL } from "../config";
+import { apiFetch } from "../lib/apiFetch";
 
 /**
  * @typedef {Object} MenuItem
@@ -26,7 +26,7 @@ import { API_URL } from "../config";
  */
 export async function getAllMenus() {
   try {
-    const response = await fetch(API_URL("/api/menus"));
+    const response = await apiFetch("/api/menus");
     if (!response.ok) {
       throw new Error("Failed to fetch menus");
     }
@@ -48,7 +48,7 @@ export async function getAllMenus() {
  */
 export async function createMenu(menuData) {
   try {
-    const response = await fetch(API_URL("/api/menus"), {
+    const response = await apiFetch("/api/menus", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export async function createMenu(menuData) {
  */
 export async function deleteMenu(id) {
   try {
-    const response = await fetch(API_URL(`/api/menus/${id}`), {
+    const response = await apiFetch(`/api/menus/${id}`, {
       method: "DELETE",
     });
 
@@ -105,7 +105,7 @@ export async function deleteMenu(id) {
  */
 export async function getMenu(id) {
   try {
-    const response = await fetch(API_URL(`/api/menus/${id}`));
+    const response = await apiFetch(`/api/menus/${id}`);
     if (!response.ok) {
       throw new Error("Failed to fetch menu");
     }
@@ -128,7 +128,7 @@ export async function getMenu(id) {
  */
 export async function updateMenu(id, menuData) {
   try {
-    const response = await fetch(API_URL(`/api/menus/${id}`), {
+    const response = await apiFetch(`/api/menus/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -162,7 +162,7 @@ export async function updateMenu(id, menuData) {
  */
 export async function duplicateMenu(id) {
   try {
-    const response = await fetch(API_URL(`/api/menus/${id}/duplicate`), {
+    const response = await apiFetch(`/api/menus/${id}/duplicate`, {
       method: "POST",
     });
 

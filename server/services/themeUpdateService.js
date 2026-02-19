@@ -26,9 +26,9 @@ const UPDATABLE_PATHS = ["layout.liquid", "assets", "widgets", "snippets", "scre
  * @returns {Promise<{hasUpdate: boolean, currentVersion: string, latestVersion: string}>} Update availability status
  * @throws {Error} If project not found
  */
-export async function checkForUpdates(projectId) {
+export async function checkForUpdates(projectId, userId = "local") {
   // Read projects file to get project info
-  const data = await readProjectsFile();
+  const data = await readProjectsFile(userId);
   const project = data.projects.find((p) => p.id === projectId);
 
   if (!project) {
@@ -40,7 +40,7 @@ export async function checkForUpdates(projectId) {
 
   // Get the theme's current source version (from latest/ or base theme.json)
   // This is the version that was last built/published, NOT all available versions
-  const themeSourceDir = await getThemeSourceDir(themeName);
+  const themeSourceDir = await getThemeSourceDir(themeName, userId);
   const themeJsonPath = path.join(themeSourceDir, "theme.json");
 
   let sourceVersion = null;
@@ -178,9 +178,9 @@ function mergeSettingsArray(userArray, newArray) {
  * @returns {Promise<{success: boolean, previousVersion: string, newVersion: string, message?: string}>} Update result
  * @throws {Error} If project not found
  */
-export async function applyThemeUpdate(projectId) {
+export async function applyThemeUpdate(projectId, userId) {
   // Read projects file to get project info
-  const data = await readProjectsFile();
+  const data = await readProjectsFile(userId);
   const projectIndex = data.projects.findIndex((p) => p.id === projectId);
 
   if (projectIndex === -1) {
@@ -192,7 +192,7 @@ export async function applyThemeUpdate(projectId) {
   const previousVersion = project.themeVersion;
 
   // Check if update is available
-  const updateStatus = await checkForUpdates(projectId);
+  const updateStatus = await checkForUpdates(projectId, userId);
   if (!updateStatus.hasUpdate) {
     return {
       success: false,
@@ -202,11 +202,11 @@ export async function applyThemeUpdate(projectId) {
     };
   }
 
-  const projectFolderName = await getProjectFolderName(projectId);
-  const projectDir = getProjectDir(projectFolderName);
+  const projectFolderName = await getProjectFolderName(projectId, userId);
+  const projectDir = getProjectDir(projectFolderName, userId);
 
   // Get theme source directory (latest/ if exists, otherwise root)
-  const themeSourceDir = await getThemeSourceDir(themeName);
+  const themeSourceDir = await getThemeSourceDir(themeName, userId);
 
   console.log(
     `[applyThemeUpdate] Updating project ${projectId} from ${previousVersion} to ${updateStatus.latestVersion}`,
@@ -295,7 +295,7 @@ export async function applyThemeUpdate(projectId) {
 
   // 3. Merge theme.json
   try {
-    const projectThemeJsonPath = getProjectThemeJsonPath(projectFolderName);
+    const projectThemeJsonPath = getProjectThemeJsonPath(projectFolderName, userId);
     const newThemeJsonPath = path.join(themeSourceDir, "theme.json");
 
     const userThemeJson = await fs.readJson(projectThemeJsonPath);
@@ -319,7 +319,7 @@ export async function applyThemeUpdate(projectId) {
     lastThemeUpdateVersion: updateStatus.latestVersion,
     updated: new Date().toISOString(),
   };
-  await writeProjectsFile(data);
+  await writeProjectsFile(data, userId);
 
   console.log(`[applyThemeUpdate] Successfully updated project ${projectId} to version ${updateStatus.latestVersion}`);
 
@@ -338,8 +338,8 @@ export async function applyThemeUpdate(projectId) {
  * @returns {Promise<{success: boolean, receiveThemeUpdates: boolean}>} Result with new flag value
  * @throws {Error} If project not found
  */
-export async function toggleThemeUpdates(projectId, enabled) {
-  const data = await readProjectsFile();
+export async function toggleThemeUpdates(projectId, enabled, userId = "local") {
+  const data = await readProjectsFile(userId);
   const projectIndex = data.projects.findIndex((p) => p.id === projectId);
 
   if (projectIndex === -1) {
@@ -352,7 +352,7 @@ export async function toggleThemeUpdates(projectId, enabled) {
     receiveThemeUpdates: enabled,
     updated: new Date().toISOString(),
   };
-  await writeProjectsFile(data);
+  await writeProjectsFile(data, userId);
 
   return {
     success: true,

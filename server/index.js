@@ -5,8 +5,10 @@ import cors from "cors";
 import helmet from "helmet";
 
 import { apiLimiter, editorApiLimiter } from "./middleware/rateLimiters.js";
+import authMiddleware from "./middleware/auth.js";
 import errorHandler from "./middleware/errorHandler.js";
-import { THEMES_DIR, STATIC_DIST_DIR, STATIC_UTILS_DIR } from "./config.js";
+import { HOSTED_MODE } from "./hostedMode.js";
+import { getUserThemesDir, STATIC_DIST_DIR, STATIC_UTILS_DIR } from "./config.js";
 
 // Load environment variables
 dotenv.config();
@@ -59,7 +61,8 @@ app.use(
 );
 app.use(express.json());
 
-// Request logging removed
+// Auth: always sets req.userId ("local" in open-source, Clerk ID in hosted)
+app.use("/api", authMiddleware);
 
 // Apply lenient rate limiting for editor-heavy routes
 app.use("/api/projects", editorApiLimiter, projectRoutes);
@@ -75,9 +78,20 @@ app.use("/api/settings", apiLimiter, appSettingsRoutes);
 app.use("/api/core-widgets", apiLimiter, coreWidgetsRoutes);
 app.use("/api/core", apiLimiter, coreRoutes);
 
-// Serve static files from the themes directory
-// TODO: We use this only for the theme screenshot.png.
-app.use("/themes", express.static(THEMES_DIR));
+// Hosted-only: publish routes (provided at deploy time, not in open-source repo)
+if (HOSTED_MODE) {
+  try {
+    const publishRoutes = (await import("./routes/publish.js")).default;
+    app.use("/api/publish", apiLimiter, publishRoutes);
+  } catch {
+    console.log("Publish routes not available (hosted-only feature)");
+  }
+}
+
+// Serve theme assets (screenshots) from user-scoped themes directory
+app.use("/themes", authMiddleware, (req, res, next) => {
+  express.static(getUserThemesDir(req.userId))(req, res, next);
+});
 
 // iFrame runtime script (MUST be before production catch-all)
 app.use("/runtime", express.static(STATIC_UTILS_DIR));

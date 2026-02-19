@@ -30,7 +30,7 @@ process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
-const { getProjectPagesDir, getPagePath } = await import("../config.js");
+const { getThemeDir, getProjectPagesDir, getPagePath } = await import("../config.js");
 
 const {
   createPage,
@@ -61,6 +61,7 @@ function mockReq({ params = {}, body = {} } = {}) {
     params,
     body,
     activeProject,
+    userId: "local",
     [Symbol.for("express-validator#contexts")]: [],
   };
 }
@@ -93,7 +94,7 @@ async function callController(controllerFn, { params, body } = {}) {
 
 /** Reset pages directory to empty (keep global/ intact) */
 async function resetPages() {
-  const pagesDir = getProjectPagesDir(activeProject.folderName);
+  const pagesDir = getProjectPagesDir(activeProject.folderName, "local");
   // Remove all .json files in pages/ (not the global/ subdirectory)
   const entries = await fs.readdir(pagesDir, { withFileTypes: true });
   for (const entry of entries) {
@@ -117,8 +118,8 @@ async function createTestPage(name = "Test Page", extraBody = {}) {
 // ============================================================================
 
 before(async () => {
-  // Create a minimal theme so createProject works
-  const themeDir = path.join(TEST_THEMES_DIR, "__page_test_theme__");
+  // Create a minimal theme in user-scoped directory
+  const themeDir = getThemeDir("__page_test_theme__", "local");
   await fs.ensureDir(path.join(themeDir, "templates"));
   await fs.writeJson(path.join(themeDir, "theme.json"), { name: "Page Test Theme", version: "1.0.0", settings: {} });
   await fs.writeFile(path.join(themeDir, "layout.liquid"), "<html></html>");
@@ -148,7 +149,7 @@ before(async () => {
   });
 
   // Create project directory structure
-  const pagesDir = getProjectPagesDir(activeProject.folderName);
+  const pagesDir = getProjectPagesDir(activeProject.folderName, "local");
   await fs.ensureDir(pagesDir);
   await fs.ensureDir(path.join(pagesDir, "global"));
   await fs.writeJson(path.join(pagesDir, "global", "header.json"), { type: "header", widgets: {} });
@@ -186,7 +187,7 @@ describe("createPage", () => {
 
   it("writes the page file to disk", async () => {
     const page = await createTestPage("Disk Write");
-    const filePath = getPagePath(activeProject.folderName, page.slug);
+    const filePath = getPagePath(activeProject.folderName, page.slug, "local");
     assert.ok(await fs.pathExists(filePath));
 
     const onDisk = await fs.readJson(filePath);
@@ -393,13 +394,13 @@ describe("listProjectPagesData", () => {
 
   it("returns page data directly by folderName", async () => {
     await createTestPage("Direct Access");
-    const pages = await listProjectPagesData(activeProject.folderName);
+    const pages = await listProjectPagesData(activeProject.folderName, "local");
     assert.equal(pages.length, 1);
     assert.equal(pages[0].name, "Direct Access");
   });
 
   it("returns empty array for non-existent project", async () => {
-    const pages = await listProjectPagesData("non-existent-folder");
+    const pages = await listProjectPagesData("non-existent-folder", "local");
     assert.deepEqual(pages, []);
   });
 });
@@ -410,24 +411,24 @@ describe("listProjectPagesData", () => {
 
 describe("readGlobalWidgetData", () => {
   it("reads header global widget", async () => {
-    const header = await readGlobalWidgetData(activeProject.folderName, "header");
+    const header = await readGlobalWidgetData(activeProject.folderName, "header", "local");
     assert.ok(header);
     assert.equal(header.type, "header");
   });
 
   it("reads footer global widget", async () => {
-    const footer = await readGlobalWidgetData(activeProject.folderName, "footer");
+    const footer = await readGlobalWidgetData(activeProject.folderName, "footer", "local");
     assert.ok(footer);
     assert.equal(footer.type, "footer");
   });
 
   it("returns null for invalid widget type", async () => {
-    const result = await readGlobalWidgetData(activeProject.folderName, "sidebar");
+    const result = await readGlobalWidgetData(activeProject.folderName, "sidebar", "local");
     assert.equal(result, null);
   });
 
   it("returns null for non-existent project", async () => {
-    const result = await readGlobalWidgetData("non-existent", "header");
+    const result = await readGlobalWidgetData("non-existent", "header", "local");
     assert.equal(result, null);
   });
 });
@@ -486,7 +487,7 @@ describe("updatePage", () => {
 
   it("renames file when slug changes", async () => {
     const page = await createTestPage("Rename Me");
-    const oldPath = getPagePath(activeProject.folderName, page.slug);
+    const oldPath = getPagePath(activeProject.folderName, page.slug, "local");
     assert.ok(await fs.pathExists(oldPath));
 
     const res = await callController(updatePage, {
@@ -499,7 +500,7 @@ describe("updatePage", () => {
     // Old file should be gone
     assert.ok(!(await fs.pathExists(oldPath)));
     // New file should exist
-    assert.ok(await fs.pathExists(getPagePath(activeProject.folderName, "renamed-slug")));
+    assert.ok(await fs.pathExists(getPagePath(activeProject.folderName, "renamed-slug", "local")));
   });
 
   it("returns 409 when new slug conflicts with existing page", async () => {
@@ -538,7 +539,7 @@ describe("updatePage", () => {
   it("preserves widgets when not included in update body", async () => {
     // Create page, then manually add widgets to it on disk
     const page = await createTestPage("Widget Preserve");
-    const pagePath = getPagePath(activeProject.folderName, page.slug);
+    const pagePath = getPagePath(activeProject.folderName, page.slug, "local");
     const onDisk = await fs.readJson(pagePath);
     onDisk.widgets = { "widget-1": { type: "hero", settings: { title: "Hello" } } };
     await fs.writeJson(pagePath, onDisk);
@@ -576,7 +577,7 @@ describe("savePageContent", () => {
     assert.equal(res._json.success, true);
 
     // Verify on disk
-    const onDisk = await fs.readJson(getPagePath(activeProject.folderName, page.slug));
+    const onDisk = await fs.readJson(getPagePath(activeProject.folderName, page.slug, "local"));
     assert.equal(Object.keys(onDisk.widgets).length, 2);
     assert.equal(onDisk.widgets.w1.settings.title, "Hero Title");
   });
@@ -590,7 +591,7 @@ describe("savePageContent", () => {
       body: { name: "Preserve Check", slug: page.slug, widgets: { w: { type: "text" } } },
     });
 
-    const onDisk = await fs.readJson(getPagePath(activeProject.folderName, page.slug));
+    const onDisk = await fs.readJson(getPagePath(activeProject.folderName, page.slug, "local"));
     assert.equal(onDisk.uuid, page.uuid);
     assert.equal(onDisk.created, page.created);
     assert.notEqual(onDisk.updated, page.updated);
@@ -598,7 +599,7 @@ describe("savePageContent", () => {
 
   it("handles slug change and deletes old file", async () => {
     const page = await createTestPage("Old Slug");
-    const oldPath = getPagePath(activeProject.folderName, page.slug);
+    const oldPath = getPagePath(activeProject.folderName, page.slug, "local");
 
     const res = await callController(savePageContent, {
       params: { id: page.slug },
@@ -607,7 +608,7 @@ describe("savePageContent", () => {
     assert.equal(res._status, 200);
 
     assert.ok(!(await fs.pathExists(oldPath)), "old file should be removed");
-    assert.ok(await fs.pathExists(getPagePath(activeProject.folderName, "new-slug")));
+    assert.ok(await fs.pathExists(getPagePath(activeProject.folderName, "new-slug", "local")));
   });
 
   it("saves SEO data", async () => {
@@ -619,7 +620,7 @@ describe("savePageContent", () => {
       body: { name: "SEO Save", slug: page.slug, widgets: {}, seo },
     });
 
-    const onDisk = await fs.readJson(getPagePath(activeProject.folderName, page.slug));
+    const onDisk = await fs.readJson(getPagePath(activeProject.folderName, page.slug, "local"));
     assert.equal(onDisk.seo.description, "Updated description");
     assert.equal(onDisk.seo.og_image, "new-hero.jpg");
   });
@@ -647,7 +648,7 @@ describe("deletePage", () => {
 
   it("deletes a page file from disk", async () => {
     const page = await createTestPage("Delete Me");
-    const filePath = getPagePath(activeProject.folderName, page.slug);
+    const filePath = getPagePath(activeProject.folderName, page.slug, "local");
     assert.ok(await fs.pathExists(filePath));
 
     const res = await callController(deletePage, { params: { id: page.slug } });
@@ -752,7 +753,7 @@ describe("duplicatePage", () => {
   it("preserves widgets from the original", async () => {
     const page = await createTestPage("Widget Page");
     // Add widgets to the page on disk
-    const pagePath = getPagePath(activeProject.folderName, page.slug);
+    const pagePath = getPagePath(activeProject.folderName, page.slug, "local");
     const onDisk = await fs.readJson(pagePath);
     onDisk.widgets = { hero: { type: "hero", settings: { title: "Keep Me" } } };
     await fs.writeJson(pagePath, onDisk);
@@ -792,7 +793,7 @@ describe("duplicatePage", () => {
     const page = await createTestPage("Disk Dup");
     const res = await callController(duplicatePage, { params: { id: page.slug } });
 
-    const dupPath = getPagePath(activeProject.folderName, res._json.slug);
+    const dupPath = getPagePath(activeProject.folderName, res._json.slug, "local");
     assert.ok(await fs.pathExists(dupPath));
   });
 });

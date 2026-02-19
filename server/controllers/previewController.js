@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { getProjectDir } from "../config.js";
+import { getContentType } from "../utils/mimeTypes.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { getSetting } from "../db/repositories/settingsRepository.js";
 import { readProjectsFile } from "./projectController.js";
@@ -48,10 +49,11 @@ function injectBaseTag(html) {
  * @param {Object} pageData - Page content including widgets and metadata
  * @param {Object} rawThemeSettings - Theme settings for rendering
  * @param {string} previewMode - "editor" or "standalone"
+ * @param {string} userId - The user ID for path scoping
  * @returns {Promise<string>} Rendered HTML string
  */
-async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
-  const projectsData = await readProjectsFile();
+async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, userId) {
+  const projectsData = await readProjectsFile(userId);
   const activeProjectId = projectsData.activeProjectId;
 
   if (!activeProjectId) {
@@ -83,6 +85,8 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
         rawThemeSettings,
         "preview",
         sharedGlobals,
+        null,
+        userId,
       );
     } catch (error) {
       console.error("Error rendering header widget:", error);
@@ -106,6 +110,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
         "preview",
         sharedGlobals,
         widgetIndex,
+        userId,
       );
       mainContent += renderedWidgetHtml;
     }
@@ -170,6 +175,8 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
         rawThemeSettings,
         "preview",
         sharedGlobals,
+        null,
+        userId,
       );
     } catch (error) {
       console.error("Error rendering footer widget:", error);
@@ -183,6 +190,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
     rawThemeSettings,
     "preview",
     sharedGlobals,
+    userId,
   );
 
   renderedHtml = injectBaseTag(renderedHtml);
@@ -200,7 +208,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
 export async function generatePreview(req, res) {
   try {
     const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
-    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode);
+    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode, req.userId);
     res.send(html);
   } catch (error) {
     console.error("Error generating preview:", error);
@@ -221,7 +229,7 @@ export async function generatePreview(req, res) {
 export async function createPreviewToken(req, res) {
   try {
     const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
-    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode);
+    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode, req.userId);
     const token = generateToken(html);
     res.json({ token });
   } catch (error) {
@@ -260,7 +268,7 @@ export async function renderSingleWidget(req, res) {
     const { widgetId, widget, themeSettings: rawThemeSettings } = req.body; // Expect themeSettings too
 
     // Get active project
-    const projectsData = await readProjectsFile();
+    const projectsData = await readProjectsFile(req.userId);
     const activeProjectId = projectsData.activeProjectId;
 
     if (!activeProjectId) {
@@ -268,7 +276,7 @@ export async function renderSingleWidget(req, res) {
     }
 
     // Call the service function, passing projectId and rawThemeSettings
-    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview");
+    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", null, null, req.userId);
 
     res.send(renderedWidget);
   } catch (error) {
@@ -294,15 +302,15 @@ export async function renderSingleWidget(req, res) {
 export async function getGlobalWidgets(req, res) {
   try {
     // Get active project
-    const projectsData = await readProjectsFile();
+    const projectsData = await readProjectsFile(req.userId);
     const activeProjectId = projectsData.activeProjectId;
 
     if (!activeProjectId) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const projectFolderName = await getProjectFolderName(activeProjectId);
-    const projectDir = getProjectDir(projectFolderName);
+    const projectFolderName = await getProjectFolderName(activeProjectId, req.userId);
+    const projectDir = getProjectDir(projectFolderName, req.userId);
     // Global widgets *data* is stored in pages/global, not widgets/global
     const globalPagesDir = path.join(projectDir, "pages", "global");
 
@@ -368,15 +376,15 @@ export async function saveGlobalWidget(req, res) {
     }
 
     // Get active project
-    const projectsData = await readProjectsFile();
+    const projectsData = await readProjectsFile(req.userId);
     const activeProjectId = projectsData.activeProjectId;
 
     if (!activeProjectId) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const projectFolderName = await getProjectFolderName(activeProjectId);
-    const projectDir = getProjectDir(projectFolderName);
+    const projectFolderName = await getProjectFolderName(activeProjectId, req.userId);
+    const projectDir = getProjectDir(projectFolderName, req.userId);
     const globalPagesDir = path.join(projectDir, "pages", "global");
 
     // Ensure global directory exists
@@ -388,7 +396,7 @@ export async function saveGlobalWidget(req, res) {
 
     // Update media usage
     try {
-      await updateGlobalWidgetMediaUsage(activeProjectId, `global:${type}`, widgetData);
+      await updateGlobalWidgetMediaUsage(activeProjectId, `global:${type}`, widgetData, req.userId);
     } catch (usageError) {
       console.error("Error updating media usage for global widget:", usageError);
       // Don't fail the save if usage update fails, but log it
@@ -421,8 +429,8 @@ export async function serveAsset(req, res) {
   }
 
   // Build the path to the asset file
-  const projectFolderName = await getProjectFolderName(projectId);
-  const baseDir = path.join(getProjectDir(projectFolderName), folder);
+  const projectFolderName = await getProjectFolderName(projectId, req.userId);
+  const baseDir = path.join(getProjectDir(projectFolderName, req.userId), folder);
   const normalizedSubpath = path.normalize(assetSubpath).replace(/^(\.\.(\/|\\|$))+/, "");
   const filePath = path.resolve(baseDir, normalizedSubpath);
 
@@ -441,24 +449,9 @@ export async function serveAsset(req, res) {
 
     // Set content type based on file extension
     const ext = path.extname(filePath).toLowerCase();
-    const contentTypes = {
-      ".css": "text/css",
-      ".js": "application/javascript",
-      ".png": "image/png",
-      ".jpg": "image/jpeg",
-      ".jpeg": "image/jpeg",
-      ".gif": "image/gif",
-      ".svg": "image/svg+xml",
-      ".webp": "image/webp",
-      ".woff": "font/woff",
-      ".woff2": "font/woff2",
-      ".ttf": "font/ttf",
-      ".eot": "application/vnd.ms-fontobject",
-    };
-
-    // Set appropriate content type
-    if (contentTypes[ext]) {
-      res.setHeader("Content-Type", contentTypes[ext]);
+    const contentType = getContentType(ext, null);
+    if (contentType) {
+      res.setHeader("Content-Type", contentType);
     }
 
     // Send the file

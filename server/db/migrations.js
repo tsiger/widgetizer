@@ -79,6 +79,16 @@ const migrations = [
       `);
     },
   },
+  {
+    version: 2,
+    description: "Add user_id to projects for multi-user support",
+    up(db) {
+      db.exec(`
+        ALTER TABLE projects ADD COLUMN user_id TEXT NOT NULL DEFAULT 'local';
+        CREATE INDEX idx_projects_user ON projects(user_id);
+      `);
+    },
+  },
 ];
 
 /**

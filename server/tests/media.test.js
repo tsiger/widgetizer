@@ -84,6 +84,7 @@ function mockReq({ params = {}, body = {}, files = null, file = null } = {}) {
     body,
     files,
     file,
+    userId: "local",
     [Symbol.for("express-validator#contexts")]: [],
   };
 }
@@ -189,12 +190,12 @@ before(async () => {
     activeProjectId: PROJECT_ID,
   });
 
-  const projectDir = getProjectDir(PROJECT_FOLDER);
+  const projectDir = getProjectDir(PROJECT_FOLDER, "local");
   await fs.ensureDir(projectDir);
-  await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER));
-  await fs.ensureDir(getProjectImagesDir(PROJECT_FOLDER));
-  await fs.ensureDir(getProjectVideosDir(PROJECT_FOLDER));
-  await fs.ensureDir(getProjectAudiosDir(PROJECT_FOLDER));
+  await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER, "local"));
+  await fs.ensureDir(getProjectImagesDir(PROJECT_FOLDER, "local"));
+  await fs.ensureDir(getProjectVideosDir(PROJECT_FOLDER, "local"));
+  await fs.ensureDir(getProjectAudiosDir(PROJECT_FOLDER, "local"));
 });
 
 after(async () => {
@@ -388,15 +389,15 @@ describe("uploadProjectMedia", () => {
     // Reset media data
     await writeMediaFile(PROJECT_ID, { files: [] });
     // Clean upload directories
-    await fs.emptyDir(getProjectImagesDir(PROJECT_FOLDER));
-    await fs.emptyDir(getProjectVideosDir(PROJECT_FOLDER));
-    await fs.emptyDir(getProjectAudiosDir(PROJECT_FOLDER));
+    await fs.emptyDir(getProjectImagesDir(PROJECT_FOLDER, "local"));
+    await fs.emptyDir(getProjectVideosDir(PROJECT_FOLDER, "local"));
+    await fs.emptyDir(getProjectAudiosDir(PROJECT_FOLDER, "local"));
   });
 
   it("uploads a JPEG image and processes with sharp", async () => {
     // Create a real JPEG on disk (600x400)
     const jpegBuffer = await createTestJpeg(600, 400);
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     const filePath = path.join(imgDir, "test-photo.jpg");
     await fs.writeFile(filePath, jpegBuffer);
 
@@ -429,7 +430,7 @@ describe("uploadProjectMedia", () => {
   it("generates resized versions for images larger than size thresholds", async () => {
     // Create a large image (2000x1500) that should generate multiple sizes
     const largeBuffer = await createTestJpeg(2000, 1500);
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     const filePath = path.join(imgDir, "large-image.jpg");
     await fs.writeFile(filePath, largeBuffer);
 
@@ -469,7 +470,7 @@ describe("uploadProjectMedia", () => {
   it("skips size generation when image is smaller than threshold", async () => {
     // Create a tiny image (100x80) — smaller than all size thresholds
     const tinyBuffer = await createTestJpeg(100, 80);
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     const filePath = path.join(imgDir, "tiny.jpg");
     await fs.writeFile(filePath, tinyBuffer);
 
@@ -494,7 +495,7 @@ describe("uploadProjectMedia", () => {
 
   it("uploads a PNG image and reads dimensions", async () => {
     const pngBuffer = await createTestPng(300, 250);
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     const filePath = path.join(imgDir, "icon.png");
     await fs.writeFile(filePath, pngBuffer);
 
@@ -519,7 +520,7 @@ describe("uploadProjectMedia", () => {
   });
 
   it("uploads a video file with basic metadata", async () => {
-    const vidDir = getProjectVideosDir(PROJECT_FOLDER);
+    const vidDir = getProjectVideosDir(PROJECT_FOLDER, "local");
     const filePath = path.join(vidDir, "clip.mp4");
     await fs.writeFile(filePath, "fake-mp4-data-here");
 
@@ -545,7 +546,7 @@ describe("uploadProjectMedia", () => {
   });
 
   it("uploads an audio file with basic metadata", async () => {
-    const audDir = getProjectAudiosDir(PROJECT_FOLDER);
+    const audDir = getProjectAudiosDir(PROJECT_FOLDER, "local");
     const filePath = path.join(audDir, "track.mp3");
     await fs.writeFile(filePath, "fake-mp3-data-here");
 
@@ -570,7 +571,7 @@ describe("uploadProjectMedia", () => {
   });
 
   it("rejects files exceeding size limit", async () => {
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     const filePath = path.join(imgDir, "huge.jpg");
     // Create a small file but claim it's 100MB in the mock
     await fs.writeFile(filePath, "tiny-content");
@@ -596,7 +597,7 @@ describe("uploadProjectMedia", () => {
   });
 
   it("handles mixed success and rejection", async () => {
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
 
     // Good file
     const goodBuffer = await createTestJpeg(200, 150);
@@ -646,7 +647,7 @@ describe("uploadProjectMedia", () => {
 
   it("persists uploaded files in media.json", async () => {
     const jpegBuffer = await createTestJpeg(200, 150);
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     const filePath = path.join(imgDir, "persisted.jpg");
     await fs.writeFile(filePath, jpegBuffer);
 
@@ -671,7 +672,7 @@ describe("uploadProjectMedia", () => {
   });
 
   it("sanitizes SVG files with DOMPurify", async () => {
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     const filePath = path.join(imgDir, "icon.svg");
     // SVG with an onload XSS attack vector
     const maliciousSvg = '<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><circle r="10"/></svg>';
@@ -801,7 +802,7 @@ describe("updateMediaMetadata", () => {
 describe("deleteProjectMedia", () => {
   beforeEach(async () => {
     // Create physical files and seed media data
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     await fs.writeFile(path.join(imgDir, "deletable.jpg"), "fake-img");
     await fs.writeFile(path.join(imgDir, "deletable-thumb.jpg"), "fake-thumb");
     await fs.writeFile(path.join(imgDir, "in-use.jpg"), "fake-img");
@@ -837,7 +838,7 @@ describe("deleteProjectMedia", () => {
     assert.ok(res._json.message.includes("deleted"));
 
     // Verify physical files are gone
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     assert.ok(!(await fs.pathExists(path.join(imgDir, "deletable.jpg"))));
     assert.ok(!(await fs.pathExists(path.join(imgDir, "deletable-thumb.jpg"))));
   });
@@ -876,7 +877,7 @@ describe("deleteProjectMedia", () => {
 
 describe("bulkDeleteProjectMedia", () => {
   beforeEach(async () => {
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     await fs.writeFile(path.join(imgDir, "bulk-a.jpg"), "a");
     await fs.writeFile(path.join(imgDir, "bulk-b.jpg"), "b");
     await fs.writeFile(path.join(imgDir, "bulk-c.jpg"), "c");
@@ -976,8 +977,8 @@ describe("bulkDeleteProjectMedia", () => {
 describe("serveProjectMedia", () => {
   before(async () => {
     // Create real files to serve
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
-    const vidDir = getProjectVideosDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
+    const vidDir = getProjectVideosDir(PROJECT_FOLDER, "local");
 
     const jpegBuffer = await createTestJpeg(50, 50);
     await fs.writeFile(path.join(imgDir, "serve-test.jpg"), jpegBuffer);
@@ -1088,7 +1089,7 @@ describe("getMediaFileUsage", () => {
 describe("refreshMediaUsage", () => {
   before(async () => {
     // Create a page that references an image
-    const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
+    const pagesDir = getProjectPagesDir(PROJECT_FOLDER, "local");
     await fs.ensureDir(pagesDir);
     await fs.writeFile(
       path.join(pagesDir, "index.json"),
@@ -1145,7 +1146,7 @@ describe("media edge cases", () => {
     // Reset
     await writeMediaFile(PROJECT_ID, { files: [] });
 
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
 
     // Upload 3 files sequentially
     for (let i = 1; i <= 3; i++) {
@@ -1205,7 +1206,7 @@ describe("media edge cases", () => {
   });
 
   it("delete removes video files from videos directory", async () => {
-    const vidDir = getProjectVideosDir(PROJECT_FOLDER);
+    const vidDir = getProjectVideosDir(PROJECT_FOLDER, "local");
     await fs.writeFile(path.join(vidDir, "to-delete.mp4"), "video-data");
 
     await writeMediaFile(PROJECT_ID, {
@@ -1228,7 +1229,7 @@ describe("media edge cases", () => {
   });
 
   it("delete removes audio files from audios directory", async () => {
-    const audDir = getProjectAudiosDir(PROJECT_FOLDER);
+    const audDir = getProjectAudiosDir(PROJECT_FOLDER, "local");
     await fs.writeFile(path.join(audDir, "to-delete.mp3"), "audio-data");
 
     await writeMediaFile(PROJECT_ID, {
@@ -1279,7 +1280,7 @@ describe("theme image size overrides", () => {
 
   /** Helper: upload a large image (2000x1500) and return the response. */
   async function uploadLargeImage(filename = "theme-test.jpg") {
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     await writeMediaFile(PROJECT_ID, { files: [] });
     await fs.emptyDir(imgDir);
 
@@ -1389,7 +1390,7 @@ describe("theme image size overrides", () => {
 
     // Verify the files exist on disk with different actual file sizes
     // due to quality difference (quality 10 vs 95 should produce very different sizes)
-    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER, "local");
     const thumbStats = await fs.stat(path.join(imgDir, "quality-test-thumb.jpg"));
     const smallStats = await fs.stat(path.join(imgDir, "quality-test-small.jpg"));
 

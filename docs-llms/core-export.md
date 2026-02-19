@@ -97,7 +97,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
     - Version numbers auto-increment starting from v1 (v1, v2, v3, etc.).
 
 2.  **Create Output Directory**:
-    - A new directory is created inside `/data/publish/`.
+    - A new directory is created inside the user-scoped publish directory (`data/users/{userId}/publish/`). In open-source mode, `userId` is always `"local"`, so exports land in `data/users/local/publish/`.
     - To prevent overwriting previous exports, the directory is named with the project's **folderName** and version number (e.g., `my-project-slug-v1`, `my-project-slug-v2`, etc.).
     - If the project ID cannot be resolved, the export fails with a clear error.
 
@@ -169,7 +169,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
   - Project ID
   - Version number
   - Creation timestamp
-  - Output directory path
+  - Output directory name (relative, e.g. `my-project-slug-v1`)
   - Export status
 - **Configurable Retention**: Users can set the maximum number of versions to keep in App Settings (1-50 versions)
 
@@ -252,6 +252,14 @@ HTML validation only runs when developer mode is enabled, ensuring:
 - **Zero overhead** in production exports (disabled by default)
 - **Faster exports** for regular users
 - **Quality assurance** during development without affecting end-user experience
+
+## User-Scoped Export Storage
+
+Export directories are scoped per user via `getUserPublishDir(userId)` (from `server/config.js`), which resolves to `data/users/{userId}/publish/`. In open-source mode, `userId` is always `"local"`, so the effective path is `data/users/local/publish/`.
+
+All export controller functions (`exportProject`, `getExportFiles`, `downloadExport`, `deleteExport`, `cleanupProjectExports`) and the `serveExportFile` route handler use `req.userId` to resolve the correct publish directory. Export records in SQLite store only the relative directory name (e.g. `my-project-slug-v1`); the `resolveOutputDir()` helper prepends the user-scoped publish path at runtime.
+
+The `GET /api/export/view/:exportDir/*` route applies `isWithinDirectory()` checks against the user's publish directory to prevent path traversal.
 
 ## Security Considerations
 

@@ -57,6 +57,7 @@ function mockReq({ params = {}, body = {} } = {}) {
   return {
     params,
     body,
+    userId: "local",
     [Symbol.for("express-validator#contexts")]: [],
   };
 }
@@ -117,9 +118,9 @@ before(async () => {
     activeProjectId: PROJECT_ID,
   });
 
-  const projectDir = getProjectDir(PROJECT_FOLDER);
+  const projectDir = getProjectDir(PROJECT_FOLDER, "local");
   await fs.ensureDir(projectDir);
-  await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER));
+  await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER, "local"));
 
   // Create global pages directory
   const globalDir = path.join(projectDir, "pages", "global");
@@ -146,7 +147,7 @@ after(async () => {
 // ============================================================================
 
 describe("getGlobalWidgets", () => {
-  const globalDir = () => path.join(getProjectDir(PROJECT_FOLDER), "pages", "global");
+  const globalDir = () => path.join(getProjectDir(PROJECT_FOLDER, "local"), "pages", "global");
 
   beforeEach(async () => {
     // Seed header and footer files
@@ -208,7 +209,7 @@ describe("getGlobalWidgets", () => {
 // ============================================================================
 
 describe("saveGlobalWidget", () => {
-  const globalDir = () => path.join(getProjectDir(PROJECT_FOLDER), "pages", "global");
+  const globalDir = () => path.join(getProjectDir(PROJECT_FOLDER, "local"), "pages", "global");
 
   beforeEach(async () => {
     await fs.ensureDir(globalDir());
@@ -302,7 +303,7 @@ describe("saveGlobalWidget", () => {
 
 describe("serveAsset", () => {
   before(async () => {
-    const projectDir = getProjectDir(PROJECT_FOLDER);
+    const projectDir = getProjectDir(PROJECT_FOLDER, "local");
 
     // Create test asset files
     await fs.ensureDir(path.join(projectDir, "assets", "css"));

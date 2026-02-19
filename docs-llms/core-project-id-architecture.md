@@ -27,9 +27,15 @@ This architecture decouples the project's identity from its filesystem represent
 - Can change when the project is renamed
 - Stored as `project.folderName` in the SQLite `projects` table
 - Used for:
-  - Directory names (`data/projects/{folderName}/`)
+  - Directory names (`data/users/{userId}/projects/{folderName}/`)
   - File path construction
   - All filesystem operations
+
+### 3. User Scoping (userId)
+
+All filesystem paths are scoped per user. Every path helper in `server/config.js` accepts a `userId` parameter (default `"local"`). In open-source mode, `userId` is always `"local"`, so paths resolve to `data/users/local/projects/{folderName}/`. In hosted mode, `userId` is the Clerk user ID.
+
+The `projects` table includes a `user_id` column, and all queries are filtered by `user_id`. The `getProjectFolderName(projectId, userId)` helper validates project ownership — it throws if the project doesn't belong to the requesting user.
 
 ## Implementation by Controller
 
@@ -48,13 +54,14 @@ const newProject = {
   id: uuidv4(), // Stable UUID
   folderName: slugify(name), // Filesystem identifier
   name,
+  userId: req.userId, // User scope
   // ...
 };
 ```
 
 **Directory Operations:**
 
-- Uses `project.folderName` for `getProjectDir(folderName)`
+- Uses `project.folderName` and `req.userId` for `getProjectDir(folderName, userId)`
 - Renames directories when folderName changes
 - Preserves UUID in project metadata
 
@@ -67,17 +74,17 @@ const newProject = {
 **Pattern:**
 
 ```javascript
-const { projects, activeProjectId } = await readProjectsFile();
+const { projects, activeProjectId } = await readProjectsFile(req.userId);
 const activeProject = projects.find((p) => p.id === activeProjectId);
 const projectFolderName = activeProject.folderName;
 
-// Use folderName for all file operations
-const pagePath = getPagePath(projectFolderName, pageSlug);
+// Use folderName + userId for all file operations
+const pagePath = getPagePath(projectFolderName, pageSlug, req.userId);
 ```
 
 **Key Functions:**
 
-- `getAllPages()`: Lists pages from `data/projects/{folderName}/pages/`
+- `getAllPages()`: Lists pages from `data/users/{userId}/projects/{folderName}/pages/`
 - `createPage()`: Creates page file in correct project directory
 - `updatePage()`: Handles page slug changes within project directory
 - `duplicatePage()`: Copies page files using project folderName
@@ -118,22 +125,22 @@ const menuPath = getMenuPath(projectFolderName, menuId);
 
 ### Media Controller (`mediaController.js`)
 
-**Rationale:** Media files (images, videos) are stored in `data/projects/{folderName}/uploads/`. The controller handles file uploads and must ensure files are stored in the correct project directory.
+**Rationale:** Media files (images, videos, audio) are stored in `data/users/{userId}/projects/{folderName}/uploads/`. The controller handles file uploads and must ensure files are stored in the correct project directory.
 
 **Pattern:**
 
 ```javascript
-const projectFolderName = await getProjectFolderName(projectId);
-const imagesDir = getProjectImagesDir(projectFolderName);
-const imagePath = getImagePath(projectFolderName, filename);
+const projectFolderName = await getProjectFolderName(projectId, req.userId);
+const imagesDir = getProjectImagesDir(projectFolderName, req.userId);
+const imagePath = getImagePath(projectFolderName, filename, req.userId);
 ```
 
 **Key Functions:**
 
-- `uploadProjectMedia()`: Stores files in `{folderName}/uploads/images/` or `{folderName}/uploads/videos/`
+- `uploadProjectMedia()`: Stores files in user-scoped `{folderName}/uploads/images/`, `uploads/videos/`, or `uploads/audios/`
 - `getProjectMedia()`: Reads media metadata from SQLite; media binaries still come from `{folderName}/uploads/*`
 - `deleteProjectMedia()`: Removes files from correct project directory
-- `serveProjectMedia()`: Serves files from `{folderName}/uploads/`
+- `serveProjectMedia()`: Serves files from `{folderName}/uploads/`, sets `Content-Type` via `getContentType()` from `server/utils/mimeTypes.js`
 
 **Multer Integration:** The multer storage configuration uses `getProjectFolderName()` to determine the upload destination dynamically.
 
@@ -173,16 +180,16 @@ const themeJsonPath = getProjectThemeJsonPath(projectFolderName);
 ```javascript
 const project = projects.find((p) => p.id === projectId);
 const projectFolderName = project.folderName;
-const projectDir = getProjectDir(projectFolderName);
+const projectDir = getProjectDir(projectFolderName, req.userId);
 ```
 
 **Key Functions:**
 
 - `exportProject()`: Reads project files from `{folderName}/` directory
-- Generates static site in `data/publish/{folderName}-v{version}/`
+- Generates static site in `data/users/{userId}/publish/{folderName}-v{version}/`
 - Uses folderName for all file path construction
 
-**Export Directory:** Exports are stored using the project folderName and version for consistency and human-readability.
+**Export Directory:** Exports are stored in the user-scoped publish directory using the project folderName and version for consistency and human-readability.
 
 ---
 
@@ -233,13 +240,13 @@ const projectDir = getProjectDir(projectFolderName);
 
 ### `getProjectFolderName()` (`server/utils/projectHelpers.js`)
 
-**Purpose:** Centralized function to resolve a project UUID to its folderName.
+**Purpose:** Centralized function to resolve a project UUID to its folderName, with ownership validation.
 
 **Implementation:**
 
 ```javascript
-export async function getProjectFolderName(projectId) {
-  const folderName = repoGetFolderName(projectId); // from projectRepository
+export async function getProjectFolderName(projectId, userId = "local") {
+  const folderName = repoGetFolderName(projectId, userId); // from projectRepository, filtered by user_id
   if (!folderName) {
     const error = new Error(`Project not found for ID ${projectId}`);
     error.code = PROJECT_ERROR_CODES.PROJECT_NOT_FOUND;
@@ -252,6 +259,7 @@ export async function getProjectFolderName(projectId) {
 **Usage:**
 
 - Imported by controllers that need folderName resolution
+- Validates that the project belongs to the requesting user (defense-in-depth)
 - Provides consistent error handling
 - Throws if the project cannot be resolved so callers can respond with 404/500
 
@@ -335,10 +343,11 @@ When a project's name (and thus folderName) changes:
 
 ### For File Operations
 
-1. **Use folderName** for all `getProjectDir()`, `getPagePath()`, etc.
+1. **Use folderName + userId** for all `getProjectDir()`, `getPagePath()`, etc.
 2. **Never use UUID** for filesystem paths
-3. **Validate folderName** before directory operations
-4. **Handle missing directories** gracefully
+3. **Always pass `req.userId`** to path helpers and `getProjectFolderName()`
+4. **Validate folderName** before directory operations
+5. **Handle missing directories** gracefully
 
 ---
 
@@ -347,25 +356,25 @@ When a project's name (and thus folderName) changes:
 ### Reading Project Data
 
 ```javascript
-// 1. Get project by UUID
-const { projects, activeProjectId } = await readProjectsFile();
+// 1. Get project by UUID (scoped to userId)
+const { projects, activeProjectId } = await readProjectsFile(req.userId);
 const project = projects.find((p) => p.id === activeProjectId);
 
 // 2. Get folderName
 const projectFolderName = project.folderName;
 
-// 3. Use folderName for file operations
-const filePath = getProjectDir(projectFolderName);
+// 3. Use folderName + userId for file operations
+const filePath = getProjectDir(projectFolderName, req.userId);
 ```
 
 ### Creating Project Resources
 
 ```javascript
-// 1. Resolve folderName from project UUID
-const projectFolderName = await getProjectFolderName(projectId);
+// 1. Resolve folderName from project UUID (validates ownership)
+const projectFolderName = await getProjectFolderName(projectId, req.userId);
 
 // 2. Construct file path
-const resourcePath = path.join(getProjectDir(projectFolderName), "resource.json");
+const resourcePath = path.join(getProjectDir(projectFolderName, req.userId), "resource.json");
 
 // 3. Perform file operation
 await fs.outputFile(resourcePath, data);

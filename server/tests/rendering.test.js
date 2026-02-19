@@ -70,15 +70,15 @@ before(async () => {
     activeProjectId: PROJECT_ID,
   });
 
-  const projectDir = getProjectDir(PROJECT_FOLDER);
+  const projectDir = getProjectDir(PROJECT_FOLDER, "local");
 
   // Create project directory structure
   await fs.ensureDir(projectDir);
-  await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER));
-  await fs.ensureDir(path.join(getProjectPagesDir(PROJECT_FOLDER), "global"));
+  await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER, "local"));
+  await fs.ensureDir(path.join(getProjectPagesDir(PROJECT_FOLDER, "local"), "global"));
   await fs.ensureDir(path.join(projectDir, "snippets"));
   await fs.ensureDir(path.join(projectDir, "widgets"));
-  await fs.ensureDir(getProjectMenusDir(PROJECT_FOLDER));
+  await fs.ensureDir(getProjectMenusDir(PROJECT_FOLDER, "local"));
 
   // Create media data
   await writeMediaFile(PROJECT_ID, {
@@ -97,7 +97,7 @@ before(async () => {
   });
 
   // Create test pages for link resolution
-  const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
+  const pagesDir = getProjectPagesDir(PROJECT_FOLDER, "local");
   await fs.writeFile(
     path.join(pagesDir, "home.json"),
     JSON.stringify({ name: "Home", slug: "home", uuid: "page-uuid-home", widgets: {} }),
@@ -163,7 +163,7 @@ before(async () => {
 
   // Create a test menu
   await fs.writeFile(
-    path.join(getProjectMenusDir(PROJECT_FOLDER), "main-nav.json"),
+    path.join(getProjectMenusDir(PROJECT_FOLDER, "local"), "main-nav.json"),
     JSON.stringify(
       {
         id: "main-nav",
@@ -206,6 +206,10 @@ describe("renderWidget — core widgets", () => {
         settings: {},
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("core-spacer"));
@@ -223,6 +227,10 @@ describe("renderWidget — core widgets", () => {
         settings: { height: 100, mobileHeight: 50, showOnMobile: true },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("height: 100px"));
@@ -238,6 +246,7 @@ describe("renderWidget — core widgets", () => {
       "preview",
       null,
       3,
+      "local",
     );
     assert.ok(html.includes('data-widget-index="3"'));
   });
@@ -251,6 +260,10 @@ describe("renderWidget — core widgets", () => {
         settings: {},
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("widget-error") || html.includes("not found"));
@@ -271,6 +284,10 @@ describe("renderWidget — theme widgets & schema defaults", () => {
         settings: {},
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // Schema default for heading is "Default Heading"
@@ -286,6 +303,10 @@ describe("renderWidget — theme widgets & schema defaults", () => {
         settings: { heading: "Custom Title" },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("Custom Title"));
@@ -301,6 +322,10 @@ describe("renderWidget — theme widgets & schema defaults", () => {
         settings: { heading: '<script>alert("xss")</script>' },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(!html.includes("<script>alert"));
@@ -330,6 +355,10 @@ describe("renderWidget — link resolution", () => {
         },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // Should resolve to "about-us.html" (current slug of page-uuid-about)
@@ -354,6 +383,10 @@ describe("renderWidget — link resolution", () => {
         },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // Deleted page → link cleared (href="", text="")
@@ -376,6 +409,10 @@ describe("renderWidget — link resolution", () => {
         },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("https://external.com"));
@@ -403,6 +440,10 @@ describe("renderWidget — menu resolution", () => {
         },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // Should render without error
@@ -422,6 +463,10 @@ describe("renderWidget — menu resolution", () => {
         },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // Should render without error — menu resolved via UUID
@@ -441,6 +486,10 @@ describe("renderWidget — menu resolution", () => {
         },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     // Should also render without error — menu resolved via slug fallback
@@ -460,6 +509,10 @@ describe("renderWidget — menu resolution", () => {
         },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("No Menu"));
@@ -481,6 +534,10 @@ describe("renderWidget — render modes", () => {
         settings: { height: 30 },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("height: 30px"));
@@ -496,6 +553,9 @@ describe("renderWidget — render modes", () => {
       },
       RAW_THEME_SETTINGS,
       "publish",
+      null,
+      null,
+      "local",
     );
 
     assert.ok(html.includes("height: 60px"));
@@ -528,6 +588,8 @@ describe("renderWidget — shared globals", () => {
       RAW_THEME_SETTINGS,
       "publish",
       sharedGlobals,
+      null,
+      "local",
     );
 
     await renderWidget(
@@ -540,6 +602,8 @@ describe("renderWidget — shared globals", () => {
       RAW_THEME_SETTINGS,
       "publish",
       sharedGlobals,
+      null,
+      "local",
     );
 
     // Shared globals should have pagesByUuid cached after first render
@@ -564,6 +628,9 @@ describe("renderPageLayout", () => {
       },
       { name: "Test Page", slug: "test-page" },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      "local",
     );
 
     assert.ok(html.includes("<!DOCTYPE html>") || html.includes("<!doctype html>"));
@@ -580,6 +647,9 @@ describe("renderPageLayout", () => {
       },
       { name: "Injected Page", slug: "injected" },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      "local",
     );
 
     assert.ok(html.includes("main-nav"));
@@ -593,6 +663,9 @@ describe("renderPageLayout", () => {
       { headerContent: "", mainContent: "", footerContent: "" },
       { name: "About", slug: "about-us" },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      "local",
     );
 
     assert.ok(html.includes('class="about-us"'));
@@ -608,6 +681,9 @@ describe("renderPageLayout", () => {
         seo: { description: "A page with SEO", og_title: "SEO Title" },
       },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      "local",
     );
 
     assert.ok(html.includes("<title>SEO Page</title>"));
@@ -622,6 +698,9 @@ describe("renderPageLayout", () => {
       { headerContent: "", mainContent: "<p>Body</p>", footerContent: "" },
       null,
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      "local",
     );
 
     // Should not crash — layout.liquid uses page.name which will be empty
@@ -642,7 +721,7 @@ describe("renderPageLayout", () => {
       projects: [noLayoutProject],
       activeProjectId: noLayoutProject.id,
     });
-    const noLayoutDir = getProjectDir(noLayoutProject.folderName);
+    const noLayoutDir = getProjectDir(noLayoutProject.folderName, "local");
     await fs.ensureDir(noLayoutDir);
     // No layout.liquid created
 
@@ -651,6 +730,9 @@ describe("renderPageLayout", () => {
       { headerContent: "", mainContent: "", footerContent: "" },
       { name: "Test", slug: "test" },
       RAW_THEME_SETTINGS,
+      "preview",
+      null,
+      "local",
     );
 
     assert.ok(html.includes("Error") || html.includes("not found"));

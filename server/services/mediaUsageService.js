@@ -143,7 +143,7 @@ function extractMediaPathsFromThemeSettings(themeData) {
  * @param {object} themeData - Theme data object (theme.json shape) with settings.global
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>}
  */
-export async function updateThemeSettingsMediaUsage(projectId, themeData) {
+export async function updateThemeSettingsMediaUsage(projectId, themeData, userId = "local") {
   try {
     const mediaPaths = extractMediaPathsFromThemeSettings(themeData);
 
@@ -160,7 +160,7 @@ export async function updateThemeSettingsMediaUsage(projectId, themeData) {
           if (!file.usedIn.includes(THEME_SETTINGS_USAGE_ID)) file.usedIn.push(THEME_SETTINGS_USAGE_ID);
         }
       });
-    });
+    }, userId);
 
     return { success: true, mediaPaths };
   } catch (error) {
@@ -179,7 +179,7 @@ export async function updateThemeSettingsMediaUsage(projectId, themeData) {
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>} Result with extracted media paths
  * @throws {Error} If media file read/write fails
  */
-export async function updatePageMediaUsage(projectId, pageId, pageData) {
+export async function updatePageMediaUsage(projectId, pageId, pageData, userId = "local") {
   try {
     const mediaPaths = extractMediaPathsFromPage(pageData);
 
@@ -204,7 +204,7 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
           }
         }
       });
-    });
+    }, userId);
 
     return { success: true, mediaPaths };
   } catch (error) {
@@ -223,7 +223,7 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>} Result with extracted media paths
  * @throws {Error} If media file read/write fails
  */
-export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData) {
+export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData, userId = "local") {
   try {
     const mediaPaths = extractMediaPathsFromGlobalWidget(widgetData);
     const usageId = globalId.startsWith("global:") ? globalId : `global:${globalId}`;
@@ -249,7 +249,7 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
           }
         }
       });
-    });
+    }, userId);
 
     return { success: true, mediaPaths };
   } catch (error) {
@@ -267,7 +267,7 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
  * @returns {Promise<{success: boolean}>} Success result
  * @throws {Error} If media file read/write fails
  */
-export async function removePageFromMediaUsage(projectId, pageId) {
+export async function removePageFromMediaUsage(projectId, pageId, userId = "local") {
   try {
     // Atomic read-modify-write to prevent race conditions with concurrent saves
     await atomicUpdateMediaFile(projectId, (mediaData) => {
@@ -276,7 +276,7 @@ export async function removePageFromMediaUsage(projectId, pageId) {
           file.usedIn = file.usedIn.filter((slug) => slug !== pageId);
         }
       });
-    });
+    }, userId);
 
     return { success: true };
   } catch (error) {
@@ -292,9 +292,9 @@ export async function removePageFromMediaUsage(projectId, pageId) {
  * @returns {Promise<{fileId: string, filename: string, usedIn: string[], isInUse: boolean}>} Usage details
  * @throws {Error} If file not found or media file read fails
  */
-export async function getMediaUsage(projectId, fileId) {
+export async function getMediaUsage(projectId, fileId, userId = "local") {
   try {
-    const mediaData = await readMediaFile(projectId);
+    const mediaData = await readMediaFile(projectId, userId);
     const file = mediaData.files.find((f) => f.id === fileId);
 
     if (!file) {
@@ -321,10 +321,10 @@ export async function getMediaUsage(projectId, fileId) {
  * @returns {Promise<{success: boolean, message: string}>} Result with summary message
  * @throws {Error} If media file read/write fails
  */
-export async function refreshAllMediaUsage(projectId) {
+export async function refreshAllMediaUsage(projectId, userId) {
   try {
-    const projectFolderName = await getProjectFolderName(projectId);
-    const pagesDir = getProjectPagesDir(projectFolderName);
+    const projectFolderName = await getProjectFolderName(projectId, userId);
+    const pagesDir = getProjectPagesDir(projectFolderName, userId);
 
     // Check if pages directory exists
     if (!(await fs.pathExists(pagesDir))) {
@@ -332,7 +332,7 @@ export async function refreshAllMediaUsage(projectId) {
     }
 
     // Reset all usedIn arrays
-    const mediaData = await readMediaFile(projectId);
+    const mediaData = await readMediaFile(projectId, userId);
     mediaData.files.forEach((file) => {
       file.usedIn = [];
     });
@@ -398,7 +398,7 @@ export async function refreshAllMediaUsage(projectId) {
     }
 
     // Also scan theme settings (e.g. favicon in settings.global.branding)
-    const themeJsonPath = getProjectThemeJsonPath(projectFolderName);
+    const themeJsonPath = getProjectThemeJsonPath(projectFolderName, userId);
     if (await fs.pathExists(themeJsonPath)) {
       try {
         const themeContent = await fs.readFile(themeJsonPath, "utf8");
@@ -418,7 +418,7 @@ export async function refreshAllMediaUsage(projectId) {
     }
 
     // Write updated media data (using locked write function to prevent race conditions)
-    await writeMediaFile(projectId, mediaData);
+    await writeMediaFile(projectId, mediaData, userId);
 
     return {
       success: true,

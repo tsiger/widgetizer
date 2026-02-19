@@ -50,9 +50,11 @@ const {
   getProjectPagesDir,
   getProjectMenusDir,
   getProjectThemeJsonPath,
-  PUBLISH_DIR,
+  getUserPublishDir,
   CORE_WIDGETS_DIR,
 } = await import("../config.js");
+
+const PUBLISH_DIR = getUserPublishDir("local");
 
 const { writeProjectsFile, readProjectsFile } = await import("../controllers/projectController.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
@@ -78,6 +80,7 @@ function mockReq({ params = {}, body = {}, file = null } = {}) {
     params,
     body,
     file,
+    userId: "local",
     [Symbol.for("express-validator#contexts")]: [],
   };
 }
@@ -169,9 +172,9 @@ before(async () => {
   // -----------------------------------------------------------
   // 2. Project directory tree
   // -----------------------------------------------------------
-  const projectDir = getProjectDir(PROJECT_FOLDER);
-  const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
-  const menusDir = getProjectMenusDir(PROJECT_FOLDER);
+  const projectDir = getProjectDir(PROJECT_FOLDER, "local");
+  const pagesDir = getProjectPagesDir(PROJECT_FOLDER, "local");
+  const menusDir = getProjectMenusDir(PROJECT_FOLDER, "local");
 
   await fs.ensureDir(projectDir);
   await fs.ensureDir(pagesDir);
@@ -185,7 +188,7 @@ before(async () => {
   // -----------------------------------------------------------
   // 3. Theme.json (project-level)
   // -----------------------------------------------------------
-  const themeJsonPath = getProjectThemeJsonPath(PROJECT_FOLDER);
+  const themeJsonPath = getProjectThemeJsonPath(PROJECT_FOLDER, "local");
   await fs.outputFile(
     themeJsonPath,
     JSON.stringify(
@@ -751,11 +754,11 @@ describe("exportProject validation", () => {
     });
     await writeProjectsFile(currentData);
 
-    const projDir = getProjectDir(tempFolder);
-    const pagesDir = getProjectPagesDir(tempFolder);
+    const projDir = getProjectDir(tempFolder, "local");
+    const pagesDir = getProjectPagesDir(tempFolder, "local");
     await fs.ensureDir(pagesDir);
     // Create theme.json for the project
-    await fs.outputFile(getProjectThemeJsonPath(tempFolder), JSON.stringify({ settings: {} }, null, 2));
+    await fs.outputFile(getProjectThemeJsonPath(tempFolder, "local"), JSON.stringify({ settings: {} }, null, 2));
     // Only an "about" page, no index
     await fs.writeFile(
       path.join(pagesDir, "about.json"),
@@ -798,10 +801,10 @@ describe("exportProject without siteUrl", () => {
     });
     await writeProjectsFile(data);
 
-    const projDir = getProjectDir(NO_URL_FOLDER);
-    const pagesDir = getProjectPagesDir(NO_URL_FOLDER);
+    const projDir = getProjectDir(NO_URL_FOLDER, "local");
+    const pagesDir = getProjectPagesDir(NO_URL_FOLDER, "local");
     await fs.ensureDir(pagesDir);
-    await fs.outputFile(getProjectThemeJsonPath(NO_URL_FOLDER), JSON.stringify({ settings: {} }, null, 2));
+    await fs.outputFile(getProjectThemeJsonPath(NO_URL_FOLDER, "local"), JSON.stringify({ settings: {} }, null, 2));
     await fs.writeFile(
       path.join(pagesDir, "index.json"),
       JSON.stringify({
@@ -821,7 +824,7 @@ describe("exportProject without siteUrl", () => {
   });
 
   after(async () => {
-    await fs.remove(getProjectDir(NO_URL_FOLDER));
+    await fs.remove(getProjectDir(NO_URL_FOLDER, "local"));
     const data = await readProjectsFile();
     data.projects = data.projects.filter((p) => p.id !== NO_URL_ID);
     await writeProjectsFile(data);
@@ -1015,12 +1018,11 @@ describe("getExportHistory", () => {
     assert.ok(versions[0] > versions[1], "First export should have higher version");
   });
 
-  it("returns empty exports for unknown project", async () => {
+  it("returns 404 for unknown project", async () => {
     const res = await callController(getExportHistory, {
       params: { projectId: "unknown-project-999" },
     });
-    assert.equal(res._status, 200);
-    assert.deepEqual(res._json.exports, []);
+    assert.equal(res._status, 404);
   });
 
   it("returns 400 when projectId is missing", async () => {
@@ -1124,10 +1126,10 @@ describe("cleanupProjectExports", () => {
     });
     await writeProjectsFile(data);
 
-    const projDir = getProjectDir(CLEANUP_FOLDER);
-    const pagesDir = getProjectPagesDir(CLEANUP_FOLDER);
+    const projDir = getProjectDir(CLEANUP_FOLDER, "local");
+    const pagesDir = getProjectPagesDir(CLEANUP_FOLDER, "local");
     await fs.ensureDir(pagesDir);
-    await fs.outputFile(getProjectThemeJsonPath(CLEANUP_FOLDER), JSON.stringify({ settings: {} }, null, 2));
+    await fs.outputFile(getProjectThemeJsonPath(CLEANUP_FOLDER, "local"), JSON.stringify({ settings: {} }, null, 2));
     await fs.writeFile(
       path.join(pagesDir, "index.json"),
       JSON.stringify({
@@ -1148,7 +1150,7 @@ describe("cleanupProjectExports", () => {
   });
 
   after(async () => {
-    await fs.remove(getProjectDir(CLEANUP_FOLDER));
+    await fs.remove(getProjectDir(CLEANUP_FOLDER, "local"));
     const data = await readProjectsFile();
     data.projects = data.projects.filter((p) => p.id !== CLEANUP_ID);
     await writeProjectsFile(data);
@@ -1181,10 +1183,11 @@ describe("cleanupProjectExports", () => {
     assert.equal(exportsAfter.length, 0, "Project should have no export history");
   });
 
-  it("handles project with no export history gracefully", async () => {
-    const result = await cleanupProjectExports("never-exported-uuid");
-    assert.equal(result.deletedDirs, 0);
-    assert.equal(result.deletedHistory, false);
+  it("throws for non-existent project (ownership check)", async () => {
+    await assert.rejects(
+      () => cleanupProjectExports("never-exported-uuid"),
+      (err) => err.message.includes("not found"),
+    );
   });
 });
 
@@ -1256,10 +1259,10 @@ describe("home page slug mapping", () => {
     });
     await writeProjectsFile(data);
 
-    const projDir = getProjectDir(HOME_SLUG_FOLDER);
-    const pagesDir = getProjectPagesDir(HOME_SLUG_FOLDER);
+    const projDir = getProjectDir(HOME_SLUG_FOLDER, "local");
+    const pagesDir = getProjectPagesDir(HOME_SLUG_FOLDER, "local");
     await fs.ensureDir(pagesDir);
-    await fs.outputFile(getProjectThemeJsonPath(HOME_SLUG_FOLDER), JSON.stringify({ settings: {} }, null, 2));
+    await fs.outputFile(getProjectThemeJsonPath(HOME_SLUG_FOLDER, "local"), JSON.stringify({ settings: {} }, null, 2));
 
     // Create both index and home pages — "home" should map to index.html
     await fs.writeFile(
@@ -1287,7 +1290,7 @@ describe("home page slug mapping", () => {
   });
 
   after(async () => {
-    await fs.remove(getProjectDir(HOME_SLUG_FOLDER));
+    await fs.remove(getProjectDir(HOME_SLUG_FOLDER, "local"));
     const data = await readProjectsFile();
     data.projects = data.projects.filter((p) => p.id !== HOME_SLUG_ID);
     await writeProjectsFile(data);
@@ -1331,8 +1334,8 @@ describe("export failure recording", () => {
     });
     await writeProjectsFile(data);
 
-    const projDir = getProjectDir(badFolder);
-    const pagesDir = getProjectPagesDir(badFolder);
+    const projDir = getProjectDir(badFolder, "local");
+    const pagesDir = getProjectPagesDir(badFolder, "local");
     await fs.ensureDir(pagesDir);
     // No theme.json — this will cause readProjectThemeData to throw
 

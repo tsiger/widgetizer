@@ -90,6 +90,7 @@ function mockReq({ params = {}, body = {}, file = null } = {}) {
     params,
     body,
     file,
+    userId: "local",
     [Symbol.for("express-validator#contexts")]: [],
   };
 }
@@ -242,11 +243,11 @@ before(async () => {
   });
 
   // Create project dir with theme.json for readProjectThemeData tests
-  const projDir = getProjectDir("theme-test-project");
+  const projDir = getProjectDir("theme-test-project", "local");
   await fs.ensureDir(projDir);
-  await fs.ensureDir(getProjectPagesDir("theme-test-project"));
+  await fs.ensureDir(getProjectPagesDir("theme-test-project", "local"));
   await fs.outputFile(
-    getProjectThemeJsonPath("theme-test-project"),
+    getProjectThemeJsonPath("theme-test-project", "local"),
     JSON.stringify({ settings: { global: { colors: [{ id: "primary", value: "#ff0000" }] } } }, null, 2),
   );
 });
@@ -1064,14 +1065,14 @@ describe("copyThemeToProject", () => {
 
 describe("readProjectThemeData", () => {
   it("reads theme.json from project directory", async () => {
-    const data = await readProjectThemeData("theme-test-project-uuid");
+    const data = await readProjectThemeData("theme-test-project-uuid", "local");
     assert.ok(data.settings);
     assert.ok(data.settings.global);
   });
 
   it("throws for nonexistent project", async () => {
     await assert.rejects(
-      () => readProjectThemeData("nonexistent-uuid"),
+      () => readProjectThemeData("nonexistent-uuid", "local"),
       (err) => err.message.includes("not found"),
     );
   });
@@ -1098,7 +1099,7 @@ describe("saveProjectThemeSettings", () => {
     assert.ok(res._json.message.includes("saved"));
 
     // Verify persisted
-    const saved = await readProjectThemeData("theme-test-project-uuid");
+    const saved = await readProjectThemeData("theme-test-project-uuid", "local");
     assert.equal(saved.settings.global.colors[0].id, "bg");
   });
 });

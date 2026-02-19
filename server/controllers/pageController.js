@@ -11,11 +11,12 @@ import { generateCopyName } from "../utils/namingHelpers.js";
 /**
  * Lists and reads data for all publishable pages in a project's pages directory.
  * @param {string} projectId - The project folder name
+ * @param {string} userId - The user ID for path scoping
  * @returns {Promise<Array<object>>} Array of page data objects
  * @throws {Error} If the pages directory cannot be read
  */
-export async function listProjectPagesData(projectId) {
-  const pagesDir = getProjectPagesDir(projectId);
+export async function listProjectPagesData(projectId, userId) {
+  const pagesDir = getProjectPagesDir(projectId, userId);
   try {
     // Check if pages directory exists
     if (!(await fs.pathExists(pagesDir))) {
@@ -36,7 +37,7 @@ export async function listProjectPagesData(projectId) {
     const pagesData = await Promise.all(
       pageFiles.map(async (fileEntry) => {
         const pageId = fileEntry.name.replace(".json", "");
-        const pagePath = getPagePath(projectId, pageId);
+        const pagePath = getPagePath(projectId, pageId, userId);
         try {
           const pageContent = await fs.readFile(pagePath, "utf8");
           const parsedData = JSON.parse(pageContent);
@@ -66,14 +67,15 @@ export async function listProjectPagesData(projectId) {
  * Reads the JSON data for a global widget (header or footer).
  * @param {string} projectId - The project folder name
  * @param {'header'|'footer'} widgetType - The type of global widget to read
+ * @param {string} userId - The user ID for path scoping
  * @returns {Promise<object|null>} The widget data or null if not found
  */
-export async function readGlobalWidgetData(projectId, widgetType) {
+export async function readGlobalWidgetData(projectId, widgetType, userId) {
   if (widgetType !== "header" && widgetType !== "footer") {
     console.error(`Invalid global widget type requested: ${widgetType}`);
     return null;
   }
-  const projectDir = getProjectDir(projectId);
+  const projectDir = getProjectDir(projectId, userId);
   // Ensure path uses projectDir consistently
   const globalWidgetPath = path.join(projectDir, "pages", "global", `${widgetType}.json`);
 
@@ -107,7 +109,7 @@ export async function getPage(req, res) {
     const projectFolderName = activeProject.folderName;
 
     // Try to find the page in the project's pages directory
-    const pagePath = getPagePath(projectFolderName, id);
+    const pagePath = getPagePath(projectFolderName, id, req.userId);
     // Check if page exists
     if (!(await fs.pathExists(pagePath))) {
       return res.status(404).json({ error: "Page not found" });
@@ -153,7 +155,7 @@ export async function updatePage(req, res) {
       );
       desiredNewSlug = await generateUniqueSlug(
         pageData.name,
-        (slug) => fs.pathExists(getPagePath(projectFolderName, slug)),
+        (slug) => fs.pathExists(getPagePath(projectFolderName, slug, req.userId)),
       );
     } else {
       // Sanitize the provided slug if it exists
@@ -166,14 +168,14 @@ export async function updatePage(req, res) {
       }
     }
 
-    const oldPath = getPagePath(projectFolderName, oldSlug);
+    const oldPath = getPagePath(projectFolderName, oldSlug, req.userId);
     let finalNewSlug = oldSlug; // Assume slug doesn't change initially
 
     // Check if the desired slug (after potential generation/sanitization) is different from the old one
     if (oldSlug !== desiredNewSlug) {
       // For explicit slug changes, check if the new slug already exists (conflict)
       if (pageData.slug && typeof pageData.slug === "string" && pageData.slug.trim() !== "") {
-        const existingPath = getPagePath(projectFolderName, desiredNewSlug);
+        const existingPath = getPagePath(projectFolderName, desiredNewSlug, req.userId);
         if (await fs.pathExists(existingPath)) {
           return res.status(409).json({
             error: "Slug already exists",
@@ -189,7 +191,7 @@ export async function updatePage(req, res) {
       finalNewSlug = oldSlug;
     }
 
-    const newPath = getPagePath(projectFolderName, finalNewSlug);
+    const newPath = getPagePath(projectFolderName, finalNewSlug, req.userId);
 
     // Read old file first to preserve original creation date and uuid
     let originalCreationDate = new Date().toISOString();
@@ -240,10 +242,10 @@ export async function updatePage(req, res) {
     try {
       // If slug changed, remove the old slug first
       if (oldSlug !== finalNewSlug) {
-        await removePageFromMediaUsage(activeProject.id, oldSlug);
+        await removePageFromMediaUsage(activeProject.id, oldSlug, req.userId);
       }
       // Then update with the new slug (or refresh if slug didn't change)
-      await updatePageMediaUsage(activeProject.id, finalNewSlug, finalUpdatedPageData);
+      await updatePageMediaUsage(activeProject.id, finalNewSlug, finalUpdatedPageData, req.userId);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for page ${finalNewSlug}:`, usageError);
       // Don't fail the request if usage tracking fails
@@ -273,7 +275,7 @@ export async function getAllPages(req, res) {
     const projectFolderName = activeProject.folderName;
 
     // Use the helper function to get page data
-    const pages = await listProjectPagesData(projectFolderName);
+    const pages = await listProjectPagesData(projectFolderName, req.userId);
 
     res.json(pages);
   } catch (error) {
@@ -295,7 +297,7 @@ export async function deletePage(req, res) {
     const projectFolderName = activeProject.folderName;
 
     const pageId = req.params.id;
-    const pagePath = getPagePath(projectFolderName, pageId);
+    const pagePath = getPagePath(projectFolderName, pageId, req.userId);
 
     // Check if file exists before deleting
     if (!(await fs.pathExists(pagePath))) {
@@ -307,7 +309,7 @@ export async function deletePage(req, res) {
 
     // Remove the page from media usage tracking
     try {
-      await removePageFromMediaUsage(activeProject.id, pageId);
+      await removePageFromMediaUsage(activeProject.id, pageId, req.userId);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
       // Don't fail the request if usage tracking fails
@@ -341,7 +343,7 @@ export async function bulkDeletePages(req, res) {
   // Process each page deletion
   for (const pageId of pageIds) {
     try {
-      const pagePath = getPagePath(projectFolderName, pageId);
+      const pagePath = getPagePath(projectFolderName, pageId, req.userId);
 
       // Check if file exists before deleting
       if (!(await fs.pathExists(pagePath))) {
@@ -354,7 +356,7 @@ export async function bulkDeletePages(req, res) {
 
       // Remove the page from media usage tracking
       try {
-        await removePageFromMediaUsage(activeProject.id, pageId);
+        await removePageFromMediaUsage(activeProject.id, pageId, req.userId);
       } catch (usageError) {
         console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
         // Don't fail the deletion if usage tracking fails
@@ -424,10 +426,10 @@ export async function createPage(req, res) {
     let slug;
     if (pageData.slug && pageData.slug.trim()) {
       // User provided a slug, ensure it's unique
-      slug = await generateUniqueSlug(pageData.slug, (slug) => fs.pathExists(getPagePath(projectFolderName, slug)), { fallback: "page" });
+      slug = await generateUniqueSlug(pageData.slug, (slug) => fs.pathExists(getPagePath(projectFolderName, slug, req.userId)), { fallback: "page" });
     } else {
       // No slug provided, generate from name
-      slug = await generateUniqueSlug(pageData.name, (slug) => fs.pathExists(getPagePath(projectFolderName, slug)));
+      slug = await generateUniqueSlug(pageData.name, (slug) => fs.pathExists(getPagePath(projectFolderName, slug, req.userId)));
     }
 
     const newPage = {
@@ -440,15 +442,15 @@ export async function createPage(req, res) {
       updated: new Date().toISOString(),
     };
 
-    const pagesDir = getProjectPagesDir(projectFolderName);
+    const pagesDir = getProjectPagesDir(projectFolderName, req.userId);
     await fs.ensureDir(pagesDir);
 
-    const pagePath = getPagePath(projectFolderName, slug);
+    const pagePath = getPagePath(projectFolderName, slug, req.userId);
     await fs.outputFile(pagePath, JSON.stringify(newPage, null, 2));
 
     // Update media usage tracking for SEO images
     try {
-      await updatePageMediaUsage(activeProject.id, slug, newPage);
+      await updatePageMediaUsage(activeProject.id, slug, newPage, req.userId);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for new page ${slug}:`, usageError);
       // Don't fail the request if usage tracking fails
@@ -491,7 +493,7 @@ export async function savePageContent(req, res) {
     // Read existing data to preserve timestamps etc.
     let existingData = {};
     try {
-      const pagePath = getPagePath(projectFolderName, id);
+      const pagePath = getPagePath(projectFolderName, id, req.userId);
       const data = await fs.readFile(pagePath, "utf8");
       existingData = JSON.parse(data);
     } catch (err) {
@@ -516,13 +518,13 @@ export async function savePageContent(req, res) {
     };
 
     // Write file
-    const newPagePath = getPagePath(projectFolderName, pageData.slug);
+    const newPagePath = getPagePath(projectFolderName, pageData.slug, req.userId);
     await fs.outputFile(newPagePath, JSON.stringify(updatedPageData, null, 2));
 
     // If the original slug (id) is different from the new slug, delete the old file
     if (id !== pageData.slug) {
       try {
-        const oldPath = getPagePath(projectFolderName, id);
+        const oldPath = getPagePath(projectFolderName, id, req.userId);
         if (await fs.pathExists(oldPath)) {
           await fs.remove(oldPath);
         }
@@ -535,10 +537,10 @@ export async function savePageContent(req, res) {
     try {
       // If slug changed, remove the old slug first
       if (id !== pageData.slug) {
-        await removePageFromMediaUsage(activeProject.id, id);
+        await removePageFromMediaUsage(activeProject.id, id, req.userId);
       }
       // Then update with the new slug
-      await updatePageMediaUsage(activeProject.id, pageData.slug, updatedPageData);
+      await updatePageMediaUsage(activeProject.id, pageData.slug, updatedPageData, req.userId);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for page ${pageData.slug}:`, usageError);
       // Don't fail the request if usage tracking fails
@@ -565,11 +567,11 @@ export async function duplicatePage(req, res) {
     const projectFolderName = activeProject.folderName;
 
     // Read the original page data
-    const originalPagePath = getPagePath(projectFolderName, originalPageId);
+    const originalPagePath = getPagePath(projectFolderName, originalPageId, req.userId);
     const originalPageData = JSON.parse(await fs.readFile(originalPagePath, "utf8"));
 
     // Read all existing page files to find existing copy names
-    const pagesDir = getProjectPagesDir(projectFolderName);
+    const pagesDir = getProjectPagesDir(projectFolderName, req.userId);
     const allEntries = await fs.readdir(pagesDir, { withFileTypes: true });
     const pageJsonFiles = allEntries.filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
     const existingPageNames = await Promise.all(
@@ -580,7 +582,7 @@ export async function duplicatePage(req, res) {
     );
 
     const newName = generateCopyName(originalPageData.name, existingPageNames);
-    const newSlug = await generateUniqueSlug(newName, (slug) => fs.pathExists(getPagePath(projectFolderName, slug)));
+    const newSlug = await generateUniqueSlug(newName, (slug) => fs.pathExists(getPagePath(projectFolderName, slug, req.userId)));
 
     // Create the new page data
     const newPage = {
@@ -594,12 +596,12 @@ export async function duplicatePage(req, res) {
     };
 
     // Save the new page
-    const newPagePath = getPagePath(projectFolderName, newSlug);
+    const newPagePath = getPagePath(projectFolderName, newSlug, req.userId);
     await fs.outputFile(newPagePath, JSON.stringify(newPage, null, 2));
 
     // Update media usage tracking for the new page
     try {
-      await updatePageMediaUsage(activeProject.id, newSlug, newPage);
+      await updatePageMediaUsage(activeProject.id, newSlug, newPage, req.userId);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for duplicated page ${newSlug}:`, usageError);
       // Don't fail the request if usage tracking fails

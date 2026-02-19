@@ -7,7 +7,7 @@ import { readProjectsFile } from "../controllers/projectController.js";
  */
 export async function resolveActiveProject(req, res, next) {
   try {
-    const { projects, activeProjectId } = await readProjectsFile();
+    const { projects, activeProjectId } = await readProjectsFile(req.userId);
     const activeProject = projects.find((p) => p.id === activeProjectId);
 
     if (!activeProject) {
