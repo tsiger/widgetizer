@@ -102,6 +102,7 @@ export const navigationSections = [
         path: "/app-settings",
         icon: SlidersHorizontal,
         requiresProject: true,
+        hostedHidden: true,
       },
     ],
   },

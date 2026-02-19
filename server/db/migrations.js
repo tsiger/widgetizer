@@ -89,6 +89,17 @@ const migrations = [
       `);
     },
   },
+  {
+    version: 3,
+    description: "Add publish tracking columns to projects",
+    up(db) {
+      db.exec(`
+        ALTER TABLE projects ADD COLUMN published_site_id TEXT DEFAULT NULL;
+        ALTER TABLE projects ADD COLUMN published_url TEXT DEFAULT NULL;
+        ALTER TABLE projects ADD COLUMN published_at TEXT DEFAULT NULL;
+      `);
+    },
+  },
 ];
 
 /**

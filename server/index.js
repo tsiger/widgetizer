@@ -1,6 +1,8 @@
+// Load .env FIRST — must be before any module that reads process.env
+import "./env.js";
+
 import express from "express";
 import path from "path";
-import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 
@@ -9,9 +11,6 @@ import authMiddleware from "./middleware/auth.js";
 import errorHandler from "./middleware/errorHandler.js";
 import { HOSTED_MODE } from "./hostedMode.js";
 import { getUserThemesDir, STATIC_DIST_DIR, STATIC_UTILS_DIR } from "./config.js";
-
-// Load environment variables
-dotenv.config();
 
 import projectRoutes from "./routes/projects.js";
 import themeRoutes from "./routes/themes.js";
@@ -83,8 +82,8 @@ if (HOSTED_MODE) {
   try {
     const publishRoutes = (await import("./routes/publish.js")).default;
     app.use("/api/publish", apiLimiter, publishRoutes);
-  } catch {
-    console.log("Publish routes not available (hosted-only feature)");
+  } catch (err) {
+    console.log("Publish routes not available (hosted-only feature):", err.message);
   }
 }
 

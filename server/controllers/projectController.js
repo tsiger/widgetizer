@@ -5,6 +5,7 @@ import archiver from "archiver";
 import {
   DATA_DIR,
   APP_ROOT,
+  getUserDataDir,
   getProjectDir,
   getProjectPagesDir,
   getProjectMenusDir,
@@ -26,9 +27,9 @@ import { processTemplatesRecursive } from "../utils/templateHelpers.js";
 import multer from "multer";
 import { readAppSettingsFile } from "./appSettingsController.js";
 
-// Make sure the projects directory exists
-async function ensureDirectories() {
-  await fs.ensureDir(path.join(DATA_DIR, "projects"));
+// Make sure the user-scoped projects directory exists
+async function ensureDirectories(userId = "local") {
+  await fs.ensureDir(path.join(getUserDataDir(userId), "projects"));
 }
 
 /**
@@ -57,7 +58,7 @@ export async function writeProjectsFile(data, userId = "local") {
  */
 export async function getAllProjects(req, res) {
   try {
-    await ensureDirectories();
+    await ensureDirectories(req.userId);
     const data = await readProjectsFile(req.userId);
 
     // Enrich projects with hasThemeUpdate flag and theme display name

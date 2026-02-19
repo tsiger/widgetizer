@@ -120,36 +120,36 @@ export async function cleanupProjectExports(projectId, userId = "local") {
 }
 
 /**
- * Exports a project to static HTML files with assets, sitemap, and robots.txt.
- * Renders all pages with widgets, copies used media, and records the export in history.
- * @param {import('express').Request} req - Express request object with projectId in params
- * @param {import('express').Response} res - Express response object
- * @returns {Promise<void>}
+ * Exports a project to a directory of static HTML files with assets, sitemap, and robots.txt.
+ * This is the core export logic extracted for reuse by both the export endpoint and the publish flow.
+ * @param {string} projectId - Project UUID
+ * @param {string} userId - User ID for scoping
+ * @param {object} [options] - Export options
+ * @param {boolean} [options.exportMarkdown=false] - Also export pages as markdown
+ * @returns {Promise<{outputDir: string, version: number, exportDirName: string, exportRecord: object}>}
  */
-export async function exportProject(req, res) {
-  const { projectId } = req.params;
-  const { exportMarkdown = false } = req.body || {};
+export async function exportProjectToDir(projectId, userId = "local", options = {}) {
+  const { exportMarkdown = false } = options;
 
-  try {
-    if (!projectId) {
-      return res.status(400).json({ error: "Project ID is required" });
-    }
+  if (!projectId) {
+    throw new Error("Project ID is required");
+  }
 
-    // Read projects file to resolve UUID to folderName (slug) for filesystem paths
-    const projectsData = await readProjectsFile(req.userId);
-    const projectData = projectsData.projects.find((p) => p.id === projectId);
+  // Read projects file to resolve UUID to folderName (slug) for filesystem paths
+  const projectsData = await readProjectsFile(userId);
+  const projectData = projectsData.projects.find((p) => p.id === projectId);
 
-    if (!projectData) {
-      throw new Error(`Project with ID "${projectId}" not found`);
-    }
+  if (!projectData) {
+    throw new Error(`Project with ID "${projectId}" not found`);
+  }
 
-    const projectFolderName = projectData.folderName;
-    const projectDir = getProjectDir(projectFolderName, req.userId);
-    const siteUrl = projectData.siteUrl || "";
+  const projectFolderName = projectData.folderName;
+  const projectDir = getProjectDir(projectFolderName, userId);
+  const siteUrl = projectData.siteUrl || "";
 
-    const version = exportRepo.getNextVersion(projectId);
-    const outputBaseDir = getUserPublishDir(req.userId);
-    const outputDir = path.join(outputBaseDir, `${projectFolderName}-v${version}`);
+  const version = exportRepo.getNextVersion(projectId);
+  const outputBaseDir = getUserPublishDir(userId);
+  const outputDir = path.join(outputBaseDir, `${projectFolderName}-v${version}`);
     const outputAssetsDir = path.join(outputDir, "assets");
     const outputImagesDir = path.join(outputAssetsDir, "images"); // Images now in assets/images/
     const outputVideosDir = path.join(outputAssetsDir, "videos"); // Videos now in assets/videos/
@@ -161,20 +161,19 @@ export async function exportProject(req, res) {
     await fs.ensureDir(outputImagesDir);
     await fs.ensureDir(outputVideosDir);
     await fs.ensureDir(outputAudiosDir);
-    const rawThemeSettings = await readProjectThemeData(projectId, req.userId);
+    const rawThemeSettings = await readProjectThemeData(projectId, userId);
 
     // Fetch list of page data using the helper function
-    const pagesDataArray = await listProjectPagesData(projectFolderName, req.userId);
+    const pagesDataArray = await listProjectPagesData(projectFolderName, userId);
 
     // Validate that at least one page has the "index" slug (required for homepage)
     // Note: page.id is derived from filename, which is the authoritative slug
     const hasIndexPage = pagesDataArray.some((page) => page.id === "index");
     if (!hasIndexPage) {
-      return res.status(400).json({
-        error: "Export failed: No homepage found",
-        message:
-          'Your project must have a page with the slug "index" to serve as the homepage. Please create or rename a page to have the slug "index" before exporting.',
-      });
+      const err = new Error('Your project must have a page with the slug "index" to serve as the homepage. Please create or rename a page to have the slug "index" before exporting.');
+      err.statusCode = 400;
+      err.errorTitle = "Export failed: No homepage found";
+      throw err;
     }
 
     // --- Generate sitemap.xml and robots.txt ---
@@ -236,8 +235,8 @@ export async function exportProject(req, res) {
     }
     // --- End of new SEO file generation ---
 
-    const headerData = await readGlobalWidgetData(projectFolderName, "header", req.userId);
-    const footerData = await readGlobalWidgetData(projectFolderName, "footer", req.userId);
+    const headerData = await readGlobalWidgetData(projectFolderName, "header", userId);
+    const footerData = await readGlobalWidgetData(projectFolderName, "footer", userId);
 
     // Handle case where no pages are found (except for theme files etc)
     if (pagesDataArray.length === 0) {
@@ -274,7 +273,7 @@ export async function exportProject(req, res) {
 
       // Render header if exists (for each page to capture enqueued assets)
       if (headerData) {
-        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null, req.userId);
+        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null, userId);
       }
 
       // Render page-specific widgets sequentially
@@ -300,14 +299,14 @@ export async function exportProject(req, res) {
             "publish",
             sharedGlobals,
             widgetIndex,
-            req.userId,
+            userId,
           );
         }
       }
 
       // Render footer if exists
       if (footerData) {
-        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null, req.userId);
+        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null, userId);
       }
 
       // Pass separated content sections to layout
@@ -322,7 +321,7 @@ export async function exportProject(req, res) {
         rawThemeSettings,
         "publish",
         sharedGlobals,
-        req.userId,
+        userId,
       );
 
       // Format HTML using Prettier
@@ -472,7 +471,7 @@ Per aspera ad astra
     // --- Copy Only Used Images ---
     try {
       const { readMediaFile } = await import("./mediaController.js");
-      const mediaData = await readMediaFile(projectId, req.userId);
+      const mediaData = await readMediaFile(projectId, userId);
 
       if (mediaData && mediaData.files) {
         const usedImages = mediaData.files.filter(
@@ -545,7 +544,7 @@ Per aspera ad astra
     // --- Copy Only Used Videos ---
     try {
       const { readMediaFile } = await import("./mediaController.js");
-      const mediaData = await readMediaFile(projectId, req.userId);
+      const mediaData = await readMediaFile(projectId, userId);
 
       if (mediaData && mediaData.files) {
         const usedVideos = mediaData.files.filter(
@@ -601,7 +600,7 @@ Per aspera ad astra
     // Copy used audio files to assets/audios/
     try {
       const { readMediaFile } = await import("./mediaController.js");
-      const mediaData = await readMediaFile(projectId, req.userId);
+      const mediaData = await readMediaFile(projectId, userId);
 
       if (mediaData && mediaData.files) {
         const usedAudios = mediaData.files.filter(
@@ -667,14 +666,34 @@ Per aspera ad astra
 
     // Record this export in history (store relative dir name, not absolute path)
     const exportDirName = `${projectFolderName}-v${version}`;
-    const exportRecord = await recordExport(projectId, version, exportDirName, "success", req.userId);
+    const exportRecord = await recordExport(projectId, version, exportDirName, "success", userId);
+
+    return { outputDir, version, exportDirName, exportRecord };
+}
+
+/**
+ * Express handler: Exports a project to static HTML files.
+ * Thin wrapper around exportProjectToDir().
+ * @param {import('express').Request} req - Express request object with projectId in params
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+export async function exportProject(req, res) {
+  const { projectId } = req.params;
+
+  try {
+    if (!projectId) {
+      return res.status(400).json({ error: "Project ID is required" });
+    }
+
+    const result = await exportProjectToDir(projectId, req.userId, req.body || {});
 
     res.json({
       success: true,
-      message: `Project exported successfully as version ${version}`,
-      outputDir: outputDir,
-      version: version,
-      exportRecord: exportRecord,
+      message: `Project exported successfully as version ${result.version}`,
+      outputDir: result.outputDir,
+      version: result.version,
+      exportRecord: result.exportRecord,
     });
   } catch (error) {
     // Try to record failed export
@@ -683,6 +702,13 @@ Per aspera ad astra
       await recordExport(projectId, version, null, "failed", req.userId);
     } catch (recordError) {
       console.error("Failed to record export failure:", recordError);
+    }
+    // Handle errors with explicit status codes (e.g., no index page)
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({
+        error: error.errorTitle || "Export failed",
+        message: error.message,
+      });
     }
     // Send specific error if theme read failed
     if (error.message.includes("Theme settings file not found")) {

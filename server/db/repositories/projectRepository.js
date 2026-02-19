@@ -88,6 +88,9 @@ export function updateProject(id, updates, userId = "local") {
     siteUrl: updates.siteUrl !== undefined ? (updates.siteUrl || "") : current.site_url,
     lastThemeUpdateAt: updates.lastThemeUpdateAt !== undefined ? updates.lastThemeUpdateAt : current.last_theme_update_at,
     lastThemeUpdateVersion: updates.lastThemeUpdateVersion !== undefined ? updates.lastThemeUpdateVersion : current.last_theme_update_version,
+    publishedSiteId: updates.publishedSiteId !== undefined ? updates.publishedSiteId : current.published_site_id,
+    publishedUrl: updates.publishedUrl !== undefined ? updates.publishedUrl : current.published_url,
+    publishedAt: updates.publishedAt !== undefined ? updates.publishedAt : current.published_at,
     updated: updates.updated || new Date().toISOString(),
     created: current.created,
   };
@@ -104,6 +107,9 @@ export function updateProject(id, updates, userId = "local") {
       site_url = @siteUrl,
       last_theme_update_at = @lastThemeUpdateAt,
       last_theme_update_version = @lastThemeUpdateVersion,
+      published_site_id = @publishedSiteId,
+      published_url = @publishedUrl,
+      published_at = @publishedAt,
       updated = @updated
     WHERE id = @id AND user_id = @userId
   `).run(merged);
@@ -255,6 +261,11 @@ function rowToProject(row) {
   // Only include theme update fields if they have values
   if (row.last_theme_update_at) project.lastThemeUpdateAt = row.last_theme_update_at;
   if (row.last_theme_update_version) project.lastThemeUpdateVersion = row.last_theme_update_version;
+
+  // Publish tracking fields
+  if (row.published_site_id) project.publishedSiteId = row.published_site_id;
+  if (row.published_url) project.publishedUrl = row.published_url;
+  if (row.published_at) project.publishedAt = row.published_at;
 
   return project;
 }
