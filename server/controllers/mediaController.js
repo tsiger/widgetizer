@@ -25,8 +25,8 @@ import { stripHtmlTags } from "../services/sanitizationService.js";
 
 // Get image processing settings from app settings
 async function getImageProcessingSettings(projectId, userId = "local") {
-  const quality = (await getSetting("media.imageProcessing.quality")) || 85;
-  const defaultSizesConfig = (await getSetting("media.imageProcessing.sizes")) || {
+  const quality = (await getSetting("media.imageProcessing.quality", userId)) || 85;
+  const defaultSizesConfig = (await getSetting("media.imageProcessing.sizes", userId)) || {
     thumb: { width: 150, enabled: true },
     small: { width: 480, enabled: true },
     medium: { width: 1024, enabled: true },
@@ -253,9 +253,9 @@ export async function uploadProjectMedia(req, res) {
     }
 
     // Get the dynamic file size limits
-    const maxImageSizeMB = await getSetting("media.maxFileSizeMB");
-    const maxVideoSizeMB = await getSetting("media.maxVideoSizeMB");
-    const maxAudioSizeMB = await getSetting("media.maxAudioSizeMB");
+    const maxImageSizeMB = await getSetting("media.maxFileSizeMB", req.userId);
+    const maxVideoSizeMB = await getSetting("media.maxVideoSizeMB", req.userId);
+    const maxAudioSizeMB = await getSetting("media.maxAudioSizeMB", req.userId);
     // Pass projectId to allow theme overrides
     const imageSizes = await getImageProcessingSettings(projectId, req.userId);
 

@@ -120,7 +120,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, user
     let emptyStateDescription = "Start building your page by adding widgets from the sidebar";
 
     try {
-      const userLocale = getSetting("general.language") || "en";
+      const userLocale = getSetting("general.language", userId) || "en";
       const localePath = path.join(__dirname, `../../src/locales/${userLocale}.json`);
       if (await fs.pathExists(localePath)) {
         const localeData = JSON.parse(await fs.readFile(localePath, "utf-8"));

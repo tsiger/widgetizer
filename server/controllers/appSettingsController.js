@@ -7,10 +7,11 @@ import {
 
 /**
  * Reads the application settings (merged with defaults).
+ * @param {string} userId - User ID (defaults to "local" for open-source mode)
  * @returns {Promise<object>} The settings object
  */
-export async function readAppSettingsFile() {
-  return getSettings();
+export async function readAppSettingsFile(userId = "local") {
+  return getSettings(userId);
 }
 
 /**
@@ -20,7 +21,7 @@ export async function readAppSettingsFile() {
  */
 export async function getAppSettings(req, res) {
   try {
-    const settings = getSettings();
+    const settings = getSettings(req.userId);
     res.json(settings);
   } catch {
     res.status(500).json({ error: "Failed to get application settings." });
@@ -35,7 +36,7 @@ export async function getAppSettings(req, res) {
 export async function updateAppSettings(req, res) {
   try {
     const settings = req.body;
-    const currentSettings = getSettings();
+    const currentSettings = getSettings(req.userId);
 
     if (typeof settings !== "object" || settings === null) {
       return res.status(400).json({ error: "Invalid request body: Expected an object." });
@@ -87,7 +88,7 @@ export async function updateAppSettings(req, res) {
       }
     }
 
-    saveSettings(newSettings);
+    saveSettings(newSettings, req.userId);
     res.json({ message: "Settings updated successfully", settings: newSettings });
   } catch (error) {
     res.status(500).json({ error: error.message || "Failed to update application settings." });
@@ -97,8 +98,9 @@ export async function updateAppSettings(req, res) {
 /**
  * Retrieves a specific setting value by key path (e.g., "media.maxFileSizeMB").
  * @param {string} key
+ * @param {string} userId - User ID (defaults to "local" for open-source mode)
  * @returns {Promise<*>}
  */
-export async function getSetting(key) {
-  return repoGetSetting(key);
+export async function getSetting(key, userId = "local") {
+  return repoGetSetting(key, userId);
 }

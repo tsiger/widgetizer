@@ -24,7 +24,7 @@
     "start:prod": "cross-env NODE_ENV=production npm start",
     "electron:dev": "concurrently -k \"cross-env NODE_ENV=development npm run server\" \"cross-env NODE_ENV=development npm run dev\" \"wait-on http://localhost:3000 && cross-env ELECTRON_DEV=1 ELECTRON_DISABLE_INTERNAL_SERVER=1 VITE_DEV_SERVER_URL=http://localhost:3000 electron .\"",
     "test": "node --test --test-reporter ./server/tests/reporter.js server/tests/*.test.js",
-    "test:verbose": "node --test server/tests/*.test.js",
+    "test:verbose": "VERBOSE=1 node --test --test-reporter ./server/tests/reporter.js server/tests/*.test.js",
     "test:frontend": "vitest run",
     "electron:build": "npm run build && electron-builder",
     "electron:build:mac": "npm run build && electron-builder --mac",

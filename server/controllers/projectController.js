@@ -849,11 +849,12 @@ const UPLOAD_TEMP_DIR = path.join(DATA_DIR, "temp");
 /**
  * Read the max upload size from app settings (shared by project import + theme upload).
  * Falls back to 500 MB when the setting is unavailable.
+ * @param {string} userId - User ID (defaults to "local" for open-source mode)
  * @returns {Promise<number>} size limit in megabytes
  */
-export async function getMaxUploadSizeMB() {
+export async function getMaxUploadSizeMB(userId = "local") {
   try {
-    const settings = await readAppSettingsFile();
+    const settings = await readAppSettingsFile(userId);
     return settings.export?.maxImportSizeMB || 500;
   } catch {
     return 500;
@@ -867,7 +868,7 @@ export async function getMaxUploadSizeMB() {
  */
 export async function handleImportUpload(req, res, next) {
   try {
-    const maxSizeMB = await getMaxUploadSizeMB();
+    const maxSizeMB = await getMaxUploadSizeMB(req.userId);
     await fs.ensureDir(UPLOAD_TEMP_DIR);
 
     const upload = multer({
@@ -912,7 +913,7 @@ export async function importProject(req, res) {
     }
 
     // Check file size against app settings (backup check)
-    const maxSizeMB = await getMaxUploadSizeMB();
+    const maxSizeMB = await getMaxUploadSizeMB(req.userId);
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     if (req.file.size > maxSizeBytes) {

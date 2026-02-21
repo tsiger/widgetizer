@@ -919,7 +919,7 @@ export async function handleThemeUpload(req, res, next) {
   try {
     let maxSizeMB = 500;
     try {
-      const settings = await readAppSettingsFile();
+      const settings = await readAppSettingsFile(req.userId);
       maxSizeMB = settings.export?.maxImportSizeMB || 500;
     } catch {
       // Fall back to default 500MB

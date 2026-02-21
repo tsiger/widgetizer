@@ -49,7 +49,7 @@ async function recordExport(projectId, version, outputDir, status = "success", u
   let maxExports = 10; // default
   try {
     const { getSetting } = await import("./appSettingsController.js");
-    const maxVersionsSetting = await getSetting("export.maxVersionsToKeep");
+    const maxVersionsSetting = await getSetting("export.maxVersionsToKeep", userId);
     maxExports = parseInt(maxVersionsSetting || "10", 10) || 10;
   } catch (error) {
     console.warn("Could not load app settings for export limit, using default of 10. Error:", error.message);
@@ -251,7 +251,7 @@ export async function exportProjectToDir(projectId, userId = "local", options = 
     let devModeEnabled = false;
     try {
       const { getSetting } = await import("./appSettingsController.js");
-      devModeEnabled = await getSetting("developer.enabled");
+      devModeEnabled = await getSetting("developer.enabled", userId);
     } catch (error) {
       console.warn("Could not check developer mode setting:", error.message);
     }
@@ -905,7 +905,7 @@ export async function getExportHistory(req, res) {
     let maxExports = 10; // default fallback
     try {
       const { getSetting } = await import("./appSettingsController.js");
-      const maxVersionsSetting = await getSetting("export.maxVersionsToKeep");
+      const maxVersionsSetting = await getSetting("export.maxVersionsToKeep", req.userId);
       maxExports = parseInt(maxVersionsSetting || "10", 10) || 10;
     } catch (error) {
       console.warn("Could not load app settings for export display limit, using default of 10. Error:", error.message);
