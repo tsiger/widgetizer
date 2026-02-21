@@ -48,7 +48,7 @@ const {
   readGlobalWidgetData,
 } = await import("../controllers/pageController.js");
 
-const { readProjectsFile, writeProjectsFile } = await import("../controllers/projectController.js");
+const projectRepo = await import("../db/repositories/projectRepository.js");
 const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
@@ -167,7 +167,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         updated: new Date().toISOString(),
       };
 
-      await writeProjectsFile({
+      await projectRepo.writeProjectsData({
         projects: [activeProject],
         activeProjectId: activeProject.id,
       }, TEST_USER_ID);
@@ -277,8 +277,8 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         const { resolveActiveProject } = await import("../middleware/resolveActiveProject.js");
 
         // Temporarily clear the active project
-        const original = await readProjectsFile(TEST_USER_ID);
-        await writeProjectsFile({ ...original, activeProjectId: null }, TEST_USER_ID);
+        const original = await projectRepo.readProjectsData(TEST_USER_ID);
+        await projectRepo.writeProjectsData({ ...original, activeProjectId: null }, TEST_USER_ID);
 
         const req = { userId: TEST_USER_ID };
         const res = mockRes();
@@ -290,7 +290,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.equal(nextCalled, false);
 
         // Restore
-        await writeProjectsFile(original, TEST_USER_ID);
+        await projectRepo.writeProjectsData(original, TEST_USER_ID);
       });
 
       it("preserves special characters in name without HTML-encoding", async () => {

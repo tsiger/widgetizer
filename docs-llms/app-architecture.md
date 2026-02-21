@@ -34,8 +34,6 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 
 | Function                    | Purpose                                                    |
 | --------------------------- | ---------------------------------------------------------- |
-| `readProjectsFile()`        | Read project metadata from SQLite                          |
-| `writeProjectsFile(data)`   | Write project metadata to SQLite                           |
 | `getAllProjects()`          | Get all projects (enriched with themeName, hasThemeUpdate) |
 | `getActiveProject()`        | Get active project                                         |
 | `createProject()`           | Create project (copies theme, applies preset, processes templates/menus) |
@@ -678,16 +676,9 @@ Save button / Auto-save timer
 
 ## Improvement Opportunities
 
-### 1. Duplicate File Reading Logic
+### 1. Theme Source Directory Resolution in getAllProjects
 
-**Problem:** `readProjectsFile()` is called multiple times in sequence within the same request handler.
-
-**Locations:**
-
-- `projectController.js`: `getAllProjects()`, `createProject()`, `updateProject()`, `deleteProject()`, etc.
-- Each function reads the file, modifies, writes back
-
-**Improvement:** For operations that need to read-modify-write, the file is read once per operation which is correct. However, `getAllProjects()` enriches each project by calling `themeController.getThemeSourceDir()` which reads theme.json multiple times. Consider batch reading.
+**Problem:** `getAllProjects()` enriches each project by calling `themeController.getThemeSourceDir()` which reads theme.json multiple times. Consider batch reading or caching.
 
 ### 2. Theme Source Directory Resolution
 

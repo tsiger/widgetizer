@@ -21,15 +21,16 @@ export function getNextVersion(projectId) {
  * @param {string} status - "success" or "failed"
  * @returns {{ version: number, timestamp: string, outputDir: string|null, status: string }}
  */
-export function recordExport(projectId, version, outputDir, status = "success") {
+export function recordExport(projectId, version, outputDir, status = "success", userId = "local") {
   const db = getDb();
   const timestamp = new Date().toISOString();
 
   db.prepare(`
-    INSERT INTO exports (project_id, version, timestamp, output_dir, status)
-    VALUES (@projectId, @version, @timestamp, @outputDir, @status)
+    INSERT INTO exports (project_id, user_id, version, timestamp, output_dir, status)
+    VALUES (@projectId, @userId, @version, @timestamp, @outputDir, @status)
   `).run({
     projectId,
+    userId,
     version,
     timestamp,
     outputDir: outputDir || null,
@@ -112,11 +113,12 @@ export function trimExports(projectId, maxToKeep) {
 
   if (toDelete.length === 0) return [];
 
-  // Delete them
+  // Delete them in a single statement
   const versions = toDelete.map((r) => r.version);
-  for (const version of versions) {
-    db.prepare("DELETE FROM exports WHERE project_id = ? AND version = ?").run(projectId, version);
-  }
+  const placeholders = versions.map(() => "?").join(",");
+  db.prepare(
+    `DELETE FROM exports WHERE project_id = ? AND version IN (${placeholders})`
+  ).run(projectId, ...versions);
 
   return toDelete.map((row) => ({
     version: row.version,

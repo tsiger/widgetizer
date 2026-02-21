@@ -36,7 +36,7 @@ const { getProjectMenusDir, getMenuPath, getProjectDir } = await import("../conf
 const { createMenu, getMenu, getAllMenus, getMenuById, updateMenu, deleteMenu, duplicateMenu } =
   await import("../controllers/menuController.js");
 
-const { readProjectsFile, writeProjectsFile } = await import("../controllers/projectController.js");
+const projectRepo = await import("../db/repositories/projectRepository.js");
 const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
@@ -120,7 +120,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
       };
 
       // Write projects.json so controllers can find the active project
-      await writeProjectsFile({
+      await projectRepo.writeProjectsData({
         projects: [activeProject],
         activeProjectId: activeProject.id,
       }, TEST_USER_ID);
@@ -701,8 +701,8 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         const { resolveActiveProject } = await import("../middleware/resolveActiveProject.js");
 
         // Temporarily clear active project
-        const backup = await readProjectsFile(TEST_USER_ID);
-        await writeProjectsFile({ ...backup, activeProjectId: null }, TEST_USER_ID);
+        const backup = await projectRepo.readProjectsData(TEST_USER_ID);
+        await projectRepo.writeProjectsData({ ...backup, activeProjectId: null }, TEST_USER_ID);
 
         const req = { userId: TEST_USER_ID };
         const res = mockRes();
@@ -714,14 +714,14 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.equal(nextCalled, false);
 
         // Restore
-        await writeProjectsFile(backup, TEST_USER_ID);
+        await projectRepo.writeProjectsData(backup, TEST_USER_ID);
       });
 
       it("returns 404 when no active project exists (getAllMenus)", async () => {
         const { resolveActiveProject } = await import("../middleware/resolveActiveProject.js");
 
-        const backup = await readProjectsFile(TEST_USER_ID);
-        await writeProjectsFile({ ...backup, activeProjectId: null }, TEST_USER_ID);
+        const backup = await projectRepo.readProjectsData(TEST_USER_ID);
+        await projectRepo.writeProjectsData({ ...backup, activeProjectId: null }, TEST_USER_ID);
 
         const req = { userId: TEST_USER_ID };
         const res = mockRes();
@@ -732,14 +732,14 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.match(res._json.error, /no active project/i);
         assert.equal(nextCalled, false);
 
-        await writeProjectsFile(backup, TEST_USER_ID);
+        await projectRepo.writeProjectsData(backup, TEST_USER_ID);
       });
 
       it("returns 404 when no active project exists (deleteMenu)", async () => {
         const { resolveActiveProject } = await import("../middleware/resolveActiveProject.js");
 
-        const backup = await readProjectsFile(TEST_USER_ID);
-        await writeProjectsFile({ ...backup, activeProjectId: null }, TEST_USER_ID);
+        const backup = await projectRepo.readProjectsData(TEST_USER_ID);
+        await projectRepo.writeProjectsData({ ...backup, activeProjectId: null }, TEST_USER_ID);
 
         const req = { userId: TEST_USER_ID };
         const res = mockRes();
@@ -750,7 +750,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.match(res._json.error, /no active project/i);
         assert.equal(nextCalled, false);
 
-        await writeProjectsFile(backup, TEST_USER_ID);
+        await projectRepo.writeProjectsData(backup, TEST_USER_ID);
       });
     });
 

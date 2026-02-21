@@ -111,7 +111,7 @@ export async function readMediaFile(projectId, userId = "local") {
  */
 export async function writeMediaFile(projectId, data, userId = "local") {
   await getProjectFolderName(projectId, userId);
-  mediaRepo.writeMediaData(projectId, data);
+  mediaRepo.writeMediaData(projectId, data, userId);
 }
 
 /**
@@ -126,7 +126,7 @@ export async function atomicUpdateMediaFile(projectId, transformFn, userId = "lo
   await getProjectFolderName(projectId, userId);
   const mediaData = mediaRepo.getMediaFiles(projectId);
   transformFn(mediaData);
-  mediaRepo.writeMediaData(projectId, mediaData);
+  mediaRepo.writeMediaData(projectId, mediaData, userId);
   return mediaData;
 }
 
@@ -259,7 +259,8 @@ export async function uploadProjectMedia(req, res) {
     // Pass projectId to allow theme overrides
     const imageSizes = await getImageProcessingSettings(projectId, req.userId);
 
-    const mediaData = await readMediaFile(projectId, req.userId);
+    // Validate project ownership
+    await getProjectFolderName(projectId, req.userId);
 
     // Process files in parallel instead of sequentially
     const filePromises = files.map(async (file) => {
@@ -398,7 +399,6 @@ export async function uploadProjectMedia(req, res) {
       if (result.status === "fulfilled") {
         if (result.value.success) {
           processedFiles.push(result.value.file);
-          mediaData.files.push(result.value.file);
         } else {
           rejectedFiles.push(result.value.file);
         }
@@ -410,9 +410,9 @@ export async function uploadProjectMedia(req, res) {
       }
     });
 
-    // Save updated metadata if any files were successfully processed
-    if (processedFiles.length > 0) {
-      await writeMediaFile(projectId, mediaData, req.userId);
+    // Insert each processed file individually (no full read/write cycle)
+    for (const file of processedFiles) {
+      mediaRepo.addMediaFile(projectId, file, req.userId);
     }
 
     // Determine response status based on results
@@ -447,58 +447,39 @@ export async function updateMediaMetadata(req, res) {
     const title = stripHtmlTags(req.body.title);
     const description = stripHtmlTags(req.body.description);
 
-    // Read media metadata
-    const mediaData = await readMediaFile(projectId, req.userId);
+    // Validate project ownership
+    await getProjectFolderName(projectId, req.userId);
 
-    // Find the file to update
-    const fileIndex = mediaData.files.findIndex((file) => file.id === fileId);
-    if (fileIndex === -1) {
+    // Get the specific file
+    const file = mediaRepo.getMediaFileById(fileId);
+    if (!file) {
       return res.status(404).json({ error: "File not found" });
     }
 
-    const file = mediaData.files[fileIndex];
     const isImage = file.type && file.type.startsWith("image/");
     const isVideoOrAudio = file.type && (file.type.startsWith("video/") || file.type.startsWith("audio/"));
 
     // Validate input based on media type
-    // Images require alt text; video/audio only need title and description (both optional)
     if (isImage && typeof alt === "undefined") {
       return res.status(400).json({ error: "Alt text is required for images" });
     }
 
-    // Update metadata - ensure metadata object exists
+    // Update metadata in DB (alt and title columns)
+    mediaRepo.updateFileMetadata(fileId, { alt: alt || "", title: title || "" });
+
+    // Build response metadata in the shape the frontend expects
+    let metadata;
     if (isImage) {
-      mediaData.files[fileIndex].metadata = {
-        ...mediaData.files[fileIndex].metadata,
-        alt: alt || "",
-        title: title || "",
-      };
+      metadata = { alt: alt || "", title: title || "" };
     } else if (isVideoOrAudio) {
-      // Create new metadata object, preserving other fields but explicitly removing alt
-      const newMetadata = {
-        ...mediaData.files[fileIndex].metadata,
-        title: title || "",
-        description: description || "",
-      };
-      delete newMetadata.alt;
-
-      mediaData.files[fileIndex].metadata = newMetadata;
+      metadata = { title: title || "", description: description || "" };
     } else {
-      // Fallback for unknown types
-      mediaData.files[fileIndex].metadata = {
-        ...mediaData.files[fileIndex].metadata,
-        alt: alt || "",
-        title: title || "",
-        description: description || "",
-      };
+      metadata = { alt: alt || "", title: title || "", description: description || "" };
     }
-
-    // Save updated metadata
-    await writeMediaFile(projectId, mediaData, req.userId);
 
     res.json({
       message: "Metadata updated successfully",
-      file: mediaData.files[fileIndex],
+      file: { ...file, metadata },
     });
   } catch (error) {
     console.error("Error updating media metadata:", error);
@@ -518,16 +499,14 @@ export async function deleteProjectMedia(req, res) {
   try {
     const { projectId, fileId } = req.params;
 
-    // Read media metadata
-    const mediaData = await readMediaFile(projectId, req.userId);
+    // Validate project ownership and get folder name for filesystem ops
+    const projectFolderName = await getProjectFolderName(projectId, req.userId);
 
-    // Find the file to delete
-    const fileIndex = mediaData.files.findIndex((file) => file.id === fileId);
-    if (fileIndex === -1) {
+    // Get the specific file from DB
+    const fileToDelete = mediaRepo.getMediaFileById(fileId);
+    if (!fileToDelete) {
       return res.status(404).json({ error: "File not found" });
     }
-
-    const fileToDelete = mediaData.files[fileIndex];
 
     // Check if file is currently in use
     if (fileToDelete.usedIn && fileToDelete.usedIn.length > 0) {
@@ -539,7 +518,6 @@ export async function deleteProjectMedia(req, res) {
     }
 
     // Remove the physical files from storage
-    const projectFolderName = await getProjectFolderName(projectId, req.userId);
     const fileDir = getMediaDir(projectFolderName, fileToDelete.type, req.userId);
 
     // 1. Delete the original file
@@ -570,9 +548,8 @@ export async function deleteProjectMedia(req, res) {
       }
     }
 
-    // Remove metadata entry
-    mediaData.files.splice(fileIndex, 1);
-    await writeMediaFile(projectId, mediaData, req.userId);
+    // Remove metadata from DB (cascade deletes sizes + usage)
+    mediaRepo.deleteMediaFile(fileId);
 
     res.json({ message: "File deleted successfully" });
   } catch (error) {
@@ -667,29 +644,27 @@ export async function bulkDeleteProjectMedia(req, res) {
       return res.status(400).json({ error: "fileIds must be a non-empty array" });
     }
 
-    const mediaData = await readMediaFile(projectId, req.userId);
+    // Validate project ownership and get folder name
+    const projectFolderName = await getProjectFolderName(projectId, req.userId);
+
+    // Read all media to check usage (needed for in-use validation)
+    const mediaData = mediaRepo.getMediaFiles(projectId);
 
     const filesToDelete = [];
-    const remainingFiles = [];
-
-    // Separate files to delete from files to keep
     const filesInUse = [];
+
+    // Separate files to delete from files in use
     mediaData.files.forEach((file) => {
       if (fileIds.includes(file.id)) {
-        // Check if file is in use before adding to delete list
         if (file.usedIn && file.usedIn.length > 0) {
-          // File is in use - add to filesInUse for the response AND keep it in remainingFiles
           filesInUse.push({
             id: file.id,
             filename: file.filename,
             usedIn: file.usedIn,
           });
-          remainingFiles.push(file); // ← IMPORTANT: Keep in-use files in the library!
         } else {
           filesToDelete.push(file);
         }
-      } else {
-        remainingFiles.push(file);
       }
     });
 
@@ -707,13 +682,8 @@ export async function bulkDeleteProjectMedia(req, res) {
       return res.status(404).json({ error: "No matching files found to delete" });
     }
 
-    // If some files are in use but some can be deleted, proceed with partial deletion
-    // We'll delete what we can and return info about files that couldn't be deleted
-
     // Asynchronously delete all associated physical files
     const deletePromises = filesToDelete.map(async (file) => {
-      // 1. Delete the original file
-      const projectFolderName = await getProjectFolderName(projectId, req.userId);
       const fileDir = getMediaDir(projectFolderName, file.type, req.userId);
 
       const originalFilePath = path.join(fileDir, file.filename);
@@ -722,7 +692,6 @@ export async function bulkDeleteProjectMedia(req, res) {
       } catch (err) {
         console.warn(`Could not delete original file ${originalFilePath}: ${err.message}`);
       }
-      // 2. Delete all generated sizes (for images)
       if (file.sizes) {
         for (const sizeName in file.sizes) {
           const size = file.sizes[sizeName];
@@ -741,9 +710,8 @@ export async function bulkDeleteProjectMedia(req, res) {
 
     await Promise.all(deletePromises);
 
-    // Update the media.json with the remaining files
-    mediaData.files = remainingFiles;
-    await writeMediaFile(projectId, mediaData, req.userId);
+    // Batch delete from DB (cascade handles sizes + usage)
+    mediaRepo.deleteMediaFiles(filesToDelete.map((f) => f.id));
 
     // Build response message
     const response = {
@@ -751,7 +719,6 @@ export async function bulkDeleteProjectMedia(req, res) {
       deletedCount: filesToDelete.length,
     };
 
-    // If some files were in use, include that info
     if (filesInUse.length > 0) {
       response.filesInUse = filesInUse;
       response.warning = `${filesInUse.length} file${filesInUse.length !== 1 ? "s" : ""} could not be deleted because ${filesInUse.length !== 1 ? "they are" : "it is"} currently in use.`;

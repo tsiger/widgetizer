@@ -39,7 +39,7 @@ process.env.NODE_ENV = "test";
 
 const { getProjectDir, getProjectPagesDir, getProjectThemeJsonPath } = await import("../config.js");
 
-const { writeProjectsFile } = await import("../controllers/projectController.js");
+const projectRepo = await import("../db/repositories/projectRepository.js");
 const { readMediaFile, writeMediaFile } = await import("../controllers/mediaController.js");
 
 const {
@@ -141,7 +141,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
     before(async () => {
       // Write projects.json
-      await writeProjectsFile({
+      await projectRepo.writeProjectsData({
         projects: [
           {
             id: PROJECT_ID,

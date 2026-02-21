@@ -8,7 +8,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { getProjectDir, getProjectThemeJsonPath } from "../config.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
-import { readProjectsFile } from "../controllers/projectController.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
 import { getThemeSourceDir } from "../controllers/themeController.js";
 import { isNewerVersion } from "../utils/semver.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
@@ -27,9 +27,7 @@ const UPDATABLE_PATHS = ["layout.liquid", "assets", "widgets", "snippets", "scre
  * @throws {Error} If project not found
  */
 export async function checkForUpdates(projectId, userId = "local") {
-  // Read projects file to get project info
-  const data = await readProjectsFile(userId);
-  const project = data.projects.find((p) => p.id === projectId);
+  const project = projectRepo.getProjectById(projectId, userId);
 
   if (!project) {
     throw new Error(`Project not found: ${projectId}`);
@@ -179,15 +177,12 @@ function mergeSettingsArray(userArray, newArray) {
  * @throws {Error} If project not found
  */
 export async function applyThemeUpdate(projectId, userId) {
-  // Read projects file to get project info
-  const data = await readProjectsFile(userId);
-  const projectIndex = data.projects.findIndex((p) => p.id === projectId);
+  const project = projectRepo.getProjectById(projectId, userId);
 
-  if (projectIndex === -1) {
+  if (!project) {
     throw new Error(`Project not found: ${projectId}`);
   }
 
-  const project = data.projects[projectIndex];
   const themeName = project.theme;
   const previousVersion = project.themeVersion;
 
@@ -311,15 +306,12 @@ export async function applyThemeUpdate(projectId, userId) {
   }
 
   // 4. Update project metadata
-  const { writeProjectsFile } = await import("../controllers/projectController.js");
-  data.projects[projectIndex] = {
-    ...project,
+  projectRepo.updateProject(projectId, {
     themeVersion: updateStatus.latestVersion,
     lastThemeUpdateAt: new Date().toISOString(),
     lastThemeUpdateVersion: updateStatus.latestVersion,
     updated: new Date().toISOString(),
-  };
-  await writeProjectsFile(data, userId);
+  }, userId);
 
   console.log(`[applyThemeUpdate] Successfully updated project ${projectId} to version ${updateStatus.latestVersion}`);
 
@@ -339,20 +331,16 @@ export async function applyThemeUpdate(projectId, userId) {
  * @throws {Error} If project not found
  */
 export async function toggleThemeUpdates(projectId, enabled, userId = "local") {
-  const data = await readProjectsFile(userId);
-  const projectIndex = data.projects.findIndex((p) => p.id === projectId);
+  const project = projectRepo.getProjectById(projectId, userId);
 
-  if (projectIndex === -1) {
+  if (!project) {
     throw new Error(`Project not found: ${projectId}`);
   }
 
-  const { writeProjectsFile } = await import("../controllers/projectController.js");
-  data.projects[projectIndex] = {
-    ...data.projects[projectIndex],
+  projectRepo.updateProject(projectId, {
     receiveThemeUpdates: enabled,
     updated: new Date().toISOString(),
-  };
-  await writeProjectsFile(data, userId);
+  }, userId);
 
   return {
     success: true,

@@ -39,11 +39,29 @@ export function getMediaFiles(projectId) {
 }
 
 /**
+ * Get a single media file by ID.
+ * @param {string} fileId
+ * @returns {object|null} Media file object or null
+ */
+export function getMediaFileById(fileId) {
+  const db = getDb();
+  const row = db.prepare("SELECT * FROM media_files WHERE id = ?").get(fileId);
+  if (!row) return null;
+
+  const sizeRows = db.prepare("SELECT * FROM media_sizes WHERE media_file_id = ?").all(fileId);
+  const usageRows = db.prepare("SELECT used_in FROM media_usage WHERE media_file_id = ?").all(fileId);
+
+  return rowToMediaFile(row, sizeRows, usageRows.map((r) => r.used_in));
+}
+
+/**
  * Write the full media data for a project (replaces all existing media files).
+ * Used for project import and duplication where a full replacement is appropriate.
  * @param {string} projectId
  * @param {{files: Array<object>}} mediaData
+ * @param {string} userId
  */
-export function writeMediaData(projectId, mediaData) {
+export function writeMediaData(projectId, mediaData, userId = "local") {
   const db = getDb();
   const txn = db.transaction(() => {
     // Delete all existing media for this project (cascades to sizes + usage)
@@ -51,7 +69,7 @@ export function writeMediaData(projectId, mediaData) {
 
     // Re-insert all files
     for (const file of mediaData.files || []) {
-      addMediaFile(projectId, file);
+      insertMediaFile(db, projectId, file, userId);
 
       // Re-insert usage
       if (file.usedIn) {
@@ -66,56 +84,170 @@ export function writeMediaData(projectId, mediaData) {
 }
 
 // ==========================================
+// Granular operations
+// ==========================================
+
+/**
+ * Add a single media file with its sizes to a project.
+ * @param {string} projectId
+ * @param {object} fileData - File info from controller
+ * @param {string} userId
+ */
+export function addMediaFile(projectId, fileData, userId = "local") {
+  const db = getDb();
+  insertMediaFile(db, projectId, fileData, userId);
+}
+
+/**
+ * Delete a single media file by ID. Cascade handles sizes + usage.
+ * @param {string} fileId
+ * @returns {boolean} True if a row was deleted
+ */
+export function deleteMediaFile(fileId) {
+  const db = getDb();
+  const result = db.prepare("DELETE FROM media_files WHERE id = ?").run(fileId);
+  return result.changes > 0;
+}
+
+/**
+ * Delete multiple media files by IDs in a single statement.
+ * @param {string[]} fileIds
+ * @returns {number} Number of rows deleted
+ */
+export function deleteMediaFiles(fileIds) {
+  if (fileIds.length === 0) return 0;
+  const db = getDb();
+  const placeholders = fileIds.map(() => "?").join(",");
+  const result = db.prepare(`DELETE FROM media_files WHERE id IN (${placeholders})`).run(...fileIds);
+  return result.changes;
+}
+
+/**
+ * Update metadata (alt, title) for a single media file.
+ * @param {string} fileId
+ * @param {{ alt?: string, title?: string, description?: string }} metadata
+ * @returns {boolean} True if a row was updated
+ */
+export function updateFileMetadata(fileId, metadata) {
+  const db = getDb();
+  const result = db.prepare(
+    "UPDATE media_files SET alt = @alt, title = @title WHERE id = @id"
+  ).run({
+    id: fileId,
+    alt: metadata.alt ?? "",
+    title: metadata.title ?? "",
+  });
+  return result.changes > 0;
+}
+
+/**
+ * Replace all media_usage entries for a project in one transaction.
+ * Only touches the media_usage table — does NOT delete/reinsert media_files or media_sizes.
+ * Used by refreshAllMediaUsage which rebuilds all usage from scratch.
+ * @param {string} projectId
+ * @param {Map<string, string[]>} usageMap - Map of fileId → array of usedIn strings
+ */
+export function replaceMediaUsage(projectId, usageMap) {
+  const db = getDb();
+  const txn = db.transaction(() => {
+    // Get all file IDs for this project
+    const fileIds = db.prepare("SELECT id FROM media_files WHERE project_id = ?").all(projectId).map((r) => r.id);
+    if (fileIds.length === 0) return;
+
+    // Delete all usage for this project's files
+    const placeholders = fileIds.map(() => "?").join(",");
+    db.prepare(`DELETE FROM media_usage WHERE media_file_id IN (${placeholders})`).run(...fileIds);
+
+    // Re-insert from the usage map
+    const insertUsage = db.prepare("INSERT OR IGNORE INTO media_usage (media_file_id, used_in) VALUES (?, ?)");
+    for (const [fileId, usedInList] of usageMap) {
+      for (const usedIn of usedInList) {
+        insertUsage.run(fileId, usedIn);
+      }
+    }
+  });
+  txn();
+}
+
+/**
+ * Update media_usage for a single source (page, global widget, theme settings) in one transaction.
+ * Removes all usage rows with this sourceId for the project's files, then re-inserts for the given fileIds.
+ * Safe for parallel calls with different sourceIds since each only touches its own rows.
+ * @param {string} projectId
+ * @param {string} sourceId - The usage source (page slug, "global:header", "global:theme-settings", etc.)
+ * @param {string[]} fileIds - File IDs that should have this sourceId in their usedIn
+ */
+export function updateMediaUsageForSource(projectId, sourceId, fileIds) {
+  const db = getDb();
+  const txn = db.transaction(() => {
+    // Get all file IDs for this project
+    const allFileIds = db.prepare("SELECT id FROM media_files WHERE project_id = ?").all(projectId).map((r) => r.id);
+    if (allFileIds.length === 0) return;
+
+    // Delete only usage rows matching this sourceId for this project's files
+    const placeholders = allFileIds.map(() => "?").join(",");
+    db.prepare(
+      `DELETE FROM media_usage WHERE used_in = ? AND media_file_id IN (${placeholders})`
+    ).run(sourceId, ...allFileIds);
+
+    // Re-insert for the specific files that reference this source
+    const insertUsage = db.prepare("INSERT OR IGNORE INTO media_usage (media_file_id, used_in) VALUES (?, ?)");
+    for (const fileId of fileIds) {
+      insertUsage.run(fileId, sourceId);
+    }
+  });
+  txn();
+}
+
+// ==========================================
 // Internal helpers
 // ==========================================
 
 /**
- * Add a new media file with its sizes.
+ * Insert a media file row and its sizes. Used by both addMediaFile and writeMediaData.
+ * @param {import('better-sqlite3').Database} db
  * @param {string} projectId
- * @param {object} fileData - File info from controller
+ * @param {object} fileData
+ * @param {string} userId
  */
-function addMediaFile(projectId, fileData) {
-  const db = getDb();
-  const txn = db.transaction(() => {
-    db.prepare(`
-      INSERT INTO media_files (id, project_id, filename, original_name, type, size, uploaded, path, alt, title, width, height)
-      VALUES (@id, @projectId, @filename, @originalName, @type, @size, @uploaded, @path, @alt, @title, @width, @height)
-    `).run({
-      id: fileData.id,
-      projectId,
-      filename: fileData.filename || "",
-      originalName: fileData.originalName || fileData.filename || "",
-      type: fileData.type || "",
-      size: fileData.size || 0,
-      uploaded: fileData.uploaded || new Date().toISOString(),
-      path: fileData.path || "",
-      alt: fileData.metadata?.alt || "",
-      title: fileData.metadata?.title || "",
-      width: fileData.width || null,
-      height: fileData.height || null,
-    });
-
-    // Insert sizes
-    if (fileData.sizes) {
-      const insertSize = db.prepare(`
-        INSERT INTO media_sizes (media_file_id, size_name, path, width, height)
-        VALUES (@mediaFileId, @sizeName, @path, @width, @height)
-      `);
-      for (const [sizeName, sizeData] of Object.entries(fileData.sizes)) {
-        if (sizeData && sizeData.path) {
-          insertSize.run({
-            mediaFileId: fileData.id,
-            sizeName,
-            path: sizeData.path,
-            width: sizeData.width,
-            height: sizeData.height,
-          });
-        }
-      }
-    }
+function insertMediaFile(db, projectId, fileData, userId = "local") {
+  db.prepare(`
+    INSERT INTO media_files (id, project_id, user_id, filename, original_name, type, size, uploaded, path, alt, title, width, height)
+    VALUES (@id, @projectId, @userId, @filename, @originalName, @type, @size, @uploaded, @path, @alt, @title, @width, @height)
+  `).run({
+    id: fileData.id,
+    projectId,
+    userId,
+    filename: fileData.filename || "",
+    originalName: fileData.originalName || fileData.filename || "",
+    type: fileData.type || "",
+    size: fileData.size || 0,
+    uploaded: fileData.uploaded || new Date().toISOString(),
+    path: fileData.path || "",
+    alt: fileData.metadata?.alt || "",
+    title: fileData.metadata?.title || "",
+    width: fileData.width || null,
+    height: fileData.height || null,
   });
 
-  txn();
+  // Insert sizes
+  if (fileData.sizes) {
+    const insertSize = db.prepare(`
+      INSERT INTO media_sizes (media_file_id, size_name, path, width, height)
+      VALUES (@mediaFileId, @sizeName, @path, @width, @height)
+    `);
+    for (const [sizeName, sizeData] of Object.entries(fileData.sizes)) {
+      if (sizeData && sizeData.path) {
+        insertSize.run({
+          mediaFileId: fileData.id,
+          sizeName,
+          path: sizeData.path,
+          width: sizeData.width,
+          height: sizeData.height,
+        });
+      }
+    }
+  }
 }
 
 /**

@@ -299,6 +299,46 @@ for (const userId of TEST_USER_IDS) {
         await updateAppSettings(req, res);
         assert.equal(res._status, 400);
       });
+
+      it("deep merges: partial section preserves sibling nested keys", async () => {
+        // Update only language — dateFormat should survive
+        const res = await callController(updateAppSettings, {
+          body: { general: { language: "de" } },
+          userId,
+        });
+        assert.equal(res._status, 200);
+        const saved = await readAppSettingsFile(userId);
+        assert.equal(saved.general.language, "de");
+        assert.equal(saved.general.dateFormat, "MM/DD/YYYY");
+      });
+
+      it("deep merges: partial media update preserves imageProcessing", async () => {
+        // Update only maxFileSizeMB — imageProcessing should survive
+        const res = await callController(updateAppSettings, {
+          body: { media: { maxFileSizeMB: 20 } },
+          userId,
+        });
+        assert.equal(res._status, 200);
+        const saved = await readAppSettingsFile(userId);
+        assert.equal(saved.media.maxFileSizeMB, 20);
+        assert.equal(saved.media.imageProcessing.quality, 85);
+        assert.equal(saved.media.imageProcessing.sizes.thumb.width, 150);
+      });
+
+      it("deep merges: updating nested key preserves siblings at same level", async () => {
+        // Update only thumb width — other sizes should survive
+        const res = await callController(updateAppSettings, {
+          body: { media: { imageProcessing: { sizes: { thumb: { width: 200 } } } } },
+          userId,
+        });
+        assert.equal(res._status, 200);
+        const saved = await readAppSettingsFile(userId);
+        assert.equal(saved.media.imageProcessing.sizes.thumb.width, 200);
+        assert.equal(saved.media.imageProcessing.sizes.thumb.enabled, true);
+        assert.equal(saved.media.imageProcessing.sizes.small.width, 480);
+        assert.equal(saved.media.imageProcessing.sizes.large.width, 1920);
+        assert.equal(saved.media.imageProcessing.quality, 85);
+      });
     });
 
     // ========================================================================

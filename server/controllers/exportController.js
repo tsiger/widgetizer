@@ -8,7 +8,7 @@ import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
 import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
-import { readProjectsFile } from "./projectController.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
 import { formatHtml, formatXml, validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
 import TurndownService from "turndown";
 import * as exportRepo from "../db/repositories/exportRepository.js";
@@ -43,7 +43,7 @@ function resolveOutputDir(outputDir, userId = "local") {
 
 // Helper function to record an export and trim old versions
 async function recordExport(projectId, version, outputDir, status = "success", userId = "local") {
-  const exportRecord = exportRepo.recordExport(projectId, version, outputDir, status);
+  const exportRecord = exportRepo.recordExport(projectId, version, outputDir, status, userId);
 
   // Get the max exports setting from app settings
   let maxExports = 10; // default
@@ -135,9 +135,8 @@ export async function exportProjectToDir(projectId, userId = "local", options = 
     throw new Error("Project ID is required");
   }
 
-  // Read projects file to resolve UUID to folderName (slug) for filesystem paths
-  const projectsData = await readProjectsFile(userId);
-  const projectData = projectsData.projects.find((p) => p.id === projectId);
+  // Look up the project by UUID to get folderName (slug) for filesystem paths
+  const projectData = projectRepo.getProjectById(projectId, userId);
 
   if (!projectData) {
     throw new Error(`Project with ID "${projectId}" not found`);

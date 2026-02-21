@@ -41,7 +41,7 @@ console.error = () => {};
 
 const { getProjectDir, getProjectThemeJsonPath, getThemeDir } = await import("../config.js");
 
-const { writeProjectsFile, readProjectsFile } = await import("../controllers/projectController.js");
+const projectRepo = await import("../db/repositories/projectRepository.js");
 const { buildLatestSnapshot } = await import("../controllers/themeController.js");
 const { checkForUpdates, applyThemeUpdate, mergeThemeSettings, toggleThemeUpdates } =
   await import("../services/themeUpdateService.js");
@@ -157,7 +157,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
      * Create a project with a given theme version.
      */
     async function createProject(themeVersion) {
-      await writeProjectsFile(
+      await projectRepo.writeProjectsData(
         {
           projects: [
             {
@@ -263,7 +263,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
       it("handles missing theme gracefully", async () => {
         // Create project referencing a theme that doesn't exist on disk
-        await writeProjectsFile(
+        await projectRepo.writeProjectsData(
           {
             projects: [
               {
@@ -287,7 +287,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
       it("throws for nonexistent project", async () => {
         // Create valid projects.json but without the target project
-        await writeProjectsFile({ projects: [], activeProjectId: null }, TEST_USER_ID);
+        await projectRepo.writeProjectsData({ projects: [], activeProjectId: null }, TEST_USER_ID);
 
         await assert.rejects(
           () => checkForUpdates("nonexistent-uuid", TEST_USER_ID),
@@ -444,7 +444,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
         await applyThemeUpdate(PROJECT_ID, TEST_USER_ID);
 
-        const projectsData = await readProjectsFile(TEST_USER_ID);
+        const projectsData = await projectRepo.readProjectsData(TEST_USER_ID);
         const project = projectsData.projects.find((p) => p.id === PROJECT_ID);
         assert.equal(project.themeVersion, "1.1.0");
         assert.ok(project.lastThemeUpdateAt, "Should record update timestamp");
@@ -588,7 +588,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.ok(result.success);
         assert.equal(result.receiveThemeUpdates, true);
 
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         const project = data.projects.find((p) => p.id === PROJECT_ID);
         assert.equal(project.receiveThemeUpdates, true);
       });
@@ -598,7 +598,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.ok(result.success);
         assert.equal(result.receiveThemeUpdates, false);
 
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         const project = data.projects.find((p) => p.id === PROJECT_ID);
         assert.equal(project.receiveThemeUpdates, false);
       });

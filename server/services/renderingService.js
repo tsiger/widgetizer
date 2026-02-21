@@ -3,9 +3,9 @@ import fs from "fs/promises";
 import path from "path";
 import { getProjectDir, CORE_WIDGETS_DIR } from "../config.js";
 // TODO: Controllers shouldn't ideally be imported into services.
-// Consider moving readProjectsFile/readMediaFile to a shared module.
+// Consider moving readMediaFile to a shared module.
 import { readMediaFile } from "../controllers/mediaController.js";
-import { readProjectsFile } from "../controllers/projectController.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
 import { listProjectPagesData } from "../controllers/pageController.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -94,10 +94,9 @@ function configureLiquidEngine(engine) {
 /**
  * Helper function to get project data by ID
  */
-async function getProjectData(projectId, userId) {
+function getProjectData(projectId, userId) {
   try {
-    const projectsData = await readProjectsFile(userId);
-    return projectsData.projects.find((p) => p.id === projectId) || null;
+    return projectRepo.getProjectById(projectId, userId) || null;
   } catch (error) {
     console.warn(`Could not load project data for ${projectId}: ${error.message}`);
     return null;

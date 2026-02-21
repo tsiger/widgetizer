@@ -53,7 +53,7 @@ const {
   getThemeDir,
 } = await import("../config.js");
 
-const { writeProjectsFile } = await import("../controllers/projectController.js");
+const projectRepo = await import("../db/repositories/projectRepository.js");
 
 const {
   readMediaFile,
@@ -200,7 +200,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
     before(async () => {
       // Write projects.json
-      await writeProjectsFile(
+      await projectRepo.writeProjectsData(
         {
           projects: [
             {

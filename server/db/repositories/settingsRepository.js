@@ -1,5 +1,29 @@
 import { getDb } from "../index.js";
 
+/**
+ * Deep merge two plain objects. Source values override target values.
+ * Arrays and non-plain-objects are replaced, not merged.
+ * @param {object} target
+ * @param {object} source
+ * @returns {object} New merged object
+ */
+export function deepMerge(target, source) {
+  const result = { ...target };
+  for (const key of Object.keys(source)) {
+    const srcVal = source[key];
+    const tgtVal = target[key];
+    if (
+      srcVal && typeof srcVal === "object" && !Array.isArray(srcVal) &&
+      tgtVal && typeof tgtVal === "object" && !Array.isArray(tgtVal)
+    ) {
+      result[key] = deepMerge(tgtVal, srcVal);
+    } else {
+      result[key] = srcVal;
+    }
+  }
+  return result;
+}
+
 // Default settings — same as appSettingsController.js
 const defaultSettings = {
   general: {
@@ -46,13 +70,13 @@ function settingsKey(userId) {
 export function getSettings(userId = "local") {
   const db = getDb();
   const row = db.prepare("SELECT value FROM app_settings WHERE key = ?").get(settingsKey(userId));
-  if (!row || !row.value) return { ...defaultSettings };
+  if (!row || !row.value) return deepMerge({}, defaultSettings);
 
   try {
     const loaded = JSON.parse(row.value);
-    return { ...defaultSettings, ...loaded };
+    return deepMerge(defaultSettings, loaded);
   } catch {
-    return { ...defaultSettings };
+    return deepMerge({}, defaultSettings);
   }
 }
 

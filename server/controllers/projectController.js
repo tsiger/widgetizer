@@ -14,10 +14,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { isNewerVersion } from "../utils/semver.js";
-import {
-  readProjectsData,
-  writeProjectsData,
-} from "../db/repositories/projectRepository.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
@@ -33,24 +30,6 @@ async function ensureDirectories(userId = "local") {
 }
 
 /**
- * Reads the projects metadata from SQLite.
- * @param {string} userId
- * @returns {Promise<{projects: Array<object>, activeProjectId: string|null}>}
- */
-export async function readProjectsFile(userId = "local") {
-  return readProjectsData(userId);
-}
-
-/**
- * Writes the projects metadata to SQLite.
- * @param {{projects: Array<object>, activeProjectId: string|null}} data
- * @param {string} userId
- */
-export async function writeProjectsFile(data, userId = "local") {
-  writeProjectsData(data, userId);
-}
-
-/**
  * Retrieves all projects with enriched metadata including theme update status.
  * @param {import('express').Request} _ - Express request object (unused)
  * @param {import('express').Response} res - Express response object
@@ -59,11 +38,11 @@ export async function writeProjectsFile(data, userId = "local") {
 export async function getAllProjects(req, res) {
   try {
     await ensureDirectories(req.userId);
-    const data = await readProjectsFile(req.userId);
+    const projects = projectRepo.getAllProjects(req.userId);
 
     // Enrich projects with hasThemeUpdate flag and theme display name
     const enrichedProjects = await Promise.all(
-      data.projects.map(async (project) => {
+      projects.map(async (project) => {
         let hasThemeUpdate = false;
         let themeName = project.theme; // Fallback to folder ID
 
@@ -110,13 +89,8 @@ export async function getAllProjects(req, res) {
  */
 export async function getActiveProject(req, res) {
   try {
-    // Read the projects file
-    const data = await readProjectsFile(req.userId);
-
-    // Find the active project
-    const activeProject = data.projects.find((p) => p.id === data.activeProjectId);
-
-    // Return the active project or null if no active project
+    const activeProjectId = projectRepo.getActiveProjectId(req.userId);
+    const activeProject = activeProjectId ? projectRepo.getProjectById(activeProjectId, req.userId) : null;
     res.json(activeProject || null);
   } catch (error) {
     console.error("Error getting active project:", error);
@@ -140,11 +114,8 @@ export async function createProject(req, res) {
       return res.status(400).json({ error: "Project name is required." });
     }
 
-    const data = await readProjectsFile(req.userId);
-
     // Check for duplicate project names
-    const duplicateName = data.projects.find((p) => p.name.toLowerCase() === name.trim().toLowerCase());
-    if (duplicateName) {
+    if (projectRepo.projectNameExists(name.trim(), null, req.userId)) {
       return res
         .status(400)
         .json({ error: `A project named "${name}" already exists. Please choose a different name.` });
@@ -160,15 +131,15 @@ export async function createProject(req, res) {
         return res.status(400).json({ error: "Folder Name can only contain lowercase letters, numbers, and hyphens" });
       }
       // Check for duplicate folderNames
-      const duplicateFolderName = data.projects.find((p) => p.folderName === folderName);
-      if (duplicateFolderName) {
+      if (projectRepo.projectFolderExists(folderName, null, req.userId)) {
         return res.status(400).json({
           error: `A project with folder name "${folderName}" already exists. Please choose a different folder name.`,
         });
       }
     } else {
       // Generate folderName from name if not provided
-      folderName = await generateUniqueSlug(name, (slug) => data.projects.some((p) => p.id === slug), { fallback: "project" });
+      const allProjects = projectRepo.getAllProjects(req.userId);
+      folderName = await generateUniqueSlug(name, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
     }
 
     // Use the permanent folderName for directory creation
@@ -270,13 +241,14 @@ export async function createProject(req, res) {
     }
 
     // Track if we're setting this as active (only happens if no active project exists)
-    const wasFirstProject = data.projects.length === 0;
+    const currentActiveId = projectRepo.getActiveProjectId(req.userId);
+    const wasFirstProject = !currentActiveId;
 
-    data.projects.push(newProject);
-    if (!data.activeProjectId) {
-      data.activeProjectId = newProject.id;
+    newProject.userId = req.userId;
+    projectRepo.createProject(newProject);
+    if (!currentActiveId) {
+      projectRepo.setActiveProjectId(newProject.id, req.userId);
     }
-    await writeProjectsFile(data, req.userId);
 
     res.status(201).json({
       ...newProject,
@@ -297,14 +269,13 @@ export async function createProject(req, res) {
 export async function setActiveProject(req, res) {
   try {
     const { id } = req.params;
-    const data = await readProjectsFile(req.userId);
+    const project = projectRepo.getProjectById(id, req.userId);
 
-    if (!data.projects.some((p) => p.id === id)) {
+    if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    data.activeProjectId = id;
-    await writeProjectsFile(data, req.userId);
+    projectRepo.setActiveProjectId(id, req.userId);
 
     res.json({ success: true });
   } catch (error) {
@@ -329,30 +300,21 @@ export async function updateProject(req, res) {
       return res.status(400).json({ error: "Project name is required." });
     }
 
-    const data = await readProjectsFile(req.userId);
-
-    const projectIndex = data.projects.findIndex((p) => p.id === id);
-    if (projectIndex === -1) {
+    const currentProject = projectRepo.getProjectById(id, req.userId);
+    if (!currentProject) {
       return res.status(404).json({ error: "Project not found" });
     }
-
-    const currentProject = data.projects[projectIndex];
 
     const currentFolderName = currentProject.folderName;
 
     // Check for duplicate project names (excluding current project)
     if (updates.name && updates.name.trim() !== currentProject.name) {
-      const duplicateName = data.projects.find(
-        (p) => p.id !== id && p.name.toLowerCase() === updates.name.trim().toLowerCase(),
-      );
-      if (duplicateName) {
+      if (projectRepo.projectNameExists(updates.name.trim(), id, req.userId)) {
         return res
           .status(400)
           .json({ error: `A project named "${updates.name}" already exists. Please choose a different name.` });
       }
     }
-
-    let updatedProject = { ...currentProject };
 
     // Check if folderName is being updated and if it would be different
     if (updates.folderName && updates.folderName.trim() !== currentFolderName) {
@@ -365,10 +327,7 @@ export async function updateProject(req, res) {
       }
 
       // Check for duplicate folderNames (excluding current project)
-      const duplicateFolderName = data.projects.find(
-        (p) => p.id !== id && p.folderName === newFolderName,
-      );
-      if (duplicateFolderName) {
+      if (projectRepo.projectFolderExists(newFolderName, id, req.userId)) {
         return res.status(400).json({
           error: `A project with folder name "${newFolderName}" already exists. Please choose a different folder name.`,
         });
@@ -396,29 +355,19 @@ export async function updateProject(req, res) {
       }
     }
 
-    // Update the project data
-    updatedProject = {
-      ...updatedProject,
-      id: id, // ID never changes
-      folderName: updates.folderName || currentFolderName, // Ensure folderName is always set
-      name: updates.name || updatedProject.name,
-      description: updates.description !== undefined ? updates.description : updatedProject.description,
-      siteUrl:
-        updates.siteUrl !== undefined
-          ? updates.siteUrl && updates.siteUrl.trim() !== ""
-            ? stripHtmlTags(updates.siteUrl.trim())
-            : ""
-          : updatedProject.siteUrl,
-      // Theme update preferences
-      receiveThemeUpdates:
-        updates.receiveThemeUpdates !== undefined ? updates.receiveThemeUpdates : updatedProject.receiveThemeUpdates,
-      updated: new Date().toISOString(),
-    };
+    // Sanitize siteUrl if provided
+    const sanitizedSiteUrl = updates.siteUrl !== undefined
+      ? (updates.siteUrl && updates.siteUrl.trim() !== "" ? stripHtmlTags(updates.siteUrl.trim()) : "")
+      : undefined;
 
-    // Replace the project in the array
-    data.projects[projectIndex] = updatedProject;
+    const updatedProject = projectRepo.updateProject(id, {
+      folderName: updates.folderName || currentFolderName,
+      name: updates.name,
+      description: updates.description,
+      siteUrl: sanitizedSiteUrl,
+      receiveThemeUpdates: updates.receiveThemeUpdates,
+    }, req.userId);
 
-    await writeProjectsFile(data, req.userId);
     res.json(updatedProject);
   } catch (error) {
     console.error("Error updating project:", error);
@@ -435,19 +384,17 @@ export async function updateProject(req, res) {
 export async function deleteProject(req, res) {
   try {
     const { id } = req.params;
-    const data = await readProjectsFile(req.userId);
+    const project = projectRepo.getProjectById(id, req.userId);
 
-    const projectIndex = data.projects.findIndex((p) => p.id === id);
-    if (projectIndex === -1) {
+    if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    const project = data.projects[projectIndex];
     const projectName = project.name;
     const projectFolderName = project.folderName;
 
-    // Clean up all exports for this project BEFORE removing from DB
-    // (writeProjectsFile triggers ON DELETE CASCADE which would delete export records first)
+    // Clean up all export files for this project BEFORE removing from DB
+    // (deleteProject triggers ON DELETE CASCADE which would delete export records)
     try {
       const { cleanupProjectExports } = await import("./exportController.js");
       await cleanupProjectExports(id, req.userId);
@@ -456,22 +403,25 @@ export async function deleteProject(req, res) {
       // Don't fail the project deletion if export cleanup fails
     }
 
-    // Remove from array AFTER we've captured the data we need
-    data.projects.splice(projectIndex, 1);
-    if (data.activeProjectId === id) {
-      data.activeProjectId = data.projects[0]?.id || null;
+    // Delete from DB (cascades to media_files, exports, etc.)
+    projectRepo.deleteProject(id, req.userId);
+
+    // Update active project if needed
+    let newActiveProjectId = projectRepo.getActiveProjectId(req.userId);
+    if (newActiveProjectId === id || !newActiveProjectId) {
+      const remainingProjects = projectRepo.getAllProjects(req.userId);
+      newActiveProjectId = remainingProjects[0]?.id || null;
+      projectRepo.setActiveProjectId(newActiveProjectId, req.userId);
     }
 
-    await writeProjectsFile(data, req.userId);
-
-    // Delete project directory using the folderName we captured earlier
+    // Delete project directory
     const projectDir = getProjectDir(projectFolderName, req.userId);
     await fs.remove(projectDir);
 
     res.json({
       success: true,
       message: `Project "${projectName}" and all associated files have been deleted successfully`,
-      activeProjectId: data.activeProjectId,
+      activeProjectId: newActiveProjectId,
     });
   } catch (error) {
     console.error("Error deleting project:", error);
@@ -488,34 +438,32 @@ export async function deleteProject(req, res) {
 export async function duplicateProject(req, res) {
   try {
     const originalProjectId = req.params.id;
-    const data = await readProjectsFile(req.userId);
+    const originalProject = projectRepo.getProjectById(originalProjectId, req.userId);
 
-    // Find the original project
-    const originalProject = data.projects.find((p) => p.id === originalProjectId);
     if (!originalProject) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    const newName = generateCopyName(originalProject.name, data.projects.map((p) => p.name));
-    const newFolderName = await generateUniqueSlug(newName, (slug) => data.projects.some((p) => p.id === slug), { fallback: "project" });
+    const allProjects = projectRepo.getAllProjects(req.userId);
+    const newName = generateCopyName(originalProject.name, allProjects.map((p) => p.name));
+    const newFolderName = await generateUniqueSlug(newName, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
 
     // Create the new project metadata
     const newProject = {
       ...originalProject,
-      id: uuidv4(), // ✅ Generate new stable UUID
-      folderName: newFolderName, // Permanent folder identifier
-      slug: undefined, // Clear legacy slug
+      id: uuidv4(),
+      folderName: newFolderName,
+      slug: undefined,
       name: newName,
-      // Preserve theme info from original
       theme: originalProject.theme,
       themeVersion: originalProject.themeVersion,
       receiveThemeUpdates: originalProject.receiveThemeUpdates || false,
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
+      userId: req.userId,
     };
 
     // Copy the entire project directory
-    // Use folderName for directory path, not ID
     const originalFolderName = originalProject.folderName;
     const originalDir = getProjectDir(originalFolderName, req.userId);
     const newDir = getProjectDir(newFolderName, req.userId);
@@ -529,21 +477,18 @@ export async function duplicateProject(req, res) {
         console.warn(`[ProjectController] Failed to update UUIDs in cloned project: ${uuidUpdateError.message}`);
       }
     } catch (copyError) {
-      // If copy fails, clean up and throw error
       try {
         await fs.remove(newDir);
       } catch (cleanupError) {
         console.warn(
           `[ProjectController] Failed to clean up new directory after copy failure: ${cleanupError.message}`,
         );
-        // Silently handle cleanup errors
       }
       throw new Error(`Failed to copy project files: ${copyError.message}`);
     }
 
-    // Add the new project to the list
-    data.projects.push(newProject);
-    await writeProjectsFile(data, req.userId);
+    // Save new project to DB
+    projectRepo.createProject(newProject);
 
     // Copy media metadata from original project to the duplicate in SQLite
     try {
@@ -553,11 +498,10 @@ export async function duplicateProject(req, res) {
         for (const file of originalMedia.files) {
           file.id = uuidv4();
         }
-        mediaRepo.writeMediaData(newProject.id, originalMedia);
+        mediaRepo.writeMediaData(newProject.id, originalMedia, req.userId);
       }
     } catch (mediaError) {
       console.warn("Could not duplicate media metadata:", mediaError.message);
-      // Non-fatal: duplicated project files exist on disk
     }
 
     res.status(201).json(newProject);
@@ -577,10 +521,7 @@ export async function getProjectWidgets(req, res) {
   try {
     const { projectId } = req.params;
 
-    // Need to look up project to get the slug/folder name
-    const data = await readProjectsFile(req.userId);
-    const project = data.projects.find((p) => p.id === projectId);
-
+    const project = projectRepo.getProjectById(projectId, req.userId);
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
@@ -688,10 +629,7 @@ export async function getProjectIcons(req, res) {
   try {
     const { projectId } = req.params;
 
-    // Need to look up project to get the folderName/folder name
-    const data = await readProjectsFile(req.userId);
-    const project = data.projects.find((p) => p.id === projectId);
-
+    const project = projectRepo.getProjectById(projectId, req.userId);
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
@@ -724,8 +662,7 @@ export async function getProjectIcons(req, res) {
 export async function exportProject(req, res) {
   try {
     const { projectId } = req.params;
-    const data = await readProjectsFile(req.userId);
-    const project = data.projects.find((p) => p.id === projectId);
+    const project = projectRepo.getProjectById(projectId, req.userId);
 
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
@@ -957,11 +894,9 @@ export async function importProject(req, res) {
       });
     }
 
-    // Read projects file
-    const data = await readProjectsFile(req.userId);
-
-    // Generate unique folderName (checking both projects.json and existing directories)
-    let folderName = await generateUniqueSlug(manifest.project.name, (slug) => data.projects.some((p) => p.id === slug), { fallback: "project" });
+    // Generate unique folderName (checking DB and existing directories)
+    const allProjects = projectRepo.getAllProjects(req.userId);
+    let folderName = await generateUniqueSlug(manifest.project.name, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
 
     // Also check if directory already exists and generate unique name if needed
     let projectDir = getProjectDir(folderName, req.userId);
@@ -1045,9 +980,9 @@ export async function importProject(req, res) {
         throw new Error("No files were copied to project directory");
       }
 
-      // Only add project to projects.json AFTER successful file copy
-      data.projects.push(newProject);
-      await writeProjectsFile(data, req.userId);
+      // Only add project to DB AFTER successful file copy
+      newProject.userId = req.userId;
+      projectRepo.createProject(newProject);
 
       // Restore media metadata from the exported media.json into SQLite
       const mediaJsonPath = path.join(projectDir, "uploads", "media.json");
@@ -1060,7 +995,7 @@ export async function importProject(req, res) {
             for (const file of mediaData.files) {
               file.id = uuidv4();
             }
-            mediaRepo.writeMediaData(newProject.id, mediaData);
+            mediaRepo.writeMediaData(newProject.id, mediaData, req.userId);
           }
           // Remove the media.json file — metadata now lives in SQLite
           await fs.remove(mediaJsonPath);
@@ -1080,17 +1015,12 @@ export async function importProject(req, res) {
         widgetizerVersion: manifest.widgetizerVersion,
       });
     } catch (error) {
-      // Clean up on error - remove project from projects.json if it was added
+      // Clean up on error - remove project from DB if it was added
       if (newProject) {
         try {
-          const currentData = await readProjectsFile(req.userId);
-          const projectIndex = currentData.projects.findIndex((p) => p.id === newProject.id);
-          if (projectIndex !== -1) {
-            currentData.projects.splice(projectIndex, 1);
-            await writeProjectsFile(currentData, req.userId);
-          }
+          projectRepo.deleteProject(newProject.id, req.userId);
         } catch (cleanupError) {
-          console.warn("Failed to remove project from projects.json after error:", cleanupError);
+          console.warn("Failed to remove project from DB after error:", cleanupError);
         }
       }
 

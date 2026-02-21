@@ -57,7 +57,7 @@ const {
   CORE_WIDGETS_DIR,
 } = await import("../config.js");
 
-const { writeProjectsFile, readProjectsFile } = await import("../controllers/projectController.js");
+const projectRepo = await import("../db/repositories/projectRepository.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
 const { exportProject, cleanupProjectExports, getExportFiles, downloadExport, getExportHistory, deleteExport } =
   await import("../controllers/exportController.js");
@@ -182,7 +182,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
       // -----------------------------------------------------------
       // 1. projects.json with test project
       // -----------------------------------------------------------
-      await writeProjectsFile(
+      await projectRepo.writeProjectsData(
         {
           projects: [
             {
@@ -769,7 +769,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         // Create a temporary project with no index page
         const tempProjectId = `no-index-project-uuid-${TEST_USER_ID}`;
         const tempFolder = `no-index-project-${TEST_USER_ID}`;
-        const currentData = await readProjectsFile(TEST_USER_ID);
+        const currentData = await projectRepo.readProjectsData(TEST_USER_ID);
         currentData.projects.push({
           id: tempProjectId,
           folderName: tempFolder,
@@ -778,7 +778,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
           siteUrl: "",
           created: new Date().toISOString(),
         });
-        await writeProjectsFile(currentData, TEST_USER_ID);
+        await projectRepo.writeProjectsData(currentData, TEST_USER_ID);
 
         const projDir = getProjectDir(tempFolder, TEST_USER_ID);
         const pagesDir = getProjectPagesDir(tempFolder, TEST_USER_ID);
@@ -805,9 +805,9 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
         // Cleanup
         await fs.remove(projDir);
-        const data2 = await readProjectsFile(TEST_USER_ID);
+        const data2 = await projectRepo.readProjectsData(TEST_USER_ID);
         data2.projects = data2.projects.filter((p) => p.id !== tempProjectId);
-        await writeProjectsFile(data2, TEST_USER_ID);
+        await projectRepo.writeProjectsData(data2, TEST_USER_ID);
       });
     });
 
@@ -822,7 +822,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
       before(async () => {
         await cleanExportHistory();
 
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         data.projects.push({
           id: NO_URL_ID,
           folderName: NO_URL_FOLDER,
@@ -831,7 +831,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
           siteUrl: "", // No site URL
           created: new Date().toISOString(),
         });
-        await writeProjectsFile(data, TEST_USER_ID);
+        await projectRepo.writeProjectsData(data, TEST_USER_ID);
 
         const projDir = getProjectDir(NO_URL_FOLDER, TEST_USER_ID);
         const pagesDir = getProjectPagesDir(NO_URL_FOLDER, TEST_USER_ID);
@@ -860,9 +860,9 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
       after(async () => {
         await fs.remove(getProjectDir(NO_URL_FOLDER, TEST_USER_ID));
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         data.projects = data.projects.filter((p) => p.id !== NO_URL_ID);
-        await writeProjectsFile(data, TEST_USER_ID);
+        await projectRepo.writeProjectsData(data, TEST_USER_ID);
       });
 
       it("exports successfully without sitemap or robots.txt", async () => {
@@ -1156,7 +1156,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         await cleanExportHistory();
 
         // Create a separate project for cleanup tests
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         data.projects.push({
           id: CLEANUP_ID,
           folderName: CLEANUP_FOLDER,
@@ -1165,7 +1165,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
           siteUrl: "",
           created: new Date().toISOString(),
         });
-        await writeProjectsFile(data, TEST_USER_ID);
+        await projectRepo.writeProjectsData(data, TEST_USER_ID);
 
         const projDir = getProjectDir(CLEANUP_FOLDER, TEST_USER_ID);
         const pagesDir = getProjectPagesDir(CLEANUP_FOLDER, TEST_USER_ID);
@@ -1195,9 +1195,9 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
       after(async () => {
         await fs.remove(getProjectDir(CLEANUP_FOLDER, TEST_USER_ID));
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         data.projects = data.projects.filter((p) => p.id !== CLEANUP_ID);
-        await writeProjectsFile(data, TEST_USER_ID);
+        await projectRepo.writeProjectsData(data, TEST_USER_ID);
       });
 
       it("removes all export directories for a project", async () => {
@@ -1292,7 +1292,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
       before(async () => {
         await cleanExportHistory();
 
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         data.projects.push({
           id: HOME_SLUG_ID,
           folderName: HOME_SLUG_FOLDER,
@@ -1301,7 +1301,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
           siteUrl: "",
           created: new Date().toISOString(),
         });
-        await writeProjectsFile(data, TEST_USER_ID);
+        await projectRepo.writeProjectsData(data, TEST_USER_ID);
 
         const projDir = getProjectDir(HOME_SLUG_FOLDER, TEST_USER_ID);
         const pagesDir = getProjectPagesDir(HOME_SLUG_FOLDER, TEST_USER_ID);
@@ -1338,9 +1338,9 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
       after(async () => {
         await fs.remove(getProjectDir(HOME_SLUG_FOLDER, TEST_USER_ID));
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         data.projects = data.projects.filter((p) => p.id !== HOME_SLUG_ID);
-        await writeProjectsFile(data, TEST_USER_ID);
+        await projectRepo.writeProjectsData(data, TEST_USER_ID);
       });
 
       it("'home' slug produces index.html (same as 'index')", async () => {
@@ -1370,7 +1370,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         // Create a project that references a non-existent theme
         const badId = `bad-theme-${TEST_USER_ID}-uuid`;
         const badFolder = `bad-theme-${TEST_USER_ID}-project`;
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         data.projects.push({
           id: badId,
           folderName: badFolder,
@@ -1379,7 +1379,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
           siteUrl: "",
           created: new Date().toISOString(),
         });
-        await writeProjectsFile(data, TEST_USER_ID);
+        await projectRepo.writeProjectsData(data, TEST_USER_ID);
 
         const projDir = getProjectDir(badFolder, TEST_USER_ID);
         const pagesDir = getProjectPagesDir(badFolder, TEST_USER_ID);
@@ -1402,9 +1402,9 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
         // Cleanup
         await fs.remove(projDir);
-        const data2 = await readProjectsFile(TEST_USER_ID);
+        const data2 = await projectRepo.readProjectsData(TEST_USER_ID);
         data2.projects = data2.projects.filter((p) => p.id !== badId);
-        await writeProjectsFile(data2, TEST_USER_ID);
+        await projectRepo.writeProjectsData(data2, TEST_USER_ID);
       });
     });
   });

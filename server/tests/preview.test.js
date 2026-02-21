@@ -39,7 +39,7 @@ console.error = () => {};
 
 const { getProjectDir, getProjectPagesDir } = await import("../config.js");
 
-const { readProjectsFile, writeProjectsFile } = await import("../controllers/projectController.js");
+const projectRepo = await import("../db/repositories/projectRepository.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
 
 const { getGlobalWidgets, saveGlobalWidget, serveAsset } = await import("../controllers/previewController.js");
@@ -127,7 +127,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
     before(async () => {
       // Write projects data for this user
-      await writeProjectsFile(
+      await projectRepo.writeProjectsData(
         {
           projects: [
             {
@@ -211,14 +211,14 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
       it("returns 404 when no active project", async () => {
         // Temporarily clear active project
-        const original = await readProjectsFile(TEST_USER_ID);
-        await writeProjectsFile({ ...original, activeProjectId: null }, TEST_USER_ID);
+        const original = await projectRepo.readProjectsData(TEST_USER_ID);
+        await projectRepo.writeProjectsData({ ...original, activeProjectId: null }, TEST_USER_ID);
 
         const res = await callController(getGlobalWidgets);
         assert.equal(res._status, 404);
 
         // Restore
-        await writeProjectsFile(original, TEST_USER_ID);
+        await projectRepo.writeProjectsData(original, TEST_USER_ID);
       });
     });
 
@@ -302,8 +302,8 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
       });
 
       it("returns 404 when no active project", async () => {
-        const original = await readProjectsFile(TEST_USER_ID);
-        await writeProjectsFile({ ...original, activeProjectId: null }, TEST_USER_ID);
+        const original = await projectRepo.readProjectsData(TEST_USER_ID);
+        await projectRepo.writeProjectsData({ ...original, activeProjectId: null }, TEST_USER_ID);
 
         const res = await callController(saveGlobalWidget, {
           params: { type: "header" },
@@ -311,7 +311,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         });
         assert.equal(res._status, 404);
 
-        await writeProjectsFile(original, TEST_USER_ID);
+        await projectRepo.writeProjectsData(original, TEST_USER_ID);
       });
     });
 

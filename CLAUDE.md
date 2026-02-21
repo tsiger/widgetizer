@@ -58,7 +58,7 @@ data/                   # Runtime data (gitignored)
 - **SQLite metadata**: projects, media metadata/usage, app settings, export history (`data/widgetizer.db`)
 - **Filesystem content**: pages (`data/projects/<folder>/pages/<slug>.json`), global widgets (`pages/global/header.json`, `footer.json`), menus, theme files, uploaded binaries
 - Repository layer in `server/db/repositories/` (project, media, settings, export)
-- Controllers use compatibility wrappers (`readProjectsFile()`, `readMediaFile()`) that delegate to SQLite repositories
+- Controllers use granular repository functions directly (e.g., `projectRepo.getProjectById()`, `mediaRepo.getMediaFiles()`)
 
 ### Rendering Pipeline
 

@@ -35,6 +35,7 @@ const migrations = [
         CREATE TABLE media_files (
           id TEXT PRIMARY KEY,
           project_id TEXT NOT NULL,
+          user_id TEXT NOT NULL DEFAULT 'local',
           filename TEXT NOT NULL,
           original_name TEXT NOT NULL,
           type TEXT NOT NULL,
@@ -50,6 +51,7 @@ const migrations = [
 
         CREATE INDEX idx_media_project ON media_files(project_id);
         CREATE INDEX idx_media_path ON media_files(project_id, path);
+        CREATE INDEX idx_media_user ON media_files(user_id);
 
         CREATE TABLE media_sizes (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,6 +76,7 @@ const migrations = [
         CREATE TABLE exports (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           project_id TEXT NOT NULL,
+          user_id TEXT NOT NULL DEFAULT 'local',
           version INTEGER NOT NULL,
           timestamp TEXT NOT NULL,
           output_dir TEXT,
@@ -83,6 +86,7 @@ const migrations = [
 
         CREATE INDEX idx_exports_project ON exports(project_id);
         CREATE UNIQUE INDEX idx_exports_project_version ON exports(project_id, version);
+        CREATE INDEX idx_exports_user ON exports(user_id);
       `);
     },
   },

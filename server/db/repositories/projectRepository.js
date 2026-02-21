@@ -130,6 +130,48 @@ export function deleteProject(id, userId = "local") {
 }
 
 /**
+ * Check if a project with the given name already exists for a user.
+ * @param {string} name - Project name (case-insensitive comparison)
+ * @param {string|null} excludeId - Project ID to exclude (for update validation)
+ * @param {string} userId
+ * @returns {boolean}
+ */
+export function projectNameExists(name, excludeId = null, userId = "local") {
+  const db = getDb();
+  if (excludeId) {
+    const row = db.prepare(
+      "SELECT 1 FROM projects WHERE LOWER(name) = LOWER(?) AND id != ? AND user_id = ? LIMIT 1"
+    ).get(name, excludeId, userId);
+    return !!row;
+  }
+  const row = db.prepare(
+    "SELECT 1 FROM projects WHERE LOWER(name) = LOWER(?) AND user_id = ? LIMIT 1"
+  ).get(name, userId);
+  return !!row;
+}
+
+/**
+ * Check if a project with the given folder name already exists for a user.
+ * @param {string} folderName
+ * @param {string|null} excludeId - Project ID to exclude (for update validation)
+ * @param {string} userId
+ * @returns {boolean}
+ */
+export function projectFolderExists(folderName, excludeId = null, userId = "local") {
+  const db = getDb();
+  if (excludeId) {
+    const row = db.prepare(
+      "SELECT 1 FROM projects WHERE folder_name = ? AND id != ? AND user_id = ? LIMIT 1"
+    ).get(folderName, excludeId, userId);
+    return !!row;
+  }
+  const row = db.prepare(
+    "SELECT 1 FROM projects WHERE folder_name = ? AND user_id = ? LIMIT 1"
+  ).get(folderName, userId);
+  return !!row;
+}
+
+/**
  * Get the active project ID for a user.
  * @param {string} userId
  * @returns {string|null}

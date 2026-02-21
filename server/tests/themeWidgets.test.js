@@ -26,7 +26,7 @@ process.env.THEMES_ROOT = path.resolve("themes");
 process.env.NODE_ENV = "test";
 
 const { getProjectDir, getProjectPagesDir, getProjectMenusDir } = await import("../config.js");
-const { writeProjectsFile } = await import("../controllers/projectController.js");
+const projectRepo = await import("../db/repositories/projectRepository.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
 const { renderWidget } = await import("../services/renderingService.js");
 const { closeDb } = await import("../db/index.js");
@@ -94,7 +94,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
     // ========================================================================
 
     before(async () => {
-      await writeProjectsFile(
+      await projectRepo.writeProjectsData(
         {
           projects: [
             {

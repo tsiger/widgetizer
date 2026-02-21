@@ -73,13 +73,14 @@ SQLite does **not** replace project content files. These remain file-based:
 
 ---
 
-## 4. Controller Wrappers
+## 4. Repository Access
 
-Controller-level convenience functions that delegate to SQLite repositories:
+Controllers use repository functions directly:
 
-- `readProjectsFile()` / `writeProjectsFile(data)` — project metadata
-- `readMediaFile(projectId)` / `writeMediaFile(projectId, data)` — media metadata
-- `readAppSettingsFile()` — application settings
+- `projectRepo.getProjectById()`, `createProject()`, `updateProject()`, `deleteProject()` — project metadata
+- `projectRepo.readProjectsData()` / `writeProjectsData()` — bulk read/write (tests only)
+- `readMediaFile(projectId)` / `writeMediaFile(projectId, data)` — media metadata (controller wrappers)
+- `readAppSettingsFile()` — application settings (controller wrapper)
 
 ---
 

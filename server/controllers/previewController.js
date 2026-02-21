@@ -4,7 +4,7 @@ import { getProjectDir } from "../config.js";
 import { getContentType } from "../utils/mimeTypes.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { getSetting } from "../db/repositories/settingsRepository.js";
-import { readProjectsFile } from "./projectController.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
@@ -53,8 +53,7 @@ function injectBaseTag(html) {
  * @returns {Promise<string>} Rendered HTML string
  */
 async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, userId) {
-  const projectsData = await readProjectsFile(userId);
-  const activeProjectId = projectsData.activeProjectId;
+  const activeProjectId = projectRepo.getActiveProjectId(userId);
 
   if (!activeProjectId) {
     throw Object.assign(new Error("No active project found"), { status: 404 });
@@ -268,8 +267,7 @@ export async function renderSingleWidget(req, res) {
     const { widgetId, widget, themeSettings: rawThemeSettings } = req.body; // Expect themeSettings too
 
     // Get active project
-    const projectsData = await readProjectsFile(req.userId);
-    const activeProjectId = projectsData.activeProjectId;
+    const activeProjectId = projectRepo.getActiveProjectId(req.userId);
 
     if (!activeProjectId) {
       return res.status(404).json({ error: "No active project found" });
@@ -302,8 +300,7 @@ export async function renderSingleWidget(req, res) {
 export async function getGlobalWidgets(req, res) {
   try {
     // Get active project
-    const projectsData = await readProjectsFile(req.userId);
-    const activeProjectId = projectsData.activeProjectId;
+    const activeProjectId = projectRepo.getActiveProjectId(req.userId);
 
     if (!activeProjectId) {
       return res.status(404).json({ error: "No active project found" });
@@ -376,8 +373,7 @@ export async function saveGlobalWidget(req, res) {
     }
 
     // Get active project
-    const projectsData = await readProjectsFile(req.userId);
-    const activeProjectId = projectsData.activeProjectId;
+    const activeProjectId = projectRepo.getActiveProjectId(req.userId);
 
     if (!activeProjectId) {
       return res.status(404).json({ error: "No active project found" });

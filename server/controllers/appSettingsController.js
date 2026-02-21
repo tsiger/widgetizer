@@ -3,6 +3,7 @@ import {
   saveSettings,
   getSetting as repoGetSetting,
   defaultSettings,
+  deepMerge,
 } from "../db/repositories/settingsRepository.js";
 
 /**
@@ -42,7 +43,7 @@ export async function updateAppSettings(req, res) {
       return res.status(400).json({ error: "Invalid request body: Expected an object." });
     }
 
-    const newSettings = { ...currentSettings, ...settings };
+    const newSettings = deepMerge(currentSettings, settings);
 
     // Specific validation for maxFileSizeMB
     if (newSettings.media && typeof newSettings.media.maxFileSizeMB !== "number") {

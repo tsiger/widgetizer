@@ -1,4 +1,4 @@
-import { readProjectsFile } from "../controllers/projectController.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
 
 /**
  * Express middleware that resolves the active project and attaches it to req.
@@ -7,8 +7,13 @@ import { readProjectsFile } from "../controllers/projectController.js";
  */
 export async function resolveActiveProject(req, res, next) {
   try {
-    const { projects, activeProjectId } = await readProjectsFile(req.userId);
-    const activeProject = projects.find((p) => p.id === activeProjectId);
+    const activeProjectId = projectRepo.getActiveProjectId(req.userId);
+
+    if (!activeProjectId) {
+      return res.status(404).json({ error: "No active project found" });
+    }
+
+    const activeProject = projectRepo.getProjectById(activeProjectId, req.userId);
 
     if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });

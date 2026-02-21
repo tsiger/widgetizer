@@ -74,8 +74,8 @@ const newProject = {
 **Pattern:**
 
 ```javascript
-const { projects, activeProjectId } = await readProjectsFile(req.userId);
-const activeProject = projects.find((p) => p.id === activeProjectId);
+const activeProjectId = projectRepo.getActiveProjectId(req.userId);
+const activeProject = projectRepo.getProjectById(activeProjectId, req.userId);
 const projectFolderName = activeProject.folderName;
 
 // Use folderName + userId for all file operations
@@ -104,8 +104,8 @@ const pagePath = getPagePath(projectFolderName, pageSlug, req.userId);
 **Pattern:**
 
 ```javascript
-const { projects, activeProjectId } = await readProjectsFile();
-const activeProject = projects.find((p) => p.id === activeProjectId);
+const activeProjectId = projectRepo.getActiveProjectId(req.userId);
+const activeProject = projectRepo.getProjectById(activeProjectId, req.userId);
 const projectFolderName = activeProject.folderName;
 
 const menusDir = getProjectMenusDir(projectFolderName);
@@ -357,8 +357,8 @@ When a project's name (and thus folderName) changes:
 
 ```javascript
 // 1. Get project by UUID (scoped to userId)
-const { projects, activeProjectId } = await readProjectsFile(req.userId);
-const project = projects.find((p) => p.id === activeProjectId);
+const activeProjectId = projectRepo.getActiveProjectId(req.userId);
+const project = projectRepo.getProjectById(activeProjectId, req.userId);
 
 // 2. Get folderName
 const projectFolderName = project.folderName;

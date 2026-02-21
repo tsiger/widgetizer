@@ -37,8 +37,6 @@ const { DATA_DIR, THEMES_DIR, getThemeDir, getProjectDir, getProjectPagesDir, ge
   await import("../config.js");
 
 const {
-  readProjectsFile,
-  writeProjectsFile,
   getAllProjects,
   getActiveProject,
   createProject,
@@ -50,6 +48,7 @@ const {
   importProject,
 } = await import("../controllers/projectController.js");
 const { closeDb } = await import("../db/index.js");
+const projectRepo = await import("../db/repositories/projectRepository.js");
 const mediaRepo = await import("../db/repositories/mediaRepository.js");
 const { PassThrough } = await import("stream");
 const AdmZip = await import("adm-zip");
@@ -212,7 +211,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
     async function resetProjects() {
       const userProjectsDir = path.join(getUserDataDir(TEST_USER_ID), "projects");
       await fs.ensureDir(userProjectsDir);
-      await writeProjectsFile({ projects: [], activeProjectId: null }, TEST_USER_ID);
+      await projectRepo.writeProjectsData({ projects: [], activeProjectId: null }, TEST_USER_ID);
     }
 
     /** Helper: create a project and return the response data */
@@ -356,22 +355,22 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
     // ========================================================================
 
     // ---------------------------------------------------------------------------
-    // readProjectsFile / writeProjectsFile (low-level)
+    // readProjectsData / writeProjectsData (low-level)
     // ---------------------------------------------------------------------------
 
-    describe("readProjectsFile / writeProjectsFile", () => {
+    describe("readProjectsData / writeProjectsData", () => {
       beforeEach(async () => {
         await resetProjects();
       });
 
       it("returns empty array when no projects exist", async () => {
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.deepEqual(data.projects, []);
         assert.equal(data.activeProjectId, null);
       });
 
       it("returns empty data from a clean database", async () => {
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.deepEqual(data.projects, []);
         assert.equal(data.activeProjectId, null);
       });
@@ -394,8 +393,8 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
           }],
           activeProjectId: `abc-${TEST_USER_ID}`,
         };
-        await writeProjectsFile(testData, TEST_USER_ID);
-        const readBack = await readProjectsFile(TEST_USER_ID);
+        await projectRepo.writeProjectsData(testData, TEST_USER_ID);
+        const readBack = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.deepEqual(readBack, testData);
       });
     });
@@ -509,7 +508,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         const project = await createTestProject("First Project");
         assert.equal(project.wasSetAsActive, true);
 
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.activeProjectId, project.id);
       });
 
@@ -517,7 +516,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         const first = await createTestProject("First");
         const second = await createTestProject("Second");
 
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.activeProjectId, first.id, "active should still be the first project");
         assert.notEqual(second.wasSetAsActive, true);
       });
@@ -680,14 +679,14 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         const second = await createTestProject("Second");
 
         // Active should be first
-        let data = await readProjectsFile(TEST_USER_ID);
+        let data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.activeProjectId, first.id);
 
         // Switch to second
         const res = await callController(setActiveProject, { params: { id: second.id } });
         assert.equal(res._status, 200);
 
-        data = await readProjectsFile(TEST_USER_ID);
+        data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.activeProjectId, second.id);
       });
 
@@ -725,7 +724,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.equal(res._json.name, "Updated Name");
 
         // Verify persisted
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.projects[0].name, "Updated Name");
       });
 
@@ -829,7 +828,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
       it("active project still resolves after its folder is renamed", async () => {
         // project is active (first project created in beforeEach)
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.activeProjectId, project.id);
 
         // Rename its folder
@@ -975,7 +974,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.equal(res._status, 200);
         assert.equal(res._json.success, true);
 
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.projects.length, 0);
       });
 
@@ -993,14 +992,14 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         const second = await createTestProject("Second");
 
         // First is active
-        let data = await readProjectsFile(TEST_USER_ID);
+        let data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.activeProjectId, first.id);
 
         // Delete first
         await callController(deleteProject, { params: { id: first.id } });
 
         // Active should switch to second
-        data = await readProjectsFile(TEST_USER_ID);
+        data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.activeProjectId, second.id);
       });
 
@@ -1009,7 +1008,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
 
         await callController(deleteProject, { params: { id: project.id } });
 
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.activeProjectId, null);
       });
 
@@ -1115,7 +1114,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
       it("adds the duplicate to the database", async () => {
         await callController(duplicateProject, { params: { id: original.id } });
 
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.projects.length, 2);
       });
 
@@ -1279,7 +1278,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.ok(res._json.folderName, "Should have a generated folderName");
 
         // Verify project exists in DB
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.projects.length, 1);
         assert.equal(data.projects[0].name, "Imported Project");
       });
@@ -1306,7 +1305,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.equal(res._json.preset, "starter");
 
         // Verify round-trip through DB
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         const imported = data.projects.find((p) => p.id === res._json.id);
         assert.equal(imported.receiveThemeUpdates, true);
         assert.equal(imported.preset, "starter");
@@ -1421,7 +1420,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         });
 
         // Verify no project was left behind
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.projects.length, 0);
       });
 
@@ -1539,7 +1538,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.notEqual(importRes._json.folderName, original.folderName);
 
         // Both projects should exist
-        const data = await readProjectsFile(TEST_USER_ID);
+        const data = await projectRepo.readProjectsData(TEST_USER_ID);
         assert.equal(data.projects.length, 2);
       });
 

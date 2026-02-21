@@ -51,7 +51,7 @@ const {
   getProjectPagesDir,
 } = await import("../config.js");
 
-const { writeProjectsFile } = await import("../controllers/projectController.js");
+const projectRepo = await import("../db/repositories/projectRepository.js");
 
 const {
   ensureThemesDirectory,
@@ -228,7 +228,7 @@ before(async () => {
   await fs.ensureDir(TEST_DATA_DIR);
 
   // projects.json with a project using a specific theme
-  await writeProjectsFile({
+  await projectRepo.writeProjectsData({
     projects: [
       {
         id: "theme-test-project-uuid",
