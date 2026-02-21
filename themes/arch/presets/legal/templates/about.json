@@ -1,0 +1,256 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_intro": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "about-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Our firm",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "about-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Founded on principled advocacy since 1986",
+            "size": "3xl"
+          }
+        },
+        "about-body": {
+          "type": "text",
+          "settings": {
+            "text": "For nearly four decades, Hargrove & Cole has represented individuals, families, and businesses with integrity and tenacity. What began as a two-partner firm in downtown has grown into a 15-attorney practice with offices across the tri-state area \u2014 but our commitment to personal attention has never changed.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "about-features": {
+          "type": "features",
+          "settings": {
+            "features": "Founded in 1986\nAV-rated by Martindale-Hubbell\nMultiple Super Lawyers selections"
+          }
+        },
+        "about-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Our team",
+              "href": "team.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Practice areas",
+              "href": "practice-areas.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["about-eyebrow", "about-heading", "about-body", "about-features", "about-buttons"]
+    },
+    "firm_timeline": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "History",
+        "title": "Four decades of principled practice",
+        "layout": "vertical",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "milestone-1": {
+          "type": "item",
+          "settings": {
+            "date": "1986",
+            "title": "Founded",
+            "description": "Partners Thomas Hargrove and Eleanor Cole open their first office with a shared vision: excellent legal work and genuine client care."
+          }
+        },
+        "milestone-2": {
+          "type": "item",
+          "settings": {
+            "date": "1994",
+            "title": "First landmark case",
+            "description": "Won a precedent-setting employment discrimination case that established new protections for workers statewide."
+          }
+        },
+        "milestone-3": {
+          "type": "item",
+          "settings": {
+            "date": "2004",
+            "title": "Second office",
+            "description": "Expanded to a second location to better serve growing client base across the region."
+          }
+        },
+        "milestone-4": {
+          "type": "item",
+          "settings": {
+            "date": "2015",
+            "title": "Named Top 50 Firm",
+            "description": "Recognized by Regional Law Review as a Top 50 firm for client satisfaction and case outcomes."
+          }
+        },
+        "milestone-5": {
+          "type": "item",
+          "settings": {
+            "date": "2024",
+            "title": "500+ cases milestone",
+            "description": "Reached 500 successfully resolved cases across all practice areas."
+          }
+        }
+      },
+      "blocksOrder": ["milestone-1", "milestone-2", "milestone-3", "milestone-4", "milestone-5"]
+    },
+    "partners_grid": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Partners",
+        "title": "Meet our founding partners",
+        "columns_desktop": 4,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "profile-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Thomas Hargrove",
+            "role": "Senior Partner",
+            "specialty": "Corporate & Real Estate",
+            "bio": "35+ years guiding businesses through complex transactions, governance, and growth."
+          }
+        },
+        "profile-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Eleanor Cole",
+            "role": "Senior Partner",
+            "specialty": "Litigation",
+            "bio": "Known for meticulous preparation and powerful courtroom advocacy."
+          }
+        },
+        "profile-3": {
+          "type": "profile",
+          "settings": {
+            "name": "William Reyes",
+            "role": "Partner",
+            "specialty": "Employment Law",
+            "bio": "Former EEOC counsel specializing in workplace rights and compliance."
+          }
+        },
+        "profile-4": {
+          "type": "profile",
+          "settings": {
+            "name": "Sarah Lindstr\u00f6m",
+            "role": "Partner",
+            "specialty": "Family Law & Estate",
+            "bio": "Combines legal precision with compassion in sensitive personal matters."
+          }
+        }
+      },
+      "blocksOrder": ["profile-1", "profile-2", "profile-3", "profile-4"]
+    },
+    "recognition_figures": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Recognition",
+        "title": "Awards and accolades",
+        "columns_desktop": 3,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "figure-1": {
+          "type": "figure",
+          "settings": {
+            "number": "98",
+            "suffix": "%",
+            "label": "Client Satisfaction",
+            "description": "Independent survey"
+          }
+        },
+        "figure-2": {
+          "type": "figure",
+          "settings": {
+            "number": "AV",
+            "suffix": "",
+            "label": "Martindale Rating",
+            "description": "Highest ethical standards"
+          }
+        },
+        "figure-3": {
+          "type": "figure",
+          "settings": {
+            "number": "3",
+            "suffix": "",
+            "label": "Office Locations",
+            "description": "Tri-state coverage"
+          }
+        }
+      },
+      "blocksOrder": ["figure-1", "figure-2", "figure-3"]
+    },
+    "about_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "about-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let's discuss your legal needs",
+            "size": "4xl"
+          }
+        },
+        "about-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Schedule a free consultation to learn how our team can help.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "about-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Free consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our team",
+              "href": "team.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["about-cta-heading", "about-cta-text", "about-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["about_intro", "firm_timeline", "partners_grid", "recognition_figures", "about_cta"],
+  "id": "about",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

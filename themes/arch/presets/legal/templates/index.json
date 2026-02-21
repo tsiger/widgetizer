@@ -1,0 +1,385 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero_split": {
+      "type": "split-hero",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Hargrove & Cole LLP",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Advocacy rooted in strategy, driven by results",
+            "size": "4xl"
+          }
+        },
+        "hero-body": {
+          "type": "text",
+          "settings": {
+            "text": "Hargrove & Cole has represented individuals and businesses for over 40 years. We combine deep legal expertise with a relentless focus on outcomes.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule a free consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our practice areas",
+              "href": "practice-areas.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-body", "hero-buttons"]
+    },
+    "trust_bar": {
+      "type": "trust-bar",
+      "settings": {
+        "show_dividers": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "award",
+            "text": "Martindale-Hubbell AV Rated"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "text": "Super Lawyers Selection"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "clock-hour-4",
+            "text": "40+ Years Combined"
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "scale",
+            "text": "500+ Cases Won"
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+    },
+    "key_figures": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Track record",
+        "title": "Results that define our reputation",
+        "columns_desktop": 4,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "figure-1": {
+          "type": "figure",
+          "settings": {
+            "number": "500",
+            "suffix": "+",
+            "label": "Cases Won",
+            "description": "Across all practice areas"
+          }
+        },
+        "figure-2": {
+          "type": "figure",
+          "settings": {
+            "number": "40",
+            "suffix": " Years",
+            "label": "Combined Experience",
+            "description": "Senior attorneys"
+          }
+        },
+        "figure-3": {
+          "type": "figure",
+          "settings": {
+            "number": "15",
+            "suffix": "",
+            "label": "Attorneys",
+            "description": "Specialized team"
+          }
+        },
+        "figure-4": {
+          "type": "figure",
+          "settings": {
+            "number": "3",
+            "suffix": "",
+            "label": "Offices",
+            "description": "Tri-state presence"
+          }
+        }
+      },
+      "blocksOrder": ["figure-1", "figure-2", "figure-3", "figure-4"]
+    },
+    "practice_areas_grid": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Practice areas",
+        "title": "Comprehensive legal counsel",
+        "description": "We represent clients across six core areas of law.",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "area-corporate": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Business",
+            "title": "Corporate Law",
+            "description": "Formation, governance, M&A, and commercial transactions.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "area-litigation": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Disputes",
+            "title": "Litigation",
+            "description": "Civil and commercial litigation, arbitration, and mediation.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "area-real-estate": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Property",
+            "title": "Real Estate",
+            "description": "Acquisitions, development, leasing, and land use.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "area-employment": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Workplace",
+            "title": "Employment Law",
+            "description": "Compliance, disputes, contracts, and workplace policy.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "area-ip": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Innovation",
+            "title": "Intellectual Property",
+            "description": "Patents, trademarks, copyrights, and trade secrets.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "area-family": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Personal",
+            "title": "Family Law",
+            "description": "Divorce, custody, prenuptial agreements, and estate matters.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["area-corporate", "area-litigation", "area-real-estate", "area-employment", "area-ip", "area-family"]
+    },
+    "why_choose_us": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "why-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Why Hargrove & Cole",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "why-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Why clients choose us",
+            "size": "2xl"
+          }
+        },
+        "why-body": {
+          "type": "text",
+          "settings": {
+            "text": "We don't just practice law \u2014 we build lasting relationships with every client. Our attorneys take the time to understand your situation and develop strategies tailored to your specific needs.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "why-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Trial-tested attorneys with decades of experience\n+ Personalized attention \u2014 you work directly with partners\n+ Transparent billing \u2014 no surprises, no hidden fees\n+ Proven track record of favorable outcomes"
+          }
+        }
+      },
+      "blocksOrder": ["why-eyebrow", "why-heading", "why-body", "why-features"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client feedback",
+        "title": "What our clients say",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Hargrove & Cole guided us through a complex acquisition with precision and care. Their corporate team anticipated every issue before it became a problem.",
+            "name": "David Moreno",
+            "title": "CEO, Triton Holdings",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Eleanor Cole kept me informed at every stage of my case. I always felt like a priority, not just another file on a desk.",
+            "name": "Sarah Mitchell",
+            "title": "Small Business Owner",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "After three other firms failed to resolve my employment dispute, Hargrove & Cole secured a settlement that exceeded my expectations.",
+            "name": "James Park",
+            "title": "Senior Executive",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+    },
+    "cta_banner": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "cta-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Schedule a free consultation",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Every case starts with a conversation",
+            "size": "4xl"
+          }
+        },
+        "cta-body": {
+          "type": "text",
+          "settings": {
+            "text": "Tell us about your situation and we'll outline your options \u2014 no obligation, no fees.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Free consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Practice areas",
+              "href": "practice-areas.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-eyebrow", "cta-heading", "cta-body", "cta-buttons"]
+    }
+  },
+  "widgetsOrder": [
+    "hero_split",
+    "trust_bar",
+    "key_figures",
+    "practice_areas_grid",
+    "why_choose_us",
+    "testimonials",
+    "cta_banner"
+  ],
+  "id": "index",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

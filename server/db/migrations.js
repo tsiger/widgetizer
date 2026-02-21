@@ -6,7 +6,7 @@ const migrations = [
       db.exec(`
         CREATE TABLE projects (
           id TEXT PRIMARY KEY,
-          folder_name TEXT NOT NULL UNIQUE,
+          folder_name TEXT NOT NULL,
           name TEXT NOT NULL,
           description TEXT DEFAULT '',
           theme TEXT,
@@ -17,8 +17,15 @@ const migrations = [
           last_theme_update_at TEXT,
           last_theme_update_version TEXT,
           created TEXT NOT NULL,
-          updated TEXT NOT NULL
+          updated TEXT NOT NULL,
+          user_id TEXT NOT NULL DEFAULT 'local',
+          published_site_id TEXT DEFAULT NULL,
+          published_url TEXT DEFAULT NULL,
+          published_at TEXT DEFAULT NULL
         );
+
+        CREATE INDEX idx_projects_user ON projects(user_id);
+        CREATE UNIQUE INDEX idx_projects_folder_user ON projects(folder_name, user_id);
 
         CREATE TABLE app_settings (
           key TEXT PRIMARY KEY,
@@ -76,27 +83,6 @@ const migrations = [
 
         CREATE INDEX idx_exports_project ON exports(project_id);
         CREATE UNIQUE INDEX idx_exports_project_version ON exports(project_id, version);
-      `);
-    },
-  },
-  {
-    version: 2,
-    description: "Add user_id to projects for multi-user support",
-    up(db) {
-      db.exec(`
-        ALTER TABLE projects ADD COLUMN user_id TEXT NOT NULL DEFAULT 'local';
-        CREATE INDEX idx_projects_user ON projects(user_id);
-      `);
-    },
-  },
-  {
-    version: 3,
-    description: "Add publish tracking columns to projects",
-    up(db) {
-      db.exec(`
-        ALTER TABLE projects ADD COLUMN published_site_id TEXT DEFAULT NULL;
-        ALTER TABLE projects ADD COLUMN published_url TEXT DEFAULT NULL;
-        ALTER TABLE projects ADD COLUMN published_at TEXT DEFAULT NULL;
       `);
     },
   },

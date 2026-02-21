@@ -1,0 +1,206 @@
+{
+  "name": "Resources",
+  "slug": "resources",
+  "widgets": {
+    "resources_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "resources-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Resources",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "resources-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tools and frameworks for your leadership toolkit",
+            "size": "4xl"
+          }
+        },
+        "resources-text": {
+          "type": "text",
+          "settings": {
+            "text": "Free resources, podcast episodes, and insights to support your growth between coaching sessions.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["resources-eyebrow", "resources-heading", "resources-text"]
+    },
+    "free_resources": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Free resources",
+        "title": "Start your leadership journey",
+        "description": "Download these tools to begin working on your leadership today.",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "resource-1": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Self-assessment",
+            "title": "Leadership Style Assessment",
+            "description": "Discover your natural leadership style and blind spots in 15 minutes.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "resource-2": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Template",
+            "title": "Goal-Setting Framework",
+            "description": "The same framework I use with executive clients to set and track meaningful goals.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "resource-3": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Diagnostic",
+            "title": "Team Health Check",
+            "description": "10 questions that reveal your team's real dynamics and areas for growth.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["resource-1", "resource-2", "resource-3"]
+    },
+    "podcast_player": {
+      "type": "podcast-player",
+      "settings": {
+        "eyebrow": "The Catalyst Podcast",
+        "title": "Conversations about leadership, growth, and change",
+        "description": "Weekly episodes exploring the challenges and breakthroughs that define great leadership.",
+        "show_volume": true,
+        "show_speed": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "track-1": {
+          "type": "track",
+          "settings": {
+            "title": "Why Most Leadership Advice Fails",
+            "episode_number": "Ep. 1",
+            "duration": "34:12",
+            "date": "Jan 7",
+            "description": "<p>We explore the most common leadership pitfalls and why conventional wisdom often leads leaders astray. Learn what actually works when the stakes are high.</p>"
+          }
+        },
+        "track-2": {
+          "type": "track",
+          "settings": {
+            "title": "The Art of Difficult Conversations",
+            "episode_number": "Ep. 2",
+            "duration": "28:45",
+            "date": "Jan 14",
+            "description": "<p>Conflict avoidance is the silent killer of great teams. This episode breaks down how to have the hard conversations that build trust and drive results.</p>"
+          }
+        },
+        "track-3": {
+          "type": "track",
+          "settings": {
+            "title": "Building a Team That Doesn't Need You",
+            "episode_number": "Ep. 3",
+            "duration": "41:03",
+            "date": "Jan 21",
+            "description": "<p>The best leaders build teams that thrive without them. We discuss delegation, empowerment, and the mindset shifts that make it possible.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["track-1", "track-2", "track-3"]
+    },
+    "newsletter_signup": {
+      "type": "newsletter",
+      "settings": {
+        "eyebrow": "Newsletter",
+        "title": "Join 5,000+ leaders getting weekly insights",
+        "description": "Every Tuesday, one actionable idea to help you lead with more clarity and less stress.",
+        "placeholder": "Your email address",
+        "button_text": "Subscribe",
+        "color_scheme": "standard"
+      }
+    },
+    "resources_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "resources-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready for something deeper?",
+            "size": "4xl"
+          }
+        },
+        "resources-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "These resources are a great start. Coaching takes your leadership to the next level.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "resources-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book discovery call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View programs",
+              "href": "programs.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["resources-cta-heading", "resources-cta-text", "resources-cta-buttons"]
+    }
+  },
+  "widgetsOrder": [
+    "resources_hero",
+    "free_resources",
+    "podcast_player",
+    "newsletter_signup",
+    "resources_cta"
+  ],
+  "id": "resources",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "main-menu",
+  "name": "Main menu",
+  "description": "",
+  "items": [
+    { "label": "Home", "link": "index.html", "items": [] },
+    { "label": "About", "link": "about.html", "items": [] },
+    { "label": "Services", "link": "services.html", "items": [] },
+    { "label": "Our Approach", "link": "approach.html", "items": [] },
+    { "label": "Insights", "link": "insights.html", "items": [] },
+    { "label": "Contact", "link": "contact.html", "items": [] }
+  ]
+}

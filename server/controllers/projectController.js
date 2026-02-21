@@ -70,7 +70,7 @@ export async function getAllProjects(req, res) {
         if (project.theme) {
           try {
             // Get theme display name from theme.json
-            const themeSourceDir = await themeController.getThemeSourceDir(project.theme);
+            const themeSourceDir = await themeController.getThemeSourceDir(project.theme, req.userId);
             const themeJsonPath = path.join(themeSourceDir, "theme.json");
             const themeData = await fs.readJson(themeJsonPath);
             themeName = themeData.name || project.theme;

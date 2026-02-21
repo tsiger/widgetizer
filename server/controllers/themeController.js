@@ -8,12 +8,9 @@ import {
   getThemeDir,
   getThemeJsonPath,
   getThemeWidgetsDir,
-  getThemeTemplatesDir,
   getThemeUpdatesDir,
   getThemeLatestDir,
   getThemeVersionDir,
-  getThemePresetsJsonPath,
-  getThemePresetDir,
   getProjectDir,
   getProjectThemeJsonPath,
 } from "../config.js";
@@ -299,7 +296,7 @@ export async function buildLatestSnapshot(themeId, userId = "local") {
   // 1. Start with base (root) files, excluding updates/ and latest/ directories
   const baseEntries = await fs.readdir(themeDir, { withFileTypes: true });
   for (const entry of baseEntries) {
-    if (entry.name === "updates" || entry.name === "latest" || entry.name === "presets") continue;
+    if (entry.name === "updates" || entry.name === "latest") continue;
 
     const sourcePath = path.join(themeDir, entry.name);
     const targetPath = path.join(latestDir, entry.name);
@@ -366,29 +363,33 @@ export async function buildLatestSnapshot(themeId, userId = "local") {
  * @returns {Promise<{templatesDir: string, menusDir: string|null, settingsOverrides: object|null}>}
  */
 export async function resolvePresetPaths(themeId, presetId, userId = "local") {
+  // Use the theme source directory (latest/ if it exists, root otherwise)
+  const sourceDir = await getThemeSourceDir(themeId, userId);
+  const rootTemplatesDir = path.join(sourceDir, "templates");
+
   if (!presetId) {
     return {
-      templatesDir: getThemeTemplatesDir(themeId, userId),
+      templatesDir: rootTemplatesDir,
       menusDir: null,
       settingsOverrides: null,
     };
   }
 
-  const presetDir = getThemePresetDir(themeId, presetId, userId);
+  const presetDir = path.join(sourceDir, "presets", presetId);
 
   // Check if the preset directory actually exists
   try {
     await fs.access(presetDir);
   } catch {
     return {
-      templatesDir: getThemeTemplatesDir(themeId, userId),
+      templatesDir: rootTemplatesDir,
       menusDir: null,
       settingsOverrides: null,
     };
   }
 
   // Resolve templates directory
-  let templatesDir = getThemeTemplatesDir(themeId, userId);
+  let templatesDir = rootTemplatesDir;
   const presetTemplatesDir = path.join(presetDir, "templates");
   try {
     await fs.access(presetTemplatesDir);
@@ -442,7 +443,11 @@ export async function getThemePresets(req, res) {
       return res.status(404).json({ error: `Theme '${id}' not found` });
     }
 
-    const presetsJsonPath = getThemePresetsJsonPath(id, userId);
+    // Read presets from the theme source directory (latest/ if it exists, root otherwise).
+    // This ensures presets delivered via theme updates are visible.
+    const sourceDir = await getThemeSourceDir(id, userId);
+    const presetsJsonPath = path.join(sourceDir, "presets", "presets.json");
+
     try {
       const content = await fs.readFile(presetsJsonPath, "utf8");
       const presetsData = JSON.parse(content);
@@ -450,12 +455,12 @@ export async function getThemePresets(req, res) {
       const enrichedPresets = await Promise.all(
         (presetsData.presets || []).map(async (preset) => {
           let hasScreenshot = false;
-          const presetDir = getThemePresetDir(id, preset.id, userId);
+          const presetDir = path.join(sourceDir, "presets", preset.id);
           try {
             await fs.access(path.join(presetDir, "screenshot.png"));
             hasScreenshot = true;
           } catch {
-            // No preset screenshot, will fall back to root
+            // No preset screenshot
           }
 
           return {
@@ -527,10 +532,10 @@ export async function getAllThemes(req, res) {
             console.warn(`Could not read widgets directory for theme ${themeId}:`, widgetDirError.message);
           }
 
-          // Count presets if presets.json exists
+          // Count presets if presets.json exists (read from source dir, not root)
           let presetCount = 0;
           try {
-            const presetsJsonPath = getThemePresetsJsonPath(themeId, userId);
+            const presetsJsonPath = path.join(sourceDir, "presets", "presets.json");
             const presetsContent = await fs.readFile(presetsJsonPath, "utf8");
             const presetsData = JSON.parse(presetsContent);
             presetCount = (presetsData.presets || []).length;

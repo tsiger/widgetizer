@@ -1,0 +1,321 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "services_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "services-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Services",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "services-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Full-service accounting for businesses that want to grow",
+            "size": "4xl"
+          }
+        },
+        "services-text": {
+          "type": "text",
+          "settings": {
+            "text": "From daily bookkeeping to strategic advisory, we handle the numbers so you can focus on what you do best.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "services-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Tax resources",
+              "href": "tax-resources.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["services-eyebrow", "services-heading", "services-text", "services-buttons"]
+    },
+    "services_grid": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "What we offer",
+        "title": "Services tailored to your business",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "service-1": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Compliance",
+            "title": "Tax Preparation",
+            "description": "Individual and business returns, filed accurately and on time.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "receipt-tax"
+          }
+        },
+        "service-2": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Operations",
+            "title": "Bookkeeping",
+            "description": "Clean, organized books so you always know where you stand.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "book-2"
+          }
+        },
+        "service-3": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Trust",
+            "title": "Audit & Assurance",
+            "description": "Independent reviews that build trust with stakeholders.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "file-check"
+          }
+        },
+        "service-4": {
+          "type": "card",
+          "settings": {
+            "subtitle": "People",
+            "title": "Payroll Services",
+            "description": "Compliant payroll processing for teams of any size.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "users"
+          }
+        },
+        "service-5": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Growth",
+            "title": "Business Advisory",
+            "description": "Strategic guidance for growth, profitability, and exit planning.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "chart-line"
+          }
+        },
+        "service-6": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Structure",
+            "title": "Entity Formation",
+            "description": "LLC, S-Corp, or C-Corp \u2014 we help you choose and set up right.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "building"
+          }
+        }
+      },
+      "blocksOrder": ["service-1", "service-2", "service-3", "service-4", "service-5", "service-6"]
+    },
+    "pricing_table": {
+      "type": "comparison-table",
+      "settings": {
+        "eyebrow": "Plans",
+        "title": "Choose the right level of support",
+        "feature_column_label": "What's included",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "column-1": {
+          "type": "column",
+          "settings": {
+            "name": "Essential \u2014 $500/mo",
+            "featured": false
+          }
+        },
+        "column-2": {
+          "type": "column",
+          "settings": {
+            "name": "Professional \u2014 $1,200/mo",
+            "featured": true,
+            "badge": "Most popular"
+          }
+        },
+        "column-3": {
+          "type": "column",
+          "settings": {
+            "name": "Enterprise \u2014 $2,500/mo",
+            "featured": false
+          }
+        },
+        "feature-1": {
+          "type": "feature",
+          "settings": {
+            "name": "Monthly bookkeeping",
+            "values": "\u2713\n\u2713\n\u2713"
+          }
+        },
+        "feature-2": {
+          "type": "feature",
+          "settings": {
+            "name": "Tax preparation",
+            "values": "\u2713\n\u2713\n\u2713"
+          }
+        },
+        "feature-3": {
+          "type": "feature",
+          "settings": {
+            "name": "Quarterly reviews",
+            "values": "\u2717\n\u2713\n\u2713"
+          }
+        },
+        "feature-4": {
+          "type": "feature",
+          "settings": {
+            "name": "Payroll processing",
+            "values": "\u2717\n\u2713\n\u2713"
+          }
+        },
+        "feature-5": {
+          "type": "feature",
+          "settings": {
+            "name": "Advisory hours",
+            "values": "\u2014\n2 hrs/mo\n5 hrs/mo"
+          }
+        },
+        "feature-6": {
+          "type": "feature",
+          "settings": {
+            "name": "Dedicated CPA",
+            "values": "\u2717\n\u2717\n\u2713"
+          }
+        },
+        "feature-7": {
+          "type": "feature",
+          "settings": {
+            "name": "Audit support",
+            "values": "\u2717\n\u2717\n\u2713"
+          }
+        }
+      },
+      "blocksOrder": ["column-1", "column-2", "column-3", "feature-1", "feature-2", "feature-3", "feature-4", "feature-5", "feature-6", "feature-7"]
+    },
+    "onboarding_steps": {
+      "type": "numbered-cards",
+      "settings": {
+        "eyebrow": "Getting started",
+        "title": "How onboarding works",
+        "columns_desktop": 4,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Send us your documents",
+            "description": "<p>Upload your existing records, prior returns, and financial statements through our secure portal.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "We review and organize",
+            "description": "<p>Our team reviews everything, identifies gaps, and sets up your accounts in our system.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "We prepare and review with you",
+            "description": "<p>We prepare your returns or reports and walk through them with you before filing.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "File and plan ahead",
+            "description": "<p>We file on time and immediately start planning for next year's tax strategy.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "services_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "services-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let's find the right fit for your business",
+            "size": "4xl"
+          }
+        },
+        "services-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View industries",
+              "href": "industries.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["services-cta-heading", "services-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["services_hero", "services_grid", "pricing_table", "onboarding_steps", "services_cta"],
+  "id": "services",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

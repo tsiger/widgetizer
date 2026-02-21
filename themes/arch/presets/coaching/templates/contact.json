@@ -1,0 +1,117 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_form": {
+      "type": "contact-form",
+      "settings": {
+        "eyebrow": "Get started",
+        "title": "Book your free discovery call",
+        "description": "30 minutes to explore your goals and see if coaching is the right fit. No pressure, no pitch.",
+        "form_action": "/submit",
+        "form_method": "POST",
+        "show_sidebar": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "input-name": {
+          "type": "input",
+          "settings": {
+            "label": "Name",
+            "name": "name",
+            "input_type": "text",
+            "placeholder": "Your name",
+            "required": true
+          }
+        },
+        "input-email": {
+          "type": "input",
+          "settings": {
+            "label": "Email",
+            "name": "email",
+            "input_type": "email",
+            "placeholder": "you@company.com",
+            "required": true
+          }
+        },
+        "dropdown-interest": {
+          "type": "dropdown",
+          "settings": {
+            "label": "I'm looking for...",
+            "name": "interest",
+            "options": "Executive coaching\nTeam coaching\nLeadership retreat\nSpeaking engagement\nOther",
+            "required": true
+          }
+        },
+        "textarea-message": {
+          "type": "textarea",
+          "settings": {
+            "label": "Message",
+            "name": "message",
+            "placeholder": "Tell me about your goals and what you are hoping to achieve...",
+            "required": true
+          }
+        },
+        "submit-button": {
+          "type": "submit",
+          "settings": {
+            "text": "Send message"
+          }
+        },
+        "info-email": {
+          "type": "info",
+          "settings": {
+            "title": "Email",
+            "text": "hello@catalystcoaching.co"
+          }
+        },
+        "info-phone": {
+          "type": "info",
+          "settings": {
+            "title": "Phone",
+            "text": "+1 (555) 612-8900"
+          }
+        },
+        "info-location": {
+          "type": "info",
+          "settings": {
+            "title": "Location",
+            "text": "Based in Austin, TX — coaching clients globally"
+          }
+        }
+      },
+      "blocksOrder": [
+        "input-name",
+        "input-email",
+        "dropdown-interest",
+        "textarea-message",
+        "submit-button",
+        "info-email",
+        "info-phone",
+        "info-location"
+      ]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Location",
+        "title": "Based in Austin, TX",
+        "description": "Coaching clients in person and virtually around the world.",
+        "address": "1200 Congress Avenue, Suite 300, Austin, TX 78701",
+        "directions_link": {
+          "text": "Get directions",
+          "href": "https://maps.google.com/?q=1200%20Congress%20Avenue%20Suite%20300%20Austin%20TX%2078701",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "color_scheme": "standard"
+      }
+    }
+  },
+  "widgetsOrder": ["contact_form", "contact_map"],
+  "id": "contact",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

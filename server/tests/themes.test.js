@@ -1362,17 +1362,20 @@ describe("copyThemeToProject excludes presets", () => {
 });
 
 // ============================================================================
-// buildLatestSnapshot excludes presets
+// buildLatestSnapshot includes presets
 // ============================================================================
 
-describe("buildLatestSnapshot excludes presets", () => {
-  it("excludes presets/ directory from snapshot", async () => {
+describe("buildLatestSnapshot includes presets", () => {
+  it("includes presets/ directory in snapshot", async () => {
     const presetSnapTheme = "preset-snap-theme";
     await createThemeOnDisk(presetSnapTheme, { version: "1.0.0" });
 
     const presetsDir = path.join(getThemeDir(presetSnapTheme), "presets");
     await fs.ensureDir(presetsDir);
-    await fs.outputFile(path.join(presetsDir, "presets.json"), "{}");
+    await fs.outputJson(path.join(presetsDir, "presets.json"), {
+      default: "default",
+      presets: [{ id: "default", name: "Default" }],
+    });
 
     const v110 = getThemeVersionDir(presetSnapTheme, "1.1.0");
     await fs.ensureDir(v110);
@@ -1381,8 +1384,142 @@ describe("buildLatestSnapshot excludes presets", () => {
     await buildLatestSnapshot(presetSnapTheme);
 
     const latestDir = getThemeLatestDir(presetSnapTheme);
-    assert.ok(!(await fs.pathExists(path.join(latestDir, "presets"))));
+    assert.ok(await fs.pathExists(path.join(latestDir, "presets")));
+    assert.ok(await fs.pathExists(path.join(latestDir, "presets", "presets.json")));
 
     await fs.remove(getThemeDir(presetSnapTheme));
+  });
+
+  it("layers update presets on top of base presets", async () => {
+    const presetLayerTheme = "preset-layer-theme";
+    await createThemeOnDisk(presetLayerTheme, { version: "1.0.0" });
+
+    // Base has one preset
+    const basePresetsDir = path.join(getThemeDir(presetLayerTheme), "presets");
+    await fs.ensureDir(path.join(basePresetsDir, "default"));
+    await fs.outputJson(path.join(basePresetsDir, "presets.json"), {
+      default: "default",
+      presets: [{ id: "default", name: "Default" }],
+    });
+    await fs.outputJson(path.join(basePresetsDir, "default", "preset.json"), { settings: {} });
+
+    // Update v1.1.0 adds a new preset
+    const v110 = getThemeVersionDir(presetLayerTheme, "1.1.0");
+    await fs.ensureDir(v110);
+    await fs.writeFile(path.join(v110, "theme.json"), JSON.stringify({ name: presetLayerTheme, version: "1.1.0" }));
+    const updatePresetsDir = path.join(v110, "presets");
+    await fs.ensureDir(path.join(updatePresetsDir, "financial"));
+    await fs.outputJson(path.join(updatePresetsDir, "presets.json"), {
+      default: "default",
+      presets: [{ id: "default", name: "Default" }, { id: "financial", name: "Financial" }],
+    });
+    await fs.outputJson(path.join(updatePresetsDir, "financial", "preset.json"), { settings: { accent: "#gold" } });
+
+    await buildLatestSnapshot(presetLayerTheme);
+
+    const latestDir = getThemeLatestDir(presetLayerTheme);
+    // Both presets should exist in latest/
+    assert.ok(await fs.pathExists(path.join(latestDir, "presets", "default", "preset.json")));
+    assert.ok(await fs.pathExists(path.join(latestDir, "presets", "financial", "preset.json")));
+    // presets.json should be the updated version (with both presets)
+    const presetsData = await fs.readJson(path.join(latestDir, "presets", "presets.json"));
+    assert.equal(presetsData.presets.length, 2);
+    assert.equal(presetsData.presets[1].id, "financial");
+
+    await fs.remove(getThemeDir(presetLayerTheme));
+  });
+});
+
+// ============================================================================
+// Presets read from source dir (latest/ when available)
+// ============================================================================
+
+describe("resolvePresetPaths reads from source dir", () => {
+  const SRC_THEME = "preset-source-dir-theme";
+
+  before(async () => {
+    // Create theme with base version 1.0.0 (no presets in root)
+    await createThemeOnDisk(SRC_THEME, { version: "1.0.0" });
+
+    // Add update v1.1.0 that introduces presets
+    const v110 = getThemeVersionDir(SRC_THEME, "1.1.0");
+    await fs.ensureDir(v110);
+    await fs.writeFile(path.join(v110, "theme.json"), JSON.stringify({ name: SRC_THEME, version: "1.1.0" }));
+    const updatePresetsDir = path.join(v110, "presets");
+    await fs.ensureDir(path.join(updatePresetsDir, "fancy"));
+    await fs.ensureDir(path.join(updatePresetsDir, "fancy", "templates"));
+    await fs.outputJson(path.join(updatePresetsDir, "fancy", "templates", "index.json"), { id: "index", name: "Home", slug: "index" });
+    await fs.ensureDir(path.join(updatePresetsDir, "fancy", "menus"));
+    await fs.outputJson(path.join(updatePresetsDir, "fancy", "menus", "main-menu.json"), { id: "main-menu", items: [] });
+    await fs.outputJson(path.join(updatePresetsDir, "fancy", "preset.json"), { settings: { standard_accent: "#ff0000" } });
+    await fs.outputJson(path.join(updatePresetsDir, "presets.json"), {
+      default: "default",
+      presets: [{ id: "default", name: "Default" }, { id: "fancy", name: "Fancy" }],
+    });
+
+    // Build latest/ so source dir points there
+    await buildLatestSnapshot(SRC_THEME);
+  });
+
+  after(async () => {
+    await fs.remove(getThemeDir(SRC_THEME));
+  });
+
+  it("resolves preset paths from latest/ directory", async () => {
+    const result = await resolvePresetPaths(SRC_THEME, "fancy");
+    const latestDir = getThemeLatestDir(SRC_THEME);
+    assert.equal(result.templatesDir, path.join(latestDir, "presets", "fancy", "templates"));
+    assert.equal(result.menusDir, path.join(latestDir, "presets", "fancy", "menus"));
+    assert.deepEqual(result.settingsOverrides, { standard_accent: "#ff0000" });
+  });
+
+  it("falls back to root templates from latest/ when preset has no templates", async () => {
+    // Add a settings-only preset to latest/
+    const latestDir = getThemeLatestDir(SRC_THEME);
+    const minimalDir = path.join(latestDir, "presets", "minimal");
+    await fs.ensureDir(minimalDir);
+    await fs.outputJson(path.join(minimalDir, "preset.json"), { settings: { standard_accent: "#000" } });
+
+    const result = await resolvePresetPaths(SRC_THEME, "minimal");
+    assert.equal(result.templatesDir, path.join(latestDir, "templates"));
+    assert.equal(result.menusDir, null);
+    assert.deepEqual(result.settingsOverrides, { standard_accent: "#000" });
+
+    await fs.remove(minimalDir);
+  });
+});
+
+describe("getThemePresets reads from source dir", () => {
+  const PRESETS_SRC_THEME = "presets-source-api-theme";
+
+  before(async () => {
+    await createThemeOnDisk(PRESETS_SRC_THEME, { version: "1.0.0" });
+
+    // No presets in root — only via update
+    const v110 = getThemeVersionDir(PRESETS_SRC_THEME, "1.1.0");
+    await fs.ensureDir(v110);
+    await fs.writeFile(path.join(v110, "theme.json"), JSON.stringify({ name: PRESETS_SRC_THEME, version: "1.1.0" }));
+    const updatePresetsDir = path.join(v110, "presets");
+    await fs.ensureDir(path.join(updatePresetsDir, "studio"));
+    await fs.outputJson(path.join(updatePresetsDir, "presets.json"), {
+      default: "default",
+      presets: [{ id: "default", name: "Default" }, { id: "studio", name: "Studio" }],
+    });
+
+    await buildLatestSnapshot(PRESETS_SRC_THEME);
+  });
+
+  after(async () => {
+    await fs.remove(getThemeDir(PRESETS_SRC_THEME));
+  });
+
+  it("returns presets from latest/ via API", async () => {
+    const res = mockRes();
+    await getThemePresets(mockReq({ params: { id: PRESETS_SRC_THEME } }), res);
+    const data = res._json;
+    assert.equal(data.presets.length, 2);
+    assert.equal(data.presets[0].id, "default");
+    assert.equal(data.presets[1].id, "studio");
+    assert.equal(data.default, "default");
   });
 });

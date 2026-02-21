@@ -1,0 +1,242 @@
+{
+  "name": "Tax Resources",
+  "slug": "tax-resources",
+  "widgets": {
+    "resources_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "resources-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Resources",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "resources-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Stay ahead of deadlines and changes",
+            "size": "4xl"
+          }
+        },
+        "resources-text": {
+          "type": "text",
+          "settings": {
+            "text": "Key dates, common questions, and practical tips to keep your finances on track.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["resources-eyebrow", "resources-heading", "resources-text"]
+    },
+    "tax_calendar": {
+      "type": "event-list",
+      "settings": {
+        "eyebrow": "Tax calendar",
+        "title": "Important dates to remember",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "event-1": {
+          "type": "event",
+          "settings": {
+            "day": "15",
+            "month": "JAN",
+            "title": "Q4 Estimated Tax Payment",
+            "location": "Federal & State",
+            "description": "<p>Fourth quarter estimated tax payment due for self-employed individuals and businesses.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "event-2": {
+          "type": "event",
+          "settings": {
+            "day": "15",
+            "month": "APR",
+            "title": "Individual Tax Returns Due",
+            "location": "Federal",
+            "description": "<p>Deadline for filing individual income tax returns or requesting an extension.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "event-3": {
+          "type": "event",
+          "settings": {
+            "day": "15",
+            "month": "JUN",
+            "title": "Q2 Estimated Tax Payment",
+            "location": "Federal & State",
+            "description": "<p>Second quarter estimated tax payment due.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "event-4": {
+          "type": "event",
+          "settings": {
+            "day": "15",
+            "month": "SEP",
+            "title": "Q3 Estimated Tax Payment",
+            "location": "Federal & State",
+            "description": "<p>Third quarter estimated tax payment due. Also: S-Corp and partnership extended returns due.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "event-5": {
+          "type": "event",
+          "settings": {
+            "day": "15",
+            "month": "OCT",
+            "title": "Extended Individual Returns Due",
+            "location": "Federal",
+            "description": "<p>Final deadline for individual returns that received an extension.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["event-1", "event-2", "event-3", "event-4", "event-5"]
+    },
+    "tax_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "FAQ",
+        "title": "Common tax questions",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "What documents do I need for my tax return?",
+            "answer": "<p>You'll typically need W-2s from employers, 1099s for freelance or investment income, receipts for deductible expenses, mortgage interest statements (1098), property tax records, charitable donation receipts, and prior year tax returns for reference.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "When should I file my business taxes?",
+            "answer": "<p>Deadlines vary by entity type. S-Corps and partnerships are due March 15. C-Corps and sole proprietors file by April 15. Extensions are available but only extend the filing deadline, not the payment deadline.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Should I form an LLC or S-Corp?",
+            "answer": "<p>It depends on your revenue, self-employment tax situation, and growth plans. LLCs offer simplicity and flexibility. S-Corps can save on self-employment taxes once your income reaches a certain level. We help you evaluate both options based on your specific numbers.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Can I deduct my home office?",
+            "answer": "<p>Yes, if you use a dedicated space in your home regularly and exclusively for business. You can use the simplified method ($5 per square foot, up to 300 sq ft) or the regular method based on actual expenses proportional to your home's square footage.</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "question": "What happens if I miss a deadline?",
+            "answer": "<p>Late filing penalties are typically 5% of unpaid taxes per month, up to 25%. Late payment penalties are 0.5% per month. Filing an extension avoids the filing penalty but not the payment penalty. Contact us immediately if you've missed a deadline \u2014 we can help minimize penalties.</p>"
+          }
+        },
+        "faq-6": {
+          "type": "item",
+          "settings": {
+            "question": "How much should I set aside for estimated taxes?",
+            "answer": "<p>A general guideline is 25\u201330% of net self-employment income for federal taxes, plus your state rate. We recommend quarterly check-ins to adjust based on actual income and deductions throughout the year.</p>"
+          }
+        },
+        "faq-7": {
+          "type": "item",
+          "settings": {
+            "question": "Do I need a bookkeeper or just a tax preparer?",
+            "answer": "<p>If you have more than a handful of transactions per month, a bookkeeper keeps your records organized year-round and makes tax time much smoother. A tax preparer alone works best for simple situations. Most growing businesses benefit from both.</p>"
+          }
+        },
+        "faq-8": {
+          "type": "item",
+          "settings": {
+            "question": "How do I choose the right accounting software?",
+            "answer": "<p>QuickBooks Online is the most popular choice and integrates well with most banks and apps. Xero is great for businesses with international needs. FreshBooks works well for service-based freelancers. We can help you set up and optimize whichever platform fits your workflow.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5", "faq-6", "faq-7", "faq-8"]
+    },
+    "newsletter_signup": {
+      "type": "newsletter",
+      "settings": {
+        "eyebrow": "Stay informed",
+        "title": "Get tax tips and deadline reminders",
+        "description": "Monthly updates on tax law changes, filing tips, and important deadlines. No spam, just useful information.",
+        "placeholder": "Your email",
+        "button_text": "Subscribe",
+        "color_scheme": "standard"
+      }
+    },
+    "resources_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "resources-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Questions about your specific situation?",
+            "size": "4xl"
+          }
+        },
+        "resources-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Talk to a CPA",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["resources-cta-heading", "resources-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["resources_hero", "tax_calendar", "tax_faq", "newsletter_signup", "resources_cta"],
+  "id": "tax-resources",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

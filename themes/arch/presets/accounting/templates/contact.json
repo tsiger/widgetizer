@@ -1,0 +1,196 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_form": {
+      "type": "contact-form",
+      "settings": {
+        "eyebrow": "Contact",
+        "title": "Get a quote for your business",
+        "description": "Tell us about your business and we'll recommend the right service package. Free initial consultation.",
+        "form_action": "/submit",
+        "form_method": "POST",
+        "show_sidebar": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "input-name": {
+          "type": "input",
+          "settings": {
+            "label": "Name",
+            "name": "name",
+            "input_type": "text",
+            "placeholder": "Your name",
+            "required": true
+          }
+        },
+        "input-email": {
+          "type": "input",
+          "settings": {
+            "label": "Email",
+            "name": "email",
+            "input_type": "email",
+            "placeholder": "you@company.com",
+            "required": true
+          }
+        },
+        "input-business": {
+          "type": "input",
+          "settings": {
+            "label": "Business name",
+            "name": "business",
+            "input_type": "text",
+            "placeholder": "Your business name",
+            "required": false
+          }
+        },
+        "dropdown-service": {
+          "type": "dropdown",
+          "settings": {
+            "label": "Service needed",
+            "name": "service",
+            "options": "Tax preparation\nBookkeeping\nAudit & assurance\nPayroll services\nBusiness advisory\nEntity formation\nOther",
+            "required": false
+          }
+        },
+        "textarea-message": {
+          "type": "textarea",
+          "settings": {
+            "label": "Message",
+            "name": "message",
+            "placeholder": "Tell us about your business and what you need help with...",
+            "required": true
+          }
+        },
+        "submit-button": {
+          "type": "submit",
+          "settings": {
+            "text": "Send message"
+          }
+        },
+        "info-email": {
+          "type": "info",
+          "settings": {
+            "title": "Email",
+            "text": "hello@greenledger.com"
+          }
+        },
+        "info-phone": {
+          "type": "info",
+          "settings": {
+            "title": "Phone",
+            "text": "+1 (555) 390-7100"
+          }
+        },
+        "info-address": {
+          "type": "info",
+          "settings": {
+            "title": "Office",
+            "text": "350 Lincoln Road, Suite 200\nMiami, FL"
+          }
+        }
+      },
+      "blocksOrder": [
+        "input-name",
+        "input-email",
+        "input-business",
+        "dropdown-service",
+        "textarea-message",
+        "submit-button",
+        "info-email",
+        "info-phone",
+        "info-address"
+      ]
+    },
+    "office_hours": {
+      "type": "schedule-table",
+      "settings": {
+        "eyebrow": "Hours",
+        "title": "Office hours",
+        "note": "Extended hours January through April. Evening appointments available.",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "day-1": {
+          "type": "day",
+          "settings": {
+            "day": "Monday",
+            "hours": "8:00 AM \u2013 6:00 PM",
+            "closed": false
+          }
+        },
+        "day-2": {
+          "type": "day",
+          "settings": {
+            "day": "Tuesday",
+            "hours": "8:00 AM \u2013 6:00 PM",
+            "closed": false
+          }
+        },
+        "day-3": {
+          "type": "day",
+          "settings": {
+            "day": "Wednesday",
+            "hours": "8:00 AM \u2013 6:00 PM",
+            "closed": false
+          }
+        },
+        "day-4": {
+          "type": "day",
+          "settings": {
+            "day": "Thursday",
+            "hours": "8:00 AM \u2013 6:00 PM",
+            "closed": false
+          }
+        },
+        "day-5": {
+          "type": "day",
+          "settings": {
+            "day": "Friday",
+            "hours": "8:00 AM \u2013 6:00 PM",
+            "closed": false
+          }
+        },
+        "day-6": {
+          "type": "day",
+          "settings": {
+            "day": "Saturday",
+            "hours": "9:00 AM \u2013 1:00 PM (tax season only)",
+            "closed": false
+          }
+        },
+        "day-7": {
+          "type": "day",
+          "settings": {
+            "day": "Sunday",
+            "hours": "Closed",
+            "closed": true
+          }
+        }
+      },
+      "blocksOrder": ["day-1", "day-2", "day-3", "day-4", "day-5", "day-6", "day-7"]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Location",
+        "title": "Visit our office",
+        "description": "Convenient location with free parking.",
+        "address": "350 Lincoln Road, Suite 200, Miami, FL 33139",
+        "directions_link": {
+          "text": "Get directions",
+          "href": "https://maps.google.com/?q=350%20Lincoln%20Road%20Suite%20200%20Miami%20FL%2033139",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "color_scheme": "standard"
+      }
+    }
+  },
+  "widgetsOrder": ["contact_form", "office_hours", "contact_map"],
+  "id": "contact",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

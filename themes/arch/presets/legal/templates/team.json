@@ -1,0 +1,254 @@
+{
+  "name": "Our Team",
+  "slug": "team",
+  "widgets": {
+    "team_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "team-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Our Team",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "team-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Experienced attorneys who understand what's at stake",
+            "size": "4xl"
+          }
+        },
+        "team-text": {
+          "type": "text",
+          "settings": {
+            "text": "Every member of our team is committed to delivering exceptional legal representation with integrity and personal attention.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["team-eyebrow", "team-heading", "team-text"]
+    },
+    "team_profiles": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Attorneys",
+        "title": "Meet the Hargrove & Cole team",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "profile-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Thomas Hargrove",
+            "role": "Senior Partner",
+            "specialty": "Corporate & Real Estate",
+            "bio": "35+ years. Georgetown Law. Board advisor to regional businesses."
+          }
+        },
+        "profile-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Eleanor Cole",
+            "role": "Senior Partner",
+            "specialty": "Litigation",
+            "bio": "30+ years. Columbia Law. Former federal clerk. Known for courtroom excellence."
+          }
+        },
+        "profile-3": {
+          "type": "profile",
+          "settings": {
+            "name": "William Reyes",
+            "role": "Partner",
+            "specialty": "Employment Law",
+            "bio": "20+ years. NYU Law. Former EEOC counsel. Employment rights advocate."
+          }
+        },
+        "profile-4": {
+          "type": "profile",
+          "settings": {
+            "name": "Sarah Lindstr\u00f6m",
+            "role": "Partner",
+            "specialty": "Family Law & Estate",
+            "bio": "18+ years. Harvard Law. Mediator-trained. Handles sensitive matters with care."
+          }
+        },
+        "profile-5": {
+          "type": "profile",
+          "settings": {
+            "name": "Michael Adebayo",
+            "role": "Associate",
+            "specialty": "Corporate",
+            "bio": "8 years. Stanford Law. M&A and venture capital transactions."
+          }
+        },
+        "profile-6": {
+          "type": "profile",
+          "settings": {
+            "name": "Jennifer Walsh",
+            "role": "Associate",
+            "specialty": "IP & Litigation",
+            "bio": "6 years. Berkeley Law. Patent prosecution and IP litigation."
+          }
+        }
+      },
+      "blocksOrder": ["profile-1", "profile-2", "profile-3", "profile-4", "profile-5", "profile-6"]
+    },
+    "careers_callout": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "careers-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Careers",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "careers-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Join our team",
+            "size": "3xl"
+          }
+        },
+        "careers-body": {
+          "type": "text",
+          "settings": {
+            "text": "We're always looking for talented attorneys and legal professionals who share our commitment to excellence and client service. Hargrove & Cole offers competitive compensation, mentorship from experienced partners, and opportunities to work on meaningful cases.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "careers-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "View open positions",
+              "href": "#careers",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["careers-eyebrow", "careers-heading", "careers-body", "careers-button"]
+    },
+    "open_positions": {
+      "type": "job-listing",
+      "settings": {
+        "eyebrow": "Open positions",
+        "title": "Current opportunities",
+        "show_filters": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "job-1": {
+          "type": "job",
+          "settings": {
+            "title": "Associate Attorney",
+            "department": "Corporate",
+            "location": "New York, NY",
+            "type": "full-time",
+            "apply_link": {
+              "text": "Apply Now",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        },
+        "job-2": {
+          "type": "job",
+          "settings": {
+            "title": "Paralegal",
+            "department": "Litigation",
+            "location": "New York, NY",
+            "type": "full-time",
+            "apply_link": {
+              "text": "Apply Now",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        },
+        "job-3": {
+          "type": "job",
+          "settings": {
+            "title": "Legal Assistant",
+            "department": "General",
+            "location": "Hartford, CT",
+            "type": "full-time",
+            "apply_link": {
+              "text": "Apply Now",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["job-1", "job-2", "job-3"]
+    },
+    "team_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "team-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to build your legal career?",
+            "size": "4xl"
+          }
+        },
+        "team-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Join a firm that values mentorship, meaningful work, and professional growth.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "team-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Contact us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["team-cta-heading", "team-cta-text", "team-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["team_hero", "team_profiles", "careers_callout", "open_positions", "team_cta"],
+  "id": "team",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

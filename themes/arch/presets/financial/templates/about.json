@@ -1,0 +1,217 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_intro": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "about-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Our story",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "about-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Advice that serves the client, not the advisor",
+            "size": "3xl"
+          }
+        },
+        "about-body": {
+          "type": "text",
+          "settings": {
+            "text": "Meridian Wealth was founded on a simple conviction: financial advice should be free from conflicts of interest. As a fee-only firm, we earn no commissions and accept no third-party compensation. Every recommendation we make is grounded in evidence, aligned with your goals, and delivered with full transparency.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "about-features": {
+          "type": "features",
+          "settings": {
+            "features": "Fee-only, always\nFiduciary commitment\nEvidence-based investing"
+          }
+        },
+        "about-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Our services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Meet the team",
+              "href": "#team",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["about-eyebrow", "about-heading", "about-body", "about-features", "about-buttons"]
+    },
+    "milestones": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "Milestones",
+        "title": "Two decades of principled advice",
+        "description": "Key moments in our journey to serve clients with integrity.",
+        "layout": "centered",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "milestone-1": {
+          "type": "item",
+          "settings": {
+            "date": "2004",
+            "duration": "The beginning",
+            "title": "Founded",
+            "description": "Meridian Wealth Advisors opens its doors with a commitment to fee-only, fiduciary advice.",
+            "features": "Independent structure\nFiduciary from day one\nClient-first philosophy"
+          }
+        },
+        "milestone-2": {
+          "type": "item",
+          "settings": {
+            "date": "2010",
+            "duration": "Growth",
+            "title": "First $100M AUM",
+            "description": "Reached our first major milestone through referrals and long-term client relationships.",
+            "features": "100+ client families\nExpanded advisory team\nNew York headquarters"
+          }
+        },
+        "milestone-3": {
+          "type": "item",
+          "settings": {
+            "date": "2016",
+            "duration": "Transition",
+            "title": "Fee-only transition",
+            "description": "Completed full transition to a fee-only model, eliminating all commission-based compensation.",
+            "features": "Zero commissions\nFull transparency\nAligned incentives"
+          }
+        },
+        "milestone-4": {
+          "type": "item",
+          "settings": {
+            "date": "2024",
+            "duration": "Milestone",
+            "title": "$2B milestone",
+            "description": "Surpassed $2 billion in assets under management, serving over 300 families nationwide.",
+            "features": "300+ families served\nNationwide reach\n98% client retention"
+          }
+        }
+      },
+      "blocksOrder": ["milestone-1", "milestone-2", "milestone-3", "milestone-4"]
+    },
+    "team_profiles": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Leadership",
+        "title": "Meet our advisors",
+        "description": "Credentialed professionals dedicated to your financial well-being.",
+        "columns_desktop": 4,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "profile-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Catherine Aldridge",
+            "role": "Managing Partner",
+            "specialty": "CFP, CFA — Wealth Management",
+            "bio": "Catherine founded Meridian in 2004 with a vision for conflict-free financial advice. She leads the firm's strategy and client relationships."
+          }
+        },
+        "profile-2": {
+          "type": "profile",
+          "settings": {
+            "name": "James Okoye",
+            "role": "Director, Investments",
+            "specialty": "CFA",
+            "bio": "James oversees portfolio construction and investment research, applying an evidence-based approach to asset allocation."
+          }
+        },
+        "profile-3": {
+          "type": "profile",
+          "settings": {
+            "name": "Sarah Chen",
+            "role": "Director, Tax Strategy",
+            "specialty": "CPA, CFP",
+            "bio": "Sarah coordinates tax planning across client portfolios, identifying opportunities to minimize liability and maximize after-tax returns."
+          }
+        },
+        "profile-4": {
+          "type": "profile",
+          "settings": {
+            "name": "David Reeves",
+            "role": "Director, Estate Planning",
+            "specialty": "JD",
+            "bio": "David guides families through estate and legacy planning, ensuring wealth is protected and transferred according to their wishes."
+          }
+        }
+      },
+      "blocksOrder": ["profile-1", "profile-2", "profile-3", "profile-4"]
+    },
+    "about_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "about-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to discuss your financial future?",
+            "size": "4xl"
+          }
+        },
+        "about-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Schedule a confidential conversation with one of our senior advisors.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "about-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["about-cta-heading", "about-cta-text", "about-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["about_intro", "milestones", "team_profiles", "about_cta"],
+  "id": "about",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

@@ -1,0 +1,418 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero_slideshow": {
+      "type": "slideshow",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "autoplay": true,
+        "autoplay_speed": 6000
+      },
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Lead with clarity, not certainty",
+            "heading_size": "5xl",
+            "text_content": "Executive coaching for leaders who want to think bigger, decide faster, and build teams that thrive.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "Book discovery call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_link_2": {
+              "text": "View programs",
+              "href": "programs.html",
+              "target": "_self"
+            },
+            "button_style_2": "secondary",
+            "button_size": "medium",
+            "color_scheme": "highlight"
+          }
+        },
+        "slide-2": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Every leader deserves a thinking partner",
+            "heading_size": "5xl",
+            "text_content": "From first-time founders to seasoned executives, I help you unlock what's next.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "Success stories",
+              "href": "success-stories.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_link_2": {
+              "text": "About me",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "button_style_2": "secondary",
+            "button_size": "medium",
+            "color_scheme": "highlight"
+          }
+        }
+      },
+      "blocksOrder": ["slide-1", "slide-2"]
+    },
+    "logo_cloud": {
+      "type": "logo-cloud",
+      "settings": {
+        "eyebrow": "Trusted by leaders at",
+        "title": "Coaching that scales impact",
+        "description": "Helping executives and teams at forward-thinking companies reach their full potential.",
+        "columns_desktop": 6,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "logo-1": {
+          "type": "logo",
+          "settings": {
+            "name": "Resonance"
+          }
+        },
+        "logo-2": {
+          "type": "logo",
+          "settings": {
+            "name": "Thrive Labs"
+          }
+        },
+        "logo-3": {
+          "type": "logo",
+          "settings": {
+            "name": "Apex Partners"
+          }
+        },
+        "logo-4": {
+          "type": "logo",
+          "settings": {
+            "name": "Kinetic"
+          }
+        },
+        "logo-5": {
+          "type": "logo",
+          "settings": {
+            "name": "Verdant"
+          }
+        },
+        "logo-6": {
+          "type": "logo",
+          "settings": {
+            "name": "Luminary"
+          }
+        }
+      },
+      "blocksOrder": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5", "logo-6"]
+    },
+    "key_figures": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Impact",
+        "title": "Real outcomes for real leaders",
+        "description": "Measurable results from coaching engagements around the world.",
+        "columns_desktop": 4,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "figure-1": {
+          "type": "figure",
+          "settings": {
+            "number": "500",
+            "suffix": "+",
+            "label": "Leaders",
+            "description": "Coached"
+          }
+        },
+        "figure-2": {
+          "type": "figure",
+          "settings": {
+            "number": "94",
+            "suffix": "%",
+            "label": "Goal Achievement",
+            "description": "Client success rate"
+          }
+        },
+        "figure-3": {
+          "type": "figure",
+          "settings": {
+            "number": "12",
+            "suffix": "",
+            "label": "Countries",
+            "description": "Global reach"
+          }
+        },
+        "figure-4": {
+          "type": "figure",
+          "settings": {
+            "number": "15",
+            "suffix": " Years",
+            "label": "Experience",
+            "description": "In executive coaching"
+          }
+        }
+      },
+      "blocksOrder": ["figure-1", "figure-2", "figure-3", "figure-4"]
+    },
+    "meet_your_coach": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "coach-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Meet your coach",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "coach-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "I help leaders get unstuck",
+            "size": "3xl"
+          }
+        },
+        "coach-body": {
+          "type": "text",
+          "settings": {
+            "text": "After 15 years in executive roles and a personal burnout that changed everything, I founded Catalyst to give leaders the clarity and accountability I wish I had.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "coach-features": {
+          "type": "features",
+          "settings": {
+            "features": "ICF-PCC Certified\n15 years executive experience\nHarvard MBA"
+          }
+        },
+        "coach-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "My story",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["coach-eyebrow", "coach-heading", "coach-body", "coach-features", "coach-buttons"]
+    },
+    "programs_switcher": {
+      "type": "content-switcher",
+      "settings": {
+        "eyebrow": "Programs",
+        "title": "Choose your path",
+        "description": "Whether you are an individual leader or building a high-performing team, there is a Catalyst program for you.",
+        "switcher_type": "toggle",
+        "option_1_label": "For Individuals",
+        "option_2_label": "For Teams",
+        "columns": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "item-1": {
+          "type": "item",
+          "settings": {
+            "title": "Executive Coaching",
+            "text": "<p>Private 1-on-1 coaching for senior leaders who want sharper thinking, stronger presence, and better results.</p>",
+            "target_option": "1",
+            "link": {
+              "text": "Learn more",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        },
+        "item-2": {
+          "type": "item",
+          "settings": {
+            "title": "Leadership Foundations",
+            "text": "<p>A structured program for emerging leaders stepping into their first management or director-level role.</p>",
+            "target_option": "1",
+            "link": {
+              "text": "Learn more",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        },
+        "item-3": {
+          "type": "item",
+          "settings": {
+            "title": "Career Transition",
+            "text": "<p>Coaching support for leaders navigating a career pivot, new role, or entrepreneurial leap.</p>",
+            "target_option": "1",
+            "link": {
+              "text": "Learn more",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        },
+        "item-4": {
+          "type": "item",
+          "settings": {
+            "title": "Team Alignment Workshop",
+            "text": "<p>A facilitated workshop that gets your leadership team on the same page around goals, roles, and priorities.</p>",
+            "target_option": "2",
+            "link": {
+              "text": "Learn more",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        },
+        "item-5": {
+          "type": "item",
+          "settings": {
+            "title": "Leadership Retreat",
+            "text": "<p>An immersive two-day experience for leadership teams who need to reset, reconnect, and realign.</p>",
+            "target_option": "2",
+            "link": {
+              "text": "Learn more",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        },
+        "item-6": {
+          "type": "item",
+          "settings": {
+            "title": "Culture Reset Program",
+            "text": "<p>A multi-month engagement to rebuild trust, improve communication, and create a thriving team culture.</p>",
+            "target_option": "2",
+            "link": {
+              "text": "Learn more",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["item-1", "item-2", "item-3", "item-4", "item-5", "item-6"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "What clients say",
+        "title": "Leaders who found their edge",
+        "description": "Hear from executives who transformed their leadership through coaching.",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Catalyst gave me the clarity to stop reacting and start leading with intention. My team noticed the difference within weeks.",
+            "name": "David Park",
+            "title": "CTO, Kinetic",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "I went from dreading difficult conversations to welcoming them. The frameworks I learned have changed how I lead.",
+            "name": "Sarah Mitchell",
+            "title": "VP of People, Verdant",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "The ROI on coaching was immediate. Within one quarter, I had better focus, better meetings, and a stronger team.",
+            "name": "James Okonkwo",
+            "title": "Founder, Luminary",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+    },
+    "cta_banner": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "cta-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Ready to grow?",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Book your free discovery call",
+            "size": "4xl"
+          }
+        },
+        "cta-body": {
+          "type": "text",
+          "settings": {
+            "text": "30 minutes to explore where you are, where you want to be, and how coaching can bridge the gap.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book discovery call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View programs",
+              "href": "programs.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-eyebrow", "cta-heading", "cta-body", "cta-buttons"]
+    }
+  },
+  "widgetsOrder": [
+    "hero_slideshow",
+    "logo_cloud",
+    "key_figures",
+    "meet_your_coach",
+    "programs_switcher",
+    "testimonials",
+    "cta_banner"
+  ],
+  "id": "index",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

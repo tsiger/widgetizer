@@ -1,0 +1,175 @@
+{
+  "name": "Industries",
+  "slug": "industries",
+  "widgets": {
+    "industries_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "industries-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Industries",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "industries-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Specialized expertise for your industry",
+            "size": "4xl"
+          }
+        },
+        "industries-text": {
+          "type": "text",
+          "settings": {
+            "text": "Every industry has unique financial challenges. We bring sector-specific knowledge to every engagement.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["industries-eyebrow", "industries-heading", "industries-text"]
+    },
+    "sectors_grid": {
+      "type": "bento-grid",
+      "settings": {
+        "eyebrow": "Sectors",
+        "title": "Industries we serve",
+        "gap": "var(--space-lg)",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "item-1": {
+          "type": "item",
+          "settings": {
+            "title": "Real Estate",
+            "text": "Property management accounting, 1031 exchanges, and investor reporting.",
+            "col_span": 2,
+            "row_span": 1
+          }
+        },
+        "item-2": {
+          "type": "item",
+          "settings": {
+            "title": "Healthcare",
+            "text": "HIPAA-compliant billing, practice management, and physician tax planning.",
+            "col_span": 1,
+            "row_span": 1
+          }
+        },
+        "item-3": {
+          "type": "item",
+          "settings": {
+            "title": "Tech Startups",
+            "text": "R&D tax credits, stock option planning, and runway forecasting.",
+            "col_span": 1,
+            "row_span": 1
+          }
+        },
+        "item-4": {
+          "type": "item",
+          "settings": {
+            "title": "Restaurants",
+            "text": "Food cost analysis, tip reporting, and multi-location consolidation.",
+            "col_span": 1,
+            "row_span": 1
+          }
+        },
+        "item-5": {
+          "type": "item",
+          "settings": {
+            "title": "E-commerce",
+            "text": "Sales tax nexus, inventory accounting, and marketplace reporting.",
+            "col_span": 1,
+            "row_span": 1
+          }
+        },
+        "item-6": {
+          "type": "item",
+          "settings": {
+            "title": "Professional Services",
+            "text": "Partner compensation, trust accounting, and professional liability planning.",
+            "col_span": 2,
+            "row_span": 1
+          }
+        }
+      },
+      "blocksOrder": ["item-1", "item-2", "item-3", "item-4", "item-5", "item-6"]
+    },
+    "industry_deep_dives": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "Spotlight",
+        "title": "Industry deep dives",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "feature-1": {
+          "type": "feature",
+          "settings": {
+            "title": "Real Estate Accounting",
+            "description": "<p>From individual landlords to commercial developers, we handle the complexity of real estate finance.</p><ul><li>1031 exchange planning</li><li>Cost segregation studies</li><li>Investor K-1 preparation</li><li>Property management reporting</li></ul>"
+          }
+        },
+        "feature-2": {
+          "type": "feature",
+          "settings": {
+            "title": "Startup Advisory",
+            "description": "<p>We help founders navigate the financial side of building a company, from incorporation to exit.</p><ul><li>R&D tax credit maximization</li><li>409A valuations</li><li>Stock option tax planning</li><li>Investor-ready financials</li></ul>"
+          }
+        }
+      },
+      "blocksOrder": ["feature-1", "feature-2"]
+    },
+    "industries_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "industries-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Need industry-specific expertise?",
+            "size": "4xl"
+          }
+        },
+        "industries-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Talk to a CPA",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["industries-cta-heading", "industries-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["industries_hero", "sectors_grid", "industry_deep_dives", "industries_cta"],
+  "id": "industries",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

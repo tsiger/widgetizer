@@ -1,0 +1,246 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_hero": {
+      "type": "split-hero",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "From corporate burnout to coaching",
+            "size": "4xl"
+          }
+        },
+        "hero-body": {
+          "type": "text",
+          "settings": {
+            "text": "After 15 years climbing the corporate ladder, a personal crisis made me realize: the system that develops leaders is broken. I founded Catalyst to fix it.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Work with me",
+              "href": "programs.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-body", "hero-buttons"]
+    },
+    "journey_timeline": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "The journey",
+        "title": "How Catalyst came to be",
+        "description": "A path shaped by experience, transformation, and purpose.",
+        "layout": "centered",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "milestone-1": {
+          "type": "item",
+          "settings": {
+            "date": "2008",
+            "duration": "",
+            "title": "Corporate leadership",
+            "description": "VP at a Fortune 500, leading teams of 200+ across three continents.",
+            "features": "Strategic planning\nTeam leadership\nP&L management"
+          }
+        },
+        "milestone-2": {
+          "type": "item",
+          "settings": {
+            "date": "2014",
+            "duration": "",
+            "title": "The breaking point",
+            "description": "Burnout led to a personal transformation and a complete rethinking of what leadership means.",
+            "features": "Self-discovery\nMindfulness practice\nLeadership reimagined"
+          }
+        },
+        "milestone-3": {
+          "type": "item",
+          "settings": {
+            "date": "2016",
+            "duration": "",
+            "title": "ICF Certification",
+            "description": "Completed intensive coaching training and earned the Professional Certified Coach credential.",
+            "features": "ICF-PCC credential\nExecutive coaching methodology\nAssessment certification"
+          }
+        },
+        "milestone-4": {
+          "type": "item",
+          "settings": {
+            "date": "2018",
+            "duration": "",
+            "title": "Catalyst founded",
+            "description": "Launched the practice and welcomed the first 50 coaching clients within the first year.",
+            "features": "First 50 clients\n1-on-1 coaching\nWorkshop facilitation"
+          }
+        },
+        "milestone-5": {
+          "type": "item",
+          "settings": {
+            "date": "2024",
+            "duration": "",
+            "title": "500+ leaders coached",
+            "description": "Grew into a global practice serving leaders across 12 countries and every major industry.",
+            "features": "Global practice\nTeam programs\nPodcast launched"
+          }
+        }
+      },
+      "blocksOrder": ["milestone-1", "milestone-2", "milestone-3", "milestone-4", "milestone-5"]
+    },
+    "credentials_figures": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Credentials",
+        "title": "The foundation behind the coaching",
+        "description": "Qualifications and experience that inform every coaching engagement.",
+        "columns_desktop": 3,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "credential-1": {
+          "type": "figure",
+          "settings": {
+            "number": "ICF-PCC",
+            "suffix": "",
+            "label": "Certified",
+            "description": "International Coaching Federation"
+          }
+        },
+        "credential-2": {
+          "type": "figure",
+          "settings": {
+            "number": "15",
+            "suffix": " Years",
+            "label": "Executive Experience",
+            "description": "Fortune 500 leadership"
+          }
+        },
+        "credential-3": {
+          "type": "figure",
+          "settings": {
+            "number": "Harvard",
+            "suffix": "",
+            "label": "MBA",
+            "description": "Business Administration"
+          }
+        }
+      },
+      "blocksOrder": ["credential-1", "credential-2", "credential-3"]
+    },
+    "philosophy_callout": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "philosophy-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Philosophy",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "philosophy-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Coaching that challenges and supports in equal measure",
+            "size": "2xl"
+          }
+        },
+        "philosophy-body": {
+          "type": "text",
+          "settings": {
+            "text": "I believe every leader already has the answers. My job is to ask the right questions, hold you accountable, and help you see what's been invisible.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "philosophy-features": {
+          "type": "features",
+          "settings": {
+            "features": "Challenge your assumptions\nBuild sustainable habits\nMeasure what matters\nCelebrate progress"
+          }
+        }
+      },
+      "blocksOrder": ["philosophy-eyebrow", "philosophy-heading", "philosophy-body", "philosophy-features"]
+    },
+    "about_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "about-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let's explore what's possible",
+            "size": "4xl"
+          }
+        },
+        "about-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Book a free discovery call to talk about your goals and see if coaching is the right fit.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "about-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book discovery call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View programs",
+              "href": "programs.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["about-cta-heading", "about-cta-text", "about-cta-buttons"]
+    }
+  },
+  "widgetsOrder": [
+    "about_hero",
+    "journey_timeline",
+    "credentials_figures",
+    "philosophy_callout",
+    "about_cta"
+  ],
+  "id": "about",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

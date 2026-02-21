@@ -1,0 +1,253 @@
+{
+  "name": "Programs",
+  "slug": "programs",
+  "widgets": {
+    "programs_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "programs-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Programs",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "programs-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Programs designed to accelerate your leadership",
+            "size": "4xl"
+          }
+        },
+        "programs-text": {
+          "type": "text",
+          "settings": {
+            "text": "Whether you are a solo leader or building a high-performing team, there is a Catalyst program for where you are right now.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "programs-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book discovery call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["programs-eyebrow", "programs-heading", "programs-text", "programs-buttons"]
+    },
+    "programs_split": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "What we offer",
+        "title": "Three ways to work together",
+        "description": "<p>Every engagement is tailored to your goals, timeline, and context. Here are our core offerings.</p>",
+        "content_position": "left",
+        "show_divider": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "feature-1": {
+          "type": "feature",
+          "settings": {
+            "title": "1-on-1 Executive Coaching",
+            "description": "<p>Private coaching sessions designed around your leadership challenges. We work together to build clarity, confidence, and a concrete action plan you can execute immediately.</p><p><strong>What's included:</strong></p><p>Bi-weekly 60-minute sessions<br>Personality and strengths assessments<br>Action plans with accountability<br>Email support between sessions</p>"
+          }
+        },
+        "feature-2": {
+          "type": "feature",
+          "settings": {
+            "title": "Leadership Retreats",
+            "description": "<p>An immersive two-day experience for leadership teams who need to step back, see the big picture, and realign around what matters most.</p><p><strong>What's included:</strong></p><p>2-day intensive experience<br>Small group (6-8 leaders)<br>Facilitated workshops<br>90-day follow-up coaching</p>"
+          }
+        },
+        "feature-3": {
+          "type": "feature",
+          "settings": {
+            "title": "Team Alignment Workshops",
+            "description": "<p>Facilitated sessions that surface the real dynamics on your team and create shared commitments for moving forward together.</p><p><strong>What's included:</strong></p><p>Half-day or full-day format<br>Team dynamics assessment<br>Conflict resolution framework<br>Shared goals and commitments</p>"
+          }
+        }
+      },
+      "blocksOrder": ["feature-1", "feature-2", "feature-3"]
+    },
+    "programs_pricing": {
+      "type": "pricing",
+      "settings": {
+        "eyebrow": "Investment",
+        "title": "Choose your level",
+        "description": "Transparent pricing for every stage of your leadership journey.",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "plan-1": {
+          "type": "plan",
+          "settings": {
+            "title": "Catalyst Starter",
+            "price": "$1,500",
+            "period": "per month",
+            "features": "+ 2 sessions per month\n+ Goal-setting framework\n+ Email support\n+ Monthly progress review",
+            "button_link": {
+              "text": "Get started",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        },
+        "plan-2": {
+          "type": "plan",
+          "settings": {
+            "title": "Catalyst Growth",
+            "price": "$2,800",
+            "period": "per month",
+            "features": "+ 4 sessions per month\n+ Comprehensive assessments\n+ Priority scheduling\n+ Slack access for quick questions\n+ Quarterly strategy session",
+            "button_link": {
+              "text": "Get started",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": true
+          }
+        },
+        "plan-3": {
+          "type": "plan",
+          "settings": {
+            "title": "Catalyst Enterprise",
+            "price": "Custom",
+            "period": "",
+            "features": "+ Team coaching program\n+ On-site workshops\n+ Leadership retreats\n+ Culture assessment\n+ Dedicated support team",
+            "button_link": {
+              "text": "Contact us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        }
+      },
+      "blocksOrder": ["plan-1", "plan-2", "plan-3"]
+    },
+    "programs_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Questions",
+        "title": "Frequently asked questions",
+        "description": "<p>Everything you need to know before getting started with coaching.</p>",
+        "style": "separated",
+        "allow_multiple": false,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "How long is a typical coaching engagement?",
+            "answer": "<p>Most clients work with me for 6 to 12 months, though some engagements are shorter or longer depending on goals. We will discuss the right timeline during your discovery call and adjust as you make progress.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "What is your coaching style?",
+            "answer": "<p>I use a Socratic approach combined with accountability. That means I ask powerful questions to help you think differently, then we create structures to ensure you follow through. Expect to be challenged and supported in equal measure.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Do you work with teams?",
+            "answer": "<p>Yes. In addition to 1-on-1 executive coaching, I offer dedicated team programs including alignment workshops, leadership retreats, and multi-month culture reset engagements. These are customized to your team's specific needs.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "What results can I expect?",
+            "answer": "<p>Clients typically experience greater clarity in decision-making, improved confidence in difficult conversations, stronger team dynamics, and measurable progress on their most important goals. 94% of clients achieve their primary coaching objectives.</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "question": "How do I get started?",
+            "answer": "<p>It starts with a free 30-minute discovery call where we discuss your goals and challenges. From there, I will recommend the best program and we will do a mutual fit assessment before beginning. No pressure, no pitch.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5"]
+    },
+    "programs_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "programs-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to invest in your leadership?",
+            "size": "4xl"
+          }
+        },
+        "programs-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Book a free discovery call and let's find the right program for where you are right now.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "programs-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book discovery call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View success stories",
+              "href": "success-stories.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["programs-cta-heading", "programs-cta-text", "programs-cta-buttons"]
+    }
+  },
+  "widgetsOrder": [
+    "programs_hero",
+    "programs_split",
+    "programs_pricing",
+    "programs_faq",
+    "programs_cta"
+  ],
+  "id": "programs",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

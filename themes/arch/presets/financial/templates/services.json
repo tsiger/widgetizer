@@ -1,0 +1,313 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "services_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "services-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Services",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "services-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Comprehensive financial planning for every stage",
+            "size": "4xl"
+          }
+        },
+        "services-text": {
+          "type": "text",
+          "settings": {
+            "text": "From wealth building to legacy planning, we provide clarity at each step.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "services-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our approach",
+              "href": "approach.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["services-eyebrow", "services-heading", "services-text", "services-buttons"]
+    },
+    "services_grid": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "What we offer",
+        "title": "Services tailored to your life",
+        "description": "A full spectrum of financial planning and investment services, delivered with independence and transparency.",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "service-1": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Planning",
+            "title": "Retirement Planning",
+            "description": "Build a clear path to financial independence with projections, income strategies, and Social Security optimization.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "beach"
+          }
+        },
+        "service-2": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Legacy",
+            "title": "Estate Planning",
+            "description": "Protect your legacy with trust strategies, beneficiary reviews, and coordinated estate documentation.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "tree"
+          }
+        },
+        "service-3": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Tax",
+            "title": "Tax Strategy",
+            "description": "Reduce your tax burden through asset location, tax-loss harvesting, Roth conversions, and charitable giving.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "receipt-tax"
+          }
+        },
+        "service-4": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Investments",
+            "title": "Investment Management",
+            "description": "Diversified, low-cost portfolios built on academic research and aligned with your risk tolerance.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "chart-line"
+          }
+        },
+        "service-5": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Protection",
+            "title": "Insurance Review",
+            "description": "Independent analysis of life, disability, and long-term care coverage to ensure proper protection.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "shield-check"
+          }
+        },
+        "service-6": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Business",
+            "title": "Business Succession",
+            "description": "Plan for ownership transitions, key-person risk, and business valuation with tax-efficient strategies.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "replace"
+          }
+        }
+      },
+      "blocksOrder": ["service-1", "service-2", "service-3", "service-4", "service-5", "service-6"]
+    },
+    "features_deep_dive": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "Deep dive",
+        "title": "How we approach retirement and estate planning",
+        "description": "<p>Our planning process is thorough, personalized, and grounded in evidence. Here is how we help clients in two of our most requested areas.</p>",
+        "content_position": "left",
+        "show_divider": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "feature-1": {
+          "type": "feature",
+          "settings": {
+            "title": "Retirement Planning",
+            "description": "<p>We model multiple retirement scenarios using Monte Carlo simulations, Social Security optimization, and tax-aware withdrawal sequencing. The result is a clear, actionable plan that adapts as your life changes.</p>"
+          }
+        },
+        "feature-2": {
+          "type": "feature",
+          "settings": {
+            "title": "Estate & Legacy Planning",
+            "description": "<p>We coordinate with your estate attorney to review trusts, beneficiary designations, and gifting strategies. Our goal is to ensure your wealth transfers efficiently and according to your wishes.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["feature-1", "feature-2"]
+    },
+    "pricing_tiers": {
+      "type": "comparison-table",
+      "settings": {
+        "eyebrow": "Engagement tiers",
+        "title": "Choose the right level of support",
+        "description": "Transparent pricing with no hidden fees or commissions.",
+        "feature_column_label": "Features",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "col-essentials": {
+          "type": "column",
+          "settings": {
+            "name": "Essentials — $5K/yr",
+            "featured": false
+          }
+        },
+        "col-growth": {
+          "type": "column",
+          "settings": {
+            "name": "Growth — $12K/yr",
+            "featured": true,
+            "badge": "Most Popular"
+          }
+        },
+        "col-legacy": {
+          "type": "column",
+          "settings": {
+            "name": "Legacy — $25K/yr",
+            "featured": false
+          }
+        },
+        "feat-plan": {
+          "type": "feature",
+          "settings": {
+            "name": "Financial plan",
+            "values": "✓\n✓\n✓"
+          }
+        },
+        "feat-invest": {
+          "type": "feature",
+          "settings": {
+            "name": "Investment management",
+            "values": "✓\n✓\n✓"
+          }
+        },
+        "feat-tax": {
+          "type": "feature",
+          "settings": {
+            "name": "Tax coordination",
+            "values": "✗\n✓\n✓"
+          }
+        },
+        "feat-estate": {
+          "type": "feature",
+          "settings": {
+            "name": "Estate review",
+            "values": "✗\n✓\n✓"
+          }
+        },
+        "feat-advisor": {
+          "type": "feature",
+          "settings": {
+            "name": "Dedicated advisor",
+            "values": "✗\n✗\n✓"
+          }
+        },
+        "feat-family": {
+          "type": "feature",
+          "settings": {
+            "name": "Family meetings",
+            "values": "✗\n✗\n✓"
+          }
+        }
+      },
+      "blocksOrder": ["col-essentials", "col-growth", "col-legacy", "feat-plan", "feat-invest", "feat-tax", "feat-estate", "feat-advisor", "feat-family"]
+    },
+    "services_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "services-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let's find the right fit",
+            "size": "4xl"
+          }
+        },
+        "services-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Schedule a complimentary consultation to discuss your needs and explore which engagement tier is right for you.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "services-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our approach",
+              "href": "approach.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["services-cta-heading", "services-cta-text", "services-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["services_hero", "services_grid", "features_deep_dive", "pricing_tiers", "services_cta"],
+  "id": "services",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}
