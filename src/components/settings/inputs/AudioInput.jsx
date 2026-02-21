@@ -3,6 +3,7 @@ import { uploadProjectMedia, getProjectMedia } from "../../../queries/mediaManag
 import { apiFetch } from "../../../lib/apiFetch";
 import useProjectStore from "../../../stores/projectStore";
 import useToastStore from "../../../stores/toastStore";
+import useAppSettings from "../../../hooks/useAppSettings";
 import { X, Edit, UploadCloud, Music } from "lucide-react";
 import MediaDrawer from "../../../components/media/MediaDrawer";
 import MediaSelectorDrawer from "../../../components/media/MediaSelectorDrawer";
@@ -13,6 +14,7 @@ export default function AudioInput({ id, value = "", onChange }) {
   const fileInputRef = useRef(null);
   const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
+  const { settings } = useAppSettings();
 
   // State for the media drawers
   const [metadataDrawerVisible, setMetadataDrawerVisible] = useState(false);
@@ -43,6 +45,14 @@ export default function AudioInput({ id, value = "", onChange }) {
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (!file || !activeProject) return;
+
+    const limitMB = settings?.media?.maxAudioSizeMB ?? 25;
+    if (file.size > limitMB * 1024 * 1024) {
+      const fileSizeMB = (file.size / 1024 / 1024).toFixed(1);
+      showToast(`File is too large (${fileSizeMB}MB). Maximum allowed size is ${limitMB}MB.`, "error");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
 
     setUploading(true);
     try {
