@@ -35,7 +35,9 @@ export async function publishProjectAPI(projectId) {
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(result.error || result.message || "Publish failed");
+    const err = new Error(result.error || result.message || "Publish failed");
+    err.status = response.status;
+    throw err;
   }
 
   return result;

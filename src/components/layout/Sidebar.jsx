@@ -77,6 +77,11 @@ export default function Sidebar() {
   };
 
   const renderSection = (section) => {
+    const visibleItems = HOSTED_MODE
+      ? section.items.filter((item) => !item.hostedHidden)
+      : section.items;
+    if (visibleItems.length === 0) return null;
+
     if (section.position === "bottom") {
       return (
         <div key={section.id} className="pt-4 border-t border-slate-800">

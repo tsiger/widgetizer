@@ -1,6 +1,18 @@
 import { PUBLISHER_API_URL } from "../hostedMode.js";
 
 /**
+ * Error thrown when the Publisher API returns a non-OK response.
+ * Preserves the HTTP status code so callers can forward it to the client.
+ */
+export class PublisherError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.name = "PublisherError";
+    this.status = status;
+  }
+}
+
+/**
  * Deploy a ZIP archive to the Publisher service.
  *
  * @param {Buffer} zipBuffer - ZIP file contents
@@ -9,6 +21,7 @@ import { PUBLISHER_API_URL } from "../hostedMode.js";
  * @param {string} metadata.projectName - Project name for display
  * @param {string} clerkToken - Clerk JWT to forward for authentication
  * @returns {Promise<{success: boolean, siteId: string, subdomain: string, url: string, version: number}>}
+ * @throws {PublisherError} If the Publisher API returns a non-OK response (preserves HTTP status)
  * @throws {Error} If PUBLISHER_API_URL is not configured or the deploy request fails
  */
 export async function deployToPublisher(zipBuffer, metadata, clerkToken) {
@@ -44,7 +57,7 @@ export async function deployToPublisher(zipBuffer, metadata, clerkToken) {
   }
 
   if (!response.ok) {
-    throw new Error(data.error || `Publisher deploy failed (HTTP ${response.status})`);
+    throw new PublisherError(data.error || `Publisher deploy failed (HTTP ${response.status})`, response.status);
   }
 
   return data;

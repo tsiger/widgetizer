@@ -93,6 +93,11 @@ export async function publishProject(req, res) {
 
     if (handleProjectResolutionError(res, error)) return;
 
+    // Forward Publisher API errors with their original status code (e.g. 403 tier limit)
+    if (error.name === "PublisherError" && error.status) {
+      return res.status(error.status).json({ error: error.message });
+    }
+
     console.error("Publish error:", error);
     res.status(500).json({
       error: "Failed to publish project",

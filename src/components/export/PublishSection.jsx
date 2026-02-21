@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import Button from "../ui/Button";
 import { publishProjectAPI, getPublishStatusAPI } from "../../queries/publishManager";
 import useToastStore from "../../stores/toastStore";
-import { Loader2, ExternalLink, Globe, Rocket } from "lucide-react";
+import { Loader2, ExternalLink, Globe, Rocket, ArrowUpCircle } from "lucide-react";
+import { PUBLISHER_URL } from "../../config";
 
 /**
  * Publish section shown at the top of the Export page in hosted mode.
@@ -72,8 +73,12 @@ export default function PublishSection({ activeProject }) {
       }
     } catch (err) {
       console.error("Publish failed:", err);
-      setError(err.message);
-      showToast(t("publishSite.publishError", { message: err.message }), "error");
+      if (err.status === 403) {
+        setError({ type: "upgrade", message: err.message });
+      } else {
+        setError({ type: "generic", message: err.message });
+        showToast(t("publishSite.publishError", { message: err.message }), "error");
+      }
     } finally {
       setIsPublishing(false);
     }
@@ -129,9 +134,31 @@ export default function PublishSection({ activeProject }) {
             <p className="text-slate-600 mb-4">{t("publishSite.description")}</p>
           )}
 
-          {error && (
+          {error?.type === "upgrade" && (
+            <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-sm">
+              <div className="flex items-start gap-3">
+                <ArrowUpCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800">{error.message}</p>
+                  {PUBLISHER_URL && (
+                    <a
+                      href={`${PUBLISHER_URL}/pricing`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 mt-2 text-sm font-medium text-amber-700 hover:text-amber-900 underline"
+                    >
+                      View plans & upgrade
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {error?.type === "generic" && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-sm">
-              <p className="text-sm text-red-700">{error}</p>
+              <p className="text-sm text-red-700">{error.message}</p>
             </div>
           )}
 

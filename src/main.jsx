@@ -11,6 +11,7 @@ const ClerkProviderWrapper =
 
 const AuthGuard =
   HOSTED_MODE && CLERK_PUBLISHABLE_KEY ? lazy(() => import("./components/auth/AuthGuard")) : null;
+  
 
 function LoadingScreen() {
   return (
