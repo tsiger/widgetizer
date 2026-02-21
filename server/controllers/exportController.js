@@ -126,10 +126,11 @@ export async function cleanupProjectExports(projectId, userId = "local") {
  * @param {string} userId - User ID for scoping
  * @param {object} [options] - Export options
  * @param {boolean} [options.exportMarkdown=false] - Also export pages as markdown
- * @returns {Promise<{outputDir: string, version: number, exportDirName: string, exportRecord: object}>}
+ * @param {boolean} [options.skipExportRecord=false] - Skip recording in export history (used by publish flow)
+ * @returns {Promise<{outputDir: string, version: number, exportDirName: string, exportRecord: object|null}>}
  */
 export async function exportProjectToDir(projectId, userId = "local", options = {}) {
-  const { exportMarkdown = false } = options;
+  const { exportMarkdown = false, skipExportRecord = false } = options;
 
   if (!projectId) {
     throw new Error("Project ID is required");
@@ -664,8 +665,12 @@ Per aspera ad astra
     await fs.writeFile(path.join(outputDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
     // Record this export in history (store relative dir name, not absolute path)
+    // Publish flow skips recording — publish is not an export.
     const exportDirName = `${projectFolderName}-v${version}`;
-    const exportRecord = await recordExport(projectId, version, exportDirName, "success", userId);
+    let exportRecord = null;
+    if (!skipExportRecord) {
+      exportRecord = await recordExport(projectId, version, exportDirName, "success", userId);
+    }
 
     return { outputDir, version, exportDirName, exportRecord };
 }

@@ -33,8 +33,8 @@ export async function publishProject(req, res) {
     // 1. Validate project ownership
     await getProjectFolderName(projectId, userId);
 
-    // 2. Export to static files (reuses existing pipeline)
-    const exportResult = await exportProjectToDir(projectId, userId);
+    // 2. Export to static files (reuses existing pipeline, skip export history)
+    const exportResult = await exportProjectToDir(projectId, userId, { skipExportRecord: true });
     exportOutputDir = exportResult.outputDir;
 
     // 3. ZIP the output directory into a buffer
