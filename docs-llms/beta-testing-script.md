@@ -1,8 +1,98 @@
 > **For beta testers.** Follow every step. Mark each one PASS or FAIL. If something breaks, write down exactly what you did, what you expected, and what happened instead. Screenshot everything that looks wrong.
 
-## SECTION 1: PROJECTS
+## SECTION 0: SETUP & TEST MODES
 
-### 1.1 Create Your First Project
+Widgetizer runs in two modes. You should run through this script **once in each mode** to catch mode-specific issues.
+
+### Local Mode (Open-Source)
+
+Single-user, no authentication. This is the default.
+
+In your `.env` file:
+
+```
+HOSTED_MODE=false          # or simply omit this line
+VITE_HOSTED_MODE=false     # or omit
+PORT=3001
+VITE_API_URL=http://localhost:3001
+SERVER_URL=http://localhost:3001
+```
+
+Start the app with `npm run dev:all`. It loads directly to the Dashboard — no sign-in required.
+
+### Hosted Mode (SaaS)
+
+Multi-user with Clerk authentication. Each user gets isolated data.
+
+In your `.env` file:
+
+```
+HOSTED_MODE=true
+VITE_HOSTED_MODE=true
+CLERK_SECRET_KEY=sk_test_...
+CLERK_PUBLISHABLE_KEY=pk_test_...
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
+PUBLISHER_API_URL=https://your-publisher-api.example.com
+VITE_PUBLISHER_URL=https://your-publisher.example.com
+PORT=3001
+VITE_API_URL=http://localhost:3001
+SERVER_URL=http://localhost:3001
+```
+
+Start the app with `npm run dev:all`. A sign-in screen appears before the app loads.
+
+### Quick Reference: Mode Differences
+
+| Feature | Local Mode | Hosted Mode |
+|---------|-----------|-------------|
+| Authentication | None (automatic) | Clerk JWT (sign-in required) |
+| App Settings page | Visible in sidebar | Hidden from sidebar |
+| Publish section (Export page) | Not shown | Shown |
+| User menu in sidebar | Not shown | Avatar + name + sign-out |
+| Data directory | `data/users/local/` | `data/users/{clerkUserId}/` |
+
+### Terminology
+
+Two pages have similar names — don't confuse them:
+
+- **Settings** (sidebar link, `/settings`) — **Theme Settings** for the active project. Controls colors, fonts, layout, and other theme-specific options.
+- **App Settings** (sidebar link at bottom, `/app-settings`) — **Application configuration**. Controls file size limits, image processing, export options, and developer mode. **Only visible in local mode.**
+
+### How to Read This Script
+
+- If a section has no mode callout, it applies to **both modes**.
+- Hosted-mode-only tests are in **Appendix A** at the end of the document.
+- Section 10 (App Settings) is **local mode only**.
+
+---
+
+## SECTION 1: DASHBOARD
+
+### 1.1 Dashboard — First-Time User
+
+1. Start the app with a clean data directory (no existing projects).
+2. **Expected**: The Dashboard loads showing three cards:
+   - **Project Count** card: Shows `0` with a message like "Ready to create".
+   - **Get Started** card: Shows a "Create your first project" heading with a pink **"Create Project"** button.
+   - A third card with a teaser about AI site generation (coming soon).
+3. Click the **"Create Project"** button.
+4. **Expected**: Navigates to the New Project page (`/projects/add`).
+
+### 1.2 Dashboard — With Active Project
+
+1. Create a project (follow Section 2 steps) and ensure it's the active project.
+2. Navigate to the Dashboard (click the home icon or navigate to `/`).
+3. **Expected**:
+   - **Project Count** card shows the correct count (e.g., `1`).
+   - **Active Project** card shows the active project's name and a link (e.g., "Let's get at it").
+4. Click the link.
+5. **Expected**: Navigates to the Pages list.
+
+---
+
+## SECTION 2: PROJECTS
+
+### 2.1 Create Your First Project
 
 1. Click **Projects** in the sidebar.
 2. Click **"New Project"** button.
@@ -14,7 +104,7 @@
 6. Click **"Create Project"**.
 7. **Expected**: Success toast appears. You're back on the project list. "My Test Site" shows with a filled star (it's the active project since it's your first).
 
-### 1.2 Create a Second Project
+### 2.2 Create a Second Project
 
 1. Click **"New Project"** again.
 2. **Title**: "Second Site"
@@ -22,12 +112,12 @@
 4. Click **"Create Project"**.
 5. **Expected**: Success toast. "Second Site" appears in the list. It should NOT have a filled star (the first project is still active).
 
-### 1.3 Switch Active Project
+### 2.3 Switch Active Project
 
 1. On "Second Site" row, click the **star icon**.
 2. **Expected**: Toast says it's now active. Star fills in. First project's star unfills.
 
-### 1.4 Edit a Project
+### 2.4 Edit a Project
 
 1. On "My Test Site" row, click the **pencil icon** (edit).
 2. Themes cannot be changed after creation.
@@ -40,7 +130,7 @@
 9. **Expected**: Success toast. Back on list, name shows "My Renamed Site".
 10. Click edit again. **Expected**: Notes and URL are still there.
 
-### 1.5 Edit a Project's Folder Name
+### 2.5 Edit a Project's Folder Name
 
 1. Click the **pencil icon** on "My Renamed Site".
 2. Manually change the **folder name** to a new value (e.g., "renamed-site").
@@ -48,46 +138,46 @@
 4. **Expected**: Success toast. The project's folder is renamed behind the scenes.
 5. Click edit again. **Expected**: Folder name shows "renamed-site".
 
-### 1.6 Upload Media to a Project
+### 2.6 Upload Media to a Project
 
 1. Make sure "My Renamed Site" is the active project (click the star icon if it isn't already).
 2. Click **Media** in the sidebar.
 3. Upload 2-3 test images — drag-and-drop onto the upload area or click to browse.
 4. **Expected**: Images appear in the media library with thumbnails. File names, sizes, and types are shown.
-5. Go to **Pages**, open any page in the editor (e.g., "index"), and add or edit a widget that uses one of the uploaded images. Save the page.
+5. Go to **Pages**, open any page in the editor (click the **"Design"** button on a page row), and add or edit a widget that uses one of the uploaded images. Save the page.
 6. **Expected**: The image displays correctly in the widget preview.
 
 > This step ensures media exists for the duplicate, export, and import tests that follow.
 
-### 1.7 Duplicate a Project
+### 2.7 Duplicate a Project
 
 1. On "My Renamed Site" row, click the **Duplicate project** icon.
 2. **Expected**: Toast says project duplicated. A new project appears in the list with the title "Copy of My Renamed Site".
 3. Click edit on the duplicate. Verify the folder name has a "copy-of-" prefix (e.g., "copy-of-renamed-site"). Verify it has the same theme, notes, and URL as the original.
-4. Go to **Media** for the duplicate. **Expected**: Same media files as the original — all images you uploaded in step 1.6 should appear in the media library, not be missing.
+4. Go to **Media** for the duplicate. **Expected**: Same media files as the original — all images you uploaded in step 2.6 should appear in the media library, not be missing.
 
-### 1.8 Try to Deactivate the Active Project
+### 2.8 Try to Deactivate the Active Project
 
 1. The active project should have a filled star.
 2. Click the **star icon** on the active project.
 3. **Expected**: Nothing happens (or a message explaining you can't deactivate). You can only switch active to a different project.
 
-### 1.9 Try to Delete the Active Project
+### 2.9 Try to Delete the Active Project
 
 1. The active project should have a filled star.
 2. Click the **trash icon** on the active project.
 3. **Expected**: You should NOT be able to delete it. Error message or disabled button. You should see something telling you it can't be deleted because it's active.
 
-### 1.10 Delete a Non-Active Project
+### 2.10 Delete a Non-Active Project
 
 1. Click the trash icon on a non-active project (like the duplicate you made).
 2. **Expected**: Confirmation dialog appears asking "Are you sure?"
 3. Click **"Delete"**.
 4. **Expected**: Toast confirms deletion. Project disappears from list.
 
-### 1.11 Export a Project
+### 2.11 Export a Project
 
-1. On "My Renamed Site" row (which already has media from step 1.6), click the **download/export icon**.
+1. On "My Renamed Site" row (which already has media from step 2.6), click the **download/export icon**.
 2. **Expected**: Toast says "Exporting project..." then a ZIP file downloads to your computer.
 3. Open the ZIP. It should contain:
    - `project-export.json` manifest file
@@ -97,7 +187,7 @@
    - `uploads/images/` (or videos/audios) with the actual media files
    - Theme files (`theme.json`, `layout.liquid`, etc.)
 
-### 1.12 Import a Project
+### 2.12 Import a Project
 
 1. Click **"Import Project"** button (should be in the page header area).
 2. An import modal should open.
@@ -109,7 +199,7 @@
    - [ ] Open a page in the editor — images used in widgets should display correctly
    - [ ] Menus match the original structure
 
-### 1.13 Navigation Guard on Edit
+### 2.13 Navigation Guard on Edit
 
 1. Click **edit** on any project.
 2. Change the title but do **NOT** save.
@@ -118,7 +208,7 @@
 5. Click Cancel/Stay. You should remain on the edit form.
 6. Save, then navigate away. No warning.
 
-### 1.14 Edge Cases to Try
+### 2.14 Edge Cases to Try
 
 - [ ] Create a project with a very long name (100+ characters). **Expected**: It should handle it without errors.
 - [ ] Create a project with special characters in the name (`Test & Site #1 — "Quotes"`). **Expected**: It works and the name is stored exactly as you typed it — no weird characters like `&amp;` appearing instead.
@@ -139,25 +229,15 @@
 
 ---
 
-## SECTION 2: PAGES
+## SECTION 3: PAGES
 
-> The Arch theme ships with 8 pre-made pages: Home (index), About, Services, Case Studies, Case Study: Atlas Group, Contact, Privacy Policy, and Terms of Service. These tests work with those existing pages.
+### 3.1 Verify Theme Pages Loaded
 
-### 2.1 Verify Theme Pages Loaded
+1. Make sure you have an active project. Click **Pages** in the sidebar.
+2. **Expected**: The theme's pre-made pages are listed. The number and names depend on the theme and preset you chose when creating the project. Each page should have a name and a slug shown.
+3. Verify each page has a reasonable slug (lowercase, hyphenated).
 
-1. Make sure you have an active project (created with the Arch theme). Click **Pages** in the sidebar.
-2. **Expected**: 8 pages are listed:
-   - Home (`index`)
-   - About (`about`)
-   - Services (`services`)
-   - Case Studies (`case-studies`)
-   - Case Study: Atlas Group (`case-study-atlas-growth`)
-   - Contact (`contact`)
-   - Privacy Policy (`privacy`)
-   - Terms of Service (`terms`)
-3. Verify each page has the correct slug shown above.
-
-### 2.2 Create a New Page with Full SEO
+### 3.2 Create a New Page with Full SEO
 
 1. Click **"New Page"** button.
 2. Fill in:
@@ -167,44 +247,44 @@
 4. Fill in **every** SEO field:
    - **Meta description**: "Our latest articles and insights"
    - **Social media title**: "Blog — My Renamed Site"
-   - **Social media image**: Click **Browse**, pick one of the images you uploaded in step 1.6
+   - **Social media image**: Click **Browse**, pick one of the images you uploaded in step 2.6
    - **Canonical URL**: `https://example.com/blog`
    - **Search engine indexing**: Change the dropdown to **"noindex, follow"**
 5. Click **"Create Page"**.
-6. **Expected**: Success toast. "Blog" appears in the page list alongside the 8 theme pages.
+6. **Expected**: Success toast. "Blog" appears in the page list alongside the theme pages.
 7. Click the **pencil icon** on "Blog" to edit it again.
 8. **Expected**: All SEO fields you just set are still there — description, social media title, social media image, canonical URL, and indexing set to "noindex, follow".
 9. Go to **Media**. Find the image you selected as the social media image.
 10. **Expected**: That image shows as **"in use"** by the Blog page.
 
-### 2.3 Edit an Existing Page
+### 3.3 Edit an Existing Page
 
-1. Click the **pencil icon** on "About".
-2. Change the name to "About Our Company".
-3. Change the slug to "about-us".
+1. Click the **pencil icon** on any page (e.g., the first theme page).
+2. Change the name to something different.
+3. Change the slug.
 4. Click **"More Settings"** and update SEO fields:
    - **Meta description**: "Learn about our team and mission"
    - **Social media title**: "About Us — My Renamed Site"
    - **Social media image**: Click Browse and pick a **different** image than the one you used for Blog
    - **Search engine indexing**: Set to **"index, follow"** (default)
 5. Click **"Save"**.
-6. **Expected**: Toast confirms. Page list shows "About Our Company" with slug "about-us".
+6. **Expected**: Toast confirms. Page list shows the updated name and slug.
 7. Go to **Media**. Check the image you just set as the social media image.
-8. **Expected**: It shows as "in use" by the About page.
+8. **Expected**: It shows as "in use" by the page you edited.
 
-### 2.4 Duplicate a Page
+### 3.4 Duplicate a Page
 
-1. Click the **copy icon** on "Contact".
-2. **Expected**: New page appears with "Copy of Contact" as the name and "contact-copy" (or similar "-copy" suffix) as the slug.
+1. Click the **copy icon** on any page (e.g., a Contact page).
+2. **Expected**: New page appears with "Copy of [Page Name]" as the name and a "-copy" suffix slug.
 3. Click the **pencil icon** on the duplicate.
-4. **Expected**: SEO fields are copied from the original Contact page (if it had any set).
+4. **Expected**: SEO fields are copied from the original page (if it had any set).
 
-### 2.5 Delete a Single Page
+### 3.5 Delete a Single Page
 
-1. Click the **trash icon** on the "Copy of Contact" duplicate you just made.
+1. Click the **trash icon** on the duplicate you just made.
 2. **Expected**: Confirmation modal. Confirm. Page gone. Toast confirms.
 
-### 2.6 Bulk Delete Pages
+### 3.6 Bulk Delete Pages
 
 1. Create 3 throwaway pages ("Delete Me 1", "Delete Me 2", "Delete Me 3").
 2. Check the **checkboxes** on all three rows.
@@ -212,9 +292,9 @@
 4. Click **"Delete Selected"**.
 5. **Expected**: Confirmation modal showing the count. Confirm. All three gone. The theme pages should still be there.
 
-### 2.7 Edge Cases to Try
+### 3.7 Edge Cases to Try
 
-- [ ] Create a page with the same slug as an existing theme page (e.g., name it "About" — slug would be `about`). **Expected**: It auto-adds a number to the slug (e.g., `about-1`) to avoid a conflict.
+- [ ] Create a page with the same slug as an existing theme page. **Expected**: It auto-adds a number to the slug (e.g., `about-1`) to avoid a conflict.
 - [ ] Create a page with special characters in the name (e.g., `About & "FAQ" — Info`). **Expected**: The slug is cleaned up to only use simple characters. The name is stored exactly as typed — no weird characters like `&amp;` appearing instead.
 - [ ] Create a page with code in the name (`My Page <img src=x onerror=alert(1)>`). **Expected**: The code part is removed — name should be just "My Page".
 - [ ] Create a page with ONLY `<script>alert(1)</script>` as the name (no other text). **Expected**: Rejected — error toast says the name is required (since the code gets stripped, nothing is left).
@@ -230,37 +310,37 @@
 
 ---
 
-## SECTION 3: PAGE EDITOR (This is the big one)
+## SECTION 4: PAGE EDITOR (This is the big one)
 
-### 3.1 Open the Editor
+### 4.1 Open the Editor
 
 1. Go to **Pages**.
-2. Click the **"Design"** button on any page.
+2. Click the **"Design"** button on any page row (the button with the paintbrush/design icon, next to the edit pencil and other action icons).
 3. **Expected**: Page editor loads with three panels:
    - **Left**: Widget list
    - **Center**: Live preview
    - **Right**: Settings panel (might be empty until you select a widget)
 
-### 3.2 Add a Widget
+### 4.2 Add a Widget
 
 1. Click the **"+" button** in the left panel (or "Add Widget").
 2. A widget selector should appear showing available widgets.
 3. Click any widget (e.g., a text section, hero banner, or whatever's available).
 4. **Expected**: Widget appears in the left panel list AND in the center preview.
 
-### 3.3 Add Multiple Widgets
+### 4.3 Add Multiple Widgets
 
 1. Add 3-4 more widgets of different types.
 2. **Expected**: Each appears in the left list in order and renders in the preview.
 
-### 3.4 Select a Widget
+### 4.4 Select a Widget
 
 1. Click a widget in the **left panel list**.
 2. **Expected**: Widget highlighted in the list. Right panel shows its settings. Preview may scroll to show it.
 3. Click a widget directly in the **center preview**.
 4. **Expected**: Same behavior — selected in left list, settings appear on right.
 
-### 3.5 Edit Widget Settings
+### 4.5 Edit Widget Settings
 
 1. Select a widget that has text settings (title, description, etc.).
 2. Change the title text in the right panel.
@@ -268,24 +348,24 @@
 4. Try changing other settings: colors, alignment, checkboxes, dropdowns.
 5. **Expected**: Each change reflects immediately in the preview.
 
-### 3.6 Reorder Widgets
+### 4.6 Reorder Widgets
 
 1. In the left panel, **drag** a widget to a different position.
 2. **Expected**: Widget moves in both the list AND the preview. The page layout changes accordingly.
 
-### 3.7 Duplicate a Widget
+### 4.7 Duplicate a Widget
 
 1. Hover over a widget in the left panel — action icons appear.
 2. Click the **copy icon** (blue on hover).
 3. **Expected**: A copy of the widget appears below it with identical settings.
 
-### 3.8 Delete a Widget
+### 4.8 Delete a Widget
 
 1. Hover over a widget in the left panel — action icons appear.
 2. Click the **trash icon** (red on hover).
 3. **Expected**: Confirmation dialog. Confirm. Widget gone from list and preview.
 
-### 3.9 Work with Blocks
+### 4.9 Work with Blocks
 
 1. Find a widget that supports blocks (e.g., a features widget, card grid, or FAQ). Look for widgets that have nested items in the left panel.
 2. **Select a block** by clicking it in the left list.
@@ -298,14 +378,14 @@
 9. **Duplicate a block**: Hover over a block, click the **copy icon** (blue on hover).
 10. **Delete a block**: Hover over a block, click the **trash icon** (red on hover). Confirm.
 
-### 3.10 Block Limits
+### 4.10 Block Limits
 
 1. If a widget has a block limit, like the Slideshow (check if a counter like "3/5" appears):
    - Add blocks until you hit the limit.
    - **Expected**: "Add Block" button disappears or disables. Duplicate option also disabled.
    - Try to add one more anyway if possible. Should be prevented.
 
-### 3.11 Image Settings
+### 4.11 Image Settings
 
 1. Find a widget with an image setting.
 2. Click **"Browse"** next to the image field.
@@ -316,7 +396,7 @@
 7. Click the **remove/clear button** on the image.
 8. **Expected**: Image removed from settings and preview.
 
-### 3.12 Link Settings
+### 4.12 Link Settings
 
 1. Find a widget with a link/button setting.
 2. Click the link field.
@@ -330,7 +410,7 @@
 6. Switch to an external URL. Type `https://google.com`.
 7. **Expected**: Link updates to the external URL.
 
-### 3.13 Menu Settings
+### 4.13 Menu Settings
 
 1. Find a widget (likely the header) that has a menu selector.
 2. Click the menu dropdown.
@@ -338,13 +418,13 @@
 4. Select a menu.
 5. **Expected**: Preview updates to show the menu's items.
 
-### 3.14 Rich Text Settings
+### 4.14 Rich Text Settings
 
 1. Find a widget with a rich text editor setting.
 2. Type formatted text. Try bold, italic, links, bullet lists, numbered lists.
 3. **Expected**: Formatting toolbar works. Preview shows formatted text.
 
-### 3.15 Global Header & Footer
+### 4.15 Global Header & Footer
 
 1. In the left panel, scroll to find **"Global Header"** and **"Global Footer"**.
 2. They should be visually distinct (grey background, can't be dragged).
@@ -355,7 +435,7 @@
 7. Navigate to a different page in the editor.
 8. **Expected**: The header change persists across pages.
 
-### 3.16 Save and Auto-Save
+### 4.16 Save and Auto-Save
 
 1. Make some changes to widgets.
 2. Look at the top bar — it should show something like "X unsaved changes".
@@ -365,7 +445,7 @@
 6. Click the **Save button** (or press **Ctrl+S** / **Cmd+S**).
 7. **Expected**: Saves immediately. Status shows saved.
 
-### 3.17 Undo / Redo
+### 4.17 Undo / Redo
 
 1. Make a change (e.g., edit a title).
 2. Press **Ctrl+Z** (or **Cmd+Z** on Mac).
@@ -375,7 +455,7 @@
 6. Try undo/redo with the **toolbar buttons** too.
 7. Try undoing multiple steps in a row.
 
-### 3.18 Preview Modes
+### 4.18 Preview Modes
 
 1. In the top bar, find the **preview mode toggle** (Desktop / Mobile).
 2. Switch to **Mobile**.
@@ -383,7 +463,7 @@
 4. Switch to **Desktop**.
 5. **Expected**: Full width restored.
 
-### 3.19 Standalone Preview
+### 4.19 Standalone Preview
 
 1. Click the **Preview button** (new tab icon) in the top bar.
 2. **Expected**: A new browser tab opens with the full page preview — no editor UI.
@@ -391,7 +471,7 @@
 4. **Expected**: They navigate to other preview pages correctly.
 5. External links should be disabled or handled safely.
 
-### 3.20 Navigation Protection
+### 4.20 Navigation Protection
 
 1. Make a change in the editor (don't save).
 2. Try to click **Pages** in the sidebar.
@@ -404,7 +484,7 @@
 9. Now click **Save**, then navigate away.
 10. **Expected**: No warning. Clean navigation.
 
-### 3.21 Image Upload & Media Tracking in the Editor
+### 4.21 Image Upload & Media Tracking in the Editor
 
 These tests verify that images uploaded and used through the editor are properly tracked in the Media library.
 
@@ -423,7 +503,7 @@ These tests verify that images uploaded and used through the editor are properly
 13. Remove the image from the second widget too. Save.
 14. Go to **Media**. **Expected**: The image now shows as NOT in use.
 
-### 3.22 Edge Cases to Try
+### 4.22 Edge Cases to Try
 
 - [ ] Add 20+ widgets to a single page. **Expected**: The editor should still feel fast and responsive.
 - [ ] Paste very long text (5000+ characters) into a text field. **Expected**: It handles it without crashing or freezing.
@@ -442,47 +522,47 @@ These tests verify that images uploaded and used through the editor are properly
 
 ---
 
-## SECTION 4: MEDIA LIBRARY
+## SECTION 5: MEDIA LIBRARY
 
-### 4.1 Upload Images
+### 5.1 Upload Images
 
 1. Click **Media** in the sidebar.
 2. Click **"Upload"** or drag files into the upload area.
 3. Upload 3-4 images (JPG, PNG, WebP).
 4. **Expected**: Progress bars shown. Files appear in the grid. Success toast with count.
 
-### 4.2 Upload Different File Types
+### 5.2 Upload Different File Types
 
 1. Upload an **SVG** file.
 2. Upload an **MP4 video**.
 3. Upload an **MP3 audio** file.
 4. **Expected**: All accepted. Each shows with appropriate icon/thumbnail.
 
-### 4.3 Upload Validation
+### 5.3 Upload Validation
 
 1. Try uploading a **.txt** file.
 2. **Expected**: Rejected. Error toast saying invalid file type.
-3. Try uploading an image larger than the max file size (check Settings for the limit).
+3. Try uploading an image larger than the max file size (check App Settings for the limit — default 5 MB).
 4. **Expected**: Rejected with clear error message about file size.
 
-### 4.4 Batch Upload
+### 5.4 Batch Upload
 
 1. Select 10+ files at once and upload.
 2. **Expected**: Files upload in batches (should see progress). Success/warning toast shows count of uploaded and rejected files.
 
-### 4.5 View Modes
+### 5.5 View Modes
 
 1. Toggle between **Grid view** and **List view** (icons in the toolbar).
-2. **Expected**: Same files, different layout. Grid shows thumbnails. List shows details.
+2. **Expected**: Same files, different layout. Grid shows thumbnails. List shows details (file name, dimensions, size, type, usage).
 
-### 4.6 Search Media
+### 5.6 Search Media
 
 1. Type a filename in the **search bar**.
 2. **Expected**: List filters in real time to show matching files.
 3. Clear the search.
 4. **Expected**: All files shown again.
 
-### 4.7 Filter by Type
+### 5.7 Filter by Type
 
 1. Use the **type filter** dropdown.
 2. Select **Images**.
@@ -492,45 +572,49 @@ These tests verify that images uploaded and used through the editor are properly
 6. Select **All**.
 7. **Expected**: Everything shown.
 
-### 4.8 Edit Media Metadata
+### 5.8 Edit Media Metadata
 
 1. Click on a file (or hover and click the edit icon).
-2. A drawer or panel should open.
+2. **Expected**: A drawer or panel opens showing:
+   - A preview of the file (image thumbnail, video player, or audio icon)
+   - **Alt text** field (for images)
+   - **Title** field
+   - File information (dimensions, file size, type)
 3. Edit the **alt text** and **title**.
 4. Save.
 5. **Expected**: Metadata saved. Toast confirms.
 
-### 4.9 Delete Unused Media
+### 5.9 Delete Unused Media
 
 1. Find a file that is NOT used in any page.
 2. Click the **delete/trash icon**.
 3. **Expected**: Confirmation dialog. Confirm. File deleted. Toast confirms.
 
-### 4.10 Try Deleting Media That's In Use
+### 5.10 Try Deleting Media That's In Use
 
 1. Go to the page editor. Add a widget with an image. Set it to one of your uploaded images. Save.
 2. Go back to Media.
 3. Try to delete that image.
 4. **Expected**: Error! The file is in use. You should see a message telling you which pages use it. Deletion should be blocked.
 
-### 4.11 Bulk Delete
+### 5.11 Bulk Delete
 
 1. Select multiple files using checkboxes.
 2. Click **"Delete Selected"**.
 3. **Expected**: Confirmation with count. Files in use should be skipped. Others deleted.
 
-### 4.12 Refresh Usage
+### 5.12 Refresh Usage
 
 1. Click **"Refresh Usage"** button in the toolbar.
 2. **Expected**: Toast confirms. Usage badges update on files.
 
-### 4.13 Image Size Variants
+### 5.13 Image Size Variants
 
 1. Upload a large image (at least 2000px wide).
 2. Check the file details (click on it).
 3. **Expected**: Multiple size variants should have been generated (thumb, small, medium, large — depending on settings). Check that the original dimensions are shown.
 
-### 4.14 Edge Cases to Try
+### 5.14 Edge Cases to Try
 
 - [ ] Upload a file with a very long filename. Does it get truncated/sanitized?
 - [ ] Upload a file with spaces and special characters in the name. Does it sanitize?
@@ -541,9 +625,9 @@ These tests verify that images uploaded and used through the editor are properly
 
 ---
 
-## SECTION 5: MENUS
+## SECTION 6: MENUS
 
-### 5.1 Create a Menu
+### 6.1 Create a Menu
 
 1. Click **Menus** in the sidebar.
 2. Click **"New Menu"**.
@@ -551,7 +635,7 @@ These tests verify that images uploaded and used through the editor are properly
 4. Click **"Create Menu"**.
 5. **Expected**: Success toast. You may be redirected to the structure editor.
 
-### 5.2 Add Menu Items
+### 6.2 Add Menu Items
 
 1. If not already there, click the **structure/grid icon** on your menu to open the structure editor.
 2. Click **"Add Item"**.
@@ -564,14 +648,14 @@ These tests verify that images uploaded and used through the editor are properly
    - "Contact" → linked to contact page
 5. **Expected**: Items appear in a list/tree view.
 
-### 5.3 Add External Links
+### 6.3 Add External Links
 
 1. Add a menu item:
    - **Label**: "Twitter"
    - **Link**: Type `https://twitter.com` (external URL instead of selecting a page)
 2. **Expected**: Item added with the external URL.
 
-### 5.4 Nest Menu Items (Submenus)
+### 6.4 Nest Menu Items (Submenus)
 
 1. Add items: "Service A", "Service B", "Service C".
 2. **Drag** "Service A" to become a child of "Services" (drag it slightly to the right under Services).
@@ -579,21 +663,21 @@ These tests verify that images uploaded and used through the editor are properly
 4. **Expected**: Three-level hierarchy. Services → Service A, Service B, Service C.
 5. Try nesting 3 levels deep (e.g., Service A → Sub-item).
 
-### 5.5 Reorder Menu Items
+### 6.5 Reorder Menu Items
 
 1. Drag "Contact" above "About".
 2. **Expected**: Order changes.
 3. Drag a nested item out to the top level.
 4. **Expected**: Item un-nests.
 
-### 5.6 Save Menu Structure
+### 6.6 Save Menu Structure
 
 1. Click **"Save Menu"**.
 2. **Expected**: Toast confirms save.
 3. Refresh the page.
 4. **Expected**: Structure preserved exactly as you left it.
 
-### 5.7 Edit Menu Settings
+### 6.7 Edit Menu Settings
 
 1. Go back to the menu list.
 2. Click the **pencil icon** on your menu.
@@ -601,25 +685,25 @@ These tests verify that images uploaded and used through the editor are properly
 4. Save.
 5. **Expected**: Name updated in the list.
 
-### 5.8 Duplicate a Menu
+### 6.8 Duplicate a Menu
 
 1. Click the **copy icon** on a menu.
 2. **Expected**: New menu appears (e.g., "Copy of Primary Navigation"). All items duplicated.
 3. Open the duplicate's structure. Verify all items and nesting preserved.
 
-### 5.9 Delete a Menu
+### 6.9 Delete a Menu
 
 1. Click the **trash icon** on the duplicate.
 2. **Expected**: Confirmation dialog. Confirm. Menu gone.
 
-### 5.10 Menu + Page Rename Integration
+### 6.10 Menu + Page Rename Integration
 
-1. Open a menu that links to "About" page.
-2. Go to **Pages** and rename the about page's slug (e.g., change "about" to "about-us").
+1. Open a menu that links to a page (e.g., "About").
+2. Go to **Pages** and rename that page's slug (e.g., change "about" to "about-us").
 3. Go back to the menu structure editor.
 4. **Expected**: The link should still work because it uses the page's UUID internally. The display might show the old slug until you save, but rendering should resolve to the new slug.
 
-### 5.11 Menu + Page Deletion
+### 6.11 Menu + Page Deletion
 
 1. Create a throwaway page ("Temp Page").
 2. Add it to a menu.
@@ -627,7 +711,7 @@ These tests verify that images uploaded and used through the editor are properly
 4. Open the menu structure.
 5. **Expected**: The menu item for "Temp Page" should show an empty or broken link. It shouldn't crash.
 
-### 5.12 Edge Cases to Try
+### 6.12 Edge Cases to Try
 
 - [ ] Create a menu with 50+ items. Performance?
 - [ ] Create deeply nested items (3+ levels). Does the UI handle it?
@@ -642,38 +726,38 @@ These tests verify that images uploaded and used through the editor are properly
 
 ---
 
-## SECTION 6: THEMES
+## SECTION 7: THEMES
 
-### 6.1 View Installed Themes
+### 7.1 View Installed Themes
 
 1. Click **Themes** in the sidebar.
 2. **Expected**: Grid of theme cards showing name, version, screenshot, description.
 
-### 6.2 Upload a Theme
+### 7.2 Upload a Theme
 
 1. If you have a theme ZIP file, click **"Upload Theme"** or drag it to the upload area.
 2. **Expected**: Theme validates (checks for required files like `theme.json`, `layout.liquid`). Appears in the grid on success.
 3. Try uploading an invalid ZIP (random files). **Expected**: Error with clear message.
 
-### 6.3 Delete a Theme
+### 7.3 Delete a Theme
 
 1. Find a theme that is NOT used by any project.
 2. Click the **three-dot menu** on the theme card → **"Delete"**.
 3. **Expected**: Confirmation dialog. Confirm. Theme removed.
 
-### 6.4 Try Deleting a Theme In Use
+### 7.4 Try Deleting a Theme In Use
 
 1. Try to delete the theme your active project uses.
 2. **Expected**: Error! Message says the theme is used by project(s). Deletion blocked.
 
-### 6.5 Theme Updates
+### 7.5 Theme Updates
 
 1. If a theme has an update available, you should see an **"Update available: vX.Y.Z"** label on its card.
-2. The sidebar should show a **badge** next to Themes with the count.
+2. The sidebar should show a **pink badge** next to Themes with the count of themes that have updates.
 3. Click **"Update"** on the theme card.
 4. **Expected**: Theme builds its latest snapshot. Version updates. Badge count decrements.
 
-### 6.6 Apply Theme Update to Project
+### 7.6 Apply Theme Update to Project
 
 1. After updating a theme, go to **Projects**.
 2. If a project uses that theme, there should be an update indicator (arrow icon or similar).
@@ -681,7 +765,7 @@ These tests verify that images uploaded and used through the editor are properly
 4. Click it.
 5. **Expected**: Theme files updated. Settings merged (your customizations preserved). Toast confirms.
 
-### 6.7 Theme Presets
+### 7.7 Theme Presets
 
 1. Create a new project.
 2. Select a theme that has presets.
@@ -691,7 +775,7 @@ These tests verify that images uploaded and used through the editor are properly
 6. Create the project.
 7. **Expected**: Project uses the selected preset's settings, templates, and menus.
 
-### 6.8 Edge Cases to Try
+### 7.8 Edge Cases to Try
 
 - [ ] Upload a theme ZIP without `theme.json`. Does it reject with a clear error?
 - [ ] Upload a theme with the same name as an existing one. What happens?
@@ -699,15 +783,34 @@ These tests verify that images uploaded and used through the editor are properly
 
 ---
 
-## SECTION 7: THEME SETTINGS (in Page Editor)
+## SECTION 8: THEME SETTINGS
 
-### 7.1 Access Theme Settings
+> **Important**: "Settings" in the sidebar refers to **Theme Settings** — colors, fonts, and other visual options for the active project's theme. This is NOT the same as "App Settings" (covered in Section 10).
+
+### 8.1 Access Theme Settings (Standalone Page)
+
+1. Click **Settings** in the sidebar.
+2. **Expected**: The Settings page loads showing the theme's settings organized by groups (e.g., Colors, Typography, Layout). The groups and settings depend on the theme.
+3. Change a setting (e.g., a color).
+4. **Expected**: A pink dot (unsaved changes indicator) appears next to the page title.
+5. Click **"Save"**.
+6. **Expected**: Success toast. Pink dot disappears.
+
+### 8.2 Settings Page Navigation Guard
+
+1. Change a setting but do NOT save.
+2. Click a sidebar link (e.g., Pages).
+3. **Expected**: Warning dialog about unsaved changes.
+4. Click Cancel/Stay. You should remain on the Settings page.
+5. Save, then navigate away. No warning.
+
+### 8.3 Access Theme Settings (In Page Editor)
 
 1. Open the page editor on any page.
 2. Look for a theme settings button/section (might be in the top bar or sidebar).
 3. **Expected**: Opens theme settings panel with groups (colors, typography, layout, etc.).
 
-### 7.2 Test Every Setting Type
+### 8.4 Test Every Setting Type
 
 Go through each setting type you find and test it:
 
@@ -727,7 +830,7 @@ Go through each setting type you find and test it:
 - [ ] **Icon picker**: Select an icon (if available). Preview shows it.
 - [ ] **YouTube input**: Paste a YouTube URL. Preview shows embed.
 
-### 7.3 Theme Settings Persist
+### 8.5 Theme Settings Persist
 
 1. Change a theme color (e.g., background color).
 2. Save the page.
@@ -735,7 +838,7 @@ Go through each setting type you find and test it:
 4. **Expected**: Same theme color applies (theme settings are global).
 5. Close the editor. Reopen. **Expected**: Setting still there.
 
-### 7.4 Edge Cases to Try
+### 8.6 Edge Cases to Try
 
 - [ ] Enter `<script>alert(1)</script>` in a theme **text input** setting. Save. Preview should escape it — no alert box. Exported HTML should have it escaped in the output.
 - [ ] Enter `<script>alert(1)</script>` in a theme **textarea** setting. Save. Same behavior — escaped in preview, no execution.
@@ -747,16 +850,16 @@ Go through each setting type you find and test it:
 
 ---
 
-## SECTION 8: EXPORT & PUBLISH
+## SECTION 9: EXPORT & PUBLISH
 
-### 8.1 Create a Basic Export
+### 9.1 Create a Basic Export
 
 1. Click **Export** in the sidebar (or find the export section).
 2. Click **"Create Export"** (or "Export Site").
 3. **Expected**: Export starts. Loading indicator. Success toast when done.
 4. Export history should show a new entry (v1).
 
-### 8.2 View the Exported Site
+### 9.2 View the Exported Site
 
 1. In the export history, click **"View"** on the latest export.
 2. **Expected**: Opens the exported site in a new tab. Should show your homepage with all widgets rendered.
@@ -764,42 +867,59 @@ Go through each setting type you find and test it:
 4. Check that images load correctly.
 5. Check that CSS/styles are applied (fonts, colors, layout).
 
-### 8.3 Download Export as ZIP
+### 9.3 Download Export as ZIP
 
 1. Click **"Download"** on an export version.
 2. **Expected**: ZIP file downloads.
 3. Extract the ZIP. Check contents:
    - HTML files for each page (e.g., `index.html`, `about.html`)
    - `assets/` folder with CSS, JS, images, videos, audios
-   - `manifest.json` with export metadata
-   - `sitemap.xml` (only if project has a site URL set)
-   - `robots.txt` (only if project has a site URL set)
+   - `manifest.json` with export metadata (generator, version, theme info, export timestamp)
+   - `sitemap.xml` — **only if the project has a Site URL set** (check in project settings)
+   - `robots.txt` — **only if the project has a Site URL set**
 
-### 8.4 Export with Markdown
+### 9.4 Sitemap & Robots.txt
+
+1. Make sure your project has a **Site URL** set (e.g., `https://example.com`). Edit the project if needed.
+2. Export the site. Download the ZIP.
+3. **Expected**: `sitemap.xml` is present. It should list URLs for all pages that are NOT set to "noindex".
+4. **Expected**: `robots.txt` is present. Pages set to "noindex" should appear in `Disallow` rules.
+5. Now remove the Site URL from the project settings (clear the field). Save.
+6. Export again. Download the ZIP.
+7. **Expected**: Neither `sitemap.xml` nor `robots.txt` should be in the ZIP.
+
+### 9.5 Export with Markdown
 
 1. Create another export with the **"Also export as Markdown"** checkbox checked (if available).
 2. Download the ZIP.
-3. **Expected**: `.md` files alongside `.html` files. Each markdown file should have YAML frontmatter with title and description.
+3. **Expected**: `.md` files alongside `.html` files. Each markdown file should have YAML frontmatter at the top:
+   ```
+   ---
+   title: "Page Title"
+   description: "Page description"
+   ---
+   ```
+   Followed by the page content converted to Markdown.
 
-### 8.5 Multiple Export Versions
+### 9.6 Multiple Export Versions
 
 1. Make a change to a page (edit text, add widget).
 2. Export again.
 3. **Expected**: New version (v2) appears in history. v1 still there.
 4. Both should be viewable and downloadable independently.
 
-### 8.6 Delete an Export
+### 9.7 Delete an Export
 
 1. Click **"Delete"** on an old export version.
 2. **Expected**: Confirmation dialog. Confirm. Version removed from history.
 
-### 8.7 Export Version Limit
+### 9.8 Export Version Limit
 
 1. Check App Settings → Export for the "Max versions to keep" setting. Note the number.
 2. Create exports until you exceed the limit.
 3. **Expected**: Oldest versions automatically cleaned up. Only the most recent N versions remain.
 
-### 8.8 Export Verification Checklist
+### 9.9 Export Verification Checklist
 
 Open an exported site and check:
 
@@ -814,23 +934,27 @@ Open an exported site and check:
 - [ ] No 404 errors in browser console
 - [ ] The "Made with Widgetizer" comment is in the HTML source (before doctype)
 
-### 8.9 Edge Cases to Try
+### 9.10 Edge Cases to Try
 
 - [ ] Export a project with no pages. What happens?
 - [ ] Export a project with no homepage (no "index" or "home" slug page). Does it warn you?
 - [ ] Export a project with a page that has no widgets. Does it produce a valid HTML file?
 - [ ] Create 50+ exports rapidly. Performance? Cleanup working?
 
+> **Hosted mode**: The Publish feature is covered in **Appendix A.4**.
+
 ---
 
-## SECTION 9: APP SETTINGS
+## SECTION 10: APP SETTINGS
 
-### 9.1 Open Settings
+> **LOCAL MODE ONLY**: The App Settings page is hidden from the sidebar in hosted mode. If you are testing in hosted mode, skip this entire section. Do not confuse this with "Settings" (Theme Settings) — see Section 8.
 
-1. Click **Settings** in the sidebar.
-2. **Expected**: Settings page with tabs (General, Media, Export, Developer — or similar sections).
+### 10.1 Open Settings
 
-### 9.2 General Settings
+1. Click **App Settings** in the sidebar (at the bottom).
+2. **Expected**: Settings page with tabs/sections (General, Media, Export, Developer — or similar).
+
+### 10.2 General Settings
 
 1. Change the **language** to a different option.
 2. Save.
@@ -839,7 +963,7 @@ Open an exported site and check:
 5. Save.
 6. **Expected**: Dates displayed in the new format.
 
-### 9.3 Media Settings
+### 10.3 Media Settings
 
 1. Change **Max Image File Size** (e.g., set to 1 MB).
 2. Save.
@@ -847,7 +971,7 @@ Open an exported site and check:
 4. **Expected**: Upload rejected with clear error about file size.
 5. Set it back to something reasonable (e.g., 5 MB).
 
-### 9.4 Image Processing Settings
+### 10.4 Image Processing Settings
 
 1. Change **Image Quality** (e.g., set to 50).
 2. Save.
@@ -858,20 +982,20 @@ Open an exported site and check:
 7. Upload another image.
 8. **Expected**: The disabled size is not generated.
 
-### 9.5 Export Settings
+### 10.5 Export Settings
 
 1. Change **Max Versions to Keep** (e.g., set to 3).
 2. Save.
 3. Create 4 exports.
 4. **Expected**: Only the 3 most recent remain. Oldest auto-deleted.
 
-### 9.6 Import Size Setting
+### 10.6 Import Size Setting
 
 1. Note the **Max Import Size** setting.
 2. Try importing a project ZIP larger than this limit.
 3. **Expected**: Rejected with clear error about file size.
 
-### 9.7 Developer Mode
+### 10.7 Developer Mode
 
 1. Toggle **Developer Mode** on.
 2. Save.
@@ -879,7 +1003,7 @@ Open an exported site and check:
 4. **Expected**: Export should include HTML validation (check for `__export__issues.html` in the output if there are validation issues).
 5. Toggle it back off.
 
-### 9.8 Navigation Guard
+### 10.8 Navigation Guard
 
 1. Change a setting but DON'T save.
 2. Try to navigate away (click Pages in sidebar).
@@ -887,7 +1011,7 @@ Open an exported site and check:
 4. Click Cancel/Stay. You should remain on Settings.
 5. Save. Then navigate away. No warning.
 
-### 9.9 Edge Cases to Try
+### 10.9 Edge Cases to Try
 
 - [ ] Set image quality to 0. What happens?
 - [ ] Set image quality to 101. Does it validate?
@@ -901,11 +1025,48 @@ Open an exported site and check:
 
 ---
 
-## SECTION 10: CROSS-FEATURE INTEGRATION TESTS
+## SECTION 11: SIDEBAR & NAVIGATION
+
+### 11.1 Items Disabled Without Active Project
+
+1. Start with no active project (delete all projects or start fresh).
+2. Look at the sidebar. **Expected**: Pages, Menus, Media, Settings, Themes, Plugins, and Export links are all disabled (grayed out, not clickable).
+3. Click a disabled item. **Expected**: Nothing happens. No navigation occurs.
+4. Create a project and set it as active.
+5. **Expected**: All sidebar items become enabled and clickable.
+
+### 11.2 Theme Update Badge
+
+1. If a theme has pending updates, look at the sidebar.
+2. **Expected**: The "Themes" link shows a pink badge (small circle) with the number of themes that have updates available.
+3. Update all themes (apply updates).
+4. **Expected**: Badge disappears (or count decrements to 0).
+
+### 11.3 Sidebar Navigation
+
+1. Click through each sidebar item in order: Dashboard, Projects, Pages, Menus, Media, Settings, Themes, Plugins, Export.
+2. **Expected**: Each navigates to the correct page without errors. The active item is highlighted in the sidebar.
+
+---
+
+## SECTION 12: PLUGINS
+
+### 12.1 View Plugins Page
+
+1. Click **Plugins** in the sidebar.
+2. **Expected**: A placeholder/empty state page loads showing:
+   - A puzzle-piece icon
+   - A heading (e.g., "Plugins")
+   - A description text indicating this feature is coming soon or currently empty
+3. **Expected**: No errors. The page renders cleanly.
+
+---
+
+## SECTION 13: CROSS-FEATURE INTEGRATION TESTS
 
 These tests verify that different features work together correctly.
 
-### 10.1 Full Project Lifecycle
+### 13.1 Full Project Lifecycle
 
 1. Create a new project with a theme and preset.
 2. Create 5 pages with different names.
@@ -919,7 +1080,7 @@ These tests verify that different features work together correctly.
 10. Download the ZIP. Extract and open `index.html` in a browser.
 11. **Expected**: Everything works — pages, images, menus, styles, links.
 
-### 10.2 Project Clone Integrity
+### 13.2 Project Clone Integrity
 
 1. Create a project with pages, menus, media, and widgets configured.
 2. Duplicate the project.
@@ -935,7 +1096,7 @@ These tests verify that different features work together correctly.
 5. Go back to the original. **Expected**: Original unchanged.
 6. Delete media from the duplicate. **Expected**: Original's media is NOT affected.
 
-### 10.3 Page Rename Ripple Effect
+### 13.3 Page Rename Ripple Effect
 
 1. Have a project with:
    - Pages that link to each other (via link settings in widgets)
@@ -947,7 +1108,7 @@ These tests verify that different features work together correctly.
    - [ ] Export the site — links in HTML should use the new slug
    - [ ] Media usage tracking updated (old slug removed, new slug added)
 
-### 10.4 Page Delete Ripple Effect
+### 13.4 Page Delete Ripple Effect
 
 1. Have widgets and menus that link to a specific page.
 2. Delete that page.
@@ -957,7 +1118,7 @@ These tests verify that different features work together correctly.
    - [ ] Media files that were ONLY used by that page should now show as "unused"
    - [ ] App doesn't crash anywhere
 
-### 10.5 Theme Settings Across Pages
+### 13.5 Theme Settings Across Pages
 
 1. In the page editor, change a theme color.
 2. Save.
@@ -966,7 +1127,7 @@ These tests verify that different features work together correctly.
 5. Export the site. Check all pages in the export.
 6. **Expected**: Consistent colors across all exported pages.
 
-### 10.6 Import → Export Round-Trip
+### 13.6 Import → Export Round-Trip
 
 1. Create a fully-built project (pages, widgets, media, menus, settings).
 2. **Upload several images** and use them in widget settings on different pages.
@@ -983,7 +1144,7 @@ These tests verify that different features work together correctly.
 7. Export the imported project as a site. View it. Does it match what the original would have produced?
 8. **Bonus**: Import the same ZIP again (without deleting the first import). Both imported projects should work independently with their own media.
 
-### 10.7 Concurrent Editing Stress Test
+### 13.7 Concurrent Editing Stress Test
 
 1. Open the page editor in Tab A.
 2. Open the SAME page editor in Tab B (same page).
@@ -992,7 +1153,7 @@ These tests verify that different features work together correctly.
 5. Refresh both tabs.
 6. **Expected**: Last save wins. No data corruption. No crashes.
 
-### 10.8 Active Project Switch During Editing
+### 13.8 Active Project Switch During Editing
 
 1. Open the page editor for a page in Project A.
 2. In another tab, switch the active project to Project B.
@@ -1002,7 +1163,7 @@ These tests verify that different features work together correctly.
 
 ---
 
-## SECTION 11: KEYBOARD SHORTCUTS
+## SECTION 14: KEYBOARD SHORTCUTS
 
 Test each keyboard shortcut:
 
@@ -1014,9 +1175,9 @@ Test each keyboard shortcut:
 
 ---
 
-## SECTION 12: RESPONSIVE & BROWSER TESTING
+## SECTION 15: RESPONSIVE & BROWSER TESTING
 
-### 12.1 Browser Compatibility
+### 15.1 Browser Compatibility
 
 Test the entire app in:
 
@@ -1027,7 +1188,7 @@ Test the entire app in:
 
 Note any visual differences or broken functionality.
 
-### 12.2 Window Sizes
+### 15.2 Window Sizes
 
 1. Resize the browser to very narrow (< 800px). Does the sidebar collapse?
 2. Resize to very wide (4K). Does the layout stretch reasonably?
@@ -1035,9 +1196,9 @@ Note any visual differences or broken functionality.
 
 ---
 
-## SECTION 13: ERROR RECOVERY
+## SECTION 16: ERROR RECOVERY
 
-### 13.1 Network Interruption
+### 16.1 Network Interruption
 
 1. Open the page editor and make changes.
 2. Disconnect from the network (airplane mode or disconnect Wi-Fi).
@@ -1046,14 +1207,14 @@ Note any visual differences or broken functionality.
 5. Reconnect. Try saving again.
 6. **Expected**: Save succeeds.
 
-### 13.2 Refresh During Editing
+### 16.2 Refresh During Editing
 
 1. Make changes in the editor (don't save).
 2. Refresh the browser (F5).
 3. **Expected**: Browser warns you about unsaved changes. If you proceed, changes are lost.
 4. After refresh, the page should load the last saved state.
 
-### 13.3 Back Button
+### 16.3 Back Button
 
 1. Navigate: Projects → Pages → Edit Page → Design.
 2. Press the browser back button at each step.
@@ -1061,7 +1222,7 @@ Note any visual differences or broken functionality.
 
 ---
 
-## SECTION 14: FINAL SMOKE TEST
+## SECTION 17: FINAL SMOKE TEST
 
 Do this at the very end after all other testing:
 
@@ -1082,12 +1243,101 @@ Do this at the very end after all other testing:
 
 ---
 
+## APPENDIX A: HOSTED MODE TESTING
+
+> These tests **only apply when running in hosted mode** (`HOSTED_MODE=true`). They require valid Clerk keys and (for publish tests) a configured Publisher API. Skip this entire appendix if you are only testing local mode.
+
+### A.1 Authentication — Sign-In Required
+
+1. Open the app URL without being signed in (clear cookies or use an incognito window).
+2. **Expected**: A full-screen centered message appears:
+   - Heading: **"Sign in required"**
+   - Text: "You need to sign in to access the editor."
+   - A pink **"Go to sign in"** button/link.
+3. Click the **"Go to sign in"** link.
+4. **Expected**: Redirects to the Publisher sign-in page.
+
+### A.2 Authentication — Loading State
+
+1. Open the app URL while signed in (or sign in).
+2. **Expected**: While Clerk is initializing, a full-screen loading spinner is shown (centered spinning icon with "Loading..." text). Once authentication is confirmed, the app renders the Dashboard normally.
+
+### A.3 Authentication — Sign Out
+
+1. Look at the very bottom of the sidebar (below all navigation items).
+2. **Expected**: A user section appears showing:
+   - Your avatar (circular image)
+   - Your first name or email address (visible when the sidebar is wide; hidden on narrow/collapsed sidebar, but avatar remains visible)
+   - A **sign-out button** (door/exit icon)
+3. Click the **sign-out button**.
+4. **Expected**: Redirects to the Publisher sign-in page (or root URL). You are signed out.
+
+### A.4 App Settings Hidden
+
+1. Look at the bottom of the sidebar.
+2. **Expected**: The **"App Settings"** link is NOT shown. It does not appear anywhere in the sidebar.
+3. All other sidebar items (Dashboard, Projects, Pages, Menus, Media, Settings, Themes, Plugins, Export) are still present.
+
+### A.5 Publish — First Publish
+
+1. Open the **Export** page (click Export in the sidebar).
+2. **Expected**: At the top of the page (above the "Create Export" section), a **Publish** section appears with a heading and description.
+3. If the project has never been published, you should see a **"Publish"** button.
+4. Click **"Publish"**.
+5. **Expected**: Button shows a loading spinner with "Publishing..." text. After a few seconds:
+   - A success toast appears.
+   - The section shows a green banner with **"Your site is live!"**
+   - A public URL is displayed (clickable link).
+   - A timestamp shows when it was last published.
+   - The button text changes to **"Republish"**.
+6. Click the public URL.
+7. **Expected**: The published site opens in a new browser tab and works correctly (all pages, images, styles).
+
+### A.6 Publish — Republish After Changes
+
+1. Go to the page editor. Make a change to a page. Save.
+2. Go back to the Export page.
+3. Click **"Republish"**.
+4. **Expected**: Publishing indicator → success. Timestamp updates. URL stays the same.
+5. Open the URL again. **Expected**: The changes you made are reflected.
+
+### A.7 Publish — Error Handling
+
+1. If the Publisher API URL is misconfigured or unreachable, attempt to publish.
+2. **Expected**: An error message appears (red banner or error toast). The app does not crash.
+
+### A.8 Publish — Not Shown in Local Mode
+
+1. Switch to local mode (set `HOSTED_MODE=false`, restart the app).
+2. Open the Export page.
+3. **Expected**: Only the "Create Export" and "Export History" sections are shown. There is NO "Publish" section.
+
+### A.9 Data Isolation Between Modes
+
+1. Start in local mode. Create a project with pages, media, and menus.
+2. Stop the app. Switch to hosted mode (update `.env`, restart).
+3. Sign in with a Clerk account.
+4. **Expected**: The project list is **empty**. Data from local mode is NOT visible. You are a new user.
+5. Create a project in hosted mode.
+6. Stop the app. Switch back to local mode (update `.env`, restart).
+7. **Expected**: The local-mode project is still there, unaffected. The hosted-mode project is NOT visible.
+
+### A.10 Data Isolation Between Users
+
+1. Sign in with **User A** in one browser. Create a project and add content.
+2. Sign in with **User B** in a different browser (or incognito window).
+3. **Expected**: User B sees an empty project list. User A's data is NOT visible to User B.
+4. Create a project as User B. Switch back to User A's browser.
+5. **Expected**: User A sees only their own project. User B's project is NOT visible.
+
+---
+
 ## Bug Report Template
 
 When you find an issue, report it with:
 
 ```
-SECTION: [e.g., 3.5 Edit Widget Settings]
+SECTION: [e.g., 4.5 Edit Widget Settings]
 SEVERITY: [Critical / Major / Minor / Cosmetic]
 STEPS TO REPRODUCE:
   1. ...
@@ -1097,6 +1347,7 @@ EXPECTED: What should happen
 ACTUAL: What actually happened
 SCREENSHOT: [attach if possible]
 BROWSER: [Chrome 120 / Firefox 115 / etc.]
+MODE: [Local / Hosted]
 NOTES: [anything extra]
 ```
 

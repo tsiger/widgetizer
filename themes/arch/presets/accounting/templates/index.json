@@ -77,14 +77,14 @@
         "item-2": {
           "type": "item",
           "settings": {
-            "icon": "shield-check",
+            "icon": "home-shield",
             "text": "IRS Enrolled Agents"
           }
         },
         "item-3": {
           "type": "item",
           "settings": {
-            "icon": "brand-google",
+            "icon": "certificate",
             "text": "QuickBooks Certified"
           }
         },
@@ -121,8 +121,8 @@
         "figure-2": {
           "type": "figure",
           "settings": {
-            "number": "$12M",
-            "suffix": "",
+            "number": "12",
+            "suffix": "M",
             "label": "Client Savings",
             "description": "In tax reductions"
           }
