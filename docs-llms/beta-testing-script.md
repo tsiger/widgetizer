@@ -48,7 +48,7 @@ Start the app with `npm run dev:all`. A sign-in screen appears before the app lo
 | Authentication | None (automatic) | Clerk JWT (sign-in required) |
 | App Settings page | Visible in sidebar | Hidden from sidebar |
 | Publish section (Export page) | Not shown | Shown |
-| User menu in sidebar | Not shown | Avatar + name + sign-out |
+| User menu in sidebar | Not shown | My Sites + My Account + Sign out |
 | Data directory | `data/users/local/` | `data/users/{clerkUserId}/` |
 
 ### Terminology
