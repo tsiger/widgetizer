@@ -1,10 +1,11 @@
 import { useClerk } from "@clerk/clerk-react";
+import { Globe, User } from "lucide-react";
 import { PUBLISHER_URL } from "../../config";
 
 /**
  * User menu for the sidebar in hosted mode.
- * Shows "Account" section with "My Account" link and sign-out button.
- * Matches the publisher-frontend sidebar layout.
+ * Shows "My Sites" link, "Account" section with "My Account" link, and sign-out button.
+ * Matches the publisher-frontend sidebar layout and icons.
  * Only rendered when HOSTED_MODE is true (lazy-loaded by Sidebar).
  */
 export default function UserMenu() {
@@ -17,6 +18,28 @@ export default function UserMenu() {
 
   return (
     <>
+      {/* My Sites section */}
+      {PUBLISHER_URL && (
+        <div className="pt-4 border-t border-slate-800">
+          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">My Sites</h3>
+          <ul className="space-y-2 md:space-y-1">
+            <li>
+              <a
+                href={`${PUBLISHER_URL}/dashboard`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center md:justify-start p-2 rounded-sm transition-all duration-150 hover:bg-slate-800 border border-slate-700 md:border-none"
+              >
+                <div className="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-pink-600">
+                  <Globe size={20} />
+                </div>
+                <span className="hidden md:inline ml-1 text-sm">My Sites</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      )}
+
       {/* Account section */}
       {PUBLISHER_URL && (
         <div className="pt-4 border-t border-slate-800">
@@ -30,14 +53,7 @@ export default function UserMenu() {
                 className="flex items-center justify-center md:justify-start p-2 rounded-sm transition-all duration-150 hover:bg-slate-800 border border-slate-700 md:border-none"
               >
                 <div className="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-pink-600">
-                  <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
+                  <User size={20} />
                 </div>
                 <span className="hidden md:inline ml-1 text-sm">My Account</span>
               </a>
