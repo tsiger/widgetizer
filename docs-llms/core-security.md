@@ -106,7 +106,7 @@ Optional security boundary that runs the preview iframe on a separate origin fro
 | Variable | Side | Required | Description |
 |----------|------|----------|-------------|
 | `PREVIEW_ISOLATION` | Server | No | Set to `true` to enable |
-| `BUILDER_ORIGIN` | Server | When isolation=true | Builder origin (e.g., `https://builder.example.com`) |
+| `EDITOR_ORIGIN` | Server | When isolation=true | Editor origin (e.g., `https://editor.example.com`) |
 | `ALLOWED_ORIGINS` | Server | When isolation=true | Comma-separated CORS allowlist |
 | `VITE_PREVIEW_ISOLATION` | Client | No | Mirrors `PREVIEW_ISOLATION` |
 | `VITE_PREVIEW_ORIGIN` | Client | When isolation=true | Preview origin (e.g., `https://preview.example.com`) |

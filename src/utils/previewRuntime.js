@@ -10,11 +10,11 @@ and cross-origin contentDocument access issues.
 
 // ── Origin-Aware PostMessage ────────────────────────────────────────────────
 
-const BUILDER_ORIGIN =
-  document.querySelector('script[src*="previewRuntime"]')?.dataset?.builderOrigin || "*";
+const EDITOR_ORIGIN =
+  document.querySelector('script[src*="previewRuntime"]')?.dataset?.editorOrigin || "*";
 
 function postToParent(data) {
-  window.parent.postMessage(data, BUILDER_ORIGIN);
+  window.parent.postMessage(data, EDITOR_ORIGIN);
 }
 
 // ── Preview Mode ────────────────────────────────────────────────────────────
@@ -736,7 +736,7 @@ function setupOverlayClickHandler() {
 
 function handleMessage(event) {
   // Origin check when isolation is enabled
-  if (BUILDER_ORIGIN !== "*" && event.origin !== BUILDER_ORIGIN) return;
+  if (EDITOR_ORIGIN !== "*" && event.origin !== EDITOR_ORIGIN) return;
 
   const { type, payload } = event.data;
 

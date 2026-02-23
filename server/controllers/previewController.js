@@ -20,8 +20,8 @@ const __dirname = dirname(__filename);
 function injectRuntimeScript(html, previewMode = "editor") {
   const safeMode = previewMode === "standalone" ? "standalone" : "editor";
   const builderOriginAttr =
-    process.env.PREVIEW_ISOLATION === "true" && process.env.BUILDER_ORIGIN
-      ? ` data-builder-origin="${process.env.BUILDER_ORIGIN}"`
+    process.env.PREVIEW_ISOLATION === "true" && process.env.EDITOR_ORIGIN
+      ? ` data-editor-origin="${process.env.EDITOR_ORIGIN}"`
       : "";
   const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}"${builderOriginAttr}></script>`;
   html = html.replace(/<\/body>/i, `${script}\n</body>`);
