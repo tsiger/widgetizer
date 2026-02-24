@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { API_URL } from "../config";
+import { apiFetch } from "../lib/apiFetch";
 
 /**
  * Hook for managing media file metadata editing via a drawer interface.
@@ -49,7 +50,7 @@ export default function useMediaMetadata({ activeProject, showToast, setFiles })
 
     setIsSavingMetadata(true);
     try {
-      const response = await fetch(API_URL(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata`), {
+      const response = await apiFetch(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

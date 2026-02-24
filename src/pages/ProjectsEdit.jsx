@@ -110,7 +110,7 @@ export default function ProjectsEdit() {
           const refreshedActiveProject = await getActiveProject();
           setActiveProject(refreshedActiveProject);
         }
-        showToast(t("projectsEdit.toasts.updateSuccessRenamed", { name: formData.name }), "success");
+        showToast(t("projectsEdit.toasts.updateSuccessRenamed", { name: updatedProject.name }), "success");
         // No need to navigate as ID is stable
       } else {
         // If this was the active project, refresh the active project state
@@ -118,7 +118,7 @@ export default function ProjectsEdit() {
           const refreshedActiveProject = await getActiveProject();
           setActiveProject(refreshedActiveProject);
         }
-        showToast(t("projectsEdit.toasts.updateSuccess", { name: formData.name }), "success");
+        showToast(t("projectsEdit.toasts.updateSuccess", { name: updatedProject.name }), "success");
       }
 
       setShowSuccessActions(true);

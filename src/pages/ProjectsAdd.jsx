@@ -32,9 +32,9 @@ export default function ProjectsAdd() {
       // Update store if backend activated it
       if (newProject.wasSetAsActive) {
         setActiveProjectInStore(newProject);
-        showToast(t("projectsAdd.toasts.createActiveSuccess", { name: formData.name }), "success");
+        showToast(t("projectsAdd.toasts.createActiveSuccess", { name: newProject.name }), "success");
       } else {
-        showToast(t("projectsAdd.toasts.createSuccess", { name: formData.name }), "success");
+        showToast(t("projectsAdd.toasts.createSuccess", { name: newProject.name }), "success");
       }
 
       // Redirect to list after successful creation

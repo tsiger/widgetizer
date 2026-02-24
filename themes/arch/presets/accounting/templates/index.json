@@ -1,0 +1,380 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero_slideshow": {
+      "type": "slideshow",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "autoplay": true,
+        "autoplay_speed": 6000
+      },
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Numbers tell a story. We help you write it.",
+            "heading_size": "5xl",
+            "text_content": "Strategic accounting and tax services for businesses that want to grow with confidence.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "Get a free review",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_link_2": {
+              "text": "Our services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "button_style_2": "secondary",
+            "button_size": "medium",
+            "color_scheme": "highlight"
+          }
+        },
+        "slide-2": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Tax strategy that saves more than it costs.",
+            "heading_size": "5xl",
+            "text_content": "Proactive planning, accurate reporting, and advisory that keeps you ahead.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "Talk to a CPA",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_link_2": {
+              "text": "Tax resources",
+              "href": "tax-resources.html",
+              "target": "_self"
+            },
+            "button_style_2": "secondary",
+            "button_size": "medium",
+            "color_scheme": "highlight"
+          }
+        }
+      },
+      "blocksOrder": ["slide-1", "slide-2"]
+    },
+    "trust_bar": {
+      "type": "trust-bar",
+      "settings": {
+        "show_dividers": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "item-1": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "text": "CPA-Licensed"
+          }
+        },
+        "item-2": {
+          "type": "item",
+          "settings": {
+            "icon": "home-shield",
+            "text": "IRS Enrolled Agents"
+          }
+        },
+        "item-3": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "text": "QuickBooks Certified"
+          }
+        },
+        "item-4": {
+          "type": "item",
+          "settings": {
+            "icon": "clock-hour-4",
+            "text": "25+ Years"
+          }
+        }
+      },
+      "blocksOrder": ["item-1", "item-2", "item-3", "item-4"]
+    },
+    "key_figures": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Track record",
+        "title": "Precision you can count on",
+        "columns_desktop": 4,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "figure-1": {
+          "type": "figure",
+          "settings": {
+            "number": "4,200",
+            "suffix": "+",
+            "label": "Returns Filed",
+            "description": "And counting"
+          }
+        },
+        "figure-2": {
+          "type": "figure",
+          "settings": {
+            "number": "12",
+            "suffix": "M",
+            "label": "Client Savings",
+            "description": "In tax reductions"
+          }
+        },
+        "figure-3": {
+          "type": "figure",
+          "settings": {
+            "number": "98.7",
+            "suffix": "%",
+            "label": "Accuracy Rate",
+            "description": "Audit-proof filings"
+          }
+        },
+        "figure-4": {
+          "type": "figure",
+          "settings": {
+            "number": "25",
+            "suffix": "Years",
+            "label": "In Business",
+            "description": "Trusted since 2001"
+          }
+        }
+      },
+      "blocksOrder": ["figure-1", "figure-2", "figure-3", "figure-4"]
+    },
+    "services_grid": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Services",
+        "title": "Everything your business needs",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "service-1": {
+          "type": "card",
+          "settings": {
+            "title": "Tax Preparation",
+            "description": "Individual and business returns, filed accurately and on time.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "receipt-tax"
+          }
+        },
+        "service-2": {
+          "type": "card",
+          "settings": {
+            "title": "Bookkeeping",
+            "description": "Clean, organized books so you always know where you stand.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "book-2"
+          }
+        },
+        "service-3": {
+          "type": "card",
+          "settings": {
+            "title": "Audit & Assurance",
+            "description": "Independent reviews that build trust with stakeholders.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "file-check"
+          }
+        },
+        "service-4": {
+          "type": "card",
+          "settings": {
+            "title": "Payroll Services",
+            "description": "Compliant payroll processing for teams of any size.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "users"
+          }
+        },
+        "service-5": {
+          "type": "card",
+          "settings": {
+            "title": "Business Advisory",
+            "description": "Strategic guidance for growth, profitability, and exit planning.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "chart-line"
+          }
+        },
+        "service-6": {
+          "type": "card",
+          "settings": {
+            "title": "Entity Formation",
+            "description": "LLC, S-Corp, or C-Corp \u2014 we help you choose and set up right.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            },
+            "icon": "building"
+          }
+        }
+      },
+      "blocksOrder": ["service-1", "service-2", "service-3", "service-4", "service-5", "service-6"]
+    },
+    "why_greenledger": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "eyebrow-text": {
+          "type": "text",
+          "settings": {
+            "text": "Why Greenledger",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Why businesses choose us",
+            "size": "2xl"
+          }
+        },
+        "description": {
+          "type": "text",
+          "settings": {
+            "text": "We combine big-firm expertise with small-firm attention. Every client gets a dedicated CPA who knows their business inside and out.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "features": {
+          "type": "features",
+          "settings": {
+            "features": "Accuracy-first approach \u2014 every return reviewed twice\nProactive tax strategy \u2014 we plan ahead, not just file\nReal-time access \u2014 cloud-based books you can check anytime\nIndustry expertise \u2014 specialized knowledge for your sector"
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow-text", "heading", "description", "features"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client feedback",
+        "title": "What business owners say",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Greenledger saved us $47K in our first year. Their proactive tax planning paid for itself ten times over.",
+            "name": "Marcus Webb",
+            "title": "CEO, Webb Construction",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Finally, an accounting firm that explains things in plain English. We actually understand our financials now.",
+            "name": "Lisa Nakamura",
+            "title": "Founder, Sakura Eats",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "They caught errors from our previous accountant and set us up with systems that just work.",
+            "name": "Daniel Osei",
+            "title": "Partner, Osei & Bright Legal",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+    },
+    "cta_banner": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get a free tax review",
+            "size": "4xl"
+          }
+        },
+        "cta-body": {
+          "type": "text",
+          "settings": {
+            "text": "Send us your last return and we'll identify opportunities you might be missing. No obligation.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Request free review",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-body", "cta-buttons"]
+    }
+  },
+  "widgetsOrder": [
+    "hero_slideshow",
+    "trust_bar",
+    "key_figures",
+    "services_grid",
+    "why_greenledger",
+    "testimonials",
+    "cta_banner"
+  ],
+  "id": "index",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

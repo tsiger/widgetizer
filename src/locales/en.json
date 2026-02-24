@@ -573,6 +573,18 @@
       "unknownError": "An unknown error occurred during exporting."
     }
   },
+  "publishSite": {
+    "title": "Publish to Web",
+    "description": "Publish your site live to the web with a single click.",
+    "publishButton": "Publish",
+    "republishButton": "Republish",
+    "publishing": "Publishing...",
+    "live": "Your site is live!",
+    "lastPublished": "Last published: {{date}}",
+    "notPublished": "This project has not been published yet.",
+    "publishSuccess": "Site published successfully!",
+    "publishError": "Failed to publish: {{message}}"
+  },
   "media": {
     "title": "Media",
     "loading": "Loading media files...",

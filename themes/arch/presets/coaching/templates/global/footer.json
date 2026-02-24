@@ -1,0 +1,11 @@
+{
+  "type": "footer",
+  "settings": {
+    "footerNavigation": "footer-menu",
+    "facebook_url": "#",
+    "twitter_url": "#",
+    "youtube_url": "#",
+    "linkedin_url": "#",
+    "copyright": "© 2026 Catalyst Coaching. All rights reserved."
+  }
+}

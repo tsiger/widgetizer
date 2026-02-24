@@ -8,9 +8,14 @@ Widgetizer is a powerful, yet simple, visual website builder designed to create 
 
 Widgetizer is built on two fundamental principles: **simplicity** and **portability**.
 
-### 1. File-Based Architecture
+### 1. Hybrid Storage Architecture
 
-Unlike most website builders, Widgetizer has **no database**. Everything—from your page content and media to your site settings—is stored in simple, human-readable files. This makes the system incredibly fast, easy to back up, and resistant to common database-related security issues.
+Widgetizer uses a **hybrid model**:
+
+- **SQLite metadata store** (`data/widgetizer.db`) for projects, media metadata/usage, app settings, and export history
+- **Filesystem content store** for page JSON, menu JSON, global widgets, theme files, and uploaded media binaries
+
+This gives fast relational lookups and safer concurrent writes without giving up portable project content folders.
 
 ### 2. Privacy & Portability
 

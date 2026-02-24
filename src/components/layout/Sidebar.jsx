@@ -1,9 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import useThemeUpdateStore from "../../stores/themeUpdateStore";
 import { navigationSections } from "../../config/navigation";
+import { HOSTED_MODE } from "../../config";
+
+// Lazy-load UserMenu to keep @clerk/clerk-react out of the main bundle
+const UserMenu = HOSTED_MODE ? lazy(() => import("../auth/UserMenu")) : null;
 
 export default function Sidebar() {
   const { t } = useTranslation();
@@ -49,6 +53,8 @@ export default function Sidebar() {
   );
 
   const renderNavItem = (item) => {
+    if (HOSTED_MODE && item.hostedHidden) return null;
+
     const Icon = item.icon;
     const disabled = item.requiresProject && !hasActiveProject;
     const showBadge = item.id === "themes" && themeUpdateCount > 0;
@@ -71,6 +77,11 @@ export default function Sidebar() {
   };
 
   const renderSection = (section) => {
+    const visibleItems = HOSTED_MODE
+      ? section.items.filter((item) => !item.hostedHidden)
+      : section.items;
+    if (visibleItems.length === 0) return null;
+
     if (section.position === "bottom") {
       return (
         <div key={section.id} className="pt-4 border-t border-slate-800">
@@ -104,7 +115,14 @@ export default function Sidebar() {
         {topSections.map(renderSection)}
       </div>
 
-      <div className="px-2 md:px-4 pb-2">{bottomSections.map(renderSection)}</div>
+      <div className="px-2 md:px-4 pb-2">
+        {bottomSections.map(renderSection)}
+        {UserMenu && (
+          <Suspense fallback={null}>
+            <UserMenu />
+          </Suspense>
+        )}
+      </div>
     </div>
   );
 }

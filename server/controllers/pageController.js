@@ -1,78 +1,24 @@
 import fs from "fs-extra";
 import slugify from "slugify";
 import { randomUUID } from "crypto";
-import { validationResult } from "express-validator";
-import { getProjectsFilePath, getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
+import { getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
 import path from "path";
 import { updatePageMediaUsage, removePageFromMediaUsage } from "../services/mediaUsageService.js";
-
-async function readProjectsFile() {
-  const projectsPath = getProjectsFilePath();
-  if (!(await fs.pathExists(projectsPath))) {
-    const initialData = { projects: [], activeProjectId: null };
-    await fs.outputFile(projectsPath, JSON.stringify(initialData, null, 2));
-    return initialData;
-  }
-  const data = await fs.readFile(projectsPath, "utf8");
-  return JSON.parse(data);
-}
-
-/**
- * Generate a unique slug
- */
-async function generateUniqueSlug(name, projectId) {
-  let baseSlug = slugify(name, { lower: true, strict: true });
-  let uniqueSlug = baseSlug;
-  let counter = 1;
-
-  // Check if slug exists by filename using fs.pathExists
-  while (true) {
-    const filePath = getPagePath(projectId, uniqueSlug);
-    if (!(await fs.pathExists(filePath))) {
-      // File does not exist, this slug is unique
-      break;
-    }
-    // File exists, increment counter and try again
-    uniqueSlug = `${baseSlug}-${counter}`;
-    counter++;
-  }
-  return uniqueSlug;
-}
-
-/**
- * Ensure a slug is unique
- */
-async function ensureUniqueSlug(desiredSlug, projectId) {
-  let slug = slugify(desiredSlug, { lower: true, strict: true }); // Sanitize the desired slug
-  if (!slug) {
-    // Handle empty slug after sanitization
-    slug = "page"; // Default slug base
-  }
-  let uniqueSlug = slug;
-  let counter = 1;
-
-  // Check if the desired slug (or variations) exists by filename
-  while (true) {
-    const filePath = getPagePath(projectId, uniqueSlug);
-    if (!(await fs.pathExists(filePath))) {
-      // File does not exist, this slug is unique
-      break;
-    }
-    // File exists, increment counter and try again
-    uniqueSlug = `${slug}-${counter}`;
-    counter++;
-  }
-  return uniqueSlug;
-}
+import { stripHtmlTags } from "../services/sanitizationService.js";
+import { generateUniqueSlug } from "../utils/slugHelpers.js";
+import { generateCopyName } from "../utils/namingHelpers.js";
+import { EDITOR_LIMITS } from "../limits.js";
+import { checkLimit, checkStringLength } from "../utils/limitChecks.js";
 
 /**
  * Lists and reads data for all publishable pages in a project's pages directory.
  * @param {string} projectId - The project folder name
+ * @param {string} userId - The user ID for path scoping
  * @returns {Promise<Array<object>>} Array of page data objects
  * @throws {Error} If the pages directory cannot be read
  */
-export async function listProjectPagesData(projectId) {
-  const pagesDir = getProjectPagesDir(projectId);
+export async function listProjectPagesData(projectId, userId) {
+  const pagesDir = getProjectPagesDir(projectId, userId);
   try {
     // Check if pages directory exists
     if (!(await fs.pathExists(pagesDir))) {
@@ -93,7 +39,7 @@ export async function listProjectPagesData(projectId) {
     const pagesData = await Promise.all(
       pageFiles.map(async (fileEntry) => {
         const pageId = fileEntry.name.replace(".json", "");
-        const pagePath = getPagePath(projectId, pageId);
+        const pagePath = getPagePath(projectId, pageId, userId);
         try {
           const pageContent = await fs.readFile(pagePath, "utf8");
           const parsedData = JSON.parse(pageContent);
@@ -123,14 +69,15 @@ export async function listProjectPagesData(projectId) {
  * Reads the JSON data for a global widget (header or footer).
  * @param {string} projectId - The project folder name
  * @param {'header'|'footer'} widgetType - The type of global widget to read
+ * @param {string} userId - The user ID for path scoping
  * @returns {Promise<object|null>} The widget data or null if not found
  */
-export async function readGlobalWidgetData(projectId, widgetType) {
+export async function readGlobalWidgetData(projectId, widgetType, userId) {
   if (widgetType !== "header" && widgetType !== "footer") {
     console.error(`Invalid global widget type requested: ${widgetType}`);
     return null;
   }
-  const projectDir = getProjectDir(projectId);
+  const projectDir = getProjectDir(projectId, userId);
   // Ensure path uses projectDir consistently
   const globalWidgetPath = path.join(projectDir, "pages", "global", `${widgetType}.json`);
 
@@ -158,23 +105,13 @@ export async function readGlobalWidgetData(projectId, widgetType) {
  * @returns {Promise<void>}
  */
 export async function getPage(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params; // This is the slug
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     // Try to find the page in the project's pages directory
-    const pagePath = getPagePath(projectFolderName, id);
+    const pagePath = getPagePath(projectFolderName, id, req.userId);
     // Check if page exists
     if (!(await fs.pathExists(pagePath))) {
       return res.status(404).json({ error: "Page not found" });
@@ -194,22 +131,19 @@ export async function getPage(req, res) {
  * @returns {Promise<void>}
  */
 export async function updatePage(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const oldSlug = req.params.id; // The slug used to identify the file to update
     const pageData = req.body; // Contains potentially new name and slug
     let desiredNewSlug = pageData.slug; // The slug the user wants
 
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
+    // Defensive sanitization for SEO fields
+    if (pageData.seo) {
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
     }
+
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     // Fallback: If slug is missing/empty, generate from name
@@ -221,8 +155,10 @@ export async function updatePage(req, res) {
       console.warn(
         `Missing/empty slug in update request for oldSlug '${oldSlug}', generating from name: '${pageData.name}'`,
       );
-      desiredNewSlug = await generateUniqueSlug(pageData.name, projectFolderName);
-      // Since generateUniqueSlug already ensures uniqueness, we can use its result directly
+      desiredNewSlug = await generateUniqueSlug(
+        pageData.name,
+        (slug) => fs.pathExists(getPagePath(projectFolderName, slug, req.userId)),
+      );
     } else {
       // Sanitize the provided slug if it exists
       desiredNewSlug = slugify(desiredNewSlug, { lower: true, strict: true });
@@ -234,14 +170,14 @@ export async function updatePage(req, res) {
       }
     }
 
-    const oldPath = getPagePath(projectFolderName, oldSlug);
+    const oldPath = getPagePath(projectFolderName, oldSlug, req.userId);
     let finalNewSlug = oldSlug; // Assume slug doesn't change initially
 
     // Check if the desired slug (after potential generation/sanitization) is different from the old one
     if (oldSlug !== desiredNewSlug) {
       // For explicit slug changes, check if the new slug already exists (conflict)
       if (pageData.slug && typeof pageData.slug === "string" && pageData.slug.trim() !== "") {
-        const existingPath = getPagePath(projectFolderName, desiredNewSlug);
+        const existingPath = getPagePath(projectFolderName, desiredNewSlug, req.userId);
         if (await fs.pathExists(existingPath)) {
           return res.status(409).json({
             error: "Slug already exists",
@@ -257,7 +193,7 @@ export async function updatePage(req, res) {
       finalNewSlug = oldSlug;
     }
 
-    const newPath = getPagePath(projectFolderName, finalNewSlug);
+    const newPath = getPagePath(projectFolderName, finalNewSlug, req.userId);
 
     // Read old file first to preserve original creation date and uuid
     let originalCreationDate = new Date().toISOString();
@@ -308,10 +244,10 @@ export async function updatePage(req, res) {
     try {
       // If slug changed, remove the old slug first
       if (oldSlug !== finalNewSlug) {
-        await removePageFromMediaUsage(activeProjectId, oldSlug);
+        await removePageFromMediaUsage(activeProject.id, oldSlug, req.userId);
       }
       // Then update with the new slug (or refresh if slug didn't change)
-      await updatePageMediaUsage(activeProjectId, finalNewSlug, finalUpdatedPageData);
+      await updatePageMediaUsage(activeProject.id, finalNewSlug, finalUpdatedPageData, req.userId);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for page ${finalNewSlug}:`, usageError);
       // Don't fail the request if usage tracking fails
@@ -337,16 +273,11 @@ export async function updatePage(req, res) {
 export async function getAllPages(req, res) {
   // No validation needed for this route
   try {
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     // Use the helper function to get page data
-    const pages = await listProjectPagesData(projectFolderName);
+    const pages = await listProjectPagesData(projectFolderName, req.userId);
 
     res.json(pages);
   } catch (error) {
@@ -363,22 +294,12 @@ export async function getAllPages(req, res) {
  * @returns {Promise<void>}
  */
 export async function deletePage(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     const pageId = req.params.id;
-    const pagePath = getPagePath(projectFolderName, pageId);
+    const pagePath = getPagePath(projectFolderName, pageId, req.userId);
 
     // Check if file exists before deleting
     if (!(await fs.pathExists(pagePath))) {
@@ -390,7 +311,7 @@ export async function deletePage(req, res) {
 
     // Remove the page from media usage tracking
     try {
-      await removePageFromMediaUsage(activeProject.id, pageId);
+      await removePageFromMediaUsage(activeProject.id, pageId, req.userId);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
       // Don't fail the request if usage tracking fails
@@ -411,18 +332,8 @@ export async function deletePage(req, res) {
  * @returns {Promise<void>}
  */
 export async function bulkDeletePages(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   const { pageIds } = req.body;
-  const { projects, activeProjectId } = await readProjectsFile();
-  const activeProject = projects.find((p) => p.id === activeProjectId);
-
-  if (!activeProject) {
-    return res.status(404).json({ error: "No active project found" });
-  }
+  const { activeProject } = req;
   const projectFolderName = activeProject.folderName;
 
   const results = {
@@ -434,7 +345,7 @@ export async function bulkDeletePages(req, res) {
   // Process each page deletion
   for (const pageId of pageIds) {
     try {
-      const pagePath = getPagePath(projectFolderName, pageId);
+      const pagePath = getPagePath(projectFolderName, pageId, req.userId);
 
       // Check if file exists before deleting
       if (!(await fs.pathExists(pagePath))) {
@@ -447,7 +358,7 @@ export async function bulkDeletePages(req, res) {
 
       // Remove the page from media usage tracking
       try {
-        await removePageFromMediaUsage(activeProjectId, pageId);
+        await removePageFromMediaUsage(activeProject.id, pageId, req.userId);
       } catch (usageError) {
         console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
         // Don't fail the deletion if usage tracking fails
@@ -495,29 +406,51 @@ export async function bulkDeletePages(req, res) {
  * @returns {Promise<void>}
  */
 export async function createPage(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const pageData = req.body; // Get all data including SEO
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
+    const { activeProject } = req;
 
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
+    // Platform limit: max pages per project
+    const pagesDir = getProjectPagesDir(activeProject.folderName, req.userId);
+    if (await fs.pathExists(pagesDir)) {
+      const entries = await fs.readdir(pagesDir, { withFileTypes: true });
+      const pageCount = entries.filter((e) => e.isFile() && e.name.endsWith(".json")).length;
+      const pageCheck = checkLimit(pageCount, EDITOR_LIMITS.maxPagesPerProject, "pages per project");
+      if (!pageCheck.ok) {
+        return res.status(403).json({ error: pageCheck.error });
+      }
     }
+
+    // Platform limit: page name length
+    if (pageData.name) {
+      const nameCheck = checkStringLength(pageData.name, EDITOR_LIMITS.maxPageNameLength, "Page name");
+      if (!nameCheck.ok) {
+        return res.status(400).json({ error: nameCheck.error });
+      }
+    }
+
+    // Defensive sanitization for SEO fields
+    if (pageData.seo) {
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
+    }
+
+    // Defensive check: ensure name is not empty after sanitization
+    if (!pageData.name || typeof pageData.name !== "string" || pageData.name.trim() === "") {
+      return res.status(400).json({ error: "Page name is required." });
+    }
+
     const projectFolderName = activeProject.folderName;
 
     // Use submitted slug if provided, otherwise generate from name
     let slug;
     if (pageData.slug && pageData.slug.trim()) {
       // User provided a slug, ensure it's unique
-      slug = await ensureUniqueSlug(pageData.slug, projectFolderName);
+      slug = await generateUniqueSlug(pageData.slug, (slug) => fs.pathExists(getPagePath(projectFolderName, slug, req.userId)), { fallback: "page" });
     } else {
       // No slug provided, generate from name
-      slug = await generateUniqueSlug(pageData.name, projectFolderName);
+      slug = await generateUniqueSlug(pageData.name, (slug) => fs.pathExists(getPagePath(projectFolderName, slug, req.userId)));
     }
 
     const newPage = {
@@ -530,15 +463,15 @@ export async function createPage(req, res) {
       updated: new Date().toISOString(),
     };
 
-    const pagesDir = getProjectPagesDir(projectFolderName);
+    // Reuses pagesDir from the limit check above
     await fs.ensureDir(pagesDir);
 
-    const pagePath = getPagePath(projectFolderName, slug);
+    const pagePath = getPagePath(projectFolderName, slug, req.userId);
     await fs.outputFile(pagePath, JSON.stringify(newPage, null, 2));
 
     // Update media usage tracking for SEO images
     try {
-      await updatePageMediaUsage(activeProjectId, slug, newPage);
+      await updatePageMediaUsage(activeProject.id, slug, newPage, req.userId);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for new page ${slug}:`, usageError);
       // Don't fail the request if usage tracking fails
@@ -559,20 +492,25 @@ export async function createPage(req, res) {
  * @returns {Promise<void>}
  */
 export async function savePageContent(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   const { id } = req.params;
   try {
     const pageData = req.body; // Get all data including SEO
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
 
-    if (!activeProject) {
-      return res.status(400).json({ error: "No active project found" });
+    // Platform limit: page JSON size
+    const jsonSize = JSON.stringify(pageData).length;
+    const sizeCheck = checkLimit(jsonSize, EDITOR_LIMITS.maxPageJsonSize, "bytes of page data", { exclusive: false });
+    if (!sizeCheck.ok) {
+      return res.status(400).json({ error: "Page content is too large. Please reduce the number of widgets or content." });
     }
+
+    // Defensive sanitization for SEO fields
+    if (pageData.seo) {
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
+    }
+
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     // Validate essential data
@@ -580,10 +518,29 @@ export async function savePageContent(req, res) {
       return res.status(400).json({ error: "Missing required page data (slug, name, widgets)." });
     }
 
+    // Platform limits: widget count, blocks per widget, nesting depth, text length
+    if (pageData.widgets && typeof pageData.widgets === "object") {
+      const widgetKeys = Object.keys(pageData.widgets);
+      const widgetCheck = checkLimit(widgetKeys.length, EDITOR_LIMITS.maxWidgetsPerPage, "widgets per page", { exclusive: false });
+      if (!widgetCheck.ok) {
+        return res.status(400).json({ error: widgetCheck.error });
+      }
+
+      for (const key of widgetKeys) {
+        const widget = pageData.widgets[key];
+        if (widget && widget.blocks && Array.isArray(widget.blocks)) {
+          const blockCheck = checkLimit(widget.blocks.length, EDITOR_LIMITS.maxBlocksPerWidget, "blocks per widget", { exclusive: false });
+          if (!blockCheck.ok) {
+            return res.status(400).json({ error: blockCheck.error });
+          }
+        }
+      }
+    }
+
     // Read existing data to preserve timestamps etc.
     let existingData = {};
     try {
-      const pagePath = getPagePath(projectFolderName, id);
+      const pagePath = getPagePath(projectFolderName, id, req.userId);
       const data = await fs.readFile(pagePath, "utf8");
       existingData = JSON.parse(data);
     } catch (err) {
@@ -608,13 +565,13 @@ export async function savePageContent(req, res) {
     };
 
     // Write file
-    const newPagePath = getPagePath(projectFolderName, pageData.slug);
+    const newPagePath = getPagePath(projectFolderName, pageData.slug, req.userId);
     await fs.outputFile(newPagePath, JSON.stringify(updatedPageData, null, 2));
 
     // If the original slug (id) is different from the new slug, delete the old file
     if (id !== pageData.slug) {
       try {
-        const oldPath = getPagePath(projectFolderName, id);
+        const oldPath = getPagePath(projectFolderName, id, req.userId);
         if (await fs.pathExists(oldPath)) {
           await fs.remove(oldPath);
         }
@@ -627,10 +584,10 @@ export async function savePageContent(req, res) {
     try {
       // If slug changed, remove the old slug first
       if (id !== pageData.slug) {
-        await removePageFromMediaUsage(activeProjectId, id);
+        await removePageFromMediaUsage(activeProject.id, id, req.userId);
       }
       // Then update with the new slug
-      await updatePageMediaUsage(activeProjectId, pageData.slug, updatedPageData);
+      await updatePageMediaUsage(activeProject.id, pageData.slug, updatedPageData, req.userId);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for page ${pageData.slug}:`, usageError);
       // Don't fail the request if usage tracking fails
@@ -651,58 +608,34 @@ export async function savePageContent(req, res) {
  * @returns {Promise<void>}
  */
 export async function duplicatePage(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const originalPageId = req.params.id;
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     // Read the original page data
-    const originalPagePath = getPagePath(projectFolderName, originalPageId);
+    const originalPagePath = getPagePath(projectFolderName, originalPageId, req.userId);
     const originalPageData = JSON.parse(await fs.readFile(originalPagePath, "utf8"));
 
-    // Determine base name for copying
-    let baseName = originalPageData.name;
-    if (baseName.match(/^Copy( \d+)? of /)) {
-      baseName = baseName.replace(/^Copy( \d+)? of /, "");
-    }
-
-    // Read all existing page *files* to find existing copies
-    const pagesDir = getProjectPagesDir(projectFolderName);
+    // Read all existing page files to find existing copy names
+    const pagesDir = getProjectPagesDir(projectFolderName, req.userId);
     const allEntries = await fs.readdir(pagesDir, { withFileTypes: true });
     const pageJsonFiles = allEntries.filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
 
-    const pages = await Promise.all(
+    // Platform limit: max pages per project
+    const pageCheck = checkLimit(pageJsonFiles.length, EDITOR_LIMITS.maxPagesPerProject, "pages per project");
+    if (!pageCheck.ok) {
+      return res.status(403).json({ error: pageCheck.error });
+    }
+    const existingPageNames = await Promise.all(
       pageJsonFiles.map(async (fileEntry) => {
-        // Read only the confirmed JSON files
         const data = await fs.readFile(path.join(pagesDir, fileEntry.name), "utf8");
-        return JSON.parse(data);
+        return JSON.parse(data).name;
       }),
     );
 
-    // Find the highest copy number for this base name
-    let copyNumber = 0;
-    const copyRegex = new RegExp(`^Copy( (\\d+))? of ${baseName}$`);
-    pages.forEach((page) => {
-      const match = page.name.match(copyRegex);
-      if (match) {
-        const num = match[2] ? parseInt(match[2]) : 1;
-        copyNumber = Math.max(copyNumber, num);
-      }
-    });
-
-    // Generate the new name
-    const newName = copyNumber === 0 ? `Copy of ${baseName}` : `Copy ${copyNumber + 1} of ${baseName}`;
-    const newSlug = await generateUniqueSlug(newName, projectFolderName);
+    const newName = generateCopyName(originalPageData.name, existingPageNames);
+    const newSlug = await generateUniqueSlug(newName, (slug) => fs.pathExists(getPagePath(projectFolderName, slug, req.userId)));
 
     // Create the new page data
     const newPage = {
@@ -716,12 +649,12 @@ export async function duplicatePage(req, res) {
     };
 
     // Save the new page
-    const newPagePath = getPagePath(projectFolderName, newSlug);
+    const newPagePath = getPagePath(projectFolderName, newSlug, req.userId);
     await fs.outputFile(newPagePath, JSON.stringify(newPage, null, 2));
 
     // Update media usage tracking for the new page
     try {
-      await updatePageMediaUsage(activeProjectId, newSlug, newPage);
+      await updatePageMediaUsage(activeProject.id, newSlug, newPage, req.userId);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for duplicated page ${newSlug}:`, usageError);
       // Don't fail the request if usage tracking fails

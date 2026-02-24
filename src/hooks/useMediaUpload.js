@@ -1,6 +1,8 @@
 import { useState } from "react";
 import DOMPurify from "dompurify";
 import { uploadProjectMedia } from "../queries/mediaManager";
+import useAppSettings from "./useAppSettings";
+import { validateFileSizes } from "../utils/mediaValidation";
 
 const CHUNK_SIZE = 5; // Process 5 files at a time
 
@@ -24,6 +26,7 @@ const CHUNK_SIZE = 5; // Process 5 files at a time
 export default function useMediaUpload({ activeProject, showToast, setFiles }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
+  const { settings } = useAppSettings();
 
   const sanitizeFiles = async (files) => {
     const sanitizedFiles = await Promise.all(
@@ -74,7 +77,21 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
     }
 
     setUploading(true);
-    const filesToUpload = await sanitizeFiles(acceptedFiles);
+
+    // Client-side size validation — rejects files before any network request
+    let filesToProcess = acceptedFiles;
+    const preRejected = [];
+    if (settings?.media) {
+      const { valid, rejected } = validateFileSizes(acceptedFiles, {
+        maxImageMB: settings.media.maxFileSizeMB,
+        maxVideoMB: settings.media.maxVideoSizeMB,
+        maxAudioMB: settings.media.maxAudioSizeMB,
+      });
+      filesToProcess = valid;
+      preRejected.push(...rejected);
+    }
+
+    const filesToUpload = await sanitizeFiles(filesToProcess);
 
     // Initialize progress for all files
     filesToUpload.forEach((file) => {
@@ -83,7 +100,7 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
 
     try {
       const allProcessedFiles = [];
-      const allRejectedFiles = [];
+      const allRejectedFiles = [...preRejected];
 
       // Split files into chunks
       const chunks = [];

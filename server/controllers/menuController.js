@@ -1,9 +1,24 @@
 import fs from "fs-extra";
 import path from "path";
-import slugify from "slugify";
-import { validationResult } from "express-validator";
+import { randomUUID } from "crypto";
 import { getProjectMenusDir, getMenuPath } from "../config.js";
-import { readProjectsFile } from "./projectController.js";
+import { stripHtmlTags } from "../services/sanitizationService.js";
+import { generateUniqueSlug } from "../utils/slugHelpers.js";
+import { generateCopyName } from "../utils/namingHelpers.js";
+import { EDITOR_LIMITS } from "../limits.js";
+import { checkLimit, checkStringLength } from "../utils/limitChecks.js";
+
+/** Count total items (flat count including nested children) */
+function countMenuItems(items) {
+  if (!Array.isArray(items)) return 0;
+  return items.reduce((count, item) => count + 1 + countMenuItems(item.items), 0);
+}
+
+/** Get max nesting depth of menu items */
+function getMenuDepth(items, currentDepth = 0) {
+  if (!Array.isArray(items) || items.length === 0) return currentDepth;
+  return Math.max(...items.map((item) => getMenuDepth(item.items, currentDepth + 1)));
+}
 
 /**
  * Retrieves all menus for the active project.
@@ -13,25 +28,29 @@ import { readProjectsFile } from "./projectController.js";
  */
 export async function getAllMenus(req, res) {
   try {
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const menusDir = getProjectMenusDir(projectFolderName);
+    const menusDir = getProjectMenusDir(projectFolderName, req.userId);
 
     if (!(await fs.pathExists(menusDir))) {
       return res.json([]);
     }
 
-    const menuFiles = await fs.readdir(menusDir);
+    const menuFiles = (await fs.readdir(menusDir)).filter((file) => file.endsWith(".json"));
     const menus = await Promise.all(
       menuFiles.map(async (file) => {
-        const menuData = await fs.readFile(path.join(menusDir, file), "utf8");
-        return JSON.parse(menuData);
+        const filePath = path.join(menusDir, file);
+        const menuData = await fs.readFile(filePath, "utf8");
+        const menu = JSON.parse(menuData);
+
+        // Lazy backfill: add uuid to existing menus that don't have one
+        if (!menu.uuid) {
+          menu.uuid = randomUUID();
+          await fs.outputFile(filePath, JSON.stringify(menu, null, 2));
+        }
+
+        return menu;
       }),
     );
 
@@ -42,28 +61,6 @@ export async function getAllMenus(req, res) {
   }
 }
 
-// Helper function to generate unique menu ID
-async function generateUniqueMenuId(projectId, baseName) {
-  const generateId = (name) => {
-    return slugify(name, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
-  };
-
-  let id = generateId(baseName);
-  let counter = 1;
-
-  // Check if the ID already exists
-  while (await fs.pathExists(getMenuPath(projectId, id))) {
-    id = generateId(`${baseName} ${counter}`);
-    counter++;
-  }
-
-  return id;
-}
-
 /**
  * Creates a new menu in the active project with a unique ID.
  * @param {import('express').Request} req - Express request object with menu data in body
@@ -71,36 +68,45 @@ async function generateUniqueMenuId(projectId, baseName) {
  * @returns {Promise<void>}
  */
 export async function createMenu(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
-    const { name, description, id: requestedId } = req.body;
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
+    // Defensive sanitization: strip HTML (route validator also does this,
+    // but the controller must be safe even when called directly)
+    const name = stripHtmlTags(req.body.name);
+    const safeDescription = stripHtmlTags(req.body.description) || "";
 
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
+    // Defensive check: ensure name is not empty after sanitization
+    if (!name || typeof name !== "string" || name.trim() === "") {
+      return res.status(400).json({ error: "Menu name is required." });
     }
+
+    // Platform limit: menu name length
+    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxMenuNameLength, "Menu name");
+    if (!nameCheck.ok) {
+      return res.status(400).json({ error: nameCheck.error });
+    }
+
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const menusDir = getProjectMenusDir(projectFolderName);
+    const menusDir = getProjectMenusDir(projectFolderName, req.userId);
     await fs.ensureDir(menusDir);
 
-    // Generate unique ID from name (or use requested ID if provided)
-    const menuId = requestedId || (await generateUniqueMenuId(projectFolderName, name));
-
-    const menuPath = getMenuPath(projectFolderName, menuId);
-    if (await fs.pathExists(menuPath)) {
-      return res.status(400).json({ error: "A menu with this name already exists" });
+    // Platform limit: max menus per project
+    const menuFiles = (await fs.readdir(menusDir)).filter((f) => f.endsWith(".json"));
+    const menuCheck = checkLimit(menuFiles.length, EDITOR_LIMITS.maxMenusPerProject, "menus per project");
+    if (!menuCheck.ok) {
+      return res.status(403).json({ error: menuCheck.error });
     }
+
+    // Generate unique ID from the sanitized name (server-side only)
+    const menuId = await generateUniqueSlug(name, (slug) => fs.pathExists(getMenuPath(projectFolderName, slug, req.userId)));
+    const menuPath = getMenuPath(projectFolderName, menuId, req.userId);
 
     const newMenu = {
       id: menuId,
+      uuid: randomUUID(),
       name,
-      description,
+      description: safeDescription,
       items: [],
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
@@ -122,22 +128,12 @@ export async function createMenu(req, res) {
  * @returns {Promise<void>}
  */
 export async function deleteMenu(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const menuPath = getMenuPath(projectFolderName, id);
+    const menuPath = getMenuPath(projectFolderName, id, req.userId);
     await fs.remove(menuPath);
     res.json({ success: true });
   } catch (error) {
@@ -153,22 +149,12 @@ export async function deleteMenu(req, res) {
  * @returns {Promise<void>}
  */
 export async function getMenu(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const menuPath = getMenuPath(projectFolderName, id);
+    const menuPath = getMenuPath(projectFolderName, id, req.userId);
     if (!(await fs.pathExists(menuPath))) {
       return res.status(404).json({ error: "Menu not found" });
     }
@@ -182,76 +168,66 @@ export async function getMenu(req, res) {
 }
 
 /**
- * Updates an existing menu, handling ID changes when the name changes.
+ * Updates an existing menu in place. The filename and ID stay stable
+ * regardless of name changes — widgets reference menus by UUID.
  * @param {import('express').Request} req - Express request object with menu ID in params and menu data in body
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
 export async function updateMenu(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
-    const currentMenuId = req.params.id;
+    const menuId = req.params.id;
     const menuData = req.body;
 
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
+    // Defensive sanitization: strip HTML (route validator also does this,
+    // but the controller must be safe even when called directly)
+    if (menuData.name != null) {
+      menuData.name = stripHtmlTags(menuData.name);
     }
+    if (menuData.description != null) {
+      menuData.description = stripHtmlTags(menuData.description) || "";
+    }
+
+    // Defensive check: ensure name is not empty after sanitization
+    if (!menuData.name || typeof menuData.name !== "string" || menuData.name.trim() === "") {
+      return res.status(400).json({ error: "Menu name is required." });
+    }
+
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const currentMenuPath = getMenuPath(projectFolderName, currentMenuId);
+    const menuPath = getMenuPath(projectFolderName, menuId, req.userId);
 
-    // Check if current menu exists
-    if (!(await fs.pathExists(currentMenuPath))) {
+    if (!(await fs.pathExists(menuPath))) {
       return res.status(404).json({ error: "Menu not found" });
     }
 
-    // For updates, we'll keep the same ID unless the user explicitly changed the name
-    // and we need to generate a new ID
-    let finalMenuId = currentMenuId;
-    let finalMenuPath = currentMenuPath;
-
-    // If name changed and it would result in a different ID, we might need to rename
-    const expectedIdFromName = slugify(menuData.name, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
-
-    // Only rename if the expected ID is different from current AND the new path doesn't exist
-    if (expectedIdFromName !== currentMenuId) {
-      const newMenuPath = getMenuPath(projectFolderName, expectedIdFromName);
-
-      if (!(await fs.pathExists(newMenuPath))) {
-        // Safe to rename
-        finalMenuId = expectedIdFromName;
-        finalMenuPath = newMenuPath;
+    // Platform limits: menu item count and nesting depth
+    if (menuData.items) {
+      const itemCount = countMenuItems(menuData.items);
+      const itemCheck = checkLimit(itemCount, EDITOR_LIMITS.maxMenuItemsPerMenu, "items per menu", { exclusive: false });
+      if (!itemCheck.ok) {
+        return res.status(400).json({ error: itemCheck.error });
       }
-      // If new path exists, keep the current ID (avoid conflicts)
+
+      const depth = getMenuDepth(menuData.items);
+      const depthCheck = checkLimit(depth, EDITOR_LIMITS.maxMenuNestingDepth, "levels of menu nesting", { exclusive: false });
+      if (!depthCheck.ok) {
+        return res.status(400).json({ error: depthCheck.error });
+      }
     }
+
+    // Read existing menu to preserve uuid
+    const existingMenu = JSON.parse(await fs.readFile(menuPath, "utf8"));
 
     const dataToSave = {
       ...menuData,
-      id: finalMenuId,
+      id: menuId,
+      uuid: existingMenu.uuid || randomUUID(),
       updated: new Date().toISOString(),
     };
 
-    await fs.outputFile(finalMenuPath, JSON.stringify(dataToSave, null, 2));
-
-    // If we renamed the file, delete the old one
-    if (finalMenuPath !== currentMenuPath) {
-      try {
-        await fs.remove(currentMenuPath);
-      } catch (unlinkError) {
-        console.warn(`Failed to delete old menu file ${currentMenuPath}: ${unlinkError.message}`);
-      }
-    }
+    await fs.outputFile(menuPath, JSON.stringify(dataToSave, null, 2));
 
     res.json(dataToSave);
   } catch (error) {
@@ -279,7 +255,15 @@ export async function getMenuById(projectIdOrDir, menuId) {
     }
 
     const menuData = await fs.readFile(menuPath, "utf8");
-    return JSON.parse(menuData);
+    const menu = JSON.parse(menuData);
+
+    // Lazy backfill: add uuid if missing
+    if (!menu.uuid) {
+      menu.uuid = randomUUID();
+      await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
+    }
+
+    return menu;
   } catch (error) {
     console.error(`Error reading menu by id (${menuId}):`, error);
     return { items: [] };
@@ -293,7 +277,7 @@ function generateNewMenuItemIds(items) {
   return items.map((item) => {
     const newItem = {
       ...item,
-      id: `item_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      id: `item_${randomUUID()}`,
     };
 
     // Recursively handle nested items
@@ -313,22 +297,12 @@ function generateNewMenuItemIds(items) {
  * @returns {Promise<void>}
  */
 export async function duplicateMenu(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
-    const { projects, activeProjectId } = await readProjectsFile();
-    const activeProject = projects.find((p) => p.id === activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
-    const originalMenuPath = getMenuPath(projectFolderName, id);
+    const originalMenuPath = getMenuPath(projectFolderName, id, req.userId);
 
     // Check if original menu exists
     if (!(await fs.pathExists(originalMenuPath))) {
@@ -339,22 +313,38 @@ export async function duplicateMenu(req, res) {
     const originalMenuData = await fs.readFile(originalMenuPath, "utf8");
     const originalMenu = JSON.parse(originalMenuData);
 
-    // Generate new unique name and ID
-    const baseName = `Copy of ${originalMenu.name}`;
-    const newMenuId = await generateUniqueMenuId(projectFolderName, baseName);
+    // Gather existing menu names for copy-number logic
+    const menusDir = getProjectMenusDir(projectFolderName, req.userId);
+    const menuFiles = (await fs.readdir(menusDir)).filter((f) => f.endsWith(".json"));
+
+    // Platform limit: max menus per project
+    const menuCheck = checkLimit(menuFiles.length, EDITOR_LIMITS.maxMenusPerProject, "menus per project");
+    if (!menuCheck.ok) {
+      return res.status(403).json({ error: menuCheck.error });
+    }
+
+    const existingMenuNames = await Promise.all(
+      menuFiles.map(async (f) => {
+        const data = JSON.parse(await fs.readFile(path.join(menusDir, f), "utf8"));
+        return data.name;
+      }),
+    );
+    const newName = generateCopyName(originalMenu.name, existingMenuNames);
+    const newMenuId = await generateUniqueSlug(newName, (slug) => fs.pathExists(getMenuPath(projectFolderName, slug, req.userId)));
 
     // Create the duplicated menu with new data
     const duplicatedMenu = {
       ...JSON.parse(JSON.stringify(originalMenu)), // Deep clone
       id: newMenuId,
-      name: baseName,
+      uuid: randomUUID(),
+      name: newName,
       items: generateNewMenuItemIds(originalMenu.items), // Generate new IDs for all items
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
 
     // Save the new menu
-    const newMenuPath = getMenuPath(projectFolderName, newMenuId);
+    const newMenuPath = getMenuPath(projectFolderName, newMenuId, req.userId);
     await fs.outputFile(newMenuPath, JSON.stringify(duplicatedMenu, null, 2));
 
     res.status(201).json(duplicatedMenu);

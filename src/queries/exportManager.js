@@ -1,4 +1,5 @@
 import { API_URL } from "../config";
+import { apiFetch } from "../lib/apiFetch";
 
 /**
  * @typedef {Object} ExportResult
@@ -30,7 +31,7 @@ export async function exportProjectAPI(projectId, options = {}) {
     throw new Error("Project ID is required to export.");
   }
 
-  const response = await fetch(API_URL(`/api/export/${projectId}`), {
+  const response = await apiFetch(`/api/export/${projectId}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -63,7 +64,7 @@ export async function getExportHistory(projectId) {
     throw new Error("Project ID is required to get export history.");
   }
 
-  const response = await fetch(API_URL(`/api/export/history/${projectId}`), {
+  const response = await apiFetch(`/api/export/history/${projectId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -93,7 +94,7 @@ export async function deleteExportAPI(projectId, version) {
     throw new Error("Project ID and version are required to delete export.");
   }
 
-  const response = await fetch(API_URL(`/api/export/${projectId}/${version}`), {
+  const response = await apiFetch(`/api/export/${projectId}/${version}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -123,7 +124,7 @@ export async function getExportEntryFile(exportDir) {
     throw new Error("Export directory is required.");
   }
 
-  const response = await fetch(API_URL(`/api/export/files/${exportDir}`), {
+  const response = await apiFetch(`/api/export/files/${exportDir}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

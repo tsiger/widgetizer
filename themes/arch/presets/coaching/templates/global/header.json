@@ -1,0 +1,15 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Catalyst",
+    "contactDetailsLine1": "Book a call: (555) 612-8900",
+    "contactDetailsLine2": "Austin, TX — Coaching Globally",
+    "headerNavigation": "main-menu",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Book discovery call",
+      "target": "_self"
+    },
+    "sticky": true
+  }
+}

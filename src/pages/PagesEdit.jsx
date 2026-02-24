@@ -59,15 +59,16 @@ export default function PagesEdit() {
       });
 
       if (result.success) {
+        const savedName = result.data?.name || formData.name;
         // Set ref BEFORE navigation to bypass guard (refs update synchronously)
         if (formData.slug !== id) {
           isNavigatingAfterSaveRef.current = true;
           navigate(`/pages/${formData.slug}/edit`, { replace: true });
-          showToast(t("pagesEdit.toasts.updateSuccessUrlChanged", { name: formData.name }), "success");
+          showToast(t("pagesEdit.toasts.updateSuccessUrlChanged", { name: savedName }), "success");
         } else {
-          showToast(t("pagesEdit.toasts.updateSuccess", { name: formData.name }), "success");
+          showToast(t("pagesEdit.toasts.updateSuccess", { name: savedName }), "success");
         }
-        setPage({
+        setPage(result.data || {
           ...page,
           ...formData,
           updated: new Date().toISOString(),

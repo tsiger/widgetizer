@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import usePageStore from "../stores/pageStore";
@@ -10,6 +10,7 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 export default function PagePreview() {
   const { t } = useTranslation();
   const { pageId } = useParams();
+  const navigate = useNavigate();
 
   const { page, loading, error, loadPage, themeSettings } = usePageStore();
 
@@ -17,6 +18,17 @@ export default function PagePreview() {
   useEffect(() => {
     loadPage(pageId);
   }, [pageId, loadPage]);
+
+  // Handle cross-origin navigation requests from the preview iframe
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data?.type === "NAVIGATE_PREVIEW") {
+        navigate(event.data.payload.url);
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [navigate]);
 
   if (loading) {
     return (

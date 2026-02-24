@@ -1,7 +1,8 @@
 import fs from "fs-extra";
 import path from "path";
 import { getProjectPagesDir, getProjectThemeJsonPath } from "../config.js";
-import { readMediaFile, writeMediaFile, atomicUpdateMediaFile } from "../controllers/mediaController.js";
+import { readMediaFile } from "../controllers/mediaController.js";
+import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 const THEME_SETTINGS_USAGE_ID = "global:theme-settings";
@@ -138,29 +139,35 @@ function extractMediaPathsFromThemeSettings(themeData) {
 }
 
 /**
+ * Find file IDs from media files whose paths match the given media paths.
+ * @param {Array<object>} files - Media files with id and path
+ * @param {string[]} mediaPaths - Media paths to match
+ * @returns {string[]} Array of matching file IDs
+ */
+function findFileIdsByPaths(files, mediaPaths) {
+  const mediaPathSet = new Set(mediaPaths);
+  const matchedIds = [];
+  for (const file of files) {
+    if (file.path && mediaPathSet.has(file.path)) {
+      matchedIds.push(file.id);
+    }
+  }
+  return matchedIds;
+}
+
+/**
  * Update media usage tracking for theme settings (e.g. favicon).
  * @param {string} projectId - The project's UUID
  * @param {object} themeData - Theme data object (theme.json shape) with settings.global
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>}
  */
-export async function updateThemeSettingsMediaUsage(projectId, themeData) {
+export async function updateThemeSettingsMediaUsage(projectId, themeData, userId = "local") {
   try {
     const mediaPaths = extractMediaPathsFromThemeSettings(themeData);
+    const mediaData = await readMediaFile(projectId, userId);
 
-    await atomicUpdateMediaFile(projectId, (mediaData) => {
-      mediaData.files.forEach((file) => {
-        if (file.usedIn) {
-          file.usedIn = file.usedIn.filter((slug) => slug !== THEME_SETTINGS_USAGE_ID);
-        }
-      });
-      mediaPaths.forEach((mediaPath) => {
-        const file = mediaData.files.find((f) => f.path === mediaPath);
-        if (file) {
-          if (!file.usedIn) file.usedIn = [];
-          if (!file.usedIn.includes(THEME_SETTINGS_USAGE_ID)) file.usedIn.push(THEME_SETTINGS_USAGE_ID);
-        }
-      });
-    });
+    const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
+    mediaRepo.updateMediaUsageForSource(projectId, THEME_SETTINGS_USAGE_ID, matchedFileIds);
 
     return { success: true, mediaPaths };
   } catch (error) {
@@ -179,32 +186,13 @@ export async function updateThemeSettingsMediaUsage(projectId, themeData) {
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>} Result with extracted media paths
  * @throws {Error} If media file read/write fails
  */
-export async function updatePageMediaUsage(projectId, pageId, pageData) {
+export async function updatePageMediaUsage(projectId, pageId, pageData, userId = "local") {
   try {
     const mediaPaths = extractMediaPathsFromPage(pageData);
+    const mediaData = await readMediaFile(projectId, userId);
 
-    // Atomic read-modify-write to prevent race conditions with concurrent saves
-    await atomicUpdateMediaFile(projectId, (mediaData) => {
-      // First, remove this page from all media files' usedIn arrays
-      mediaData.files.forEach((file) => {
-        if (file.usedIn) {
-          file.usedIn = file.usedIn.filter((slug) => slug !== pageId);
-        }
-      });
-
-      // Then, add this page to the usedIn array of files that are actually used
-      mediaPaths.forEach((mediaPath) => {
-        const file = mediaData.files.find((f) => f.path === mediaPath);
-        if (file) {
-          if (!file.usedIn) {
-            file.usedIn = [];
-          }
-          if (!file.usedIn.includes(pageId)) {
-            file.usedIn.push(pageId);
-          }
-        }
-      });
-    });
+    const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
+    mediaRepo.updateMediaUsageForSource(projectId, pageId, matchedFileIds);
 
     return { success: true, mediaPaths };
   } catch (error) {
@@ -223,33 +211,14 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>} Result with extracted media paths
  * @throws {Error} If media file read/write fails
  */
-export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData) {
+export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData, userId = "local") {
   try {
     const mediaPaths = extractMediaPathsFromGlobalWidget(widgetData);
     const usageId = globalId.startsWith("global:") ? globalId : `global:${globalId}`;
+    const mediaData = await readMediaFile(projectId, userId);
 
-    // Atomic read-modify-write to prevent race conditions with concurrent saves
-    await atomicUpdateMediaFile(projectId, (mediaData) => {
-      // Remove old usage
-      mediaData.files.forEach((file) => {
-        if (file.usedIn) {
-          file.usedIn = file.usedIn.filter((slug) => slug !== usageId);
-        }
-      });
-
-      // Add new usage
-      mediaPaths.forEach((mediaPath) => {
-        const file = mediaData.files.find((f) => f.path === mediaPath);
-        if (file) {
-          if (!file.usedIn) {
-            file.usedIn = [];
-          }
-          if (!file.usedIn.includes(usageId)) {
-            file.usedIn.push(usageId);
-          }
-        }
-      });
-    });
+    const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
+    mediaRepo.updateMediaUsageForSource(projectId, usageId, matchedFileIds);
 
     return { success: true, mediaPaths };
   } catch (error) {
@@ -267,16 +236,10 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
  * @returns {Promise<{success: boolean}>} Success result
  * @throws {Error} If media file read/write fails
  */
-export async function removePageFromMediaUsage(projectId, pageId) {
+export async function removePageFromMediaUsage(projectId, pageId, userId = "local") {
   try {
-    // Atomic read-modify-write to prevent race conditions with concurrent saves
-    await atomicUpdateMediaFile(projectId, (mediaData) => {
-      mediaData.files.forEach((file) => {
-        if (file.usedIn) {
-          file.usedIn = file.usedIn.filter((slug) => slug !== pageId);
-        }
-      });
-    });
+    // Remove all usage rows for this page (no fileIds = nothing to re-add)
+    mediaRepo.updateMediaUsageForSource(projectId, pageId, []);
 
     return { success: true };
   } catch (error) {
@@ -292,10 +255,9 @@ export async function removePageFromMediaUsage(projectId, pageId) {
  * @returns {Promise<{fileId: string, filename: string, usedIn: string[], isInUse: boolean}>} Usage details
  * @throws {Error} If file not found or media file read fails
  */
-export async function getMediaUsage(projectId, fileId) {
+export async function getMediaUsage(projectId, fileId, userId = "local") {
   try {
-    const mediaData = await readMediaFile(projectId);
-    const file = mediaData.files.find((f) => f.id === fileId);
+    const file = mediaRepo.getMediaFileById(fileId);
 
     if (!file) {
       throw new Error("File not found");
@@ -321,21 +283,38 @@ export async function getMediaUsage(projectId, fileId) {
  * @returns {Promise<{success: boolean, message: string}>} Result with summary message
  * @throws {Error} If media file read/write fails
  */
-export async function refreshAllMediaUsage(projectId) {
+export async function refreshAllMediaUsage(projectId, userId) {
   try {
-    const projectFolderName = await getProjectFolderName(projectId);
-    const pagesDir = getProjectPagesDir(projectFolderName);
+    const projectFolderName = await getProjectFolderName(projectId, userId);
+    const pagesDir = getProjectPagesDir(projectFolderName, userId);
 
     // Check if pages directory exists
     if (!(await fs.pathExists(pagesDir))) {
       return { success: true, message: "No pages directory found" };
     }
 
-    // Reset all usedIn arrays
-    const mediaData = await readMediaFile(projectId);
-    mediaData.files.forEach((file) => {
-      file.usedIn = [];
-    });
+    // Read all media files to build a path → fileId lookup
+    const mediaData = await readMediaFile(projectId, userId);
+    const pathToFileId = new Map();
+    for (const file of mediaData.files) {
+      if (file.path) pathToFileId.set(file.path, file.id);
+    }
+
+    // Fresh usage map: fileId → Set<usageId>
+    const usageMap = new Map();
+    for (const file of mediaData.files) {
+      usageMap.set(file.id, new Set());
+    }
+
+    // Helper to add usage entries by matching media paths to file IDs
+    function addUsageForPaths(mediaPaths, usageId) {
+      for (const mediaPath of mediaPaths) {
+        const fileId = pathToFileId.get(mediaPath);
+        if (fileId && usageMap.has(fileId)) {
+          usageMap.get(fileId).add(usageId);
+        }
+      }
+    }
 
     // Get all page files
     const allEntries = await fs.readdir(pagesDir, { withFileTypes: true });
@@ -351,17 +330,7 @@ export async function refreshAllMediaUsage(projectId) {
       try {
         const pageContent = await fs.readFile(pagePath, "utf8");
         const pageData = JSON.parse(pageContent);
-
-        // Extract media paths and update usage
-        const mediaPaths = extractMediaPathsFromPage(pageData);
-        mediaPaths.forEach((mediaPath) => {
-          const file = mediaData.files.find((f) => f.path === mediaPath);
-          if (file) {
-            if (!file.usedIn.includes(pageId)) {
-              file.usedIn.push(pageId);
-            }
-          }
-        });
+        addUsageForPaths(extractMediaPathsFromPage(pageData), pageId);
       } catch (error) {
         console.warn(`Error processing page ${pageId} for media usage:`, error.message);
       }
@@ -370,26 +339,14 @@ export async function refreshAllMediaUsage(projectId) {
     // Also scan global widgets (header and footer)
     const globalWidgetsDir = path.join(pagesDir, "global");
     if (await fs.pathExists(globalWidgetsDir)) {
-      const globalWidgetFiles = ["header.json", "footer.json"];
-
-      for (const fileName of globalWidgetFiles) {
+      for (const fileName of ["header.json", "footer.json"]) {
         const globalFilePath = path.join(globalWidgetsDir, fileName);
         if (await fs.pathExists(globalFilePath)) {
           try {
             const globalContent = await fs.readFile(globalFilePath, "utf8");
             const globalData = JSON.parse(globalContent);
-            const globalId = `global:${fileName.replace(".json", "")}`; // e.g., "global:header"
-
-            // Extract media from global widget settings
-            const mediaPaths = extractMediaPathsFromGlobalWidget(globalData);
-            mediaPaths.forEach((mediaPath) => {
-              const file = mediaData.files.find((f) => f.path === mediaPath);
-              if (file) {
-                if (!file.usedIn.includes(globalId)) {
-                  file.usedIn.push(globalId);
-                }
-              }
-            });
+            const globalId = `global:${fileName.replace(".json", "")}`;
+            addUsageForPaths(extractMediaPathsFromGlobalWidget(globalData), globalId);
           } catch (error) {
             console.warn(`Error processing global widget ${fileName} for media usage:`, error.message);
           }
@@ -398,27 +355,23 @@ export async function refreshAllMediaUsage(projectId) {
     }
 
     // Also scan theme settings (e.g. favicon in settings.global.branding)
-    const themeJsonPath = getProjectThemeJsonPath(projectFolderName);
+    const themeJsonPath = getProjectThemeJsonPath(projectFolderName, userId);
     if (await fs.pathExists(themeJsonPath)) {
       try {
         const themeContent = await fs.readFile(themeJsonPath, "utf8");
         const themeData = JSON.parse(themeContent);
-        const themeMediaPaths = extractMediaPathsFromThemeSettings(themeData);
-        themeMediaPaths.forEach((mediaPath) => {
-          const file = mediaData.files.find((f) => f.path === mediaPath);
-          if (file) {
-            if (!file.usedIn.includes(THEME_SETTINGS_USAGE_ID)) {
-              file.usedIn.push(THEME_SETTINGS_USAGE_ID);
-            }
-          }
-        });
+        addUsageForPaths(extractMediaPathsFromThemeSettings(themeData), THEME_SETTINGS_USAGE_ID);
       } catch (error) {
         console.warn("Error processing theme settings for media usage:", error.message);
       }
     }
 
-    // Write updated media data (using locked write function to prevent race conditions)
-    await writeMediaFile(projectId, mediaData);
+    // Convert Sets to arrays and write via replaceMediaUsage (only touches media_usage table)
+    const finalUsageMap = new Map();
+    for (const [fileId, usageSet] of usageMap) {
+      finalUsageMap.set(fileId, Array.from(usageSet));
+    }
+    mediaRepo.replaceMediaUsage(projectId, finalUsageMap);
 
     return {
       success: true,

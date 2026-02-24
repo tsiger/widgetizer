@@ -8,9 +8,11 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
 
 ### Physical File Storage
 
-- **Location**: Uploaded files are physically stored on the server's filesystem:
-- **Images**: `/data/projects/<folderName>/uploads/images/`
-- **Videos**: `/data/projects/<folderName>/uploads/videos/`
+- **Location**: Uploaded files are physically stored on the server's filesystem, scoped per user:
+- **Images**: `data/users/{userId}/projects/{folderName}/uploads/images/`
+- **Videos**: `data/users/{userId}/projects/{folderName}/uploads/videos/`
+- **Audio**: `data/users/{userId}/projects/{folderName}/uploads/audios/`
+- In open-source mode, `userId` is always `"local"` (e.g. `data/users/local/projects/{folderName}/uploads/images/`).
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
 - **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original with prefixes (e.g., `thumb_`, `small_`, `medium_`, `large_`).
 - **Smart Size Generation**: The system only creates image sizes that are meaningfully smaller than the original. If an image is 800px wide and the "large" size is configured for 1920px, no "large" size will be generated since it would be identical to a smaller size. The image tag automatically falls back to the best available size or original image.
@@ -65,10 +67,17 @@ Themes can override the app-level image size configuration by defining `imageSiz
 
 ### Metadata Storage
 
-All metadata for the files in a project's media library is stored in a single JSON file.
+Media metadata is stored in SQLite, while the uploaded binary files remain on disk under each project folder.
 
-- **Location**: `/data/projects/<folderName>/uploads/media.json`
-- **Structure**: This file contains a single object with a `files` array. Each object in the array represents one file and stores critical information.
+- **Database**: `/data/widgetizer.db`
+- **Tables**:
+  - `media_files`: core file records (id, project_id, filename, type, path, dimensions, metadata)
+  - `media_sizes`: generated image variants (thumb/small/medium/etc.)
+  - `media_usage`: usage relationships (`used_in`) for pages, globals, and theme settings
+- **Filesystem**: original uploads and generated image variants still live in:
+  - `data/users/{userId}/projects/{folderName}/uploads/images/`
+  - `data/users/{userId}/projects/{folderName}/uploads/videos/`
+  - `data/users/{userId}/projects/{folderName}/uploads/audios/`
 
 ```json
 {
@@ -116,7 +125,7 @@ All metadata for the files in a project's media library is stored in a single JS
 }
 ```
 
-_Note: The `sizes` object only contains entries for enabled image sizes. Disabled sizes are not generated or stored._
+_Note: API responses return a `files` array assembled from SQLite rows._
 
 ### Usage Tracking
 
@@ -178,15 +187,22 @@ The media library supports audio uploads alongside images and videos with the fo
 
 ### Media Type Configuration
 
-The system uses a centralized configuration for media types and allowed extensions.
+The system uses centralized configuration for media types and MIME handling on both frontend and backend.
 
-- **Location**: `src/config.js`
-- **Definition**: The `MEDIA_TYPES` constant defines the allowed file extensions for different categories:
+**Frontend** (`src/config.js`):
+- `MEDIA_TYPES` defines allowed file extensions for the upload UI:
   - `image`: `.jpeg`, `.jpg`, `.png`, `.gif`, `.webp`, `.svg`
   - `video`: `.mp4`
   - `audio`: `.mp3`
 
-This central definition ensures consistency across the application, from file upload validation to browser filtering.
+**Backend** (`server/utils/mimeTypes.js`):
+All server-side MIME definitions live in a single module:
+- `ALLOWED_MIME_TYPES` — MIME types accepted for media uploads (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `video/mp4`, `audio/mpeg`)
+- `ZIP_MIME_TYPES` — MIME types for ZIP archive validation (`application/zip`, `application/x-zip-compressed`), used by project import and theme upload
+- `getContentType(ext)` — resolves a file extension (e.g. `".png"`) to its MIME type, used by `serveProjectMedia`, `serveAsset`, and `serveExportFile` for setting `Content-Type` headers
+- `getMediaCategory(mimeType)` — classifies a MIME type as `"image"`, `"video"`, or `"audio"` (re-exported from `server/config.js` for backward compatibility)
+
+This ensures consistency across all server code — upload validation, file serving, and export content-type resolution all use the same definitions.
 
 ## 2. Frontend Implementation (`src/pages/Media.jsx`)
 
@@ -326,7 +342,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 
 | Method | Endpoint | Middleware | Controller Function | Description |
 | --- | --- | --- | --- | --- |
-| `GET` | `/api/media/projects/:projectId/media` |  | `getProjectMedia` | Reads and returns the `media.json`. |
+| `GET` | `/api/media/projects/:projectId/media` |  | `getProjectMedia` | Reads and returns media metadata from SQLite. |
 | `POST` | `/api/media/projects/:projectId/media` | `upload.array("files")` | `uploadProjectMedia` | Handles file uploads. |
 | `DELETE` | `/api/media/projects/:projectId/media/:fileId` |  | `deleteProjectMedia` | Deletes a single file and its metadata. Prevents deletion if file is in use. |
 | `POST` | `/api/media/projects/:projectId/media/bulk-delete` |  | `bulkDeleteProjectMedia` | Deletes multiple files and their metadata. Prevents deletion if any files are in use. |
@@ -346,7 +362,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
   // Returns only enabled sizes with their width and quality settings
   ```
 - **File Upload (`multer` + `uploadProjectMedia`)**:
-  1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (images: `/data/projects/<folderName>/uploads/images/`, videos: `/data/projects/<folderName>/uploads/videos/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type.
+  1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct user-scoped project directory (e.g. images: `data/users/{userId}/projects/{folderName}/uploads/images/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (from `ALLOWED_MIME_TYPES` in `server/utils/mimeTypes.js`).
   2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the appropriate size limit (`media.maxFileSizeMB` for images, `media.maxVideoSizeMB` for videos).
   3.  For each valid file, it generates a unique ID (`uuidv4`).
   4.  **SVG Sanitization**: If the file is an SVG, it's sanitized using `DOMPurify` with SVG profile to prevent XSS attacks before being saved.
@@ -357,7 +373,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
       - Apply the configured maximum widths for each enabled size
       - **Skip sizes larger than original**: Only creates sizes that are smaller than the original image dimensions to avoid storage waste
   6.  If the file is a video, no processing is performed - it's simply stored as-is.
-  7.  It creates a new metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants (images only)—and adds it to the `files` array in `media.json`.
+  7.  It creates a metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants (images only)—and persists it to SQLite.
   8.  **Thumbnail Assignment**: The system ensures there's always a thumbnail for previews:
       - If `thumb` size is enabled: uses the thumb image
       - If `thumb` is disabled: uses the first available enabled size
@@ -366,23 +382,23 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
   10. **Parallel Processing**: All files are processed in parallel using `Promise.allSettled` for optimal performance.
   11. It returns a JSON response to the client with arrays of successfully processed and rejected files.
 - **Deletion Logic (`deleteProjectMedia`, `bulkDeleteProjectMedia`)**:
-  1.  The controller reads `media.json`.
+  1.  The controller reads media metadata via the SQLite-backed repository wrapper.
   2.  It finds the file entry (or entries) by ID.
   3.  **Usage Check**: It verifies that the file(s) are not currently in use by checking the `usedIn` array. If any files are in use, deletion is prevented with an error response.
   4.  It uses `fs.remove` to delete the original physical file and **all** of its generated sizes from the filesystem.
   5.  It removes the metadata object(s) from the `files` array.
-  6.  It overwrites `media.json` with the updated data.
+  6.  It writes the updated media state back to SQLite.
 - **Metadata Update (`updateMediaMetadata`)**:
-  1.  The controller reads `media.json`.
+  1.  The controller reads media metadata from SQLite.
   2.  It finds the file to update in the `files` array by its `fileId`.
   3.  It updates the `alt` and `title` properties within the `metadata` object for that file.
-  4.  It overwrites `media.json` with the updated data and returns the updated file object.
+  4.  It persists the update to SQLite and returns the updated file object.
 
 ### Usage Tracking Service (`server/services/mediaUsageService.js`)
 
 The media usage tracking is handled by a dedicated service that provides automated tracking of which pages and global widgets use which media files:
 
-- **`updatePageMediaUsage(projectId, pageId, pageData)`**: Scans a page's content for media references and updates the `usedIn` arrays in `media.json`. First removes the page from all existing `usedIn` arrays, then adds it to files that are actually referenced.
+- **`updatePageMediaUsage(projectId, pageId, pageData)`**: Scans a page's content for media references and updates `usedIn` in SQLite. First removes the page from all existing usage links, then adds it to files that are actually referenced.
 - **`updateGlobalWidgetMediaUsage(projectId, globalId, widgetData)`**: Scans a global widget (header/footer) for media references and updates the `usedIn` arrays. Works the same way as page tracking but for global widgets.
 - **`removePageFromMediaUsage(projectId, pageId)`**: Removes a page from all media files' `usedIn` arrays when the page is deleted.
 - **`getMediaUsage(projectId, fileId)`**: Returns usage information for a specific media file, including which pages and global widgets use it.

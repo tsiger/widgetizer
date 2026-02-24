@@ -1,0 +1,11 @@
+{
+  "type": "footer",
+  "settings": {
+    "footerNavigation": "footer-menu",
+    "facebook_url": "#",
+    "twitter_url": "#",
+    "youtube_url": "#",
+    "linkedin_url": "#",
+    "copyright": "\u00a9 2026 Meridian Wealth Advisors. All rights reserved."
+  }
+}

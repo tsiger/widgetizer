@@ -1,7 +1,10 @@
 import fs from "fs-extra";
 import path from "path";
-import { getProjectDir, getAppSettingsPath } from "../config.js";
-import { readProjectsFile } from "./projectController.js";
+import { getProjectDir } from "../config.js";
+import { getContentType } from "../utils/mimeTypes.js";
+import { isWithinDirectory } from "../utils/pathSecurity.js";
+import { getSetting } from "../db/repositories/settingsRepository.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { renderWidget, renderPageLayout } from "../services/renderingService.js";
@@ -17,8 +20,8 @@ const __dirname = dirname(__filename);
 function injectRuntimeScript(html, previewMode = "editor") {
   const safeMode = previewMode === "standalone" ? "standalone" : "editor";
   const builderOriginAttr =
-    process.env.PREVIEW_ISOLATION === "true" && process.env.BUILDER_ORIGIN
-      ? ` data-builder-origin="${process.env.BUILDER_ORIGIN}"`
+    process.env.PREVIEW_ISOLATION === "true" && process.env.EDITOR_ORIGIN
+      ? ` data-editor-origin="${process.env.EDITOR_ORIGIN}"`
       : "";
   const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}"${builderOriginAttr}></script>`;
   html = html.replace(/<\/body>/i, `${script}\n</body>`);
@@ -46,11 +49,11 @@ function injectBaseTag(html) {
  * @param {Object} pageData - Page content including widgets and metadata
  * @param {Object} rawThemeSettings - Theme settings for rendering
  * @param {string} previewMode - "editor" or "standalone"
+ * @param {string} userId - The user ID for path scoping
  * @returns {Promise<string>} Rendered HTML string
  */
-async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
-  const projectsData = await readProjectsFile();
-  const activeProjectId = projectsData.activeProjectId;
+async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, userId) {
+  const activeProjectId = projectRepo.getActiveProjectId(userId);
 
   if (!activeProjectId) {
     throw Object.assign(new Error("No active project found"), { status: 404 });
@@ -81,6 +84,8 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
         rawThemeSettings,
         "preview",
         sharedGlobals,
+        null,
+        userId,
       );
     } catch (error) {
       console.error("Error rendering header widget:", error);
@@ -104,6 +109,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
         "preview",
         sharedGlobals,
         widgetIndex,
+        userId,
       );
       mainContent += renderedWidgetHtml;
     }
@@ -113,16 +119,12 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
     let emptyStateDescription = "Start building your page by adding widgets from the sidebar";
 
     try {
-      const appSettingsPath = getAppSettingsPath();
-      if (await fs.pathExists(appSettingsPath)) {
-        const appSettings = JSON.parse(await fs.readFile(appSettingsPath, "utf-8"));
-        const userLocale = appSettings?.general?.language || "en";
-        const localePath = path.join(__dirname, `../../src/locales/${userLocale}.json`);
-        if (await fs.pathExists(localePath)) {
-          const localeData = JSON.parse(await fs.readFile(localePath, "utf-8"));
-          emptyStateTitle = localeData?.preview?.emptyState?.title || emptyStateTitle;
-          emptyStateDescription = localeData?.preview?.emptyState?.description || emptyStateDescription;
-        }
+      const userLocale = getSetting("general.language", userId) || "en";
+      const localePath = path.join(__dirname, `../../src/locales/${userLocale}.json`);
+      if (await fs.pathExists(localePath)) {
+        const localeData = JSON.parse(await fs.readFile(localePath, "utf-8"));
+        emptyStateTitle = localeData?.preview?.emptyState?.title || emptyStateTitle;
+        emptyStateDescription = localeData?.preview?.emptyState?.description || emptyStateDescription;
       }
     } catch (error) {
       console.warn("Could not load translations for empty state, using default:", error.message);
@@ -172,6 +174,8 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
         rawThemeSettings,
         "preview",
         sharedGlobals,
+        null,
+        userId,
       );
     } catch (error) {
       console.error("Error rendering footer widget:", error);
@@ -185,6 +189,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
     rawThemeSettings,
     "preview",
     sharedGlobals,
+    userId,
   );
 
   renderedHtml = injectBaseTag(renderedHtml);
@@ -202,7 +207,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
 export async function generatePreview(req, res) {
   try {
     const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
-    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode);
+    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode, req.userId);
     res.send(html);
   } catch (error) {
     console.error("Error generating preview:", error);
@@ -223,7 +228,7 @@ export async function generatePreview(req, res) {
 export async function createPreviewToken(req, res) {
   try {
     const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
-    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode);
+    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode, req.userId);
     const token = generateToken(html);
     res.json({ token });
   } catch (error) {
@@ -262,15 +267,14 @@ export async function renderSingleWidget(req, res) {
     const { widgetId, widget, themeSettings: rawThemeSettings } = req.body; // Expect themeSettings too
 
     // Get active project
-    const projectsData = await readProjectsFile();
-    const activeProjectId = projectsData.activeProjectId;
+    const activeProjectId = projectRepo.getActiveProjectId(req.userId);
 
     if (!activeProjectId) {
       return res.status(404).json({ error: "No active project found" });
     }
 
     // Call the service function, passing projectId and rawThemeSettings
-    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview");
+    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", null, null, req.userId);
 
     res.send(renderedWidget);
   } catch (error) {
@@ -296,15 +300,14 @@ export async function renderSingleWidget(req, res) {
 export async function getGlobalWidgets(req, res) {
   try {
     // Get active project
-    const projectsData = await readProjectsFile();
-    const activeProjectId = projectsData.activeProjectId;
+    const activeProjectId = projectRepo.getActiveProjectId(req.userId);
 
     if (!activeProjectId) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const projectFolderName = await getProjectFolderName(activeProjectId);
-    const projectDir = getProjectDir(projectFolderName);
+    const projectFolderName = await getProjectFolderName(activeProjectId, req.userId);
+    const projectDir = getProjectDir(projectFolderName, req.userId);
     // Global widgets *data* is stored in pages/global, not widgets/global
     const globalPagesDir = path.join(projectDir, "pages", "global");
 
@@ -370,15 +373,14 @@ export async function saveGlobalWidget(req, res) {
     }
 
     // Get active project
-    const projectsData = await readProjectsFile();
-    const activeProjectId = projectsData.activeProjectId;
+    const activeProjectId = projectRepo.getActiveProjectId(req.userId);
 
     if (!activeProjectId) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const projectFolderName = await getProjectFolderName(activeProjectId);
-    const projectDir = getProjectDir(projectFolderName);
+    const projectFolderName = await getProjectFolderName(activeProjectId, req.userId);
+    const projectDir = getProjectDir(projectFolderName, req.userId);
     const globalPagesDir = path.join(projectDir, "pages", "global");
 
     // Ensure global directory exists
@@ -390,7 +392,7 @@ export async function saveGlobalWidget(req, res) {
 
     // Update media usage
     try {
-      await updateGlobalWidgetMediaUsage(activeProjectId, `global:${type}`, widgetData);
+      await updateGlobalWidgetMediaUsage(activeProjectId, `global:${type}`, widgetData, req.userId);
     } catch (usageError) {
       console.error("Error updating media usage for global widget:", usageError);
       // Don't fail the save if usage update fails, but log it
@@ -423,12 +425,12 @@ export async function serveAsset(req, res) {
   }
 
   // Build the path to the asset file
-  const projectFolderName = await getProjectFolderName(projectId);
-  const baseDir = path.join(getProjectDir(projectFolderName), folder);
+  const projectFolderName = await getProjectFolderName(projectId, req.userId);
+  const baseDir = path.join(getProjectDir(projectFolderName, req.userId), folder);
   const normalizedSubpath = path.normalize(assetSubpath).replace(/^(\.\.(\/|\\|$))+/, "");
   const filePath = path.resolve(baseDir, normalizedSubpath);
 
-  if (!filePath.startsWith(baseDir)) {
+  if (!isWithinDirectory(filePath, baseDir)) {
     return res.status(400).send("Invalid asset path");
   }
 
@@ -443,24 +445,9 @@ export async function serveAsset(req, res) {
 
     // Set content type based on file extension
     const ext = path.extname(filePath).toLowerCase();
-    const contentTypes = {
-      ".css": "text/css",
-      ".js": "application/javascript",
-      ".png": "image/png",
-      ".jpg": "image/jpeg",
-      ".jpeg": "image/jpeg",
-      ".gif": "image/gif",
-      ".svg": "image/svg+xml",
-      ".webp": "image/webp",
-      ".woff": "font/woff",
-      ".woff2": "font/woff2",
-      ".ttf": "font/ttf",
-      ".eot": "application/vnd.ms-fontobject",
-    };
-
-    // Set appropriate content type
-    if (contentTypes[ext]) {
-      res.setHeader("Content-Type", contentTypes[ext]);
+    const contentType = getContentType(ext, null);
+    if (contentType) {
+      res.setHeader("Content-Type", contentType);
     }
 
     // Send the file

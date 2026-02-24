@@ -1,0 +1,231 @@
+{
+  "name": "Our Approach",
+  "slug": "approach",
+  "widgets": {
+    "approach_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "approach-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Our approach",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "approach-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A disciplined process built around your life",
+            "size": "4xl"
+          }
+        },
+        "approach-text": {
+          "type": "text",
+          "settings": {
+            "text": "We follow a structured, repeatable process that puts your goals at the center of every decision.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["approach-eyebrow", "approach-heading", "approach-text"]
+    },
+    "process_steps": {
+      "type": "numbered-cards",
+      "settings": {
+        "eyebrow": "Our process",
+        "title": "Four steps to financial clarity",
+        "description": "A repeatable framework that evolves with your life and goals.",
+        "columns_desktop": 4,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Discover",
+            "description": "<p>We listen deeply to understand your goals, risk tolerance, values, and the full picture of your financial life.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Design",
+            "description": "<p>We build a comprehensive financial plan covering investments, tax strategy, estate planning, and insurance.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Implement",
+            "description": "<p>We execute the plan across all accounts, coordinating with your tax advisor, attorney, and other professionals.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "Monitor",
+            "description": "<p>We conduct ongoing reviews, rebalance portfolios, and adjust your plan as life changes and markets shift.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "differentiators": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "diff-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Why Meridian",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "diff-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What makes us different",
+            "size": "2xl"
+          }
+        },
+        "diff-body": {
+          "type": "text",
+          "settings": {
+            "text": "Our commitment to independence and transparency sets us apart from traditional advisors and wirehouses.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "diff-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Fiduciary commitment — your interests first\n+ Fee-only — no commissions, no conflicts\n+ Evidence-based — data-driven decisions\n+ Holistic view — wealth, tax, estate, insurance"
+          }
+        }
+      },
+      "blocksOrder": ["diff-eyebrow", "diff-heading", "diff-body", "diff-features"]
+    },
+    "faq_section": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Common questions",
+        "title": "Frequently asked questions",
+        "description": "<p>Answers to the questions we hear most from prospective clients.</p>",
+        "style": "separated",
+        "allow_multiple": false,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "How are your fees structured?",
+            "answer": "<p>We charge a transparent flat fee based on the complexity of your financial situation and the tier you choose. We do not earn commissions, accept referral fees, or receive any third-party compensation. You always know exactly what you are paying.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "What is your minimum to become a client?",
+            "answer": "<p>Our Essentials tier is available to clients with $250,000 or more in investable assets. For clients with more complex needs, our Growth and Legacy tiers provide deeper planning and dedicated advisor access.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "How often will we meet?",
+            "answer": "<p>All clients receive quarterly portfolio reviews and an annual comprehensive plan update. Legacy tier clients also receive semi-annual family meetings and on-demand access to their dedicated advisor.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "What does fiduciary mean?",
+            "answer": "<p>A fiduciary is legally obligated to act in your best interest at all times. Unlike broker-dealers who follow a suitability standard, we must put your interests ahead of our own in every recommendation we make.</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "question": "Will I have access to my accounts?",
+            "answer": "<p>Absolutely. Your assets remain in your name at an independent custodian. You have full visibility and access to your accounts at all times through the custodian's online portal and mobile app.</p>"
+          }
+        },
+        "faq-6": {
+          "type": "item",
+          "settings": {
+            "question": "How do I get started?",
+            "answer": "<p>Schedule a complimentary consultation through our contact page. We will discuss your goals, answer your questions, and determine if Meridian is the right fit. There is no obligation and no pressure.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5", "faq-6"]
+    },
+    "approach_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "approach-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Take the first step toward financial clarity",
+            "size": "4xl"
+          }
+        },
+        "approach-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Schedule a complimentary consultation to see how our process works for you.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "approach-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["approach-cta-heading", "approach-cta-text", "approach-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["approach_hero", "process_steps", "differentiators", "faq_section", "approach_cta"],
+  "id": "approach",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

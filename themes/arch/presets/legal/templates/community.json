@@ -1,0 +1,272 @@
+{
+  "name": "Community",
+  "slug": "community",
+  "widgets": {
+    "community_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "community-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Community",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "community-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Committed to the communities we serve",
+            "size": "4xl"
+          }
+        },
+        "community-text": {
+          "type": "text",
+          "settings": {
+            "text": "At Hargrove & Cole, we believe that access to justice is a fundamental right. We give back through pro bono work, legal aid, and community education.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["community-eyebrow", "community-heading", "community-text"]
+    },
+    "initiatives_grid": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Initiatives",
+        "title": "How we give back",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "initiative-1": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Access to justice",
+            "title": "Pro Bono Program",
+            "description": "Our attorneys dedicate over 500 hours annually to pro bono representation for individuals who cannot afford legal counsel.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "initiative-2": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Community service",
+            "title": "Legal Aid Clinic",
+            "description": "We operate a monthly walk-in legal aid clinic providing free consultations on housing, employment, and family law matters.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "initiative-3": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Next generation",
+            "title": "Scholarship Fund",
+            "description": "The Hargrove & Cole Scholarship supports first-generation law students pursuing careers in public interest law.",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["initiative-1", "initiative-2", "initiative-3"]
+    },
+    "events_list": {
+      "type": "event-list",
+      "settings": {
+        "eyebrow": "Events",
+        "title": "Upcoming community events",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "event-1": {
+          "type": "event",
+          "settings": {
+            "day": "8",
+            "month": "MAR",
+            "title": "Annual Pro Bono Day",
+            "location": "Main Office, New York",
+            "description": "<p>A full day of free legal consultations for community members. Walk-ins welcome.</p>",
+            "button_link": {
+              "text": "Learn more",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        },
+        "event-2": {
+          "type": "event",
+          "settings": {
+            "day": "12",
+            "month": "APR",
+            "title": "Legal Aid Clinic",
+            "location": "Community Center, Hartford",
+            "description": "<p>Monthly walk-in clinic covering housing, employment, and family law questions.</p>",
+            "button_link": {
+              "text": "Learn more",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        },
+        "event-3": {
+          "type": "event",
+          "settings": {
+            "day": "20",
+            "month": "MAY",
+            "title": "CLE Seminar: Ethics in Practice",
+            "location": "Conference Center, New York",
+            "description": "<p>Continuing legal education seminar open to all attorneys. 3 CLE credits available.</p>",
+            "button_link": {
+              "text": "Register",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        },
+        "event-4": {
+          "type": "event",
+          "settings": {
+            "day": "15",
+            "month": "JUN",
+            "title": "Community Legal Workshop",
+            "location": "Public Library, Stamford",
+            "description": "<p>Free workshop on understanding your rights as a tenant and employee.</p>",
+            "button_link": {
+              "text": "Learn more",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["event-1", "event-2", "event-3", "event-4"]
+    },
+    "social_links": {
+      "type": "social-icons",
+      "settings": {
+        "eyebrow": "Follow us",
+        "title": "Stay connected",
+        "description": "Follow Hargrove & Cole for legal insights, community updates, and firm news.",
+        "icon_size": 2.4,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "social-linkedin": {
+          "type": "social_link",
+          "settings": {
+            "platform": "linkedin",
+            "link": {
+              "href": "#",
+              "text": "LinkedIn"
+            }
+          }
+        },
+        "social-twitter": {
+          "type": "social_link",
+          "settings": {
+            "platform": "twitter",
+            "link": {
+              "href": "#",
+              "text": "Twitter"
+            }
+          }
+        },
+        "social-facebook": {
+          "type": "social_link",
+          "settings": {
+            "platform": "facebook",
+            "link": {
+              "href": "#",
+              "text": "Facebook"
+            }
+          }
+        },
+        "social-instagram": {
+          "type": "social_link",
+          "settings": {
+            "platform": "instagram",
+            "link": {
+              "href": "#",
+              "text": "Instagram"
+            }
+          }
+        },
+        "social-youtube": {
+          "type": "social_link",
+          "settings": {
+            "platform": "youtube",
+            "link": {
+              "href": "#",
+              "text": "YouTube"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["social-linkedin", "social-twitter", "social-facebook", "social-instagram", "social-youtube"]
+    },
+    "community_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "community-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Want to get involved?",
+            "size": "4xl"
+          }
+        },
+        "community-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Learn about volunteer opportunities, pro bono partnerships, and community programs.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "community-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Contact us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["community-cta-heading", "community-cta-text", "community-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["community_hero", "initiatives_grid", "events_list", "social_links", "community_cta"],
+  "id": "community",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

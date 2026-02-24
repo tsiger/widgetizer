@@ -1,0 +1,30 @@
+{
+  "default": "default",
+  "presets": [
+    {
+      "id": "default",
+      "name": "Consulting Firm",
+      "description": "Strategy & operations consulting with a professional, authoritative feel"
+    },
+    {
+      "id": "financial",
+      "name": "Financial Advisor",
+      "description": "Wealth management and financial planning with a trustworthy, premium look"
+    },
+    {
+      "id": "coaching",
+      "name": "Business Coach",
+      "description": "Executive coaching and leadership development with a warm, approachable tone"
+    },
+    {
+      "id": "accounting",
+      "name": "Accounting Firm",
+      "description": "Tax, audit, and advisory services with a clean, precise aesthetic"
+    },
+    {
+      "id": "legal",
+      "name": "Law Firm",
+      "description": "Legal services with a dignified, established presence"
+    }
+  ]
+}

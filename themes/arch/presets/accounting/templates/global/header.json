@@ -1,0 +1,15 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Greenledger",
+    "contactDetailsLine1": "Call us: (555) 390-7100",
+    "contactDetailsLine2": "350 Lincoln Road, Suite 200",
+    "headerNavigation": "main-menu",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Get a quote",
+      "target": "_self"
+    },
+    "sticky": true
+  }
+}

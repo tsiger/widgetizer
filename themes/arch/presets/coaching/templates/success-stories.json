@@ -1,0 +1,210 @@
+{
+  "name": "Success Stories",
+  "slug": "success-stories",
+  "widgets": {
+    "stories_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "stories-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Success stories",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "stories-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Real leaders, real breakthroughs",
+            "size": "4xl"
+          }
+        },
+        "stories-text": {
+          "type": "text",
+          "settings": {
+            "text": "Every coaching engagement is unique, but the results speak for themselves.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["stories-eyebrow", "stories-heading", "stories-text"]
+    },
+    "featured_testimonial": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "testimonial-quote": {
+          "type": "text",
+          "settings": {
+            "text": "When I started working with Catalyst, I was drowning in decisions and losing sleep over team conflicts. Within three months, I had a clear framework for prioritization and the confidence to have the hard conversations. My team went from dysfunction to our highest-performing quarter ever.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "testimonial-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Rachel Torres",
+            "size": "lg"
+          }
+        },
+        "testimonial-title": {
+          "type": "text",
+          "settings": {
+            "text": "VP of Operations, Thrive Labs",
+            "size": "sm",
+            "uppercase": false,
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["testimonial-quote", "testimonial-name", "testimonial-title"]
+    },
+    "case_studies_tabs": {
+      "type": "image-tabs",
+      "settings": {
+        "eyebrow": "Case studies",
+        "title": "Breakthroughs across industries",
+        "description": "From startups to Fortune 500 companies, coaching creates lasting change.",
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "tab-1": {
+          "type": "tab",
+          "settings": {
+            "title": "Doubled Team Output",
+            "description": "<p>A VP of Engineering was struggling with a team that missed deadlines and avoided accountability. Through coaching, she developed a new approach to delegation and feedback that doubled her team's output in two quarters while reducing overtime by 30%.</p>"
+          }
+        },
+        "tab-2": {
+          "type": "tab",
+          "settings": {
+            "title": "Found Work-Life Balance",
+            "description": "<p>A startup founder was working 80-hour weeks and heading for burnout. Coaching helped him build systems, hire a leadership team, and scale the company from $2M to $8M in revenue without sacrificing his health or family time.</p>"
+          }
+        },
+        "tab-3": {
+          "type": "tab",
+          "settings": {
+            "title": "Aligned the C-Suite",
+            "description": "<p>A CEO inherited a fractured executive team with competing agendas and low trust. Through a combination of 1-on-1 coaching and team workshops, the leadership team built a shared vision and went from infighting to their most successful product launch in company history.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["tab-1", "tab-2", "tab-3"]
+    },
+    "results_figures": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Results",
+        "title": "The impact of coaching",
+        "description": "Aggregate outcomes from coaching engagements across all programs.",
+        "columns_desktop": 3,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "result-1": {
+          "type": "figure",
+          "settings": {
+            "number": "3.2",
+            "suffix": "x",
+            "label": "Average ROI",
+            "description": "Return on coaching investment"
+          }
+        },
+        "result-2": {
+          "type": "figure",
+          "settings": {
+            "number": "40",
+            "suffix": "%",
+            "label": "Faster Decisions",
+            "description": "Improved decision speed"
+          }
+        },
+        "result-3": {
+          "type": "figure",
+          "settings": {
+            "number": "92",
+            "suffix": "%",
+            "label": "Would Recommend",
+            "description": "Client satisfaction rate"
+          }
+        }
+      },
+      "blocksOrder": ["result-1", "result-2", "result-3"]
+    },
+    "stories_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "stories-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your breakthrough is next",
+            "size": "4xl"
+          }
+        },
+        "stories-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Book a free discovery call and start writing your own success story.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "stories-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book discovery call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View programs",
+              "href": "programs.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["stories-cta-heading", "stories-cta-text", "stories-cta-buttons"]
+    }
+  },
+  "widgetsOrder": [
+    "stories_hero",
+    "featured_testimonial",
+    "case_studies_tabs",
+    "results_figures",
+    "stories_cta"
+  ],
+  "id": "success-stories",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

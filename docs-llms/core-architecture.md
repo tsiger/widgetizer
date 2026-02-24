@@ -34,8 +34,6 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 
 | Function                    | Purpose                                                    |
 | --------------------------- | ---------------------------------------------------------- |
-| `readProjectsFile()`        | Read projects.json                                         |
-| `writeProjectsFile(data)`   | Write projects.json                                        |
 | `getAllProjects()`          | Get all projects (enriched with themeName, hasThemeUpdate) |
 | `getActiveProject()`        | Get active project                                         |
 | `createProject()`           | Create project (copies theme, applies preset, processes templates/menus) |
@@ -211,8 +209,8 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 
 | Function                          | Purpose                                    |
 | --------------------------------- | ------------------------------------------ |
-| `readMediaFile(projectId)`        | Read media.json (with corruption recovery) |
-| `writeMediaFile(projectId, data)` | Write media.json (with locks/retries)      |
+| `readMediaFile(projectId)`        | Read media metadata from SQLite                        |
+| `writeMediaFile(projectId, data)` | Write media metadata to SQLite                        |
 | `getProjectMedia()`               | Get all media files                        |
 | `uploadProjectMedia()`            | Upload and process files                   |
 | `updateMediaMetadata()`           | Update alt/title/description               |
@@ -244,7 +242,7 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 ### Features
 
 - 30-second cache with request deduplication
-- Write locks prevent race conditions
+- SQLite transactions provide atomic media metadata updates
 - Usage tracking prevents deletion of in-use files
 - Image processing (multiple sizes, quality)
 - SVG sanitization with DOMPurify
@@ -613,10 +611,15 @@ Save button / Auto-save timer
 
 | File | Functions |
 | --- | --- |
-| `server/config.js` | Path helpers: `getProjectDir()`, `getProjectPagesDir()`, `getThemeDir()`, etc. |
+| `server/config.js` | Path helpers (`getProjectDir()`, `getUserPublishDir()`, `getThemeDir()`, `getUserThemesDir()`, etc.), `getMediaDir()`, `getMediaCategory()` (re-exported from mimeTypes.js) |
+| `server/utils/mimeTypes.js` | `ALLOWED_MIME_TYPES`, `ZIP_MIME_TYPES`, `getContentType()`, `getMediaCategory()` |
 | `server/utils/semver.js` | `parseVersion()`, `compareVersions()`, `isNewerVersion()`, `sortVersions()`, `getLatestVersion()` |
 | `server/utils/themeHelpers.js` | `preprocessThemeSettings()` |
-| `server/utils/projectHelpers.js` | Project-related utilities |
+| `server/utils/projectHelpers.js` | `getProjectFolderName(projectId, userId)`, `getProjectDetails()` |
+| `server/utils/pathSecurity.js` | `isWithinDirectory()` |
+| `server/utils/projectErrors.js` | `PROJECT_ERROR_CODES`, `handleProjectResolutionError()`, `isProjectResolutionError()` |
+| `server/hostedMode.js` | `HOSTED_MODE`, `PUBLISHER_API_URL` feature flags |
+| `server/middleware/auth.js` | Auth middleware — sets `req.userId` on every request |
 
 ### Shared Hooks
 
@@ -673,16 +676,9 @@ Save button / Auto-save timer
 
 ## Improvement Opportunities
 
-### 1. Duplicate File Reading Logic
+### 1. Theme Source Directory Resolution in getAllProjects
 
-**Problem:** `readProjectsFile()` is called multiple times in sequence within the same request handler.
-
-**Locations:**
-
-- `projectController.js`: `getAllProjects()`, `createProject()`, `updateProject()`, `deleteProject()`, etc.
-- Each function reads the file, modifies, writes back
-
-**Improvement:** For operations that need to read-modify-write, the file is read once per operation which is correct. However, `getAllProjects()` enriches each project by calling `themeController.getThemeSourceDir()` which reads theme.json multiple times. Consider batch reading.
+**Problem:** `getAllProjects()` enriches each project by calling `themeController.getThemeSourceDir()` which reads theme.json multiple times. Consider batch reading or caching.
 
 ### 2. Theme Source Directory Resolution
 
@@ -710,7 +706,7 @@ Save button / Auto-save timer
 
 ### 4. Active Project Resolution
 
-**Problem:** Many controllers read `projects.json` just to get the active project.
+**Problem:** Many controllers resolve active project context repeatedly (now via SQLite-backed project metadata), creating repeated boilerplate.
 
 **Locations:**
 

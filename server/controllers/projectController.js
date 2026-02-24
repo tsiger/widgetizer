@@ -1,82 +1,34 @@
 import fs from "fs-extra";
 import path from "path";
-import { validationResult } from "express-validator";
 import * as themeController from "./themeController.js";
-import slugify from "slugify";
 import archiver from "archiver";
 import {
   DATA_DIR,
   APP_ROOT,
-  getProjectsFilePath,
+  getUserDataDir,
   getProjectDir,
   getProjectPagesDir,
   getProjectMenusDir,
-  THEMES_DIR,
+  getThemeDir,
 } from "../config.js";
 import { v4 as uuidv4 } from "uuid";
+import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { isNewerVersion } from "../utils/semver.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
+import * as mediaRepo from "../db/repositories/mediaRepository.js";
+import { stripHtmlTags } from "../services/sanitizationService.js";
+import { generateUniqueSlug } from "../utils/slugHelpers.js";
+import { EDITOR_LIMITS } from "../limits.js";
+import { checkLimit, checkStringLength, validateZipEntries } from "../utils/limitChecks.js";
+import { generateCopyName } from "../utils/namingHelpers.js";
+import { enrichNewProjectReferences, remapDuplicatedProjectUuids } from "../utils/linkEnrichment.js";
+import { processTemplatesRecursive } from "../utils/templateHelpers.js";
+import multer from "multer";
+import { readAppSettingsFile } from "./appSettingsController.js";
 
-// Make sure the projects directory exists
-async function ensureDirectories() {
-  await fs.ensureDir(path.join(DATA_DIR, "projects"));
-}
-
-/**
- * Reads the projects metadata file from disk.
- * Creates a new file with default structure if it doesn't exist.
- * @returns {Promise<{projects: Array<object>, activeProjectId: string|null}>} The projects data object
- * @throws {Error} If the file cannot be read or parsed
- */
-export async function readProjectsFile() {
-  const projectsFilePath = getProjectsFilePath();
-  try {
-    // Check existence first
-    if (!(await fs.pathExists(projectsFilePath))) {
-      const initialData = { projects: [], activeProjectId: null };
-      await writeProjectsFile(initialData);
-      return initialData;
-    }
-    const data = await fs.readFile(projectsFilePath, "utf8");
-    return JSON.parse(data);
-  } catch (error) {
-    console.error("Error reading projects file:", error);
-    throw error;
-  }
-}
-
-/**
- * Writes the projects metadata to disk.
- * @param {{projects: Array<object>, activeProjectId: string|null}} data - The projects data to save
- * @returns {Promise<void>}
- */
-export async function writeProjectsFile(data) {
-  const projectsFilePath = getProjectsFilePath();
-  await fs.outputFile(projectsFilePath, JSON.stringify(data, null, 2));
-}
-
-// Helper function to generate a unique project ID based on name
-async function generateUniqueProjectId(name, projects) {
-  let baseId = slugify(name, { lower: true, strict: true });
-  if (!baseId) baseId = "project";
-  let uniqueId = baseId;
-  let counter = 1;
-
-  // Add safety counter to prevent infinite loops
-  let safetyCounter = 0;
-  const maxAttempts = 1000;
-
-  while (projects.some((p) => p.id === uniqueId)) {
-    uniqueId = `${baseId}-${counter}`;
-    counter++;
-    safetyCounter++;
-
-    if (safetyCounter >= maxAttempts) {
-      console.error(`generateUniqueProjectId: Hit safety limit after ${maxAttempts} attempts for name "${name}"`);
-      throw new Error(`Unable to generate unique project ID after ${maxAttempts} attempts`);
-    }
-  }
-
-  return uniqueId;
+// Make sure the user-scoped projects directory exists
+async function ensureDirectories(userId = "local") {
+  await fs.ensureDir(path.join(getUserDataDir(userId), "projects"));
 }
 
 /**
@@ -85,21 +37,21 @@ async function generateUniqueProjectId(name, projects) {
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
-export async function getAllProjects(_, res) {
+export async function getAllProjects(req, res) {
   try {
-    await ensureDirectories();
-    const data = await readProjectsFile();
+    await ensureDirectories(req.userId);
+    const projects = projectRepo.getAllProjects(req.userId);
 
     // Enrich projects with hasThemeUpdate flag and theme display name
     const enrichedProjects = await Promise.all(
-      data.projects.map(async (project) => {
+      projects.map(async (project) => {
         let hasThemeUpdate = false;
         let themeName = project.theme; // Fallback to folder ID
 
         if (project.theme) {
           try {
             // Get theme display name from theme.json
-            const themeSourceDir = await themeController.getThemeSourceDir(project.theme);
+            const themeSourceDir = await themeController.getThemeSourceDir(project.theme, req.userId);
             const themeJsonPath = path.join(themeSourceDir, "theme.json");
             const themeData = await fs.readJson(themeJsonPath);
             themeName = themeData.name || project.theme;
@@ -137,15 +89,21 @@ export async function getAllProjects(_, res) {
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
-export async function getActiveProject(_, res) {
+export async function getActiveProject(req, res) {
   try {
-    // Read the projects file
-    const data = await readProjectsFile();
+    const activeProjectId = projectRepo.getActiveProjectId(req.userId);
+    let activeProject = activeProjectId ? projectRepo.getProjectById(activeProjectId, req.userId) : null;
 
-    // Find the active project
-    const activeProject = data.projects.find((p) => p.id === data.activeProjectId);
+    // Fallback: if no active project but user has projects, auto-activate the first one.
+    // This handles edge cases like deleted active projects, missing DB records, or migrated data.
+    if (!activeProject) {
+      const projects = projectRepo.getAllProjects(req.userId);
+      if (projects.length > 0) {
+        projectRepo.setActiveProjectId(projects[0].id, req.userId);
+        activeProject = projects[0];
+      }
+    }
 
-    // Return the active project or null if no active project
     res.json(activeProject || null);
   } catch (error) {
     console.error("Error getting active project:", error);
@@ -161,19 +119,29 @@ export async function getActiveProject(_, res) {
  * @returns {Promise<void>}
  */
 export async function createProject(req, res) {
-  // Validate incoming data
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates, preset } = req.body;
-    const data = await readProjectsFile();
+
+    // Platform limit: max projects per user
+    const allProjects = projectRepo.getAllProjects(req.userId);
+    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects");
+    if (!projectCheck.ok) {
+      return res.status(403).json({ error: projectCheck.error });
+    }
+
+    // Defensive check: ensure name is not empty after sanitization
+    if (!name || typeof name !== "string" || name.trim() === "") {
+      return res.status(400).json({ error: "Project name is required." });
+    }
+
+    // Platform limit: project name length
+    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxProjectNameLength, "Project name");
+    if (!nameCheck.ok) {
+      return res.status(400).json({ error: nameCheck.error });
+    }
 
     // Check for duplicate project names
-    const duplicateName = data.projects.find((p) => p.name.toLowerCase() === name.trim().toLowerCase());
-    if (duplicateName) {
+    if (projectRepo.projectNameExists(name.trim(), null, req.userId)) {
       return res
         .status(400)
         .json({ error: `A project named "${name}" already exists. Please choose a different name.` });
@@ -189,19 +157,18 @@ export async function createProject(req, res) {
         return res.status(400).json({ error: "Folder Name can only contain lowercase letters, numbers, and hyphens" });
       }
       // Check for duplicate folderNames
-      const duplicateFolderName = data.projects.find((p) => p.folderName === folderName);
-      if (duplicateFolderName) {
+      if (projectRepo.projectFolderExists(folderName, null, req.userId)) {
         return res.status(400).json({
           error: `A project with folder name "${folderName}" already exists. Please choose a different folder name.`,
         });
       }
     } else {
-      // Generate folderName from name if not provided
-      folderName = await generateUniqueProjectId(name, data.projects);
+      // Generate folderName from name if not provided (reuse allProjects from limit check above)
+      folderName = await generateUniqueSlug(name, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
     }
 
     // Use the permanent folderName for directory creation
-    const projectDir = getProjectDir(folderName);
+    const projectDir = getProjectDir(folderName, req.userId);
     await fs.ensureDir(projectDir);
 
     if (!theme) {
@@ -212,7 +179,7 @@ export async function createProject(req, res) {
     let themeVersion;
     try {
       // First copy theme assets (excluding templates)
-      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"]);
+      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"], req.userId);
     } catch (error) {
       await fs.remove(projectDir);
       throw new Error(`Failed to copy theme: ${error.message}`);
@@ -220,11 +187,11 @@ export async function createProject(req, res) {
 
     // Resolve preset paths (templates, menus, settings overrides)
     const { templatesDir: resolvedTemplatesDir, menusDir: presetMenusDir, settingsOverrides } =
-      await themeController.resolvePresetPaths(theme, preset);
+      await themeController.resolvePresetPaths(theme, preset, req.userId);
 
     // If preset has custom menus, replace root menus with preset menus
     if (presetMenusDir) {
-      const projectMenusDir = getProjectMenusDir(folderName);
+      const projectMenusDir = getProjectMenusDir(folderName, req.userId);
       try {
         await fs.remove(projectMenusDir);
         await fs.copy(presetMenusDir, projectMenusDir);
@@ -242,257 +209,33 @@ export async function createProject(req, res) {
       themeVersion, // Version that was installed
       preset: preset || null, // Track which preset was used
       receiveThemeUpdates: receiveThemeUpdates || false, // Opt-in flag (default: off)
-      siteUrl: siteUrl && siteUrl.trim() !== "" ? siteUrl.trim() : "",
+      siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlTags(siteUrl.trim()) : "",
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
 
     try {
       // Then handle templates separately, recursively
-      const pagesDir = getProjectPagesDir(folderName);
+      const pagesDir = getProjectPagesDir(folderName, req.userId);
       const themeTemplatesDir = resolvedTemplatesDir;
 
-      // Helper function to recursively find and process templates
-      async function processTemplatesRecursive(sourceDir, targetDir) {
-        await fs.ensureDir(targetDir);
-        const entries = await fs.readdir(sourceDir, { withFileTypes: true });
-
-        for (const entry of entries) {
-          const sourcePath = path.join(sourceDir, entry.name);
-          const targetPath = path.join(targetDir, entry.name);
-
-          if (entry.isDirectory()) {
-            // If it's a directory, recurse
-            await processTemplatesRecursive(sourcePath, targetPath);
-          } else if (entry.isFile() && entry.name.endsWith(".json")) {
-            // If it's a JSON file, process it
-            const templateContent = await fs.readFile(sourcePath, "utf8");
-            const templatePage = JSON.parse(templateContent);
-
-            // Use the template's slug or fallback to filename
-            const templateSlug = templatePage.slug || path.basename(entry.name, ".json");
-
-            // Define the new target path based on the slug (e.g., home.json -> index.json)
-            const targetFilename = `${templateSlug}.json`;
-            const targetPathWithSlug = path.join(targetDir, targetFilename);
-
-            // Create initialized page
-            const initializedPage = {
-              ...templatePage,
-              // Only add metadata for non-global widgets (pages become editable templates)
-              ...(templatePage.type !== "header" && templatePage.type !== "footer"
-                ? {
-                    uuid: uuidv4(), // Stable identifier for internal links
-                    id: templateSlug, // Set ID to match the new filename/slug
-                    slug: templateSlug,
-                    created: new Date().toISOString(),
-                    updated: new Date().toISOString(),
-                  }
-                : {}),
-            };
-
-            // Save with the new filename
-            await fs.outputFile(targetPathWithSlug, JSON.stringify(initializedPage, null, 2));
-          }
-        }
-      }
-
-      // Start the recursive processing for templates
-      await processTemplatesRecursive(themeTemplatesDir, pagesDir);
-
-      const projectMenusDir = getProjectMenusDir(folderName);
-
-      // Build a map of page slugs to UUIDs for menu item linking
-      const pageSlugToUuid = new Map();
-      try {
-        const pageFiles = await fs.readdir(pagesDir);
-        for (const pageFile of pageFiles) {
-          if (!pageFile.endsWith(".json")) continue;
-          try {
-            const pageContent = await fs.readFile(path.join(pagesDir, pageFile), "utf8");
-            const page = JSON.parse(pageContent);
-            if (page.slug && page.uuid) {
-              pageSlugToUuid.set(page.slug, page.uuid);
-            }
-          } catch {
-            // Skip pages that can't be read
-          }
-        }
-      } catch {
-        // If pages directory doesn't exist or can't be read, continue without linking
-      }
-
-      // Helper function to recursively add pageUuid to menu items
-      function addPageUuidToMenuItems(items) {
-        if (!Array.isArray(items)) return items;
-        return items.map((item) => {
-          const updatedItem = { ...item };
-
-          // Check if this is an internal page link (ends with .html, no protocol)
-          if (item.link && typeof item.link === "string") {
-            const link = item.link;
-            if (link.endsWith(".html") && !link.includes("://") && !link.startsWith("#")) {
-              // Extract slug from link (e.g., "about.html" -> "about")
-              const slug = link.replace(".html", "");
-              const uuid = pageSlugToUuid.get(slug);
-              if (uuid) {
-                updatedItem.pageUuid = uuid;
-              }
-            }
-          }
-
-          // Recursively process nested items
-          if (item.items && Array.isArray(item.items)) {
-            updatedItem.items = addPageUuidToMenuItems(item.items);
-          }
-
-          return updatedItem;
-        });
-      }
-
-      // Helper to check if a value is a link object
-      function isLinkObject(value) {
-        return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
-      }
-
-      // Helper to add pageUuid to a link value
-      function enrichLinkValue(linkValue) {
-        if (!isLinkObject(linkValue)) return linkValue;
-
-        const { href, pageUuid } = linkValue;
-
-        // Skip if already has pageUuid or not an internal page link
-        if (pageUuid) return linkValue;
-        if (!href || !href.endsWith(".html") || href.includes("://") || href.startsWith("#")) {
-          return linkValue;
-        }
-
-        const slug = href.replace(".html", "");
-        const uuid = pageSlugToUuid.get(slug);
-
-        return uuid ? { ...linkValue, pageUuid: uuid } : linkValue;
-      }
-
-      // Enrich all link settings in a widget
-      function enrichWidgetLinks(widgetData) {
-        const enriched = { ...widgetData };
-
-        // Enrich widget-level settings
-        if (enriched.settings) {
-          enriched.settings = { ...enriched.settings };
-          for (const [key, value] of Object.entries(enriched.settings)) {
-            enriched.settings[key] = enrichLinkValue(value);
-          }
-        }
-
-        // Enrich block-level settings
-        if (enriched.blocks) {
-          enriched.blocks = { ...enriched.blocks };
-          for (const [blockId, block] of Object.entries(enriched.blocks)) {
-            if (block && block.settings) {
-              enriched.blocks[blockId] = {
-                ...block,
-                settings: { ...block.settings },
-              };
-              for (const [key, value] of Object.entries(block.settings)) {
-                enriched.blocks[blockId].settings[key] = enrichLinkValue(value);
-              }
-            }
-          }
-        }
-
-        return enriched;
-      }
-
-      try {
-        // Check if project has menus directory (copied from theme)
-        if (await fs.pathExists(projectMenusDir)) {
-          // Process and enrich menu files that were copied from theme
-          const menuFiles = await fs.readdir(projectMenusDir);
-          for (const menuFile of menuFiles) {
-            if (!menuFile.endsWith(".json")) continue;
-
-            const projectMenuPath = path.join(projectMenusDir, menuFile);
-            try {
-              // Read the copied menu file from the project dir
-              const menuContent = await fs.readFile(projectMenuPath, "utf8");
-              const menu = JSON.parse(menuContent);
-              const menuSlug = path.parse(menuFile).name;
-
-              // Add pageUuid to menu items that link to internal pages
-              const enrichedItems = addPageUuidToMenuItems(menu.items);
-
-              const enrichedMenu = {
-                ...menu,
-                id: menuSlug,
-                items: enrichedItems,
+      await processTemplatesRecursive(themeTemplatesDir, pagesDir, async (template, slug, targetPath) => {
+        const initializedPage = {
+          ...template,
+          ...(template.type !== "header" && template.type !== "footer"
+            ? {
+                uuid: uuidv4(),
+                id: slug,
+                slug,
                 created: new Date().toISOString(),
                 updated: new Date().toISOString(),
-              };
-              // Overwrite the copied file with the enriched version
-              await fs.outputFile(projectMenuPath, JSON.stringify(enrichedMenu, null, 2));
-            } catch (error) {
-              console.warn(`[ProjectController] Failed to enrich menu ${menuFile}, skipping. Reason: ${error.message}`);
-              // Silently skip menu enrichment errors
-            }
-          }
-        }
-      } catch (menuAccessError) {
-        // If project menus directory doesn't exist, do nothing
-        if (menuAccessError.code !== "ENOENT") {
-          console.warn(`[ProjectController] Failed to access project menus directory: ${menuAccessError.message}`);
-        }
-      }
-
-      // Enrich page widgets with pageUuid for internal links
-      try {
-        const allPageFiles = await fs.readdir(pagesDir);
-        for (const pageFile of allPageFiles) {
-          if (!pageFile.endsWith(".json")) continue;
-
-          const pagePath = path.join(pagesDir, pageFile);
-          const pageContent = await fs.readFile(pagePath, "utf8");
-          const page = JSON.parse(pageContent);
-
-          // Skip global widgets (they're in a subdirectory, but just in case)
-          if (page.type === "header" || page.type === "footer") continue;
-
-          let modified = false;
-          const enrichedWidgets = {};
-
-          for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
-            const enriched = enrichWidgetLinks(widget);
-            enrichedWidgets[widgetId] = enriched;
-            if (JSON.stringify(enriched) !== JSON.stringify(widget)) {
-              modified = true;
-            }
-          }
-
-          if (modified) {
-            page.widgets = enrichedWidgets;
-            await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
-          }
-        }
-
-        // Also enrich global widgets (header/footer)
-        const globalDir = path.join(pagesDir, "global");
-        if (await fs.pathExists(globalDir)) {
-          for (const widgetType of ["header", "footer"]) {
-            const widgetPath = path.join(globalDir, `${widgetType}.json`);
-            if (await fs.pathExists(widgetPath)) {
-              const content = await fs.readFile(widgetPath, "utf8");
-              const widget = JSON.parse(content);
-              const enriched = enrichWidgetLinks(widget);
-              if (JSON.stringify(enriched) !== JSON.stringify(widget)) {
-                await fs.outputFile(widgetPath, JSON.stringify(enriched, null, 2));
               }
-            }
-          }
-        }
-      } catch (widgetEnrichError) {
-        console.warn(`[ProjectController] Failed to enrich widget links: ${widgetEnrichError.message}`);
-        // Continue without failing - widget links will be enriched on first edit
-      }
+            : {}),
+        };
+        await fs.outputFile(targetPath, JSON.stringify(initializedPage, null, 2));
+      });
+
+      await enrichNewProjectReferences(folderName, req.userId);
     } catch (error) {
       await fs.remove(projectDir);
       throw new Error(`Failed to process templates: ${error.message}`);
@@ -523,13 +266,14 @@ export async function createProject(req, res) {
     }
 
     // Track if we're setting this as active (only happens if no active project exists)
-    const wasFirstProject = data.projects.length === 0;
+    const currentActiveId = projectRepo.getActiveProjectId(req.userId);
+    const wasFirstProject = !currentActiveId;
 
-    data.projects.push(newProject);
-    if (!data.activeProjectId) {
-      data.activeProjectId = newProject.id;
+    newProject.userId = req.userId;
+    projectRepo.createProject(newProject);
+    if (!currentActiveId) {
+      projectRepo.setActiveProjectId(newProject.id, req.userId);
     }
-    await writeProjectsFile(data);
 
     res.status(201).json({
       ...newProject,
@@ -548,21 +292,15 @@ export async function createProject(req, res) {
  * @returns {Promise<void>}
  */
 export async function setActiveProject(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
-    const data = await readProjectsFile();
+    const project = projectRepo.getProjectById(id, req.userId);
 
-    if (!data.projects.some((p) => p.id === id)) {
+    if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    data.activeProjectId = id;
-    await writeProjectsFile(data);
+    projectRepo.setActiveProjectId(id, req.userId);
 
     res.json({ success: true });
   } catch (error) {
@@ -578,64 +316,57 @@ export async function setActiveProject(req, res) {
  * @returns {Promise<void>}
  */
 export async function updateProject(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
     const updates = req.body;
-    const data = await readProjectsFile();
 
-    const projectIndex = data.projects.findIndex((p) => p.id === id);
-    if (projectIndex === -1) {
-      return res.status(404).json({ error: "Project not found" });
+    // Defensive check: ensure name is not empty after sanitization
+    if (!updates.name || typeof updates.name !== "string" || updates.name.trim() === "") {
+      return res.status(400).json({ error: "Project name is required." });
     }
 
-    const currentProject = data.projects[projectIndex];
+    const currentProject = projectRepo.getProjectById(id, req.userId);
+    if (!currentProject) {
+      return res.status(404).json({ error: "Project not found" });
+    }
 
     const currentFolderName = currentProject.folderName;
 
     // Check for duplicate project names (excluding current project)
     if (updates.name && updates.name.trim() !== currentProject.name) {
-      const duplicateName = data.projects.find(
-        (p) => p.id !== id && p.name.toLowerCase() === updates.name.trim().toLowerCase(),
-      );
-      if (duplicateName) {
+      if (projectRepo.projectNameExists(updates.name.trim(), id, req.userId)) {
         return res
           .status(400)
           .json({ error: `A project named "${updates.name}" already exists. Please choose a different name.` });
       }
     }
 
-    let updatedProject = { ...currentProject };
-
     // Check if folderName is being updated and if it would be different
     if (updates.folderName && updates.folderName.trim() !== currentFolderName) {
       const newFolderName = updates.folderName.trim();
 
+      // Validate folderName format (must match create validation)
+      const folderNamePattern = /^[a-z0-9-]+$/;
+      if (!folderNamePattern.test(newFolderName)) {
+        return res.status(400).json({ error: "Folder Name can only contain lowercase letters, numbers, and hyphens" });
+      }
+
       // Check for duplicate folderNames (excluding current project)
-      const duplicateFolderName = data.projects.find(
-        (p) => p.id !== id && (p.folderName === newFolderName || p.slug === newFolderName),
-      );
-      if (duplicateFolderName) {
+      if (projectRepo.projectFolderExists(newFolderName, id, req.userId)) {
         return res.status(400).json({
           error: `A project with folder name "${newFolderName}" already exists. Please choose a different folder name.`,
         });
       }
 
       // Rename the project directory
-      const oldDir = getProjectDir(currentFolderName);
-      const newDir = getProjectDir(newFolderName);
+      const oldDir = getProjectDir(currentFolderName, req.userId);
+      const newDir = getProjectDir(newFolderName, req.userId);
 
       try {
         // Use copy + remove instead of rename for better Windows compatibility
         await fs.copy(oldDir, newDir);
         await new Promise((resolve) => setTimeout(resolve, 100));
         await fs.remove(oldDir);
-
-        // ID remains the same! We only updated the slug/folder.
       } catch (renameError) {
         // If copy succeeded but remove failed, try to clean up the new directory
         try {
@@ -649,30 +380,19 @@ export async function updateProject(req, res) {
       }
     }
 
-    // Update the project data
-    updatedProject = {
-      ...updatedProject,
-      id: id, // ID never changes
-      folderName: updates.folderName || currentFolderName, // Ensure folderName is always set
-      slug: undefined, // Remove legacy slug if it exists
-      name: updates.name || updatedProject.name,
-      description: updates.description !== undefined ? updates.description : updatedProject.description,
-      siteUrl:
-        updates.siteUrl !== undefined
-          ? updates.siteUrl && updates.siteUrl.trim() !== ""
-            ? updates.siteUrl.trim()
-            : ""
-          : updatedProject.siteUrl,
-      // Theme update preferences
-      receiveThemeUpdates:
-        updates.receiveThemeUpdates !== undefined ? updates.receiveThemeUpdates : updatedProject.receiveThemeUpdates,
-      updated: new Date().toISOString(),
-    };
+    // Sanitize siteUrl if provided
+    const sanitizedSiteUrl = updates.siteUrl !== undefined
+      ? (updates.siteUrl && updates.siteUrl.trim() !== "" ? stripHtmlTags(updates.siteUrl.trim()) : "")
+      : undefined;
 
-    // Replace the project in the array
-    data.projects[projectIndex] = updatedProject;
+    const updatedProject = projectRepo.updateProject(id, {
+      folderName: updates.folderName || currentFolderName,
+      name: updates.name,
+      description: updates.description,
+      siteUrl: sanitizedSiteUrl,
+      receiveThemeUpdates: updates.receiveThemeUpdates,
+    }, req.userId);
 
-    await writeProjectsFile(data);
     res.json(updatedProject);
   } catch (error) {
     console.error("Error updating project:", error);
@@ -687,49 +407,46 @@ export async function updateProject(req, res) {
  * @returns {Promise<void>}
  */
 export async function deleteProject(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
-    const data = await readProjectsFile();
+    const project = projectRepo.getProjectById(id, req.userId);
 
-    const projectIndex = data.projects.findIndex((p) => p.id === id);
-    if (projectIndex === -1) {
+    if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    const project = data.projects[projectIndex];
     const projectName = project.name;
     const projectFolderName = project.folderName;
 
-    // Remove from array AFTER we've captured the data we need
-    data.projects.splice(projectIndex, 1);
-    if (data.activeProjectId === id) {
-      data.activeProjectId = data.projects[0]?.id || null;
-    }
-
-    await writeProjectsFile(data);
-
-    // Delete project directory using the folderName we captured earlier
-    const projectDir = getProjectDir(projectFolderName);
-    await fs.remove(projectDir);
-
-    // Clean up all exports for this project
+    // Clean up all export files for this project BEFORE removing from DB
+    // (deleteProject triggers ON DELETE CASCADE which would delete export records)
     try {
       const { cleanupProjectExports } = await import("./exportController.js");
-      await cleanupProjectExports(id);
+      await cleanupProjectExports(id, req.userId);
     } catch (exportCleanupError) {
       console.warn(`Failed to clean up exports for project ${id}:`, exportCleanupError);
       // Don't fail the project deletion if export cleanup fails
     }
 
+    // Delete from DB (cascades to media_files, exports, etc.)
+    projectRepo.deleteProject(id, req.userId);
+
+    // Update active project if needed
+    let newActiveProjectId = projectRepo.getActiveProjectId(req.userId);
+    if (newActiveProjectId === id || !newActiveProjectId) {
+      const remainingProjects = projectRepo.getAllProjects(req.userId);
+      newActiveProjectId = remainingProjects[0]?.id || null;
+      projectRepo.setActiveProjectId(newActiveProjectId, req.userId);
+    }
+
+    // Delete project directory
+    const projectDir = getProjectDir(projectFolderName, req.userId);
+    await fs.remove(projectDir);
+
     res.json({
       success: true,
       message: `Project "${projectName}" and all associated files have been deleted successfully`,
-      activeProjectId: data.activeProjectId,
+      activeProjectId: newActiveProjectId,
     });
   } catch (error) {
     console.error("Error deleting project:", error);
@@ -744,235 +461,78 @@ export async function deleteProject(req, res) {
  * @returns {Promise<void>}
  */
 export async function duplicateProject(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const originalProjectId = req.params.id;
-    const data = await readProjectsFile();
+    const originalProject = projectRepo.getProjectById(originalProjectId, req.userId);
 
-    // Find the original project
-    const originalProject = data.projects.find((p) => p.id === originalProjectId);
     if (!originalProject) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    // Determine base name for copying (similar to page duplication logic)
-    let baseName = originalProject.name;
-    if (baseName.match(/^Copy( \d+)? of /)) {
-      baseName = baseName.replace(/^Copy( \d+)? of /, "");
+    // Platform limit: max projects per user
+    const allProjects = projectRepo.getAllProjects(req.userId);
+    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects");
+    if (!projectCheck.ok) {
+      return res.status(403).json({ error: projectCheck.error });
     }
-
-    // Find the highest copy number for this base name
-    let copyNumber = 0;
-    const copyRegex = new RegExp(`^Copy( (\\d+))? of ${baseName}$`);
-    data.projects.forEach((project) => {
-      const match = project.name.match(copyRegex);
-      if (match) {
-        const num = match[2] ? parseInt(match[2]) : 1;
-        copyNumber = Math.max(copyNumber, num);
-      }
-    });
-
-    // Generate the new name and folderName
-    const newName = copyNumber === 0 ? `Copy of ${baseName}` : `Copy ${copyNumber + 1} of ${baseName}`;
-    const newFolderName = await generateUniqueProjectId(newName, data.projects);
+    const newName = generateCopyName(originalProject.name, allProjects.map((p) => p.name));
+    const newFolderName = await generateUniqueSlug(newName, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
 
     // Create the new project metadata
     const newProject = {
       ...originalProject,
-      id: uuidv4(), // ✅ Generate new stable UUID
-      folderName: newFolderName, // Permanent folder identifier
-      slug: undefined, // Clear legacy slug
+      id: uuidv4(),
+      folderName: newFolderName,
+      slug: undefined,
       name: newName,
-      // Preserve theme info from original
       theme: originalProject.theme,
       themeVersion: originalProject.themeVersion,
       receiveThemeUpdates: originalProject.receiveThemeUpdates || false,
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
+      userId: req.userId,
     };
 
     // Copy the entire project directory
-    // Use folderName for directory path, not ID
     const originalFolderName = originalProject.folderName;
-    const originalDir = getProjectDir(originalFolderName);
-    const newDir = getProjectDir(newFolderName);
+    const originalDir = getProjectDir(originalFolderName, req.userId);
+    const newDir = getProjectDir(newFolderName, req.userId);
 
     try {
       await fs.copy(originalDir, newDir);
 
-      // Regenerate page UUIDs and update all references
-      const oldToNewUuid = new Map();
-      const newPageSlugToUuid = new Map();
-      const newPagesDir = getProjectPagesDir(newFolderName);
-
-      // Helper to check if a value is a link object
-      function isLinkObject(value) {
-        return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
-      }
-
-      // Helper to update pageUuid in a link value using old-to-new mapping
-      function updateLinkPageUuid(linkValue) {
-        if (!isLinkObject(linkValue) || !linkValue.pageUuid) return linkValue;
-        const newUuid = oldToNewUuid.get(linkValue.pageUuid);
-        return newUuid ? { ...linkValue, pageUuid: newUuid } : linkValue;
-      }
-
-      // Helper to update all link pageUuids in a widget
-      function updateWidgetLinkUuids(widgetData) {
-        const updated = { ...widgetData };
-
-        if (updated.settings) {
-          updated.settings = { ...updated.settings };
-          for (const [key, value] of Object.entries(updated.settings)) {
-            updated.settings[key] = updateLinkPageUuid(value);
-          }
-        }
-
-        if (updated.blocks) {
-          updated.blocks = { ...updated.blocks };
-          for (const [blockId, block] of Object.entries(updated.blocks)) {
-            if (block && block.settings) {
-              updated.blocks[blockId] = {
-                ...block,
-                settings: { ...block.settings },
-              };
-              for (const [key, value] of Object.entries(block.settings)) {
-                updated.blocks[blockId].settings[key] = updateLinkPageUuid(value);
-              }
-            }
-          }
-        }
-
-        return updated;
-      }
-
-      // Helper to recursively update pageUuid in menu items
-      function updateMenuItemUuids(items) {
-        if (!Array.isArray(items)) return items;
-        return items.map((item) => {
-          const updated = { ...item };
-          if (item.pageUuid) {
-            const newUuid = oldToNewUuid.get(item.pageUuid);
-            if (newUuid) {
-              updated.pageUuid = newUuid;
-            }
-          }
-          if (item.items && Array.isArray(item.items)) {
-            updated.items = updateMenuItemUuids(item.items);
-          }
-          return updated;
-        });
-      }
-
-      // Step 1: Regenerate page UUIDs and build mapping
       try {
-        const pageFiles = await fs.readdir(newPagesDir);
-        for (const pageFile of pageFiles) {
-          if (!pageFile.endsWith(".json")) continue;
-
-          const pagePath = path.join(newPagesDir, pageFile);
-          const content = await fs.readFile(pagePath, "utf8");
-          const page = JSON.parse(content);
-
-          // Skip global widgets
-          if (page.type === "header" || page.type === "footer") continue;
-
-          const oldUuid = page.uuid;
-          const newUuid = uuidv4();
-
-          oldToNewUuid.set(oldUuid, newUuid);
-          newPageSlugToUuid.set(page.slug, newUuid);
-
-          page.uuid = newUuid;
-          await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
-        }
-
-        // Step 2: Update widget link pageUuids to new UUIDs
-        for (const pageFile of pageFiles) {
-          if (!pageFile.endsWith(".json")) continue;
-
-          const pagePath = path.join(newPagesDir, pageFile);
-          const content = await fs.readFile(pagePath, "utf8");
-          const page = JSON.parse(content);
-
-          // Skip global widgets (handled separately)
-          if (page.type === "header" || page.type === "footer") continue;
-
-          let modified = false;
-          const updatedWidgets = {};
-
-          for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
-            const updated = updateWidgetLinkUuids(widget);
-            updatedWidgets[widgetId] = updated;
-            if (JSON.stringify(updated) !== JSON.stringify(widget)) {
-              modified = true;
-            }
-          }
-
-          if (modified) {
-            page.widgets = updatedWidgets;
-            await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
-          }
-        }
-
-        // Update global widgets (header/footer)
-        const globalDir = path.join(newPagesDir, "global");
-        if (await fs.pathExists(globalDir)) {
-          for (const widgetType of ["header", "footer"]) {
-            const widgetPath = path.join(globalDir, `${widgetType}.json`);
-            if (await fs.pathExists(widgetPath)) {
-              const content = await fs.readFile(widgetPath, "utf8");
-              const widget = JSON.parse(content);
-              const updated = updateWidgetLinkUuids(widget);
-              if (JSON.stringify(updated) !== JSON.stringify(widget)) {
-                await fs.outputFile(widgetPath, JSON.stringify(updated, null, 2));
-              }
-            }
-          }
-        }
-
-        // Step 3: Update menu item pageUuids to new UUIDs
-        const newMenusDir = getProjectMenusDir(newFolderName);
-        if (await fs.pathExists(newMenusDir)) {
-          const menuFiles = await fs.readdir(newMenusDir);
-          for (const menuFile of menuFiles) {
-            if (!menuFile.endsWith(".json")) continue;
-
-            const menuPath = path.join(newMenusDir, menuFile);
-            const content = await fs.readFile(menuPath, "utf8");
-            const menu = JSON.parse(content);
-
-            const updatedItems = updateMenuItemUuids(menu.items);
-            if (JSON.stringify(updatedItems) !== JSON.stringify(menu.items)) {
-              menu.items = updatedItems;
-              await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
-            }
-          }
-        }
+        await remapDuplicatedProjectUuids(newFolderName, req.userId);
       } catch (uuidUpdateError) {
         console.warn(`[ProjectController] Failed to update UUIDs in cloned project: ${uuidUpdateError.message}`);
-        // Continue without failing - the cloned project will still work, just with old UUIDs
       }
     } catch (copyError) {
-      // If copy fails, clean up and throw error
       try {
         await fs.remove(newDir);
       } catch (cleanupError) {
         console.warn(
           `[ProjectController] Failed to clean up new directory after copy failure: ${cleanupError.message}`,
         );
-        // Silently handle cleanup errors
       }
       throw new Error(`Failed to copy project files: ${copyError.message}`);
     }
 
-    // Add the new project to the list
-    data.projects.push(newProject);
-    await writeProjectsFile(data);
+    // Save new project to DB
+    projectRepo.createProject(newProject);
+
+    // Copy media metadata from original project to the duplicate in SQLite
+    try {
+      const originalMedia = mediaRepo.getMediaFiles(originalProjectId);
+      if (originalMedia.files && originalMedia.files.length > 0) {
+        // Regenerate media file IDs to avoid UNIQUE constraint conflicts
+        for (const file of originalMedia.files) {
+          file.id = uuidv4();
+        }
+        mediaRepo.writeMediaData(newProject.id, originalMedia, req.userId);
+      }
+    } catch (mediaError) {
+      console.warn("Could not duplicate media metadata:", mediaError.message);
+    }
 
     res.status(201).json(newProject);
   } catch (error) {
@@ -988,24 +548,16 @@ export async function duplicateProject(req, res) {
  * @returns {Promise<void>}
  */
 export async function getProjectWidgets(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { projectId } = req.params;
 
-    // Need to look up project to get the slug/folder name
-    const data = await readProjectsFile();
-    const project = data.projects.find((p) => p.id === projectId);
-
+    const project = projectRepo.getProjectById(projectId, req.userId);
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
     const projectFolderName = project.folderName;
-    const projectRootDir = getProjectDir(projectFolderName);
+    const projectRootDir = getProjectDir(projectFolderName, req.userId);
     const widgetsBaseDir = path.join(projectRootDir, "widgets");
     const globalWidgetsDir = path.join(widgetsBaseDir, "global");
 
@@ -1104,24 +656,16 @@ export async function getProjectWidgets(req, res) {
  * @returns {Promise<void>}
  */
 export async function getProjectIcons(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { projectId } = req.params;
 
-    // Need to look up project to get the folderName/folder name
-    const data = await readProjectsFile();
-    const project = data.projects.find((p) => p.id === projectId);
-
+    const project = projectRepo.getProjectById(projectId, req.userId);
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
     const projectFolderName = project.folderName;
-    const projectRootDir = getProjectDir(projectFolderName);
+    const projectRootDir = getProjectDir(projectFolderName, req.userId);
     const iconsPath = path.join(projectRootDir, "assets", "icons.json");
 
     if (await fs.pathExists(iconsPath)) {
@@ -1146,22 +690,16 @@ export async function getProjectIcons(req, res) {
  * @returns {Promise<void>}
  */
 export async function exportProject(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { projectId } = req.params;
-    const data = await readProjectsFile();
-    const project = data.projects.find((p) => p.id === projectId);
+    const project = projectRepo.getProjectById(projectId, req.userId);
 
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
     const projectFolderName = project.folderName;
-    const projectDir = getProjectDir(projectFolderName);
+    const projectDir = getProjectDir(projectFolderName, req.userId);
 
     if (!(await fs.pathExists(projectDir))) {
       return res.status(404).json({ error: "Project directory not found" });
@@ -1187,6 +725,8 @@ export async function exportProject(req, res) {
         description: project.description || "",
         theme: project.theme,
         themeVersion: project.themeVersion || null,
+        receiveThemeUpdates: project.receiveThemeUpdates || false,
+        preset: project.preset || null,
         siteUrl: project.siteUrl || "",
         created: project.created,
         updated: project.updated,
@@ -1246,6 +786,17 @@ export async function exportProject(req, res) {
 
     await addDirectory(projectDir);
 
+    // Serialize media metadata from SQLite into the ZIP
+    // (media metadata moved from uploads/media.json to SQLite, so it must be explicitly included)
+    try {
+      const mediaData = mediaRepo.getMediaFiles(project.id);
+      if (mediaData.files && mediaData.files.length > 0) {
+        archive.append(JSON.stringify(mediaData, null, 2), { name: "uploads/media.json" });
+      }
+    } catch (mediaError) {
+      console.warn("Could not export media metadata:", mediaError.message);
+    }
+
     // Finalize the archive
     await archive.finalize();
   } catch (error) {
@@ -1253,6 +804,64 @@ export async function exportProject(req, res) {
     if (!res.headersSent) {
       res.status(500).json({ error: error.message || "Failed to export project" });
     }
+  }
+}
+
+function isZipFile(file) {
+  return ZIP_MIME_TYPES.includes(file.mimetype) || file.originalname.endsWith(".zip");
+}
+
+const UPLOAD_TEMP_DIR = path.join(DATA_DIR, "temp");
+
+/**
+ * Read the max upload size from app settings (shared by project import + theme upload).
+ * Falls back to 500 MB when the setting is unavailable.
+ * @param {string} userId - User ID (defaults to "local" for open-source mode)
+ * @returns {Promise<number>} size limit in megabytes
+ */
+export async function getMaxUploadSizeMB(userId = "local") {
+  try {
+    const settings = await readAppSettingsFile(userId);
+    return settings.export?.maxImportSizeMB || 500;
+  } catch {
+    return 500;
+  }
+}
+
+/**
+ * Express middleware that configures multer for project ZIP import,
+ * reading the max size from app settings. Files are written to disk
+ * (data/temp/) instead of buffered in memory.
+ */
+export async function handleImportUpload(req, res, next) {
+  try {
+    const maxSizeMB = await getMaxUploadSizeMB(req.userId);
+    await fs.ensureDir(UPLOAD_TEMP_DIR);
+
+    const upload = multer({
+      dest: UPLOAD_TEMP_DIR,
+      limits: { fileSize: maxSizeMB * 1024 * 1024 },
+      fileFilter: (_req, file, cb) => {
+        if (isZipFile(file)) {
+          cb(null, true);
+        } else {
+          cb(new Error("Only ZIP files are allowed"), false);
+        }
+      },
+    });
+
+    upload.single("projectZip")(req, res, async (err) => {
+      if (!err) return next();
+
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({
+          error: `File size exceeds the maximum allowed size of ${maxSizeMB}MB. Please reduce the project size or increase the limit in Settings.`,
+        });
+      }
+      return res.status(400).json({ error: err.message || "File upload error" });
+    });
+  } catch {
+    return res.status(500).json({ error: "Failed to configure file upload" });
   }
 }
 
@@ -1264,15 +873,14 @@ export async function exportProject(req, res) {
  * @returns {Promise<void>}
  */
 export async function importProject(req, res) {
+  const uploadedFilePath = req.file?.path;
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No ZIP file uploaded" });
     }
 
     // Check file size against app settings (backup check)
-    const { readAppSettingsFile } = await import("./appSettingsController.js");
-    const settings = await readAppSettingsFile();
-    const maxSizeMB = settings.export?.maxImportSizeMB || 500;
+    const maxSizeMB = await getMaxUploadSizeMB(req.userId);
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     if (req.file.size > maxSizeBytes) {
@@ -1281,9 +889,22 @@ export async function importProject(req, res) {
       });
     }
 
-    const zipBuffer = req.file.buffer;
+    // Platform limit: max projects per user
+    const allProjects = projectRepo.getAllProjects(req.userId);
+    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects");
+    if (!projectCheck.ok) {
+      return res.status(403).json({ error: projectCheck.error });
+    }
+
     const AdmZip = await import("adm-zip");
-    const zip = new AdmZip.default(zipBuffer);
+    const zip = new AdmZip.default(uploadedFilePath);
+
+    // Safety: validate ZIP entries (path traversal + entry count) — always enforced
+    const zipCheck = validateZipEntries(zip);
+    if (!zipCheck.ok) {
+      return res.status(400).json({ error: zipCheck.error });
+    }
+
     const zipEntries = zip.getEntries();
 
     if (zipEntries.length === 0) {
@@ -1310,26 +931,24 @@ export async function importProject(req, res) {
     }
 
     // Check if theme exists
-    const themeDir = path.join(THEMES_DIR, manifest.project.theme);
+    const themeDir = getThemeDir(manifest.project.theme, req.userId);
     if (!(await fs.pathExists(themeDir))) {
       return res.status(400).json({
         error: `Theme "${manifest.project.theme}" not found in this installation. Please install the theme first.`,
       });
     }
 
-    // Read projects file
-    const data = await readProjectsFile();
-
-    // Generate unique folderName (checking both projects.json and existing directories)
-    let folderName = await generateUniqueProjectId(manifest.project.name, data.projects);
+    // Generate unique folderName (checking DB and existing directories)
+    // Reuses allProjects from the limit check above
+    let folderName = await generateUniqueSlug(manifest.project.name, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
 
     // Also check if directory already exists and generate unique name if needed
-    let projectDir = getProjectDir(folderName);
+    let projectDir = getProjectDir(folderName, req.userId);
     let counter = 1;
     while (await fs.pathExists(projectDir)) {
       const baseFolderName = folderName;
       folderName = `${baseFolderName}-${counter}`;
-      projectDir = getProjectDir(folderName);
+      projectDir = getProjectDir(folderName, req.userId);
       counter++;
       if (counter > 1000) {
         throw new Error("Unable to generate unique folder name after 1000 attempts");
@@ -1374,6 +993,8 @@ export async function importProject(req, res) {
         description: manifest.project.description || "",
         theme: manifest.project.theme,
         themeVersion,
+        receiveThemeUpdates: manifest.project.receiveThemeUpdates || false,
+        preset: manifest.project.preset || null,
         siteUrl: manifest.project.siteUrl || "",
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
@@ -1403,12 +1024,34 @@ export async function importProject(req, res) {
         throw new Error("No files were copied to project directory");
       }
 
-      // Only add project to projects.json AFTER successful file copy
-      data.projects.push(newProject);
-      await writeProjectsFile(data);
+      // Only add project to DB AFTER successful file copy
+      newProject.userId = req.userId;
+      projectRepo.createProject(newProject);
 
-      // Clean up temporary directory
+      // Restore media metadata from the exported media.json into SQLite
+      const mediaJsonPath = path.join(projectDir, "uploads", "media.json");
+      try {
+        if (await fs.pathExists(mediaJsonPath)) {
+          const mediaData = await fs.readJson(mediaJsonPath);
+          if (mediaData.files && mediaData.files.length > 0) {
+            // Regenerate media file IDs to avoid UNIQUE constraint conflicts
+            // (the original project may still exist in the database)
+            for (const file of mediaData.files) {
+              file.id = uuidv4();
+            }
+            mediaRepo.writeMediaData(newProject.id, mediaData, req.userId);
+          }
+          // Remove the media.json file — metadata now lives in SQLite
+          await fs.remove(mediaJsonPath);
+        }
+      } catch (mediaError) {
+        console.warn("Could not restore media metadata from export:", mediaError.message);
+        // Non-fatal: project is still usable, media files exist on disk
+      }
+
+      // Clean up temporary files (extraction dir + uploaded ZIP)
       await fs.remove(tempDir);
+      if (uploadedFilePath) await fs.remove(uploadedFilePath).catch(() => {});
 
       res.status(201).json({
         ...newProject,
@@ -1416,17 +1059,12 @@ export async function importProject(req, res) {
         widgetizerVersion: manifest.widgetizerVersion,
       });
     } catch (error) {
-      // Clean up on error - remove project from projects.json if it was added
+      // Clean up on error - remove project from DB if it was added
       if (newProject) {
         try {
-          const currentData = await readProjectsFile();
-          const projectIndex = currentData.projects.findIndex((p) => p.id === newProject.id);
-          if (projectIndex !== -1) {
-            currentData.projects.splice(projectIndex, 1);
-            await writeProjectsFile(currentData);
-          }
+          projectRepo.deleteProject(newProject.id, req.userId);
         } catch (cleanupError) {
-          console.warn("Failed to remove project from projects.json after error:", cleanupError);
+          console.warn("Failed to remove project from DB after error:", cleanupError);
         }
       }
 
@@ -1444,6 +1082,8 @@ export async function importProject(req, res) {
       throw error;
     }
   } catch (error) {
+    // Always clean up the uploaded temp file
+    if (uploadedFilePath) await fs.remove(uploadedFilePath).catch(() => {});
     console.error("Error importing project:", error);
     res.status(500).json({ error: error.message || "Failed to import project" });
   }
@@ -1460,15 +1100,10 @@ export async function importProject(req, res) {
  * @returns {Promise<void>}
  */
 export async function getThemeUpdateStatus(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
     const { checkForUpdates } = await import("../services/themeUpdateService.js");
-    const status = await checkForUpdates(id);
+    const status = await checkForUpdates(id, req.userId);
     res.json(status);
   } catch (error) {
     console.error("Error checking theme update status:", error);
@@ -1486,11 +1121,6 @@ export async function getThemeUpdateStatus(req, res) {
  * @returns {Promise<void>}
  */
 export async function toggleProjectThemeUpdates(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
     const { enabled } = req.body;
@@ -1500,7 +1130,7 @@ export async function toggleProjectThemeUpdates(req, res) {
     }
 
     const { toggleThemeUpdates } = await import("../services/themeUpdateService.js");
-    const result = await toggleThemeUpdates(id, enabled);
+    const result = await toggleThemeUpdates(id, enabled, req.userId);
     res.json(result);
   } catch (error) {
     console.error("Error toggling theme updates:", error);
@@ -1518,15 +1148,10 @@ export async function toggleProjectThemeUpdates(req, res) {
  * @returns {Promise<void>}
  */
 export async function applyProjectThemeUpdate(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { id } = req.params;
     const { applyThemeUpdate } = await import("../services/themeUpdateService.js");
-    const result = await applyThemeUpdate(id);
+    const result = await applyThemeUpdate(id, req.userId);
     res.json(result);
   } catch (error) {
     console.error("Error applying theme update:", error);

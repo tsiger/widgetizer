@@ -161,7 +161,7 @@ The backend handles the logic for listing themes, processing uploads, and managi
 
 #### Theme Deletion
 
-- `deleteTheme`: Removes the theme directory from the filesystem. Before deletion, checks if any project in `projects.json` references this theme; if so, returns 409 with message that the theme is in use. On success, returns 200 with success message.
+- `deleteTheme`: Removes the theme directory from the filesystem. Before deletion, checks if any project metadata row in SQLite references this theme; if so, returns 409 with message that the theme is in use. On success, returns 200 with success message.
 
 #### Theme Presets
 

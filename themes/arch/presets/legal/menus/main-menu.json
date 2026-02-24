@@ -1,0 +1,14 @@
+{
+  "id": "main-menu",
+  "name": "Main menu",
+  "description": "",
+  "items": [
+    { "label": "Home", "link": "index.html", "items": [] },
+    { "label": "About", "link": "about.html", "items": [] },
+    { "label": "Practice Areas", "link": "practice-areas.html", "items": [] },
+    { "label": "Our Team", "link": "team.html", "items": [] },
+    { "label": "Case Results", "link": "case-results.html", "items": [] },
+    { "label": "Community", "link": "community.html", "items": [] },
+    { "label": "Contact", "link": "contact.html", "items": [] }
+  ]
+}

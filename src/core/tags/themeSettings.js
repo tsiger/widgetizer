@@ -72,9 +72,12 @@ export const ThemeSettingsTag = {
       return "";
     }
 
+    // Defense-in-depth: strip <>{} from CSS values to prevent style tag breakout
+    const escapeCssValue = (v) => String(v).replace(/[<>{}]/g, "");
+
     // Format as CSS string
     const cssString = Object.entries(cssVariables)
-      .map(([key, value]) => `${key}: ${value};`)
+      .map(([key, value]) => `${key}: ${escapeCssValue(value)};`)
       .join("\n  ");
 
     const output = `<style id="theme-settings-styles">\n:root {\n  ${cssString}\n}\n</style>`;

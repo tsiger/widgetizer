@@ -17,7 +17,7 @@ npm run electron:dev   # Full Electron dev mode
 
 ## Architecture
 
-- **No database** — all content stored as JSON files under `data/`
+- **Hybrid storage** — SQLite (`data/widgetizer.db`) for metadata (projects, media metadata/usage, app settings, export history); filesystem for content (page/menu/global JSON, theme files, uploaded binaries)
 - **Frontend**: React 19, Zustand (state), React Query, Tailwind CSS 4, Vite 7
 - **Backend**: Express 5 (ES modules), LiquidJS templates, Sharp for images
 - **Electron**: Optional desktop wrapper (`electron/main.js`)
@@ -38,14 +38,16 @@ server/                 # Express backend
   services/             # Business logic (rendering, sanitization, media usage)
   routes/               # Express route definitions
   middleware/            # Error handler, rate limiters
+  db/                   # SQLite init, migrations, repositories
   tests/                # Node test runner test files (*.test.js)
   utils/                # Helpers (HTML processing, semver, etc.)
 themes/                 # Theme definitions (templates, widgets, assets)
 electron/               # Electron main process + preload
 data/                   # Runtime data (gitignored)
+  widgetizer.db         # SQLite database (metadata)
   projects/<folder>/    # Per-project content
     pages/*.json        # Page content
-    uploads/media.json  # Media metadata with usage tracking
+    uploads/            # Media binaries (images/, videos/, audios/)
     pages/global/       # header.json, footer.json (global widgets)
 ```
 
@@ -53,9 +55,10 @@ data/                   # Runtime data (gitignored)
 
 ### Content Model
 
-- Pages are JSON files at `data/projects/<folder>/pages/<slug>.json`
-- Global widgets (header/footer) live at `pages/global/header.json` and `footer.json`
-- Media metadata in `data/projects/<folder>/uploads/media.json` with `usedIn` arrays tracking which pages reference each file
+- **SQLite metadata**: projects, media metadata/usage, app settings, export history (`data/widgetizer.db`)
+- **Filesystem content**: pages (`data/projects/<folder>/pages/<slug>.json`), global widgets (`pages/global/header.json`, `footer.json`), menus, theme files, uploaded binaries
+- Repository layer in `server/db/repositories/` (project, media, settings, export)
+- Controllers use granular repository functions directly (e.g., `projectRepo.getProjectById()`, `mediaRepo.getMediaFiles()`)
 
 ### Rendering Pipeline
 
@@ -72,8 +75,8 @@ data/                   # Runtime data (gitignored)
 ### Save Flow
 
 - `saveStore.js` orchestrates parallel saves of page content, global widgets, and theme settings
-- `mediaController.js` uses write locks (Map-based) for serializing writes to `media.json`
-- `mediaUsageService.js` handles atomic read-modify-write for media usage tracking
+- Media metadata updates go through SQLite transactions (via `mediaRepository`)
+- `mediaUsageService.js` handles media usage tracking updates in SQLite
 
 ## Testing
 

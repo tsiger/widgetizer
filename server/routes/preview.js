@@ -7,8 +7,10 @@ import {
   saveGlobalWidget,
   serveAsset,
 } from "../controllers/previewController.js";
+import { standardJsonParser } from "../middleware/jsonParser.js";
 
 const router = express.Router();
+router.use(standardJsonParser);
 
 // POST /api/preview - Generate a full page preview
 router.post("/", generatePreview);

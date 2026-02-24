@@ -1,0 +1,192 @@
+{
+  "name": "Insights",
+  "slug": "insights",
+  "widgets": {
+    "insights_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "insights-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Insights",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "insights-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Market perspectives and planning strategies",
+            "size": "4xl"
+          }
+        },
+        "insights-text": {
+          "type": "text",
+          "settings": {
+            "text": "Timely analysis and practical guidance from our advisory team.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["insights-eyebrow", "insights-heading", "insights-text"]
+    },
+    "articles_grid": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Latest insights",
+        "title": "What we're thinking about",
+        "description": "Research-backed perspectives on markets, tax planning, and wealth management.",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "article-1": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Market Outlook",
+            "title": "Q1 2026 Market Outlook: Navigating Uncertainty",
+            "description": "<p>Our investment team examines the key macro trends shaping markets in 2026 and what they mean for diversified portfolios.</p>",
+            "button_link": {
+              "text": "Read more",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        },
+        "article-2": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Tax Planning",
+            "title": "5 Tax Moves to Make Before April",
+            "description": "<p>From Roth conversions to charitable giving strategies, here are five actions that could reduce your tax bill this year.</p>",
+            "button_link": {
+              "text": "Read more",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        },
+        "article-3": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Retirement",
+            "title": "The New Retirement Math: Planning Beyond Traditional Models",
+            "description": "<p>Longer lifespans and shifting markets demand a fresh approach to retirement income planning and withdrawal strategies.</p>",
+            "button_link": {
+              "text": "Read more",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["article-1", "article-2", "article-3"]
+    },
+    "subscribe_section": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "subscribe-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Stay informed",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "subscribe-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Subscribe to Meridian Perspectives",
+            "size": "3xl"
+          }
+        },
+        "subscribe-body": {
+          "type": "text",
+          "settings": {
+            "text": "Our quarterly newsletter delivers market outlooks, planning strategies, and tax insights directly to your inbox. Trusted by over 2,000 subscribers.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "subscribe-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Subscribe",
+              "href": "#newsletter",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["subscribe-eyebrow", "subscribe-heading", "subscribe-body", "subscribe-button"]
+    },
+    "insights_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "insights-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Have a question about your financial plan?",
+            "size": "4xl"
+          }
+        },
+        "insights-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Our advisors are here to help you make confident, informed decisions.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "insights-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["insights-cta-heading", "insights-cta-text", "insights-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["insights_hero", "articles_grid", "subscribe_section", "insights_cta"],
+  "id": "insights",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

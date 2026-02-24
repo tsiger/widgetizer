@@ -3,10 +3,9 @@ import fs from "fs/promises";
 import path from "path";
 import { getProjectDir, CORE_WIDGETS_DIR } from "../config.js";
 // TODO: Controllers shouldn't ideally be imported into services.
-// We might need to move readProjectsFile/readMediaFile to utils or their own services later.
+// Consider moving readMediaFile to a shared module.
 import { readMediaFile } from "../controllers/mediaController.js";
-import { getMenuById } from "../controllers/menuController.js";
-import { readProjectsFile } from "../controllers/projectController.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
 import { listProjectPagesData } from "../controllers/pageController.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -95,10 +94,9 @@ function configureLiquidEngine(engine) {
 /**
  * Helper function to get project data by ID
  */
-async function getProjectData(projectId) {
+function getProjectData(projectId, userId) {
   try {
-    const projectsData = await readProjectsFile();
-    return projectsData.projects.find((p) => p.id === projectId) || null;
+    return projectRepo.getProjectById(projectId, userId) || null;
   } catch (error) {
     console.warn(`Could not load project data for ${projectId}: ${error.message}`);
     return null;
@@ -249,11 +247,12 @@ function resolveMenuPageLinks(menuData, pagesByUuid) {
  * Load all pages for a project and return a map of uuid -> page data.
  * Results are cached per projectId during a single render pass.
  * @param {string} projectFolderName - The project folder name
+ * @param {string} userId - The user ID for path scoping
  * @returns {Promise<Map>} Map of uuid -> page data
  */
-async function loadPagesByUuid(projectFolderName) {
+async function loadPagesByUuid(projectFolderName, userId) {
   try {
-    const pages = await listProjectPagesData(projectFolderName);
+    const pages = await listProjectPagesData(projectFolderName, userId);
     const map = new Map();
     pages.forEach((page) => {
       if (page.uuid) {
@@ -268,13 +267,55 @@ async function loadPagesByUuid(projectFolderName) {
 }
 
 /**
+ * Load all menus for a project and return maps for UUID and slug-based lookup.
+ * @param {string} projectFolderName - The project folder name
+ * @param {string} userId - The user ID for path scoping
+ * @returns {Promise<{byUuid: Map, bySlug: Map}>} Maps for UUID and slug-based lookup
+ */
+async function loadMenuMaps(projectFolderName, userId) {
+  const byUuid = new Map();
+  const bySlug = new Map();
+
+  try {
+    const menusDir = path.join(getProjectDir(projectFolderName, userId), "menus");
+
+    let files;
+    try {
+      files = await fs.readdir(menusDir);
+    } catch {
+      return { byUuid, bySlug };
+    }
+
+    for (const file of files) {
+      if (!file.endsWith(".json")) continue;
+      try {
+        const content = await fs.readFile(path.join(menusDir, file), "utf8");
+        const menu = JSON.parse(content);
+        if (menu.uuid) {
+          byUuid.set(menu.uuid, menu);
+        }
+        const slugId = file.replace(".json", "");
+        bySlug.set(slugId, menu);
+      } catch {
+        // Skip unreadable menu files
+      }
+    }
+  } catch (error) {
+    console.warn(`Could not load menus for UUID resolution: ${error.message}`);
+  }
+
+  return { byUuid, bySlug };
+}
+
+/**
  * Creates base render context with common properties
  * @param {string} projectId
  * @param {object} rawThemeSettings
  * @param {string} renderMode
  * @param {object} sharedGlobals - Optional shared globals object to preserve enqueued assets
+ * @param {string} userId - The user ID for path scoping
  */
-async function createBaseRenderContext(projectId, rawThemeSettings, renderMode = "preview", sharedGlobals = null) {
+async function createBaseRenderContext(projectId, rawThemeSettings, renderMode = "preview", sharedGlobals = null, userId) {
   // Validate project ID
   if (!projectId) {
     throw new Error("projectId must be provided to create render context");
@@ -306,7 +347,7 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   // Load media metadata and create a useful map
   let mediaFiles = {};
   try {
-    const mediaData = await readMediaFile(projectId);
+    const mediaData = await readMediaFile(projectId, userId);
     if (mediaData && Array.isArray(mediaData.files)) {
       mediaData.files.forEach((file) => {
         if (file.filename) {
@@ -326,8 +367,8 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   // Check if icons need to be reloaded (new project, or file changed in preview mode)
   let shouldReloadIcons = !global.iconsCache.has(projectId);
 
-  const projectFolderName = await getProjectFolderName(projectId);
-  const projectDir = getProjectDir(projectFolderName);
+  const projectFolderName = await getProjectFolderName(projectId, userId);
+  const projectDir = getProjectDir(projectFolderName, userId);
   const iconsPath = path.join(projectDir, "assets", "icons.json");
 
   if (!shouldReloadIcons && renderMode === "preview") {
@@ -419,6 +460,7 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
  * @param {string} [renderMode='preview'] - Render mode: 'preview' for dev server URLs, 'publish' for relative paths
  * @param {object} [sharedGlobals=null] - Optional shared globals to preserve enqueued assets across widgets
  * @param {number} [index=null] - Optional 1-based index of the widget in the page
+ * @param {string} userId - The user ID for path scoping
  * @returns {Promise<string>} Rendered HTML string, or error HTML if rendering fails
  * @throws {Error} If project resolution fails (re-throws project resolution errors)
  */
@@ -430,11 +472,12 @@ async function renderWidget(
   renderMode = "preview",
   sharedGlobals = null,
   index = null,
+  userId,
 ) {
   try {
     const { type, settings = {}, blocks = {}, blocksOrder = [] } = widgetData;
-    const projectFolderName = await getProjectFolderName(projectId);
-    const projectDir = getProjectDir(projectFolderName);
+    const projectFolderName = await getProjectFolderName(projectId, userId);
+    const projectDir = getProjectDir(projectFolderName, userId);
 
     // Determine if this is a core widget (prefixed with "core-")
     const isCoreWidget = type.startsWith("core-");
@@ -522,7 +565,7 @@ async function renderWidget(
     if (sharedGlobals && sharedGlobals.pagesByUuid) {
       pagesByUuid = sharedGlobals.pagesByUuid;
     } else {
-      pagesByUuid = await loadPagesByUuid(projectFolderName);
+      pagesByUuid = await loadPagesByUuid(projectFolderName, userId);
       if (sharedGlobals) {
         sharedGlobals.pagesByUuid = pagesByUuid;
       }
@@ -538,13 +581,23 @@ async function renderWidget(
       });
     }
 
-    // Load menu data for any menu-type settings (using enhancedSettings which includes defaults)
+    // Load menu maps (UUID and slug-based) — cached in sharedGlobals across widgets
+    let menuMaps;
+    if (sharedGlobals && sharedGlobals.menuMaps) {
+      menuMaps = sharedGlobals.menuMaps;
+    } else {
+      menuMaps = await loadMenuMaps(projectFolderName, userId);
+      if (sharedGlobals) {
+        sharedGlobals.menuMaps = menuMaps;
+      }
+    }
+
+    // Resolve menu-type settings: try UUID first, fall back to slug-based ID
     for (const [key, value] of Object.entries(enhancedSettings)) {
       if (menuSettingIds.has(key)) {
         try {
           if (value) {
-            // Use getMenuById instead of direct file access
-            const menuData = await getMenuById(projectDir, value);
+            const menuData = menuMaps.byUuid.get(value) || menuMaps.bySlug.get(value);
             // Resolve page links in menu items (pageUuid -> current slug)
             enhancedSettings[key] = resolveMenuPageLinks(menuData, pagesByUuid) || { items: [] };
           } else {
@@ -580,7 +633,7 @@ async function renderWidget(
     };
 
     // Get base render context (use shared globals if provided)
-    const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, renderMode, sharedGlobals);
+    const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, renderMode, sharedGlobals, userId);
 
     // Merge with widget-specific context
     const renderContext = {
@@ -628,6 +681,7 @@ async function renderWidget(
  * @param {object} rawThemeSettings - Raw theme settings from theme.json
  * @param {string} [renderMode='preview'] - Render mode: 'preview' for dev server URLs, 'publish' for relative paths
  * @param {object} [sharedGlobals=null] - Optional shared globals with enqueued styles/scripts
+ * @param {string} userId - The user ID for path scoping
  * @returns {Promise<string>} Complete rendered HTML document
  * @throws {Error} If project resolution fails (re-throws project resolution errors)
  */
@@ -638,11 +692,12 @@ async function renderPageLayout(
   rawThemeSettings,
   renderMode = "preview",
   sharedGlobals = null,
+  userId,
 ) {
   try {
     // 1. Fetch layout.liquid for the project
-    const projectFolderName = await getProjectFolderName(projectId);
-    const projectDir = getProjectDir(projectFolderName);
+    const projectFolderName = await getProjectFolderName(projectId, userId);
+    const projectDir = getProjectDir(projectFolderName, userId);
     const layoutPath = path.join(projectDir, "layout.liquid");
 
     let layoutTemplate;
@@ -653,11 +708,11 @@ async function renderPageLayout(
       return `<html><body><h1>Error: Layout template not found</h1><pre>${readErr.message}</pre></body></html>`;
     }
 
-    // 2. Create context for layout render (use shared globals
-    const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, renderMode, sharedGlobals);
+    // 2. Create context for layout render (use shared globals)
+    const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, renderMode, sharedGlobals, userId);
 
     // 3. Load project data
-    const projectData = await getProjectData(projectId);
+    const projectData = await getProjectData(projectId, userId);
 
     // 4. Add page-specific context with separated content sections
     const renderContext = {

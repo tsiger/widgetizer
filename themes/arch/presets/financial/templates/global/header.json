@@ -1,0 +1,15 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Meridian",
+    "contactDetailsLine1": "Call us: (555) 847-3200",
+    "contactDetailsLine2": "200 Park Avenue, Suite 1400",
+    "headerNavigation": "main-menu",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Schedule consultation",
+      "target": "_self"
+    },
+    "sticky": true
+  }
+}

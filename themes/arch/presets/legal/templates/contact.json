@@ -1,0 +1,136 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_form": {
+      "type": "contact-form",
+      "settings": {
+        "eyebrow": "Contact",
+        "title": "Schedule a free consultation",
+        "description": "Tell us about your legal matter and an attorney will respond within one business day. Initial consultations are always free.",
+        "form_action": "/submit",
+        "form_method": "POST",
+        "show_sidebar": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "input-name": {
+          "type": "input",
+          "settings": {
+            "label": "Name",
+            "name": "name",
+            "input_type": "text",
+            "placeholder": "Your full name",
+            "required": true
+          }
+        },
+        "input-email": {
+          "type": "input",
+          "settings": {
+            "label": "Email",
+            "name": "email",
+            "input_type": "email",
+            "placeholder": "you@example.com",
+            "required": true
+          }
+        },
+        "input-phone": {
+          "type": "input",
+          "settings": {
+            "label": "Phone",
+            "name": "phone",
+            "input_type": "tel",
+            "placeholder": "(555) 000-0000",
+            "required": false
+          }
+        },
+        "dropdown-concern": {
+          "type": "dropdown",
+          "settings": {
+            "label": "Area of concern",
+            "name": "concern",
+            "options": "Corporate law\nLitigation\nReal estate\nEmployment law\nIntellectual property\nFamily law\nOther",
+            "required": false
+          }
+        },
+        "textarea-message": {
+          "type": "textarea",
+          "settings": {
+            "label": "Message",
+            "name": "message",
+            "placeholder": "Tell us about your legal matter...",
+            "required": true
+          }
+        },
+        "submit-button": {
+          "type": "submit",
+          "settings": {
+            "text": "Send message"
+          }
+        },
+        "info-ny-office": {
+          "type": "info",
+          "settings": {
+            "title": "New York Office",
+            "text": "75 Broad Street, Suite 2400\nNew York, NY 10004"
+          }
+        },
+        "info-hartford-office": {
+          "type": "info",
+          "settings": {
+            "title": "Hartford Office",
+            "text": "100 Pearl Street, Suite 800\nHartford, CT 06103"
+          }
+        },
+        "info-phone": {
+          "type": "info",
+          "settings": {
+            "title": "Phone",
+            "text": "+1 (555) 284-6100"
+          }
+        },
+        "info-email": {
+          "type": "info",
+          "settings": {
+            "title": "Email",
+            "text": "info@hargrovecole.com"
+          }
+        }
+      },
+      "blocksOrder": [
+        "input-name",
+        "input-email",
+        "input-phone",
+        "dropdown-concern",
+        "textarea-message",
+        "submit-button",
+        "info-ny-office",
+        "info-hartford-office",
+        "info-phone",
+        "info-email"
+      ]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Location",
+        "title": "Visit our main office",
+        "description": "Located in the Financial District, easily accessible by subway.",
+        "address": "75 Broad Street, Suite 2400, New York, NY 10004",
+        "directions_link": {
+          "text": "Get directions",
+          "href": "https://maps.google.com/?q=75%20Broad%20Street%20New%20York%20NY%2010004",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "color_scheme": "standard"
+      }
+    }
+  },
+  "widgetsOrder": ["contact_form", "contact_map"],
+  "id": "contact",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

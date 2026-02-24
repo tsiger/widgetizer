@@ -1,0 +1,243 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_intro": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "about-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Our story",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "about-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Big-firm expertise, small-firm attention",
+            "size": "3xl"
+          }
+        },
+        "about-body": {
+          "type": "text",
+          "settings": {
+            "text": "Greenledger was founded on a simple idea: every business deserves an accounting partner who cares as much about their success as they do. We started with three CPAs and a commitment to do things differently. Today, our team of 12 serves over 4,200 clients \u2014 but every client still gets a dedicated advisor who knows their name and their numbers.",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "about-features": {
+          "type": "features",
+          "settings": {
+            "features": "Founded in 2001\nLocally owned and operated\nTechnology-forward practice"
+          }
+        },
+        "about-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Our services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Get in touch",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["about-eyebrow", "about-heading", "about-body", "about-features", "about-buttons"]
+    },
+    "about_figures": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "By the numbers",
+        "title": "A team built for accuracy",
+        "columns_desktop": 3,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "figure-1": {
+          "type": "figure",
+          "settings": {
+            "number": "25",
+            "suffix": "Years",
+            "label": "In Business",
+            "description": ""
+          }
+        },
+        "figure-2": {
+          "type": "figure",
+          "settings": {
+            "number": "12",
+            "suffix": "",
+            "label": "CPAs & Staff",
+            "description": ""
+          }
+        },
+        "figure-3": {
+          "type": "figure",
+          "settings": {
+            "number": "4,200",
+            "suffix": "+",
+            "label": "Clients Served",
+            "description": ""
+          }
+        }
+      },
+      "blocksOrder": ["figure-1", "figure-2", "figure-3"]
+    },
+    "team_profiles": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Leadership",
+        "title": "Meet the team",
+        "columns_desktop": 4,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "profile-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Margaret Chen, CPA",
+            "role": "Managing Partner",
+            "specialty": "Tax Strategy",
+            "bio": "25+ years helping businesses minimize tax burden and maximize growth."
+          }
+        },
+        "profile-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Robert Adler, CPA",
+            "role": "Partner",
+            "specialty": "Audit & Assurance",
+            "bio": "Leads our audit practice with a focus on accuracy and compliance."
+          }
+        },
+        "profile-3": {
+          "type": "profile",
+          "settings": {
+            "name": "Priya Venkatesh, CPA",
+            "role": "Director",
+            "specialty": "Advisory Services",
+            "bio": "Specializes in financial planning for startups and high-growth companies."
+          }
+        },
+        "profile-4": {
+          "type": "profile",
+          "settings": {
+            "name": "James Thornton",
+            "role": "Director",
+            "specialty": "Payroll & Operations",
+            "bio": "Ensures every payroll runs smoothly and every deadline is met."
+          }
+        }
+      },
+      "blocksOrder": ["profile-1", "profile-2", "profile-3", "profile-4"]
+    },
+    "client_logos": {
+      "type": "logo-cloud",
+      "settings": {
+        "eyebrow": "Our clients",
+        "title": "Trusted by businesses across industries",
+        "columns_desktop": 6,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "logo-1": {
+          "type": "logo",
+          "settings": {
+            "name": "Oakmont Properties"
+          }
+        },
+        "logo-2": {
+          "type": "logo",
+          "settings": {
+            "name": "Sakura Eats"
+          }
+        },
+        "logo-3": {
+          "type": "logo",
+          "settings": {
+            "name": "Webb Construction"
+          }
+        },
+        "logo-4": {
+          "type": "logo",
+          "settings": {
+            "name": "Pinnacle Health"
+          }
+        },
+        "logo-5": {
+          "type": "logo",
+          "settings": {
+            "name": "Dash Commerce"
+          }
+        },
+        "logo-6": {
+          "type": "logo",
+          "settings": {
+            "name": "Brightline Legal"
+          }
+        }
+      },
+      "blocksOrder": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5", "logo-6"]
+    },
+    "about_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "about-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready for a better accounting experience?",
+            "size": "4xl"
+          }
+        },
+        "about-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get in touch",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["about-cta-heading", "about-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["about_intro", "about_figures", "team_profiles", "client_logos", "about_cta"],
+  "id": "about",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

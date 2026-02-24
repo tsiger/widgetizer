@@ -1,0 +1,314 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero_split": {
+      "type": "split-hero",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Meridian Wealth Advisors",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your wealth deserves a plan, not a product",
+            "size": "4xl"
+          }
+        },
+        "hero-body": {
+          "type": "text",
+          "settings": {
+            "text": "We provide independent, fee-only financial planning and investment management for families and business owners who want clarity, confidence, and a trusted partner.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our approach",
+              "href": "approach.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-body", "hero-buttons"]
+    },
+    "trust_bar": {
+      "type": "trust-bar",
+      "settings": {
+        "show_dividers": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "shield-check",
+            "text": "Fiduciary Standard"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "text": "SEC Registered"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "coin",
+            "text": "Fee-Only"
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "rosette-discount-check",
+            "text": "Certified Planners"
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+    },
+    "key_figures": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "By the numbers",
+        "title": "Built on trust, measured by results",
+        "description": "Two decades of principled advice for families and founders.",
+        "columns_desktop": 4,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "figure-1": {
+          "type": "figure",
+          "settings": {
+            "number": "$2.4B",
+            "suffix": "+",
+            "label": "AUM",
+            "description": "Assets under management"
+          }
+        },
+        "figure-2": {
+          "type": "figure",
+          "settings": {
+            "number": "98",
+            "suffix": "%",
+            "label": "Retention",
+            "description": "Client retention rate"
+          }
+        },
+        "figure-3": {
+          "type": "figure",
+          "settings": {
+            "number": "22",
+            "suffix": " Years",
+            "label": "Experience",
+            "description": "Of principled advice"
+          }
+        },
+        "figure-4": {
+          "type": "figure",
+          "settings": {
+            "number": "300",
+            "suffix": "+",
+            "label": "Families",
+            "description": "Served nationwide"
+          }
+        }
+      },
+      "blocksOrder": ["figure-1", "figure-2", "figure-3", "figure-4"]
+    },
+    "capabilities_grid": {
+      "type": "bento-grid",
+      "settings": {
+        "eyebrow": "Capabilities",
+        "title": "Planning that covers every angle",
+        "description": "Comprehensive wealth management across every dimension of your financial life.",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "bento-1": {
+          "type": "item",
+          "settings": {
+            "title": "Retirement Planning",
+            "text": "Build a retirement strategy that ensures financial independence and the lifestyle you envision.",
+            "col_span": 2,
+            "row_span": 1
+          }
+        },
+        "bento-2": {
+          "type": "item",
+          "settings": {
+            "title": "Estate Planning",
+            "text": "Protect your legacy and ensure a smooth transfer of wealth to the next generation.",
+            "col_span": 1,
+            "row_span": 1
+          }
+        },
+        "bento-3": {
+          "type": "item",
+          "settings": {
+            "title": "Tax Strategy",
+            "text": "Minimize tax burden through proactive planning and smart asset location.",
+            "col_span": 1,
+            "row_span": 1
+          }
+        },
+        "bento-4": {
+          "type": "item",
+          "settings": {
+            "title": "Investment Management",
+            "text": "Evidence-based portfolio construction aligned with your goals, timeline, and risk tolerance.",
+            "col_span": 2,
+            "row_span": 1
+          }
+        }
+      },
+      "blocksOrder": ["bento-1", "bento-2", "bento-3", "bento-4"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client stories",
+        "title": "Trusted by families and founders",
+        "description": "Hear from clients who chose Meridian as their financial partner.",
+        "columns_desktop": 3,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Meridian helped us consolidate five accounts, reduce our tax bill, and build a retirement plan we actually understand.",
+            "name": "Robert and Linda Chen",
+            "title": "Retired Educators",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "After selling my company, I needed a team I could trust with the proceeds. Meridian has been that team for eight years.",
+            "name": "Marcus Thompson",
+            "title": "Founder, Apex Logistics",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Their fee-only model means I never wonder if advice is in my best interest. The quarterly reviews keep us on track.",
+            "name": "Priya Kapoor",
+            "title": "Chief Medical Officer",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+    },
+    "newsletter_signup": {
+      "type": "newsletter",
+      "settings": {
+        "eyebrow": "Insights",
+        "title": "Quarterly wealth perspectives",
+        "description": "Join 2,000+ subscribers for market outlooks and planning strategies.",
+        "placeholder": "Your email",
+        "button_text": "Subscribe",
+        "color_scheme": "standard"
+      }
+    },
+    "cta_banner": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "cta-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Get started",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Schedule a confidential consultation",
+            "size": "4xl"
+          }
+        },
+        "cta-body": {
+          "type": "text",
+          "settings": {
+            "text": "Let's discuss your financial goals and build a plan that grows with you.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-eyebrow", "cta-heading", "cta-body", "cta-buttons"]
+    }
+  },
+  "widgetsOrder": [
+    "hero_split",
+    "trust_bar",
+    "key_figures",
+    "capabilities_grid",
+    "testimonials",
+    "newsletter_signup",
+    "cta_banner"
+  ],
+  "id": "index",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

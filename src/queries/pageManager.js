@@ -1,4 +1,4 @@
-import { API_URL } from "../config";
+import { apiFetch } from "../lib/apiFetch";
 
 /**
  * @typedef {Object} Page
@@ -19,7 +19,7 @@ import { API_URL } from "../config";
  */
 export async function getAllPages() {
   try {
-    const response = await fetch(API_URL("/api/pages"));
+    const response = await apiFetch("/api/pages");
     if (!response.ok) {
       throw new Error("Failed to fetch pages");
     }
@@ -37,7 +37,7 @@ export async function getAllPages() {
  */
 export async function deletePage(pageId) {
   try {
-    const response = await fetch(API_URL(`/api/pages/${pageId}`), {
+    const response = await apiFetch(`/api/pages/${pageId}`, {
       method: "DELETE",
     });
     if (!response.ok) {
@@ -57,7 +57,7 @@ export async function deletePage(pageId) {
  */
 export async function bulkDeletePages(pageIds) {
   try {
-    const response = await fetch(API_URL("/api/pages/bulk-delete"), {
+    const response = await apiFetch("/api/pages/bulk-delete", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -84,7 +84,7 @@ export async function bulkDeletePages(pageIds) {
  */
 export async function getPage(id) {
   try {
-    const response = await fetch(API_URL(`/api/pages/${id}`));
+    const response = await apiFetch(`/api/pages/${id}`);
     if (!response.ok) {
       throw new Error("Failed to fetch page");
     }
@@ -108,7 +108,7 @@ export async function getPage(id) {
  */
 export async function updatePage(id, pageData) {
   try {
-    const response = await fetch(API_URL(`/api/pages/${id}`), {
+    const response = await apiFetch(`/api/pages/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -118,6 +118,10 @@ export async function updatePage(id, pageData) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      // Handle express-validator format: { errors: [{msg, param}, ...] }
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
+      }
       throw new Error(errorData.message || errorData.error || "Failed to update page");
     }
 
@@ -141,7 +145,7 @@ export async function updatePage(id, pageData) {
  */
 export async function createPage(pageData) {
   try {
-    const response = await fetch(API_URL("/api/pages"), {
+    const response = await apiFetch("/api/pages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -150,12 +154,19 @@ export async function createPage(pageData) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to create page");
+      const errorData = await response.json();
+      // Handle express-validator format: { errors: [{msg, param}, ...] }
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
+      }
+      throw new Error(errorData.error || "Failed to create page");
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error creating page:", error);
+    if (error.message && !error.message.includes("Failed to fetch")) {
+      throw error;
+    }
     throw new Error("Failed to create page");
   }
 }
@@ -172,7 +183,7 @@ export async function createPage(pageData) {
  */
 export async function savePageContent(pageId, pageData) {
   try {
-    const response = await fetch(API_URL(`/api/pages/${pageId}/content`), {
+    const response = await apiFetch(`/api/pages/${pageId}/content`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -200,7 +211,7 @@ export async function savePageContent(pageId, pageData) {
  */
 export async function duplicatePage(pageId) {
   try {
-    const response = await fetch(API_URL(`/api/pages/${pageId}/duplicate`), {
+    const response = await apiFetch(`/api/pages/${pageId}/duplicate`, {
       method: "POST",
     });
 

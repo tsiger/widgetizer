@@ -103,7 +103,8 @@ The neutral palette for text, backgrounds, and UI chrome.
 ### Font Family
 
 ```css
-font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+font-family:
+  ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 ```
 
 Use Tailwind's `font-sans` class.
@@ -410,13 +411,19 @@ Square buttons for icon-only actions.
 
 ```html
 <!-- Standard label -->
-<label class="block text-sm font-medium text-slate-700 mb-1"> Field Name </label>
+<label class="block text-sm font-medium text-slate-700 mb-1">
+  Field Name
+</label>
 
 <!-- Required field label -->
-<label class="block text-sm font-medium text-slate-700 mb-1"> Field Name <span class="text-pink-500">*</span> </label>
+<label class="block text-sm font-medium text-slate-700 mb-1">
+  Field Name <span class="text-pink-500">*</span>
+</label>
 
 <!-- Optional field label -->
-<label class="block text-sm font-medium text-slate-600 mb-1"> Field Name (optional) </label>
+<label class="block text-sm font-medium text-slate-600 mb-1">
+  Field Name (optional)
+</label>
 ```
 
 #### Help Text & Descriptions
@@ -432,14 +439,20 @@ Square buttons for icon-only actions.
 #### Error Messages
 
 ```html
-<p class="text-sm font-medium bg-pink-50 py-1 px-2 rounded-sm text-pink-600 mt-1">This field is required.</p>
+<p
+  class="text-sm font-medium bg-pink-50 py-1 px-2 rounded-sm text-pink-600 mt-1"
+>
+  This field is required.
+</p>
 ```
 
 #### Complete Form Field Example
 
 ```html
 <div class="space-y-1">
-  <label class="block text-sm font-medium text-slate-700 mb-1"> Page Title <span class="text-pink-500">*</span> </label>
+  <label class="block text-sm font-medium text-slate-700 mb-1">
+    Page Title <span class="text-pink-500">*</span>
+  </label>
   <input
     type="text"
     class="w-full px-3 py-2 
@@ -448,7 +461,9 @@ Square buttons for icon-only actions.
     focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
     placeholder="Enter page title..."
   />
-  <p class="text-sm text-slate-500 mt-1">The title that appears in the browser tab.</p>
+  <p class="text-sm text-slate-500 mt-1">
+    The title that appears in the browser tab.
+  </p>
 </div>
 ```
 
@@ -456,7 +471,11 @@ Square buttons for icon-only actions.
 
 ```html
 <div class="space-y-4">
-  <h3 class="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2 mb-4">Section Title</h3>
+  <h3
+    class="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2 mb-4"
+  >
+    Section Title
+  </h3>
   <!-- Form fields go here -->
 </div>
 ```
@@ -477,7 +496,9 @@ Square buttons for icon-only actions.
 #### Table Container
 
 ```html
-<table class="w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden">
+<table
+  class="w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden"
+>
   <!-- table content -->
 </table>
 ```
@@ -497,13 +518,17 @@ Square buttons for icon-only actions.
 #### Table Body Row
 
 ```html
-<tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors duration-150 group">
+<tr
+  class="border-b border-slate-100 hover:bg-slate-50 transition-colors duration-150 group"
+>
   <td class="py-3 px-4 text-sm">
     <span class="font-medium text-slate-900">Page Name</span>
   </td>
   <td class="py-3 px-4 text-sm text-slate-600">Published</td>
   <td class="py-3 px-4 text-right">
-    <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+    <div
+      class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+    >
       <!-- action buttons -->
     </div>
   </td>
@@ -525,7 +550,9 @@ Square buttons for icon-only actions.
 <div class="w-4 h-4 border border-slate-400 rounded-sm bg-white"></div>
 
 <!-- Checked -->
-<div class="w-4 h-4 border border-pink-500 rounded-sm bg-pink-500 flex items-center justify-center">
+<div
+  class="w-4 h-4 border border-pink-500 rounded-sm bg-pink-500 flex items-center justify-center"
+>
   <svg class="w-3 h-3 text-white"><!-- checkmark icon --></svg>
 </div>
 ```
@@ -561,7 +588,9 @@ Square buttons for icon-only actions.
 #### Structured Card with Header/Footer
 
 ```html
-<div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+<div
+  class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
+>
   <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
     <h3 class="font-medium text-slate-800">Card Title</h3>
   </div>
@@ -704,7 +733,9 @@ Square buttons for icon-only actions.
 #### Modal Overlay
 
 ```html
-<div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+<div
+  class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+>
   <!-- modal content -->
 </div>
 ```
@@ -725,12 +756,22 @@ Square buttons for icon-only actions.
   </div>
 
   <!-- Body (optional) -->
-  <div class="p-4 text-slate-600">Additional context or details about the action.</div>
+  <div class="p-4 text-slate-600">
+    Additional context or details about the action.
+  </div>
 
   <!-- Footer -->
   <div class="p-4 bg-slate-50 flex justify-end gap-2">
-    <button class="px-4 py-2 border border-slate-300 rounded-sm hover:bg-slate-100 text-sm font-medium">Cancel</button>
-    <button class="px-4 py-2 bg-red-600 text-white rounded-sm hover:bg-red-700 text-sm font-medium">Delete</button>
+    <button
+      class="px-4 py-2 border border-slate-300 rounded-sm hover:bg-slate-100 text-sm font-medium"
+    >
+      Cancel
+    </button>
+    <button
+      class="px-4 py-2 bg-red-600 text-white rounded-sm hover:bg-red-700 text-sm font-medium"
+    >
+      Delete
+    </button>
   </div>
 </div>
 ```
@@ -755,7 +796,11 @@ Same structure but with:
     opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0
     transition-all duration-150 pointer-events-none"
   >
-    <div class="px-2 py-1 text-xs text-white bg-black/75 rounded whitespace-nowrap">Tooltip text</div>
+    <div
+      class="px-2 py-1 text-xs text-white bg-black/75 rounded whitespace-nowrap"
+    >
+      Tooltip text
+    </div>
     <div
       class="absolute top-full left-1/2 -translate-x-1/2
       border-l-[6px] border-l-transparent 
@@ -772,7 +817,9 @@ Same structure but with:
 
 ```html
 <div class="p-6 text-center">
-  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
+  <div
+    class="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"
+  ></div>
   <p class="mt-2 text-slate-500">Loading...</p>
 </div>
 ```
@@ -787,7 +834,9 @@ Same structure but with:
     <svg class="w-12 h-12 mx-auto"><!-- icon --></svg>
   </div>
   <h3 class="text-xl font-semibold text-slate-700 mb-2">No pages yet</h3>
-  <p class="text-sm text-slate-500 mb-4">Create your first page to get started.</p>
+  <p class="text-sm text-slate-500 mb-4">
+    Create your first page to get started.
+  </p>
   <button class="...primary button...">Create Page</button>
 </div>
 ```
@@ -799,10 +848,14 @@ Same structure but with:
 ### Sidebar Navigation (Dark Theme)
 
 ```html
-<div class="w-[72px] md:w-48 bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto">
+<div
+  class="w-[72px] md:w-48 bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto"
+>
   <!-- Logo -->
-  <div class="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-4 px-2 md:px-4">
-    <img src="/logo.svg" class="hidden md:block" />
+  <div
+    class="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-4 px-2 md:px-4"
+  >
+    <img src="/logo.svg" class="hidden md:block w-40" />
     <img src="/logo-symbol.svg" class="md:hidden w-12 h-12 mx-auto" />
   </div>
 
@@ -810,7 +863,9 @@ Same structure but with:
   <div class="pb-2 px-2 md:px-4 grow">
     <!-- Section -->
     <div class="border-b border-slate-800 pb-4 mb-4">
-      <h4 class="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">SECTION TITLE</h4>
+      <h4 class="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">
+        SECTION TITLE
+      </h4>
       <ul class="space-y-2 md:space-y-1">
         <!-- Navigation items -->
       </ul>
@@ -833,7 +888,9 @@ Same structure but with:
   border border-slate-700 md:border-none
   hover:bg-slate-800 transition-all duration-150"
 >
-  <span class="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-pink-600">
+  <span
+    class="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-pink-600"
+  >
     <svg><!-- icon --></svg>
   </span>
   <span class="hidden md:inline ml-1 text-sm">Pages</span>
@@ -848,7 +905,9 @@ Same structure but with:
   class="flex items-center justify-center md:justify-start p-2 rounded-sm
   bg-pink-600 border-pink-600 transition-all duration-150"
 >
-  <span class="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-white">
+  <span
+    class="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-white"
+  >
     <svg><!-- icon --></svg>
   </span>
   <span class="hidden md:inline ml-1 text-sm">Pages</span>
@@ -862,7 +921,9 @@ Same structure but with:
   class="flex items-center justify-center md:justify-start p-2 rounded-sm
   opacity-40 cursor-not-allowed"
 >
-  <span class="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-slate-500">
+  <span
+    class="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-slate-500"
+  >
     <svg><!-- icon --></svg>
   </span>
   <span class="hidden md:inline ml-1 text-sm">Pages</span>
@@ -872,7 +933,9 @@ Same structure but with:
 #### Sidebar Badge (Notification)
 
 ```html
-<span class="ml-auto bg-pink-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+<span
+  class="ml-auto bg-pink-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+>
   3
 </span>
 ```
@@ -880,6 +943,12 @@ Same structure but with:
 ---
 
 ### Page Layout
+
+**IMPORTANT:** All pages must follow this consistent structure:
+
+1. Layout component provides outer `p-8 max-w-7xl mx-auto` padding
+2. Page header (title, description, actions) sits OUTSIDE the white container
+3. Main content is wrapped in ONE white container: `bg-white rounded-xl border border-gray-200`
 
 ```html
 <div class="flex h-screen overflow-hidden">
@@ -891,20 +960,24 @@ Same structure but with:
   <!-- Main Content -->
   <main class="flex-1 overflow-auto ml-[72px] md:ml-48 bg-gray-50">
     <div class="p-8 max-w-7xl mx-auto">
-      <!-- Page Header -->
+      <!-- Page Header (OUTSIDE white container) -->
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Page Title</h1>
-          <p class="text-gray-700 mt-1">Optional description text.</p>
+          <h1 class="text-2xl font-bold text-gray-900 tracking-tight">
+            Page Title
+          </h1>
+          <p class="text-slate-500 mt-1">Optional description text.</p>
         </div>
         <div class="flex gap-2 items-center">
-          <!-- Header actions -->
+          <!-- Header actions (buttons) -->
         </div>
       </div>
 
-      <!-- Page Content -->
-      <div class="bg-white rounded-xl border border-gray-200 p-4">
-        <!-- content -->
+      <!-- Page Content (INSIDE white container) -->
+      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <!-- For tables: no padding, table fills container -->
+        <!-- For other content: add p-4 or p-6 -->
+        <!-- For sections: use border-b border-gray-200 dividers -->
       </div>
     </div>
   </main>
@@ -926,7 +999,9 @@ Same structure but with:
   <div class="flex items-center gap-2">
     <!-- Search input with icon -->
     <div class="relative">
-      <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+      <span
+        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
+      >
         <svg><!-- search icon --></svg>
       </span>
       <input type="text" class="form-input pl-10" placeholder="Search..." />

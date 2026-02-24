@@ -1,0 +1,198 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_form": {
+      "type": "contact-form",
+      "settings": {
+        "eyebrow": "Contact",
+        "title": "Start a conversation about your future",
+        "description": "Share a few details and a senior advisor will respond within one business day.",
+        "form_action": "/submit",
+        "form_method": "POST",
+        "show_sidebar": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "input-name": {
+          "type": "input",
+          "settings": {
+            "label": "Name",
+            "name": "name",
+            "input_type": "text",
+            "placeholder": "Your name",
+            "required": true
+          }
+        },
+        "input-email": {
+          "type": "input",
+          "settings": {
+            "label": "Email",
+            "name": "email",
+            "input_type": "email",
+            "placeholder": "you@example.com",
+            "required": true
+          }
+        },
+        "input-phone": {
+          "type": "input",
+          "settings": {
+            "label": "Phone",
+            "name": "phone",
+            "input_type": "tel",
+            "placeholder": "(555) 000-0000",
+            "required": false
+          }
+        },
+        "dropdown-assets": {
+          "type": "dropdown",
+          "settings": {
+            "label": "Investable assets",
+            "name": "assets",
+            "options": "$250K \u2013 $500K\n$500K \u2013 $1M\n$1M \u2013 $5M\n$5M+\nPrefer not to say",
+            "required": true
+          }
+        },
+        "textarea-message": {
+          "type": "textarea",
+          "settings": {
+            "label": "Message",
+            "name": "message",
+            "placeholder": "Tell us about your financial goals and how we can help...",
+            "required": true
+          }
+        },
+        "submit-button": {
+          "type": "submit",
+          "settings": {
+            "text": "Send message"
+          }
+        },
+        "info-email": {
+          "type": "info",
+          "settings": {
+            "title": "Email",
+            "text": "hello@meridianwealth.com"
+          }
+        },
+        "info-phone": {
+          "type": "info",
+          "settings": {
+            "title": "Phone",
+            "text": "+1 (555) 847-3200"
+          }
+        },
+        "info-address": {
+          "type": "info",
+          "settings": {
+            "title": "Office",
+            "text": "200 Park Avenue, Suite 1400\nNew York, NY"
+          }
+        }
+      },
+      "blocksOrder": [
+        "input-name",
+        "input-email",
+        "input-phone",
+        "dropdown-assets",
+        "textarea-message",
+        "submit-button",
+        "info-email",
+        "info-phone",
+        "info-address"
+      ]
+    },
+    "office_hours": {
+      "type": "schedule-table",
+      "settings": {
+        "eyebrow": "Office hours",
+        "title": "When we're available",
+        "description": "",
+        "note": "Evening appointments available upon request",
+        "week_start_day": "1",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "day-mon": {
+          "type": "day",
+          "settings": {
+            "day": "Monday",
+            "hours": "8:30 AM \u2013 5:30 PM",
+            "closed": false
+          }
+        },
+        "day-tue": {
+          "type": "day",
+          "settings": {
+            "day": "Tuesday",
+            "hours": "8:30 AM \u2013 5:30 PM",
+            "closed": false
+          }
+        },
+        "day-wed": {
+          "type": "day",
+          "settings": {
+            "day": "Wednesday",
+            "hours": "8:30 AM \u2013 5:30 PM",
+            "closed": false
+          }
+        },
+        "day-thu": {
+          "type": "day",
+          "settings": {
+            "day": "Thursday",
+            "hours": "8:30 AM \u2013 5:30 PM",
+            "closed": false
+          }
+        },
+        "day-fri": {
+          "type": "day",
+          "settings": {
+            "day": "Friday",
+            "hours": "8:30 AM \u2013 5:30 PM",
+            "closed": false
+          }
+        },
+        "day-sat": {
+          "type": "day",
+          "settings": {
+            "day": "Saturday",
+            "hours": "By appointment",
+            "closed": false
+          }
+        },
+        "day-sun": {
+          "type": "day",
+          "settings": {
+            "day": "Sunday",
+            "hours": "Closed",
+            "closed": true
+          }
+        }
+      },
+      "blocksOrder": ["day-mon", "day-tue", "day-wed", "day-thu", "day-fri", "day-sat", "day-sun"]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Location",
+        "title": "Visit our office",
+        "description": "Located in Midtown Manhattan, steps from Grand Central Terminal.",
+        "address": "200 Park Avenue, Suite 1400, New York, NY 10166",
+        "directions_link": {
+          "text": "Get directions",
+          "href": "https://maps.google.com/?q=200+Park+Avenue+New+York+NY+10166",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "color_scheme": "standard"
+      }
+    }
+  },
+  "widgetsOrder": ["contact_form", "office_hours", "contact_map"],
+  "id": "contact",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

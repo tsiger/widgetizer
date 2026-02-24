@@ -5,11 +5,13 @@
 
 import fs from "fs-extra";
 import path from "path";
+import { randomUUID } from "crypto";
 import { getProjectDir, getProjectThemeJsonPath } from "../config.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
-import { readProjectsFile } from "../controllers/projectController.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
 import { getThemeSourceDir } from "../controllers/themeController.js";
 import { isNewerVersion } from "../utils/semver.js";
+import { processTemplatesRecursive } from "../utils/templateHelpers.js";
 
 /**
  * Updatable paths - these are copied from theme to project during updates.
@@ -24,10 +26,8 @@ const UPDATABLE_PATHS = ["layout.liquid", "assets", "widgets", "snippets", "scre
  * @returns {Promise<{hasUpdate: boolean, currentVersion: string, latestVersion: string}>} Update availability status
  * @throws {Error} If project not found
  */
-export async function checkForUpdates(projectId) {
-  // Read projects file to get project info
-  const data = await readProjectsFile();
-  const project = data.projects.find((p) => p.id === projectId);
+export async function checkForUpdates(projectId, userId = "local") {
+  const project = projectRepo.getProjectById(projectId, userId);
 
   if (!project) {
     throw new Error(`Project not found: ${projectId}`);
@@ -38,7 +38,7 @@ export async function checkForUpdates(projectId) {
 
   // Get the theme's current source version (from latest/ or base theme.json)
   // This is the version that was last built/published, NOT all available versions
-  const themeSourceDir = await getThemeSourceDir(themeName);
+  const themeSourceDir = await getThemeSourceDir(themeName, userId);
   const themeJsonPath = path.join(themeSourceDir, "theme.json");
 
   let sourceVersion = null;
@@ -176,21 +176,18 @@ function mergeSettingsArray(userArray, newArray) {
  * @returns {Promise<{success: boolean, previousVersion: string, newVersion: string, message?: string}>} Update result
  * @throws {Error} If project not found
  */
-export async function applyThemeUpdate(projectId) {
-  // Read projects file to get project info
-  const data = await readProjectsFile();
-  const projectIndex = data.projects.findIndex((p) => p.id === projectId);
+export async function applyThemeUpdate(projectId, userId) {
+  const project = projectRepo.getProjectById(projectId, userId);
 
-  if (projectIndex === -1) {
+  if (!project) {
     throw new Error(`Project not found: ${projectId}`);
   }
 
-  const project = data.projects[projectIndex];
   const themeName = project.theme;
   const previousVersion = project.themeVersion;
 
   // Check if update is available
-  const updateStatus = await checkForUpdates(projectId);
+  const updateStatus = await checkForUpdates(projectId, userId);
   if (!updateStatus.hasUpdate) {
     return {
       success: false,
@@ -200,11 +197,11 @@ export async function applyThemeUpdate(projectId) {
     };
   }
 
-  const projectFolderName = await getProjectFolderName(projectId);
-  const projectDir = getProjectDir(projectFolderName);
+  const projectFolderName = await getProjectFolderName(projectId, userId);
+  const projectDir = getProjectDir(projectFolderName, userId);
 
   // Get theme source directory (latest/ if exists, otherwise root)
-  const themeSourceDir = await getThemeSourceDir(themeName);
+  const themeSourceDir = await getThemeSourceDir(themeName, userId);
 
   console.log(
     `[applyThemeUpdate] Updating project ${projectId} from ${previousVersion} to ${updateStatus.latestVersion}`,
@@ -256,6 +253,7 @@ export async function applyThemeUpdate(projectId) {
           const enrichedMenu = {
             ...menuContent,
             id: menuSlug,
+            uuid: menuContent.uuid || randomUUID(),
             created: new Date().toISOString(),
             updated: new Date().toISOString(),
           };
@@ -274,50 +272,25 @@ export async function applyThemeUpdate(projectId) {
     const themeTemplatesDir = path.join(themeSourceDir, "templates");
     const projectPagesDir = path.join(projectDir, "pages");
 
-    // Recursively process templates
-    async function addNewTemplatesRecursive(sourceDir, targetDir) {
-      if (!(await fs.pathExists(sourceDir))) return;
-
-      await fs.ensureDir(targetDir);
-      const entries = await fs.readdir(sourceDir, { withFileTypes: true });
-
-      for (const entry of entries) {
-        const sourcePath = path.join(sourceDir, entry.name);
-        const targetPath = path.join(targetDir, entry.name);
-
-        if (entry.isDirectory()) {
-          await addNewTemplatesRecursive(sourcePath, targetPath);
-        } else if (entry.isFile() && entry.name.endsWith(".json")) {
-          const templateContent = await fs.readJson(sourcePath);
-          const templateSlug = templateContent.slug || path.basename(entry.name, ".json");
-          const targetFilename = `${templateSlug}.json`;
-          const targetPathWithSlug = path.join(targetDir, targetFilename);
-
-          // Only add if it doesn't exist in project (preserve user pages)
-          if (!(await fs.pathExists(targetPathWithSlug))) {
-            const newPage = {
-              ...templateContent,
-              id: templateSlug,
-              slug: templateSlug,
-              created: new Date().toISOString(),
-              updated: new Date().toISOString(),
-            };
-
-            await fs.writeJson(targetPathWithSlug, newPage, { spaces: 2 });
-            console.log(`[applyThemeUpdate] Added new page from template: ${templateSlug}`);
-          }
-        }
-      }
-    }
-
-    await addNewTemplatesRecursive(themeTemplatesDir, projectPagesDir);
+    await processTemplatesRecursive(themeTemplatesDir, projectPagesDir, async (template, slug, targetPath) => {
+      if (await fs.pathExists(targetPath)) return;
+      const newPage = {
+        ...template,
+        id: slug,
+        slug,
+        created: new Date().toISOString(),
+        updated: new Date().toISOString(),
+      };
+      await fs.writeJson(targetPath, newPage, { spaces: 2 });
+      console.log(`[applyThemeUpdate] Added new page from template: ${slug}`);
+    });
   } catch (error) {
     console.warn(`[applyThemeUpdate] Failed to add new templates: ${error.message}`);
   }
 
   // 3. Merge theme.json
   try {
-    const projectThemeJsonPath = getProjectThemeJsonPath(projectFolderName);
+    const projectThemeJsonPath = getProjectThemeJsonPath(projectFolderName, userId);
     const newThemeJsonPath = path.join(themeSourceDir, "theme.json");
 
     const userThemeJson = await fs.readJson(projectThemeJsonPath);
@@ -333,15 +306,12 @@ export async function applyThemeUpdate(projectId) {
   }
 
   // 4. Update project metadata
-  const { writeProjectsFile } = await import("../controllers/projectController.js");
-  data.projects[projectIndex] = {
-    ...project,
+  projectRepo.updateProject(projectId, {
     themeVersion: updateStatus.latestVersion,
     lastThemeUpdateAt: new Date().toISOString(),
     lastThemeUpdateVersion: updateStatus.latestVersion,
     updated: new Date().toISOString(),
-  };
-  await writeProjectsFile(data);
+  }, userId);
 
   console.log(`[applyThemeUpdate] Successfully updated project ${projectId} to version ${updateStatus.latestVersion}`);
 
@@ -360,21 +330,17 @@ export async function applyThemeUpdate(projectId) {
  * @returns {Promise<{success: boolean, receiveThemeUpdates: boolean}>} Result with new flag value
  * @throws {Error} If project not found
  */
-export async function toggleThemeUpdates(projectId, enabled) {
-  const data = await readProjectsFile();
-  const projectIndex = data.projects.findIndex((p) => p.id === projectId);
+export async function toggleThemeUpdates(projectId, enabled, userId = "local") {
+  const project = projectRepo.getProjectById(projectId, userId);
 
-  if (projectIndex === -1) {
+  if (!project) {
     throw new Error(`Project not found: ${projectId}`);
   }
 
-  const { writeProjectsFile } = await import("../controllers/projectController.js");
-  data.projects[projectIndex] = {
-    ...data.projects[projectIndex],
+  projectRepo.updateProject(projectId, {
     receiveThemeUpdates: enabled,
     updated: new Date().toISOString(),
-  };
-  await writeProjectsFile(data);
+  }, userId);
 
   return {
     success: true,

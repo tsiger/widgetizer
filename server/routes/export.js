@@ -1,7 +1,9 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import { PUBLISH_DIR } from "../config.js";
+import { getUserPublishDir } from "../config.js";
+import { getContentType } from "../utils/mimeTypes.js";
+import { isWithinDirectory } from "../utils/pathSecurity.js";
 import {
   exportProject,
   getExportHistory,
@@ -9,8 +11,10 @@ import {
   getExportFiles,
   downloadExport,
 } from "../controllers/exportController.js";
+import { standardJsonParser } from "../middleware/jsonParser.js";
 
 const router = express.Router();
+router.use(standardJsonParser);
 
 // Route to trigger the exporting process for a project
 // POST /api/export/:projectId
@@ -62,13 +66,14 @@ function serveExportFile(req, res) {
     const { exportDir } = req.params;
     const requestedPath = normalizeExportPath(req.params.filePath ?? req.params[0]);
 
-    const fullPath = path.join(PUBLISH_DIR, exportDir, requestedPath);
+    const userPublishDir = getUserPublishDir(req.userId);
+    const fullPath = path.join(userPublishDir, exportDir, requestedPath);
 
     // Security check: ensure the path is within the publish directory
     const resolvedPath = path.resolve(fullPath);
-    const publishPath = path.resolve(PUBLISH_DIR);
+    const publishPath = path.resolve(userPublishDir);
 
-    if (!resolvedPath.startsWith(publishPath)) {
+    if (!isWithinDirectory(resolvedPath, publishPath)) {
       console.error(`Security check failed: ${resolvedPath} not within ${publishPath}`);
       return res.status(403).json({ error: "Access denied" });
     }
@@ -86,7 +91,7 @@ function serveExportFile(req, res) {
       const indexPath = path.join(resolvedPath, "index.html");
       if (fs.existsSync(indexPath)) {
         const resolvedIndexPath = path.resolve(indexPath);
-        if (!resolvedIndexPath.startsWith(publishPath)) {
+        if (!isWithinDirectory(resolvedIndexPath, publishPath)) {
           return res.status(403).json({ error: "Access denied" });
         }
         return res.sendFile(resolvedIndexPath);
@@ -96,25 +101,7 @@ function serveExportFile(req, res) {
 
     // Determine content type
     const ext = path.extname(resolvedPath).toLowerCase();
-    const contentTypes = {
-      ".html": "text/html",
-      ".css": "text/css",
-      ".js": "application/javascript",
-      ".png": "image/png",
-      ".jpg": "image/jpeg",
-      ".jpeg": "image/jpeg",
-      ".gif": "image/gif",
-      ".svg": "image/svg+xml",
-      ".webp": "image/webp",
-      ".mp4": "video/mp4",
-      ".woff": "font/woff",
-      ".woff2": "font/woff2",
-      ".ttf": "font/ttf",
-      ".eot": "application/vnd.ms-fontobject",
-    };
-
-    const contentType = contentTypes[ext] || "application/octet-stream";
-    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Type", getContentType(ext));
 
     // Use sendFile instead of manual streaming for better error handling
     res.sendFile(resolvedPath, (err) => {

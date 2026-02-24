@@ -51,7 +51,7 @@ const {
   getProjectPagesDir,
 } = await import("../config.js");
 
-const { writeProjectsFile } = await import("../controllers/projectController.js");
+const projectRepo = await import("../db/repositories/projectRepository.js");
 
 const {
   ensureThemesDirectory,
@@ -59,7 +59,6 @@ const {
   getThemeSourceDir,
   getThemeLatestVersion,
   buildLatestSnapshot,
-  themeHasUpdates,
   getAllThemes,
   getTheme,
   getThemeWidgets,
@@ -77,6 +76,7 @@ const {
   resolvePresetPaths,
   getThemePresets,
 } = await import("../controllers/themeController.js");
+const { closeDb } = await import("../db/index.js");
 
 // Lazy-load AdmZip for building test zip files
 let AdmZip;
@@ -90,6 +90,7 @@ function mockReq({ params = {}, body = {}, file = null } = {}) {
     params,
     body,
     file,
+    userId: "local",
     [Symbol.for("express-validator#contexts")]: [],
   };
 }
@@ -203,7 +204,16 @@ function buildThemeZip(themeName, opts = {}) {
     zip.addFile(`${themeName}/${filePath}`, Buffer.from(content));
   }
 
-  return zip.toBuffer();
+  const buf = zip.toBuffer();
+  return zipBufferToTempFile(buf);
+}
+
+/** Write a ZIP buffer to a temp file and return a multer-like file descriptor */
+function zipBufferToTempFile(buf) {
+  const tmpPath = path.join(TEST_DATA_DIR, "temp", `test-theme-${Date.now()}-${Math.random().toString(36).slice(2)}.zip`);
+  fs.ensureDirSync(path.dirname(tmpPath));
+  fs.writeFileSync(tmpPath, buf);
+  return { path: tmpPath, size: buf.length };
 }
 
 // ============================================================================
@@ -218,7 +228,7 @@ before(async () => {
   await fs.ensureDir(TEST_DATA_DIR);
 
   // projects.json with a project using a specific theme
-  await writeProjectsFile({
+  await projectRepo.writeProjectsData({
     projects: [
       {
         id: "theme-test-project-uuid",
@@ -233,11 +243,11 @@ before(async () => {
   });
 
   // Create project dir with theme.json for readProjectThemeData tests
-  const projDir = getProjectDir("theme-test-project");
+  const projDir = getProjectDir("theme-test-project", "local");
   await fs.ensureDir(projDir);
-  await fs.ensureDir(getProjectPagesDir("theme-test-project"));
+  await fs.ensureDir(getProjectPagesDir("theme-test-project", "local"));
   await fs.outputFile(
-    getProjectThemeJsonPath("theme-test-project"),
+    getProjectThemeJsonPath("theme-test-project", "local"),
     JSON.stringify({ settings: { global: { colors: [{ id: "primary", value: "#ff0000" }] } } }, null, 2),
   );
 });
@@ -246,6 +256,7 @@ after(async () => {
   console.log = _origLog;
   console.warn = _origWarn;
   console.error = _origError;
+  closeDb();
   await fs.remove(TEST_ROOT);
 });
 
@@ -414,27 +425,6 @@ describe("getThemeSourceDir", () => {
     const sourceDir = await getThemeSourceDir(theme);
     assert.equal(sourceDir, latestDir);
 
-    await fs.remove(getThemeDir(theme));
-  });
-});
-
-describe("themeHasUpdates", () => {
-  it("returns true when more than one version exists", async () => {
-    const theme = "multi-ver-theme";
-    await createThemeOnDisk(theme, { version: "1.0.0" });
-    const updDir = getThemeVersionDir(theme, "1.1.0");
-    await fs.ensureDir(updDir);
-    await fs.writeFile(path.join(updDir, "theme.json"), JSON.stringify({ version: "1.1.0" }));
-
-    assert.equal(await themeHasUpdates(theme), true);
-    await fs.remove(getThemeDir(theme));
-  });
-
-  it("returns false when only base version exists", async () => {
-    const theme = "base-only-theme";
-    await createThemeOnDisk(theme, { version: "1.0.0" });
-
-    assert.equal(await themeHasUpdates(theme), false);
     await fs.remove(getThemeDir(theme));
   });
 });
@@ -763,7 +753,7 @@ describe("uploadTheme validation", () => {
   it("returns 400 for empty zip", async () => {
     const zip = new AdmZip.default();
     const res = await callController(uploadTheme, {
-      file: { buffer: zip.toBuffer() },
+      file: zipBufferToTempFile(zip.toBuffer()),
     });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("empty"));
@@ -779,7 +769,7 @@ describe("uploadTheme validation", () => {
     zip.addFile("my-theme/widgets/hero/schema.json", Buffer.from("{}"));
 
     const res = await callController(uploadTheme, {
-      file: { buffer: zip.toBuffer() },
+      file: zipBufferToTempFile(zip.toBuffer()),
     });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("theme.json"));
@@ -787,35 +777,35 @@ describe("uploadTheme validation", () => {
 
   it("returns 400 when screenshot.png is missing", async () => {
     const buffer = buildThemeZip("no-screenshot", { includeScreenshot: false });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("screenshot.png"));
   });
 
   it("returns 400 when layout.liquid is missing", async () => {
     const buffer = buildThemeZip("no-layout", { includeLayout: false });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("layout.liquid"));
   });
 
   it("returns 400 when assets/ directory is missing", async () => {
     const buffer = buildThemeZip("no-assets", { includeAssets: false });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("assets"));
   });
 
   it("returns 400 when templates/ directory is missing", async () => {
     const buffer = buildThemeZip("no-templates", { includeTemplates: false });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("templates"));
   });
 
   it("returns 400 when widgets/ directory is missing", async () => {
     const buffer = buildThemeZip("no-widgets", { includeWidgets: false });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("widgets"));
   });
@@ -829,7 +819,7 @@ describe("uploadTheme validation", () => {
     zip.addFile("bad-json-theme/templates/h.json", Buffer.from("{}"));
     zip.addFile("bad-json-theme/widgets/w/s.json", Buffer.from("{}"));
 
-    const res = await callController(uploadTheme, { file: { buffer: zip.toBuffer() } });
+    const res = await callController(uploadTheme, { file: zipBufferToTempFile(zip.toBuffer()) });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("parse JSON"));
   });
@@ -838,7 +828,7 @@ describe("uploadTheme validation", () => {
     const buffer = buildThemeZip("missing-fields", {
       themeJsonOverride: { version: "1.0.0" }, // missing name and author
     });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("Missing required fields"));
     assert.ok(res._json.message.includes("name"));
@@ -847,7 +837,7 @@ describe("uploadTheme validation", () => {
 
   it("returns 400 for invalid semver version", async () => {
     const buffer = buildThemeZip("bad-version", { version: "not-a-version" });
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("Invalid version format"));
   });
@@ -857,7 +847,7 @@ describe("uploadTheme validation", () => {
     zip.addFile("theme.json", Buffer.from(JSON.stringify({ name: "test", version: "1.0.0", author: "a" })));
     zip.addFile("layout.liquid", Buffer.from("<html></html>"));
 
-    const res = await callController(uploadTheme, { file: { buffer: zip.toBuffer() } });
+    const res = await callController(uploadTheme, { file: zipBufferToTempFile(zip.toBuffer()) });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("structure is invalid") || res._json.message.includes("root folder"));
   });
@@ -879,7 +869,7 @@ describe("uploadTheme update validation", () => {
     zip.addFile(`${n}/widgets/w/s.json`, Buffer.from("{}"));
     zip.addFile(`${n}/updates/bad-name/theme.json`, Buffer.from(JSON.stringify({ version: "bad-name" })));
 
-    const res = await callController(uploadTheme, { file: { buffer: zip.toBuffer() } });
+    const res = await callController(uploadTheme, { file: zipBufferToTempFile(zip.toBuffer()) });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("Invalid update folder name"));
   });
@@ -896,7 +886,7 @@ describe("uploadTheme update validation", () => {
     // Update folder with no theme.json
     zip.addFile(`${n}/updates/1.1.0/assets/new.css`, Buffer.from(""));
 
-    const res = await callController(uploadTheme, { file: { buffer: zip.toBuffer() } });
+    const res = await callController(uploadTheme, { file: zipBufferToTempFile(zip.toBuffer()) });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("missing required theme.json"));
   });
@@ -907,7 +897,7 @@ describe("uploadTheme update validation", () => {
       updates: [{ version: "1.1.0", themeJsonVersion: "9.9.9" }],
     });
 
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 400);
     assert.ok(res._json.message.includes("version mismatch"));
   });
@@ -932,7 +922,7 @@ describe("uploadTheme — new theme", () => {
       author: "Test Author",
     });
 
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 201, `Expected 201, got ${res._status}: ${JSON.stringify(res._json)}`);
     assert.ok(res._json.message.includes("installed"));
     assert.equal(res._json.theme.id, "fresh-theme");
@@ -944,7 +934,7 @@ describe("uploadTheme — new theme", () => {
 
   it("creates theme directory with all required files", async () => {
     const buffer = buildThemeZip("fresh-theme");
-    await callController(uploadTheme, { file: { buffer } });
+    await callController(uploadTheme, { file: buffer });
 
     const themeDir = getThemeDir("fresh-theme");
     assert.ok(await fs.pathExists(path.join(themeDir, "theme.json")));
@@ -961,7 +951,7 @@ describe("uploadTheme — new theme", () => {
       updates: [{ version: "1.1.0", files: { "assets/new.css": "new style" } }],
     });
 
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 201);
     assert.ok(res._json.theme.versions.includes("1.0.0"));
     assert.ok(res._json.theme.versions.includes("1.1.0"));
@@ -972,11 +962,12 @@ describe("uploadTheme — new theme", () => {
   });
 
   it("returns 409 when theme is already installed and up to date", async () => {
-    const buffer = buildThemeZip("fresh-theme", { version: "1.0.0" });
-    await callController(uploadTheme, { file: { buffer } });
+    const firstUpload = buildThemeZip("fresh-theme", { version: "1.0.0" });
+    await callController(uploadTheme, { file: firstUpload });
 
-    // Upload again — same version, no new updates
-    const res = await callController(uploadTheme, { file: { buffer } });
+    // Upload again — same version, no new updates (need a new temp file)
+    const secondUpload = buildThemeZip("fresh-theme", { version: "1.0.0" });
+    const res = await callController(uploadTheme, { file: secondUpload });
     assert.equal(res._status, 409);
     assert.ok(res._json.message.includes("already up to date"));
   });
@@ -992,7 +983,7 @@ describe("uploadTheme — theme update", () => {
   before(async () => {
     // Install the base theme first
     const buffer = buildThemeZip(EXISTING_THEME, { version: "1.0.0" });
-    await callController(uploadTheme, { file: { buffer } });
+    await callController(uploadTheme, { file: buffer });
   });
 
   after(async () => {
@@ -1005,7 +996,7 @@ describe("uploadTheme — theme update", () => {
       updates: [{ version: "1.1.0", files: { "assets/patch.css": "patched" } }],
     });
 
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 201);
     assert.ok(res._json.theme.isUpdate);
     assert.deepEqual(res._json.theme.addedVersions, ["1.1.0"]);
@@ -1018,7 +1009,7 @@ describe("uploadTheme — theme update", () => {
       updates: [{ version: "2.1.0" }],
     });
 
-    const res = await callController(uploadTheme, { file: { buffer } });
+    const res = await callController(uploadTheme, { file: buffer });
     assert.equal(res._status, 409);
     assert.ok(res._json.message.includes("base version"));
   });
@@ -1074,14 +1065,14 @@ describe("copyThemeToProject", () => {
 
 describe("readProjectThemeData", () => {
   it("reads theme.json from project directory", async () => {
-    const data = await readProjectThemeData("theme-test-project-uuid");
+    const data = await readProjectThemeData("theme-test-project-uuid", "local");
     assert.ok(data.settings);
     assert.ok(data.settings.global);
   });
 
   it("throws for nonexistent project", async () => {
     await assert.rejects(
-      () => readProjectThemeData("nonexistent-uuid"),
+      () => readProjectThemeData("nonexistent-uuid", "local"),
       (err) => err.message.includes("not found"),
     );
   });
@@ -1108,7 +1099,7 @@ describe("saveProjectThemeSettings", () => {
     assert.ok(res._json.message.includes("saved"));
 
     // Verify persisted
-    const saved = await readProjectThemeData("theme-test-project-uuid");
+    const saved = await readProjectThemeData("theme-test-project-uuid", "local");
     assert.equal(saved.settings.global.colors[0].id, "bg");
   });
 });
@@ -1371,17 +1362,20 @@ describe("copyThemeToProject excludes presets", () => {
 });
 
 // ============================================================================
-// buildLatestSnapshot excludes presets
+// buildLatestSnapshot includes presets
 // ============================================================================
 
-describe("buildLatestSnapshot excludes presets", () => {
-  it("excludes presets/ directory from snapshot", async () => {
+describe("buildLatestSnapshot includes presets", () => {
+  it("includes presets/ directory in snapshot", async () => {
     const presetSnapTheme = "preset-snap-theme";
     await createThemeOnDisk(presetSnapTheme, { version: "1.0.0" });
 
     const presetsDir = path.join(getThemeDir(presetSnapTheme), "presets");
     await fs.ensureDir(presetsDir);
-    await fs.outputFile(path.join(presetsDir, "presets.json"), "{}");
+    await fs.outputJson(path.join(presetsDir, "presets.json"), {
+      default: "default",
+      presets: [{ id: "default", name: "Default" }],
+    });
 
     const v110 = getThemeVersionDir(presetSnapTheme, "1.1.0");
     await fs.ensureDir(v110);
@@ -1390,8 +1384,142 @@ describe("buildLatestSnapshot excludes presets", () => {
     await buildLatestSnapshot(presetSnapTheme);
 
     const latestDir = getThemeLatestDir(presetSnapTheme);
-    assert.ok(!(await fs.pathExists(path.join(latestDir, "presets"))));
+    assert.ok(await fs.pathExists(path.join(latestDir, "presets")));
+    assert.ok(await fs.pathExists(path.join(latestDir, "presets", "presets.json")));
 
     await fs.remove(getThemeDir(presetSnapTheme));
+  });
+
+  it("layers update presets on top of base presets", async () => {
+    const presetLayerTheme = "preset-layer-theme";
+    await createThemeOnDisk(presetLayerTheme, { version: "1.0.0" });
+
+    // Base has one preset
+    const basePresetsDir = path.join(getThemeDir(presetLayerTheme), "presets");
+    await fs.ensureDir(path.join(basePresetsDir, "default"));
+    await fs.outputJson(path.join(basePresetsDir, "presets.json"), {
+      default: "default",
+      presets: [{ id: "default", name: "Default" }],
+    });
+    await fs.outputJson(path.join(basePresetsDir, "default", "preset.json"), { settings: {} });
+
+    // Update v1.1.0 adds a new preset
+    const v110 = getThemeVersionDir(presetLayerTheme, "1.1.0");
+    await fs.ensureDir(v110);
+    await fs.writeFile(path.join(v110, "theme.json"), JSON.stringify({ name: presetLayerTheme, version: "1.1.0" }));
+    const updatePresetsDir = path.join(v110, "presets");
+    await fs.ensureDir(path.join(updatePresetsDir, "financial"));
+    await fs.outputJson(path.join(updatePresetsDir, "presets.json"), {
+      default: "default",
+      presets: [{ id: "default", name: "Default" }, { id: "financial", name: "Financial" }],
+    });
+    await fs.outputJson(path.join(updatePresetsDir, "financial", "preset.json"), { settings: { accent: "#gold" } });
+
+    await buildLatestSnapshot(presetLayerTheme);
+
+    const latestDir = getThemeLatestDir(presetLayerTheme);
+    // Both presets should exist in latest/
+    assert.ok(await fs.pathExists(path.join(latestDir, "presets", "default", "preset.json")));
+    assert.ok(await fs.pathExists(path.join(latestDir, "presets", "financial", "preset.json")));
+    // presets.json should be the updated version (with both presets)
+    const presetsData = await fs.readJson(path.join(latestDir, "presets", "presets.json"));
+    assert.equal(presetsData.presets.length, 2);
+    assert.equal(presetsData.presets[1].id, "financial");
+
+    await fs.remove(getThemeDir(presetLayerTheme));
+  });
+});
+
+// ============================================================================
+// Presets read from source dir (latest/ when available)
+// ============================================================================
+
+describe("resolvePresetPaths reads from source dir", () => {
+  const SRC_THEME = "preset-source-dir-theme";
+
+  before(async () => {
+    // Create theme with base version 1.0.0 (no presets in root)
+    await createThemeOnDisk(SRC_THEME, { version: "1.0.0" });
+
+    // Add update v1.1.0 that introduces presets
+    const v110 = getThemeVersionDir(SRC_THEME, "1.1.0");
+    await fs.ensureDir(v110);
+    await fs.writeFile(path.join(v110, "theme.json"), JSON.stringify({ name: SRC_THEME, version: "1.1.0" }));
+    const updatePresetsDir = path.join(v110, "presets");
+    await fs.ensureDir(path.join(updatePresetsDir, "fancy"));
+    await fs.ensureDir(path.join(updatePresetsDir, "fancy", "templates"));
+    await fs.outputJson(path.join(updatePresetsDir, "fancy", "templates", "index.json"), { id: "index", name: "Home", slug: "index" });
+    await fs.ensureDir(path.join(updatePresetsDir, "fancy", "menus"));
+    await fs.outputJson(path.join(updatePresetsDir, "fancy", "menus", "main-menu.json"), { id: "main-menu", items: [] });
+    await fs.outputJson(path.join(updatePresetsDir, "fancy", "preset.json"), { settings: { standard_accent: "#ff0000" } });
+    await fs.outputJson(path.join(updatePresetsDir, "presets.json"), {
+      default: "default",
+      presets: [{ id: "default", name: "Default" }, { id: "fancy", name: "Fancy" }],
+    });
+
+    // Build latest/ so source dir points there
+    await buildLatestSnapshot(SRC_THEME);
+  });
+
+  after(async () => {
+    await fs.remove(getThemeDir(SRC_THEME));
+  });
+
+  it("resolves preset paths from latest/ directory", async () => {
+    const result = await resolvePresetPaths(SRC_THEME, "fancy");
+    const latestDir = getThemeLatestDir(SRC_THEME);
+    assert.equal(result.templatesDir, path.join(latestDir, "presets", "fancy", "templates"));
+    assert.equal(result.menusDir, path.join(latestDir, "presets", "fancy", "menus"));
+    assert.deepEqual(result.settingsOverrides, { standard_accent: "#ff0000" });
+  });
+
+  it("falls back to root templates from latest/ when preset has no templates", async () => {
+    // Add a settings-only preset to latest/
+    const latestDir = getThemeLatestDir(SRC_THEME);
+    const minimalDir = path.join(latestDir, "presets", "minimal");
+    await fs.ensureDir(minimalDir);
+    await fs.outputJson(path.join(minimalDir, "preset.json"), { settings: { standard_accent: "#000" } });
+
+    const result = await resolvePresetPaths(SRC_THEME, "minimal");
+    assert.equal(result.templatesDir, path.join(latestDir, "templates"));
+    assert.equal(result.menusDir, null);
+    assert.deepEqual(result.settingsOverrides, { standard_accent: "#000" });
+
+    await fs.remove(minimalDir);
+  });
+});
+
+describe("getThemePresets reads from source dir", () => {
+  const PRESETS_SRC_THEME = "presets-source-api-theme";
+
+  before(async () => {
+    await createThemeOnDisk(PRESETS_SRC_THEME, { version: "1.0.0" });
+
+    // No presets in root — only via update
+    const v110 = getThemeVersionDir(PRESETS_SRC_THEME, "1.1.0");
+    await fs.ensureDir(v110);
+    await fs.writeFile(path.join(v110, "theme.json"), JSON.stringify({ name: PRESETS_SRC_THEME, version: "1.1.0" }));
+    const updatePresetsDir = path.join(v110, "presets");
+    await fs.ensureDir(path.join(updatePresetsDir, "studio"));
+    await fs.outputJson(path.join(updatePresetsDir, "presets.json"), {
+      default: "default",
+      presets: [{ id: "default", name: "Default" }, { id: "studio", name: "Studio" }],
+    });
+
+    await buildLatestSnapshot(PRESETS_SRC_THEME);
+  });
+
+  after(async () => {
+    await fs.remove(getThemeDir(PRESETS_SRC_THEME));
+  });
+
+  it("returns presets from latest/ via API", async () => {
+    const res = mockRes();
+    await getThemePresets(mockReq({ params: { id: PRESETS_SRC_THEME } }), res);
+    const data = res._json;
+    assert.equal(data.presets.length, 2);
+    assert.equal(data.presets[0].id, "default");
+    assert.equal(data.presets[1].id, "studio");
+    assert.equal(data.default, "default");
   });
 });

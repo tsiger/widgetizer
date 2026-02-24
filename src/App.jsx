@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
@@ -21,6 +22,8 @@ import ProjectsEdit from "./pages/ProjectsEdit";
 import MenuStructure from "./pages/MenuStructure";
 import ToastContainer from "./components/ui/ToastContainer";
 import RequireActiveProject from "./components/layout/RequireActiveProject";
+import useProjectStore from "./stores/projectStore";
+import { HOSTED_MODE } from "./config";
 import "./i18n";
 import LanguageInitializer from "./components/layout/LanguageInitializer";
 
@@ -127,6 +130,14 @@ function AppWithToast() {
 }
 
 function App() {
+  // In open-source mode, bootstrap the project store on mount.
+  // In hosted mode, AuthGuard.jsx handles this after Clerk confirms sign-in.
+  useEffect(() => {
+    if (!HOSTED_MODE) {
+      useProjectStore.getState().fetchActiveProject();
+    }
+  }, []);
+
   return <AppWithToast />;
 }
 

@@ -359,7 +359,7 @@ Contains data from the current page's JSON file:
 
 #### Project Object (`{{ project.* }}`)
 
-Contains data from the main `projects.json` file:
+Contains project metadata resolved from the SQLite-backed project store:
 
 ```liquid
 {{ project.id }}          <!-- Project ID -->

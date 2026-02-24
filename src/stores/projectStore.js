@@ -36,7 +36,10 @@ const useProjectStore = create((set) => ({
   setActiveProject: (project) => set({ activeProject: project }),
 }));
 
-// Just do the initial fetch when the store is created
-useProjectStore.getState().fetchActiveProject();
+// NOTE: Do NOT call fetchActiveProject() here at module load time.
+// In hosted mode, Clerk auth may not be ready yet, causing a 401.
+// Instead, the fetch is triggered from:
+//   - AuthGuard.jsx (hosted mode — after Clerk confirms sign-in)
+//   - App.jsx (open-source mode — on mount)
 
 export default useProjectStore;

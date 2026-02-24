@@ -1,4 +1,4 @@
-import { API_URL } from "../config";
+import { apiFetch } from "../lib/apiFetch";
 
 /**
  * @typedef {Object} Project
@@ -27,7 +27,7 @@ import { API_URL } from "../config";
  */
 export async function getAllProjects() {
   try {
-    const response = await fetch(API_URL("/api/projects"));
+    const response = await apiFetch("/api/projects");
     if (!response.ok) {
       throw new Error("Failed to fetch projects");
     }
@@ -44,7 +44,7 @@ export async function getAllProjects() {
  */
 export async function getActiveProject() {
   try {
-    const response = await fetch(API_URL("/api/projects/active"));
+    const response = await apiFetch("/api/projects/active");
     if (!response.ok) {
       throw new Error("Failed to fetch active project");
     }
@@ -65,7 +65,7 @@ export async function getActiveProject() {
  */
 export async function createProject(projectData) {
   try {
-    const response = await fetch(API_URL("/api/projects"), {
+    const response = await apiFetch("/api/projects", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -75,6 +75,10 @@ export async function createProject(projectData) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      // Handle express-validator format: { errors: [{msg, param}, ...] }
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
+      }
       throw new Error(errorData.error || "Failed to create project");
     }
 
@@ -95,7 +99,7 @@ export async function createProject(projectData) {
  */
 export async function setActiveProject(projectId) {
   try {
-    const response = await fetch(API_URL(`/api/projects/active/${projectId}`), {
+    const response = await apiFetch(`/api/projects/active/${projectId}`, {
       method: "PUT",
     });
     if (!response.ok) {
@@ -120,7 +124,7 @@ export async function setActiveProject(projectId) {
  */
 export async function updateProject(projectId, updates) {
   try {
-    const response = await fetch(API_URL(`/api/projects/${projectId}`), {
+    const response = await apiFetch(`/api/projects/${projectId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -130,6 +134,10 @@ export async function updateProject(projectId, updates) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      // Handle express-validator format: { errors: [{msg, param}, ...] }
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
+      }
       throw new Error(errorData.error || "Failed to update project");
     }
 
@@ -150,7 +158,7 @@ export async function updateProject(projectId, updates) {
  */
 export async function deleteProject(projectId) {
   try {
-    const response = await fetch(API_URL(`/api/projects/${projectId}`), {
+    const response = await apiFetch(`/api/projects/${projectId}`, {
       method: "DELETE",
     });
     if (!response.ok) {
@@ -170,7 +178,7 @@ export async function deleteProject(projectId) {
  */
 export async function duplicateProject(projectId) {
   try {
-    const response = await fetch(API_URL(`/api/projects/${projectId}/duplicate`), {
+    const response = await apiFetch(`/api/projects/${projectId}/duplicate`, {
       method: "POST",
     });
 
@@ -198,7 +206,7 @@ export async function duplicateProject(projectId) {
  */
 export async function exportProject(projectId) {
   try {
-    const response = await fetch(API_URL(`/api/projects/${projectId}/export`), {
+    const response = await apiFetch(`/api/projects/${projectId}/export`, {
       method: "POST",
     });
 
@@ -246,7 +254,7 @@ export async function importProject(file) {
     const formData = new FormData();
     formData.append("projectZip", file);
 
-    const response = await fetch(API_URL("/api/projects/import"), {
+    const response = await apiFetch("/api/projects/import", {
       method: "POST",
       body: formData,
     });
@@ -278,7 +286,7 @@ export async function importProject(file) {
  */
 export async function checkThemeUpdates(projectId) {
   try {
-    const response = await fetch(API_URL(`/api/projects/${projectId}/theme-updates/status`));
+    const response = await apiFetch(`/api/projects/${projectId}/theme-updates/status`);
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Failed to check theme updates");
@@ -301,7 +309,7 @@ export async function checkThemeUpdates(projectId) {
  */
 export async function toggleThemeUpdates(projectId, enabled) {
   try {
-    const response = await fetch(API_URL(`/api/projects/${projectId}/theme-updates`), {
+    const response = await apiFetch(`/api/projects/${projectId}/theme-updates`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -332,7 +340,7 @@ export async function toggleThemeUpdates(projectId, enabled) {
  */
 export async function applyThemeUpdate(projectId) {
   try {
-    const response = await fetch(API_URL(`/api/projects/${projectId}/theme-updates/apply`), {
+    const response = await apiFetch(`/api/projects/${projectId}/theme-updates/apply`, {
       method: "POST",
     });
 

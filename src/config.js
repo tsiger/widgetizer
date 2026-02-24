@@ -8,6 +8,11 @@ export const API_URL = (path) => `${BASE_URL}${path}`;
 export const PREVIEW_ISOLATION = import.meta.env.VITE_PREVIEW_ISOLATION === "true";
 export const PREVIEW_ORIGIN = import.meta.env.VITE_PREVIEW_ORIGIN || "";
 
+// Hosted mode config (for SaaS deployment)
+export const HOSTED_MODE = import.meta.env.VITE_HOSTED_MODE === "true";
+export const PUBLISHER_URL = import.meta.env.VITE_PUBLISHER_URL || "";
+export const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "";
+
 export const MEDIA_TYPES = {
   image: [".jpeg", ".jpg", ".png", ".gif", ".webp", ".svg"],
   video: [".mp4"],

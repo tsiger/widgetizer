@@ -1,0 +1,218 @@
+{
+  "name": "Case Results",
+  "slug": "case-results",
+  "widgets": {
+    "results_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "results-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Case Results",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "results-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A record of results that speaks for itself",
+            "size": "4xl"
+          }
+        },
+        "results-text": {
+          "type": "text",
+          "settings": {
+            "text": "While every case is unique, our track record demonstrates consistent, favorable outcomes for our clients.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["results-eyebrow", "results-heading", "results-text"]
+    },
+    "featured_testimonial": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "featured-quote": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Hargrove & Cole guided us through a complex multi-jurisdictional M&A transaction worth $85 million. Their corporate team's attention to detail and strategic thinking protected our interests at every stage. They didn't just close the deal \u2014 they structured it to maximize long-term value for all stakeholders.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "featured-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Richard Kwon",
+            "size": "lg"
+          }
+        },
+        "featured-title": {
+          "type": "text",
+          "settings": {
+            "text": "CEO, Atlas Partners",
+            "size": "sm",
+            "uppercase": false,
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["featured-quote", "featured-name", "featured-title"]
+    },
+    "case_showcase": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "Notable cases",
+        "title": "Selected case outcomes",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "project-1": {
+          "type": "project",
+          "settings": {
+            "title": "$85M Corporate Acquisition",
+            "description": "Structured and closed a complex multi-jurisdictional merger, protecting minority shareholder interests.",
+            "link": {
+              "text": "View details",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        },
+        "project-2": {
+          "type": "project",
+          "settings": {
+            "title": "$4.2M Employment Settlement",
+            "description": "Negotiated a landmark settlement in a class-action workplace discrimination case.",
+            "link": {
+              "text": "View details",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        },
+        "project-3": {
+          "type": "project",
+          "settings": {
+            "title": "Landmark IP Victory",
+            "description": "Defended a technology startup's core patent against infringement by a Fortune 500 competitor.",
+            "link": {
+              "text": "View details",
+              "href": "#",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["project-1", "project-2", "project-3"]
+    },
+    "impact_figures": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "By the numbers",
+        "title": "Measurable impact",
+        "columns_desktop": 3,
+        "layout": "cards",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "figure-1": {
+          "type": "figure",
+          "settings": {
+            "number": "$120M",
+            "suffix": "+",
+            "label": "Recovered",
+            "description": "For our clients"
+          }
+        },
+        "figure-2": {
+          "type": "figure",
+          "settings": {
+            "number": "97",
+            "suffix": "%",
+            "label": "Success Rate",
+            "description": "Favorable outcomes"
+          }
+        },
+        "figure-3": {
+          "type": "figure",
+          "settings": {
+            "number": "500",
+            "suffix": "+",
+            "label": "Cases",
+            "description": "Successfully resolved"
+          }
+        }
+      },
+      "blocksOrder": ["figure-1", "figure-2", "figure-3"]
+    },
+    "results_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "results-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to discuss your case?",
+            "size": "4xl"
+          }
+        },
+        "results-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Schedule a free consultation and let us show you what we can achieve together.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "results-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Free consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Practice areas",
+              "href": "practice-areas.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["results-cta-heading", "results-cta-text", "results-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["results_hero", "featured_testimonial", "case_showcase", "impact_figures", "results_cta"],
+  "id": "case-results",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

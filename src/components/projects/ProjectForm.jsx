@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { API_URL } from "../../config";
+import { apiFetch } from "../../lib/apiFetch";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import Button from "../ui/Button";
 import { formatSlug } from "../../utils/slugUtils";
@@ -127,7 +127,7 @@ export default function ProjectForm({
 
   const loadThemes = async () => {
     try {
-      const response = await fetch(API_URL("/api/themes"));
+      const response = await apiFetch("/api/themes");
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

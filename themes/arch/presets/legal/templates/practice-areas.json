@@ -1,0 +1,205 @@
+{
+  "name": "Practice Areas",
+  "slug": "practice-areas",
+  "widgets": {
+    "practice_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "practice-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Practice Areas",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "practice-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Comprehensive legal counsel for individuals and businesses",
+            "size": "4xl"
+          }
+        },
+        "practice-text": {
+          "type": "text",
+          "settings": {
+            "text": "Our attorneys bring deep subject-matter expertise to every case, combining specialized knowledge with a practical, results-oriented approach.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "practice-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our team",
+              "href": "team.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["practice-eyebrow", "practice-heading", "practice-text", "practice-buttons"]
+    },
+    "practice_areas_tabs": {
+      "type": "image-tabs",
+      "settings": {
+        "eyebrow": "Areas of law",
+        "title": "Explore our practice areas",
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "tab-corporate": {
+          "type": "tab",
+          "settings": {
+            "title": "Corporate Law",
+            "description": "<p>Our corporate attorneys advise businesses of all sizes on formation, governance, mergers and acquisitions, joint ventures, and commercial contracts. We help clients navigate complex transactions and regulatory requirements with strategic precision.</p>"
+          }
+        },
+        "tab-litigation": {
+          "type": "tab",
+          "settings": {
+            "title": "Litigation",
+            "description": "<p>From pre-trial strategy through appeal, our litigation team handles civil and commercial disputes, arbitration, and mediation. We are known for thorough preparation and persuasive courtroom advocacy that delivers results.</p>"
+          }
+        },
+        "tab-real-estate": {
+          "type": "tab",
+          "settings": {
+            "title": "Real Estate",
+            "description": "<p>We represent buyers, sellers, developers, and investors in all aspects of real estate law including acquisitions, development, commercial leasing, zoning, and land use. Our team ensures every transaction is structured to protect your interests.</p>"
+          }
+        },
+        "tab-employment": {
+          "type": "tab",
+          "settings": {
+            "title": "Employment Law",
+            "description": "<p>Our employment practice covers compliance, workplace discrimination, wrongful termination, employment contracts, FMLA, and wage disputes. We represent both employers seeking compliant policies and employees whose rights have been violated.</p>"
+          }
+        },
+        "tab-ip": {
+          "type": "tab",
+          "settings": {
+            "title": "Intellectual Property",
+            "description": "<p>We help innovators and businesses protect their most valuable assets through patent prosecution, trademark registration, copyright protection, trade secret enforcement, and IP licensing agreements.</p>"
+          }
+        },
+        "tab-family": {
+          "type": "tab",
+          "settings": {
+            "title": "Family Law",
+            "description": "<p>Our family law attorneys handle divorce, child custody, prenuptial and postnuptial agreements, spousal support, and estate planning. We approach every matter with sensitivity, discretion, and a focus on achieving the best possible outcome.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["tab-corporate", "tab-litigation", "tab-real-estate", "tab-employment", "tab-ip", "tab-family"]
+    },
+    "process_steps": {
+      "type": "numbered-cards",
+      "settings": {
+        "eyebrow": "Our process",
+        "title": "How we handle your case",
+        "columns_desktop": 4,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Initial Consultation",
+            "description": "<p>We listen to your situation, assess the legal issues, and outline your options \u2014 at no cost or obligation.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Case Assessment",
+            "description": "<p>Our team conducts thorough research, gathers evidence, and develops a clear legal strategy.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Strategy & Representation",
+            "description": "<p>We advocate for your interests through negotiation, mediation, or litigation \u2014 whatever achieves the best outcome.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "Resolution & Follow-up",
+            "description": "<p>We see your case through to completion and ensure all loose ends are tied up for lasting peace of mind.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "practice_cta": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "practice-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to discuss your case?",
+            "size": "4xl"
+          }
+        },
+        "practice-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Contact us for a free, no-obligation consultation with one of our experienced attorneys.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "practice-cta-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Free consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our team",
+              "href": "team.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["practice-cta-heading", "practice-cta-text", "practice-cta-buttons"]
+    }
+  },
+  "widgetsOrder": ["practice_hero", "practice_areas_tabs", "process_steps", "practice_cta"],
+  "id": "practice-areas",
+  "created": "2026-02-20T00:00:00.000Z",
+  "updated": "2026-02-20T00:00:00.000Z"
+}

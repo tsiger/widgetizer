@@ -8,7 +8,10 @@ import slugify from "slugify";
  * 2. Page Filenames/Slugs (e.g. my-page.html)
  */
 export const formatSlug = (value) => {
-  return slugify(value, {
+  // Strip HTML tags before slugifying so "<script>alert()</script>" doesn't
+  // produce garbage like "scriptalertscript" in the slug.
+  const stripped = value.replace(/<[^>]*>/g, "");
+  return slugify(stripped, {
     lower: true,
     strict: true,
     trim: true,

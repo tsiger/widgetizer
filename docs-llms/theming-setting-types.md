@@ -444,7 +444,7 @@ A specialized input for YouTube videos. It allows users to paste a YouTube URL o
 
 ### Menu
 
-A dropdown that is automatically populated with all available menus created in the system. The value is the ID (filename without `.json`) of the selected menu.
+A dropdown that is automatically populated with all available menus created in the system. The stored value is the menu's stable UUID, which ensures references remain valid even when menus are renamed.
 
 **ID Flexibility**: The `id` field can be any valid identifier (e.g., `headerNavigation`, `footerNavigation`, `main_menu`). The system will correctly handle menu selection regardless of the ID name used.
 
@@ -469,7 +469,17 @@ A dropdown that is automatically populated with all available menus created in t
 }
 ```
 
-The `default` value should match a menu's filename (without the `.json` extension) from the theme's `menus/` directory.
+The `default` value should match a menu's filename (without the `.json` extension) from the theme's `menus/` directory. When a project is created from a theme, slug-based defaults are automatically converted to the menu's UUID.
+
+**How Menu References Work:**
+
+Each menu has a stable `uuid` that never changes, even when the menu is renamed. This works similarly to how `pageUuid` stabilizes internal page links:
+
+1. **Menu Creation**: Each menu is assigned a stable UUID on creation.
+2. **User Selection**: When a user selects a menu from the dropdown, the menu's UUID is stored as the setting value.
+3. **Rendering/Export**: The system resolves the UUID to the current menu data. If a menu was renamed, the reference still works because the UUID is unchanged.
+4. **Project Cloning**: When a project is cloned, all menu UUIDs are regenerated and widget references are updated to point to the new UUIDs.
+5. **Backward Compatibility**: Legacy slug-based references (e.g., `"main-menu"`) are resolved via slug fallback at render time and converted to UUIDs on first interaction in the editor.
 
 ### Link
 

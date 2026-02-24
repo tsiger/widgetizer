@@ -1,0 +1,15 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Hargrove & Cole",
+    "contactDetailsLine1": "Call us: (555) 284-6100",
+    "contactDetailsLine2": "75 Broad Street, Suite 2400",
+    "headerNavigation": "main-menu",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Free consultation",
+      "target": "_self"
+    },
+    "sticky": true
+  }
+}

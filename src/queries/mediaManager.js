@@ -1,4 +1,5 @@
 import { API_URL } from "../config";
+import { apiFetch } from "../lib/apiFetch";
 
 /**
  * @typedef {Object} MediaFile
@@ -63,7 +64,7 @@ export async function getProjectMedia(projectId, forceRefresh = false) {
   // Create a new fetch promise
   const fetchPromise = (async () => {
     try {
-      const response = await fetch(API_URL(`/api/media/projects/${projectId}/media`));
+      const response = await apiFetch(`/api/media/projects/${projectId}/media`);
       if (!response.ok) {
         throw new Error("Failed to fetch media files");
       }
@@ -147,6 +148,12 @@ export async function uploadProjectMedia(projectId, files, onProgress) {
     formData.append("files", file);
   });
 
+  // Get auth token before creating the XHR promise
+  let authToken = null;
+  if (window.Clerk?.session) {
+    authToken = await window.Clerk.session.getToken();
+  }
+
   const xhr = new XMLHttpRequest();
 
   return new Promise((resolve, reject) => {
@@ -178,6 +185,9 @@ export async function uploadProjectMedia(projectId, files, onProgress) {
     };
 
     xhr.open("POST", API_URL(`/api/media/projects/${projectId}/media`));
+    if (authToken) {
+      xhr.setRequestHeader("Authorization", `Bearer ${authToken}`);
+    }
     xhr.send(formData);
   });
 }
@@ -192,7 +202,7 @@ export async function uploadProjectMedia(projectId, files, onProgress) {
  */
 export async function deleteProjectMedia(projectId, fileId) {
   try {
-    const response = await fetch(API_URL(`/api/media/projects/${projectId}/media/${fileId}`), {
+    const response = await apiFetch(`/api/media/projects/${projectId}/media/${fileId}`, {
       method: "DELETE",
     });
 
@@ -219,7 +229,7 @@ export async function deleteProjectMedia(projectId, fileId) {
  */
 export async function deleteMultipleMedia(projectId, fileIds) {
   try {
-    const response = await fetch(API_URL(`/api/media/projects/${projectId}/media/bulk-delete`), {
+    const response = await apiFetch(`/api/media/projects/${projectId}/media/bulk-delete`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -258,7 +268,7 @@ export async function deleteMultipleMedia(projectId, fileIds) {
  */
 export async function getMediaFileUsage(projectId, fileId) {
   try {
-    const response = await fetch(API_URL(`/api/media/projects/${projectId}/media/${fileId}/usage`));
+    const response = await apiFetch(`/api/media/projects/${projectId}/media/${fileId}/usage`);
     if (!response.ok) {
       throw new Error("Failed to get media usage");
     }
@@ -277,7 +287,7 @@ export async function getMediaFileUsage(projectId, fileId) {
  */
 export async function refreshMediaUsage(projectId) {
   try {
-    const response = await fetch(API_URL(`/api/media/projects/${projectId}/refresh-usage`), {
+    const response = await apiFetch(`/api/media/projects/${projectId}/refresh-usage`, {
       method: "POST",
     });
     if (!response.ok) {

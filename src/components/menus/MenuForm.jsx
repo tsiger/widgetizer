@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
-import slugify from "slugify";
 import useToastStore from "../../stores/toastStore";
 import Button from "../ui/Button";
 
@@ -49,20 +48,9 @@ export default function MenuForm({
     }
   });
 
-  const generateId = (name) => {
-    return slugify(name, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
-  };
-
   const onSubmitHandler = async (data) => {
     try {
-      const result = await onSubmit({
-        ...data,
-        id: generateId(data.name),
-      });
+      const result = await onSubmit(data);
 
       return result;
     } catch (err) {
