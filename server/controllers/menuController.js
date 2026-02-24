@@ -5,6 +5,20 @@ import { getProjectMenusDir, getMenuPath } from "../config.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
+import { EDITOR_LIMITS } from "../limits.js";
+import { checkLimit, checkStringLength } from "../utils/limitChecks.js";
+
+/** Count total items (flat count including nested children) */
+function countMenuItems(items) {
+  if (!Array.isArray(items)) return 0;
+  return items.reduce((count, item) => count + 1 + countMenuItems(item.items), 0);
+}
+
+/** Get max nesting depth of menu items */
+function getMenuDepth(items, currentDepth = 0) {
+  if (!Array.isArray(items) || items.length === 0) return currentDepth;
+  return Math.max(...items.map((item) => getMenuDepth(item.items, currentDepth + 1)));
+}
 
 /**
  * Retrieves all menus for the active project.
@@ -65,11 +79,24 @@ export async function createMenu(req, res) {
       return res.status(400).json({ error: "Menu name is required." });
     }
 
+    // Platform limit: menu name length
+    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxMenuNameLength, "Menu name");
+    if (!nameCheck.ok) {
+      return res.status(400).json({ error: nameCheck.error });
+    }
+
     const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     const menusDir = getProjectMenusDir(projectFolderName, req.userId);
     await fs.ensureDir(menusDir);
+
+    // Platform limit: max menus per project
+    const menuFiles = (await fs.readdir(menusDir)).filter((f) => f.endsWith(".json"));
+    const menuCheck = checkLimit(menuFiles.length, EDITOR_LIMITS.maxMenusPerProject, "menus per project");
+    if (!menuCheck.ok) {
+      return res.status(403).json({ error: menuCheck.error });
+    }
 
     // Generate unique ID from the sanitized name (server-side only)
     const menuId = await generateUniqueSlug(name, (slug) => fs.pathExists(getMenuPath(projectFolderName, slug, req.userId)));
@@ -175,6 +202,21 @@ export async function updateMenu(req, res) {
       return res.status(404).json({ error: "Menu not found" });
     }
 
+    // Platform limits: menu item count and nesting depth
+    if (menuData.items) {
+      const itemCount = countMenuItems(menuData.items);
+      const itemCheck = checkLimit(itemCount, EDITOR_LIMITS.maxMenuItemsPerMenu, "items per menu", { exclusive: false });
+      if (!itemCheck.ok) {
+        return res.status(400).json({ error: itemCheck.error });
+      }
+
+      const depth = getMenuDepth(menuData.items);
+      const depthCheck = checkLimit(depth, EDITOR_LIMITS.maxMenuNestingDepth, "levels of menu nesting", { exclusive: false });
+      if (!depthCheck.ok) {
+        return res.status(400).json({ error: depthCheck.error });
+      }
+    }
+
     // Read existing menu to preserve uuid
     const existingMenu = JSON.parse(await fs.readFile(menuPath, "utf8"));
 
@@ -274,6 +316,13 @@ export async function duplicateMenu(req, res) {
     // Gather existing menu names for copy-number logic
     const menusDir = getProjectMenusDir(projectFolderName, req.userId);
     const menuFiles = (await fs.readdir(menusDir)).filter((f) => f.endsWith(".json"));
+
+    // Platform limit: max menus per project
+    const menuCheck = checkLimit(menuFiles.length, EDITOR_LIMITS.maxMenusPerProject, "menus per project");
+    if (!menuCheck.ok) {
+      return res.status(403).json({ error: menuCheck.error });
+    }
+
     const existingMenuNames = await Promise.all(
       menuFiles.map(async (f) => {
         const data = JSON.parse(await fs.readFile(path.join(menusDir, f), "utf8"));

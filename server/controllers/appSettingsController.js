@@ -5,6 +5,9 @@ import {
   defaultSettings,
   deepMerge,
 } from "../db/repositories/settingsRepository.js";
+import { EDITOR_LIMITS } from "../limits.js";
+import { clampToCeiling } from "../utils/limitChecks.js";
+import { HOSTED_MODE } from "../hostedMode.js";
 
 /**
  * Reads the application settings (merged with defaults).
@@ -86,6 +89,20 @@ export async function updateAppSettings(req, res) {
             }
           }
         }
+      }
+    }
+
+    // Clamp user-configurable values to platform ceilings (hosted mode only —
+    // self-hosted users control their own instance and can set any values).
+    if (HOSTED_MODE) {
+      if (newSettings.media) {
+        newSettings.media.maxFileSizeMB = clampToCeiling(newSettings.media.maxFileSizeMB, EDITOR_LIMITS.media.maxFileSizeMBCeiling);
+        newSettings.media.maxVideoSizeMB = clampToCeiling(newSettings.media.maxVideoSizeMB, EDITOR_LIMITS.media.maxVideoSizeMBCeiling);
+        newSettings.media.maxAudioSizeMB = clampToCeiling(newSettings.media.maxAudioSizeMB, EDITOR_LIMITS.media.maxAudioSizeMBCeiling);
+      }
+      if (newSettings.export) {
+        newSettings.export.maxImportSizeMB = clampToCeiling(newSettings.export.maxImportSizeMB, EDITOR_LIMITS.maxImportSizeMBCeiling);
+        newSettings.export.maxVersionsToKeep = clampToCeiling(newSettings.export.maxVersionsToKeep, EDITOR_LIMITS.maxExportVersionsCeiling);
       }
     }
 

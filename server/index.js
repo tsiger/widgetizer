@@ -58,7 +58,8 @@ app.use(
     crossOriginOpenerPolicy: false, // YouTube player needs cross-origin popup communication
   }),
 );
-app.use(express.json());
+// JSON body parsing is applied per-router (not globally) so that the page
+// content save route can use a higher limit. See middleware/jsonParser.js.
 
 // Auth: always sets req.userId ("local" in open-source, Clerk ID in hosted)
 app.use("/api", authMiddleware);

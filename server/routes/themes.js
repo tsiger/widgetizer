@@ -1,7 +1,9 @@
 import express from "express";
 import * as themeController from "../controllers/themeController.js";
+import { standardJsonParser } from "../middleware/jsonParser.js";
 
 const router = express.Router();
+router.use(standardJsonParser);
 
 // GET /api/themes - Get all themes
 router.get("/", themeController.getAllThemes);

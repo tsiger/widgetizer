@@ -11,8 +11,10 @@ import {
   getExportFiles,
   downloadExport,
 } from "../controllers/exportController.js";
+import { standardJsonParser } from "../middleware/jsonParser.js";
 
 const router = express.Router();
+router.use(standardJsonParser);
 
 // Route to trigger the exporting process for a project
 // POST /api/export/:projectId

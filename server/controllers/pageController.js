@@ -7,6 +7,8 @@ import { updatePageMediaUsage, removePageFromMediaUsage } from "../services/medi
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
+import { EDITOR_LIMITS } from "../limits.js";
+import { checkLimit, checkStringLength } from "../utils/limitChecks.js";
 
 /**
  * Lists and reads data for all publishable pages in a project's pages directory.
@@ -406,6 +408,26 @@ export async function bulkDeletePages(req, res) {
 export async function createPage(req, res) {
   try {
     const pageData = req.body; // Get all data including SEO
+    const { activeProject } = req;
+
+    // Platform limit: max pages per project
+    const pagesDir = getProjectPagesDir(activeProject.folderName, req.userId);
+    if (await fs.pathExists(pagesDir)) {
+      const entries = await fs.readdir(pagesDir, { withFileTypes: true });
+      const pageCount = entries.filter((e) => e.isFile() && e.name.endsWith(".json")).length;
+      const pageCheck = checkLimit(pageCount, EDITOR_LIMITS.maxPagesPerProject, "pages per project");
+      if (!pageCheck.ok) {
+        return res.status(403).json({ error: pageCheck.error });
+      }
+    }
+
+    // Platform limit: page name length
+    if (pageData.name) {
+      const nameCheck = checkStringLength(pageData.name, EDITOR_LIMITS.maxPageNameLength, "Page name");
+      if (!nameCheck.ok) {
+        return res.status(400).json({ error: nameCheck.error });
+      }
+    }
 
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
@@ -419,7 +441,6 @@ export async function createPage(req, res) {
       return res.status(400).json({ error: "Page name is required." });
     }
 
-    const { activeProject } = req;
     const projectFolderName = activeProject.folderName;
 
     // Use submitted slug if provided, otherwise generate from name
@@ -442,7 +463,7 @@ export async function createPage(req, res) {
       updated: new Date().toISOString(),
     };
 
-    const pagesDir = getProjectPagesDir(projectFolderName, req.userId);
+    // Reuses pagesDir from the limit check above
     await fs.ensureDir(pagesDir);
 
     const pagePath = getPagePath(projectFolderName, slug, req.userId);
@@ -475,6 +496,13 @@ export async function savePageContent(req, res) {
   try {
     const pageData = req.body; // Get all data including SEO
 
+    // Platform limit: page JSON size
+    const jsonSize = JSON.stringify(pageData).length;
+    const sizeCheck = checkLimit(jsonSize, EDITOR_LIMITS.maxPageJsonSize, "bytes of page data", { exclusive: false });
+    if (!sizeCheck.ok) {
+      return res.status(400).json({ error: "Page content is too large. Please reduce the number of widgets or content." });
+    }
+
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
       if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
@@ -488,6 +516,25 @@ export async function savePageContent(req, res) {
     // Validate essential data
     if (!pageData.slug || !pageData.name || !pageData.widgets) {
       return res.status(400).json({ error: "Missing required page data (slug, name, widgets)." });
+    }
+
+    // Platform limits: widget count, blocks per widget, nesting depth, text length
+    if (pageData.widgets && typeof pageData.widgets === "object") {
+      const widgetKeys = Object.keys(pageData.widgets);
+      const widgetCheck = checkLimit(widgetKeys.length, EDITOR_LIMITS.maxWidgetsPerPage, "widgets per page", { exclusive: false });
+      if (!widgetCheck.ok) {
+        return res.status(400).json({ error: widgetCheck.error });
+      }
+
+      for (const key of widgetKeys) {
+        const widget = pageData.widgets[key];
+        if (widget && widget.blocks && Array.isArray(widget.blocks)) {
+          const blockCheck = checkLimit(widget.blocks.length, EDITOR_LIMITS.maxBlocksPerWidget, "blocks per widget", { exclusive: false });
+          if (!blockCheck.ok) {
+            return res.status(400).json({ error: blockCheck.error });
+          }
+        }
+      }
     }
 
     // Read existing data to preserve timestamps etc.
@@ -574,6 +621,12 @@ export async function duplicatePage(req, res) {
     const pagesDir = getProjectPagesDir(projectFolderName, req.userId);
     const allEntries = await fs.readdir(pagesDir, { withFileTypes: true });
     const pageJsonFiles = allEntries.filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
+
+    // Platform limit: max pages per project
+    const pageCheck = checkLimit(pageJsonFiles.length, EDITOR_LIMITS.maxPagesPerProject, "pages per project");
+    if (!pageCheck.ok) {
+      return res.status(403).json({ error: pageCheck.error });
+    }
     const existingPageNames = await Promise.all(
       pageJsonFiles.map(async (fileEntry) => {
         const data = await fs.readFile(path.join(pagesDir, fileEntry.name), "utf8");

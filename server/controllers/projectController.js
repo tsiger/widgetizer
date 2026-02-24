@@ -18,6 +18,8 @@ import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
+import { EDITOR_LIMITS } from "../limits.js";
+import { checkLimit, checkStringLength, validateZipEntries } from "../utils/limitChecks.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 import { enrichNewProjectReferences, remapDuplicatedProjectUuids } from "../utils/linkEnrichment.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
@@ -120,9 +122,22 @@ export async function createProject(req, res) {
   try {
     const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates, preset } = req.body;
 
+    // Platform limit: max projects per user
+    const allProjects = projectRepo.getAllProjects(req.userId);
+    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects");
+    if (!projectCheck.ok) {
+      return res.status(403).json({ error: projectCheck.error });
+    }
+
     // Defensive check: ensure name is not empty after sanitization
     if (!name || typeof name !== "string" || name.trim() === "") {
       return res.status(400).json({ error: "Project name is required." });
+    }
+
+    // Platform limit: project name length
+    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxProjectNameLength, "Project name");
+    if (!nameCheck.ok) {
+      return res.status(400).json({ error: nameCheck.error });
     }
 
     // Check for duplicate project names
@@ -148,8 +163,7 @@ export async function createProject(req, res) {
         });
       }
     } else {
-      // Generate folderName from name if not provided
-      const allProjects = projectRepo.getAllProjects(req.userId);
+      // Generate folderName from name if not provided (reuse allProjects from limit check above)
       folderName = await generateUniqueSlug(name, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
     }
 
@@ -455,7 +469,12 @@ export async function duplicateProject(req, res) {
       return res.status(404).json({ error: "Project not found" });
     }
 
+    // Platform limit: max projects per user
     const allProjects = projectRepo.getAllProjects(req.userId);
+    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects");
+    if (!projectCheck.ok) {
+      return res.status(403).json({ error: projectCheck.error });
+    }
     const newName = generateCopyName(originalProject.name, allProjects.map((p) => p.name));
     const newFolderName = await generateUniqueSlug(newName, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
 
@@ -870,8 +889,22 @@ export async function importProject(req, res) {
       });
     }
 
+    // Platform limit: max projects per user
+    const allProjects = projectRepo.getAllProjects(req.userId);
+    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects");
+    if (!projectCheck.ok) {
+      return res.status(403).json({ error: projectCheck.error });
+    }
+
     const AdmZip = await import("adm-zip");
     const zip = new AdmZip.default(uploadedFilePath);
+
+    // Safety: validate ZIP entries (path traversal + entry count) — always enforced
+    const zipCheck = validateZipEntries(zip);
+    if (!zipCheck.ok) {
+      return res.status(400).json({ error: zipCheck.error });
+    }
+
     const zipEntries = zip.getEntries();
 
     if (zipEntries.length === 0) {
@@ -906,7 +939,7 @@ export async function importProject(req, res) {
     }
 
     // Generate unique folderName (checking DB and existing directories)
-    const allProjects = projectRepo.getAllProjects(req.userId);
+    // Reuses allProjects from the limit check above
     let folderName = await generateUniqueSlug(manifest.project.name, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
 
     // Also check if directory already exists and generate unique name if needed

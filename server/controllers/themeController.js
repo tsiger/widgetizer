@@ -22,6 +22,8 @@ import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { updateThemeSettingsMediaUsage } from "../services/mediaUsageService.js";
 import { sanitizeThemeSettings } from "../services/sanitizationService.js";
 import { readAppSettingsFile } from "./appSettingsController.js";
+import { EDITOR_LIMITS } from "../limits.js";
+import { checkLimit, validateZipEntries } from "../utils/limitChecks.js";
 
 /**
  * Ensure the user's themes directory exists.
@@ -971,6 +973,13 @@ export async function uploadTheme(req, res) {
 
     const AdmZip = await import("adm-zip");
     const zip = new AdmZip.default(uploadedFilePath);
+
+  // Safety: validate ZIP entries (path traversal + entry count) — always enforced
+  const zipCheck = validateZipEntries(zip);
+  if (!zipCheck.ok) {
+    return res.status(400).json({ message: zipCheck.error });
+  }
+
   const zipEntries = zip.getEntries();
 
   if (zipEntries.length === 0) {
@@ -1182,6 +1191,18 @@ export async function uploadTheme(req, res) {
   // Determine what to install
   let isNewTheme = !themeExists;
   let newUpdateVersions = [];
+
+  // Platform limit: max themes per user (only for net-new themes, not updates)
+  if (isNewTheme) {
+    const themesDir = getUserThemesDir(userId);
+    if (await fs.pathExists(themesDir)) {
+      const themeDirs = (await fs.readdir(themesDir, { withFileTypes: true })).filter((e) => e.isDirectory());
+      const themeCheck = checkLimit(themeDirs.length, EDITOR_LIMITS.maxThemesPerUser, "themes");
+      if (!themeCheck.ok) {
+        return res.status(403).json({ message: themeCheck.error });
+      }
+    }
+  }
 
   if (themeExists) {
     // Theme already exists - check what's new in this zip

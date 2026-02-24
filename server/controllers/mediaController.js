@@ -22,6 +22,8 @@ import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers
 import { handleProjectResolutionError, PROJECT_ERROR_CODES } from "../utils/projectErrors.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
+import { EDITOR_LIMITS } from "../limits.js";
+import { checkLimit } from "../utils/limitChecks.js";
 
 // Get image processing settings from app settings
 async function getImageProcessingSettings(projectId, userId = "local") {
@@ -252,6 +254,17 @@ export async function uploadProjectMedia(req, res) {
       return res.status(400).json({ error: "No valid files uploaded or received." });
     }
 
+    // Platform limit: max media files per project (accounts for incoming batch)
+    const existingMedia = mediaRepo.getMediaFiles(projectId);
+    const currentCount = existingMedia.files ? existingMedia.files.length : 0;
+    const max = EDITOR_LIMITS.media.maxFilesPerProject;
+    const fileCheck = checkLimit(currentCount + files.length, max, "media files per project", { exclusive: false });
+    if (!fileCheck.ok) {
+      return res.status(403).json({
+        error: `Limit reached: uploading ${files.length} file(s) would exceed the maximum of ${max} media files per project (currently ${currentCount})`,
+      });
+    }
+
     // Get the dynamic file size limits
     const maxImageSizeMB = await getSetting("media.maxFileSizeMB", req.userId);
     const maxVideoSizeMB = await getSetting("media.maxVideoSizeMB", req.userId);
@@ -309,8 +322,24 @@ export async function uploadProjectMedia(req, res) {
 
         // Process image files (thumbnails, dimensions etc.)
         if (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") {
-          const image = sharp(file.path);
+          const image = sharp(file.path, {
+            limitInputPixels: EDITOR_LIMITS.media.maxImagePixels,
+          });
           const metadata = await image.metadata();
+
+          // Safety: reject images with extreme dimensions (always enforced)
+          if (metadata.width > EDITOR_LIMITS.media.maxImageDimension || metadata.height > EDITOR_LIMITS.media.maxImageDimension) {
+            try { await fs.unlink(file.path); } catch {}
+            return {
+              success: false,
+              file: {
+                originalName: file.originalname,
+                reason: `Image dimensions (${metadata.width}x${metadata.height}) exceed maximum of ${EDITOR_LIMITS.media.maxImageDimension}px.`,
+                sizeBytes: file.size,
+              },
+            };
+          }
+
           fileInfo.width = metadata.width;
           fileInfo.height = metadata.height;
 

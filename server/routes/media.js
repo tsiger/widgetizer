@@ -13,8 +13,10 @@ import {
   getMediaFileUsage,
   refreshMediaUsage,
 } from "../controllers/mediaController.js";
+import { standardJsonParser } from "../middleware/jsonParser.js";
 
 const router = express.Router();
+router.use(standardJsonParser);
 
 // Get all media for a project
 router.get(

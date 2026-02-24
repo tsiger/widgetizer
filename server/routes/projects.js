@@ -3,8 +3,11 @@ import { body, param } from "express-validator";
 import * as projectController from "../controllers/projectController.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { validateRequest } from "../middleware/validateRequest.js";
+import { EDITOR_LIMITS } from "../limits.js";
+import { standardJsonParser } from "../middleware/jsonParser.js";
 
 const router = express.Router();
+router.use(standardJsonParser);
 
 // GET /api/projects - Get all projects
 router.get("/", projectController.getAllProjects);
@@ -16,8 +19,8 @@ router.get("/active", projectController.getActiveProject);
 router.post(
   "/",
   [
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required."),
-    body("description").trim().customSanitizer(stripHtmlTags),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required.").isLength({ max: EDITOR_LIMITS.maxProjectNameLength }).withMessage(`Project name must be at most ${EDITOR_LIMITS.maxProjectNameLength} characters.`),
+    body("description").trim().customSanitizer(stripHtmlTags).isLength({ max: EDITOR_LIMITS.maxProjectDescriptionLength }).withMessage(`Description must be at most ${EDITOR_LIMITS.maxProjectDescriptionLength} characters.`),
     body("siteUrl").optional().trim().customSanitizer(stripHtmlTags),
     body("theme").notEmpty().withMessage("A theme is required to create a project."),
     body("preset").optional().isString().trim(),
@@ -39,8 +42,8 @@ router.put(
   "/:id",
   [
     param("id").notEmpty().withMessage("Project ID is required."),
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required."),
-    body("description").trim().customSanitizer(stripHtmlTags),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required.").isLength({ max: EDITOR_LIMITS.maxProjectNameLength }).withMessage(`Project name must be at most ${EDITOR_LIMITS.maxProjectNameLength} characters.`),
+    body("description").trim().customSanitizer(stripHtmlTags).isLength({ max: EDITOR_LIMITS.maxProjectDescriptionLength }).withMessage(`Description must be at most ${EDITOR_LIMITS.maxProjectDescriptionLength} characters.`),
     body("siteUrl").optional().trim().customSanitizer(stripHtmlTags),
   ],
   validateRequest,
