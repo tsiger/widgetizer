@@ -90,7 +90,18 @@ export async function getAllProjects(req, res) {
 export async function getActiveProject(req, res) {
   try {
     const activeProjectId = projectRepo.getActiveProjectId(req.userId);
-    const activeProject = activeProjectId ? projectRepo.getProjectById(activeProjectId, req.userId) : null;
+    let activeProject = activeProjectId ? projectRepo.getProjectById(activeProjectId, req.userId) : null;
+
+    // Fallback: if no active project but user has projects, auto-activate the first one.
+    // This handles edge cases like deleted active projects, missing DB records, or migrated data.
+    if (!activeProject) {
+      const projects = projectRepo.getAllProjects(req.userId);
+      if (projects.length > 0) {
+        projectRepo.setActiveProjectId(projects[0].id, req.userId);
+        activeProject = projects[0];
+      }
+    }
+
     res.json(activeProject || null);
   } catch (error) {
     console.error("Error getting active project:", error);

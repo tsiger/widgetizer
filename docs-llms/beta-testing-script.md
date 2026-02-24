@@ -1,68 +1,99 @@
+# Beta Testing Script — Widgetizer (Local / Open-Source)
+
 > **For beta testers.** Follow every step. Mark each one PASS or FAIL. If something breaks, write down exactly what you did, what you expected, and what happened instead. Screenshot everything that looks wrong.
 
-## SECTION 0: SETUP & TEST MODES
+---
 
-Widgetizer runs in two modes. You should run through this script **once in each mode** to catch mode-specific issues.
+## TEST KIT
 
-### Local Mode (Open-Source)
+You should have received a `beta-test-kit/` folder alongside this script. Verify it contains these files before starting.
 
-Single-user, no authentication. This is the default.
+### Images (8 files)
 
-In your `.env` file:
+| File | Size / Notes | Used In |
+|------|-------------|---------|
+| `photo-small.jpg` | ~200 KB, any dimensions | General testing (2.6, 5.1) |
+| `photo-medium.png` | ~800 KB, at least 2000 px wide | Size variant testing (5.1, 5.13) |
+| `photo-large.jpg` | ~3 MB | Normal large upload (5.1) |
+| `photo-oversized.jpg` | **> 5 MB** | Rejection at default 5 MB limit (5.3) |
+| `photo-1.5mb.jpg` | ~1.5 MB | Rejection at custom 1 MB limit (10.3) |
+| `image.webp` | Any size | Format variety (5.1, 5.2) |
+| `image.gif` | Any size, animated preferred | Format variety (5.1) |
+| `logo.svg` | Clean SVG, no scripts | SVG upload (5.2) |
 
-```
-HOSTED_MODE=false          # or simply omit this line
-VITE_HOSTED_MODE=false     # or omit
-PORT=3001
-VITE_API_URL=http://localhost:3001
-SERVER_URL=http://localhost:3001
-```
+### Security Test Files (1 file)
 
-Start the app with `npm run dev:all`. It loads directly to the Dashboard — no sign-in required.
+| File | Notes | Used In |
+|------|-------|---------|
+| `svg-malicious.svg` | SVG with embedded `<script>` tag | SVG sanitization (5.14) |
 
-### Hosted Mode (SaaS)
+### Video & Audio (2 files)
 
-Multi-user with Clerk authentication. Each user gets isolated data.
+| File | Size / Notes | Used In |
+|------|-------------|---------|
+| `clip.mp4` | ~2 MB, short clip | Video upload (5.2) |
+| `sample.mp3` | ~1 MB, short audio | Audio upload (5.2) |
 
-In your `.env` file:
+### Theme Files (2 files)
 
-```
-HOSTED_MODE=true
-VITE_HOSTED_MODE=true
-CLERK_SECRET_KEY=sk_test_...
-CLERK_PUBLISHABLE_KEY=pk_test_...
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
-PUBLISHER_API_URL=https://your-publisher-api.example.com
-VITE_PUBLISHER_URL=https://your-publisher.example.com
-PORT=3001
-VITE_API_URL=http://localhost:3001
-SERVER_URL=http://localhost:3001
-```
+| File | Notes | Used In |
+|------|-------|---------|
+| `valid-theme.zip` | Working theme (has `theme.json`, `layout.liquid`, etc.) | Theme upload (7.2) |
+| `invalid-theme.zip` | Random files, NOT a theme | Theme upload rejection (7.2) |
 
-Start the app with `npm run dev:all`. A sign-in screen appears before the app loads.
+### Rejected File Types (2 files)
 
-### Quick Reference: Mode Differences
+| File | Notes | Used In |
+|------|-------|---------|
+| `document.txt` | Plain text file | Media upload rejection (5.3) |
+| `random-files.zip` | ZIP of random files, NOT a project export | Project import rejection (2.14) |
 
-| Feature | Local Mode | Hosted Mode |
-|---------|-----------|-------------|
-| Authentication | None (automatic) | Clerk JWT (sign-in required) |
-| App Settings page | Visible in sidebar | Hidden from sidebar |
-| Publish section (Export page) | Not shown | Shown |
-| User menu in sidebar | Not shown | My Sites + My Account + Sign out |
-| Data directory | `data/users/local/` | `data/users/{clerkUserId}/` |
+> **Total: 15 files.** If anything is missing, ask the person who sent you this script. You will also create test files during testing (project exports, additional uploads) — the kit covers what you can't easily make yourself.
+
+---
+
+## SECTION 0: SETUP
+
+### Environment
+
+This script tests the **local (open-source) mode** — single-user, no authentication.
+
+1. In the project root folder, find the file called `.env.example`.
+2. Make a copy of it in the same folder and rename the copy to `.env` (just `.env`, nothing else).
+3. You don't need to change anything inside — the defaults are ready to use.
+4. Open a terminal in the project folder and run:
+   ```
+   npm run dev:all
+   ```
+5. The app opens in your browser at `http://localhost:3000`. It loads directly to the Dashboard — no sign-in required.
 
 ### Terminology
 
 Two pages have similar names — don't confuse them:
 
 - **Settings** (sidebar link, `/settings`) — **Theme Settings** for the active project. Controls colors, fonts, layout, and other theme-specific options.
-- **App Settings** (sidebar link at bottom, `/app-settings`) — **Application configuration**. Controls file size limits, image processing, export options, and developer mode. **Only visible in local mode.**
+- **App Settings** (sidebar link at bottom, `/app-settings`) — **Application configuration**. Controls file size limits, image processing, export options, and developer mode.
 
-### How to Read This Script
+### About the "Code Safety Tests"
 
-- If a section has no mode callout, it applies to **both modes**.
-- Hosted-mode-only tests are in **Appendix A** at the end of the document.
-- Section 10 (App Settings) is **local mode only**.
+Many edge case sections ask you to type this text into fields:
+
+```
+<script>alert(1)</script>
+```
+
+This is a harmless test string that attackers commonly try to sneak into websites. We use it to verify the app handles it safely. Here's what you're checking:
+
+| Where you type it | What PASS looks like | What FAIL looks like |
+|-------------------|---------------------|---------------------|
+| **Name / title / description** fields | The code is quietly removed. Field ends up empty or with just plain text. | The code stays in the field as-is, or a **popup box** appears. |
+| **URL fields** | Rejected — not a valid URL. | Accepted as a URL. |
+| **Number fields** | Rejected — not a valid number. | Accepted as a number. |
+| **Rich text editors** | The code part is removed. Only normal formatting (bold, links, etc.) stays. | A **popup box** appears. |
+| **Code editors** (CSS/HTML) | Code editors intentionally allow code. But the **preview** must NOT show a popup box. | A **popup box** appears in the preview. |
+| **Anywhere in the preview** | No popup box. Text may appear literally or get removed. | A **popup box** appears. |
+
+**The golden rule: if you see a popup box appear at any point during these tests, that's a bug. Report it immediately.**
 
 ---
 
@@ -212,11 +243,11 @@ Two pages have similar names — don't confuse them:
 
 - [ ] Create a project with a very long name (100+ characters). **Expected**: It should handle it without errors.
 - [ ] Create a project with special characters in the name (`Test & Site #1 — "Quotes"`). **Expected**: It works and the name is stored exactly as you typed it — no weird characters like `&amp;` appearing instead.
-- [ ] Create a project with code in the name (`My Site <script>alert('xss')</script>`). **Expected**: The code part is removed — the stored name should be just "My Site".
-- [ ] Create a project with ONLY `<script>alert(1)</script>` as the name (no other text). **Expected**: Rejected — error toast says the name is required (since the code gets stripped, nothing is left).
-- [ ] Enter `<script>alert(1)</script>` in the **Notes/Description** field. Save, edit again. **Expected**: The code is removed — the field should be empty or contain only plain text.
-- [ ] Enter `<script>alert(1)</script>` in the **Website URL** field. **Expected**: Rejected — it's not a valid URL.
-- [ ] Enter `<script>alert(1)</script>` in the **Folder Name** field. **Expected**: Rejected — folder names only allow lowercase letters, numbers, and hyphens.
+- [ ] **Code safety** — Create a project with code in the name: type `My Site <script>alert(1)</script>`. **Expected**: Name saved as just "My Site" — the code part is removed.
+- [ ] **Code safety** — Create a project with ONLY `<script>alert(1)</script>` as the name. **Expected**: Rejected — name is required (the code gets removed, so nothing is left).
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **Notes** field. Save, edit again. **Expected**: The code is gone — field is empty or plain text only.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **Website URL** field. **Expected**: Rejected — not a valid URL.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **Folder Name** field. **Expected**: Rejected — not a valid folder name.
 - [ ] Create two projects with the same name. **Expected**: The second project gets a slightly different folder name (e.g., with a number added) to avoid conflict.
 - [ ] Edit a project's folder name to match an existing project's folder. **Expected**: It should prevent the conflict.
 - [ ] Enter an invalid website URL (e.g., "not a url"). **Expected**: Validation catches it and shows an error.
@@ -296,14 +327,14 @@ Two pages have similar names — don't confuse them:
 
 - [ ] Create a page with the same slug as an existing theme page. **Expected**: It auto-adds a number to the slug (e.g., `about-1`) to avoid a conflict.
 - [ ] Create a page with special characters in the name (e.g., `About & "FAQ" — Info`). **Expected**: The slug is cleaned up to only use simple characters. The name is stored exactly as typed — no weird characters like `&amp;` appearing instead.
-- [ ] Create a page with code in the name (`My Page <img src=x onerror=alert(1)>`). **Expected**: The code part is removed — name should be just "My Page".
-- [ ] Create a page with ONLY `<script>alert(1)</script>` as the name (no other text). **Expected**: Rejected — error toast says the name is required (since the code gets stripped, nothing is left).
-- [ ] Enter `<script>alert(1)</script>` in the **slug** field. **Expected**: Rejected or cleaned up to empty — slugs only allow lowercase letters, numbers, and hyphens.
+- [ ] **Code safety** — Create a page named `My Page <img src=x onerror=alert(1)>`. **Expected**: Name saved as just "My Page" — code removed.
+- [ ] **Code safety** — Create a page with ONLY `<script>alert(1)</script>` as the name. **Expected**: Rejected — name is required.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **slug** field. **Expected**: Rejected — not a valid slug.
 - [ ] Edit a page slug to match another existing page's slug. **Expected**: It prevents the conflict.
 - [ ] Try to navigate away from the page form with unsaved changes. **Expected**: A warning dialog appears.
-- [ ] Enter `<script>alert(1)</script>` in the **meta description** field. Save. Edit again. **Expected**: The code is removed, only plain text remains.
-- [ ] Enter `<script>alert(1)</script>` in the **social media title** field. Save. Edit again. **Expected**: The code is removed, only plain text remains.
-- [ ] Enter `<script>alert(1)</script>` in the **canonical URL** field. **Expected**: Rejected — it's not a valid URL.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **meta description** field. Save, edit again. **Expected**: The code is gone — only plain text remains.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **social media title** field. Save, edit again. **Expected**: The code is gone — only plain text remains.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **canonical URL** field. **Expected**: Rejected — not a valid URL.
 - [ ] Set a social media image on a page, then go to **Media** and try to delete that image. **Expected**: Deletion is blocked — you should see an error saying the image is in use by that page.
 - [ ] Enter an invalid **canonical URL** (e.g., "not a url"). **Expected**: Validation catches it and shows an error.
 - [ ] Export the site. Open the exported page in a browser and view the page source. **Expected**: No raw code appears in the page metadata — everything should look clean and properly formatted.
@@ -508,12 +539,12 @@ These tests verify that images uploaded and used through the editor are properly
 - [ ] Add 20+ widgets to a single page. **Expected**: The editor should still feel fast and responsive.
 - [ ] Paste very long text (5000+ characters) into a text field. **Expected**: It handles it without crashing or freezing.
 - [ ] Paste code into a plain text field. **Expected**: The code should show as plain text in the preview, not actually run.
-- [ ] Enter `<script>alert(1)</script>` in a widget **title** field. **Expected**: The preview should show the text literally or strip it — no popup box should appear.
-- [ ] Enter `<script>alert(1)</script>` in a widget **description/text** field. **Expected**: Same as above — shown as text or stripped, no popup.
-- [ ] Enter `<script>alert(1)</script>` in a **link text** field. **Expected**: Shown as text or stripped in the preview — no popup.
-- [ ] Enter `<script>alert(1)</script>` in a **link URL** field (external URL). **Expected**: Rejected or cleaned up — the link should not run any code when clicked.
-- [ ] Paste `<script>alert(1)</script>` into a **rich text editor** field. **Expected**: The code part is automatically removed. Only normal formatting (bold, links, etc.) is kept.
-- [ ] Enter `<script>alert(1)</script>` in the **code editor** (CSS/HTML field). **Expected**: Code editors allow raw code, but verify it does NOT cause any popups or run in the preview — the preview should remain safe.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in a widget **title** field. **Expected**: Preview shows it as plain text or removes it — no popup box.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in a widget **description/text** field. **Expected**: Same — plain text or removed, no popup box.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in a **link text** field. **Expected**: Plain text or removed in preview — no popup box.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in a **link URL** field. **Expected**: Rejected — not a valid URL.
+- [ ] **Code safety** — Paste `<script>alert(1)</script>` into a **rich text editor** field. **Expected**: The code part is removed. Only normal formatting stays.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in a **code editor** (CSS/HTML field). **Expected**: Code editors allow raw code, but check the preview — no popup box should appear.
 - [ ] Upload a very large image through the widget image browser. **Expected**: It either uploads successfully or shows a clear error about file size.
 - [ ] Rapidly click undo 50 times. **Expected**: It handles it without crashing.
 - [ ] Open the same page in two browser tabs. Edit in both. Save both. **Expected**: The last save wins. No crashes or corrupted data.
@@ -619,9 +650,9 @@ These tests verify that images uploaded and used through the editor are properly
 - [ ] Upload a file with a very long filename. Does it get truncated/sanitized?
 - [ ] Upload a file with spaces and special characters in the name. Does it sanitize?
 - [ ] Upload the same filename twice. Does it handle the conflict (e.g., append `-1`)?
-- [ ] Upload a potentially malicious SVG (one with JavaScript inside). Is it sanitized?
-- [ ] Enter `<script>alert(1)</script>` in the **alt text** field of a media file. Save. Edit again — should be escaped or stripped. Check the exported HTML — alt attribute must not contain executable script.
-- [ ] Enter `<script>alert(1)</script>` in the **title** field of a media file. Save. Edit again — should be escaped or stripped.
+- [ ] **Code safety** — Upload `svg-malicious.svg` from the test kit (SVG with code inside). **Expected**: The code is removed from the SVG — it should display as a normal image.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **alt text** field of a media file. Save, edit again. **Expected**: The code is gone — field shows plain text or is empty. Also export the site and check the HTML source — no code in the alt attribute.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **title** field of a media file. Save, edit again. **Expected**: The code is gone.
 
 ---
 
@@ -716,10 +747,10 @@ These tests verify that images uploaded and used through the editor are properly
 - [ ] Create a menu with 50+ items. Performance?
 - [ ] Create deeply nested items (3+ levels). Does the UI handle it?
 - [ ] Create a menu with special characters in the name (e.g., `Nav & "Links"`). Is the name stored without HTML-encoding?
-- [ ] Create a menu with HTML in the name (`Menu <script>alert(1)</script>`). HTML tags should be stripped — name should be just `Menu`.
-- [ ] Create a menu with ONLY `<script>alert(1)</script>` as the name (no other text). Should be **rejected** — error toast says name is required.
-- [ ] Enter `<script>alert(1)</script>` as a **menu item label**. Save. Edit again — should be escaped or stripped. Check the preview and exported HTML — no script execution.
-- [ ] Enter `<script>alert(1)</script>` as a **menu item external URL**. Save. Check the preview — the link should not execute scripts. Exported HTML href should be escaped or removed.
+- [ ] **Code safety** — Create a menu named `Menu <script>alert(1)</script>`. **Expected**: Name saved as just "Menu" — code removed.
+- [ ] **Code safety** — Create a menu with ONLY `<script>alert(1)</script>` as the name. **Expected**: Rejected — name is required.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` as a **menu item label**. Save, edit again. **Expected**: The code is gone. Check the preview and export — no popup box.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` as a **menu item external URL**. Save. **Expected**: Preview link does nothing dangerous. Export the site and check the HTML — no code in the link.
 - [ ] Add a menu item with no label. What happens?
 - [ ] Add a menu item with no link. What happens?
 - [ ] Save menu, delete it, try to use it in a header widget. What shows?
@@ -840,17 +871,17 @@ Go through each setting type you find and test it:
 
 ### 8.6 Edge Cases to Try
 
-- [ ] Enter `<script>alert(1)</script>` in a theme **text input** setting. Save. Preview should escape it — no alert box. Exported HTML should have it escaped in the output.
-- [ ] Enter `<script>alert(1)</script>` in a theme **textarea** setting. Save. Same behavior — escaped in preview, no execution.
-- [ ] Enter `<script>alert(1)</script>` in a theme **color picker** (typed as hex value). Should be rejected or ignored — not a valid color.
-- [ ] Paste `<script>alert(1)</script>` into a theme **rich text editor** setting. DOMPurify should strip the script tags. Only safe formatting tags remain.
-- [ ] Enter `<script>alert(1)</script>` in a theme **code editor** (CSS/HTML) setting. Code fields allow raw code — verify it renders correctly without breaking the page layout (CSS context) or that it's properly sandboxed.
-- [ ] Enter `<script>alert(1)</script>` as a **YouTube URL** in a YouTube input. Should not execute — should be rejected or show an error/empty embed.
-- [ ] Enter `<script>alert(1)</script>` in a theme **link URL** field. Should be rejected or sanitized.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in a theme **text input** setting. Save. **Expected**: Preview shows it as plain text or removes it — no popup box. Export the site and check the HTML — no code running.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in a theme **textarea** setting. Save. **Expected**: Same — plain text or removed, no popup box.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in a theme **color picker** (as the hex value). **Expected**: Rejected or ignored — not a valid color.
+- [ ] **Code safety** — Paste `<script>alert(1)</script>` into a theme **rich text editor** setting. **Expected**: The code part is removed. Only normal formatting stays.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in a theme **code editor** (CSS/HTML) setting. **Expected**: Code editors allow raw code, but check the preview — no popup box should appear.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` as a **YouTube URL**. **Expected**: Rejected or shows empty/error — no popup box.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in a theme **link URL** field. **Expected**: Rejected — not a valid URL.
 
 ---
 
-## SECTION 9: EXPORT & PUBLISH
+## SECTION 9: EXPORT
 
 ### 9.1 Create a Basic Export
 
@@ -941,13 +972,11 @@ Open an exported site and check:
 - [ ] Export a project with a page that has no widgets. Does it produce a valid HTML file?
 - [ ] Create 50+ exports rapidly. Performance? Cleanup working?
 
-> **Hosted mode**: The Publish feature is covered in **Appendix A.4**.
-
 ---
 
 ## SECTION 10: APP SETTINGS
 
-> **LOCAL MODE ONLY**: The App Settings page is hidden from the sidebar in hosted mode. If you are testing in hosted mode, skip this entire section. Do not confuse this with "Settings" (Theme Settings) — see Section 8.
+> Do not confuse this with "Settings" (Theme Settings) — see Section 8.
 
 ### 10.1 Open Settings
 
@@ -1018,10 +1047,10 @@ Open an exported site and check:
 - [ ] Set max file size to a negative number. Does it validate?
 - [ ] Set max versions to keep to 0. Does it validate?
 - [ ] Set all image sizes to disabled. Upload an image. Does thumb still get generated?
-- [ ] Enter `<script>alert(1)</script>` in the **image quality** field (numeric input). Should be rejected — not a valid number.
-- [ ] Enter `<script>alert(1)</script>` in the **max file size** field. Should be rejected — not a valid number.
-- [ ] Enter `<script>alert(1)</script>` in the **max versions to keep** field. Should be rejected — not a valid number.
-- [ ] Enter `<script>alert(1)</script>` in the **max import size** field. Should be rejected — not a valid number.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **image quality** field. **Expected**: Rejected — not a valid number.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **max file size** field. **Expected**: Rejected — not a valid number.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **max versions to keep** field. **Expected**: Rejected — not a valid number.
+- [ ] **Code safety** — Type `<script>alert(1)</script>` in the **max import size** field. **Expected**: Rejected — not a valid number.
 
 ---
 
@@ -1243,95 +1272,6 @@ Do this at the very end after all other testing:
 
 ---
 
-## APPENDIX A: HOSTED MODE TESTING
-
-> These tests **only apply when running in hosted mode** (`HOSTED_MODE=true`). They require valid Clerk keys and (for publish tests) a configured Publisher API. Skip this entire appendix if you are only testing local mode.
-
-### A.1 Authentication — Sign-In Required
-
-1. Open the app URL without being signed in (clear cookies or use an incognito window).
-2. **Expected**: A full-screen centered message appears:
-   - Heading: **"Sign in required"**
-   - Text: "You need to sign in to access the editor."
-   - A pink **"Go to sign in"** button/link.
-3. Click the **"Go to sign in"** link.
-4. **Expected**: Redirects to the Publisher sign-in page.
-
-### A.2 Authentication — Loading State
-
-1. Open the app URL while signed in (or sign in).
-2. **Expected**: While Clerk is initializing, a full-screen loading spinner is shown (centered spinning icon with "Loading..." text). Once authentication is confirmed, the app renders the Dashboard normally.
-
-### A.3 Authentication — Sign Out
-
-1. Look at the very bottom of the sidebar (below all navigation items).
-2. **Expected**: A user section appears showing:
-   - Your avatar (circular image)
-   - Your first name or email address (visible when the sidebar is wide; hidden on narrow/collapsed sidebar, but avatar remains visible)
-   - A **sign-out button** (door/exit icon)
-3. Click the **sign-out button**.
-4. **Expected**: Redirects to the Publisher sign-in page (or root URL). You are signed out.
-
-### A.4 App Settings Hidden
-
-1. Look at the bottom of the sidebar.
-2. **Expected**: The **"App Settings"** link is NOT shown. It does not appear anywhere in the sidebar.
-3. All other sidebar items (Dashboard, Projects, Pages, Menus, Media, Settings, Themes, Plugins, Export) are still present.
-
-### A.5 Publish — First Publish
-
-1. Open the **Export** page (click Export in the sidebar).
-2. **Expected**: At the top of the page (above the "Create Export" section), a **Publish** section appears with a heading and description.
-3. If the project has never been published, you should see a **"Publish"** button.
-4. Click **"Publish"**.
-5. **Expected**: Button shows a loading spinner with "Publishing..." text. After a few seconds:
-   - A success toast appears.
-   - The section shows a green banner with **"Your site is live!"**
-   - A public URL is displayed (clickable link).
-   - A timestamp shows when it was last published.
-   - The button text changes to **"Republish"**.
-6. Click the public URL.
-7. **Expected**: The published site opens in a new browser tab and works correctly (all pages, images, styles).
-
-### A.6 Publish — Republish After Changes
-
-1. Go to the page editor. Make a change to a page. Save.
-2. Go back to the Export page.
-3. Click **"Republish"**.
-4. **Expected**: Publishing indicator → success. Timestamp updates. URL stays the same.
-5. Open the URL again. **Expected**: The changes you made are reflected.
-
-### A.7 Publish — Error Handling
-
-1. If the Publisher API URL is misconfigured or unreachable, attempt to publish.
-2. **Expected**: An error message appears (red banner or error toast). The app does not crash.
-
-### A.8 Publish — Not Shown in Local Mode
-
-1. Switch to local mode (set `HOSTED_MODE=false`, restart the app).
-2. Open the Export page.
-3. **Expected**: Only the "Create Export" and "Export History" sections are shown. There is NO "Publish" section.
-
-### A.9 Data Isolation Between Modes
-
-1. Start in local mode. Create a project with pages, media, and menus.
-2. Stop the app. Switch to hosted mode (update `.env`, restart).
-3. Sign in with a Clerk account.
-4. **Expected**: The project list is **empty**. Data from local mode is NOT visible. You are a new user.
-5. Create a project in hosted mode.
-6. Stop the app. Switch back to local mode (update `.env`, restart).
-7. **Expected**: The local-mode project is still there, unaffected. The hosted-mode project is NOT visible.
-
-### A.10 Data Isolation Between Users
-
-1. Sign in with **User A** in one browser. Create a project and add content.
-2. Sign in with **User B** in a different browser (or incognito window).
-3. **Expected**: User B sees an empty project list. User A's data is NOT visible to User B.
-4. Create a project as User B. Switch back to User A's browser.
-5. **Expected**: User A sees only their own project. User B's project is NOT visible.
-
----
-
 ## Bug Report Template
 
 When you find an issue, report it with:
@@ -1347,7 +1287,6 @@ EXPECTED: What should happen
 ACTUAL: What actually happened
 SCREENSHOT: [attach if possible]
 BROWSER: [Chrome 120 / Firefox 115 / etc.]
-MODE: [Local / Hosted]
 NOTES: [anything extra]
 ```
 

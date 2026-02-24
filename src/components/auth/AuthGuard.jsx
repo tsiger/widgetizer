@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { PUBLISHER_URL } from "../../config";
+import useProjectStore from "../../stores/projectStore";
 
 /**
  * Ensures the user is authenticated in hosted mode.
@@ -7,10 +9,22 @@ import { PUBLISHER_URL } from "../../config";
  * publisher sign-in page if not authenticated, or renders children
  * when signed in.
  *
+ * Also bootstraps the active project store once auth is confirmed,
+ * so that apiFetch() has a valid Clerk token for the request.
+ *
  * Only rendered inside ClerkProvider (hosted mode only).
  */
 export default function AuthGuard({ children }) {
   const { isLoaded, isSignedIn } = useAuth();
+
+  // Bootstrap the project store after auth is confirmed.
+  // This replaces the old module-level fetch in projectStore.js which
+  // could fire before Clerk was ready, causing a silent 401.
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      useProjectStore.getState().fetchActiveProject();
+    }
+  }, [isLoaded, isSignedIn]);
 
   if (!isLoaded) {
     return (
