@@ -152,7 +152,7 @@ The file size settings demonstrate server-side enforcement:
 
 1.  When a user uploads files through the Media Manager, the files are sent directly to the server.
 2.  The backend route (`/api/media/projects/:projectId/media`) receives the files.
-3.  Before processing the upload, the server-side controller (`mediaController.js`) reads the appropriate size limit directly from the application's settings file:
+3.  Before processing the upload, the server-side controller (`mediaController.js`) reads the appropriate size limit directly from the SQLite-backed app settings store:
     - `maxFileSizeMB` for images
     - `maxVideoSizeMB` for videos
     - `maxAudioSizeMB` for audios
@@ -166,7 +166,7 @@ The image processing settings directly control how uploaded images are processed
 2.  **Quality Application**: The configured quality setting (1-100) is applied to all generated image sizes during the Sharp.js processing
 3.  **Size Generation**: Only enabled image sizes are generated, respecting the configured maximum widths:
 
-- If `thumb` is disabled: system uses first available size for thumbnails
+- If `thumb` is unavailable: the media UI falls back to the original image path
 - If `large` is disabled: no large images are generated, saving storage space
 - Custom widths are applied: e.g., changing `medium` from 1024px to 800px
 

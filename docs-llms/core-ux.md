@@ -171,7 +171,7 @@ _(Excluding the Page Editor itself)_
 ### **5.2. Activate a Theme**
 
 - **Current State:**
-  - Themes are activated by selecting them during project creation or editing.
+  - Themes are selected during project creation (theme changes are not supported in project edit).
   - The active theme is visually indicated with a pink "Active" badge on the theme card.
   - No direct activation UI exists on the themes page itself.
 - **Future Improvement:** Add an "Activate" button on theme cards to allow switching themes without editing the project. Show success toast: `Theme "[Theme Name]" has been activated.`

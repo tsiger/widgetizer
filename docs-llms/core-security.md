@@ -21,7 +21,7 @@ All incoming data is validated and sanitized before reaching controllers.
 IP-based request throttling via `express-rate-limit`:
 
 - **Editor routes** (`/api/projects`, `/api/themes`, `/api/pages`, `/api/preview`): 1500 req / 15 min
-- **Other API routes** (`/api/menus`, `/api/media`, `/api/export`, `/api/settings`): 5000 req / 15 min
+- **Other API routes** (`/api/menus`, `/api/media`, `/api/export`, `/api/settings`, `/api/core-widgets`, `/api/core`, `/api/publish` in hosted mode): 5000 req / 15 min
 
 ### 3. HTTP Security Headers
 
@@ -62,7 +62,7 @@ Custom error-handling middleware (`server/middleware/errorHandler.js`) registere
 - Users understand the implications of injecting raw HTML/CSS/JS
 - Theme authors control whether to include these tags in `layout.liquid`
 
-**Known risks:** XSS via custom scripts, CSS injection, CSP bypass, third-party script supply-chain risk. These are accepted trade-offs documented for users and theme authors. See the [theming docs](../docs/theming.md) for user-facing guidance.
+**Known risks:** XSS via custom scripts, CSS injection, CSP bypass, third-party script supply-chain risk. These are accepted trade-offs documented for users and theme authors. See the [theming docs](theming.md) for user-facing guidance.
 
 ### 8. Platform Limits (`server/limits.js`)
 
@@ -147,7 +147,7 @@ When isolation is off (default), the preview loads same-origin and `postMessage`
 | `VITE_API_URL` | Backend API base URL for the frontend |
 | `SERVER_URL` | Server's own base URL for runtime/preview URLs |
 
-Preview isolation variables are listed in section 9 above.
+Preview isolation variables are listed in section 10 above.
 
 ### Health Check
 

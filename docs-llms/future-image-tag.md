@@ -1,214 +1,304 @@
-# Image Tag: Responsive Images Research & Ideas
+# Responsive Images for `{% image %}`: Detailed Spec (Options A + B)
 
-> **Status: Brainstorming** — This document captures research and ideas for adding responsive image support to the `{% image %}` Liquid tag. Nothing here is implemented yet.
+> **Status: Proposed**
+> This document defines the concrete implementation plan for responsive image support in Widgetizer using:
+> 1. Option A: `srcset` + `sizes` on `{% image %}`
+> 2. Option B: `image_srcset` Liquid filter
 
-## Context
+## Decision
 
-The `{% image %}` tag (`src/core/tags/imageTag.js`) currently renders a single `<img>` element with one `src` pointing to a hardcoded size variant. The upload pipeline already generates multiple size variants (thumb, small, medium, large) via Sharp and stores their paths/dimensions in SQLite-backed media metadata — but there's no way for theme authors to leverage `srcset`/`sizes` to let the browser pick the optimal image for the viewport.
+Implement **Option B + Option A**.
 
-**Goal**: Give theme authors opt-in, un-opinionated building blocks for responsive images. Provide data and primitives — don't dictate markup patterns.
+- **Option B (`image_srcset`) is the core primitive** for maximum theme-author flexibility.
+- **Option A (`srcset: true`) is convenience sugar** on top of the same data.
+- Both are opt-in and backward-compatible.
+- No built-in `<picture>` mode (too opinionated).
+- No WebP/AVIF generation in this scope (separate upload-pipeline project).
+
+## Why this fits current Widgetizer media architecture
+
+Current behavior and constraints in the codebase:
+
+- The `{% image %}` tag currently resolves a single source URL from `mediaFiles` + `imagePath`.
+- Upload pipeline already stores multiple size variants in `mediaFile.sizes` with width/height.
+- Theme-defined image sizes support **custom size names** (not limited to `thumb/small/medium/large`).
+- Tiny images can have `sizes: {}` (no generated variants).
+- SVGs are stored/sanitized but do not have raster variants.
+- Render context already exposes everything needed:
+  - `mediaFiles`
+  - `imagePath` (`/api/media/...` in preview, `assets/images` in publish)
+- `enqueue_preload` already supports `imagesrcset` and `imagesizes`.
+- Export currently copies original + all generated sizes for used images, so responsive output is safe immediately.
+
+## Scope
+
+In scope:
+
+- Add `srcset` + `sizes` support to `{% image %}` HTML output.
+- Add `image_srcset` filter for author-defined markup (`<picture>`, custom `<img>`, custom preloads).
+- Keep behavior consistent in preview and publish render modes.
+- Add tests for both paths.
+
+Out of scope:
+
+- Auto-generated `<picture>` markup.
+- New media formats (WebP/AVIF variants).
+- Upload pipeline/schema changes.
 
 ---
 
-## Current Image Tag Behavior
+## Option A: `{% image %}` with `srcset` + `sizes`
 
-**File**: `src/core/tags/imageTag.js`
+### API
+
+Existing tag (no breaking changes), add two optional params:
+
+- `srcset`: boolean, default `false`
+- `sizes`: string, optional
+
+Example:
 
 ```liquid
-{% image src: 'hero.jpg', size: 'medium', class: 'hero-img', alt: 'Hero' %}
+{% image src: widget.settings.hero_image, size: 'medium', srcset: true, sizes: '(max-width: 900px) 100vw, 50vw' %}
 ```
 
-**Output**:
+### Output rules
+
+1. `src` continues to be resolved from `size` (same fallback behavior as today).
+2. `width`/`height` remain tied to resolved `src` image (for CLS protection).
+3. `srcset` is added only when `srcset: true` and at least 2 viable width candidates exist.
+4. `sizes` is emitted only when:
+   - `srcset` is emitted, and
+   - `sizes` param is provided and non-empty.
+5. SVG behavior remains unchanged:
+   - no `srcset`
+   - no `sizes`
+   - no width/height attrs from raster sizes.
+6. `output: 'url'|'path'` mode remains path-only and never emits attributes.
+
+### Candidate-building algorithm (for `srcset`)
+
+Given `mediaFile`:
+
+1. Collect candidates from `mediaFile.sizes` where `path` and numeric `width` exist.
+2. Exclude `thumb` by default in Option A.
+3. Convert each candidate path to final URL using `imagePath + basename(path)`.
+4. Sort candidates by width ascending.
+5. Optionally include original as a candidate when:
+   - original has numeric width, and
+   - original width is greater than current max candidate width.
+6. Deduplicate by width (keep first stable entry).
+7. Render as: `"url widthw, url widthw, ..."`
+
+If final candidate count < 2, skip `srcset` entirely.
+
+### Behavior matrix
+
+| Case | Result |
+|---|---|
+| JPEG/PNG/WebP with multiple sizes | `<img src="..." srcset="..." ...>` |
+| Image with no generated sizes (`sizes: {}`) | `<img src="...">` only |
+| SVG | current SVG behavior, no responsive attrs |
+| `output: 'url'/'path'` | URL string only |
+| `srcset: false` (or omitted) | current behavior |
+
+### Examples
+
+Basic:
+
+```liquid
+{% image src: 'hero.jpg', srcset: true, sizes: '100vw' %}
+```
+
+Likely output (publish mode):
+
 ```html
-<img src="hero-medium.jpg" alt="Hero" class="hero-img" width="1024" height="768" loading="lazy">
+<img src="assets/images/hero-medium.jpg"
+     srcset="assets/images/hero-small.jpg 480w, assets/images/hero-medium.jpg 1024w, assets/images/hero-large.jpg 1920w"
+     sizes="100vw"
+     width="1024"
+     height="768"
+     loading="lazy"
+     alt="">
 ```
 
-**Supported params**: `src`, `size` (thumb/small/medium/large, default: medium), `class`, `alt`, `title`, `lazy` (default: true), `loading`, `fetchpriority`, `decoding`, `output` (html/url/path).
+No responsive attrs in path mode:
 
-**What's missing**: No `srcset`, no `sizes`, no `<picture>` support. The browser always downloads exactly the size hardcoded in the template, regardless of viewport width.
+```liquid
+{% image src: 'hero.jpg', srcset: true, output: 'url' %}
+```
 
-**What already exists**:
-- All size variants are pre-generated at upload time with paths/dimensions in media metadata returned by `readMediaFile()`
-- `mediaFiles` context object provides full size data during rendering
-- `enqueue_preload` tag already supports `imagesrcset` and `imagesizes` for link preloads
-- `media_meta` filter exists as a pattern for custom filters
+Returns only URL string.
 
 ---
 
-## Options for Responsive Support
+## Option B: `image_srcset` filter (core flexibility primitive)
 
-### Option A: `srcset` + `sizes` params on `{% image %}`
+### API
 
-Add two new opt-in parameters to the existing tag.
+New filter:
 
-**Usage**:
 ```liquid
-{% image src: 'hero.jpg', srcset: true, sizes: '(max-width: 768px) 100vw, 50vw' %}
+{{ image_path_or_filename | image_srcset }}
+{{ image_path_or_filename | image_srcset: 'small,medium,hero' }}
 ```
 
-**Output**:
-```html
-<img src="hero-medium.jpg"
-     srcset="hero-small.jpg 480w, hero-medium.jpg 1024w, hero-large.jpg 1920w"
-     sizes="(max-width: 768px) 100vw, 50vw"
-     width="1024" height="768" loading="lazy" alt="...">
-```
+Arguments:
 
-**Implementation details**:
-- Build `srcset` from `mediaFile.sizes` entries, sorted by width ascending, using `{path} {width}w` format
-- Include the original image in srcset if it's larger than all size variants
-- Exclude `thumb` from srcset (too small for viewport-based selection; it's for UI thumbnails)
-- SVGs skip srcset entirely (vector, no benefit)
-- `sizes` param is passthrough — the tag doesn't interpret it, just emits it as-is
-- The `size` param still controls which variant is used for `src` (fallback for non-srcset browsers)
-- If `srcset: true` but only one size exists, render normal `<img>` (no srcset needed)
+- arg1 (optional): comma-separated size names to include.
+  - If omitted: include all available sizes except `thumb`.
+  - If provided: include only those names, in the provided order, filtered to existing sizes.
+  - `thumb` can be included explicitly if requested.
 
-**Pros**: Simple, backward compatible, covers 80-90% of responsive needs, zero new concepts for theme authors.
+### Output contract
 
-**Cons**: All variants are same crop/aspect ratio — no art direction. No format switching (WebP/AVIF).
+- Returns a valid `srcset` string (`"url 480w, url 1024w, ..."`), or empty string.
+- Returns empty string for:
+  - missing file
+  - non-image file
+  - SVG
+  - insufficient candidates (< 1 for filter; caller can decide usage)
+- Uses current `imagePath`, so output is correct in both preview and publish modes.
 
----
+### Candidate-building algorithm (shared with Option A)
 
-### Option B: `image_srcset` filter
+Use the same core builder as Option A for consistency.
 
-A Liquid filter that returns just the srcset string, for theme authors who want to construct their own markup.
+Recommended implementation: move candidate construction to a shared helper used by:
 
-**New file**: `src/core/filters/imageSrcsetFilter.js`
+- `src/core/tags/imageTag.js`
+- `src/core/filters/imageSrcsetFilter.js`
 
-**Registration**: Follow `registerMediaMetaFilter` pattern in `server/services/renderingService.js` (line ~30 import, line ~89 registration).
+Benefits:
 
-**Usage**:
-```liquid
-{{ 'hero.jpg' | image_srcset }}
-→ "hero-small.jpg 480w, hero-medium.jpg 1024w, hero-large.jpg 1920w"
+- One source of truth for URL shaping, sorting, inclusion rules, SVG handling.
+- Easier future smart-export integration.
 
-{{ 'hero.jpg' | image_srcset: 'small,medium' }}
-→ "hero-small.jpg 480w, hero-medium.jpg 1024w"
-```
+### Why Option B is required for flexibility
 
-**This enables fully custom markup**:
+Theme authors can build:
+
+- `<picture>` for art direction
+- media-query-specific `<source>` elements
+- custom priority/LCP strategies
+- custom preload tags with `imagesrcset`
+
+Example: author-controlled `<picture>`:
+
 ```liquid
 <picture>
-  <source media="(min-width: 1024px)"
-          srcset="{{ widget.settings.image | image_srcset: 'large' }}">
-  <img src="{% image src: widget.settings.image, size: 'medium', output: 'url' %}"
-       srcset="{{ widget.settings.image | image_srcset: 'small,medium' }}"
-       sizes="100vw"
-       alt="{{ widget.settings.image | media_meta: 'alt' }}">
+  <source media="(min-width: 1200px)" srcset="{{ widget.settings.hero | image_srcset: 'hero,large' }}">
+  <source media="(min-width: 700px)" srcset="{{ widget.settings.hero | image_srcset: 'medium' }}">
+  <img
+    src="{% image src: widget.settings.hero, size: 'small', output: 'url' %}"
+    srcset="{{ widget.settings.hero | image_srcset: 'small,medium,hero' }}"
+    sizes="100vw"
+    alt="{{ widget.settings.hero | media_meta: 'alt' }}">
 </picture>
 ```
 
-**Implementation details**:
-- Receives filename, looks up mediaFile from context `mediaFiles`
-- Optional argument: comma-separated size names to include (e.g. `'small,medium'`)
-- If no argument, includes all sizes except `thumb`
-- Returns empty string for SVGs or missing files
-- Prepends `imagePath` to each path (same as image tag does)
-
-**Pros**: Maximum flexibility for theme authors who need `<picture>` or custom markup. Works with existing `media_meta` filter and `{% image output: 'url' %}` for complete control.
-
-**Cons**: Requires more Liquid knowledge from theme authors. Only useful for advanced responsive patterns.
-
----
-
-### Option C: `<picture>` element support
-
-A `picture: true` param on the image tag that wraps output in `<picture>` with `<source>` elements per breakpoint.
+Example: responsive preload:
 
 ```liquid
-{% image src: 'hero.jpg', picture: true, sizes: '100vw' %}
+{% capture hero_srcset %}{{ widget.settings.hero | image_srcset: 'small,medium,large' }}{% endcapture %}
+{% enqueue_preload src: "{% image src: widget.settings.hero, size: 'medium', output: 'url' %}", as: "image", imagesrcset: hero_srcset, imagesizes: "100vw", fetchpriority: "high" %}
 ```
-
-**Output**:
-```html
-<picture>
-  <source srcset="hero-large.jpg" media="(min-width: 1024px)" width="1920" height="1440">
-  <source srcset="hero-medium.jpg" media="(min-width: 480px)" width="1024" height="768">
-  <img src="hero-small.jpg" width="480" height="360" loading="lazy" alt="...">
-</picture>
-```
-
-**Pros**: Art direction support. Future-proof for WebP/AVIF format switching.
-
-**Cons**: Opinionated — the tag decides breakpoint media queries. Harder to style (CSS targets `<img>` inside `<picture>`). Theme authors lose control over breakpoint values. Conflicts with the "un-opinionated" goal.
-
-**Verdict**: Skip this. Option B (the filter) gives theme authors the tools to build `<picture>` themselves with whatever breakpoints they want. A built-in `picture` mode would be opinionated about things that are layout-specific.
 
 ---
 
-### Option D: WebP/AVIF format generation
+## Backward compatibility
 
-Extend the Sharp upload pipeline to also generate WebP (and optionally AVIF) variants alongside the existing JPEG/PNG variants.
-
-**Media metadata addition (SQLite-backed)**:
-```json
-{
-  "sizes": {
-    "medium": {
-      "path": "/uploads/images/hero-medium.jpg",
-      "width": 1024, "height": 768,
-      "formats": {
-        "webp": "/uploads/images/hero-medium.webp",
-        "avif": "/uploads/images/hero-medium.avif"
-      }
-    }
-  }
-}
-```
-
-**Template usage** (combined with Option B):
-```liquid
-<picture>
-  <source type="image/webp"
-          srcset="{{ widget.settings.image | image_srcset: 'small,medium,large', format: 'webp' }}"
-          sizes="100vw">
-  <img src="{% image src: widget.settings.image, size: 'medium', output: 'url' %}"
-       srcset="{{ widget.settings.image | image_srcset }}"
-       sizes="100vw" alt="...">
-</picture>
-```
-
-**Pros**: Best performance — modern browsers use WebP/AVIF (30-50% smaller files).
-
-**Cons**: Significantly larger scope — changes the upload pipeline, media metadata schema, disk usage (more variants), and export logic. Should be its own project, not bundled with responsive `srcset` support.
-
-**Verdict**: Valuable but separate concern. Implement Options A+B first. Format generation can be added later and will naturally compose with the filter/srcset infrastructure.
+- Existing themes continue to render unchanged.
+- Existing `{% image %}` usage remains valid.
+- Existing app settings/theme image size configurations remain valid.
+- No DB migration required.
 
 ---
 
-## Recommendation
+## Edge cases and exact handling
 
-**Implement Options A + B together**:
+1. **Custom theme size names**
+   - Must work automatically (`hero`, `card`, `sidebar`, etc.).
+   - Do not hardcode size names in srcset logic.
 
-1. **`srcset: true` param on `{% image %}`** — handles the 90% case. Theme authors add one param and get responsive images. Zero new concepts.
+2. **Requested `size` missing in `{% image %}`**
+   - Keep current fallback to original image for `src`.
+   - `srcset` still built from available candidates.
 
-2. **`image_srcset` filter** — handles the 10% case where authors need `<picture>` or custom markup. Provides the raw srcset string; the author decides everything else.
+3. **Duplicate widths**
+   - Dedupe by width to avoid noisy srcset.
 
-Both are opt-in. Both are un-opinionated (the tag/filter provides data, the author decides layout). Both compose well with existing tools (`media_meta`, `output: 'url'`, `enqueue_preload`).
+4. **Invalid metadata**
+   - Ignore entries with missing path/width.
 
-Skip Options C and D for now. `<picture>` is better served by the filter + manual markup. WebP/AVIF is a separate pipeline concern.
+5. **Escaping**
+   - Escape `sizes` attribute value.
+   - Keep existing escaping for `alt`/`title`.
 
 ---
 
-## Files to Modify
+## Interaction with export and future smart export
+
+Current export behavior copies original + all generated sizes for used images, so Options A/B are safe immediately.
+
+For future smart export:
+
+- Tracking only in `imageTag` is not enough once authors use `image_srcset` directly.
+- Track used sizes in the **shared srcset helper** so both tag and filter usage can report size usage.
+- When `srcset` is emitted, all included candidates should be considered used (browser may choose any).
+
+---
+
+## Implementation plan
+
+### Files
 
 | File | Change |
 |---|---|
-| `src/core/tags/imageTag.js` | Add `srcset` and `sizes` param handling |
-| `src/core/filters/imageSrcsetFilter.js` | New file — `image_srcset` filter |
-| `server/services/renderingService.js` | Import and register the new filter (~line 30 + ~89) |
-| `server/tests/tags.test.js` | Tests for both new features |
+| `src/core/tags/imageTag.js` | Add `srcset` + `sizes` param handling for HTML output |
+| `src/core/filters/imageSrcsetFilter.js` | Add new `image_srcset` filter |
+| `src/core/media/buildSrcsetCandidates.js` (or similar) | Shared helper for candidate generation (recommended) |
+| `server/services/renderingService.js` | Register new filter next to `media_meta` |
+| `server/tests/tags.test.js` | Add Option A tests |
+| `server/tests/tags.test.js` or new filter test file | Add Option B tests |
+
+### Test cases
+
+Option A tests:
+
+- emits `srcset` + `sizes` when multiple raster candidates exist
+- excludes `thumb` by default
+- includes original candidate when larger than generated variants
+- no `srcset` for SVG
+- no `srcset` in `output: "url"` mode
+- graceful fallback when requested `size` is missing
+
+Option B tests:
+
+- returns full srcset with default selection
+- respects explicit size list
+- supports custom size names
+- returns empty for missing file/SVG/non-image
+- returns publish/preview-correct paths
+
+Integration sanity tests:
+
+- verify no regressions in existing image/video/audio tag behavior
+- verify existing theme templates still pass
 
 ---
 
-## Interaction with Smart Export
+## Recommended delivery order
 
-If/when smart export (see `future-media-handling.md` section 3) is implemented, the render-time size tracker in `imageTag.js` would need to be aware of srcset. When `srcset: true`, all included size variants should be recorded as "used" — since the browser may choose any of them at runtime. This means smart export would still copy all srcset-included variants for that image, which is correct behavior (the whole point of srcset is letting the browser choose).
+1. Implement Option B (`image_srcset`) + shared helper.
+2. Implement Option A by reusing the same helper.
+3. Update theming docs with responsive examples.
+4. Add future smart-export note to use shared helper signals.
 
 ---
 
-**See also:**
+## See also
 
-- [Media Handling Ideas](future-media-handling.md) — Smart export, original capping, on-demand variants
-- [Media Library](core-media.md) — Current image processing and upload pipeline
-- [Theming: Widgets](theming-widgets.md) — Widget template patterns
+- [Media Handling Ideas](future-media-handling.md)
+- [Media Library](core-media.md)
+- [Theming Guide](theming.md)

@@ -6,7 +6,7 @@ This document provides a comprehensive overview of the menu management system, f
 
 Each menu is stored as an individual JSON file within the active project's directory. This isolates menu data and keeps it organized per-project.
 
-- **Location**: `/data/projects/<folderName>/menus/`
+- **Location**: `/data/users/<userId>/projects/<folderName>/menus/`
 - **Filename**: The filename is a "slugified" version of the menu's name (e.g., `main-menu.json`).
 
 A typical menu JSON file (`main-menu.json`) has the following structure:
@@ -50,7 +50,7 @@ A typical menu JSON file (`main-menu.json`) has the following structure:
 
 **Menu Item Fields:**
 
-- `items`: An array of menu item objects. Each item can contain a nested `items` array, allowing for up to 3 levels of hierarchy.
+- `items`: An array of menu item objects. Each item can contain a nested `items` array, allowing for up to 4 levels of hierarchy.
 - `id`: A unique identifier for the menu item within the menu.
 - `label`: The display text shown in the navigation.
 - `link`: The URL or page filename (e.g., `about.html` for internal pages, or a full URL for external links).
@@ -112,17 +112,19 @@ This router maps HTTP requests to the appropriate controller functions.
 The controller handles the logic for interacting with the menu JSON files on the server's filesystem.
 
 - **File Operations**: Uses `fs-extra` to read the list of files in the `menus` directory, read individual menu files, write new ones, and delete them.
-- **ID Generation**: When a new menu is created, a unique, URL-friendly ID is generated from its name using `slugify`. This ID is used as the filename (e.g., "Header Menu" becomes `header-menu.json`).
+- **ID Generation**: When a new menu is created, a unique, URL-friendly ID is generated from its name (via `generateUniqueSlug`). This ID is used as the filename (e.g., "Header Menu" becomes `header-menu.json`).
 - **CRUD Logic**:
   - `createMenu`: Creates a new JSON file with a basic menu structure.
-  - `updateMenu`: Overwrites an existing menu file with the new data. If the menu name is changed, the system automatically renames the underlying JSON file to match the new slugified name, while ensuring no conflicts with existing menus.
+  - `updateMenu`: Overwrites the existing menu file in place. The menu filename/ID remains stable even if the menu name changes.
   - `duplicateMenu`: Creates a complete copy of an existing menu with:
-    - **New unique ID**: Generated using the existing `generateUniqueMenuId()` helper
+    - **New unique ID**: Generated using `generateUniqueSlug()` from `slugHelpers`
     - **New name**: Follows the pattern "Copy of {original-name}"
     - **Deep cloning**: All menu data is completely duplicated
     - **Unique item IDs**: All nested menu items get new unique IDs to prevent conflicts
     - **Fresh timestamps**: New `created` and `updated` timestamps
   - `deleteMenu`: Removes the corresponding menu file from the `menus` directory.
+
+In open-source mode, `userId` is always `local`.
 
 ## Security Considerations
 

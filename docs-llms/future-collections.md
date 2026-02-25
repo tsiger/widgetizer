@@ -141,10 +141,10 @@ themes/arch/
 
 Collection items are stored **per-project** (like pages and menus).
 
-**Location**: `data/projects/{project}/collections/{collection-type}/{item-slug}.json`
+**Location**: `data/users/{userId}/projects/{project}/collections/{collection-type}/{item-slug}.json`
 
 ```
-data/projects/my-site/
+data/users/local/projects/my-site/
 ├── pages/
 ├── menus/
 ├── collections/
@@ -193,16 +193,18 @@ data/projects/my-site/
 
 ```javascript
 // Collection paths (NEW)
-export const getProjectCollectionsDir = (projectId) => path.join(getProjectDir(projectId), "collections");
-export const getCollectionDir = (projectId, collectionType) =>
-  path.join(getProjectCollectionsDir(projectId), collectionType);
-export const getCollectionItemPath = (projectId, collectionType, itemSlug) =>
-  path.join(getCollectionDir(projectId, collectionType), `${itemSlug}.json`);
+export const getProjectCollectionsDir = (projectId, userId) =>
+  path.join(getProjectDir(projectId, userId), "collections");
+export const getCollectionDir = (projectId, collectionType, userId) =>
+  path.join(getProjectCollectionsDir(projectId, userId), collectionType);
+export const getCollectionItemPath = (projectId, collectionType, itemSlug, userId) =>
+  path.join(getCollectionDir(projectId, collectionType, userId), `${itemSlug}.json`);
 
 // Theme collection schema paths
-export const getThemeCollectionsDir = (themeId) => path.join(getThemeDir(themeId), "collections");
-export const getCollectionSchemaPath = (themeId, collectionType) =>
-  path.join(getThemeCollectionsDir(themeId), collectionType, "schema.json");
+export const getThemeCollectionsDir = (themeId, userId = "local") =>
+  path.join(getThemeDir(themeId, userId), "collections");
+export const getCollectionSchemaPath = (themeId, collectionType, userId = "local") =>
+  path.join(getThemeCollectionsDir(themeId, userId), collectionType, "schema.json");
 ```
 
 ---

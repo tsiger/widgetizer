@@ -99,7 +99,7 @@ const pagePath = getPagePath(projectFolderName, pageSlug, req.userId);
 
 ### Menu Controller (`menuController.js`)
 
-**Rationale:** Menus are stored as JSON files in `data/projects/{folderName}/menus/`. Like pages, menu operations require folderName resolution.
+**Rationale:** Menus are stored as JSON files in `data/users/{userId}/projects/{folderName}/menus/`. Like pages, menu operations require folderName resolution.
 
 **Pattern:**
 
@@ -108,8 +108,8 @@ const activeProjectId = projectRepo.getActiveProjectId(req.userId);
 const activeProject = projectRepo.getProjectById(activeProjectId, req.userId);
 const projectFolderName = activeProject.folderName;
 
-const menusDir = getProjectMenusDir(projectFolderName);
-const menuPath = getMenuPath(projectFolderName, menuId);
+const menusDir = getProjectMenusDir(projectFolderName, req.userId);
+const menuPath = getMenuPath(projectFolderName, menuId, req.userId);
 ```
 
 **Key Functions:**
@@ -148,13 +148,13 @@ const imagePath = getImagePath(projectFolderName, filename, req.userId);
 
 ### Theme Controller (`themeController.js`)
 
-**Rationale:** Theme settings are stored per-project in `data/projects/{folderName}/theme.json`. Theme operations must use the project folderName to access these files.
+**Rationale:** Theme settings are stored per-project in `data/users/{userId}/projects/{folderName}/theme.json`. Theme operations must use the project folderName to access these files.
 
 **Pattern:**
 
 ```javascript
-const projectFolderName = await getProjectFolderName(projectId);
-const themeJsonPath = getProjectThemeJsonPath(projectFolderName);
+const projectFolderName = await getProjectFolderName(projectId, req.userId);
+const themeJsonPath = getProjectThemeJsonPath(projectFolderName, req.userId);
 ```
 
 **Key Functions:**
@@ -178,7 +178,7 @@ const themeJsonPath = getProjectThemeJsonPath(projectFolderName);
 **Pattern:**
 
 ```javascript
-const project = projects.find((p) => p.id === projectId);
+const project = projectRepo.getProjectById(projectId, req.userId);
 const projectFolderName = project.folderName;
 const projectDir = getProjectDir(projectFolderName, req.userId);
 ```
@@ -200,8 +200,8 @@ const projectDir = getProjectDir(projectFolderName, req.userId);
 **Pattern:**
 
 ```javascript
-const projectFolderName = await getProjectFolderName(activeProjectId);
-const projectDir = getProjectDir(projectFolderName);
+const projectFolderName = await getProjectFolderName(activeProjectId, req.userId);
+const projectDir = getProjectDir(projectFolderName, req.userId);
 ```
 
 **Key Functions:**
@@ -222,8 +222,8 @@ const projectDir = getProjectDir(projectFolderName);
 **Pattern:**
 
 ```javascript
-const projectFolderName = await getProjectFolderName(projectId);
-const projectDir = getProjectDir(projectFolderName);
+const projectFolderName = await getProjectFolderName(projectId, userId);
+const projectDir = getProjectDir(projectFolderName, userId);
 ```
 
 **Key Functions:**
@@ -386,8 +386,8 @@ await fs.outputFile(resourcePath, data);
 // 1. Detect folderName change
 if (updatedProject.folderName !== originalProject.folderName) {
   // 2. Rename directory
-  const oldDir = getProjectDir(originalProject.folderName);
-  const newDir = getProjectDir(updatedProject.folderName);
+  const oldDir = getProjectDir(originalProject.folderName, req.userId);
+  const newDir = getProjectDir(updatedProject.folderName, req.userId);
   await fs.copy(oldDir, newDir);
   await fs.remove(oldDir);
 }
@@ -413,7 +413,7 @@ if (updatedProject.folderName !== originalProject.folderName) {
 
 - System automatically appends numbers to ensure uniqueness
 - Check folderName generation logic in `projectController.js`
-- Verify `generateUniqueProjectId()` is being used
+- Verify `generateUniqueSlug()` is being used
 
 ---
 
@@ -429,8 +429,8 @@ The Project ID/FolderName architecture provides a robust foundation for managing
 
 An alternative architecture would use **UUIDs exclusively** for all filesystem operations, with human-readable folderNames **only** for exports:
 
-- Project directories: `data/projects/a7f3c2b1-4d5e-6789-0abc-def123456789/`
-- Exports: `data/publish/my-awesome-project/` (folderName-based)
+- Project directories: `data/users/{userId}/projects/a7f3c2b1-4d5e-6789-0abc-def123456789/`
+- Exports: `data/users/{userId}/publish/my-awesome-project/` (folderName-based)
 
 ### Advantages of UUID-Only Approach
 

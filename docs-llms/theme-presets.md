@@ -125,7 +125,7 @@ For any preset:
 
 **Settings override application**: After `copyThemeToProject` copies `theme.json`, iterate all settings groups and update `item.default` for items whose `id` matches a key in `settingsOverrides`. This happens once at project creation — after that the project is independent.
 
-**Static file serving**: Screenshots already served via `express.static("themes")` at `server/index.js:63`. Preset screenshots at `/themes/arch/presets/restaurant/screenshot.png` work automatically.
+**Static file serving**: Screenshots are served from the authenticated, user-scoped themes directory via `/themes/*` (backed by `getUserThemesDir(req.userId)` in `server/index.js`). Preset screenshots at `/themes/arch/presets/restaurant/screenshot.png` work automatically for the authenticated user.
 
 **Theme updates**: Presets are only used at project creation time. Once a project is created, it's independent. Theme updates (`applyThemeUpdate`) modify widgets/layout/assets but never touch project pages/menus. Preset files can be updated via the existing version system (add/modify files in `updates/` version folders).
 

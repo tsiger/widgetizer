@@ -182,7 +182,8 @@ The export system provides several API endpoints for comprehensive export manage
 - **`DELETE /api/export/:projectId/:version`**: Delete a specific export version
 - **`GET /api/export/files/:exportDir`**: Get entry file information for an export
 - **`GET /api/export/download/:exportDir`**: Download export as ZIP file
-- **`GET /api/export/view/:exportDir/*`**: Serve exported files for preview
+- **`GET /api/export/view/:exportDir`**: Serve export entry file for preview
+- **`GET /api/export/view/:exportDir/*filePath`**: Serve specific exported files for preview
 
 ### Smart File Detection
 
@@ -259,7 +260,7 @@ Export directories are scoped per user via `getUserPublishDir(userId)` (from `se
 
 All export controller functions (`exportProject`, `getExportFiles`, `downloadExport`, `deleteExport`, `cleanupProjectExports`) and the `serveExportFile` route handler use `req.userId` to resolve the correct publish directory. Export records in SQLite store only the relative directory name (e.g. `my-project-slug-v1`); the `resolveOutputDir()` helper prepends the user-scoped publish path at runtime.
 
-The `GET /api/export/view/:exportDir/*` route applies `isWithinDirectory()` checks against the user's publish directory to prevent path traversal.
+The `GET /api/export/view/:exportDir` and `GET /api/export/view/:exportDir/*filePath` routes apply `isWithinDirectory()` checks against the user's publish directory to prevent path traversal.
 
 ## Security Considerations
 

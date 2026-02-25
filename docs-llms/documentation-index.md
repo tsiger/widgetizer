@@ -37,7 +37,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[arch-design-system.md](arch-design-system.md)** - Arch Theme Design System
+### **[theme-design-system.md](theme-design-system.md)** - Arch Theme Design System
 
 **Purpose**: Complete reference for the Arch theme's visual design language, CSS custom properties, layout system, component patterns, and modifiers **When to use**:
 
@@ -275,7 +275,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## 🗺️ Architecture & Reference
 
-### **[app-architecture.md](app-architecture.md)** - Application Architecture
+### **[core-architecture.md](core-architecture.md)** - Application Architecture
 
 **Purpose**: Comprehensive documentation of the app's architecture across all major sections **When to use**:
 
@@ -341,7 +341,7 @@ Primary docs: `core-export.md`, `core-media.md`, `core-projects.md` Secondary: `
 
 ### **System Architects**
 
-Primary docs: `theming.md`, `core-projects.md`, `core-hooks.md`, `app-architecture.md` Secondary: All other documents for comprehensive understanding
+Primary docs: `theming.md`, `core-projects.md`, `core-hooks.md`, `core-architecture.md` Secondary: All other documents for comprehensive understanding
 
 ### **Content Managers / End-Users**
 
@@ -361,22 +361,21 @@ Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`
 
 ## 🎨 Code Quality & Standards
 
-### **[future-tests.md](future-tests.md)** - Testing Strategy & Implementation
+### **[beta-testing-script.md](beta-testing-script.md)** - Beta Testing Checklist
 
-**Purpose**: Documents the testing infrastructure, what's been tested, and what remains **When to use**:
+**Purpose**: End-to-end manual validation checklist for core product workflows **When to use**:
 
-- Running or adding frontend tests (Vitest)
-- Running or adding backend tests (Node test runner)
-- Understanding test conventions (file location, store testing pattern, theme widget pattern)
-- Planning next testing phases (hooks, browser tests)
+- Running a full regression pass before release
+- Validating project/theme/media/export workflows manually
+- Coordinating beta testing with explicit pass/fail checklists
 
-**Key topics**: Vitest config, Tier 1 (utility functions), Tier 2 (Zustand stores), theme widget rendering tests, future Tier 3 (React hooks) and Tier 4 (preview runtime)
+**Key topics**: Core flow scenarios, expected results, edge-case checks, release readiness validation
 
 ---
 
 ## 💻 Desktop Builds
 
-### **[electron-app.md](electron-app.md)** - Electron Desktop App
+### **[core-electron.md](core-electron.md)** - Electron Desktop App
 
 **Purpose**: Guide for developing, building, and distributing the Electron desktop application **When to use**:
 

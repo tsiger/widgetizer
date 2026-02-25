@@ -4,7 +4,7 @@ This document explains the "Themes" management page, which is the user interface
 
 ## 1. Overview
 
-Themes are structured directories that define the layout, styles, and functionality of the application. In packaged Electron builds, the themes directory is bundled under `app.asar.unpacked/themes/`. Each theme contains:
+Themes are structured directories that define the layout, styles, and functionality of the application. Runtime theme operations are user-scoped under `data/users/{userId}/themes/`. In packaged Electron builds, default themes are seeded from `app.asar.unpacked/themes/` into each user's themes directory on first access. Each theme contains:
 
 - `theme.json`: Theme metadata and configuration.
 - `screenshot.png`: A 1280x720 preview image of the theme, displayed on the card in the Themes UI.
@@ -131,12 +131,17 @@ The backend handles the logic for listing themes, processing uploads, and managi
 | Method | Endpoint | Middleware | Controller Function | Description |
 | --- | --- | --- | --- | --- |
 | `GET` | `/api/themes` |  | `getAllThemes` | Gets metadata for all installed themes with update status. |
-| `POST` | `/api/themes/upload` | `upload.single("themeZip")` | `uploadTheme` | Handles the upload and extraction of a new theme zip. |
-| `GET` | `/api/themes/:id/versions` |  | `getThemeVersions` | Gets all available versions for a theme. |
-| `POST` | `/api/themes/:id/update` |  | `updateTheme` | Builds `latest/` snapshot for a single theme. |
-| `DELETE` | `/api/themes/:id` |  | `deleteTheme` | Deletes a theme. Returns 409 if theme is used by any project. |
-| `GET` | `/api/themes/:id/presets` |  | `getThemePresets` | Gets all presets for a theme (names, descriptions, screenshots). |
 | `GET` | `/api/themes/update-count` |  | `getThemeUpdateCount` | Gets count of themes with pending updates. |
+| `GET` | `/api/themes/:id` |  | `getTheme` | Gets full metadata for one theme. |
+| `GET` | `/api/themes/:id/widgets` |  | `getThemeWidgets` | Gets widget schemas for a theme. |
+| `GET` | `/api/themes/:id/templates` |  | `getThemeTemplates` | Gets templates for a theme. |
+| `GET` | `/api/themes/:id/versions` |  | `getThemeVersionsHandler` | Gets all available versions for a theme. |
+| `GET` | `/api/themes/:id/presets` |  | `getThemePresets` | Gets all presets for a theme (names, descriptions, screenshots). |
+| `POST` | `/api/themes/:id/update` |  | `updateTheme` | Builds `latest/` snapshot for a single theme. |
+| `GET` | `/api/themes/project/:projectId` |  | `getProjectThemeSettings` | Gets a project's `theme.json` settings. |
+| `POST` | `/api/themes/project/:projectId` |  | `saveProjectThemeSettings` | Saves a project's `theme.json` settings. |
+| `POST` | `/api/themes/upload` | `handleThemeUpload` | `uploadTheme` | Handles upload and extraction of a theme ZIP (new theme or updates). |
+| `DELETE` | `/api/themes/:id` |  | `deleteTheme` | Deletes a theme. Returns 409 if theme is used by any project. |
 
 ### Controller Logic (`server/controllers/themeController.js`)
 
@@ -157,7 +162,7 @@ The backend handles the logic for listing themes, processing uploads, and managi
   - Validates ZIP structure and required files
   - Ensures `theme.json`, `layout.liquid`, `screenshot.png` exist
   - Verifies `assets/`, `templates/`, `widgets/` directories
-  - Prevents overwriting existing themes
+  - Supports importing new update versions for existing themes when base versions match
 
 #### Theme Deletion
 

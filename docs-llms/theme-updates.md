@@ -275,15 +275,15 @@ Projects track theme update information:
   "id": "project-uuid",
   "name": "My Project",
   "theme": "arch",
-  "themeVersion": "1.0.0"
+  "themeVersion": "1.0.0",
+  "receiveThemeUpdates": true
   // ... other fields
 }
 ```
 
 - `theme`: Theme folder ID (unchanged)
 - `themeVersion`: Currently installed theme version
-
-**Note:** The `receiveThemeUpdates` toggle was removed. All projects can receive theme updates.
+- `receiveThemeUpdates`: Per-project preference controlled by `PUT /api/projects/:id/theme-updates` (`enabled: boolean`)
 
 ## API Endpoints
 
@@ -293,7 +293,8 @@ Projects track theme update information:
 | `GET`  | `/api/themes/:id/versions`              | Get all versions for a theme                |
 | `POST` | `/api/themes/:id/update`                | Build `latest/` for a single theme          |
 | `GET`  | `/api/themes/update-count`              | Get count of themes with pending updates    |
-| `GET`  | `/api/projects/:id/theme-updates`       | Check if project has theme update available |
+| `GET`  | `/api/projects/:id/theme-updates/status` | Check if project has theme update available |
+| `PUT`  | `/api/projects/:id/theme-updates`       | Toggle project `receiveThemeUpdates` preference |
 | `POST` | `/api/projects/:id/theme-updates/apply` | Apply theme update to project               |
 
 ## Implementation Files

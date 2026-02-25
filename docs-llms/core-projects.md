@@ -64,7 +64,7 @@ This file contains functions that make API calls to the backend:
 6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
 7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
 8.  **API Call**: `ProjectsAdd.jsx`'s `handleSubmit` function calls `createProject(formData)` from `projectManager.js`, which sends a `POST` request to the backend API to create the new project.
-9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`. In packaged Electron builds, the source theme files live in `app.asar.unpacked/themes/`. The `presets/` directory is excluded from the copy. These become the project's working theme files.
+9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/users/<userId>/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`. In packaged Electron builds, base themes are seeded from `app.asar.unpacked/themes/` into each user's installed themes directory (`data/users/<userId>/themes/`) on first access. The `presets/` directory is excluded from the project copy. These become the project's working theme files.
 9b. **Preset Application**: If a preset was selected during creation, the system applies preset overrides after the theme copy:
     - **Templates**: If the preset has its own `templates/` directory, those templates are used instead of the root theme templates for the `processTemplatesRecursive` step.
     - **Menus**: If the preset has its own `menus/` directory, the root menus already copied into the project are removed and replaced with the preset's menus. This happens before menu enrichment (step 10).
@@ -167,6 +167,9 @@ The frontend `projectManager.js` communicates with a set of backend API endpoint
 | `POST` | `/api/projects/import` | `importProject` | Imports a project from a ZIP file upload. |
 | `GET` | `/api/projects/:projectId/widgets` | `getProjectWidgets` | Retrieves all widget schemas for a project. |
 | `GET` | `/api/projects/:projectId/icons` | `getProjectIcons` | Retrieves all available icons for a project. |
+| `GET` | `/api/projects/:id/theme-updates/status` | `getThemeUpdateStatus` | Checks whether a newer theme version is available for the project. |
+| `PUT` | `/api/projects/:id/theme-updates` | `toggleProjectThemeUpdates` | Toggles the project's `receiveThemeUpdates` preference (`enabled: boolean`). |
+| `POST` | `/api/projects/:id/theme-updates/apply` | `applyProjectThemeUpdate` | Applies the currently available theme update to the project. |
 
 ### Security Considerations
 

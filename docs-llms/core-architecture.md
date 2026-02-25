@@ -28,6 +28,7 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 | `exportProject(id)`       | POST   | `/api/projects/:id/export`               |
 | `importProject(file)`     | POST   | `/api/projects/import`                   |
 | `checkThemeUpdates(id)`   | GET    | `/api/projects/:id/theme-updates/status` |
+| `toggleThemeUpdates(id, enabled)` | PUT | `/api/projects/:id/theme-updates` |
 | `applyThemeUpdate(id)`    | POST   | `/api/projects/:id/theme-updates/apply`  |
 
 ### Server Controller (`server/controllers/projectController.js`)
@@ -46,6 +47,7 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 | `exportProject()`           | Export as ZIP with manifest                                |
 | `importProject()`           | Import from ZIP                                            |
 | `getThemeUpdateStatus()`    | Check theme update availability                            |
+| `toggleProjectThemeUpdates()` | Toggle per-project theme update preference                 |
 | `applyProjectThemeUpdate()` | Apply theme update                                         |
 
 ### Store (`src/stores/projectStore.js`)
@@ -125,9 +127,8 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 
 ### Internal Helpers
 
-- `generateUniqueSlug(name, projectId)` - Generate unique slug
-- `ensureUniqueSlug(slug, projectId)` - Ensure slug uniqueness
-- `listProjectPagesData(projectId)` - List and read all page files
+- `generateUniqueSlug(baseName, existsCheck, options)` - Generate unique slug
+- `listProjectPagesData(projectFolderName, userId)` - List and read all page files
 
 ### Services Used
 
@@ -168,14 +169,14 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 | `getAllMenus()`   | List all menus for active project |
 | `getMenu()`       | Get menu by ID                    |
 | `createMenu()`    | Create menu with unique ID        |
-| `updateMenu()`    | Update menu, handle ID rename     |
+| `updateMenu()`    | Update menu in place (stable ID)  |
 | `deleteMenu()`    | Delete menu file                  |
 | `duplicateMenu()` | Clone with regenerated item IDs   |
 | `getMenuById()`   | Helper for rendering service      |
 
 ### Internal Helpers
 
-- `generateUniqueMenuId()` - Generate unique menu ID from name
+- `generateUniqueSlug()` - Generate unique menu ID from name
 - `generateNewMenuItemIds()` - Recursively regenerate item IDs
 
 ---
@@ -280,13 +281,13 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 | `getThemeSourceDir(id)`      | Get source dir (latest/ or root)  |
 | `getThemeLatestVersion(id)`  | Get latest version string         |
 | `buildLatestSnapshot(id)`    | Build latest/ from base + updates |
-| `themeHasUpdates(id)`        | Check if theme has updates folder |
 | `themeHasPendingUpdates(id)` | Check if pending updates exist    |
 | `getAllThemes()`             | Get all themes with metadata      |
 | `getTheme()`                 | Get specific theme                |
 | `getThemeWidgets()`          | Get theme widgets                 |
 | `getThemeTemplates()`        | Get theme templates               |
 | `uploadTheme()`              | Upload theme zip                  |
+| `handleThemeUpload()`        | Configure theme ZIP upload middleware |
 | `getThemeUpdateCount()`      | Count themes with pending updates |
 | `updateTheme()`              | Build latest/ for single theme    |
 | `getThemePresets()`          | Get presets for a theme            |
@@ -301,6 +302,7 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 | Function                      | Purpose                               |
 | ----------------------------- | ------------------------------------- |
 | `checkForUpdates(projectId)`  | Check if update available for project |
+| `toggleThemeUpdates(projectId)` | Toggle project `receiveThemeUpdates` |
 | `mergeThemeSettings()`        | Merge user + new theme.json settings  |
 | `applyThemeUpdate(projectId)` | Apply update to project               |
 
@@ -357,11 +359,11 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 
 ### Internal Helpers
 
-- `readExportHistory()` / `writeExportHistory()` - History file ops
-- `getNextVersion()` - Auto-increment version
-- `recordExport()` - Record to history
-- `findEntryFile()` - Find index.html or first HTML
+- `resolveOutputDir()` - Resolve user-scoped publish output path from relative `outputDir`
+- `findEntryFile()` - Find `index.html`, fallback to first HTML
 - `findFilesRecursive()` - Find files by patterns
+- `exportRepo.getNextVersion()` - Auto-increment export version
+- `exportRepo.recordExport()` - Persist export history row in SQLite
 
 ### Service (`server/services/renderingService.js`)
 
@@ -398,7 +400,7 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 | ----------------------- | --------------------------------------- |
 | `getAppSettings()`      | Return current settings                 |
 | `updateAppSettings()`   | Update with validation                  |
-| `readAppSettingsFile()` | Read file (creates defaults if missing) |
+| `readAppSettingsFile()` | Read from SQLite-backed settings store (with defaults merge) |
 | `getSetting(key)`       | Get setting by dot-notation key         |
 
 ### Hook (`src/hooks/useAppSettings.js`)
@@ -694,27 +696,26 @@ Save button / Auto-save timer
 
 ### 3. Duplicate Slug Generation Logic
 
-**Problem:** Similar slug generation patterns in multiple controllers.
+**Status:** Mostly resolved. Slug generation is centralized via `slugHelpers.generateUniqueSlug()`.
 
 **Locations:**
 
-- `pageController.js`: `generateUniqueSlug()`, `ensureUniqueSlug()`
-- `menuController.js`: `generateUniqueMenuId()`
-- `projectController.js`: `generateUniqueProjectId()`
+- `pageController.js`: `generateUniqueSlug()`
+- `menuController.js`: `generateUniqueSlug()`
+- `projectController.js`: `generateUniqueSlug()`
 
-**Improvement:** Extract to a shared utility: `generateUniqueId(baseName, existingIds, options)`.
+**Improvement:** Keep all new slug/ID generation paths on `generateUniqueSlug()` to avoid regressions.
 
 ### 4. Active Project Resolution
 
-**Problem:** Many controllers resolve active project context repeatedly (now via SQLite-backed project metadata), creating repeated boilerplate.
+**Status:** Mostly resolved for active-project routes.
 
-**Locations:**
+**Current behavior:**
 
-- `pageController.js`: Every function starts with getting active project
-- `menuController.js`: Same pattern
-- `mediaController.js`: Same pattern
+- `pageController.js` and `menuController.js` use `resolveActiveProject` middleware (`req.activeProject`)
+- `mediaController.js` uses explicit `:projectId` route params and resolves folderName via `getProjectFolderName()`
 
-**Improvement:** Create middleware that attaches `req.activeProject` and `req.projectFolderName` for routes that need it.
+**Improvement:** Keep `resolveActiveProject` as the standard for active-project routes and avoid re-introducing per-handler project lookups.
 
 ### 5. Media Usage Tracking Pattern
 

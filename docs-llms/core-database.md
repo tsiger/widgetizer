@@ -62,14 +62,16 @@ Controllers use repository modules instead of direct SQL:
 
 SQLite does **not** replace project content files. These remain file-based:
 
-- `data/projects/<folderName>/pages/*.json`
-- `data/projects/<folderName>/pages/global/header.json`
-- `data/projects/<folderName>/pages/global/footer.json`
-- `data/projects/<folderName>/menus/*.json`
-- `data/projects/<folderName>/theme.json` (and theme assets/templates/widgets)
-- `data/projects/<folderName>/uploads/images/*`
-- `data/projects/<folderName>/uploads/videos/*`
-- `data/projects/<folderName>/uploads/audios/*`
+- `data/users/<userId>/projects/<folderName>/pages/*.json`
+- `data/users/<userId>/projects/<folderName>/pages/global/header.json`
+- `data/users/<userId>/projects/<folderName>/pages/global/footer.json`
+- `data/users/<userId>/projects/<folderName>/menus/*.json`
+- `data/users/<userId>/projects/<folderName>/theme.json` (and theme assets/templates/widgets)
+- `data/users/<userId>/projects/<folderName>/uploads/images/*`
+- `data/users/<userId>/projects/<folderName>/uploads/videos/*`
+- `data/users/<userId>/projects/<folderName>/uploads/audios/*`
+
+In open-source mode, `userId` is always `local`.
 
 ---
 
@@ -102,4 +104,3 @@ Use this as the quick rule:
 - **Filesystem owns content assets**: pages, menus, globals, themes, uploaded binaries
 
 When updating docs or code paths, keep this boundary explicit to avoid stale JSON-era assumptions.
-

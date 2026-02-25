@@ -14,7 +14,7 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
 - **Audio**: `data/users/{userId}/projects/{folderName}/uploads/audios/`
 - In open-source mode, `userId` is always `"local"` (e.g. `data/users/local/projects/{folderName}/uploads/images/`).
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
-- **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original with prefixes (e.g., `thumb_`, `small_`, `medium_`, `large_`).
+- **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original using `-{size}` suffixes (e.g., `photo-thumb.jpg`, `photo-small.jpg`).
 - **Smart Size Generation**: The system only creates image sizes that are meaningfully smaller than the original. If an image is 800px wide and the "large" size is configured for 1920px, no "large" size will be generated since it would be identical to a smaller size. The image tag automatically falls back to the best available size or original image.
 - **Video Processing**: Videos are stored without any processing - no thumbnail generation or metadata extraction. This keeps the upload process simple and fast.
 
@@ -31,7 +31,7 @@ The system's image processing behavior is controlled through **App Settings**, m
   - `small`: 480px width
   - `medium`: 1024px width
   - `large`: 1920px width
-- **Fallback Behavior**: If the `thumb` size is disabled, the system automatically uses the first available enabled size (or original image) for thumbnail previews.
+- **Fallback Behavior**: If a thumbnail variant is unavailable, the media UI falls back to the original image path for preview rendering.
 
 ### Theme-Defined Image Sizes
 
@@ -96,12 +96,11 @@ Media metadata is stored in SQLite, while the uploaded binary files remain on di
       },
       "width": 1920,
       "height": 1080,
-      "thumbnail": "/uploads/images/thumb_my-awesome-picture.jpg",
       "usedIn": ["about-us", "home"],
       "sizes": {
-        "thumb": { "path": "/uploads/images/thumb_my-awesome-picture.jpg", "width": 150, "height": 113 },
-        "small": { "path": "/uploads/images/small_my-awesome-picture.jpg", "width": 480, "height": 360 },
-        "medium": { "path": "/uploads/images/medium_my-awesome-picture.jpg", "width": 1024, "height": 768 }
+        "thumb": { "path": "/uploads/images/my-awesome-picture-thumb.jpg", "width": 150, "height": 113 },
+        "small": { "path": "/uploads/images/my-awesome-picture-small.jpg", "width": 480, "height": 360 },
+        "medium": { "path": "/uploads/images/my-awesome-picture-medium.jpg", "width": 1024, "height": 768 }
         // Note: "large" size omitted if disabled in settings
       }
     },
@@ -114,12 +113,11 @@ Media metadata is stored in SQLite, while the uploaded binary files remain on di
       "uploaded": "2023-10-29T11:00:00.000Z",
       "path": "/uploads/videos/hero-video.mp4",
       "metadata": {
-        "alt": "Hero background video showing product in action",
-        "title": "Product Demo Video"
+        "title": "Product Demo Video",
+        "description": "Hero background video"
       },
       "thumbnail": null,
       "usedIn": []
-    }
     }
   ]
 }
@@ -161,7 +159,8 @@ The media library supports video uploads alongside images with the following fea
 **Video-Specific Metadata:**
 
 - `thumbnail`: Always `null` for videos (no thumbnails generated)
-- No additional metadata is extracted or stored for videos
+- Metadata includes `title` and `description` fields in API responses
+- No additional technical metadata (duration/codec) is extracted
 
 ### Audio Support
 
@@ -181,7 +180,6 @@ The media library supports audio uploads alongside images and videos with the fo
 
 **Audio-Specific Metadata:**
 
-- `thumbnail`: Always `null` for audio files
 - Metadata includes `title` and `description` (both optional)
 - No additional metadata is extracted or stored for audio files
 
@@ -343,13 +341,16 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 | Method | Endpoint | Middleware | Controller Function | Description |
 | --- | --- | --- | --- | --- |
 | `GET` | `/api/media/projects/:projectId/media` |  | `getProjectMedia` | Reads and returns media metadata from SQLite. |
-| `POST` | `/api/media/projects/:projectId/media` | `upload.array("files")` | `uploadProjectMedia` | Handles file uploads. |
+| `POST` | `/api/media/projects/:projectId/media` | `upload.array("files", 10)` | `uploadProjectMedia` | Handles file uploads. |
 | `DELETE` | `/api/media/projects/:projectId/media/:fileId` |  | `deleteProjectMedia` | Deletes a single file and its metadata. Prevents deletion if file is in use. |
 | `POST` | `/api/media/projects/:projectId/media/bulk-delete` |  | `bulkDeleteProjectMedia` | Deletes multiple files and their metadata. Prevents deletion if any files are in use. |
 | `PUT` | `/api/media/projects/:projectId/media/:fileId/metadata` |  | `updateMediaMetadata` | Updates the metadata for a single file. |
 | `GET` | `/api/media/projects/:projectId/media/:fileId/usage` |  | `getMediaFileUsage` | Returns usage information for a specific media file. |
 | `POST` | `/api/media/projects/:projectId/refresh-usage` |  | `refreshMediaUsage` | Manually refreshes usage tracking for all media files in the project. |
-| `GET` | `/api/media/projects/:projectId/uploads/images/:filename` |  | `serveProjectMedia` | Serves a physical file for viewing. |
+| `GET` | `/api/media/projects/:projectId/media/:fileId` |  | `serveProjectMedia` | Serves a media file by metadata ID. |
+| `GET` | `/api/media/projects/:projectId/uploads/images/:filename` |  | `serveProjectMedia` | Serves an image file by filename. |
+| `GET` | `/api/media/projects/:projectId/uploads/videos/:filename` |  | `serveProjectMedia` | Serves a video file by filename. |
+| `GET` | `/api/media/projects/:projectId/uploads/audios/:filename` |  | `serveProjectMedia` | Serves an audio file by filename. |
 
 **Identifier contract:** `:projectId` is always the project UUID in API routes. The backend resolves it to `folderName` for filesystem paths. If the UUID cannot be resolved, the request fails (no fallback directories are created). Errors use standardized codes (for example `PROJECT_NOT_FOUND`, `PROJECT_DIR_MISSING`) to keep responses consistent.
 
@@ -374,25 +375,19 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
       - **Skip sizes larger than original**: Only creates sizes that are smaller than the original image dimensions to avoid storage waste
   6.  If the file is a video, no processing is performed - it's simply stored as-is.
   7.  It creates a metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants (images only)—and persists it to SQLite.
-  8.  **Thumbnail Assignment**: The system ensures there's always a thumbnail for previews:
-      - If `thumb` size is enabled: uses the thumb image
-      - If `thumb` is disabled: uses the first available enabled size
-      - If no sizes are enabled: uses the original image
-  9.  Files that are too large or have the wrong type are rejected and immediately deleted from the server.
-  10. **Parallel Processing**: All files are processed in parallel using `Promise.allSettled` for optimal performance.
-  11. It returns a JSON response to the client with arrays of successfully processed and rejected files.
+  8.  Files that are too large or have the wrong type are rejected and immediately deleted from the server.
+  9.  **Parallel Processing**: All files are processed in parallel using `Promise.allSettled` for optimal performance.
+  10. It returns a JSON response to the client with arrays of successfully processed and rejected files.
 - **Deletion Logic (`deleteProjectMedia`, `bulkDeleteProjectMedia`)**:
-  1.  The controller reads media metadata via the SQLite-backed repository wrapper.
-  2.  It finds the file entry (or entries) by ID.
+  1.  The controller loads the target file entry (or entries) from SQLite.
+  2.  It resolves filesystem paths for originals and generated variants.
   3.  **Usage Check**: It verifies that the file(s) are not currently in use by checking the `usedIn` array. If any files are in use, deletion is prevented with an error response.
   4.  It uses `fs.remove` to delete the original physical file and **all** of its generated sizes from the filesystem.
-  5.  It removes the metadata object(s) from the `files` array.
-  6.  It writes the updated media state back to SQLite.
+  5.  It deletes metadata rows from SQLite (`media_files`, with cascade to `media_sizes` + `media_usage`).
 - **Metadata Update (`updateMediaMetadata`)**:
-  1.  The controller reads media metadata from SQLite.
-  2.  It finds the file to update in the `files` array by its `fileId`.
-  3.  It updates the `alt` and `title` properties within the `metadata` object for that file.
-  4.  It persists the update to SQLite and returns the updated file object.
+  1.  The controller loads the file from SQLite by `fileId`.
+  2.  It updates persisted metadata columns (`alt`, `title`).
+  3.  For video/audio responses, `description` is accepted in the request and echoed in response metadata, but persistence is currently limited to `title` in SQLite.
 
 ### Usage Tracking Service (`server/services/mediaUsageService.js`)
 
