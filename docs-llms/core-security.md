@@ -64,7 +64,28 @@ Custom error-handling middleware (`server/middleware/errorHandler.js`) registere
 
 **Known risks:** XSS via custom scripts, CSS injection, CSP bypass, third-party script supply-chain risk. These are accepted trade-offs documented for users and theme authors. See the [theming docs](../docs/theming.md) for user-facing guidance.
 
-### 8. Project Import/Export & Theme Upload Security
+### 8. Platform Limits (`server/limits.js`)
+
+All server-enforced resource limits are centralized in `server/limits.js` as `EDITOR_LIMITS`. These limits have two enforcement modes:
+
+**Always enforced (both open-source and hosted):**
+- ZIP entry count (`maxZipEntries`: 10,000) — prevents ZIP bombs
+- Image dimensions (`maxImageDimension`: 10,000px, `maxImagePixels`: 100M) — prevents decompression bombs
+- Request body sizes (`jsonBodyLimit`: 2MB, `editorJsonBodyLimit`: 10MB)
+
+**Hosted-mode only (`HOSTED_MODE=true`):**
+- Project counts (`maxProjectsPerUser`: 25)
+- Page counts (`maxPagesPerProject`: 100)
+- Widget counts (`maxWidgetsPerPage`: 50, `maxBlocksPerWidget`: 200)
+- Media limits (`maxFilesPerProject`: 1,000, `maxTotalStoragePerUserMB`: 5,000)
+- Menu limits (`maxMenusPerProject`: 20, `maxMenuItemsPerMenu`: 200)
+- Theme limits (`maxThemesPerUser`: 20)
+- Upload ceilings (`maxFileSizeMBCeiling`: 50, `maxVideoSizeMBCeiling`: 200, `maxAudioSizeMBCeiling`: 100)
+- Export ceilings (`maxImportSizeMBCeiling`: 2,000MB, `maxExportVersionsCeiling`: 50)
+
+User-configurable app settings (e.g., `maxFileSizeMB`) are clamped to these ceilings in `appSettingsController.js` before saving. Enforcement utility functions (`checkLimit`, `checkStringLength`, `validateZipEntries`, `clampToCeiling`) are in `server/utils/limitChecks.js`.
+
+### 9. Project Import/Export & Theme Upload Security
 
 Both project import and theme upload accept ZIP files from external sources. Implemented protections:
 
@@ -93,7 +114,7 @@ Both project import and theme upload accept ZIP files from external sources. Imp
 - Project import: cleanup in both success path and outer catch
 - Theme upload: cleanup via `finally` block on all code paths
 
-### 9. Preview Isolation
+### 10. Preview Isolation
 
 Optional security boundary that runs the preview iframe on a separate origin from the builder.
 

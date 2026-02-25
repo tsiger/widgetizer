@@ -113,7 +113,19 @@ For a successful export:
 
 The exported folder contains static HTML, CSS, JS, and media files that can be deployed to any web server or static hosting service. Simply upload the contents to your hosting provider's public directory.
 
-> **Coming soon:** We're building a hosting service specifically designed for Widgetizer sites, with one-click deployment directly from the app.
+### Widgetizer Publisher (Free Hosting)
+
+[Widgetizer Publisher](https://publisher.widgetizer.org) is a free hosting service built specifically for Widgetizer sites. Upload your exported ZIP and get a live site at `your-site.mywidgetizer.org` in seconds.
+
+**What you get:**
+
+- **Instant hosting** --- upload your ZIP and your site is live immediately
+- **Built-in analytics** --- privacy-first pageview tracking is auto-injected into your HTML on upload (no cookies, no tracking identifiers, respects Do Not Track)
+- **Form submissions** --- if your site uses the contact form widget, submissions are collected and emailed to you automatically
+- **Version history** --- roll back to previous uploads at any time
+- **Custom subdomains** --- choose your `*.mywidgetizer.org` subdomain
+
+If you use the hosted editor at `editor.widgetizer.org`, publishing is even simpler --- one-click deploy directly from the app, with analytics and forms set up automatically.
 
 # Export vs. Project Export
 

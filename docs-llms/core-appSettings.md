@@ -174,6 +174,32 @@ The image processing settings directly control how uploaded images are processed
 
 This server-side validation and processing ensures that the constraints are always enforced securely, regardless of any frontend logic, while providing administrators full control over image processing behavior and storage requirements.
 
+## Server-Side Enforcement Ceilings (`EDITOR_LIMITS`)
+
+When running in hosted mode (`HOSTED_MODE=true`), all user-configurable app settings are clamped to server-enforced ceilings defined in `server/limits.js`. This prevents users from setting values that exceed safe platform limits.
+
+| User Setting | Ceiling Constant | Max Value |
+|-------------|-----------------|-----------|
+| `maxFileSizeMB` | `media.maxFileSizeMBCeiling` | 50 MB |
+| `maxVideoSizeMB` | `media.maxVideoSizeMBCeiling` | 200 MB |
+| `maxAudioSizeMB` | `media.maxAudioSizeMBCeiling` | 100 MB |
+| `maxImportSizeMB` | `maxImportSizeMBCeiling` | 2,000 MB |
+| `maxVersionsToKeep` | `maxExportVersionsCeiling` | 50 |
+
+Clamping is applied in `appSettingsController.js` using the `clampToCeiling()` utility from `server/utils/limitChecks.js`. If a user saves `maxFileSizeMB: 999`, it is silently clamped to 50 before persisting.
+
+**Safety limits (always enforced, regardless of mode):**
+
+| Limit | Value | Purpose |
+|-------|-------|---------|
+| `maxImageDimension` | 10,000 px | Prevents image decompression bombs |
+| `maxImagePixels` | 100,000,000 | Sharp `limitInputPixels` protection |
+| `maxZipEntries` | 10,000 | Prevents ZIP bombs on import/upload |
+| `jsonBodyLimit` | 2 MB | Express JSON body limit |
+| `editorJsonBodyLimit` | 10 MB | Page content save routes |
+
+For the full list of all platform limits, see `server/limits.js` and **[Platform Security](core-security.md)**.
+
 ## Security Considerations
 
 All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.

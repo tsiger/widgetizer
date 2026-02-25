@@ -300,6 +300,31 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+## 🌐 Publisher Platform (Hosted Service)
+
+The Publisher is the hosting platform built on Cloudflare Workers that hosts sites created with the open-source editor. Its documentation lives in the sibling `widgetizer-publisher/docs-llms/` directory.
+
+### Key Publisher Docs (cross-reference)
+
+| Document | What it covers |
+|----------|---------------|
+| `publisher/docs-llms/publisher.md` | Full API reference — endpoints, database, deployment |
+| `publisher/docs-llms/publisher-analytics.md` | Analytics system — separate worker (`analytics.widgetizer.org`), Cloudflare Analytics Engine, event schema, privacy posture, snippet auto-injection |
+| `publisher/docs-llms/forms.md` | Form submissions — tokens, Turnstile, email notifications |
+| `publisher/docs-llms/pricing.md` | Tier definitions and feature limits |
+
+### How Analytics Connects to the Editor
+
+The open-source editor does **not** contain any analytics code. When a user exports a site and uploads it to Publisher (or publishes via the hosted editor), the Publisher API **auto-injects** a lightweight tracking snippet (`<script data-widgetizer-analytics="1" ...>`) into all HTML files during upload/deploy. This means:
+
+- Open-source users get analytics automatically on Publisher with zero configuration.
+- The editor's export pipeline does not need to know about analytics.
+- Users can disable auto-injection or revoke the analytics token from the Publisher dashboard.
+
+See `publisher/docs-llms/publisher-analytics.md` for the full architecture and event schema.
+
+---
+
 ## 🎯 Quick Reference by Role
 
 ### **Theme Developers**
