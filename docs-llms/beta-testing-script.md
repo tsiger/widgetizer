@@ -10,42 +10,42 @@ You should have received a `beta-test-kit/` folder alongside this script. Verify
 
 ### Images (8 files)
 
-| File | Size / Notes | Used In |
-|------|-------------|---------|
-| `photo-small.jpg` | ~200 KB, any dimensions | General testing (2.6, 5.1) |
-| `photo-medium.png` | ~800 KB, at least 2000 px wide | Size variant testing (5.1, 5.13) |
-| `photo-large.jpg` | ~3 MB | Normal large upload (5.1) |
-| `photo-oversized.jpg` | **> 5 MB** | Rejection at default 5 MB limit (5.3) |
-| `photo-1.5mb.jpg` | ~1.5 MB | Rejection at custom 1 MB limit (10.3) |
-| `image.webp` | Any size | Format variety (5.1, 5.2) |
-| `image.gif` | Any size, animated preferred | Format variety (5.1) |
-| `logo.svg` | Clean SVG, no scripts | SVG upload (5.2) |
+| File                  | Size / Notes                   | Used In                               |
+| --------------------- | ------------------------------ | ------------------------------------- |
+| `photo-small.jpg`     | ~200 KB, any dimensions        | General testing (2.6, 5.1)            |
+| `photo-medium.png`    | ~800 KB, at least 2000 px wide | Size variant testing (5.1, 5.13)      |
+| `photo-large.jpg`     | ~3 MB                          | Normal large upload (5.1)             |
+| `photo-oversized.jpg` | **> 5 MB**                     | Rejection at default 5 MB limit (5.3) |
+| `photo-1.5mb.jpg`     | ~1.5 MB                        | Rejection at custom 1 MB limit (10.3) |
+| `image.webp`          | Any size                       | Format variety (5.1, 5.2)             |
+| `image.gif`           | Any size, animated preferred   | Format variety (5.1)                  |
+| `logo.svg`            | Clean SVG, no scripts          | SVG upload (5.2)                      |
 
 ### Security Test Files (1 file)
 
-| File | Notes | Used In |
-|------|-------|---------|
+| File                | Notes                            | Used In                 |
+| ------------------- | -------------------------------- | ----------------------- |
 | `svg-malicious.svg` | SVG with embedded `<script>` tag | SVG sanitization (5.14) |
 
 ### Video & Audio (2 files)
 
-| File | Size / Notes | Used In |
-|------|-------------|---------|
-| `clip.mp4` | ~2 MB, short clip | Video upload (5.2) |
+| File         | Size / Notes       | Used In            |
+| ------------ | ------------------ | ------------------ |
+| `clip.mp4`   | ~2 MB, short clip  | Video upload (5.2) |
 | `sample.mp3` | ~1 MB, short audio | Audio upload (5.2) |
 
 ### Theme Files (2 files)
 
-| File | Notes | Used In |
-|------|-------|---------|
-| `valid-theme.zip` | Working theme (has `theme.json`, `layout.liquid`, etc.) | Theme upload (7.2) |
-| `invalid-theme.zip` | Random files, NOT a theme | Theme upload rejection (7.2) |
+| File                | Notes                                                   | Used In                      |
+| ------------------- | ------------------------------------------------------- | ---------------------------- |
+| `valid-theme.zip`   | Working theme (has `theme.json`, `layout.liquid`, etc.) | Theme upload (7.2)           |
+| `invalid-theme.zip` | Random files, NOT a theme                               | Theme upload rejection (7.2) |
 
 ### Rejected File Types (2 files)
 
-| File | Notes | Used In |
-|------|-------|---------|
-| `document.txt` | Plain text file | Media upload rejection (5.3) |
+| File               | Notes                                     | Used In                         |
+| ------------------ | ----------------------------------------- | ------------------------------- |
+| `document.txt`     | Plain text file                           | Media upload rejection (5.3)    |
 | `random-files.zip` | ZIP of random files, NOT a project export | Project import rejection (2.14) |
 
 > **Total: 15 files.** If anything is missing, ask the person who sent you this script. You will also create test files during testing (project exports, additional uploads) — the kit covers what you can't easily make yourself.
@@ -85,7 +85,7 @@ Many edge case sections ask you to type this text into fields:
 This is a harmless test string that attackers commonly try to sneak into websites. We use it to verify the app handles it safely. Here's what you're checking:
 
 | Where you type it | What PASS looks like | What FAIL looks like |
-|-------------------|---------------------|---------------------|
+| --- | --- | --- |
 | **Name / title / description** fields | The code is quietly removed. Field ends up empty or with just plain text. | The code stays in the field as-is, or a **popup box** appears. |
 | **URL fields** | Rejected — not a valid URL. | Accepted as a URL. |
 | **Number fields** | Rejected — not a valid number. | Accepted as a number. |
@@ -130,8 +130,8 @@ This is a harmless test string that attackers commonly try to sneak into website
 3. Fill in the form:
    - **Title**: "My Test Site"
    - Leave everything else default.
-4. Pick any available theme from the theme dropdown.
-5. If the theme has presets, you should see preset cards appear below the theme dropdown. Click one.
+4. Select the **Arch** theme from the theme dropdown.
+5. You should see preset cards appear below the theme dropdown. Click "Default" or "Clinic".
 6. Click **"Create Project"**.
 7. **Expected**: Success toast appears. You're back on the project list. "My Test Site" shows with a filled star (it's the active project since it's your first).
 
@@ -361,7 +361,11 @@ This is a harmless test string that attackers commonly try to sneak into website
 
 ### 4.3 Add Multiple Widgets
 
-1. Add 3-4 more widgets of different types.
+1. Add these specific widgets to stress-test the editor:
+   - [ ] Add a **Slideshow** widget (tests block limits)
+   - [ ] Add a **Pricing** widget (tests complex nested blocks & layout)
+   - [ ] Add a **Video Embed** widget (tests external media)
+   - [ ] Add a **Card Grid** widget (tests image and text combinations)
 2. **Expected**: Each appears in the left list in order and renders in the preview.
 
 ### 4.4 Select a Widget
@@ -568,6 +572,8 @@ These tests verify that images uploaded and used through the editor are properly
 2. Upload an **MP4 video**.
 3. Upload an **MP3 audio** file.
 4. **Expected**: All accepted. Each shows with appropriate icon/thumbnail.
+5. Go to the Page Editor. Add a **Logo Cloud** widget and select your SVG file. **Expected**: It displays properly.
+6. Add a **Video** widget (not Video Embed) and select your MP4 file. **Expected**: The video plays.
 
 ### 5.3 Upload Validation
 
@@ -841,25 +847,34 @@ These tests verify that images uploaded and used through the editor are properly
 2. Look for a theme settings button/section (might be in the top bar or sidebar).
 3. **Expected**: Opens theme settings panel with groups (colors, typography, layout, etc.).
 
-### 8.4 Test Every Setting Type
+### 8.4 Test Every Setting Type (Using the Arch Theme)
 
-Go through each setting type you find and test it:
+To thoroughly test all setting types, you will need to check both **Theme Settings** (global) and **Widget Settings** (local to specific widgets). Using the Arch theme, follow this exact checklist:
 
-- [ ] **Text input**: Type text. Preview updates.
-- [ ] **Textarea**: Type multi-line text. Preview updates.
-- [ ] **Number input**: Enter a number. Try negative. Try letters (should reject).
-- [ ] **Color picker**: Click to open picker. Choose a color. Try typing a hex value. Preview updates.
-- [ ] **Checkbox**: Toggle on/off. Preview updates.
-- [ ] **Select dropdown**: Choose different options. Preview updates.
-- [ ] **Range slider**: Drag the slider. Preview updates.
-- [ ] **Font picker**: Select different fonts. Preview updates. Check that font loads.
-- [ ] **Image input**: Browse and select an image. Preview shows it.
-- [ ] **Code editor**: Type CSS or HTML. Preview updates.
-- [ ] **Link input**: Set internal page and external URL. Test both.
-- [ ] **Menu selector**: Pick a menu. Preview shows menu items.
-- [ ] **Rich text editor**: Type formatted text with bold, links, lists. Preview renders it.
-- [ ] **Icon picker**: Select an icon (if available). Preview shows it.
-- [ ] **YouTube input**: Paste a YouTube URL. Preview shows embed.
+#### Part A: Theme Settings (Global)
+
+Navigate to **Settings** in the sidebar and test these specific global inputs:
+
+- [ ] **Checkbox**: In _Layout_ -> toggle "Enable scroll reveal animations". Preview updates.
+- [ ] **Image input**: In _Branding_ -> upload a "Favicon". Preview shows it.
+- [ ] **Color picker**: In _Colors_ -> change "Primary Background". Try typing a hex value. Preview updates.
+- [ ] **Font picker**: In _Typography_ -> change "Heading Font". Preview updates. Check that font loads.
+- [ ] **Code editor**: In _Advanced_ -> type CSS in "Custom CSS". Preview updates.
+
+#### Part B: Widget Settings (Local)
+
+Go to the **Page Editor**, and add or edit these specific widgets to test the remaining input types:
+
+- [ ] **Text input**: Add a **Banner** widget. Type text in the "Eyebrow" or "Title" field. Preview updates.
+- [ ] **Textarea**: Add a **Video Embed** widget. Type multi-line text in the "Description" field. Preview updates.
+- [ ] **Select dropdown**: Add a **Banner** widget. Change the "Alignment" or "Size" dropdown. Preview updates.
+- [ ] **Range slider**: Add a **Pricing** widget. Drag the "Border Radius" slider. Preview updates.
+- [ ] **Link input**: Add a **Banner** widget. Set internal page and external URL in the "Button Link" field. Test both.
+- [ ] **Menu selector**: Edit the **Global Header** widget. Pick a menu in the "Navigation Menu" field. Preview shows menu items.
+- [ ] **Rich text editor**: Add a **Rich Text** widget. Type formatted text with bold, links, lists. Preview renders it.
+- [ ] **Icon picker**: Add a **Trust Bar** widget. Select an icon. Preview shows it.
+- [ ] **YouTube input**: Add a **Video Embed** widget. Paste a YouTube URL. Preview shows embed.
+- [ ] **Number input**: (Not used in Arch theme, but test any 3rd party widget if available). Enter a number. Try negative. Try letters.
 
 ### 8.5 Theme Settings Persist
 
@@ -931,6 +946,7 @@ Go through each setting type you find and test it:
    ---
    ```
    Followed by the page content converted to Markdown.
+4. Verify complex content degrades gracefully: Open the markdown file for a page that has a **Pricing** or **Slideshow** widget. It should be readable markdown and not crash the export.
 
 ### 9.6 Multiple Export Versions
 
@@ -964,6 +980,7 @@ Open an exported site and check:
 - [ ] Custom code (head/footer scripts) present in source
 - [ ] No 404 errors in browser console
 - [ ] The "Made with Widgetizer" comment is in the HTML source (before doctype)
+- [ ] SEO `<meta>` tags (description, og:title, og:image) are present in the `<head>` and match your inputs
 
 ### 9.10 Edge Cases to Try
 
@@ -1257,11 +1274,11 @@ Do this at the very end after all other testing:
 
 1. Create a brand new project from scratch.
 2. Create 3 pages: Home (index), About, Contact.
-3. Upload 3 images.
+3. Upload 3 images, an SVG logo, and a short MP4 video.
 4. Create a menu with all 3 pages.
-5. Design the Home page: Add a hero with image, text section, and a features widget with 3 blocks.
-6. Design the About page: Add text widgets.
-7. Design the Contact page: Add whatever widgets are available.
+5. Design the Home page: Add **Global Header**, **Slideshow** (with 2 slides), **Trust Bar**, **Card Grid**, and **Global Footer**.
+6. Design the About page: Add **Video Embed**, **Timeline**, and **Profile Grid**.
+7. Design the Contact page: Add **Rich Text** with a link, and **Social Icons**.
 8. Set the header menu to your navigation menu.
 9. Add content to the footer.
 10. Change theme colors and fonts.
