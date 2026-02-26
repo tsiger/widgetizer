@@ -23,6 +23,8 @@ import { checkLimit, checkStringLength, validateZipEntries } from "../utils/limi
 import { generateCopyName } from "../utils/namingHelpers.js";
 import { enrichNewProjectReferences, remapDuplicatedProjectUuids } from "../utils/linkEnrichment.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
+
+const VALID_SOURCES = ["manual", "theme", "ai"];
 import multer from "multer";
 import { readAppSettingsFile } from "./appSettingsController.js";
 
@@ -112,6 +114,27 @@ export async function getActiveProject(req, res) {
 }
 
 /**
+ * Looks up a project by its published site ID (publisher's website.id).
+ * Sets the found project as active and returns it.
+ * Used for deep-linking from publisher "Edit in Editor" back to the editor.
+ */
+export async function getProjectBySiteId(req, res) {
+  try {
+    const { siteId } = req.params;
+    const project = projectRepo.getProjectByPublishedSiteId(siteId, req.userId);
+    if (!project) {
+      return res.status(404).json({ error: "No project found for this site ID" });
+    }
+    // Set as active so the editor opens to the correct project
+    projectRepo.setActiveProjectId(project.id, req.userId);
+    res.json(project);
+  } catch (error) {
+    console.error("Error looking up project by site ID:", error);
+    res.status(500).json({ error: "Failed to look up project by site ID" });
+  }
+}
+
+/**
  * Creates a new project with the specified theme and configuration.
  * Copies theme assets and initializes project structure including pages and menus.
  * @param {import('express').Request} req - Express request object with project data in body
@@ -120,7 +143,7 @@ export async function getActiveProject(req, res) {
  */
 export async function createProject(req, res) {
   try {
-    const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates, preset } = req.body;
+    const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates, preset, source } = req.body;
 
     // Platform limit: max projects per user
     const allProjects = projectRepo.getAllProjects(req.userId);
@@ -175,6 +198,9 @@ export async function createProject(req, res) {
       throw new Error("Theme is required");
     }
 
+    // Ensure seed themes are provisioned for this user (idempotent no-op if already done)
+    await themeController.ensureThemesDirectory(req.userId);
+
     // Copy theme and get the version that was copied
     let themeVersion;
     try {
@@ -208,6 +234,7 @@ export async function createProject(req, res) {
       theme,
       themeVersion, // Version that was installed
       preset: preset || null, // Track which preset was used
+      source: source || "manual", // How the project was created: manual, theme, ai
       receiveThemeUpdates: receiveThemeUpdates || false, // Opt-in flag (default: off)
       siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlTags(siteUrl.trim()) : "",
       created: new Date().toISOString(),
@@ -281,6 +308,146 @@ export async function createProject(req, res) {
     });
   } catch (error) {
     console.error("Project creation error:", error);
+    res.status(500).json({ error: error.message || "Failed to create project" });
+  }
+}
+
+/**
+ * Create a project from a deep-link and always set it as active.
+ * Used by marketing site theme gallery links.
+ *
+ * Body: { name, theme, preset?, source? }
+ *
+ * Unlike createProject, this endpoint:
+ * - Auto-suffixes the name if a duplicate exists ("X" → "X (2)" → "X (3)")
+ * - Always sets the new project as active (not just when it's the first)
+ */
+export async function deepLinkCreateProject(req, res) {
+  try {
+    const { name, theme, preset, source } = req.body;
+
+    if (!name || typeof name !== "string" || name.trim() === "") {
+      return res.status(400).json({ error: "Project name is required." });
+    }
+
+    if (!theme) {
+      return res.status(400).json({ error: "A theme is required." });
+    }
+
+    // Platform limit: max projects per user
+    const allProjects = projectRepo.getAllProjects(req.userId);
+    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects");
+    if (!projectCheck.ok) {
+      return res.status(403).json({ error: projectCheck.error });
+    }
+
+    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxProjectNameLength, "Project name");
+    if (!nameCheck.ok) {
+      return res.status(400).json({ error: nameCheck.error });
+    }
+
+    // Auto-suffix name if duplicate exists: "Financial Advisor" → "Financial Advisor (2)"
+    let finalName = name.trim();
+    if (projectRepo.projectNameExists(finalName, null, req.userId)) {
+      const existingNames = allProjects.map((p) => p.name.toLowerCase());
+      let suffix = 2;
+      while (existingNames.includes(`${finalName} (${suffix})`.toLowerCase())) {
+        suffix++;
+      }
+      finalName = `${finalName} (${suffix})`;
+    }
+
+    const folderName = await generateUniqueSlug(finalName, (slug) => allProjects.some((p) => p.id === slug), {
+      fallback: "project",
+    });
+
+    const projectDir = getProjectDir(folderName, req.userId);
+    await fs.ensureDir(projectDir);
+
+    await themeController.ensureThemesDirectory(req.userId);
+
+    let themeVersion;
+    try {
+      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"], req.userId);
+    } catch (error) {
+      await fs.remove(projectDir);
+      throw new Error(`Failed to copy theme: ${error.message}`);
+    }
+
+    const { templatesDir: resolvedTemplatesDir, menusDir: presetMenusDir, settingsOverrides } =
+      await themeController.resolvePresetPaths(theme, preset, req.userId);
+
+    if (presetMenusDir) {
+      const projectMenusDir = getProjectMenusDir(folderName, req.userId);
+      try {
+        await fs.remove(projectMenusDir);
+        await fs.copy(presetMenusDir, projectMenusDir);
+      } catch (error) {
+        console.warn(`[deepLinkCreateProject] Failed to apply preset menus: ${error.message}`);
+      }
+    }
+
+    const newProject = {
+      id: uuidv4(),
+      folderName,
+      name: finalName,
+      description: "",
+      theme,
+      themeVersion,
+      preset: preset || null,
+      source: source || "theme",
+      receiveThemeUpdates: false,
+      siteUrl: "",
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+    };
+
+    try {
+      const pagesDir = getProjectPagesDir(folderName, req.userId);
+      await processTemplatesRecursive(resolvedTemplatesDir, pagesDir, async (template, slug, targetPath) => {
+        const initializedPage = {
+          ...template,
+          ...(template.type !== "header" && template.type !== "footer"
+            ? { uuid: uuidv4(), id: slug, slug, created: new Date().toISOString(), updated: new Date().toISOString() }
+            : {}),
+        };
+        await fs.outputFile(targetPath, JSON.stringify(initializedPage, null, 2));
+      });
+      await enrichNewProjectReferences(folderName, req.userId);
+    } catch (error) {
+      await fs.remove(projectDir);
+      throw new Error(`Failed to process templates: ${error.message}`);
+    }
+
+    if (settingsOverrides) {
+      try {
+        const projectThemeJsonPath = path.join(projectDir, "theme.json");
+        const themeJsonStr = await fs.readFile(projectThemeJsonPath, "utf8");
+        const themeJson = JSON.parse(themeJsonStr);
+        if (themeJson.settings && themeJson.settings.global) {
+          for (const group of Object.values(themeJson.settings.global)) {
+            if (!Array.isArray(group)) continue;
+            for (const item of group) {
+              if (item.id && settingsOverrides[item.id] !== undefined) {
+                item.default = settingsOverrides[item.id];
+              }
+            }
+          }
+        }
+        await fs.writeFile(projectThemeJsonPath, JSON.stringify(themeJson, null, 2));
+      } catch (error) {
+        console.warn(`[deepLinkCreateProject] Failed to apply preset settings overrides: ${error.message}`);
+      }
+    }
+
+    newProject.userId = req.userId;
+    projectRepo.createProject(newProject);
+    // Always activate — this is the project the user just chose
+    projectRepo.setActiveProjectId(newProject.id, req.userId);
+
+    res.status(201).json(newProject);
+  } catch (error) {
+    console.error("Deep-link create project error:", error);
     res.status(500).json({ error: error.message || "Failed to create project" });
   }
 }
@@ -487,6 +654,7 @@ export async function duplicateProject(req, res) {
       name: newName,
       theme: originalProject.theme,
       themeVersion: originalProject.themeVersion,
+      source: originalProject.source || "manual",
       receiveThemeUpdates: originalProject.receiveThemeUpdates || false,
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
@@ -727,6 +895,7 @@ export async function exportProject(req, res) {
         themeVersion: project.themeVersion || null,
         receiveThemeUpdates: project.receiveThemeUpdates || false,
         preset: project.preset || null,
+        source: project.source || "manual",
         siteUrl: project.siteUrl || "",
         created: project.created,
         updated: project.updated,
@@ -995,6 +1164,7 @@ export async function importProject(req, res) {
         themeVersion,
         receiveThemeUpdates: manifest.project.receiveThemeUpdates || false,
         preset: manifest.project.preset || null,
+        source: VALID_SOURCES.includes(manifest.project.source) ? manifest.project.source : "manual",
         siteUrl: manifest.project.siteUrl || "",
         created: new Date().toISOString(),
         updated: new Date().toISOString(),

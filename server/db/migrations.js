@@ -12,6 +12,7 @@ const migrations = [
           theme TEXT,
           theme_version TEXT,
           preset TEXT,
+          source TEXT DEFAULT 'manual',
           receive_theme_updates INTEGER DEFAULT 0,
           site_url TEXT DEFAULT '',
           last_theme_update_at TEXT,

@@ -23,6 +23,19 @@ export function getProjectById(id, userId = "local") {
 }
 
 /**
+ * Get a project by its published site ID (the publisher's website.id).
+ * Used for deep-linking from publisher "Edit in Editor" back to the editor.
+ * @param {string} siteId - The publisher website ID
+ * @param {string} userId - User ID for scoping
+ * @returns {object|null} Project object or null
+ */
+export function getProjectByPublishedSiteId(siteId, userId = "local") {
+  const db = getDb();
+  const row = db.prepare("SELECT * FROM projects WHERE published_site_id = ? AND user_id = ?").get(siteId, userId);
+  return row ? rowToProject(row) : null;
+}
+
+/**
  * Get the folder name for a project by its UUID.
  * @param {string} projectId
  * @param {string} userId - User ID for scoping
@@ -41,8 +54,8 @@ export function getProjectFolderName(projectId, userId = "local") {
 export function createProject(project) {
   const db = getDb();
   db.prepare(`
-    INSERT INTO projects (id, folder_name, name, description, theme, theme_version, preset, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated, user_id)
-    VALUES (@id, @folderName, @name, @description, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated, @userId)
+    INSERT INTO projects (id, folder_name, name, description, theme, theme_version, preset, source, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated, user_id)
+    VALUES (@id, @folderName, @name, @description, @theme, @themeVersion, @preset, @source, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated, @userId)
   `).run({
     id: project.id,
     folderName: project.folderName,
@@ -51,6 +64,7 @@ export function createProject(project) {
     theme: project.theme || null,
     themeVersion: project.themeVersion || null,
     preset: project.preset || null,
+    source: project.source || "manual",
     receiveThemeUpdates: project.receiveThemeUpdates ? 1 : 0,
     siteUrl: project.siteUrl || "",
     lastThemeUpdateAt: project.lastThemeUpdateAt || null,
@@ -82,6 +96,7 @@ export function updateProject(id, updates, userId = "local") {
     theme: updates.theme !== undefined ? updates.theme : current.theme,
     themeVersion: updates.themeVersion !== undefined ? updates.themeVersion : current.theme_version,
     preset: updates.preset !== undefined ? updates.preset : current.preset,
+    source: updates.source !== undefined ? updates.source : current.source,
     receiveThemeUpdates: updates.receiveThemeUpdates !== undefined
       ? (updates.receiveThemeUpdates ? 1 : 0)
       : current.receive_theme_updates,
@@ -103,6 +118,7 @@ export function updateProject(id, updates, userId = "local") {
       theme = @theme,
       theme_version = @themeVersion,
       preset = @preset,
+      source = @source,
       receive_theme_updates = @receiveThemeUpdates,
       site_url = @siteUrl,
       last_theme_update_at = @lastThemeUpdateAt,
@@ -240,8 +256,8 @@ export function writeProjectsData(data, userId = "local") {
 
     // Upsert each project
     const upsert = db.prepare(`
-      INSERT INTO projects (id, folder_name, name, description, theme, theme_version, preset, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated, user_id)
-      VALUES (@id, @folderName, @name, @description, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated, @userId)
+      INSERT INTO projects (id, folder_name, name, description, theme, theme_version, preset, source, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated, user_id)
+      VALUES (@id, @folderName, @name, @description, @theme, @themeVersion, @preset, @source, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated, @userId)
       ON CONFLICT(id) DO UPDATE SET
         folder_name = @folderName,
         name = @name,
@@ -249,6 +265,7 @@ export function writeProjectsData(data, userId = "local") {
         theme = @theme,
         theme_version = @themeVersion,
         preset = @preset,
+        source = @source,
         receive_theme_updates = @receiveThemeUpdates,
         site_url = @siteUrl,
         last_theme_update_at = @lastThemeUpdateAt,
@@ -265,6 +282,7 @@ export function writeProjectsData(data, userId = "local") {
         theme: p.theme || null,
         themeVersion: p.themeVersion || null,
         preset: p.preset || null,
+        source: p.source || "manual",
         receiveThemeUpdates: p.receiveThemeUpdates ? 1 : 0,
         siteUrl: p.siteUrl || "",
         lastThemeUpdateAt: p.lastThemeUpdateAt || null,
@@ -294,6 +312,7 @@ function rowToProject(row) {
     theme: row.theme,
     themeVersion: row.theme_version,
     preset: row.preset,
+    source: row.source || "manual",
     receiveThemeUpdates: !!row.receive_theme_updates,
     siteUrl: row.site_url,
     created: row.created,

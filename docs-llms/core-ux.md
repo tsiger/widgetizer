@@ -20,11 +20,13 @@ This document provides a user experience (UX) audit of the application's core wo
 ### **1.1. Create a New Project**
 
 - **Current State:**
-  - After creating a project, the user is redirected to `/projects` (project list).
+  - In open-source mode: after creating a project, the user is redirected to `/projects` (project list).
+  - In hosted mode: after creating a project, the user is redirected to `/pages` (straight into editing), since the project list is hidden.
   - If this is the first project created, it is automatically set as the active project by the backend.
   - Success toast is shown: `Project "[Project Name]" has been created and set as active.` (if activated) or `Project "[Project Name]" has been created.` (if not activated).
   - Navigation guard prevents accidental navigation with unsaved changes.
-- **Future Improvement:** Consider redirecting to the dashboard (`/`) when a new project is automatically activated, to immediately immerse the user in their new project environment.
+  - **Deep-link creation (hosted mode):** Marketing site deep-links create projects via `POST /api/projects/deep-link`, which auto-suffixes duplicate names and always activates the new project. Users land directly on `/pages`.
+- **Status:** ✅ Implemented for both open-source and hosted modes
 
 ### **1.2. Edit a Project**
 

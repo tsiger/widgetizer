@@ -32,20 +32,24 @@ export default function ExportSite() {
           </Suspense>
         )}
 
-        <ExportCreator
-          activeProject={activeProject}
-          lastExport={lastExport}
-          setLastExport={setLastExport}
-          loadExportHistory={loadExportHistory}
-        />
+        {(!HOSTED_MODE || activeProject?.source === "manual") && (
+          <>
+            <ExportCreator
+              activeProject={activeProject}
+              lastExport={lastExport}
+              setLastExport={setLastExport}
+              loadExportHistory={loadExportHistory}
+            />
 
-        <ExportHistoryTable
-          exportHistory={exportHistory}
-          loadingHistory={loadingHistory}
-          maxVersionsToKeep={maxVersionsToKeep}
-          activeProject={activeProject}
-          setExportHistory={setExportHistory}
-        />
+            <ExportHistoryTable
+              exportHistory={exportHistory}
+              loadingHistory={loadingHistory}
+              maxVersionsToKeep={maxVersionsToKeep}
+              activeProject={activeProject}
+              setExportHistory={setExportHistory}
+            />
+          </>
+        )}
       </div>
     </PageLayout>
   );

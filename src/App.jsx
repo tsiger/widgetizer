@@ -22,6 +22,9 @@ import ProjectsEdit from "./pages/ProjectsEdit";
 import MenuStructure from "./pages/MenuStructure";
 import ToastContainer from "./components/ui/ToastContainer";
 import RequireActiveProject from "./components/layout/RequireActiveProject";
+import RouteSourceGuard from "./components/layout/RouteSourceGuard";
+import DeepLinkResolver from "./components/layout/DeepLinkResolver";
+import HostedModeGuard from "./components/layout/HostedModeGuard";
 import useProjectStore from "./stores/projectStore";
 import { HOSTED_MODE } from "./config";
 import "./i18n";
@@ -34,80 +37,90 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        index: true,
-        element: <Dashboard />,
-      },
-      {
-        path: "projects",
-        element: <Projects />,
-      },
-      {
-        path: "projects/add",
-        element: <ProjectsAdd />,
-      },
-      {
-        path: "projects/edit/:id",
-        element: <ProjectsEdit />,
-      },
-      {
-        element: <RequireActiveProject />,
+        element: <DeepLinkResolver />,
         children: [
           {
-            path: "pages",
-            element: <Pages />,
+            index: true,
+            element: <HostedModeGuard><Dashboard /></HostedModeGuard>,
           },
           {
-            path: "pages/add",
-            element: <PagesAdd />,
+            path: "projects",
+            element: <HostedModeGuard><Projects /></HostedModeGuard>,
           },
           {
-            path: "pages/:id/edit",
-            element: <PagesEdit />,
+            path: "projects/add",
+            element: <ProjectsAdd />,
           },
           {
-            path: "page-editor",
-            element: <PageEditor />,
+            path: "projects/edit/:id",
+            element: <HostedModeGuard><ProjectsEdit /></HostedModeGuard>,
           },
           {
-            path: "menus",
-            element: <Menus />,
+            element: <RequireActiveProject />,
+            children: [
+              {
+                element: <RouteSourceGuard />,
+                children: [
+              {
+                path: "pages",
+                element: <Pages />,
+              },
+              {
+                path: "pages/add",
+                element: <PagesAdd />,
+              },
+              {
+                path: "pages/:id/edit",
+                element: <PagesEdit />,
+              },
+              {
+                path: "page-editor",
+                element: <PageEditor />,
+              },
+              {
+                path: "menus",
+                element: <Menus />,
+              },
+              {
+                path: "menus/add",
+                element: <MenusAdd />,
+              },
+              {
+                path: "menus/edit/:id",
+                element: <MenusEdit />,
+              },
+              {
+                path: "menus/:id/structure",
+                element: <MenuStructure />,
+              },
+              {
+                path: "media",
+                element: <Media />,
+              },
+              {
+                path: "settings",
+                element: <Settings />,
+              },
+              {
+                path: "themes",
+                element: <Themes />,
+              },
+              {
+                path: "plugins",
+                element: <Plugins />,
+              },
+              {
+                path: "export-site",
+                element: <ExportSite />,
+              },
+              {
+                path: "app-settings",
+                element: <AppSettings />,
+              },
+            ],
           },
-          {
-            path: "menus/add",
-            element: <MenusAdd />,
-          },
-          {
-            path: "menus/edit/:id",
-            element: <MenusEdit />,
-          },
-          {
-            path: "menus/:id/structure",
-            element: <MenuStructure />,
-          },
-          {
-            path: "media",
-            element: <Media />,
-          },
-          {
-            path: "settings",
-            element: <Settings />,
-          },
-          {
-            path: "themes",
-            element: <Themes />,
-          },
-          {
-            path: "plugins",
-            element: <Plugins />,
-          },
-          {
-            path: "export-site",
-            element: <ExportSite />,
-          },
-          {
-            path: "app-settings",
-            element: <AppSettings />,
-          },
+        ],
+      },
         ],
       },
     ],

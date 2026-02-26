@@ -1,13 +1,10 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import useThemeUpdateStore from "../../stores/themeUpdateStore";
 import { navigationSections } from "../../config/navigation";
 import { HOSTED_MODE } from "../../config";
-
-// Lazy-load UserMenu to keep @clerk/clerk-react out of the main bundle
-const UserMenu = HOSTED_MODE ? lazy(() => import("../auth/UserMenu")) : null;
 
 export default function Sidebar() {
   const { t } = useTranslation();
@@ -53,11 +50,34 @@ export default function Sidebar() {
   );
 
   const renderNavItem = (item) => {
+    if (item.hostedOnly && !HOSTED_MODE) return null;
     if (HOSTED_MODE && item.hostedHidden) return null;
+    const source = activeProject?.source;
+    if (source && item.hiddenForSource?.includes(source)) return null;
 
     const Icon = item.icon;
     const disabled = item.requiresProject && !hasActiveProject;
     const showBadge = item.id === "themes" && themeUpdateCount > 0;
+    const labelKey = (source && item.labelOverrides?.[source]) || item.labelKey;
+
+    // External links (e.g. My Sites → publisher) render as <a> instead of <Link>
+    if (item.external) {
+      return (
+        <li key={item.id}>
+          <a
+            href={item.path}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center md:justify-start p-2 rounded-sm transition-all duration-150 hover:bg-slate-800 border border-slate-700 md:border-none"
+          >
+            <div className="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-pink-600">
+              <Icon size={20} />
+            </div>
+            <span className="hidden md:inline ml-1 text-sm">{t(labelKey)}</span>
+          </a>
+        </li>
+      );
+    }
 
     return (
       <li key={item.id}>
@@ -65,7 +85,7 @@ export default function Sidebar() {
           <div className={iconClass(item.path, disabled)}>
             <Icon size={20} />
           </div>
-          <span className="hidden md:inline ml-1 text-sm">{t(item.labelKey)}</span>
+          <span className="hidden md:inline ml-1 text-sm">{t(labelKey)}</span>
           {showBadge && (
             <span className="ml-auto bg-pink-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
               {themeUpdateCount}
@@ -77,9 +97,13 @@ export default function Sidebar() {
   };
 
   const renderSection = (section) => {
-    const visibleItems = HOSTED_MODE
-      ? section.items.filter((item) => !item.hostedHidden)
-      : section.items;
+    const source = activeProject?.source;
+    const visibleItems = section.items.filter((item) => {
+      if (item.hostedOnly && !HOSTED_MODE) return false;
+      if (HOSTED_MODE && item.hostedHidden) return false;
+      if (source && item.hiddenForSource?.includes(source)) return false;
+      return true;
+    });
     if (visibleItems.length === 0) return null;
 
     if (section.position === "bottom") {
@@ -117,11 +141,6 @@ export default function Sidebar() {
 
       <div className="px-2 md:px-4 pb-2">
         {bottomSections.map(renderSection)}
-        {UserMenu && (
-          <Suspense fallback={null}>
-            <UserMenu />
-          </Suspense>
-        )}
       </div>
     </div>
   );

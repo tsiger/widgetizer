@@ -14,7 +14,11 @@
     "tools": "Tools",
     "exportSite": "Export site",
     "general": "General",
-    "appSettings": "Settings"
+    "appSettings": "Settings",
+    "design": "Design",
+    "publish": "Publish",
+    "mySites": "My Sites",
+    "myAccount": "My Account"
   },
   "layout": {
     "toolbar": {

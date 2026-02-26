@@ -41,6 +41,7 @@ This file contains functions that make API calls to the backend:
 
 - `getAllProjects()`: Fetches a list of all projects.
 - `createProject(formData)`: Creates a new project.
+- `deepLinkCreateProject(data)`: Creates a project from a marketing deep-link (auto-suffixes name, always activates).
 - `updateProject(id, formData)`: Updates an existing project.
 - `deleteProject(id)`: Deletes a project.
 - `duplicateProject(id)`: Creates a copy of a project.
@@ -74,7 +75,17 @@ This file contains functions that make API calls to the backend:
     - **Menus**: All menu items that link to internal pages (e.g., `index.html`, `about.html`) are enriched with the corresponding page's `pageUuid`. This ensures menu links remain valid even if pages are renamed.
     - **Widgets**: All widget settings with link-type values (objects containing `href` pointing to internal `.html` pages) are enriched with `pageUuid`. This includes links in header, footer, and all page widgets.
 11. **Setting Active Project**: If this is the very first project being created (i.e., there was no active project before), it is automatically set as the active project by calling `setActiveProject(newProject.id)`. The global state is updated via the `projectStore`.
-12. **Feedback**: A success toast notification is shown (localized), and the user is presented with buttons to either navigate to the project list or edit the newly created project.
+12. **Feedback**: A success toast notification is shown (localized), and the user is presented with buttons to either navigate to the project list or edit the newly created project. In hosted mode, navigates to `/pages` instead of the project list.
+
+### 1b. Creating a Project via Deep-Link (Hosted Mode)
+
+When a user arrives at the editor via a marketing deep-link (`?theme=arch&preset=financial&source=theme&name=Financial+Advisor`), the `DeepLinkResolver` component intercepts the URL params and calls `POST /api/projects/deep-link`.
+
+1. **Name collision handling**: If a project with the same name already exists, the name is auto-suffixed ("Financial Advisor" becomes "Financial Advisor (2)", then "(3)", etc.).
+2. **Theme provisioning**: Seed themes are copied to the user's directory if needed (`ensureThemesDirectory`).
+3. **Always activates**: The new project is always set as active, regardless of how many projects exist.
+4. **Source tracking**: The project's `source` field is set to the value from the deep-link (typically `"theme"`). This controls which sidebar items and routes are visible.
+5. **Navigation**: After creation, the user lands on `/pages` to start editing immediately.
 
 ### 2. Listing and Managing Projects
 
@@ -164,6 +175,8 @@ The frontend `projectManager.js` communicates with a set of backend API endpoint
 | `DELETE` | `/api/projects/:id` | `deleteProject` | Deletes a specific project. |
 | `POST` | `/api/projects/:id/duplicate` | `duplicateProject` | Creates a complete copy of a project. |
 | `POST` | `/api/projects/:projectId/export` | `exportProject` | Exports project as a downloadable ZIP file. |
+| `POST` | `/api/projects/deep-link` | `deepLinkCreateProject` | Creates a project from a marketing deep-link. Auto-suffixes name on duplicate, always activates. |
+| `GET` | `/api/projects/by-site/:siteId` | `getProjectBySiteId` | Looks up a project by its published site ID (for publisher "Edit in Editor" deep-link). |
 | `POST` | `/api/projects/import` | `importProject` | Imports a project from a ZIP file upload. |
 | `GET` | `/api/projects/:projectId/widgets` | `getProjectWidgets` | Retrieves all widget schemas for a project. |
 | `GET` | `/api/projects/:projectId/icons` | `getProjectIcons` | Retrieves all available icons for a project. |

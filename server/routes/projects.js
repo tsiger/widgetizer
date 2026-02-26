@@ -24,9 +24,31 @@ router.post(
     body("siteUrl").optional().trim().customSanitizer(stripHtmlTags),
     body("theme").notEmpty().withMessage("A theme is required to create a project."),
     body("preset").optional().isString().trim(),
+    body("source").optional().isIn(["manual", "theme", "ai"]).withMessage("Source must be one of: manual, theme, ai"),
   ],
   validateRequest,
   projectController.createProject,
+);
+
+// POST /api/projects/deep-link - Create project from marketing deep-link (auto-suffix name, always activate)
+router.post(
+  "/deep-link",
+  [
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required.").isLength({ max: EDITOR_LIMITS.maxProjectNameLength }).withMessage(`Project name must be at most ${EDITOR_LIMITS.maxProjectNameLength} characters.`),
+    body("theme").notEmpty().withMessage("A theme is required."),
+    body("preset").optional().isString().trim(),
+    body("source").optional().isIn(["manual", "theme", "ai"]).withMessage("Source must be one of: manual, theme, ai"),
+  ],
+  validateRequest,
+  projectController.deepLinkCreateProject,
+);
+
+// GET /api/projects/by-site/:siteId - Look up project by published site ID (deep-link from publisher)
+router.get(
+  "/by-site/:siteId",
+  [param("siteId").notEmpty().withMessage("Site ID is required.")],
+  validateRequest,
+  projectController.getProjectBySiteId,
 );
 
 // PUT /api/projects/active/:id - Set the active project

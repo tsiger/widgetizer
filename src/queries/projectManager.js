@@ -113,6 +113,38 @@ export async function setActiveProject(projectId) {
 }
 
 /**
+ * Create a project from a marketing deep-link.
+ * Auto-suffixes the name on duplicates and always activates the new project.
+ * @param {Object} data
+ * @param {string} data.name - Project name
+ * @param {string} data.theme - Theme identifier
+ * @param {string} [data.preset] - Preset identifier
+ * @param {string} [data.source] - Source type (theme, ai)
+ * @returns {Promise<Project>} The newly created project
+ */
+export async function deepLinkCreateProject(data) {
+  try {
+    const response = await apiFetch("/api/projects/deep-link", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to create project");
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error.message && !error.message.includes("Failed to fetch")) {
+      throw error;
+    }
+    throw new Error("Failed to create project");
+  }
+}
+
+/**
  * Update an existing project with new data.
  * @param {string} projectId - The ID of the project to update
  * @param {Object} updates - The fields to update

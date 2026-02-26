@@ -46,6 +46,8 @@ const {
   duplicateProject,
   exportProject,
   importProject,
+  getProjectBySiteId,
+  deepLinkCreateProject,
 } = await import("../controllers/projectController.js");
 const { closeDb } = await import("../db/index.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
@@ -386,6 +388,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
             theme: null,
             themeVersion: null,
             preset: null,
+            source: "manual",
             receiveThemeUpdates: false,
             siteUrl: "",
             created: now,
@@ -1578,6 +1581,243 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         for (const file of importedMedia.files) {
           assert.ok(!originalIds.has(file.id), "Imported media IDs should be regenerated");
         }
+      });
+    });
+
+    // ========================================================================
+    // Source field
+    // ========================================================================
+
+    describe("source field", () => {
+      beforeEach(async () => {
+        await resetProjects();
+      });
+
+      it("defaults source to manual when not provided", async () => {
+        const project = await createTestProject("No Source");
+        assert.equal(project.source, "manual", "source should default to 'manual'");
+      });
+
+      it("stores source when provided as 'theme'", async () => {
+        const project = await createTestProject("Theme Project", { source: "theme" });
+        assert.equal(project.source, "theme");
+      });
+
+      it("stores source when provided as 'ai'", async () => {
+        const project = await createTestProject("AI Project", { source: "ai" });
+        assert.equal(project.source, "ai");
+      });
+
+      it("includes source in project list", async () => {
+        await createTestProject("Listed Project", { source: "theme" });
+        const res = await callController(getAllProjects);
+        assert.equal(res._status, 200);
+        const found = res._json.find((p) => p.name === "Listed Project");
+        assert.ok(found, "Project should be in list");
+        assert.equal(found.source, "theme");
+      });
+
+      it("includes source in active project", async () => {
+        const project = await createTestProject("Active Source", { source: "ai" });
+        await callController(setActiveProject, { params: { id: project.id } });
+        const res = await callController(getActiveProject);
+        assert.equal(res._status, 200);
+        assert.equal(res._json.source, "ai");
+      });
+
+      it("preserves source on duplicate", async () => {
+        const original = await createTestProject(`Dup Source ${folderSuffix(TEST_USER_ID)}`, { source: "theme" });
+        const res = await callController(duplicateProject, { params: { id: original.id } });
+        assert.equal(res._status, 201);
+        assert.equal(res._json.source, "theme", "Duplicated project should inherit source");
+      });
+
+      it("round-trips source through export/import", async () => {
+        const project = await createTestProject(`Export Source ${folderSuffix(TEST_USER_ID)}`, { source: "ai" });
+        await callController(setActiveProject, { params: { id: project.id } });
+
+        // Export
+        const { res: exportRes, manifest } = await exportTestProject(project.id);
+        assert.equal(exportRes._status, 200, "Export should succeed");
+        assert.equal(manifest.project.source, "ai", "Manifest should include source");
+
+        // Import
+        const zipFile = zipBufferToTempFile(exportRes.getBuffer());
+        const importRes = await callController(importProject, { file: zipFile });
+        assert.equal(importRes._status, 201, `Import should succeed: ${JSON.stringify(importRes._json)}`);
+        assert.equal(importRes._json.source, "ai", "Imported project should preserve source");
+      });
+
+      it("normalizes invalid source to manual on import", async () => {
+        const manifest = {
+          formatVersion: "1.1",
+          exportedAt: new Date().toISOString(),
+          widgetizerVersion: "1.0.0",
+          project: {
+            name: `Invalid Source Import ${folderSuffix(TEST_USER_ID)}`,
+            description: "",
+            theme: `__test_theme_${TEST_USER_ID}__`,
+            themeVersion: "1.0.0",
+            receiveThemeUpdates: false,
+            preset: null,
+            source: "hacked",
+            siteUrl: "",
+            created: "2025-01-01T00:00:00.000Z",
+            updated: "2025-01-01T00:00:00.000Z",
+          },
+        };
+        const zipFile = buildImportZip(manifest, {
+          "theme.json": { name: "Test Theme", version: "1.0.0" },
+          "pages/index.json": { name: "Home", slug: "index", widgets: {} },
+        });
+        const res = await callController(importProject, { file: zipFile });
+        assert.equal(res._status, 201, `Import should succeed: ${JSON.stringify(res._json)}`);
+        assert.equal(res._json.source, "manual", "Invalid source should be normalized to manual");
+      });
+    });
+
+    // ========================================================================
+    // getProjectBySiteId (deep-link from publisher)
+    // ========================================================================
+
+    describe("getProjectBySiteId", () => {
+      beforeEach(async () => {
+        await resetProjects();
+      });
+
+      it("returns 404 when no project matches the siteId", async () => {
+        const res = await callController(getProjectBySiteId, {
+          params: { siteId: "nonexistent-site-id" },
+        });
+        assert.equal(res._status, 404);
+        assert.ok(res._json.error);
+      });
+
+      it("finds a project by its published_site_id and sets it as active", async () => {
+        // Create a project and simulate publish by setting published_site_id
+        const project = await createTestProject(`Deep Link Test ${folderSuffix(TEST_USER_ID)}`);
+        const fakeSiteId = `pub-site-${Date.now()}`;
+        projectRepo.updateProject(project.id, { publishedSiteId: fakeSiteId }, TEST_USER_ID);
+
+        // Create a second project and set it as active
+        const project2 = await createTestProject(`Other Project ${folderSuffix(TEST_USER_ID)}`);
+        projectRepo.setActiveProjectId(project2.id, TEST_USER_ID);
+
+        // Look up by siteId — should return the first project and activate it
+        const res = await callController(getProjectBySiteId, {
+          params: { siteId: fakeSiteId },
+        });
+        assert.equal(res._status, 200);
+        assert.equal(res._json.id, project.id);
+        assert.equal(res._json.publishedSiteId, fakeSiteId);
+
+        // Verify it was set as active
+        const activeRes = await callController(getActiveProject);
+        assert.equal(activeRes._json.id, project.id);
+      });
+
+      it("does not return projects belonging to a different user", async () => {
+        // Create a project and set its published_site_id
+        const project = await createTestProject(`Isolation Test ${folderSuffix(TEST_USER_ID)}`);
+        const fakeSiteId = `pub-site-isolation-${Date.now()}`;
+        projectRepo.updateProject(project.id, { publishedSiteId: fakeSiteId }, TEST_USER_ID);
+
+        // Try to look it up with a different userId
+        const otherUserId = TEST_USER_ID === "local" ? "user_hosted_abc" : "local";
+        const req = {
+          params: { siteId: fakeSiteId },
+          userId: otherUserId,
+          [Symbol.for("express-validator#contexts")]: [],
+        };
+        const res = mockRes();
+        await getProjectBySiteId(req, res);
+        assert.equal(res._status, 404, "Should not find project belonging to different user");
+      });
+    });
+
+    // ========================================================================
+    // deepLinkCreateProject (deep-link auto-create from marketing site)
+    // ========================================================================
+
+    describe("deepLinkCreateProject", () => {
+      beforeEach(async () => {
+        await resetProjects();
+      });
+
+      it("creates a new project and sets it as active", async () => {
+        const res = await callController(deepLinkCreateProject, {
+          body: { name: `New Theme Project ${folderSuffix(TEST_USER_ID)}`, theme: TEST_THEME_ID, preset: "default", source: "theme" },
+        });
+        assert.equal(res._status, 201);
+        assert.equal(res._json.name, `New Theme Project ${folderSuffix(TEST_USER_ID)}`);
+        assert.equal(res._json.source, "theme");
+
+        // Should be set as active
+        const activeRes = await callController(getActiveProject);
+        assert.equal(activeRes._json.id, res._json.id);
+      });
+
+      it("auto-suffixes name when duplicate exists", async () => {
+        // Create a project with the base name
+        await createTestProject(`Financial Advisor ${folderSuffix(TEST_USER_ID)}`);
+
+        // Deep-link with same name should create a new project with suffix
+        const res = await callController(deepLinkCreateProject, {
+          body: { name: `Financial Advisor ${folderSuffix(TEST_USER_ID)}`, theme: TEST_THEME_ID, source: "theme" },
+        });
+        assert.equal(res._status, 201);
+        assert.equal(res._json.name, `Financial Advisor ${folderSuffix(TEST_USER_ID)} (2)`);
+
+        // Third time should get (3)
+        const res3 = await callController(deepLinkCreateProject, {
+          body: { name: `Financial Advisor ${folderSuffix(TEST_USER_ID)}`, theme: TEST_THEME_ID, source: "theme" },
+        });
+        assert.equal(res3._status, 201);
+        assert.equal(res3._json.name, `Financial Advisor ${folderSuffix(TEST_USER_ID)} (3)`);
+      });
+
+      it("always activates the newly created project even when another is active", async () => {
+        // Create a first project (becomes active automatically)
+        const first = await createTestProject(`First ${folderSuffix(TEST_USER_ID)}`);
+        const activeCheck = await callController(getActiveProject);
+        assert.equal(activeCheck._json.id, first.id);
+
+        // Deep-link create a different project
+        const res = await callController(deepLinkCreateProject, {
+          body: { name: `Second Via Deeplink ${folderSuffix(TEST_USER_ID)}`, theme: TEST_THEME_ID, source: "theme" },
+        });
+        assert.equal(res._status, 201);
+
+        // The new project should be active, not the first one
+        const activeRes = await callController(getActiveProject);
+        assert.equal(activeRes._json.id, res._json.id, "New deep-link project should be active");
+      });
+
+      it("enforces maxProjectsPerUser limit", async () => {
+        const p1 = await createTestProject(`Limit A ${folderSuffix(TEST_USER_ID)}`);
+        const p2 = await createTestProject(`Limit B ${folderSuffix(TEST_USER_ID)}`);
+        assert.ok(p1.id);
+        assert.ok(p2.id);
+
+        // Deep-link create should still work (under the 25 limit)
+        const res = await callController(deepLinkCreateProject, {
+          body: { name: `Limit C ${folderSuffix(TEST_USER_ID)}`, theme: TEST_THEME_ID, source: "theme" },
+        });
+        assert.equal(res._status, 201);
+      });
+
+      it("returns 400 when name is missing", async () => {
+        const res = await callController(deepLinkCreateProject, {
+          body: { theme: TEST_THEME_ID, source: "theme" },
+        });
+        assert.equal(res._status, 400);
+      });
+
+      it("returns 400 when theme is missing", async () => {
+        const res = await callController(deepLinkCreateProject, {
+          body: { name: `No Theme ${folderSuffix(TEST_USER_ID)}` },
+        });
+        assert.equal(res._status, 400);
       });
     });
   });

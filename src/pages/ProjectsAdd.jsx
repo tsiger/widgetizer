@@ -8,6 +8,7 @@ import useToastStore from "../stores/toastStore";
 import { createProject } from "../queries/projectManager";
 import useProjectStore from "../stores/projectStore";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import { HOSTED_MODE } from "../config";
 
 export default function ProjectsAdd() {
   const { t } = useTranslation();
@@ -37,9 +38,10 @@ export default function ProjectsAdd() {
         showToast(t("projectsAdd.toasts.createSuccess", { name: newProject.name }), "success");
       }
 
-      // Redirect to list after successful creation
+      // In hosted mode, go straight to editing (Projects list is hidden).
+      // In open-source mode, go to the projects list.
       skipNavigationGuardRef.current = true;
-      navigate("/projects");
+      navigate(HOSTED_MODE ? "/pages" : "/projects");
       return true;
     } catch (err) {
       showToast(err.message || t("projectsAdd.toasts.createError"), "error");
@@ -64,7 +66,7 @@ export default function ProjectsAdd() {
         submitLabel={t("projectsAdd.create")}
         onCancel={() => {
           skipNavigationGuardRef.current = true;
-          navigate("/projects");
+          navigate(HOSTED_MODE ? "/pages" : "/projects");
         }}
         onDirtyChange={setIsDirty}
         isDirty={isDirty}
