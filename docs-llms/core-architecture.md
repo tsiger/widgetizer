@@ -13,9 +13,10 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 - `src/pages/ProjectsEdit.jsx` - Edit project with theme update UI
 - `src/components/projects/ProjectForm.jsx` - Reusable form component
 - `src/components/projects/ProjectImportModal.jsx` - ZIP import modal
-- `src/components/layout/DeepLinkResolver.jsx` - Processes deep-link URL params on initial load (siteId, theme)
-- `src/components/layout/HostedModeGuard.jsx` - Blocks Dashboard/Projects/ProjectsEdit routes in hosted mode
-- `src/components/layout/RouteSourceGuard.jsx` - Blocks routes hidden for project source type (theme/ai)
+- `src/components/layout/DeepLinkResolver.jsx` - Processes deep-link URL params on initial load (siteId, theme). If no params and no active project in hosted mode, redirects to publisher dashboard.
+- `src/components/layout/HostedModeGuard.jsx` - Layout route guard wrapping `/`, `/projects`, `/projects/edit/:id`. In hosted mode: redirects to `/pages` (if active project) or publisher dashboard (if none). No-op in open-source mode.
+- `src/components/layout/RouteSourceGuard.jsx` - Layout route guard for project-scoped routes. Checks `activeProject.source` against `hiddenForSource` from `navigation.js`. Redirects to `/pages` if route is restricted for the project's source type.
+- `src/components/common/Breadcrumb.jsx` - Navigation breadcrumb. Hidden entirely in hosted mode (`return null`).
 
 ### Query Layer (`src/queries/projectManager.js`)
 

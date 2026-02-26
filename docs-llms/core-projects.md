@@ -86,6 +86,7 @@ When a user arrives at the editor via a marketing deep-link (`?theme=arch&preset
 3. **Always activates**: The new project is always set as active, regardless of how many projects exist.
 4. **Source tracking**: The project's `source` field is set to the value from the deep-link (typically `"theme"`). This controls which sidebar items and routes are visible.
 5. **Navigation**: After creation, the user lands on `/pages` to start editing immediately.
+6. **No-project fallback**: If a user navigates to the editor without deep-link params and has no active project (e.g. typing `editor.widgetizer.org` directly), `DeepLinkResolver` redirects to the publisher dashboard via `window.location.href`.
 
 ### 2. Listing and Managing Projects
 
