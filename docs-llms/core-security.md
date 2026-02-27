@@ -1,6 +1,6 @@
 # Platform Security
 
-This document covers all security measures in Widgetizer. Everything in the **Implemented** sections is active in both the open-source and hosted versions of the app. The **Pending** sections at the end list work that hasn't been done yet.
+This document covers all security measures in Widgetizer. The editor is a pure open-source project. Hosted capabilities (auth, publishing, limits enforcement) are injected via adapters by an external platform (`widgetizer-platform`, a separate private repo) through `createEditorApp({ hostedMode: true, adapters })`. Everything in the **Implemented** sections is active in the open-source editor. Sections marked as platform-enforced only apply when the platform wraps the editor with hosted adapters.
 
 ---
 
@@ -21,11 +21,11 @@ All incoming data is validated and sanitized before reaching controllers.
 IP-based request throttling via `express-rate-limit`:
 
 - **Editor routes** (`/api/projects`, `/api/themes`, `/api/pages`, `/api/preview`): 1500 req / 15 min
-- **Other API routes** (`/api/menus`, `/api/media`, `/api/export`, `/api/settings`, `/api/core-widgets`, `/api/core`, `/api/publish` in hosted mode): 5000 req / 15 min
+- **Other API routes** (`/api/menus`, `/api/media`, `/api/export`, `/api/settings`, `/api/core-widgets`, `/api/core`): 5000 req / 15 min
 
 ### 3. HTTP Security Headers
 
-`helmet` in `server/index.js` with intentional relaxations for preview compatibility:
+`helmet` in `server/createApp.js` with intentional relaxations for preview compatibility:
 
 | Directive | Value | Reason |
 |-----------|-------|--------|
@@ -73,7 +73,7 @@ All server-enforced resource limits are centralized in `server/limits.js` as `ED
 - Image dimensions (`maxImageDimension`: 10,000px, `maxImagePixels`: 100M) — prevents decompression bombs
 - Request body sizes (`jsonBodyLimit`: 2MB, `editorJsonBodyLimit`: 10MB)
 
-**Hosted-mode only (`HOSTED_MODE=true`):**
+**Platform-enforced (when the platform calls `createEditorApp({ hostedMode: true, adapters })`):**
 - Project counts (`maxProjectsPerUser`: 25)
 - Page counts (`maxPagesPerProject`: 100)
 - Widget counts (`maxWidgetsPerPage`: 50, `maxBlocksPerWidget`: 200)
@@ -83,7 +83,7 @@ All server-enforced resource limits are centralized in `server/limits.js` as `ED
 - Upload ceilings (`maxFileSizeMBCeiling`: 50, `maxVideoSizeMBCeiling`: 200, `maxAudioSizeMBCeiling`: 100)
 - Export ceilings (`maxImportSizeMBCeiling`: 2,000MB, `maxExportVersionsCeiling`: 50)
 
-User-configurable app settings (e.g., `maxFileSizeMB`) are clamped to these ceilings in `appSettingsController.js` before saving. Enforcement utility functions (`checkLimit`, `checkStringLength`, `validateZipEntries`, `clampToCeiling`) are in `server/utils/limitChecks.js`.
+User-configurable app settings (e.g., `maxFileSizeMB`) are clamped to these ceilings in `appSettingsController.js` (which reads `req.app.locals.hostedMode`) before saving. Enforcement utility functions (`checkLimit`, `checkStringLength`, `validateZipEntries`, `clampToCeiling`) are in `server/utils/limitChecks.js` and accept `{ hostedMode }` as a parameter option.
 
 ### 9. Project Import/Export & Theme Upload Security
 
@@ -176,13 +176,13 @@ No outstanding security tasks. All protections listed above are active.
 
 ---
 
-## Implemented: Hosted / Multi-user (Phase 2)
+## Implemented: Multi-user / Adapter-based Architecture
 
 ### Authentication
 
-- [x] Auth middleware (`server/middleware/auth.js`) — unconditionally sets `req.userId`. Open-source mode: `"local"`. Hosted mode: verifies Clerk JWT and extracts user ID; returns 401 on failure.
-- [x] `apiFetch` wrapper (`src/lib/apiFetch.js`) — attaches Clerk Bearer token when `window.Clerk?.session` exists. No-op in open-source mode.
-- [x] Feature flag: `HOSTED_MODE` from `server/hostedMode.js` controls whether auth is enforced.
+- [x] Auth is handled via the **auth adapter** (`server/adapters/authAdapter.js`). The default (open-source) adapter sets `req.userId = "local"`. The platform provides a hosted auth adapter (e.g., Clerk integration) when calling `createEditorApp({ hostedMode: true, adapters: { auth: hostedAuthAdapter } })`.
+- [x] The editor does **not** depend on Clerk or any external auth provider directly. Clerk was removed as a dependency; auth is fully adapter-injected.
+- [x] `apiFetch` wrapper (`src/lib/apiFetch.js`) — thin wrapper around `fetch` for API calls. Does not inject auth tokens; that is the platform's responsibility when wrapping the editor.
 
 ### Multi-tenant Data Isolation
 

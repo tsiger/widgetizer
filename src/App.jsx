@@ -24,9 +24,7 @@ import ToastContainer from "./components/ui/ToastContainer";
 import RequireActiveProject from "./components/layout/RequireActiveProject";
 import RouteSourceGuard from "./components/layout/RouteSourceGuard";
 import DeepLinkResolver from "./components/layout/DeepLinkResolver";
-import HostedModeGuard from "./components/layout/HostedModeGuard";
 import useProjectStore from "./stores/projectStore";
-import { HOSTED_MODE } from "./config";
 import "./i18n";
 import LanguageInitializer from "./components/layout/LanguageInitializer";
 
@@ -41,11 +39,11 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <HostedModeGuard><Dashboard /></HostedModeGuard>,
+            element: <Dashboard />,
           },
           {
             path: "projects",
-            element: <HostedModeGuard><Projects /></HostedModeGuard>,
+            element: <Projects />,
           },
           {
             path: "projects/add",
@@ -53,7 +51,7 @@ const router = createBrowserRouter([
           },
           {
             path: "projects/edit/:id",
-            element: <HostedModeGuard><ProjectsEdit /></HostedModeGuard>,
+            element: <ProjectsEdit />,
           },
           {
             element: <RequireActiveProject />,
@@ -143,12 +141,9 @@ function AppWithToast() {
 }
 
 function App() {
-  // In open-source mode, bootstrap the project store on mount.
-  // In hosted mode, AuthGuard.jsx handles this after Clerk confirms sign-in.
+  // Bootstrap the project store on mount
   useEffect(() => {
-    if (!HOSTED_MODE) {
-      useProjectStore.getState().fetchActiveProject();
-    }
+    useProjectStore.getState().fetchActiveProject();
   }, []);
 
   return <AppWithToast />;

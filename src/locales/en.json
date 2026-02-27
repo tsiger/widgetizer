@@ -32,7 +32,8 @@
       "goToProjects": "Go to Projects"
     },
     "footer": {
-      "thankYou": "Thank you for creating with"
+      "thankYou": "Thank you for creating with",
+      "yourWebsite": "Your website address is"
     }
   },
   "forms": {

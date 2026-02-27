@@ -1,5 +1,4 @@
 import { exportProjectToDir } from "./exportController.js";
-import { deployToPublisher } from "../services/publisherClient.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
@@ -8,8 +7,8 @@ import { PassThrough } from "stream";
 import fs from "fs-extra";
 
 /**
- * Publish a project to the hosted Publisher platform.
- * Flow: validate → export to static files → ZIP → deploy to Publisher → update project record.
+ * Publish a project via the publish adapter.
+ * Flow: validate -> export to static files -> ZIP -> deploy via adapter -> update project record.
  *
  * @param {import('express').Request} req - Express request with projectId in params
  * @param {import('express').Response} res - Express response
@@ -17,17 +16,13 @@ import fs from "fs-extra";
 export async function publishProject(req, res) {
   const { projectId } = req.params;
   const userId = req.userId;
-  const clerkToken = req.headers.authorization?.replace("Bearer ", "");
+  const publishAdapter = req.app.locals.adapters.publish;
 
   let exportOutputDir = null;
 
   try {
     if (!projectId) {
       return res.status(400).json({ error: "Project ID is required" });
-    }
-
-    if (!clerkToken) {
-      return res.status(401).json({ error: "Authentication required for publishing" });
     }
 
     // 1. Validate project ownership
@@ -46,14 +41,14 @@ export async function publishProject(req, res) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    // 5. Deploy to Publisher
-    const publishResult = await deployToPublisher(
+    // 5. Deploy via the publish adapter
+    const publishResult = await publishAdapter.deploy(
       zipBuffer,
       {
         siteId: project.publishedSiteId || null,
         projectName: project.name,
       },
-      clerkToken,
+      userId,
     );
 
     // 6. Update project record with publish info
@@ -92,11 +87,6 @@ export async function publishProject(req, res) {
     }
 
     if (handleProjectResolutionError(res, error)) return;
-
-    // Forward Publisher API errors with their original status code (e.g. 403 tier limit)
-    if (error.name === "PublisherError" && error.status) {
-      return res.status(error.status).json({ error: error.message });
-    }
 
     console.error("Publish error:", error);
     res.status(500).json({
@@ -142,6 +132,35 @@ export async function getPublishStatus(req, res) {
       error: "Failed to get publish status",
       message: error.message,
     });
+  }
+}
+
+/**
+ * Sync the published URL for a project.
+ * Called by the Publisher API when a subdomain changes so the editor
+ * stays in sync without requiring the user to re-publish.
+ *
+ * Expects body: { siteId: string, url: string }
+ */
+export async function syncPublishUrl(req, res) {
+  const { siteId, url } = req.body;
+
+  try {
+    if (!siteId || !url) {
+      return res.status(400).json({ error: "siteId and url are required" });
+    }
+
+    const project = projectRepo.getProjectByPublishedSiteId(siteId, req.userId);
+    if (!project) {
+      return res.status(404).json({ error: "No project found for this site" });
+    }
+
+    projectRepo.updateProject(project.id, { publishedUrl: url }, req.userId);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Sync publish URL error:", error);
+    res.status(500).json({ error: "Failed to sync publish URL" });
   }
 }
 

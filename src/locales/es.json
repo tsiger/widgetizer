@@ -28,7 +28,8 @@
       "goToProjects": "Ir a Proyectos"
     },
     "footer": {
-      "thankYou": "Gracias por crear con"
+      "thankYou": "Gracias por crear con",
+      "yourWebsite": "La dirección de tu sitio web es"
     }
   },
   "forms": {

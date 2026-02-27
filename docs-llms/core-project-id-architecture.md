@@ -33,7 +33,7 @@ This architecture decouples the project's identity from its filesystem represent
 
 ### 3. User Scoping (userId)
 
-All filesystem paths are scoped per user. Every path helper in `server/config.js` accepts a `userId` parameter (default `"local"`). In open-source mode, `userId` is always `"local"`, so paths resolve to `data/users/local/projects/{folderName}/`. In hosted mode, `userId` is the Clerk user ID.
+All filesystem paths are scoped per user. Every path helper in `server/config.js` accepts a `userId` parameter (default `"local"`). In open-source mode, `userId` is always `"local"` (set by the default auth adapter), so paths resolve to `data/users/local/projects/{folderName}/`. In hosted mode, the platform's auth adapter sets `userId` to the authenticated user's ID.
 
 The `projects` table includes a `user_id` column, and all queries are filtered by `user_id`. The `getProjectFolderName(projectId, userId)` helper validates project ownership — it throws if the project doesn't belong to the requesting user.
 

@@ -80,7 +80,8 @@ export async function createMenu(req, res) {
     }
 
     // Platform limit: menu name length
-    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxMenuNameLength, "Menu name");
+    const hostedMode = req.app.locals.hostedMode;
+    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxMenuNameLength, "Menu name", { hostedMode });
     if (!nameCheck.ok) {
       return res.status(400).json({ error: nameCheck.error });
     }
@@ -93,7 +94,7 @@ export async function createMenu(req, res) {
 
     // Platform limit: max menus per project
     const menuFiles = (await fs.readdir(menusDir)).filter((f) => f.endsWith(".json"));
-    const menuCheck = checkLimit(menuFiles.length, EDITOR_LIMITS.maxMenusPerProject, "menus per project");
+    const menuCheck = checkLimit(menuFiles.length, EDITOR_LIMITS.maxMenusPerProject, "menus per project", { hostedMode });
     if (!menuCheck.ok) {
       return res.status(403).json({ error: menuCheck.error });
     }
@@ -203,15 +204,16 @@ export async function updateMenu(req, res) {
     }
 
     // Platform limits: menu item count and nesting depth
+    const hostedMode = req.app.locals.hostedMode;
     if (menuData.items) {
       const itemCount = countMenuItems(menuData.items);
-      const itemCheck = checkLimit(itemCount, EDITOR_LIMITS.maxMenuItemsPerMenu, "items per menu", { exclusive: false });
+      const itemCheck = checkLimit(itemCount, EDITOR_LIMITS.maxMenuItemsPerMenu, "items per menu", { exclusive: false, hostedMode });
       if (!itemCheck.ok) {
         return res.status(400).json({ error: itemCheck.error });
       }
 
       const depth = getMenuDepth(menuData.items);
-      const depthCheck = checkLimit(depth, EDITOR_LIMITS.maxMenuNestingDepth, "levels of menu nesting", { exclusive: false });
+      const depthCheck = checkLimit(depth, EDITOR_LIMITS.maxMenuNestingDepth, "levels of menu nesting", { exclusive: false, hostedMode });
       if (!depthCheck.ok) {
         return res.status(400).json({ error: depthCheck.error });
       }
@@ -318,7 +320,7 @@ export async function duplicateMenu(req, res) {
     const menuFiles = (await fs.readdir(menusDir)).filter((f) => f.endsWith(".json"));
 
     // Platform limit: max menus per project
-    const menuCheck = checkLimit(menuFiles.length, EDITOR_LIMITS.maxMenusPerProject, "menus per project");
+    const menuCheck = checkLimit(menuFiles.length, EDITOR_LIMITS.maxMenusPerProject, "menus per project", { hostedMode: req.app.locals.hostedMode });
     if (!menuCheck.ok) {
       return res.status(403).json({ error: menuCheck.error });
     }

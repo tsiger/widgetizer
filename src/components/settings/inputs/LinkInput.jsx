@@ -107,7 +107,7 @@ export default function LinkInput({ id, value = {}, onChange, setting }) {
         });
       } else {
         // User typed a custom URL - remove pageUuid if present
-        // eslint-disable-next-line no-unused-vars
+         
         const { pageUuid: _pageUuid, ...rest } = resolvedValue;
         onChange({
           ...rest,

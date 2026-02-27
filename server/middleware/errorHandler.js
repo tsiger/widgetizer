@@ -1,6 +1,6 @@
 // This middleware handles errors globally, preventing the server from crashing.
 
-// eslint-disable-next-line no-unused-vars
+ 
 const errorHandler = (err, req, res, _next) => {
   const statusCode = res.statusCode ? res.statusCode : 500;
 

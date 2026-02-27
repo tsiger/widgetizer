@@ -168,6 +168,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         body,
         file,
         userId: TEST_USER_ID,
+        app: { locals: { hostedMode: false, adapters: {} } },
         // express-validator needs these to exist
         [Symbol.for("express-validator#contexts")]: [],
       };

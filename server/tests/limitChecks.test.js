@@ -4,7 +4,10 @@
  * Tests the pure limit-checking functions: checkLimit, checkStringLength,
  * validateZipEntries, and clampToCeiling.
  *
- * Sets HOSTED_MODE=true before importing so that enforcement logic is active.
+ * Passes hostedMode: true to checkLimit / checkStringLength so that
+ * enforcement logic is active — mirroring what the platform does via
+ * createEditorApp({ hostedMode: true }).
+ *
  * Functions that always enforce (validateZipEntries, clampToCeiling) are also
  * tested for completeness.
  *
@@ -14,65 +17,65 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-// Enable hosted mode so checkLimit / checkStringLength actually enforce
-process.env.HOSTED_MODE = "true";
-
 const { checkLimit, checkStringLength, validateZipEntries, clampToCeiling } = await import(
   "../utils/limitChecks.js"
 );
+
+/** Shorthand: hosted-mode options for checkLimit / checkStringLength. */
+const hosted = { hostedMode: true };
 
 // ============================================================================
 // checkLimit
 // ============================================================================
 
-describe("checkLimit (HOSTED_MODE=true)", () => {
+describe("checkLimit (hostedMode: true)", () => {
   it("returns ok when current value is under the limit", () => {
-    const result = checkLimit(5, 10, "widgets per page");
+    const result = checkLimit(5, 10, "widgets per page", hosted);
     assert.equal(result.ok, true);
     assert.equal(result.error, undefined);
   });
 
   it("returns error when current value equals the limit", () => {
-    const result = checkLimit(10, 10, "widgets per page");
+    const result = checkLimit(10, 10, "widgets per page", hosted);
     assert.equal(result.ok, false);
     assert.match(result.error, /maximum 10 widgets per page/);
   });
 
   it("returns error when current value exceeds the limit", () => {
-    const result = checkLimit(15, 10, "widgets per page");
+    const result = checkLimit(15, 10, "widgets per page", hosted);
     assert.equal(result.ok, false);
     assert.match(result.error, /maximum 10 widgets per page/);
   });
 
   it("returns ok when current value is 0 and limit is positive", () => {
-    const result = checkLimit(0, 25, "projects");
+    const result = checkLimit(0, 25, "projects", hosted);
     assert.equal(result.ok, true);
   });
 
   it("returns error when both values are 0", () => {
-    const result = checkLimit(0, 0, "items");
+    const result = checkLimit(0, 0, "items", hosted);
     assert.equal(result.ok, false);
   });
 
   it("returns ok when maxValue is null (no limit configured)", () => {
-    const result = checkLimit(999, null, "things");
+    const result = checkLimit(999, null, "things", hosted);
     assert.equal(result.ok, true);
   });
 
   it("returns ok when maxValue is undefined (no limit configured)", () => {
-    const result = checkLimit(999, undefined, "things");
+    const result = checkLimit(999, undefined, "things", hosted);
     assert.equal(result.ok, true);
   });
 
   it("includes the limit number and label in the error message", () => {
-    const result = checkLimit(100, 50, "pages per project");
+    const result = checkLimit(100, 50, "pages per project", hosted);
     assert.equal(result.ok, false);
     assert.equal(result.error, "Limit reached: maximum 50 pages per project allowed");
   });
 });
 
 describe("checkLimit — alwaysEnforce flag", () => {
-  it("enforces when alwaysEnforce is true (regardless of HOSTED_MODE)", () => {
+  it("enforces when alwaysEnforce is true (regardless of hostedMode)", () => {
     const result = checkLimit(5000, 1000, "ZIP entries", { alwaysEnforce: true });
     assert.equal(result.ok, false);
     assert.match(result.error, /maximum 1000 ZIP entries/);
@@ -86,27 +89,27 @@ describe("checkLimit — alwaysEnforce flag", () => {
 
 describe("checkLimit — exclusive vs inclusive", () => {
   it("exclusive (default): fails when value equals max", () => {
-    const result = checkLimit(10, 10, "items");
+    const result = checkLimit(10, 10, "items", hosted);
     assert.equal(result.ok, false);
   });
 
   it("exclusive (default): passes when value is one below max", () => {
-    const result = checkLimit(9, 10, "items");
+    const result = checkLimit(9, 10, "items", hosted);
     assert.equal(result.ok, true);
   });
 
   it("inclusive (exclusive: false): passes when value equals max", () => {
-    const result = checkLimit(50, 50, "widgets per page", { exclusive: false });
+    const result = checkLimit(50, 50, "widgets per page", { exclusive: false, ...hosted });
     assert.equal(result.ok, true);
   });
 
   it("inclusive (exclusive: false): fails when value exceeds max", () => {
-    const result = checkLimit(51, 50, "widgets per page", { exclusive: false });
+    const result = checkLimit(51, 50, "widgets per page", { exclusive: false, ...hosted });
     assert.equal(result.ok, false);
   });
 
   it("inclusive (exclusive: false): passes when value is under max", () => {
-    const result = checkLimit(30, 50, "widgets per page", { exclusive: false });
+    const result = checkLimit(30, 50, "widgets per page", { exclusive: false, ...hosted });
     assert.equal(result.ok, true);
   });
 
@@ -119,23 +122,35 @@ describe("checkLimit — exclusive vs inclusive", () => {
   });
 });
 
+describe("checkLimit — open-source mode (hostedMode: false)", () => {
+  it("bypasses limits when hostedMode is false (default)", () => {
+    const result = checkLimit(999, 10, "widgets per page");
+    assert.equal(result.ok, true);
+  });
+
+  it("still enforces when alwaysEnforce is true even without hostedMode", () => {
+    const result = checkLimit(999, 10, "widgets per page", { alwaysEnforce: true });
+    assert.equal(result.ok, false);
+  });
+});
+
 // ============================================================================
 // checkStringLength
 // ============================================================================
 
-describe("checkStringLength (HOSTED_MODE=true)", () => {
+describe("checkStringLength (hostedMode: true)", () => {
   it("returns ok for string within the limit", () => {
-    const result = checkStringLength("hello", 200, "project name");
+    const result = checkStringLength("hello", 200, "project name", hosted);
     assert.equal(result.ok, true);
   });
 
   it("returns ok for string exactly at the limit", () => {
-    const result = checkStringLength("ab", 2, "name");
+    const result = checkStringLength("ab", 2, "name", hosted);
     assert.equal(result.ok, true);
   });
 
   it("returns error for string exceeding the limit", () => {
-    const result = checkStringLength("abcdef", 3, "menu name");
+    const result = checkStringLength("abcdef", 3, "menu name", hosted);
     assert.equal(result.ok, false);
     assert.match(result.error, /menu name is too long/);
     assert.match(result.error, /6 characters/);
@@ -143,32 +158,32 @@ describe("checkStringLength (HOSTED_MODE=true)", () => {
   });
 
   it("returns ok for empty string", () => {
-    const result = checkStringLength("", 200, "name");
+    const result = checkStringLength("", 200, "name", hosted);
     assert.equal(result.ok, true);
   });
 
   it("returns ok when maxLen is null", () => {
-    const result = checkStringLength("anything", null, "field");
+    const result = checkStringLength("anything", null, "field", hosted);
     assert.equal(result.ok, true);
   });
 
   it("returns ok when maxLen is undefined", () => {
-    const result = checkStringLength("anything", undefined, "field");
+    const result = checkStringLength("anything", undefined, "field", hosted);
     assert.equal(result.ok, true);
   });
 
   it("returns ok when value is not a string (null)", () => {
-    const result = checkStringLength(null, 200, "field");
+    const result = checkStringLength(null, 200, "field", hosted);
     assert.equal(result.ok, true);
   });
 
   it("returns ok when value is not a string (number)", () => {
-    const result = checkStringLength(42, 200, "field");
+    const result = checkStringLength(42, 200, "field", hosted);
     assert.equal(result.ok, true);
   });
 
   it("returns ok when value is not a string (undefined)", () => {
-    const result = checkStringLength(undefined, 200, "field");
+    const result = checkStringLength(undefined, 200, "field", hosted);
     assert.equal(result.ok, true);
   });
 });
@@ -180,8 +195,20 @@ describe("checkStringLength — alwaysEnforce flag", () => {
   });
 });
 
+describe("checkStringLength — open-source mode (hostedMode: false)", () => {
+  it("bypasses limits when hostedMode is false (default)", () => {
+    const result = checkStringLength("toolong", 3, "field");
+    assert.equal(result.ok, true);
+  });
+
+  it("still enforces when alwaysEnforce is true even without hostedMode", () => {
+    const result = checkStringLength("toolong", 3, "field", { alwaysEnforce: true });
+    assert.equal(result.ok, false);
+  });
+});
+
 // ============================================================================
-// validateZipEntries (always enforced, no HOSTED_MODE gating)
+// validateZipEntries (always enforced, no hosted-mode gating)
 // ============================================================================
 
 /** Create a mock adm-zip instance with the given entry names. */

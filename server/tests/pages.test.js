@@ -88,6 +88,7 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         body,
         activeProject,
         userId: TEST_USER_ID,
+        app: { locals: { hostedMode: false, adapters: {} } },
         [Symbol.for("express-validator#contexts")]: [],
       };
     }

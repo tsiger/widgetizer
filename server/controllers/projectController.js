@@ -144,10 +144,11 @@ export async function getProjectBySiteId(req, res) {
 export async function createProject(req, res) {
   try {
     const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates, preset, source } = req.body;
+    const hostedMode = req.app.locals.hostedMode;
 
     // Platform limit: max projects per user
     const allProjects = projectRepo.getAllProjects(req.userId);
-    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects");
+    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects", { hostedMode });
     if (!projectCheck.ok) {
       return res.status(403).json({ error: projectCheck.error });
     }
@@ -158,7 +159,7 @@ export async function createProject(req, res) {
     }
 
     // Platform limit: project name length
-    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxProjectNameLength, "Project name");
+    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxProjectNameLength, "Project name", { hostedMode });
     if (!nameCheck.ok) {
       return res.status(400).json({ error: nameCheck.error });
     }
@@ -335,13 +336,14 @@ export async function deepLinkCreateProject(req, res) {
     }
 
     // Platform limit: max projects per user
+    const hostedMode = req.app.locals.hostedMode;
     const allProjects = projectRepo.getAllProjects(req.userId);
-    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects");
+    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects", { hostedMode });
     if (!projectCheck.ok) {
       return res.status(403).json({ error: projectCheck.error });
     }
 
-    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxProjectNameLength, "Project name");
+    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxProjectNameLength, "Project name", { hostedMode });
     if (!nameCheck.ok) {
       return res.status(400).json({ error: nameCheck.error });
     }
@@ -638,7 +640,7 @@ export async function duplicateProject(req, res) {
 
     // Platform limit: max projects per user
     const allProjects = projectRepo.getAllProjects(req.userId);
-    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects");
+    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects", { hostedMode: req.app.locals.hostedMode });
     if (!projectCheck.ok) {
       return res.status(403).json({ error: projectCheck.error });
     }
@@ -1060,7 +1062,7 @@ export async function importProject(req, res) {
 
     // Platform limit: max projects per user
     const allProjects = projectRepo.getAllProjects(req.userId);
-    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects");
+    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects", { hostedMode: req.app.locals.hostedMode });
     if (!projectCheck.ok) {
       return res.status(403).json({ error: projectCheck.error });
     }

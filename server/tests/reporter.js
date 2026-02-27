@@ -370,7 +370,7 @@ function popNestingStack(testId) {
  * In verbose mode, emit suite header lines for any parent suites
  * that haven't been printed yet (so test results appear under their section).
  */
-function emitVerboseSuiteHeaders(filePath, testNesting) {
+function emitVerboseSuiteHeaders(filePath, _testNesting) {
   for (const entry of nestingStack) {
     const key = `${entry.file}:${entry.testId}`;
     if (emittedSuiteHeaders.has(key)) continue;

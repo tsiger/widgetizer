@@ -1197,7 +1197,7 @@ export async function uploadTheme(req, res) {
     const themesDir = getUserThemesDir(userId);
     if (await fs.pathExists(themesDir)) {
       const themeDirs = (await fs.readdir(themesDir, { withFileTypes: true })).filter((e) => e.isDirectory());
-      const themeCheck = checkLimit(themeDirs.length, EDITOR_LIMITS.maxThemesPerUser, "themes");
+      const themeCheck = checkLimit(themeDirs.length, EDITOR_LIMITS.maxThemesPerUser, "themes", { hostedMode: req.app.locals.hostedMode });
       if (!themeCheck.ok) {
         return res.status(403).json({ message: themeCheck.error });
       }

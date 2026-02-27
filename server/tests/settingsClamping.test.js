@@ -24,7 +24,6 @@ const TEST_DATA_DIR = path.join(TEST_ROOT, "data");
 
 process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.NODE_ENV = "test";
-process.env.HOSTED_MODE = "true"; // Clamping only applies in hosted mode
 
 const { updateAppSettings, readAppSettingsFile } = await import("../controllers/appSettingsController.js");
 const { saveSettings, defaultSettings } = await import("../db/repositories/settingsRepository.js");
@@ -35,10 +34,11 @@ const { EDITOR_LIMITS } = await import("../limits.js");
 // Test helpers
 // ============================================================================
 
-function mockReq({ body = {}, userId = "local" } = {}) {
+function mockReq({ body = {}, userId = "local", hostedMode = true } = {}) {
   return {
     body,
     userId,
+    app: { locals: { hostedMode } },
     [Symbol.for("express-validator#contexts")]: [],
   };
 }

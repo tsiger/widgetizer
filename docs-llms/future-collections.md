@@ -439,7 +439,7 @@ output/
 | Path                                     | Changes                                |
 | ---------------------------------------- | -------------------------------------- |
 | `server/config.js`                       | Add collection path helpers            |
-| `server/index.js`                        | Register collections routes            |
+| `server/createApp.js`                    | Register collections routes            |
 | `src/App.jsx`                            | Add collection routes                  |
 | `src/components/layout/Sidebar.jsx`      | Dynamic collection nav items           |
 | `src/locales/en/translation.json`        | Add collection translation keys        |

@@ -148,12 +148,6 @@ export async function uploadProjectMedia(projectId, files, onProgress) {
     formData.append("files", file);
   });
 
-  // Get auth token before creating the XHR promise
-  let authToken = null;
-  if (window.Clerk?.session) {
-    authToken = await window.Clerk.session.getToken();
-  }
-
   const xhr = new XMLHttpRequest();
 
   return new Promise((resolve, reject) => {
@@ -185,9 +179,6 @@ export async function uploadProjectMedia(projectId, files, onProgress) {
     };
 
     xhr.open("POST", API_URL(`/api/media/projects/${projectId}/media`));
-    if (authToken) {
-      xhr.setRequestHeader("Authorization", `Bearer ${authToken}`);
-    }
     xhr.send(formData);
   });
 }

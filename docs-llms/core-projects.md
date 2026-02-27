@@ -75,9 +75,11 @@ This file contains functions that make API calls to the backend:
     - **Menus**: All menu items that link to internal pages (e.g., `index.html`, `about.html`) are enriched with the corresponding page's `pageUuid`. This ensures menu links remain valid even if pages are renamed.
     - **Widgets**: All widget settings with link-type values (objects containing `href` pointing to internal `.html` pages) are enriched with `pageUuid`. This includes links in header, footer, and all page widgets.
 11. **Setting Active Project**: If this is the very first project being created (i.e., there was no active project before), it is automatically set as the active project by calling `setActiveProject(newProject.id)`. The global state is updated via the `projectStore`.
-12. **Feedback**: A success toast notification is shown (localized), and the user is presented with buttons to either navigate to the project list or edit the newly created project. In hosted mode, navigates to `/pages` instead of the project list.
+12. **Feedback**: A success toast notification is shown (localized), and the user is presented with buttons to either navigate to the project list or edit the newly created project.
 
-### 1b. Creating a Project via Deep-Link (Hosted Mode)
+### 1b. Creating a Project via Deep-Link (Platform-Injected)
+
+The deep-link project creation flow is used when the platform wraps the editor. It is not part of the open-source editor's default behavior -- the platform injects the `DeepLinkResolver` component and the `/api/projects/deep-link` route via its adapter layer.
 
 When a user arrives at the editor via a marketing deep-link (`?theme=arch&preset=financial&source=theme&name=Financial+Advisor`), the `DeepLinkResolver` component intercepts the URL params and calls `POST /api/projects/deep-link`.
 
@@ -86,7 +88,7 @@ When a user arrives at the editor via a marketing deep-link (`?theme=arch&preset
 3. **Always activates**: The new project is always set as active, regardless of how many projects exist.
 4. **Source tracking**: The project's `source` field is set to the value from the deep-link (typically `"theme"`). This controls which sidebar items and routes are visible.
 5. **Navigation**: After creation, the user lands on `/pages` to start editing immediately.
-6. **No-project fallback**: If a user navigates to the editor without deep-link params and has no active project (e.g. typing `editor.widgetizer.org` directly), `DeepLinkResolver` redirects to the publisher dashboard via `window.location.href`.
+6. **No-project fallback**: If a user navigates to the editor without deep-link params and has no active project, `DeepLinkResolver` redirects to the publisher dashboard via `window.location.href`.
 
 ### 2. Listing and Managing Projects
 

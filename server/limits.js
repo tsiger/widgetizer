@@ -1,14 +1,16 @@
 /**
  * Global platform limits for the Editor service.
  *
- * When HOSTED_MODE=true, these are server-enforced ceilings that override
- * user-configurable app settings (e.g., a user can set maxFileSizeMB to 50,
- * but the server caps it at media.maxFileSizeMBCeiling).
+ * When the platform sets hostedMode: true via the adapter system
+ * (createEditorApp({ hostedMode: true })), these are server-enforced
+ * ceilings that override user-configurable app settings (e.g., a user
+ * can set maxFileSizeMB to 50, but the server caps it at
+ * media.maxFileSizeMBCeiling).
  *
- * When HOSTED_MODE=false (open-source / self-hosted), most limits are NOT
- * enforced — the user controls their own instance. Limits marked "always
- * enforced" apply regardless of mode for safety (ZIP bomb protection,
- * image decompression bombs, request body sizes).
+ * In open-source / self-hosted mode (hostedMode defaults to false), most
+ * limits are NOT enforced — the user controls their own instance. Limits
+ * marked "always enforced" apply regardless of mode for safety (ZIP bomb
+ * protection, image decompression bombs, request body sizes).
  *
  * Single file to change when adjusting platform limits.
  */

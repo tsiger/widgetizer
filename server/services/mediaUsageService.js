@@ -236,7 +236,7 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
  * @returns {Promise<{success: boolean}>} Success result
  * @throws {Error} If media file read/write fails
  */
-export async function removePageFromMediaUsage(projectId, pageId, userId = "local") {
+export async function removePageFromMediaUsage(projectId, pageId, _userId = "local") {
   try {
     // Remove all usage rows for this page (no fileIds = nothing to re-add)
     mediaRepo.updateMediaUsageForSource(projectId, pageId, []);
@@ -255,7 +255,7 @@ export async function removePageFromMediaUsage(projectId, pageId, userId = "loca
  * @returns {Promise<{fileId: string, filename: string, usedIn: string[], isInUse: boolean}>} Usage details
  * @throws {Error} If file not found or media file read fails
  */
-export async function getMediaUsage(projectId, fileId, userId = "local") {
+export async function getMediaUsage(projectId, fileId, _userId = "local") {
   try {
     const file = mediaRepo.getMediaFileById(fileId);
 

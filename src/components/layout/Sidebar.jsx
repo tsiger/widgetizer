@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import useThemeUpdateStore from "../../stores/themeUpdateStore";
 import { navigationSections } from "../../config/navigation";
-import { HOSTED_MODE } from "../../config";
 
 export default function Sidebar() {
   const { t } = useTranslation();
@@ -50,8 +49,6 @@ export default function Sidebar() {
   );
 
   const renderNavItem = (item) => {
-    if (item.hostedOnly && !HOSTED_MODE) return null;
-    if (HOSTED_MODE && item.hostedHidden) return null;
     const source = activeProject?.source;
     if (source && item.hiddenForSource?.includes(source)) return null;
 
@@ -99,8 +96,6 @@ export default function Sidebar() {
   const renderSection = (section) => {
     const source = activeProject?.source;
     const visibleItems = section.items.filter((item) => {
-      if (item.hostedOnly && !HOSTED_MODE) return false;
-      if (HOSTED_MODE && item.hostedHidden) return false;
       if (source && item.hiddenForSource?.includes(source)) return false;
       return true;
     });

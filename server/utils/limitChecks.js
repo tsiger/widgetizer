@@ -1,11 +1,10 @@
 import path from "path";
-import { HOSTED_MODE } from "../hostedMode.js";
 import { EDITOR_LIMITS } from "../limits.js";
 
 /**
  * Check whether a value exceeds a platform limit.
  *
- * In open-source mode (HOSTED_MODE=false), limits are bypassed unless
+ * In open-source mode (hostedMode=false), limits are bypassed unless
  * `alwaysEnforce` is true (used for safety limits like ZIP bombs and
  * image decompression protection).
  *
@@ -23,10 +22,11 @@ import { EDITOR_LIMITS } from "../limits.js";
  * @param {object} [opts]
  * @param {boolean} [opts.alwaysEnforce=false] - Enforce even in open-source mode
  * @param {boolean} [opts.exclusive=true]      - true: >= fails (pre-create); false: > fails (value check)
+ * @param {boolean} [opts.hostedMode=false]    - Whether the platform is running in hosted mode (set via app.locals.hostedMode)
  * @returns {{ ok: boolean, error?: string }}
  */
-export function checkLimit(currentValue, maxValue, label, { alwaysEnforce = false, exclusive = true } = {}) {
-  if (!HOSTED_MODE && !alwaysEnforce) {
+export function checkLimit(currentValue, maxValue, label, { alwaysEnforce = false, exclusive = true, hostedMode = false } = {}) {
+  if (!hostedMode && !alwaysEnforce) {
     return { ok: true };
   }
 
@@ -54,10 +54,11 @@ export function checkLimit(currentValue, maxValue, label, { alwaysEnforce = fals
  * @param {string} fieldName - Human-readable field name for error messages
  * @param {object} [opts]
  * @param {boolean} [opts.alwaysEnforce=false]
+ * @param {boolean} [opts.hostedMode=false] - Whether the platform is running in hosted mode (set via app.locals.hostedMode)
  * @returns {{ ok: boolean, error?: string }}
  */
-export function checkStringLength(value, maxLen, fieldName, { alwaysEnforce = false } = {}) {
-  if (!HOSTED_MODE && !alwaysEnforce) {
+export function checkStringLength(value, maxLen, fieldName, { alwaysEnforce = false, hostedMode = false } = {}) {
+  if (!hostedMode && !alwaysEnforce) {
     return { ok: true };
   }
 
@@ -78,7 +79,7 @@ export function checkStringLength(value, maxLen, fieldName, { alwaysEnforce = fa
 /**
  * Validate ZIP entries before extraction.
  * Checks entry count and path traversal attempts.
- * Always enforced regardless of HOSTED_MODE.
+ * Always enforced regardless of hosted mode.
  *
  * @param {import("adm-zip")} zip - adm-zip instance
  * @param {number} [maxEntries] - Max allowed entries (defaults to EDITOR_LIMITS.maxZipEntries)

@@ -37,9 +37,6 @@ const useProjectStore = create((set) => ({
 }));
 
 // NOTE: Do NOT call fetchActiveProject() here at module load time.
-// In hosted mode, Clerk auth may not be ready yet, causing a 401.
-// Instead, the fetch is triggered from:
-//   - AuthGuard.jsx (hosted mode — after Clerk confirms sign-in)
-//   - App.jsx (open-source mode — on mount)
+// Instead, the fetch is triggered from App.jsx on mount.
 
 export default useProjectStore;

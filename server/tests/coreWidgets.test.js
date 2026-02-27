@@ -174,7 +174,7 @@ describe("getCoreWidget", () => {
 
 describe("getAllCoreWidgets", () => {
   it("returns 200 with widget array", async () => {
-    const req = {};
+    const req = { app: { locals: { hostedMode: false, adapters: {} } } };
     const res = mockRes();
     await getAllCoreWidgets(req, res);
 

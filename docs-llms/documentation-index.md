@@ -315,7 +315,7 @@ The Publisher is the hosting platform built on Cloudflare Workers that hosts sit
 
 ### How Analytics Connects to the Editor
 
-The open-source editor does **not** contain any analytics code. When a user exports a site and uploads it to Publisher (or publishes via the hosted editor), the Publisher API **auto-injects** a lightweight tracking snippet (`<script data-widgetizer-analytics="1" ...>`) into all HTML files during upload/deploy. This means:
+The open-source editor does **not** contain any analytics code. When a user exports a site and uploads it to Publisher (or publishes via the platform's publish adapter), the Publisher API **auto-injects** a lightweight tracking snippet (`<script data-widgetizer-analytics="1" ...>`) into all HTML files during upload/deploy. This means:
 
 - Open-source users get analytics automatically on Publisher with zero configuration.
 - The editor's export pipeline does not need to know about analytics.

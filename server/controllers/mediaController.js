@@ -258,7 +258,7 @@ export async function uploadProjectMedia(req, res) {
     const existingMedia = mediaRepo.getMediaFiles(projectId);
     const currentCount = existingMedia.files ? existingMedia.files.length : 0;
     const max = EDITOR_LIMITS.media.maxFilesPerProject;
-    const fileCheck = checkLimit(currentCount + files.length, max, "media files per project", { exclusive: false });
+    const fileCheck = checkLimit(currentCount + files.length, max, "media files per project", { exclusive: false, hostedMode: req.app.locals.hostedMode });
     if (!fileCheck.ok) {
       return res.status(403).json({
         error: `Limit reached: uploading ${files.length} file(s) would exceed the maximum of ${max} media files per project (currently ${currentCount})`,
@@ -329,7 +329,7 @@ export async function uploadProjectMedia(req, res) {
 
           // Safety: reject images with extreme dimensions (always enforced)
           if (metadata.width > EDITOR_LIMITS.media.maxImageDimension || metadata.height > EDITOR_LIMITS.media.maxImageDimension) {
-            try { await fs.unlink(file.path); } catch {}
+            try { await fs.unlink(file.path); } catch { /* ignore cleanup failure */ }
             return {
               success: false,
               file: {

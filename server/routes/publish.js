@@ -1,5 +1,5 @@
 import express from "express";
-import { publishProject, getPublishStatus } from "../controllers/publishController.js";
+import { publishProject, getPublishStatus, syncPublishUrl } from "../controllers/publishController.js";
 import { standardJsonParser } from "../middleware/jsonParser.js";
 
 const router = express.Router();
@@ -10,5 +10,8 @@ router.post("/:projectId", publishProject);
 
 // GET /api/publish/status/:projectId — Get publish status for a project
 router.get("/status/:projectId", getPublishStatus);
+
+// PUT /api/publish/sync — Called by the publisher when a subdomain changes
+router.put("/sync", syncPublishUrl);
 
 export default router;

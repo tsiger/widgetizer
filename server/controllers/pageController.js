@@ -411,11 +411,12 @@ export async function createPage(req, res) {
     const { activeProject } = req;
 
     // Platform limit: max pages per project
+    const hostedMode = req.app.locals.hostedMode;
     const pagesDir = getProjectPagesDir(activeProject.folderName, req.userId);
     if (await fs.pathExists(pagesDir)) {
       const entries = await fs.readdir(pagesDir, { withFileTypes: true });
       const pageCount = entries.filter((e) => e.isFile() && e.name.endsWith(".json")).length;
-      const pageCheck = checkLimit(pageCount, EDITOR_LIMITS.maxPagesPerProject, "pages per project");
+      const pageCheck = checkLimit(pageCount, EDITOR_LIMITS.maxPagesPerProject, "pages per project", { hostedMode });
       if (!pageCheck.ok) {
         return res.status(403).json({ error: pageCheck.error });
       }
@@ -423,7 +424,7 @@ export async function createPage(req, res) {
 
     // Platform limit: page name length
     if (pageData.name) {
-      const nameCheck = checkStringLength(pageData.name, EDITOR_LIMITS.maxPageNameLength, "Page name");
+      const nameCheck = checkStringLength(pageData.name, EDITOR_LIMITS.maxPageNameLength, "Page name", { hostedMode });
       if (!nameCheck.ok) {
         return res.status(400).json({ error: nameCheck.error });
       }
@@ -495,10 +496,11 @@ export async function savePageContent(req, res) {
   const { id } = req.params;
   try {
     const pageData = req.body; // Get all data including SEO
+    const hostedMode = req.app.locals.hostedMode;
 
     // Platform limit: page JSON size
     const jsonSize = JSON.stringify(pageData).length;
-    const sizeCheck = checkLimit(jsonSize, EDITOR_LIMITS.maxPageJsonSize, "bytes of page data", { exclusive: false });
+    const sizeCheck = checkLimit(jsonSize, EDITOR_LIMITS.maxPageJsonSize, "bytes of page data", { exclusive: false, hostedMode });
     if (!sizeCheck.ok) {
       return res.status(400).json({ error: "Page content is too large. Please reduce the number of widgets or content." });
     }
@@ -521,7 +523,7 @@ export async function savePageContent(req, res) {
     // Platform limits: widget count, blocks per widget, nesting depth, text length
     if (pageData.widgets && typeof pageData.widgets === "object") {
       const widgetKeys = Object.keys(pageData.widgets);
-      const widgetCheck = checkLimit(widgetKeys.length, EDITOR_LIMITS.maxWidgetsPerPage, "widgets per page", { exclusive: false });
+      const widgetCheck = checkLimit(widgetKeys.length, EDITOR_LIMITS.maxWidgetsPerPage, "widgets per page", { exclusive: false, hostedMode });
       if (!widgetCheck.ok) {
         return res.status(400).json({ error: widgetCheck.error });
       }
@@ -529,7 +531,7 @@ export async function savePageContent(req, res) {
       for (const key of widgetKeys) {
         const widget = pageData.widgets[key];
         if (widget && widget.blocks && Array.isArray(widget.blocks)) {
-          const blockCheck = checkLimit(widget.blocks.length, EDITOR_LIMITS.maxBlocksPerWidget, "blocks per widget", { exclusive: false });
+          const blockCheck = checkLimit(widget.blocks.length, EDITOR_LIMITS.maxBlocksPerWidget, "blocks per widget", { exclusive: false, hostedMode });
           if (!blockCheck.ok) {
             return res.status(400).json({ error: blockCheck.error });
           }
@@ -623,7 +625,7 @@ export async function duplicatePage(req, res) {
     const pageJsonFiles = allEntries.filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
 
     // Platform limit: max pages per project
-    const pageCheck = checkLimit(pageJsonFiles.length, EDITOR_LIMITS.maxPagesPerProject, "pages per project");
+    const pageCheck = checkLimit(pageJsonFiles.length, EDITOR_LIMITS.maxPagesPerProject, "pages per project", { hostedMode: req.app.locals.hostedMode });
     if (!pageCheck.ok) {
       return res.status(403).json({ error: pageCheck.error });
     }

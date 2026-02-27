@@ -1,20 +1,6 @@
-import { Home, Folder, File, Menu, Image, Settings, Rocket, SlidersHorizontal, Layers, Puzzle, Globe, User } from "lucide-react";
-import { PUBLISHER_URL } from "../config";
+import { Home, Folder, File, Menu, Image, Settings, Rocket, SlidersHorizontal, Layers, Puzzle } from "lucide-react";
 
 export const navigationSections = [
-  {
-    id: "hosted",
-    items: [
-      {
-        id: "my-sites",
-        labelKey: "navigation.mySites",
-        path: `${PUBLISHER_URL}/dashboard`,
-        icon: Globe,
-        external: true,
-        hostedOnly: true,
-      },
-    ],
-  },
   {
     id: "main",
     items: [
@@ -24,7 +10,6 @@ export const navigationSections = [
         path: "/",
         icon: Home,
         hiddenForSource: ["ai", "theme"],
-        hostedHidden: true,
       },
       {
         id: "projects",
@@ -32,7 +17,6 @@ export const navigationSections = [
         path: "/projects",
         icon: Folder,
         hiddenForSource: ["ai", "theme"],
-        hostedHidden: true,
       },
     ],
   },
@@ -127,14 +111,6 @@ export const navigationSections = [
         icon: SlidersHorizontal,
         requiresProject: true,
         hiddenForSource: ["ai", "theme"],
-      },
-      {
-        id: "my-account",
-        labelKey: "navigation.myAccount",
-        path: `${PUBLISHER_URL}/account`,
-        icon: User,
-        external: true,
-        hostedOnly: true,
       },
     ],
   },

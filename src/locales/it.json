@@ -28,7 +28,8 @@
       "goToProjects": "Vai ai Progetti"
     },
     "footer": {
-      "thankYou": "Grazie per aver creato con"
+      "thankYou": "Grazie per aver creato con",
+      "yourWebsite": "L'indirizzo del tuo sito web è"
     }
   },
   "forms": {

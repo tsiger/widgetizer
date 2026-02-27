@@ -2,12 +2,9 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import usePageStore from "../../stores/pageStore";
-import { HOSTED_MODE } from "../../config";
 import { useMemo } from "react";
 
 export default function Breadcrumb() {
-  if (HOSTED_MODE) return null;
-
   const { t } = useTranslation();
   const location = useLocation();
   const params = useParams();

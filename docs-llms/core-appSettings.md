@@ -176,7 +176,7 @@ This server-side validation and processing ensures that the constraints are alwa
 
 ## Server-Side Enforcement Ceilings (`EDITOR_LIMITS`)
 
-When running in hosted mode (`HOSTED_MODE=true`), all user-configurable app settings are clamped to server-enforced ceilings defined in `server/limits.js`. This prevents users from setting values that exceed safe platform limits.
+When the platform calls `createEditorApp({ hostedMode: true, adapters })`, all user-configurable app settings are clamped to server-enforced ceilings defined in `server/limits.js`. The controller reads `req.app.locals.hostedMode` to decide whether to apply clamping. This prevents users from setting values that exceed safe platform limits. In open-source mode (`hostedMode: false`, the default), no clamping is applied except for safety limits.
 
 | User Setting | Ceiling Constant | Max Value |
 |-------------|-----------------|-----------|
@@ -186,7 +186,7 @@ When running in hosted mode (`HOSTED_MODE=true`), all user-configurable app sett
 | `maxImportSizeMB` | `maxImportSizeMBCeiling` | 2,000 MB |
 | `maxVersionsToKeep` | `maxExportVersionsCeiling` | 50 |
 
-Clamping is applied in `appSettingsController.js` using the `clampToCeiling()` utility from `server/utils/limitChecks.js`. If a user saves `maxFileSizeMB: 999`, it is silently clamped to 50 before persisting.
+Clamping is applied in `appSettingsController.js` (which reads `req.app.locals.hostedMode`) using the `clampToCeiling()` utility from `server/utils/limitChecks.js`. If a user saves `maxFileSizeMB: 999` in hosted mode, it is silently clamped to 50 before persisting.
 
 **Safety limits (always enforced, regardless of mode):**
 

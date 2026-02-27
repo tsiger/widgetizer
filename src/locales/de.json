@@ -28,7 +28,8 @@
       "goToProjects": "Zu den Projekten"
     },
     "footer": {
-      "thankYou": "Vielen Dank für Ihre Arbeit mit"
+      "thankYou": "Vielen Dank für Ihre Arbeit mit",
+      "yourWebsite": "Ihre Website-Adresse ist"
     }
   },
   "forms": {

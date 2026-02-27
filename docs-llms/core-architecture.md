@@ -13,10 +13,9 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 - `src/pages/ProjectsEdit.jsx` - Edit project with theme update UI
 - `src/components/projects/ProjectForm.jsx` - Reusable form component
 - `src/components/projects/ProjectImportModal.jsx` - ZIP import modal
-- `src/components/layout/DeepLinkResolver.jsx` - Processes deep-link URL params on initial load (siteId, theme). If no params and no active project in hosted mode, redirects to publisher dashboard.
-- `src/components/layout/HostedModeGuard.jsx` - Layout route guard wrapping `/`, `/projects`, `/projects/edit/:id`. In hosted mode: redirects to `/pages` (if active project) or publisher dashboard (if none). No-op in open-source mode.
+- `src/components/layout/DeepLinkResolver.jsx` - Processes deep-link URL params on initial load (siteId).
 - `src/components/layout/RouteSourceGuard.jsx` - Layout route guard for project-scoped routes. Checks `activeProject.source` against `hiddenForSource` from `navigation.js`. Redirects to `/pages` if route is restricted for the project's source type.
-- `src/components/common/Breadcrumb.jsx` - Navigation breadcrumb. Hidden entirely in hosted mode (`return null`).
+- `src/components/layout/Breadcrumb.jsx` - Navigation breadcrumb in the footer.
 
 ### Query Layer (`src/queries/projectManager.js`)
 
@@ -627,8 +626,11 @@ Save button / Auto-save timer
 | `server/utils/projectHelpers.js` | `getProjectFolderName(projectId, userId)`, `getProjectDetails()` |
 | `server/utils/pathSecurity.js` | `isWithinDirectory()` |
 | `server/utils/projectErrors.js` | `PROJECT_ERROR_CODES`, `handleProjectResolutionError()`, `isProjectResolutionError()` |
-| `server/hostedMode.js` | `HOSTED_MODE`, `PUBLISHER_API_URL` feature flags |
-| `server/middleware/auth.js` | Auth middleware — sets `req.userId` on every request |
+| `server/adapters/authAdapter.js` | Default auth adapter — sets `req.userId = "local"`. Platform overrides via `createEditorApp({ adapters: { auth } })` |
+| `server/adapters/publishAdapter.js` | Default publish adapter — throws "not available". Platform provides deploy implementation |
+| `server/adapters/limitsAdapter.js` | Default limits adapter — returns null (no enforcement). Platform provides hosted limits |
+| `server/adapters/emailAdapter.js` | Default email adapter — logs to console. Platform provides real email delivery |
+| `server/createApp.js` | `createEditorApp(options)` factory — accepts `{ hostedMode, adapters }`, sets `app.locals.hostedMode` and `app.locals.adapters` |
 
 ### Shared Hooks
 
