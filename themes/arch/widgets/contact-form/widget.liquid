@@ -221,7 +221,7 @@
                   {% when 'submit' %}
                     <div class="form-group" data-block-id="{{ blockId }}">
                       {% if widget.settings.form_token != blank %}
-                        <div class="cf-turnstile" data-sitekey="0x4AAAAAACaLwpWEkcnqtCRW" data-theme="auto"></div>
+                        <div class="cf-turnstile" data-sitekey="{{ globals.turnstileSiteKey }}" data-theme="auto"></div>
                       {% endif %}
                       <button type="submit" class="widget-button widget-button-primary" data-text="{{ block.settings.text }}">
                         {{ block.settings.text }}
@@ -301,7 +301,7 @@
           data._form_token = form.dataset.formToken;
           data._form_name = form.dataset.formName || '';
 
-          fetch('https://publisher.widgetizer.org/api/forms/submit', {
+          fetch('{{ globals.formSubmitUrl }}', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)

@@ -422,6 +422,16 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     });
   }
 
+  // Form submit URL and Turnstile site key — configurable via env vars.
+  // In preview mode, uses the local server URL. In publish mode, requires
+  // FORMS_PUBLIC_SUBMIT_URL to be set (the hosted platform sets this;
+  // OSS/self-hosted users configure their own form backend).
+  const formSubmitUrl =
+    renderMode === "preview"
+      ? `${apiUrl}/api/forms/submit`
+      : process.env.FORMS_PUBLIC_SUBMIT_URL || "";
+  const turnstileSiteKey = process.env.TURNSTILE_SITE_KEY || "";
+
   // Use shared globals if provided, otherwise create new ones
   const globals = sharedGlobals || {
     projectId,
@@ -430,7 +440,15 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     themeSettingsRaw: rawThemeSettings,
     enqueuedStyles: new Map(),
     enqueuedScripts: new Map(),
+    formSubmitUrl,
+    turnstileSiteKey,
   };
+
+  // Always ensure form config is present in globals (whether shared or new)
+  if (globals.formSubmitUrl === undefined) {
+    globals.formSubmitUrl = formSubmitUrl;
+    globals.turnstileSiteKey = turnstileSiteKey;
+  }
 
   // Always ensure icons are present in globals (whether shared or new)
   if (!globals.icons) {
