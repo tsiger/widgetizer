@@ -8,7 +8,9 @@ export default function Footer() {
   const { t } = useTranslation();
   const hostedMode = useAppInfoStore((state) => state.hostedMode);
   const activeProject = useProjectStore((state) => state.activeProject);
-  const publishedUrl = activeProject?.publishedUrl;
+  // Only show the published URL link after the site is actually live (publishedAt set).
+  // Draft registration sets publishedUrl but not publishedAt — the subdomain has no files yet.
+  const publishedUrl = activeProject?.publishedAt ? activeProject?.publishedUrl : null;
 
   return (
     <footer className="bg-white px-4 py-2 flex justify-between items-center text-xs border-t border-slate-200 rounded-bl-lg rounded-br-lg">

@@ -16,4 +16,8 @@ export const defaultPublishAdapter = {
   async deleteSite(_siteId, _userId) {
     // no-op in open-source
   },
+  async createDraft(_projectName, _source, _userId) {
+    // no-op in open-source — returns null (no D1 draft registration)
+    return null;
+  },
 };

@@ -447,6 +447,36 @@ export async function deepLinkCreateProject(req, res) {
     // Always activate — this is the project the user just chose
     projectRepo.setActiveProjectId(newProject.id, req.userId);
 
+    // In hosted mode, register a draft website in D1 so the site appears
+    // immediately in "My Sites". The D1 row is the canonical project lifecycle
+    // record — if draft registration fails, roll back the local project.
+    // In OSS mode, createDraft() returns null and the if(draft) branch is skipped.
+    const publishAdapter = req.app.locals.adapters?.publish;
+    if (publishAdapter?.createDraft) {
+      try {
+        const draft = await publishAdapter.createDraft(finalName, source || "theme", req.userId);
+        if (draft) {
+          projectRepo.updateProject(newProject.id, {
+            publishedSiteId: draft.siteId,
+            publishedUrl: draft.url,
+          }, req.userId);
+          newProject.publishedSiteId = draft.siteId;
+          newProject.publishedUrl = draft.url;
+        }
+      } catch (draftError) {
+        // Roll back via the shared deletion utility so activeProjectId is also repaired.
+        try {
+          const { deleteProjectById } = await import("../services/projectService.js");
+          await deleteProjectById(newProject.id, req.userId);
+        } catch (rollbackError) {
+          console.error(`[deepLinkCreateProject] Rollback failed: ${rollbackError.message}`);
+        }
+        // Surface the error to the user (quota exceeded, D1 unavailable, etc.)
+        const status = draftError.status || 500;
+        return res.status(status).json({ error: draftError.message });
+      }
+    }
+
     res.status(201).json(newProject);
   } catch (error) {
     console.error("Deep-link create project error:", error);
@@ -584,38 +614,24 @@ export async function deleteProject(req, res) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    const projectName = project.name;
-    const projectFolderName = project.folderName;
-
-    // Clean up all export files for this project BEFORE removing from DB
-    // (deleteProject triggers ON DELETE CASCADE which would delete export records)
-    try {
-      const { cleanupProjectExports } = await import("./exportController.js");
-      await cleanupProjectExports(id, req.userId);
-    } catch (exportCleanupError) {
-      console.warn(`Failed to clean up exports for project ${id}:`, exportCleanupError);
-      // Don't fail the project deletion if export cleanup fails
+    // If linked to a platform website, delete the canonical D1 record FIRST.
+    // If this fails, abort — the user still sees the site in "My Sites" and
+    // the local project remains intact. This is the safer failure mode.
+    if (project.publishedSiteId) {
+      const publishAdapter = req.app.locals.adapters?.publish;
+      if (publishAdapter?.deleteSite) {
+        await publishAdapter.deleteSite(project.publishedSiteId, req.userId);
+      }
     }
 
-    // Delete from DB (cascades to media_files, exports, etc.)
-    projectRepo.deleteProject(id, req.userId);
-
-    // Update active project if needed
-    let newActiveProjectId = projectRepo.getActiveProjectId(req.userId);
-    if (newActiveProjectId === id || !newActiveProjectId) {
-      const remainingProjects = projectRepo.getAllProjects(req.userId);
-      newActiveProjectId = remainingProjects[0]?.id || null;
-      projectRepo.setActiveProjectId(newActiveProjectId, req.userId);
-    }
-
-    // Delete project directory
-    const projectDir = getProjectDir(projectFolderName, req.userId);
-    await fs.remove(projectDir);
+    // Only after the canonical record is gone (or didn't exist), delete local data
+    const { deleteProjectById } = await import("../services/projectService.js");
+    const result = await deleteProjectById(id, req.userId);
 
     res.json({
       success: true,
-      message: `Project "${projectName}" and all associated files have been deleted successfully`,
-      activeProjectId: newActiveProjectId,
+      message: `Project "${result.projectName}" and all associated files have been deleted successfully`,
+      activeProjectId: result.newActiveProjectId,
     });
   } catch (error) {
     console.error("Error deleting project:", error);

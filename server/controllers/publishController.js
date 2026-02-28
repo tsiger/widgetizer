@@ -113,8 +113,11 @@ export async function getPublishStatus(req, res) {
       return res.status(404).json({ error: "Project not found" });
     }
 
+    // A project is "published" only after deploy() succeeds and sets publishedAt.
+    // Draft registration (createDraft) sets publishedSiteId and publishedUrl but
+    // NOT publishedAt — a draft is linked to D1 but not yet live.
     res.json({
-      published: !!project.publishedSiteId,
+      published: !!project.publishedAt,
       siteId: project.publishedSiteId || null,
       url: project.publishedUrl || null,
       publishedAt: project.publishedAt || null,

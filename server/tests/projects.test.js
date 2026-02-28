@@ -162,13 +162,19 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
     const TEST_THEME_ID = `__test_theme_${TEST_USER_ID}__`;
 
     /** Build a mock Express req object */
-    function mockReq({ params = {}, body = {}, file = null } = {}) {
+    function mockReq({ params = {}, body = {}, file = null, appLocals = null } = {}) {
       return {
         params,
         body,
         file,
         userId: TEST_USER_ID,
-        app: { locals: { hostedMode: false, adapters: {} } },
+        app: {
+          locals: {
+            hostedMode: false,
+            adapters: {},
+            ...(appLocals || {}),
+          },
+        },
         // express-validator needs these to exist
         [Symbol.for("express-validator#contexts")]: [],
       };
@@ -203,8 +209,8 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
      * We bypass validation and call the controller directly (the route layer
      * handles validation in production; here we test the controller logic).
      */
-    async function callController(controllerFn, { params, body, file } = {}) {
-      const req = mockReq({ params, body, file });
+    async function callController(controllerFn, { params, body, file, appLocals } = {}) {
+      const req = mockReq({ params, body, file, appLocals });
       const res = mockRes();
       await controllerFn(req, res);
       return res;
@@ -1756,6 +1762,86 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         // Should be set as active
         const activeRes = await callController(getActiveProject);
         assert.equal(activeRes._json.id, res._json.id);
+      });
+
+      it("stores adapter-provided draft linkage when draft registration succeeds", async () => {
+        const fakeDraft = {
+          siteId: `site-${Date.now()}-${TEST_USER_ID}`,
+          url: `https://draft-${folderSuffix(TEST_USER_ID)}.mywidgetizer.org`,
+        };
+        let createDraftCalls = 0;
+
+        const res = await callController(deepLinkCreateProject, {
+          body: {
+            name: `Hosted Draft ${folderSuffix(TEST_USER_ID)}`,
+            theme: TEST_THEME_ID,
+            preset: "default",
+            source: "theme",
+          },
+          appLocals: {
+            hostedMode: true,
+            adapters: {
+              publish: {
+                async createDraft(projectName, source, userId) {
+                  createDraftCalls++;
+                  assert.equal(projectName, `Hosted Draft ${folderSuffix(TEST_USER_ID)}`);
+                  assert.equal(source, "theme");
+                  assert.equal(userId, TEST_USER_ID);
+                  return fakeDraft;
+                },
+              },
+            },
+          },
+        });
+
+        assert.equal(res._status, 201);
+        assert.equal(createDraftCalls, 1, "createDraft should be called exactly once");
+        assert.equal(res._json.publishedSiteId, fakeDraft.siteId);
+        assert.equal(res._json.publishedUrl, fakeDraft.url);
+
+        const stored = projectRepo.getProjectById(res._json.id, TEST_USER_ID);
+        assert.equal(stored.publishedSiteId, fakeDraft.siteId);
+        assert.equal(stored.publishedUrl, fakeDraft.url);
+        assert.equal(stored.publishedAt, undefined, "Draft linkage should not mark the project as published");
+      });
+
+      it("rolls back the local project when draft registration fails", async () => {
+        const userProjectsDir = path.join(getUserDataDir(TEST_USER_ID), "projects");
+        await fs.ensureDir(userProjectsDir);
+        const dirsBefore = await fs.readdir(userProjectsDir);
+
+        const res = await callController(deepLinkCreateProject, {
+          body: {
+            name: `Quota Failure ${folderSuffix(TEST_USER_ID)}`,
+            theme: TEST_THEME_ID,
+            preset: "default",
+            source: "theme",
+          },
+          appLocals: {
+            hostedMode: true,
+            adapters: {
+              publish: {
+                async createDraft() {
+                  const err = new Error("Quota exceeded");
+                  err.status = 403;
+                  throw err;
+                },
+              },
+            },
+          },
+        });
+
+        assert.equal(res._status, 403);
+        assert.equal(res._json.error, "Quota exceeded");
+
+        const allProjects = projectRepo.getAllProjects(TEST_USER_ID);
+        assert.equal(allProjects.length, 0, "Failed deep-link creation should not leave a SQLite project behind");
+
+        const activeRes = await callController(getActiveProject);
+        assert.equal(activeRes._json, null, "Rollback should leave no active project");
+
+        const dirsAfter = await fs.readdir(userProjectsDir);
+        assert.deepEqual(dirsAfter, dirsBefore, "Rollback should remove any project directory created before the failure");
       });
 
       it("auto-suffixes name when duplicate exists", async () => {
