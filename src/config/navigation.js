@@ -1,15 +1,24 @@
-import { Home, Folder, File, Menu, Image, Settings, Rocket, SlidersHorizontal, Layers, Puzzle } from "lucide-react";
+import { Home, Folder, File, Menu, Image, Settings, Rocket, SlidersHorizontal, Layers, Puzzle, Globe, User } from "lucide-react";
 
 export const navigationSections = [
   {
     id: "main",
     items: [
       {
+        id: "my-sites",
+        labelKey: "navigation.mySites",
+        path: "/dashboard",
+        icon: Globe,
+        external: true,
+        hostedOnly: true,
+      },
+      {
         id: "dashboard",
         labelKey: "navigation.dashboard",
         path: "/",
         icon: Home,
         hiddenForSource: ["ai", "theme"],
+        hiddenInHosted: true,
       },
       {
         id: "projects",
@@ -17,6 +26,7 @@ export const navigationSections = [
         path: "/projects",
         icon: Folder,
         hiddenForSource: ["ai", "theme"],
+        hiddenInHosted: true,
       },
     ],
   },
@@ -100,6 +110,22 @@ export const navigationSections = [
     ],
   },
   {
+    id: "account",
+    titleKey: "navigation.account",
+    position: "bottom",
+    hostedOnly: true,
+    items: [
+      {
+        id: "my-account",
+        labelKey: "navigation.myAccount",
+        path: "/dashboard/account",
+        icon: User,
+        external: true,
+        hostedOnly: true,
+      },
+    ],
+  },
+  {
     id: "general",
     titleKey: "navigation.general",
     position: "bottom",
@@ -111,6 +137,7 @@ export const navigationSections = [
         icon: SlidersHorizontal,
         requiresProject: true,
         hiddenForSource: ["ai", "theme"],
+        hiddenInHosted: true,
       },
     ],
   },

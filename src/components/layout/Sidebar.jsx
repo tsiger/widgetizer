@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import useThemeUpdateStore from "../../stores/themeUpdateStore";
+import useAppInfoStore from "../../stores/appInfoStore";
 import { navigationSections } from "../../config/navigation";
 
 export default function Sidebar() {
@@ -11,6 +12,9 @@ export default function Sidebar() {
   const { activeProject } = useProjectStore();
   const hasActiveProject = !!activeProject;
   const { updateCount: themeUpdateCount, fetchUpdateCount } = useThemeUpdateStore();
+  const hostedMode = useAppInfoStore((state) => state.hostedMode);
+  const loaded = useAppInfoStore((state) => state.loaded);
+  const dashboardUrl = useAppInfoStore((state) => state.dashboardUrl);
 
   // Fetch theme update count on mount
   useEffect(() => {
@@ -57,12 +61,22 @@ export default function Sidebar() {
     const showBadge = item.id === "themes" && themeUpdateCount > 0;
     const labelKey = (source && item.labelOverrides?.[source]) || item.labelKey;
 
-    // External links (e.g. My Sites → publisher) render as <a> instead of <Link>
+    // External links (e.g. My Sites → dashboard) render as <a> instead of <Link>
     if (item.external) {
+      // Resolve hosted nav paths against the dashboardUrl base
+      // dashboardUrl has no trailing slash (e.g. "http://localhost:3000/dashboard" or "/dashboard")
+      // item.path is "/dashboard" (My Sites) or "/dashboard/account" (My Account)
+      // We strip "/dashboard" prefix and append to dashboardUrl, always adding trailing slash for bare path
+      let href = item.path;
+      if (item.hostedOnly && dashboardUrl) {
+        const subPath = item.path.replace(/^\/dashboard/, "");
+        // subPath is "" for My Sites, "/account" for My Account
+        href = subPath ? `${dashboardUrl}${subPath}` : `${dashboardUrl}/`;
+      }
       return (
         <li key={item.id}>
           <a
-            href={item.path}
+            href={href}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center md:justify-start p-2 rounded-sm transition-all duration-150 hover:bg-slate-800 border border-slate-700 md:border-none"
@@ -94,8 +108,12 @@ export default function Sidebar() {
   };
 
   const renderSection = (section) => {
+    if (section.hostedOnly && !hostedMode) return null;
+    if (section.hiddenInHosted && hostedMode) return null;
     const source = activeProject?.source;
     const visibleItems = section.items.filter((item) => {
+      if (item.hostedOnly && !hostedMode) return false;
+      if (item.hiddenInHosted && hostedMode) return false;
       if (source && item.hiddenForSource?.includes(source)) return false;
       return true;
     });
@@ -131,11 +149,11 @@ export default function Sidebar() {
           <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="md:hidden w-12 h-12 mx-auto" />
         </div>
 
-        {topSections.map(renderSection)}
+        {loaded && topSections.map(renderSection)}
       </div>
 
       <div className="px-2 md:px-4 pb-2">
-        {bottomSections.map(renderSection)}
+        {loaded && bottomSections.map(renderSection)}
       </div>
     </div>
   );

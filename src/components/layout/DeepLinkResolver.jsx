@@ -2,13 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { Outlet, useNavigate, useSearchParams } from "react-router-dom";
 import useProjectStore from "../../stores/projectStore";
 import { apiFetch } from "../../lib/apiFetch";
+import { deepLinkCreateProject } from "../../queries/projectManager";
 import LoadingSpinner from "../ui/LoadingSpinner";
 
 /**
  * Handles deep-link URL parameters on initial load:
  *
- * 1. ?siteId=xxx  — From publisher "Edit in Editor". Looks up the project
+ * 1. ?siteId=xxx  — From dashboard "Edit in Editor". Looks up the project
  *    by its published site ID, sets it as active, navigates to /pages.
+ *
+ * 2. ?theme=xxx&preset=yyy&source=theme&name=zzz — From marketing/dashboard
+ *    preset selection. Creates a new project via POST /api/projects/deep-link,
+ *    sets it as active, navigates to /pages.
  *
  * Renders inside Layout, wrapping all child routes.
  * Runs once on initial load — does not interfere with subsequent navigation.
@@ -19,7 +24,9 @@ export default function DeepLinkResolver() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const loading = useProjectStore((state) => state.loading);
   const siteId = searchParams.get("siteId");
-  const [resolving, setResolving] = useState(!!siteId);
+  const theme = searchParams.get("theme");
+  const hasDeepLink = !!(siteId || theme);
+  const [resolving, setResolving] = useState(hasDeepLink);
   const processedRef = useRef(false);
 
   useEffect(() => {
@@ -27,20 +34,37 @@ export default function DeepLinkResolver() {
     if (processedRef.current || loading) return;
     processedRef.current = true;
 
-    if (!siteId) return;
+    if (!hasDeepLink) return;
 
-    // Deep-link from publisher: look up project by published site ID
-    resolveSiteId(siteId).then((project) => {
-      if (project) {
-        useProjectStore.getState().setActiveProject(project);
-        navigate("/pages", { replace: true });
-      } else {
-        // Project not found — might have been deleted
-        navigate("/projects/add", { replace: true });
-      }
-      setResolving(false);
-    });
-  }, [loading, siteId, activeProject, navigate]);
+    if (siteId) {
+      // Deep-link from dashboard: look up project by published site ID
+      resolveSiteId(siteId).then((project) => {
+        if (project) {
+          useProjectStore.getState().setActiveProject(project);
+          navigate("/pages", { replace: true });
+        } else {
+          navigate("/projects/add", { replace: true });
+        }
+        setResolving(false);
+      });
+    } else if (theme) {
+      // Deep-link from marketing/dashboard: create project from theme preset
+      const preset = searchParams.get("preset") || "default";
+      const source = searchParams.get("source") || "theme";
+      const name = searchParams.get("name") || "My Site";
+
+      deepLinkCreateProject({ name, theme, preset, source })
+        .then((project) => {
+          useProjectStore.getState().setActiveProject(project);
+          navigate("/pages", { replace: true });
+          setResolving(false);
+        })
+        .catch(() => {
+          navigate("/projects/add", { replace: true });
+          setResolving(false);
+        });
+    }
+  }, [loading, hasDeepLink, siteId, theme, searchParams, navigate]);
 
   if (loading || resolving) {
     return (

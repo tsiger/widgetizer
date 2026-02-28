@@ -23,8 +23,10 @@ import MenuStructure from "./pages/MenuStructure";
 import ToastContainer from "./components/ui/ToastContainer";
 import RequireActiveProject from "./components/layout/RequireActiveProject";
 import RouteSourceGuard from "./components/layout/RouteSourceGuard";
+import HostedModeGuard from "./components/layout/HostedModeGuard";
 import DeepLinkResolver from "./components/layout/DeepLinkResolver";
 import useProjectStore from "./stores/projectStore";
+import useAppInfoStore from "./stores/appInfoStore";
 import "./i18n";
 import LanguageInitializer from "./components/layout/LanguageInitializer";
 
@@ -38,20 +40,26 @@ const router = createBrowserRouter([
         element: <DeepLinkResolver />,
         children: [
           {
-            index: true,
-            element: <Dashboard />,
-          },
-          {
-            path: "projects",
-            element: <Projects />,
-          },
-          {
-            path: "projects/add",
-            element: <ProjectsAdd />,
-          },
-          {
-            path: "projects/edit/:id",
-            element: <ProjectsEdit />,
+            // Dashboard/Projects routes — blocked in hosted mode (HostedModeGuard)
+            element: <HostedModeGuard />,
+            children: [
+              {
+                index: true,
+                element: <Dashboard />,
+              },
+              {
+                path: "projects",
+                element: <Projects />,
+              },
+              {
+                path: "projects/add",
+                element: <ProjectsAdd />,
+              },
+              {
+                path: "projects/edit/:id",
+                element: <ProjectsEdit />,
+              },
+            ],
           },
           {
             element: <RequireActiveProject />,
@@ -141,9 +149,10 @@ function AppWithToast() {
 }
 
 function App() {
-  // Bootstrap the project store on mount
+  // Bootstrap stores on mount
   useEffect(() => {
     useProjectStore.getState().fetchActiveProject();
+    useAppInfoStore.getState().fetchAppInfo();
   }, []);
 
   return <AppWithToast />;

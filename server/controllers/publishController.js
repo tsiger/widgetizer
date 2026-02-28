@@ -2,13 +2,11 @@ import { exportProjectToDir } from "./exportController.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
-import archiver from "archiver";
-import { PassThrough } from "stream";
 import fs from "fs-extra";
 
 /**
  * Publish a project via the publish adapter.
- * Flow: validate -> export to static files -> ZIP -> deploy via adapter -> update project record.
+ * Flow: validate -> export to static files -> deploy via adapter -> update project record.
  *
  * @param {import('express').Request} req - Express request with projectId in params
  * @param {import('express').Response} res - Express response
@@ -32,18 +30,15 @@ export async function publishProject(req, res) {
     const exportResult = await exportProjectToDir(projectId, userId, { skipExportRecord: true });
     exportOutputDir = exportResult.outputDir;
 
-    // 3. ZIP the output directory into a buffer
-    const zipBuffer = await zipDirectory(exportOutputDir);
-
-    // 4. Get project data for metadata
+    // 3. Get project data for metadata
     const project = projectRepo.getProjectById(projectId, userId);
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    // 5. Deploy via the publish adapter
+    // 4. Deploy via the publish adapter (adapter reads files from the export directory)
     const publishResult = await publishAdapter.deploy(
-      zipBuffer,
+      exportOutputDir,
       {
         siteId: project.publishedSiteId || null,
         projectName: project.name,
@@ -164,23 +159,3 @@ export async function syncPublishUrl(req, res) {
   }
 }
 
-/**
- * ZIP a directory into a Buffer (in-memory).
- * @param {string} dirPath - Absolute path to the directory to ZIP
- * @returns {Promise<Buffer>} ZIP file contents
- */
-async function zipDirectory(dirPath) {
-  return new Promise((resolve, reject) => {
-    const buffers = [];
-    const passthrough = new PassThrough();
-    passthrough.on("data", (chunk) => buffers.push(chunk));
-    passthrough.on("end", () => resolve(Buffer.concat(buffers)));
-    passthrough.on("error", reject);
-
-    const archive = archiver("zip", { zlib: { level: 6 } });
-    archive.on("error", reject);
-    archive.pipe(passthrough);
-    archive.directory(dirPath, false);
-    archive.finalize();
-  });
-}

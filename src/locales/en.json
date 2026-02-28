@@ -18,7 +18,8 @@
     "design": "Design",
     "publish": "Publish",
     "mySites": "My Sites",
-    "myAccount": "My Account"
+    "myAccount": "My Account",
+    "account": "Account"
   },
   "layout": {
     "toolbar": {

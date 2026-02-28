@@ -8,6 +8,21 @@ const router = express.Router();
 const coreAssetsDir = STATIC_CORE_ASSETS_DIR;
 
 /**
+ * GET /api/core/info
+ * Returns app runtime info (hosted mode flag, dashboard URL, etc.)
+ */
+router.get("/info", (req, res) => {
+  const hostedMode = !!req.app.locals.hostedMode;
+  // Strip trailing slashes so the frontend can build URLs consistently
+  const rawUrl = process.env.DASHBOARD_URL || "/dashboard";
+  const dashboardUrl = rawUrl.replace(/\/+$/, "");
+  res.json({
+    hostedMode,
+    dashboardUrl: hostedMode ? dashboardUrl : null,
+  });
+});
+
+/**
  * GET /api/core/assets/:filename
  * Serves static assets from the core assets directory
  */
