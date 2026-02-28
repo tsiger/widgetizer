@@ -16,6 +16,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:hosted": "cross-env WIDGETIZER_BASE_PATH=/editor/ VITE_ROUTER_BASENAME=/editor vite build",
     "lint": "eslint src server",
     "lint:electron": "eslint electron",
     "lint:all": "eslint .",

@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import { STATIC_CORE_ASSETS_DIR } from "../config.js";
+import { normalizeDashboardUrl } from "../utils/hostedUrls.js";
 
 const router = express.Router();
 
@@ -13,9 +14,7 @@ const coreAssetsDir = STATIC_CORE_ASSETS_DIR;
  */
 router.get("/info", (req, res) => {
   const hostedMode = !!req.app.locals.hostedMode;
-  // Strip trailing slashes so the frontend can build URLs consistently
-  const rawUrl = process.env.DASHBOARD_URL || "/dashboard";
-  const dashboardUrl = rawUrl.replace(/\/+$/, "");
+  const dashboardUrl = normalizeDashboardUrl(process.env.DASHBOARD_URL || "/");
   res.json({
     hostedMode,
     dashboardUrl: hostedMode ? dashboardUrl : null,

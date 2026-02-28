@@ -81,14 +81,15 @@ This file contains functions that make API calls to the backend:
 
 The deep-link project creation flow is used when the platform wraps the editor. It is not part of the open-source editor's default behavior -- the platform injects the `DeepLinkResolver` component and the `/api/projects/deep-link` route via its adapter layer.
 
-When a user arrives at the editor via a marketing deep-link (`?theme=arch&preset=financial&source=theme&name=Financial+Advisor`), the `DeepLinkResolver` component intercepts the URL params and calls `POST /api/projects/deep-link`.
+When a user arrives at the editor via a marketing deep-link (`/editor?theme=arch&preset=financial&source=theme&name=Financial+Advisor`), the `DeepLinkResolver` component intercepts the URL params and calls `POST /api/projects/deep-link`.
 
 1. **Name collision handling**: If a project with the same name already exists, the name is auto-suffixed ("Financial Advisor" becomes "Financial Advisor (2)", then "(3)", etc.).
 2. **Theme provisioning**: Seed themes are copied to the user's directory if needed (`ensureThemesDirectory`).
 3. **Always activates**: The new project is always set as active, regardless of how many projects exist.
 4. **Source tracking**: The project's `source` field is set to the value from the deep-link (typically `"theme"`). This controls which sidebar items and routes are visible.
-5. **Navigation**: After creation, the user lands on `/pages` to start editing immediately.
-6. **No-project fallback**: If a user navigates to the editor without deep-link params and has no active project, `DeepLinkResolver` redirects to the publisher dashboard via `window.location.href`.
+5. **Draft registration (hosted mode)**: After the SQLite project is created, `publishAdapter.createDraft()` registers a draft in D1 (`version_number = 0`, `site_name = projectName`). This makes the project immediately visible in the dashboard's "My Sites". If draft registration fails (quota exceeded, D1 unavailable), the SQLite project is rolled back and the user sees an error. In OSS mode, `createDraft()` returns null (no-op).
+6. **Navigation**: After creation, the user lands on `/pages` to start editing immediately.
+7. **Editor access guard**: If a user navigates to the editor without deep-link params and has no active project, `RequireActiveProject` redirects to the dashboard URL in hosted mode. In OSS mode, it shows the "No Active Project" empty state.
 
 ### 2. Listing and Managing Projects
 
@@ -98,7 +99,7 @@ When a user arrives at the editor via a marketing deep-link (`?theme=arch&preset
     - **Set Active (`Star` icon)**: Calls `handleSetActive`, which uses `setActiveProjectInBackend(id)` to update the backend. It then re-fetches the active project information to update the global store and UI. You cannot deactivate the active project; you must set another as active.
     - **Edit (`Pencil` icon)**: Navigates the user to `/projects/edit/:id`.
     - **Duplicate (`Copy` icon)**: Calls `handleDuplicate`, which uses `duplicateProject(id)` to make an API call. The duplication process includes UUID regeneration for all pages and automatic updating of all `pageUuid` references in widgets and menus to point to the new UUIDs. The project list is then reloaded.
-    - **Delete (`Trash2` icon)**: Calls `openDeleteConfirmation`, which opens a localized confirmation modal. You cannot delete the currently active project. If confirmed, the `deleteProject(id)` function is called, and the list is reloaded.
+    - **Delete (`Trash2` icon)**: Calls `openDeleteConfirmation`, which opens a localized confirmation modal. You cannot delete the currently active project. If confirmed, the `deleteProject(id)` function is called, and the list is reloaded. In hosted mode, deletion cascades: the canonical D1 record is deleted first (via `publishAdapter.deleteSite()`), then local SQLite + files (via `deleteProjectById()` from `projectService.js`).
 
 ### 3. Exporting a Project
 
@@ -175,10 +176,10 @@ The frontend `projectManager.js` communicates with a set of backend API endpoint
 | `POST` | `/api/projects` | `createProject` | Creates a new project. Accepts optional `preset` field (string) to apply a theme preset. |
 | `PUT` | `/api/projects/active/:id` | `setActiveProject` | Sets the project with the given `id` as active. |
 | `PUT` | `/api/projects/:id` | `updateProject` | Updates a specific project. |
-| `DELETE` | `/api/projects/:id` | `deleteProject` | Deletes a specific project. |
+| `DELETE` | `/api/projects/:id` | `deleteProject` | Deletes a specific project. In hosted mode: cascades to D1 (via `publishAdapter.deleteSite()`) then local cleanup. |
 | `POST` | `/api/projects/:id/duplicate` | `duplicateProject` | Creates a complete copy of a project. |
 | `POST` | `/api/projects/:projectId/export` | `exportProject` | Exports project as a downloadable ZIP file. |
-| `POST` | `/api/projects/deep-link` | `deepLinkCreateProject` | Creates a project from a marketing deep-link. Auto-suffixes name on duplicate, always activates. |
+| `POST` | `/api/projects/deep-link` | `deepLinkCreateProject` | Creates a project from a marketing deep-link. Auto-suffixes name on duplicate, always activates. In hosted mode: registers draft in D1 via `publishAdapter.createDraft()`, rolls back on failure. |
 | `GET` | `/api/projects/by-site/:siteId` | `getProjectBySiteId` | Looks up a project by its published site ID (for publisher "Edit in Editor" deep-link). |
 | `POST` | `/api/projects/import` | `importProject` | Imports a project from a ZIP file upload. |
 | `GET` | `/api/projects/:projectId/widgets` | `getProjectWidgets` | Retrieves all widget schemas for a project. |

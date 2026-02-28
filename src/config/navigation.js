@@ -7,7 +7,7 @@ export const navigationSections = [
       {
         id: "my-sites",
         labelKey: "navigation.mySites",
-        path: "/dashboard",
+        path: "/",
         icon: Globe,
         external: true,
         hostedOnly: true,
@@ -118,7 +118,7 @@ export const navigationSections = [
       {
         id: "my-account",
         labelKey: "navigation.myAccount",
-        path: "/dashboard/account",
+        path: "/account",
         icon: User,
         external: true,
         hostedOnly: true,

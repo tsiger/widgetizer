@@ -5,6 +5,7 @@ import useProjectStore from "../../stores/projectStore";
 import useThemeUpdateStore from "../../stores/themeUpdateStore";
 import useAppInfoStore from "../../stores/appInfoStore";
 import { navigationSections } from "../../config/navigation";
+import { joinDashboardUrl } from "../../lib/hostedUrls";
 
 export default function Sidebar() {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ export default function Sidebar() {
   const hostedMode = useAppInfoStore((state) => state.hostedMode);
   const loaded = useAppInfoStore((state) => state.loaded);
   const dashboardUrl = useAppInfoStore((state) => state.dashboardUrl);
+  const assetBase = import.meta.env.BASE_URL || "/";
 
   // Fetch theme update count on mount
   useEffect(() => {
@@ -63,15 +65,9 @@ export default function Sidebar() {
 
     // External links (e.g. My Sites → dashboard) render as <a> instead of <Link>
     if (item.external) {
-      // Resolve hosted nav paths against the dashboardUrl base
-      // dashboardUrl has no trailing slash (e.g. "http://localhost:3000/dashboard" or "/dashboard")
-      // item.path is "/dashboard" (My Sites) or "/dashboard/account" (My Account)
-      // We strip "/dashboard" prefix and append to dashboardUrl, always adding trailing slash for bare path
       let href = item.path;
       if (item.hostedOnly && dashboardUrl) {
-        const subPath = item.path.replace(/^\/dashboard/, "");
-        // subPath is "" for My Sites, "/account" for My Account
-        href = subPath ? `${dashboardUrl}${subPath}` : `${dashboardUrl}/`;
+        href = joinDashboardUrl(dashboardUrl, item.path);
       }
       return (
         <li key={item.id}>
@@ -145,8 +141,8 @@ export default function Sidebar() {
     <div className="w-[72px] md:w-48 bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto">
       <div className="pb-2 px-2 md:px-4 grow">
         <div className="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-4">
-          <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="hidden md:block h-7" />
-          <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="md:hidden w-12 h-12 mx-auto" />
+          <img src={`${assetBase}widgetizer_logo.svg`} alt={t("common.appTitle")} className="hidden md:block h-7" />
+          <img src={`${assetBase}widgetizer_symbol.svg`} alt={t("common.appTitle")} className="md:hidden w-12 h-12 mx-auto" />
         </div>
 
         {loaded && topSections.map(renderSection)}

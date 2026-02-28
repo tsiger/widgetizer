@@ -8,6 +8,7 @@ const packageJson = JSON.parse(readFileSync("./package.json", "utf8"));
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: process.env.WIDGETIZER_BASE_PATH || "/",
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
   },

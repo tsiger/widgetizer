@@ -14,6 +14,8 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 - `src/components/projects/ProjectForm.jsx` - Reusable form component
 - `src/components/projects/ProjectImportModal.jsx` - ZIP import modal
 - `src/components/layout/DeepLinkResolver.jsx` - Processes deep-link URL params on initial load (siteId).
+- `src/components/layout/RequireActiveProject.jsx` - Route guard wrapping all content routes. In hosted mode: redirects to dashboard (via `window.location.href`) if no active project. In OSS mode: shows EmptyState with link to `/projects`. Reads `hostedMode`/`dashboardUrl` from `appInfoStore`.
+- `src/components/layout/HostedModeGuard.jsx` - Route guard that blocks OSS-only routes (`/`, `/projects`) in hosted mode by redirecting to `/pages`.
 - `src/components/layout/RouteSourceGuard.jsx` - Layout route guard for project-scoped routes. Checks `activeProject.source` against `hiddenForSource` from `navigation.js`. Redirects to `/pages` if route is restricted for the project's source type.
 - `src/components/layout/Breadcrumb.jsx` - Navigation breadcrumb in the footer.
 
@@ -65,6 +67,23 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 | `setActiveProject(project)` | Set active project              |
 | `fetchActiveProject()`      | Fetch and update active project |
 | `clearActiveProject()`      | Clear active project            |
+
+### Store (`src/stores/appInfoStore.js`)
+
+| State/Action     | Purpose                                    |
+| ---------------- | ------------------------------------------ |
+| `hostedMode`     | Whether the editor is running in hosted mode |
+| `dashboardUrl`   | External dashboard URL for redirects       |
+| `loaded`         | Whether `/api/core/info` response received |
+| `fetchAppInfo()` | Fetch from `GET /api/core/info`            |
+
+Used by `RequireActiveProject` (hosted redirect), `HostedModeGuard` (block OSS routes), `Sidebar` (dashboard links).
+
+### Service (`server/services/projectService.js`)
+
+| Function               | Purpose                                               |
+| ---------------------- | ----------------------------------------------------- |
+| `deleteProjectById()` | Reusable project deletion: exports, SQLite, files, active project reassignment. Called by both editor delete and dashboard cascade delete. |
 
 ### Utils Used
 
@@ -627,10 +646,10 @@ Save button / Auto-save timer
 | `server/utils/pathSecurity.js` | `isWithinDirectory()` |
 | `server/utils/projectErrors.js` | `PROJECT_ERROR_CODES`, `handleProjectResolutionError()`, `isProjectResolutionError()` |
 | `server/adapters/authAdapter.js` | Default auth adapter — sets `req.userId = "local"`. Platform overrides via `createEditorApp({ adapters: { auth } })` |
-| `server/adapters/publishAdapter.js` | Default publish adapter — throws "not available". Platform provides deploy implementation |
+| `server/adapters/publishAdapter.js` | Default publish adapter — `deploy()` throws "not available", `createDraft()` returns null, `deleteSite()` returns null. Platform provides real implementations |
 | `server/adapters/limitsAdapter.js` | Default limits adapter — returns null (no enforcement). Platform provides hosted limits |
 | `server/adapters/emailAdapter.js` | Default email adapter — logs to console. Platform provides real email delivery |
-| `server/createApp.js` | `createEditorApp(options)` factory — accepts `{ hostedMode, adapters }`, sets `app.locals.hostedMode` and `app.locals.adapters` |
+| `server/createApp.js` | Editor app factory — exports `createEditorApiApp()` (API routes + middleware) and `createEditorUiApp()` (static files + SPA catch-all). Both accept `{ hostedMode, adapters }` |
 
 ### Shared Hooks
 

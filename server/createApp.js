@@ -22,30 +22,16 @@ import { renderPreviewToken } from "./controllers/previewController.js";
 
 import { resolveAdapters } from "./adapters/index.js";
 
-/**
- * Create and configure an Express app for the Widgetizer editor.
- *
- * @param {object} [options]
- * @param {boolean} [options.hostedMode=false] - Whether to run in hosted mode
- * @param {object} [options.adapters] - Adapter overrides (partial overrides supported)
- * @returns {Promise<import('express').Express>} Configured Express app (call .listen() yourself)
- */
-export async function createEditorApp(options = {}) {
-  const hostedMode = options.hostedMode ?? false;
-  const adapters = resolveAdapters(options.adapters);
-
-  const app = express();
-
-  // Store adapters and hostedMode on app.locals so routes can access them
+function applyAppLocals(app, hostedMode, adapters) {
   app.locals.adapters = adapters;
   app.locals.hostedMode = hostedMode;
 
-  // Trust proxy in production (required for rate limiting behind reverse proxy)
   if (process.env.NODE_ENV === "production") {
     app.set("trust proxy", 1);
   }
+}
 
-  // CORS: use allowlist when preview isolation is enabled, permissive otherwise
+function applySharedMiddleware(app) {
   if (process.env.PREVIEW_ISOLATION === "true" && process.env.ALLOWED_ORIGINS) {
     const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim());
     app.use(
@@ -62,6 +48,7 @@ export async function createEditorApp(options = {}) {
   } else {
     app.use(cors());
   }
+
   app.use(
     helmet({
       contentSecurityPolicy: false, // Preview iframe needs inline styles/scripts from widgets
@@ -72,6 +59,9 @@ export async function createEditorApp(options = {}) {
       crossOriginOpenerPolicy: false, // YouTube player needs cross-origin popup communication
     }),
   );
+}
+
+async function mountEditorApiRoutes(app, hostedMode) {
   // JSON body parsing is applied per-router (not globally) so that the page
   // content save route can use a higher limit. See middleware/jsonParser.js.
 
@@ -113,24 +103,81 @@ export async function createEditorApp(options = {}) {
   // Token-based preview rendering (MUST be before production catch-all)
   app.get("/render/:token", renderPreviewToken);
 
-  // --- Production-Only Logic ---
-  if (process.env.NODE_ENV === "production") {
-    // Serve static assets from the dist/assets directory
-    app.use("/assets", express.static(path.join(STATIC_DIST_DIR, "assets")));
-
-    // Serve the static files from the React app
-    app.use(express.static(STATIC_DIST_DIR));
-
-    // Handles any requests that don't match the ones above
-    app.get(/^\/(?!api|health|render).*/, (req, res) => {
-      res.sendFile(path.join(STATIC_DIST_DIR, "index.html"));
-    });
-  }
-
   // Health check endpoint
   app.get("/health", (req, res) => {
     res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
   });
+}
+
+function mountEditorUiRoutes(app) {
+  // Serve static assets from the dist/assets directory
+  app.use("/assets", express.static(path.join(STATIC_DIST_DIR, "assets")));
+
+  // Serve the static files from the React app
+  app.use(express.static(STATIC_DIST_DIR));
+
+  // Handles any requests that don't match the ones above
+  app.get(/^\/(?!api|health|render).*/, (req, res) => {
+    res.sendFile(path.join(STATIC_DIST_DIR, "index.html"));
+  });
+}
+
+/**
+ * Create the API/support surface for the Widgetizer editor.
+ *
+ * Includes the editor APIs and support endpoints that must stay rooted at `/`.
+ *
+ * @param {object} [options]
+ * @param {boolean} [options.hostedMode=false]
+ * @param {object} [options.adapters]
+ * @returns {Promise<import('express').Express>}
+ */
+export async function createEditorApiApp(options = {}) {
+  const hostedMode = options.hostedMode ?? false;
+  const adapters = resolveAdapters(options.adapters);
+
+  const app = express();
+  applyAppLocals(app, hostedMode, adapters);
+  applySharedMiddleware(app);
+  await mountEditorApiRoutes(app, hostedMode);
+  return app;
+}
+
+/**
+ * Create the UI-only surface for the Widgetizer editor.
+ *
+ * Includes only static asset serving + the SPA catch-all.
+ *
+ * @param {object} [options]
+ * @param {boolean} [options.hostedMode=false]
+ * @param {object} [options.adapters]
+ * @returns {Promise<import('express').Express>}
+ */
+export async function createEditorUiApp(options = {}) {
+  const hostedMode = options.hostedMode ?? false;
+  const adapters = resolveAdapters(options.adapters);
+
+  const app = express();
+  applyAppLocals(app, hostedMode, adapters);
+  mountEditorUiRoutes(app);
+  return app;
+}
+
+/**
+ * Create and configure an Express app for the Widgetizer editor.
+ *
+ * @param {object} [options]
+ * @param {boolean} [options.hostedMode=false] - Whether to run in hosted mode
+ * @param {object} [options.adapters] - Adapter overrides (partial overrides supported)
+ * @returns {Promise<import('express').Express>} Configured Express app (call .listen() yourself)
+ */
+export async function createEditorApp(options = {}) {
+  const app = express();
+  const apiApp = await createEditorApiApp(options);
+  const uiApp = await createEditorUiApp(options);
+
+  app.use(apiApp);
+  app.use(uiApp);
 
   app.use(errorHandler);
 

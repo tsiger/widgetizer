@@ -31,111 +31,116 @@ import "./i18n";
 import LanguageInitializer from "./components/layout/LanguageInitializer";
 
 // Create router with data router API (required for useBlocker)
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <Layout />,
+      children: [
+        {
+          element: <DeepLinkResolver />,
+          children: [
+            {
+              // Dashboard/Projects routes — blocked in hosted mode (HostedModeGuard)
+              element: <HostedModeGuard />,
+              children: [
+                {
+                  index: true,
+                  element: <Dashboard />,
+                },
+                {
+                  path: "projects",
+                  element: <Projects />,
+                },
+                {
+                  path: "projects/add",
+                  element: <ProjectsAdd />,
+                },
+                {
+                  path: "projects/edit/:id",
+                  element: <ProjectsEdit />,
+                },
+              ],
+            },
+            {
+              element: <RequireActiveProject />,
+              children: [
+                {
+                  element: <RouteSourceGuard />,
+                  children: [
+                    {
+                      path: "pages",
+                      element: <Pages />,
+                    },
+                    {
+                      path: "pages/add",
+                      element: <PagesAdd />,
+                    },
+                    {
+                      path: "pages/:id/edit",
+                      element: <PagesEdit />,
+                    },
+                    {
+                      path: "page-editor",
+                      element: <PageEditor />,
+                    },
+                    {
+                      path: "menus",
+                      element: <Menus />,
+                    },
+                    {
+                      path: "menus/add",
+                      element: <MenusAdd />,
+                    },
+                    {
+                      path: "menus/edit/:id",
+                      element: <MenusEdit />,
+                    },
+                    {
+                      path: "menus/:id/structure",
+                      element: <MenuStructure />,
+                    },
+                    {
+                      path: "media",
+                      element: <Media />,
+                    },
+                    {
+                      path: "settings",
+                      element: <Settings />,
+                    },
+                    {
+                      path: "themes",
+                      element: <Themes />,
+                    },
+                    {
+                      path: "plugins",
+                      element: <Plugins />,
+                    },
+                    {
+                      path: "export-site",
+                      element: <ExportSite />,
+                    },
+                    {
+                      path: "app-settings",
+                      element: <AppSettings />,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      path: "/preview/:pageId",
+      element: <PagePreview />,
+    },
+  ],
   {
-    path: "/",
-    element: <Layout />,
-    children: [
-      {
-        element: <DeepLinkResolver />,
-        children: [
-          {
-            // Dashboard/Projects routes — blocked in hosted mode (HostedModeGuard)
-            element: <HostedModeGuard />,
-            children: [
-              {
-                index: true,
-                element: <Dashboard />,
-              },
-              {
-                path: "projects",
-                element: <Projects />,
-              },
-              {
-                path: "projects/add",
-                element: <ProjectsAdd />,
-              },
-              {
-                path: "projects/edit/:id",
-                element: <ProjectsEdit />,
-              },
-            ],
-          },
-          {
-            element: <RequireActiveProject />,
-            children: [
-              {
-                element: <RouteSourceGuard />,
-                children: [
-              {
-                path: "pages",
-                element: <Pages />,
-              },
-              {
-                path: "pages/add",
-                element: <PagesAdd />,
-              },
-              {
-                path: "pages/:id/edit",
-                element: <PagesEdit />,
-              },
-              {
-                path: "page-editor",
-                element: <PageEditor />,
-              },
-              {
-                path: "menus",
-                element: <Menus />,
-              },
-              {
-                path: "menus/add",
-                element: <MenusAdd />,
-              },
-              {
-                path: "menus/edit/:id",
-                element: <MenusEdit />,
-              },
-              {
-                path: "menus/:id/structure",
-                element: <MenuStructure />,
-              },
-              {
-                path: "media",
-                element: <Media />,
-              },
-              {
-                path: "settings",
-                element: <Settings />,
-              },
-              {
-                path: "themes",
-                element: <Themes />,
-              },
-              {
-                path: "plugins",
-                element: <Plugins />,
-              },
-              {
-                path: "export-site",
-                element: <ExportSite />,
-              },
-              {
-                path: "app-settings",
-                element: <AppSettings />,
-              },
-            ],
-          },
-        ],
-      },
-        ],
-      },
-    ],
+    basename: import.meta.env.VITE_ROUTER_BASENAME || "/",
   },
-  {
-    path: "/preview/:pageId",
-    element: <PagePreview />,
-  },
-]);
+);
 
 // Wrapper component to include ToastContainer
 function AppWithToast() {

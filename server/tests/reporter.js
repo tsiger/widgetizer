@@ -51,6 +51,7 @@ const FILE_GROUPS = {
   "coreWidgets.test.js": "Widgets",
   "htmlProcessor.test.js": "Utilities",
   "semver.test.js": "Utilities",
+  "hostedUrls.test.js": "Utilities",
 };
 
 /** Human-readable labels for test files (used to prefix [userId=...] suites) */
@@ -76,6 +77,7 @@ const FILE_LABELS = {
   "coreWidgets.test.js": "Core Widgets",
   "htmlProcessor.test.js": "HTML Processor",
   "semver.test.js": "Semver",
+  "hostedUrls.test.js": "Hosted URLs",
   "multiUser.test.js": "Multi-User",
   "pathSecurity.test.js": "Path Security",
 };
