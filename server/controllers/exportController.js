@@ -235,6 +235,24 @@ export async function exportProjectToDir(projectId, userId = "local", options = 
     }
     // --- End of new SEO file generation ---
 
+    // --- Generate _pages.json metadata for dynamic sitemap/robots ---
+    const pagesMetadata = pagesDataArray.map((page) => {
+      const pageId = page.id || page.slug;
+      const filename = pageId === "index" || pageId === "home" ? "index.html" : `${pageId}.html`;
+      const entry = {
+        path: filename,
+        lastmod: (page.updated || page.gcreated || new Date().toISOString()).split("T")[0],
+      };
+      if (page.seo?.robots?.includes("noindex")) {
+        entry.noindex = true;
+      }
+      return entry;
+    });
+    await fs.writeFile(
+      path.join(outputDir, "_pages.json"),
+      JSON.stringify({ pages: pagesMetadata }, null, 2),
+    );
+
     const headerData = await readGlobalWidgetData(projectFolderName, "header", userId);
     const footerData = await readGlobalWidgetData(projectFolderName, "footer", userId);
 

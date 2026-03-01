@@ -112,9 +112,8 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
     - The controller loops through each page of the project. For each page, it: a. Renders all the widgets assigned to that page into a single HTML string. b. Combines the rendered header, page widgets, and footer into the final page content. c. Passes this combined content to the main `layout.liquid` template via the `renderPageLayout` function. d. The final, complete HTML for the page is generated.
 
 6.  **Generate SEO Files**:
-    - If the project has a `siteUrl` defined, the system automatically generates:
-      - **`sitemap.xml`**: A complete sitemap of all indexed pages (respecting SEO metadata).
-      - **`robots.txt`**: A standard instructions file for search engines, including the sitemap location and disallow rules for pages marked `noindex`.
+    - **`_pages.json`** (always generated): A metadata file listing all pages with their filenames, `lastmod` dates, and `noindex` flags. Contains no absolute URLs — it's domain-agnostic. Used by the serving worker to dynamically generate `sitemap.xml` and `robots.txt` at request time (see below). Harmless in OSS ZIP downloads (ignored by browsers).
+    - **`sitemap.xml`** and **`robots.txt`** (conditional on `siteUrl`): If the project has a `siteUrl` defined, static versions are generated with absolute URLs baked in. These are for OSS users who know their deployment URL. In hosted mode, `siteUrl` is never set — the serving worker generates these dynamically from `_pages.json` using the request's Host header, so URLs stay correct when subdomains change or custom domains are added.
 
 7.  **Format and Validate HTML Files**:
     - The generated HTML for each page is run through **Prettier** to ensure clean, readable formatting.

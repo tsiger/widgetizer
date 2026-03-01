@@ -613,6 +613,56 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         assert.ok(robots.includes("Disallow: /hidden.html"), "Should disallow hidden page");
       });
 
+      it("generates _pages.json with page metadata", async () => {
+        const exportDir = await getLatestExportDir();
+        const pagesJsonPath = path.join(exportDir, "_pages.json");
+        assert.ok(await fs.pathExists(pagesJsonPath), "_pages.json should exist");
+        const pagesData = JSON.parse(await fs.readFile(pagesJsonPath, "utf8"));
+        assert.ok(Array.isArray(pagesData.pages), "Should have pages array");
+        assert.ok(pagesData.pages.length > 0, "Should have at least one page");
+      });
+
+      it("_pages.json includes all pages with correct paths", async () => {
+        const exportDir = await getLatestExportDir();
+        const pagesData = JSON.parse(await fs.readFile(path.join(exportDir, "_pages.json"), "utf8"));
+        const paths = pagesData.pages.map((p) => p.path);
+        assert.ok(paths.includes("index.html"), "Should include index.html");
+        assert.ok(paths.includes("about.html"), "Should include about.html");
+        assert.ok(paths.includes("hidden.html"), "Should include hidden.html (even noindex pages)");
+      });
+
+      it("_pages.json marks noindex pages", async () => {
+        const exportDir = await getLatestExportDir();
+        const pagesData = JSON.parse(await fs.readFile(path.join(exportDir, "_pages.json"), "utf8"));
+        const hiddenPage = pagesData.pages.find((p) => p.path === "hidden.html");
+        assert.ok(hiddenPage, "Should have hidden page entry");
+        assert.equal(hiddenPage.noindex, true, "Hidden page should be marked noindex");
+      });
+
+      it("_pages.json does not mark indexable pages as noindex", async () => {
+        const exportDir = await getLatestExportDir();
+        const pagesData = JSON.parse(await fs.readFile(path.join(exportDir, "_pages.json"), "utf8"));
+        const indexPage = pagesData.pages.find((p) => p.path === "index.html");
+        assert.ok(indexPage, "Should have index page entry");
+        assert.equal(indexPage.noindex, undefined, "Index page should not have noindex flag");
+      });
+
+      it("_pages.json has lastmod dates in YYYY-MM-DD format", async () => {
+        const exportDir = await getLatestExportDir();
+        const pagesData = JSON.parse(await fs.readFile(path.join(exportDir, "_pages.json"), "utf8"));
+        for (const page of pagesData.pages) {
+          assert.ok(page.lastmod, `Page ${page.path} should have lastmod`);
+          assert.match(page.lastmod, /^\d{4}-\d{2}-\d{2}$/, `lastmod should be YYYY-MM-DD format`);
+        }
+      });
+
+      it("_pages.json contains no absolute URLs", async () => {
+        const exportDir = await getLatestExportDir();
+        const content = await fs.readFile(path.join(exportDir, "_pages.json"), "utf8");
+        assert.ok(!content.includes("http://"), "Should not contain http:// URLs");
+        assert.ok(!content.includes("https://"), "Should not contain https:// URLs");
+      });
+
       it("copies used images to assets/images/, not uploads/", async () => {
         const exportDir = await getLatestExportDir();
         const heroPath = path.join(exportDir, "assets", "images", "hero.jpg");
@@ -877,6 +927,14 @@ for (const TEST_USER_ID of TEST_USER_IDS) {
         const exportDir = res._json.outputDir;
         assert.ok(!(await fs.pathExists(path.join(exportDir, "sitemap.xml"))), "No sitemap without siteUrl");
         assert.ok(!(await fs.pathExists(path.join(exportDir, "robots.txt"))), "No robots.txt without siteUrl");
+      });
+
+      it("generates _pages.json even without siteUrl", async () => {
+        const res = await callController(exportProject, {
+          params: { projectId: NO_URL_ID },
+        });
+        const exportDir = res._json.outputDir;
+        assert.ok(await fs.pathExists(path.join(exportDir, "_pages.json")), "_pages.json should exist even without siteUrl");
       });
     });
 

@@ -57,6 +57,9 @@ export default function Sidebar() {
   const renderNavItem = (item) => {
     const source = activeProject?.source;
     if (source && item.hiddenForSource?.includes(source)) return null;
+    if (item.hiddenInHosted && hostedMode) return null;
+    // In hosted mode, hide project-dependent items until a project loads
+    if (hostedMode && item.requiresProject && !hasActiveProject) return null;
 
     const Icon = item.icon;
     const disabled = item.requiresProject && !hasActiveProject;
@@ -111,6 +114,7 @@ export default function Sidebar() {
       if (item.hostedOnly && !hostedMode) return false;
       if (item.hiddenInHosted && hostedMode) return false;
       if (source && item.hiddenForSource?.includes(source)) return false;
+      if (hostedMode && item.requiresProject && !hasActiveProject) return false;
       return true;
     });
     if (visibleItems.length === 0) return null;
