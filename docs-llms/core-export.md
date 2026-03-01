@@ -267,16 +267,13 @@ All API endpoints described in this document are protected by the platform's cor
 
 ---
 
-## Publisher Hosting Integration
+## 4. Publishing (Hosted Mode)
 
-Exported ZIPs can be uploaded to [Widgetizer Publisher](https://publisher.widgetizer.org) for instant hosting on `*.mywidgetizer.org`. Publishing is handled via the **publish adapter** (`server/adapters/publishAdapter.js`). The default adapter throws "not available"; the platform provides a hosted adapter that deploys exports to Publisher via `req.app.locals.adapters.publish.deploy()`.
-
-When Publisher receives a ZIP (via upload or deploy), it **auto-injects a privacy-first analytics snippet** into all `.html` files. This happens at the Publisher API level during file processing --- the editor's export pipeline does not need to know about analytics. See `widgetizer-publisher/docs-llms/publisher-analytics.md` for the full analytics architecture.
+In hosted mode, the export page shows a Publish UI instead of the local export interface. Publishing deploys the site to the platform via the publish adapter (`server/adapters/publishAdapter.js`). The default adapter is a no-op; the hosted platform provides an override. See the platform documentation for details.
 
 ---
 
 **See also:**
 
-- [App Settings](core-appSettings.md) - Configure export retention limits
-- [Media Library](core-media.md) - Media usage tracking for optimized exports
-- `widgetizer-publisher/docs-llms/publisher-analytics.md` - Analytics auto-injection on Publisher uploads
+- [App Settings](core-appSettings.md) — Configure export retention limits
+- [Media Library](core-media.md) — Media usage tracking for optimized exports
