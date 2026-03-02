@@ -66,7 +66,7 @@ export default function Sidebar() {
     const showBadge = item.id === "themes" && themeUpdateCount > 0;
     const labelKey = (source && item.labelOverrides?.[source]) || item.labelKey;
 
-    // External links (e.g. My Sites → dashboard) render as <a> instead of <Link>
+    // External links (e.g. My Websites → dashboard) render as <a> instead of <Link>
     if (item.external) {
       let href = item.path;
       if (item.hostedOnly && dashboardUrl) {
@@ -76,8 +76,6 @@ export default function Sidebar() {
         <li key={item.id}>
           <a
             href={href}
-            target="_blank"
-            rel="noopener noreferrer"
             className="flex items-center justify-center md:justify-start p-2 rounded-sm transition-all duration-150 hover:bg-slate-800 border border-slate-700 md:border-none"
           >
             <div className="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-pink-600">
