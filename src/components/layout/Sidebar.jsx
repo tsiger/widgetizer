@@ -55,6 +55,7 @@ export default function Sidebar() {
   );
 
   const renderNavItem = (item) => {
+    if (item.hostedOnly && !hostedMode) return null;
     const source = activeProject?.source;
     if (source && item.hiddenForSource?.includes(source)) return null;
     if (item.hiddenInHosted && hostedMode) return null;

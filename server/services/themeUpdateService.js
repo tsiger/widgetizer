@@ -26,7 +26,7 @@ const UPDATABLE_PATHS = ["layout.liquid", "assets", "widgets", "snippets", "scre
  * @returns {Promise<{hasUpdate: boolean, currentVersion: string, latestVersion: string}>} Update availability status
  * @throws {Error} If project not found
  */
-export async function checkForUpdates(projectId, userId = "local") {
+export async function checkForUpdates(projectId, userId = "local", { hostedMode } = {}) {
   const project = projectRepo.getProjectById(projectId, userId);
 
   if (!project) {
@@ -38,7 +38,7 @@ export async function checkForUpdates(projectId, userId = "local") {
 
   // Get the theme's current source version (from latest/ or base theme.json)
   // This is the version that was last built/published, NOT all available versions
-  const themeSourceDir = await getThemeSourceDir(themeName, userId);
+  const themeSourceDir = await getThemeSourceDir(themeName, userId, { hostedMode });
   const themeJsonPath = path.join(themeSourceDir, "theme.json");
 
   let sourceVersion = null;
@@ -176,7 +176,7 @@ function mergeSettingsArray(userArray, newArray) {
  * @returns {Promise<{success: boolean, previousVersion: string, newVersion: string, message?: string}>} Update result
  * @throws {Error} If project not found
  */
-export async function applyThemeUpdate(projectId, userId) {
+export async function applyThemeUpdate(projectId, userId, { hostedMode } = {}) {
   const project = projectRepo.getProjectById(projectId, userId);
 
   if (!project) {
@@ -187,7 +187,7 @@ export async function applyThemeUpdate(projectId, userId) {
   const previousVersion = project.themeVersion;
 
   // Check if update is available
-  const updateStatus = await checkForUpdates(projectId, userId);
+  const updateStatus = await checkForUpdates(projectId, userId, { hostedMode });
   if (!updateStatus.hasUpdate) {
     return {
       success: false,
@@ -201,7 +201,7 @@ export async function applyThemeUpdate(projectId, userId) {
   const projectDir = getProjectDir(projectFolderName, userId);
 
   // Get theme source directory (latest/ if exists, otherwise root)
-  const themeSourceDir = await getThemeSourceDir(themeName, userId);
+  const themeSourceDir = await getThemeSourceDir(themeName, userId, { hostedMode });
 
   console.log(
     `[applyThemeUpdate] Updating project ${projectId} from ${previousVersion} to ${updateStatus.latestVersion}`,

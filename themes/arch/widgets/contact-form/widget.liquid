@@ -124,9 +124,10 @@
         <div>
           <form
             class="contact-form reveal reveal-up"
+            data-widgetizer-form
+            data-form-name="{{ widget.settings.form_name }}"
             {% if widget.settings.form_token != blank %}
               data-form-token="{{ widget.settings.form_token }}"
-              data-form-name="{{ widget.settings.form_name }}"
             {% endif %}
           >
             {% for blockId in widget.blocksOrder %}
@@ -220,7 +221,7 @@
 
                   {% when 'submit' %}
                     <div class="form-group" data-block-id="{{ blockId }}">
-                      {% if widget.settings.form_token != blank %}
+                      {% if globals.turnstileSiteKey != blank %}
                         <div class="cf-turnstile" data-sitekey="{{ globals.turnstileSiteKey }}" data-theme="auto"></div>
                       {% endif %}
                       <button type="submit" class="widget-button widget-button-primary" data-text="{{ block.settings.text }}">
@@ -232,10 +233,8 @@
             {% endfor %}
           </form>
 
-          {% if widget.settings.form_token != blank %}
-            <div class="form-status form-status-success" style="display:none;">Thank you! Your message has been sent.</div>
-            <div class="form-status form-status-error" style="display:none;"></div>
-          {% endif %}
+          <div class="form-status form-status-success" style="display:none;">Thank you! Your message has been sent.</div>
+          <div class="form-status form-status-error" style="display:none;"></div>
         </div>
 
         {% if widget.settings.show_sidebar %}
@@ -262,75 +261,75 @@
     </div>
   </div>
 
-  {% if widget.settings.form_token != blank %}
+  {% if globals.turnstileSiteKey != blank %}
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    <script>
-      (function() {
-        var widget = document.getElementById('{{ widget.id }}');
-        if (!widget || widget.dataset.initialized) return;
-        widget.dataset.initialized = 'true';
-
-        var form = widget.querySelector('.contact-form');
-        if (!form || !form.dataset.formToken) return;
-
-        var successEl = widget.querySelector('.form-status-success');
-        var errorEl = widget.querySelector('.form-status-error');
-
-        form.addEventListener('submit', function(e) {
-          e.preventDefault();
-
-          // Disable submit button
-          var submitBtn = form.querySelector('button[type="submit"]');
-          if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending...';
-          }
-
-          // Hide previous messages
-          successEl.style.display = 'none';
-          errorEl.style.display = 'none';
-
-          // Collect form data
-          var formData = new FormData(form);
-          var data = {};
-          formData.forEach(function(value, key) {
-            data[key] = value;
-          });
-
-          // Add system fields
-          data._form_token = form.dataset.formToken;
-          data._form_name = form.dataset.formName || '';
-
-          fetch('{{ globals.formSubmitUrl }}', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          })
-          .then(function(res) {
-            if (res.ok) {
-              form.style.display = 'none';
-              successEl.style.display = 'block';
-            } else {
-              return res.json().then(function(err) {
-                throw new Error(err.error || 'Something went wrong. Please try again.');
-              });
-            }
-          })
-          .catch(function(err) {
-            errorEl.textContent = err.message || 'Network error. Please try again.';
-            errorEl.style.display = 'block';
-            if (submitBtn) {
-              submitBtn.disabled = false;
-              submitBtn.textContent = submitBtn.dataset.text || 'Send Message';
-            }
-            // Reset Turnstile
-            if (window.turnstile) {
-              var turnstileEl = form.querySelector('.cf-turnstile');
-              if (turnstileEl) window.turnstile.reset(turnstileEl);
-            }
-          });
-        });
-      })();
-    </script>
   {% endif %}
+  <script>
+    (function() {
+      var widget = document.getElementById('{{ widget.id }}');
+      if (!widget || widget.dataset.initialized) return;
+      widget.dataset.initialized = 'true';
+
+      var form = widget.querySelector('.contact-form');
+      if (!form || !form.dataset.formToken) return;
+
+      var successEl = widget.querySelector('.form-status-success');
+      var errorEl = widget.querySelector('.form-status-error');
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Disable submit button
+        var submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Sending...';
+        }
+
+        // Hide previous messages
+        successEl.style.display = 'none';
+        errorEl.style.display = 'none';
+
+        // Collect form data
+        var formData = new FormData(form);
+        var data = {};
+        formData.forEach(function(value, key) {
+          data[key] = value;
+        });
+
+        // Add system fields
+        data._form_token = form.dataset.formToken;
+        data._form_name = form.dataset.formName || '';
+
+        fetch('{{ globals.formSubmitUrl }}', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        })
+        .then(function(res) {
+          if (res.ok) {
+            form.style.display = 'none';
+            successEl.style.display = 'block';
+          } else {
+            return res.json().then(function(err) {
+              throw new Error(err.error || 'Something went wrong. Please try again.');
+            });
+          }
+        })
+        .catch(function(err) {
+          errorEl.textContent = err.message || 'Network error. Please try again.';
+          errorEl.style.display = 'block';
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = submitBtn.dataset.text || 'Send Message';
+          }
+          // Reset Turnstile
+          if (window.turnstile) {
+            var turnstileEl = form.querySelector('.cf-turnstile');
+            if (turnstileEl) window.turnstile.reset(turnstileEl);
+          }
+        });
+      });
+    })();
+  </script>
 </section>

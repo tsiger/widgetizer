@@ -24,6 +24,13 @@ export const THEMES_SEED_DIR = process.env.THEMES_ROOT
 // Keep THEMES_DIR as an alias for backward compat in tests that set THEMES_ROOT
 export const THEMES_DIR = THEMES_SEED_DIR;
 
+// Hosted-mode shared themes directory — contains all commercial themes.
+// Set by the control-plane via environment variable when mounting the editor.
+// In OSS mode this is undefined and ignored.
+export const HOSTED_THEMES_ROOT = process.env.HOSTED_THEMES_ROOT
+  ? path.resolve(process.env.HOSTED_THEMES_ROOT)
+  : null;
+
 // Legacy global publish dir — kept for backward compat in tests.
 // Production code should use getUserPublishDir(userId) instead.
 export const PUBLISH_DIR = path.join(DATA_DIR, "publish");
@@ -123,5 +130,8 @@ if (process.env.NODE_ENV !== "test") {
   console.log(`  UNPACKED_ROOT: ${UNPACKED_ROOT}`);
   console.log(`  DATA_DIR: ${DATA_DIR}`);
   console.log(`  THEMES_DIR: ${THEMES_DIR}`);
+  if (HOSTED_THEMES_ROOT) {
+    console.log(`  HOSTED_THEMES_ROOT: ${HOSTED_THEMES_ROOT}`);
+  }
   console.log(`  CORE_WIDGETS_DIR: ${CORE_WIDGETS_DIR}`);
 }

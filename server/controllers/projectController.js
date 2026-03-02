@@ -43,6 +43,7 @@ export async function getAllProjects(req, res) {
   try {
     await ensureDirectories(req.userId);
     const projects = projectRepo.getAllProjects(req.userId);
+    const hostedMode = req.app.locals.hostedMode;
 
     // Enrich projects with hasThemeUpdate flag and theme display name
     const enrichedProjects = await Promise.all(
@@ -53,7 +54,7 @@ export async function getAllProjects(req, res) {
         if (project.theme) {
           try {
             // Get theme display name from theme.json
-            const themeSourceDir = await themeController.getThemeSourceDir(project.theme, req.userId);
+            const themeSourceDir = await themeController.getThemeSourceDir(project.theme, req.userId, { hostedMode });
             const themeJsonPath = path.join(themeSourceDir, "theme.json");
             const themeData = await fs.readJson(themeJsonPath);
             themeName = themeData.name || project.theme;
@@ -366,18 +367,20 @@ export async function deepLinkCreateProject(req, res) {
     const projectDir = getProjectDir(folderName, req.userId);
     await fs.ensureDir(projectDir);
 
-    await themeController.ensureThemesDirectory(req.userId);
+    if (!hostedMode) {
+      await themeController.ensureThemesDirectory(req.userId);
+    }
 
     let themeVersion;
     try {
-      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"], req.userId);
+      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"], req.userId, { hostedMode });
     } catch (error) {
       await fs.remove(projectDir);
       throw new Error(`Failed to copy theme: ${error.message}`);
     }
 
     const { templatesDir: resolvedTemplatesDir, menusDir: presetMenusDir, settingsOverrides } =
-      await themeController.resolvePresetPaths(theme, preset, req.userId);
+      await themeController.resolvePresetPaths(theme, preset, req.userId, { hostedMode });
 
     if (presetMenusDir) {
       const projectMenusDir = getProjectMenusDir(folderName, req.userId);
@@ -1290,8 +1293,9 @@ export async function importProject(req, res) {
 export async function getThemeUpdateStatus(req, res) {
   try {
     const { id } = req.params;
+    const hostedMode = req.app.locals.hostedMode;
     const { checkForUpdates } = await import("../services/themeUpdateService.js");
-    const status = await checkForUpdates(id, req.userId);
+    const status = await checkForUpdates(id, req.userId, { hostedMode });
     res.json(status);
   } catch (error) {
     console.error("Error checking theme update status:", error);
@@ -1338,8 +1342,9 @@ export async function toggleProjectThemeUpdates(req, res) {
 export async function applyProjectThemeUpdate(req, res) {
   try {
     const { id } = req.params;
+    const hostedMode = req.app.locals.hostedMode;
     const { applyThemeUpdate } = await import("../services/themeUpdateService.js");
-    const result = await applyThemeUpdate(id, req.userId);
+    const result = await applyThemeUpdate(id, req.userId, { hostedMode });
     res.json(result);
   } catch (error) {
     console.error("Error applying theme update:", error);

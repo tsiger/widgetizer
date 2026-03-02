@@ -4,6 +4,7 @@ import multer from "multer";
 import {
   DATA_DIR,
   THEMES_SEED_DIR,
+  HOSTED_THEMES_ROOT,
   getUserThemesDir,
   getThemeDir,
   getThemeJsonPath,
@@ -188,7 +189,21 @@ export async function getThemeVersions(themeId, userId = "local") {
  * @param {string} themeId - Theme identifier (folder name)
  * @returns {Promise<string>} - Path to the theme source directory
  */
-export async function getThemeSourceDir(themeId, userId = "local") {
+export async function getThemeSourceDir(themeId, userId = "local", { hostedMode } = {}) {
+  // Hosted: resolve from shared commercial themes directory
+  if (hostedMode && HOSTED_THEMES_ROOT) {
+    const hostedThemeDir = path.join(HOSTED_THEMES_ROOT, themeId);
+    const latestDir = path.join(hostedThemeDir, "latest");
+    const latestThemeJson = path.join(latestDir, "theme.json");
+    try {
+      await fs.access(latestThemeJson);
+      return latestDir;
+    } catch {
+      return hostedThemeDir;
+    }
+  }
+
+  // OSS: resolve from user's installed themes
   const latestDir = getThemeLatestDir(themeId, userId);
   const latestThemeJson = path.join(latestDir, "theme.json");
 
@@ -364,9 +379,9 @@ export async function buildLatestSnapshot(themeId, userId = "local") {
  * @param {string|null} presetId - Preset identifier (null = use root defaults)
  * @returns {Promise<{templatesDir: string, menusDir: string|null, settingsOverrides: object|null}>}
  */
-export async function resolvePresetPaths(themeId, presetId, userId = "local") {
+export async function resolvePresetPaths(themeId, presetId, userId = "local", { hostedMode } = {}) {
   // Use the theme source directory (latest/ if it exists, root otherwise)
-  const sourceDir = await getThemeSourceDir(themeId, userId);
+  const sourceDir = await getThemeSourceDir(themeId, userId, { hostedMode });
   const rootTemplatesDir = path.join(sourceDir, "templates");
 
   if (!presetId) {
@@ -797,9 +812,9 @@ export async function updateTheme(req, res) {
  * @returns {Promise<string>} The version string that was copied
  * @throws {Error} If theme copy fails
  */
-export async function copyThemeToProject(themeName, projectDir, excludeDirs = [], userId = "local") {
+export async function copyThemeToProject(themeName, projectDir, excludeDirs = [], userId = "local", { hostedMode } = {}) {
   // Use the source directory (latest/ if exists, otherwise root)
-  const sourceDir = await getThemeSourceDir(themeName, userId);
+  const sourceDir = await getThemeSourceDir(themeName, userId, { hostedMode });
 
   try {
     // Copy theme directory to project directory recursively

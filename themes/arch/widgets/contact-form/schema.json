@@ -28,7 +28,7 @@
       "type": "text",
       "id": "form_token",
       "label": "Form Token",
-      "description": "Paste your form token from Widgetizer Publisher (starts with ft_)"
+      "description": "Auto-injected when published to Widgetizer. For self-hosted: paste your form token (starts with ft_)"
     },
     {
       "type": "text",
