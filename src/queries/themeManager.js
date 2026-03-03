@@ -154,20 +154,15 @@ export async function getThemeSettings() {
 }
 
 /**
- * Save theme settings for the active project.
+ * Save theme settings for a specific project.
+ * @param {string} projectId - The project ID to save settings for
  * @param {ThemeSettings} data - The theme settings to save
  * @returns {Promise<{success: boolean, settings: ThemeSettings}>} Save confirmation with updated settings
- * @throws {Error} If no active project or save fails
+ * @throws {Error} If save fails
  */
-export async function saveThemeSettings(data) {
+export async function saveThemeSettings(projectId, data) {
   try {
-    const activeProject = await getActiveProject();
-
-    if (!activeProject) {
-      throw new Error("No active project");
-    }
-
-    const response = await apiFetch(`/api/themes/project/${activeProject.id}`, {
+    const response = await apiFetch(`/api/themes/project/${projectId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

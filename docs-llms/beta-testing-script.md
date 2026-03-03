@@ -1281,13 +1281,15 @@ These tests verify that different features work together correctly.
 5. Refresh both tabs.
 6. **Expected**: Last save wins. No data corruption. No crashes.
 
-### 12.5 Active Project Switch During Editing
+### 12.5 Active Project Mismatch Guard
 
-1. Open the page editor for a page in Project A.
+1. Open the page editor for a page in Project A. Make a small change (don't save yet).
 2. In another tab, switch the active project to Project B.
-3. Go back to the editor tab.
-4. Try to save.
-5. **Known issue**: The save uses whatever the active project is at the time, so Project A's page data may be saved into Project B's folder. This is a known limitation — avoid switching projects while editing in another tab.
+3. Go back to the editor tab and save (Ctrl+S).
+4. **Expected**: Error toast appears: "The active project has changed." Auto-save stops. Your edits are still visible in the editor (not lost).
+5. No data should have been written to Project B.
+6. Reload the editor tab.
+7. **Expected**: The editor loads Project B (the now-active project). Your unsaved edits to Project A are gone (expected — they were in-memory only).
 
 ---
 
@@ -1300,74 +1302,6 @@ Test each keyboard shortcut:
 - [ ] **Ctrl+Shift+Z / Cmd+Shift+Z** in editor — Redoes
 - [ ] **Ctrl+Y** in editor — Also redoes
 - [ ] **Escape** — Closes open drawers/modals
-
----
-
-## SECTION 14: RESPONSIVE & BROWSER TESTING
-
-### 14.1 Browser Compatibility
-
-Test the entire app in:
-
-- [ ] Chrome (latest)
-- [ ] Firefox (latest)
-- [ ] Safari (latest, if on Mac)
-- [ ] Edge (latest)
-
-Note any visual differences or broken functionality.
-
-### 14.2 Window Sizes
-
-1. Resize the browser to very narrow (< 800px). Does the sidebar collapse?
-2. Resize to very wide (4K). Does the layout stretch reasonably?
-3. Test the page editor at different window sizes. Does it remain usable?
-
----
-
-## SECTION 15: ERROR RECOVERY
-
-### 15.1 Network Interruption
-
-1. Open the page editor and make changes.
-2. Disconnect from the network (airplane mode or disconnect Wi-Fi).
-3. Try to save.
-4. **Expected**: Error toast. Changes not lost (still in memory).
-5. Reconnect. Try saving again.
-6. **Expected**: Save succeeds.
-
-### 15.2 Refresh During Editing
-
-1. Make changes in the editor (don't save).
-2. Refresh the browser (F5).
-3. **Expected**: Browser warns you about unsaved changes. If you proceed, changes are lost.
-4. After refresh, the page should load the last saved state.
-
-### 15.3 Back Button
-
-1. Navigate: Projects → Pages → Edit Page → Design.
-2. Press the browser back button at each step.
-3. **Expected**: Navigates back through each page cleanly. No blank screens or errors.
-
----
-
-## SECTION 17: FINAL SMOKE TEST
-
-Do this at the very end after all other testing:
-
-1. Create a brand new project from scratch.
-2. Create 3 pages: Home (index), About, Contact.
-3. Upload 3 images, an SVG logo, and a short MP4 video.
-4. Create a menu with all 3 pages.
-5. Design the Home page: Add **Global Header**, **Slideshow** (with 2 slides), **Trust Bar**, **Card Grid**, and **Global Footer**.
-6. Design the About page: Add **Video Embed**, **Timeline**, and **Profile Grid**.
-7. Design the Contact page: Add **Rich Text** with a link, and **Social Icons**.
-8. Set the header menu to your navigation menu.
-9. Add content to the footer.
-10. Change theme colors and fonts.
-11. Export the site.
-12. Download and open the exported site in a browser.
-13. Navigate every page. Click every link. Check every image.
-14. **Expected**: A complete, working static website.
 
 ---
 

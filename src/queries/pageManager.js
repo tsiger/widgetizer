@@ -193,11 +193,17 @@ export async function savePageContent(pageId, pageData) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      if (response.status === 409 && errorData.code === "PROJECT_MISMATCH") {
+        const err = new Error(errorData.message || "Project mismatch");
+        err.code = "PROJECT_MISMATCH";
+        throw err;
+      }
       throw new Error(errorData.error || "Failed to save page content");
     }
 
     return await response.json();
   } catch (error) {
+    if (error.code === "PROJECT_MISMATCH") throw error;
     console.error("Error saving page content:", error);
     throw new Error(`Failed to save page content: ${error.message}`);
   }

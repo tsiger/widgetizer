@@ -23,7 +23,12 @@ import Plugins from "./pages/Plugins";
 import ToastContainer from "./components/ui/ToastContainer";
 import RequireActiveProject from "./components/layout/RequireActiveProject";
 import useProjectStore from "./stores/projectStore";
+import { registerProjectStore } from "./lib/activeProjectId";
 import "./i18n";
+
+// Register project store for apiFetch X-Project-Id header injection.
+// Safe at module level — Zustand stores are singletons that exist immediately.
+registerProjectStore(useProjectStore);
 import LanguageInitializer from "./components/layout/LanguageInitializer";
 
 // Create router with data router API (required for useBlocker)

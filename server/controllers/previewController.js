@@ -370,6 +370,16 @@ export async function saveGlobalWidget(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
+    // Guard: reject writes if the frontend's project doesn't match
+    const clientProjectId = req.headers["x-project-id"];
+    if (clientProjectId && clientProjectId !== activeProjectId) {
+      return res.status(409).json({
+        error: "Project mismatch",
+        message: "The active project has changed. Please reload the page.",
+        code: "PROJECT_MISMATCH",
+      });
+    }
+
     const projectFolderName = await getProjectFolderName(activeProjectId);
     const projectDir = getProjectDir(projectFolderName);
     const globalPagesDir = path.join(projectDir, "pages", "global");

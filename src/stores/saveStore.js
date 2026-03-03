@@ -6,6 +6,7 @@ import { invalidateMediaCache } from "../queries/mediaManager";
 import usePageStore from "./pageStore";
 import useThemeStore from "./themeStore";
 import useProjectStore from "./projectStore";
+import useToastStore from "./toastStore";
 
 /**
  * Zustand store for managing auto-save functionality in the page editor.
@@ -114,35 +115,38 @@ const useAutoSave = create((set, get) => ({
     }
 
     try {
-      const savePromises = [];
+      const activeProject = useProjectStore.getState().activeProject;
 
-      // Save global widgets
+      // Phase 1: mismatch-guarded writes (page content + global widgets)
+      // These go through resolveActiveProject middleware or saveGlobalWidget's
+      // inline guard, which return 409 if the active project has changed.
+      const guardedPromises = [];
+
       if (globalWidgets.header && modifiedWidgets.has("header")) {
-        savePromises.push(saveGlobalWidget("header", globalWidgets.header));
+        guardedPromises.push(saveGlobalWidget("header", globalWidgets.header));
       }
 
       if (globalWidgets.footer && modifiedWidgets.has("footer")) {
-        savePromises.push(saveGlobalWidget("footer", globalWidgets.footer));
+        guardedPromises.push(saveGlobalWidget("footer", globalWidgets.footer));
       }
 
-      // Save page content if there are page changes (including undo/redo)
       // Filter out global widget IDs - they are saved separately via saveGlobalWidget
       const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
       const hasPageDiff =
         page && pageStore.originalPage ? JSON.stringify(page) !== JSON.stringify(pageStore.originalPage) : false;
       if (page && (hasPageWidgetChanges || structureModified || hasPageDiff)) {
-        savePromises.push(savePageContent(page.id, page));
+        guardedPromises.push(savePageContent(page.id, page));
       }
 
-      // Save theme settings if modified (use pageStore's copy for unified undo)
-      if (themeSettingsModified && themeSettings) {
-        savePromises.push(saveThemeSettings(themeSettings));
-      }
+      await Promise.all(guardedPromises);
 
-      await Promise.all(savePromises);
+      // Phase 2: theme settings (uses explicit projectId, no mismatch guard)
+      // Only runs if phase 1 succeeded — prevents partial save
+      if (themeSettingsModified && themeSettings && activeProject) {
+        await saveThemeSettings(activeProject.id, themeSettings);
+      }
 
       // Invalidate media cache since page saves update media usage tracking
-      const activeProject = useProjectStore.getState().activeProject;
       if (activeProject) {
         invalidateMediaCache(activeProject.id);
       }
@@ -166,6 +170,16 @@ const useAutoSave = create((set, get) => ({
         themeStore.markThemeSettingsSaved();
       }
     } catch (err) {
+      if (err.code === "PROJECT_MISMATCH") {
+        const { showToast } = useToastStore.getState();
+        showToast(
+          "The active project has changed. Your unsaved edits are preserved — reload to continue editing.",
+          "error",
+          { duration: 0 },
+        );
+        get().stopAutoSave();
+        return;
+      }
       console.error("Failed to save:", err);
     } finally {
       if (isAuto) {

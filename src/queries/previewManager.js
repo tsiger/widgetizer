@@ -343,11 +343,17 @@ export async function saveGlobalWidget(type, widget) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      if (response.status === 409 && errorData.code === "PROJECT_MISMATCH") {
+        const err = new Error(errorData.message || "Project mismatch");
+        err.code = "PROJECT_MISMATCH";
+        throw err;
+      }
       throw new Error(errorData.error || "Failed to save global widget");
     }
 
     return await response.json();
   } catch (error) {
+    if (error.code === "PROJECT_MISMATCH") throw error;
     console.error("Error saving global widget:", error);
     throw error;
   }

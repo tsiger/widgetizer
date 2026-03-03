@@ -65,10 +65,11 @@ after(async () => {
 // Mock helpers
 // ============================================================================
 
-function mockReq({ params = {}, body = {} } = {}) {
+function mockReq({ params = {}, body = {}, headers = {} } = {}) {
   return {
     params,
     body,
+    headers,
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
@@ -103,8 +104,8 @@ function mockRes() {
   return res;
 }
 
-async function callController(fn, { params, body } = {}) {
-  const req = mockReq({ params, body });
+async function callController(fn, { params, body, headers } = {}) {
+  const req = mockReq({ params, body, headers });
   const res = mockRes();
   await fn(req, res);
   return res;
@@ -390,5 +391,43 @@ describe("serveAsset", () => {
       params: { projectId: PROJECT_ID, folder: "assets", filepath: [] },
     });
     assert.equal(res._status, 400);
+  });
+});
+
+// ============================================================================
+// saveGlobalWidget — mismatch guard
+// ============================================================================
+
+describe("saveGlobalWidget — mismatch guard", () => {
+  const validWidget = { type: "theme-header", settings: {}, blocks: [] };
+
+  it("saves successfully with matching X-Project-Id", async () => {
+    const res = await callController(saveGlobalWidget, {
+      params: { type: "header" },
+      body: validWidget,
+      headers: { "x-project-id": PROJECT_ID },
+    });
+    assert.equal(res._status, 200);
+    assert.ok(res._json.success);
+  });
+
+  it("returns 409 with mismatched X-Project-Id", async () => {
+    const res = await callController(saveGlobalWidget, {
+      params: { type: "header" },
+      body: validWidget,
+      headers: { "x-project-id": "wrong-project-uuid" },
+    });
+    assert.equal(res._status, 409);
+    assert.equal(res._json.code, "PROJECT_MISMATCH");
+  });
+
+  it("saves successfully without X-Project-Id header (backward compat)", async () => {
+    const res = await callController(saveGlobalWidget, {
+      params: { type: "footer" },
+      body: validWidget,
+      headers: {},
+    });
+    assert.equal(res._status, 200);
+    assert.ok(res._json.success);
   });
 });

@@ -410,5 +410,21 @@ describe("saveStore (useAutoSave)", () => {
 
       expect(usePageStore.getState().originalPage.title).toBe("Modified");
     });
+
+    it("passes store-cached project ID to saveThemeSettings", async () => {
+      const { saveThemeSettings } = await import("../../queries/themeManager");
+
+      seedPageStore();
+      const themeSettings = {
+        settings: { global: { colors: [{ id: "c1", value: "#000" }] } },
+      };
+      usePageStore.setState({ themeSettings });
+      useAutoSave.getState().setThemeSettingsModified(true);
+
+      await useAutoSave.getState().save();
+
+      // The mock projectStore returns activeProject.id = "test-project"
+      expect(saveThemeSettings).toHaveBeenCalledWith("test-project", themeSettings);
+    });
   });
 });
