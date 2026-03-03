@@ -97,7 +97,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
     - Version numbers auto-increment starting from v1 (v1, v2, v3, etc.).
 
 2.  **Create Output Directory**:
-    - A new directory is created inside the user-scoped publish directory (`data/users/{userId}/publish/`). In open-source mode, `userId` is always `"local"`, so exports land in `data/users/local/publish/`.
+    - A new directory is created inside the publish directory (`data/publish/`).
     - To prevent overwriting previous exports, the directory is named with the project's **folderName** and version number (e.g., `my-project-slug-v1`, `my-project-slug-v2`, etc.).
     - If the project ID cannot be resolved, the export fails with a clear error.
 
@@ -113,7 +113,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
 
 6.  **Generate SEO Files**:
     - **`_pages.json`** (always generated): A metadata file listing all pages with their filenames, `lastmod` dates, and `noindex` flags. Contains no absolute URLs — it's domain-agnostic. Used by the serving worker to dynamically generate `sitemap.xml` and `robots.txt` at request time (see below). Harmless in OSS ZIP downloads (ignored by browsers).
-    - **`sitemap.xml`** and **`robots.txt`** (conditional on `siteUrl`): If the project has a `siteUrl` defined, static versions are generated with absolute URLs baked in. These are for OSS users who know their deployment URL. In hosted mode, `siteUrl` is never set — the serving worker generates these dynamically from `_pages.json` using the request's Host header, so URLs stay correct when subdomains change or custom domains are added.
+    - **`sitemap.xml`** and **`robots.txt`** (conditional on `siteUrl`): If the project has a `siteUrl` defined, static versions are generated with absolute URLs baked in. These are for users who know their deployment URL upfront.
 
 7.  **Format and Validate HTML Files**:
     - The generated HTML for each page is run through **Prettier** to ensure clean, readable formatting.
@@ -253,23 +253,17 @@ HTML validation only runs when developer mode is enabled, ensuring:
 - **Faster exports** for regular users
 - **Quality assurance** during development without affecting end-user experience
 
-## User-Scoped Export Storage
+## Export Storage
 
-Export directories are scoped per user via `getUserPublishDir(userId)` (from `server/config.js`), which resolves to `data/users/{userId}/publish/`. In open-source mode, `userId` is always `"local"`, so the effective path is `data/users/local/publish/`.
+Export directories are stored in `data/publish/` via `getPublishDir()` (from `server/config.js`).
 
-All export controller functions (`exportProject`, `getExportFiles`, `downloadExport`, `deleteExport`, `cleanupProjectExports`) and the `serveExportFile` route handler use `req.userId` to resolve the correct publish directory. Export records in SQLite store only the relative directory name (e.g. `my-project-slug-v1`); the `resolveOutputDir()` helper prepends the user-scoped publish path at runtime.
+Export records in SQLite store only the relative directory name (e.g. `my-project-slug-v1`); the `resolveOutputDir()` helper prepends the publish path at runtime.
 
-The `GET /api/export/view/:exportDir` and `GET /api/export/view/:exportDir/*filePath` routes apply `isWithinDirectory()` checks against the user's publish directory to prevent path traversal.
+The `GET /api/export/view/:exportDir` and `GET /api/export/view/:exportDir/*filePath` routes apply `isWithinDirectory()` checks against the publish directory to prevent path traversal.
 
 ## Security Considerations
 
-All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
-
----
-
-## 4. Publishing (Hosted Mode)
-
-In hosted mode, the export page shows a Publish UI instead of the local export interface. Publishing deploys the site to the platform via the publish adapter (`server/adapters/publishAdapter.js`). The default adapter is a no-op; the hosted platform provides an override. See the platform documentation for details.
+All API endpoints described in this document are protected by input validation and CORS policies. For details, see the **[Platform Security](core-security.md)** documentation.
 
 ---
 

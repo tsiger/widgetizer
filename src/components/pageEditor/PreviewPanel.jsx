@@ -3,16 +3,12 @@ import { useTranslation } from "react-i18next";
 import { fetchPreviewToken, scrollElementIntoView, updatePreview } from "../../queries/previewManager";
 import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
-import { BASE_URL, PREVIEW_ISOLATION, PREVIEW_ORIGIN } from "../../config";
+import { BASE_URL } from "../../config";
 import SelectionOverlay from "./SelectionOverlay";
 
-// PostMessage target origin: use preview origin when isolation is enabled
-const TARGET_ORIGIN = PREVIEW_ISOLATION ? PREVIEW_ORIGIN : "*";
-
 // Build the preview URL from a token
-const previewBaseUrl = PREVIEW_ISOLATION ? PREVIEW_ORIGIN : BASE_URL;
 function buildPreviewUrl(token) {
-  return `${previewBaseUrl}/render/${token}`;
+  return `${BASE_URL}/render/${token}`;
 }
 
 /**
@@ -156,12 +152,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         structuralReloadRef.current = true;
         // Capture scrollY now while the old iframe content is still present
         let scrollY = 0;
-        if (!PREVIEW_ISOLATION) {
-          try {
-            scrollY = iframeRef.current?.contentWindow?.scrollY || 0;
-          } catch {
-            scrollY = 0;
-          }
+        try {
+          scrollY = iframeRef.current?.contentWindow?.scrollY || 0;
+        } catch {
+          scrollY = 0;
         }
         pendingScrollRef.current = {
           scrollY,
@@ -193,7 +187,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         if (iframeRef.current?.contentWindow) {
           iframeRef.current.contentWindow.postMessage(
             { type: "RESTORE_SCROLL", payload: { scrollY: pending.scrollY } },
-            TARGET_ORIGIN,
+            "*",
           );
         }
 
@@ -224,7 +218,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
     iframeRef.current.contentWindow.postMessage(
       { type: "SET_WIDGET_METADATA", payload: { metadata, widgetOrder } },
-      TARGET_ORIGIN,
+      "*",
     );
   }, [page, globalWidgets, schemas, initialLoadComplete, previewReadyKey]);
 
@@ -353,7 +347,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
           iframeRef.current.contentWindow.postMessage(
             { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId, changes } },
-            TARGET_ORIGIN,
+            "*",
           );
         }
       });
@@ -375,7 +369,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
           iframeRef.current.contentWindow.postMessage(
             { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId: globalWidgetKey, changes } },
-            TARGET_ORIGIN,
+            "*",
           );
         }
       });
@@ -398,12 +392,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
           // Capture scrollY before morph
           let morphScrollY = 0;
-          if (!PREVIEW_ISOLATION) {
-            try {
-              morphScrollY = iframeRef.current?.contentWindow?.scrollY || 0;
-            } catch {
-              morphScrollY = 0;
-            }
+          try {
+            morphScrollY = iframeRef.current?.contentWindow?.scrollY || 0;
+          } catch {
+            morphScrollY = 0;
           }
 
           const updateState = {
@@ -417,13 +409,11 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
           await updatePreview(iframeRef.current, updateState, previousState || {});
 
-          // Restore scroll position after morph (cross-origin safe)
-          if (!PREVIEW_ISOLATION) {
-            try {
-              iframeRef.current?.contentWindow?.scrollTo(0, morphScrollY);
-            } catch {
-              // Cross-origin access denied — skip scroll restore
-            }
+          // Restore scroll position after morph
+          try {
+            iframeRef.current?.contentWindow?.scrollTo(0, morphScrollY);
+          } catch {
+            // skip scroll restore on error
           }
           setPreviewReadyKey((prev) => prev + 1);
         }
@@ -506,12 +496,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           ref={iframeRef}
           src={previewSrc}
           title={t("pageEditor.preview.title")}
-          {...(runtimeMode === "standalone" || PREVIEW_ISOLATION
+          {...(runtimeMode === "standalone"
             ? {
                 sandbox:
-                  runtimeMode === "standalone"
-                    ? "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation allow-top-navigation-by-user-activation"
-                    : "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation",
+                  "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation allow-top-navigation-by-user-activation",
               }
             : {})}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"

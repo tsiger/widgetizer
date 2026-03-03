@@ -8,11 +8,10 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
 
 ### Physical File Storage
 
-- **Location**: Uploaded files are physically stored on the server's filesystem, scoped per user:
-- **Images**: `data/users/{userId}/projects/{folderName}/uploads/images/`
-- **Videos**: `data/users/{userId}/projects/{folderName}/uploads/videos/`
-- **Audio**: `data/users/{userId}/projects/{folderName}/uploads/audios/`
-- In open-source mode, `userId` is always `"local"` (e.g. `data/users/local/projects/{folderName}/uploads/images/`).
+- **Location**: Uploaded files are physically stored on the server's filesystem, scoped per project:
+- **Images**: `data/projects/{folderName}/uploads/images/`
+- **Videos**: `data/projects/{folderName}/uploads/videos/`
+- **Audio**: `data/projects/{folderName}/uploads/audios/`
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
 - **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original using `-{size}` suffixes (e.g., `photo-thumb.jpg`, `photo-small.jpg`).
 - **Smart Size Generation**: The system only creates image sizes that are meaningfully smaller than the original. If an image is 800px wide and the "large" size is configured for 1920px, no "large" size will be generated since it would be identical to a smaller size. The image tag automatically falls back to the best available size or original image.
@@ -75,9 +74,9 @@ Media metadata is stored in SQLite, while the uploaded binary files remain on di
   - `media_sizes`: generated image variants (thumb/small/medium/etc.)
   - `media_usage`: usage relationships (`used_in`) for pages, globals, and theme settings
 - **Filesystem**: original uploads and generated image variants still live in:
-  - `data/users/{userId}/projects/{folderName}/uploads/images/`
-  - `data/users/{userId}/projects/{folderName}/uploads/videos/`
-  - `data/users/{userId}/projects/{folderName}/uploads/audios/`
+  - `data/projects/{folderName}/uploads/images/`
+  - `data/projects/{folderName}/uploads/videos/`
+  - `data/projects/{folderName}/uploads/audios/`
 
 ```json
 {
@@ -363,7 +362,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
   // Returns only enabled sizes with their width and quality settings
   ```
 - **File Upload (`multer` + `uploadProjectMedia`)**:
-  1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct user-scoped project directory (e.g. images: `data/users/{userId}/projects/{folderName}/uploads/images/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (from `ALLOWED_MIME_TYPES` in `server/utils/mimeTypes.js`).
+  1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (e.g. images: `data/projects/{folderName}/uploads/images/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (from `ALLOWED_MIME_TYPES` in `server/utils/mimeTypes.js`).
   2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the appropriate size limit (`media.maxFileSizeMB` for images, `media.maxVideoSizeMB` for videos).
   3.  For each valid file, it generates a unique ID (`uuidv4`).
   4.  **SVG Sanitization**: If the file is an SVG, it's sanitized using `DOMPurify` with SVG profile to prevent XSS attacks before being saved.
@@ -412,7 +411,7 @@ The media usage tracking is handled by a dedicated service that provides automat
 
 ## Security Considerations
 
-All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
+All API endpoints described in this document are protected by input validation and CORS policies. For details, see the **[Platform Security](core-security.md)** documentation.
 
 ---
 

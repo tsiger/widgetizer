@@ -59,9 +59,8 @@ export function getMediaFileById(fileId) {
  * Used for project import and duplication where a full replacement is appropriate.
  * @param {string} projectId
  * @param {{files: Array<object>}} mediaData
- * @param {string} userId
  */
-export function writeMediaData(projectId, mediaData, userId = "local") {
+export function writeMediaData(projectId, mediaData) {
   const db = getDb();
   const txn = db.transaction(() => {
     // Delete all existing media for this project (cascades to sizes + usage)
@@ -69,7 +68,7 @@ export function writeMediaData(projectId, mediaData, userId = "local") {
 
     // Re-insert all files
     for (const file of mediaData.files || []) {
-      insertMediaFile(db, projectId, file, userId);
+      insertMediaFile(db, projectId, file);
 
       // Re-insert usage
       if (file.usedIn) {
@@ -91,11 +90,10 @@ export function writeMediaData(projectId, mediaData, userId = "local") {
  * Add a single media file with its sizes to a project.
  * @param {string} projectId
  * @param {object} fileData - File info from controller
- * @param {string} userId
  */
-export function addMediaFile(projectId, fileData, userId = "local") {
+export function addMediaFile(projectId, fileData) {
   const db = getDb();
-  insertMediaFile(db, projectId, fileData, userId);
+  insertMediaFile(db, projectId, fileData);
 }
 
 /**
@@ -145,7 +143,7 @@ export function updateFileMetadata(fileId, metadata) {
  * Only touches the media_usage table — does NOT delete/reinsert media_files or media_sizes.
  * Used by refreshAllMediaUsage which rebuilds all usage from scratch.
  * @param {string} projectId
- * @param {Map<string, string[]>} usageMap - Map of fileId → array of usedIn strings
+ * @param {Map<string, string[]>} usageMap - Map of fileId -> array of usedIn strings
  */
 export function replaceMediaUsage(projectId, usageMap) {
   const db = getDb();
@@ -208,16 +206,14 @@ export function updateMediaUsageForSource(projectId, sourceId, fileIds) {
  * @param {import('better-sqlite3').Database} db
  * @param {string} projectId
  * @param {object} fileData
- * @param {string} userId
  */
-function insertMediaFile(db, projectId, fileData, userId = "local") {
+function insertMediaFile(db, projectId, fileData) {
   db.prepare(`
-    INSERT INTO media_files (id, project_id, user_id, filename, original_name, type, size, uploaded, path, alt, title, width, height)
-    VALUES (@id, @projectId, @userId, @filename, @originalName, @type, @size, @uploaded, @path, @alt, @title, @width, @height)
+    INSERT INTO media_files (id, project_id, filename, original_name, type, size, uploaded, path, alt, title, width, height)
+    VALUES (@id, @projectId, @filename, @originalName, @type, @size, @uploaded, @path, @alt, @title, @width, @height)
   `).run({
     id: fileData.id,
     projectId,
-    userId,
     filename: fileData.filename || "",
     originalName: fileData.originalName || fileData.filename || "",
     type: fileData.type || "",

@@ -623,11 +623,6 @@
       "uploadError": "Error al subir el tema."
     }
   },
-  "plugins": {
-    "title": "Plugins",
-    "emptyTitle": "No hay plugins instalados",
-    "emptyDesc": "Comienza instalando tu primer plugin desde la tienda o subiendo un plugin personalizado."
-  },
   "pagePreview": {
     "title": "Vista previa: {{name}}",
     "loading": "Cargando página..."
@@ -740,5 +735,10 @@
       "imageSizesManagedByThemeGeneric": "Los tamaños de imagen están gestionados por el tema seleccionado. La configuración de la app se ignora. Las miniaturas se siguen generando para la biblioteca de medios.",
       "noSettings": "No hay configuraciones disponibles"
     }
+  },
+  "plugins": {
+    "title": "Plugins",
+    "emptyTitle": "Plugins próximamente",
+    "emptyDesc": "Esta función está actualmente en desarrollo."
   }
 }

@@ -4,7 +4,7 @@ This document explains the "Themes" management page, which is the user interface
 
 ## 1. Overview
 
-Themes are structured directories that define the layout, styles, and functionality of the application. Runtime theme operations are user-scoped under `data/users/{userId}/themes/`. In packaged Electron builds, default themes are seeded from `app.asar.unpacked/themes/` into each user's themes directory on first access. Each theme contains:
+Themes are structured directories that define the layout, styles, and functionality of the application. Runtime theme operations use `data/themes/`. In packaged Electron builds, default themes are seeded from `app.asar.unpacked/themes/` into the themes directory on first access. Each theme contains:
 
 - `theme.json`: Theme metadata and configuration.
 - `screenshot.png`: A 1280x720 preview image of the theme, displayed on the card in the Themes UI.
@@ -272,7 +272,7 @@ The sidebar displays a badge next to "Themes" showing the count of themes with p
 
 ## Security Considerations
 
-All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
+All API endpoints described in this document are protected by input validation and CORS policies. For details, see the **[Platform Security](core-security.md)** documentation.
 
 ---
 

@@ -11,17 +11,13 @@ import * as projectRepo from "../db/repositories/projectRepository.js";
  *
  * This is the single reusable utility called from:
  *   - projectController.deleteProject()  (editor-initiated delete)
- *   - websites.js DELETE route           (dashboard cascade delete)
- *   - deepLinkCreateProject() rollback   (draft registration failure)
- *   - reconciliation orphan cleanup      (stale local projects)
  *
  * @param {string} projectId - Editor project UUID
- * @param {string} userId    - Owner's user ID
  * @returns {Promise<{success: boolean, projectName: string, newActiveProjectId: string|null}|null>}
  *   Returns null if project not found, otherwise the result object.
  */
-export async function deleteProjectById(projectId, userId) {
-  const project = projectRepo.getProjectById(projectId, userId);
+export async function deleteProjectById(projectId) {
+  const project = projectRepo.getProjectById(projectId);
   if (!project) {
     return null;
   }
@@ -33,25 +29,25 @@ export async function deleteProjectById(projectId, userId) {
   // export records, making it impossible to find export directories).
   try {
     const { cleanupProjectExports } = await import("../controllers/exportController.js");
-    await cleanupProjectExports(projectId, userId);
+    await cleanupProjectExports(projectId);
   } catch (exportCleanupError) {
     console.warn(`[deleteProjectById] Export cleanup failed for ${projectId}:`, exportCleanupError);
     // Non-fatal: proceed with deletion even if export cleanup fails
   }
 
   // Delete from SQLite (cascades to media_files, media_sizes, media_usage, exports)
-  projectRepo.deleteProject(projectId, userId);
+  projectRepo.deleteProject(projectId);
 
   // Reassign active project if the deleted one was active
-  let newActiveProjectId = projectRepo.getActiveProjectId(userId);
+  let newActiveProjectId = projectRepo.getActiveProjectId();
   if (newActiveProjectId === projectId || !newActiveProjectId) {
-    const remainingProjects = projectRepo.getAllProjects(userId);
+    const remainingProjects = projectRepo.getAllProjects();
     newActiveProjectId = remainingProjects[0]?.id || null;
-    projectRepo.setActiveProjectId(newActiveProjectId, userId);
+    projectRepo.setActiveProjectId(newActiveProjectId);
   }
 
   // Delete project directory from disk
-  const projectDir = getProjectDir(projectFolderName, userId);
+  const projectDir = getProjectDir(projectFolderName);
   await fs.remove(projectDir);
 
   return { success: true, projectName, newActiveProjectId };

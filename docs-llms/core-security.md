@@ -1,10 +1,10 @@
 # Platform Security
 
-This document covers all security measures in Widgetizer. The editor is a pure open-source project. Hosted capabilities (auth, publishing, limits enforcement) are injected via adapters by an external platform (`widgetizer-platform`, a separate private repo) through `createEditorApp({ hostedMode: true, adapters })`. Everything in the **Implemented** sections is active in the open-source editor. Sections marked as platform-enforced only apply when the platform wraps the editor with hosted adapters.
+This document covers all security measures in Widgetizer.
 
 ---
 
-## Implemented (both versions)
+## Implemented
 
 ### 1. Input Validation & Sanitization
 
@@ -16,14 +16,7 @@ All incoming data is validated and sanitized before reaching controllers.
 - Widget/block settings use schema-aware sanitization via `sanitizationService.js` (DOMPurify for richtext, protocol blocking for links)
 - Text/textarea fields rely on LiquidJS autoescape (`outputEscape: "escape"`) at render time
 
-### 2. API Rate Limiting
-
-IP-based request throttling via `express-rate-limit`:
-
-- **Editor routes** (`/api/projects`, `/api/themes`, `/api/pages`, `/api/preview`): 1500 req / 15 min
-- **Other API routes** (`/api/menus`, `/api/media`, `/api/export`, `/api/settings`, `/api/core-widgets`, `/api/core`): 5000 req / 15 min
-
-### 3. HTTP Security Headers
+### 2. HTTP Security Headers
 
 `helmet` in `server/createApp.js` with intentional relaxations for preview compatibility:
 
@@ -39,7 +32,6 @@ IP-based request throttling via `express-rate-limit`:
 ### 4. Cross-Origin Resource Sharing (CORS)
 
 - Permissive defaults (`app.use(cors())`) for local-only usage
-- When `PREVIEW_ISOLATION=true`, switches to an allowlist-based origin policy using `ALLOWED_ORIGINS`
 
 ### 5. Multi-layered SVG Sanitization
 
@@ -64,26 +56,13 @@ Custom error-handling middleware (`server/middleware/errorHandler.js`) registere
 
 **Known risks:** XSS via custom scripts, CSS injection, CSP bypass, third-party script supply-chain risk. These are accepted trade-offs documented for users and theme authors. See the [theming docs](theming.md) for user-facing guidance.
 
-### 8. Platform Limits (`server/limits.js`)
+### 8. Upload Safety Limits
 
-All server-enforced resource limits are centralized in `server/limits.js` as `EDITOR_LIMITS`. These limits have two enforcement modes:
+File-size and image-dimension safety limits are enforced inline in each upload handler:
 
-**Always enforced (both open-source and hosted):**
-- ZIP entry count (`maxZipEntries`: 10,000) — prevents ZIP bombs
-- Image dimensions (`maxImageDimension`: 10,000px, `maxImagePixels`: 100M) — prevents decompression bombs
-- Request body sizes (`jsonBodyLimit`: 2MB, `editorJsonBodyLimit`: 10MB)
-
-**Platform-enforced (when the platform calls `createEditorApp({ hostedMode: true, adapters })`):**
-- Project counts (`maxProjectsPerUser`: 25)
-- Page counts (`maxPagesPerProject`: 100)
-- Widget counts (`maxWidgetsPerPage`: 50, `maxBlocksPerWidget`: 200)
-- Media limits (`maxFilesPerProject`: 1,000, `maxTotalStoragePerUserMB`: 5,000)
-- Menu limits (`maxMenusPerProject`: 20, `maxMenuItemsPerMenu`: 200)
-- Theme limits (`maxThemesPerUser`: 20)
-- Upload ceilings (`maxFileSizeMBCeiling`: 50, `maxVideoSizeMBCeiling`: 200, `maxAudioSizeMBCeiling`: 100)
-- Export ceilings (`maxImportSizeMBCeiling`: 2,000MB, `maxExportVersionsCeiling`: 50)
-
-User-configurable app settings (e.g., `maxFileSizeMB`) are clamped to these ceilings in `appSettingsController.js` (which reads `req.app.locals.hostedMode`) before saving. Enforcement utility functions (`checkLimit`, `checkStringLength`, `validateZipEntries`, `clampToCeiling`) are in `server/utils/limitChecks.js` and accept `{ hostedMode }` as a parameter option.
+- **Image dimensions**: Sharp `limitInputPixels` (100M pixels) in mediaController and themeController
+- **File sizes**: Multer size limits derived from app settings in mediaController, themeController, and projectController
+- **Request body sizes**: Express JSON body limits configured in index.js
 
 ### 9. Project Import/Export & Theme Upload Security
 
@@ -122,17 +101,7 @@ Optional security boundary that runs the preview iframe on a separate origin fro
 
 **PostMessage origin verification:** All `postMessage` calls use explicit target origins (not `"*"`) when isolation is enabled. The preview runtime rejects messages from unexpected origins.
 
-**Inline overlay rendering:** Selection/hover overlays are rendered inside the iframe by `previewRuntime.js`, eliminating cross-origin `contentDocument` access.
-
-| Variable | Side | Required | Description |
-|----------|------|----------|-------------|
-| `PREVIEW_ISOLATION` | Server | No | Set to `true` to enable |
-| `EDITOR_ORIGIN` | Server | When isolation=true | Editor origin (e.g., `https://editor.example.com`) |
-| `ALLOWED_ORIGINS` | Server | When isolation=true | Comma-separated CORS allowlist |
-| `VITE_PREVIEW_ISOLATION` | Client | No | Mirrors `PREVIEW_ISOLATION` |
-| `VITE_PREVIEW_ORIGIN` | Client | When isolation=true | Preview origin (e.g., `https://preview.example.com`) |
-
-When isolation is off (default), the preview loads same-origin and `postMessage` uses `"*"`.
+**Inline overlay rendering:** Selection/hover overlays are rendered inside the iframe by `previewRuntime.js`, eliminating cross-origin `contentDocument` access. The preview loads same-origin and `postMessage` uses `"*"`.
 
 ---
 
@@ -159,7 +128,7 @@ Preview isolation variables are listed in section 10 above.
 
 - **Production build**: `npm run build` creates an optimized frontend in `dist/`
 - **Static serving**: `express.static` serves `dist/` in production; catch-all route serves `index.html` for client-side routing
-- **Trust proxy**: Enabled in production for correct rate limiting behind reverse proxies
+- **Trust proxy**: Enabled in production behind reverse proxies
 
 ---
 
@@ -170,50 +139,16 @@ Preview isolation variables are listed in section 10 above.
 
 ---
 
-## Pending: Open Source
+## Pending
 
-No outstanding security tasks. All protections listed above are active.
-
----
-
-## Implemented: Multi-user / Adapter-based Architecture
-
-### Authentication
-
-- [x] Auth is handled via the **auth adapter** (`server/adapters/authAdapter.js`). The default (open-source) adapter sets `req.userId = "local"`. The platform provides a hosted auth adapter (e.g., Clerk integration) when calling `createEditorApp({ hostedMode: true, adapters: { auth: hostedAuthAdapter } })`.
-- [x] The editor does **not** depend on Clerk or any external auth provider directly. Clerk was removed as a dependency; auth is fully adapter-injected.
-- [x] `apiFetch` wrapper (`src/lib/apiFetch.js`) — thin wrapper around `fetch` for API calls. Does not inject auth tokens; that is the platform's responsibility when wrapping the editor.
-
-### Multi-tenant Data Isolation
-
-- [x] All data is scoped per user: `data/users/{userId}/projects/`, `data/users/{userId}/themes/`, `data/users/{userId}/publish/`
-- [x] All path helpers in `server/config.js` take a `userId` parameter (default `"local"`)
-- [x] All controller functions thread `req.userId` through to path helpers and repository calls
-- [x] SQLite `projects` table has a `user_id` column; all queries are filtered by `user_id`
-- [x] `getProjectFolderName(projectId, userId)` validates project ownership (throws if the project doesn't belong to the user)
-- [x] Theme operations are per-user — each user has their own installed themes in `data/users/{userId}/themes/`
-- [x] Default themes are provisioned from a read-only seed directory (`THEMES_SEED_DIR`) on first access
-
-### Pending: Authorization & Hardening
-
-- [ ] Add role-based access control (admin, editor, viewer)
-- [ ] Restrict theme settings (custom CSS/JS) to admin role only
-
-### Pending: CORS & CSP Hardening
+### CORS & CSP Hardening
 
 - [ ] Environment-based CORS branching: strict allowlist in production, permissive in local dev
 - [ ] Implement Content Security Policy with nonce or hash-based validation for inline scripts
 - [ ] Provide a whitelist of allowed external script sources
 
-### Theme Settings Security (multi-user context)
-
-- [ ] Optional sanitization modes (strict vs. permissive) for `custom_css`/`custom_scripts`
-- [ ] Code review / approval workflows for theme settings changes
-- [ ] Audit logging for all theme setting modifications
-
-### Project Sharing / Marketplace (future)
+### Future Security Enhancements
 
 - [ ] Digital signatures for verified project exports
 - [ ] Content scanning for known malicious patterns in imported projects/themes
 - [ ] Sandboxed import environment for untrusted sources
-- [ ] Project reputation/rating system

@@ -53,23 +53,15 @@ const defaultSettings = {
   },
 };
 
-/**
- * Build the per-user settings key.
- * @param {string} userId
- * @returns {string}
- */
-function settingsKey(userId) {
-  return `config:${userId}`;
-}
+const SETTINGS_KEY = "config:local";
 
 /**
- * Read application settings for a user, merged with defaults.
- * @param {string} userId - User ID (defaults to "local" for open-source mode)
+ * Read application settings, merged with defaults.
  * @returns {object} Settings object
  */
-export function getSettings(userId = "local") {
+export function getSettings() {
   const db = getDb();
-  const row = db.prepare("SELECT value FROM app_settings WHERE key = ?").get(settingsKey(userId));
+  const row = db.prepare("SELECT value FROM app_settings WHERE key = ?").get(SETTINGS_KEY);
   if (!row || !row.value) return deepMerge({}, defaultSettings);
 
   try {
@@ -81,13 +73,12 @@ export function getSettings(userId = "local") {
 }
 
 /**
- * Save application settings for a user.
+ * Save application settings.
  * @param {object} settings - The full settings object
- * @param {string} userId - User ID (defaults to "local" for open-source mode)
  */
-export function saveSettings(settings, userId = "local") {
+export function saveSettings(settings) {
   const db = getDb();
-  const key = settingsKey(userId);
+  const key = SETTINGS_KEY;
   db.prepare(`
     INSERT INTO app_settings (key, value) VALUES (@key, @value)
     ON CONFLICT(key) DO UPDATE SET value = @value
@@ -98,11 +89,10 @@ export function saveSettings(settings, userId = "local") {
  * Get a specific setting by dot-notation key path.
  * Falls back to defaults if the key doesn't exist.
  * @param {string} key - Dot-notation path (e.g., "media.maxFileSizeMB")
- * @param {string} userId - User ID (defaults to "local" for open-source mode)
  * @returns {*} The setting value
  */
-export function getSetting(key, userId = "local") {
-  const settings = getSettings(userId);
+export function getSetting(key) {
+  const settings = getSettings();
   const keys = key.split(".");
   let value = settings;
 

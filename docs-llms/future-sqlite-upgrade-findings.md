@@ -19,34 +19,32 @@ Priority legend:
 
 ## Findings
 
-### 1) `P0` Media-by-ID operations are not scoped to project/user
+### 1) `P0` Media-by-ID operations are not scoped to project
 
 **Problem**
 - Several media repository methods operate by `fileId` only.
-- Controllers validate `projectId`, but then load/update/delete by `fileId` without proving the file belongs to that project/user.
+- Controllers validate `projectId`, but then load/update/delete by `fileId` without proving the file belongs to that project.
 
 **Code references**
-- [`server/db/repositories/mediaRepository.js:46`](/Users/tsiger/Playground/widgetizer-saas/widgetizer/server/db/repositories/mediaRepository.js:46) `getMediaFileById(fileId)`
-- [`server/db/repositories/mediaRepository.js:106`](/Users/tsiger/Playground/widgetizer-saas/widgetizer/server/db/repositories/mediaRepository.js:106) `deleteMediaFile(fileId)`
-- [`server/db/repositories/mediaRepository.js:131`](/Users/tsiger/Playground/widgetizer-saas/widgetizer/server/db/repositories/mediaRepository.js:131) `updateFileMetadata(fileId, ...)`
-- [`server/controllers/mediaController.js:483`](/Users/tsiger/Playground/widgetizer-saas/widgetizer/server/controllers/mediaController.js:483)
-- [`server/controllers/mediaController.js:535`](/Users/tsiger/Playground/widgetizer-saas/widgetizer/server/controllers/mediaController.js:535)
-- [`server/services/mediaUsageService.js:260`](/Users/tsiger/Playground/widgetizer-saas/widgetizer/server/services/mediaUsageService.js:260)
+- `server/db/repositories/mediaRepository.js` `getMediaFileById(fileId)`
+- `server/db/repositories/mediaRepository.js` `deleteMediaFile(fileId)`
+- `server/db/repositories/mediaRepository.js` `updateFileMetadata(fileId, ...)`
+- `server/controllers/mediaController.js`
+- `server/services/mediaUsageService.js`
 
 **Risk**
-- Cross-project metadata mutation/deletion by ID (and potentially cross-user if IDs leak).
+- Cross-project metadata mutation/deletion by ID.
 
 **Fix**
 - Add scoped repo methods:
-  - `getMediaFileById(projectId, fileId, userId)`
-  - `updateFileMetadata(projectId, fileId, userId, metadata)`
-  - `deleteMediaFile(projectId, fileId, userId)`
-- Require `project_id` + `user_id` constraints in all these queries.
+  - `getMediaFileById(projectId, fileId)`
+  - `updateFileMetadata(projectId, fileId, metadata)`
+  - `deleteMediaFile(projectId, fileId)`
+- Require `project_id` constraints in all these queries.
 - Update controller/service call sites to use scoped methods only.
 
 **Acceptance criteria**
 - Attempting to mutate/delete a file not belonging to route `projectId` returns `404`.
-- Attempting cross-user access returns `404`/`403`.
 - Existing happy paths remain unchanged.
 
 ---
@@ -63,7 +61,7 @@ Priority legend:
 
 **Risk**
 - Slug collisions are not prevented correctly.
-- Can surface as DB unique constraint failures (`folder_name,user_id`) or confusing import/duplicate errors.
+- Can surface as DB unique constraint failures (`folder_name`) or confusing import/duplicate errors.
 
 **Fix**
 - Replace callback checks with `p.folderName === slug`.
@@ -164,7 +162,7 @@ Priority legend:
 - Harder to test and reason about as SQLite ownership grows.
 
 **Fix**
-- Extract media metadata reads to a dedicated service/repository adapter (non-controller module).
+- Extract media metadata reads to a dedicated service/repository module (not a controller).
 - Replace dynamic imports with direct dependency.
 
 **Acceptance criteria**
@@ -175,7 +173,7 @@ Priority legend:
 ## Suggested One-Sprint Plan
 
 ### Sprint backlog
-1. `P0` Scope media-by-ID operations by `projectId` + `userId`.
+1. `P0` Scope media-by-ID operations by `projectId`.
 2. `P1` Fix folderName uniqueness callback bugs.
 3. `P1` Resolve `description` persistence mismatch (migration v2 or API contract rollback).
 4. `P1` Fix/remove legacy `getMediaUrl` helper and align typedef docs.
@@ -183,7 +181,7 @@ Priority legend:
 6. `P2` Refactor controller-coupled media reads into service/repository layer.
 
 ### Test plan additions
-- Add cross-project/cross-user media mutation tests (must fail).
+- Add cross-project media mutation tests (must fail).
 - Add create/duplicate/import slug collision tests.
 - Add video/audio metadata roundtrip test for `description` (if persisted).
 - Add frontend unit test or integration check for media URL helper (if kept).

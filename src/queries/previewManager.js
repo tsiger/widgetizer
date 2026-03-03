@@ -1,10 +1,6 @@
-import { PREVIEW_ISOLATION, PREVIEW_ORIGIN } from "../config";
 import { apiFetch } from "../lib/apiFetch";
 import useProjectStore from "../stores/projectStore";
 import fontDefinitions from "../core/config/fonts.json";
-
-// PostMessage target origin: use preview origin when isolation is enabled
-const TARGET_ORIGIN = PREVIEW_ISOLATION ? PREVIEW_ORIGIN : "*";
 
 /**
  * Extract Google fonts used in theme typography settings.
@@ -204,7 +200,7 @@ export async function updatePreview(iframe, newState, oldState) {
       try {
         console.log(`[PreviewManager] → Morphing widget: ${widgetId}`);
         const renderedHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings);
-        iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, TARGET_ORIGIN);
+        iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, "*");
       } catch (error) {
         console.error(`Error updating widget ${widgetId}:`, error);
       }
@@ -217,7 +213,7 @@ export async function updatePreview(iframe, newState, oldState) {
       const renderedHtml = await fetchRenderedWidget("header", newGlobalWidgets.header, newThemeSettings);
       iframe.contentWindow.postMessage(
         { type: "MORPH_WIDGET", payload: { widgetId: "header", html: renderedHtml } },
-        TARGET_ORIGIN,
+        "*",
       );
     } catch (error) {
       console.error("Error updating header:", error);
@@ -228,7 +224,7 @@ export async function updatePreview(iframe, newState, oldState) {
       const renderedHtml = await fetchRenderedWidget("footer", newGlobalWidgets.footer, newThemeSettings);
       iframe.contentWindow.postMessage(
         { type: "MORPH_WIDGET", payload: { widgetId: "footer", html: renderedHtml } },
-        TARGET_ORIGIN,
+        "*",
       );
     } catch (error) {
       console.error("Error updating footer:", error);
@@ -297,13 +293,13 @@ function updateThemeSettings(iframe, settings) {
   const variables = settingsToCssVariables(settings);
   const fontsMetadata = extractFonts(settings);
 
-  iframe.contentWindow.postMessage({ type: "UPDATE_CSS_VARIABLES", payload: variables }, TARGET_ORIGIN);
+  iframe.contentWindow.postMessage({ type: "UPDATE_CSS_VARIABLES", payload: variables }, "*");
 
   if (Object.keys(fontsMetadata).length > 0) {
     const fontsPayload = Object.fromEntries(
       Object.entries(fontsMetadata).map(([name, weightsSet]) => [name, Array.from(weightsSet)]),
     );
-    iframe.contentWindow.postMessage({ type: "LOAD_FONTS", payload: fontsPayload }, TARGET_ORIGIN);
+    iframe.contentWindow.postMessage({ type: "LOAD_FONTS", payload: fontsPayload }, "*");
   }
 }
 
@@ -396,5 +392,5 @@ export function scrollElementIntoView(iframe, widgetId, blockId = null) {
     return;
   }
 
-  iframe.contentWindow.postMessage({ type: "SCROLL_TO_ELEMENT", payload: { widgetId, blockId } }, TARGET_ORIGIN);
+  iframe.contentWindow.postMessage({ type: "SCROLL_TO_ELEMENT", payload: { widgetId, blockId } }, "*");
 }

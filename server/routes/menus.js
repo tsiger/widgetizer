@@ -4,7 +4,7 @@ import * as menuController from "../controllers/menuController.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
 import { validateRequest } from "../middleware/validateRequest.js";
-import { EDITOR_LIMITS } from "../limits.js";
+
 import { standardJsonParser } from "../middleware/jsonParser.js";
 
 const router = express.Router();
@@ -21,7 +21,7 @@ router.get("/:id", [param("id").notEmpty().withMessage("Menu ID is required.")],
 router.post(
   "/",
   [
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required.").isLength({ max: EDITOR_LIMITS.maxMenuNameLength }).withMessage(`Menu name must be at most ${EDITOR_LIMITS.maxMenuNameLength} characters.`),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required.").isLength({ max: 200 }).withMessage(`Menu name must be at most ${200} characters.`),
     body("description").optional().trim().customSanitizer(stripHtmlTags),
   ],
   validateRequest,
@@ -33,7 +33,7 @@ router.put(
   "/:id",
   [
     param("id").notEmpty().withMessage("Menu ID is required."),
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required.").isLength({ max: EDITOR_LIMITS.maxMenuNameLength }).withMessage(`Menu name must be at most ${EDITOR_LIMITS.maxMenuNameLength} characters.`),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required.").isLength({ max: 200 }).withMessage(`Menu name must be at most ${200} characters.`),
     body("description").optional().trim().customSanitizer(stripHtmlTags),
   ],
   validateRequest,

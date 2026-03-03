@@ -75,7 +75,7 @@ The export pipeline already renders every page before copying assets. The `{% im
 - **Captures actual resolved behavior** including fallbacks (if a widget asks for `size: 'large'` but the image doesn't have a large variant, the tag falls back to the original — this captures that truth)
 - **Works for both `<img>` tags and `output: "url"` mode** (CSS backgrounds) — both code paths resolve a size variant
 - **~25 lines across 2 files**
-- **Memory footprint**: ~30KB for 500 images. The Map lives for one export request and is garbage collected after. No cross-request state, no shared memory, no contention in multitenant environments.
+- **Memory footprint**: ~30KB for 500 images. The Map lives for one export request and is garbage collected after. No cross-request state, no shared memory.
 
 ### Implementation
 

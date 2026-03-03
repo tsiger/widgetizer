@@ -5,16 +5,13 @@ import {
   defaultSettings,
   deepMerge,
 } from "../db/repositories/settingsRepository.js";
-import { EDITOR_LIMITS } from "../limits.js";
-import { clampToCeiling } from "../utils/limitChecks.js";
 
 /**
  * Reads the application settings (merged with defaults).
- * @param {string} userId - User ID (defaults to "local" for open-source mode)
  * @returns {Promise<object>} The settings object
  */
-export async function readAppSettingsFile(userId = "local") {
-  return getSettings(userId);
+export async function readAppSettingsFile() {
+  return getSettings();
 }
 
 /**
@@ -24,7 +21,7 @@ export async function readAppSettingsFile(userId = "local") {
  */
 export async function getAppSettings(req, res) {
   try {
-    const settings = getSettings(req.userId);
+    const settings = getSettings();
     res.json(settings);
   } catch {
     res.status(500).json({ error: "Failed to get application settings." });
@@ -39,7 +36,7 @@ export async function getAppSettings(req, res) {
 export async function updateAppSettings(req, res) {
   try {
     const settings = req.body;
-    const currentSettings = getSettings(req.userId);
+    const currentSettings = getSettings();
 
     if (typeof settings !== "object" || settings === null) {
       return res.status(400).json({ error: "Invalid request body: Expected an object." });
@@ -91,21 +88,7 @@ export async function updateAppSettings(req, res) {
       }
     }
 
-    // Clamp user-configurable values to platform ceilings (hosted mode only —
-    // self-hosted users control their own instance and can set any values).
-    if (req.app.locals.hostedMode) {
-      if (newSettings.media) {
-        newSettings.media.maxFileSizeMB = clampToCeiling(newSettings.media.maxFileSizeMB, EDITOR_LIMITS.media.maxFileSizeMBCeiling);
-        newSettings.media.maxVideoSizeMB = clampToCeiling(newSettings.media.maxVideoSizeMB, EDITOR_LIMITS.media.maxVideoSizeMBCeiling);
-        newSettings.media.maxAudioSizeMB = clampToCeiling(newSettings.media.maxAudioSizeMB, EDITOR_LIMITS.media.maxAudioSizeMBCeiling);
-      }
-      if (newSettings.export) {
-        newSettings.export.maxImportSizeMB = clampToCeiling(newSettings.export.maxImportSizeMB, EDITOR_LIMITS.maxImportSizeMBCeiling);
-        newSettings.export.maxVersionsToKeep = clampToCeiling(newSettings.export.maxVersionsToKeep, EDITOR_LIMITS.maxExportVersionsCeiling);
-      }
-    }
-
-    saveSettings(newSettings, req.userId);
+    saveSettings(newSettings);
     res.json({ message: "Settings updated successfully", settings: newSettings });
   } catch (error) {
     res.status(500).json({ error: error.message || "Failed to update application settings." });
@@ -115,9 +98,8 @@ export async function updateAppSettings(req, res) {
 /**
  * Retrieves a specific setting value by key path (e.g., "media.maxFileSizeMB").
  * @param {string} key
- * @param {string} userId - User ID (defaults to "local" for open-source mode)
  * @returns {Promise<*>}
  */
-export async function getSetting(key, userId = "local") {
-  return repoGetSetting(key, userId);
+export async function getSetting(key) {
+  return repoGetSetting(key);
 }

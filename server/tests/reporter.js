@@ -51,10 +51,9 @@ const FILE_GROUPS = {
   "coreWidgets.test.js": "Widgets",
   "htmlProcessor.test.js": "Utilities",
   "semver.test.js": "Utilities",
-  "hostedUrls.test.js": "Utilities",
 };
 
-/** Human-readable labels for test files (used to prefix [userId=...] suites) */
+/** Human-readable labels for test files */
 const FILE_LABELS = {
   "projects.test.js": "Projects",
   "pages.test.js": "Pages",
@@ -72,13 +71,10 @@ const FILE_LABELS = {
   "preview.test.js": "Preview",
   "maxBlocks.test.js": "Max Blocks",
   "export.test.js": "Export",
-  "publish.test.js": "Publish",
   "appSettings.test.js": "App Settings",
   "coreWidgets.test.js": "Core Widgets",
   "htmlProcessor.test.js": "HTML Processor",
   "semver.test.js": "Semver",
-  "hostedUrls.test.js": "Hosted URLs",
-  "multiUser.test.js": "Multi-User",
   "pathSecurity.test.js": "Path Security",
 };
 
@@ -116,14 +112,9 @@ function getFilename(filePath) {
 }
 
 /**
- * Add a label prefix to [userId=...] suite names for context.
- * "[userId=local]" → "Projects [userId=local]"
+ * Add a label prefix to suite names for context.
  */
 function labelSuiteName(suiteName, filePath) {
-  if (suiteName.startsWith("[userId=")) {
-    const label = getFileLabel(filePath);
-    return label ? `${label} ${suiteName}` : suiteName;
-  }
   return suiteName;
 }
 

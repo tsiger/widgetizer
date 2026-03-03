@@ -62,16 +62,14 @@ Controllers use repository modules instead of direct SQL:
 
 SQLite does **not** replace project content files. These remain file-based:
 
-- `data/users/<userId>/projects/<folderName>/pages/*.json`
-- `data/users/<userId>/projects/<folderName>/pages/global/header.json`
-- `data/users/<userId>/projects/<folderName>/pages/global/footer.json`
-- `data/users/<userId>/projects/<folderName>/menus/*.json`
-- `data/users/<userId>/projects/<folderName>/theme.json` (and theme assets/templates/widgets)
-- `data/users/<userId>/projects/<folderName>/uploads/images/*`
-- `data/users/<userId>/projects/<folderName>/uploads/videos/*`
-- `data/users/<userId>/projects/<folderName>/uploads/audios/*`
-
-In open-source mode, `userId` is always `local`.
+- `data/projects/<folderName>/pages/*.json`
+- `data/projects/<folderName>/pages/global/header.json`
+- `data/projects/<folderName>/pages/global/footer.json`
+- `data/projects/<folderName>/menus/*.json`
+- `data/projects/<folderName>/theme.json` (and theme assets/templates/widgets)
+- `data/projects/<folderName>/uploads/images/*`
+- `data/projects/<folderName>/uploads/videos/*`
+- `data/projects/<folderName>/uploads/audios/*`
 
 ---
 

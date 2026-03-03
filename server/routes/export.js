@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import { getUserPublishDir } from "../config.js";
+import { getPublishDir } from "../config.js";
 import { getContentType } from "../utils/mimeTypes.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import {
@@ -66,7 +66,7 @@ function serveExportFile(req, res) {
     const { exportDir } = req.params;
     const requestedPath = normalizeExportPath(req.params.filePath ?? req.params[0]);
 
-    const userPublishDir = getUserPublishDir(req.userId);
+    const userPublishDir = getPublishDir();
     const fullPath = path.join(userPublishDir, exportDir, requestedPath);
 
     // Security check: ensure the path is within the publish directory

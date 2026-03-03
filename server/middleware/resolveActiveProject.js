@@ -7,13 +7,13 @@ import * as projectRepo from "../db/repositories/projectRepository.js";
  */
 export async function resolveActiveProject(req, res, next) {
   try {
-    const activeProjectId = projectRepo.getActiveProjectId(req.userId);
+    const activeProjectId = projectRepo.getActiveProjectId();
 
     if (!activeProjectId) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    const activeProject = projectRepo.getProjectById(activeProjectId, req.userId);
+    const activeProject = projectRepo.getProjectById(activeProjectId);
 
     if (!activeProject) {
       return res.status(404).json({ error: "No active project found" });

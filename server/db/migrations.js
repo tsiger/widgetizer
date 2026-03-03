@@ -6,27 +6,19 @@ const migrations = [
       db.exec(`
         CREATE TABLE projects (
           id TEXT PRIMARY KEY,
-          folder_name TEXT NOT NULL,
+          folder_name TEXT NOT NULL UNIQUE,
           name TEXT NOT NULL,
           description TEXT DEFAULT '',
           theme TEXT,
           theme_version TEXT,
           preset TEXT,
-          source TEXT DEFAULT 'manual',
           receive_theme_updates INTEGER DEFAULT 0,
           site_url TEXT DEFAULT '',
           last_theme_update_at TEXT,
           last_theme_update_version TEXT,
           created TEXT NOT NULL,
-          updated TEXT NOT NULL,
-          user_id TEXT NOT NULL DEFAULT 'local',
-          published_site_id TEXT DEFAULT NULL,
-          published_url TEXT DEFAULT NULL,
-          published_at TEXT DEFAULT NULL
+          updated TEXT NOT NULL
         );
-
-        CREATE INDEX idx_projects_user ON projects(user_id);
-        CREATE UNIQUE INDEX idx_projects_folder_user ON projects(folder_name, user_id);
 
         CREATE TABLE app_settings (
           key TEXT PRIMARY KEY,
@@ -36,7 +28,6 @@ const migrations = [
         CREATE TABLE media_files (
           id TEXT PRIMARY KEY,
           project_id TEXT NOT NULL,
-          user_id TEXT NOT NULL DEFAULT 'local',
           filename TEXT NOT NULL,
           original_name TEXT NOT NULL,
           type TEXT NOT NULL,
@@ -52,7 +43,6 @@ const migrations = [
 
         CREATE INDEX idx_media_project ON media_files(project_id);
         CREATE INDEX idx_media_path ON media_files(project_id, path);
-        CREATE INDEX idx_media_user ON media_files(user_id);
 
         CREATE TABLE media_sizes (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -77,7 +67,6 @@ const migrations = [
         CREATE TABLE exports (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           project_id TEXT NOT NULL,
-          user_id TEXT NOT NULL DEFAULT 'local',
           version INTEGER NOT NULL,
           timestamp TEXT NOT NULL,
           output_dir TEXT,
@@ -87,7 +76,6 @@ const migrations = [
 
         CREATE INDEX idx_exports_project ON exports(project_id);
         CREATE UNIQUE INDEX idx_exports_project_version ON exports(project_id, version);
-        CREATE INDEX idx_exports_user ON exports(user_id);
       `);
     },
   },

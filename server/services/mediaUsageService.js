@@ -161,10 +161,10 @@ function findFileIdsByPaths(files, mediaPaths) {
  * @param {object} themeData - Theme data object (theme.json shape) with settings.global
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>}
  */
-export async function updateThemeSettingsMediaUsage(projectId, themeData, userId = "local") {
+export async function updateThemeSettingsMediaUsage(projectId, themeData) {
   try {
     const mediaPaths = extractMediaPathsFromThemeSettings(themeData);
-    const mediaData = await readMediaFile(projectId, userId);
+    const mediaData = await readMediaFile(projectId);
 
     const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
     mediaRepo.updateMediaUsageForSource(projectId, THEME_SETTINGS_USAGE_ID, matchedFileIds);
@@ -186,10 +186,10 @@ export async function updateThemeSettingsMediaUsage(projectId, themeData, userId
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>} Result with extracted media paths
  * @throws {Error} If media file read/write fails
  */
-export async function updatePageMediaUsage(projectId, pageId, pageData, userId = "local") {
+export async function updatePageMediaUsage(projectId, pageId, pageData) {
   try {
     const mediaPaths = extractMediaPathsFromPage(pageData);
-    const mediaData = await readMediaFile(projectId, userId);
+    const mediaData = await readMediaFile(projectId);
 
     const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
     mediaRepo.updateMediaUsageForSource(projectId, pageId, matchedFileIds);
@@ -211,11 +211,11 @@ export async function updatePageMediaUsage(projectId, pageId, pageData, userId =
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>} Result with extracted media paths
  * @throws {Error} If media file read/write fails
  */
-export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData, userId = "local") {
+export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData) {
   try {
     const mediaPaths = extractMediaPathsFromGlobalWidget(widgetData);
     const usageId = globalId.startsWith("global:") ? globalId : `global:${globalId}`;
-    const mediaData = await readMediaFile(projectId, userId);
+    const mediaData = await readMediaFile(projectId);
 
     const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
     mediaRepo.updateMediaUsageForSource(projectId, usageId, matchedFileIds);
@@ -236,7 +236,7 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
  * @returns {Promise<{success: boolean}>} Success result
  * @throws {Error} If media file read/write fails
  */
-export async function removePageFromMediaUsage(projectId, pageId, _userId = "local") {
+export async function removePageFromMediaUsage(projectId, pageId) {
   try {
     // Remove all usage rows for this page (no fileIds = nothing to re-add)
     mediaRepo.updateMediaUsageForSource(projectId, pageId, []);
@@ -255,7 +255,7 @@ export async function removePageFromMediaUsage(projectId, pageId, _userId = "loc
  * @returns {Promise<{fileId: string, filename: string, usedIn: string[], isInUse: boolean}>} Usage details
  * @throws {Error} If file not found or media file read fails
  */
-export async function getMediaUsage(projectId, fileId, _userId = "local") {
+export async function getMediaUsage(projectId, fileId) {
   try {
     const file = mediaRepo.getMediaFileById(fileId);
 
@@ -283,10 +283,10 @@ export async function getMediaUsage(projectId, fileId, _userId = "local") {
  * @returns {Promise<{success: boolean, message: string}>} Result with summary message
  * @throws {Error} If media file read/write fails
  */
-export async function refreshAllMediaUsage(projectId, userId) {
+export async function refreshAllMediaUsage(projectId) {
   try {
-    const projectFolderName = await getProjectFolderName(projectId, userId);
-    const pagesDir = getProjectPagesDir(projectFolderName, userId);
+    const projectFolderName = await getProjectFolderName(projectId);
+    const pagesDir = getProjectPagesDir(projectFolderName);
 
     // Check if pages directory exists
     if (!(await fs.pathExists(pagesDir))) {
@@ -294,7 +294,7 @@ export async function refreshAllMediaUsage(projectId, userId) {
     }
 
     // Read all media files to build a path → fileId lookup
-    const mediaData = await readMediaFile(projectId, userId);
+    const mediaData = await readMediaFile(projectId);
     const pathToFileId = new Map();
     for (const file of mediaData.files) {
       if (file.path) pathToFileId.set(file.path, file.id);
@@ -355,7 +355,7 @@ export async function refreshAllMediaUsage(projectId, userId) {
     }
 
     // Also scan theme settings (e.g. favicon in settings.global.branding)
-    const themeJsonPath = getProjectThemeJsonPath(projectFolderName, userId);
+    const themeJsonPath = getProjectThemeJsonPath(projectFolderName);
     if (await fs.pathExists(themeJsonPath)) {
       try {
         const themeContent = await fs.readFile(themeJsonPath, "utf8");

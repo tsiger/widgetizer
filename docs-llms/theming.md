@@ -1884,9 +1884,9 @@ This theming system provides a powerful and flexible foundation for creating bea
 
 When a new project is created, the selected theme is copied into the project's data directory so it can be customized independently of the source theme:
 
-- **Destination**: `/data/users/<userId>/projects/<folderName>/`
+- **Destination**: `/data/projects/<folderName>/`
 - **Copied items**: `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`
 
 If a preset was selected during creation, the system also applies preset overrides (custom templates, menus, and/or settings) after the theme copy. The `presets/` directory itself is never copied into projects. See [Project Management](core-projects.md) for the full creation workflow and [Theme Presets](theme-presets.md) for preset details.
 
-After this copy, edits in the project affect only that project's files and do not modify the original installed theme in `data/users/<userId>/themes/`.
+After this copy, edits in the project affect only that project's files and do not modify the original installed theme in `data/themes/`.

@@ -65,7 +65,7 @@ This file contains functions that make API calls to the backend:
 6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
 7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
 8.  **API Call**: `ProjectsAdd.jsx`'s `handleSubmit` function calls `createProject(formData)` from `projectManager.js`, which sends a `POST` request to the backend API to create the new project.
-9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/users/<userId>/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`. In packaged Electron builds, base themes are seeded from `app.asar.unpacked/themes/` into each user's installed themes directory (`data/users/<userId>/themes/`) on first access. The `presets/` directory is excluded from the project copy. These become the project's working theme files.
+9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`. In packaged Electron builds, base themes are seeded from `app.asar.unpacked/themes/` into the installed themes directory (`data/themes/`) on first access. The `presets/` directory is excluded from the project copy. These become the project's working theme files.
 9b. **Preset Application**: If a preset was selected during creation, the system applies preset overrides after the theme copy:
     - **Templates**: If the preset has its own `templates/` directory, those templates are used instead of the root theme templates for the `processTemplatesRecursive` step.
     - **Menus**: If the preset has its own `menus/` directory, the root menus already copied into the project are removed and replaced with the preset's menus. This happens before menu enrichment (step 10).
@@ -77,19 +77,16 @@ This file contains functions that make API calls to the backend:
 11. **Setting Active Project**: If this is the very first project being created (i.e., there was no active project before), it is automatically set as the active project by calling `setActiveProject(newProject.id)`. The global state is updated via the `projectStore`.
 12. **Feedback**: A success toast notification is shown (localized), and the user is presented with buttons to either navigate to the project list or edit the newly created project.
 
-### 1b. Creating a Project via Deep-Link (Platform-Injected)
+### 1b. Creating a Project via Deep-Link
 
-The deep-link project creation flow is used when the platform wraps the editor. It is not part of the open-source editor's default behavior -- the platform injects the `DeepLinkResolver` component and the `/api/projects/deep-link` route via its adapter layer.
-
-When a user arrives at the editor via a marketing deep-link (`/editor?theme=arch&preset=financial&source=theme&name=Financial+Advisor`), the `DeepLinkResolver` component intercepts the URL params and calls `POST /api/projects/deep-link`.
+When a user arrives at the editor via a deep-link (`/editor?theme=arch&preset=financial&source=theme&name=Financial+Advisor`), the `DeepLinkResolver` component intercepts the URL params and calls `POST /api/projects/deep-link`.
 
 1. **Name collision handling**: If a project with the same name already exists, the name is auto-suffixed ("Financial Advisor" becomes "Financial Advisor (2)", then "(3)", etc.).
-2. **Theme provisioning**: Seed themes are copied to the user's directory if needed (`ensureThemesDirectory`).
+2. **Theme provisioning**: Seed themes are copied if needed (`ensureThemesDirectory`).
 3. **Always activates**: The new project is always set as active, regardless of how many projects exist.
 4. **Source tracking**: The project's `source` field is set to the value from the deep-link (typically `"theme"`). This controls which sidebar items and routes are visible.
-5. **Draft registration (hosted mode)**: After the SQLite project is created, `publishAdapter.createDraft()` registers a draft in D1 (`version_number = 0`, `site_name = projectName`). This makes the project immediately visible in the dashboard's "My Sites". If draft registration fails (quota exceeded, D1 unavailable), the SQLite project is rolled back and the user sees an error. In OSS mode, `createDraft()` returns null (no-op).
-6. **Navigation**: After creation, the user lands on `/pages` to start editing immediately.
-7. **Editor access guard**: If a user navigates to the editor without deep-link params and has no active project, `RequireActiveProject` redirects to the dashboard URL in hosted mode. In OSS mode, it shows the "No Active Project" empty state.
+5. **Navigation**: After creation, the user lands on `/pages` to start editing immediately.
+6. **Editor access guard**: If a user navigates to the editor without deep-link params and has no active project, `RequireActiveProject` shows the "No Active Project" empty state.
 
 ### 2. Listing and Managing Projects
 
@@ -99,7 +96,7 @@ When a user arrives at the editor via a marketing deep-link (`/editor?theme=arch
     - **Set Active (`Star` icon)**: Calls `handleSetActive`, which uses `setActiveProjectInBackend(id)` to update the backend. It then re-fetches the active project information to update the global store and UI. You cannot deactivate the active project; you must set another as active.
     - **Edit (`Pencil` icon)**: Navigates the user to `/projects/edit/:id`.
     - **Duplicate (`Copy` icon)**: Calls `handleDuplicate`, which uses `duplicateProject(id)` to make an API call. The duplication process includes UUID regeneration for all pages and automatic updating of all `pageUuid` references in widgets and menus to point to the new UUIDs. The project list is then reloaded.
-    - **Delete (`Trash2` icon)**: Calls `openDeleteConfirmation`, which opens a localized confirmation modal. You cannot delete the currently active project. If confirmed, the `deleteProject(id)` function is called, and the list is reloaded. In hosted mode, deletion cascades: the canonical D1 record is deleted first (via `publishAdapter.deleteSite()`), then local SQLite + files (via `deleteProjectById()` from `projectService.js`).
+    - **Delete (`Trash2` icon)**: Calls `openDeleteConfirmation`, which opens a localized confirmation modal. You cannot delete the currently active project. If confirmed, the `deleteProject(id)` function is called (via `deleteProjectById()` from `projectService.js`), and the list is reloaded.
 
 ### 3. Exporting a Project
 
@@ -176,11 +173,10 @@ The frontend `projectManager.js` communicates with a set of backend API endpoint
 | `POST` | `/api/projects` | `createProject` | Creates a new project. Accepts optional `preset` field (string) to apply a theme preset. |
 | `PUT` | `/api/projects/active/:id` | `setActiveProject` | Sets the project with the given `id` as active. |
 | `PUT` | `/api/projects/:id` | `updateProject` | Updates a specific project. |
-| `DELETE` | `/api/projects/:id` | `deleteProject` | Deletes a specific project. In hosted mode: cascades to D1 (via `publishAdapter.deleteSite()`) then local cleanup. |
+| `DELETE` | `/api/projects/:id` | `deleteProject` | Deletes a specific project. |
 | `POST` | `/api/projects/:id/duplicate` | `duplicateProject` | Creates a complete copy of a project. |
 | `POST` | `/api/projects/:projectId/export` | `exportProject` | Exports project as a downloadable ZIP file. |
-| `POST` | `/api/projects/deep-link` | `deepLinkCreateProject` | Creates a project from a marketing deep-link. Auto-suffixes name on duplicate, always activates. In hosted mode: registers draft in D1 via `publishAdapter.createDraft()`, rolls back on failure. |
-| `GET` | `/api/projects/by-site/:siteId` | `getProjectBySiteId` | Looks up a project by its published site ID (for publisher "Edit in Editor" deep-link). |
+| `POST` | `/api/projects/deep-link` | `deepLinkCreateProject` | Creates a project from a deep-link. Auto-suffixes name on duplicate, always activates. |
 | `POST` | `/api/projects/import` | `importProject` | Imports a project from a ZIP file upload. |
 | `GET` | `/api/projects/:projectId/widgets` | `getProjectWidgets` | Retrieves all widget schemas for a project. |
 | `GET` | `/api/projects/:projectId/icons` | `getProjectIcons` | Retrieves all available icons for a project. |
@@ -190,7 +186,7 @@ The frontend `projectManager.js` communicates with a set of backend API endpoint
 
 ### Security Considerations
 
-All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
+All API endpoints described in this document are protected by input validation and CORS policies. For details, see the **[Platform Security](core-security.md)** documentation.
 
 ---
 

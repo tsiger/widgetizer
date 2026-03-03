@@ -59,7 +59,7 @@ Working with Widgetizer follows a simple, three-step journey:
 
 1.  **Create**: Start a new project by choosing a theme that fits your needs.
 2.  **Build**: Use the visual editor to add widgets, customize their settings, and fill them with your content. Arrange blocks within widgets to create dynamic layouts.
-3.  **Publish**: When yours site is ready, use the **Export** feature. Widgetizer converts your project into a collection of fast, secure, static HTML files.
+3.  **Export**: When your site is ready, use the **Export** feature. Widgetizer converts your project into a collection of fast, secure, static HTML files.
 
 ---
 

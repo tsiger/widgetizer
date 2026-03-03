@@ -21,16 +21,15 @@ export function getNextVersion(projectId) {
  * @param {string} status - "success" or "failed"
  * @returns {{ version: number, timestamp: string, outputDir: string|null, status: string }}
  */
-export function recordExport(projectId, version, outputDir, status = "success", userId = "local") {
+export function recordExport(projectId, version, outputDir, status = "success") {
   const db = getDb();
   const timestamp = new Date().toISOString();
 
   db.prepare(`
-    INSERT INTO exports (project_id, user_id, version, timestamp, output_dir, status)
-    VALUES (@projectId, @userId, @version, @timestamp, @outputDir, @status)
+    INSERT INTO exports (project_id, version, timestamp, output_dir, status)
+    VALUES (@projectId, @version, @timestamp, @outputDir, @status)
   `).run({
     projectId,
-    userId,
     version,
     timestamp,
     outputDir: outputDir || null,

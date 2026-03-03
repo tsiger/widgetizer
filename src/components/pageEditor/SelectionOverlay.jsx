@@ -2,10 +2,6 @@ import { useEffect, useCallback } from "react";
 import useWidgetStore from "../../stores/widgetStore";
 import usePageStore from "../../stores/pageStore";
 import { scrollElementIntoView } from "../../queries/previewManager";
-import { PREVIEW_ISOLATION, PREVIEW_ORIGIN } from "../../config";
-
-// PostMessage target origin
-const TARGET_ORIGIN = PREVIEW_ISOLATION ? PREVIEW_ORIGIN : "*";
 
 /**
  * SelectionOverlay - Message relay between React stores and the preview iframe.
@@ -48,7 +44,7 @@ export default function SelectionOverlay({
     (message) => {
       const iframe = iframeRef?.current;
       if (!iframe?.contentWindow) return;
-      iframe.contentWindow.postMessage(message, TARGET_ORIGIN);
+      iframe.contentWindow.postMessage(message, "*");
     },
     [iframeRef],
   );

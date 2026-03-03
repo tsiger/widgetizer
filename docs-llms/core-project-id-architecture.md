@@ -27,15 +27,9 @@ This architecture decouples the project's identity from its filesystem represent
 - Can change when the project is renamed
 - Stored as `project.folderName` in the SQLite `projects` table
 - Used for:
-  - Directory names (`data/users/{userId}/projects/{folderName}/`)
+  - Directory names (`data/projects/{folderName}/`)
   - File path construction
   - All filesystem operations
-
-### 3. User Scoping (userId)
-
-All filesystem paths are scoped per user. Every path helper in `server/config.js` accepts a `userId` parameter (default `"local"`). In open-source mode, `userId` is always `"local"` (set by the default auth adapter), so paths resolve to `data/users/local/projects/{folderName}/`. In hosted mode, the platform's auth adapter sets `userId` to the authenticated user's ID.
-
-The `projects` table includes a `user_id` column, and all queries are filtered by `user_id`. The `getProjectFolderName(projectId, userId)` helper validates project ownership — it throws if the project doesn't belong to the requesting user.
 
 ## Implementation by Controller
 
@@ -54,14 +48,13 @@ const newProject = {
   id: uuidv4(), // Stable UUID
   folderName: slugify(name), // Filesystem identifier
   name,
-  userId: req.userId, // User scope
   // ...
 };
 ```
 
 **Directory Operations:**
 
-- Uses `project.folderName` and `req.userId` for `getProjectDir(folderName, userId)`
+- Uses `project.folderName` for `getProjectDir(folderName)`
 - Renames directories when folderName changes
 - Preserves UUID in project metadata
 
@@ -74,17 +67,17 @@ const newProject = {
 **Pattern:**
 
 ```javascript
-const activeProjectId = projectRepo.getActiveProjectId(req.userId);
-const activeProject = projectRepo.getProjectById(activeProjectId, req.userId);
+const activeProjectId = projectRepo.getActiveProjectId();
+const activeProject = projectRepo.getProjectById(activeProjectId);
 const projectFolderName = activeProject.folderName;
 
-// Use folderName + userId for all file operations
-const pagePath = getPagePath(projectFolderName, pageSlug, req.userId);
+// Use folderName for all file operations
+const pagePath = getPagePath(projectFolderName, pageSlug);
 ```
 
 **Key Functions:**
 
-- `getAllPages()`: Lists pages from `data/users/{userId}/projects/{folderName}/pages/`
+- `getAllPages()`: Lists pages from `data/projects/{folderName}/pages/`
 - `createPage()`: Creates page file in correct project directory
 - `updatePage()`: Handles page slug changes within project directory
 - `duplicatePage()`: Copies page files using project folderName
@@ -99,17 +92,17 @@ const pagePath = getPagePath(projectFolderName, pageSlug, req.userId);
 
 ### Menu Controller (`menuController.js`)
 
-**Rationale:** Menus are stored as JSON files in `data/users/{userId}/projects/{folderName}/menus/`. Like pages, menu operations require folderName resolution.
+**Rationale:** Menus are stored as JSON files in `data/projects/{folderName}/menus/`. Like pages, menu operations require folderName resolution.
 
 **Pattern:**
 
 ```javascript
-const activeProjectId = projectRepo.getActiveProjectId(req.userId);
-const activeProject = projectRepo.getProjectById(activeProjectId, req.userId);
+const activeProjectId = projectRepo.getActiveProjectId();
+const activeProject = projectRepo.getProjectById(activeProjectId);
 const projectFolderName = activeProject.folderName;
 
-const menusDir = getProjectMenusDir(projectFolderName, req.userId);
-const menuPath = getMenuPath(projectFolderName, menuId, req.userId);
+const menusDir = getProjectMenusDir(projectFolderName);
+const menuPath = getMenuPath(projectFolderName, menuId);
 ```
 
 **Key Functions:**
@@ -125,19 +118,19 @@ const menuPath = getMenuPath(projectFolderName, menuId, req.userId);
 
 ### Media Controller (`mediaController.js`)
 
-**Rationale:** Media files (images, videos, audio) are stored in `data/users/{userId}/projects/{folderName}/uploads/`. The controller handles file uploads and must ensure files are stored in the correct project directory.
+**Rationale:** Media files (images, videos, audio) are stored in `data/projects/{folderName}/uploads/`. The controller handles file uploads and must ensure files are stored in the correct project directory.
 
 **Pattern:**
 
 ```javascript
-const projectFolderName = await getProjectFolderName(projectId, req.userId);
-const imagesDir = getProjectImagesDir(projectFolderName, req.userId);
-const imagePath = getImagePath(projectFolderName, filename, req.userId);
+const projectFolderName = await getProjectFolderName(projectId);
+const imagesDir = getProjectImagesDir(projectFolderName);
+const imagePath = getImagePath(projectFolderName, filename);
 ```
 
 **Key Functions:**
 
-- `uploadProjectMedia()`: Stores files in user-scoped `{folderName}/uploads/images/`, `uploads/videos/`, or `uploads/audios/`
+- `uploadProjectMedia()`: Stores files in `{folderName}/uploads/images/`, `uploads/videos/`, or `uploads/audios/`
 - `getProjectMedia()`: Reads media metadata from SQLite; media binaries still come from `{folderName}/uploads/*`
 - `deleteProjectMedia()`: Removes files from correct project directory
 - `serveProjectMedia()`: Serves files from `{folderName}/uploads/`, sets `Content-Type` via `getContentType()` from `server/utils/mimeTypes.js`
@@ -148,13 +141,13 @@ const imagePath = getImagePath(projectFolderName, filename, req.userId);
 
 ### Theme Controller (`themeController.js`)
 
-**Rationale:** Theme settings are stored per-project in `data/users/{userId}/projects/{folderName}/theme.json`. Theme operations must use the project folderName to access these files.
+**Rationale:** Theme settings are stored per-project in `data/projects/{folderName}/theme.json`. Theme operations must use the project folderName to access these files.
 
 **Pattern:**
 
 ```javascript
-const projectFolderName = await getProjectFolderName(projectId, req.userId);
-const themeJsonPath = getProjectThemeJsonPath(projectFolderName, req.userId);
+const projectFolderName = await getProjectFolderName(projectId);
+const themeJsonPath = getProjectThemeJsonPath(projectFolderName);
 ```
 
 **Key Functions:**
@@ -178,18 +171,18 @@ const themeJsonPath = getProjectThemeJsonPath(projectFolderName, req.userId);
 **Pattern:**
 
 ```javascript
-const project = projectRepo.getProjectById(projectId, req.userId);
+const project = projectRepo.getProjectById(projectId);
 const projectFolderName = project.folderName;
-const projectDir = getProjectDir(projectFolderName, req.userId);
+const projectDir = getProjectDir(projectFolderName);
 ```
 
 **Key Functions:**
 
 - `exportProject()`: Reads project files from `{folderName}/` directory
-- Generates static site in `data/users/{userId}/publish/{folderName}-v{version}/`
+- Generates static site in `data/publish/{folderName}-v{version}/`
 - Uses folderName for all file path construction
 
-**Export Directory:** Exports are stored in the user-scoped publish directory using the project folderName and version for consistency and human-readability.
+**Export Directory:** Exports are stored in the publish directory using the project folderName and version for consistency and human-readability.
 
 ---
 
@@ -200,8 +193,8 @@ const projectDir = getProjectDir(projectFolderName, req.userId);
 **Pattern:**
 
 ```javascript
-const projectFolderName = await getProjectFolderName(activeProjectId, req.userId);
-const projectDir = getProjectDir(projectFolderName, req.userId);
+const projectFolderName = await getProjectFolderName(activeProjectId);
+const projectDir = getProjectDir(projectFolderName);
 ```
 
 **Key Functions:**
@@ -222,8 +215,8 @@ const projectDir = getProjectDir(projectFolderName, req.userId);
 **Pattern:**
 
 ```javascript
-const projectFolderName = await getProjectFolderName(projectId, userId);
-const projectDir = getProjectDir(projectFolderName, userId);
+const projectFolderName = await getProjectFolderName(projectId);
+const projectDir = getProjectDir(projectFolderName);
 ```
 
 **Key Functions:**
@@ -245,8 +238,8 @@ const projectDir = getProjectDir(projectFolderName, userId);
 **Implementation:**
 
 ```javascript
-export async function getProjectFolderName(projectId, userId = "local") {
-  const folderName = repoGetFolderName(projectId, userId); // from projectRepository, filtered by user_id
+export async function getProjectFolderName(projectId) {
+  const folderName = repoGetFolderName(projectId);
   if (!folderName) {
     const error = new Error(`Project not found for ID ${projectId}`);
     error.code = PROJECT_ERROR_CODES.PROJECT_NOT_FOUND;
@@ -259,7 +252,6 @@ export async function getProjectFolderName(projectId, userId = "local") {
 **Usage:**
 
 - Imported by controllers that need folderName resolution
-- Validates that the project belongs to the requesting user (defense-in-depth)
 - Provides consistent error handling
 - Throws if the project cannot be resolved so callers can respond with 404/500
 
@@ -343,11 +335,10 @@ When a project's name (and thus folderName) changes:
 
 ### For File Operations
 
-1. **Use folderName + userId** for all `getProjectDir()`, `getPagePath()`, etc.
+1. **Use folderName** for all `getProjectDir()`, `getPagePath()`, etc.
 2. **Never use UUID** for filesystem paths
-3. **Always pass `req.userId`** to path helpers and `getProjectFolderName()`
-4. **Validate folderName** before directory operations
-5. **Handle missing directories** gracefully
+3. **Validate folderName** before directory operations
+4. **Handle missing directories** gracefully
 
 ---
 
@@ -356,25 +347,25 @@ When a project's name (and thus folderName) changes:
 ### Reading Project Data
 
 ```javascript
-// 1. Get project by UUID (scoped to userId)
-const activeProjectId = projectRepo.getActiveProjectId(req.userId);
-const project = projectRepo.getProjectById(activeProjectId, req.userId);
+// 1. Get project by UUID
+const activeProjectId = projectRepo.getActiveProjectId();
+const project = projectRepo.getProjectById(activeProjectId);
 
 // 2. Get folderName
 const projectFolderName = project.folderName;
 
-// 3. Use folderName + userId for file operations
-const filePath = getProjectDir(projectFolderName, req.userId);
+// 3. Use folderName for file operations
+const filePath = getProjectDir(projectFolderName);
 ```
 
 ### Creating Project Resources
 
 ```javascript
-// 1. Resolve folderName from project UUID (validates ownership)
-const projectFolderName = await getProjectFolderName(projectId, req.userId);
+// 1. Resolve folderName from project UUID
+const projectFolderName = await getProjectFolderName(projectId);
 
 // 2. Construct file path
-const resourcePath = path.join(getProjectDir(projectFolderName, req.userId), "resource.json");
+const resourcePath = path.join(getProjectDir(projectFolderName), "resource.json");
 
 // 3. Perform file operation
 await fs.outputFile(resourcePath, data);
@@ -386,8 +377,8 @@ await fs.outputFile(resourcePath, data);
 // 1. Detect folderName change
 if (updatedProject.folderName !== originalProject.folderName) {
   // 2. Rename directory
-  const oldDir = getProjectDir(originalProject.folderName, req.userId);
-  const newDir = getProjectDir(updatedProject.folderName, req.userId);
+  const oldDir = getProjectDir(originalProject.folderName);
+  const newDir = getProjectDir(updatedProject.folderName);
   await fs.copy(oldDir, newDir);
   await fs.remove(oldDir);
 }
@@ -429,8 +420,8 @@ The Project ID/FolderName architecture provides a robust foundation for managing
 
 An alternative architecture would use **UUIDs exclusively** for all filesystem operations, with human-readable folderNames **only** for exports:
 
-- Project directories: `data/users/{userId}/projects/a7f3c2b1-4d5e-6789-0abc-def123456789/`
-- Exports: `data/users/{userId}/publish/my-awesome-project/` (folderName-based)
+- Project directories: `data/projects/a7f3c2b1-4d5e-6789-0abc-def123456789/`
+- Exports: `data/publish/my-awesome-project/` (folderName-based)
 
 ### Advantages of UUID-Only Approach
 

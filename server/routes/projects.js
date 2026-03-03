@@ -3,7 +3,7 @@ import { body, param } from "express-validator";
 import * as projectController from "../controllers/projectController.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { validateRequest } from "../middleware/validateRequest.js";
-import { EDITOR_LIMITS } from "../limits.js";
+
 import { standardJsonParser } from "../middleware/jsonParser.js";
 
 const router = express.Router();
@@ -19,36 +19,14 @@ router.get("/active", projectController.getActiveProject);
 router.post(
   "/",
   [
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required.").isLength({ max: EDITOR_LIMITS.maxProjectNameLength }).withMessage(`Project name must be at most ${EDITOR_LIMITS.maxProjectNameLength} characters.`),
-    body("description").trim().customSanitizer(stripHtmlTags).isLength({ max: EDITOR_LIMITS.maxProjectDescriptionLength }).withMessage(`Description must be at most ${EDITOR_LIMITS.maxProjectDescriptionLength} characters.`),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required.").isLength({ max: 200 }).withMessage(`Project name must be at most ${200} characters.`),
+    body("description").trim().customSanitizer(stripHtmlTags).isLength({ max: 1000 }).withMessage(`Description must be at most ${1000} characters.`),
     body("siteUrl").optional().trim().customSanitizer(stripHtmlTags),
     body("theme").notEmpty().withMessage("A theme is required to create a project."),
     body("preset").optional().isString().trim(),
-    body("source").optional().isIn(["manual", "theme", "ai"]).withMessage("Source must be one of: manual, theme, ai"),
   ],
   validateRequest,
   projectController.createProject,
-);
-
-// POST /api/projects/deep-link - Create project from marketing deep-link (auto-suffix name, always activate)
-router.post(
-  "/deep-link",
-  [
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required.").isLength({ max: EDITOR_LIMITS.maxProjectNameLength }).withMessage(`Project name must be at most ${EDITOR_LIMITS.maxProjectNameLength} characters.`),
-    body("theme").notEmpty().withMessage("A theme is required."),
-    body("preset").optional().isString().trim(),
-    body("source").optional().isIn(["manual", "theme", "ai"]).withMessage("Source must be one of: manual, theme, ai"),
-  ],
-  validateRequest,
-  projectController.deepLinkCreateProject,
-);
-
-// GET /api/projects/by-site/:siteId - Look up project by published site ID (deep-link from publisher)
-router.get(
-  "/by-site/:siteId",
-  [param("siteId").notEmpty().withMessage("Site ID is required.")],
-  validateRequest,
-  projectController.getProjectBySiteId,
 );
 
 // PUT /api/projects/active/:id - Set the active project
@@ -64,8 +42,8 @@ router.put(
   "/:id",
   [
     param("id").notEmpty().withMessage("Project ID is required."),
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required.").isLength({ max: EDITOR_LIMITS.maxProjectNameLength }).withMessage(`Project name must be at most ${EDITOR_LIMITS.maxProjectNameLength} characters.`),
-    body("description").trim().customSanitizer(stripHtmlTags).isLength({ max: EDITOR_LIMITS.maxProjectDescriptionLength }).withMessage(`Description must be at most ${EDITOR_LIMITS.maxProjectDescriptionLength} characters.`),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required.").isLength({ max: 200 }).withMessage(`Project name must be at most ${200} characters.`),
+    body("description").trim().customSanitizer(stripHtmlTags).isLength({ max: 1000 }).withMessage(`Description must be at most ${1000} characters.`),
     body("siteUrl").optional().trim().customSanitizer(stripHtmlTags),
   ],
   validateRequest,

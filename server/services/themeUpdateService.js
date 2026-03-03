@@ -26,8 +26,8 @@ const UPDATABLE_PATHS = ["layout.liquid", "assets", "widgets", "snippets", "scre
  * @returns {Promise<{hasUpdate: boolean, currentVersion: string, latestVersion: string}>} Update availability status
  * @throws {Error} If project not found
  */
-export async function checkForUpdates(projectId, userId = "local", { hostedMode } = {}) {
-  const project = projectRepo.getProjectById(projectId, userId);
+export async function checkForUpdates(projectId) {
+  const project = projectRepo.getProjectById(projectId);
 
   if (!project) {
     throw new Error(`Project not found: ${projectId}`);
@@ -38,7 +38,7 @@ export async function checkForUpdates(projectId, userId = "local", { hostedMode 
 
   // Get the theme's current source version (from latest/ or base theme.json)
   // This is the version that was last built/published, NOT all available versions
-  const themeSourceDir = await getThemeSourceDir(themeName, userId, { hostedMode });
+  const themeSourceDir = await getThemeSourceDir(themeName);
   const themeJsonPath = path.join(themeSourceDir, "theme.json");
 
   let sourceVersion = null;
@@ -176,8 +176,8 @@ function mergeSettingsArray(userArray, newArray) {
  * @returns {Promise<{success: boolean, previousVersion: string, newVersion: string, message?: string}>} Update result
  * @throws {Error} If project not found
  */
-export async function applyThemeUpdate(projectId, userId, { hostedMode } = {}) {
-  const project = projectRepo.getProjectById(projectId, userId);
+export async function applyThemeUpdate(projectId) {
+  const project = projectRepo.getProjectById(projectId);
 
   if (!project) {
     throw new Error(`Project not found: ${projectId}`);
@@ -187,7 +187,7 @@ export async function applyThemeUpdate(projectId, userId, { hostedMode } = {}) {
   const previousVersion = project.themeVersion;
 
   // Check if update is available
-  const updateStatus = await checkForUpdates(projectId, userId, { hostedMode });
+  const updateStatus = await checkForUpdates(projectId);
   if (!updateStatus.hasUpdate) {
     return {
       success: false,
@@ -197,11 +197,11 @@ export async function applyThemeUpdate(projectId, userId, { hostedMode } = {}) {
     };
   }
 
-  const projectFolderName = await getProjectFolderName(projectId, userId);
-  const projectDir = getProjectDir(projectFolderName, userId);
+  const projectFolderName = await getProjectFolderName(projectId);
+  const projectDir = getProjectDir(projectFolderName);
 
   // Get theme source directory (latest/ if exists, otherwise root)
-  const themeSourceDir = await getThemeSourceDir(themeName, userId, { hostedMode });
+  const themeSourceDir = await getThemeSourceDir(themeName);
 
   console.log(
     `[applyThemeUpdate] Updating project ${projectId} from ${previousVersion} to ${updateStatus.latestVersion}`,
@@ -290,7 +290,7 @@ export async function applyThemeUpdate(projectId, userId, { hostedMode } = {}) {
 
   // 3. Merge theme.json
   try {
-    const projectThemeJsonPath = getProjectThemeJsonPath(projectFolderName, userId);
+    const projectThemeJsonPath = getProjectThemeJsonPath(projectFolderName);
     const newThemeJsonPath = path.join(themeSourceDir, "theme.json");
 
     const userThemeJson = await fs.readJson(projectThemeJsonPath);
@@ -311,7 +311,7 @@ export async function applyThemeUpdate(projectId, userId, { hostedMode } = {}) {
     lastThemeUpdateAt: new Date().toISOString(),
     lastThemeUpdateVersion: updateStatus.latestVersion,
     updated: new Date().toISOString(),
-  }, userId);
+  });
 
   console.log(`[applyThemeUpdate] Successfully updated project ${projectId} to version ${updateStatus.latestVersion}`);
 
@@ -330,8 +330,8 @@ export async function applyThemeUpdate(projectId, userId, { hostedMode } = {}) {
  * @returns {Promise<{success: boolean, receiveThemeUpdates: boolean}>} Result with new flag value
  * @throws {Error} If project not found
  */
-export async function toggleThemeUpdates(projectId, enabled, userId = "local") {
-  const project = projectRepo.getProjectById(projectId, userId);
+export async function toggleThemeUpdates(projectId, enabled) {
+  const project = projectRepo.getProjectById(projectId);
 
   if (!project) {
     throw new Error(`Project not found: ${projectId}`);
@@ -340,7 +340,7 @@ export async function toggleThemeUpdates(projectId, enabled, userId = "local") {
   projectRepo.updateProject(projectId, {
     receiveThemeUpdates: enabled,
     updated: new Date().toISOString(),
-  }, userId);
+  });
 
   return {
     success: true,

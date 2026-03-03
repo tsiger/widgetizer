@@ -5,7 +5,6 @@ import archiver from "archiver";
 import {
   DATA_DIR,
   APP_ROOT,
-  getUserDataDir,
   getProjectDir,
   getProjectPagesDir,
   getProjectMenusDir,
@@ -18,19 +17,17 @@ import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
-import { EDITOR_LIMITS } from "../limits.js";
-import { checkLimit, checkStringLength, validateZipEntries } from "../utils/limitChecks.js";
+
 import { generateCopyName } from "../utils/namingHelpers.js";
 import { enrichNewProjectReferences, remapDuplicatedProjectUuids } from "../utils/linkEnrichment.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
 
-const VALID_SOURCES = ["manual", "theme", "ai"];
 import multer from "multer";
 import { readAppSettingsFile } from "./appSettingsController.js";
 
-// Make sure the user-scoped projects directory exists
-async function ensureDirectories(userId = "local") {
-  await fs.ensureDir(path.join(getUserDataDir(userId), "projects"));
+// Make sure the projects directory exists
+async function ensureDirectories() {
+  await fs.ensureDir(path.join(DATA_DIR, "projects"));
 }
 
 /**
@@ -41,9 +38,8 @@ async function ensureDirectories(userId = "local") {
  */
 export async function getAllProjects(req, res) {
   try {
-    await ensureDirectories(req.userId);
-    const projects = projectRepo.getAllProjects(req.userId);
-    const hostedMode = req.app.locals.hostedMode;
+    await ensureDirectories();
+    const projects = projectRepo.getAllProjects();
 
     // Enrich projects with hasThemeUpdate flag and theme display name
     const enrichedProjects = await Promise.all(
@@ -54,7 +50,7 @@ export async function getAllProjects(req, res) {
         if (project.theme) {
           try {
             // Get theme display name from theme.json
-            const themeSourceDir = await themeController.getThemeSourceDir(project.theme, req.userId, { hostedMode });
+            const themeSourceDir = await themeController.getThemeSourceDir(project.theme);
             const themeJsonPath = path.join(themeSourceDir, "theme.json");
             const themeData = await fs.readJson(themeJsonPath);
             themeName = themeData.name || project.theme;
@@ -94,15 +90,15 @@ export async function getAllProjects(req, res) {
  */
 export async function getActiveProject(req, res) {
   try {
-    const activeProjectId = projectRepo.getActiveProjectId(req.userId);
-    let activeProject = activeProjectId ? projectRepo.getProjectById(activeProjectId, req.userId) : null;
+    const activeProjectId = projectRepo.getActiveProjectId();
+    let activeProject = activeProjectId ? projectRepo.getProjectById(activeProjectId) : null;
 
     // Fallback: if no active project but user has projects, auto-activate the first one.
     // This handles edge cases like deleted active projects, missing DB records, or migrated data.
     if (!activeProject) {
-      const projects = projectRepo.getAllProjects(req.userId);
+      const projects = projectRepo.getAllProjects();
       if (projects.length > 0) {
-        projectRepo.setActiveProjectId(projects[0].id, req.userId);
+        projectRepo.setActiveProjectId(projects[0].id);
         activeProject = projects[0];
       }
     }
@@ -115,27 +111,6 @@ export async function getActiveProject(req, res) {
 }
 
 /**
- * Looks up a project by its published site ID (publisher's website.id).
- * Sets the found project as active and returns it.
- * Used for deep-linking from publisher "Edit in Editor" back to the editor.
- */
-export async function getProjectBySiteId(req, res) {
-  try {
-    const { siteId } = req.params;
-    const project = projectRepo.getProjectByPublishedSiteId(siteId, req.userId);
-    if (!project) {
-      return res.status(404).json({ error: "No project found for this site ID" });
-    }
-    // Set as active so the editor opens to the correct project
-    projectRepo.setActiveProjectId(project.id, req.userId);
-    res.json(project);
-  } catch (error) {
-    console.error("Error looking up project by site ID:", error);
-    res.status(500).json({ error: "Failed to look up project by site ID" });
-  }
-}
-
-/**
  * Creates a new project with the specified theme and configuration.
  * Copies theme assets and initializes project structure including pages and menus.
  * @param {import('express').Request} req - Express request object with project data in body
@@ -144,29 +119,15 @@ export async function getProjectBySiteId(req, res) {
  */
 export async function createProject(req, res) {
   try {
-    const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates, preset, source } = req.body;
-    const hostedMode = req.app.locals.hostedMode;
-
-    // Platform limit: max projects per user
-    const allProjects = projectRepo.getAllProjects(req.userId);
-    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects", { hostedMode });
-    if (!projectCheck.ok) {
-      return res.status(403).json({ error: projectCheck.error });
-    }
+    const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates, preset } = req.body;
 
     // Defensive check: ensure name is not empty after sanitization
     if (!name || typeof name !== "string" || name.trim() === "") {
       return res.status(400).json({ error: "Project name is required." });
     }
 
-    // Platform limit: project name length
-    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxProjectNameLength, "Project name", { hostedMode });
-    if (!nameCheck.ok) {
-      return res.status(400).json({ error: nameCheck.error });
-    }
-
     // Check for duplicate project names
-    if (projectRepo.projectNameExists(name.trim(), null, req.userId)) {
+    if (projectRepo.projectNameExists(name.trim(), null)) {
       return res
         .status(400)
         .json({ error: `A project named "${name}" already exists. Please choose a different name.` });
@@ -182,32 +143,32 @@ export async function createProject(req, res) {
         return res.status(400).json({ error: "Folder Name can only contain lowercase letters, numbers, and hyphens" });
       }
       // Check for duplicate folderNames
-      if (projectRepo.projectFolderExists(folderName, null, req.userId)) {
+      if (projectRepo.projectFolderExists(folderName, null)) {
         return res.status(400).json({
           error: `A project with folder name "${folderName}" already exists. Please choose a different folder name.`,
         });
       }
     } else {
-      // Generate folderName from name if not provided (reuse allProjects from limit check above)
-      folderName = await generateUniqueSlug(name, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
+      // Generate folderName from name if not provided
+      folderName = await generateUniqueSlug(name, (slug) => projectRepo.projectFolderExists(slug, null), { fallback: "project" });
     }
 
     // Use the permanent folderName for directory creation
-    const projectDir = getProjectDir(folderName, req.userId);
+    const projectDir = getProjectDir(folderName);
     await fs.ensureDir(projectDir);
 
     if (!theme) {
       throw new Error("Theme is required");
     }
 
-    // Ensure seed themes are provisioned for this user (idempotent no-op if already done)
-    await themeController.ensureThemesDirectory(req.userId);
+    // Ensure seed themes are provisioned (idempotent no-op if already done)
+    await themeController.ensureThemesDirectory();
 
     // Copy theme and get the version that was copied
     let themeVersion;
     try {
       // First copy theme assets (excluding templates)
-      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"], req.userId);
+      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"]);
     } catch (error) {
       await fs.remove(projectDir);
       throw new Error(`Failed to copy theme: ${error.message}`);
@@ -215,11 +176,11 @@ export async function createProject(req, res) {
 
     // Resolve preset paths (templates, menus, settings overrides)
     const { templatesDir: resolvedTemplatesDir, menusDir: presetMenusDir, settingsOverrides } =
-      await themeController.resolvePresetPaths(theme, preset, req.userId);
+      await themeController.resolvePresetPaths(theme, preset);
 
     // If preset has custom menus, replace root menus with preset menus
     if (presetMenusDir) {
-      const projectMenusDir = getProjectMenusDir(folderName, req.userId);
+      const projectMenusDir = getProjectMenusDir(folderName);
       try {
         await fs.remove(projectMenusDir);
         await fs.copy(presetMenusDir, projectMenusDir);
@@ -236,7 +197,6 @@ export async function createProject(req, res) {
       theme,
       themeVersion, // Version that was installed
       preset: preset || null, // Track which preset was used
-      source: source || "manual", // How the project was created: manual, theme, ai
       receiveThemeUpdates: receiveThemeUpdates || false, // Opt-in flag (default: off)
       siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlTags(siteUrl.trim()) : "",
       created: new Date().toISOString(),
@@ -245,7 +205,7 @@ export async function createProject(req, res) {
 
     try {
       // Then handle templates separately, recursively
-      const pagesDir = getProjectPagesDir(folderName, req.userId);
+      const pagesDir = getProjectPagesDir(folderName);
       const themeTemplatesDir = resolvedTemplatesDir;
 
       await processTemplatesRecursive(themeTemplatesDir, pagesDir, async (template, slug, targetPath) => {
@@ -264,7 +224,7 @@ export async function createProject(req, res) {
         await fs.outputFile(targetPath, JSON.stringify(initializedPage, null, 2));
       });
 
-      await enrichNewProjectReferences(folderName, req.userId);
+      await enrichNewProjectReferences(folderName);
     } catch (error) {
       await fs.remove(projectDir);
       throw new Error(`Failed to process templates: ${error.message}`);
@@ -295,13 +255,12 @@ export async function createProject(req, res) {
     }
 
     // Track if we're setting this as active (only happens if no active project exists)
-    const currentActiveId = projectRepo.getActiveProjectId(req.userId);
+    const currentActiveId = projectRepo.getActiveProjectId();
     const wasFirstProject = !currentActiveId;
 
-    newProject.userId = req.userId;
     projectRepo.createProject(newProject);
     if (!currentActiveId) {
-      projectRepo.setActiveProjectId(newProject.id, req.userId);
+      projectRepo.setActiveProjectId(newProject.id);
     }
 
     res.status(201).json({
@@ -315,179 +274,6 @@ export async function createProject(req, res) {
 }
 
 /**
- * Create a project from a deep-link and always set it as active.
- * Used by marketing site theme gallery links.
- *
- * Body: { name, theme, preset?, source? }
- *
- * Unlike createProject, this endpoint:
- * - Auto-suffixes the name if a duplicate exists ("X" → "X (2)" → "X (3)")
- * - Always sets the new project as active (not just when it's the first)
- */
-export async function deepLinkCreateProject(req, res) {
-  try {
-    const { name, theme, preset, source } = req.body;
-
-    if (!name || typeof name !== "string" || name.trim() === "") {
-      return res.status(400).json({ error: "Project name is required." });
-    }
-
-    if (!theme) {
-      return res.status(400).json({ error: "A theme is required." });
-    }
-
-    // Platform limit: max projects per user
-    const hostedMode = req.app.locals.hostedMode;
-    const allProjects = projectRepo.getAllProjects(req.userId);
-    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects", { hostedMode });
-    if (!projectCheck.ok) {
-      return res.status(403).json({ error: projectCheck.error });
-    }
-
-    const nameCheck = checkStringLength(name, EDITOR_LIMITS.maxProjectNameLength, "Project name", { hostedMode });
-    if (!nameCheck.ok) {
-      return res.status(400).json({ error: nameCheck.error });
-    }
-
-    // Auto-suffix name if duplicate exists: "Financial Advisor" → "Financial Advisor (2)"
-    let finalName = name.trim();
-    if (projectRepo.projectNameExists(finalName, null, req.userId)) {
-      const existingNames = allProjects.map((p) => p.name.toLowerCase());
-      let suffix = 2;
-      while (existingNames.includes(`${finalName} (${suffix})`.toLowerCase())) {
-        suffix++;
-      }
-      finalName = `${finalName} (${suffix})`;
-    }
-
-    const folderName = await generateUniqueSlug(finalName, (slug) => allProjects.some((p) => p.id === slug), {
-      fallback: "project",
-    });
-
-    const projectDir = getProjectDir(folderName, req.userId);
-    await fs.ensureDir(projectDir);
-
-    if (!hostedMode) {
-      await themeController.ensureThemesDirectory(req.userId);
-    }
-
-    let themeVersion;
-    try {
-      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"], req.userId, { hostedMode });
-    } catch (error) {
-      await fs.remove(projectDir);
-      throw new Error(`Failed to copy theme: ${error.message}`);
-    }
-
-    const { templatesDir: resolvedTemplatesDir, menusDir: presetMenusDir, settingsOverrides } =
-      await themeController.resolvePresetPaths(theme, preset, req.userId, { hostedMode });
-
-    if (presetMenusDir) {
-      const projectMenusDir = getProjectMenusDir(folderName, req.userId);
-      try {
-        await fs.remove(projectMenusDir);
-        await fs.copy(presetMenusDir, projectMenusDir);
-      } catch (error) {
-        console.warn(`[deepLinkCreateProject] Failed to apply preset menus: ${error.message}`);
-      }
-    }
-
-    const newProject = {
-      id: uuidv4(),
-      folderName,
-      name: finalName,
-      description: "",
-      theme,
-      themeVersion,
-      preset: preset || null,
-      source: source || "theme",
-      receiveThemeUpdates: false,
-      siteUrl: "",
-      created: new Date().toISOString(),
-      updated: new Date().toISOString(),
-    };
-
-    try {
-      const pagesDir = getProjectPagesDir(folderName, req.userId);
-      await processTemplatesRecursive(resolvedTemplatesDir, pagesDir, async (template, slug, targetPath) => {
-        const initializedPage = {
-          ...template,
-          ...(template.type !== "header" && template.type !== "footer"
-            ? { uuid: uuidv4(), id: slug, slug, created: new Date().toISOString(), updated: new Date().toISOString() }
-            : {}),
-        };
-        await fs.outputFile(targetPath, JSON.stringify(initializedPage, null, 2));
-      });
-      await enrichNewProjectReferences(folderName, req.userId);
-    } catch (error) {
-      await fs.remove(projectDir);
-      throw new Error(`Failed to process templates: ${error.message}`);
-    }
-
-    if (settingsOverrides) {
-      try {
-        const projectThemeJsonPath = path.join(projectDir, "theme.json");
-        const themeJsonStr = await fs.readFile(projectThemeJsonPath, "utf8");
-        const themeJson = JSON.parse(themeJsonStr);
-        if (themeJson.settings && themeJson.settings.global) {
-          for (const group of Object.values(themeJson.settings.global)) {
-            if (!Array.isArray(group)) continue;
-            for (const item of group) {
-              if (item.id && settingsOverrides[item.id] !== undefined) {
-                item.default = settingsOverrides[item.id];
-              }
-            }
-          }
-        }
-        await fs.writeFile(projectThemeJsonPath, JSON.stringify(themeJson, null, 2));
-      } catch (error) {
-        console.warn(`[deepLinkCreateProject] Failed to apply preset settings overrides: ${error.message}`);
-      }
-    }
-
-    newProject.userId = req.userId;
-    projectRepo.createProject(newProject);
-    // Always activate — this is the project the user just chose
-    projectRepo.setActiveProjectId(newProject.id, req.userId);
-
-    // In hosted mode, register a draft website in D1 so the site appears
-    // immediately in "My Sites". The D1 row is the canonical project lifecycle
-    // record — if draft registration fails, roll back the local project.
-    // In OSS mode, createDraft() returns null and the if(draft) branch is skipped.
-    const publishAdapter = req.app.locals.adapters?.publish;
-    if (publishAdapter?.createDraft) {
-      try {
-        const draft = await publishAdapter.createDraft(finalName, source || "theme", req.userId);
-        if (draft) {
-          projectRepo.updateProject(newProject.id, {
-            publishedSiteId: draft.siteId,
-            publishedUrl: draft.url,
-          }, req.userId);
-          newProject.publishedSiteId = draft.siteId;
-          newProject.publishedUrl = draft.url;
-        }
-      } catch (draftError) {
-        // Roll back via the shared deletion utility so activeProjectId is also repaired.
-        try {
-          const { deleteProjectById } = await import("../services/projectService.js");
-          await deleteProjectById(newProject.id, req.userId);
-        } catch (rollbackError) {
-          console.error(`[deepLinkCreateProject] Rollback failed: ${rollbackError.message}`);
-        }
-        // Surface the error to the user (quota exceeded, D1 unavailable, etc.)
-        const status = draftError.status || 500;
-        return res.status(status).json({ error: draftError.message });
-      }
-    }
-
-    res.status(201).json(newProject);
-  } catch (error) {
-    console.error("Deep-link create project error:", error);
-    res.status(500).json({ error: error.message || "Failed to create project" });
-  }
-}
-
-/**
  * Sets a project as the active project.
  * @param {import('express').Request} req - Express request object with project ID in params
  * @param {import('express').Response} res - Express response object
@@ -496,13 +282,13 @@ export async function deepLinkCreateProject(req, res) {
 export async function setActiveProject(req, res) {
   try {
     const { id } = req.params;
-    const project = projectRepo.getProjectById(id, req.userId);
+    const project = projectRepo.getProjectById(id);
 
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    projectRepo.setActiveProjectId(id, req.userId);
+    projectRepo.setActiveProjectId(id);
 
     res.json({ success: true });
   } catch (error) {
@@ -527,7 +313,7 @@ export async function updateProject(req, res) {
       return res.status(400).json({ error: "Project name is required." });
     }
 
-    const currentProject = projectRepo.getProjectById(id, req.userId);
+    const currentProject = projectRepo.getProjectById(id);
     if (!currentProject) {
       return res.status(404).json({ error: "Project not found" });
     }
@@ -536,7 +322,7 @@ export async function updateProject(req, res) {
 
     // Check for duplicate project names (excluding current project)
     if (updates.name && updates.name.trim() !== currentProject.name) {
-      if (projectRepo.projectNameExists(updates.name.trim(), id, req.userId)) {
+      if (projectRepo.projectNameExists(updates.name.trim(), id)) {
         return res
           .status(400)
           .json({ error: `A project named "${updates.name}" already exists. Please choose a different name.` });
@@ -554,15 +340,15 @@ export async function updateProject(req, res) {
       }
 
       // Check for duplicate folderNames (excluding current project)
-      if (projectRepo.projectFolderExists(newFolderName, id, req.userId)) {
+      if (projectRepo.projectFolderExists(newFolderName, id)) {
         return res.status(400).json({
           error: `A project with folder name "${newFolderName}" already exists. Please choose a different folder name.`,
         });
       }
 
       // Rename the project directory
-      const oldDir = getProjectDir(currentFolderName, req.userId);
-      const newDir = getProjectDir(newFolderName, req.userId);
+      const oldDir = getProjectDir(currentFolderName);
+      const newDir = getProjectDir(newFolderName);
 
       try {
         // Use copy + remove instead of rename for better Windows compatibility
@@ -593,7 +379,7 @@ export async function updateProject(req, res) {
       description: updates.description,
       siteUrl: sanitizedSiteUrl,
       receiveThemeUpdates: updates.receiveThemeUpdates,
-    }, req.userId);
+    });
 
     res.json(updatedProject);
   } catch (error) {
@@ -611,25 +397,14 @@ export async function updateProject(req, res) {
 export async function deleteProject(req, res) {
   try {
     const { id } = req.params;
-    const project = projectRepo.getProjectById(id, req.userId);
+    const project = projectRepo.getProjectById(id);
 
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    // If linked to a platform website, delete the canonical D1 record FIRST.
-    // If this fails, abort — the user still sees the site in "My Sites" and
-    // the local project remains intact. This is the safer failure mode.
-    if (project.publishedSiteId) {
-      const publishAdapter = req.app.locals.adapters?.publish;
-      if (publishAdapter?.deleteSite) {
-        await publishAdapter.deleteSite(project.publishedSiteId, req.userId);
-      }
-    }
-
-    // Only after the canonical record is gone (or didn't exist), delete local data
     const { deleteProjectById } = await import("../services/projectService.js");
-    const result = await deleteProjectById(id, req.userId);
+    const result = await deleteProjectById(id);
 
     res.json({
       success: true,
@@ -651,20 +426,15 @@ export async function deleteProject(req, res) {
 export async function duplicateProject(req, res) {
   try {
     const originalProjectId = req.params.id;
-    const originalProject = projectRepo.getProjectById(originalProjectId, req.userId);
+    const originalProject = projectRepo.getProjectById(originalProjectId);
 
     if (!originalProject) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    // Platform limit: max projects per user
-    const allProjects = projectRepo.getAllProjects(req.userId);
-    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects", { hostedMode: req.app.locals.hostedMode });
-    if (!projectCheck.ok) {
-      return res.status(403).json({ error: projectCheck.error });
-    }
+    const allProjects = projectRepo.getAllProjects();
     const newName = generateCopyName(originalProject.name, allProjects.map((p) => p.name));
-    const newFolderName = await generateUniqueSlug(newName, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
+    const newFolderName = await generateUniqueSlug(newName, (slug) => projectRepo.projectFolderExists(slug, null), { fallback: "project" });
 
     // Create the new project metadata
     const newProject = {
@@ -675,23 +445,21 @@ export async function duplicateProject(req, res) {
       name: newName,
       theme: originalProject.theme,
       themeVersion: originalProject.themeVersion,
-      source: originalProject.source || "manual",
       receiveThemeUpdates: originalProject.receiveThemeUpdates || false,
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
-      userId: req.userId,
     };
 
     // Copy the entire project directory
     const originalFolderName = originalProject.folderName;
-    const originalDir = getProjectDir(originalFolderName, req.userId);
-    const newDir = getProjectDir(newFolderName, req.userId);
+    const originalDir = getProjectDir(originalFolderName);
+    const newDir = getProjectDir(newFolderName);
 
     try {
       await fs.copy(originalDir, newDir);
 
       try {
-        await remapDuplicatedProjectUuids(newFolderName, req.userId);
+        await remapDuplicatedProjectUuids(newFolderName);
       } catch (uuidUpdateError) {
         console.warn(`[ProjectController] Failed to update UUIDs in cloned project: ${uuidUpdateError.message}`);
       }
@@ -717,7 +485,7 @@ export async function duplicateProject(req, res) {
         for (const file of originalMedia.files) {
           file.id = uuidv4();
         }
-        mediaRepo.writeMediaData(newProject.id, originalMedia, req.userId);
+        mediaRepo.writeMediaData(newProject.id, originalMedia);
       }
     } catch (mediaError) {
       console.warn("Could not duplicate media metadata:", mediaError.message);
@@ -740,13 +508,13 @@ export async function getProjectWidgets(req, res) {
   try {
     const { projectId } = req.params;
 
-    const project = projectRepo.getProjectById(projectId, req.userId);
+    const project = projectRepo.getProjectById(projectId);
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
     const projectFolderName = project.folderName;
-    const projectRootDir = getProjectDir(projectFolderName, req.userId);
+    const projectRootDir = getProjectDir(projectFolderName);
     const widgetsBaseDir = path.join(projectRootDir, "widgets");
     const globalWidgetsDir = path.join(widgetsBaseDir, "global");
 
@@ -848,13 +616,13 @@ export async function getProjectIcons(req, res) {
   try {
     const { projectId } = req.params;
 
-    const project = projectRepo.getProjectById(projectId, req.userId);
+    const project = projectRepo.getProjectById(projectId);
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
     const projectFolderName = project.folderName;
-    const projectRootDir = getProjectDir(projectFolderName, req.userId);
+    const projectRootDir = getProjectDir(projectFolderName);
     const iconsPath = path.join(projectRootDir, "assets", "icons.json");
 
     if (await fs.pathExists(iconsPath)) {
@@ -881,14 +649,14 @@ export async function getProjectIcons(req, res) {
 export async function exportProject(req, res) {
   try {
     const { projectId } = req.params;
-    const project = projectRepo.getProjectById(projectId, req.userId);
+    const project = projectRepo.getProjectById(projectId);
 
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
     const projectFolderName = project.folderName;
-    const projectDir = getProjectDir(projectFolderName, req.userId);
+    const projectDir = getProjectDir(projectFolderName);
 
     if (!(await fs.pathExists(projectDir))) {
       return res.status(404).json({ error: "Project directory not found" });
@@ -916,7 +684,6 @@ export async function exportProject(req, res) {
         themeVersion: project.themeVersion || null,
         receiveThemeUpdates: project.receiveThemeUpdates || false,
         preset: project.preset || null,
-        source: project.source || "manual",
         siteUrl: project.siteUrl || "",
         created: project.created,
         updated: project.updated,
@@ -1006,12 +773,11 @@ const UPLOAD_TEMP_DIR = path.join(DATA_DIR, "temp");
 /**
  * Read the max upload size from app settings (shared by project import + theme upload).
  * Falls back to 500 MB when the setting is unavailable.
- * @param {string} userId - User ID (defaults to "local" for open-source mode)
  * @returns {Promise<number>} size limit in megabytes
  */
-export async function getMaxUploadSizeMB(userId = "local") {
+export async function getMaxUploadSizeMB() {
   try {
-    const settings = await readAppSettingsFile(userId);
+    const settings = await readAppSettingsFile();
     return settings.export?.maxImportSizeMB || 500;
   } catch {
     return 500;
@@ -1025,7 +791,7 @@ export async function getMaxUploadSizeMB(userId = "local") {
  */
 export async function handleImportUpload(req, res, next) {
   try {
-    const maxSizeMB = await getMaxUploadSizeMB(req.userId);
+    const maxSizeMB = await getMaxUploadSizeMB();
     await fs.ensureDir(UPLOAD_TEMP_DIR);
 
     const upload = multer({
@@ -1070,7 +836,7 @@ export async function importProject(req, res) {
     }
 
     // Check file size against app settings (backup check)
-    const maxSizeMB = await getMaxUploadSizeMB(req.userId);
+    const maxSizeMB = await getMaxUploadSizeMB();
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     if (req.file.size > maxSizeBytes) {
@@ -1079,20 +845,15 @@ export async function importProject(req, res) {
       });
     }
 
-    // Platform limit: max projects per user
-    const allProjects = projectRepo.getAllProjects(req.userId);
-    const projectCheck = checkLimit(allProjects.length, EDITOR_LIMITS.maxProjectsPerUser, "projects", { hostedMode: req.app.locals.hostedMode });
-    if (!projectCheck.ok) {
-      return res.status(403).json({ error: projectCheck.error });
-    }
-
     const AdmZip = await import("adm-zip");
     const zip = new AdmZip.default(uploadedFilePath);
 
-    // Safety: validate ZIP entries (path traversal + entry count) — always enforced
-    const zipCheck = validateZipEntries(zip);
-    if (!zipCheck.ok) {
-      return res.status(400).json({ error: zipCheck.error });
+    // Safety: validate ZIP paths (prevent path traversal)
+    for (const entry of zip.getEntries()) {
+      const normalized = path.normalize(entry.entryName);
+      if (normalized.startsWith("..") || path.isAbsolute(normalized)) {
+        return res.status(400).json({ error: `ZIP contains unsafe path: ${entry.entryName}` });
+      }
     }
 
     const zipEntries = zip.getEntries();
@@ -1121,7 +882,7 @@ export async function importProject(req, res) {
     }
 
     // Check if theme exists
-    const themeDir = getThemeDir(manifest.project.theme, req.userId);
+    const themeDir = getThemeDir(manifest.project.theme);
     if (!(await fs.pathExists(themeDir))) {
       return res.status(400).json({
         error: `Theme "${manifest.project.theme}" not found in this installation. Please install the theme first.`,
@@ -1129,16 +890,15 @@ export async function importProject(req, res) {
     }
 
     // Generate unique folderName (checking DB and existing directories)
-    // Reuses allProjects from the limit check above
-    let folderName = await generateUniqueSlug(manifest.project.name, (slug) => allProjects.some((p) => p.id === slug), { fallback: "project" });
+    let folderName = await generateUniqueSlug(manifest.project.name, (slug) => projectRepo.projectFolderExists(slug, null), { fallback: "project" });
 
     // Also check if directory already exists and generate unique name if needed
-    let projectDir = getProjectDir(folderName, req.userId);
+    let projectDir = getProjectDir(folderName);
     let counter = 1;
     while (await fs.pathExists(projectDir)) {
       const baseFolderName = folderName;
       folderName = `${baseFolderName}-${counter}`;
-      projectDir = getProjectDir(folderName, req.userId);
+      projectDir = getProjectDir(folderName);
       counter++;
       if (counter > 1000) {
         throw new Error("Unable to generate unique folder name after 1000 attempts");
@@ -1185,7 +945,6 @@ export async function importProject(req, res) {
         themeVersion,
         receiveThemeUpdates: manifest.project.receiveThemeUpdates || false,
         preset: manifest.project.preset || null,
-        source: VALID_SOURCES.includes(manifest.project.source) ? manifest.project.source : "manual",
         siteUrl: manifest.project.siteUrl || "",
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
@@ -1216,7 +975,6 @@ export async function importProject(req, res) {
       }
 
       // Only add project to DB AFTER successful file copy
-      newProject.userId = req.userId;
       projectRepo.createProject(newProject);
 
       // Restore media metadata from the exported media.json into SQLite
@@ -1230,7 +988,7 @@ export async function importProject(req, res) {
             for (const file of mediaData.files) {
               file.id = uuidv4();
             }
-            mediaRepo.writeMediaData(newProject.id, mediaData, req.userId);
+            mediaRepo.writeMediaData(newProject.id, mediaData);
           }
           // Remove the media.json file — metadata now lives in SQLite
           await fs.remove(mediaJsonPath);
@@ -1253,7 +1011,7 @@ export async function importProject(req, res) {
       // Clean up on error - remove project from DB if it was added
       if (newProject) {
         try {
-          projectRepo.deleteProject(newProject.id, req.userId);
+          projectRepo.deleteProject(newProject.id);
         } catch (cleanupError) {
           console.warn("Failed to remove project from DB after error:", cleanupError);
         }
@@ -1293,9 +1051,8 @@ export async function importProject(req, res) {
 export async function getThemeUpdateStatus(req, res) {
   try {
     const { id } = req.params;
-    const hostedMode = req.app.locals.hostedMode;
     const { checkForUpdates } = await import("../services/themeUpdateService.js");
-    const status = await checkForUpdates(id, req.userId, { hostedMode });
+    const status = await checkForUpdates(id);
     res.json(status);
   } catch (error) {
     console.error("Error checking theme update status:", error);
@@ -1322,7 +1079,7 @@ export async function toggleProjectThemeUpdates(req, res) {
     }
 
     const { toggleThemeUpdates } = await import("../services/themeUpdateService.js");
-    const result = await toggleThemeUpdates(id, enabled, req.userId);
+    const result = await toggleThemeUpdates(id, enabled);
     res.json(result);
   } catch (error) {
     console.error("Error toggling theme updates:", error);
@@ -1342,9 +1099,8 @@ export async function toggleProjectThemeUpdates(req, res) {
 export async function applyProjectThemeUpdate(req, res) {
   try {
     const { id } = req.params;
-    const hostedMode = req.app.locals.hostedMode;
     const { applyThemeUpdate } = await import("../services/themeUpdateService.js");
-    const result = await applyThemeUpdate(id, req.userId, { hostedMode });
+    const result = await applyThemeUpdate(id);
     res.json(result);
   } catch (error) {
     console.error("Error applying theme update:", error);

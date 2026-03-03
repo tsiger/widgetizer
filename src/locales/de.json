@@ -622,11 +622,6 @@
       "uploadError": "Fehler beim Hochladen des Themes."
     }
   },
-  "plugins": {
-    "title": "Plugins",
-    "emptyTitle": "Keine Plugins installiert",
-    "emptyDesc": "Beginnen Sie, indem Sie Ihr erstes Plugin aus dem Store installieren oder ein benutzerdefiniertes Plugin hochladen."
-  },
   "pagePreview": {
     "title": "Vorschau: {{name}}",
     "loading": "Seite wird geladen..."
@@ -739,5 +734,10 @@
       "imageSizesManagedByThemeGeneric": "Die Bildgrößen werden vom ausgewählten Theme verwaltet. Die App-Einstellungen werden ignoriert. Vorschaubilder werden weiterhin für die Medienbibliothek erzeugt.",
       "noSettings": "Keine Einstellungen verfügbar"
     }
+  },
+  "plugins": {
+    "title": "Plugins",
+    "emptyTitle": "Plugins kommen bald",
+    "emptyDesc": "Diese Funktion befindet sich in Entwicklung."
   }
 }

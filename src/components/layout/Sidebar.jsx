@@ -3,9 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import useThemeUpdateStore from "../../stores/themeUpdateStore";
-import useAppInfoStore from "../../stores/appInfoStore";
 import { navigationSections } from "../../config/navigation";
-import { joinDashboardUrl } from "../../lib/hostedUrls";
 
 export default function Sidebar() {
   const { t } = useTranslation();
@@ -13,9 +11,6 @@ export default function Sidebar() {
   const { activeProject } = useProjectStore();
   const hasActiveProject = !!activeProject;
   const { updateCount: themeUpdateCount, fetchUpdateCount } = useThemeUpdateStore();
-  const hostedMode = useAppInfoStore((state) => state.hostedMode);
-  const loaded = useAppInfoStore((state) => state.loaded);
-  const dashboardUrl = useAppInfoStore((state) => state.dashboardUrl);
   const assetBase = import.meta.env.BASE_URL || "/";
 
   // Fetch theme update count on mount
@@ -55,38 +50,10 @@ export default function Sidebar() {
   );
 
   const renderNavItem = (item) => {
-    if (item.hostedOnly && !hostedMode) return null;
-    const source = activeProject?.source;
-    if (source && item.hiddenForSource?.includes(source)) return null;
-    if (item.hiddenInHosted && hostedMode) return null;
-    // In hosted mode, hide project-dependent items until a project loads
-    if (hostedMode && item.requiresProject && !hasActiveProject) return null;
-
     const Icon = item.icon;
     const disabled = item.requiresProject && !hasActiveProject;
     const showBadge = item.id === "themes" && themeUpdateCount > 0;
-    const labelKey = (source && item.labelOverrides?.[source]) || item.labelKey;
-
-    // External links (e.g. My Websites → dashboard) render as <a> instead of <Link>
-    if (item.external) {
-      let href = item.path;
-      if (item.hostedOnly && dashboardUrl) {
-        href = joinDashboardUrl(dashboardUrl, item.path);
-      }
-      return (
-        <li key={item.id}>
-          <a
-            href={href}
-            className="flex items-center justify-center md:justify-start p-2 rounded-sm transition-all duration-150 hover:bg-slate-800 border border-slate-700 md:border-none"
-          >
-            <div className="w-8 h-8 md:w-4 md:h-4 flex items-center justify-center text-pink-600">
-              <Icon size={20} />
-            </div>
-            <span className="hidden md:inline ml-1 text-sm">{t(labelKey)}</span>
-          </a>
-        </li>
-      );
-    }
+    const labelKey = item.labelKey;
 
     return (
       <li key={item.id}>
@@ -106,18 +73,6 @@ export default function Sidebar() {
   };
 
   const renderSection = (section) => {
-    if (section.hostedOnly && !hostedMode) return null;
-    if (section.hiddenInHosted && hostedMode) return null;
-    const source = activeProject?.source;
-    const visibleItems = section.items.filter((item) => {
-      if (item.hostedOnly && !hostedMode) return false;
-      if (item.hiddenInHosted && hostedMode) return false;
-      if (source && item.hiddenForSource?.includes(source)) return false;
-      if (hostedMode && item.requiresProject && !hasActiveProject) return false;
-      return true;
-    });
-    if (visibleItems.length === 0) return null;
-
     if (section.position === "bottom") {
       return (
         <div key={section.id} className="pt-4 border-t border-slate-800">
@@ -148,11 +103,11 @@ export default function Sidebar() {
           <img src={`${assetBase}widgetizer_symbol.svg`} alt={t("common.appTitle")} className="md:hidden w-12 h-12 mx-auto" />
         </div>
 
-        {loaded && topSections.map(renderSection)}
+        {topSections.map(renderSection)}
       </div>
 
       <div className="px-2 md:px-4 pb-2">
-        {loaded && bottomSections.map(renderSection)}
+        {bottomSections.map(renderSection)}
       </div>
     </div>
   );

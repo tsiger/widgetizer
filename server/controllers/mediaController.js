@@ -22,13 +22,12 @@ import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers
 import { handleProjectResolutionError, PROJECT_ERROR_CODES } from "../utils/projectErrors.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
-import { EDITOR_LIMITS } from "../limits.js";
-import { checkLimit } from "../utils/limitChecks.js";
+
 
 // Get image processing settings from app settings
-async function getImageProcessingSettings(projectId, userId = "local") {
-  const quality = (await getSetting("media.imageProcessing.quality", userId)) || 85;
-  const defaultSizesConfig = (await getSetting("media.imageProcessing.sizes", userId)) || {
+async function getImageProcessingSettings(projectId) {
+  const quality = (await getSetting("media.imageProcessing.quality")) || 85;
+  const defaultSizesConfig = (await getSetting("media.imageProcessing.sizes")) || {
     thumb: { width: 150, enabled: true },
     small: { width: 480, enabled: true },
     medium: { width: 1024, enabled: true },
@@ -39,9 +38,9 @@ async function getImageProcessingSettings(projectId, userId = "local") {
   // If projectId is provided, try to load theme-specific overrides
   if (projectId) {
     try {
-      const project = await getProjectDetails(projectId, userId);
+      const project = await getProjectDetails(projectId);
       if (project && project.theme) {
-        const themeJsonPath = getThemeJsonPath(project.theme, userId);
+        const themeJsonPath = getThemeJsonPath(project.theme);
         if (await fs.pathExists(themeJsonPath)) {
           const themeConfig = await fs.readJson(themeJsonPath);
           if (themeConfig.settings?.imageSizes) {
@@ -99,9 +98,9 @@ function decodeFileName(filename) {
  * @param {string} projectId - The project UUID
  * @returns {Promise<{files: Array<object>}>} The media metadata object
  */
-export async function readMediaFile(projectId, userId = "local") {
+export async function readMediaFile(projectId) {
   // Validate project exists (throws if not found)
-  await getProjectFolderName(projectId, userId);
+  await getProjectFolderName(projectId);
   return mediaRepo.getMediaFiles(projectId);
 }
 
@@ -109,11 +108,11 @@ export async function readMediaFile(projectId, userId = "local") {
  * Writes media metadata to SQLite for a project (full replacement).
  * @param {string} projectId - The project UUID
  * @param {{files: Array<object>}} data - The media metadata to save
- * @param {string} userId - The user ID (validates project ownership)
+
  */
-export async function writeMediaFile(projectId, data, userId = "local") {
-  await getProjectFolderName(projectId, userId);
-  mediaRepo.writeMediaData(projectId, data, userId);
+export async function writeMediaFile(projectId, data) {
+  await getProjectFolderName(projectId);
+  mediaRepo.writeMediaData(projectId, data);
 }
 
 /**
@@ -121,14 +120,14 @@ export async function writeMediaFile(projectId, data, userId = "local") {
  * SQLite transactions handle atomicity natively — no write locks needed.
  * @param {string} projectId - The project UUID
  * @param {function(Object): void} transformFn - Function that receives mediaData and mutates it in place
- * @param {string} userId - The user ID (validates project ownership)
+
  * @returns {Promise<Object>} The transformed media data
  */
-export async function atomicUpdateMediaFile(projectId, transformFn, userId = "local") {
-  await getProjectFolderName(projectId, userId);
+export async function atomicUpdateMediaFile(projectId, transformFn) {
+  await getProjectFolderName(projectId);
   const mediaData = mediaRepo.getMediaFiles(projectId);
   transformFn(mediaData);
-  mediaRepo.writeMediaData(projectId, mediaData, userId);
+  mediaRepo.writeMediaData(projectId, mediaData);
   return mediaData;
 }
 
@@ -137,15 +136,15 @@ const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
     try {
       const { projectId } = req.params;
-      const projectFolderName = await getProjectFolderName(projectId, req.userId);
-      const projectDir = getProjectDir(projectFolderName, req.userId);
+      const projectFolderName = await getProjectFolderName(projectId);
+      const projectDir = getProjectDir(projectFolderName);
 
       if (!(await fs.pathExists(projectDir))) {
         const error = new Error(`Project directory not found for ${projectId}`);
         error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
         throw error;
       }
-      const targetDir = getMediaDir(projectFolderName, file.mimetype, req.userId);
+      const targetDir = getMediaDir(projectFolderName, file.mimetype);
 
       await fs.ensureDir(targetDir);
       cb(null, targetDir);
@@ -160,8 +159,8 @@ const storage = multer.diskStorage({
       const nameWithoutExt = path.basename(decodedName, extension);
       let cleanName = slugify(nameWithoutExt, { lower: true, strict: true, trim: true });
       const { projectId } = req.params;
-      const projectFolderName = await getProjectFolderName(projectId, req.userId);
-      const projectDir = getProjectDir(projectFolderName, req.userId);
+      const projectFolderName = await getProjectFolderName(projectId);
+      const projectDir = getProjectDir(projectFolderName);
 
       if (!(await fs.pathExists(projectDir))) {
         const error = new Error(`Project directory not found for ${projectId}`);
@@ -169,7 +168,7 @@ const storage = multer.diskStorage({
         throw error;
       }
 
-      const targetDir = getMediaDir(projectFolderName, file.mimetype, req.userId);
+      const targetDir = getMediaDir(projectFolderName, file.mimetype);
 
       let finalName = `${cleanName}${extension}`;
       let counter = 1;
@@ -214,16 +213,16 @@ export async function getProjectMedia(req, res) {
       return res.status(400).json({ error: "Project ID is required" });
     }
 
-    const projectFolderName = await getProjectFolderName(projectId, req.userId);
+    const projectFolderName = await getProjectFolderName(projectId);
 
     // Ensure project exists
-    const projectDir = getProjectDir(projectFolderName, req.userId);
+    const projectDir = getProjectDir(projectFolderName);
     if (!(await fs.pathExists(projectDir))) {
       return res.status(404).json({ error: "Project not found" });
     }
 
     // Read media metadata
-    const mediaData = await readMediaFile(projectId, req.userId);
+    const mediaData = await readMediaFile(projectId);
 
     res.json(mediaData);
   } catch (error) {
@@ -254,26 +253,15 @@ export async function uploadProjectMedia(req, res) {
       return res.status(400).json({ error: "No valid files uploaded or received." });
     }
 
-    // Platform limit: max media files per project (accounts for incoming batch)
-    const existingMedia = mediaRepo.getMediaFiles(projectId);
-    const currentCount = existingMedia.files ? existingMedia.files.length : 0;
-    const max = EDITOR_LIMITS.media.maxFilesPerProject;
-    const fileCheck = checkLimit(currentCount + files.length, max, "media files per project", { exclusive: false, hostedMode: req.app.locals.hostedMode });
-    if (!fileCheck.ok) {
-      return res.status(403).json({
-        error: `Limit reached: uploading ${files.length} file(s) would exceed the maximum of ${max} media files per project (currently ${currentCount})`,
-      });
-    }
-
     // Get the dynamic file size limits
-    const maxImageSizeMB = await getSetting("media.maxFileSizeMB", req.userId);
-    const maxVideoSizeMB = await getSetting("media.maxVideoSizeMB", req.userId);
-    const maxAudioSizeMB = await getSetting("media.maxAudioSizeMB", req.userId);
+    const maxImageSizeMB = await getSetting("media.maxFileSizeMB");
+    const maxVideoSizeMB = await getSetting("media.maxVideoSizeMB");
+    const maxAudioSizeMB = await getSetting("media.maxAudioSizeMB");
     // Pass projectId to allow theme overrides
-    const imageSizes = await getImageProcessingSettings(projectId, req.userId);
+    const imageSizes = await getImageProcessingSettings(projectId);
 
     // Validate project ownership
-    await getProjectFolderName(projectId, req.userId);
+    await getProjectFolderName(projectId);
 
     // Process files in parallel instead of sequentially
     const filePromises = files.map(async (file) => {
@@ -323,18 +311,18 @@ export async function uploadProjectMedia(req, res) {
         // Process image files (thumbnails, dimensions etc.)
         if (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") {
           const image = sharp(file.path, {
-            limitInputPixels: EDITOR_LIMITS.media.maxImagePixels,
+            limitInputPixels: 100_000_000,
           });
           const metadata = await image.metadata();
 
           // Safety: reject images with extreme dimensions (always enforced)
-          if (metadata.width > EDITOR_LIMITS.media.maxImageDimension || metadata.height > EDITOR_LIMITS.media.maxImageDimension) {
+          if (metadata.width > 10_000 || metadata.height > 10_000) {
             try { await fs.unlink(file.path); } catch { /* ignore cleanup failure */ }
             return {
               success: false,
               file: {
                 originalName: file.originalname,
-                reason: `Image dimensions (${metadata.width}x${metadata.height}) exceed maximum of ${EDITOR_LIMITS.media.maxImageDimension}px.`,
+                reason: `Image dimensions (${metadata.width}x${metadata.height}) exceed maximum of ${10_000}px.`,
                 sizeBytes: file.size,
               },
             };
@@ -441,7 +429,7 @@ export async function uploadProjectMedia(req, res) {
 
     // Insert each processed file individually (no full read/write cycle)
     for (const file of processedFiles) {
-      mediaRepo.addMediaFile(projectId, file, req.userId);
+      mediaRepo.addMediaFile(projectId, file);
     }
 
     // Determine response status based on results
@@ -477,7 +465,7 @@ export async function updateMediaMetadata(req, res) {
     const description = stripHtmlTags(req.body.description);
 
     // Validate project ownership
-    await getProjectFolderName(projectId, req.userId);
+    await getProjectFolderName(projectId);
 
     // Get the specific file
     const file = mediaRepo.getMediaFileById(fileId);
@@ -529,7 +517,7 @@ export async function deleteProjectMedia(req, res) {
     const { projectId, fileId } = req.params;
 
     // Validate project ownership and get folder name for filesystem ops
-    const projectFolderName = await getProjectFolderName(projectId, req.userId);
+    const projectFolderName = await getProjectFolderName(projectId);
 
     // Get the specific file from DB
     const fileToDelete = mediaRepo.getMediaFileById(fileId);
@@ -547,7 +535,7 @@ export async function deleteProjectMedia(req, res) {
     }
 
     // Remove the physical files from storage
-    const fileDir = getMediaDir(projectFolderName, fileToDelete.type, req.userId);
+    const fileDir = getMediaDir(projectFolderName, fileToDelete.type);
 
     // 1. Delete the original file
     const originalFilePath = path.join(fileDir, fileToDelete.filename);
@@ -565,7 +553,7 @@ export async function deleteProjectMedia(req, res) {
         const size = fileToDelete.sizes[sizeName];
         if (size && size.path) {
           const sizeFilename = path.basename(size.path);
-          const sizeFilePath = path.join(getProjectImagesDir(projectFolderName, req.userId), sizeFilename);
+          const sizeFilePath = path.join(getProjectImagesDir(projectFolderName), sizeFilename);
           try {
             if (await fs.pathExists(sizeFilePath)) {
               await fs.unlink(sizeFilePath);
@@ -608,19 +596,19 @@ export async function serveProjectMedia(req, res) {
       const videoExtensions = [".mp4"];
       const audioExtensions = [".mp3"];
 
-      const projectFolderName = await getProjectFolderName(projectId, req.userId);
+      const projectFolderName = await getProjectFolderName(projectId);
       if (videoExtensions.includes(ext)) {
-        filePath = getVideoPath(projectFolderName, filename, req.userId);
+        filePath = getVideoPath(projectFolderName, filename);
       } else if (audioExtensions.includes(ext)) {
-        filePath = getAudioPath(projectFolderName, filename, req.userId);
+        filePath = getAudioPath(projectFolderName, filename);
       } else {
-        filePath = getImagePath(projectFolderName, filename, req.userId);
+        filePath = getImagePath(projectFolderName, filename);
       }
     }
     // Otherwise, look up the file by ID
     else if (fileId) {
       // Read media metadata
-      const mediaData = await readMediaFile(projectId, req.userId);
+      const mediaData = await readMediaFile(projectId);
 
       // Find the file
       const fileInfo = mediaData.files.find((file) => file.id === fileId);
@@ -628,8 +616,8 @@ export async function serveProjectMedia(req, res) {
         return res.status(404).json({ error: "File not found" });
       }
 
-      const projectFolderName = await getProjectFolderName(projectId, req.userId);
-      filePath = path.join(getProjectDir(projectFolderName, req.userId), fileInfo.path);
+      const projectFolderName = await getProjectFolderName(projectId);
+      filePath = path.join(getProjectDir(projectFolderName), fileInfo.path);
     }
 
     if (!filePath) {
@@ -674,7 +662,7 @@ export async function bulkDeleteProjectMedia(req, res) {
     }
 
     // Validate project ownership and get folder name
-    const projectFolderName = await getProjectFolderName(projectId, req.userId);
+    const projectFolderName = await getProjectFolderName(projectId);
 
     // Read all media to check usage (needed for in-use validation)
     const mediaData = mediaRepo.getMediaFiles(projectId);
@@ -713,7 +701,7 @@ export async function bulkDeleteProjectMedia(req, res) {
 
     // Asynchronously delete all associated physical files
     const deletePromises = filesToDelete.map(async (file) => {
-      const fileDir = getMediaDir(projectFolderName, file.type, req.userId);
+      const fileDir = getMediaDir(projectFolderName, file.type);
 
       const originalFilePath = path.join(fileDir, file.filename);
       try {
@@ -726,7 +714,7 @@ export async function bulkDeleteProjectMedia(req, res) {
           const size = file.sizes[sizeName];
           if (size && size.path) {
             const sizeFilename = path.basename(size.path);
-            const sizeFilePath = path.join(getProjectImagesDir(projectFolderName, req.userId), sizeFilename);
+            const sizeFilePath = path.join(getProjectImagesDir(projectFolderName), sizeFilename);
             try {
               if (await fs.pathExists(sizeFilePath)) await fs.unlink(sizeFilePath);
             } catch (err) {
@@ -773,7 +761,7 @@ export async function bulkDeleteProjectMedia(req, res) {
 export async function getMediaFileUsage(req, res) {
   try {
     const { projectId, fileId } = req.params;
-    const usage = await getMediaUsage(projectId, fileId, req.userId);
+    const usage = await getMediaUsage(projectId, fileId);
     res.json(usage);
   } catch (error) {
     console.error("Error getting media usage:", error);
@@ -796,7 +784,7 @@ export async function getMediaFileUsage(req, res) {
 export async function refreshMediaUsage(req, res) {
   try {
     const { projectId } = req.params;
-    const result = await refreshAllMediaUsage(projectId, req.userId);
+    const result = await refreshAllMediaUsage(projectId);
     res.json(result);
   } catch (error) {
     console.error("Error refreshing media usage:", error);

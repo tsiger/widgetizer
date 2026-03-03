@@ -6,7 +6,7 @@ This document provides a comprehensive overview of the menu management system, f
 
 Each menu is stored as an individual JSON file within the active project's directory. This isolates menu data and keeps it organized per-project.
 
-- **Location**: `/data/users/<userId>/projects/<folderName>/menus/`
+- **Location**: `/data/projects/<folderName>/menus/`
 - **Filename**: The filename is a "slugified" version of the menu's name (e.g., `main-menu.json`).
 
 A typical menu JSON file (`main-menu.json`) has the following structure:
@@ -124,11 +124,9 @@ The controller handles the logic for interacting with the menu JSON files on the
     - **Fresh timestamps**: New `created` and `updated` timestamps
   - `deleteMenu`: Removes the corresponding menu file from the `menus` directory.
 
-In open-source mode, `userId` is always `local`.
-
 ## Security Considerations
 
-All API endpoints described in this document are protected by the platform's core security layers, including input validation, rate limiting, and CORS policies. For a comprehensive overview of these protections, see the **[Platform Security](core-security.md)** documentation.
+All API endpoints described in this document are protected by input validation and CORS policies. For details, see the **[Platform Security](core-security.md)** documentation.
 
 ---
 

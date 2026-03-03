@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import archiver from "archiver";
-import { getProjectDir, getUserPublishDir, APP_ROOT, STATIC_CORE_ASSETS_DIR } from "../config.js";
+import { getProjectDir, getPublishDir, APP_ROOT, STATIC_CORE_ASSETS_DIR } from "../config.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
@@ -35,21 +35,21 @@ async function getAppVersion() {
 // Resolve a stored outputDir to an absolute path.
 // New exports store just the directory name (e.g. "my-project-v1");
 // legacy data may still have full absolute paths.
-function resolveOutputDir(outputDir, userId = "local") {
+function resolveOutputDir(outputDir) {
   if (!outputDir) return null;
   if (path.isAbsolute(outputDir)) return outputDir;
-  return path.join(getUserPublishDir(userId), outputDir);
+  return path.join(getPublishDir(), outputDir);
 }
 
 // Helper function to record an export and trim old versions
-async function recordExport(projectId, version, outputDir, status = "success", userId = "local") {
-  const exportRecord = exportRepo.recordExport(projectId, version, outputDir, status, userId);
+async function recordExport(projectId, version, outputDir, status = "success") {
+  const exportRecord = exportRepo.recordExport(projectId, version, outputDir, status);
 
   // Get the max exports setting from app settings
   let maxExports = 10; // default
   try {
     const { getSetting } = await import("./appSettingsController.js");
-    const maxVersionsSetting = await getSetting("export.maxVersionsToKeep", userId);
+    const maxVersionsSetting = await getSetting("export.maxVersionsToKeep");
     maxExports = parseInt(maxVersionsSetting || "10", 10) || 10;
   } catch (error) {
     console.warn("Could not load app settings for export limit, using default of 10. Error:", error.message);
@@ -58,7 +58,7 @@ async function recordExport(projectId, version, outputDir, status = "success", u
   // Trim old exports beyond the limit
   const trimmed = exportRepo.trimExports(projectId, maxExports);
   for (const old of trimmed) {
-    const dir = resolveOutputDir(old.outputDir, userId);
+    const dir = resolveOutputDir(old.outputDir);
     if (dir && (await fs.pathExists(dir))) {
       try {
         await fs.remove(dir);
@@ -78,10 +78,9 @@ async function recordExport(projectId, version, outputDir, status = "success", u
  * @returns {Promise<{deletedDirs: number, deletedHistory: boolean}>} Cleanup results
  * @throws {Error} If cleanup fails
  */
-export async function cleanupProjectExports(projectId, userId = "local") {
+export async function cleanupProjectExports(projectId) {
   try {
-    // Validate project belongs to this user
-    await getProjectFolderName(projectId, userId);
+    await getProjectFolderName(projectId);
     console.log(`Cleaning up exports for deleted project: ${projectId}`);
 
     const records = exportRepo.getExports(projectId);
@@ -94,7 +93,7 @@ export async function cleanupProjectExports(projectId, userId = "local") {
     // Delete all physical export directories for this project
     const deletedDirs = [];
     for (const record of records) {
-      const dir = resolveOutputDir(record.outputDir, userId);
+      const dir = resolveOutputDir(record.outputDir);
       if (dir && (await fs.pathExists(dir))) {
         try {
           await fs.remove(dir);
@@ -123,13 +122,12 @@ export async function cleanupProjectExports(projectId, userId = "local") {
  * Exports a project to a directory of static HTML files with assets, sitemap, and robots.txt.
  * This is the core export logic extracted for reuse by both the export endpoint and the publish flow.
  * @param {string} projectId - Project UUID
- * @param {string} userId - User ID for scoping
  * @param {object} [options] - Export options
  * @param {boolean} [options.exportMarkdown=false] - Also export pages as markdown
  * @param {boolean} [options.skipExportRecord=false] - Skip recording in export history (used by publish flow)
  * @returns {Promise<{outputDir: string, version: number, exportDirName: string, exportRecord: object|null}>}
  */
-export async function exportProjectToDir(projectId, userId = "local", options = {}) {
+export async function exportProjectToDir(projectId, options = {}) {
   const { exportMarkdown = false, skipExportRecord = false } = options;
 
   if (!projectId) {
@@ -137,18 +135,18 @@ export async function exportProjectToDir(projectId, userId = "local", options = 
   }
 
   // Look up the project by UUID to get folderName (slug) for filesystem paths
-  const projectData = projectRepo.getProjectById(projectId, userId);
+  const projectData = projectRepo.getProjectById(projectId);
 
   if (!projectData) {
     throw new Error(`Project with ID "${projectId}" not found`);
   }
 
   const projectFolderName = projectData.folderName;
-  const projectDir = getProjectDir(projectFolderName, userId);
+  const projectDir = getProjectDir(projectFolderName);
   const siteUrl = projectData.siteUrl || "";
 
   const version = exportRepo.getNextVersion(projectId);
-  const outputBaseDir = getUserPublishDir(userId);
+  const outputBaseDir = getPublishDir();
   const outputDir = path.join(outputBaseDir, `${projectFolderName}-v${version}`);
     const outputAssetsDir = path.join(outputDir, "assets");
     const outputImagesDir = path.join(outputAssetsDir, "images"); // Images now in assets/images/
@@ -161,10 +159,10 @@ export async function exportProjectToDir(projectId, userId = "local", options = 
     await fs.ensureDir(outputImagesDir);
     await fs.ensureDir(outputVideosDir);
     await fs.ensureDir(outputAudiosDir);
-    const rawThemeSettings = await readProjectThemeData(projectId, userId);
+    const rawThemeSettings = await readProjectThemeData(projectId);
 
     // Fetch list of page data using the helper function
-    const pagesDataArray = await listProjectPagesData(projectFolderName, userId);
+    const pagesDataArray = await listProjectPagesData(projectFolderName);
 
     // Validate that at least one page has the "index" slug (required for homepage)
     // Note: page.id is derived from filename, which is the authoritative slug
@@ -253,8 +251,8 @@ export async function exportProjectToDir(projectId, userId = "local", options = 
       JSON.stringify({ pages: pagesMetadata }, null, 2),
     );
 
-    const headerData = await readGlobalWidgetData(projectFolderName, "header", userId);
-    const footerData = await readGlobalWidgetData(projectFolderName, "footer", userId);
+    const headerData = await readGlobalWidgetData(projectFolderName, "header");
+    const footerData = await readGlobalWidgetData(projectFolderName, "footer");
 
     // Handle case where no pages are found (except for theme files etc)
     if (pagesDataArray.length === 0) {
@@ -269,7 +267,7 @@ export async function exportProjectToDir(projectId, userId = "local", options = 
     let devModeEnabled = false;
     try {
       const { getSetting } = await import("./appSettingsController.js");
-      devModeEnabled = await getSetting("developer.enabled", userId);
+      devModeEnabled = await getSetting("developer.enabled");
     } catch (error) {
       console.warn("Could not check developer mode setting:", error.message);
     }
@@ -291,7 +289,7 @@ export async function exportProjectToDir(projectId, userId = "local", options = 
 
       // Render header if exists (for each page to capture enqueued assets)
       if (headerData) {
-        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null, userId);
+        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null);
       }
 
       // Render page-specific widgets sequentially
@@ -317,14 +315,13 @@ export async function exportProjectToDir(projectId, userId = "local", options = 
             "publish",
             sharedGlobals,
             widgetIndex,
-            userId,
           );
         }
       }
 
       // Render footer if exists
       if (footerData) {
-        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null, userId);
+        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null);
       }
 
       // Pass separated content sections to layout
@@ -339,7 +336,6 @@ export async function exportProjectToDir(projectId, userId = "local", options = 
         rawThemeSettings,
         "publish",
         sharedGlobals,
-        userId,
       );
 
       // Format HTML using Prettier
@@ -489,7 +485,7 @@ Per aspera ad astra
     // --- Copy Only Used Images ---
     try {
       const { readMediaFile } = await import("./mediaController.js");
-      const mediaData = await readMediaFile(projectId, userId);
+      const mediaData = await readMediaFile(projectId);
 
       if (mediaData && mediaData.files) {
         const usedImages = mediaData.files.filter(
@@ -562,7 +558,7 @@ Per aspera ad astra
     // --- Copy Only Used Videos ---
     try {
       const { readMediaFile } = await import("./mediaController.js");
-      const mediaData = await readMediaFile(projectId, userId);
+      const mediaData = await readMediaFile(projectId);
 
       if (mediaData && mediaData.files) {
         const usedVideos = mediaData.files.filter(
@@ -618,7 +614,7 @@ Per aspera ad astra
     // Copy used audio files to assets/audios/
     try {
       const { readMediaFile } = await import("./mediaController.js");
-      const mediaData = await readMediaFile(projectId, userId);
+      const mediaData = await readMediaFile(projectId);
 
       if (mediaData && mediaData.files) {
         const usedAudios = mediaData.files.filter(
@@ -687,7 +683,7 @@ Per aspera ad astra
     const exportDirName = `${projectFolderName}-v${version}`;
     let exportRecord = null;
     if (!skipExportRecord) {
-      exportRecord = await recordExport(projectId, version, exportDirName, "success", userId);
+      exportRecord = await recordExport(projectId, version, exportDirName, "success");
     }
 
     return { outputDir, version, exportDirName, exportRecord };
@@ -708,7 +704,7 @@ export async function exportProject(req, res) {
       return res.status(400).json({ error: "Project ID is required" });
     }
 
-    const result = await exportProjectToDir(projectId, req.userId, req.body || {});
+    const result = await exportProjectToDir(projectId, req.body || {});
 
     res.json({
       success: true,
@@ -721,7 +717,7 @@ export async function exportProject(req, res) {
     // Try to record failed export
     try {
       const version = exportRepo.getNextVersion(projectId);
-      await recordExport(projectId, version, null, "failed", req.userId);
+      await recordExport(projectId, version, null, "failed");
     } catch (recordError) {
       console.error("Failed to record export failure:", recordError);
     }
@@ -808,7 +804,7 @@ export async function getExportFiles(req, res) {
       return res.status(400).json({ error: "Export directory is required" });
     }
 
-    const userPublishDir = getUserPublishDir(req.userId);
+    const userPublishDir = getPublishDir();
     const fullPath = path.join(userPublishDir, exportDir);
 
     // Security check
@@ -852,7 +848,7 @@ export async function downloadExport(req, res) {
       return res.status(400).json({ error: "Export directory is required" });
     }
 
-    const userPublishDir = getUserPublishDir(req.userId);
+    const userPublishDir = getPublishDir();
     const fullPath = path.join(userPublishDir, exportDir);
 
     // Security check
@@ -919,7 +915,7 @@ export async function getExportHistory(req, res) {
     }
 
     // Validate project belongs to this user
-    await getProjectFolderName(projectId, req.userId);
+    await getProjectFolderName(projectId);
 
     const exports = exportRepo.getExports(projectId);
 
@@ -927,7 +923,7 @@ export async function getExportHistory(req, res) {
     let maxExports = 10; // default fallback
     try {
       const { getSetting } = await import("./appSettingsController.js");
-      const maxVersionsSetting = await getSetting("export.maxVersionsToKeep", req.userId);
+      const maxVersionsSetting = await getSetting("export.maxVersionsToKeep");
       maxExports = parseInt(maxVersionsSetting || "10", 10) || 10;
     } catch (error) {
       console.warn("Could not load app settings for export display limit, using default of 10. Error:", error.message);
@@ -964,7 +960,7 @@ export async function deleteExport(req, res) {
     }
 
     // Validate project belongs to this user
-    await getProjectFolderName(projectId, req.userId);
+    await getProjectFolderName(projectId);
 
     const exports = exportRepo.getExports(projectId);
 
@@ -980,7 +976,7 @@ export async function deleteExport(req, res) {
     }
 
     // Delete the physical directory if it exists
-    const dir = resolveOutputDir(deleted.outputDir, req.userId);
+    const dir = resolveOutputDir(deleted.outputDir);
     if (dir && (await fs.pathExists(dir))) {
       await fs.remove(dir);
     }

@@ -9,17 +9,12 @@
     "settings": "Settings",
     "appearance": "Appearance",
     "themes": "Themes",
-    "extend": "Extend",
-    "plugins": "Plugins",
     "tools": "Tools",
     "exportSite": "Export site",
+    "extend": "Extend",
+    "plugins": "Plugins",
     "general": "General",
-    "appSettings": "Settings",
-    "design": "Design",
-    "publish": "Publish",
-    "mySites": "My Websites",
-    "myAccount": "My Account",
-    "account": "Account"
+    "appSettings": "Settings"
   },
   "layout": {
     "toolbar": {
@@ -579,6 +574,11 @@
       "unknownError": "An unknown error occurred during exporting."
     }
   },
+  "plugins": {
+    "title": "Plugins",
+    "emptyTitle": "Plugins coming soon",
+    "emptyDesc": "This feature is currently in development."
+  },
   "publishSite": {
     "title": "Publish to Web",
     "description": "Publish your site live to the web with a single click.",
@@ -649,11 +649,6 @@
       "updateSuccess": "Theme updated successfully!",
       "updateError": "Failed to update theme"
     }
-  },
-  "plugins": {
-    "title": "Plugins",
-    "emptyTitle": "No plugins installed",
-    "emptyDesc": "Get started by installing your first plugin from the store or uploading a custom plugin."
   },
   "pagePreview": {
     "title": "Preview: {{name}}",

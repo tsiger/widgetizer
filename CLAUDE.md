@@ -37,7 +37,7 @@ server/                 # Express backend
   controllers/          # Route handlers
   services/             # Business logic (rendering, sanitization, media usage)
   routes/               # Express route definitions
-  middleware/            # Error handler, rate limiters
+  middleware/            # Error handler, JSON body parsers
   db/                   # SQLite init, migrations, repositories
   tests/                # Node test runner test files (*.test.js)
   utils/                # Helpers (HTML processing, semver, etc.)

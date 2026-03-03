@@ -622,11 +622,6 @@
       "uploadError": "Échec du téléversement du thème."
     }
   },
-  "plugins": {
-    "title": "Plugins",
-    "emptyTitle": "Aucun plugin installé",
-    "emptyDesc": "Commencez par installer votre premier plugin depuis le magasin ou téléversez un plugin personnalisé."
-  },
   "pagePreview": {
     "title": "Aperçu : {{name}}",
     "loading": "Chargement de la page..."
@@ -739,5 +734,10 @@
       "imageSizesManagedByThemeGeneric": "Les tailles d’image sont gérées par le thème sélectionné. Les paramètres de l’application sont ignorés. Des vignettes sont toujours générées pour la bibliothèque média.",
       "noSettings": "Aucun paramètre disponible"
     }
+  },
+  "plugins": {
+    "title": "Plugins",
+    "emptyTitle": "Plugins bientôt disponibles",
+    "emptyDesc": "Cette fonctionnalité est en cours de développement."
   }
 }

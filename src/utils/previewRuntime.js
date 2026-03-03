@@ -8,13 +8,10 @@ The selection overlay is rendered inside the iframe to eliminate scroll lag
 and cross-origin contentDocument access issues.
 */
 
-// ── Origin-Aware PostMessage ────────────────────────────────────────────────
-
-const EDITOR_ORIGIN =
-  document.querySelector('script[src*="previewRuntime"]')?.dataset?.editorOrigin || "*";
+// ── PostMessage ─────────────────────────────────────────────────────────────
 
 function postToParent(data) {
-  window.parent.postMessage(data, EDITOR_ORIGIN);
+  window.parent.postMessage(data, "*");
 }
 
 // ── Preview Mode ────────────────────────────────────────────────────────────
@@ -735,9 +732,6 @@ function setupOverlayClickHandler() {
 // ── Message Handler ─────────────────────────────────────────────────────────
 
 function handleMessage(event) {
-  // Origin check when isolation is enabled
-  if (EDITOR_ORIGIN !== "*" && event.origin !== EDITOR_ORIGIN) return;
-
   const { type, payload } = event.data;
 
   switch (type) {

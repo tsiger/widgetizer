@@ -90,8 +90,7 @@ function mockReq({ params = {}, body = {}, file = null } = {}) {
     params,
     body,
     file,
-    userId: "local",
-    app: { locals: { hostedMode: false, adapters: {} } },
+    app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
 }
