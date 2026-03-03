@@ -97,7 +97,8 @@ export default function Settings() {
    */
   const handleSave = async () => {
     try {
-      const result = await saveThemeSettings(themeData);
+      const activeProject = useProjectStore.getState().activeProject;
+      const result = await saveThemeSettings(activeProject?.id, themeData);
       if (result.warnings?.length) {
         // Refetch to show the corrected values in the UI
         const freshData = await getThemeSettings();
@@ -111,7 +112,6 @@ export default function Settings() {
         showToast(t("themeSettings.toasts.saveSuccess"), "success");
       }
       // Invalidate media cache so usage (e.g. favicon) is reflected immediately
-      const activeProject = useProjectStore.getState().activeProject;
       if (activeProject) {
         invalidateMediaCache(activeProject.id);
       }
