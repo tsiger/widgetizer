@@ -38,7 +38,7 @@ console.warn = () => {};
 console.error = () => {};
 
 const {
-  THEMES_DIR,
+  THEMES_SEED_DIR,
   getThemeDir,
   getThemeJsonPath,
   getThemeWidgetsDir,
@@ -314,7 +314,7 @@ describe("ensureThemesDirectory", () => {
   it("creates the themes directory if it does not exist", async () => {
     // It's already created in before(), but let's verify idempotency
     await ensureThemesDirectory();
-    assert.ok(await fs.pathExists(THEMES_DIR));
+    assert.ok(await fs.pathExists(THEMES_SEED_DIR));
   });
 });
 

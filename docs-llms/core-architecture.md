@@ -14,7 +14,6 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 - `src/components/projects/ProjectForm.jsx` - Reusable form component
 - `src/components/projects/ProjectImportModal.jsx` - ZIP import modal
 - `src/components/layout/RequireActiveProject.jsx` - Route guard wrapping all content routes. Shows EmptyState with link to `/projects` if no active project.
-- `src/components/layout/RouteSourceGuard.jsx` - Layout route guard for project-scoped routes. Checks `activeProject.source` against `hiddenForSource` from `navigation.js`. Redirects to `/pages` if route is restricted for the project's source type.
 - `src/components/layout/Breadcrumb.jsx` - Navigation breadcrumb in the footer.
 
 ### Query Layer (`src/queries/projectManager.js`)
@@ -24,7 +23,6 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 | `getAllProjects()`        | GET    | `/api/projects`                          |
 | `getActiveProject()`      | GET    | `/api/projects/active`                   |
 | `createProject(data)`     | POST   | `/api/projects`                          |
-| `deepLinkCreateProject(data)` | POST | `/api/projects/deep-link`              |
 | `setActiveProject(id)`    | PUT    | `/api/projects/active/:id`               |
 | `updateProject(id, data)` | PUT    | `/api/projects/:id`                      |
 | `deleteProject(id)`       | DELETE | `/api/projects/:id`                      |
@@ -42,8 +40,6 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 | `getAllProjects()`          | Get all projects (enriched with themeName, hasThemeUpdate) |
 | `getActiveProject()`        | Get active project                                         |
 | `createProject()`           | Create project (copies theme, applies preset, processes templates/menus) |
-| `deepLinkCreateProject()`   | Create from marketing deep-link (auto-suffix name, always activate) |
-| `getProjectBySiteId()`      | Look up project by site ID (deep-link) |
 | `setActiveProject()`        | Set active project ID                                      |
 | `updateProject()`           | Update project (handles folderName rename)                 |
 | `deleteProject()`           | Delete project and cleanup exports                         |

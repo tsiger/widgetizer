@@ -12,7 +12,7 @@ The project management UI is primarily handled by three pages:
 
 These pages rely on a central form component for handling user input:
 
-- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, notes, website address)
+- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, description, website address)
   - Migrated to **react-hook-form** for improved validation and state management
   - Fully **localized** using `react-i18next` for all labels, errors, and help text
   - Exposes `isDirty` state to parent components for navigation guard integration
@@ -41,7 +41,6 @@ This file contains functions that make API calls to the backend:
 
 - `getAllProjects()`: Fetches a list of all projects.
 - `createProject(formData)`: Creates a new project.
-- `deepLinkCreateProject(data)`: Creates a project from a marketing deep-link (auto-suffixes name, always activates).
 - `updateProject(id, formData)`: Updates an existing project.
 - `deleteProject(id)`: Deletes a project.
 - `duplicateProject(id)`: Creates a copy of a project.
@@ -60,7 +59,7 @@ This file contains functions that make API calls to the backend:
 2.  **Rendering**: The `ProjectsAdd.jsx` page is rendered. It contains the `ProjectForm.jsx` component.
 3.  **Navigation Guard**: The page integrates `useFormNavigationGuard` to prevent accidental navigation with unsaved changes.
 4.  **Theme Loading**: `ProjectForm.jsx` makes an API call via `/api/themes` to fetch the list of available themes and populates the "Theme" dropdown.
-5.  **User Input**: The user fills in the title and selects a theme. Additional fields (folder name, notes, website address) are available under "More settings". The "Theme" dropdown is only enabled during project creation.
+5.  **User Input**: The user fills in the title and selects a theme. Additional fields (folder name, description, website address) are available under "More settings". The "Theme" dropdown is only enabled during project creation.
 5b. **Preset Selection**: If the selected theme has presets, a visual card grid appears below the theme dropdown showing available presets (screenshot, name, description). The default preset is pre-selected. The user can click a different preset card to switch. Presets are fetched from `GET /api/themes/{themeId}/presets` via `getThemePresets()` in `themeManager.js`.
 6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
 7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
@@ -75,25 +74,18 @@ This file contains functions that make API calls to the backend:
     - **Menus**: All menu items that link to internal pages (e.g., `index.html`, `about.html`) are enriched with the corresponding page's `pageUuid`. This ensures menu links remain valid even if pages are renamed.
     - **Widgets**: All widget settings with link-type values (objects containing `href` pointing to internal `.html` pages) are enriched with `pageUuid`. This includes links in header, footer, and all page widgets.
 11. **Setting Active Project**: If this is the very first project being created (i.e., there was no active project before), it is automatically set as the active project by calling `setActiveProject(newProject.id)`. The global state is updated via the `projectStore`.
-12. **Feedback**: A success toast notification is shown (localized), and the user is presented with buttons to either navigate to the project list or edit the newly created project.
+12. **Feedback**: A success toast notification is shown (localized), and the user is redirected back to the project list.
 
-### 1b. Creating a Project via Deep-Link
+### 1b. Access Without an Active Project
 
-When a user arrives at the editor via a deep-link (`/editor?theme=arch&preset=financial&source=theme&name=Financial+Advisor`), the `DeepLinkResolver` component intercepts the URL params and calls `POST /api/projects/deep-link`.
-
-1. **Name collision handling**: If a project with the same name already exists, the name is auto-suffixed ("Financial Advisor" becomes "Financial Advisor (2)", then "(3)", etc.).
-2. **Theme provisioning**: Seed themes are copied if needed (`ensureThemesDirectory`).
-3. **Always activates**: The new project is always set as active, regardless of how many projects exist.
-4. **Source tracking**: The project's `source` field is set to the value from the deep-link (typically `"theme"`). This controls which sidebar items and routes are visible.
-5. **Navigation**: After creation, the user lands on `/pages` to start editing immediately.
-6. **Editor access guard**: If a user navigates to the editor without deep-link params and has no active project, `RequireActiveProject` shows the "No Active Project" empty state.
+If a user navigates to any project-scoped route without an active project selected, `RequireActiveProject` blocks the route and shows the "No Active Project" empty state with a link back to `/projects`.
 
 ### 2. Listing and Managing Projects
 
 1.  **Data Fetching**: When `Projects.jsx` loads, it calls `getAllProjects()` to fetch and display a list of all projects in a table.
 2.  **Localization**: The page is fully localized with translated headers, action labels, toast messages, and empty states.
 3.  **Actions**: For each project in the list, a set of actions are available on hover:
-    - **Set Active (`Star` icon)**: Calls `handleSetActive`, which uses `setActiveProjectInBackend(id)` to update the backend. It then re-fetches the active project information to update the global store and UI. You cannot deactivate the active project; you must set another as active.
+    - **Set Active (`Star` icon)**: Calls `handleSetActive`, which uses the `setActiveProject(id)` project query to update the backend. It then re-fetches the active project information to update the global store and UI. You cannot deactivate the active project; you must set another as active.
     - **Edit (`Pencil` icon)**: Navigates the user to `/projects/edit/:id`.
     - **Duplicate (`Copy` icon)**: Calls `handleDuplicate`, which uses `duplicateProject(id)` to make an API call. The duplication process includes UUID regeneration for all pages and automatic updating of all `pageUuid` references in widgets and menus to point to the new UUIDs. The project list is then reloaded.
     - **Delete (`Trash2` icon)**: Calls `openDeleteConfirmation`, which opens a localized confirmation modal. You cannot delete the currently active project. If confirmed, the `deleteProject(id)` function is called (via `deleteProjectById()` from `projectService.js`), and the list is reloaded.
@@ -143,7 +135,7 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 4.  **Rendering**: The `ProjectForm.jsx` component is rendered with the `initialData` of the project being edited with several key features:
     - **Theme Restriction**: The "Theme" dropdown is disabled, as themes cannot be changed after creation to maintain consistency
     - **Project Folder Name**: Editable field for the project's folder name, independent of the project title
-    - **Notes Field**: Optional field for personal notes about the project
+    - **Description Field**: Optional field for project description
     - **Website Address Field**: Optional field for setting the base URL for the project, used for generating absolute URLs in social media meta tags and SEO
 5.  **Form Features**:
     - **Independent Fields**: Project title and folder name can be edited independently
@@ -176,7 +168,6 @@ The frontend `projectManager.js` communicates with a set of backend API endpoint
 | `DELETE` | `/api/projects/:id` | `deleteProject` | Deletes a specific project. |
 | `POST` | `/api/projects/:id/duplicate` | `duplicateProject` | Creates a complete copy of a project. |
 | `POST` | `/api/projects/:projectId/export` | `exportProject` | Exports project as a downloadable ZIP file. |
-| `POST` | `/api/projects/deep-link` | `deepLinkCreateProject` | Creates a project from a deep-link. Auto-suffixes name on duplicate, always activates. |
 | `POST` | `/api/projects/import` | `importProject` | Imports a project from a ZIP file upload. |
 | `GET` | `/api/projects/:projectId/widgets` | `getProjectWidgets` | Retrieves all widget schemas for a project. |
 | `GET` | `/api/projects/:projectId/icons` | `getProjectIcons` | Retrieves all available icons for a project. |

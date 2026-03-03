@@ -1,6 +1,6 @@
 import { apiFetch } from "../lib/apiFetch";
 import useProjectStore from "../stores/projectStore";
-import fontDefinitions from "../core/config/fonts.json";
+import fontDefinitions from "../core/config/fonts.json" with { type: "json" };
 
 /**
  * Extract Google fonts used in theme typography settings.

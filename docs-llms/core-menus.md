@@ -79,7 +79,7 @@ The frontend for menu management is split across several React components, provi
 - **`src/pages/MenusEdit.jsx`**: A page containing a form (`MenuForm.jsx`) to update an existing menu's name and description. Integrates `useFormNavigationGuard`.
 - **`src/pages/MenuStructure.jsx`**: The core of the menu editing experience. It uses the `MenuEditor.jsx` component to provide a drag-and-drop interface for adding, editing, reordering, and nesting menu items. Fully localized interface.
 
-### Client-Side API (`src/utils/menuManager.js`)
+### Client-Side API (`src/queries/menuManager.js`)
 
 This utility file handles all communication with the backend API endpoints for menus.
 

@@ -32,13 +32,10 @@ async function getAppVersion() {
   return cachedAppVersion;
 }
 
-// Resolve a stored outputDir to an absolute path.
-// New exports store just the directory name (e.g. "my-project-v1");
-// legacy data may still have full absolute paths.
+// Resolve a stored outputDir to an absolute path within the publish directory.
 function resolveOutputDir(outputDir) {
   if (!outputDir) return null;
-  if (path.isAbsolute(outputDir)) return outputDir;
-  return path.join(getPublishDir(), outputDir);
+  return path.join(getPublishDir(), path.basename(outputDir));
 }
 
 // Helper function to record an export and trim old versions
@@ -120,15 +117,14 @@ export async function cleanupProjectExports(projectId) {
 
 /**
  * Exports a project to a directory of static HTML files with assets, sitemap, and robots.txt.
- * This is the core export logic extracted for reuse by both the export endpoint and the publish flow.
+ * This is the core export logic used by the export endpoint.
  * @param {string} projectId - Project UUID
  * @param {object} [options] - Export options
  * @param {boolean} [options.exportMarkdown=false] - Also export pages as markdown
- * @param {boolean} [options.skipExportRecord=false] - Skip recording in export history (used by publish flow)
- * @returns {Promise<{outputDir: string, version: number, exportDirName: string, exportRecord: object|null}>}
+ * @returns {Promise<{outputDir: string, version: number, exportDirName: string, exportRecord: object}>}
  */
 export async function exportProjectToDir(projectId, options = {}) {
-  const { exportMarkdown = false, skipExportRecord = false } = options;
+  const { exportMarkdown = false } = options;
 
   if (!projectId) {
     throw new Error("Project ID is required");
@@ -232,24 +228,6 @@ export async function exportProjectToDir(projectId, options = {}) {
       console.warn(`Project ${projectId} has no siteUrl defined. Skipping sitemap.xml and robots.txt generation.`);
     }
     // --- End of new SEO file generation ---
-
-    // --- Generate _pages.json metadata for dynamic sitemap/robots ---
-    const pagesMetadata = pagesDataArray.map((page) => {
-      const pageId = page.id || page.slug;
-      const filename = pageId === "index" || pageId === "home" ? "index.html" : `${pageId}.html`;
-      const entry = {
-        path: filename,
-        lastmod: (page.updated || page.gcreated || new Date().toISOString()).split("T")[0],
-      };
-      if (page.seo?.robots?.includes("noindex")) {
-        entry.noindex = true;
-      }
-      return entry;
-    });
-    await fs.writeFile(
-      path.join(outputDir, "_pages.json"),
-      JSON.stringify({ pages: pagesMetadata }, null, 2),
-    );
 
     const headerData = await readGlobalWidgetData(projectFolderName, "header");
     const footerData = await readGlobalWidgetData(projectFolderName, "footer");
@@ -679,12 +657,8 @@ Per aspera ad astra
     await fs.writeFile(path.join(outputDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
     // Record this export in history (store relative dir name, not absolute path)
-    // Publish flow skips recording — publish is not an export.
     const exportDirName = `${projectFolderName}-v${version}`;
-    let exportRecord = null;
-    if (!skipExportRecord) {
-      exportRecord = await recordExport(projectId, version, exportDirName, "success");
-    }
+    const exportRecord = await recordExport(projectId, version, exportDirName, "success");
 
     return { outputDir, version, exportDirName, exportRecord };
 }

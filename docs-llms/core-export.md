@@ -106,13 +106,12 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
     - **Homepage Validation**: The system verifies that at least one page has the slug "index" to serve as the homepage. If no homepage exists, the export fails with a clear error message.
 
 4.  **Render Global Widgets**:
-    - The header and footer widgets are rendered once into HTML strings using the `renderingService`. This is done in `"publish"` mode, which ensures that asset paths in the final HTML are relative (e.g., `uploads/images/logo.png`) instead of absolute API URLs.
+    - The header and footer widgets are rendered once into HTML strings using the `renderingService`. This is done in `"publish"` mode, which ensures that asset paths in the final HTML are relative (e.g., `assets/images/logo.png`) instead of absolute API URLs.
 
 5.  **Iterate and Render Pages**:
     - The controller loops through each page of the project. For each page, it: a. Renders all the widgets assigned to that page into a single HTML string. b. Combines the rendered header, page widgets, and footer into the final page content. c. Passes this combined content to the main `layout.liquid` template via the `renderPageLayout` function. d. The final, complete HTML for the page is generated.
 
 6.  **Generate SEO Files**:
-    - **`_pages.json`** (always generated): A metadata file listing all pages with their filenames, `lastmod` dates, and `noindex` flags. Contains no absolute URLs — it's domain-agnostic. Used by the serving worker to dynamically generate `sitemap.xml` and `robots.txt` at request time (see below). Harmless in OSS ZIP downloads (ignored by browsers).
     - **`sitemap.xml`** and **`robots.txt`** (conditional on `siteUrl`): If the project has a `siteUrl` defined, static versions are generated with absolute URLs baked in. These are for users who know their deployment URL upfront.
 
 7.  **Format and Validate HTML Files**:

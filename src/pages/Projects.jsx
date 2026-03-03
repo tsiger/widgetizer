@@ -17,7 +17,7 @@ import {
   getAllProjects,
   deleteProject,
   duplicateProject,
-  setActiveProject as setActiveProjectInBackend,
+  setActiveProject,
   exportProject,
 } from "../queries/projectManager";
 import { formatDate } from "../utils/dateFormatter";
@@ -87,7 +87,7 @@ export default function Projects() {
 
   const handleSetActive = async (id) => {
     try {
-      await setActiveProjectInBackend(id);
+      await setActiveProject(id);
       await fetchActiveProject();
       await loadProjects();
 

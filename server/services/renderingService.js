@@ -420,9 +420,8 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   }
 
   // Form submit URL and Turnstile site key — configurable via env vars.
-  // In preview mode, uses the local server URL. In publish mode, requires
-  // FORMS_PUBLIC_SUBMIT_URL to be set (the hosted platform sets this;
-  // OSS/self-hosted users configure their own form backend).
+  // In preview mode, uses the local server URL. In publish mode, the
+  // public form endpoint must be provided via FORMS_PUBLIC_SUBMIT_URL.
   const formSubmitUrl =
     renderMode === "preview"
       ? `${apiUrl}/api/forms/submit`

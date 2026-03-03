@@ -46,36 +46,10 @@ const FILE_GROUPS = {
   "preview.test.js": "Page Editor",
   "maxBlocks.test.js": "Page Editor",
   "export.test.js": "Export",
-  "publish.test.js": "Publish",
   "appSettings.test.js": "Settings",
   "coreWidgets.test.js": "Widgets",
   "htmlProcessor.test.js": "Utilities",
   "semver.test.js": "Utilities",
-};
-
-/** Human-readable labels for test files */
-const FILE_LABELS = {
-  "projects.test.js": "Projects",
-  "pages.test.js": "Pages",
-  "menus.test.js": "Menus",
-  "media.test.js": "Media",
-  "mediaUsage.test.js": "Media Usage",
-  "themes.test.js": "Themes",
-  "themeUpdates.test.js": "Theme Updates",
-  "themeUpdateService.test.js": "Theme Update Service",
-  "themeHelpers.test.js": "Theme Helpers",
-  "themeWidgets.test.js": "Theme Widgets",
-  "rendering.test.js": "Rendering",
-  "sanitization.test.js": "Sanitization",
-  "tags.test.js": "Tags",
-  "preview.test.js": "Preview",
-  "maxBlocks.test.js": "Max Blocks",
-  "export.test.js": "Export",
-  "appSettings.test.js": "App Settings",
-  "coreWidgets.test.js": "Core Widgets",
-  "htmlProcessor.test.js": "HTML Processor",
-  "semver.test.js": "Semver",
-  "pathSecurity.test.js": "Path Security",
 };
 
 /** Display order for groups */
@@ -100,12 +74,6 @@ function getGroup(filePath) {
   return FILE_GROUPS[filename] || "Other";
 }
 
-function getFileLabel(filePath) {
-  if (!filePath) return "";
-  const filename = path.basename(filePath);
-  return FILE_LABELS[filename] || filename.replace(".test.js", "");
-}
-
 function getFilename(filePath) {
   if (!filePath) return "unknown";
   return path.basename(filePath);
@@ -114,7 +82,7 @@ function getFilename(filePath) {
 /**
  * Add a label prefix to suite names for context.
  */
-function labelSuiteName(suiteName, filePath) {
+function labelSuiteName(suiteName, _filePath) {
   return suiteName;
 }
 

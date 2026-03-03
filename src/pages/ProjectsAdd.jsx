@@ -37,8 +37,7 @@ export default function ProjectsAdd() {
         showToast(t("projectsAdd.toasts.createSuccess", { name: newProject.name }), "success");
       }
 
-      // In hosted mode, go straight to editing (Projects list is hidden).
-      // In open-source mode, go to the projects list.
+      // After creating a project, return to the projects list.
       skipNavigationGuardRef.current = true;
       navigate("/projects");
       return true;

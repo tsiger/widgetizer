@@ -95,6 +95,3 @@ export async function createEditorApp() {
 
   return app;
 }
-
-// Keep legacy exports for tests that import them directly
-export { createEditorApp as createEditorApiApp, createEditorApp as createEditorUiApp };

@@ -11,7 +11,6 @@ export default function Sidebar() {
   const { activeProject } = useProjectStore();
   const hasActiveProject = !!activeProject;
   const { updateCount: themeUpdateCount, fetchUpdateCount } = useThemeUpdateStore();
-  const assetBase = import.meta.env.BASE_URL || "/";
 
   // Fetch theme update count on mount
   useEffect(() => {
@@ -99,8 +98,8 @@ export default function Sidebar() {
     <div className="w-[72px] md:w-48 bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto">
       <div className="pb-2 px-2 md:px-4 grow">
         <div className="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-4">
-          <img src={`${assetBase}widgetizer_logo.svg`} alt={t("common.appTitle")} className="hidden md:block h-7" />
-          <img src={`${assetBase}widgetizer_symbol.svg`} alt={t("common.appTitle")} className="md:hidden w-12 h-12 mx-auto" />
+          <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="hidden md:block h-7" />
+          <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="md:hidden w-12 h-12 mx-auto" />
         </div>
 
         {topSections.map(renderSection)}

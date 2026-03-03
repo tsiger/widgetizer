@@ -13,7 +13,7 @@
  * Run with: node --test server/tests/media.test.js
  */
 
-import { describe, it, before, after, beforeEach, afterEach } from "node:test";
+import { describe, it, before, after, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
@@ -46,8 +46,6 @@ const {
   getProjectImagesDir,
   getProjectVideosDir,
   getProjectAudiosDir,
-  getThemeJsonPath,
-  getThemeDir,
 } = await import("../config.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");

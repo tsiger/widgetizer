@@ -80,7 +80,7 @@ The `PageForm.jsx` component includes several advanced features for comprehensiv
 - **Absolute URL Generation**: Social media image URLs are automatically converted to absolute URLs using the project's configured site URL for proper social sharing
 - **Fallback Handling**: Gracefully handles cases where no site URL is configured, preventing broken meta tags
 
-### Client-Side API (`src/utils/pageManager.js`)
+### Client-Side API (`src/queries/pageManager.js`)
 
 This file acts as the bridge between the React components and the backend API. It abstracts away the `fetch` calls into a set of clean, async functions.
 

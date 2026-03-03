@@ -42,17 +42,15 @@
       "buildResources": "electron/resources"
     },
     "files": [
-      "dist/**/*",
-      "server/**/*",
-      "src/core/**/*",
-      "src/utils/**/*",
-      "src/config/**/*",
-      "src/locales/**/*",
-      "themes/**/*",
-      "electron/**/*",
+      "dist",
+      "server",
+      "src/core",
+      "src/utils",
+      "src/locales",
+      "themes",
+      "electron",
       "package.json"
     ],
-    "extraResources": [],
     "asar": true,
     "asarUnpack": [
       "themes/**",

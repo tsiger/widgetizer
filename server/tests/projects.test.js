@@ -4,7 +4,7 @@
  * Tests project creation, reading, updating, deletion, duplication, and
  * active project management through the actual controller functions.
  *
- * Uses an isolated DATA_DIR and THEMES_DIR so tests never touch real data.
+ * Uses an isolated DATA_DIR and THEMES_SEED_DIR so tests never touch real data.
  *
  * Run with: node --test server/tests/projects.test.js
  */
@@ -30,7 +30,7 @@ process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
 // Now import server modules — they'll use our overridden paths
-const { DATA_DIR, THEMES_DIR, getThemeDir, getProjectDir, getProjectPagesDir, getProjectMenusDir } =
+const { DATA_DIR, THEMES_SEED_DIR, getThemeDir, getProjectDir, getProjectPagesDir, getProjectMenusDir } =
   await import("../config.js");
 
 const {
@@ -57,7 +57,7 @@ const AdmZip = await import("adm-zip");
 before(async () => {
   // Verify our env override worked
   assert.equal(DATA_DIR, TEST_DATA_DIR, "DATA_DIR should use test override");
-  assert.equal(THEMES_DIR, TEST_THEMES_DIR, "THEMES_DIR should use test override");
+  assert.equal(THEMES_SEED_DIR, TEST_THEMES_DIR, "THEMES_SEED_DIR should use test override");
 
   await fs.ensureDir(TEST_DATA_DIR);
   await fs.ensureDir(TEST_THEMES_DIR);
@@ -1560,6 +1560,3 @@ describe("exportProject -> importProject round-trip", () => {
     }
   });
 });
-
-// (source field, getProjectBySiteId, deepLinkCreateProject tests removed — platform-only features)
-

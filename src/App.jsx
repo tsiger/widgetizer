@@ -117,9 +117,6 @@ const router = createBrowserRouter(
       element: <PagePreview />,
     },
   ],
-  {
-    basename: import.meta.env.VITE_ROUTER_BASENAME || "/",
-  },
 );
 
 // Wrapper component to include ToastContainer

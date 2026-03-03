@@ -21,9 +21,6 @@ export const THEMES_SEED_DIR = process.env.THEMES_ROOT
   ? path.resolve(process.env.THEMES_ROOT)
   : path.join(APP_ROOT, "themes");
 
-// Keep THEMES_DIR as an alias for backward compat in tests that set THEMES_ROOT
-export const THEMES_DIR = THEMES_SEED_DIR;
-
 export const CORE_WIDGETS_DIR = path.join(APP_ROOT, "src", "core", "widgets");
 
 // Static paths — served via express.static() or res.sendFile(), so must be real files on disk.
@@ -116,6 +113,6 @@ if (process.env.NODE_ENV !== "test") {
   console.log(`  APP_ROOT: ${APP_ROOT}`);
   console.log(`  UNPACKED_ROOT: ${UNPACKED_ROOT}`);
   console.log(`  DATA_DIR: ${DATA_DIR}`);
-  console.log(`  THEMES_DIR: ${THEMES_DIR}`);
+  console.log(`  THEMES_SEED_DIR: ${THEMES_SEED_DIR}`);
   console.log(`  CORE_WIDGETS_DIR: ${CORE_WIDGETS_DIR}`);
 }

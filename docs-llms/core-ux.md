@@ -24,7 +24,6 @@ This document provides a user experience (UX) audit of the application's core wo
   - If this is the first project created, it is automatically set as the active project by the backend.
   - Success toast is shown: `Project "[Project Name]" has been created and set as active.` (if activated) or `Project "[Project Name]" has been created.` (if not activated).
   - Navigation guard prevents accidental navigation with unsaved changes.
-  - **Deep-link creation (platform-injected):** When the platform wraps the editor, marketing site deep-links create projects via `POST /api/projects/deep-link`, which auto-suffixes duplicate names and always activates the new project. Users land directly on `/pages`. This flow is not part of the open-source editor's default behavior.
 - **Status:** ✅ Implemented
 
 ### **1.2. Edit a Project**
@@ -214,18 +213,17 @@ _(Excluding the Page Editor itself)_
 
 ---
 
-## 6. Export Management (`/export`)
+## 6. Export Management (`/export-site`)
 
 ### **6.1. Create an Export**
 
 - **Current State:**
-  1.  User clicks "Create Export".
-  2.  A new row appears in the history table with "Processing" status.
-  3.  Toasts provide feedback on start and completion.
-  4.  History table updates automatically.
-  5.  Export history persists and shows download links when complete.
+  1.  User clicks the export button on the Export Site page.
+  2.  The button enters a loading state while the export request is running.
+  3.  Toasts provide feedback on success or failure.
+  4.  Export history reloads after a successful export.
+  5.  Export history persists and shows view/download/delete actions when complete.
 - **Status:** ✅ Implemented with comprehensive feedback
-- **Future Improvement:** Ensure the "Processing" state persists if the user navigates away and back (if supported by backend polling/sockets).
 
 ---
 
@@ -252,7 +250,7 @@ _(Excluding the Page Editor itself)_
 
 ### ⚠️ Partially Implemented / Needs Improvement
 
-- **Project creation:** Redirects to list instead of dashboard when auto-activated
+- **Project creation:** Redirects to the project list after creation
 - **Page creation:** Redirects to list instead of page editor
 - **Theme activation:** Only available via project edit, not directly from themes page
 

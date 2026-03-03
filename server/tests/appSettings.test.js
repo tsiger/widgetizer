@@ -27,7 +27,7 @@ process.env.NODE_ENV = "test";
 
 const { getAppSettings, updateAppSettings, readAppSettingsFile, getSetting } =
   await import("../controllers/appSettingsController.js");
-const { saveSettings, getSettings, defaultSettings } = await import("../db/repositories/settingsRepository.js");
+const { saveSettings, defaultSettings } = await import("../db/repositories/settingsRepository.js");
 const { getDb, closeDb } = await import("../db/index.js");
 
 // ============================================================================
