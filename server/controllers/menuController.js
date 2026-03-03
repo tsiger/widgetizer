@@ -6,6 +6,32 @@ import { stripHtmlTags } from "../services/sanitizationService.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 
+/**
+ * Recursively sanitize menu items — strip HTML from labels and links.
+ * @param {Array} items - Array of menu item objects
+ * @returns {Array} Sanitized items
+ */
+function sanitizeMenuItems(items) {
+  if (!Array.isArray(items)) return [];
+  return items.map((item) => ({
+    ...item,
+    label: typeof item.label === "string" ? stripHtmlTags(item.label) : "",
+    link: typeof item.link === "string" ? stripHtmlTags(item.link) : "",
+    items: sanitizeMenuItems(item.items),
+  }));
+}
+
+/**
+ * Recursively check that all menu items have a non-empty label.
+ * @param {Array} items - Array of sanitized menu item objects
+ * @returns {boolean} true if all items have labels
+ */
+function allItemsHaveLabels(items) {
+  if (!Array.isArray(items)) return true;
+  return items.every(
+    (item) => typeof item.label === "string" && item.label.trim() !== "" && allItemsHaveLabels(item.items),
+  );
+}
 
 /**
  * Retrieves all menus for the active project.
@@ -63,7 +89,7 @@ export async function createMenu(req, res) {
 
     // Defensive check: ensure name is not empty after sanitization
     if (!name || typeof name !== "string" || name.trim() === "") {
-      return res.status(400).json({ error: "Menu name is required." });
+      return res.status(400).json({ error: "Menu title is required. HTML tags are not allowed." });
     }
 
     const { activeProject } = req;
@@ -164,7 +190,7 @@ export async function updateMenu(req, res) {
 
     // Defensive check: ensure name is not empty after sanitization
     if (!menuData.name || typeof menuData.name !== "string" || menuData.name.trim() === "") {
-      return res.status(400).json({ error: "Menu name is required." });
+      return res.status(400).json({ error: "Menu title is required. HTML tags are not allowed." });
     }
 
     const { activeProject } = req;
@@ -174,6 +200,16 @@ export async function updateMenu(req, res) {
 
     if (!(await fs.pathExists(menuPath))) {
       return res.status(404).json({ error: "Menu not found" });
+    }
+
+    // Sanitize menu item labels and links
+    if (Array.isArray(menuData.items)) {
+      menuData.items = sanitizeMenuItems(menuData.items);
+
+      // Validate: every item must have a label
+      if (!allItemsHaveLabels(menuData.items)) {
+        return res.status(400).json({ error: "Every menu item must have a label." });
+      }
     }
 
     // Read existing menu to preserve uuid

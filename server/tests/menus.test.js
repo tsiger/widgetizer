@@ -260,13 +260,13 @@ describe("createMenu", () => {
   it("rejects empty name (e.g. after HTML tags are stripped)", async () => {
     const res = await createTestMenu("");
     assert.equal(res._status, 400);
-    assert.match(res._json.error, /name.*required/i);
+    assert.match(res._json.error, /title.*required/i);
   });
 
   it("rejects whitespace-only name", async () => {
     const res = await createTestMenu("   ");
     assert.equal(res._status, 400);
-    assert.match(res._json.error, /name.*required/i);
+    assert.match(res._json.error, /title.*required/i);
   });
 });
 
@@ -526,7 +526,7 @@ describe("updateMenu", () => {
       body: { name: "" },
     });
     assert.equal(res._status, 400);
-    assert.match(res._json.error, /name.*required/i);
+    assert.match(res._json.error, /title.*required/i);
   });
 
   it("rejects whitespace-only name on update", async () => {
@@ -535,7 +535,7 @@ describe("updateMenu", () => {
       body: { name: "   " },
     });
     assert.equal(res._status, 400);
-    assert.match(res._json.error, /name.*required/i);
+    assert.match(res._json.error, /title.*required/i);
   });
 });
 

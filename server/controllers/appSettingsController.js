@@ -44,15 +44,27 @@ export async function updateAppSettings(req, res) {
 
     const newSettings = deepMerge(currentSettings, settings);
 
-    // Specific validation for maxFileSizeMB
-    if (newSettings.media && typeof newSettings.media.maxFileSizeMB !== "number") {
-      const parsedSize = parseInt(newSettings.media.maxFileSizeMB, 10);
-      if (isNaN(parsedSize) || parsedSize <= 0) {
-        return res.status(400).json({ error: "Invalid Max File Size. Must be a positive number." });
-      }
-      newSettings.media.maxFileSizeMB = parsedSize;
-    } else if (!newSettings.media) {
+    if (!newSettings.media) {
       newSettings.media = defaultSettings.media;
+    }
+
+    // Validate file size limits
+    if (newSettings.media) {
+      const sizeLimits = [
+        { key: "maxFileSizeMB", label: "Max Image Upload Size", min: 1, max: 100 },
+        { key: "maxVideoSizeMB", label: "Max Video Upload Size", min: 1, max: 500 },
+        { key: "maxAudioSizeMB", label: "Max Audio Upload Size", min: 1, max: 100 },
+      ];
+
+      for (const { key, label, min, max } of sizeLimits) {
+        if (typeof newSettings.media[key] !== "undefined") {
+          const parsed = parseInt(newSettings.media[key], 10);
+          if (isNaN(parsed) || parsed < min || parsed > max) {
+            return res.status(400).json({ error: `Invalid ${label}. Must be between ${min} and ${max}.` });
+          }
+          newSettings.media[key] = parsed;
+        }
+      }
     }
 
     // Validation for imageProcessing settings

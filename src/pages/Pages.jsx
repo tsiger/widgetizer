@@ -3,9 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Palette, Pencil, Trash2, Copy, Search, Check, FileText, CirclePlus } from "lucide-react";
 import { getAllPages, deletePage, duplicatePage, bulkDeletePages } from "../queries/pageManager";
+import { invalidateMediaCache } from "../queries/mediaManager";
 import { usePageSelection } from "../hooks/usePageSelection";
 import useConfirmationModal from "../hooks/useConfirmationModal";
 import useToastStore from "../stores/toastStore";
+import useProjectStore from "../stores/projectStore";
 import useAppSettings from "../hooks/useAppSettings";
 import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
@@ -97,6 +99,11 @@ export default function Pages() {
       await duplicatePage(pageId);
       showToast(t("pages.toasts.duplicateSuccess"), "success");
       loadPages();
+      // Invalidate media cache since the duplicate may reference the same images
+      const activeProject = useProjectStore.getState().activeProject;
+      if (activeProject) {
+        invalidateMediaCache(activeProject.id);
+      }
     } catch (error) {
       console.error("Error duplicating page:", error);
       showToast(t("pages.toasts.duplicateError"), "error");

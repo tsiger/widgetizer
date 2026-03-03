@@ -308,13 +308,14 @@ function updateSelection(widgetId, blockId) {
 
 // ── Real-Time Widget Settings ───────────────────────────────────────────────
 
-function updateWidgetSettings(widgetId, changes) {
+function updateWidgetSettings(widgetId, changes, fieldTypes) {
   const widget = document.querySelector(`[data-widget-id="${widgetId}"]`);
   if (!widget) return;
 
   if (changes.settings) {
     Object.entries(changes.settings).forEach(([settingId, value]) => {
-      applySettingToElement(widget, settingId, value);
+      const type = fieldTypes?.settings?.[settingId];
+      applySettingToElement(widget, settingId, value, type);
     });
   }
 
@@ -322,20 +323,17 @@ function updateWidgetSettings(widgetId, changes) {
     Object.entries(changes.blocks).forEach(([blockId, blockChanges]) => {
       const blockEl = widget.querySelector(`[data-block-id="${blockId}"]`);
       if (blockEl && blockChanges.settings) {
+        const blockFieldTypes = fieldTypes?.blocks?.[blockId];
         Object.entries(blockChanges.settings).forEach(([settingId, value]) => {
-          applySettingToElement(blockEl, settingId, value);
+          const type = blockFieldTypes?.[settingId];
+          applySettingToElement(blockEl, settingId, value, type);
         });
       }
     });
   }
 }
 
-function isHtmlContent(value) {
-  if (typeof value !== "string") return false;
-  return /<(p|strong|em|a|br|span|div)\b[^>]*>/i.test(value);
-}
-
-function applySettingToElement(container, settingId, value) {
+function applySettingToElement(container, settingId, value, fieldType) {
   const childElements = [...container.querySelectorAll(`[data-setting="${settingId}"]`)];
   const elements = container.matches(`[data-setting="${settingId}"]`) ? [container, ...childElements] : childElements;
 
@@ -370,7 +368,8 @@ function applySettingToElement(container, settingId, value) {
       }
     } else {
       if (typeof value === "string" || typeof value === "number") {
-        if (isHtmlContent(value)) {
+        // Only use innerHTML for richtext and code fields — all other fields use safe textContent
+        if (fieldType === "richtext" || fieldType === "code") {
           el.innerHTML = value;
         } else {
           el.textContent = value;
@@ -749,7 +748,7 @@ function handleMessage(event) {
       renderOverlay();
       break;
     case "UPDATE_WIDGET_SETTINGS":
-      updateWidgetSettings(payload.widgetId, payload.changes);
+      updateWidgetSettings(payload.widgetId, payload.changes, payload.fieldTypes);
       break;
     case "GET_ELEMENT_BOUNDS":
       reportElementBounds(payload.widgetId, payload.blockId);

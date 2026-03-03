@@ -21,7 +21,7 @@ router.get("/:id", [param("id").notEmpty().withMessage("Menu ID is required.")],
 router.post(
   "/",
   [
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required.").isLength({ max: 200 }).withMessage(`Menu name must be at most ${200} characters.`),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu title is required. HTML tags are not allowed.").isLength({ max: 200 }).withMessage(`Menu title must be at most ${200} characters.`),
     body("description").optional().trim().customSanitizer(stripHtmlTags),
   ],
   validateRequest,
@@ -33,7 +33,7 @@ router.put(
   "/:id",
   [
     param("id").notEmpty().withMessage("Menu ID is required."),
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu name is required.").isLength({ max: 200 }).withMessage(`Menu name must be at most ${200} characters.`),
+    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu title is required. HTML tags are not allowed.").isLength({ max: 200 }).withMessage(`Menu title must be at most ${200} characters.`),
     body("description").optional().trim().customSanitizer(stripHtmlTags),
   ],
   validateRequest,

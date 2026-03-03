@@ -10,6 +10,8 @@ import { SettingsPanel } from "../components/settings";
 import useToastStore from "../stores/toastStore";
 
 import { getThemeSettings, saveThemeSettings } from "../queries/themeManager";
+import { invalidateMediaCache } from "../queries/mediaManager";
+import useProjectStore from "../stores/projectStore";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function Settings() {
@@ -107,6 +109,11 @@ export default function Settings() {
         setOriginalData(JSON.parse(JSON.stringify(themeData)));
         setHasChanges(false);
         showToast(t("themeSettings.toasts.saveSuccess"), "success");
+      }
+      // Invalidate media cache so usage (e.g. favicon) is reflected immediately
+      const activeProject = useProjectStore.getState().activeProject;
+      if (activeProject) {
+        invalidateMediaCache(activeProject.id);
       }
     } catch (error) {
       console.error("Failed to save theme settings:", error);

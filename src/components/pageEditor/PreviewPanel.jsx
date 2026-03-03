@@ -69,6 +69,46 @@ function detectChangeType(newState, oldState) {
 }
 
 /**
+ * Build a fieldTypes map for a widget's changed settings/blocks so the preview
+ * runtime knows which fields are richtext (safe for innerHTML) vs plain text.
+ */
+function buildFieldTypes(widget, changedSettings, changedBlocks, schemas) {
+  const widgetSchema = schemas[widget.type];
+  if (!widgetSchema) return null;
+
+  const fieldTypes = { settings: {}, blocks: {} };
+
+  if (changedSettings && Array.isArray(widgetSchema.settings)) {
+    for (const settingId of Object.keys(changedSettings)) {
+      const settingSchema = widgetSchema.settings.find((s) => s.id === settingId);
+      if (settingSchema) {
+        fieldTypes.settings[settingId] = settingSchema.type;
+      }
+    }
+  }
+
+  if (changedBlocks && Array.isArray(widgetSchema.blocks)) {
+    for (const [blockId, blockChanges] of Object.entries(changedBlocks)) {
+      const block = widget.blocks?.[blockId];
+      if (block && blockChanges.settings) {
+        const blockSchema = widgetSchema.blocks.find((b) => b.type === block.type);
+        if (blockSchema?.settings) {
+          fieldTypes.blocks[blockId] = {};
+          for (const settingId of Object.keys(blockChanges.settings)) {
+            const settingSchema = blockSchema.settings.find((s) => s.id === settingId);
+            if (settingSchema) {
+              fieldTypes.blocks[blockId][settingId] = settingSchema.type;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return fieldTypes;
+}
+
+/**
  * Build widget metadata map (widgetId → displayName) for the overlay labels.
  */
 function buildWidgetMetadata(page, globalWidgets, schemas) {
@@ -345,8 +385,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
             });
           }
 
+          const fieldTypes = buildFieldTypes(widget, changes.settings, changes.blocks, schemas);
+
           iframeRef.current.contentWindow.postMessage(
-            { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId, changes } },
+            { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId, changes, fieldTypes } },
             "*",
           );
         }
@@ -367,8 +409,10 @@ const PreviewPanel = forwardRef(function PreviewPanel(
             }
           });
 
+          const fieldTypes = buildFieldTypes(globalWidget, changes.settings, {}, schemas);
+
           iframeRef.current.contentWindow.postMessage(
-            { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId: globalWidgetKey, changes } },
+            { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId: globalWidgetKey, changes, fieldTypes } },
             "*",
           );
         }
@@ -447,6 +491,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     widgets,
     globalWidgets,
     themeSettings,
+    schemas,
     selectedWidgetId,
     selectedBlockId,
     selectedGlobalWidgetId,

@@ -158,22 +158,27 @@ export async function getThemeVersions(themeId) {
     console.warn(`Could not read base theme.json for ${themeId}:`, error.message);
   }
 
-  // Get versions from updates/ directory
-  const updatesDir = getThemeUpdatesDir(themeId);
-  try {
-    const entries = await fs.readdir(updatesDir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (entry.isDirectory() && isValidVersion(entry.name)) {
-        // Only add if not already in versions (avoid duplicates if base version is also in updates/)
-        if (!versions.includes(entry.name)) {
-          versions.push(entry.name);
+  // Get versions from updates/ directories (both user data and seed/source)
+  const updatesDirs = [
+    getThemeUpdatesDir(themeId),
+    path.join(THEMES_SEED_DIR, themeId, "updates"),
+  ];
+
+  for (const updatesDir of updatesDirs) {
+    try {
+      const entries = await fs.readdir(updatesDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.isDirectory() && isValidVersion(entry.name)) {
+          if (!versions.includes(entry.name)) {
+            versions.push(entry.name);
+          }
         }
       }
-    }
-  } catch (error) {
-    // updates/ directory doesn't exist yet - that's fine
-    if (error.code !== "ENOENT") {
-      console.warn(`Could not read updates directory for ${themeId}:`, error.message);
+    } catch (error) {
+      // updates/ directory doesn't exist yet - that's fine
+      if (error.code !== "ENOENT") {
+        console.warn(`Could not read updates directory for ${themeId}:`, error.message);
+      }
     }
   }
 
@@ -219,6 +224,29 @@ export async function getThemeLatestVersion(themeId) {
 export async function buildLatestSnapshot(themeId) {
   const themeDir = getThemeDir(themeId);
   const latestDir = getThemeLatestDir(themeId);
+
+  // Sync update folders from the seed (source) directory into the user data directory.
+  // This allows theme authors to create updates in themes/{name}/updates/ and have
+  // them picked up automatically without requiring a ZIP upload.
+  const seedUpdatesDir = path.join(THEMES_SEED_DIR, themeId, "updates");
+  const dataUpdatesDir = getThemeUpdatesDir(themeId);
+  try {
+    if (await fs.pathExists(seedUpdatesDir)) {
+      const seedEntries = await fs.readdir(seedUpdatesDir, { withFileTypes: true });
+      for (const entry of seedEntries) {
+        if (entry.isDirectory() && isValidVersion(entry.name)) {
+          const targetDir = path.join(dataUpdatesDir, entry.name);
+          if (!(await fs.pathExists(targetDir))) {
+            await fs.ensureDir(dataUpdatesDir);
+            await fs.copy(path.join(seedUpdatesDir, entry.name), targetDir);
+            console.log(`[buildLatestSnapshot] Synced update v${entry.name} from seed for ${themeId}`);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.warn(`[buildLatestSnapshot] Could not sync seed updates for ${themeId}:`, error.message);
+  }
 
   // Get all versions (base + updates)
   const versions = await getThemeVersions(themeId);

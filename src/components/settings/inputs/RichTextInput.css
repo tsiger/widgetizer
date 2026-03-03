@@ -373,10 +373,19 @@
   box-shadow: none;
 }
 
+/* EditorContent wrapper div — bridge the flex chain to .tiptap */
+.richtext-editor-expanded > div:not(.richtext-menubar) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .richtext-editor-expanded .tiptap {
   flex: 1;
   min-height: 20rem;
   max-height: none;
+  overflow-y: auto;
   padding: 1rem 1.25rem;
   font-size: 1rem;
   line-height: 1.75;
@@ -386,6 +395,7 @@
   flex: 1;
   min-height: 20rem;
   max-height: none;
+  overflow-y: auto;
   padding: 1rem 1.25rem;
   font-size: 0.875rem;
   resize: none;

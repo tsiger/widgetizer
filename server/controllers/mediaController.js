@@ -158,6 +158,10 @@ const storage = multer.diskStorage({
       const extension = path.extname(decodedName);
       const nameWithoutExt = path.basename(decodedName, extension);
       let cleanName = slugify(nameWithoutExt, { lower: true, strict: true, trim: true });
+      // Truncate to avoid exceeding OS path/filename limits
+      if (cleanName.length > 100) {
+        cleanName = cleanName.slice(0, 100);
+      }
       const { projectId } = req.params;
       const projectFolderName = await getProjectFolderName(projectId);
       const projectDir = getProjectDir(projectFolderName);

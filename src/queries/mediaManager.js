@@ -197,16 +197,18 @@ export async function deleteProjectMedia(projectId, fileId) {
       method: "DELETE",
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error("Failed to delete file");
+      throw new Error(data.error || "Failed to delete file");
     }
 
     // Invalidate cache since files changed
     invalidateMediaCache(projectId);
 
-    return await response.json();
-  } catch {
-    throw new Error("Failed to delete file");
+    return data;
+  } catch (err) {
+    throw err instanceof Error ? err : new Error("Failed to delete file");
   }
 }
 

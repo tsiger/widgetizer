@@ -181,13 +181,12 @@ describe("updateAppSettings", () => {
     assert.equal(saved.media.maxFileSizeMB, 5);
   });
 
-  it("accepts negative maxFileSizeMB when passed as number (no type guard)", async () => {
-    // Note: the controller only validates non-number types (strings).
-    // A numeric -1 passes through — this documents the current behaviour.
+  it("rejects negative maxFileSizeMB", async () => {
     const res = await callController(updateAppSettings, {
       body: { media: { maxFileSizeMB: -1 } },
     });
-    assert.equal(res._status, 200);
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /max image upload size/i);
   });
 
   it("validates maxFileSizeMB rejects negative string", async () => {
@@ -195,7 +194,7 @@ describe("updateAppSettings", () => {
       body: { media: { maxFileSizeMB: "-5" } },
     });
     assert.equal(res._status, 400);
-    assert.match(res._json.error, /max file size/i);
+    assert.match(res._json.error, /max image upload size/i);
   });
 
   it("validates maxFileSizeMB rejects non-numeric string", async () => {
