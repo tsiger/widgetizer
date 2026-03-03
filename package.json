@@ -31,7 +31,7 @@
     "test:verbose": "VERBOSE=1 node --test --test-reporter ./server/tests/reporter.js server/tests/*.test.js",
     "test:frontend": "vitest run",
     "electron:build": "npm run build && electron-builder",
-    "electron:build:mac": "npm run build && electron-builder --mac",
+    "electron:build:mac": "npm run build && node electron/prepareMacSharp.cjs && electron-builder --mac",
     "electron:build:win": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild && electron-builder --win"
   },
   "build": {
@@ -52,7 +52,6 @@
       "package.json"
     ],
     "asar": true,
-    "npmRebuild": false,
     "afterPack": "./electron/afterPack.cjs",
     "asarUnpack": [
       "themes/**",

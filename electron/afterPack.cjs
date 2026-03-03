@@ -12,6 +12,10 @@ const path = require("path");
  * @electron/rebuild compiled for Electron (run earlier in the build script).
  */
 exports.default = async function afterPack(context) {
+  if (context.electronPlatformName !== "win32") {
+    return;
+  }
+
   const binaryName = "better_sqlite3.node";
   const relativePath = path.join(
     "node_modules",
