@@ -32,11 +32,12 @@
     "test:frontend": "vitest run",
     "electron:build": "npm run build && electron-builder",
     "electron:build:mac": "npm run build && node electron/prepareMacSharp.cjs && electron-builder --mac",
-    "electron:build:win": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild && electron-builder --win"
+    "electron:build:win": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --win"
   },
   "build": {
     "appId": "com.widgetizer.app",
     "productName": "Widgetizer",
+    "npmRebuild": false,
     "directories": {
       "output": "dist-electron",
       "buildResources": "electron/resources"
@@ -52,7 +53,6 @@
       "package.json"
     ],
     "asar": true,
-    "afterPack": "./electron/afterPack.cjs",
     "asarUnpack": [
       "themes/**",
       "dist/**",
