@@ -34,12 +34,13 @@ You should have received a `beta-test-kit/` folder alongside this script. Verify
 | `clip.mp4`   | ~2 MB, short clip  | Video upload (5.2) |
 | `sample.mp3` | ~1 MB, short audio | Audio upload (5.2) |
 
-### Theme Files (2 files)
+### Theme Files (3 files)
 
-| File                | Notes                                                   | Used In                      |
-| ------------------- | ------------------------------------------------------- | ---------------------------- |
-| `valid-theme.zip`   | Working theme (has `theme.json`, `layout.liquid`, etc.) | Theme upload (7.2)           |
-| `invalid-theme.zip` | Random files, NOT a theme                               | Theme upload rejection (7.2) |
+| File                | Notes                                                                                | Used In                          |
+| ------------------- | ------------------------------------------------------------------------------------ | -------------------------------- |
+| `valid-theme.zip`   | Working theme (has `theme.json`, `layout.liquid`, etc.)                              | Theme upload (7.2)               |
+| `theme-update.zip`  | Same theme as `valid-theme.zip` but with a newer version in its `updates/` folder    | Theme update (7.3, 7.6–7.8)     |
+| `invalid-theme.zip` | Random files, NOT a theme                                                            | Theme upload rejection (7.4, 7.5)|
 
 ### Rejected File Types (1 file)
 
@@ -47,7 +48,7 @@ You should have received a `beta-test-kit/` folder alongside this script. Verify
 | ------------------ | ----------------------------------------- | ------------------------------- |
 | `random-files.zip` | ZIP of random files, NOT a project export | Project import rejection (2.14) |
 
-> **Total: 14 files.** If anything is missing, ask the person who sent you this script. You will also create test files during testing (project exports, additional uploads) — the kit covers what you can't easily make yourself.
+> **Total: 15 files.** If anything is missing, ask the person who sent you this script. You will also create test files during testing (project exports, additional uploads) — the kit covers what you can't easily make yourself.
 
 ---
 
@@ -782,9 +783,7 @@ You should still be on the structure editor.
 
 ### 7.3 Upload a Theme Update (New Version)
 
-> This test requires a theme ZIP that contains an `updates/` folder with a newer version. If you don't have one, skip to 7.4.
-
-1. Upload a theme ZIP whose base version matches an already-installed theme, but includes new version(s) in its `updates/` folder.
+1. Upload `theme-update.zip` from the test kit. Its base version matches `valid-theme.zip` (installed in 7.2), but it includes a newer version in its `updates/` folder.
 2. **Expected**: Toast confirms the update was imported. The toast or response should mention which version(s) were added.
 3. Go to the Themes list. The theme card should now show an **"Update available: vX.Y.Z"** label.
 4. The sidebar **Themes** link should show a **pink badge** with a count of `1` (or incremented if other themes also have pending updates).
