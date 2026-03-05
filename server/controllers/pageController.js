@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
 import path from "path";
 import { updatePageMediaUsage, removePageFromMediaUsage } from "../services/mediaUsageService.js";
+import { cleanupDeletedPageReferences } from "../utils/linkEnrichment.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
@@ -303,6 +304,15 @@ export async function deletePage(req, res) {
       return res.status(404).json({ error: "Page not found" });
     }
 
+    // Read the page to get its UUID before deleting (needed for reference cleanup)
+    let deletedPageUuid = null;
+    try {
+      const pageData = JSON.parse(await fs.readFile(pagePath, "utf8"));
+      deletedPageUuid = pageData.uuid || null;
+    } catch (readError) {
+      console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
+    }
+
     // Delete the page file
     await fs.remove(pagePath);
 
@@ -311,7 +321,15 @@ export async function deletePage(req, res) {
       await removePageFromMediaUsage(activeProject.id, pageId);
     } catch (usageError) {
       console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
-      // Don't fail the request if usage tracking fails
+    }
+
+    // Clean up orphaned references in menus and widget links
+    if (deletedPageUuid) {
+      try {
+        await cleanupDeletedPageReferences(projectFolderName, deletedPageUuid);
+      } catch (cleanupError) {
+        console.warn(`Failed to clean up references for deleted page ${pageId}:`, cleanupError.message);
+      }
     }
 
     res.json({ success: true });
@@ -339,6 +357,8 @@ export async function bulkDeletePages(req, res) {
     errors: [],
   };
 
+  const deletedUuids = [];
+
   // Process each page deletion
   for (const pageId of pageIds) {
     try {
@@ -348,6 +368,14 @@ export async function bulkDeletePages(req, res) {
       if (!(await fs.pathExists(pagePath))) {
         results.notFound.push(pageId);
         continue;
+      }
+
+      // Read the page to get its UUID before deleting (needed for reference cleanup)
+      try {
+        const pageData = JSON.parse(await fs.readFile(pagePath, "utf8"));
+        if (pageData.uuid) deletedUuids.push(pageData.uuid);
+      } catch (readError) {
+        console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
       }
 
       // Delete the page file
@@ -365,6 +393,15 @@ export async function bulkDeletePages(req, res) {
     } catch (error) {
       console.error(`Error deleting page ${pageId}:`, error);
       results.errors.push({ pageId, error: error.message });
+    }
+  }
+
+  // Clean up orphaned references for all deleted pages
+  for (const uuid of deletedUuids) {
+    try {
+      await cleanupDeletedPageReferences(projectFolderName, uuid);
+    } catch (cleanupError) {
+      console.warn(`Failed to clean up references for deleted page UUID ${uuid}:`, cleanupError.message);
     }
   }
 

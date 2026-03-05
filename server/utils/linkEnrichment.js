@@ -318,3 +318,53 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
 }
+
+/**
+ * Clean up all references to a deleted page across the project.
+ * Removes orphaned pageUuid references from widget link settings (pages + globals)
+ * and menu items, writing back only files that were actually modified.
+ * @param {string} projectFolderName - The project folder name
+ * @param {string} deletedPageUuid - The UUID of the deleted page
+ */
+export async function cleanupDeletedPageReferences(projectFolderName, deletedPageUuid) {
+  const pagesDir = getProjectPagesDir(projectFolderName);
+  const menusDir = getProjectMenusDir(projectFolderName);
+
+  // Clean widget link settings in pages and global widgets
+  const cleanValue = (value) => {
+    if (isLinkObject(value) && value.pageUuid === deletedPageUuid) {
+      return { href: "", text: "", target: "_self" };
+    }
+    return value;
+  };
+
+  const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
+
+  await updatePageWidgets(pagesDir, widgetProcessor);
+  await updateGlobalWidgets(pagesDir, widgetProcessor);
+
+  // Clean menu items
+  if (await fs.pathExists(menusDir)) {
+    const menuFiles = await fs.readdir(menusDir);
+    for (const menuFile of menuFiles) {
+      if (!menuFile.endsWith(".json")) continue;
+
+      const menuPath = path.join(menusDir, menuFile);
+      const content = await fs.readFile(menuPath, "utf8");
+      const menu = JSON.parse(content);
+
+      const cleanedItems = processMenuItems(menu.items, (item) => {
+        if (item.pageUuid === deletedPageUuid) {
+          item.link = "";
+          delete item.pageUuid;
+        }
+        return item;
+      });
+
+      if (JSON.stringify(cleanedItems) !== JSON.stringify(menu.items)) {
+        menu.items = cleanedItems;
+        await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
+      }
+    }
+  }
+}
