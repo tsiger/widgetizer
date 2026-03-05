@@ -744,7 +744,7 @@ You should still be on the structure editor.
 3. Click **"Add Item"**. Set **Label**: "Temp" and **Link**: select "Temp Page" from the dropdown. Click **"Save Menu"**.
 4. Click **Pages** in the sidebar. Delete "Temp Page".
 5. Click **Menus** in the sidebar. Open the structure editor for "Primary Navigation".
-6. **Expected**: The "Temp" menu item should show an empty or broken link. The editor should not crash.
+6. **Expected**: The "Temp" menu item should show an empty link — the system automatically cleans up references when a page is deleted. The editor should not crash.
 
 ### 6.12 Edge Cases to Try
 
@@ -1249,8 +1249,8 @@ These tests verify that different features work together correctly.
 1. Have widgets and menus that link to a specific page.
 2. Delete that page.
 3. Check:
-   - [ ] Menu item still exists but link should be empty/broken
-   - [ ] Widget link settings should be cleared
+   - [ ] Menu item still exists but link is automatically cleared (empty)
+   - [ ] Widget link settings are automatically cleared (href empty, pageUuid removed)
    - [ ] Media files that were ONLY used by that page should now show as "unused"
    - [ ] App doesn't crash anywhere
 

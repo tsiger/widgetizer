@@ -62,9 +62,9 @@ A typical menu JSON file (`main-menu.json`) has the following structure:
 
 2. **User Selection**: When users select an internal page in the menu editor, both `link` and `pageUuid` are stored.
 
-3. **Rendering/Export**: The rendering service resolves each item's `pageUuid` to the current page slug, ensuring links stay up-to-date even after page renames. If a referenced page was deleted, the link is cleared during rendering.
+3. **Rendering/Export**: The rendering service resolves each item's `pageUuid` to the current page slug, ensuring links stay up-to-date even after page renames.
 
-4. **Editor Display**: When editing a menu with items linking to deleted pages, those items display with empty link fields. The menu is not automatically saved—changes only persist when the user explicitly saves.
+4. **Page Deletion Cleanup**: When a page is deleted, all menu items referencing its `pageUuid` are automatically cleaned up — the `link` is set to empty and `pageUuid` is removed from the JSON file.
 
 5. **Project Cloning**: When a project is cloned, all page UUIDs are regenerated, and all menu item `pageUuid` references are updated to point to the new UUIDs.
 

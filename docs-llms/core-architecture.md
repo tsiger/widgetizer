@@ -128,8 +128,8 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 | `getPage()`         | Get page by slug                   |
 | `createPage()`      | Create page with unique slug       |
 | `updatePage()`      | Update page, handle slug changes   |
-| `deletePage()`      | Delete page and update media usage |
-| `bulkDeletePages()` | Delete multiple pages              |
+| `deletePage()`      | Delete page, update media usage, clean up references |
+| `bulkDeletePages()` | Delete multiple pages, clean up references            |
 | `duplicatePage()`   | Clone page with "Copy of" naming   |
 | `savePageContent()` | Save page content from editor      |
 

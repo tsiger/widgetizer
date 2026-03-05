@@ -504,9 +504,9 @@ The `pageUuid` system ensures links remain valid even when pages are renamed or 
    - The `pageUuid` - the stable identifier that never changes
    - The `href` - the current slug-based filename (e.g., `services.html`)
 
-3. **Rendering/Export**: The system resolves `pageUuid` to the current page slug. If a page was renamed, links automatically point to the new filename. If the linked page was deleted, the link is cleared.
+3. **Rendering/Export**: The system resolves `pageUuid` to the current page slug. If a page was renamed, links automatically point to the new filename.
 
-4. **Editor Display**: When editing a page with a link to a deleted page, the link fields display as empty. The link is not automatically saved as empty—it only updates if the user explicitly changes it.
+4. **Page Deletion Cleanup**: When a page is deleted, all widget link settings referencing its `pageUuid` are automatically cleaned up — the link is cleared (`href: ""`) and `pageUuid` is removed from the JSON file. This applies to page widgets, global widgets (header/footer), and menu items.
 
 5. **Project Cloning**: When a project is cloned, all page UUIDs are regenerated, and all widget/menu `pageUuid` references are updated to point to the new UUIDs.
 
