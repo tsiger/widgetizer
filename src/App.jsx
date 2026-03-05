@@ -20,6 +20,8 @@ import ProjectsAdd from "./pages/ProjectsAdd";
 import ProjectsEdit from "./pages/ProjectsEdit";
 import MenuStructure from "./pages/MenuStructure";
 import Plugins from "./pages/Plugins";
+import NotFound from "./pages/NotFound";
+import RouteError from "./pages/RouteError";
 import ToastContainer from "./components/ui/ToastContainer";
 import RequireActiveProject from "./components/layout/RequireActiveProject";
 import useProjectStore from "./stores/projectStore";
@@ -37,6 +39,7 @@ const router = createBrowserRouter(
     {
       path: "/",
       element: <Layout />,
+      errorElement: <RouteError />,
       children: [
         {
           index: true,
@@ -115,11 +118,16 @@ const router = createBrowserRouter(
             },
           ],
         },
+        {
+          path: "*",
+          element: <NotFound />,
+        },
       ],
     },
     {
       path: "/preview/:pageId",
       element: <PagePreview />,
+      errorElement: <RouteError />,
     },
   ],
 );
