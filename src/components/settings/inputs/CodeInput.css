@@ -1,5 +1,7 @@
 .code-input-wrapper {
   position: relative;
+  --code-editor-padding-y: 0.5rem;
+  --code-editor-padding-x: 0.75rem;
 }
 
 .code-input-container {
@@ -18,7 +20,7 @@
 
 .code-line-numbers {
   flex-shrink: 0;
-  padding: 0.5rem 0.75rem;
+  padding: var(--code-editor-padding-y) 0.75rem;
   background: rgb(248 250 252);
   border-right: 1px solid rgb(226 232 240);
   text-align: right;
@@ -46,19 +48,21 @@
   font-family: "Fira Code", "Fira Mono", "Consolas", "Monaco", "Courier New", monospace !important;
   font-size: 13px !important;
   line-height: 1.5rem !important;
-  padding: 0 !important;
+  padding: var(--code-editor-padding-y) var(--code-editor-padding-x) !important;
   margin: 0 !important;
   border: none !important;
   outline: none !important;
   background: transparent !important;
   resize: none !important;
   color: rgb(30 41 59) !important;
+  box-sizing: border-box !important;
 }
 
 .code-pre {
   margin: 0 !important;
-  padding: 0 !important;
+  padding: var(--code-editor-padding-y) var(--code-editor-padding-x) !important;
   background: transparent !important;
+  box-sizing: border-box !important;
 }
 
 /* Prism theme overrides for better contrast */

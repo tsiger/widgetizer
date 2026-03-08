@@ -82,7 +82,7 @@ export default function CodeInput({ value = "", onChange, language = "html", pla
             onValueChange={onChange}
             highlight={(code) => highlight(code, prismLanguage, language)}
             placeholder={placeholder}
-            padding={8}
+            padding={0}
             style={{
               fontFamily: '"Fira Code", "Fira Mono", "Consolas", "Monaco", "Courier New", monospace',
               fontSize: "13px",
