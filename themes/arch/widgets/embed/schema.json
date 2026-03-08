@@ -35,12 +35,12 @@
       "type": "select",
       "id": "max_width",
       "label": "Container Width",
-      "default": "large",
+      "default": "wide",
       "options": [
-        { "value": "full", "label": "Full Width" },
-        { "value": "large", "label": "Large (900px)" },
-        { "value": "medium", "label": "Medium (800px)" },
-        { "value": "small", "label": "Small (600px)" }
+        { "value": "narrow", "label": "Narrow" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "wide", "label": "Wide" },
+        { "value": "fullwidth", "label": "Fullwidth" }
       ]
     },
     {

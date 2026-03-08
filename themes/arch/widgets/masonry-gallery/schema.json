@@ -29,7 +29,7 @@
       "type": "range",
       "id": "columns_desktop",
       "label": "Columns (Desktop)",
-      "default": 4,
+      "default": 3,
       "min": 2,
       "max": 5,
       "step": 1

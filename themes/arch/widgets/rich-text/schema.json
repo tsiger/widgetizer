@@ -32,19 +32,39 @@
       "type": "select",
       "id": "content_width",
       "label": "Content width",
-      "default": "md",
+      "default": "medium",
       "options": [
         {
-          "value": "sm",
-          "label": "Narrow (600px)"
+          "value": "narrow",
+          "label": "Narrow"
         },
         {
-          "value": "md",
-          "label": "Medium (800px)"
+          "value": "medium",
+          "label": "Medium"
         },
         {
-          "value": "lg",
-          "label": "Wide (900px)"
+          "value": "wide",
+          "label": "Wide"
+        },
+        {
+          "value": "fullwidth",
+          "label": "Fullwidth"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
         }
       ]
     }

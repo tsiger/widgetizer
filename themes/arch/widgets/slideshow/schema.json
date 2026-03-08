@@ -13,8 +13,9 @@
       "type": "select",
       "id": "height",
       "label": "Height",
-      "default": "medium",
+      "default": "auto",
       "options": [
+        { "value": "auto", "label": "Auto" },
         { "value": "small", "label": "Small" },
         { "value": "medium", "label": "Medium" },
         { "value": "large", "label": "Large" }

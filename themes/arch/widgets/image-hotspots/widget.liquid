@@ -249,8 +249,9 @@
       </div>
     {% endif %}
 
-    <div class="widget-content widget-content-lg">
-      <div class="image-hotspots-wrapper reveal reveal-fade">
+    <div class="widget-content">
+      <div class="color-scheme-standard">
+        <div class="image-hotspots-wrapper reveal reveal-fade">
         <!-- Main Image -->
         {% if widget.settings.image != blank %}
           {% image src: widget.settings.image, size: 'large', class: 'image-hotspots-image', loading: 'eager' %}
@@ -320,6 +321,7 @@
             </div>
           </div>
         {% endfor %}
+        </div>
       </div>
     </div>
   </div>

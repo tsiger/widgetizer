@@ -23,19 +23,28 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: var(--space-md);
+        padding: var(--space-sm);
         background-color: var(--bg-primary);
         border: var(--border-width-thin) solid var(--border-color);
-        min-height: 10rem;
+        min-height: 11rem;
         overflow: hidden;
+      }
+
+      & .logo-link,
+      & .logo-frame {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        aspect-ratio: 4 / 3;
       }
 
       & .logo-image {
         width: 100%;
         height: 100%;
         max-width: 100%;
-        max-height: 100%;
         object-fit: contain;
+        object-position: center;
         filter: grayscale(100%);
         opacity: 0.6;
         transition: opacity 0.3s, filter 0.3s;
@@ -47,21 +56,15 @@
         }
       }
 
-      & .logo-link {
-        display: block;
-      }
-
       @media (min-width: 750px) {
-        & .logo-image {
-          max-width: 100%;
-          max-height: 100%;
+        & .logo-item {
+          min-height: 12rem;
         }
       }
 
       @media (min-width: 990px) {
-        & .logo-image {
-          max-width: 100%;
-          max-height: 100%;
+        & .logo-item {
+          min-height: 13rem;
         }
       }
     }
@@ -112,11 +115,13 @@
                 {% endif %}
               </a>
             {% else %}
-              {% if block.settings.image != blank %}
-                {% image src: block.settings.image, size: 'small', class: 'logo-image', alt: block.settings.name %}
-              {% else %}
-                {% placeholder_image aspect: 'landscape', class: 'logo-image' %}
-              {% endif %}
+              <div class="logo-frame">
+                {% if block.settings.image != blank %}
+                  {% image src: block.settings.image, size: 'small', class: 'logo-image', alt: block.settings.name %}
+                {% else %}
+                  {% placeholder_image aspect: 'landscape', class: 'logo-image' %}
+                {% endif %}
+              </div>
             {% endif %}
           </li>
         {% endfor %}

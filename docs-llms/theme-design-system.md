@@ -489,7 +489,7 @@ The outer wrapper. Handles backgrounds, background images, and overlays.
 
 #### `.widget-container`
 
-The inner container that constrains width and adds vertical rhythm.
+The inner container that constrains width and adds vertical spacing.
 
 - `max-width: var(--container-max-width)` (1420px)
 - `margin-inline: auto` — Centers content
@@ -498,14 +498,7 @@ The inner container that constrains width and adds vertical rhythm.
 
 #### `.widget-container-padded`
 
-Alternative to `.widget-container` for widgets with non-default backgrounds. Uses `padding-block` instead of `margin-block` so the background fills the padded area:
-
-```css
-.widget-container-padded {
-  margin-block: 0;
-  padding-block: var(--section-padding-block);
-}
-```
+Alternative for widgets with non-default backgrounds. Uses `padding-block` instead of `margin-block` so the background fills the padded area.
 
 Usage pattern in templates:
 
@@ -549,9 +542,9 @@ For full-viewport or partial-viewport hero sections:
 
 | Class                       | Min Height         |
 | --------------------------- | ------------------ |
-| `.widget-height-half`       | `50vh`             |
-| `.widget-height-two-thirds` | `66vh`             |
-| `.widget-height-full`       | `100vh` / `100dvh` |
+| `.widget-height-small`      | `50vh`             |
+| `.widget-height-medium`     | `75vh`             |
+| `.widget-height-large`      | `100vh` / `100dvh` |
 
 All three also set `display: flex; flex-direction: column; justify-content: center;` to vertically center content.
 

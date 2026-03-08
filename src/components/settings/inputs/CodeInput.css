@@ -27,7 +27,7 @@
   font-family: "Fira Code", "Fira Mono", "Consolas", "Monaco", "Courier New", monospace;
   user-select: none;
   overflow: hidden;
-  min-width: 3rem;
+  min-width: 1rem;
 }
 
 .code-line-number {

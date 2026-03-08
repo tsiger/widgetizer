@@ -395,8 +395,9 @@ These classes are semantic hooks (no default styling) for targeting in CSS:
 </div>
 ```
 
-- **Default**: Margin-based spacing (collapses naturally)
+- **Default**: Margin-based spacing (collapses naturally between adjacent widgets)
 - **With background**: Add `widget-container-padded` class for padding-based spacing
+
 
 ### Content Width Modifiers
 
@@ -416,9 +417,9 @@ These classes are semantic hooks (no default styling) for targeting in CSS:
 ### Widget Height Modifiers
 
 ```liquid
-<section class="widget widget-height-half">      <!-- 50vh -->
-<section class="widget widget-height-two-thirds"> <!-- 66vh -->
-<section class="widget widget-height-full">      <!-- 100vh -->
+<section class="widget widget-height-small">   <!-- 50vh -->
+<section class="widget widget-height-medium"> <!-- 75vh -->
+<section class="widget widget-height-large">   <!-- 100vh -->
 ```
 
 ### Grid System

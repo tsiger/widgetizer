@@ -334,7 +334,7 @@ h6 {
   display: block;
   font-size: var(--font-size-sm);
   font-weight: var(--typography-body_font_bold-weight, 700);
-  text-transform: uppercase;
+
   letter-spacing: 0.05em;
   color: var(--text-muted);
   margin-block-end: var(--space-sm);
@@ -517,17 +517,16 @@ h6 {
   }
 }
 
-/* Widget inner container (handles spacing) */
+/* Widget inner container (handles spacing via margin — collapses between adjacent widgets) */
 .widget-container {
   position: relative;
   z-index: 2;
   max-width: var(--container-max-width);
   margin-inline: auto;
-  /* Default: margin-based spacing (collapses) */
   margin-block: var(--section-padding-block);
 }
 
-/* Padded variant: for widgets with different background */
+/* Padded variant: for widgets with different background (padding so background fills) */
 .widget-container-padded {
   margin-block: 0;
   padding-block: var(--section-padding-block);
@@ -612,23 +611,23 @@ h6 {
    4.3 Height Modifiers
    -------------------------------------------------------------------------- */
 
-.widget-height-half,
-.widget-height-two-thirds,
-.widget-height-full {
+.widget-height-small,
+.widget-height-medium,
+.widget-height-large {
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-.widget-height-half {
+.widget-height-small {
   min-height: 50vh;
 }
 
-.widget-height-two-thirds {
-  min-height: 66vh;
+.widget-height-medium {
+  min-height: 75vh;
 }
 
-.widget-height-full {
+.widget-height-large {
   min-height: 100vh;
   min-height: 100dvh; /* Mobile viewport fix */
 }
@@ -735,7 +734,6 @@ h6 {
 .widget-card-subtitle {
   font-size: var(--font-size-xs);
   font-weight: var(--typography-body_font_bold-weight, 700);
-  text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
 }
