@@ -232,17 +232,6 @@
       },
       "blocksOrder": ["quote-1", "quote-2", "quote-3"]
     },
-    "newsletter_signup": {
-      "type": "newsletter",
-      "settings": {
-        "eyebrow": "Insights",
-        "title": "Quarterly wealth perspectives",
-        "description": "Join 2,000+ subscribers for market outlooks and planning strategies.",
-        "placeholder": "Your email",
-        "button_text": "Subscribe",
-        "color_scheme": "standard"
-      }
-    },
     "cta_banner": {
       "type": "banner",
       "settings": {
@@ -305,7 +294,6 @@
     "key_figures",
     "capabilities_grid",
     "testimonials",
-    "newsletter_signup",
     "cta_banner"
   ],
   "id": "index",

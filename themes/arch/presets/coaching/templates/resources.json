@@ -135,17 +135,6 @@
       },
       "blocksOrder": ["track-1", "track-2", "track-3"]
     },
-    "newsletter_signup": {
-      "type": "newsletter",
-      "settings": {
-        "eyebrow": "Newsletter",
-        "title": "Join 5,000+ leaders getting weekly insights",
-        "description": "Every Tuesday, one actionable idea to help you lead with more clarity and less stress.",
-        "placeholder": "Your email address",
-        "button_text": "Subscribe",
-        "color_scheme": "standard"
-      }
-    },
     "resources_cta": {
       "type": "banner",
       "settings": {
@@ -197,7 +186,6 @@
     "resources_hero",
     "free_resources",
     "podcast_player",
-    "newsletter_signup",
     "resources_cta"
   ],
   "id": "resources",
