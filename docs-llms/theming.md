@@ -1745,24 +1745,30 @@ To enable these features in your theme, add the `advanced` settings group to you
           "label": "Advanced"
         },
         {
-          "type": "textarea",
+          "type": "code",
           "id": "custom_css",
           "label": "Custom CSS",
           "description": "Add custom CSS that will be injected in the <head> section. Use the {% custom_css %} tag in your layout.liquid to render it.",
+          "language": "css",
+          "rows": 12,
           "default": ""
         },
         {
-          "type": "textarea",
+          "type": "code",
           "id": "custom_head_scripts",
           "label": "Custom Head Scripts",
           "description": "Add custom scripts (e.g., Google Analytics) that will be injected in the <head> section. Use the {% custom_head_scripts %} tag in your layout.liquid to render them.",
+          "language": "html",
+          "rows": 12,
           "default": ""
         },
         {
-          "type": "textarea",
+          "type": "code",
           "id": "custom_footer_scripts",
           "label": "Custom Footer Scripts",
           "description": "Add custom scripts that will be injected before the closing </body> tag. Use the {% custom_footer_scripts %} tag in your layout.liquid to render them.",
+          "language": "html",
+          "rows": 12,
           "default": ""
         }
       ]

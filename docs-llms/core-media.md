@@ -294,9 +294,16 @@ A specialized drawer component that allows users to browse and select existing m
 
 The `MediaSelectorDrawer` is integrated into:
 
-- **`ImageInput`**: Browse for existing images when setting image widget properties
+- **`ImageInput`**: Browse for existing images when setting image widget properties or theme-level image settings like favicons
 - **`VideoInput`**: Browse for existing videos when setting video widget properties
 - **`PageForm`**: Select featured images for pages
+
+#### `ImageInput` Modes (`src/components/settings/inputs/ImageInput.jsx`)
+
+The image setting input supports two presentation modes:
+
+- **Default mode**: Wide preview area with Upload and Browse actions below it. Used for most widget and theme image settings.
+- **Compact mode** (`compact: true`): Square preview with Upload and Browse stacked beside it, plus hover-only Edit and Remove controls on the preview. Intended for small assets such as the Arch theme's `favicon` setting.
 
 **Props Interface:**
 

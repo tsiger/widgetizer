@@ -1110,6 +1110,6 @@ Apply `.reveal` + direction class to elements, with staggered delays using `--re
 
 ## Available Widgets (Arch Theme)
 
-The Arch theme ships with 43 widgets organized by purpose:
+The Arch theme ships with 42 widgets organized by purpose:
 
-**Heroes & Banners**: banner, slideshow, split-hero, image-callout **Content**: rich-text, image-text, features-split, content-switcher **Cards & Grids**: card-grid, icon-card-grid, numbered-cards, bento-grid, profile-grid, project-showcase **Data & Lists**: accordion, comparison-table, icon-list, key-figures, pricing, priced-list, schedule-table, job-listing, event-list **Media**: image, gallery, masonry-gallery, video, video-embed, comparison-slider, image-hotspots, image-tabs **Social & Trust**: testimonials, testimonial-hero, logo-cloud, trust-bar, social-icons **Interactive**: countdown, map, embed, podcast-player **Forms**: contact-form, newsletter **Timeline**: timeline **Global**: header (global), footer (global)
+**Heroes & Banners**: banner, slideshow, split-hero, image-callout **Content**: rich-text, image-text, features-split, content-switcher **Cards & Grids**: card-grid, icon-card-grid, numbered-cards, bento-grid, profile-grid, project-showcase **Data & Lists**: accordion, comparison-table, icon-list, key-figures, pricing, priced-list, schedule-table, job-listing, event-list **Media**: image, gallery, masonry-gallery, video, video-embed, comparison-slider, image-hotspots, image-tabs **Social & Trust**: testimonials, testimonial-hero, logo-cloud, trust-bar, social-icons **Interactive**: countdown, map, embed, podcast-player **Forms**: contact-form **Timeline**: timeline **Global**: header (global), footer (global)

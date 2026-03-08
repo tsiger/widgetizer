@@ -196,6 +196,7 @@ A code editor with syntax highlighting and line numbers. Ideal for editing CSS, 
 - Syntax highlighting with color-coded tokens
 - Monospace font for better code readability
 - Scrollable editor with synchronized line number scrolling
+- Shared inner padding keeps code aligned with the line-number gutter
 - Minimal design that matches other form inputs
 
 **When to use Code vs Textarea:**
@@ -354,9 +355,13 @@ An icon picker that allows users to select from a library of available icons. Th
 
 An image uploader that includes a preview, the ability to replace the image, and a button to browse the media library. The value is the URL path to the image.
 
+**Additional Properties:**
+
+- **`compact`** (boolean, optional): If `true`, renders a compact square preview with Upload/Browse buttons stacked beside it. Useful for small image settings like favicons. Defaults to `false`.
+
 **Features:**
 
-- **Upload**: Direct file upload with drag-and-drop support
+- **Upload**: Direct file upload from the OS file picker
 - **Preview**: Shows thumbnail preview with hover controls
 - **Browse**: Opens `MediaSelectorDrawer` to select from existing images
 - **Metadata Editing**: Edit button opens `MediaDrawer` for alt text and title editing
@@ -372,6 +377,18 @@ An image uploader that includes a preview, the ability to replace the image, and
   "label": "Logo",
   "default": "/default-logo.png",
   "description": "Upload a logo for the site header."
+}
+```
+
+**Compact Example:**
+
+```json
+{
+  "id": "favicon",
+  "type": "image",
+  "label": "Favicon",
+  "compact": true,
+  "description": "Recommended size 180x180 px."
 }
 ```
 
