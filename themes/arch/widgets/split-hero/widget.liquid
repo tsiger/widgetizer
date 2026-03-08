@@ -1,9 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-split-hero widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
-  {% if widget.settings.color_scheme == 'highlight' %}
-    style="--widget-bg-color: var(--bg-primary);"
-  {% endif %}
+  class="widget widget-split-hero widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.color_scheme == 'highlight' %} has-highlight-background{% endif %} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="split-hero"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
@@ -17,6 +14,10 @@
       width: 100%;
       margin-inline: 0;
       max-width: none;
+
+      &.has-highlight-background {
+        --widget-bg-color: var(--bg-primary);
+      }
 
       & .widget-container {
         max-width: none;
@@ -89,7 +90,7 @@
     }
   </style>
 
-  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+  <div class="widget-container">
     <div class="split-hero-wrapper">
     <!-- Background Image Section (50%) -->
     {% if widget.settings.image != blank %}
