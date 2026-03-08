@@ -10,7 +10,7 @@ import MediaDrawer from "../../../components/media/MediaDrawer";
 import MediaSelectorDrawer from "../../../components/media/MediaSelectorDrawer";
 import Button from "../../ui/Button";
 
-export default function ImageInput({ id, value = "", onChange }) {
+export default function ImageInput({ id, value = "", onChange, compact = false }) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
   const activeProject = useProjectStore((state) => state.activeProject);
@@ -113,8 +113,20 @@ export default function ImageInput({ id, value = "", onChange }) {
     }
   };
 
+  const previewClassName = compact
+    ? "relative h-56 w-56 rounded-md bg-slate-100 flex items-center justify-center group overflow-hidden"
+    : "relative w-full aspect-video bg-slate-100 rounded-md flex items-center justify-center group overflow-hidden";
+
+  const emptyStateClassName = compact
+    ? "h-56 w-56 rounded-md border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors"
+    : "w-full aspect-video bg-slate-50 rounded-md border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors";
+
+  const actionWrapperClassName = compact ? "flex w-40 flex-col gap-2" : "mt-2 flex items-center gap-2";
+  const primaryButtonClassName = compact ? "w-full" : "flex-1";
+  const secondaryButtonClassName = compact ? "w-full" : "flex-1";
+
   return (
-    <div>
+    <div className={compact ? "flex items-start gap-3" : ""}>
       <input
         ref={fileInputRef}
         type="file"
@@ -125,7 +137,7 @@ export default function ImageInput({ id, value = "", onChange }) {
         className="hidden"
       />
       {value && currentImageFile ? (
-        <div className="relative w-full aspect-video bg-slate-100 rounded-md flex items-center justify-center group overflow-hidden">
+        <div className={previewClassName}>
           <img
             src={API_URL(`/api/media/projects/${activeProject.id}${currentImageFile.path}`)}
             alt={currentImageFile.metadata?.alt || "Preview"}
@@ -143,23 +155,23 @@ export default function ImageInput({ id, value = "", onChange }) {
       ) : (
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="w-full aspect-video bg-slate-50 rounded-md border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors"
+          className={emptyStateClassName}
         >
-          <UploadCloud size={32} />
-          <p className="mt-2 text-sm font-semibold">Click to upload</p>
-          <p className="text-xs">PNG, JPG, GIF</p>
+          <UploadCloud size={compact ? 32 : 32} />
+          <p className={`mt-2 font-semibold ${compact ? "text-sm text-center" : "text-sm"}`}>Click to upload</p>
+          <p className={`text-xs ${compact ? "text-center" : ""}`}>PNG, JPG, GIF</p>
         </div>
       )}
 
-      <div className="flex items-center gap-2 mt-2">
-        <Button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="flex-1" type="button">
+      <div className={actionWrapperClassName}>
+        <Button onClick={() => fileInputRef.current?.click()} disabled={uploading} className={primaryButtonClassName} type="button">
           {uploading ? "Uploading..." : "Upload"}
         </Button>
         <Button
           onClick={handleOpenMediaSelector}
           disabled={uploading}
           variant="secondary"
-          className="flex-1"
+          className={secondaryButtonClassName}
           type="button"
         >
           Browse

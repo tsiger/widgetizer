@@ -30,6 +30,7 @@
           "id": "favicon",
           "label": "Favicon",
           "default": "",
+          "compact": true,
           "description": "Recommended size 180×180 px."
         }
       ],

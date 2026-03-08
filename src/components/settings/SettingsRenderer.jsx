@@ -30,7 +30,7 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
     return <div>Error: Invalid setting configuration.</div>;
   }
 
-  const { type, id, label, description, options, min, max, step, unit, allow_alpha, language } = setting;
+  const { type, id, label, description, options, min, max, step, unit, allow_alpha, language, compact } = setting;
 
   // Translate label and description if they are translation keys
   const translatedLabel = label?.startsWith("appSettings.") ? t(label) : label;
@@ -93,7 +93,7 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
       case "menu":
         return <MenuSelectInput {...inputProps} />;
       case "image":
-        return <ImageInput {...inputProps} />;
+        return <ImageInput {...inputProps} compact={compact} />;
       case "video":
         return <VideoInput {...inputProps} />;
       case "audio":
