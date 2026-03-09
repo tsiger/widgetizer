@@ -84,7 +84,14 @@
             "x64"
           ]
         }
-      ]
+      ],
+      "signtoolOptions": {
+        "signingHashAlgorithms": [
+          "sha256"
+        ],
+        "certificateSubjectName": "Open Source Developer Gerasimos Tsiamalos",
+        "rfc3161TimeStampServer": "http://time.certum.pl"
+      }
     }
   },
   "dependencies": {
