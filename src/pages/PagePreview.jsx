@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import usePageStore from "../stores/pageStore";
 import PreviewPanel from "../components/pageEditor/PreviewPanel";
+import { isStandalonePreviewNavigationUrl } from "../utils/previewLinkUtils";
 
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
@@ -22,8 +23,9 @@ export default function PagePreview() {
   // Handle cross-origin navigation requests from the preview iframe
   useEffect(() => {
     const handleMessage = (event) => {
-      if (event.data?.type === "NAVIGATE_PREVIEW") {
-        navigate(event.data.payload.url);
+      const targetUrl = event.data?.payload?.url;
+      if (event.data?.type === "NAVIGATE_PREVIEW" && isStandalonePreviewNavigationUrl(targetUrl)) {
+        navigate(targetUrl);
       }
     };
     window.addEventListener("message", handleMessage);
