@@ -4,7 +4,6 @@ import { ChevronRight, ChevronDown, GripVertical, Plus, Trash2 } from "lucide-re
 import { IconButton } from "../../ui/Button";
 import Tooltip from "../../ui/Tooltip";
 import MenuCombobox from "./MenuCombobox";
-import SortableList from "./SortableList";
 
 // SortableItem component - memoized
 const SortableItem = memo(function SortableItem({
@@ -16,10 +15,11 @@ const SortableItem = memo(function SortableItem({
   onAddChild,
   onToggle,
   expandedItems,
-  activeId,
   pages,
   openDropdownId,
   onDropdownOpen,
+  projectedDepth,
+  indicatorPosition,
 }) {
   // Memoize expensive calculations
   const isExpanded = useMemo(() => expandedItems.includes(item.id), [expandedItems, item.id]);
@@ -159,10 +159,25 @@ const SortableItem = memo(function SortableItem({
   return (
     <div
       ref={setNodeRef}
+      data-menu-sortable-id={id}
       style={style}
-      className={`mb-2 ${isDragging ? "z-50" : ""} ${hasActiveDropdown ? "!z-[99999] relative" : ""}`}
+      className={`mb-2 relative ${isDragging ? "z-50" : ""} ${hasActiveDropdown ? "!z-[99999]" : ""}`}
     >
+      {/* Drop indicator — always shown below the indicator row */}
+      {projectedDepth !== null && indicatorPosition !== null && (
+        <div
+          className="absolute left-0 right-0 pointer-events-none z-10"
+          style={{ [indicatorPosition === "above" ? "top" : "bottom"]: "-8px" }}
+        >
+          <div className="flex items-center" style={{ paddingLeft: `${projectedDepth * 20}px` }}>
+            <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 -ml-1" />
+            <div className="h-0.5 bg-blue-500 flex-1 rounded-full" />
+          </div>
+        </div>
+      )}
+
       <div
+        style={{ marginLeft: `${depth * 20}px` }}
         className={`group flex items-center p-3 gap-3 border border-slate-200 rounded-md transition-colors ${getBackgroundColor} ${getHoverBackgroundColor} hover:border-slate-300`}
       >
         {/* Left section: Drag handle and expand/collapse */}
@@ -222,21 +237,6 @@ const SortableItem = memo(function SortableItem({
         </div>
       </div>
 
-      {item.items && item.items.length > 0 && isExpanded && (
-        <SortableList
-          items={item.items}
-          depth={depth + 1}
-          onRemove={onRemove}
-          onEdit={onEdit}
-          onAddChild={onAddChild}
-          onToggle={onToggle}
-          expandedItems={expandedItems}
-          activeId={activeId}
-          pages={pages}
-          openDropdownId={openDropdownId}
-          onDropdownOpen={onDropdownOpen}
-        />
-      )}
     </div>
   );
 });
