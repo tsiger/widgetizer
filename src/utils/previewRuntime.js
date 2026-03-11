@@ -27,7 +27,7 @@ const PREVIEW_MODE = getPreviewMode();
 function getStandalonePreviewTarget(href) {
   if (!href || typeof href !== "string") return null;
   const trimmed = href.trim();
-  if (trimmed.startsWith("#")) return null;
+  if (!trimmed || trimmed.startsWith("#")) return null;
 
   const lower = trimmed.toLowerCase();
   if (
@@ -488,10 +488,6 @@ function setupInteractionHandler() {
       if (linkElement) {
         if (PREVIEW_MODE === "standalone") {
           const href = linkElement.getAttribute("href");
-          if (href?.trim().startsWith("#")) {
-            return;
-          }
-
           const targetUrl = getStandalonePreviewTarget(href);
           event.preventDefault();
           event.stopPropagation();

@@ -18,7 +18,7 @@ Use this when testing Electron-specific features (menus, native dialogs). For re
 
 ## Production Build
 
-Build the React frontend and package a portable Electron app:
+Build the React frontend and package the Electron app:
 
 ```bash
 # Both platforms
@@ -36,6 +36,13 @@ Output directory: `dist-electron/`
 ### Windows note
 
 If you build the Windows app on macOS, native modules like `sharp` may be missing. The `electron:build:win` script installs Windows optional dependencies before packaging. For best results, run Windows builds on Windows.
+
+### Current Packaging Status
+
+- Windows builds run successfully on Windows.
+- Windows signing is now working with `electron-builder` 26.
+- The current Windows target is still `zip`, not an installer.
+- macOS builds are still unsigned (`identity: null`).
 
 ### macOS Output
 
@@ -57,6 +64,32 @@ dist-electron/
 │   └── Widgetizer.exe
 └── Widgetizer-x.x.x-win.zip
 ```
+
+## Windows Signing Status
+
+Windows signing is configured in `package.json` under `build.win.signtoolOptions`.
+
+Working configuration details:
+
+- `signingHashAlgorithms: ["sha256"]`
+- `certificateSubjectName` set to the current Certum/SimplySign certificate subject
+- `rfc3161TimeStampServer` set to `http://time.certum.pl`
+
+Important `electron-builder` 26 note:
+
+- Windows signing options such as `certificateSubjectName`, `signingHashAlgorithms`, and `rfc3161TimeStampServer` must be nested under `win.signtoolOptions`.
+- Putting those keys directly under `build.win` causes schema validation errors and the build fails before signing starts.
+
+How signing was verified:
+
+- `electron-builder` successfully invoked `signtool.exe`
+- `signtool verify /pa /v` passed for `dist-electron/win-unpacked/Widgetizer.exe`
+- Windows file properties showed a valid digital signature and timestamp
+
+SimplySign behavior note:
+
+- Certum SimplySign typically authenticates a session first rather than prompting on every individual signing operation.
+- If the SimplySign Desktop session is active and the certificate is available in the Current User certificate store, signing can complete without an extra PIN dialog during the build.
 
 ## Runtime Paths
 
@@ -118,19 +151,26 @@ Or run in Terminal:
 xattr -cr /path/to/Widgetizer.app
 ```
 
-## Code Signing (Optional for MVP)
+## Code Signing
 
 ### macOS
 
-Unsigned apps trigger Gatekeeper warnings. For MVP/internal testing, this is acceptable with the workaround above.
+We have not implemented macOS signing or notarization yet. Leave this for later.
 
-For public distribution, you need:
+Current macOS status:
 
-- Apple Developer Program ($99/year)
+- `identity: null` in the Electron build config
+- unsigned macOS builds are acceptable for local/internal testing
+- Gatekeeper warnings are still expected for public distribution
+
+When we come back to macOS, we will need:
+
+- Apple Developer Program membership
 - Developer ID Application certificate
-- Notarization
+- notarization
+- hardened runtime and entitlements review
 
-Update `package.json` build config:
+Expected config shape later:
 
 ```json
 "mac": {
@@ -144,9 +184,21 @@ Update `package.json` build config:
 
 ### Windows
 
-Unsigned builds show SmartScreen warnings ("Unknown publisher"). For MVP, this is acceptable.
+Windows app signing is now working for the packaged executable.
 
-For public distribution, use Authenticode code signing certificate.
+What is done:
+
+- Authenticode signing works with the current Certum/SimplySign certificate
+- the executable verifies successfully after signing
+- RFC3161 timestamping is included
+
+What is left for Windows:
+
+- switch the build target from `zip` to `nsis`
+- decide how releases will be published on GitHub Releases
+- add in-app update support with `electron-updater`
+- decide how users should be notified about available updates
+- optionally clean up the `electron:build:win` script to avoid the npm `--platform` / `--arch` warnings
 
 ## Technical Notes
 

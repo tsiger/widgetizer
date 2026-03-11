@@ -9,7 +9,6 @@ import {
   DragOverlay,
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { Plus } from "lucide-react";
 import { debounce, isEqual } from "lodash";
 
@@ -17,7 +16,17 @@ import Button from "../../ui/Button";
 import SortableList from "./SortableList";
 import DragOverlayComponent from "./DragOverlay";
 import { ensureIds, findItemById, getItemAtPath, generateId } from "./utils/menuUtils";
+import {
+  flattenTree,
+  getProjection,
+  getMaxSubtreeDepth,
+  applyDrop,
+  isDescendant,
+  removeActiveFromFlat,
+} from "./utils/treeUtils";
 import { getAllPages } from "../../../queries/pageManager";
+
+const DRAG_DEPTH_STEP = 32; // horizontal drag needed to change depth
 
 function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
   // Ensure all items have IDs
@@ -25,8 +34,17 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
   const [expandedItems, setExpandedItems] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [activeItem, setActiveItem] = useState(null);
+  const [activeItemDepth, setActiveItemDepth] = useState(0);
+  const [activeItemWidth, setActiveItemWidth] = useState(null);
   const [pages, setPages] = useState([]);
   const [openDropdownId, setOpenDropdownId] = useState(null);
+
+  // Cross-level drag state
+  const [projection, setProjection] = useState(null);
+  const activeDepthRef = useRef(0);
+  const activeSubtreeDepthRef = useRef(0);
+  const projectionRef = useRef(null);
+  const rafRef = useRef(null);
 
   // Add this to track if initialItems have changed
   const initialItemsRef = useRef(initialItems);
@@ -44,6 +62,17 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
+  );
+
+  // Flatten tree for rendering — memoized
+  const flattenedItems = useMemo(() => flattenTree(items, expandedItems), [items, expandedItems]);
+
+  const sortableIds = useMemo(() => flattenedItems.map((f) => f.id), [flattenedItems]);
+
+  // Flat list without active item's subtree — for projection calculations
+  const flatItemsWithoutActive = useMemo(
+    () => (activeId ? removeActiveFromFlat(flattenedItems, activeId) : flattenedItems),
+    [flattenedItems, activeId],
   );
 
   // Fetch pages for the link selector - use uuid as value for stable references
@@ -109,97 +138,168 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
     return findItemById(items, id, path, parentItems, itemCache.current);
   }, []);
 
+  // Reset all drag state
+  const resetDragState = useCallback(() => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    setActiveId(null);
+    setActiveItem(null);
+    setActiveItemDepth(0);
+    setActiveItemWidth(null);
+    setProjection(null);
+    activeDepthRef.current = 0;
+    activeSubtreeDepthRef.current = 0;
+    projectionRef.current = null;
+  }, []);
+
+  const getPointerY = useCallback((event) => {
+    const translatedRect = event.active.rect.current.translated;
+    if (translatedRect) {
+      return translatedRect.top + translatedRect.height / 2;
+    }
+
+    const initialRect = event.active.rect.current.initial;
+    if (initialRect) {
+      return initialRect.top + initialRect.height / 2 + event.delta.y;
+    }
+
+    return null;
+  }, []);
+
+  const getRowRects = useCallback((itemsForProjection) => {
+    if (typeof document === "undefined") {
+      return [];
+    }
+
+    const rectMap = new Map();
+    document.querySelectorAll("[data-menu-sortable-id]").forEach((element) => {
+      const id = element.getAttribute("data-menu-sortable-id");
+      if (!id) return;
+
+      const rect = element.getBoundingClientRect();
+      rectMap.set(id, {
+        id,
+        top: rect.top,
+        bottom: rect.bottom,
+        mid: rect.top + rect.height / 2,
+      });
+    });
+
+    return itemsForProjection.map((item) => rectMap.get(item.id)).filter(Boolean);
+  }, []);
+
   // Handle drag start
   const handleDragStart = useCallback(
     (event) => {
       const { active } = event;
       setActiveId(active.id);
+      setActiveItemWidth(active.rect.current.initial?.width ?? null);
 
-      // Find the active item
-      const result = findItemByIdCached(items, active.id);
-      if (result) {
-        setActiveItem(result.item);
+      const flatItem = flattenedItems.find((f) => f.id === active.id);
+      if (flatItem) {
+        setActiveItem(flatItem.item);
+        setActiveItemDepth(flatItem.depth);
+        activeDepthRef.current = flatItem.depth;
+        activeSubtreeDepthRef.current = getMaxSubtreeDepth(flatItem.item);
       }
     },
-    [items, findItemByIdCached],
+    [flattenedItems],
   );
 
-  // Handle drag end
+  // Handle drag move — track projection with rAF throttling
+  const handleDragMove = useCallback(
+    (event) => {
+      const { delta } = event;
+
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
+      rafRef.current = requestAnimationFrame(() => {
+        const pointerY = getPointerY(event);
+        const rowRects = getRowRects(flatItemsWithoutActive);
+        if (pointerY === null) {
+          projectionRef.current = null;
+          setProjection(null);
+          return;
+        }
+
+        const nextProjection = getProjection(
+          flatItemsWithoutActive,
+          pointerY,
+          delta.x,
+          DRAG_DEPTH_STEP,
+          activeDepthRef.current,
+          activeSubtreeDepthRef.current,
+          rowRects,
+        );
+
+        if (nextProjection) {
+          const prev = projectionRef.current;
+          if (
+            !prev ||
+            prev.depth !== nextProjection.depth ||
+            prev.parentId !== nextProjection.parentId ||
+            prev.targetIndex !== nextProjection.targetIndex ||
+            prev.indicatorId !== nextProjection.indicatorId ||
+            prev.indicatorPosition !== nextProjection.indicatorPosition
+          ) {
+            projectionRef.current = nextProjection;
+            setProjection(nextProjection);
+          }
+        }
+      });
+    },
+    [flatItemsWithoutActive, getPointerY, getRowRects],
+  );
+
+  // Handle drag end — apply the drop
   const handleDragEnd = useCallback(
     (event) => {
-      const { active, over } = event;
+      const { active, delta } = event;
 
-      setActiveId(null);
-      setActiveItem(null);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
 
-      if (!over) return;
+      const currentActiveId = active.id;
+      const currentActiveDepth = activeDepthRef.current;
+      const currentSubtreeDepth = activeSubtreeDepthRef.current;
+      const pointerY = getPointerY(event);
+      const rowRects = getRowRects(flatItemsWithoutActive);
 
-      if (active.id !== over.id) {
-        setItems((prevItems) => {
-          // Find the items
-          const activeResult = findItemByIdCached(prevItems, active.id);
-          const overResult = findItemByIdCached(prevItems, over.id);
+      const projection =
+        projectionRef.current ||
+        (pointerY !== null
+          ? getProjection(
+              flatItemsWithoutActive,
+              pointerY,
+              delta.x,
+              DRAG_DEPTH_STEP,
+              currentActiveDepth,
+              currentSubtreeDepth,
+              rowRects,
+            )
+          : null);
 
-          if (!activeResult || !overResult) return prevItems;
+      resetDragState();
 
-          // Check if they're in the same container
-          const activeParentPath = activeResult.path.slice(0, -1);
-          const overParentPath = overResult.path.slice(0, -1);
+      if (!projection) return;
 
-          const sameContainer =
-            activeParentPath.length === overParentPath.length &&
-            activeParentPath.every((value, index) => value === overParentPath[index]);
+      // Prevent dropping into own subtree
+      if (isDescendant(items, currentActiveId, projection.parentId)) return;
 
-          if (sameContainer) {
-            // Get the indices
-            const oldIndex = activeResult.path[activeResult.path.length - 1];
-            const newIndex = overResult.path[overResult.path.length - 1];
+      setItems((prevItems) => {
+        return applyDrop(prevItems, currentActiveId, projection, flatItemsWithoutActive);
+      });
 
-            // Create a new array with the items reordered - use structuredClone for better performance
-            const newItems = structuredClone(prevItems);
-
-            // Get the container in the new items
-            let newContainer;
-            if (activeParentPath.length === 0) {
-              newContainer = newItems;
-            } else {
-              newContainer = getItemAtPath(newItems, activeParentPath);
-            }
-
-            // Reorder the items
-            const reorderedItems = [...newContainer];
-            const [removed] = reorderedItems.splice(oldIndex, 1);
-            reorderedItems.splice(newIndex, 0, removed);
-
-            // Update the container
-            if (activeParentPath.length === 0) {
-              return reorderedItems;
-            } else {
-              let current = newItems;
-              for (let i = 0; i < activeParentPath.length - 1; i++) {
-                if (typeof activeParentPath[i] === "number") {
-                  current = current[activeParentPath[i]];
-                } else if (activeParentPath[i] === "items") {
-                  current = current.items;
-                }
-              }
-
-              if (activeParentPath[activeParentPath.length - 1] === "items") {
-                current.items = reorderedItems;
-              } else {
-                current[activeParentPath[activeParentPath.length - 1]] = reorderedItems;
-              }
-
-              return newItems;
-            }
-          }
-
-          return prevItems;
-        });
+      // Auto-expand parent if item was dropped into a collapsed parent
+      if (projection.parentId && !expandedItems.includes(projection.parentId)) {
+        setExpandedItems((prev) => [...prev, projection.parentId]);
       }
     },
-    [findItemByIdCached],
+    [expandedItems, flatItemsWithoutActive, getPointerY, getRowRects, items, resetDragState],
   );
+
+  // Handle drag cancel
+  const handleDragCancel = useCallback(() => {
+    resetDragState();
+  }, [resetDragState]);
 
   // Add a new top-level item
   const handleAddItem = useCallback(() => {
@@ -382,8 +482,9 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
+      onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
-      modifiers={[restrictToVerticalAxis]}
+      onDragCancel={handleDragCancel}
     >
       <div className="menu-editor">
         <div className="flex justify-between items-center mb-4">
@@ -414,7 +515,8 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
         </div>
 
         <SortableList
-          items={items}
+          flattenedItems={flattenedItems}
+          sortableIds={sortableIds}
           onRemove={handleRemoveItem}
           onEdit={handleEditItem}
           onAddChild={handleAddChildItem}
@@ -424,6 +526,7 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
           pages={pages}
           openDropdownId={openDropdownId}
           onDropdownOpen={handleDropdownOpen}
+          projection={projection}
         />
 
         {items.length === 0 && (
@@ -434,7 +537,15 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
           </div>
         )}
 
-        <DragOverlay>{activeId ? <DragOverlayComponent activeItem={activeItem} /> : null}</DragOverlay>
+        <DragOverlay>
+          {activeId ? (
+            <DragOverlayComponent
+              activeItem={activeItem}
+              projectedDepth={projection?.depth ?? activeItemDepth}
+              width={activeItemWidth}
+            />
+          ) : null}
+        </DragOverlay>
       </div>
     </DndContext>
   );
