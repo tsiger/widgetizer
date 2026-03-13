@@ -235,12 +235,15 @@ export async function buildLatestSnapshot(themeId) {
       const seedEntries = await fs.readdir(seedUpdatesDir, { withFileTypes: true });
       for (const entry of seedEntries) {
         if (entry.isDirectory() && isValidVersion(entry.name)) {
+          const sourceDir = path.join(seedUpdatesDir, entry.name);
           const targetDir = path.join(dataUpdatesDir, entry.name);
-          if (!(await fs.pathExists(targetDir))) {
-            await fs.ensureDir(dataUpdatesDir);
-            await fs.copy(path.join(seedUpdatesDir, entry.name), targetDir);
-            console.log(`[buildLatestSnapshot] Synced update v${entry.name} from seed for ${themeId}`);
-          }
+          const targetExists = await fs.pathExists(targetDir);
+          await fs.ensureDir(dataUpdatesDir);
+          // Always refresh shipped updates so partial installed folders get repaired.
+          await fs.copy(sourceDir, targetDir, { overwrite: true });
+          console.log(
+            `[buildLatestSnapshot] ${targetExists ? "Refreshed" : "Synced"} update v${entry.name} from seed for ${themeId}`,
+          );
         }
       }
     }

@@ -528,6 +528,29 @@ describe("buildLatestSnapshot", () => {
     await fs.remove(getThemeDir(noJsonTheme));
   });
 
+  it("repairs incomplete installed update folders from seed before validating", async () => {
+    const repairedTheme = "repair-from-seed-theme";
+    await createThemeOnDisk(repairedTheme, { version: "1.0.0" });
+
+    const installedUpdateDir = getThemeVersionDir(repairedTheme, "1.1.0");
+    await fs.ensureDir(path.join(installedUpdateDir, "assets"));
+    await fs.writeFile(path.join(installedUpdateDir, "assets", "partial.css"), "partial");
+
+    const seedUpdateDir = path.join(THEMES_SEED_DIR, repairedTheme, "updates", "1.1.0");
+    await fs.ensureDir(seedUpdateDir);
+    await fs.writeFile(path.join(seedUpdateDir, "theme.json"), JSON.stringify({ name: repairedTheme, version: "1.1.0" }));
+    await fs.writeFile(path.join(seedUpdateDir, "seed-file.txt"), "from seed");
+
+    await buildLatestSnapshot(repairedTheme);
+
+    const latestDir = getThemeLatestDir(repairedTheme);
+    assert.ok(await fs.pathExists(path.join(installedUpdateDir, "theme.json")));
+    assert.ok(await fs.pathExists(path.join(latestDir, "seed-file.txt")));
+
+    await fs.remove(getThemeDir(repairedTheme));
+    await fs.remove(path.join(THEMES_SEED_DIR, repairedTheme));
+  });
+
   it("processes deleted/ folder to remove files", async () => {
     const delTheme = "delete-test-theme";
     await createThemeOnDisk(delTheme, { version: "1.0.0" });
