@@ -39,7 +39,7 @@
       }
 
       & .countdown-number {
-        font-size: var(--font-size-4xl);
+        font-size: calc(var(--font-size-4xl) * var(--heading-scale));
         line-height: 1;
         font-variant-numeric: tabular-nums;
         color: var(--text-heading);
@@ -51,12 +51,16 @@
       }
 
       &.style-minimal .countdown-number {
-        font-size: var(--font-size-5xl);
+        font-size: calc(var(--font-size-5xl) * var(--heading-scale));
       }
 
       &.style-minimal .countdown-separator {
         align-self: flex-start;
         padding-block-start: var(--space-md);
+      }
+
+      & .countdown-label {
+        letter-spacing: 0.05em;
       }
 
       & .countdown-expired {
@@ -81,11 +85,11 @@
         }
 
         & .countdown-number {
-          font-size: var(--font-size-2xl);
+          font-size: calc(var(--font-size-2xl) * var(--heading-scale));
         }
 
         &.style-minimal .countdown-number {
-          font-size: var(--font-size-3xl);
+          font-size: calc(var(--font-size-3xl) * var(--heading-scale));
         }
       }
     }
@@ -96,19 +100,19 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -124,29 +128,29 @@
         >
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="days">00</span>
-            <span class="countdown-label block-text block-text-sm block-text-muted block-text-uppercase">Days</span>
+            <span class="countdown-label w-meta t-sm t-uppercase">Days</span>
           </div>
           {% if widget.settings.style == 'minimal' -%}
-            <span class="countdown-separator block-text block-text-4xl block-text-muted">:</span>
+            <span class="countdown-separator t-4xl t-muted">:</span>
           {%- endif %}
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="hours">00</span>
-            <span class="countdown-label block-text block-text-sm block-text-muted block-text-uppercase">Hours</span>
+            <span class="countdown-label w-meta t-sm t-uppercase">Hours</span>
           </div>
           {% if widget.settings.style == 'minimal' -%}
-            <span class="countdown-separator block-text block-text-4xl block-text-muted">:</span>
+            <span class="countdown-separator t-4xl t-muted">:</span>
           {%- endif %}
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="minutes">00</span>
-            <span class="countdown-label block-text block-text-sm block-text-muted block-text-uppercase">Minutes</span>
+            <span class="countdown-label w-meta t-sm t-uppercase">Minutes</span>
           </div>
           {% if widget.settings.show_seconds %}
             {% if widget.settings.style == 'minimal' -%}
-              <span class="countdown-separator block-text block-text-4xl block-text-muted">:</span>
+              <span class="countdown-separator t-4xl t-muted">:</span>
             {%- endif %}
             <div class="countdown-unit">
               <span class="countdown-number" data-unit="seconds">00</span>
-              <span class="countdown-label block-text block-text-sm block-text-muted block-text-uppercase">Seconds</span>
+              <span class="countdown-label w-meta t-sm t-uppercase">Seconds</span>
             </div>
           {% endif %}
         </div>
@@ -187,7 +191,7 @@
         const distance = targetDate - now;
 
         if (distance < 0) {
-          timer.innerHTML = '<div class="countdown-expired block-text block-text-2xl block-text-accent">' + expiredMessage + '</div>';
+          timer.innerHTML = '<div class="countdown-expired w-body t-2xl t-accent">' + expiredMessage + '</div>';
           return;
         }
 

@@ -59,7 +59,7 @@
       }
 
       & .features-split-item-title {
-        margin: 0;
+        font-size: calc(var(--font-size-lg) * var(--heading-scale));
       }
 
       & .features-split-item-description {
@@ -106,19 +106,19 @@
       <div class="features-split-content">
         {% assign content_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign content_delay = content_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign content_delay = content_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <div class="widget-description block-text block-rte reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="description">{{ widget.settings.description | raw }}</div>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
 
@@ -136,11 +136,11 @@
                 {% render 'icon', icon: block.settings.icon, class: 'features-split-icon' %}
               {% endif %}
               <div class="features-split-item-content">
-                <{{ item_heading_level }} class="features-split-item-title block-text block-text-lg block-text-heading-weight block-text-heading" data-setting="title">
+                <{{ item_heading_level }} class="features-split-item-title w-title" data-setting="title">
                   {{ block.settings.title }}
                 </{{ item_heading_level }}>
                 {% if block.settings.description != blank %}
-                  <div class="features-split-item-description block-text block-text-sm block-text-muted block-rte" data-setting="description">
+                  <div class="features-split-item-description w-body w-rte" data-setting="description">
                     {{ block.settings.description | raw }}
                   </div>
                 {% endif %}

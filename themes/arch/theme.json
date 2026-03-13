@@ -195,6 +195,28 @@
             "stack": "\"Inter\", sans-serif",
             "weight": 400
           }
+        },
+        {
+          "type": "range",
+          "id": "heading_scale",
+          "label": "Heading Size",
+          "description": "Scale all heading text sizes up or down",
+          "default": 100,
+          "min": 80,
+          "max": 120,
+          "step": 5,
+          "outputAsCssVar": true
+        },
+        {
+          "type": "range",
+          "id": "body_scale",
+          "label": "Body Text Size",
+          "description": "Scale all body text sizes up or down",
+          "default": 100,
+          "min": 80,
+          "max": 120,
+          "step": 5,
+          "outputAsCssVar": true
         }
       ],
       "privacy": [

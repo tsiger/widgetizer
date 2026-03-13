@@ -40,23 +40,23 @@
         <div class="widget-container {% if widget.settings.height == 'auto' %}widget-container-padded{% endif %}">
           <div class="widget-content widget-content-lg {% if widget.settings.alignment == 'center' %}widget-content-align-center{% else %}widget-content-align-start{% endif %}">
             {% if block.settings.heading_text != blank %}
-              {% assign size_class = 'block-text-' | append: block.settings.heading_size %}
+              {% assign size_class = 't-' | append: block.settings.heading_size %}
               {% if widget.index == 1 and forloop.first %}
-                <h1 class="widget-headline block-text {{ size_class }} block-text-heading-weight block-text-heading" data-block-id="{{ blockId }}" data-setting="heading_text">
+                <h1 class="w-headline {{ size_class }}" data-block-id="{{ blockId }}" data-setting="heading_text">
                   {{ block.settings.heading_text }}
                 </h1>
               {% else %}
-                <h2 class="widget-headline block-text {{ size_class }} block-text-heading-weight block-text-heading" data-block-id="{{ blockId }}" data-setting="heading_text">
+                <h2 class="w-headline {{ size_class }}" data-block-id="{{ blockId }}" data-setting="heading_text">
                   {{ block.settings.heading_text }}
                 </h2>
               {% endif %}
             {% endif %}
             {% if block.settings.text_content != blank %}
-              {% assign size_class = 'block-text-' | append: block.settings.text_size %}
+              {% assign size_class = 't-' | append: block.settings.text_size %}
               {% assign style_class = '' %}
-              {% if block.settings.text_uppercase %}{% assign style_class = style_class | append: ' block-text-uppercase' %}{% endif %}
-              {% if block.settings.text_muted %}{% assign style_class = style_class | append: ' block-text-muted' %}{% endif %}
-              <p class="widget-description block-text {{ size_class }}{{ style_class }}" data-block-id="{{ blockId }}" data-setting="text_content">
+              {% if block.settings.text_uppercase %}{% assign style_class = style_class | append: ' t-uppercase' %}{% endif %}
+              {% if block.settings.text_muted %}{% assign style_class = style_class | append: ' t-muted' %}{% endif %}
+              <p class="w-body {{ size_class }}{{ style_class }}" data-block-id="{{ blockId }}" data-setting="text_content">
                 {{ block.settings.text_content }}
               </p>
             {% endif %}

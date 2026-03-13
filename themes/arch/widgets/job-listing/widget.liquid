@@ -83,7 +83,8 @@
           gap: var(--space-xl);
         }
 
-        & .widget-card-title {
+        & .w-title {
+          font-size: calc(var(--font-size-xl) * var(--heading-scale));
           min-width: 25rem;
           flex-shrink: 0;
         }
@@ -141,19 +142,19 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -177,7 +178,7 @@
         <li>
           <button
             type="button"
-            class="job-filter-btn block-text block-text-sm is-active"
+            class="job-filter-btn w-label t-sm is-active"
             data-filter="all"
             aria-pressed="true"
           >
@@ -189,7 +190,7 @@
             <li>
               <button
                 type="button"
-                class="job-filter-btn block-text block-text-sm"
+                class="job-filter-btn w-label t-sm"
                 data-filter="{{ dept }}"
                 aria-pressed="false"
               >
@@ -218,8 +219,8 @@
           >
             <div class="widget-card-content">
               <div class="job-header">
-                <{{ item_heading_level }} class="widget-card-title block-text block-text-xl block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
-                <div class="job-meta block-text block-text-sm">
+                <{{ item_heading_level }} class="w-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                <div class="job-meta w-meta">
                   <span class="job-meta-item">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" />
@@ -233,7 +234,7 @@
                     </svg>
                     <span data-setting="location">{{ block.settings.location }}</span>
                   </span>
-                  <span class="job-badge block-text block-text-xs block-text-uppercase">
+                  <span class="job-badge w-label t-xs t-uppercase">
                     {% case block.settings.type %}
                       {% when 'full-time' -%}
                         Full-Time

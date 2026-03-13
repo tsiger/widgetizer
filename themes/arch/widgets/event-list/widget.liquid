@@ -37,8 +37,7 @@
       }
 
       & .event-date-day {
-        line-height: 1;
-        color: var(--text-heading);
+        font-size: calc(var(--font-size-4xl) * var(--heading-scale));
       }
 
       & .event-date-month {
@@ -65,19 +64,19 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -93,18 +92,18 @@
           {% assign block = widget.blocks[blockId] %}
           <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             <div class="event-date">
-              <span class="event-date-day block-text-4xl block-text-body-bold" data-setting="day">{{ block.settings.day }}</span>
-              <span class="event-date-month block-text-sm block-text-uppercase block-text-muted" data-setting="month">{{ block.settings.month }}</span>
+              <span class="event-date-day t-4xl t-body-bold" data-setting="day">{{ block.settings.day }}</span>
+              <span class="event-date-month w-meta t-sm t-uppercase" data-setting="month">{{ block.settings.month }}</span>
             </div>
             <div class="widget-card-content">
               {% if block.settings.title != blank %}
-                <{{ item_heading_level }} class="widget-card-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                <{{ item_heading_level }} class="w-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
               {% endif %}
               {% if block.settings.location != blank %}
-                <p class="widget-card-subtitle" data-setting="location">{{ block.settings.location }}</p>
+                <p class="w-meta" data-setting="location">{{ block.settings.location }}</p>
               {% endif %}
               {% if block.settings.description != blank %}
-                <div class="widget-card-description block-rte" data-setting="description">{{ block.settings.description | raw }}</div>
+                <div class="w-body w-rte t-sm" data-setting="description">{{ block.settings.description | raw }}</div>
               {% endif %}
               {% if block.settings.button_link.text != blank %}
                 <div class="widget-card-footer">

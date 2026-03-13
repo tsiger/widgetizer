@@ -9,14 +9,16 @@
       1.1 CSS Reset
       1.2 Design Tokens (CSS Custom Properties)
       1.3 Color Scheme System
+      1.4 Typography Scale Variables
 
    2. BASE STYLES
       2.1 Document Defaults
       2.2 Typography Elements
 
-   3. TYPOGRAPHY UTILITIES
-      3.1 Widget Text Classes
-      3.2 Block Text Classes
+   3. TYPOGRAPHY SYSTEM
+      3.1 Semantic Base Classes (w-)
+      3.2 Text Modifier Classes (t-)
+      3.3 Rich Text Container
 
    4. LAYOUT SYSTEM
       4.1 Widget Container System
@@ -211,6 +213,15 @@ img {
   --rating-star-color: var(--colors-highlight_rating_star, #fbbf24);
 }
 
+/* --------------------------------------------------------------------------
+   1.4 Typography Scale Variables
+   -------------------------------------------------------------------------- */
+
+:root {
+  --heading-scale: calc(var(--typography-heading_scale, 100) / 100);
+  --body-scale: calc(var(--typography-body_scale, 100) / 100);
+}
+
 /* ==========================================================================
    2. BASE STYLES
    ========================================================================== */
@@ -290,153 +301,182 @@ h6 {
 }
 
 /* ==========================================================================
-   3. TYPOGRAPHY UTILITIES
+   3. TYPOGRAPHY SYSTEM
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   3.1 Widget Text Classes
+   3.1 Semantic Base Classes (w-)
    -------------------------------------------------------------------------- */
 
-/* Headlines (Section titles, usually centered) */
-/* .widget-headline - No default style, used for semantic hooking */
-
-/* Titles (Card/item titles) */
-/* .widget-title - No default style, used for semantic hooking */
-
-/* Subtitles */
-/* .widget-subtitle - No default style, used for semantic hooking */
-
-/* Body text / Description */
-.widget-text,
-.widget-description {
-  color: var(--text-content);
-}
-
-/* Large text */
-.widget-text-large {
-  font-size: var(--font-size-lg);
-}
-
-/* Small text */
-.widget-text-small {
-  font-size: var(--font-size-sm);
-}
-
-/* Meta text */
-.widget-meta {
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-normal);
-  color: var(--text-muted);
-}
-
-/* Eyebrow text (Labels above headlines) */
-.widget-eyebrow {
+/* Eyebrow — small label above headlines */
+.w-eyebrow {
   display: block;
-  font-size: var(--font-size-sm);
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
   font-weight: var(--typography-body_font_bold-weight, 700);
-
   letter-spacing: 0.05em;
+  line-height: var(--line-height-relaxed);
   color: var(--text-muted);
-  margin-block-end: var(--space-sm);
+  margin: 0;
+}
+
+/* Headline — section-level heading (h1/h2 in widget header or block-driven) */
+.w-headline {
+  font-weight: var(--typography-heading_font-weight, 700);
+  line-height: var(--line-height-tight);
+  color: var(--text-heading);
+  margin: 0;
+}
+
+/* Title — item-level heading (card title, list item name, accordion question) */
+.w-title {
+  font-weight: var(--typography-heading_font-weight, 700);
+  line-height: var(--line-height-tight);
+  color: var(--text-heading);
+  margin: 0;
+}
+
+/* Description — subtext in header trio only (eyebrow + headline + description) */
+.w-description {
+  line-height: var(--line-height-relaxed);
+  color: var(--text-content);
+  margin: 0;
+}
+
+/* Body — all other body-level text (paragraphs, quotes, content blocks) */
+.w-body {
+  line-height: var(--line-height-relaxed);
+  color: var(--text-content);
+  margin: 0;
+}
+
+/* Meta — small secondary text (dates, roles, captions, subtitles) */
+.w-meta {
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
+  line-height: var(--line-height-relaxed);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Label — small bold text (badges, tags, filter buttons) */
+.w-label {
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-relaxed);
+  color: var(--text-content);
+  margin: 0;
 }
 
 /* --------------------------------------------------------------------------
-   3.2 Block Text Classes
+   3.2 Text Modifier Classes (t-)
    -------------------------------------------------------------------------- */
 
-/* Base block text - resets and default styling */
-.block-text {
-  margin: 0;
-  line-height: var(--line-height-relaxed);
-  color: var(--text-content);
+/* Size modifiers — body scale (xs through xl) */
+.t-xs {
+  font-size: calc(var(--font-size-xs) * var(--body-scale));
 }
 
-/* Size modifiers */
-.block-text-xs {
-  font-size: var(--font-size-xs);
+.t-sm {
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
 }
 
-.block-text-sm {
-  font-size: var(--font-size-sm);
+.t-base {
+  font-size: calc(var(--font-size-base) * var(--body-scale));
 }
 
-.block-text-base {
-  font-size: var(--font-size-base);
+.t-lg {
+  font-size: calc(var(--font-size-lg) * var(--body-scale));
 }
 
-.block-text-lg {
-  font-size: var(--font-size-lg);
+.t-xl {
+  font-size: calc(var(--font-size-xl) * var(--body-scale));
 }
 
-.block-text-xl {
-  font-size: var(--font-size-xl);
-}
-
-.block-text-2xl {
-  font-size: var(--font-size-2xl);
+/* Size modifiers — heading scale (2xl and above) */
+.t-2xl {
+  font-size: calc(var(--font-size-2xl) * var(--heading-scale));
   line-height: var(--line-height-tight);
 }
 
-.block-text-3xl {
-  font-size: var(--font-size-3xl);
+.t-3xl {
+  font-size: calc(var(--font-size-3xl) * var(--heading-scale));
   line-height: var(--line-height-tight);
 }
 
-.block-text-4xl {
-  font-size: var(--font-size-4xl);
+.t-4xl {
+  font-size: calc(var(--font-size-4xl) * var(--heading-scale));
   line-height: var(--line-height-tight);
 }
 
-.block-text-5xl {
-  font-size: var(--font-size-5xl);
+.t-5xl {
+  font-size: calc(var(--font-size-5xl) * var(--heading-scale));
   line-height: var(--line-height-tight);
+}
+
+.t-6xl {
+  font-size: calc(var(--font-size-6xl) * var(--heading-scale));
+  line-height: var(--line-height-tight);
+}
+
+.t-7xl {
+  font-size: calc(var(--font-size-7xl) * var(--heading-scale));
+  line-height: var(--line-height-tight);
+}
+
+.t-8xl {
+  font-size: calc(var(--font-size-8xl) * var(--heading-scale));
+  line-height: 1.1;
+}
+
+.t-9xl {
+  font-size: calc(var(--font-size-9xl) * var(--heading-scale));
+  line-height: 1.1;
 }
 
 /* Weight modifiers */
-.block-text-normal {
+.t-normal {
   font-weight: var(--typography-body_font-weight, 400);
 }
 
-.block-text-medium {
+.t-medium {
   font-weight: var(--font-weight-medium);
 }
 
-.block-text-semibold {
+.t-semibold {
   font-weight: var(--font-weight-semibold);
 }
 
-.block-text-heading-weight {
+.t-heading-weight {
   font-weight: var(--typography-heading_font-weight, 700);
 }
 
-.block-text-body-weight {
-  font-weight: var(--typography-body_font_weight, 400);
-}
-
-.block-text-body-bold {
+.t-body-bold {
   font-weight: var(--typography-body_font_bold-weight, 700);
 }
 
 /* Style modifiers */
-.block-text-uppercase {
+.t-uppercase {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.block-text-muted {
+/* Color modifiers */
+.t-muted {
   color: var(--text-muted);
 }
 
-.block-text-heading {
+.t-heading {
   color: var(--text-heading);
 }
 
-.block-text-accent {
+.t-accent {
   color: var(--accent);
 }
 
-/* Rich text editor content */
-.block-rte {
+/* --------------------------------------------------------------------------
+   3.3 Rich Text Container
+   -------------------------------------------------------------------------- */
+
+.w-rte {
   & p {
     margin-block-end: var(--space-md);
 
@@ -550,7 +590,7 @@ h6 {
     margin-block: 0;
   }
 
-  & .widget-description {
+  & .w-description {
     max-width: 70rem; /* 700px */
     margin-inline: auto;
   }
@@ -720,32 +760,7 @@ h6 {
   margin-block-end: var(--space-lg);
 }
 
-/* Card Title */
-.widget-card-title {
-  font-size: var(--font-size-lg);
-  line-height: var(--line-height-tight);
-  color: var(--text-heading);
-
-  @media (min-width: 990px) {
-    font-size: var(--font-size-xl);
-  }
-}
-
-/* Card Subtitle / Eyebrow */
-.widget-card-subtitle {
-  font-size: var(--font-size-xs);
-  font-weight: var(--typography-body_font_bold-weight, 700);
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-}
-
-/* Card Description */
-.widget-card-description {
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-relaxed);
-  color: var(--text-content);
-  margin-block-end: var(--space-md);
-}
+/* Card typography: use w-title, w-eyebrow/w-meta, w-body + t-* modifiers */
 
 /* Card Content / Body */
 .widget-card-content {
@@ -1677,7 +1692,6 @@ h6 {
   gap: var(--space-xs);
   padding: 0;
   width: 100%;
-  color: var(--text-content);
   list-style: none;
 }
 

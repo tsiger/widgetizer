@@ -39,15 +39,15 @@
     }
 
     /* Hero/Slideshow spacing hierarchy */
-    & .widget-eyebrow {
+    & .w-eyebrow {
       margin-block-end: var(--space-md);
     }
 
-    & .widget-headline {
+    & .w-headline {
       margin-block-end: var(--space-lg);
     }
 
-    & .widget-description {
+    & .w-body {
       margin-block-end: var(--space-lg);
 
       &:last-child {

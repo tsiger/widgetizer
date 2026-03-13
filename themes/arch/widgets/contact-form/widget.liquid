@@ -36,11 +36,11 @@
       }
 
       & .contact-info-title {
-        margin: 0;
+        font-size: calc(var(--font-size-lg) * var(--heading-scale));
       }
 
       & .contact-info-text {
-        margin: 0;
+        font-size: calc(var(--font-size-base) * var(--body-scale));
       }
 
       & .contact-info-link {
@@ -101,19 +101,19 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -245,10 +245,10 @@
               {% if block.type == 'info' %}
                 <div class="contact-info-block" data-block-id="{{ blockId }}">
                   {% if block.settings.title != blank %}
-                    <h3 class="contact-info-title block-text block-text-lg block-text-heading" data-setting="title">{{ block.settings.title }}</h3>
+                    <h3 class="contact-info-title w-title" data-setting="title">{{ block.settings.title }}</h3>
                   {% endif %}
                   {% if block.settings.text != blank %}
-                    <div class="contact-info-text block-text block-text-base block-rte" data-setting="text">
+                    <div class="contact-info-text w-body w-rte" data-setting="text">
                       {{ block.settings.text | raw }}
                     </div>
                   {% endif %}

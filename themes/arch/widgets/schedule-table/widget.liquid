@@ -49,19 +49,19 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -76,18 +76,18 @@
             data-block-id="{{ blockId }}"
             data-day-index="{{ forloop.index0 }}"
           >
-            <span class="schedule-label block-text" data-setting="day">{{ block.settings.day }}</span>
+            <span class="schedule-label w-body" data-setting="day">{{ block.settings.day }}</span>
             {% if block.settings.closed %}
-              <span class="schedule-closed block-text block-text-muted">Closed</span>
+              <span class="schedule-closed w-body t-muted">Closed</span>
             {% else %}
-              <span class="schedule-value block-text block-text-heading" data-setting="hours">{{ block.settings.hours }}</span>
+              <span class="schedule-value w-body t-heading" data-setting="hours">{{ block.settings.hours }}</span>
             {% endif %}
           </div>
         {% endfor %}
       </div>
 
       {% if widget.settings.note != blank %}
-        <p class="schedule-note block-text block-text-sm block-text-muted" data-setting="note">{{ widget.settings.note }}</p>
+        <p class="schedule-note w-meta t-sm" data-setting="note">{{ widget.settings.note }}</p>
       {% endif %}
     </div>
   </div>

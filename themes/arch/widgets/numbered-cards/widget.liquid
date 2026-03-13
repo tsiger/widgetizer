@@ -11,7 +11,9 @@
   <style>
     .widget-{{ widget.id }} {
       & .widget-card-number {
+        font-size: calc(var(--font-size-5xl) * var(--heading-scale));
         line-height: 1;
+        margin: 0;
         margin-block-end: var(--space-md);
         color: var(--text-muted);
       }
@@ -23,19 +25,19 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -54,13 +56,13 @@
           {% assign block = widget.blocks[blockId] %}
           {% assign step_number = forloop.index | prepend: '0' | slice: -2, 2 %}
           <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
-            <div class="widget-card-number block-text block-text-5xl">{{ step_number }}</div>
+            <div class="widget-card-number">{{ step_number }}</div>
             <div class="widget-card-content">
               {% if block.settings.title != blank %}
-                <{{ item_heading_level }} class="widget-card-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                <{{ item_heading_level }} class="w-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
               {% endif %}
               {% if block.settings.description != blank %}
-                <div class="widget-card-description block-rte" data-setting="description">{{ block.settings.description | raw }}</div>
+                <div class="w-body w-rte t-sm" data-setting="description">{{ block.settings.description | raw }}</div>
               {% endif %}
             </div>
           </li>

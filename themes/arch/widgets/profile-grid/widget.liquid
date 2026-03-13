@@ -40,6 +40,7 @@
       }
 
       & .profile-name {
+        font-size: calc(var(--font-size-xl) * var(--heading-scale));
         margin-block-end: var(--space-xs);
       }
 
@@ -95,19 +96,19 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -128,23 +129,23 @@
             {% if block.settings.photo != blank and block.settings.photo != 'placeholder' %}
               {% image src: block.settings.photo, size: 'medium', class: 'profile-image' %}
             {% else %}
-              <div class="profile-image-placeholder block-text block-text-4xl block-text-muted" style="background-image: url({% placeholder_image aspect: 'square', output: 'url' %}); background-size: cover; background-position: center;"></div>
+              <div class="profile-image-placeholder t-4xl t-muted" style="background-image: url({% placeholder_image aspect: 'square', output: 'url' %}); background-size: cover; background-position: center;"></div>
             {% endif %}
 
             {% if block.settings.name != blank %}
-              <{{ item_heading_level }} class="profile-name block-text block-text-xl block-text-heading-weight block-text-heading" data-setting="name">{{ block.settings.name }}</{{ item_heading_level }}>
+              <{{ item_heading_level }} class="profile-name w-title" data-setting="name">{{ block.settings.name }}</{{ item_heading_level }}>
             {% endif %}
 
             {% if block.settings.role != blank %}
-              <p class="profile-role block-text block-text-base block-text-semibold block-text-accent" data-setting="role">{{ block.settings.role }}</p>
+              <p class="profile-role w-meta t-base t-semibold t-accent" data-setting="role">{{ block.settings.role }}</p>
             {% endif %}
 
             {% if block.settings.specialty != blank %}
-              <p class="profile-specialty block-text block-text-sm block-text-muted" data-setting="specialty">{{ block.settings.specialty }}</p>
+              <p class="profile-specialty w-meta t-sm" data-setting="specialty">{{ block.settings.specialty }}</p>
             {% endif %}
 
             {% if block.settings.bio != blank %}
-              <p class="profile-bio block-text block-text-sm" data-setting="bio">{{ block.settings.bio }}</p>
+              <p class="profile-bio w-body t-sm" data-setting="bio">{{ block.settings.bio }}</p>
             {% endif %}
 
             {% assign has_social = false %}

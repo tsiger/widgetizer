@@ -16,10 +16,10 @@
       "default": "Frequently Asked Questions"
     },
     {
-      "type": "richtext",
+      "type": "textarea",
       "id": "description",
       "label": "Description",
-      "default": "<p>Everything you need to know about the product and billing.</p>"
+      "default": "Everything you need to know about the product and billing."
     },
     {
       "type": "header",

@@ -75,12 +75,16 @@
         flex-wrap: wrap;
       }
 
+      & .timeline-date {
+      }
+
       & .timeline-duration {
         padding-inline-start: var(--space-sm);
         border-inline-start: var(--border-width-thin) solid var(--border-color);
       }
 
       & .timeline-title {
+        font-size: calc(var(--font-size-2xl) * var(--heading-scale));
         margin-block-end: var(--space-sm);
       }
 
@@ -90,6 +94,9 @@
         &:last-child {
           margin-block-end: 0;
         }
+      }
+
+      & .feature-item {
       }
 
       @media (min-width: 750px) {
@@ -245,19 +252,19 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -270,17 +277,17 @@
           {% assign item_index = item_index | plus: 1 %}
           <li class="timeline-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             <div class="timeline-marker">
-              <span class="marker-number block-text block-text-base">{{ item_index }}</span>
+              <span class="marker-number w-label t-base">{{ item_index }}</span>
             </div>
 
             <div class="timeline-content">
               {% if block.settings.date != blank or block.settings.duration != blank %}
                 <div class="timeline-meta">
                   {% if block.settings.date != blank %}
-                    <span class="timeline-date block-text block-text-sm block-text-semibold block-text-uppercase block-text-accent" data-setting="date">{{ block.settings.date }}</span>
+                    <span class="timeline-date w-meta t-sm t-semibold t-uppercase t-accent" data-setting="date">{{ block.settings.date }}</span>
                   {% endif %}
                   {% if block.settings.duration != blank %}
-                    <span class="timeline-duration block-text block-text-sm block-text-muted" data-setting="duration">{{ block.settings.duration }}</span>
+                    <span class="timeline-duration w-meta t-sm" data-setting="duration">{{ block.settings.duration }}</span>
                   {% endif %}
                 </div>
               {% endif %}
@@ -290,11 +297,11 @@
                 {% if widget.settings.title == blank %}
                   {% assign item_heading_level = 'h2' %}
                 {% endif %}
-                <{{ item_heading_level }} class="timeline-title block-text block-text-xl block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                <{{ item_heading_level }} class="timeline-title w-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
               {% endif %}
 
               {% if block.settings.description != blank %}
-                <div class="timeline-text block-text block-rte" data-setting="description">{{ block.settings.description | raw }}</div>
+                <div class="timeline-text w-body w-rte" data-setting="description">{{ block.settings.description | raw }}</div>
               {% endif %}
 
               {% if block.settings.features != blank %}
@@ -314,7 +321,7 @@
                         {% assign icon_name = 'x' %}
                         {% assign feature_text = trimmed_feature | remove_first: '-' | strip %}
                       {% endif %}
-                      <li class="feature-item block-text">
+                      <li class="feature-item w-body">
                         {% if icon_name != blank %}
                           <span class="feature-icon">
                             {% render 'icon', icon: icon_name, class: 'feature-icon-svg' %}

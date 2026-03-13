@@ -75,11 +75,9 @@
       }
 
       & .testimonial-name {
-        margin: 0;
       }
 
       & .testimonial-title {
-        margin: 0;
       }
     }
   </style>
@@ -89,19 +87,19 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -134,7 +132,7 @@
             {% endif %}
 
             {% if block.settings.quote != blank %}
-              <p class="testimonial-quote block-text" data-setting="quote">{{ block.settings.quote }}</p>
+              <p class="testimonial-quote w-body" data-setting="quote">{{ block.settings.quote }}</p>
             {% endif %}
 
             <div class="testimonial-author{% if block.settings.avatar == blank %} testimonial-author-no-avatar{% endif %}">
@@ -144,10 +142,10 @@
 
               <div class="testimonial-info">
                 {% if block.settings.name != blank %}
-                  <p class="testimonial-name block-text block-text-semibold block-text-heading" data-setting="name">{{ block.settings.name }}</p>
+                  <p class="testimonial-name w-body t-semibold t-heading" data-setting="name">{{ block.settings.name }}</p>
                 {% endif %}
                 {% if block.settings.title != blank %}
-                  <p class="testimonial-title block-text block-text-sm block-text-muted" data-setting="title">{{ block.settings.title }}</p>
+                  <p class="testimonial-title w-meta t-sm" data-setting="title">{{ block.settings.title }}</p>
                 {% endif %}
               </div>
             </div>

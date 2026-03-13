@@ -63,14 +63,14 @@
       }
 
       & .project-title {
+        font-size: calc(var(--font-size-xl) * var(--heading-scale));
         color: #ffffff;
-        margin: 0;
       }
 
       & .project-description {
+        font-size: calc(var(--font-size-sm) * var(--body-scale));
         color: rgba(255, 255, 255, 0.8);
         margin-block-start: var(--space-xs);
-        margin-block-end: 0;
       }
 
       & .widget-card-link {
@@ -86,19 +86,19 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -124,10 +124,10 @@
             <div class="project-overlay">
               <div class="project-content">
                 {% if block.settings.title != blank %}
-                  <{{ item_heading_level }} class="project-title block-text block-text-xl block-text-heading-weight" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                  <{{ item_heading_level }} class="project-title w-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
                 {% endif %}
                 {% if block.settings.description != blank %}
-                  <p class="project-description block-text block-text-sm" data-setting="description">{{ block.settings.description }}</p>
+                  <p class="project-description w-body t-sm" data-setting="description">{{ block.settings.description }}</p>
                 {% endif %}
               </div>
             </div>

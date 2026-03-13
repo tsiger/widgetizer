@@ -41,7 +41,11 @@
         padding: var(--space-md);
       }
 
-      & .widget-card-title {
+      & .w-title {
+        font-size: calc(var(--font-size-base) * var(--heading-scale));
+      }
+
+      & .widget-card-category {
         margin: 0;
       }
 
@@ -64,19 +68,19 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
           {% if widget.index == 1 %}
-            <h1 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
           {% else %}
-            <h2 class="widget-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
           {% endif %}
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -109,10 +113,10 @@
             {% if block.settings.title != blank or block.settings.category != blank %}
               <div class="widget-card-content">
                 {% if block.settings.title != blank %}
-                  <{{ item_heading_level }} class="widget-card-title block-text block-text-base block-text-heading-weight block-text-heading" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                  <{{ item_heading_level }} class="w-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
                 {% endif %}
                 {% if block.settings.category != blank %}
-                  <p class="widget-card-category block-text block-text-sm" data-setting="category">{{ block.settings.category }}</p>
+                  <p class="widget-card-category w-meta t-sm" data-setting="category">{{ block.settings.category }}</p>
                 {% endif %}
               </div>
             {% endif %}
