@@ -12,14 +12,25 @@ The theme update system enables:
 
 ## Core Concepts
 
+### Two-Directory Architecture
+
+Themes exist in two locations with distinct roles:
+
+1. **Seed directory** (`themes/{name}/`) — The authored source that ships with the app. Checked into git. Read-only at runtime; never modified by the system.
+2. **User data directory** (`data/themes/{name}/`) — The working copy where all runtime operations happen. Gitignored. Provisioned by copying the seed on first launch.
+
+The `latest/` snapshot is only built in the **user data directory** — the seed stays clean (no generated files in source).
+
+When `buildLatestSnapshot` runs, it first syncs any `updates/` folders from the seed into the user data directory, then builds `latest/` there.
+
 ### Version Structure
 
-Themes use a versioned folder structure:
+Theme authors create update folders in the **seed** directory:
 
 ```
-themes/
+themes/                          # Seed directory (source, git-tracked)
   arch/
-    theme.json          # Base version (e.g., 1.0.0)
+    theme.json                   # Base version (e.g., 1.0.0)
     layout.liquid
     screenshot.png
     widgets/
@@ -27,16 +38,30 @@ themes/
     templates/
     menus/
     snippets/
-    updates/            # Version update folders (partial updates)
+    updates/                     # Version update folders (partial updates)
       1.1.0/
-        theme.json      # Required, version must match folder name
+        theme.json               # Required, version must match folder name
         widgets/
           new-widget/
       1.2.0/
         theme.json
         assets/
           updated-file.css
-    latest/             # Materialized snapshot (auto-built)
+```
+
+At runtime, the system builds a composed snapshot in the **user data** directory:
+
+```
+data/themes/                     # User data directory (runtime, gitignored)
+  arch/
+    theme.json                   # Copied from seed
+    layout.liquid
+    widgets/
+    assets/
+    updates/                     # Synced from seed + any uploaded updates
+      1.1.0/
+      1.2.0/
+    latest/                      # Materialized snapshot (auto-built here)
 ```
 
 ### Partial Updates (Delta Updates)
@@ -50,19 +75,17 @@ Each version folder in `updates/` contains **only the files that changed** in th
 
 ### File Deletions
 
-To **remove** files from previous versions, add a `deleted/` folder to your version update. The structure inside `deleted/` mirrors the paths you want to remove:
+To **remove** files from previous versions, add a `deleted/` folder to your version update (in the seed). The structure inside `deleted/` mirrors the paths you want to remove:
 
 ```
-themes/
-  arch/
-    updates/
-      1.2.0/
-        theme.json
-        deleted/              # Files/folders to remove
-          widgets/
-            deprecated-widget/  # This widget will be deleted from latest/
-          assets/
-            old-style.css       # This file will be deleted from latest/
+themes/arch/updates/             # In the seed directory
+  1.2.0/
+    theme.json
+    deleted/                     # Files/folders to remove
+      widgets/
+        deprecated-widget/       # This widget will be deleted from latest/
+      assets/
+        old-style.css            # This file will be deleted from latest/
 ```
 
 **How it works:**
@@ -86,19 +109,21 @@ themes/
 
 ### Materialized Snapshot (`latest/`)
 
-The `latest/` folder is a **composed, ready-to-use snapshot** built by the system:
+The `latest/` folder is a **composed, ready-to-use snapshot** built in `data/themes/{name}/latest/` (never in the seed directory):
 
-1. Start from the base version (root theme files)
-2. Apply each version folder in `updates/` in semver order
-3. For each version, copy its files over the previous state
-4. For each version, process `deleted/` folder removals
-5. Result: `latest/` contains the complete, up-to-date theme
+1. Sync any new `updates/` folders from the seed into `data/themes/{name}/updates/`
+2. Start from the base version (root theme files)
+3. Apply each version folder in `updates/` in semver order
+4. For each version, copy its files over the previous state
+5. For each version, process `deleted/` folder removals
+6. Result: `latest/` contains the complete, up-to-date theme
 
 **Key behaviors:**
 
 - If a file exists in multiple versions, the **latest version wins**
 - `latest/` is rebuilt when a theme author clicks "Update" on the Themes page
 - Projects read theme files from `latest/` (or base if `latest/` doesn't exist)
+- The seed directory (`themes/{name}/`) is never modified — only the user data directory is
 
 ## Update Eligibility
 

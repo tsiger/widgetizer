@@ -521,6 +521,7 @@ h6 {
 .widget-container {
   position: relative;
   z-index: 2;
+  width: 1005;
   max-width: var(--container-max-width);
   margin-inline: auto;
   margin-block: var(--section-padding-block);
@@ -1530,6 +1531,29 @@ h6 {
 
     & .header-contact-mobile {
       display: none;
+    }
+
+     /* Centered navigation layout */
+    & .header-inner.header-center-nav {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+    }
+ 
+    & .header-inner.header-center-nav .header-actions {
+      display: contents;
+    }
+ 
+    & .header-inner.header-center-nav .header-branding {
+      justify-self: start;
+    }
+ 
+    & .header-inner.header-center-nav .header-nav {
+      justify-self: center;
+    }
+ 
+    & .header-inner.header-center-nav .desktop-cta {
+      justify-self: end;
     }
   }
 }

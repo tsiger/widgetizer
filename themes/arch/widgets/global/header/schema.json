@@ -93,6 +93,13 @@
       "default": false
     },
     {
+      "type": "checkbox",
+      "id": "center_nav",
+      "label": "Center Navigation",
+      "description": "Centers the navigation menu in the header with the logo on the left and CTA on the right (desktop only)",
+      "default": false
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",

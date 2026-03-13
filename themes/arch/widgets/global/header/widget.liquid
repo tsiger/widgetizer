@@ -29,7 +29,7 @@
     {% endunless %}
   </style>
 
-  <div class="header-inner">
+  <div class="header-inner{% if widget.settings.center_nav %} header-center-nav{% endif %}">
     <div class="header-branding">
       <a href="index.html" class="header-logo">
         {% if widget.settings.logoImage != blank %}
