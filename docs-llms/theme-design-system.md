@@ -377,70 +377,97 @@ h1-h6 {
 | `h5`    | `--font-size-xl`  | 20px |
 | `h6`    | `--font-size-lg`  | 18px |
 
-### Widget Text Classes
+### Semantic Base Classes (`w-` prefix)
 
-Semantic text classes for use in widget templates:
+Each class is a complete, self-contained text style. All set `margin: 0`. Modifiers (`t-*`) can always override.
 
-| Class | Purpose | Styles |
+| Class | Role | Key Properties |
 | --- | --- | --- |
-| `.widget-headline` | Section titles | Semantic hook, no default styles |
-| `.widget-title` | Card/item titles | Semantic hook, no default styles |
-| `.widget-subtitle` | Subtitles | Semantic hook, no default styles |
-| `.widget-text` / `.widget-description` | Body text | `color: var(--text-content)` |
-| `.widget-text-large` | Large text | `font-size: var(--font-size-lg)` |
-| `.widget-text-small` | Small text | `font-size: var(--font-size-sm)` |
-| `.widget-meta` | Metadata text | `font-size: sm`, `color: --text-muted` |
-| `.widget-eyebrow` | Labels above headlines | `sm`, `bold`, `uppercase`, `0.05em tracking`, `--text-muted` |
+| `.w-eyebrow` | Small label above headline | `font-size-sm * body-scale`, `body-bold weight`, `letter-spacing: 0.05em`, `color: --text-muted` |
+| `.w-headline` | Section-level heading (h1/h2) | `heading font-weight`, `color: --text-heading`, `line-height-tight` |
+| `.w-title` | Item-level heading (card title, list item name) | `heading font-weight`, `color: --text-heading`, `line-height-tight` |
+| `.w-description` | Subtext in header trio ONLY | `line-height-relaxed`, `color: --text-content` |
+| `.w-body` | All other body-level text | `line-height-relaxed`, `color: --text-content` |
+| `.w-meta` | Small secondary text (dates, roles, captions) | `font-size-sm * body-scale`, `color: --text-muted` |
+| `.w-label` | Small bold text (badges, tags, filters) | `font-size-sm * body-scale`, `font-weight-semibold` |
 
-### Block Text Classes
+Notes:
+- `w-headline` vs `w-title`: headline = section-level (h1/h2 in widget header), title = item-level (card title, list item name)
+- `w-description` is **only** for the header trio (eyebrow + headline + description). Gets `max-width: 70rem` inside `.widget-header`.
+- `w-body` is for all other body-level text
+- `w-eyebrow` does NOT include `text-transform: uppercase` — add `t-uppercase` explicitly when needed
 
-Composable text utility classes used within widget blocks:
+### Text Modifier Classes (`t-` prefix)
 
-#### Base
-
-| Class         | Effect                                                             |
-| ------------- | ------------------------------------------------------------------ |
-| `.block-text` | Reset margins, set `line-height: relaxed`, `color: --text-content` |
+Short, composable modifiers. Declared after base classes in CSS so they always win.
 
 #### Size Modifiers
 
-| Class              | Font Size Token           |
-| ------------------ | ------------------------- |
-| `.block-text-xs`   | `--font-size-xs` (12px)   |
-| `.block-text-sm`   | `--font-size-sm` (14px)   |
-| `.block-text-base` | `--font-size-base` (16px) |
-| `.block-text-lg`   | `--font-size-lg` (18px)   |
-| `.block-text-xl`   | `--font-size-xl` (20px)   |
-| `.block-text-2xl`  | `--font-size-2xl` (24px)  |
-| `.block-text-3xl`  | `--font-size-3xl` (28px)  |
-| `.block-text-4xl`  | `--font-size-4xl` (32px)  |
-| `.block-text-5xl`  | `--font-size-5xl` (36px)  |
+Body-scale sizes (xs–xl) use `--body-scale`, heading-scale sizes (2xl–9xl) use `--heading-scale`:
 
-Sizes 2xl and above also set `line-height: var(--line-height-tight)`.
+| Class | Font Size | Scale |
+| --- | --- | --- |
+| `.t-xs` | `--font-size-xs` (12px) | body-scale |
+| `.t-sm` | `--font-size-sm` (14px) | body-scale |
+| `.t-base` | `--font-size-base` (16px) | body-scale |
+| `.t-lg` | `--font-size-lg` (18px) | body-scale |
+| `.t-xl` | `--font-size-xl` (20px) | body-scale |
+| `.t-2xl` | `--font-size-2xl` (24px) | heading-scale + line-height-tight |
+| `.t-3xl` | `--font-size-3xl` (28px) | heading-scale + line-height-tight |
+| `.t-4xl` | `--font-size-4xl` (32px) | heading-scale + line-height-tight |
+| `.t-5xl` | `--font-size-5xl` (36px) | heading-scale + line-height-tight |
+| `.t-6xl` | `--font-size-6xl` (40px) | heading-scale + line-height-tight |
+| `.t-7xl` … `.t-9xl` | `--font-size-7xl` … `--font-size-9xl` | heading-scale + line-height-tight |
 
 #### Weight Modifiers
 
-| Class                        | Weight Source                                  |
-| ---------------------------- | ---------------------------------------------- |
-| `.block-text-normal`         | `var(--typography-body_font-weight, 400)`      |
-| `.block-text-medium`         | `var(--font-weight-medium)` (500)              |
-| `.block-text-semibold`       | `var(--font-weight-semibold)` (600)            |
-| `.block-text-heading-weight` | `var(--typography-heading_font-weight, 700)`   |
-| `.block-text-body-weight`    | `var(--typography-body_font_weight, 400)`      |
-| `.block-text-body-bold`      | `var(--typography-body_font_bold-weight, 700)` |
+| Class | Weight Source |
+| --- | --- |
+| `.t-normal` | `var(--typography-body_font-weight, 400)` |
+| `.t-medium` | `var(--font-weight-medium)` (500) |
+| `.t-semibold` | `var(--font-weight-semibold)` (600) |
+| `.t-heading-weight` | `var(--typography-heading_font-weight, 700)` |
+| `.t-body-bold` | `var(--typography-body_font_bold-weight, 700)` |
+
+#### Color Modifiers
+
+| Class | Effect |
+| --- | --- |
+| `.t-muted` | `color: var(--text-muted)` |
+| `.t-heading` | `color: var(--text-heading)` |
+| `.t-accent` | `color: var(--accent)` |
 
 #### Style Modifiers
 
-| Class                   | Effect                                                |
-| ----------------------- | ----------------------------------------------------- |
-| `.block-text-uppercase` | `text-transform: uppercase`, `letter-spacing: 0.05em` |
-| `.block-text-muted`     | `color: var(--text-muted)`                            |
-| `.block-text-heading`   | `color: var(--text-heading)`                          |
-| `.block-text-accent`    | `color: var(--accent)`                                |
+| Class | Effect |
+| --- | --- |
+| `.t-uppercase` | `text-transform: uppercase; letter-spacing: 0.05em` |
 
-#### Rich Text Content
+### Typography Scale Variables
 
-`.block-rte` — Styles rich text editor output. Adds bottom margin to `<p>` tags (except last child) and styles links with accent color and hover underline.
+Two independent scale multipliers allow users to adjust body and heading text sizes:
+
+```css
+--heading-scale: calc(var(--typography-heading_scale, 100) / 100);
+--body-scale: calc(var(--typography-body_scale, 100) / 100);
+```
+
+Body-size classes (xs–xl) multiply by `--body-scale`. Heading-size classes (2xl–9xl) multiply by `--heading-scale`.
+
+### Rich Text Container
+
+`.w-rte` — Styles rich text editor output. Adds bottom margin to `<p>` tags (except last child), styles links with accent color and hover underline, and formats `<ul>`, `<ol>`, and `<li>` elements.
+
+### Dynamic Size/Style Classes in Liquid
+
+Templates build dynamic classes using the `t-` prefix:
+
+```liquid
+{% assign size_class = 't-' | append: block.settings.size %}
+{% assign style_class = '' %}
+{% if block.settings.uppercase %}{% assign style_class = style_class | append: ' t-uppercase' %}{% endif %}
+{% if block.settings.muted %}{% assign style_class = style_class | append: ' t-muted' %}{% endif %}
+```
 
 ---
 
@@ -513,7 +540,7 @@ Centered section header with flex column layout:
 - `text-align: center`, `align-items: center`
 - `margin-block-end: var(--space-2xl)` — Gap before content
 - `gap: var(--space-sm)` — Between header children
-- `.widget-description` inside is capped at `max-width: 70rem` (700px)
+- `.w-description` inside is capped at `max-width: 70rem` (700px)
 
 ### Content Width Modifiers
 
@@ -624,13 +651,12 @@ An alternative grid container with the same breakpoint behavior as `.widget-grid
 | -------------------------- | ----------------- | ------------------------------------------------------------ |
 | `.widget-card-flat`        | No-border variant | `background: var(--bg-secondary)`                            |
 | `.widget-card-header`      | Header section    | `margin-block-end: var(--space-lg)`                          |
-| `.widget-card-title`       | Title             | `font-size: lg` (xl @990px), `color: --text-heading`         |
-| `.widget-card-subtitle`    | Uppercase eyebrow | `xs`, `bold`, `uppercase`, `0.05em tracking`, `--text-muted` |
-| `.widget-card-description` | Body text         | `sm`, `relaxed line-height`, `--text-content`                |
 | `.widget-card-content`     | Main body         | `flex: 1` (fills remaining space)                            |
 | `.widget-card-footer`      | Bottom section    | `margin-block-start: auto` (pushes to bottom)                |
 | `.widget-card-image`       | Cover image       | `aspect-ratio: 16/9`, `object-fit: cover`                    |
 | `.widget-card-icon`        | Accent icon       | `--icon-size-lg`, `color: --accent`                          |
+
+Card typography uses `w-*` + `t-*` classes: `w-title` for card titles, `w-eyebrow` or `w-meta` for subtitles, `w-body w-rte` for card descriptions.
 
 ### Buttons
 
@@ -835,7 +861,7 @@ For displaying lists of features or benefits:
 | Class               | Purpose                                                        |
 | ------------------- | -------------------------------------------------------------- |
 | `.features-list`    | Container — flex column, `gap: --space-xs`, resets list styles |
-| `.feature-item`     | Row — flex, `gap: --space-xs`, `color: --text-content`         |
+| `.feature-item`     | Row — flex, `gap: --space-xs` (add `w-body` for text styling)  |
 | `.feature-icon`     | Icon wrapper — `flex-shrink: 0`, `color: --text-content`       |
 | `.feature-icon-svg` | Icon SVG — `1em` square                                        |
 
@@ -1074,9 +1100,9 @@ Widgets use `widget.index` to determine heading levels (h1 vs h2) for proper sem
 
 ```liquid
 {% if widget.index == 1 %}
-  <h1 class="widget-headline">{{ widget.settings.title }}</h1>
+  <h1 class="w-headline">{{ widget.settings.title }}</h1>
 {% else %}
-  <h2 class="widget-headline">{{ widget.settings.title }}</h2>
+  <h2 class="w-headline">{{ widget.settings.title }}</h2>
 {% endif %}
 ```
 
@@ -1112,4 +1138,4 @@ Apply `.reveal` + direction class to elements, with staggered delays using `--re
 
 The Arch theme ships with 42 widgets organized by purpose:
 
-**Heroes & Banners**: banner, slideshow, split-hero, image-callout **Content**: rich-text, image-text, features-split, content-switcher **Cards & Grids**: card-grid, icon-card-grid, numbered-cards, bento-grid, profile-grid, project-showcase **Data & Lists**: accordion, comparison-table, icon-list, key-figures, pricing, priced-list, schedule-table, job-listing, event-list **Media**: image, gallery, masonry-gallery, video, video-embed, comparison-slider, image-hotspots, image-tabs **Social & Trust**: testimonials, testimonial-hero, logo-cloud, trust-bar, social-icons **Interactive**: countdown, map, embed, podcast-player **Forms**: contact-form **Timeline**: timeline **Global**: header (global), footer (global)
+**Heroes & Banners**: banner, slideshow, split-hero, image-callout **Content**: rich-text, image-text, features-split, content-switcher **Cards & Grids**: card-grid, icon-card-grid, numbered-cards, bento-grid, profile-grid, project-showcase **Data & Lists**: accordion, comparison-table, icon-list, key-figures, pricing, priced-list, schedule-table, job-listing, event-list **Media**: image, gallery, masonry-gallery, video-embed, comparison-slider, image-hotspots, image-tabs **Social & Trust**: testimonials, testimonial-hero, logo-cloud, trust-bar, social-icons **Interactive**: countdown, map, embed **Forms**: contact-form **Timeline**: timeline **Global**: header (global), footer (global)

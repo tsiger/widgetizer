@@ -74,13 +74,13 @@ Every widget follows this structure:
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% if widget.settings.eyebrow != blank %}
-          <span class="widget-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow t-uppercase" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
         {% endif %}
         {% if widget.settings.title != blank %}
-          <h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+          <h2 class="w-headline" data-setting="title">{{ widget.settings.title }}</h2>
         {% endif %}
         {% if widget.settings.description != blank %}
-          <p class="widget-description" data-setting="description">{{ widget.settings.description }}</p>
+          <p class="w-description" data-setting="description">{{ widget.settings.description }}</p>
         {% endif %}
       </div>
     {% endif %}
@@ -116,20 +116,24 @@ For widgets with dynamic block ordering (text, headings, buttons), use the **con
     {% assign block = widget.blocks[blockId] %}
     {% case block.type %}
       {% when 'heading' %}
-        {% assign size_class = 'block-text-' | append: block.settings.size %}
+        {% assign size_class = 't-' | append: block.settings.size %}
         {% if widget.index == 1 %}
-          <h1 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
+          <h1 class="w-headline {{ size_class }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
             {{ block.settings.text }}
           </h1>
         {% else %}
-          <h2 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
+          <h2 class="w-headline {{ size_class }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
             {{ block.settings.text }}
           </h2>
         {% endif %}
       {% when 'text' %}
-        <p class="widget-description block-text block-text-{{ block.settings.size }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
-          {{ block.settings.text }}
-        </p>
+        {%- assign size_class = 't-' | append: block.settings.size -%}
+        {%- assign style_class = '' -%}
+        {%- if block.settings.uppercase -%}{%- assign style_class = style_class | append: ' t-uppercase' -%}{%- endif -%}
+        {%- if block.settings.muted -%}{%- assign style_class = style_class | append: ' t-muted' -%}{%- endif -%}
+        <div class="w-body w-rte {{ size_class }}{{ style_class }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
+          {{ block.settings.text | raw }}
+        </div>
       {% when 'button' %}
         <div class="widget-actions reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
           <a href="#" class="widget-button widget-button-{{ block.settings.size }} widget-button-primary">
@@ -324,64 +328,83 @@ Use **native CSS nesting** with `&`:
 
 ## Typography System
 
-### Block Text Utilities
+The typography system uses two class layers: **semantic base classes** (`w-` prefix) that define the role and default styles of text, and **text modifiers** (`t-` prefix) that override individual properties.
 
-**Never hardcode `font-size`, `font-weight`, `line-height`, or `color` in CSS.** Use `block-text` utility classes instead:
+### Semantic Base Classes (`w-` prefix)
 
-#### Size Modifiers
-
-```html
-<span class="block-text block-text-xs">Extra small</span>
-<span class="block-text block-text-sm">Small</span>
-<span class="block-text block-text-base">Base</span>
-<span class="block-text block-text-lg">Large</span>
-<span class="block-text block-text-xl">Extra large</span>
-<span class="block-text block-text-2xl">2X Large</span>
-<span class="block-text block-text-3xl">3X Large</span>
-<span class="block-text block-text-4xl">4X Large</span>
-<span class="block-text block-text-5xl">5X Large</span>
-```
-
-#### Weight Modifiers
+Each class is a complete, self-contained text style with `margin: 0`. Always start with one `w-*` class per element.
 
 ```html
-<span class="block-text block-text-normal">Normal (400)</span>
-<span class="block-text block-text-medium">Medium (500)</span>
-<span class="block-text block-text-semibold">Semibold (600)</span>
-<span class="block-text block-text-bold">Bold (700)</span>
+<span class="w-eyebrow t-uppercase">Label</span>      <!-- Small muted label -->
+<h2 class="w-headline">Section Heading</h2>             <!-- Section-level heading -->
+<h3 class="w-title">Card Title</h3>                     <!-- Item-level heading -->
+<p class="w-description">Subtext below headline</p>     <!-- Header trio only -->
+<p class="w-body">Body content text</p>                  <!-- All other body text -->
+<span class="w-meta t-sm">Jan 2025</span>               <!-- Small muted metadata -->
+<span class="w-label t-xs t-uppercase">Badge</span>     <!-- Small bold label -->
 ```
 
-#### Color Modifiers
+Key distinctions:
+- `w-headline` = section-level (h1/h2 in widget header). `w-title` = item-level (card title, list item).
+- `w-description` = header trio subtext ONLY. `w-body` = all other body text.
+- `w-eyebrow` does NOT include uppercase — add `t-uppercase` explicitly when needed.
+
+### Text Modifier Classes (`t-` prefix)
+
+Composable modifiers layered on top of any `w-*` base class:
 
 ```html
-<span class="block-text block-text-muted">Muted text</span>
-<span class="block-text block-text-heading">Heading color</span>
-<span class="block-text block-text-accent">Accent color</span>
+<h3 class="w-title t-2xl">Large title</h3>
+<p class="w-body t-sm t-muted">Small muted text</p>
+<span class="w-meta t-sm t-uppercase t-accent">Styled meta</span>
 ```
 
-#### Style Modifiers
+**Size** (`t-xs` through `t-xl` use body-scale; `t-2xl` through `t-9xl` use heading-scale):
+```html
+<span class="w-body t-sm">Small body</span>
+<h2 class="w-headline t-5xl">Large heading</h2>
+```
+
+**Weight**: `t-normal`, `t-medium`, `t-semibold`, `t-heading-weight`, `t-body-bold`
+
+**Color**: `t-muted`, `t-heading`, `t-accent`
+
+**Style**: `t-uppercase` (adds `text-transform: uppercase` + `letter-spacing: 0.05em`)
+
+### Rich Text Container
+
+Use `w-rte` alongside `w-body` for richtext field output:
 
 ```html
-<span class="block-text block-text-uppercase">UPPERCASE</span>
+<div class="w-body w-rte t-sm">{{ block.settings.text | raw }}</div>
 ```
 
-#### Combined Example
+`w-rte` styles nested `<p>`, `<a>`, `<ul>`, `<ol>`, and `<li>` elements.
 
-```html
-<h3 class="widget-card-title block-text block-text-xl block-text-bold block-text-heading">Card Title</h3>
-<p class="widget-card-description block-text block-text-sm block-text-muted">Description text</p>
+### Dynamic Size/Style Classes in Liquid
+
+For widgets with configurable text size and style:
+
+```liquid
+{%- assign size_class = 't-' | append: block.settings.size -%}
+{%- assign style_class = '' -%}
+{%- if block.settings.uppercase -%}{%- assign style_class = style_class | append: ' t-uppercase' -%}{%- endif -%}
+{%- if block.settings.muted -%}{%- assign style_class = style_class | append: ' t-muted' -%}{%- endif -%}
+
+<div class="w-body w-rte {{ size_class }}{{ style_class }}">{{ block.settings.text | raw }}</div>
 ```
 
-### Semantic Classes
+### Scoped CSS Role
 
-These classes are semantic hooks (no default styling) for targeting in CSS:
+Scoped CSS (`& .element { ... }`) should ONLY handle:
+- **Layout** (flex, grid, width, gap, position, text-align)
+- **Spacing** (padding, margin-block-end)
+- **Font-size** (with scale multipliers — keep in scoped CSS for now)
+- **Widget-specific visual** (transitions, animations, borders, border-radius)
 
-- `.widget-headline` - Section titles (usually `<h2>`)
-- `.widget-title` - Card/item titles (usually `<h3>`)
-- `.widget-subtitle` - Secondary headings
-- `.widget-description` - Body text
-- `.widget-eyebrow` - Small label above headline
-- `.widget-meta` - Meta information (dates, categories)
+It should **NOT** set `color`, `font-weight`, or `line-height` — these belong in `w-*` and `t-*` classes.
+
+Exception: Elements with hardcoded colors (e.g. project overlay with `color: #fff`) can set color in scoped CSS.
 
 ---
 
@@ -602,8 +625,8 @@ Note: Custom backgrounds override the color scheme background completely.
 <div class="widget-card">
   <!-- Optional Header -->
   <div class="widget-card-header">
-    <span class="widget-card-subtitle">Category</span>
-    <h3 class="widget-card-title">Card Title</h3>
+    <span class="w-eyebrow t-xs">Category</span>
+    <h3 class="w-title">Card Title</h3>
   </div>
 
   <!-- Optional Image -->
@@ -611,7 +634,7 @@ Note: Custom backgrounds override the color scheme background completely.
 
   <!-- Main Content -->
   <div class="widget-card-content">
-    <p class="widget-card-description">Description</p>
+    <p class="w-body t-sm">Description</p>
   </div>
 
   <!-- Optional Footer -->
@@ -969,8 +992,8 @@ Each increment adds 0.1s delay. So `--reveal-delay: 0` has no delay, `--reveal-d
     {% assign block = widget.blocks[blockId] %}
     <div class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
       {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
-      <h3 class="widget-card-title">{{ block.settings.title }}</h3>
-      <p class="widget-card-description">{{ block.settings.description }}</p>
+      <h3 class="w-title">{{ block.settings.title }}</h3>
+      <p class="w-body t-sm">{{ block.settings.description }}</p>
     </div>
   {% endfor %}
 </div>
@@ -1287,15 +1310,11 @@ To ensure consistency across widgets, use these standardized block definitions:
 **Template usage:**
 
 ```liquid
-{% assign size_class = 'block-text-' | append: block.settings.size %}
+{% assign size_class = 't-' | append: block.settings.size %}
 {% if widget.index == 1 %}
-  <h1 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading">
-    {{ block.settings.text }}
-  </h1>
+  <h1 class="w-headline {{ size_class }}">{{ block.settings.text }}</h1>
 {% else %}
-  <h2 class="widget-headline block-text {{ size_class }} block-text-bold block-text-heading">
-    {{ block.settings.text }}
-  </h2>
+  <h2 class="w-headline {{ size_class }}">{{ block.settings.text }}</h2>
 {% endif %}
 ```
 
@@ -1346,13 +1365,13 @@ To ensure consistency across widgets, use these standardized block definitions:
 **Template usage:**
 
 ```liquid
-{% assign size_class = 'block-text-' | append: block.settings.size %}
-{% assign style_class = '' %}
-{% if block.settings.uppercase %}{% assign style_class = style_class | append: ' block-text-uppercase' %}{% endif %}
-{% if block.settings.muted %}{% assign style_class = style_class | append: ' block-text-muted' %}{% endif %}
-<p class="widget-description block-text {{ size_class }}{{ style_class }}">
-  {{ block.settings.text }}
-</p>
+{%- assign size_class = 't-' | append: block.settings.size -%}
+{%- assign style_class = '' -%}
+{%- if block.settings.uppercase -%}{%- assign style_class = style_class | append: ' t-uppercase' -%}{%- endif -%}
+{%- if block.settings.muted -%}{%- assign style_class = style_class | append: ' t-muted' -%}{%- endif -%}
+<div class="w-body w-rte {{ size_class }}{{ style_class }}">
+  {{ block.settings.text | raw }}
+</div>
 ```
 
 ---
@@ -1510,9 +1529,9 @@ Example implementation:
 {%- comment -%} Widget header {%- endcomment -%}
 {% if widget.settings.title != blank %}
   {% if widget.index == 1 %}
-    <h1 class="widget-headline">{{ widget.settings.title }}</h1>
+    <h1 class="w-headline">{{ widget.settings.title }}</h1>
   {% else %}
-    <h2 class="widget-headline">{{ widget.settings.title }}</h2>
+    <h2 class="w-headline">{{ widget.settings.title }}</h2>
   {% endif %}
 {% endif %}
 
@@ -1604,7 +1623,7 @@ Example implementation:
 Add `data-setting` attributes to enable instant text updates in the editor:
 
 ```liquid
-<h2 class="widget-headline" data-setting="title">{{ widget.settings.title }}</h2>
+<h2 class="w-headline" data-setting="title">{{ widget.settings.title }}</h2>
 <p data-setting="description">{{ widget.settings.description }}</p>
 <a href="..." data-setting="button_link">{{ widget.settings.button_link.text }}</a>
 ```
@@ -1639,7 +1658,7 @@ Before submitting a widget:
 - [ ] ARIA attributes for interactive elements
 - [ ] Keyboard navigation works
 - [ ] Responsive on mobile, tablet, desktop
-- [ ] Uses `block-text` utilities (no hardcoded typography CSS)
+- [ ] Uses `w-*` base classes and `t-*` modifiers (no hardcoded typography CSS)
 - [ ] Background setting at END of settings array (if applicable)
 - [ ] No duplicate CSS properties from `base.css`
 - [ ] Scroll reveal animations added to content elements (`.reveal .reveal-up` with `--reveal-delay`)
