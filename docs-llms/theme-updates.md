@@ -225,12 +225,12 @@ When updating `theme.json`, the system uses intelligent merging:
 
 ### 1. Theme Author Publishes Update
 
-1. Create version folder in `themes/{name}/updates/` (e.g., `1.2.0/`)
+1. Create version folder in the **seed** directory: `themes/{name}/updates/` (e.g., `1.2.0/`)
 2. Add `theme.json` with matching version
 3. Add changed files only
 4. Go to Themes page in Widgetizer
 5. Click "Update" button on the theme card
-6. System builds `latest/` snapshot
+6. System syncs seed updates into `data/themes/{name}/updates/` and builds `latest/` there
 7. Zip and distribute the entire theme folder (including `updates/`)
 
 ### Distributing Theme Updates
