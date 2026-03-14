@@ -1,7 +1,12 @@
 {
   "type": "countdown",
   "displayName": "Countdown Timer",
-  "aliases": ["timer", "launch date", "offer ends", "deadline"],
+  "aliases": [
+    "timer",
+    "launch date",
+    "offer ends",
+    "deadline"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Coming Soon"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -62,8 +67,14 @@
       "id": "style",
       "label": "Style",
       "options": [
-        { "value": "cards", "label": "Cards" },
-        { "value": "minimal", "label": "Minimal" }
+        {
+          "value": "cards",
+          "label": "Cards"
+        },
+        {
+          "value": "minimal",
+          "label": "Minimal"
+        }
       ],
       "default": "cards"
     },
@@ -73,8 +84,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ]

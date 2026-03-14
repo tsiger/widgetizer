@@ -58,11 +58,6 @@
     & .widget-actions {
       margin-block-start: var(--space-xl);
     }
-
-    /* Center single button */
-    & .widget-actions-single {
-      justify-content: center;
-    }
   }
 
   /* Navigation */

@@ -1,7 +1,12 @@
 {
   "type": "comparison-table",
   "displayName": "Comparison Table",
-  "aliases": ["pricing table", "features comparison", "specs", "benchmark"],
+  "aliases": [
+    "pricing table",
+    "features comparison",
+    "specs",
+    "benchmark"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Compare Our Plans"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -46,8 +51,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],
@@ -103,8 +114,8 @@
         {
           "type": "textarea",
           "id": "values",
-          "label": "Values for each column (one per line: ✓, ✗, or custom text)",
-          "default": "✓\n✓\n✗"
+          "label": "Values for each column (one per line: yes, no, or custom text)",
+          "default": "yes\nyes\nno"
         }
       ]
     }
@@ -136,21 +147,21 @@
       "type": "feature",
       "settings": {
         "name": "Basic Features",
-        "values": "✓\n✓\n✓"
+        "values": "yes\nyes\nyes"
       }
     },
     {
       "type": "feature",
       "settings": {
         "name": "Advanced Analytics",
-        "values": "✗\n✓\n✓"
+        "values": "no\nyes\nyes"
       }
     },
     {
       "type": "feature",
       "settings": {
         "name": "Priority Support",
-        "values": "✗\n✗\n✓"
+        "values": "no\nno\nyes"
       }
     }
   ]

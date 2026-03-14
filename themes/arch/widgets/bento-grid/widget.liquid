@@ -88,10 +88,6 @@
         width: 100%;
       }
 
-      & .w-headline {
-        font-size: calc(var(--font-size-xl) * var(--heading-scale));
-      }
-
       @media (min-width: 990px) {
         & .bento-grid-container {
           grid-template-columns: repeat(4, 1fr);
@@ -113,7 +109,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -194,9 +190,9 @@
             <div class="bento-content">
               {% if block.settings.title != blank %}
                 {% if forloop.first %}
-                  <{{ first_item_level }} class="w-headline" data-setting="title">{{ block.settings.title }}</{{ first_item_level }}>
+                  <{{ first_item_level }} class="w-headline t-2xl" data-setting="title">{{ block.settings.title }}</{{ first_item_level }}>
                 {% else %}
-                  <{{ other_items_level }} class="w-headline" data-setting="title">{{ block.settings.title }}</{{ other_items_level }}>
+                  <{{ other_items_level }} class="w-headline t-2xl" data-setting="title">{{ block.settings.title }}</{{ other_items_level }}>
                 {% endif %}
               {% endif %}
               {% if block.settings.text != blank %}

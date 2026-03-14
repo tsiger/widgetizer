@@ -1,7 +1,12 @@
 {
   "type": "profile-grid",
   "displayName": "Profile Grid",
-  "aliases": ["team", "members", "staff", "about us"],
+  "aliases": [
+    "team",
+    "members",
+    "staff",
+    "about us"
+  ],
   "settings": [
     {
       "type": "text",
@@ -16,9 +21,9 @@
       "default": "Meet Our Team"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",

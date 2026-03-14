@@ -1,7 +1,12 @@
 {
   "type": "social-icons",
   "displayName": "Social Icons",
-  "aliases": ["links", "follow", "share", "connect"],
+  "aliases": [
+    "links",
+    "follow",
+    "share",
+    "connect"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Follow Us"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description",
+      "label": "Subheading",
       "default": "Stay connected with us on social media."
     },
     {
@@ -49,141 +54,6 @@
           "label": "Highlight"
         }
       ]
-    }
-  ],
-  "blocks": [
-    {
-      "type": "social_link",
-      "displayName": "Social Link",
-      "settings": [
-        {
-          "type": "header",
-          "id": "content_header",
-          "label": "Content"
-        },
-        {
-          "type": "select",
-          "id": "platform",
-          "label": "Platform",
-          "default": "facebook",
-          "options": [
-            {
-              "value": "facebook",
-              "label": "Facebook"
-            },
-            {
-              "value": "instagram",
-              "label": "Instagram"
-            },
-            {
-              "value": "twitter",
-              "label": "Twitter"
-            },
-            {
-              "value": "x",
-              "label": "X"
-            },
-            {
-              "value": "linkedin",
-              "label": "LinkedIn"
-            },
-            {
-              "value": "youtube",
-              "label": "YouTube"
-            },
-            {
-              "value": "tiktok",
-              "label": "TikTok"
-            },
-            {
-              "value": "pinterest",
-              "label": "Pinterest"
-            },
-            {
-              "value": "github",
-              "label": "GitHub"
-            },
-            {
-              "value": "github-copilot",
-              "label": "GitHub Copilot"
-            },
-            {
-              "value": "mastodon",
-              "label": "Mastodon"
-            },
-            {
-              "value": "bluesky",
-              "label": "Bluesky"
-            },
-            {
-              "value": "discord",
-              "label": "Discord"
-            },
-            {
-              "value": "meta",
-              "label": "Meta"
-            },
-            {
-              "value": "reddit",
-              "label": "Reddit"
-            },
-            {
-              "value": "telegram",
-              "label": "Telegram"
-            },
-            {
-              "value": "threads",
-              "label": "Threads"
-            },
-            {
-              "value": "whatsapp",
-              "label": "WhatsApp"
-            },
-            {
-              "value": "mail",
-              "label": "Email"
-            }
-          ]
-        },
-        {
-          "type": "link",
-          "id": "link",
-          "label": "Link URL",
-          "hide_text": true
-        }
-      ]
-    }
-  ],
-  "defaultBlocks": [
-    {
-      "type": "social_link",
-      "settings": {
-        "platform": "facebook",
-        "link": {
-          "href": "https://facebook.com",
-          "text": "Facebook"
-        }
-      }
-    },
-    {
-      "type": "social_link",
-      "settings": {
-        "platform": "instagram",
-        "link": {
-          "href": "https://instagram.com",
-          "text": "Instagram"
-        }
-      }
-    },
-    {
-      "type": "social_link",
-      "settings": {
-        "platform": "twitter",
-        "link": {
-          "href": "https://twitter.com",
-          "text": "X"
-        }
-      }
     }
   ]
 }

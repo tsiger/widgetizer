@@ -1,7 +1,12 @@
 {
   "type": "job-listing",
   "displayName": "Job Listing",
-  "aliases": ["careers", "hiring", "positions", "vacancies"],
+  "aliases": [
+    "careers",
+    "hiring",
+    "positions",
+    "vacancies"
+  ],
   "settings": [
     {
       "type": "text",
@@ -16,9 +21,9 @@
       "default": "Open Positions"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -37,8 +42,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],
@@ -76,10 +87,22 @@
           "label": "Employment type",
           "default": "full-time",
           "options": [
-            { "value": "full-time", "label": "Full-Time" },
-            { "value": "part-time", "label": "Part-Time" },
-            { "value": "contract", "label": "Contract" },
-            { "value": "internship", "label": "Internship" }
+            {
+              "value": "full-time",
+              "label": "Full-Time"
+            },
+            {
+              "value": "part-time",
+              "label": "Part-Time"
+            },
+            {
+              "value": "contract",
+              "label": "Contract"
+            },
+            {
+              "value": "internship",
+              "label": "Internship"
+            }
           ]
         },
         {

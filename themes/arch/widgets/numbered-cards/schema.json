@@ -1,7 +1,12 @@
 {
   "type": "numbered-cards",
   "displayName": "Numbered Cards",
-  "aliases": ["steps", "process", "workflow", "ordered list"],
+  "aliases": [
+    "steps",
+    "process",
+    "workflow",
+    "ordered list"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Our Process"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -39,8 +44,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],

@@ -1,7 +1,12 @@
 {
   "type": "accordion",
   "displayName": "Accordion",
-  "aliases": ["faq", "details", "toggle", "collapsible"],
+  "aliases": [
+    "faq",
+    "details",
+    "toggle",
+    "collapsible"
+  ],
   "settings": [
     {
       "type": "text",
@@ -16,9 +21,9 @@
       "default": "Frequently Asked Questions"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description",
+      "label": "Subheading",
       "default": "Everything you need to know about the product and billing."
     },
     {
@@ -32,8 +37,14 @@
       "label": "Style",
       "default": "separated",
       "options": [
-        { "value": "separated", "label": "Separated" },
-        { "value": "connected", "label": "Connected" }
+        {
+          "value": "separated",
+          "label": "Separated"
+        },
+        {
+          "value": "connected",
+          "label": "Connected"
+        }
       ]
     },
     {
@@ -44,12 +55,34 @@
     },
     {
       "type": "select",
+      "id": "sidebar_position",
+      "label": "Sidebar position",
+      "default": "right",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],
@@ -71,6 +104,29 @@
           "default": "<p>Answer goes here</p>"
         }
       ]
+    },
+    {
+      "type": "info",
+      "displayName": "Info",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Need Help?"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>hello@example.com</p>"
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "displayName": "Social Icons",
+      "settings": []
     }
   ],
   "defaultBlocks": [
@@ -100,6 +156,13 @@
       "settings": {
         "question": "Is technical support included?",
         "answer": "<p>Yes, all plans include 24/7 email support. Premium plans also include priority live chat and phone support options.</p>"
+      }
+    },
+    {
+      "type": "info",
+      "settings": {
+        "title": "Need Help?",
+        "text": "<p>hello@example.com</p>"
       }
     }
   ]

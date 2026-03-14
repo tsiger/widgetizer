@@ -1,7 +1,12 @@
 {
   "type": "event-list",
   "displayName": "Event List",
-  "aliases": ["calendar", "schedule", "upcoming events", "agenda"],
+  "aliases": [
+    "calendar",
+    "schedule",
+    "upcoming events",
+    "agenda"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Upcoming Events"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -30,8 +35,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],
@@ -67,7 +78,7 @@
           "type": "text",
           "id": "location",
           "label": "Location & time",
-          "default": "New York, NY • 6:00 PM"
+          "default": "New York, NY · 6:00 PM"
         },
         {
           "type": "richtext",
@@ -94,7 +105,7 @@
         "day": "15",
         "month": "Jan",
         "title": "Product Launch Webinar",
-        "location": "Online • 2:00 PM EST",
+        "location": "Online · 2:00 PM EST",
         "description": "<p>Join us for an exclusive first look at our latest product release.</p>",
         "button_link": {
           "text": "Register Now",
@@ -109,7 +120,7 @@
         "day": "22",
         "month": "Jan",
         "title": "Customer Workshop",
-        "location": "San Francisco, CA • 10:00 AM",
+        "location": "San Francisco, CA · 10:00 AM",
         "description": "<p>Hands-on workshop covering best practices and advanced features.</p>",
         "button_link": {
           "text": "Register Now",
@@ -124,7 +135,7 @@
         "day": "5",
         "month": "Feb",
         "title": "Annual Conference",
-        "location": "New York, NY • 9:00 AM",
+        "location": "New York, NY · 9:00 AM",
         "description": "<p>Our biggest event of the year featuring speakers, workshops, and networking.</p>",
         "button_link": {
           "text": "Get Tickets",

@@ -131,10 +131,6 @@
         margin-block-end: var(--space-sm);
       }
 
-      & .image-hotspot-tooltip-title {
-        font-size: calc(var(--font-size-lg) * var(--heading-scale));
-      }
-
       & .image-hotspot-tooltip-close {
         background: transparent;
         border: none;
@@ -232,7 +228,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}

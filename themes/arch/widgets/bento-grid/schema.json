@@ -1,7 +1,13 @@
 {
   "type": "bento-grid",
   "displayName": "Bento Grid",
-  "aliases": ["dashboard", "tiles", "highlights", "featured grid", "masonry"],
+  "aliases": [
+    "dashboard",
+    "tiles",
+    "highlights",
+    "featured grid",
+    "masonry"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +21,9 @@
       "default": "Feature Spotlight"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -30,6 +36,10 @@
       "label": "Gap Size",
       "default": "var(--space-md)",
       "options": [
+        {
+          "value": "0",
+          "label": "None"
+        },
         {
           "value": "var(--space-sm)",
           "label": "Small"

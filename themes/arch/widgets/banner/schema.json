@@ -186,7 +186,7 @@
       "settings": {
         "text": "<p>Welcome</p>",
         "size": "sm",
-        "uppercase": true,
+        "uppercase": false,
         "muted": false
       }
     },

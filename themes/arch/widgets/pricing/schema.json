@@ -1,7 +1,12 @@
 {
   "type": "pricing",
   "displayName": "Pricing",
-  "aliases": ["plans", "packages", "subscription", "pricing tiers"],
+  "aliases": [
+    "plans",
+    "packages",
+    "subscription",
+    "pricing tiers"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Pricing Plans"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description",
+      "label": "Subheading",
       "default": "Choose the plan that fits your needs."
     },
     {
@@ -40,8 +45,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],

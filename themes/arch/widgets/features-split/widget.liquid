@@ -58,10 +58,6 @@
         gap: var(--space-xs);
       }
 
-      & .features-split-item-title {
-        font-size: calc(var(--font-size-lg) * var(--heading-scale));
-      }
-
       & .features-split-item-description {
         margin: 0;
       }
@@ -106,7 +102,7 @@
       <div class="features-split-content">
         {% assign content_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign content_delay = content_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -136,11 +132,11 @@
                 {% render 'icon', icon: block.settings.icon, class: 'features-split-icon' %}
               {% endif %}
               <div class="features-split-item-content">
-                <{{ item_heading_level }} class="features-split-item-title w-title" data-setting="title">
+                <{{ item_heading_level }} class="features-split-item-title w-title t-2xl" data-setting="title">
                   {{ block.settings.title }}
                 </{{ item_heading_level }}>
                 {% if block.settings.description != blank %}
-                  <div class="features-split-item-description w-body w-rte" data-setting="description">
+                  <div class="features-split-item-description w-body w-rte t-sm" data-setting="description">
                     {{ block.settings.description | raw }}
                   </div>
                 {% endif %}

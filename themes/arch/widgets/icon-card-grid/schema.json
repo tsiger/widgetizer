@@ -1,7 +1,13 @@
 {
   "type": "icon-card-grid",
   "displayName": "Icon Card Grid",
-  "aliases": ["features", "services", "icon grid", "icon blocks", "icon cards"],
+  "aliases": [
+    "features",
+    "services",
+    "icon grid",
+    "icon blocks",
+    "icon cards"
+  ],
   "settings": [
     {
       "type": "text",
@@ -16,9 +22,9 @@
       "default": "What We Offer"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description",
+      "label": "Subheading",
       "default": "A responsive grid layout showcasing services with icons, descriptions, and call-to-action buttons."
     },
     {
@@ -32,8 +38,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     },
     {
@@ -96,6 +108,7 @@
     {
       "type": "card",
       "settings": {
+        "icon": "globe",
         "subtitle": "Design",
         "title": "Web Design",
         "description": "<p>Beautiful, responsive websites that engage and convert visitors.</p>",
@@ -109,6 +122,7 @@
     {
       "type": "card",
       "settings": {
+        "icon": "terminal",
         "subtitle": "Development",
         "title": "Web Development",
         "description": "<p>Custom web applications built with modern technologies.</p>",
@@ -122,6 +136,7 @@
     {
       "type": "card",
       "settings": {
+        "icon": "target",
         "subtitle": "Marketing",
         "title": "Digital Marketing",
         "description": "<p>Strategies that drive traffic and grow your business.</p>",
@@ -135,6 +150,7 @@
     {
       "type": "card",
       "settings": {
+        "icon": "headset",
         "subtitle": "Support",
         "title": "Customer Support",
         "description": "<p>24/7 dedicated support to help you succeed.</p>",
@@ -148,6 +164,7 @@
     {
       "type": "card",
       "settings": {
+        "icon": "graph",
         "subtitle": "Analytics",
         "title": "Data Analytics",
         "description": "<p>Powerful insights to make informed decisions.</p>",
@@ -161,6 +178,7 @@
     {
       "type": "card",
       "settings": {
+        "icon": "plug",
         "subtitle": "Integration",
         "title": "API Integration",
         "description": "<p>Seamlessly connect with your existing tools.</p>",
@@ -174,6 +192,7 @@
     {
       "type": "card",
       "settings": {
+        "icon": "shield",
         "subtitle": "Security",
         "title": "Enterprise Security",
         "description": "<p>Bank-level encryption and data protection.</p>",
@@ -187,6 +206,7 @@
     {
       "type": "card",
       "settings": {
+        "icon": "school",
         "subtitle": "Training",
         "title": "Team Training",
         "description": "<p>Comprehensive onboarding and training programs.</p>",

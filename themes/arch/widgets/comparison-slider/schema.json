@@ -1,7 +1,12 @@
 {
   "type": "comparison-slider",
   "displayName": "Comparison Slider",
-  "aliases": ["before after", "visual comparison", "image slider", "compare"],
+  "aliases": [
+    "before after",
+    "visual comparison",
+    "image slider",
+    "compare"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "See the Transformation"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "image",
@@ -57,8 +62,14 @@
       "label": "Slider orientation",
       "default": "horizontal",
       "options": [
-        { "value": "horizontal", "label": "Horizontal" },
-        { "value": "vertical", "label": "Vertical" }
+        {
+          "value": "horizontal",
+          "label": "Horizontal"
+        },
+        {
+          "value": "vertical",
+          "label": "Vertical"
+        }
       ]
     },
     {
@@ -83,8 +94,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ]

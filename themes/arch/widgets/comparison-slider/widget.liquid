@@ -210,7 +210,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -251,10 +251,10 @@
 
         <!-- Labels -->
         {% if widget.settings.show_labels %}
-          <div class="comparison-slider-label comparison-slider-label-before w-label t-sm t-uppercase t-heading">
+          <div class="comparison-slider-label comparison-slider-label-before w-label t-sm t-heading">
             {{ widget.settings.before_label | default: 'Before' }}
           </div>
-          <div class="comparison-slider-label comparison-slider-label-after w-label t-sm t-uppercase t-heading">
+          <div class="comparison-slider-label comparison-slider-label-after w-label t-sm t-heading">
             {{ widget.settings.after_label | default: 'After' }}
           </div>
         {% endif %}

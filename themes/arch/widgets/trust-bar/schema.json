@@ -53,24 +53,28 @@
     {
       "type": "item",
       "settings": {
+        "icon": "medal",
         "text": "Experienced industry professionals"
       }
     },
     {
       "type": "item",
       "settings": {
+        "icon": "star",
         "text": "Modern marketing & strategic planning"
       }
     },
     {
       "type": "item",
       "settings": {
+        "icon": "shield",
         "text": "Modern web design & ecommerce solutions"
       }
     },
     {
       "type": "item",
       "settings": {
+        "icon": "headset",
         "text": "24/7 online client support"
       }
     }

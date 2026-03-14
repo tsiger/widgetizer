@@ -172,7 +172,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -204,7 +204,7 @@
                 >
                   <div class="comparison-table-th-name w-body" data-setting="name">{{ col.settings.name }}</div>
                   {% if col.settings.badge != blank %}
-                    <span class="comparison-table-badge w-label t-xs t-uppercase" data-setting="badge">{{ col.settings.badge }}</span>
+                    <span class="comparison-table-badge w-label t-xs" data-setting="badge">{{ col.settings.badge }}</span>
                   {% endif %}
                 </th>
               {% endfor %}

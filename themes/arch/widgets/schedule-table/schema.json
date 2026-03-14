@@ -1,7 +1,12 @@
 {
   "type": "schedule-table",
   "displayName": "Schedule Table",
-  "aliases": ["agenda", "time table", "timetable", "events schedule"],
+  "aliases": [
+    "agenda",
+    "time table",
+    "timetable",
+    "events schedule"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Opening Hours"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -37,11 +42,33 @@
     },
     {
       "type": "select",
+      "id": "sidebar_position",
+      "label": "Sidebar position",
+      "default": "right",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "select",
       "id": "week_start_day",
       "label": "Week starts on",
       "options": [
-        { "value": "0", "label": "Sunday" },
-        { "value": "1", "label": "Monday" }
+        {
+          "value": "0",
+          "label": "Sunday"
+        },
+        {
+          "value": "1",
+          "label": "Monday"
+        }
       ],
       "default": "1"
     },
@@ -51,8 +78,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],
@@ -90,6 +123,29 @@
           "default": false
         }
       ]
+    },
+    {
+      "type": "info",
+      "displayName": "Info",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Contact Us"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>hello@example.com</p>"
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "displayName": "Social Icons",
+      "settings": []
     }
   ],
   "defaultBlocks": [
@@ -147,6 +203,13 @@
         "day": "Sunday",
         "hours": "Closed",
         "closed": true
+      }
+    },
+    {
+      "type": "info",
+      "settings": {
+        "title": "Contact Us",
+        "text": "<p>hello@example.com</p>"
       }
     }
   ]

@@ -1,7 +1,12 @@
 {
   "type": "testimonials",
   "displayName": "Testimonials",
-  "aliases": ["reviews", "feedback", "social proof", "quotes"],
+  "aliases": [
+    "reviews",
+    "feedback",
+    "social proof",
+    "quotes"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "What Our Customers Say"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -39,8 +44,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],
@@ -87,10 +98,22 @@
           "id": "rating",
           "label": "Star rating",
           "options": [
-            { "value": "", "label": "No rating" },
-            { "value": "5", "label": "5 stars" },
-            { "value": "4", "label": "4 stars" },
-            { "value": "3", "label": "3 stars" }
+            {
+              "value": "",
+              "label": "No rating"
+            },
+            {
+              "value": "5",
+              "label": "5 stars"
+            },
+            {
+              "value": "4",
+              "label": "4 stars"
+            },
+            {
+              "value": "3",
+              "label": "3 stars"
+            }
           ],
           "default": "5"
         }

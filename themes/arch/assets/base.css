@@ -5,53 +5,72 @@
    TABLE OF CONTENTS
    =================
 
-   1. FOUNDATIONS
-      1.1 CSS Reset
-      1.2 Design Tokens (CSS Custom Properties)
-      1.3 Color Scheme System
-      1.4 Typography Scale Variables
+   1. RESET
+      1.1 Box Model & Defaults
 
-   2. BASE STYLES
-      2.1 Document Defaults
-      2.2 Typography Elements
+   2. DESIGN TOKENS
+      2.1 Typography Scale
+      2.2 Typography Weights & Line Heights
+      2.3 Spacing Scale
+      2.4 Border Tokens
+      2.5 Color Primitives
+      2.6 Semantic Colors
+      2.7 Container & Content Widths
+      2.8 Icon Sizes
+      2.9 Transitions
+      2.10 Widget Background & Overlay Defaults
+      2.11 Responsive Spacing Overrides
+      2.12 Computed Scales
 
-   3. TYPOGRAPHY SYSTEM
-      3.1 Semantic Base Classes (w-)
-      3.2 Text Modifier Classes (t-)
-      3.3 Rich Text Container
+   3. COLOR SCHEMES
+      3.1 Standard (default)
+      3.2 Highlight (emphasis)
 
-   4. LAYOUT SYSTEM
-      4.1 Widget Container System
-      4.2 Widget Header & Content
-      4.3 Height Modifiers
-      4.4 Grid System
+   4. BASE ELEMENTS
+      4.1 Document Defaults
+      4.2 Headings
+      4.3 Inline Elements
 
-   5. COMPONENT UTILITIES
-      5.1 Cards
-      5.2 Buttons
-      5.3 Forms
-      5.4 Icons
+   5. TYPOGRAPHY CLASSES
+      5.1 Semantic Classes (w-)
+      5.2 Size Modifiers (t-)
+      5.3 Weight Modifiers (t-)
+      5.4 Style Modifiers (t-)
+      5.5 Color Modifiers (t-)
+      5.6 Rich Text Container (w-rte)
 
-   6. BLOCK SYSTEM
-      6.1 Block Item Background/Overlay
+   6. LAYOUT
+      6.1 Widget Container
+      6.2 Widget Header & Content
+      6.3 Height Modifiers
+      6.4 Grid System
+      6.5 Content Alignment & Width
 
-   7. GLOBAL COMPONENTS
-      7.1 Site Header
-      7.2 Site Footer
+   7. COMPONENTS
+      7.1 Cards
+      7.2 Buttons
+      7.3 Forms
+      7.4 Icons
+      7.5 Feature Lists
+      7.6 Block Items
 
-   8. UTILITY CLASSES
-      8.1 Content Flow
-      8.2 Feature Lists
-      8.3 Accessibility Helpers
+   8. GLOBAL COMPONENTS
+      8.1 Site Header
+      8.2 Site Footer
+
+   9. UTILITIES
+      9.1 Content Flow
+      9.2 Accessibility Helpers
+      9.3 Scroll Reveal Animations
 
    ========================================================================== */
 
 /* ==========================================================================
-   1. FOUNDATIONS
+   1. RESET
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1.1 CSS Reset
+   1.1 Box Model & Defaults
    -------------------------------------------------------------------------- */
 
 /* Base: 62.5% = 10px, so 0.1rem = 1px */
@@ -72,12 +91,15 @@ img {
   display: block;
 }
 
-/* --------------------------------------------------------------------------
-   1.2 Design Tokens (CSS Custom Properties)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   2. DESIGN TOKENS
+   ========================================================================== */
 
 :root {
-  /* Typography Scale (0.1rem = 1px) */
+  /* --------------------------------------------------------------------------
+     2.1 Typography Scale (0.1rem = 1px)
+     -------------------------------------------------------------------------- */
+
   --font-size-xs: 1.2rem; /* 12px */
   --font-size-sm: 1.4rem; /* 14px */
   --font-size-base: 1.6rem; /* 16px */
@@ -88,17 +110,25 @@ img {
   --font-size-4xl: 3.2rem; /* 32px */
   --font-size-5xl: 3.6rem; /* 36px */
   --font-size-6xl: 4rem; /* 40px */
+  --font-size-7xl: 4.4rem; /* 44px */
+  --font-size-8xl: 4.8rem; /* 48px */
+  --font-size-9xl: 5.2rem; /* 52px */
 
-  /* Line Heights */
+  /* --------------------------------------------------------------------------
+     2.2 Typography Weights & Line Heights
+     -------------------------------------------------------------------------- */
+
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
   --line-height-tight: 1.2;
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.6;
 
-  /* Font Weights */
-  --font-weight-medium: 500; /* Static utility */
-  --font-weight-semibold: 600; /* Static utility */
+  /* --------------------------------------------------------------------------
+     2.3 Spacing Scale (0.1rem = 1px)
+     -------------------------------------------------------------------------- */
 
-  /* Spacing Scale (0.1rem = 1px) */
   --space-xs: 0.8rem; /* 8px */
   --space-sm: 1.2rem; /* 12px */
   --space-md: 1.6rem; /* 16px */
@@ -110,58 +140,78 @@ img {
   --space-5xl: 8rem; /* 80px */
   --space-6xl: 9.6rem; /* 96px */
 
-  /* Section Spacing */
   --section-padding-block: var(--space-4xl);
   --section-padding-inline: var(--space-lg);
 
-  /* Container */
+  /* --------------------------------------------------------------------------
+     2.4 Border Tokens
+     -------------------------------------------------------------------------- */
+
+  --border-width-thin: 0.1rem; /* 1px */
+  --border-width-medium: 0.2rem; /* 2px */
+  --border-width-thick: 0.3rem; /* 3px */
+
+  /* --------------------------------------------------------------------------
+     2.5 Color Primitives
+     -------------------------------------------------------------------------- */
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* --------------------------------------------------------------------------
+     2.6 Semantic Colors
+     -------------------------------------------------------------------------- */
+
+  /* Text */
+  --text-content: var(--colors-standard_text_content, #333);
+  --text-heading: var(--colors-standard_text_heading, #000);
+  --text-muted: var(--colors-standard_text_muted, #666);
+
+  /* Backgrounds */
+  --bg-primary: var(--colors-standard_bg_primary, #fff);
+  --bg-secondary: var(--colors-standard_bg_secondary, #f9f9f9);
+
+  /* Accent */
+  --accent: var(--colors-standard_accent, #0d47b7);
+  --accent-text: var(--colors-standard_accent_text, #fff);
+
+  /* Misc */
+  --rating-star-color: var(--colors-standard_rating_star, #fbbf24);
+  --border-color: var(--colors-standard_border_color, #e0e0e0);
+
+  /* --------------------------------------------------------------------------
+     2.7 Container & Content Widths
+     -------------------------------------------------------------------------- */
+
   --container-max-width: 142rem; /* 1420px */
 
-  /* Content Width Constraints */
   --content-width-xs: 40rem; /* 400px - Narrow content (schedules, forms) */
   --content-width-sm: 60rem; /* 600px - Forms, modals */
   --content-width-md: 80rem; /* 800px - Text-heavy sections */
   --content-width-lg: 90rem; /* 900px - Comfortable reading width */
 
-  /* Border Widths (0.1rem = 1px) */
-  --border-width-thin: 0.1rem; /* 1px */
-  --border-width-medium: 0.2rem; /* 2px */
-  --border-width-thick: 0.3rem; /* 3px */
+  /* --------------------------------------------------------------------------
+     2.8 Icon Sizes
+     -------------------------------------------------------------------------- */
 
-  /* Border */
-  --border-color: var(--colors-standard_border_color, #e0e0e0);
-
-  /* Text Colors */
-  --text-content: var(--colors-standard_text_content, #333);
-  --text-heading: var(--colors-standard_text_heading, #000);
-  --text-muted: var(--colors-standard_text_muted, #666);
-
-  /* Background Colors */
-  --bg-primary: var(--colors-standard_bg_primary, #fff);
-  --bg-secondary: var(--colors-standard_bg_secondary, #f9f9f9);
-
-  /* Accent Colors */
-  --accent: var(--colors-standard_accent, #0d47b7);
-  --accent-text: var(--colors-standard_accent_text, #fff);
-  --rating-star-color: var(--colors-standard_rating_star, #fbbf24);
-
-  /* Primitive Colors */
-  --color-white: #ffffff;
-  --color-black: #000000;
-
-  /* Icon Sizes */
   --icon-size-xs: 1.6rem; /* 16px */
   --icon-size-sm: 2rem; /* 20px */
   --icon-size-md: 2.4rem; /* 24px */
   --icon-size-lg: 3.2rem; /* 32px */
   --icon-size-xl: 4.8rem; /* 48px */
 
-  /* Transition Speeds */
+  /* --------------------------------------------------------------------------
+     2.9 Transitions
+     -------------------------------------------------------------------------- */
+
   --transition-speed-fast: 0.15s;
   --transition-speed-normal: 0.3s;
   --transition-speed-slow: 0.5s;
 
-  /* Widget Background System (defaults) */
+  /* --------------------------------------------------------------------------
+     2.10 Widget Background & Overlay Defaults
+     -------------------------------------------------------------------------- */
+
   --widget-bg-color: transparent;
   /* Note: background-image is set inline on elements, not via CSS variable */
   --widget-bg-size: cover;
@@ -169,11 +219,13 @@ img {
   --widget-bg-repeat: no-repeat;
   --widget-bg-attachment: scroll;
 
-  /* Widget Overlay System (defaults) */
   --widget-overlay-color: transparent;
   --widget-overlay-opacity: 0.5;
 
-  /* Responsive spacing adjustments */
+  /* --------------------------------------------------------------------------
+     2.11 Responsive Spacing Overrides
+     -------------------------------------------------------------------------- */
+
   @media (min-width: 750px) {
     --section-padding-block: var(--space-5xl);
   }
@@ -181,13 +233,23 @@ img {
   @media (min-width: 990px) {
     --section-padding-block: var(--space-6xl);
   }
+
+  /* --------------------------------------------------------------------------
+     2.12 Computed Scales
+     -------------------------------------------------------------------------- */
+
+  --heading-scale: calc(var(--typography-heading_scale, 100) / 100);
+  --body-scale: calc(var(--typography-body_scale, 100) / 100);
 }
 
+/* ==========================================================================
+   3. COLOR SCHEMES
+   ========================================================================== */
+
 /* --------------------------------------------------------------------------
-   1.3 Color Scheme System
+   3.1 Standard (default)
    -------------------------------------------------------------------------- */
 
-/* Standard color scheme (default) */
 .color-scheme-standard {
   --text-heading: var(--colors-standard_text_heading, #0f172a);
   --text-content: var(--colors-standard_text_content, #1f2937);
@@ -200,7 +262,10 @@ img {
   --rating-star-color: var(--colors-standard_rating_star, #fbbf24);
 }
 
-/* Highlight color scheme (for emphasis) */
+/* --------------------------------------------------------------------------
+   3.2 Highlight (emphasis)
+   -------------------------------------------------------------------------- */
+
 .color-scheme-highlight {
   --text-heading: var(--colors-highlight_text_heading, #ffffff);
   --text-content: var(--colors-highlight_text_content, #eaf3fc);
@@ -213,21 +278,12 @@ img {
   --rating-star-color: var(--colors-highlight_rating_star, #fbbf24);
 }
 
-/* --------------------------------------------------------------------------
-   1.4 Typography Scale Variables
-   -------------------------------------------------------------------------- */
-
-:root {
-  --heading-scale: calc(var(--typography-heading_scale, 100) / 100);
-  --body-scale: calc(var(--typography-body_scale, 100) / 100);
-}
-
 /* ==========================================================================
-   2. BASE STYLES
+   4. BASE ELEMENTS
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   2.1 Document Defaults
+   4.1 Document Defaults
    -------------------------------------------------------------------------- */
 
 body {
@@ -242,7 +298,7 @@ body {
     sans-serif
   );
   font-weight: var(--typography-body_font-weight, 400);
-  font-size: var(--font-size-base);
+  font-size: calc(var(--font-size-base) * var(--body-scale));
   line-height: var(--line-height-normal);
   color: var(--text-content);
   background-color: var(--bg-primary);
@@ -258,14 +314,8 @@ body {
   flex: 1;
 }
 
-/* Bold elements use smart bold weight */
-strong,
-b {
-  font-weight: var(--typography-body_font_bold-weight, 700);
-}
-
 /* --------------------------------------------------------------------------
-   2.2 Typography Elements
+   4.2 Headings
    -------------------------------------------------------------------------- */
 
 h1,
@@ -282,37 +332,45 @@ h6 {
 }
 
 h1 {
-  font-size: var(--font-size-5xl);
+  font-size: calc(var(--font-size-5xl) * var(--heading-scale));
 }
 h2 {
-  font-size: var(--font-size-4xl);
+  font-size: calc(var(--font-size-4xl) * var(--heading-scale));
 }
 h3 {
-  font-size: var(--font-size-3xl);
+  font-size: calc(var(--font-size-3xl) * var(--heading-scale));
 }
 h4 {
-  font-size: var(--font-size-2xl);
+  font-size: calc(var(--font-size-2xl) * var(--heading-scale));
 }
 h5 {
-  font-size: var(--font-size-xl);
+  font-size: calc(var(--font-size-xl) * var(--heading-scale));
 }
 h6 {
-  font-size: var(--font-size-lg);
+  font-size: calc(var(--font-size-lg) * var(--heading-scale));
+}
+
+/* --------------------------------------------------------------------------
+   4.3 Inline Elements
+   -------------------------------------------------------------------------- */
+
+strong,
+b {
+  font-weight: var(--typography-body_font_bold-weight, 700);
 }
 
 /* ==========================================================================
-   3. TYPOGRAPHY SYSTEM
+   5. TYPOGRAPHY CLASSES
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   3.1 Semantic Base Classes (w-)
+   5.1 Semantic Classes (w-)
    -------------------------------------------------------------------------- */
 
 /* Eyebrow — small label above headlines */
 .w-eyebrow {
   display: block;
-  font-size: calc(var(--font-size-sm) * var(--body-scale));
-  font-weight: var(--typography-body_font_bold-weight, 700);
+  font-size: calc(var(--font-size-sm) * var(--body-scale));  
   letter-spacing: 0.05em;
   line-height: var(--line-height-relaxed);
   color: var(--text-muted);
@@ -321,6 +379,7 @@ h6 {
 
 /* Headline — section-level heading (h1/h2 in widget header or block-driven) */
 .w-headline {
+  font-size: calc(var(--font-size-4xl) * var(--heading-scale));
   font-weight: var(--typography-heading_font-weight, 700);
   line-height: var(--line-height-tight);
   color: var(--text-heading);
@@ -367,10 +426,9 @@ h6 {
 }
 
 /* --------------------------------------------------------------------------
-   3.2 Text Modifier Classes (t-)
+   5.2 Size Modifiers (t-) — body scale (xs through xl)
    -------------------------------------------------------------------------- */
 
-/* Size modifiers — body scale (xs through xl) */
 .t-xs {
   font-size: calc(var(--font-size-xs) * var(--body-scale));
 }
@@ -432,7 +490,10 @@ h6 {
   line-height: 1.1;
 }
 
-/* Weight modifiers */
+/* --------------------------------------------------------------------------
+   5.3 Weight Modifiers (t-)
+   -------------------------------------------------------------------------- */
+
 .t-normal {
   font-weight: var(--typography-body_font-weight, 400);
 }
@@ -453,13 +514,28 @@ h6 {
   font-weight: var(--typography-body_font_bold-weight, 700);
 }
 
-/* Style modifiers */
+/* --------------------------------------------------------------------------
+   5.4 Style Modifiers (t-)
+   -------------------------------------------------------------------------- */
+
 .t-uppercase {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-/* Color modifiers */
+/* Font family modifiers */
+.t-heading-font {
+  font-family: var(--typography-heading_font-family, inherit);
+}
+
+.t-body-font {
+  font-family: var(--typography-body_font-family, inherit);
+}
+
+/* --------------------------------------------------------------------------
+   5.5 Color Modifiers (t-)
+   -------------------------------------------------------------------------- */
+
 .t-muted {
   color: var(--text-muted);
 }
@@ -473,7 +549,7 @@ h6 {
 }
 
 /* --------------------------------------------------------------------------
-   3.3 Rich Text Container
+   5.6 Rich Text Container (w-rte)
    -------------------------------------------------------------------------- */
 
 .w-rte {
@@ -527,11 +603,11 @@ h6 {
 }
 
 /* ==========================================================================
-   4. LAYOUT SYSTEM
+   6. LAYOUT
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   4.1 Widget Container System
+   6.1 Widget Container
    -------------------------------------------------------------------------- */
 
 /* Widget wrapper (handles background only, no spacing) */
@@ -561,7 +637,7 @@ h6 {
 .widget-container {
   position: relative;
   z-index: 2;
-  width: 1005;
+  width: 100%;
   max-width: var(--container-max-width);
   margin-inline: auto;
   margin-block: var(--section-padding-block);
@@ -574,7 +650,7 @@ h6 {
 }
 
 /* --------------------------------------------------------------------------
-   4.2 Widget Header & Content
+   6.2 Widget Header & Content
    -------------------------------------------------------------------------- */
 
 /* Widget header (centered section header) */
@@ -602,54 +678,8 @@ h6 {
   display: block; /* Default */
 }
 
-/* Content width modifiers */
-.widget-content-xs {
-  max-width: var(--content-width-xs);
-  margin-inline: auto;
-}
-
-.widget-content-sm {
-  max-width: var(--content-width-sm);
-  margin-inline: auto;
-}
-
-.widget-content-md {
-  max-width: var(--content-width-md);
-  margin-inline: auto;
-}
-
-.widget-content-lg {
-  max-width: var(--content-width-lg);
-  margin-inline: auto;
-}
-
-/* Content alignment modifiers */
-.widget-content-align-center {
-  text-align: center;
-
-  & .widget-actions {
-    justify-content: center;
-  }
-}
-
-.widget-content-align-start {
-  text-align: start;
-
-  & .widget-actions {
-    justify-content: flex-start;
-  }
-}
-
-.widget-content-align-end {
-  text-align: end;
-
-  & .widget-actions {
-    justify-content: flex-end;
-  }
-}
-
 /* --------------------------------------------------------------------------
-   4.3 Height Modifiers
+   6.3 Height Modifiers
    -------------------------------------------------------------------------- */
 
 .widget-height-small,
@@ -674,7 +704,7 @@ h6 {
 }
 
 /* --------------------------------------------------------------------------
-   4.4 Grid System
+   6.4 Grid System
    -------------------------------------------------------------------------- */
 
 .widget-grid {
@@ -720,12 +750,65 @@ h6 {
   --grid-cols-desktop: 8;
 }
 
+/* --------------------------------------------------------------------------
+   6.5 Content Alignment & Width
+   -------------------------------------------------------------------------- */
+
+/* Content width modifiers */
+.widget-content-xs {
+  max-width: var(--content-width-xs);
+  margin-inline: auto;
+}
+
+.widget-content-sm {
+  max-width: var(--content-width-sm);
+  margin-inline: auto;
+}
+
+.widget-content-md {
+  max-width: var(--content-width-md);
+  margin-inline: auto;
+}
+
+.widget-content-lg {
+  max-width: var(--content-width-lg);
+  margin-inline: auto;
+}
+
+/* Content alignment modifiers */
+.widget-content-align-center {
+  text-align: center;
+
+  & .widget-actions {
+    justify-content: center;
+  }
+}
+
+.widget-content-align-start {
+  text-align: start;
+  margin-inline: 0;
+
+  & .widget-actions {
+    justify-content: flex-start;
+  }
+}
+
+.widget-content-align-end {
+  text-align: end;
+  margin-inline-start: auto;
+  margin-inline-end: 0;
+
+  & .widget-actions {
+    justify-content: flex-end;
+  }
+}
+
 /* ==========================================================================
-   5. COMPONENT UTILITIES
+   7. COMPONENTS
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   5.1 Cards
+   7.1 Cards
    -------------------------------------------------------------------------- */
 
 /* Base Card */
@@ -736,10 +819,6 @@ h6 {
   border: var(--border-width-thin) solid var(--border-color);
   padding: var(--space-lg);
   transition: border-color var(--transition-speed-normal);
-
-  &:hover {
-    border-color: var(--border-color);
-  }
 
   @media (min-width: 750px) {
     padding: var(--space-xl);
@@ -760,20 +839,15 @@ h6 {
   margin-block-end: var(--space-lg);
 }
 
-/* Card typography: use w-title, w-eyebrow/w-meta, w-body + t-* modifiers */
-
 /* Card Content / Body */
 .widget-card-content {
-  font-size: var(--font-size-base);
+  font-size: calc(var(--font-size-base) * var(--body-scale));
   line-height: var(--line-height-relaxed);
   color: var(--text-content);
   flex: 1;
   display: flex;
   flex-direction: column;
-
-  & > *:last-child {
-    margin-block-end: 0;
-  }
+  gap: var(--space-sm);
 }
 
 /* Card Footer */
@@ -791,7 +865,6 @@ h6 {
   height: auto;
   aspect-ratio: 16/9;
   object-fit: cover;
-  border-radius: var(--border-radius-sm);
   margin-block-end: var(--space-lg);
 }
 
@@ -804,26 +877,15 @@ h6 {
   stroke-width: 0.15rem;
 }
 
-/* Card Grid Container */
+/* Card Grid Container (list reset — pair with .widget-grid for column layout) */
 .widget-card-grid {
-  display: grid;
   list-style: none;
   padding: 0;
   margin: 0;
-
-  grid-template-columns: 1fr;
-
-  @media (min-width: 750px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  @media (min-width: 990px) {
-    grid-template-columns: repeat(var(--grid-cols-desktop, 3), minmax(0, 1fr));
-  }
 }
 
 /* --------------------------------------------------------------------------
-   5.2 Buttons
+   7.2 Buttons
    -------------------------------------------------------------------------- */
 
 /* Base Button - Secondary style by default */
@@ -833,7 +895,7 @@ h6 {
   align-self: flex-start;
   gap: var(--space-sm);
   padding: 0.8rem 1.6rem;
-  font-size: var(--font-size-sm);
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
   font-weight: var(--typography-body_font-weight, 400);
   font-family: inherit;
   background-color: transparent;
@@ -857,17 +919,17 @@ h6 {
 /* Button Sizes */
 .widget-button-medium {
   padding: 1.2rem 2.4rem;
-  font-size: var(--font-size-base);
+  font-size: calc(var(--font-size-base) * var(--body-scale));
 }
 
 .widget-button-large {
   padding: 1.6rem 3.2rem;
-  font-size: var(--font-size-lg);
+  font-size: calc(var(--font-size-lg) * var(--body-scale));
 }
 
 .widget-button-xlarge {
   padding: 2rem 4.8rem;
-  font-size: var(--font-size-xl);
+  font-size: calc(var(--font-size-xl) * var(--body-scale));
 }
 
 .widget-button-full {
@@ -913,7 +975,7 @@ h6 {
 }
 
 /* --------------------------------------------------------------------------
-   5.3 Forms
+   7.3 Forms
    -------------------------------------------------------------------------- */
 
 .form-group {
@@ -923,7 +985,7 @@ h6 {
 }
 
 .form-label {
-  font-size: var(--font-size-sm);
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
   color: var(--text-content);
 }
 
@@ -932,7 +994,7 @@ h6 {
 .form-select {
   width: 100%;
   padding: var(--space-sm) var(--space-md);
-  font-size: var(--font-size-base);
+  font-size: calc(var(--font-size-base) * var(--body-scale));
   font-family: inherit;
   border: var(--border-width-thin) solid var(--border-color);
   background-color: var(--bg-primary);
@@ -979,7 +1041,7 @@ h6 {
 }
 
 .form-checkbox-label {
-  font-size: var(--font-size-base);
+  font-size: calc(var(--font-size-base) * var(--body-scale));
   color: var(--text-content);
   cursor: pointer;
   line-height: var(--line-height-normal);
@@ -995,7 +1057,7 @@ h6 {
 .widget-input {
   width: 100%;
   padding: 1.2rem 1.6rem;
-  font-size: var(--font-size-base);
+  font-size: calc(var(--font-size-base) * var(--body-scale));
   font-family: inherit;
   color: var(--text-content);
   background-color: var(--bg-primary);
@@ -1014,7 +1076,7 @@ h6 {
 }
 
 /* --------------------------------------------------------------------------
-   5.4 Icons
+   7.4 Icons
    -------------------------------------------------------------------------- */
 
 .widget-icon {
@@ -1035,14 +1097,47 @@ h6 {
   height: var(--icon-size-xl);
 }
 
-/* ==========================================================================
-   6. BLOCK SYSTEM
-   ========================================================================== */
+/* --------------------------------------------------------------------------
+   7.5 Feature Lists
+   -------------------------------------------------------------------------- */
+
+.features-list {
+  list-style: none;
+  list-style-type: none;
+  padding: 0;
+  padding-inline-start: 0;
+  margin-inline-start: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0;
+  width: 100%;
+  list-style: none;
+}
+
+.feature-icon {
+  color: var(--text-content);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.feature-icon-svg {
+  width: 1em;
+  height: 1em;
+  display: block;
+}
 
 /* --------------------------------------------------------------------------
-   6.1 Block Item Background/Overlay
-   Reusable background/overlay system for blocks within widgets.
-   Uses same CSS variables as .widget: --widget-bg-color, --widget-overlay-color
+   7.6 Block Items
    -------------------------------------------------------------------------- */
 
 .block-item {
@@ -1063,12 +1158,41 @@ h6 {
   }
 }
 
+/* --------------------------------------------------------------------------
+   7.x Social Links
+   -------------------------------------------------------------------------- */
+
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-content);
+  transition: color var(--transition-speed-fast);
+  width: 2.4rem;
+  height: 2.4rem;
+
+  &:hover {
+    color: var(--accent);
+  }
+
+  & svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
 /* ==========================================================================
-   7. GLOBAL COMPONENTS
+   8. GLOBAL COMPONENTS
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   7.1 Site Header
+   8.1 Site Header
    -------------------------------------------------------------------------- */
 
 .widget-site-header {
@@ -1104,7 +1228,7 @@ h6 {
   & .header-logo {
     display: block;
     text-decoration: none;
-    font-size: var(--font-size-2xl);
+    font-size: calc(var(--font-size-2xl) * var(--heading-scale));
     font-weight: var(--typography-body_font_bold-weight, 700);
     color: var(--text-heading);
     z-index: 1001;
@@ -1131,7 +1255,7 @@ h6 {
   }
 
   & .header-contact-line {
-    font-size: var(--font-size-xs);
+    font-size: calc(var(--font-size-xs) * var(--body-scale));
     color: var(--text-muted);
     line-height: var(--line-height-normal);
     white-space: nowrap;
@@ -1209,7 +1333,7 @@ h6 {
     border-block-end: var(--border-width-thin) solid var(--border-color);
 
     & .nav-close-title {
-      font-size: var(--font-size-lg);
+      font-size: calc(var(--font-size-lg) * var(--body-scale));
       font-weight: var(--font-weight-semibold);
       color: var(--text-content);
     }
@@ -1251,7 +1375,7 @@ h6 {
       text-decoration: none;
       color: var(--text-content);
       font-weight: var(--typography-body_font_weight, 400);
-      font-size: var(--font-size-lg);
+      font-size: calc(var(--font-size-lg) * var(--body-scale));
       background: transparent;
       border: none;
       text-align: start;
@@ -1323,7 +1447,7 @@ h6 {
 
       & > a,
       & > button {
-        font-size: var(--font-size-sm);
+        font-size: calc(var(--font-size-sm) * var(--body-scale));
         font-weight: var(--typography-body_font-weight, 400);
         padding-block: 1.2rem;
       }
@@ -1335,7 +1459,7 @@ h6 {
 
         & > a,
         & > button {
-          font-size: var(--font-size-sm);
+          font-size: calc(var(--font-size-sm) * var(--body-scale));
         }
       }
     }
@@ -1408,7 +1532,7 @@ h6 {
       & > button:not(.submenu-toggle) {
         padding-block: 1rem;
         padding-inline: var(--space-md);
-        font-size: var(--font-size-sm);
+        font-size: calc(var(--font-size-sm) * var(--body-scale));
         transition: background-color 0.2s;
 
         &:hover {
@@ -1474,7 +1598,7 @@ h6 {
         & > button:not(.submenu-toggle) {
           padding-block: 1.2rem;
           padding-inline: var(--space-md);
-          font-size: var(--font-size-sm);
+          font-size: calc(var(--font-size-sm) * var(--body-scale));
           transition: background-color 0.2s;
 
           &:hover {
@@ -1548,25 +1672,25 @@ h6 {
       display: none;
     }
 
-     /* Centered navigation layout */
+    /* Centered navigation layout */
     & .header-inner.header-center-nav {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
     }
- 
+
     & .header-inner.header-center-nav .header-actions {
       display: contents;
     }
- 
+
     & .header-inner.header-center-nav .header-branding {
       justify-self: start;
     }
- 
+
     & .header-inner.header-center-nav .header-nav {
       justify-self: center;
     }
- 
+
     & .header-inner.header-center-nav .desktop-cta {
       justify-self: end;
     }
@@ -1574,7 +1698,7 @@ h6 {
 }
 
 /* --------------------------------------------------------------------------
-   7.2 Site Footer
+   8.2 Site Footer
    -------------------------------------------------------------------------- */
 
 .widget-footer {
@@ -1612,7 +1736,7 @@ h6 {
   & .footer-menu-link {
     color: var(--text-content);
     text-decoration: none;
-    font-size: var(--font-size-sm);
+    font-size: calc(var(--font-size-sm) * var(--body-scale));
     font-weight: var(--typography-body_font-weight, 400);
     transition: color var(--transition-speed-fast);
 
@@ -1622,44 +1746,22 @@ h6 {
   }
 
   & .footer-social {
-    display: flex;
-    gap: var(--space-md);
     justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  & .social-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-content);
-    transition: color var(--transition-speed-fast);
-    width: 2.4rem;
-    height: 2.4rem;
-
-    &:hover {
-      color: var(--accent);
-    }
-
-    & svg {
-      width: 100%;
-      height: 100%;
-    }
   }
 
   & .footer-copyright {
     color: var(--text-muted);
-    font-size: var(--font-size-xs);
+    font-size: calc(var(--font-size-xs) * var(--body-scale));
     margin: 0;
   }
 }
 
 /* ==========================================================================
-   8. UTILITY CLASSES
+   9. UTILITIES
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   8.1 Content Flow
+   9.1 Content Flow
    -------------------------------------------------------------------------- */
 
 .content-flow > * + * {
@@ -1671,47 +1773,7 @@ h6 {
 }
 
 /* --------------------------------------------------------------------------
-   8.2 Feature Lists
-   Shared across widgets for consistent feature/benefit presentation
-   -------------------------------------------------------------------------- */
-
-.features-list {
-  list-style: none;
-  list-style-type: none;
-  padding: 0;
-  padding-inline-start: 0;
-  margin-inline-start: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  padding: 0;
-  width: 100%;
-  list-style: none;
-}
-
-.feature-icon {
-  color: var(--text-content);
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-.feature-icon-svg {
-  width: 1em;
-  height: 1em;
-  display: block;
-}
-
-/* --------------------------------------------------------------------------
-   8.3 Accessibility Helpers
+   9.2 Accessibility Helpers
    -------------------------------------------------------------------------- */
 
 /* Visually hidden (for accessibility) */
@@ -1744,7 +1806,7 @@ h6 {
 }
 
 /* --------------------------------------------------------------------------
-   8.4 Scroll Reveal Animations
+   9.3 Scroll Reveal Animations
    -------------------------------------------------------------------------- */
 
 /* Base reveal class - hidden state */

@@ -83,10 +83,6 @@
         font-family: inherit;
       }
 
-      & .image-tabs-tab-title {
-        font-size: calc(var(--font-size-lg) * var(--heading-scale));
-      }
-
       & .image-tabs-tab-description {
         font-size: calc(var(--font-size-sm) * var(--body-scale));
       }
@@ -130,7 +126,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -196,7 +192,7 @@
                 tabindex="{% if first_tab %}0{% else %}-1{% endif %}"
               >
                 {% if block.settings.title != blank %}
-                  <{{ tab_heading_level }} class="image-tabs-tab-title w-title" data-setting="title">{{ block.settings.title }}</{{ tab_heading_level }}>
+                  <{{ tab_heading_level }} class="image-tabs-tab-title w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ tab_heading_level }}>
                 {% endif %}
                 {% if block.settings.description != blank %}
                   <div class="image-tabs-tab-description w-body w-rte" data-setting="description">{{ block.settings.description | raw }}</div>

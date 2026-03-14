@@ -1,7 +1,12 @@
 {
   "type": "image-hotspots",
   "displayName": "Image Hotspots",
-  "aliases": ["interactive image", "markers", "product details", "hotspots"],
+  "aliases": [
+    "interactive image",
+    "markers",
+    "product details",
+    "hotspots"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Interactive Image"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -46,8 +51,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],

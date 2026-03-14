@@ -57,7 +57,7 @@
       }
 
       & .job-badge {
-        padding: var(--space-2xs) var(--space-sm);
+        padding: var(--space-xs) var(--space-md);
         background-color: var(--bg-secondary);
         border: var(--border-width-thin) solid var(--border-color);
       }
@@ -84,7 +84,6 @@
         }
 
         & .w-title {
-          font-size: calc(var(--font-size-xl) * var(--heading-scale));
           min-width: 25rem;
           flex-shrink: 0;
         }
@@ -142,7 +141,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -219,7 +218,7 @@
           >
             <div class="widget-card-content">
               <div class="job-header">
-                <{{ item_heading_level }} class="w-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                <{{ item_heading_level }} class="w-title t-2xl" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
                 <div class="job-meta w-meta">
                   <span class="job-meta-item">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -234,7 +233,7 @@
                     </svg>
                     <span data-setting="location">{{ block.settings.location }}</span>
                   </span>
-                  <span class="job-badge w-label t-xs t-uppercase">
+                  <span class="job-badge w-label t-xs">
                     {% case block.settings.type %}
                       {% when 'full-time' -%}
                         Full-Time

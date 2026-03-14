@@ -1,6 +1,14 @@
+{% assign has_sidebar_blocks = false %}
+{% for blockId in widget.blocksOrder %}
+  {% assign block = widget.blocks[blockId] %}
+  {% if block.type == 'info' or block.type == 'social' %}
+    {% assign has_sidebar_blocks = true %}
+  {% endif %}
+{% endfor %}
+
 <section
   id="{{ widget.id }}"
-  class="widget widget-accordion widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.style == 'connected' %}accordion-bordered{% endif %}"
+  class="widget widget-accordion widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.style == 'connected' %}accordion-bordered{% endif %} {% if has_sidebar_blocks and widget.settings.sidebar_position == 'left' %}layout-reverse{% endif %}"
   {% if widget.settings.color_scheme == 'highlight' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endif %}
@@ -13,6 +21,12 @@
 >
   <style>
     .widget-{{ widget.id }} {
+      & .accordion-content-wrapper {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+
       & .accordion-list {
         list-style: none;
         padding: 0;
@@ -70,13 +84,13 @@
       }
 
       /* Grid-based collapse animation */
-      & .accordion-content {
+      & .accordion-collapse {
         display: grid;
         grid-template-rows: 0fr;
         transition: grid-template-rows 0.3s ease-out;
       }
 
-      & .accordion-content[aria-hidden="false"] {
+      & .accordion-collapse[aria-hidden="false"] {
         grid-template-rows: 1fr;
       }
 
@@ -97,14 +111,44 @@
           transform 0.25s ease-out;
       }
 
-      & .accordion-content[aria-hidden="false"] .accordion-answer {
+      & .accordion-collapse[aria-hidden="false"] .accordion-answer {
         opacity: 1;
         transform: translateY(0);
+      }
+
+      /* Sidebar */
+      & .accordion-info {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xl);
+      }
+
+      & .accordion-info-block {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
       }
 
       @media (min-width: 750px) {
         & .accordion-trigger {
           padding: var(--space-lg);
+        }
+
+        & .accordion-content-wrapper:not(.no-sidebar) {
+          grid-template-columns: 7fr 3fr;
+          gap: var(--space-3xl);
+        }
+
+        &.layout-reverse .accordion-content-wrapper:not(.no-sidebar) {
+          grid-template-columns: 3fr 7fr;
+        }
+
+        &.layout-reverse .accordion-list-wrapper {
+          order: 2;
+        }
+
+        &.layout-reverse .accordion-info {
+          order: 1;
         }
       }
 
@@ -134,7 +178,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -151,47 +195,77 @@
       </div>
     {% endif %}
 
-    <div class="widget-content widget-content-md">
-      <ul class="accordion-list">
-        {% for blockId in widget.blocksOrder %}
-          {% assign block = widget.blocks[blockId] %}
-          <li class="accordion-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
-            <button
-              type="button"
-              class="accordion-trigger"
-              aria-expanded="false"
-              aria-controls="accordion-content-{{ widget.id }}-{{ blockId }}"
-              id="accordion-trigger-{{ widget.id }}-{{ blockId }}"
-            >
-              <span class="accordion-question w-title" data-setting="question">{{ block.settings.question }}</span>
-              <span class="accordion-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </span>
-            </button>
-            <div
-              class="accordion-content"
-              id="accordion-content-{{ widget.id }}-{{ blockId }}"
-              role="region"
-              aria-labelledby="accordion-trigger-{{ widget.id }}-{{ blockId }}"
-              aria-hidden="true"
-            >
-              <div class="accordion-inner">
-                <div class="accordion-answer w-body w-rte" data-setting="answer">{{ block.settings.answer | raw }}</div>
-              </div>
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
+    <div class="widget-content {% if has_sidebar_blocks %}{% else %}widget-content-md{% endif %}">
+      <div class="accordion-content-wrapper {% unless has_sidebar_blocks %}no-sidebar{% endunless %}">
+        <div class="accordion-list-wrapper">
+          <ul class="accordion-list">
+            {% for blockId in widget.blocksOrder %}
+              {% assign block = widget.blocks[blockId] %}
+              {% if block.type == 'item' %}
+                <li class="accordion-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+                  <button
+                    type="button"
+                    class="accordion-trigger"
+                    aria-expanded="false"
+                    aria-controls="accordion-content-{{ widget.id }}-{{ blockId }}"
+                    id="accordion-trigger-{{ widget.id }}-{{ blockId }}"
+                  >
+                    <span class="accordion-question w-title t-xl t-heading-font" data-setting="question">{{ block.settings.question }}</span>
+                    <span class="accordion-icon">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </span>
+                  </button>
+                  <div
+                    class="accordion-collapse"
+                    id="accordion-content-{{ widget.id }}-{{ blockId }}"
+                    role="region"
+                    aria-labelledby="accordion-trigger-{{ widget.id }}-{{ blockId }}"
+                    aria-hidden="true"
+                  >
+                    <div class="accordion-inner">
+                      <div class="accordion-answer w-body w-rte" data-setting="answer">{{ block.settings.answer | raw }}</div>
+                    </div>
+                  </div>
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+
+        {% if has_sidebar_blocks %}
+          <div class="accordion-info">
+            {% for blockId in widget.blocksOrder %}
+              {% assign block = widget.blocks[blockId] %}
+              {% if block.type == 'info' %}
+                <div class="accordion-info-block" data-block-id="{{ blockId }}">
+                  {% if block.settings.title != blank %}
+                    <h3 class="accordion-info-title w-title t-xl" data-setting="title">{{ block.settings.title }}</h3>
+                  {% endif %}
+                  {% if block.settings.text != blank %}
+                    <div class="accordion-info-text w-body w-rte" data-setting="text">
+                      {{ block.settings.text | raw }}
+                    </div>
+                  {% endif %}
+                </div>
+              {% elsif block.type == 'social' %}
+                <div class="social-links" data-block-id="{{ blockId }}">
+                  {% render 'social-icons', social: theme.social %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
     </div>
   </div>
 
@@ -231,7 +305,7 @@
           const item = widget.querySelector(`.accordion-item[data-block-id="${blockId}"]`);
           if (!item) return;
           const trigger = item.querySelector('.accordion-trigger');
-          const content = item.querySelector('.accordion-content');
+          const content = item.querySelector('.accordion-collapse');
           if (!trigger || !content) return;
           if (trigger.getAttribute('aria-expanded') === 'true') return;
 

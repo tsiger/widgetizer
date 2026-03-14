@@ -13,7 +13,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -80,10 +80,10 @@
             {% endif %}
             <div class="widget-card-content">
               {% if block.settings.subtitle != blank %}
-                <span class="w-eyebrow t-xs" data-setting="subtitle">{{ block.settings.subtitle }}</span>
+                <span class="w-eyebrow" data-setting="subtitle">{{ block.settings.subtitle }}</span>
               {% endif %}
               {% if block.settings.title != blank %}
-                <{{ current_card_level }} class="w-title" data-setting="title">{{ block.settings.title }}</{{ current_card_level }}>
+                <{{ current_card_level }} class="w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ current_card_level }}>
               {% endif %}
               {% if block.settings.description != blank %}
                 <div class="w-body w-rte t-sm" data-setting="description">

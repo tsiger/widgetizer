@@ -35,7 +35,7 @@
   </style>
 
   <div class="widget-container {% if widget.settings.height == 'auto' %}widget-container-padded{% endif %}">
-    <div class="widget-content content-flow {% if widget.settings.alignment == 'center' %}widget-content-align-center{% else %}widget-content-align-start{% endif %}">
+    <div class="widget-content widget-content-lg content-flow {% if widget.settings.alignment == 'center' %}widget-content-align-center{% else %}widget-content-align-start{% endif %}">
       {% for blockId in widget.blocksOrder %}
         {% assign block = widget.blocks[blockId] %}
         {% case block.type %}

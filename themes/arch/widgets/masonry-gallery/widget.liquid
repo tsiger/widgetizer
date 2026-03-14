@@ -41,10 +41,6 @@
         padding: var(--space-md);
       }
 
-      & .w-title {
-        font-size: calc(var(--font-size-base) * var(--heading-scale));
-      }
-
       & .widget-card-category {
         margin: 0;
       }
@@ -68,7 +64,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -113,7 +109,7 @@
             {% if block.settings.title != blank or block.settings.category != blank %}
               <div class="widget-card-content">
                 {% if block.settings.title != blank %}
-                  <{{ item_heading_level }} class="w-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                  <{{ item_heading_level }} class="w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
                 {% endif %}
                 {% if block.settings.category != blank %}
                   <p class="widget-card-category w-meta t-sm" data-setting="category">{{ block.settings.category }}</p>

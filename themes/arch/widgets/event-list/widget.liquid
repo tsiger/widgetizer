@@ -64,7 +64,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -92,12 +92,12 @@
           {% assign block = widget.blocks[blockId] %}
           <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             <div class="event-date">
-              <span class="event-date-day t-4xl t-body-bold" data-setting="day">{{ block.settings.day }}</span>
-              <span class="event-date-month w-meta t-sm t-uppercase" data-setting="month">{{ block.settings.month }}</span>
+              <span class="event-date-day t-4xl t-body-bold t-heading" data-setting="day">{{ block.settings.day }}</span>
+              <span class="event-date-month w-meta t-sm" data-setting="month">{{ block.settings.month }}</span>
             </div>
             <div class="widget-card-content">
               {% if block.settings.title != blank %}
-                <{{ item_heading_level }} class="w-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                <{{ item_heading_level }} class="w-title t-2xl" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
               {% endif %}
               {% if block.settings.location != blank %}
                 <p class="w-meta" data-setting="location">{{ block.settings.location }}</p>

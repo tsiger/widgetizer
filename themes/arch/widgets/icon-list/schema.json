@@ -1,7 +1,13 @@
 {
   "type": "icon-list",
   "displayName": "Icon List",
-  "aliases": ["amenities", "features", "icons", "services list", "facilities"],
+  "aliases": [
+    "amenities",
+    "features",
+    "icons",
+    "services list",
+    "facilities"
+  ],
   "settings": [
     {
       "type": "text",
@@ -14,9 +20,9 @@
       "label": "Heading"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -69,6 +75,11 @@
           "id": "title",
           "label": "Title",
           "default": "Feature"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description"
         }
       ]
     }

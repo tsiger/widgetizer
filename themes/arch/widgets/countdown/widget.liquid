@@ -71,7 +71,7 @@
         margin-block-start: var(--space-md);
       }
 
-      @media (max-width: 600px) {
+      @media (max-width: 749px) {
         & .countdown-timer {
           gap: var(--space-sm);
         }
@@ -100,7 +100,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -128,21 +128,21 @@
         >
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="days">00</span>
-            <span class="countdown-label w-meta t-sm t-uppercase">Days</span>
+            <span class="countdown-label w-meta t-sm">Days</span>
           </div>
           {% if widget.settings.style == 'minimal' -%}
             <span class="countdown-separator t-4xl t-muted">:</span>
           {%- endif %}
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="hours">00</span>
-            <span class="countdown-label w-meta t-sm t-uppercase">Hours</span>
+            <span class="countdown-label w-meta t-sm">Hours</span>
           </div>
           {% if widget.settings.style == 'minimal' -%}
             <span class="countdown-separator t-4xl t-muted">:</span>
           {%- endif %}
           <div class="countdown-unit">
             <span class="countdown-number" data-unit="minutes">00</span>
-            <span class="countdown-label w-meta t-sm t-uppercase">Minutes</span>
+            <span class="countdown-label w-meta t-sm">Minutes</span>
           </div>
           {% if widget.settings.show_seconds %}
             {% if widget.settings.style == 'minimal' -%}
@@ -150,7 +150,7 @@
             {%- endif %}
             <div class="countdown-unit">
               <span class="countdown-number" data-unit="seconds">00</span>
-              <span class="countdown-label w-meta t-sm t-uppercase">Seconds</span>
+              <span class="countdown-label w-meta t-sm">Seconds</span>
             </div>
           {% endif %}
         </div>

@@ -23,11 +23,11 @@
 
       & .pricing-price {
         font-size: calc(var(--font-size-5xl) * var(--heading-scale));
-        font-weight: var(--typography-heading_font-weight, 700);
+        font-weight: var(--font-weight-bold);
         line-height: var(--line-height-tight);
         color: var(--text-heading);
         margin: 0;
-        margin-block-end: var(--space-xs);
+        margin-block-start: var(--space-sm);
       }
 
       & .pricing-features {
@@ -72,7 +72,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -104,7 +104,7 @@
           <li class="widget-card reveal reveal-up {% if block.settings.featured %}is-featured{% endif %}" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             <div class="widget-card-header">
               {% if block.settings.title != blank %}
-                <{{ item_heading_level }} class="w-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                <{{ item_heading_level }} class="w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
               {% endif %}
               {% if block.settings.price != blank %}
                 <div class="pricing-price" data-setting="price">{{ block.settings.price }}</div>

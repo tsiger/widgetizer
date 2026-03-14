@@ -1,7 +1,12 @@
 {
   "type": "key-figures",
   "displayName": "Key Figures",
-  "aliases": ["stats", "metrics", "data points", "numbers"],
+  "aliases": [
+    "stats",
+    "metrics",
+    "data points",
+    "numbers"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "By The Numbers"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -30,8 +35,14 @@
       "label": "Layout",
       "default": "cards",
       "options": [
-        { "value": "cards", "label": "Cards" },
-        { "value": "bar", "label": "Horizontal Bar" }
+        {
+          "value": "cards",
+          "label": "Cards"
+        },
+        {
+          "value": "bar",
+          "label": "Horizontal Bar"
+        }
       ]
     },
     {
@@ -55,8 +66,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],

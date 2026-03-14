@@ -1,0 +1,85 @@
+{% comment %}
+  Renders social media icons from theme social settings.
+  Usage: {% render 'social-icons', social: theme.social %}
+{% endcomment %}
+
+{% if social.facebook_url != blank %}
+  <a href="{{ social.facebook_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+    {% render 'icon', icon: 'facebook' %}
+  </a>
+{% endif %}
+{% if social.instagram_url != blank %}
+  <a href="{{ social.instagram_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+    {% render 'icon', icon: 'instagram' %}
+  </a>
+{% endif %}
+{% if social.twitter_url != blank %}
+  <a href="{{ social.twitter_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+    {% render 'icon', icon: 'twitter' %}
+  </a>
+{% endif %}
+{% if social.linkedin_url != blank %}
+  <a href="{{ social.linkedin_url }}" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+    {% render 'icon', icon: 'linkedin' %}
+  </a>
+{% endif %}
+{% if social.youtube_url != blank %}
+  <a href="{{ social.youtube_url }}" class="social-link" target="_blank" rel="noopener" aria-label="YouTube">
+    {% render 'icon', icon: 'youtube' %}
+  </a>
+{% endif %}
+{% if social.tiktok_url != blank %}
+  <a href="{{ social.tiktok_url }}" class="social-link" target="_blank" rel="noopener" aria-label="TikTok">
+    {% render 'icon', icon: 'tiktok' %}
+  </a>
+{% endif %}
+{% if social.pinterest_url != blank %}
+  <a href="{{ social.pinterest_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Pinterest">
+    {% render 'icon', icon: 'pinterest' %}
+  </a>
+{% endif %}
+{% if social.github_url != blank %}
+  <a href="{{ social.github_url }}" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">
+    {% render 'icon', icon: 'github' %}
+  </a>
+{% endif %}
+{% if social.mastodon_url != blank %}
+  <a href="{{ social.mastodon_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Mastodon">
+    {% render 'icon', icon: 'mastodon' %}
+  </a>
+{% endif %}
+{% if social.bluesky_url != blank %}
+  <a href="{{ social.bluesky_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Bluesky">
+    {% render 'icon', icon: 'bluesky' %}
+  </a>
+{% endif %}
+{% if social.discord_url != blank %}
+  <a href="{{ social.discord_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Discord">
+    {% render 'icon', icon: 'discord' %}
+  </a>
+{% endif %}
+{% if social.reddit_url != blank %}
+  <a href="{{ social.reddit_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Reddit">
+    {% render 'icon', icon: 'reddit' %}
+  </a>
+{% endif %}
+{% if social.telegram_url != blank %}
+  <a href="{{ social.telegram_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Telegram">
+    {% render 'icon', icon: 'telegram' %}
+  </a>
+{% endif %}
+{% if social.threads_url != blank %}
+  <a href="{{ social.threads_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Threads">
+    {% render 'icon', icon: 'threads' %}
+  </a>
+{% endif %}
+{% if social.whatsapp_url != blank %}
+  <a href="{{ social.whatsapp_url }}" class="social-link" target="_blank" rel="noopener" aria-label="WhatsApp">
+    {% render 'icon', icon: 'whatsapp' %}
+  </a>
+{% endif %}
+{% if social.mail_url != blank %}
+  <a href="{{ social.mail_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Email">
+    {% render 'icon', icon: 'mail' %}
+  </a>
+{% endif %}

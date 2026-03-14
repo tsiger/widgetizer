@@ -178,7 +178,7 @@
       "settings": {
         "text": "Why Choose Us",
         "size": "sm",
-        "uppercase": true,
+        "uppercase": false,
         "muted": true
       }
     },

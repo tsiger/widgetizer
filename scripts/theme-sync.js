@@ -1,0 +1,143 @@
+import chokidar from "chokidar";
+import { copyFile, rm, mkdir } from "node:fs/promises";
+import { cpSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, "..");
+
+// Directories excluded from the project destination (matches copyThemeToProject logic)
+const PROJECT_EXCLUDES = new Set(["templates", "presets", "updates", "latest"]);
+
+function parseArgs(argv) {
+  const result = {};
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i].startsWith("--") && i + 1 < argv.length) {
+      result[argv[i].slice(2)] = argv[i + 1];
+      i++;
+    }
+  }
+  return result;
+}
+
+const args = parseArgs(process.argv.slice(2));
+const themeId = args.theme ?? "arch";
+const project = args.project ?? "theme";
+
+const srcDir = path.join(ROOT, "themes", themeId);
+const themeDest = path.join(ROOT, "data", "themes", themeId);
+const projectDest = path.join(ROOT, "data", "projects", project);
+
+function isExcludedForProject(relPath) {
+  const topDir = relPath.split(path.sep)[0];
+  return PROJECT_EXCLUDES.has(topDir);
+}
+
+async function syncFile(relPath) {
+  const src = path.join(srcDir, relPath);
+
+  const targets = [path.join(themeDest, relPath)];
+  if (!isExcludedForProject(relPath)) {
+    targets.push(path.join(projectDest, relPath));
+  }
+
+  for (const dest of targets) {
+    await mkdir(path.dirname(dest), { recursive: true });
+    await copyFile(src, dest);
+  }
+}
+
+async function removeFile(relPath) {
+  const targets = [path.join(themeDest, relPath)];
+  if (!isExcludedForProject(relPath)) {
+    targets.push(path.join(projectDest, relPath));
+  }
+
+  for (const dest of targets) {
+    try {
+      await rm(dest, { force: true });
+    } catch {
+      // already gone
+    }
+  }
+}
+
+async function removeDir(relPath) {
+  const targets = [path.join(themeDest, relPath)];
+  if (!isExcludedForProject(relPath)) {
+    targets.push(path.join(projectDest, relPath));
+  }
+
+  for (const dest of targets) {
+    try {
+      await rm(dest, { recursive: true, force: true });
+    } catch {
+      // already gone
+    }
+  }
+}
+
+function initialSync() {
+  console.log(`[sync] Full copy: themes/${themeId} → data/themes/${themeId}`);
+  cpSync(srcDir, themeDest, { recursive: true });
+
+  console.log(`[sync] Full copy: themes/${themeId} → data/projects/${project} (filtered)`);
+  cpSync(srcDir, projectDest, {
+    recursive: true,
+    filter: (src) => {
+      const rel = path.relative(srcDir, src);
+      if (!rel) return true; // root
+      return !isExcludedForProject(rel);
+    },
+  });
+}
+
+function startWatcher() {
+  const watcher = chokidar.watch(srcDir, {
+    ignoreInitial: true,
+    awaitWriteFinish: { stabilityThreshold: 100, pollInterval: 50 },
+  });
+
+  watcher
+    .on("add", (filePath) => {
+      const rel = path.relative(srcDir, filePath);
+      console.log(`[sync] + ${rel}`);
+      syncFile(rel);
+    })
+    .on("change", (filePath) => {
+      const rel = path.relative(srcDir, filePath);
+      console.log(`[sync] ~ ${rel}`);
+      syncFile(rel);
+    })
+    .on("unlink", (filePath) => {
+      const rel = path.relative(srcDir, filePath);
+      console.log(`[sync] - ${rel}`);
+      removeFile(rel);
+    })
+    .on("addDir", (dirPath) => {
+      const rel = path.relative(srcDir, dirPath);
+      if (!rel) return;
+      console.log(`[sync] +dir ${rel}`);
+      const targets = [path.join(themeDest, rel)];
+      if (!isExcludedForProject(rel)) targets.push(path.join(projectDest, rel));
+      targets.forEach((d) => mkdir(d, { recursive: true }));
+    })
+    .on("unlinkDir", (dirPath) => {
+      const rel = path.relative(srcDir, dirPath);
+      if (!rel) return;
+      console.log(`[sync] -dir ${rel}`);
+      removeDir(rel);
+    })
+    .on("error", (err) => console.error("[sync] Watcher error:", err))
+    .on("ready", () => {
+      console.log(`[sync] Watching themes/${themeId} for changes…`);
+      console.log(`[sync] Destinations:`);
+      console.log(`[sync]   data/themes/${themeId}`);
+      console.log(`[sync]   data/projects/${project}`);
+      console.log(`[sync] Press Ctrl+C to stop.`);
+    });
+}
+
+initialSync();
+startWatcher();

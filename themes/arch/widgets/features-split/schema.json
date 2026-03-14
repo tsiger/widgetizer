@@ -1,7 +1,13 @@
 {
   "type": "features-split",
   "displayName": "Features Split",
-  "aliases": ["services split", "markets", "audience", "segments", "two column features"],
+  "aliases": [
+    "services split",
+    "markets",
+    "audience",
+    "segments",
+    "two column features"
+  ],
   "settings": [
     {
       "type": "text",
@@ -16,9 +22,9 @@
       "default": "Optimal Solution For Every Business"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description",
+      "label": "Subheading",
       "default": "We combine industry expertise with innovative technology to deliver solutions that drive real results. Our approach is tailored to meet the unique challenges of each market segment we serve."
     },
     {
@@ -32,8 +38,14 @@
       "label": "Content position",
       "default": "left",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
       ]
     },
     {
@@ -48,8 +60,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],
@@ -87,6 +105,7 @@
     {
       "type": "feature",
       "settings": {
+        "icon": "user",
         "title": "Private entrepreneurs",
         "description": "<p>Tailored solutions for independent professionals looking to streamline operations and accelerate growth.</p>"
       }
@@ -94,6 +113,7 @@
     {
       "type": "feature",
       "settings": {
+        "icon": "users",
         "title": "Small & medium companies",
         "description": "<p>Scalable tools designed to help growing teams collaborate effectively and compete with larger organizations.</p>"
       }
@@ -101,6 +121,7 @@
     {
       "type": "feature",
       "settings": {
+        "icon": "building",
         "title": "Large companies",
         "description": "<p>Enterprise-grade features with dedicated support to meet the demands of complex organizational structures.</p>"
       }

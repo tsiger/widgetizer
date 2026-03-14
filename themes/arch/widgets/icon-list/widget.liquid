@@ -47,6 +47,7 @@
 
       & .icon-list-title {
         margin: 0;
+        color: var(--text-heading);
       }
     }
   </style>
@@ -56,7 +57,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -87,7 +88,10 @@
               {% render 'icon', icon: block.settings.icon, class: 'icon-list-icon' %}
             {% endif %}
             {% if block.settings.title != blank %}
-              <span class="icon-list-title w-body" data-setting="title">{{ block.settings.title }}</span>
+              <span class="icon-list-title t-heading-font" data-setting="title">{{ block.settings.title }}</span>
+            {% endif %}
+            {% if block.settings.description != blank %}
+              <span class="icon-list-description w-body t-muted t-sm" data-setting="description">{{ block.settings.description }}</span>
             {% endif %}
           </li>
         {% endfor %}

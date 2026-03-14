@@ -1,7 +1,12 @@
 {
   "type": "contact-form",
   "displayName": "Contact Form",
-  "aliases": ["lead capture", "inquiry", "message", "feedback"],
+  "aliases": [
+    "lead capture",
+    "inquiry",
+    "message",
+    "feedback"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Get in Touch"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -43,19 +48,19 @@
       "label": "Display"
     },
     {
-      "type": "checkbox",
-      "id": "show_sidebar",
-      "label": "Show contact info sidebar",
-      "default": true
-    },
-    {
       "type": "select",
       "id": "sidebar_position",
       "label": "Sidebar position",
       "default": "right",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
       ]
     },
     {
@@ -64,8 +69,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],
@@ -97,12 +108,30 @@
           "label": "Input type",
           "default": "text",
           "options": [
-            { "value": "text", "label": "Text" },
-            { "value": "email", "label": "Email" },
-            { "value": "tel", "label": "Phone" },
-            { "value": "url", "label": "URL" },
-            { "value": "number", "label": "Number" },
-            { "value": "date", "label": "Date" }
+            {
+              "value": "text",
+              "label": "Text"
+            },
+            {
+              "value": "email",
+              "label": "Email"
+            },
+            {
+              "value": "tel",
+              "label": "Phone"
+            },
+            {
+              "value": "url",
+              "label": "URL"
+            },
+            {
+              "value": "number",
+              "label": "Number"
+            },
+            {
+              "value": "date",
+              "label": "Date"
+            }
           ]
         },
         {
@@ -275,6 +304,11 @@
           "default": "<p>hello@example.com</p>"
         }
       ]
+    },
+    {
+      "type": "social",
+      "displayName": "Social Icons",
+      "settings": []
     }
   ],
   "defaultBlocks": [

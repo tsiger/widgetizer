@@ -61,13 +61,7 @@
               </p>
             {% endif %}
             {% if block.settings.button_link.text != blank or block.settings.button_link_2.text != blank %}
-              {% assign hasSingleButton = false %}
-              {% if block.settings.button_link.text != blank and block.settings.button_link_2.text == blank %}
-                {% assign hasSingleButton = true %}
-              {% elsif block.settings.button_link.text == blank and block.settings.button_link_2.text != blank %}
-                {% assign hasSingleButton = true %}
-              {% endif %}
-              <div class="widget-actions{% if hasSingleButton %} widget-actions-single{% endif %}" data-block-id="{{ blockId }}">
+              <div class="widget-actions" data-block-id="{{ blockId }}">
                 {% if block.settings.button_link.text != blank %}
                   {% if block.settings.button_size != 'small' and block.settings.button_size != blank %}
                     {% assign size_class = 'widget-button-' | append: block.settings.button_size %}

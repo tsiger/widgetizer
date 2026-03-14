@@ -84,7 +84,6 @@
       }
 
       & .timeline-title {
-        font-size: calc(var(--font-size-2xl) * var(--heading-scale));
         margin-block-end: var(--space-sm);
       }
 
@@ -252,7 +251,7 @@
       <div class="widget-header">
         {% assign header_delay = 0 %}
         {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow t-uppercase reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
           {% assign header_delay = header_delay | plus: 1 %}
         {% endif %}
         {% if widget.settings.title != blank %}
@@ -284,7 +283,7 @@
               {% if block.settings.date != blank or block.settings.duration != blank %}
                 <div class="timeline-meta">
                   {% if block.settings.date != blank %}
-                    <span class="timeline-date w-meta t-sm t-semibold t-uppercase t-accent" data-setting="date">{{ block.settings.date }}</span>
+                    <span class="timeline-date w-meta t-sm t-semibold t-accent" data-setting="date">{{ block.settings.date }}</span>
                   {% endif %}
                   {% if block.settings.duration != blank %}
                     <span class="timeline-duration w-meta t-sm" data-setting="duration">{{ block.settings.duration }}</span>
@@ -297,7 +296,7 @@
                 {% if widget.settings.title == blank %}
                   {% assign item_heading_level = 'h2' %}
                 {% endif %}
-                <{{ item_heading_level }} class="timeline-title w-title" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                <{{ item_heading_level }} class="timeline-title w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
               {% endif %}
 
               {% if block.settings.description != blank %}

@@ -1,7 +1,12 @@
 {
   "type": "logo-cloud",
   "displayName": "Logo Cloud",
-  "aliases": ["partners", "clients", "trust signals", "brands"],
+  "aliases": [
+    "partners",
+    "clients",
+    "trust signals",
+    "brands"
+  ],
   "settings": [
     {
       "type": "text",
@@ -16,9 +21,9 @@
       "default": "Join 500+ Companies Already Using Our Platform"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -40,8 +45,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],

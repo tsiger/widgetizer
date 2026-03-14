@@ -1,7 +1,12 @@
 {
   "type": "map",
   "displayName": "Map",
-  "aliases": ["location", "directions", "store finder", "google maps"],
+  "aliases": [
+    "location",
+    "directions",
+    "store finder",
+    "google maps"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Find Us"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -51,9 +56,18 @@
       "id": "height",
       "label": "Map height",
       "options": [
-        { "value": "small", "label": "Small (300px)" },
-        { "value": "medium", "label": "Medium (450px)" },
-        { "value": "large", "label": "Large (600px)" }
+        {
+          "value": "small",
+          "label": "Small (300px)"
+        },
+        {
+          "value": "medium",
+          "label": "Medium (450px)"
+        },
+        {
+          "value": "large",
+          "label": "Large (600px)"
+        }
       ],
       "default": "medium"
     },
@@ -69,8 +83,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],

@@ -1,7 +1,12 @@
 {
   "type": "content-switcher",
   "displayName": "Content Switcher",
-  "aliases": ["tabs", "toggle content", "switch", "selector"],
+  "aliases": [
+    "tabs",
+    "toggle content",
+    "switch",
+    "selector"
+  ],
   "settings": [
     {
       "type": "text",
@@ -16,9 +21,9 @@
       "default": "Choose Your Plan"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description",
+      "label": "Subheading",
       "default": "Select the billing cycle that works best for you. All plans include our core features."
     },
     {
@@ -239,48 +244,6 @@
         "text": "<p>Comprehensive solution for large organizations and enterprises.</p>",
         "price": "$990/yr",
         "target_option": "2",
-        "link": {
-          "text": "Contact Sales",
-          "href": "#",
-          "target": "_self"
-        }
-      }
-    },
-    {
-      "type": "item",
-      "settings": {
-        "title": "Starter",
-        "text": "<p>Perfect for individuals and small projects just getting started.</p>",
-        "price": "$499",
-        "target_option": "3",
-        "link": {
-          "text": "Buy Now",
-          "href": "#",
-          "target": "_self"
-        }
-      }
-    },
-    {
-      "type": "item",
-      "settings": {
-        "title": "Professional",
-        "text": "<p>Ideal for growing teams and businesses with advanced needs.</p>",
-        "price": "$999",
-        "target_option": "3",
-        "link": {
-          "text": "Buy Now",
-          "href": "#",
-          "target": "_self"
-        }
-      }
-    },
-    {
-      "type": "item",
-      "settings": {
-        "title": "Enterprise",
-        "text": "<p>Comprehensive solution for large organizations and enterprises.</p>",
-        "price": "$2,999",
-        "target_option": "3",
         "link": {
           "text": "Contact Sales",
           "href": "#",

@@ -1,7 +1,12 @@
 {
   "type": "image-tabs",
   "displayName": "Image Tabs",
-  "aliases": ["visual tabs", "image selector", "gallery tabs", "interactive gallery"],
+  "aliases": [
+    "visual tabs",
+    "image selector",
+    "gallery tabs",
+    "interactive gallery"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Our Features"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -30,8 +35,14 @@
       "label": "Image position",
       "default": "left",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
       ]
     },
     {
@@ -40,8 +51,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],

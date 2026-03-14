@@ -1,7 +1,12 @@
 {
   "type": "priced-list",
   "displayName": "Priced List",
-  "aliases": ["menu", "catalog", "services with price", "inventory"],
+  "aliases": [
+    "menu",
+    "catalog",
+    "services with price",
+    "inventory"
+  ],
   "settings": [
     {
       "type": "text",
@@ -16,9 +21,9 @@
       "default": "Appetizers"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Section description"
+      "label": "Subheading"
     },
     {
       "type": "header",
@@ -31,8 +36,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],

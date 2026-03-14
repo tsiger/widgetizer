@@ -1,7 +1,12 @@
 {
   "type": "masonry-gallery",
   "displayName": "Masonry Gallery",
-  "aliases": ["pinterest style", "dynamic grid", "auto layout", "photo grid"],
+  "aliases": [
+    "pinterest style",
+    "dynamic grid",
+    "auto layout",
+    "photo grid"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Our Work"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description",
+      "label": "Subheading",
       "default": "A collection of our recent projects and creative work."
     },
     {
@@ -40,8 +45,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],

@@ -1,7 +1,12 @@
 {
   "type": "embed",
   "displayName": "Embed Widget",
-  "aliases": ["iframe", "external content", "integration", "third-party"],
+  "aliases": [
+    "iframe",
+    "external content",
+    "integration",
+    "third-party"
+  ],
   "settings": [
     {
       "type": "text",
@@ -15,9 +20,9 @@
       "default": "Watch Our Video"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "description",
-      "label": "Description",
+      "label": "Subheading",
       "default": "Learn more about our product in this quick video overview."
     },
     {
@@ -37,10 +42,22 @@
       "label": "Container Width",
       "default": "wide",
       "options": [
-        { "value": "narrow", "label": "Narrow" },
-        { "value": "medium", "label": "Medium" },
-        { "value": "wide", "label": "Wide" },
-        { "value": "fullwidth", "label": "Fullwidth" }
+        {
+          "value": "narrow",
+          "label": "Narrow"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        },
+        {
+          "value": "fullwidth",
+          "label": "Fullwidth"
+        }
       ]
     },
     {
@@ -49,9 +66,18 @@
       "label": "Alignment",
       "default": "center",
       "options": [
-        { "value": "start", "label": "Left" },
-        { "value": "center", "label": "Center" },
-        { "value": "end", "label": "Right" }
+        {
+          "value": "start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "Right"
+        }
       ]
     },
     {
@@ -60,8 +86,14 @@
       "label": "Color Scheme",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "highlight",
+          "label": "Highlight"
+        }
       ]
     }
   ],
