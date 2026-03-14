@@ -377,6 +377,34 @@ export async function uploadProjectMedia(req, res) {
               fileInfo.sizes[result.value.sizeName] = result.value.data;
             }
           });
+
+          // Compress original in-place when it's smaller than the largest enabled size.
+          // In this case the original is what gets served (via imageTag fallback),
+          // so applying the quality setting reduces file size without changing dimensions.
+          // GIFs are excluded to preserve animation frames.
+          if (file.mimetype !== "image/gif") {
+            const largestEnabledWidth = Math.max(...Object.values(imageSizes).map((s) => s.width));
+
+            if (metadata.width <= largestEnabledWidth) {
+              const quality = Math.max(...Object.values(imageSizes).map((s) => s.quality));
+              const tempPath = file.path + ".tmp";
+              const compressOp = sharp(file.path);
+
+              if (file.mimetype === "image/jpeg") {
+                compressOp.jpeg({ quality });
+              } else if (file.mimetype === "image/png") {
+                compressOp.png({ quality });
+              } else if (file.mimetype === "image/webp") {
+                compressOp.webp({ quality });
+              }
+
+              await compressOp.toFile(tempPath);
+              await fs.rename(tempPath, file.path);
+
+              const stats = await fs.stat(file.path);
+              fileInfo.size = stats.size;
+            }
+          }
         } else if (file.mimetype === "image/svg+xml") {
           const svgContent = await fs.readFile(file.path, "utf-8");
           const sanitizedSvg = DOMPurify.sanitize(svgContent, { USE_PROFILES: { svg: true } });

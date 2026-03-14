@@ -387,6 +387,7 @@ before(async () => {
   // Dummy image files
   await fs.writeFile(path.join(uploadsDir, "images", "hero.jpg"), "fake-jpg-data");
   await fs.writeFile(path.join(uploadsDir, "images", "hero-medium.jpg"), "fake-jpg-medium");
+  await fs.writeFile(path.join(uploadsDir, "images", "hero-thumb.jpg"), "fake-jpg-thumb");
   await fs.writeFile(path.join(uploadsDir, "images", "unused.png"), "fake-png-data");
   // Dummy video
   await fs.writeFile(path.join(uploadsDir, "videos", "intro.mp4"), "fake-mp4-data");
@@ -405,6 +406,11 @@ before(async () => {
         height: 1080,
         usedIn: ["index"],
         sizes: {
+          thumb: {
+            path: "/uploads/images/hero-thumb.jpg",
+            width: 150,
+            height: 84,
+          },
           medium: {
             path: "/uploads/images/hero-medium.jpg",
             width: 1024,
@@ -612,6 +618,12 @@ describe("exportProject", () => {
     const exportDir = await getLatestExportDir();
     const mediumPath = path.join(exportDir, "assets", "images", "hero-medium.jpg");
     assert.ok(await fs.pathExists(mediumPath), "Medium size image should be copied");
+  });
+
+  it("skips thumb variants in export", async () => {
+    const exportDir = await getLatestExportDir();
+    const thumbPath = path.join(exportDir, "assets", "images", "hero-thumb.jpg");
+    assert.ok(!(await fs.pathExists(thumbPath)), "Thumb variant should NOT be copied to export");
   });
 
   it("skips unused images", async () => {

@@ -299,6 +299,5 @@ Integration sanity tests:
 
 ## See also
 
-- [Media Handling Ideas](future-media-handling.md)
 - [Media Library](core-media.md)
 - [Theming Guide](theming.md)

@@ -665,6 +665,81 @@ describe("uploadProjectMedia", () => {
     assert.ok(res._json.error.toLowerCase().includes("no valid files"));
   });
 
+  it("compresses original in-place when image is smaller than largest enabled size", async () => {
+    // Create a 600x400 JPEG — smaller than the largest default size (1920px large)
+    // Use quality 100 to ensure the uncompressed buffer is as large as possible
+    const uncompressedBuffer = await sharp({
+      create: { width: 600, height: 400, channels: 3, background: { r: 100, g: 150, b: 200 } },
+    })
+      .jpeg({ quality: 100 })
+      .toBuffer();
+
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const filePath = path.join(imgDir, "compress-test.jpg");
+    await fs.writeFile(filePath, uncompressedBuffer);
+    const originalSize = uncompressedBuffer.length;
+
+    const res = await callController(uploadProjectMedia, {
+      params: { projectId: PROJECT_ID },
+      files: [
+        {
+          originalname: "compress-test.jpg",
+          filename: "compress-test.jpg",
+          mimetype: "image/jpeg",
+          size: originalSize,
+          path: filePath,
+        },
+      ],
+    });
+
+    assert.equal(res._status, 201);
+    const processed = res._json.processedFiles[0];
+
+    // Dimensions should be unchanged
+    assert.equal(processed.width, 600);
+    assert.equal(processed.height, 400);
+
+    // File on disk should be smaller than the uncompressed original
+    const compressedStats = await fs.stat(filePath);
+    assert.ok(compressedStats.size < originalSize, "Compressed file should be smaller than uncompressed original");
+
+    // Reported size should match actual file size
+    assert.equal(processed.size, compressedStats.size);
+
+    // File should still be a valid JPEG
+    const meta = await sharp(filePath).metadata();
+    assert.equal(meta.format, "jpeg");
+    assert.equal(meta.width, 600);
+  });
+
+  it("does not compress original when image is larger than largest enabled size", async () => {
+    // Create a 2000x1500 JPEG — larger than the default large size (1920px)
+    const largeBuffer = await createTestJpeg(2000, 1500);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const filePath = path.join(imgDir, "no-compress.jpg");
+    await fs.writeFile(filePath, largeBuffer);
+    const originalSize = largeBuffer.length;
+
+    const res = await callController(uploadProjectMedia, {
+      params: { projectId: PROJECT_ID },
+      files: [
+        {
+          originalname: "no-compress.jpg",
+          filename: "no-compress.jpg",
+          mimetype: "image/jpeg",
+          size: originalSize,
+          path: filePath,
+        },
+      ],
+    });
+
+    assert.equal(res._status, 201);
+
+    // Original file size should be unchanged (not compressed)
+    const stats = await fs.stat(filePath);
+    assert.equal(stats.size, originalSize, "Original should not be compressed when larger than largest enabled size");
+  });
+
   it("persists uploaded files in media.json", async () => {
     const jpegBuffer = await createTestJpeg(200, 150);
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);

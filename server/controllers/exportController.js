@@ -492,6 +492,8 @@ Per aspera ad astra
           // Copy all generated sizes for this image
           if (imageFile.sizes) {
             for (const [sizeName, sizeInfo] of Object.entries(imageFile.sizes)) {
+              // Skip thumb variants — only used for the media library UI
+              if (sizeName === "thumb") continue;
               const sourceSizePath = path.join(projectDir, sizeInfo.path.replace(/^\//, ""));
               // Changed: Export image sizes to assets/images/ instead of uploads/images/
               const targetSizePath = path.join(outputDir, "assets", "images", path.basename(sizeInfo.path));
