@@ -445,8 +445,13 @@ For cases where you need just the image URL (e.g., CSS background images), use t
 | `lazy`    | Boolean | `true`       | Whether to add `loading="lazy"` attribute               |
 | `alt`     | String  | (from media) | Override alt text from media library                    |
 | `title`   | String  | (from media) | Override title text from media library                  |
+| `srcset`  | Boolean | `false`      | When `true`, adds a `srcset` attribute with all available size variants (except thumb) |
+| `sizes`   | String  | `''`         | HTML `sizes` attribute value; only emitted when `srcset` is also emitted |
+| `fetchpriority` | String | — | Sets `fetchpriority` attribute (`'high'`, `'low'`, `'auto'`) |
+| `decoding` | String | — | Sets `decoding` attribute (`'async'`, `'sync'`, `'auto'`) |
+| `loading` | String | — | Overrides loading strategy (takes precedence over `lazy` boolean) |
 
-**For path-only output:** use `output: 'path'` or `output: 'url'`. Optional: `size` (default `'medium'`).
+**For path-only output:** use `output: 'path'` or `output: 'url'`. Optional: `size` (default `'medium'`). `srcset` and `sizes` are ignored in path-only mode.
 
 #### Usage Examples
 
@@ -464,11 +469,19 @@ For cases where you need just the image URL (e.g., CSS background images), use t
 <!-- Custom alt text -->
 {% image src: widget.settings.photo, size: 'medium', lazy: true, alt: 'Custom description' %}
 
-<!-- Path-only for CSS backgrounds -->
+<!-- Responsive image with srcset (browser picks optimal size) -->
+{% image src: widget.settings.heroImage, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 50vw' %}
+
+<!-- srcset for card grid (3-col layout, ~400px per card) -->
+{% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
+
+<!-- Path-only for CSS backgrounds (srcset not applicable) -->
 {% image src: widget.settings.backgroundImage, output: 'path' %}
 {% image src: widget.settings.backgroundImage, size: 'large', output: 'path' %}
 {% image src: widget.settings.backgroundImage, size: 'medium', output: 'url' %}
 ```
+
+**How `srcset` works:** When `srcset: true`, the tag collects all available size variants (excluding `thumb`), includes the original if it's wider than all variants, sorts by width ascending, and emits a `srcset` attribute with `w` descriptors. The browser uses the `sizes` attribute and its own device pixel ratio to pick the best candidate. If fewer than 2 candidates are available, `srcset` is omitted. SVGs and path-only output modes are unaffected.
 
 ### Video tag
 

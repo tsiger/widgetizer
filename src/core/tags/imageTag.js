@@ -8,7 +8,17 @@ export const ImageTag = {
 
   *render(context) {
     const options = yield this.hash.render(context);
-    const { src, size = "medium", class: cssClass = "", lazy = true, alt = "", title = "", output } = options;
+    const {
+      src,
+      size = "medium",
+      class: cssClass = "",
+      lazy = true,
+      alt = "",
+      title = "",
+      output,
+      srcset: wantSrcset = false,
+      sizes: sizesAttr,
+    } = options;
 
     if (!src) return "";
 
@@ -66,6 +76,41 @@ export const ImageTag = {
     if (!isSvg && imageSize.width) attrs.push(`width="${imageSize.width}"`);
     if (!isSvg && imageSize.height) attrs.push(`height="${imageSize.height}"`);
 
+    // Build srcset candidates (only for non-SVG with srcset: true)
+    let srcsetValue = "";
+    if (wantSrcset && !isSvg) {
+      const candidates = [];
+      const seenWidths = new Set();
+
+      if (mediaFile.sizes) {
+        for (const [sizeName, sizeData] of Object.entries(mediaFile.sizes)) {
+          if (sizeName === "thumb") continue;
+          if (!sizeData.path || typeof sizeData.width !== "number") continue;
+          if (seenWidths.has(sizeData.width)) continue;
+          seenWidths.add(sizeData.width);
+          candidates.push({ path: sizeData.path, width: sizeData.width });
+        }
+      }
+
+      // Include original if wider than all candidates
+      const maxCandidateWidth = candidates.reduce((max, c) => Math.max(max, c.width), 0);
+      if (
+        typeof mediaFile.width === "number" &&
+        mediaFile.width > maxCandidateWidth &&
+        !seenWidths.has(mediaFile.width)
+      ) {
+        candidates.push({ path: mediaFile.path, width: mediaFile.width });
+      }
+
+      candidates.sort((a, b) => a.width - b.width);
+
+      if (candidates.length >= 2) {
+        srcsetValue = candidates
+          .map((c) => `${imageBasePath}/${path.basename(c.path)} ${c.width}w`)
+          .join(", ");
+      }
+    }
+
     // Advanced performance attributes
     if (options.fetchpriority) attrs.push(`fetchpriority="${options.fetchpriority}"`);
     if (options.decoding) attrs.push(`decoding="${options.decoding}"`);
@@ -75,6 +120,14 @@ export const ImageTag = {
       attrs.push(`loading="${options.loading}"`);
     } else if (lazy) {
       attrs.push('loading="lazy"');
+    }
+
+    // Responsive image attributes
+    if (srcsetValue) {
+      attrs.push(`srcset="${srcsetValue}"`);
+      if (sizesAttr) {
+        attrs.push(`sizes="${sizesAttr}"`);
+      }
     }
 
     return `<img ${attrs.join(" ")}>`;

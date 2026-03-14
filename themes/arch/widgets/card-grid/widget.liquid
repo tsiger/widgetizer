@@ -82,7 +82,7 @@
 
               <li class="widget-card carousel-item" data-block-id="{{ blockId }}">
                 {% if block.settings.image != blank %}
-                  {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
+                  {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
                 {% endif %}
                 <div class="widget-card-content">
                   {% if block.settings.subtitle != blank %}
@@ -137,7 +137,7 @@
 
             <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
               {% if block.settings.image != blank %}
-                {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
+                {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
               {% endif %}
               <div class="widget-card-content">
                 {% if block.settings.subtitle != blank %}

@@ -1576,7 +1576,10 @@ Example implementation:
 <!-- Render image tag -->
 {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
 
-<!-- Get image path only (for CSS backgrounds) -->
+<!-- Responsive image with srcset (browser picks optimal size for viewport + retina) -->
+{% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
+
+<!-- Get image path only (for CSS backgrounds — srcset not applicable) -->
 {% image src: block.settings.image, size: 'large', output: 'path' %}
 ```
 

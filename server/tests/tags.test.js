@@ -164,7 +164,10 @@ async function render(template, context = {}, globals = {}) {
         width: 800,
         height: 600,
         sizes: {
+          thumb: { path: "hero-thumb.jpg", width: 150, height: 112 },
+          small: { path: "hero-small.jpg", width: 300, height: 225 },
           medium: { path: "hero-medium.jpg", width: 400, height: 300 },
+          large: { path: "hero-large.jpg", width: 700, height: 525 },
         },
       },
       "logo.svg": {
@@ -577,6 +580,90 @@ describe("ImageTag", () => {
     const result = await render('{% image src: "hero.jpg", output: "url" %}', {}, { renderMode: "preview" });
     assert.equal(result, "/uploads/images/hero-medium.jpg");
     assert.doesNotMatch(result, /<img/, "should not produce an img tag in url mode");
+  });
+
+  // srcset tests
+
+  it("emits srcset when srcset: true and multiple candidates exist", async () => {
+    const result = await render('{% image src: "hero.jpg", srcset: true %}', {}, { renderMode: "preview" });
+    assert.match(result, /srcset="/);
+    assert.match(result, /hero-small\.jpg 300w/);
+    assert.match(result, /hero-medium\.jpg 400w/);
+    assert.match(result, /hero-large\.jpg 700w/);
+    assert.match(result, /hero\.jpg 800w/, "original should be included as largest candidate");
+  });
+
+  it("excludes thumb from srcset candidates", async () => {
+    const result = await render('{% image src: "hero.jpg", srcset: true %}', {}, { renderMode: "preview" });
+    assert.doesNotMatch(result, /hero-thumb\.jpg/, "thumb should never appear in srcset");
+  });
+
+  it("emits sizes attribute when srcset and sizes param are both present", async () => {
+    const result = await render(
+      '{% image src: "hero.jpg", srcset: true, sizes: "(max-width: 768px) 100vw, 50vw" %}',
+      {},
+      { renderMode: "preview" },
+    );
+    assert.match(result, /srcset="/);
+    assert.match(result, /sizes="\(max-width: 768px\) 100vw, 50vw"/);
+  });
+
+  it("does not emit sizes when srcset is not enabled", async () => {
+    const result = await render(
+      '{% image src: "hero.jpg", sizes: "100vw" %}',
+      {},
+      { renderMode: "preview" },
+    );
+    assert.doesNotMatch(result, /sizes=/, "sizes should not appear without srcset: true");
+  });
+
+  it("does not emit srcset for SVG images", async () => {
+    const result = await render('{% image src: "logo.svg", srcset: true %}', {}, { renderMode: "preview" });
+    assert.doesNotMatch(result, /srcset=/, "SVGs should not have srcset");
+  });
+
+  it("does not emit srcset in output url mode", async () => {
+    const result = await render(
+      '{% image src: "hero.jpg", srcset: true, output: "url" %}',
+      {},
+      { renderMode: "preview" },
+    );
+    assert.doesNotMatch(result, /srcset=/, "url mode should not have srcset");
+    assert.doesNotMatch(result, /<img/, "url mode should not produce img tag");
+  });
+
+  it("skips srcset when fewer than 2 candidates exist", async () => {
+    const result = await render('{% image src: "hero.jpg", srcset: true %}', {
+      mediaFiles: {
+        "hero.jpg": {
+          filename: "hero.jpg",
+          path: "hero.jpg",
+          type: "image/jpeg",
+          width: 400,
+          height: 300,
+          sizes: {
+            medium: { path: "hero-medium.jpg", width: 400, height: 300 },
+          },
+        },
+      },
+      imagePath: "/uploads/images",
+    });
+    assert.doesNotMatch(result, /srcset=/, "should not emit srcset with only 1 candidate");
+  });
+
+  it("does not emit srcset by default for backward compatibility", async () => {
+    const result = await render('{% image src: "hero.jpg" %}', {}, { renderMode: "preview" });
+    assert.doesNotMatch(result, /srcset=/, "srcset should not appear by default");
+  });
+
+  it("sorts srcset candidates by width ascending", async () => {
+    const result = await render('{% image src: "hero.jpg", srcset: true %}', {}, { renderMode: "preview" });
+    const srcsetMatch = result.match(/srcset="([^"]+)"/);
+    assert.ok(srcsetMatch, "srcset attribute should exist");
+    const widths = srcsetMatch[1].match(/(\d+)w/g).map((w) => parseInt(w));
+    for (let i = 1; i < widths.length; i++) {
+      assert.ok(widths[i] > widths[i - 1], `widths should be ascending: ${widths[i]} > ${widths[i - 1]}`);
+    }
   });
 });
 

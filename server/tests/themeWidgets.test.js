@@ -538,7 +538,7 @@ describe("rich-text widget", () => {
       "richtext-align",
       {
         type: "rich-text",
-        settings: { text_alignment: "center", content_width: "sm" },
+        settings: { text_alignment: "center", content_width: "narrow" },
         blocks: {
           "h1": { type: "heading", settings: { text: "Centered" } },
         },
