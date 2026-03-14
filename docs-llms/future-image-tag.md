@@ -172,7 +172,6 @@ Recommended implementation: move candidate construction to a shared helper used 
 Benefits:
 
 - One source of truth for URL shaping, sorting, inclusion rules, SVG handling.
-- Easier future smart-export integration.
 
 ### Why Option B is required for flexibility
 
@@ -237,15 +236,9 @@ Example: responsive preload:
 
 ---
 
-## Interaction with export and future smart export
+## Interaction with export
 
-Current export behavior copies original + all generated sizes for used images, so Options A/B are safe immediately.
-
-For future smart export:
-
-- Tracking only in `imageTag` is not enough once authors use `image_srcset` directly.
-- Track used sizes in the **shared srcset helper** so both tag and filter usage can report size usage.
-- When `srcset` is emitted, all included candidates should be considered used (browser may choose any).
+Current export behavior copies original + all generated sizes (except thumb) for used images, so Options A/B are safe immediately.
 
 ---
 
@@ -293,7 +286,6 @@ Integration sanity tests:
 1. Implement Option B (`image_srcset`) + shared helper.
 2. Implement Option A by reusing the same helper.
 3. Update theming docs with responsive examples.
-4. Add future smart-export note to use shared helper signals.
 
 ---
 
