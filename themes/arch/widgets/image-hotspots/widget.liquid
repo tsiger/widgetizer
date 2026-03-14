@@ -10,6 +10,8 @@
 >
   <style>
     .widget-{{ widget.id }} {
+      overflow-x: clip;
+
       & .image-hotspots-wrapper {
         position: relative;
         border: var(--border-width-thin) solid var(--border-color);
@@ -114,6 +116,21 @@
           transform: translateX(-50%);
           border: 0.8rem solid transparent;
           border-block-end-color: var(--bg-primary);
+        }
+      }
+
+      & .image-hotspot-tooltip.is-mobile {
+        position: relative;
+        inset: auto;
+        width: 100%;
+        max-width: none;
+        transform: none;
+        border: var(--border-width-thin) solid var(--border-color);
+        margin-block-start: var(--space-sm);
+
+        &::before,
+        &::after {
+          display: none;
         }
       }
 
@@ -328,7 +345,29 @@
       if (!widget || widget.dataset.initialized) return;
       widget.dataset.initialized = 'true';
 
+      const wrapper = widget.querySelector('.image-hotspots-wrapper');
       const hotspots = widget.querySelectorAll('.image-hotspot');
+      const isMobile = () => window.innerWidth < 750;
+
+      const closeAll = () => {
+        widget.querySelectorAll('.image-hotspot-tooltip.is-visible').forEach((t) => {
+          t.classList.remove('is-visible');
+          t.classList.remove('is-mobile');
+          t.setAttribute('aria-hidden', 'true');
+          t.style.insetInlineStart = '';
+          t.style.insetInlineEnd = '';
+          t.style.transform = '';
+          // Move tooltip back to its hotspot if it was moved
+          const parentHotspot = widget.querySelector(`[data-tooltip-id="${t.id}"]`);
+          if (parentHotspot && t.parentElement !== parentHotspot) {
+            parentHotspot.appendChild(t);
+          }
+        });
+        widget.querySelectorAll('.image-hotspot-button.is-active').forEach((b) => {
+          b.classList.remove('is-active');
+          b.setAttribute('aria-expanded', 'false');
+        });
+      };
 
       hotspots.forEach((hotspot) => {
         const button = hotspot.querySelector('.image-hotspot-button');
@@ -337,59 +376,50 @@
 
         if (!button || !tooltip) return;
 
-        // Toggle tooltip
+        // Mark hotspot so we can find it later to return the tooltip
+        hotspot.setAttribute('data-tooltip-id', tooltip.id);
+
         const toggleTooltip = () => {
           const isVisible = tooltip.classList.contains('is-visible');
-
-          // Close all other tooltips first
-          widget.querySelectorAll('.image-hotspot-tooltip.is-visible').forEach((t) => {
-            t.classList.remove('is-visible');
-            t.setAttribute('aria-hidden', 'true');
-            // Reset positioning
-            t.style.insetInlineStart = '';
-            t.style.insetInlineEnd = '';
-            t.style.transform = '';
-          });
-          widget.querySelectorAll('.image-hotspot-button.is-active').forEach((b) => {
-            b.classList.remove('is-active');
-            b.setAttribute('aria-expanded', 'false');
-          });
+          closeAll();
 
           if (!isVisible) {
+            if (isMobile()) {
+              // Move tooltip to wrapper level so it sits below the image
+              wrapper.after(tooltip);
+              tooltip.classList.add('is-mobile');
+            }
+
             tooltip.classList.add('is-visible');
             tooltip.setAttribute('aria-hidden', 'false');
             button.classList.add('is-active');
             button.setAttribute('aria-expanded', 'true');
             closeButton?.focus();
 
-            // Smart positioning: check if tooltip would go off-screen
-            setTimeout(() => {
-              const tooltipRect = tooltip.getBoundingClientRect();
-              const viewportWidth = window.innerWidth;
-
-              // If tooltip goes off right edge
-              if (tooltipRect.right > viewportWidth - 16) {
-                tooltip.style.insetInlineStart = 'auto';
-                tooltip.style.insetInlineEnd = '0';
-                tooltip.style.transform = 'none';
-              }
-              // If tooltip goes off left edge
-              else if (tooltipRect.left < 16) {
-                tooltip.style.insetInlineStart = '0';
-                tooltip.style.insetInlineEnd = 'auto';
-                tooltip.style.transform = 'none';
-              }
-            }, 0);
+            // Desktop: smart positioning
+            if (!isMobile()) {
+              setTimeout(() => {
+                const tooltipRect = tooltip.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+                if (tooltipRect.right > viewportWidth - 16) {
+                  tooltip.style.insetInlineStart = 'auto';
+                  tooltip.style.insetInlineEnd = '0';
+                  tooltip.style.transform = 'none';
+                } else if (tooltipRect.left < 16) {
+                  tooltip.style.insetInlineStart = '0';
+                  tooltip.style.insetInlineEnd = 'auto';
+                  tooltip.style.transform = 'none';
+                }
+              }, 0);
+            }
           }
         };
 
-        // Button click
         button.addEventListener('click', (e) => {
           e.stopPropagation();
           toggleTooltip();
         });
 
-        // Keyboard support
         button.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -397,57 +427,21 @@
           }
         });
 
-        // Close button
         if (closeButton) {
           closeButton.addEventListener('click', (e) => {
             e.stopPropagation();
-            tooltip.classList.remove('is-visible');
-            tooltip.setAttribute('aria-hidden', 'true');
-            tooltip.style.insetInlineStart = '';
-            tooltip.style.insetInlineEnd = '';
-            tooltip.style.transform = '';
-            button.classList.remove('is-active');
-            button.setAttribute('aria-expanded', 'false');
+            closeAll();
             button.focus();
           });
         }
       });
 
-      // Close tooltips when clicking outside
       document.addEventListener('click', (e) => {
-        if (!widget.contains(e.target)) {
-          widget.querySelectorAll('.image-hotspot-tooltip.is-visible').forEach((tooltip) => {
-            tooltip.classList.remove('is-visible');
-            tooltip.setAttribute('aria-hidden', 'true');
-            tooltip.style.insetInlineStart = '';
-            tooltip.style.insetInlineEnd = '';
-            tooltip.style.transform = '';
-          });
-          widget.querySelectorAll('.image-hotspot-button.is-active').forEach((button) => {
-            button.classList.remove('is-active');
-            button.setAttribute('aria-expanded', 'false');
-          });
-        }
+        if (!widget.contains(e.target)) closeAll();
       });
 
-      // Close tooltips with ESC key
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          const activeTooltips = widget.querySelectorAll('.image-hotspot-tooltip.is-visible');
-          if (activeTooltips.length > 0) {
-            activeTooltips.forEach((tooltip) => {
-              tooltip.classList.remove('is-visible');
-              tooltip.style.insetInlineStart = '';
-              tooltip.style.insetInlineEnd = '';
-              tooltip.style.transform = '';
-            });
-            widget.querySelectorAll('.image-hotspot-button.is-active').forEach((button) => {
-              button.classList.remove('is-active');
-              button.setAttribute('aria-expanded', 'false');
-              button.focus();
-            });
-          }
-        }
+        if (e.key === 'Escape') closeAll();
       });
     })();
   </script>

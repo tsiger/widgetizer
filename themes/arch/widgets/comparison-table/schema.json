@@ -36,11 +36,6 @@
       "default": "Features"
     },
     {
-      "type": "link",
-      "id": "cta_link",
-      "label": "Footer CTA button"
-    },
-    {
       "type": "header",
       "id": "display_header",
       "label": "Display"
@@ -93,6 +88,11 @@
           "id": "featured",
           "label": "Featured (highlighted)",
           "default": false
+        },
+        {
+          "type": "link",
+          "id": "link",
+          "label": "CTA Button"
         }
       ]
     },
@@ -125,7 +125,8 @@
       "type": "column",
       "settings": {
         "name": "Free",
-        "featured": false
+        "featured": false,
+        "link": { "text": "Get Started", "href": "#", "target": "_self" }
       }
     },
     {
@@ -133,14 +134,16 @@
       "settings": {
         "name": "Pro",
         "featured": true,
-        "badge": "Popular"
+        "badge": "Popular",
+        "link": { "text": "Get Started", "href": "#", "target": "_self" }
       }
     },
     {
       "type": "column",
       "settings": {
         "name": "Enterprise",
-        "featured": false
+        "featured": false,
+        "link": { "text": "Contact Us", "href": "#", "target": "_self" }
       }
     },
     {
