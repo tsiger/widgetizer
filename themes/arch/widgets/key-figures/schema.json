@@ -40,6 +40,10 @@
           "label": "Cards"
         },
         {
+          "value": "carousel",
+          "label": "Carousel"
+        },
+        {
           "value": "bar",
           "label": "Horizontal Bar"
         }

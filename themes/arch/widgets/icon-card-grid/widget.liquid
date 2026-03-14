@@ -33,79 +33,141 @@
     {% endif %}
 
     <div class="widget-content">
-      <ul
-        class="widget-card-grid widget-grid"
-        style="
-          --grid-cols-desktop: {{ widget.settings.columns_desktop }};
-        "
-      >
-        {% comment %} Determine heading levels {% endcomment %}
-        {% assign has_widget_title = false %}
-        {% if widget.settings.title != blank %}
-          {% assign has_widget_title = true %}
-        {% endif %}
+      {% comment %} Determine heading levels {% endcomment %}
+      {% assign has_widget_title = false %}
+      {% if widget.settings.title != blank %}
+        {% assign has_widget_title = true %}
+      {% endif %}
 
-        {% assign card_heading_level = 'h2' %}
+      {% assign card_heading_level = 'h2' %}
 
-        {% if has_widget_title %}
-          {% if widget.index == 1 %}
-             {% assign card_heading_level = 'h2' %}
-          {% else %}
-             {% assign card_heading_level = 'h3' %}
-          {% endif %}
+      {% if has_widget_title %}
+        {% if widget.index == 1 %}
+           {% assign card_heading_level = 'h2' %}
         {% else %}
-          {% if widget.index == 1 %}
-            {% assign card_heading_level = 'h1' %}
-          {% else %}
-             {% assign card_heading_level = 'h2' %}
-          {% endif %}
+           {% assign card_heading_level = 'h3' %}
         {% endif %}
+      {% else %}
+        {% if widget.index == 1 %}
+          {% assign card_heading_level = 'h1' %}
+        {% else %}
+           {% assign card_heading_level = 'h2' %}
+        {% endif %}
+      {% endif %}
 
-        {% for blockId in widget.blocksOrder %}
-          {% assign block = widget.blocks[blockId] %}
+      {% if widget.settings.layout == 'carousel' %}
+        <div class="carousel-container reveal reveal-up">
+          <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">
+            <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button type="button" class="carousel-btn carousel-btn-next" aria-label="Next">
+            <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <ul class="widget-card-grid carousel-track" style="--carousel-cols: {{ widget.settings.columns_desktop }}">
+            {% for blockId in widget.blocksOrder %}
+              {% assign block = widget.blocks[blockId] %}
 
-          {% comment %} Per-card level logic for the NO-TITLE + INDEX-1 case {% endcomment %}
-          {% assign current_card_level = card_heading_level %}
-          {% if has_widget_title == false and widget.index == 1 %}
-            {% if forloop.first %}
-              {% assign current_card_level = 'h1' %}
-            {% else %}
-              {% assign current_card_level = 'h2' %}
-            {% endif %}
-          {% endif %}
-
-          <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
-            {% if block.settings.icon != blank %}
-              {% render 'icon', icon: block.settings.icon, class: 'widget-card-icon' %}
-            {% endif %}
-            <div class="widget-card-content">
-              {% if block.settings.subtitle != blank %}
-                <span class="w-eyebrow" data-setting="subtitle">{{ block.settings.subtitle }}</span>
+              {% assign current_card_level = card_heading_level %}
+              {% if has_widget_title == false and widget.index == 1 %}
+                {% if forloop.first %}
+                  {% assign current_card_level = 'h1' %}
+                {% else %}
+                  {% assign current_card_level = 'h2' %}
+                {% endif %}
               {% endif %}
-              {% if block.settings.title != blank %}
-                <{{ current_card_level }} class="w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ current_card_level }}>
-              {% endif %}
-              {% if block.settings.description != blank %}
-                <div class="w-body w-rte t-sm" data-setting="description">
-                  {{ block.settings.description | raw }}
+
+              <li class="widget-card carousel-item" data-block-id="{{ blockId }}">
+                {% if block.settings.icon != blank %}
+                  {% render 'icon', icon: block.settings.icon, class: 'widget-card-icon' %}
+                {% endif %}
+                <div class="widget-card-content">
+                  {% if block.settings.subtitle != blank %}
+                    <span class="w-eyebrow" data-setting="subtitle">{{ block.settings.subtitle }}</span>
+                  {% endif %}
+                  {% if block.settings.title != blank %}
+                    <{{ current_card_level }} class="w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ current_card_level }}>
+                  {% endif %}
+                  {% if block.settings.description != blank %}
+                    <div class="w-body w-rte t-sm" data-setting="description">
+                      {{ block.settings.description | raw }}
+                    </div>
+                  {% endif %}
+                  {% if block.settings.button_link.text != blank %}
+                    <div class="widget-card-footer">
+                      <a
+                        href="{{ block.settings.button_link.href }}"
+                        class="widget-button widget-button-secondary"
+                        data-setting="button_link"
+                        target="{{ block.settings.button_link.target | default: '_self' }}"
+                      >
+                        {{- block.settings.button_link.text -}}
+                      </a>
+                    </div>
+                  {% endif %}
                 </div>
+              </li>
+            {% endfor %}
+          </ul>
+
+        </div>
+
+      {% else %}
+        <ul
+          class="widget-card-grid widget-grid"
+          style="
+            --grid-cols-desktop: {{ widget.settings.columns_desktop }};
+          "
+        >
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+
+            {% comment %} Per-card level logic for the NO-TITLE + INDEX-1 case {% endcomment %}
+            {% assign current_card_level = card_heading_level %}
+            {% if has_widget_title == false and widget.index == 1 %}
+              {% if forloop.first %}
+                {% assign current_card_level = 'h1' %}
+              {% else %}
+                {% assign current_card_level = 'h2' %}
               {% endif %}
-              {% if block.settings.button_link.text != blank %}
-                <div class="widget-card-footer">
-                  <a
-                    href="{{ block.settings.button_link.href }}"
-                    class="widget-button widget-button-secondary"
-                    data-setting="button_link"
-                    target="{{ block.settings.button_link.target | default: '_self' }}"
-                  >
-                    {{- block.settings.button_link.text -}}
-                  </a>
-                </div>
+            {% endif %}
+
+            <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+              {% if block.settings.icon != blank %}
+                {% render 'icon', icon: block.settings.icon, class: 'widget-card-icon' %}
               {% endif %}
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
+              <div class="widget-card-content">
+                {% if block.settings.subtitle != blank %}
+                  <span class="w-eyebrow" data-setting="subtitle">{{ block.settings.subtitle }}</span>
+                {% endif %}
+                {% if block.settings.title != blank %}
+                  <{{ current_card_level }} class="w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ current_card_level }}>
+                {% endif %}
+                {% if block.settings.description != blank %}
+                  <div class="w-body w-rte t-sm" data-setting="description">
+                    {{ block.settings.description | raw }}
+                  </div>
+                {% endif %}
+                {% if block.settings.button_link.text != blank %}
+                  <div class="widget-card-footer">
+                    <a
+                      href="{{ block.settings.button_link.href }}"
+                      class="widget-button widget-button-secondary"
+                      data-setting="button_link"
+                      target="{{ block.settings.button_link.target | default: '_self' }}"
+                    >
+                      {{- block.settings.button_link.text -}}
+                    </a>
+                  </div>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
     </div>
   </div>
 </section>

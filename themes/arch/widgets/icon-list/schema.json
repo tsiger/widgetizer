@@ -30,6 +30,22 @@
       "label": "Display"
     },
     {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "default": "grid",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "carousel",
+          "label": "Carousel"
+        }
+      ]
+    },
+    {
       "type": "range",
       "id": "columns_desktop",
       "label": "Columns (Desktop)",

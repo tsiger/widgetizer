@@ -77,25 +77,57 @@
     {% endif %}
 
     <div class="widget-content">
-      <ul
-        class="icon-list-grid widget-grid"
-        style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
-      >
-        {% for blockId in widget.blocksOrder %}
-          {% assign block = widget.blocks[blockId] %}
-          <li class="icon-list-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
-            {% if block.settings.icon != blank %}
-              {% render 'icon', icon: block.settings.icon, class: 'icon-list-icon' %}
-            {% endif %}
-            {% if block.settings.title != blank %}
-              <span class="icon-list-title t-heading-font" data-setting="title">{{ block.settings.title }}</span>
-            {% endif %}
-            {% if block.settings.description != blank %}
-              <span class="icon-list-description w-body t-muted t-sm" data-setting="description">{{ block.settings.description }}</span>
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
+      {% if widget.settings.layout == 'carousel' %}
+        <div class="carousel-container reveal reveal-up">
+          <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">
+            <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button type="button" class="carousel-btn carousel-btn-next" aria-label="Next">
+            <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <ul class="icon-list-grid carousel-track" style="--carousel-cols: {{ widget.settings.columns_desktop }}">
+            {% for blockId in widget.blocksOrder %}
+              {% assign block = widget.blocks[blockId] %}
+              <li class="icon-list-item carousel-item" data-block-id="{{ blockId }}">
+                {% if block.settings.icon != blank %}
+                  {% render 'icon', icon: block.settings.icon, class: 'icon-list-icon' %}
+                {% endif %}
+                {% if block.settings.title != blank %}
+                  <span class="icon-list-title t-heading-font" data-setting="title">{{ block.settings.title }}</span>
+                {% endif %}
+                {% if block.settings.description != blank %}
+                  <span class="icon-list-description w-body t-muted t-sm" data-setting="description">{{ block.settings.description }}</span>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      {% else %}
+        <ul
+          class="icon-list-grid widget-grid"
+          style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
+        >
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+            <li class="icon-list-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+              {% if block.settings.icon != blank %}
+                {% render 'icon', icon: block.settings.icon, class: 'icon-list-icon' %}
+              {% endif %}
+              {% if block.settings.title != blank %}
+                <span class="icon-list-title t-heading-font" data-setting="title">{{ block.settings.title }}</span>
+              {% endif %}
+              {% if block.settings.description != blank %}
+                <span class="icon-list-description w-body t-muted t-sm" data-setting="description">{{ block.settings.description }}</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
     </div>
   </div>
 </section>

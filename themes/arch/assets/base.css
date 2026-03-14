@@ -620,6 +620,7 @@ b {
   background-position: var(--widget-bg-position, center);
   background-repeat: var(--widget-bg-repeat, no-repeat);
   background-attachment: var(--widget-bg-attachment, scroll);
+  overflow-x: clip;
 
   /* Overlay pseudo-element */
   &.has-overlay::before {
@@ -882,6 +883,121 @@ b {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   7.1 Carousel
+   -------------------------------------------------------------------------- */
+
+.carousel-container {
+  position: relative;
+}
+
+.carousel-track {
+  display: flex;
+  gap: var(--space-md);
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-block: var(--space-2xs);
+  max-width: 100%;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.carousel-item {
+  flex: 0 0 calc(85% - var(--space-md));
+  scroll-snap-align: start;
+  min-width: 0;
+}
+
+.carousel-btn {
+  display: none;
+  position: absolute;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  background-color: var(--bg-primary);
+  border: var(--border-width-medium) solid var(--border-color);
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+  z-index: 2;
+
+  &:hover {
+    border-color: var(--text-heading);
+  }
+
+  &:focus {
+    outline: var(--border-width-medium) solid var(--text-heading);
+    outline-offset: 0.2rem;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+
+    &:hover {
+      border-color: var(--border-color);
+    }
+  }
+}
+
+.carousel-btn-prev {
+  inset-inline-start: -2rem;
+}
+
+.carousel-btn-next {
+  inset-inline-end: -2rem;
+}
+
+.carousel-btn-icon {
+  width: 1.6rem;
+  height: 1.6rem;
+  stroke: var(--text-heading);
+  stroke-width: 2;
+  fill: none;
+}
+
+@media (min-width: 750px) {
+  .carousel-item {
+    flex: 0 0 calc(50% - var(--space-md) / 2);
+  }
+}
+
+@media (min-width: 990px) {
+  .carousel-track {
+    gap: var(--space-lg);
+  }
+
+  .carousel-item {
+    flex: 0 0 calc(100% / var(--carousel-cols, 4) - var(--space-lg) * (var(--carousel-cols, 4) - 1) / var(--carousel-cols, 4));
+  }
+
+  .carousel-btn {
+    display: flex;
+    width: 4.4rem;
+    height: 4.4rem;
+  }
+
+  .carousel-btn-prev {
+    inset-inline-start: -2.2rem;
+  }
+
+  .carousel-btn-next {
+    inset-inline-end: -2.2rem;
+  }
+
+  .carousel-btn-icon {
+    width: 2rem;
+    height: 2rem;
+  }
 }
 
 /* --------------------------------------------------------------------------

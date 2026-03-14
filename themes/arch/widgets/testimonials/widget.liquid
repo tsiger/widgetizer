@@ -10,15 +10,6 @@
 >
   <style>
     .widget-{{ widget.id }} {
-      & .testimonial-card {
-        display: flex;
-        flex-direction: column;
-        padding: var(--space-xl);
-        background: var(--bg-secondary);
-        border-radius: var(--radius-md);
-        border: var(--border-width-thin) solid var(--border-color);
-      }
-
       & .testimonial-quote {
         margin: 0 0 var(--space-lg) 0;
         position: relative;
@@ -58,26 +49,10 @@
         object-fit: cover;
       }
 
-      & .testimonial-avatar-placeholder {
-        width: 4.8rem;
-        height: 4.8rem;
-        border-radius: 50%;
-        background: var(--bg-secondary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
       & .testimonial-info {
         display: flex;
         flex-direction: column;
         gap: var(--space-2xs);
-      }
-
-      & .testimonial-name {
-      }
-
-      & .testimonial-title {
       }
     }
   </style>
@@ -105,53 +80,114 @@
     {% endif %}
 
     <div class="widget-content">
-      <ul
-        class="widget-card-grid widget-grid"
-        style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
-      >
-        {% for blockId in widget.blocksOrder %}
-          {% assign block = widget.blocks[blockId] %}
-          <li class="testimonial-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
-            {% if block.settings.rating != blank %}
-              <div class="testimonial-rating">
-                {% assign rating = block.settings.rating | plus: 0 %}
-                <span class="stars" aria-hidden="true">
-                  {% for i in (1..5) %}
-                    {% if i <= rating %}
-                      <span class="testimonial-star">★</span>
-                    {% else %}
-                      <span class="testimonial-star empty">★</span>
+      {% if widget.settings.layout == 'carousel' %}
+        <div class="carousel-container reveal reveal-up">
+          <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">
+            <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button type="button" class="carousel-btn carousel-btn-next" aria-label="Next">
+            <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <ul class="widget-card-grid carousel-track" style="--carousel-cols: {{ widget.settings.columns_desktop }}">
+            {% for blockId in widget.blocksOrder %}
+              {% assign block = widget.blocks[blockId] %}
+              <li class="widget-card widget-card-flat carousel-item" data-block-id="{{ blockId }}">
+                {% if block.settings.rating != blank %}
+                  <div class="testimonial-rating">
+                    {% assign rating = block.settings.rating | plus: 0 %}
+                    <span class="stars" aria-hidden="true">
+                      {% for i in (1..5) %}
+                        {% if i <= rating %}
+                          <span class="testimonial-star">★</span>
+                        {% else %}
+                          <span class="testimonial-star empty">★</span>
+                        {% endif %}
+                      {% endfor %}
+                    </span>
+
+                    <span class="visually-hidden">
+                      Rated {{ rating }} out of 5
+                    </span>
+                  </div>
+                {% endif %}
+
+                {% if block.settings.quote != blank %}
+                  <p class="testimonial-quote w-body" data-setting="quote">{{ block.settings.quote }}</p>
+                {% endif %}
+
+                <div class="testimonial-author{% if block.settings.avatar == blank %} testimonial-author-no-avatar{% endif %}">
+                  {% if block.settings.avatar != blank %}
+                    {% image src: block.settings.avatar, size: 'small', class: 'testimonial-avatar' %}
+                  {% endif %}
+
+                  <div class="testimonial-info">
+                    {% if block.settings.name != blank %}
+                      <p class="testimonial-name w-body t-semibold t-heading" data-setting="name">{{ block.settings.name }}</p>
                     {% endif %}
-                  {% endfor %}
-                </span>
+                    {% if block.settings.title != blank %}
+                      <p class="testimonial-title w-meta t-sm" data-setting="title">{{ block.settings.title }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
 
-                <span class="visually-hidden">
-                  Rated {{ rating }} out of 5
-                </span>
-              </div>
-            {% endif %}
+        </div>
 
-            {% if block.settings.quote != blank %}
-              <p class="testimonial-quote w-body" data-setting="quote">{{ block.settings.quote }}</p>
-            {% endif %}
+      {% else %}
+        <ul
+          class="widget-card-grid widget-grid"
+          style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
+        >
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+            <li class="widget-card widget-card-flat reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+              {% if block.settings.rating != blank %}
+                <div class="testimonial-rating">
+                  {% assign rating = block.settings.rating | plus: 0 %}
+                  <span class="stars" aria-hidden="true">
+                    {% for i in (1..5) %}
+                      {% if i <= rating %}
+                        <span class="testimonial-star">★</span>
+                      {% else %}
+                        <span class="testimonial-star empty">★</span>
+                      {% endif %}
+                    {% endfor %}
+                  </span>
 
-            <div class="testimonial-author{% if block.settings.avatar == blank %} testimonial-author-no-avatar{% endif %}">
-              {% if block.settings.avatar != blank %}
-                {% image src: block.settings.avatar, size: 'small', class: 'testimonial-avatar' %}
+                  <span class="visually-hidden">
+                    Rated {{ rating }} out of 5
+                  </span>
+                </div>
               {% endif %}
 
-              <div class="testimonial-info">
-                {% if block.settings.name != blank %}
-                  <p class="testimonial-name w-body t-semibold t-heading" data-setting="name">{{ block.settings.name }}</p>
+              {% if block.settings.quote != blank %}
+                <p class="testimonial-quote w-body" data-setting="quote">{{ block.settings.quote }}</p>
+              {% endif %}
+
+              <div class="testimonial-author{% if block.settings.avatar == blank %} testimonial-author-no-avatar{% endif %}">
+                {% if block.settings.avatar != blank %}
+                  {% image src: block.settings.avatar, size: 'small', class: 'testimonial-avatar' %}
                 {% endif %}
-                {% if block.settings.title != blank %}
-                  <p class="testimonial-title w-meta t-sm" data-setting="title">{{ block.settings.title }}</p>
-                {% endif %}
+
+                <div class="testimonial-info">
+                  {% if block.settings.name != blank %}
+                    <p class="testimonial-name w-body t-semibold t-heading" data-setting="name">{{ block.settings.name }}</p>
+                  {% endif %}
+                  {% if block.settings.title != blank %}
+                    <p class="testimonial-title w-meta t-sm" data-setting="title">{{ block.settings.title }}</p>
+                  {% endif %}
+                </div>
               </div>
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
     </div>
   </div>
 </section>

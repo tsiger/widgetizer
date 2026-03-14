@@ -41,6 +41,22 @@
     },
     {
       "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "default": "grid",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "carousel",
+          "label": "Carousel"
+        }
+      ]
+    },
+    {
+      "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
       "default": "standard",
