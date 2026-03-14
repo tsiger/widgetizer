@@ -79,65 +79,6 @@
           "type": "image",
           "id": "image",
           "label": "Photo (optional)"
-        },
-        {
-          "type": "header",
-          "id": "options_header",
-          "label": "Options"
-        },
-        {
-          "type": "checkbox",
-          "id": "featured",
-          "label": "Featured item",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "vegetarian",
-          "label": "Vegetarian",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "vegan",
-          "label": "Vegan",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "gluten_free",
-          "label": "Gluten-Free",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "dairy_free",
-          "label": "Dairy-Free",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "nut_free",
-          "label": "Nut-Free",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "spicy",
-          "label": "Spicy",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "halal",
-          "label": "Halal",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "kosher",
-          "label": "Kosher",
-          "default": false
         }
       ]
     }
@@ -148,9 +89,7 @@
       "settings": {
         "name": "Garden Bruschetta",
         "description": "<p>Toasted sourdough topped with fresh tomatoes, basil, garlic, and extra virgin olive oil.</p>",
-        "price": "$9",
-        "vegetarian": true,
-        "vegan": true
+        "price": "$9"
       }
     },
     {
@@ -158,8 +97,7 @@
       "settings": {
         "name": "Crispy Calamari",
         "description": "<p>Lightly battered calamari rings served with lemon aioli and marinara sauce.</p>",
-        "price": "$14",
-        "gluten_free": false
+        "price": "$14"
       }
     },
     {
@@ -167,10 +105,7 @@
       "settings": {
         "name": "Spicy Buffalo Wings",
         "description": "<p>Crispy chicken wings tossed in our signature buffalo sauce. Served with blue cheese dip.</p>",
-        "price": "$12",
-        "spicy": true,
-        "gluten_free": true,
-        "featured": true
+        "price": "$12"
       }
     }
   ]

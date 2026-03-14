@@ -78,6 +78,16 @@
     },
     {
       "type": "select",
+      "id": "text_display",
+      "label": "Text Display",
+      "default": "hover",
+      "options": [
+        { "value": "hover", "label": "On Hover" },
+        { "value": "always", "label": "Always" }
+      ]
+    },
+    {
+      "type": "select",
       "id": "color_scheme",
       "label": "Color Scheme",
       "default": "standard",

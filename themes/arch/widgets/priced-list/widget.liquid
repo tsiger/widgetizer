@@ -29,51 +29,11 @@
         border-block-start: var(--border-width-thin) solid var(--border-color);
       }
 
-      & .priced-item.is-featured {
-        border-block-start: var(--border-width-medium) solid var(--accent);
-        border-block-end: var(--border-width-medium) solid var(--accent);
-      }
-
-      & .priced-item.is-featured + .priced-item.is-featured {
-        border-block-start: none;
-      }
-
       & .priced-item-content {
         display: flex;
         flex-direction: column;
         gap: var(--space-xs);
       }
-
-      & .priced-item-header {
-        display: flex;
-        align-items: center;
-        gap: var(--space-sm);
-        flex-wrap: wrap;
-      }
-
-      & .priced-item-badges {
-        display: flex;
-        gap: var(--space-xs);
-        flex-wrap: wrap;
-      }
-
-      & .priced-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2rem;
-        height: 2rem;
-        border-radius: 50%;
-      }
-
-      & .priced-badge-vegetarian { background: #22c55e; color: white; }
-      & .priced-badge-vegan { background: #16a34a; color: white; }
-      & .priced-badge-gluten-free { background: #f59e0b; color: white; }
-      & .priced-badge-dairy-free { background: #3b82f6; color: white; }
-      & .priced-badge-nut-free { background: #8b5cf6; color: white; }
-      & .priced-badge-spicy { background: #ef4444; color: white; }
-      & .priced-badge-halal { background: #06b6d4; color: white; }
-      & .priced-badge-kosher { background: #6366f1; color: white; }
 
       & .priced-item-description {
         max-width: 60ch;
@@ -146,39 +106,11 @@
 
         {% for blockId in widget.blocksOrder %}
           {% assign block = widget.blocks[blockId] %}
-          <div class="priced-item {% if block.settings.featured %}is-featured{% endif %} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+          <div class="priced-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             <div class="priced-item-content">
-              <div class="priced-item-header">
-                {% if block.settings.name != blank %}
-                  <{{ item_heading_level }} class="priced-item-name w-title t-xl" data-setting="name">{{ block.settings.name }}</{{ item_heading_level }}>
-                {% endif %}
-                <div class="priced-item-badges">
-                  {% if block.settings.vegetarian %}
-                    <span class="priced-badge priced-badge-vegetarian w-label t-xs" title="Vegetarian">V</span>
-                  {% endif %}
-                  {% if block.settings.vegan %}
-                    <span class="priced-badge priced-badge-vegan w-label t-xs" title="Vegan">VG</span>
-                  {% endif %}
-                  {% if block.settings.gluten_free %}
-                    <span class="priced-badge priced-badge-gluten-free w-label t-xs" title="Gluten-Free">GF</span>
-                  {% endif %}
-                  {% if block.settings.dairy_free %}
-                    <span class="priced-badge priced-badge-dairy-free w-label t-xs" title="Dairy-Free">DF</span>
-                  {% endif %}
-                  {% if block.settings.nut_free %}
-                    <span class="priced-badge priced-badge-nut-free w-label t-xs" title="Nut-Free">NF</span>
-                  {% endif %}
-                  {% if block.settings.spicy %}
-                    <span class="priced-badge priced-badge-spicy w-label t-xs" title="Spicy">🌶</span>
-                  {% endif %}
-                  {% if block.settings.halal %}
-                    <span class="priced-badge priced-badge-halal w-label t-xs" title="Halal">H</span>
-                  {% endif %}
-                  {% if block.settings.kosher %}
-                    <span class="priced-badge priced-badge-kosher w-label t-xs" title="Kosher">K</span>
-                  {% endif %}
-                </div>
-              </div>
+              {% if block.settings.name != blank %}
+                <{{ item_heading_level }} class="priced-item-name w-title t-xl" data-setting="name">{{ block.settings.name }}</{{ item_heading_level }}>
+              {% endif %}
               {% if block.settings.description != blank %}
                 <div class="priced-item-description w-body w-rte t-sm" data-setting="description">{{ block.settings.description | raw }}</div>
               {% endif %}
