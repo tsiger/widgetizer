@@ -932,6 +932,7 @@ if (window.Widgetizer?.designMode) {
 ### When to Use
 
 - **Slideshows/Carousels**: Navigate to the selected slide, pause autoplay
+- **Carousel Layouts**: Handled automatically by the global `carousel.js` — no per-widget JS needed
 - **Tabs/Content Switchers**: Switch to the tab group containing the selected block
 - **Accordions**: Expand the selected panel
 - **Any widget with hidden blocks**: Reveal the block the user is editing
@@ -1638,6 +1639,75 @@ Match `data-setting` value to setting `id` in schema.
 
 **Aspect ratios**: `square`, `portrait`, `landscape`
 
+### Carousel Layout
+
+Many card-based widgets support switching between grid and carousel layout via a `layout` select setting. When implementing this pattern:
+
+**Schema setting:**
+
+```json
+{
+  "type": "select",
+  "id": "layout",
+  "label": "Layout",
+  "default": "grid",
+  "options": [
+    { "value": "grid", "label": "Grid" },
+    { "value": "carousel", "label": "Carousel" }
+  ]
+}
+```
+
+**Template pattern:** Branch on `widget.settings.layout` to render either a `.widget-grid` or a `.carousel-container` with `.carousel-track`:
+
+```liquid
+{% if widget.settings.layout == 'carousel' %}
+  <div class="carousel-container">
+    <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">
+      <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <button type="button" class="carousel-btn carousel-btn-next" aria-label="Next">
+      <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <ul class="widget-card-grid carousel-track" style="--carousel-cols: {{ widget.settings.columns_desktop }}">
+      {% for blockId in widget.blocksOrder %}
+        <li class="carousel-item" data-block-id="{{ blockId }}">
+          <!-- card content -->
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% else %}
+  <ul class="widget-card-grid widget-grid" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
+    {% for blockId in widget.blocksOrder %}
+      <li data-block-id="{{ blockId }}">
+        <!-- card content -->
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+```
+
+No per-widget JavaScript is needed — `carousel.js` (loaded globally via `layout.liquid`) auto-initializes all `.carousel-container` elements. Widgets supporting this pattern: card-grid, icon-card-grid, profile-grid, testimonials, gallery, pricing, icon-list, key-figures, logo-cloud, numbered-cards, project-showcase.
+
+### Social Icons Snippet
+
+The `social-icons.liquid` snippet renders social media link icons from theme-level social settings. It supports 16 platforms: Facebook, Instagram, Twitter, LinkedIn, YouTube, TikTok, Pinterest, GitHub, Mastodon, Bluesky, Discord, Reddit, Telegram, Threads, WhatsApp, and Email.
+
+**Usage in widget templates:**
+
+```liquid
+{% render 'social-icons', social: theme.social %}
+```
+
+Each link renders as an `<a class="social-link">` with the platform icon via `{% render 'icon', icon: 'platform-name' %}`. Links with blank URLs are automatically hidden.
+
+Some widgets (accordion, contact-form) include a `social` block type that renders these icons inline. The `social-icons` widget provides a standalone section for displaying social links with an eyebrow, heading, description, and configurable icon size.
+
 ---
 
 ## Checklist
@@ -1659,6 +1729,7 @@ Before submitting a widget:
 - [ ] Keyboard navigation works
 - [ ] Responsive on mobile, tablet, desktop
 - [ ] Uses `w-*` base classes and `t-*` modifiers (no hardcoded typography CSS)
+- [ ] Carousel layout option added for card-based grid widgets (if applicable)
 - [ ] Background setting at END of settings array (if applicable)
 - [ ] No duplicate CSS properties from `base.css`
 - [ ] Scroll reveal animations added to content elements (`.reveal .reveal-up` with `--reveal-delay`)

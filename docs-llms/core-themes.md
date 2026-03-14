@@ -40,20 +40,23 @@ themes/
       ...
     presets/             # Optional preset variants
       presets.json       # Preset registry (names, descriptions, default)
-      warm/
+      financial/
         preset.json      # Settings overrides (colors, fonts, etc.)
         screenshot.png   # Preset preview image
-      hotel/
-        preset.json      # Settings overrides
-        screenshot.png
-        templates/       # Optional custom page templates
+        templates/       # Custom page templates
           index.json
+          about.json
+          services.json
+          contact.json
           global/
             header.json
             footer.json
-        menus/           # Optional custom navigation
+        menus/           # Custom navigation
           main-menu.json
           footer-menu.json
+      coaching/          # Same structure
+      accounting/
+      legal/
 ```
 
 The `latest/` folder is automatically built by composing the base version with all updates in version order.

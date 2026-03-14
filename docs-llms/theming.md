@@ -46,7 +46,8 @@ A theme is organized as a directory with the following structure:
 │           ├── schema.json
 │           └── widget.liquid
 ├── snippets/               # Reusable Liquid partials
-│   └── icon.liquid         # Icon rendering snippet
+│   ├── icon.liquid         # Icon rendering snippet
+│   └── social-icons.liquid # Social media icon links snippet
 ├── templates/              # Page and global templates
 │   ├── index.json          # Homepage template
 │   ├── about.json          # About page template
@@ -57,22 +58,23 @@ A theme is organized as a directory with the following structure:
 │   └── main-nav.json       # Menu structure and items
 ├── presets/                # Optional preset variants
 │   ├── presets.json        # Preset registry (names, descriptions, default)
-│   ├── warm/
+│   ├── financial/
 │   │   ├── preset.json     # Settings overrides (colors, fonts, etc.)
-│   │   └── screenshot.png  # Preset preview image
-│   └── hotel/
-│       ├── preset.json     # Settings overrides
-│       ├── screenshot.png
-│       ├── templates/      # Optional custom page templates
-│       │   ├── index.json
-│       │   └── global/
-│       │       ├── header.json
-│       │       └── footer.json
-│       └── menus/          # Optional custom navigation
-│           ├── main-menu.json
-│           └── footer-menu.json
+│   │   ├── screenshot.png  # Preset preview image
+│   │   ├── templates/      # Custom page templates
+│   │   │   ├── index.json
+│   │   │   └── global/
+│   │   │       ├── header.json
+│   │   │       └── footer.json
+│   │   └── menus/          # Custom navigation
+│   │       ├── main-menu.json
+│   │       └── footer-menu.json
+│   ├── coaching/
+│   ├── accounting/
+│   └── legal/
 └── assets/                 # Static assets
     ├── base.css            # Theme base styles (design tokens, utilities)
+    ├── carousel.js         # Carousel layout logic for card-based widgets
     ├── scripts.js          # Theme scripts
     └── icons.json          # Icon definitions (optional)
 ```
@@ -1476,6 +1478,25 @@ Widget-specific CSS and JavaScript are typically **inline** within the `widget.l
 </section>
 ```
 
+#### Carousel Layout
+
+Card-based widgets (e.g., `card-grid`, `icon-card-grid`) can offer a carousel layout option alongside the default grid. This is implemented using a `select` setting in the widget's `schema.json`:
+
+```json
+{
+  "type": "select",
+  "id": "layout",
+  "label": "Layout",
+  "default": "grid",
+  "options": [
+    { "value": "grid", "label": "Grid" },
+    { "value": "carousel", "label": "Carousel" }
+  ]
+}
+```
+
+The widget template conditionally renders carousel markup (navigation buttons, a `.carousel-track` container, and `.carousel-item` wrappers) when `widget.settings.layout == 'carousel'`. The carousel behavior is powered by `carousel.js` in the theme's `assets/` directory, which is loaded globally via `layout.liquid`.
+
 For complex widgets that need shared scripts (like sliders or carousels), place reusable assets in `widgets/{widget-name}/` and enqueue them:
 
 ```liquid
@@ -1792,21 +1813,23 @@ presets/
   presets.json              # Registry of all presets
   default/                  # Optional — if absent, root templates/menus are used
     preset.json             # Settings overrides only
-  warm/
+  financial/
     preset.json             # Settings overrides (colors, fonts)
     screenshot.png          # Preview shown in preset selector UI
-  hotel/
-    preset.json             # Settings overrides
-    screenshot.png
     templates/              # Full custom page templates
       index.json
-      rooms.json
+      about.json
+      services.json
+      contact.json
       global/
         header.json
         footer.json
     menus/                  # Custom navigation
       main-menu.json
       footer-menu.json
+  coaching/                 # Same structure as financial
+  accounting/
+  legal/
 ```
 
 ### presets.json (Preset Registry)
@@ -1815,15 +1838,18 @@ presets/
 {
   "default": "default",
   "presets": [
-    { "id": "default", "name": "Consulting Firm", "description": "Clean professional style with cool tones" },
-    { "id": "warm", "name": "Warm Studio", "description": "Warm earthy palette with elegant serif typography" },
-    { "id": "hotel", "name": "Boutique Hotel", "description": "Luxury hotel with rooms, dining, spa, and gallery pages" }
+    { "id": "default", "name": "Consulting Firm", "description": "Strategy & operations consulting with a professional, authoritative feel" },
+    { "id": "financial", "name": "Financial Advisor", "description": "Wealth management and financial planning with a trustworthy, premium look" },
+    { "id": "coaching", "name": "Business Coach", "description": "Executive coaching and leadership development with a warm, approachable tone" },
+    { "id": "accounting", "name": "Accounting Firm", "description": "Tax, audit, and advisory services with a clean, precise aesthetic" },
+    { "id": "legal", "name": "Law Firm", "description": "Legal services with a dignified, established presence" }
   ]
 }
 ```
 
 - `"default"` field specifies which preset is pre-selected in the UI
-- The `"default"` preset falls through to root `templates/`, `menus/`, and `theme.json` defaults when no `presets/default/` directory exists
+- The `"default"` preset falls through to root `templates/`, `menus/`, and `theme.json` defaults (no `presets/default/` directory needed)
+- All non-default presets include full `templates/`, `menus/`, `preset.json`, and `screenshot.png`
 - Themes without a `presets/` directory work exactly as before (zero breaking changes)
 
 ### preset.json (Per-Preset Settings Overrides)

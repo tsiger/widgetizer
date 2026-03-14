@@ -39,8 +39,9 @@ themes/arch/
 ├── assets/
 │   ├── base.css        # Design system: tokens, resets, components, utilities
 │   ├── scripts.js      # Core JS (header, navigation)
-│   └── reveal.js       # Scroll reveal animation engine
-├── widgets/            # 43 widget components
+│   ├── reveal.js       # Scroll reveal animation engine
+│   └── carousel.js     # Carousel initialization and navigation
+├── widgets/            # 41 widget components
 │   ├── accordion/
 │   ├── banner/
 │   ├── card-grid/
@@ -48,7 +49,9 @@ themes/arch/
 │   └── global/         # Header + Footer (appear on every page)
 │       ├── header/
 │       └── footer/
-├── snippets/           # Reusable Liquid partials (e.g., icon rendering)
+├── snippets/           # Reusable Liquid partials
+│   ├── icon.liquid     # SVG icon rendering from icons.json
+│   └── social-icons.liquid  # Social media link icons (16 platforms)
 ├── templates/          # Page template definitions
 └── menus/              # Navigation menu JSON files
 ```
@@ -68,8 +71,9 @@ Defined in `layout.liquid`, assets load in this sequence:
 9. Page content (header, main, footer)
 10. `{% asset src: "scripts.js", defer: true %}` — Core JS
 11. `{% asset src: "reveal.js", defer: true %}` — Reveal animations (conditional)
-12. `{% footer_assets %}` — Widget-enqueued footer assets
-13. `{% custom_footer_scripts %}` — User's footer scripts
+12. `{% asset src: "carousel.js", defer: true %}` — Carousel navigation
+13. `{% footer_assets %}` — Widget-enqueued footer assets
+14. `{% custom_footer_scripts %}` — User's footer scripts
 
 This order ensures that theme settings CSS variables are available before `base.css` reads them, and that user customizations cascade last.
 
@@ -625,6 +629,80 @@ The column count can also be set inline from widget settings:
 
 An alternative grid container with the same breakpoint behavior as `.widget-grid`, designed for card lists (resets `list-style`, `padding`, `margin`).
 
+### Carousel Layout
+
+Many card-based widgets support a `layout` setting with `grid` and `carousel` options. When `carousel` is selected, the grid is replaced by a horizontal scrolling carousel.
+
+**Widgets supporting carousel layout:** card-grid, icon-card-grid, profile-grid, testimonials, gallery, pricing, icon-list, key-figures, logo-cloud, numbered-cards, project-showcase.
+
+#### CSS Classes
+
+| Class | Purpose |
+| --- | --- |
+| `.carousel-container` | Wrapper with `position: relative` for button positioning |
+| `.carousel-track` | Scrollable flex container with `scroll-snap-type: x mandatory` |
+| `.carousel-item` | Individual item with `scroll-snap-align: start` |
+| `.carousel-btn` | Prev/next navigation button (hidden on mobile, visible at 990px+) |
+| `.carousel-btn-prev` | Positioned at left edge (`inset-inline-start: -2.2rem`) |
+| `.carousel-btn-next` | Positioned at right edge (`inset-inline-end: -2.2rem`) |
+| `.carousel-btn-icon` | SVG chevron icon inside buttons |
+
+#### Responsive Behavior
+
+```
+Mobile (<750px):   ~85% width per item, buttons hidden, swipe to scroll
+Tablet (750px+):   50% width per item, buttons hidden
+Desktop (990px+):  var(--carousel-cols) columns, prev/next buttons visible
+```
+
+#### Column Control
+
+The number of visible columns at desktop is set inline via `--carousel-cols`:
+
+```liquid
+<ul class="widget-card-grid carousel-track" style="--carousel-cols: {{ widget.settings.columns_desktop }}">
+```
+
+#### JavaScript (`carousel.js`)
+
+Loaded globally via `layout.liquid`. Auto-initializes all `.carousel-container` elements:
+
+- Prev/next buttons scroll by one item width + gap
+- Buttons auto-disable at scroll boundaries
+- `ResizeObserver` updates button state on container resize
+- `MutationObserver` on `#main-content` picks up dynamically added carousels
+
+#### Template Pattern
+
+```liquid
+{% if widget.settings.layout == 'carousel' %}
+  <div class="carousel-container">
+    <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">
+      <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <button type="button" class="carousel-btn carousel-btn-next" aria-label="Next">
+      <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <ul class="widget-card-grid carousel-track" style="--carousel-cols: {{ widget.settings.columns_desktop }}">
+      {% for blockId in widget.blocksOrder %}
+        {% assign block = widget.blocks[blockId] %}
+        <li class="widget-card carousel-item" data-block-id="{{ blockId }}">
+          <!-- card content -->
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% else %}
+  <ul class="widget-card-grid widget-grid" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
+    <!-- grid items -->
+  </ul>
+{% endif %}
+```
+
 ---
 
 ## Component Patterns
@@ -1136,6 +1214,17 @@ Apply `.reveal` + direction class to elements, with staggered delays using `--re
 
 ## Available Widgets (Arch Theme)
 
-The Arch theme ships with 42 widgets organized by purpose:
+The Arch theme ships with 41 widgets organized by purpose:
 
-**Heroes & Banners**: banner, slideshow, split-hero, image-callout **Content**: rich-text, image-text, features-split, content-switcher **Cards & Grids**: card-grid, icon-card-grid, numbered-cards, bento-grid, profile-grid, project-showcase **Data & Lists**: accordion, comparison-table, icon-list, key-figures, pricing, priced-list, schedule-table, job-listing, event-list **Media**: image, gallery, masonry-gallery, video-embed, comparison-slider, image-hotspots, image-tabs **Social & Trust**: testimonials, testimonial-hero, logo-cloud, trust-bar, social-icons **Interactive**: countdown, map, embed **Forms**: contact-form **Timeline**: timeline **Global**: header (global), footer (global)
+**Heroes & Banners**: banner, slideshow, split-hero, image-callout
+**Content**: rich-text, image-text, features-split, content-switcher
+**Cards & Grids**: card-grid, icon-card-grid, numbered-cards, bento-grid, profile-grid, project-showcase
+**Data & Lists**: accordion, comparison-table, icon-list, key-figures, pricing, priced-list, schedule-table, job-listing, event-list
+**Media**: image, gallery, masonry-gallery, video-embed, comparison-slider, image-hotspots, image-tabs
+**Social & Trust**: testimonials, testimonial-hero, logo-cloud, trust-bar, social-icons
+**Interactive**: countdown, map, embed
+**Forms**: contact-form
+**Timeline**: timeline
+**Global**: header (global), footer (global)
+
+Many card-based widgets (card-grid, icon-card-grid, profile-grid, testimonials, gallery, pricing, icon-list, key-figures, logo-cloud, numbered-cards, project-showcase) support a `layout` setting to switch between grid and carousel display modes. See [Carousel Layout](#carousel-layout) for details.

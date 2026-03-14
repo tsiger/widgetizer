@@ -24,20 +24,25 @@ themes/arch/
   menus/                  # Default menus (backward compatible)
   presets/                # NEW
     presets.json          # Preset registry
-    restaurant/
+    financial/
       preset.json         # Settings overrides (colors, fonts, etc.)
       screenshot.png      # Preset preview
-      templates/          # Optional — full page set for this demo
+      templates/          # Full page set for this preset
         index.json
-        menu.json
+        about.json
+        services.json
+        contact.json
         global/
           header.json
           footer.json
-      menus/              # Optional — different navigation
+      menus/              # Preset navigation
         main-menu.json
-    creative/
-      preset.json         # Settings overrides only (no templates/ = uses root templates/)
+        footer-menu.json
+    coaching/
+      preset.json         # Settings overrides
       screenshot.png
+      templates/          # Full page set
+      menus/
 ```
 
 ### presets.json (preset registry)
@@ -46,15 +51,18 @@ themes/arch/
 {
   "default": "default",
   "presets": [
-    { "id": "default", "name": "Consulting Firm", "description": "Professional consulting site" },
-    { "id": "restaurant", "name": "Restaurant", "description": "Warm colors, food-focused layout" },
-    { "id": "creative", "name": "Creative Agency", "description": "Bold minimal design" }
+    { "id": "default", "name": "Consulting Firm", "description": "Strategy & operations consulting with a professional, authoritative feel" },
+    { "id": "financial", "name": "Financial Advisor", "description": "Wealth management and financial planning with a trustworthy, premium look" },
+    { "id": "coaching", "name": "Business Coach", "description": "Executive coaching and leadership development with a warm, approachable tone" },
+    { "id": "accounting", "name": "Accounting Firm", "description": "Tax, audit, and advisory services with a clean, precise aesthetic" },
+    { "id": "legal", "name": "Law Firm", "description": "Legal services with a dignified, established presence" }
   ]
 }
 ```
 
 - `"default"` field = which preset is pre-selected in UI
-- `"default"` preset falls through to root `templates/`, `menus/`, and `theme.json` defaults when no `presets/default/` directory exists
+- `"default"` preset falls through to root `templates/`, `menus/`, and `theme.json` defaults (no `presets/default/` directory needed)
+- All non-default presets include full `templates/`, `menus/`, `preset.json`, and `screenshot.png`
 - Themes without `presets/` work exactly as before (zero breaking changes)
 
 ### preset.json (per-preset settings overrides)
@@ -125,7 +133,7 @@ For any preset:
 
 **Settings override application**: After `copyThemeToProject` copies `theme.json`, iterate all settings groups and update `item.default` for items whose `id` matches a key in `settingsOverrides`. This happens once at project creation — after that the project is independent.
 
-**Static file serving**: Screenshots are served from the themes directory via `/themes/*` (backed by `getThemesDir()` in `server/createApp.js`). Preset screenshots at `/themes/arch/presets/restaurant/screenshot.png` work automatically.
+**Static file serving**: Screenshots are served from the themes directory via `/themes/*` (backed by `getThemesDir()` in `server/createApp.js`). Preset screenshots at `/themes/arch/presets/financial/screenshot.png` work automatically.
 
 **Theme updates**: Presets are only used at project creation time. Once a project is created, it's independent. Theme updates (`applyThemeUpdate`) modify widgets/layout/assets but never touch project pages/menus. Preset files can be updated via the existing version system (add/modify files in `updates/` version folders).
 
