@@ -7,7 +7,7 @@ import { getSetting } from "../db/repositories/settingsRepository.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { renderWidget, renderPageLayout } from "../services/renderingService.js";
+import { renderWidget, renderPageLayout, renderEnqueuedAssetTags } from "../services/renderingService.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
@@ -264,10 +264,19 @@ export async function renderSingleWidget(req, res) {
       return res.status(404).json({ error: "No active project found" });
     }
 
-    // Call the service function, passing projectId and rawThemeSettings
-    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", null, null);
+    // Provide sharedGlobals so we can read back enqueued assets after render
+    const sharedGlobals = {
+      renderMode: "preview",
+      enqueuedStyles: new Map(),
+      enqueuedScripts: new Map(),
+    };
 
-    res.send(renderedWidget);
+    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", sharedGlobals, null);
+
+    // Append enqueued asset tags so the preview runtime can load them on morph
+    const assetTags = renderEnqueuedAssetTags(sharedGlobals);
+
+    res.send(renderedWidget + assetTags);
   } catch (error) {
     console.error("Widget rendering error:", error);
     if (isProjectResolutionError(error)) {

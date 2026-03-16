@@ -25,8 +25,18 @@ export const ImageTag = {
     const filename = path.basename(src);
     const mediaFile = context.get(["mediaFiles", filename]);
 
+    const imageBasePath = context.get(["imagePath"]);
+
+    // Fallback: no media metadata — render a simple img tag
     if (!mediaFile) {
-      return `<!-- Image tag error: media file "${filename}" not found -->`;
+      if (output === "url" || output === "path") return `${imageBasePath}/${filename}`;
+      const attrs = [`src="${imageBasePath}/${filename}"`];
+      if (alt) attrs.push(`alt="${alt.replace(/"/g, "&quot;")}"`);
+      if (cssClass) attrs.push(`class="${cssClass}"`);
+      if (options.loading) attrs.push(`loading="${options.loading}"`);
+      else if (lazy) attrs.push('loading="lazy"');
+      if (options.fetchpriority) attrs.push(`fetchpriority="${options.fetchpriority}"`);
+      return `<img ${attrs.join(" ")}>`;
     }
 
     const isSvg = mediaFile.type === "image/svg+xml" || filename.toLowerCase().endsWith(".svg");
@@ -34,7 +44,6 @@ export const ImageTag = {
     // Return URL only if requested
     if (output === "url" || output === "path") {
       if (isSvg) {
-        const imageBasePath = context.get(["imagePath"]);
         return `${imageBasePath}/${path.basename(mediaFile.path)}`;
       }
 
@@ -44,7 +53,6 @@ export const ImageTag = {
         height: mediaFile.height,
       };
 
-      const imageBasePath = context.get(["imagePath"]);
       return `${imageBasePath}/${path.basename(imageSize.path)}`;
     }
 
@@ -61,7 +69,6 @@ export const ImageTag = {
     }
 
     const attrs = [];
-    const imageBasePath = context.get(["imagePath"]);
     attrs.push(`src="${imageBasePath}/${path.basename(imageSize.path)}"`);
 
     const finalAlt = alt || mediaFile.metadata?.alt || "";

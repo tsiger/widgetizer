@@ -440,6 +440,10 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     turnstileSiteKey,
   };
 
+  // Always ensure projectId and apiUrl are present in globals (whether shared or new)
+  if (!globals.projectId) globals.projectId = projectId;
+  if (!globals.apiUrl) globals.apiUrl = apiUrl;
+
   // Always ensure form config is present in globals (whether shared or new)
   if (globals.formSubmitUrl === undefined) {
     globals.formSubmitUrl = formSubmitUrl;
@@ -754,5 +758,56 @@ async function renderPageLayout(
   }
 }
 
+/**
+ * Render enqueued asset tags from sharedGlobals into HTML.
+ * Used by renderSingleWidget so that dynamically enqueued assets
+ * are included in the morph response and picked up by the preview runtime.
+ */
+function renderEnqueuedAssetTags(sharedGlobals) {
+  const apiUrl = sharedGlobals.apiUrl || "";
+  const projectId = sharedGlobals.projectId || "";
+  const renderMode = sharedGlobals.renderMode || "preview";
+  let output = "";
+
+  function resolveUrl(filepath, opts) {
+    if (renderMode === "publish") {
+      const version = sharedGlobals.exportVersion;
+      return version ? `assets/${filepath}?v=${version}` : `assets/${filepath}`;
+    }
+    if (opts.source === "widget" && opts.widgetType) {
+      return `${apiUrl}/api/preview/assets/${projectId}/widgets/${opts.widgetType}/${filepath}`;
+    }
+    return `${apiUrl}/api/preview/assets/${projectId}/assets/${filepath}`;
+  }
+
+  const styles = sharedGlobals.enqueuedStyles;
+  if (styles?.size > 0) {
+    const sorted = [...styles.entries()]
+      .map(([filepath, opts]) => ({ filepath, opts }))
+      .sort((a, b) => a.opts.priority - b.opts.priority);
+    for (const { filepath, opts } of sorted) {
+      let tag = `<link rel="stylesheet" href="${resolveUrl(filepath, opts)}"`;
+      if (opts.media) tag += ` media="${opts.media}"`;
+      if (opts.id) tag += ` id="${opts.id}"`;
+      output += tag + ">\n";
+    }
+  }
+
+  const scripts = sharedGlobals.enqueuedScripts;
+  if (scripts?.size > 0) {
+    const sorted = [...scripts.entries()]
+      .map(([filepath, opts]) => ({ filepath, opts }))
+      .sort((a, b) => a.opts.priority - b.opts.priority);
+    for (const { filepath, opts } of sorted) {
+      let tag = `<script src="${resolveUrl(filepath, opts)}"`;
+      if (opts.defer) tag += " defer";
+      if (opts.async) tag += " async";
+      output += tag + "></script>\n";
+    }
+  }
+
+  return output;
+}
+
 // Export the necessary functions
-export { renderWidget, renderPageLayout };
+export { renderWidget, renderPageLayout, renderEnqueuedAssetTags };

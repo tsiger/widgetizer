@@ -564,9 +564,10 @@ describe("ImageTag", () => {
     assert.equal(result, "");
   });
 
-  it("returns error comment when media file not found", async () => {
+  it("renders fallback img for missing media file", async () => {
     const result = await render('{% image src: "missing.jpg" %}', {}, { renderMode: "preview" });
-    assert.match(result, /<!-- Image tag error:.*not found -->/);
+    assert.match(result, /src="[^"]*missing\.jpg"/);
+    assert.match(result, /loading="lazy"/);
   });
 
   it("handles SVG images without sizes lookup", async () => {

@@ -480,7 +480,7 @@ Injected into preview iframe, handles:
 
 - CSS variable updates
 - Font loading
-- Widget morphing
+- Widget morphing (including loading newly enqueued styles/scripts from morph response)
 - Selection detection and editor lifecycle events (`widget:select`, `widget:deselect`, `widget:block-select`, `widget:block-deselect`)
 - Scroll to widget
 - Real-time settings updates

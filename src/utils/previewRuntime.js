@@ -903,6 +903,12 @@ function morphWidget(widgetId, newHtml) {
     const newScripts = extractScripts(newElement);
     newElement.querySelectorAll("script").forEach((script) => script.remove());
 
+    // Collect enqueued assets appended outside the widget element (from renderSingleWidget)
+    const enqueuedLinks = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
+    const enqueuedScripts = Array.from(doc.querySelectorAll("script[src]")).filter(
+      (s) => !newElement.contains(s),
+    );
+
     preserveFormState(existingElement, newElement);
     cleanupWidget(widgetId);
 
@@ -910,6 +916,22 @@ function morphWidget(widgetId, newHtml) {
 
     if (newScripts.length > 0) {
       executeScripts(newScripts, newElement);
+    }
+
+    // Load enqueued styles/scripts that aren't already in the document
+    for (const link of enqueuedLinks) {
+      if (!document.querySelector(`link[href="${link.getAttribute("href")}"]`)) {
+        document.head.appendChild(link.cloneNode(true));
+      }
+    }
+    for (const script of enqueuedScripts) {
+      if (!document.querySelector(`script[src="${script.getAttribute("src")}"]`)) {
+        const s = document.createElement("script");
+        s.src = script.src;
+        if (script.defer) s.defer = true;
+        if (script.async) s.async = true;
+        document.body.appendChild(s);
+      }
     }
 
     newElement.dataset.initialized = "true";

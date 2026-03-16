@@ -739,7 +739,7 @@ Enqueue them in your widget template:
 {% enqueue_script src: "slideshow.js", priority: 30 %}
 ```
 
-These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority.
+These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority. During editor partial updates (widget morphing), any newly enqueued assets are appended to the single-widget render response and automatically loaded by the preview runtime, so scripts like `carousel.js` become available immediately when a setting change triggers their enqueue.
 
 **Asset Resolution:**
 
@@ -773,8 +773,10 @@ When using **external JavaScript files** (via `{% enqueue_script %}`), the scrip
 **The Problem:**
 
 - Inline scripts (inside `widget.liquid`) are automatically re-executed after DOM updates
-- External scripts (loaded via `{% enqueue_script %}`) are NOT re-executed
+- External scripts (loaded via `{% enqueue_script %}`) are NOT re-executed (though newly enqueued scripts are loaded — see below)
 - After partial update, the widget appears but interactive features (buttons, sliders, etc.) stop working
+
+> **Note:** If a widget conditionally enqueues a script (e.g., `carousel.js` only when `layout == 'carousel'`), the preview runtime will detect and load the script when it first appears in a morph response. However, the script still only runs once — it must use the `widget:updated` pattern below to re-initialize after subsequent morphs.
 
 **The Solution:**
 
