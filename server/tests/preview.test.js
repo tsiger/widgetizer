@@ -392,6 +392,50 @@ describe("serveAsset", () => {
     });
     assert.equal(res._status, 400);
   });
+
+  it("falls back to theme assets when widget asset not found", async () => {
+    // carousel.js exists in assets/ but NOT in widgets/card-grid/
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    await fs.writeFile(path.join(projectDir, "assets", "carousel.js"), "// carousel code");
+    await fs.ensureDir(path.join(projectDir, "widgets", "card-grid"));
+
+    const res = await callController(serveAsset, {
+      params: { projectId: PROJECT_ID, folder: "widgets", filepath: ["card-grid", "carousel.js"] },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._headers["Content-Type"], "application/javascript");
+  });
+
+  it("prefers widget-local asset over theme assets fallback", async () => {
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    await fs.writeFile(path.join(projectDir, "assets", "carousel.js"), "// theme version");
+    await fs.ensureDir(path.join(projectDir, "widgets", "card-grid"));
+    await fs.writeFile(path.join(projectDir, "widgets", "card-grid", "carousel.js"), "// widget version");
+
+    const res = await callController(serveAsset, {
+      params: { projectId: PROJECT_ID, folder: "widgets", filepath: ["card-grid", "carousel.js"] },
+    });
+    assert.equal(res._status, 200);
+    const content = res._sent.toString();
+    assert.ok(content.includes("widget version"), "should serve the widget-local file, not the theme fallback");
+  });
+
+  it("returns 404 when asset not in widget folder or theme assets", async () => {
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    await fs.ensureDir(path.join(projectDir, "widgets", "card-grid"));
+
+    const res = await callController(serveAsset, {
+      params: { projectId: PROJECT_ID, folder: "widgets", filepath: ["card-grid", "nonexistent.js"] },
+    });
+    assert.equal(res._status, 404);
+  });
+
+  it("fallback does not allow path traversal via widget filepath", async () => {
+    const res = await callController(serveAsset, {
+      params: { projectId: PROJECT_ID, folder: "widgets", filepath: ["..", "secret.txt"] },
+    });
+    assert.ok(res._status === 400 || res._status === 404, `Should block traversal, got ${res._status}`);
+  });
 });
 
 // ============================================================================

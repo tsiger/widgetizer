@@ -71,9 +71,8 @@ Defined in `layout.liquid`, assets load in this sequence:
 9. Page content (header, main, footer)
 10. `{% asset src: "scripts.js", defer: true %}` — Core JS
 11. `{% asset src: "reveal.js", defer: true %}` — Reveal animations (conditional)
-12. `{% asset src: "carousel.js", defer: true %}` — Carousel navigation
-13. `{% footer_assets %}` — Widget-enqueued footer assets
-14. `{% custom_footer_scripts %}` — User's footer scripts
+12. `{% footer_assets %}` — Widget-enqueued footer assets (e.g., `carousel.js` when carousel widgets are present)
+13. `{% custom_footer_scripts %}` — User's footer scripts
 
 This order ensures that theme settings CSS variables are available before `base.css` reads them, and that user customizations cascade last.
 

@@ -436,16 +436,26 @@ export async function serveAsset(req, res) {
   }
 
   try {
-    // Check if file exists using fs-extra
-    if (!(await fs.pathExists(filePath))) {
+    let resolvedPath = filePath;
+
+    // Fallback: if asset not found in widget folder, try theme assets folder
+    if (!(await fs.pathExists(resolvedPath)) && folder === "widgets") {
+      const assetsDir = path.join(getProjectDir(projectFolderName), "assets");
+      const fallbackPath = path.resolve(assetsDir, path.basename(normalizedSubpath));
+      if (isWithinDirectory(fallbackPath, assetsDir) && (await fs.pathExists(fallbackPath))) {
+        resolvedPath = fallbackPath;
+      }
+    }
+
+    if (!(await fs.pathExists(resolvedPath))) {
       return res.status(404).send(`Asset ${assetSubpath} not found in ${folder}`);
     }
 
     // File exists, read it (readFile is compatible)
-    const fileContent = await fs.readFile(filePath);
+    const fileContent = await fs.readFile(resolvedPath);
 
     // Set content type based on file extension
-    const ext = path.extname(filePath).toLowerCase();
+    const ext = path.extname(resolvedPath).toLowerCase();
     const contentType = getContentType(ext, null);
     if (contentType) {
       res.setHeader("Content-Type", contentType);

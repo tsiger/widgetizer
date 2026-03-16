@@ -23,7 +23,7 @@ export const EnqueueStyleTag = {
 
   *render(context) {
     const options = yield this.hash.render(context);
-    const { src: filepath, location = "header", priority = 50, media = null, id = null } = options;
+    const { src: filepath, location = "header", priority = 50, media = null, id = null, theme = false } = options;
 
     if (!filepath) {
       console.warn("enqueue_style: No 'src' provided");
@@ -36,6 +36,7 @@ export const EnqueueStyleTag = {
     }
 
     const widgetContext = context.environments?.widget || null;
+    const isThemeAsset = theme === true;
 
     // Add to the Map (filepath as key for deduplication)
     context.globals.enqueuedStyles.set(filepath, {
@@ -43,8 +44,8 @@ export const EnqueueStyleTag = {
       id: id,
       location: location,
       priority: priority,
-      source: widgetContext ? "widget" : "theme",
-      widgetType: widgetContext?.type || null,
+      source: widgetContext && !isThemeAsset ? "widget" : "theme",
+      widgetType: widgetContext && !isThemeAsset ? widgetContext.type : null,
     });
 
     // No output - just registers the asset

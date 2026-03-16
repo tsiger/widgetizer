@@ -23,7 +23,7 @@ export const EnqueueScriptTag = {
 
   *render(context) {
     const options = yield this.hash.render(context);
-    const { src: filepath, location = "footer", priority = 50, defer = false, async = false } = options;
+    const { src: filepath, location = "footer", priority = 50, defer = false, async = false, theme = false } = options;
 
     if (!filepath) {
       console.warn("enqueue_script: No 'src' provided");
@@ -36,6 +36,7 @@ export const EnqueueScriptTag = {
     }
 
     const widgetContext = context.environments?.widget || null;
+    const isThemeAsset = theme === true;
 
     // Add to the Map (filepath as key for deduplication)
     context.globals.enqueuedScripts.set(filepath, {
@@ -43,8 +44,8 @@ export const EnqueueScriptTag = {
       async: async === true, // Opt-in
       location: location,
       priority: priority,
-      source: widgetContext ? "widget" : "theme",
-      widgetType: widgetContext?.type || null,
+      source: widgetContext && !isThemeAsset ? "widget" : "theme",
+      widgetType: widgetContext && !isThemeAsset ? widgetContext.type : null,
     });
 
     // No output - just registers the asset

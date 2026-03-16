@@ -743,12 +743,17 @@ These will be automatically rendered by `{% header_assets %}` (for styles) and `
 
 **Asset Resolution:**
 
-- **Inside widget templates**: Assets are loaded from that widget's folder (`widgets/{widget-name}/`)
+- **Inside widget templates**: Assets are loaded from that widget's folder (`widgets/{widget-name}/`). If the file is not found in the widget folder during preview, it falls back to the theme `assets/` folder.
 - **Inside `layout.liquid` or snippets**: Assets are loaded from the theme `assets/` folder
+- **`theme: true` option**: Forces resolution from the theme `assets/` folder, even when called from a widget template. Use this for shared theme-level assets (e.g., `carousel.js`) that live in `assets/` but are enqueued by multiple widgets:
+
+```liquid
+{% enqueue_script src: "carousel.js", defer: true, location: "footer", priority: 40, theme: true %}
+```
 
 **Deduplication:**
 
-Multiple widgets can safely enqueue the same asset file. The enqueue system uses the filename as a unique key, so if two widgets both call `{% enqueue_script src: "shared-lib.js" %}`, the script is only output once. This is useful when multiple widgets share a common library.
+Multiple widgets can safely enqueue the same asset file. The enqueue system uses the filename as a unique key, so if two widgets both call `{% enqueue_script src: "shared-lib.js" %}`, the script is only output once. This is useful when multiple widgets share a common library (e.g., all carousel-capable widgets enqueue `carousel.js` with `theme: true`, but it is only loaded once).
 
 > [!IMPORTANT] **Asset Filename Collisions**
 >

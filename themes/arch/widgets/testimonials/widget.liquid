@@ -1,3 +1,6 @@
+{% if widget.settings.layout == 'carousel' %}
+  {% enqueue_script src: "carousel.js", defer: true, location: "footer", priority: 40, theme: true %}
+{% endif %}
 <section
   id="{{ widget.id }}"
   class="widget widget-type-testimonials widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"

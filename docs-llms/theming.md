@@ -616,8 +616,9 @@ These tags allow for efficient, deduplicated loading of assets (CSS and JS) in y
 
 **Asset Resolution:**
 
-- **Inside widget templates**: `enqueue_*` loads assets from the widget's folder (`widgets/{widget-name}/`)
+- **Inside widget templates**: `enqueue_*` loads assets from the widget's folder (`widgets/{widget-name}/`). If the file is not found in the widget folder, it falls back to the theme `assets/` folder.
 - **Inside `layout.liquid` or snippets**: `enqueue_*` loads assets from the theme `assets/` folder
+- **`theme: true` option**: When a widget needs to enqueue a shared theme-level asset (e.g., `carousel.js` in `assets/`), pass `theme: true` to force resolution from the theme `assets/` folder, bypassing the widget folder lookup entirely. This generates the correct URL and avoids relying on fallback resolution.
 
 > [!IMPORTANT] **Asset Filename Collisions During Export**
 >
@@ -641,6 +642,7 @@ Registers a JavaScript file for loading. By default, scripts are output in the f
 - `priority`: (Number, default: `50`) Loading order priority. Lower numbers load first (10 → 20 → 30 → 50 → 100)
 - `defer`: (Boolean, default: `false`) Whether to add the `defer` attribute (opt-in)
 - `async`: (Boolean, default: `false`) Whether to add the `async` attribute (opt-in)
+- `theme`: (Boolean, default: `false`) Force resolution from theme `assets/` folder even when called from a widget template. Use for shared theme-level assets like `carousel.js`.
 
 **Priority Examples:**
 
@@ -695,6 +697,7 @@ Registers a CSS file for loading. By default, styles are output in the header, b
 - `priority`: (Number, default: `50`) Loading order priority. Lower numbers load first (10 → 20 → 30 → 50 → 100)
 - `media`: (String, default: `null`) The value for the `media` attribute (e.g., `"screen"`, `"print"`)
 - `id`: (String, default: `null`) The value for the `id` attribute
+- `theme`: (Boolean, default: `false`) Force resolution from theme `assets/` folder even when called from a widget template. Use for shared theme-level assets.
 
 **Priority Examples:**
 
@@ -1508,16 +1511,24 @@ Card-based widgets (e.g., `card-grid`, `icon-card-grid`) can offer a carousel la
 }
 ```
 
-The widget template conditionally renders carousel markup (navigation buttons, a `.carousel-track` container, and `.carousel-item` wrappers) when `widget.settings.layout == 'carousel'`. The carousel behavior is powered by `carousel.js` in the theme's `assets/` directory, which is loaded globally via `layout.liquid`.
-
-For complex widgets that need shared scripts (like sliders or carousels), place reusable assets in `widgets/{widget-name}/` and enqueue them:
+The widget template conditionally renders carousel markup (navigation buttons, a `.carousel-track` container, and `.carousel-item` wrappers) when `widget.settings.layout == ‘carousel’`. The carousel behavior is powered by `carousel.js` in the theme’s `assets/` directory, which is conditionally enqueued by each widget that supports the carousel layout:
 
 ```liquid
-{% enqueue_style "slideshow.css", { "priority": 30 } %}
-{% enqueue_script "slideshow.js", { "priority": 30 } %}
+{% if widget.settings.layout == ‘carousel’ %}
+  {% enqueue_script src: "carousel.js", defer: true, location: "footer", priority: 40, theme: true %}
+{% endif %}
 ```
 
-These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority. When `enqueue_*` is called from a widget template, assets are loaded from that widget’s folder. When `enqueue_*` is called from `layout.liquid` or snippets, assets are loaded from the theme `assets/` folder.
+The `theme: true` option tells the enqueue system to resolve the asset from the theme `assets/` folder rather than the widget’s own folder. This is the correct approach for shared theme-level assets used across multiple widgets — `carousel.js` is only loaded when at least one carousel widget is present on the page, and the enqueue system deduplicates it automatically if multiple carousel widgets appear on the same page.
+
+For widget-specific assets (scripts/styles that belong to a single widget), place them in the widget’s folder and enqueue without `theme: true`:
+
+```liquid
+{% enqueue_style src: "slideshow.css", priority: 30 %}
+{% enqueue_script src: "slideshow.js", priority: 30, defer: true %}
+```
+
+These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority. When `enqueue_*` is called from a widget template without `theme: true`, assets are loaded from that widget’s folder. When called with `theme: true` or from `layout.liquid`/snippets, assets are loaded from the theme `assets/` folder.
 
 ### Assets During Export
 
