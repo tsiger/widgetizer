@@ -246,7 +246,7 @@
                 data-caption="{{ block.settings.caption }}"
               >
                 {% if block.settings.image != blank %}
-                  {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
+                  {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
                 {% else %}
                   {% placeholder_image aspect: 'landscape', class: 'widget-card-image' %}
                 {% endif %}
@@ -273,7 +273,7 @@
               data-caption="{{ block.settings.caption }}"
             >
               {% if block.settings.image != blank %}
-                {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
+                {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
               {% else %}
                 {% placeholder_image aspect: 'landscape', class: 'widget-card-image' %}
               {% endif %}

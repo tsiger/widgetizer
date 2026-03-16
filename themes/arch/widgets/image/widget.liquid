@@ -60,11 +60,11 @@
             {% endif %}
             data-setting="link"
           >
-            {% image src: widget.settings.image, size: 'large', class: 'widget-image' %}
+            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: '100vw', class: 'widget-image' %}
           </a>
         {% else %}
           <div class="image-wrapper reveal reveal-fade">
-            {% image src: widget.settings.image, size: 'large', class: 'widget-image' %}
+            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: '100vw', class: 'widget-image' %}
           </div>
         {% endif %}
       {% else %}

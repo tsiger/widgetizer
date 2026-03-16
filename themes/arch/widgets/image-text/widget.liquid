@@ -52,7 +52,7 @@
       <div class="image-text-wrapper">
         <div class="image-wrapper reveal reveal-fade">
           {% if widget.settings.image != blank %}
-            {% image src: widget.settings.image, size: 'large', class: 'image-text-image' %}
+            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: '(max-width: 768px) 100vw, 50vw', class: 'image-text-image' %}
           {% else %}
             {% placeholder_image aspect: 'landscape', class: 'image-text-image' %}
           {% endif %}

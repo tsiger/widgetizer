@@ -160,7 +160,7 @@
               {% unless blockId == first_block_id %}hidden{% endunless %}
             >
               {% if block.settings.image != blank %}
-                {% image src: block.settings.image, size: 'large', class: 'image-tabs-image' %}
+                {% image src: block.settings.image, size: 'large', srcset: true, sizes: '100vw', class: 'image-tabs-image' %}
               {% else %}
                 {% placeholder_image aspect: 'landscape', class: 'image-tabs-image' %}
               {% endif %}

@@ -1,6 +1,6 @@
 # Responsive Images Rollout
 
-> **Status: In progress** — `srcset` support implemented on `{% image %}` tag. `card-grid` widget updated. Remaining widgets need `srcset: true` with appropriate `sizes` values.
+> **Status: Complete** — `srcset` support implemented on `{% image %}` tag and rolled out to all applicable widgets.
 
 ## What was done
 
@@ -8,69 +8,53 @@
 - Excludes `thumb` from srcset candidates, includes original if wider than all variants
 - Backward compatible — existing templates render unchanged unless `srcset: true` is added
 
-## Completed
+## Completed — Large size widgets
+
+Full-width or hero images using `size: 'large'`.
+
+| Widget | `sizes` value | Notes |
+|--------|--------------|-------|
+| `image` | `100vw` | Standalone image, fullwidth or constrained |
+| `image-callout` | `(max-width: 768px) 100vw, 50vw` | Image beside text, ~50/50 split |
+| `image-hotspots` | `100vw` | Full container width overlay |
+| `image-text` | `(max-width: 768px) 100vw, 50vw` | Split layout, ~50/50 |
+| `image-tabs` | `100vw` | Full container tabbed display |
+| `comparison-slider` | `100vw` | Full container before/after (2 images) |
+| `project-showcase` | `(max-width: 768px) 100vw, 50vw` | Portfolio grid cards |
+| `testimonial-hero` | `100vw` | Author hero image (large) |
+
+## Completed — Medium size widgets
+
+Card-based or moderate-width images using `size: 'medium'`.
 
 | Widget | `sizes` value | Notes |
 |--------|--------------|-------|
 | `card-grid` | `(max-width: 768px) 100vw, 400px` | 3-5 columns in fixed container |
+| `content-switcher` | `(max-width: 768px) 100vw, 400px` | 3 layout variants with card images |
+| `gallery` | `(max-width: 768px) 100vw, 400px` | Grid gallery |
+| `masonry-gallery` | `(max-width: 768px) 100vw, 400px` | Masonry layout |
+| `profile-grid` | `(max-width: 768px) 50vw, 300px` | Team member photos, 2+ columns |
 
-## Remaining — Large size widgets
+## Skipped — Too small to benefit
 
-Full-width or hero images using `size: 'large'`. Likely `sizes: '100vw'` for fullwidth layouts, or container-relative for constrained ones.
+Logos, avatars, and small accent images. These use `size: 'small'` or `size: 'medium'` for logos and are unlikely to have 2+ srcset candidates. The tag gracefully omits `srcset` when fewer than 2 candidates exist.
 
-| Widget | File | Notes |
-|--------|------|-------|
-| `image` | `widgets/image/widget.liquid` | Standalone image, can be fullwidth or constrained |
-| `image-callout` | `widgets/image-callout/widget.liquid` | Image beside text |
-| `image-hotspots` | `widgets/image-hotspots/widget.liquid` | Interactive hotspot overlay |
-| `image-text` | `widgets/image-text/widget.liquid` | Split layout (image + text) |
-| `image-tabs` | `widgets/image-tabs/widget.liquid` | Tabbed image display |
-| `comparison-slider` | `widgets/comparison-slider/widget.liquid` | Before/after slider (2 images) |
-| `project-showcase` | `widgets/project-showcase/widget.liquid` | Portfolio-style grid |
-| `testimonial-hero` | `widgets/testimonial-hero/widget.liquid` | Author image (large) |
+| Widget | Reason |
+|--------|--------|
+| `testimonials` | Reviewer avatars (`small`) |
+| `priced-list` | Menu item images (`small`) |
+| `logo-cloud` | Partner/client logos (`small`) |
+| `global/footer` | Footer logo (`small`) |
+| `global/header` | Site logo (`medium`, but logo-sized) |
+| `testimonial-hero` | Company logo (`medium`, but logo-sized) |
 
-## Remaining — Medium size widgets
-
-Card-based or moderate-width images using `size: 'medium'`.
-
-| Widget | File | Notes |
-|--------|------|-------|
-| `content-switcher` | `widgets/content-switcher/widget.liquid` | 3 layout variants with card images |
-| `gallery` | `widgets/gallery/widget.liquid` | Grid/masonry gallery |
-| `masonry-gallery` | `widgets/masonry-gallery/widget.liquid` | Masonry layout |
-| `profile-grid` | `widgets/profile-grid/widget.liquid` | Team member photos |
-| `testimonial-hero` | `widgets/testimonial-hero/widget.liquid` | Logo image (medium) |
-| `global/header` | `widgets/global/header/widget.liquid` | Site logo |
-
-## Remaining — Small size widgets
-
-Avatars, logos, and small accent images using `size: 'small'`.
-
-| Widget | File | Notes |
-|--------|------|-------|
-| `testimonials` | `widgets/testimonials/widget.liquid` | Reviewer avatars |
-| `priced-list` | `widgets/priced-list/widget.liquid` | Menu item images |
-| `logo-cloud` | `widgets/logo-cloud/widget.liquid` | Partner/client logos |
-| `global/footer` | `widgets/global/footer/widget.liquid` | Footer logo |
-
-## Skip — NOT srcset-capable
+## Skipped — NOT srcset-capable
 
 These use `output: 'url'` for CSS `background-image`. `srcset` doesn't apply to CSS backgrounds.
 
-| Widget | File | Reason |
-|--------|------|--------|
-| `banner` | `widgets/banner/widget.liquid` | CSS background-image |
-| `bento-grid` | `widgets/bento-grid/widget.liquid` | CSS background-image |
-| `slideshow` | `widgets/slideshow/widget.liquid` | CSS background-image |
-| `split-hero` | `widgets/split-hero/widget.liquid` | CSS background-image |
-
-## Approach
-
-For each widget, determine the correct `sizes` value based on:
-1. Is the image fullwidth or inside a fixed container (~1200px)?
-2. How many columns on desktop?
-3. Does it stack to full width on mobile?
-
-The `sizes` attribute describes **CSS layout width**, not image file width. The browser handles retina (2x/3x) automatically.
-
-All widget files are in `themes/arch/widgets/`.
+| Widget | Reason |
+|--------|--------|
+| `banner` | CSS background-image |
+| `bento-grid` | CSS background-image |
+| `slideshow` | CSS background-image |
+| `split-hero` | CSS background-image |

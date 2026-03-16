@@ -95,7 +95,7 @@
           {% assign block = widget.blocks[blockId] %}
           <div class="widget-card reveal reveal-fade" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             {% if block.settings.image != blank %}
-              {% image src: block.settings.image, size: 'medium', class: 'widget-card-image' %}
+              {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
             {% else %}
               {% assign aspect_index = forloop.index | modulo: 3 %}
               {% if aspect_index == 1 %}

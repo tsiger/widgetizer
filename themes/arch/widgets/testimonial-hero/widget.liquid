@@ -120,7 +120,7 @@
 
         {% if widget.settings.author_image != blank %}
           <div class="testimonial-image-wrapper reveal reveal-fade">
-            {% image src: widget.settings.author_image, size: 'large', class: 'testimonial-author-image', loading: 'eager' %}
+            {% image src: widget.settings.author_image, size: 'large', srcset: true, sizes: '100vw', class: 'testimonial-author-image', loading: 'eager' %}
           </div>
         {% else %}
           <div class="testimonial-image-wrapper reveal reveal-fade">
