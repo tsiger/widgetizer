@@ -80,10 +80,10 @@
       "titleRequired": "Il nome del progetto è obbligatorio",
       "nameNotEmpty": "Il nome non può essere vuoto",
       "titleHelp": "Il nome visualizzato per il tuo progetto.",
-      "slugLabel": "Slug",
-      "slugRequired": "Lo slug del progetto è obbligatorio",
-      "slugNotEmpty": "Lo slug non può essere vuoto",
-      "slugPattern": "Lo slug può contenere solo lettere minuscole, numeri e trattini",
+      "folderNameLabel": "Nome Cartella",
+      "folderNameRequired": "Il nome della cartella del progetto è obbligatorio",
+      "folderNameNotEmpty": "Il nome della cartella non può essere vuoto",
+      "folderNamePattern": "Il nome della cartella può contenere solo lettere minuscole, numeri e trattini",
       "folderNameHelp": "Il nome della cartella dove il tuo progetto verrà salvato ed esportato.",
       "descriptionLabel": "Descrizione",
       "descriptionHelp": "Opzionale. Aggiungi note o dettagli sul tuo progetto.",
@@ -611,15 +611,27 @@
       "supported": "Formato supportato: .zip"
     },
     "version": "Versione {{version}}",
+    "versionsAvailable": "versioni",
     "widgets": "{{count}} widget",
     "by": "Di {{author}}",
     "active": "Attivo",
     "emptyTitle": "Nessun tema disponibile",
     "emptyDesc": "Carica un tema utilizzando l'area qui sopra per iniziare",
+    "updateAvailable": "Aggiornamento disponibile",
+    "buttons": {
+      "rebuildThemes": "Ricostruisci Temi",
+      "rebuilding": "Ricostruzione...",
+      "update": "Aggiorna",
+      "updating": "Aggiornamento..."
+    },
     "toasts": {
       "singleFileError": "Si prega di caricare un singolo file zip.",
       "uploadSuccess": "Tema caricato con successo!",
-      "uploadError": "Impossibile caricare il tema."
+      "uploadError": "Impossibile caricare il tema.",
+      "rebuildSuccess": "{{count}} tema/i ricostruiti con successo",
+      "rebuildError": "Impossibile ricostruire i temi",
+      "updateSuccess": "Tema aggiornato con successo!",
+      "updateError": "Impossibile aggiornare il tema"
     }
   },
   "pagePreview": {
@@ -642,6 +654,11 @@
         "label": "Esportazione & Versioni",
         "description": "Gestisci impostazioni di esportazione e controllo versioni",
         "sectionTitle": "Impostazioni Esportazione & Versioni"
+      },
+      "developer": {
+        "label": "Strumenti Sviluppatore",
+        "description": "Strumenti per lo sviluppo di temi e widget",
+        "sectionTitle": "Strumenti Sviluppatore"
       }
     },
     "groups": {
@@ -727,6 +744,12 @@
       "maxImportSizeMB": {
         "label": "Dimensione Massima Importazione Progetto (MB)",
         "description": "Dimensione massima del file per i file ZIP di importazione progetto. Aumenta questo valore se devi importare progetti grandi con molti file multimediali."
+      }
+    },
+    "developer": {
+      "enabled": {
+        "label": "Attiva Modalità Sviluppatore",
+        "description": "Mostra gli strumenti sviluppatore per lo sviluppo dei temi, come la possibilità di ricostruire le versioni dei temi."
       }
     },
     "messages": {

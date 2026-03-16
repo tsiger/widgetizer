@@ -80,10 +80,10 @@
       "titleRequired": "Projektname ist erforderlich",
       "nameNotEmpty": "Name darf nicht leer sein",
       "titleHelp": "Der Anzeigename für Ihr Projekt.",
-      "slugLabel": "Slug",
-      "slugRequired": "Projekt-Slug ist erforderlich",
-      "slugNotEmpty": "Slug darf nicht leer sein",
-      "slugPattern": "Slug darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten",
+      "folderNameLabel": "Ordnername",
+      "folderNameRequired": "Projektordnername ist erforderlich",
+      "folderNameNotEmpty": "Ordnername darf nicht leer sein",
+      "folderNamePattern": "Ordnername darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten",
       "folderNameHelp": "Der Ordnername, in dem Ihr Projekt gespeichert und exportiert wird.",
       "descriptionLabel": "Beschreibung",
       "descriptionHelp": "Optional. Fügen Sie Notizen oder Details zu Ihrem Projekt hinzu.",
@@ -611,15 +611,27 @@
       "supported": "Unterstütztes Format: .zip"
     },
     "version": "Version {{version}}",
+    "versionsAvailable": "Versionen",
     "widgets": "{{count}} Widgets",
     "by": "Von {{author}}",
     "active": "Aktiv",
     "emptyTitle": "Keine Themes verfügbar",
     "emptyDesc": "Laden Sie ein Theme über den Bereich oben hoch, um zu beginnen",
+    "updateAvailable": "Update verfügbar",
+    "buttons": {
+      "rebuildThemes": "Themes neu erstellen",
+      "rebuilding": "Wird neu erstellt...",
+      "update": "Aktualisieren",
+      "updating": "Wird aktualisiert..."
+    },
     "toasts": {
       "singleFileError": "Bitte laden Sie nur eine einzelne Zip-Datei hoch.",
       "uploadSuccess": "Theme erfolgreich hochgeladen!",
-      "uploadError": "Fehler beim Hochladen des Themes."
+      "uploadError": "Fehler beim Hochladen des Themes.",
+      "rebuildSuccess": "{{count}} Theme(s) erfolgreich neu erstellt",
+      "rebuildError": "Fehler beim Neuerstellen der Themes",
+      "updateSuccess": "Theme erfolgreich aktualisiert!",
+      "updateError": "Fehler beim Aktualisieren des Themes"
     }
   },
   "pagePreview": {
@@ -642,6 +654,11 @@
         "label": "Export & Versionierung",
         "description": "Export-Einstellungen und Versionskontrolle verwalten",
         "sectionTitle": "Export & Versionierung Einstellungen"
+      },
+      "developer": {
+        "label": "Entwicklerwerkzeuge",
+        "description": "Werkzeuge für Theme- und Widget-Entwicklung",
+        "sectionTitle": "Entwicklerwerkzeuge"
       }
     },
     "groups": {
@@ -727,6 +744,12 @@
       "maxImportSizeMB": {
         "label": "Maximale Projektimport-Größe (MB)",
         "description": "Maximale Dateigröße für Projektimport-ZIP-Dateien. Erhöhen Sie diesen Wert, wenn Sie große Projekte mit vielen Mediendateien importieren müssen."
+      }
+    },
+    "developer": {
+      "enabled": {
+        "label": "Entwicklermodus aktivieren",
+        "description": "Zeigt Entwicklerwerkzeuge für die Theme-Entwicklung an, wie z.B. die Möglichkeit, Theme-Versionen neu zu erstellen."
       }
     },
     "messages": {

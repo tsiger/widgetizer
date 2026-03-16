@@ -80,10 +80,10 @@
       "titleRequired": "Le nom du projet est requis",
       "nameNotEmpty": "Le nom ne peut pas être vide",
       "titleHelp": "Le nom d'affichage de votre projet.",
-      "slugLabel": "Slug",
-      "slugRequired": "Le slug du projet est requis",
-      "slugNotEmpty": "Le slug ne peut pas être vide",
-      "slugPattern": "Le slug ne peut contenir que des lettres minuscules, des chiffres et des traits d'union",
+      "folderNameLabel": "Nom du Dossier",
+      "folderNameRequired": "Le nom du dossier du projet est requis",
+      "folderNameNotEmpty": "Le nom du dossier ne peut pas être vide",
+      "folderNamePattern": "Le nom du dossier ne peut contenir que des lettres minuscules, des chiffres et des traits d'union",
       "folderNameHelp": "Le nom du dossier où votre projet sera sauvegardé et exporté.",
       "descriptionLabel": "Description",
       "descriptionHelp": "Facultatif. Ajoutez des notes ou des détails sur votre projet.",
@@ -611,15 +611,27 @@
       "supported": "Format pris en charge : .zip"
     },
     "version": "Version {{version}}",
+    "versionsAvailable": "versions",
     "widgets": "{{count}} widgets",
     "by": "Par {{author}}",
     "active": "Actif",
     "emptyTitle": "Aucun thème disponible",
     "emptyDesc": "Téléversez un thème en utilisant la zone ci-dessus pour commencer",
+    "updateAvailable": "Mise à jour disponible",
+    "buttons": {
+      "rebuildThemes": "Reconstruire les thèmes",
+      "rebuilding": "Reconstruction...",
+      "update": "Mettre à jour",
+      "updating": "Mise à jour..."
+    },
     "toasts": {
       "singleFileError": "Veuillez téléverser un seul fichier zip.",
       "uploadSuccess": "Thème téléversé avec succès !",
-      "uploadError": "Échec du téléversement du thème."
+      "uploadError": "Échec du téléversement du thème.",
+      "rebuildSuccess": "{{count}} thème(s) reconstruit(s) avec succès",
+      "rebuildError": "Échec de la reconstruction des thèmes",
+      "updateSuccess": "Thème mis à jour avec succès !",
+      "updateError": "Échec de la mise à jour du thème"
     }
   },
   "pagePreview": {
@@ -642,6 +654,11 @@
         "label": "Export et Versionnage",
         "description": "Gérer les paramètres d'exportation et le contrôle de version",
         "sectionTitle": "Paramètres Export et Versionnage"
+      },
+      "developer": {
+        "label": "Outils Développeur",
+        "description": "Outils pour le développement de thèmes et de widgets",
+        "sectionTitle": "Outils Développeur"
       }
     },
     "groups": {
@@ -727,6 +744,12 @@
       "maxImportSizeMB": {
         "label": "Taille maximale d'importation de projet (Mo)",
         "description": "Taille maximale des fichiers ZIP d'importation de projet. Augmentez cette valeur si vous devez importer de grands projets avec de nombreux fichiers médias."
+      }
+    },
+    "developer": {
+      "enabled": {
+        "label": "Activer le Mode Développeur",
+        "description": "Affiche les outils développeur pour le développement de thèmes, comme la possibilité de reconstruire les versions des thèmes."
       }
     },
     "messages": {

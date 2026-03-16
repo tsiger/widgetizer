@@ -80,10 +80,10 @@
       "titleRequired": "El nombre del proyecto es obligatorio",
       "nameNotEmpty": "El nombre no puede estar vacío",
       "titleHelp": "El nombre para mostrar de tu proyecto.",
-      "slugLabel": "Slug",
-      "slugRequired": "El slug del proyecto es obligatorio",
-      "slugNotEmpty": "El slug no puede estar vacío",
-      "slugPattern": "El slug solo puede contener letras minúsculas, números y guiones",
+      "folderNameLabel": "Nombre de Carpeta",
+      "folderNameRequired": "El nombre de carpeta del proyecto es obligatorio",
+      "folderNameNotEmpty": "El nombre de carpeta no puede estar vacío",
+      "folderNamePattern": "El nombre de carpeta solo puede contener letras minúsculas, números y guiones",
       "folderNameHelp": "El nombre de la carpeta donde se guardará y exportará tu proyecto.",
       "descriptionLabel": "Descripción",
       "descriptionHelp": "Opcional. Agrega notas o detalles sobre tu proyecto.",
@@ -298,7 +298,6 @@
     "count": "{{count}} página",
     "count_other": "{{count}} páginas",
     "selected": "{{count}} seleccionada",
-    "selected_other": "{{count}} seleccionadas",
     "deleteSelected": "Eliminar seleccionadas",
     "delete": "Eliminar",
     "searchPlaceholder": "Buscar páginas...",
@@ -612,15 +611,27 @@
       "supported": "Formato compatible: .zip"
     },
     "version": "Versión {{version}}",
+    "versionsAvailable": "versiones",
     "widgets": "{{count}} widgets",
     "by": "Por {{author}}",
     "active": "Activo",
     "emptyTitle": "No hay temas disponibles",
     "emptyDesc": "Sube un tema usando el área de arriba para comenzar",
+    "updateAvailable": "Actualización disponible",
+    "buttons": {
+      "rebuildThemes": "Reconstruir Temas",
+      "rebuilding": "Reconstruyendo...",
+      "update": "Actualizar",
+      "updating": "Actualizando..."
+    },
     "toasts": {
       "singleFileError": "Por favor, sube un solo archivo zip.",
       "uploadSuccess": "¡Tema subido exitosamente!",
-      "uploadError": "Error al subir el tema."
+      "uploadError": "Error al subir el tema.",
+      "rebuildSuccess": "Se reconstruyeron {{count}} tema(s) exitosamente",
+      "rebuildError": "Error al reconstruir los temas",
+      "updateSuccess": "¡Tema actualizado exitosamente!",
+      "updateError": "Error al actualizar el tema"
     }
   },
   "pagePreview": {
@@ -643,6 +654,11 @@
         "label": "Exportación y Versionado",
         "description": "Gestionar configuración de exportación y control de versiones",
         "sectionTitle": "Configuración de Exportación y Versionado"
+      },
+      "developer": {
+        "label": "Herramientas de Desarrollador",
+        "description": "Herramientas para el desarrollo de temas y widgets",
+        "sectionTitle": "Herramientas de Desarrollador"
       }
     },
     "groups": {
@@ -728,6 +744,12 @@
       "maxImportSizeMB": {
         "label": "Tamaño Máximo de Importación de Proyecto (MB)",
         "description": "Tamaño máximo de archivo para archivos ZIP de importación de proyecto. Aumenta esto si necesitas importar proyectos grandes con muchos archivos multimedia."
+      }
+    },
+    "developer": {
+      "enabled": {
+        "label": "Activar Modo Desarrollador",
+        "description": "Muestra herramientas de desarrollador para el desarrollo de temas, como la capacidad de reconstruir versiones de temas."
       }
     },
     "messages": {
