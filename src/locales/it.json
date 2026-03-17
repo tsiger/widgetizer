@@ -99,7 +99,9 @@
       "moreSettings": "Altre impostazioni",
       "presetLabel": "Stile Predefinito",
       "presetHelp": "Scegli uno stile visivo e un layout di contenuto.",
-      "loadingPresets": "Caricamento stili..."
+      "loadingPresets": "Caricamento stili...",
+      "receiveThemeUpdatesLabel": "Ricevi aggiornamenti del tema",
+      "receiveThemeUpdatesHelp": "Ricevi una notifica quando è disponibile una nuova versione del tema."
     },
     "media": {
       "editTitle": "Modifica Metadati {{type}}",

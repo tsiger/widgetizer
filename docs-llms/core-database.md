@@ -79,7 +79,8 @@ Controllers use repository functions directly:
 
 - `projectRepo.getProjectById()`, `createProject()`, `updateProject()`, `deleteProject()` — project metadata
 - `projectRepo.readProjectsData()` / `writeProjectsData()` — bulk read/write (tests only)
-- `readMediaFile(projectId)` / `writeMediaFile(projectId, data)` — media metadata (controller wrappers)
+- `readMediaFile(projectId)` — media metadata (`server/services/mediaService.js`)
+- `writeMediaFile(projectId, data)` — media metadata (controller wrapper)
 - `readAppSettingsFile()` — application settings (controller wrapper)
 
 ---

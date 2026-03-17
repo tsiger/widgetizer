@@ -57,7 +57,8 @@ export async function getAllProjects(req, res) {
 
             // Check for updates - compare project version against theme's current source version
             // (from latest/ snapshot or base), NOT against all available versions
-            if (project.themeVersion && themeData.version) {
+            // Only flag updates if the project has opted in via receiveThemeUpdates
+            if (project.receiveThemeUpdates && project.themeVersion && themeData.version) {
               if (isNewerVersion(project.themeVersion, themeData.version)) {
                 hasThemeUpdate = true;
               }

@@ -99,7 +99,9 @@
       "moreSettings": "Περισσότερες ρυθμίσεις",
       "presetLabel": "Στυλ Προτύπου",
       "presetHelp": "Επιλέξτε ένα οπτικό στυλ και διάταξη περιεχομένου.",
-      "loadingPresets": "Φόρτωση προτύπων..."
+      "loadingPresets": "Φόρτωση προτύπων...",
+      "receiveThemeUpdatesLabel": "Λήψη ενημερώσεων θέματος",
+      "receiveThemeUpdatesHelp": "Λάβετε ειδοποίηση όταν μια νέα έκδοση του θέματος είναι διαθέσιμη."
     },
     "media": {
       "editTitle": "Επεξεργασία Metadata {{type}}",

@@ -50,8 +50,9 @@ const {
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
 
+const { readMediaFile } = await import("../services/mediaService.js");
+
 const {
-  readMediaFile,
   writeMediaFile,
   atomicUpdateMediaFile,
   getProjectMedia,

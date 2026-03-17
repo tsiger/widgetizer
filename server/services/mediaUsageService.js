@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { getProjectPagesDir, getProjectThemeJsonPath } from "../config.js";
-import { readMediaFile } from "../controllers/mediaController.js";
+import { readMediaFile } from "./mediaService.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 
@@ -257,7 +257,7 @@ export async function removePageFromMediaUsage(projectId, pageId) {
  */
 export async function getMediaUsage(projectId, fileId) {
   try {
-    const file = mediaRepo.getMediaFileById(fileId);
+    const file = mediaRepo.getMediaFileById(projectId, fileId);
 
     if (!file) {
       throw new Error("File not found");

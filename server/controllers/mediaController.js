@@ -22,6 +22,7 @@ import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers
 import { handleProjectResolutionError, PROJECT_ERROR_CODES } from "../utils/projectErrors.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
+import { readMediaFile } from "../services/mediaService.js";
 
 
 // Get image processing settings from app settings
@@ -93,16 +94,6 @@ function decodeFileName(filename) {
   }
 }
 
-/**
- * Reads media metadata from SQLite for a project.
- * @param {string} projectId - The project UUID
- * @returns {Promise<{files: Array<object>}>} The media metadata object
- */
-export async function readMediaFile(projectId) {
-  // Validate project exists (throws if not found)
-  await getProjectFolderName(projectId);
-  return mediaRepo.getMediaFiles(projectId);
-}
 
 /**
  * Writes media metadata to SQLite for a project (full replacement).
@@ -499,8 +490,8 @@ export async function updateMediaMetadata(req, res) {
     // Validate project ownership
     await getProjectFolderName(projectId);
 
-    // Get the specific file
-    const file = mediaRepo.getMediaFileById(fileId);
+    // Get the specific file (scoped to project)
+    const file = mediaRepo.getMediaFileById(projectId, fileId);
     if (!file) {
       return res.status(404).json({ error: "File not found" });
     }
@@ -513,8 +504,8 @@ export async function updateMediaMetadata(req, res) {
       return res.status(400).json({ error: "Alt text is required for images" });
     }
 
-    // Update metadata in DB (alt and title columns)
-    mediaRepo.updateFileMetadata(fileId, { alt: alt || "", title: title || "" });
+    // Update metadata in DB (alt and title columns, scoped to project)
+    mediaRepo.updateFileMetadata(projectId, fileId, { alt: alt || "", title: title || "" });
 
     // Build response metadata in the shape the frontend expects
     let metadata;
@@ -551,8 +542,8 @@ export async function deleteProjectMedia(req, res) {
     // Validate project ownership and get folder name for filesystem ops
     const projectFolderName = await getProjectFolderName(projectId);
 
-    // Get the specific file from DB
-    const fileToDelete = mediaRepo.getMediaFileById(fileId);
+    // Get the specific file from DB (scoped to project)
+    const fileToDelete = mediaRepo.getMediaFileById(projectId, fileId);
     if (!fileToDelete) {
       return res.status(404).json({ error: "File not found" });
     }
@@ -597,8 +588,8 @@ export async function deleteProjectMedia(req, res) {
       }
     }
 
-    // Remove metadata from DB (cascade deletes sizes + usage)
-    mediaRepo.deleteMediaFile(fileId);
+    // Remove metadata from DB (cascade deletes sizes + usage, scoped to project)
+    mediaRepo.deleteMediaFile(projectId, fileId);
 
     res.json({ message: "File deleted successfully" });
   } catch (error) {
@@ -759,8 +750,8 @@ export async function bulkDeleteProjectMedia(req, res) {
 
     await Promise.all(deletePromises);
 
-    // Batch delete from DB (cascade handles sizes + usage)
-    mediaRepo.deleteMediaFiles(filesToDelete.map((f) => f.id));
+    // Batch delete from DB (cascade handles sizes + usage, scoped to project)
+    mediaRepo.deleteMediaFiles(projectId, filesToDelete.map((f) => f.id));
 
     // Build response message
     const response = {

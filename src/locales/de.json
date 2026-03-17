@@ -99,7 +99,9 @@
       "moreSettings": "Weitere Einstellungen",
       "presetLabel": "Stil-Vorlage",
       "presetHelp": "Wähle einen visuellen Stil und ein Demo-Layout.",
-      "loadingPresets": "Vorlagen werden geladen..."
+      "loadingPresets": "Vorlagen werden geladen...",
+      "receiveThemeUpdatesLabel": "Theme-Updates erhalten",
+      "receiveThemeUpdatesHelp": "Benachrichtigung erhalten, wenn eine neue Version des Themes verfügbar ist."
     },
     "media": {
       "editTitle": "Metadaten für {{type}} bearbeiten",

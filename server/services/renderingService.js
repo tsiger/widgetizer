@@ -2,9 +2,7 @@ import { Liquid } from "liquidjs";
 import fs from "fs/promises";
 import path from "path";
 import { getProjectDir, CORE_WIDGETS_DIR } from "../config.js";
-// TODO: Controllers shouldn't ideally be imported into services.
-// Consider moving readMediaFile to a shared module.
-import { readMediaFile } from "../controllers/mediaController.js";
+import { readMediaFile } from "./mediaService.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { listProjectPagesData } from "../controllers/pageController.js";
 import { fileURLToPath } from "url";

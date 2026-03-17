@@ -214,11 +214,16 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 | `refreshMediaUsage(projectId)`                     | POST   | `/api/media/projects/:projectId/refresh-usage`       |
 | `getMediaUrl(projectId, fileId, type)`             | -      | URL construction                                     |
 
+### Media Service (`server/services/mediaService.js`)
+
+| Function                          | Purpose                                    |
+| --------------------------------- | ------------------------------------------ |
+| `readMediaFile(projectId)`        | Read media metadata from SQLite            |
+
 ### Server Controller (`server/controllers/mediaController.js`)
 
 | Function                          | Purpose                                    |
 | --------------------------------- | ------------------------------------------ |
-| `readMediaFile(projectId)`        | Read media metadata from SQLite                        |
 | `writeMediaFile(projectId, data)` | Write media metadata to SQLite                        |
 | `getProjectMedia()`               | Get all media files                        |
 | `uploadProjectMedia()`            | Upload and process files                   |

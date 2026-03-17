@@ -145,28 +145,9 @@ Priority legend:
 
 ---
 
-### 6) `P2` Controller-to-service coupling remains in media access path
+### 6) ~~`P2` Controller-to-service coupling remains in media access path~~ **RESOLVED**
 
-**Problem**
-- Services/controllers import media read logic from controller layer.
-- `exportController` dynamically imports `readMediaFile` from `mediaController`.
-
-**Code references**
-- [`server/services/renderingService.js:5`](/Users/tsiger/Playground/widgetizer-saas/widgetizer/server/services/renderingService.js:5)
-- [`server/controllers/exportController.js:473`](/Users/tsiger/Playground/widgetizer-saas/widgetizer/server/controllers/exportController.js:473)
-- [`server/controllers/exportController.js:546`](/Users/tsiger/Playground/widgetizer-saas/widgetizer/server/controllers/exportController.js:546)
-- [`server/controllers/exportController.js:602`](/Users/tsiger/Playground/widgetizer-saas/widgetizer/server/controllers/exportController.js:602)
-
-**Risk**
-- Layering violation and brittle dependencies.
-- Harder to test and reason about as SQLite ownership grows.
-
-**Fix**
-- Extract media metadata reads to a dedicated service/repository module (not a controller).
-- Replace dynamic imports with direct dependency.
-
-**Acceptance criteria**
-- No service imports from controller modules for media metadata access.
+Extracted `readMediaFile()` to `server/services/mediaService.js`. All consumers (`renderingService`, `mediaUsageService`, `exportController`, tests) now import from the service. No service-to-controller imports remain for media metadata access.
 
 ---
 

@@ -462,7 +462,7 @@ Per aspera ad astra
 
     // --- Copy Only Used Images ---
     try {
-      const { readMediaFile } = await import("./mediaController.js");
+      const { readMediaFile } = await import("../services/mediaService.js");
       const mediaData = await readMediaFile(projectId);
 
       if (mediaData && mediaData.files) {
@@ -537,7 +537,7 @@ Per aspera ad astra
 
     // --- Copy Only Used Videos ---
     try {
-      const { readMediaFile } = await import("./mediaController.js");
+      const { readMediaFile } = await import("../services/mediaService.js");
       const mediaData = await readMediaFile(projectId);
 
       if (mediaData && mediaData.files) {
@@ -593,7 +593,7 @@ Per aspera ad astra
 
     // Copy used audio files to assets/audios/
     try {
-      const { readMediaFile } = await import("./mediaController.js");
+      const { readMediaFile } = await import("../services/mediaService.js");
       const mediaData = await readMediaFile(projectId);
 
       if (mediaData && mediaData.files) {

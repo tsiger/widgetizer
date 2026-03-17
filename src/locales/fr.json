@@ -99,7 +99,9 @@
       "moreSettings": "Plus de paramètres",
       "presetLabel": "Style Prédéfini",
       "presetHelp": "Choisissez un style visuel et une mise en page.",
-      "loadingPresets": "Chargement des styles..."
+      "loadingPresets": "Chargement des styles...",
+      "receiveThemeUpdatesLabel": "Recevoir les mises à jour du thème",
+      "receiveThemeUpdatesHelp": "Être notifié lorsqu'une nouvelle version du thème est disponible."
     },
     "media": {
       "editTitle": "Modifier les métadonnées {{type}}",

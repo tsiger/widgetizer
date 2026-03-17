@@ -39,13 +39,14 @@ export function getMediaFiles(projectId) {
 }
 
 /**
- * Get a single media file by ID.
+ * Get a single media file by ID, scoped to a project.
+ * @param {string} projectId - Project UUID
  * @param {string} fileId
  * @returns {object|null} Media file object or null
  */
-export function getMediaFileById(fileId) {
+export function getMediaFileById(projectId, fileId) {
   const db = getDb();
-  const row = db.prepare("SELECT * FROM media_files WHERE id = ?").get(fileId);
+  const row = db.prepare("SELECT * FROM media_files WHERE id = ? AND project_id = ?").get(fileId, projectId);
   if (!row) return null;
 
   const sizeRows = db.prepare("SELECT * FROM media_sizes WHERE media_file_id = ?").all(fileId);
@@ -97,41 +98,45 @@ export function addMediaFile(projectId, fileData) {
 }
 
 /**
- * Delete a single media file by ID. Cascade handles sizes + usage.
+ * Delete a single media file by ID, scoped to a project. Cascade handles sizes + usage.
+ * @param {string} projectId - Project UUID
  * @param {string} fileId
  * @returns {boolean} True if a row was deleted
  */
-export function deleteMediaFile(fileId) {
+export function deleteMediaFile(projectId, fileId) {
   const db = getDb();
-  const result = db.prepare("DELETE FROM media_files WHERE id = ?").run(fileId);
+  const result = db.prepare("DELETE FROM media_files WHERE id = ? AND project_id = ?").run(fileId, projectId);
   return result.changes > 0;
 }
 
 /**
- * Delete multiple media files by IDs in a single statement.
+ * Delete multiple media files by IDs in a single statement, scoped to a project.
+ * @param {string} projectId - Project UUID
  * @param {string[]} fileIds
  * @returns {number} Number of rows deleted
  */
-export function deleteMediaFiles(fileIds) {
+export function deleteMediaFiles(projectId, fileIds) {
   if (fileIds.length === 0) return 0;
   const db = getDb();
   const placeholders = fileIds.map(() => "?").join(",");
-  const result = db.prepare(`DELETE FROM media_files WHERE id IN (${placeholders})`).run(...fileIds);
+  const result = db.prepare(`DELETE FROM media_files WHERE id IN (${placeholders}) AND project_id = ?`).run(...fileIds, projectId);
   return result.changes;
 }
 
 /**
- * Update metadata (alt, title) for a single media file.
+ * Update metadata (alt, title) for a single media file, scoped to a project.
+ * @param {string} projectId - Project UUID
  * @param {string} fileId
  * @param {{ alt?: string, title?: string, description?: string }} metadata
  * @returns {boolean} True if a row was updated
  */
-export function updateFileMetadata(fileId, metadata) {
+export function updateFileMetadata(projectId, fileId, metadata) {
   const db = getDb();
   const result = db.prepare(
-    "UPDATE media_files SET alt = @alt, title = @title WHERE id = @id"
+    "UPDATE media_files SET alt = @alt, title = @title WHERE id = @id AND project_id = @projectId"
   ).run({
     id: fileId,
+    projectId,
     alt: metadata.alt ?? "",
     title: metadata.title ?? "",
   });

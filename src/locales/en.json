@@ -99,7 +99,9 @@
       "moreSettings": "More settings",
       "presetLabel": "Style Preset",
       "presetHelp": "Choose a visual style and demo content layout.",
-      "loadingPresets": "Loading presets..."
+      "loadingPresets": "Loading presets...",
+      "receiveThemeUpdatesLabel": "Receive theme updates",
+      "receiveThemeUpdatesHelp": "Get notified when a new version of the theme is available."
     },
     "media": {
       "editTitle": "Edit {{type}} Metadata",

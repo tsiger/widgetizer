@@ -135,7 +135,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
       - **Core Assets**: Placeholder images (SVG) from the core assets are copied to ensure widgets using placeholders work correctly.
       - **Widget Assets**: The controller recursively searches the project's `/widgets` directory for any `.css` or `.js` files and copies them into the output `/assets` directory.
       - **Optimized Image Copying**: Uses media usage tracking to selectively copy only images that are actually used:
-        - Reads project media metadata from SQLite (via `readMediaFile` compatibility wrapper) to identify images with non-empty `usedIn`
+        - Reads project media metadata from SQLite (via `readMediaFile` from `mediaService.js`) to identify images with non-empty `usedIn`
         - Only copies images that are referenced in at least one page
         - For each used image, copies the original file plus all generated sizes (small, medium, large) — `thumb` variants are excluded since they are only used for the media library UI
         - Images are copied to `assets/images/` (not `uploads/images/`)

@@ -39,7 +39,8 @@ process.env.NODE_ENV = "test";
 const { getProjectDir, getProjectPagesDir, getProjectThemeJsonPath } = await import("../config.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
-const { readMediaFile, writeMediaFile } = await import("../controllers/mediaController.js");
+const { readMediaFile } = await import("../services/mediaService.js");
+const { writeMediaFile } = await import("../controllers/mediaController.js");
 
 const {
   updatePageMediaUsage,

@@ -44,6 +44,7 @@ export default function ProjectForm({
       description: initialData.description || "",
       theme: initialData.theme || "",
       siteUrl: initialData.siteUrl || "",
+      receiveThemeUpdates: initialData.receiveThemeUpdates || false,
       preset: "",
     },
   });
@@ -79,6 +80,7 @@ export default function ProjectForm({
         description: initialData.description || "",
         theme: initialData.theme || "",
         siteUrl: initialData.siteUrl || "",
+        receiveThemeUpdates: initialData.receiveThemeUpdates || false,
         preset: "",
       });
       prevInitialDataRef.current = currentInitialDataStr;
@@ -166,6 +168,7 @@ export default function ProjectForm({
           description: "",
           theme: "",
           siteUrl: "",
+          receiveThemeUpdates: false,
           preset: "",
         });
         setPresets({ default: null, presets: [] });
@@ -352,6 +355,21 @@ export default function ProjectForm({
               {errors.siteUrl && <p className="form-error">{errors.siteUrl.message}</p>}
               <p className="form-description">{t("forms.project.siteUrlHelp")}</p>
             </div>
+
+            {/* Theme Updates Toggle - only for existing projects */}
+            {!isNew && (
+              <div className="form-field">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    {...register("receiveThemeUpdates")}
+                    className="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-500"
+                  />
+                  <span className="form-label !mb-0">{t("forms.project.receiveThemeUpdatesLabel")}</span>
+                </label>
+                <p className="form-description ml-7">{t("forms.project.receiveThemeUpdatesHelp")}</p>
+              </div>
+            )}
           </>
         )}
       </div>
