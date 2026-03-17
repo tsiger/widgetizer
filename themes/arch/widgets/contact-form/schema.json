@@ -216,7 +216,7 @@
           "type": "textarea",
           "id": "options",
           "label": "tTheme:contact_form.blocks.dropdown.settings.options.label",
-          "default": "General Inquiry\\nSupport\\nSales\\nOther"
+          "default": "General Inquiry\nSupport\nSales\nOther"
         },
         {
           "type": "header",

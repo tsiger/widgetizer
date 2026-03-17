@@ -27,6 +27,7 @@ import { AudioTag } from "../../src/core/tags/audioTag.js";
 import { YouTubeTag } from "../../src/core/tags/youtubeTag.js";
 import { EnqueuePreloadTag } from "../../src/core/tags/enqueuePreload.js";
 import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
+import { registerHandleizeFilter } from "../../src/core/filters/handleizeFilter.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
@@ -86,6 +87,7 @@ function configureLiquidEngine(engine) {
 
   // Register custom filters
   registerMediaMetaFilter(engine);
+  registerHandleizeFilter(engine);
 }
 
 // Global engine for fallback/static use if needed (optional, can be removed if strictly per-request)
