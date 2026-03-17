@@ -2917,6 +2917,7 @@
   },
   "global": {
     "layout": {
+      "name": "Diseño",
       "settings": {
         "layout_header": {
           "label": "Animaciones"
@@ -2928,6 +2929,7 @@
       }
     },
     "branding": {
+      "name": "Marca",
       "settings": {
         "branding_header": {
           "label": "Marca"
@@ -3004,6 +3006,7 @@
       }
     },
     "typography": {
+      "name": "Tipografía",
       "settings": {
         "typography_header": {
           "label": "Tipografía"
@@ -3025,7 +3028,7 @@
       }
     },
     "social": {
-      "name": "Social",
+      "name": "Redes sociales",
       "settings": {
         "twitter_url": {
           "label": "URL de Twitter / X"
@@ -3081,6 +3084,7 @@
       }
     },
     "privacy": {
+      "name": "Privacidad",
       "settings": {
         "privacy_header": {
           "label": "Privacidad"
@@ -3092,6 +3096,7 @@
       }
     },
     "advanced": {
+      "name": "Avanzado",
       "settings": {
         "advanced_header": {
           "label": "Avanzado"

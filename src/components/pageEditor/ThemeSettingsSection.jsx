@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { Palette } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../hooks/useThemeLocale";
 import ThemeGroupItem from "./ThemeGroupItem";
 
 export default function ThemeSettingsSection({ themeSettings, selectedThemeGroup, onThemeGroupSelect }) {
+  const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!themeSettings || !themeSettings.settings || !themeSettings.settings.global) {
@@ -24,7 +28,7 @@ export default function ThemeSettingsSection({ themeSettings, selectedThemeGroup
       >
         <div className="flex items-center gap-2">
           <Palette size={16} className="text-slate-600" />
-          <span className="text-sm font-medium text-slate-700">Theme Settings</span>
+          <span className="text-sm font-medium text-slate-700">{t("pageEditor.themeSelector.title")}</span>
         </div>
         <svg
           className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}
@@ -43,7 +47,7 @@ export default function ThemeSettingsSection({ themeSettings, selectedThemeGroup
             <ThemeGroupItem
               key={groupKey}
               groupKey={groupKey}
-              groupName={groupKey.charAt(0).toUpperCase() + groupKey.slice(1)}
+              groupName={tTheme("tTheme:global." + groupKey + ".name")}
               isSelected={selectedThemeGroup === groupKey}
               onClick={() => onThemeGroupSelect(groupKey)}
             />

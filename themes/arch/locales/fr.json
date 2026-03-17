@@ -2917,6 +2917,7 @@
   },
   "global": {
     "layout": {
+      "name": "Mise en page",
       "settings": {
         "layout_header": {
           "label": "Animations"
@@ -2928,6 +2929,7 @@
       }
     },
     "branding": {
+      "name": "Image de marque",
       "settings": {
         "branding_header": {
           "label": "Image de marque"
@@ -3004,6 +3006,7 @@
       }
     },
     "typography": {
+      "name": "Typographie",
       "settings": {
         "typography_header": {
           "label": "Typographie"
@@ -3025,7 +3028,7 @@
       }
     },
     "social": {
-      "name": "Social",
+      "name": "Réseaux sociaux",
       "settings": {
         "twitter_url": {
           "label": "URL Twitter / X"
@@ -3081,6 +3084,7 @@
       }
     },
     "privacy": {
+      "name": "Confidentialité",
       "settings": {
         "privacy_header": {
           "label": "Confidentialité"
@@ -3092,6 +3096,7 @@
       }
     },
     "advanced": {
+      "name": "Avancé",
       "settings": {
         "advanced_header": {
           "label": "Avancé"

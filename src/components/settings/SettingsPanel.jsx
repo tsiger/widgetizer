@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useThemeLocale } from "../../hooks/useThemeLocale";
 import SettingsGroup from "./SettingsGroup";
 
 /**
@@ -6,6 +7,7 @@ import SettingsGroup from "./SettingsGroup";
  * Renders a panel with vertical tabs for different setting groups
  */
 export default function SettingsPanel({ schema = {}, values = {}, onChange, errors = {} }) {
+  const { tTheme } = useThemeLocale();
   const [activeTab, setActiveTab] = useState(Object.keys(schema)[0] || "");
 
   if (Object.keys(schema).length === 0) {
@@ -27,7 +29,7 @@ export default function SettingsPanel({ schema = {}, values = {}, onChange, erro
               }`}
               onClick={() => setActiveTab(tabKey)}
             >
-              {tabKey.charAt(0).toUpperCase() + tabKey.slice(1)}
+              {tTheme("tTheme:global." + tabKey + ".name")}
             </button>
           ))}
         </div>
@@ -36,7 +38,7 @@ export default function SettingsPanel({ schema = {}, values = {}, onChange, erro
       {/* Content area */}
       <div className="flex-1 p-6 min-h-[400px]">
         <h2 className="text-lg font-semibold mb-4 text-slate-800">
-          {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Settings
+          {tTheme("tTheme:global." + activeTab + ".name")}
         </h2>
         <SettingsGroup settings={schema[activeTab]} values={values} onChange={onChange} errors={errors} />
       </div>
