@@ -72,10 +72,6 @@ This file lists code and project items that look unused or left over after refac
 - What it does: Closes the database connection.
 - Why it looks removable: It looks like a test teardown helper rather than something used by the real app.
 
-### `docs-llms/temp-roadmap.md`
-- What it does: Temporary planning notes / roadmap draft.
-- Why it looks removable: It does not appear to be referenced anywhere and looks like leftover scratch documentation.
-
 ## Review before removing
 
 ### `src/pages/Plugins.jsx`
