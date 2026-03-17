@@ -913,6 +913,44 @@
       }
     }
   },
+  "footer": {
+    "name": "Pie de página",
+    "settings": {
+      "content_header": {
+        "label": "Contenido"
+      },
+      "logo": {
+        "label": "Imagen del logo"
+      },
+      "logo_width": {
+        "label": "Ancho del logo"
+      },
+      "footerNavigation": {
+        "label": "Menú de navegación",
+        "description": "Selecciona el menú para el pie de página"
+      },
+      "copyright": {
+        "label": "Texto de derechos de autor"
+      },
+      "social_header": {
+        "label": "Redes sociales"
+      },
+      "show_social": {
+        "label": "Mostrar iconos sociales",
+        "description": "Mostrar iconos de redes sociales de la configuración del tema"
+      },
+      "display_header": {
+        "label": "Visualización"
+      },
+      "color_scheme": {
+        "label": "Esquema de colores",
+        "options": {
+          "standard": "Estándar",
+          "highlight": "Resaltado"
+        }
+      }
+    }
+  },
   "gallery": {
     "name": "Galería",
     "settings": {
@@ -972,6 +1010,70 @@
           }
         },
         "name": "Acordeón"
+      }
+    }
+  },
+  "header": {
+    "name": "Encabezado",
+    "settings": {
+      "logo_header": {
+        "label": "Logo"
+      },
+      "logoImage": {
+        "label": "Imagen del logo",
+        "description": "Sube una imagen de logo. Si se proporciona, se mostrará en lugar del logo de texto."
+      },
+      "logoMaxWidth": {
+        "label": "Ancho máximo del logo",
+        "description": "Ancho máximo de la imagen del logo"
+      },
+      "logoText": {
+        "label": "Texto del logo",
+        "description": "Texto para mostrar en el logo del encabezado"
+      },
+      "contact_header": {
+        "label": "Datos de contacto"
+      },
+      "contactDetailsLine1": {
+        "label": "Datos de contacto 1",
+        "description": "Primera línea de contacto (ej. teléfono)"
+      },
+      "contactDetailsLine2": {
+        "label": "Datos de contacto 2",
+        "description": "Segunda línea de contacto (ej. dirección)"
+      },
+      "navigation_header": {
+        "label": "Navegación"
+      },
+      "headerNavigation": {
+        "label": "Menú de navegación",
+        "description": "Selecciona el menú para el encabezado"
+      },
+      "ctaButtonLink": {
+        "label": "Botón CTA",
+        "description": "Botón de llamada a la acción (deja el texto vacío para ocultar)"
+      },
+      "display_header": {
+        "label": "Visualización"
+      },
+      "full_width": {
+        "label": "Ancho completo",
+        "description": "Cuando está activado, el encabezado se extiende por todo el ancho. Cuando está desactivado, se mantiene centrado en un contenedor."
+      },
+      "sticky": {
+        "label": "Encabezado fijo",
+        "description": "Cuando está activado, el encabezado permanece fijo arriba al desplazarse"
+      },
+      "center_nav": {
+        "label": "Centrar navegación",
+        "description": "Centra el menú de navegación en el encabezado con el logo a la izquierda y CTA a la derecha (solo escritorio)"
+      },
+      "color_scheme": {
+        "label": "Esquema de colores",
+        "options": {
+          "standard": "Estándar",
+          "highlight": "Resaltado"
+        }
       }
     }
   },

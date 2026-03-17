@@ -1,23 +1,23 @@
 {
   "type": "header",
-  "displayName": "Header",
+  "displayName": "tTheme:header.name",
   "settings": [
     {
       "type": "header",
       "id": "logo_header",
-      "label": "Logo"
+      "label": "tTheme:header.settings.logo_header.label"
     },
     {
       "type": "image",
       "id": "logoImage",
-      "label": "Logo Image",
-      "description": "Upload a logo image. If provided, this will be displayed instead of the text logo."
+      "label": "tTheme:header.settings.logoImage.label",
+      "description": "tTheme:header.settings.logoImage.description"
     },
     {
       "type": "range",
       "id": "logoMaxWidth",
-      "label": "Logo Max Width",
-      "description": "Maximum width of the logo image",
+      "label": "tTheme:header.settings.logoMaxWidth.label",
+      "description": "tTheme:header.settings.logoMaxWidth.description",
       "default": 150,
       "min": 50,
       "max": 300,
@@ -27,46 +27,45 @@
     {
       "type": "text",
       "id": "logoText",
-      "label": "Logo Text",
-      "description": "Text to display in the header logo",
+      "label": "tTheme:header.settings.logoText.label",
+      "description": "tTheme:header.settings.logoText.description",
       "default": "Arch"
     },
     {
       "type": "header",
       "id": "contact_header",
-      "label": "Contact Details"
+      "label": "tTheme:header.settings.contact_header.label"
     },
     {
       "type": "text",
       "id": "contactDetailsLine1",
-      "label": "Contact Details 1",
-      "description": "First line of contact info (e.g., phone)",
+      "label": "tTheme:header.settings.contactDetailsLine1.label",
+      "description": "tTheme:header.settings.contactDetailsLine1.description",
       "default": "Call us: (555) 203-9844"
     },
     {
       "type": "text",
       "id": "contactDetailsLine2",
-      "label": "Contact Details 2",
-      "description": "Second line of contact info (e.g., address)",
+      "label": "tTheme:header.settings.contactDetailsLine2.label",
+      "description": "tTheme:header.settings.contactDetailsLine2.description",
       "default": "1450 Market St, Suite 200"
     },
     {
       "type": "header",
       "id": "navigation_header",
-      "label": "Navigation"
+      "label": "tTheme:header.settings.navigation_header.label"
     },
     {
       "type": "menu",
       "id": "headerNavigation",
-      "label": "Navigation Menu",
-      "description": "Select the menu to display in the header",
-      "default": "main-menu"
+      "label": "tTheme:header.settings.headerNavigation.label",
+      "description": "tTheme:header.settings.headerNavigation.description"
     },
     {
       "type": "link",
       "id": "ctaButtonLink",
-      "label": "CTA Button",
-      "description": "Call-to-action button (leave text empty to hide)",
+      "label": "tTheme:header.settings.ctaButtonLink.label",
+      "description": "tTheme:header.settings.ctaButtonLink.description",
       "default": {
         "href": "contact.html",
         "text": "Get in touch",
@@ -76,42 +75,42 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:header.settings.display_header.label"
     },
     {
       "type": "checkbox",
       "id": "full_width",
-      "label": "Full Width",
-      "description": "When enabled, the header stretches across the full viewport. When disabled, it stays centered in a container.",
+      "label": "tTheme:header.settings.full_width.label",
+      "description": "tTheme:header.settings.full_width.description",
       "default": true
     },
     {
       "type": "checkbox",
       "id": "sticky",
-      "label": "Sticky Header",
-      "description": "When enabled, the header stays fixed at the top when scrolling",
+      "label": "tTheme:header.settings.sticky.label",
+      "description": "tTheme:header.settings.sticky.description",
       "default": false
     },
     {
       "type": "checkbox",
       "id": "center_nav",
-      "label": "Center Navigation",
-      "description": "Centers the navigation menu in the header with the logo on the left and CTA on the right (desktop only)",
+      "label": "tTheme:header.settings.center_nav.label",
+      "description": "tTheme:header.settings.center_nav.description",
       "default": false
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:header.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:header.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:header.settings.color_scheme.options.highlight"
         }
       ]
     }

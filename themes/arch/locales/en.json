@@ -913,6 +913,44 @@
       }
     }
   },
+  "footer": {
+    "name": "Footer",
+    "settings": {
+      "content_header": {
+        "label": "Content"
+      },
+      "logo": {
+        "label": "Logo image"
+      },
+      "logo_width": {
+        "label": "Logo width"
+      },
+      "footerNavigation": {
+        "label": "Navigation Menu",
+        "description": "Select the menu to display in the footer"
+      },
+      "copyright": {
+        "label": "Copyright text"
+      },
+      "social_header": {
+        "label": "Social Media"
+      },
+      "show_social": {
+        "label": "Show social icons",
+        "description": "Display social media icons from theme settings"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
   "gallery": {
     "name": "Gallery",
     "settings": {
@@ -972,6 +1010,70 @@
           }
         },
         "name": "Accordion"
+      }
+    }
+  },
+  "header": {
+    "name": "Header",
+    "settings": {
+      "logo_header": {
+        "label": "Logo"
+      },
+      "logoImage": {
+        "label": "Logo Image",
+        "description": "Upload a logo image. If provided, this will be displayed instead of the text logo."
+      },
+      "logoMaxWidth": {
+        "label": "Logo Max Width",
+        "description": "Maximum width of the logo image"
+      },
+      "logoText": {
+        "label": "Logo Text",
+        "description": "Text to display in the header logo"
+      },
+      "contact_header": {
+        "label": "Contact Details"
+      },
+      "contactDetailsLine1": {
+        "label": "Contact Details 1",
+        "description": "First line of contact info (e.g., phone)"
+      },
+      "contactDetailsLine2": {
+        "label": "Contact Details 2",
+        "description": "Second line of contact info (e.g., address)"
+      },
+      "navigation_header": {
+        "label": "Navigation"
+      },
+      "headerNavigation": {
+        "label": "Navigation Menu",
+        "description": "Select the menu to display in the header"
+      },
+      "ctaButtonLink": {
+        "label": "CTA Button",
+        "description": "Call-to-action button (leave text empty to hide)"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "full_width": {
+        "label": "Full Width",
+        "description": "When enabled, the header stretches across the full viewport. When disabled, it stays centered in a container."
+      },
+      "sticky": {
+        "label": "Sticky Header",
+        "description": "When enabled, the header stays fixed at the top when scrolling"
+      },
+      "center_nav": {
+        "label": "Center Navigation",
+        "description": "Centers the navigation menu in the header with the logo on the left and CTA on the right (desktop only)"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
       }
     }
   },

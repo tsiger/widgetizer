@@ -913,6 +913,44 @@
       }
     }
   },
+  "footer": {
+    "name": "Fußzeile",
+    "settings": {
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "logo": {
+        "label": "Logo-Bild"
+      },
+      "logo_width": {
+        "label": "Logo-Breite"
+      },
+      "footerNavigation": {
+        "label": "Navigationsmenü",
+        "description": "Wählen Sie das Menü für die Fußzeile"
+      },
+      "copyright": {
+        "label": "Urheberrechtstext"
+      },
+      "social_header": {
+        "label": "Soziale Medien"
+      },
+      "show_social": {
+        "label": "Social-Media-Icons anzeigen",
+        "description": "Social-Media-Icons aus den Theme-Einstellungen anzeigen"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
   "gallery": {
     "name": "Galerie",
     "settings": {
@@ -972,6 +1010,70 @@
           }
         },
         "name": "Akkordeon"
+      }
+    }
+  },
+  "header": {
+    "name": "Kopfzeile",
+    "settings": {
+      "logo_header": {
+        "label": "Logo"
+      },
+      "logoImage": {
+        "label": "Logo-Bild",
+        "description": "Laden Sie ein Logo-Bild hoch. Falls vorhanden, wird es anstelle des Text-Logos angezeigt."
+      },
+      "logoMaxWidth": {
+        "label": "Maximale Logo-Breite",
+        "description": "Maximale Breite des Logo-Bildes"
+      },
+      "logoText": {
+        "label": "Logo-Text",
+        "description": "Text für das Logo in der Kopfzeile"
+      },
+      "contact_header": {
+        "label": "Kontaktdaten"
+      },
+      "contactDetailsLine1": {
+        "label": "Kontaktdaten 1",
+        "description": "Erste Zeile der Kontaktdaten (z.B. Telefon)"
+      },
+      "contactDetailsLine2": {
+        "label": "Kontaktdaten 2",
+        "description": "Zweite Zeile der Kontaktdaten (z.B. Adresse)"
+      },
+      "navigation_header": {
+        "label": "Navigation"
+      },
+      "headerNavigation": {
+        "label": "Navigationsmenü",
+        "description": "Wählen Sie das Menü für die Kopfzeile"
+      },
+      "ctaButtonLink": {
+        "label": "CTA-Button",
+        "description": "Call-to-Action-Button (Text leer lassen zum Ausblenden)"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "full_width": {
+        "label": "Volle Breite",
+        "description": "Wenn aktiviert, erstreckt sich die Kopfzeile über die gesamte Breite. Wenn deaktiviert, bleibt sie zentriert in einem Container."
+      },
+      "sticky": {
+        "label": "Fixierte Kopfzeile",
+        "description": "Wenn aktiviert, bleibt die Kopfzeile beim Scrollen oben fixiert"
+      },
+      "center_nav": {
+        "label": "Navigation zentrieren",
+        "description": "Zentriert das Navigationsmenü in der Kopfzeile mit dem Logo links und CTA rechts (nur Desktop)"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
       }
     }
   },

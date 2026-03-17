@@ -913,6 +913,44 @@
       }
     }
   },
+  "footer": {
+    "name": "Pied de page",
+    "settings": {
+      "content_header": {
+        "label": "Contenu"
+      },
+      "logo": {
+        "label": "Image du logo"
+      },
+      "logo_width": {
+        "label": "Largeur du logo"
+      },
+      "footerNavigation": {
+        "label": "Menu de navigation",
+        "description": "Sélectionnez le menu à afficher dans le pied de page"
+      },
+      "copyright": {
+        "label": "Texte de droits d'auteur"
+      },
+      "social_header": {
+        "label": "Réseaux sociaux"
+      },
+      "show_social": {
+        "label": "Afficher les icônes sociales",
+        "description": "Afficher les icônes des réseaux sociaux depuis les paramètres du thème"
+      },
+      "display_header": {
+        "label": "Affichage"
+      },
+      "color_scheme": {
+        "label": "Palette de couleurs",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Accentué"
+        }
+      }
+    }
+  },
   "gallery": {
     "name": "Galerie",
     "settings": {
@@ -972,6 +1010,70 @@
           }
         },
         "name": "Accordéon"
+      }
+    }
+  },
+  "header": {
+    "name": "En-tête",
+    "settings": {
+      "logo_header": {
+        "label": "Logo"
+      },
+      "logoImage": {
+        "label": "Image du logo",
+        "description": "Téléchargez une image de logo. Si fournie, elle sera affichée à la place du logo texte."
+      },
+      "logoMaxWidth": {
+        "label": "Largeur maximale du logo",
+        "description": "Largeur maximale de l'image du logo"
+      },
+      "logoText": {
+        "label": "Texte du logo",
+        "description": "Texte à afficher dans le logo de l'en-tête"
+      },
+      "contact_header": {
+        "label": "Coordonnées"
+      },
+      "contactDetailsLine1": {
+        "label": "Coordonnées 1",
+        "description": "Première ligne de contact (ex. téléphone)"
+      },
+      "contactDetailsLine2": {
+        "label": "Coordonnées 2",
+        "description": "Deuxième ligne de contact (ex. adresse)"
+      },
+      "navigation_header": {
+        "label": "Navigation"
+      },
+      "headerNavigation": {
+        "label": "Menu de navigation",
+        "description": "Sélectionnez le menu à afficher dans l'en-tête"
+      },
+      "ctaButtonLink": {
+        "label": "Bouton CTA",
+        "description": "Bouton d'appel à l'action (laisser le texte vide pour masquer)"
+      },
+      "display_header": {
+        "label": "Affichage"
+      },
+      "full_width": {
+        "label": "Pleine largeur",
+        "description": "Lorsqu'activé, l'en-tête s'étend sur toute la largeur. Lorsque désactivé, il reste centré dans un conteneur."
+      },
+      "sticky": {
+        "label": "En-tête fixe",
+        "description": "Lorsqu'activé, l'en-tête reste fixe en haut lors du défilement"
+      },
+      "center_nav": {
+        "label": "Centrer la navigation",
+        "description": "Centre le menu de navigation dans l'en-tête avec le logo à gauche et le CTA à droite (bureau uniquement)"
+      },
+      "color_scheme": {
+        "label": "Palette de couleurs",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Accentué"
+        }
       }
     }
   },

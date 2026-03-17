@@ -1,21 +1,21 @@
 {
   "type": "footer",
-  "displayName": "Footer",
+  "displayName": "tTheme:footer.name",
   "settings": [
     {
       "type": "header",
       "id": "content_header",
-      "label": "Content"
+      "label": "tTheme:footer.settings.content_header.label"
     },
     {
       "type": "image",
       "id": "logo",
-      "label": "Logo image"
+      "label": "tTheme:footer.settings.logo.label"
     },
     {
       "type": "range",
       "id": "logo_width",
-      "label": "Logo width",
+      "label": "tTheme:footer.settings.logo_width.label",
       "min": 50,
       "max": 300,
       "step": 10,
@@ -25,46 +25,45 @@
     {
       "type": "menu",
       "id": "footerNavigation",
-      "label": "Navigation Menu",
-      "description": "Select the menu to display in the footer",
-      "default": "footer-menu"
+      "label": "tTheme:footer.settings.footerNavigation.label",
+      "description": "tTheme:footer.settings.footerNavigation.description"
     },
     {
       "type": "textarea",
       "id": "copyright",
-      "label": "Copyright text",
+      "label": "tTheme:footer.settings.copyright.label",
       "default": "© 2026 Widgetizer. All rights are yours to keep."
     },
     {
       "type": "header",
       "id": "social_header",
-      "label": "Social Media"
+      "label": "tTheme:footer.settings.social_header.label"
     },
     {
       "type": "checkbox",
       "id": "show_social",
-      "label": "Show social icons",
+      "label": "tTheme:footer.settings.show_social.label",
       "default": true,
-      "description": "Display social media icons from theme settings"
+      "description": "tTheme:footer.settings.show_social.description"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:footer.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:footer.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:footer.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:footer.settings.color_scheme.options.highlight"
         }
       ]
     }

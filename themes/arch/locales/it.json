@@ -913,6 +913,44 @@
       }
     }
   },
+  "footer": {
+    "name": "Piè di pagina",
+    "settings": {
+      "content_header": {
+        "label": "Contenuto"
+      },
+      "logo": {
+        "label": "Immagine logo"
+      },
+      "logo_width": {
+        "label": "Larghezza logo"
+      },
+      "footerNavigation": {
+        "label": "Menu di navigazione",
+        "description": "Seleziona il menu da visualizzare nel piè di pagina"
+      },
+      "copyright": {
+        "label": "Testo copyright"
+      },
+      "social_header": {
+        "label": "Social media"
+      },
+      "show_social": {
+        "label": "Mostra icone social",
+        "description": "Mostra le icone social dalle impostazioni del tema"
+      },
+      "display_header": {
+        "label": "Visualizzazione"
+      },
+      "color_scheme": {
+        "label": "Schema colori",
+        "options": {
+          "standard": "Standard",
+          "highlight": "In evidenza"
+        }
+      }
+    }
+  },
   "gallery": {
     "name": "Galleria",
     "settings": {
@@ -972,6 +1010,70 @@
           }
         },
         "name": "Fisarmonica"
+      }
+    }
+  },
+  "header": {
+    "name": "Intestazione",
+    "settings": {
+      "logo_header": {
+        "label": "Logo"
+      },
+      "logoImage": {
+        "label": "Immagine logo",
+        "description": "Carica un'immagine logo. Se fornita, verrà visualizzata al posto del logo testuale."
+      },
+      "logoMaxWidth": {
+        "label": "Larghezza massima logo",
+        "description": "Larghezza massima dell'immagine del logo"
+      },
+      "logoText": {
+        "label": "Testo logo",
+        "description": "Testo da visualizzare nel logo dell'intestazione"
+      },
+      "contact_header": {
+        "label": "Dettagli contatto"
+      },
+      "contactDetailsLine1": {
+        "label": "Dettagli contatto 1",
+        "description": "Prima riga delle informazioni di contatto (es. telefono)"
+      },
+      "contactDetailsLine2": {
+        "label": "Dettagli contatto 2",
+        "description": "Seconda riga delle informazioni di contatto (es. indirizzo)"
+      },
+      "navigation_header": {
+        "label": "Navigazione"
+      },
+      "headerNavigation": {
+        "label": "Menu di navigazione",
+        "description": "Seleziona il menu da visualizzare nell'intestazione"
+      },
+      "ctaButtonLink": {
+        "label": "Pulsante CTA",
+        "description": "Pulsante di invito all'azione (lascia il testo vuoto per nascondere)"
+      },
+      "display_header": {
+        "label": "Visualizzazione"
+      },
+      "full_width": {
+        "label": "Larghezza piena",
+        "description": "Quando attivato, l'intestazione si estende su tutta la larghezza. Quando disattivato, rimane centrata in un contenitore."
+      },
+      "sticky": {
+        "label": "Intestazione fissa",
+        "description": "Quando attivato, l'intestazione rimane fissa in alto durante lo scorrimento"
+      },
+      "center_nav": {
+        "label": "Centra navigazione",
+        "description": "Centra il menu di navigazione nell'intestazione con il logo a sinistra e il CTA a destra (solo desktop)"
+      },
+      "color_scheme": {
+        "label": "Schema colori",
+        "options": {
+          "standard": "Standard",
+          "highlight": "In evidenza"
+        }
       }
     }
   },
