@@ -9,9 +9,7 @@
     "settings": "Paramètres",
     "appearance": "Apparence",
     "themes": "Thèmes",
-    "extend": "Extensions",
-    "plugins": "Plugins",
-    "tools": "Outils",
+"tools": "Outils",
     "exportSite": "Exporter le site",
     "general": "Général",
     "appSettings": "Paramètres de l'app"
@@ -759,10 +757,5 @@
       "imageSizesManagedByThemeGeneric": "Les tailles d’image sont gérées par le thème sélectionné. Les paramètres de l’application sont ignorés. Des vignettes sont toujours générées pour la bibliothèque média.",
       "noSettings": "Aucun paramètre disponible"
     }
-  },
-  "plugins": {
-    "title": "Plugins",
-    "emptyTitle": "Plugins bientôt disponibles",
-    "emptyDesc": "Cette fonctionnalité est en cours de développement."
   }
 }

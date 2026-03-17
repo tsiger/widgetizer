@@ -11,9 +11,7 @@
     "themes": "Themes",
     "tools": "Tools",
     "exportSite": "Export site",
-    "extend": "Extend",
-    "plugins": "Plugins",
-    "general": "General",
+"general": "General",
     "appSettings": "Settings"
   },
   "layout": {
@@ -576,12 +574,7 @@
       "unknownError": "An unknown error occurred during exporting."
     }
   },
-  "plugins": {
-    "title": "Plugins",
-    "emptyTitle": "Plugins coming soon",
-    "emptyDesc": "This feature is currently in development."
-  },
-  "media": {
+"media": {
     "title": "Media",
     "loading": "Loading media files...",
     "emptyTitle": "No media files yet",

@@ -14,7 +14,6 @@ import mediaRoutes from "./routes/media.js";
 import previewRoutes from "./routes/preview.js";
 import exportRoutes from "./routes/export.js";
 import appSettingsRoutes from "./routes/appSettings.js";
-import coreWidgetsRoutes from "./routes/coreWidgets.js";
 import coreRoutes from "./routes/core.js";
 import { renderPreviewToken } from "./controllers/previewController.js";
 
@@ -45,8 +44,7 @@ function mountEditorApiRoutes(app) {
   app.use("/api/media", mediaRoutes);
   app.use("/api/export", exportRoutes);
   app.use("/api/settings", appSettingsRoutes);
-  app.use("/api/core-widgets", coreWidgetsRoutes);
-  app.use("/api/core", coreRoutes);
+app.use("/api/core", coreRoutes);
 
   // Serve theme assets (screenshots) from themes directory
   app.use("/themes", express.static(getThemesDir()));

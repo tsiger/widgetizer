@@ -9,9 +9,7 @@
     "settings": "Configuración",
     "appearance": "Apariencia",
     "themes": "Temas",
-    "extend": "Extender",
-    "plugins": "Plugins",
-    "tools": "Herramientas",
+"tools": "Herramientas",
     "exportSite": "Exportar sitio",
     "general": "General",
     "appSettings": "Configuración"
@@ -759,10 +757,5 @@
       "imageSizesManagedByThemeGeneric": "Los tamaños de imagen están gestionados por el tema seleccionado. La configuración de la app se ignora. Las miniaturas se siguen generando para la biblioteca de medios.",
       "noSettings": "No hay configuraciones disponibles"
     }
-  },
-  "plugins": {
-    "title": "Plugins",
-    "emptyTitle": "Plugins próximamente",
-    "emptyDesc": "Esta función está actualmente en desarrollo."
   }
 }

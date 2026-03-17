@@ -118,7 +118,7 @@ export function invalidateMediaCache(projectId) {
  * @param {MediaFile[]} newFiles - Array of newly uploaded file objects to add
  * @returns {void}
  */
-export function updateMediaCache(projectId, newFiles) {
+function updateMediaCache(projectId, newFiles) {
   const cached = mediaCache.get(projectId);
   if (cached && cached.data) {
     const updatedData = {
@@ -292,14 +292,4 @@ export async function refreshMediaUsage(projectId) {
   }
 }
 
-/**
- * Generate the URL for accessing a media file.
- * @param {string} projectId - The ID of the project
- * @param {string} fileId - The ID of the file
- * @param {"original"|"thumbnail"} [type="original"] - Which version to get URL for
- * @returns {string} The full URL to access the media file
- */
-export function getMediaUrl(projectId, fileId, type = "original") {
-  const folder = type === "thumbnail" ? "thumbnails" : "originals";
-  return `${API_URL(`/api/media/projects/${projectId}/uploads/${folder}/${fileId}`)}`;
-}
+

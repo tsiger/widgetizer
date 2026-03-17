@@ -77,10 +77,6 @@ export const getMenuPath = (projectId, menuId) =>
 export const getProjectThemeDir = (projectId) => path.join(getProjectDir(projectId), "theme");
 export const getProjectThemeJsonPath = (projectId) =>
   path.join(getProjectDir(projectId), "theme.json");
-export const getProjectThemeTemplatesDir = (projectId) =>
-  path.join(getProjectThemeDir(projectId), "templates");
-export const getProjectThemeWidgetsDir = (projectId) =>
-  path.join(getProjectThemeDir(projectId), "widgets");
 
 // Project Media paths
 export const getProjectUploadsDir = (projectId) => path.join(getProjectDir(projectId), "uploads");

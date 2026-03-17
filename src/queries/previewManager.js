@@ -243,7 +243,7 @@ export async function updatePreview(iframe, newState, oldState) {
  * @param {Object} settings - Theme settings object with global settings
  * @returns {Object<string, string>} Map of CSS variable names to values
  */
-export function settingsToCssVariables(settings) {
+function settingsToCssVariables(settings) {
   const variables = {};
 
   if (!settings || !settings.settings || !settings.settings.global) {

@@ -1,4 +1,4 @@
-import { Home, Folder, File, Menu, Image, Settings, Rocket, SlidersHorizontal, Layers, Puzzle } from "lucide-react";
+import { Home, Folder, File, Menu, Image, Settings, Rocket, SlidersHorizontal, Layers } from "lucide-react";
 
 export const navigationSections = [
   {
@@ -65,20 +65,7 @@ export const navigationSections = [
       },
     ],
   },
-  {
-    id: "extend",
-    titleKey: "navigation.extend",
-    items: [
-      {
-        id: "plugins",
-        labelKey: "navigation.plugins",
-        path: "/plugins",
-        icon: Puzzle,
-        requiresProject: true,
-      },
-    ],
-  },
-  {
+{
     id: "tools",
     titleKey: "navigation.tools",
     items: [

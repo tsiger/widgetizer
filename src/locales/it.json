@@ -9,9 +9,7 @@
     "settings": "Impostazioni",
     "appearance": "Aspetto",
     "themes": "Temi",
-    "extend": "Estendi",
-    "plugins": "Plugins",
-    "tools": "Strumenti",
+"tools": "Strumenti",
     "exportSite": "Esporta sito",
     "general": "Generale",
     "appSettings": "Impostazioni App"
@@ -759,10 +757,5 @@
       "imageSizesManagedByThemeGeneric": "Le dimensioni delle immagini sono gestite dal tema selezionato. Le impostazioni dell'app vengono ignorate. Le miniature vengono comunque generate per la libreria multimediale.",
       "noSettings": "Nessuna impostazione disponibile"
     }
-  },
-  "plugins": {
-    "title": "Plugins",
-    "emptyTitle": "Plugins in arrivo",
-    "emptyDesc": "Questa funzionalità è attualmente in fase di sviluppo."
   }
 }

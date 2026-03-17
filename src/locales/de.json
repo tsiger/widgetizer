@@ -9,9 +9,7 @@
     "settings": "Einstellungen",
     "appearance": "Design",
     "themes": "Themes",
-    "extend": "Erweitern",
-    "plugins": "Plugins",
-    "tools": "Werkzeuge",
+"tools": "Werkzeuge",
     "exportSite": "Seite exportieren",
     "general": "Allgemein",
     "appSettings": "App-Einstellungen"
@@ -759,10 +757,5 @@
       "imageSizesManagedByThemeGeneric": "Die Bildgrößen werden vom ausgewählten Theme verwaltet. Die App-Einstellungen werden ignoriert. Vorschaubilder werden weiterhin für die Medienbibliothek erzeugt.",
       "noSettings": "Keine Einstellungen verfügbar"
     }
-  },
-  "plugins": {
-    "title": "Plugins",
-    "emptyTitle": "Plugins kommen bald",
-    "emptyDesc": "Diese Funktion befindet sich in Entwicklung."
   }
 }

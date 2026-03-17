@@ -88,11 +88,6 @@ export default function Breadcrumb() {
         crumbs.push({ label: t("navigation.settings") });
       }
 
-      // Plugins
-      else if (path === "/plugins") {
-        crumbs.push({ label: t("navigation.plugins") });
-      }
-
       // Themes
       else if (path === "/themes") {
         crumbs.push({ label: t("navigation.themes") });
