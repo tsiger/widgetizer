@@ -1,4 +1,6 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../hooks/useThemeLocale";
 import {
   TextInput,
   TextareaInput,
@@ -25,24 +27,28 @@ import SettingsField from "./SettingsField";
  */
 export default function SettingsRenderer({ setting, value, onChange, error }) {
   const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
+
+  const { type, id, label, description, options, min, max, step, unit, allow_alpha, language, compact } = setting || {};
+
+  // Translate options (select/radio) via theme locale
+  const translatedOptions = useMemo(() => {
+    if (!Array.isArray(options)) return options;
+    return options.map((opt) =>
+      typeof opt === "object" && opt.label ? { ...opt, label: tTheme(opt.label) } : opt,
+    );
+  }, [options, tTheme]);
 
   if (!setting || !setting.type) {
     return <div>Error: Invalid setting configuration.</div>;
   }
 
-  const { type, id, label, description, options, min, max, step, unit, allow_alpha, language, compact } = setting;
-
-  // Translate label and description if they are translation keys
-  const translatedLabel = label?.startsWith("appSettings.") ? t(label) : label;
-  const translatedDescription = description?.startsWith("appSettings.") ? t(description) : description;
+  // Translate label and description — app settings use i18n keys, theme settings use tTheme
+  const translatedLabel = label?.startsWith("appSettings.") ? t(label) : tTheme(label);
+  const translatedDescription = description?.startsWith("appSettings.") ? t(description) : tTheme(description);
 
   // Handle the new 'header' type, which acts as a section divider
   if (type === "header") {
-    // The parent container is expected to have a `space-y-*` class,
-    // which provides the margin-top to create space between this header
-    // and the previous setting.
-    // We add a top border and padding to visually separate the new section,
-    // but skip the border if this is the first setting to avoid duplicate borders.
     return (
       <div className={`setting-type-header pt-2`}>
         {translatedLabel && <h2 className="text-sm font-semibold leading-7 text-slate-800">{translatedLabel}</h2>}
@@ -57,7 +63,7 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
     id,
     value: currentValue,
     onChange: (newValue) => onChange(id, newValue),
-    options,
+    options: translatedOptions,
     min,
     max,
     step,

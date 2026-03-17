@@ -1,6 +1,6 @@
 {
   "type": "accordion",
-  "displayName": "Accordion",
+  "displayName": "tTheme:accordion.name",
   "aliases": [
     "faq",
     "details",
@@ -11,77 +11,77 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text",
+      "label": "tTheme:accordion.settings.eyebrow.label",
       "default": "Support"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:accordion.settings.title.label",
       "default": "Frequently Asked Questions"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading",
+      "label": "tTheme:accordion.settings.description.label",
       "default": "Everything you need to know about the product and billing."
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:accordion.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "style",
-      "label": "Style",
+      "label": "tTheme:accordion.settings.style.label",
       "default": "separated",
       "options": [
         {
           "value": "separated",
-          "label": "Separated"
+          "label": "tTheme:accordion.settings.style.options.separated"
         },
         {
           "value": "connected",
-          "label": "Connected"
+          "label": "tTheme:accordion.settings.style.options.connected"
         }
       ]
     },
     {
       "type": "checkbox",
       "id": "allow_multiple",
-      "label": "Allow multiple open",
+      "label": "tTheme:accordion.settings.allow_multiple.label",
       "default": false
     },
     {
       "type": "select",
       "id": "sidebar_position",
-      "label": "Sidebar position",
+      "label": "tTheme:accordion.settings.sidebar_position.label",
       "default": "right",
       "options": [
         {
           "value": "left",
-          "label": "Left"
+          "label": "tTheme:accordion.settings.sidebar_position.options.left"
         },
         {
           "value": "right",
-          "label": "Right"
+          "label": "tTheme:accordion.settings.sidebar_position.options.right"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:accordion.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:accordion.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:accordion.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -89,43 +89,43 @@
   "blocks": [
     {
       "type": "item",
-      "displayName": "Item",
+      "displayName": "tTheme:accordion.blocks.item.name",
       "settings": [
         {
           "type": "text",
           "id": "question",
-          "label": "Question",
+          "label": "tTheme:accordion.blocks.item.settings.question.label",
           "default": "Question goes here"
         },
         {
           "type": "richtext",
           "id": "answer",
-          "label": "Answer",
+          "label": "tTheme:accordion.blocks.item.settings.answer.label",
           "default": "<p>Answer goes here</p>"
         }
       ]
     },
     {
       "type": "info",
-      "displayName": "Info",
+      "displayName": "tTheme:accordion.blocks.info.name",
       "settings": [
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
+          "label": "tTheme:accordion.blocks.info.settings.title.label",
           "default": "Need Help?"
         },
         {
           "type": "richtext",
           "id": "text",
-          "label": "Text",
+          "label": "tTheme:accordion.blocks.info.settings.text.label",
           "default": "<p>hello@example.com</p>"
         }
       ]
     },
     {
       "type": "social",
-      "displayName": "Social Icons",
+      "displayName": "tTheme:accordion.blocks.social.name",
       "settings": []
     }
   ],

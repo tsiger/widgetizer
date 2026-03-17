@@ -60,6 +60,8 @@ Core widget schemas use the same format as theme widgets, plus additional metada
 - **`isCore`**: Boolean flag identifying this as a core widget (used by the editor)
 - **`category`**: Grouping category for the widget picker (e.g., "Layout")
 
+**Note:** Core widgets use plain English strings for `displayName`, `label`, and `description`. Theme widgets, by contrast, use `tTheme:`-prefixed i18n keys (e.g., `"displayName": "tTheme:carousel.name"`) that are resolved via theme locale files. See [Widget Authoring Guide](theming-widgets.md) for details.
+
 ## 4. Theme Opt-Out
 
 Theme authors can disable core widgets by adding the following flag to **theme.json**:

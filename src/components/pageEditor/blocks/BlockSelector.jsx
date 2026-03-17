@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../../hooks/useThemeLocale";
 
 export default function BlockSelector({ isOpen, onClose, widgetSchema, onSelectBlock, triggerRef }) {
   const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
   const dropdownRef = useRef(null);
   const [positionStyle, setPositionStyle] = useState({});
 
@@ -118,7 +120,7 @@ export default function BlockSelector({ isOpen, onClose, widgetSchema, onSelectB
               }}
             >
               <div className="text-sm font-medium text-slate-800 group-hover:text-pink-600">
-                {blockSchema.displayName || blockSchema.type}
+                {tTheme(blockSchema.displayName) || blockSchema.type}
               </div>
             </button>
           ))}

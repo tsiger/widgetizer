@@ -17,7 +17,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Managing theme assets and CSS variables
 - Implementing scroll reveal animations
 
-**Key topics**: Theme manifest, layout templates, widgets, global settings, menu rendering, asset management, scroll reveal animations, export behavior, theme presets
+**Key topics**: Theme manifest, layout templates, widgets, global settings, menu rendering, asset management, scroll reveal animations, export behavior, theme presets, theme locales (i18n)
 
 ---
 
@@ -33,7 +33,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing scroll reveal animations
 - Following accessibility best practices
 
-**Key topics**: Widget structure, CSS design tokens, typography system, layout utilities, component patterns, JavaScript initialization, scroll reveal animations, schema conventions, accessibility, blocks
+**Key topics**: Widget structure, CSS design tokens, typography system, layout utilities, component patterns, JavaScript initialization, scroll reveal animations, schema conventions, accessibility, blocks, theme locales (tTheme: prefix i18n)
 
 ---
 
@@ -63,7 +63,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Understanding setting properties and behaviors
 - Implementing CSS variable output
 
-**Key topics**: Setting types (color, text, range, select, etc.), common properties, CSS variable generation
+**Key topics**: Setting types (color, text, range, select, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys)
 
 ---
 

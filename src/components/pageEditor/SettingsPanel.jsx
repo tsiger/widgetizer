@@ -4,6 +4,7 @@ import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
 import useAutoSave from "../../stores/saveStore";
 import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../hooks/useThemeLocale";
 
 export default function SettingsPanel({
   selectedWidget,
@@ -17,6 +18,7 @@ export default function SettingsPanel({
   onBackToWidget,
 }) {
   const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
   const { globalWidgets, updateThemeSetting } = usePageStore();
   const { updateWidgetSettings, updateGlobalWidgetSettings, updateBlockSettings } = useWidgetStore();
   const { markWidgetModified, setThemeSettingsModified } = useAutoSave();
@@ -82,11 +84,11 @@ export default function SettingsPanel({
 
   // Calculate display name with priority: custom name > block name > widget schema name > fallback
   const displayName = isThemeSettings
-    ? selectedThemeGroup.charAt(0).toUpperCase() + selectedThemeGroup.slice(1)
+    ? tTheme("tTheme:global." + selectedThemeGroup + ".name")
     : selectedBlockId
-      ? selectedBlockSchema?.displayName || t("pageEditor.settingsPanel.blockSettings")
+      ? tTheme(selectedBlockSchema?.displayName) || t("pageEditor.settingsPanel.blockSettings")
       : currentWidget?.settings?.name || // Use custom name if set
-        currentWidgetSchema?.displayName ||
+        tTheme(currentWidgetSchema?.displayName) ||
         (isGlobalWidget
           ? selectedGlobalWidgetId === "header"
             ? t("pageEditor.settingsPanel.header")

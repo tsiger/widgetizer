@@ -1,6 +1,6 @@
 {
   "type": "job-listing",
-  "displayName": "Job Listing",
+  "displayName": "tTheme:job_listing.name",
   "aliases": [
     "careers",
     "hiring",
@@ -11,44 +11,44 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text",
+      "label": "tTheme:job_listing.settings.eyebrow.label",
       "default": "Join Our Team"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:job_listing.settings.title.label",
       "default": "Open Positions"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:job_listing.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:job_listing.settings.display_header.label"
     },
     {
       "type": "checkbox",
       "id": "show_filters",
-      "label": "Show department filters",
+      "label": "tTheme:job_listing.settings.show_filters.label",
       "default": true
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:job_listing.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:job_listing.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:job_listing.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -56,59 +56,59 @@
   "blocks": [
     {
       "type": "job",
-      "displayName": "Job",
+      "displayName": "tTheme:job_listing.blocks.job.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:job_listing.blocks.job.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Job title",
+          "label": "tTheme:job_listing.blocks.job.settings.title.label",
           "default": "Software Engineer"
         },
         {
           "type": "text",
           "id": "department",
-          "label": "Department",
+          "label": "tTheme:job_listing.blocks.job.settings.department.label",
           "default": "Engineering"
         },
         {
           "type": "text",
           "id": "location",
-          "label": "Location",
+          "label": "tTheme:job_listing.blocks.job.settings.location.label",
           "default": "Remote"
         },
         {
           "type": "select",
           "id": "type",
-          "label": "Employment type",
+          "label": "tTheme:job_listing.blocks.job.settings.type.label",
           "default": "full-time",
           "options": [
             {
               "value": "full-time",
-              "label": "Full-Time"
+              "label": "tTheme:job_listing.blocks.job.settings.type.options.full-time"
             },
             {
               "value": "part-time",
-              "label": "Part-Time"
+              "label": "tTheme:job_listing.blocks.job.settings.type.options.part-time"
             },
             {
               "value": "contract",
-              "label": "Contract"
+              "label": "tTheme:job_listing.blocks.job.settings.type.options.contract"
             },
             {
               "value": "internship",
-              "label": "Internship"
+              "label": "tTheme:job_listing.blocks.job.settings.type.options.internship"
             }
           ]
         },
         {
           "type": "link",
           "id": "apply_link",
-          "label": "Apply button",
+          "label": "tTheme:job_listing.blocks.job.settings.apply_link.label",
           "default": {
             "text": "Apply Now",
             "href": "#",

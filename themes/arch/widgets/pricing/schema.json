@@ -1,6 +1,6 @@
 {
   "type": "pricing",
-  "displayName": "Pricing",
+  "displayName": "tTheme:pricing.name",
   "aliases": [
     "plans",
     "packages",
@@ -11,45 +11,45 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:pricing.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:pricing.settings.title.label",
       "default": "Pricing Plans"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading",
+      "label": "tTheme:pricing.settings.description.label",
       "default": "Choose the plan that fits your needs."
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:pricing.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "Layout",
+      "label": "tTheme:pricing.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "Grid"
+          "label": "tTheme:pricing.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "Carousel"
+          "label": "tTheme:pricing.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "Columns (Desktop)",
+      "label": "tTheme:pricing.settings.columns_desktop.label",
       "default": 3,
       "min": 2,
       "max": 5,
@@ -58,16 +58,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:pricing.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:pricing.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:pricing.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -75,42 +75,42 @@
   "blocks": [
     {
       "type": "plan",
-      "displayName": "Plan",
+      "displayName": "tTheme:pricing.blocks.plan.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:pricing.blocks.plan.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Plan name",
+          "label": "tTheme:pricing.blocks.plan.settings.title.label",
           "default": "Pro"
         },
         {
           "type": "text",
           "id": "price",
-          "label": "Price",
+          "label": "tTheme:pricing.blocks.plan.settings.price.label",
           "default": "$49"
         },
         {
           "type": "text",
           "id": "period",
-          "label": "Period",
+          "label": "tTheme:pricing.blocks.plan.settings.period.label",
           "default": "per month"
         },
         {
           "type": "textarea",
           "id": "features",
-          "label": "Features (one per line)",
-          "description": "Start a line with + for a checkmark or - for a cross.",
+          "label": "tTheme:pricing.blocks.plan.settings.features.label",
+          "description": "tTheme:pricing.blocks.plan.settings.features.description",
           "default": "+ Unlimited Projects\n+ Priority Support\n+ 10GB Storage"
         },
         {
           "type": "link",
           "id": "button_link",
-          "label": "Button",
+          "label": "tTheme:pricing.blocks.plan.settings.button_link.label",
           "default": {
             "text": "Get Started",
             "href": "#",
@@ -120,12 +120,12 @@
         {
           "type": "header",
           "id": "options_header",
-          "label": "Options"
+          "label": "tTheme:pricing.blocks.plan.settings.options_header.label"
         },
         {
           "type": "checkbox",
           "id": "featured",
-          "label": "Featured plan",
+          "label": "tTheme:pricing.blocks.plan.settings.featured.label",
           "default": false
         }
       ]

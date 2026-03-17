@@ -1,6 +1,6 @@
 {
   "type": "image-tabs",
-  "displayName": "Image Tabs",
+  "displayName": "tTheme:image_tabs.name",
   "aliases": [
     "visual tabs",
     "image selector",
@@ -11,53 +11,53 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:image_tabs.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:image_tabs.settings.title.label",
       "default": "Our Features"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:image_tabs.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:image_tabs.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "image_position",
-      "label": "Image position",
+      "label": "tTheme:image_tabs.settings.image_position.label",
       "default": "left",
       "options": [
         {
           "value": "left",
-          "label": "Left"
+          "label": "tTheme:image_tabs.settings.image_position.options.left"
         },
         {
           "value": "right",
-          "label": "Right"
+          "label": "tTheme:image_tabs.settings.image_position.options.right"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:image_tabs.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:image_tabs.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:image_tabs.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -65,28 +65,28 @@
   "blocks": [
     {
       "type": "tab",
-      "displayName": "Tab",
+      "displayName": "tTheme:image_tabs.blocks.tab.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:image_tabs.blocks.tab.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Tab title",
+          "label": "tTheme:image_tabs.blocks.tab.settings.title.label",
           "default": "Feature Name"
         },
         {
           "type": "richtext",
           "id": "description",
-          "label": "Tab description"
+          "label": "tTheme:image_tabs.blocks.tab.settings.description.label"
         },
         {
           "type": "image",
           "id": "image",
-          "label": "Image"
+          "label": "tTheme:image_tabs.blocks.tab.settings.image.label"
         }
       ]
     }

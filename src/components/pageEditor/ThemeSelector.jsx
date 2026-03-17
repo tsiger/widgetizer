@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Palette, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../hooks/useThemeLocale";
 import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
 
 export default function ThemeSelector() {
   const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { themeSettings: settings, originalThemeSettings: originalSettings, hasUnsavedThemeChanges } = usePageStore();
@@ -71,7 +73,7 @@ export default function ThemeSelector() {
                   isSelected ? "bg-pink-600 text-white hover:bg-pink-700" : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
-                <span>{group.charAt(0).toUpperCase() + group.slice(1)}</span>
+                <span>{tTheme("tTheme:global." + group + ".name")}</span>
                 {isChanged && (
                   <div
                     className={`w-2 h-2 rounded-full ${isSelected ? "bg-pink-500 border border-white" : "bg-pink-500"}`}

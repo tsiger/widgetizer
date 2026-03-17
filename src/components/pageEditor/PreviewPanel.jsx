@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, forwardRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../hooks/useThemeLocale";
 import { fetchPreviewToken, scrollElementIntoView, updatePreview } from "../../queries/previewManager";
 import usePageStore from "../../stores/pageStore";
 import useWidgetStore from "../../stores/widgetStore";
@@ -111,7 +112,7 @@ function buildFieldTypes(widget, changedSettings, changedBlocks, schemas) {
 /**
  * Build widget metadata map (widgetId → displayName) for the overlay labels.
  */
-function buildWidgetMetadata(page, globalWidgets, schemas) {
+function buildWidgetMetadata(page, globalWidgets, schemas, tTheme) {
   const metadata = {};
 
   // Page widgets
@@ -119,7 +120,7 @@ function buildWidgetMetadata(page, globalWidgets, schemas) {
     for (const [widgetId, widgetData] of Object.entries(page.widgets)) {
       const customName = widgetData?.settings?.name;
       const widgetType = widgetData?.type;
-      metadata[widgetId] = customName || schemas[widgetType]?.displayName || widgetType || widgetId;
+      metadata[widgetId] = customName || tTheme(schemas[widgetType]?.displayName) || widgetType || widgetId;
     }
   }
 
@@ -129,7 +130,7 @@ function buildWidgetMetadata(page, globalWidgets, schemas) {
       if (widgetData) {
         const customName = widgetData?.settings?.name;
         const widgetType = widgetData?.type;
-        metadata[key] = customName || schemas[widgetType]?.displayName || widgetType || key;
+        metadata[key] = customName || tTheme(schemas[widgetType]?.displayName) || widgetType || key;
       }
     }
   }
@@ -155,6 +156,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   ref,
 ) {
   const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
   const [previewSrc, setPreviewSrc] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -253,14 +255,14 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   useEffect(() => {
     if (!iframeRef.current?.contentWindow || !initialLoadComplete) return;
 
-    const metadata = buildWidgetMetadata(page, globalWidgets, schemas);
+    const metadata = buildWidgetMetadata(page, globalWidgets, schemas, tTheme);
     const widgetOrder = page?.widgetsOrder || [];
 
     iframeRef.current.contentWindow.postMessage(
       { type: "SET_WIDGET_METADATA", payload: { metadata, widgetOrder } },
       "*",
     );
-  }, [page, globalWidgets, schemas, initialLoadComplete, previewReadyKey]);
+  }, [page, globalWidgets, schemas, tTheme, initialLoadComplete, previewReadyKey]);
 
   // Initial page load effect
   useEffect(() => {

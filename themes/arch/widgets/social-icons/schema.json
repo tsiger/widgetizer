@@ -1,6 +1,6 @@
 {
   "type": "social-icons",
-  "displayName": "Social Icons",
+  "displayName": "tTheme:social_icons.name",
   "aliases": [
     "links",
     "follow",
@@ -11,29 +11,29 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:social_icons.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:social_icons.settings.title.label",
       "default": "Follow Us"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading",
+      "label": "tTheme:social_icons.settings.description.label",
       "default": "Stay connected with us on social media."
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:social_icons.settings.display_header.label"
     },
     {
       "type": "range",
       "id": "icon_size",
-      "label": "Icon size",
+      "label": "tTheme:social_icons.settings.icon_size.label",
       "default": 2.4,
       "min": 1.6,
       "max": 4.8,
@@ -42,16 +42,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:social_icons.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:social_icons.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:social_icons.settings.color_scheme.options.highlight"
         }
       ]
     }

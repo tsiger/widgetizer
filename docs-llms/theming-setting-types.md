@@ -7,8 +7,8 @@ This document outlines the available setting types that can be used in `theme.js
 All setting types share the following common properties:
 
 - `id` (string, required): A unique, machine-readable identifier for the setting.
-- `label` (string, required): A human-readable label displayed in the UI. While the renderer can fall back to the `id`, it's strongly recommended to always provide a clean label.
-- `description` (string, optional): Help text displayed below the input to guide the user.
+- `label` (string, required): A `tTheme:` prefixed key that references a translation in the theme's locale files (e.g., `"tTheme:carousel.settings.title.label"`). The frontend resolves this to a human-readable string at runtime. While the renderer can fall back to the `id`, it's strongly recommended to always provide a clean label.
+- `description` (string, optional): A `tTheme:` prefixed key for help text displayed below the input (e.g., `"tTheme:carousel.settings.title.description"`).
 - `default` (any, optional): The default value for the setting if none is provided.
 - `outputAsCssVar` (boolean, optional): If set to `true`, the setting's value will be output as a CSS custom property (variable) in the page's `<head>`. This is the primary way to link theme settings to your theme's CSS.
 
@@ -24,8 +24,8 @@ A visual divider to group related settings into sections. It does not store a va
 {
   "id": "section_header_unique_id",
   "type": "header",
-  "label": "My Section Title",
-  "description": "Optional text to describe the section."
+  "label": "tTheme:my_widget.settings.section_header_unique_id.label",
+  "description": "tTheme:my_widget.settings.section_header_unique_id.description"
 }
 ```
 
@@ -37,9 +37,9 @@ A standard single-line text input.
 {
   "id": "site_title",
   "type": "text",
-  "label": "Site Title",
+  "label": "tTheme:global.general.settings.site_title.label",
   "default": "My Awesome Site",
-  "description": "The title of your website."
+  "description": "tTheme:global.general.settings.site_title.description"
 }
 ```
 
@@ -56,7 +56,7 @@ A numeric input field.
 {
   "id": "max_items",
   "type": "number",
-  "label": "Max Items",
+  "label": "tTheme:my_widget.settings.max_items.label",
   "default": 10,
   "min": 1,
   "max": 50
@@ -71,9 +71,9 @@ A multi-line text input field.
 {
   "id": "footer_text",
   "type": "textarea",
-  "label": "Footer Text",
+  "label": "tTheme:global.general.settings.footer_text.label",
   "default": "Copyright 2024",
-  "description": "Text that appears in the site footer."
+  "description": "tTheme:global.general.settings.footer_text.description"
 }
 ```
 
@@ -90,10 +90,10 @@ A rich text editor with basic formatting (bold, italic, link, lists). The value 
 {
   "id": "description",
   "type": "richtext",
-  "label": "Description",
+  "label": "tTheme:my_widget.settings.description.label",
   "placeholder": "Enter formatted text...",
   "default": "<p>Welcome to our <strong>platform</strong>.</p>",
-  "description": "A formatted description with basic styling support."
+  "description": "tTheme:my_widget.settings.description.description"
 }
 ```
 
@@ -103,9 +103,9 @@ A rich text editor with basic formatting (bold, italic, link, lists). The value 
 {
   "id": "content",
   "type": "richtext",
-  "label": "Content",
+  "label": "tTheme:my_widget.settings.content.label",
   "allow_source": true,
-  "description": "Content with access to raw HTML editing."
+  "description": "tTheme:my_widget.settings.content.description"
 }
 ```
 
@@ -168,8 +168,8 @@ A code editor with syntax highlighting and line numbers. Ideal for editing CSS, 
 {
   "id": "custom_css",
   "type": "code",
-  "label": "Custom CSS",
-  "description": "Add custom CSS that will be injected in the <head> section.",
+  "label": "tTheme:global.advanced.settings.custom_css.label",
+  "description": "tTheme:global.advanced.settings.custom_css.description",
   "language": "css",
   "rows": 12,
   "default": ""
@@ -182,8 +182,8 @@ A code editor with syntax highlighting and line numbers. Ideal for editing CSS, 
 {
   "id": "custom_head_scripts",
   "type": "code",
-  "label": "Custom Head Scripts",
-  "description": "Add custom scripts (e.g., Google Analytics) that will be injected in the <head> section.",
+  "label": "tTheme:global.advanced.settings.custom_head_scripts.label",
+  "description": "tTheme:global.advanced.settings.custom_head_scripts.description",
   "language": "html",
   "rows": 12,
   "default": ""
@@ -216,9 +216,9 @@ A color picker with a hex input field and a pop-over color swatch.
 {
   "id": "accent_color",
   "type": "color",
-  "label": "Accent Color",
+  "label": "tTheme:global.colors.settings.accent_color.label",
   "default": "#ec4899",
-  "description": "The primary color for buttons and links.",
+  "description": "tTheme:global.colors.settings.accent_color.description",
   "outputAsCssVar": true
 }
 ```
@@ -229,10 +229,10 @@ A color picker with a hex input field and a pop-over color swatch.
 {
   "id": "overlay_color",
   "type": "color",
-  "label": "Overlay Color",
+  "label": "tTheme:my_widget.settings.overlay_color.label",
   "default": "#00000080",
   "allow_alpha": true,
-  "description": "Semi-transparent overlay for background images."
+  "description": "tTheme:my_widget.settings.overlay_color.description"
 }
 ```
 
@@ -244,9 +244,9 @@ A boolean toggle switch, representing `true` or `false`.
 {
   "id": "show_breadcrumbs",
   "type": "checkbox",
-  "label": "Show Breadcrumbs",
+  "label": "tTheme:global.layout.settings.show_breadcrumbs.label",
   "default": true,
-  "description": "Display navigation breadcrumbs at the top of pages."
+  "description": "tTheme:global.layout.settings.show_breadcrumbs.description"
 }
 ```
 
@@ -263,13 +263,13 @@ A slider for selecting a number within a defined range.
 {
   "id": "base_font_size",
   "type": "range",
-  "label": "Base Font Size",
+  "label": "tTheme:global.typography.settings.base_font_size.label",
   "default": 16,
   "min": 12,
   "max": 24,
   "step": 1,
   "unit": "px",
-  "description": "The default font size for body text.",
+  "description": "tTheme:global.typography.settings.base_font_size.description",
   "outputAsCssVar": true
 }
 ```
@@ -282,12 +282,12 @@ A dropdown menu for selecting a single option from a list. The `options` array s
 {
   "id": "font_weight",
   "type": "select",
-  "label": "Font Weight",
+  "label": "tTheme:my_widget.settings.font_weight.label",
   "default": "400",
   "options": [
-    { "label": "Light", "value": "300" },
-    { "label": "Normal", "value": "400" },
-    { "label": "Bold", "value": "700" }
+    { "label": "tTheme:my_widget.settings.font_weight.options.300", "value": "300" },
+    { "label": "tTheme:my_widget.settings.font_weight.options.400", "value": "400" },
+    { "label": "tTheme:my_widget.settings.font_weight.options.700", "value": "700" }
   ]
 }
 ```
@@ -300,12 +300,12 @@ A set of radio buttons for selecting a single option from a list. The `options` 
 {
   "id": "text_align",
   "type": "radio",
-  "label": "Text Alignment",
+  "label": "tTheme:my_widget.settings.text_align.label",
   "default": "left",
   "options": [
-    { "label": "Left", "value": "left" },
-    { "label": "Center", "value": "center" },
-    { "label": "Right", "value": "right" }
+    { "label": "tTheme:my_widget.settings.text_align.options.left", "value": "left" },
+    { "label": "tTheme:my_widget.settings.text_align.options.center", "value": "center" },
+    { "label": "tTheme:my_widget.settings.text_align.options.right", "value": "right" }
   ]
 }
 ```
@@ -318,7 +318,7 @@ A specialized input with two dropdowns for selecting a font family and its corre
 {
   "id": "heading_font",
   "type": "font_picker",
-  "label": "Heading Font",
+  "label": "tTheme:global.typography.settings.heading_font.label",
   "default": {
     "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
     "weight": 700
@@ -338,8 +338,8 @@ An icon picker that allows users to select from a library of available icons. Th
 {
   "id": "card_icon",
   "type": "icon",
-  "label": "Icon",
-  "description": "Select an icon to display on the card."
+  "label": "tTheme:my_widget.settings.card_icon.label",
+  "description": "tTheme:my_widget.settings.card_icon.description"
 }
 ```
 
@@ -374,9 +374,9 @@ An image uploader that includes a preview, the ability to replace the image, and
 {
   "id": "logo_image",
   "type": "image",
-  "label": "Logo",
+  "label": "tTheme:global.branding.settings.logo_image.label",
   "default": "/default-logo.png",
-  "description": "Upload a logo for the site header."
+  "description": "tTheme:global.branding.settings.logo_image.description"
 }
 ```
 
@@ -386,9 +386,9 @@ An image uploader that includes a preview, the ability to replace the image, and
 {
   "id": "favicon",
   "type": "image",
-  "label": "Favicon",
+  "label": "tTheme:global.branding.settings.favicon.label",
   "compact": true,
-  "description": "Recommended size 180x180 px."
+  "description": "tTheme:global.branding.settings.favicon.description"
 }
 ```
 
@@ -409,9 +409,9 @@ A video uploader that includes a preview with placeholder icon, the ability to r
 {
   "id": "hero_video",
   "type": "video",
-  "label": "Hero Background Video",
+  "label": "tTheme:hero_banner.settings.hero_video.label",
   "default": "/default-video.mp4",
-  "description": "Upload a background video for the hero section."
+  "description": "tTheme:hero_banner.settings.hero_video.description"
 }
 ```
 
@@ -430,8 +430,8 @@ An audio uploader for selecting or uploading sound files. The value is the URL p
 {
   "id": "background_music",
   "type": "audio",
-  "label": "Background Music",
-  "description": "Select an audio file for the page background."
+  "label": "tTheme:my_widget.settings.background_music.label",
+  "description": "tTheme:my_widget.settings.background_music.description"
 }
 ```
 
@@ -449,8 +449,8 @@ A specialized input for YouTube videos. It allows users to paste a YouTube URL o
 {
   "id": "hero_youtube_video",
   "type": "youtube",
-  "label": "Hero Video (YouTube)",
-  "description": "Enter a YouTube URL or Video ID.",
+  "label": "tTheme:hero_banner.settings.hero_youtube_video.label",
+  "description": "tTheme:hero_banner.settings.hero_youtube_video.description",
   "embedOptions": {
     "autoplay": false,
     "controls": true,
@@ -469,8 +469,8 @@ A dropdown that is automatically populated with all available menus created in t
 {
   "id": "headerNavigation",
   "type": "menu",
-  "label": "Header Navigation",
-  "description": "Select the menu to display in the header."
+  "label": "tTheme:header.settings.headerNavigation.label",
+  "description": "tTheme:header.settings.headerNavigation.description"
 }
 ```
 
@@ -480,8 +480,8 @@ A dropdown that is automatically populated with all available menus created in t
 {
   "id": "footerNavigation",
   "type": "menu",
-  "label": "Footer Navigation",
-  "description": "Select the menu to display in the footer",
+  "label": "tTheme:footer.settings.footerNavigation.label",
+  "description": "tTheme:footer.settings.footerNavigation.description",
   "default": "footer-menu"
 }
 ```
@@ -533,13 +533,13 @@ The UI for this setting type provides a choice between selecting from a list of 
 {
   "id": "hero_button_link",
   "type": "link",
-  "label": "Hero Button Link",
+  "label": "tTheme:hero_banner.settings.hero_button_link.label",
   "default": {
     "href": "#",
     "text": "Click Here",
     "target": "_self"
   },
-  "description": "The primary call-to-action link in the hero section."
+  "description": "tTheme:hero_banner.settings.hero_button_link.description"
 }
 ```
 
@@ -570,7 +570,7 @@ The UI for this setting type provides a choice between selecting from a list of 
 {
   "id": "card_link",
   "type": "link",
-  "label": "Card Link",
+  "label": "tTheme:my_widget.settings.card_link.label",
   "hide_text": true
 }
 ```

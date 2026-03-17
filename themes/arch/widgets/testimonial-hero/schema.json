@@ -1,111 +1,166 @@
 {
   "type": "testimonial-hero",
-  "displayName": "Testimonial Hero",
-  "aliases": ["testimonial", "customer quote", "social proof"],
+  "displayName": "tTheme:testimonial_hero.name",
+  "aliases": [
+    "testimonial",
+    "customer quote",
+    "social proof"
+  ],
   "settings": [
     {
       "type": "header",
       "id": "content_header",
-      "label": "Content"
+      "label": "tTheme:testimonial_hero.settings.content_header.label"
     },
     {
       "type": "image",
       "id": "logo",
-      "label": "Company Logo"
+      "label": "tTheme:testimonial_hero.settings.logo.label"
     },
     {
       "type": "image",
       "id": "author_image",
-      "label": "Author Image"
+      "label": "tTheme:testimonial_hero.settings.author_image.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:testimonial_hero.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "image_position",
-      "label": "Image Position",
+      "label": "tTheme:testimonial_hero.settings.image_position.label",
       "default": "right",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "left",
+          "label": "tTheme:testimonial_hero.settings.image_position.options.left"
+        },
+        {
+          "value": "right",
+          "label": "tTheme:testimonial_hero.settings.image_position.options.right"
+        }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:testimonial_hero.settings.color_scheme.label",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "tTheme:testimonial_hero.settings.color_scheme.options.standard"
+        },
+        {
+          "value": "highlight",
+          "label": "tTheme:testimonial_hero.settings.color_scheme.options.highlight"
+        }
       ]
     }
   ],
   "blocks": [
     {
       "type": "heading",
-      "displayName": "Heading",
+      "displayName": "tTheme:testimonial_hero.blocks.heading.name",
       "settings": [
         {
           "type": "text",
           "id": "text",
-          "label": "Text",
+          "label": "tTheme:testimonial_hero.blocks.heading.settings.text.label",
           "default": "Megan Taylor"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "Size",
+          "label": "tTheme:testimonial_hero.blocks.heading.settings.size.label",
           "default": "lg",
           "options": [
-            { "value": "lg", "label": "Large" },
-            { "value": "xl", "label": "Extra Large" },
-            { "value": "2xl", "label": "2X Large" },
-            { "value": "3xl", "label": "3X Large" },
-            { "value": "4xl", "label": "4X Large" },
-            { "value": "5xl", "label": "5X Large" },
-            { "value": "6xl", "label": "6X Large" },
-            { "value": "7xl", "label": "7X Large" },
-            { "value": "8xl", "label": "8X Large" },
-            { "value": "9xl", "label": "9X Large" }
+            {
+              "value": "lg",
+              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.lg"
+            },
+            {
+              "value": "xl",
+              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.xl"
+            },
+            {
+              "value": "2xl",
+              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.2xl"
+            },
+            {
+              "value": "3xl",
+              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.3xl"
+            },
+            {
+              "value": "4xl",
+              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.4xl"
+            },
+            {
+              "value": "5xl",
+              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.5xl"
+            },
+            {
+              "value": "6xl",
+              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.6xl"
+            },
+            {
+              "value": "7xl",
+              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.7xl"
+            },
+            {
+              "value": "8xl",
+              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.8xl"
+            },
+            {
+              "value": "9xl",
+              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.9xl"
+            }
           ]
         }
       ]
     },
     {
       "type": "text",
-      "displayName": "Text",
+      "displayName": "tTheme:testimonial_hero.blocks.text.name",
       "settings": [
         {
           "type": "richtext",
           "id": "text",
-          "label": "Text",
+          "label": "tTheme:testimonial_hero.blocks.text.settings.text.label",
           "default": "<p>They took our ideas and turned them into visuals and content that really connected with our audience. The results exceeded our expectations!</p>"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "Size",
+          "label": "tTheme:testimonial_hero.blocks.text.settings.size.label",
           "default": "lg",
           "options": [
-            { "value": "sm", "label": "Small" },
-            { "value": "base", "label": "Base" },
-            { "value": "lg", "label": "Large" }
+            {
+              "value": "sm",
+              "label": "tTheme:testimonial_hero.blocks.text.settings.size.options.sm"
+            },
+            {
+              "value": "base",
+              "label": "tTheme:testimonial_hero.blocks.text.settings.size.options.base"
+            },
+            {
+              "value": "lg",
+              "label": "tTheme:testimonial_hero.blocks.text.settings.size.options.lg"
+            }
           ]
         },
         {
           "type": "checkbox",
           "id": "uppercase",
-          "label": "Uppercase",
+          "label": "tTheme:testimonial_hero.blocks.text.settings.uppercase.label",
           "default": false
         },
         {
           "type": "checkbox",
           "id": "muted",
-          "label": "Muted color",
+          "label": "tTheme:testimonial_hero.blocks.text.settings.muted.label",
           "default": false
         }
       ]

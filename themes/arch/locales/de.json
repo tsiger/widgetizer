@@ -1,0 +1,3012 @@
+{
+  "accordion": {
+    "name": "Akkordeon",
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "style": {
+        "label": "Stil",
+        "options": {
+          "separated": "Getrennt",
+          "connected": "Verbunden"
+        }
+      },
+      "allow_multiple": {
+        "label": "Mehrere gleichzeitig öffnen"
+      },
+      "sidebar_position": {
+        "label": "Seitenleisten-Position",
+        "options": {
+          "left": "Links",
+          "right": "Rechts"
+        }
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Element",
+        "settings": {
+          "question": {
+            "label": "Frage"
+          },
+          "answer": {
+            "label": "Antwort"
+          }
+        }
+      },
+      "info": {
+        "name": "Info",
+        "settings": {
+          "title": {
+            "label": "Titel"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      },
+      "social": {
+        "name": "Social-Media-Symbole"
+      }
+    }
+  },
+  "banner": {
+    "name": "Banner",
+    "settings": {
+      "image": {
+        "label": "Hintergrundbild"
+      },
+      "overlay_color": {
+        "label": "Overlay-Farbe",
+        "description": "Gilt nur, wenn ein Hintergrundbild vorhanden ist."
+      },
+      "height": {
+        "label": "Höhe",
+        "options": {
+          "auto": "Automatisch",
+          "small": "Klein (300px)",
+          "medium": "Mittel (450px)",
+          "large": "Groß (600px)"
+        }
+      },
+      "fullwidth": {
+        "label": "Volle Breite"
+      },
+      "alignment": {
+        "label": "Inhaltsausrichtung",
+        "options": {
+          "center": "Zentriert",
+          "start": "Start"
+        }
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "button": {
+        "settings": {
+          "size": {
+            "options": {
+              "small": "Klein",
+              "medium": "Mittel",
+              "large": "Groß",
+              "xlarge": "Extra Groß"
+            },
+            "label": "Schaltflächen-Größe"
+          },
+          "link": {
+            "label": "Schaltfläche 1"
+          },
+          "style": {
+            "label": "Schaltfläche 1 Stil",
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            }
+          },
+          "style_2": {
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            },
+            "label": "Schaltfläche 2 Stil"
+          },
+          "link_2": {
+            "label": "Schaltfläche 2"
+          }
+        },
+        "name": "Schaltflächen-Gruppe"
+      },
+      "text": {
+        "settings": {
+          "size": {
+            "label": "Größe",
+            "options": {
+              "base": "Basis",
+              "sm": "Klein",
+              "lg": "Groß"
+            }
+          },
+          "uppercase": {
+            "label": "Großbuchstaben"
+          },
+          "muted": {
+            "label": "Gedämpfte Farbe"
+          },
+          "text": {
+            "label": "Text"
+          }
+        },
+        "name": "Akkordeon"
+      },
+      "heading": {
+        "settings": {
+          "size": {
+            "options": {
+              "2xl": "2X Groß",
+              "3xl": "3X Groß",
+              "4xl": "4X Groß",
+              "5xl": "5X Groß",
+              "6xl": "6X Groß",
+              "7xl": "7X Groß",
+              "8xl": "8X Groß",
+              "9xl": "9X Groß",
+              "lg": "Groß",
+              "xl": "Extra Groß"
+            },
+            "label": "Schaltflächen-Größe"
+          },
+          "text": {
+            "label": "Text"
+          }
+        },
+        "name": "Akkordeon"
+      }
+    }
+  },
+  "bento_grid": {
+    "name": "Bento-Raster",
+    "settings": {
+      "gap": {
+        "label": "Abstandsgröße",
+        "options": {
+          "0": "Keine",
+          "var(--space-sm)": "Klein",
+          "var(--space-md)": "Mittel",
+          "var(--space-lg)": "Groß",
+          "var(--space-xl)": "Extra Groß"
+        }
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Bento-Element",
+        "settings": {
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "link": {
+            "label": "Link"
+          },
+          "layout_header": {
+            "label": "Layout"
+          },
+          "col_span": {
+            "label": "Spaltenbreite"
+          },
+          "row_span": {
+            "label": "Zeilenhöhe"
+          },
+          "background_color": {
+            "label": "Block-Hintergrund"
+          },
+          "overlay_color": {
+            "label": "Bild-Overlay",
+            "description": "Gilt nur, wenn ein Hintergrundbild vorhanden ist."
+          },
+          "text_color": {
+            "label": "Textfarbe",
+            "options": {
+              "dark": "Dunkel",
+              "light": "Hell"
+            }
+          },
+          "alignment": {
+            "label": "Textausrichtung",
+            "options": {
+              "start": "Start",
+              "center": "Zentriert"
+            }
+          },
+          "title": {
+            "label": "Überschrift"
+          },
+          "text": {
+            "label": "Text"
+          },
+          "image": {
+            "label": "Foto (optional)"
+          },
+          "display_header": {
+            "label": "Anzeige"
+          }
+        }
+      }
+    }
+  },
+  "card_grid": {
+    "name": "Karten-Raster",
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "layout": {
+        "options": {
+          "grid": "Raster",
+          "carousel": "Karussell"
+        },
+        "label": "Dachzeile"
+      },
+      "columns_desktop": {
+        "label": "Desktop-Spalten"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "card": {
+        "name": "Karte",
+        "settings": {
+          "image": {
+            "label": "Bild"
+          },
+          "subtitle": {
+            "label": "Untertitel"
+          },
+          "description": {
+            "label": "Beschreibung"
+          },
+          "button_link": {
+            "label": "Schaltflächen-Link"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "title": {
+            "label": "Überschrift"
+          }
+        }
+      }
+    }
+  },
+  "comparison_slider": {
+    "name": "Vergleichsregler",
+    "settings": {
+      "before_image": {
+        "label": "Vorher-Bild"
+      },
+      "after_image": {
+        "label": "Nachher-Bild"
+      },
+      "labels_header": {
+        "label": "Beschriftungen"
+      },
+      "before_label": {
+        "label": "Vorher-Beschriftung"
+      },
+      "after_label": {
+        "label": "Nachher-Beschriftung"
+      },
+      "orientation": {
+        "label": "Regler-Ausrichtung",
+        "options": {
+          "horizontal": "Horizontal",
+          "vertical": "Vertikal"
+        }
+      },
+      "initial_position": {
+        "label": "Anfangsposition des Reglers"
+      },
+      "show_labels": {
+        "label": "Vorher-/Nachher-Beschriftungen anzeigen"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "comparison_table": {
+    "name": "Vergleichstabelle",
+    "settings": {
+      "feature_column_label": {
+        "label": "Merkmal-Spaltenbeschriftung"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "column": {
+        "name": "Spalte",
+        "settings": {
+          "name": {
+            "label": "Spaltenname"
+          },
+          "badge": {
+            "label": "Badge-Text (optional)"
+          },
+          "options_header": {
+            "label": "Optionen"
+          },
+          "featured": {
+            "label": "Hervorgehoben (markiert)"
+          },
+          "link": {
+            "label": "CTA-Schaltfläche"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          }
+        }
+      },
+      "feature": {
+        "name": "Merkmal-Zeile",
+        "settings": {
+          "name": {
+            "label": "Merkmalname"
+          },
+          "values": {
+            "label": "Werte für jede Spalte (einer pro Zeile: ja, nein oder eigener Text)"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          }
+        }
+      }
+    }
+  },
+  "contact_form": {
+    "name": "Kontaktformular",
+    "settings": {
+      "form_header": {
+        "label": "Formular"
+      },
+      "form_token": {
+        "label": "Formular-Token",
+        "description": "Wird beim Veröffentlichen auf Widgetizer automatisch eingefügt. Für Self-Hosting: Formular-Token einfügen (beginnt mit ft_)"
+      },
+      "form_name": {
+        "label": "Formularname",
+        "description": "Beschriftung zur Identifizierung dieses Formulars im Einreichungs-Dashboard"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "sidebar_position": {
+        "label": "Seitenleisten-Position",
+        "options": {
+          "left": "Links",
+          "right": "Rechts"
+        }
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "input": {
+        "name": "Eingabefeld",
+        "settings": {
+          "input_type": {
+            "label": "Eingabetyp",
+            "options": {
+              "email": "E-Mail",
+              "tel": "Telefon",
+              "url": "URL",
+              "number": "Zahl",
+              "date": "Datum",
+              "text": "Text"
+            }
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "label": {
+            "label": "Beschriftung"
+          },
+          "name": {
+            "label": "Feldname (für Formularübermittlung)"
+          },
+          "placeholder": {
+            "label": "Platzhalter"
+          },
+          "options_header": {
+            "label": "Optionen"
+          },
+          "required": {
+            "label": "Pflichtfeld"
+          }
+        }
+      },
+      "checkbox": {
+        "settings": {
+          "label": {
+            "label": "Beschriftung"
+          },
+          "name": {
+            "label": "Feldname (für Formularübermittlung)"
+          },
+          "required": {
+            "label": "Pflichtfeld"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "options_header": {
+            "label": "Optionen"
+          }
+        },
+        "name": "Kontrollkästchen"
+      },
+      "textarea": {
+        "settings": {
+          "placeholder": {
+            "label": "Platzhalter"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "label": {
+            "label": "Beschriftung"
+          },
+          "name": {
+            "label": "Feldname (für Formularübermittlung)"
+          },
+          "options_header": {
+            "label": "Optionen"
+          },
+          "required": {
+            "label": "Pflichtfeld"
+          }
+        },
+        "name": "Textbereich"
+      },
+      "dropdown": {
+        "name": "Dropdown",
+        "settings": {
+          "options": {
+            "label": "Optionen (eine pro Zeile)"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "label": {
+            "label": "Beschriftung"
+          },
+          "name": {
+            "label": "Feldname (für Formularübermittlung)"
+          },
+          "options_header": {
+            "label": "Optionen"
+          },
+          "required": {
+            "label": "Pflichtfeld"
+          }
+        }
+      },
+      "submit": {
+        "name": "Absenden-Schaltfläche",
+        "settings": {
+          "text": {
+            "label": "Schaltflächen-Text"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          }
+        }
+      },
+      "info": {
+        "name": "Kontaktdaten",
+        "settings": {
+          "text": {
+            "label": "Text/Details"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "title": {
+            "label": "Titel"
+          }
+        }
+      },
+      "social": {
+        "name": "Social-Media-Symbole"
+      }
+    }
+  },
+  "content_switcher": {
+    "name": "Inhaltsumschalter",
+    "settings": {
+      "switcher_header": {
+        "label": "Umschalter"
+      },
+      "switcher_type": {
+        "label": "Umschalter-Stil",
+        "options": {
+          "toggle": "Umschalter (2 Optionen)",
+          "tabs": "Tabs (bis zu 3 Optionen)"
+        }
+      },
+      "option_1_label": {
+        "label": "Option 1 Beschriftung"
+      },
+      "option_2_label": {
+        "label": "Option 2 Beschriftung"
+      },
+      "option_3_label": {
+        "label": "Option 3 Beschriftung (nur Tabs)"
+      },
+      "columns": {
+        "label": "Spalten pro Status"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "labels_header": {
+        "label": "Beschriftungen"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Inhaltselement",
+        "settings": {
+          "price": {
+            "label": "Preis / Wert (Optional)"
+          },
+          "link": {
+            "label": "Link / CTA"
+          },
+          "target_option": {
+            "label": "Option zuweisen",
+            "options": {
+              "1": "Option 1",
+              "2": "Option 2",
+              "3": "Option 3"
+            }
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "title": {
+            "label": "Überschrift"
+          },
+          "text": {
+            "label": "Text"
+          },
+          "image": {
+            "label": "Foto (optional)"
+          },
+          "layout_header": {
+            "label": "Layout"
+          }
+        }
+      }
+    }
+  },
+  "countdown": {
+    "name": "Countdown-Timer",
+    "settings": {
+      "target_date": {
+        "label": "Zieldatum (YYYY-MM-DD HH:MM)"
+      },
+      "expired_message": {
+        "label": "Nachricht nach Ablauf"
+      },
+      "button": {
+        "label": "Call-to-Action-Schaltfläche"
+      },
+      "show_seconds": {
+        "label": "Sekunden anzeigen"
+      },
+      "style": {
+        "options": {
+          "cards": "Karten",
+          "minimal": "Minimal"
+        },
+        "label": "Stil"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "options_header": {
+        "label": "Optionen"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "embed": {
+    "name": "Einbettungs-Widget",
+    "settings": {
+      "code": {
+        "label": "Einbettungscode (HTML/JS/Iframe)"
+      },
+      "max_width": {
+        "label": "Container-Breite",
+        "options": {
+          "narrow": "Schmal",
+          "wide": "Breit",
+          "fullwidth": "Volle Breite",
+          "medium": "Mittel"
+        }
+      },
+      "alignment": {
+        "label": "Ausrichtung",
+        "options": {
+          "start": "Start",
+          "center": "Zentriert",
+          "end": "Ende"
+        }
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "event_list": {
+    "name": "Veranstaltungsliste",
+    "blocks": {
+      "event": {
+        "name": "Veranstaltung",
+        "settings": {
+          "day": {
+            "label": "Tag (Zahl)"
+          },
+          "month": {
+            "label": "Monat (kurz)"
+          },
+          "title": {
+            "label": "Veranstaltungstitel"
+          },
+          "location": {
+            "label": "Ort & Zeit"
+          },
+          "button_link": {
+            "label": "Schaltfläche"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "description": {
+            "label": "Unterüberschrift"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "features_split": {
+    "name": "Merkmale geteilt",
+    "settings": {
+      "content_position": {
+        "label": "Inhaltsposition",
+        "options": {
+          "left": "Links",
+          "right": "Rechts"
+        }
+      },
+      "show_divider": {
+        "label": "Trennlinie anzeigen"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "feature": {
+        "name": "Merkmal",
+        "settings": {
+          "icon": {
+            "label": "Symbol"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "title": {
+            "label": "Überschrift"
+          },
+          "description": {
+            "label": "Unterüberschrift"
+          }
+        }
+      }
+    }
+  },
+  "gallery": {
+    "name": "Galerie",
+    "settings": {
+      "columns_desktop": {
+        "label": "Spalten (Desktop)"
+      },
+      "aspect_ratio": {
+        "label": "Bild-Seitenverhältnis",
+        "options": {
+          "contain": "Vollständiges Bild anzeigen",
+          "1 / 1": "Quadrat (1:1)",
+          "4 / 3": "Standard (4:3)",
+          "3 / 2": "Querformat (3:2)",
+          "3 / 4": "Hochformat (3:4)",
+          "16 / 9": "Breitbild (16:9)",
+          "auto": "Automatisch"
+        }
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "layout": {
+        "label": "Dachzeile",
+        "options": {
+          "grid": "Raster",
+          "carousel": "Karussell"
+        }
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "image": {
+        "settings": {
+          "caption": {
+            "label": "Bildunterschrift"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "image": {
+            "label": "Hintergrundbild"
+          }
+        },
+        "name": "Akkordeon"
+      }
+    }
+  },
+  "icon_card_grid": {
+    "name": "Symbol-Karten-Raster",
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      },
+      "layout": {
+        "label": "Dachzeile",
+        "options": {
+          "grid": "Raster",
+          "carousel": "Karussell"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop-Spalten"
+      }
+    },
+    "blocks": {
+      "card": {
+        "name": "Karte",
+        "settings": {
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "icon": {
+            "label": "Symbol"
+          },
+          "subtitle": {
+            "label": "Untertitel"
+          },
+          "title": {
+            "label": "Überschrift"
+          },
+          "description": {
+            "label": "Beschreibung"
+          },
+          "button_link": {
+            "label": "Schaltflächen-Link"
+          }
+        }
+      }
+    }
+  },
+  "icon_list": {
+    "name": "Symbolliste",
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "layout": {
+        "label": "Dachzeile",
+        "options": {
+          "grid": "Raster",
+          "carousel": "Karussell"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop-Spalten"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Element",
+        "settings": {
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "icon": {
+            "label": "Symbol"
+          },
+          "title": {
+            "label": "Überschrift"
+          },
+          "description": {
+            "label": "Unterüberschrift"
+          }
+        }
+      }
+    }
+  },
+  "image": {
+    "settings": {
+      "link": {
+        "description": "Optionaler Link beim Klick auf das Bild.",
+        "label": "Schaltfläche 1"
+      },
+      "fullwidth": {
+        "description": "Wenn aktiviert, erstreckt sich das Bild über die volle Breite. Wenn deaktiviert, bleibt das Bild innerhalb des Theme-Rasters.",
+        "label": "Volle Breite"
+      },
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "image": {
+        "label": "Hintergrundbild"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      }
+    },
+    "name": "Akkordeon"
+  },
+  "image_callout": {
+    "name": "Bild-Hervorhebung",
+    "settings": {
+      "image_position": {
+        "label": "Bildposition",
+        "options": {
+          "left": "Links",
+          "right": "Rechts"
+        }
+      },
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "image": {
+        "label": "Hintergrundbild"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "features": {
+        "name": "Merkmale",
+        "settings": {
+          "features": {
+            "label": "Merkmale (eins pro Zeile)",
+            "description": "Zeile mit + für ein Häkchen oder - für ein Kreuz beginnen."
+          }
+        }
+      },
+      "heading": {
+        "name": "Akkordeon",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Schaltflächen-Größe",
+            "options": {
+              "lg": "Groß",
+              "xl": "Extra Groß",
+              "2xl": "2X Groß",
+              "3xl": "3X Groß",
+              "4xl": "4X Groß",
+              "5xl": "5X Groß",
+              "6xl": "6X Groß",
+              "7xl": "7X Groß",
+              "8xl": "8X Groß",
+              "9xl": "9X Groß"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Akkordeon",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Größe",
+            "options": {
+              "sm": "Klein",
+              "base": "Basis",
+              "lg": "Groß"
+            }
+          },
+          "uppercase": {
+            "label": "Großbuchstaben"
+          },
+          "muted": {
+            "label": "Gedämpfte Farbe"
+          }
+        }
+      },
+      "button": {
+        "name": "Schaltflächen-Gruppe",
+        "settings": {
+          "link": {
+            "label": "Schaltfläche 1"
+          },
+          "style": {
+            "label": "Schaltfläche 1 Stil",
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            }
+          },
+          "link_2": {
+            "label": "Schaltfläche 2"
+          },
+          "style_2": {
+            "label": "Schaltfläche 2 Stil",
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            }
+          },
+          "size": {
+            "label": "Schaltflächen-Größe",
+            "options": {
+              "small": "Klein",
+              "medium": "Mittel",
+              "large": "Groß",
+              "xlarge": "Extra Groß"
+            }
+          }
+        }
+      }
+    }
+  },
+  "image_hotspots": {
+    "name": "Bild-Hotspots",
+    "settings": {
+      "image_alt": {
+        "label": "Bild-Alternativtext"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "image": {
+        "label": "Hintergrundbild"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "hotspot": {
+        "name": "Hotspot",
+        "settings": {
+          "title": {
+            "label": "Tooltip-Titel"
+          },
+          "description": {
+            "label": "Tooltip-Beschreibung"
+          },
+          "button_link": {
+            "label": "Schaltflächen-Link"
+          },
+          "position_x": {
+            "label": "Horizontale Position (%)"
+          },
+          "position_y": {
+            "label": "Vertikale Position (%)"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "layout_header": {
+            "label": "Layout"
+          }
+        }
+      }
+    }
+  },
+  "image_tabs": {
+    "name": "Bild-Tabs",
+    "blocks": {
+      "tab": {
+        "name": "Tab",
+        "settings": {
+          "title": {
+            "label": "Tab-Titel"
+          },
+          "description": {
+            "label": "Tab-Beschreibung"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "image": {
+            "label": "Hintergrundbild"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "image_position": {
+        "label": "Bildposition",
+        "options": {
+          "left": "Links",
+          "right": "Rechts"
+        }
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "image_text": {
+    "name": "Bild + Text",
+    "settings": {
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "image": {
+        "label": "Hintergrundbild"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "image_position": {
+        "label": "Bildposition",
+        "options": {
+          "left": "Links",
+          "right": "Rechts"
+        }
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Akkordeon",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Schaltflächen-Größe",
+            "options": {
+              "lg": "Groß",
+              "xl": "Extra Groß",
+              "2xl": "2X Groß",
+              "3xl": "3X Groß",
+              "4xl": "4X Groß",
+              "5xl": "5X Groß",
+              "6xl": "6X Groß",
+              "7xl": "7X Groß",
+              "8xl": "8X Groß",
+              "9xl": "9X Groß"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Akkordeon",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Größe",
+            "options": {
+              "sm": "Klein",
+              "base": "Basis",
+              "lg": "Groß"
+            }
+          },
+          "uppercase": {
+            "label": "Großbuchstaben"
+          },
+          "muted": {
+            "label": "Gedämpfte Farbe"
+          }
+        }
+      },
+      "features": {
+        "name": "Merkmale",
+        "settings": {
+          "features": {
+            "label": "Merkmale (eins pro Zeile)",
+            "description": "Zeile mit + für ein Häkchen oder - für ein Kreuz beginnen."
+          }
+        }
+      },
+      "button": {
+        "name": "Schaltflächen-Gruppe",
+        "settings": {
+          "link": {
+            "label": "Schaltfläche 1"
+          },
+          "style": {
+            "label": "Schaltfläche 1 Stil",
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            }
+          },
+          "link_2": {
+            "label": "Schaltfläche 2"
+          },
+          "style_2": {
+            "label": "Schaltfläche 2 Stil",
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            }
+          },
+          "size": {
+            "label": "Schaltflächen-Größe",
+            "options": {
+              "small": "Klein",
+              "medium": "Mittel",
+              "large": "Groß",
+              "xlarge": "Extra Groß"
+            }
+          }
+        }
+      }
+    }
+  },
+  "job_listing": {
+    "name": "Stellenanzeige",
+    "settings": {
+      "show_filters": {
+        "label": "Abteilungsfilter anzeigen"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "job": {
+        "name": "Stelle",
+        "settings": {
+          "title": {
+            "label": "Berufsbezeichnung"
+          },
+          "department": {
+            "label": "Abteilung"
+          },
+          "location": {
+            "label": "Ort"
+          },
+          "type": {
+            "label": "Beschäftigungsart",
+            "options": {
+              "full-time": "Vollzeit",
+              "part-time": "Teilzeit",
+              "contract": "Befristet",
+              "internship": "Praktikum"
+            }
+          },
+          "apply_link": {
+            "label": "Übernehmen-Schaltfläche"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          }
+        }
+      }
+    }
+  },
+  "key_figures": {
+    "name": "Kennzahlen",
+    "settings": {
+      "layout": {
+        "options": {
+          "bar": "Horizontale Leiste",
+          "cards": "Karten",
+          "carousel": "Karussell"
+        },
+        "label": "Dachzeile"
+      },
+      "animate": {
+        "label": "Zahlen animieren"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "columns_desktop": {
+        "label": "Desktop-Spalten"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "figure": {
+        "name": "Abbildung",
+        "settings": {
+          "suffix": {
+            "label": "Suffix"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "number": {
+            "label": "Dachzeile"
+          },
+          "label": {
+            "label": "Beschriftung"
+          },
+          "description": {
+            "label": "Unterüberschrift"
+          }
+        }
+      }
+    }
+  },
+  "logo_cloud": {
+    "name": "Logo-Cloud",
+    "blocks": {
+      "logo": {
+        "name": "Logo",
+        "settings": {
+          "image": {
+            "label": "Logo-Bild"
+          },
+          "name": {
+            "label": "Firmenname"
+          },
+          "link": {
+            "label": "Link (optional)"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "layout": {
+        "label": "Dachzeile",
+        "options": {
+          "grid": "Raster",
+          "carousel": "Karussell"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop-Spalten"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "map": {
+    "name": "Karte",
+    "settings": {
+      "address": {
+        "label": "Adresse"
+      },
+      "embed_url": {
+        "label": "Google Maps Einbettungs-URL"
+      },
+      "directions_link": {
+        "label": "Wegbeschreibungs-Link"
+      },
+      "height": {
+        "label": "Kartenhöhe",
+        "options": {
+          "small": "Klein (300px)",
+          "medium": "Mittel (450px)",
+          "large": "Groß (600px)"
+        }
+      },
+      "show_address": {
+        "label": "Adresse unter der Karte anzeigen"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "masonry_gallery": {
+    "name": "Masonry-Galerie",
+    "blocks": {
+      "item": {
+        "name": "Galerie-Element",
+        "settings": {
+          "category": {
+            "label": "Kategorie"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "image": {
+            "label": "Foto (optional)"
+          },
+          "title": {
+            "label": "Überschrift"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "columns_desktop": {
+        "label": "Desktop-Spalten"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "numbered_cards": {
+    "name": "Nummerierte Karten",
+    "blocks": {
+      "step": {
+        "name": "Schritt",
+        "settings": {
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "title": {
+            "label": "Überschrift"
+          },
+          "description": {
+            "label": "Unterüberschrift"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "columns_desktop": {
+        "label": "Desktop-Spalten"
+      },
+      "layout": {
+        "label": "Dachzeile",
+        "options": {
+          "grid": "Raster",
+          "carousel": "Karussell"
+        }
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "priced_list": {
+    "name": "Preisliste",
+    "settings": {
+      "eyebrow": {
+        "label": "Kategorie-Beschriftung"
+      },
+      "title": {
+        "label": "Abschnittsüberschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Menüpunkt",
+        "settings": {
+          "name": {
+            "label": "Elementname"
+          },
+          "price": {
+            "label": "Preis"
+          },
+          "image": {
+            "label": "Foto (optional)"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "description": {
+            "label": "Unterüberschrift"
+          }
+        }
+      }
+    }
+  },
+  "pricing": {
+    "name": "Preise",
+    "blocks": {
+      "plan": {
+        "name": "Tarif",
+        "settings": {
+          "title": {
+            "label": "Tarifname"
+          },
+          "period": {
+            "label": "Zeitraum"
+          },
+          "featured": {
+            "label": "Hervorgehobener Tarif"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "price": {
+            "label": "Preis / Wert (Optional)"
+          },
+          "features": {
+            "label": "Merkmale (eins pro Zeile)",
+            "description": "Zeile mit + für ein Häkchen oder - für ein Kreuz beginnen."
+          },
+          "button_link": {
+            "label": "Schaltflächen-Link"
+          },
+          "options_header": {
+            "label": "Optionen"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "layout": {
+        "label": "Dachzeile",
+        "options": {
+          "grid": "Raster",
+          "carousel": "Karussell"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop-Spalten"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "profile_grid": {
+    "name": "Profil-Raster",
+    "blocks": {
+      "profile": {
+        "name": "Teammitglied",
+        "settings": {
+          "photo": {
+            "label": "Foto"
+          },
+          "name": {
+            "label": "Name"
+          },
+          "role": {
+            "label": "Rolle / Titel"
+          },
+          "specialty": {
+            "label": "Fachgebiet"
+          },
+          "bio": {
+            "label": "Bio"
+          },
+          "social_header": {
+            "label": "Social Media"
+          },
+          "linkedin": {
+            "label": "LinkedIn URL"
+          },
+          "twitter": {
+            "label": "Twitter URL"
+          },
+          "instagram": {
+            "label": "Instagram URL"
+          },
+          "facebook": {
+            "label": "Facebook URL"
+          },
+          "github": {
+            "label": "GitHub URL"
+          },
+          "youtube": {
+            "label": "YouTube URL"
+          },
+          "tiktok": {
+            "label": "TikTok URL"
+          },
+          "pinterest": {
+            "label": "Pinterest URL"
+          },
+          "bluesky": {
+            "label": "Bluesky URL"
+          },
+          "discord": {
+            "label": "Discord URL"
+          },
+          "meta": {
+            "label": "Meta URL"
+          },
+          "reddit": {
+            "label": "Reddit URL"
+          },
+          "telegram": {
+            "label": "Telegram URL"
+          },
+          "threads": {
+            "label": "Threads URL"
+          },
+          "whatsapp": {
+            "label": "WhatsApp URL"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "email": {
+            "label": "Dachzeile"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "columns_desktop": {
+        "label": "Desktop-Spalten"
+      },
+      "layout": {
+        "label": "Dachzeile",
+        "options": {
+          "grid": "Raster",
+          "carousel": "Karussell"
+        }
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "project_showcase": {
+    "name": "Projekt-Showcase",
+    "settings": {
+      "text_display": {
+        "label": "Textanzeige",
+        "options": {
+          "hover": "Bei Hover",
+          "always": "Immer"
+        }
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "layout": {
+        "label": "Dachzeile",
+        "options": {
+          "grid": "Raster",
+          "carousel": "Karussell"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop-Spalten"
+      },
+      "aspect_ratio": {
+        "label": "Bild-Seitenverhältnis",
+        "options": {
+          "auto": "Automatisch",
+          "contain": "Vollständiges Bild anzeigen",
+          "1 / 1": "Quadrat (1:1)",
+          "4 / 3": "Standard (4:3)",
+          "3 / 2": "Querformat (3:2)",
+          "3 / 4": "Hochformat (3:4)",
+          "16 / 9": "Breitbild (16:9)"
+        }
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "project": {
+        "name": "Projekt",
+        "settings": {
+          "image": {
+            "label": "Projektbild"
+          },
+          "title": {
+            "label": "Projekttitel"
+          },
+          "description": {
+            "label": "Kurzbeschreibung"
+          },
+          "link": {
+            "label": "Projekt-Link"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          }
+        }
+      }
+    }
+  },
+  "rich_text": {
+    "name": "Formatierter Text",
+    "settings": {
+      "text_alignment": {
+        "label": "Textausrichtung",
+        "options": {
+          "start": "Start",
+          "end": "Ende",
+          "center": "Zentriert"
+        }
+      },
+      "content_width": {
+        "label": "Inhaltsbreite",
+        "options": {
+          "narrow": "Schmal",
+          "medium": "Mittel",
+          "wide": "Breit",
+          "fullwidth": "Volle Breite"
+        }
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Akkordeon",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Schaltflächen-Größe",
+            "options": {
+              "lg": "Groß",
+              "xl": "Extra Groß",
+              "2xl": "2X Groß",
+              "3xl": "3X Groß",
+              "4xl": "4X Groß",
+              "5xl": "5X Groß",
+              "6xl": "6X Groß",
+              "7xl": "7X Groß",
+              "8xl": "8X Groß",
+              "9xl": "9X Groß"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Akkordeon",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Größe",
+            "options": {
+              "sm": "Klein",
+              "base": "Basis",
+              "lg": "Groß"
+            }
+          },
+          "uppercase": {
+            "label": "Großbuchstaben"
+          },
+          "muted": {
+            "label": "Gedämpfte Farbe"
+          }
+        }
+      },
+      "button": {
+        "name": "Schaltflächen-Gruppe",
+        "settings": {
+          "link": {
+            "label": "Schaltfläche 1"
+          },
+          "style": {
+            "label": "Schaltfläche 1 Stil",
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            }
+          },
+          "link_2": {
+            "label": "Schaltfläche 2"
+          },
+          "style_2": {
+            "label": "Schaltfläche 2 Stil",
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            }
+          },
+          "size": {
+            "label": "Schaltflächen-Größe",
+            "options": {
+              "small": "Klein",
+              "medium": "Mittel",
+              "large": "Groß",
+              "xlarge": "Extra Groß"
+            }
+          }
+        }
+      }
+    }
+  },
+  "schedule_table": {
+    "name": "Zeitplan-Tabelle",
+    "settings": {
+      "note": {
+        "label": "Zusätzliche Anmerkung"
+      },
+      "week_start_day": {
+        "label": "Woche beginnt am",
+        "options": {
+          "0": "Sonntag",
+          "1": "Montag"
+        }
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "sidebar_position": {
+        "label": "Seitenleisten-Position",
+        "options": {
+          "left": "Links",
+          "right": "Rechts"
+        }
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "day": {
+        "settings": {
+          "day": {
+            "label": "Tag"
+          },
+          "hours": {
+            "label": "Stunden"
+          },
+          "closed": {
+            "label": "Geschlossen"
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "options_header": {
+            "label": "Optionen"
+          }
+        },
+        "name": "Akkordeon"
+      },
+      "info": {
+        "name": "Info",
+        "settings": {
+          "title": {
+            "label": "Titel"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      },
+      "social": {
+        "name": "Social-Media-Symbole"
+      }
+    }
+  },
+  "slideshow": {
+    "name": "Diashow",
+    "settings": {
+      "autoplay": {
+        "label": "Folien automatisch wechseln"
+      },
+      "autoplay_speed": {
+        "label": "Folien wechseln alle"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "height": {
+        "label": "Höhe",
+        "options": {
+          "auto": "Automatisch",
+          "small": "Klein (300px)",
+          "medium": "Mittel (450px)",
+          "large": "Groß (600px)"
+        }
+      },
+      "fullwidth": {
+        "label": "Volle Breite"
+      },
+      "alignment": {
+        "label": "Inhaltsausrichtung",
+        "options": {
+          "center": "Zentriert",
+          "start": "Start"
+        }
+      }
+    },
+    "blocks": {
+      "slide": {
+        "name": "Folie",
+        "settings": {
+          "image": {
+            "label": "Hintergrundbild"
+          },
+          "heading_text": {
+            "label": "Überschriftstext"
+          },
+          "heading_size": {
+            "label": "Überschrift-Größe",
+            "options": {
+              "lg": "Groß",
+              "xl": "Sehr groß",
+              "2xl": "2X Groß",
+              "3xl": "3X Groß",
+              "4xl": "4X Groß",
+              "5xl": "5X Groß",
+              "6xl": "6X Groß",
+              "7xl": "7X Groß",
+              "8xl": "8X Groß",
+              "9xl": "9X Groß"
+            }
+          },
+          "text_content": {
+            "label": "Textinhalt"
+          },
+          "text_size": {
+            "label": "Textgröße",
+            "options": {
+              "sm": "Klein",
+              "base": "Basis",
+              "lg": "Groß"
+            }
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "text_uppercase": {
+            "label": "Dachzeile"
+          },
+          "text_muted": {
+            "label": "Dachzeile"
+          },
+          "button_link": {
+            "label": "Schaltflächen-Link"
+          },
+          "button_link_2": {
+            "label": "Dachzeile"
+          },
+          "display_header": {
+            "label": "Anzeige"
+          },
+          "button_style": {
+            "label": "Dachzeile",
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            }
+          },
+          "button_style_2": {
+            "label": "Dachzeile",
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            }
+          },
+          "button_size": {
+            "label": "Dachzeile",
+            "options": {
+              "small": "Klein",
+              "medium": "Mittel",
+              "large": "Groß",
+              "xlarge": "Extra Groß"
+            }
+          },
+          "overlay_color": {
+            "label": "Overlay-Farbe",
+            "description": "Gilt nur, wenn ein Hintergrundbild vorhanden ist."
+          },
+          "color_scheme": {
+            "label": "Farbschema",
+            "options": {
+              "standard": "Standard",
+              "highlight": "Hervorgehoben"
+            }
+          }
+        }
+      }
+    }
+  },
+  "social_icons": {
+    "settings": {
+      "icon_size": {
+        "label": "Symbolgröße"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "name": "Akkordeon"
+  },
+  "split_hero": {
+    "name": "Geteilter Hero",
+    "settings": {
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "image": {
+        "label": "Hintergrundbild"
+      },
+      "overlay_color": {
+        "label": "Overlay-Farbe",
+        "description": "Gilt nur, wenn ein Hintergrundbild vorhanden ist."
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "image_position": {
+        "label": "Bildposition",
+        "options": {
+          "left": "Links",
+          "right": "Rechts"
+        }
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Akkordeon",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Schaltflächen-Größe",
+            "options": {
+              "lg": "Groß",
+              "xl": "Extra Groß",
+              "2xl": "2X Groß",
+              "3xl": "3X Groß",
+              "4xl": "4X Groß",
+              "5xl": "5X Groß",
+              "6xl": "6X Groß",
+              "7xl": "7X Groß",
+              "8xl": "8X Groß",
+              "9xl": "9X Groß"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Akkordeon",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Größe",
+            "options": {
+              "sm": "Klein",
+              "base": "Basis",
+              "lg": "Groß"
+            }
+          },
+          "uppercase": {
+            "label": "Großbuchstaben"
+          },
+          "muted": {
+            "label": "Gedämpfte Farbe"
+          }
+        }
+      },
+      "features": {
+        "name": "Merkmale",
+        "settings": {
+          "features": {
+            "label": "Merkmale (eins pro Zeile)",
+            "description": "Zeile mit + für ein Häkchen oder - für ein Kreuz beginnen."
+          }
+        }
+      },
+      "button": {
+        "name": "Schaltflächen-Gruppe",
+        "settings": {
+          "link": {
+            "label": "Schaltfläche 1"
+          },
+          "style": {
+            "label": "Schaltfläche 1 Stil",
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            }
+          },
+          "link_2": {
+            "label": "Schaltfläche 2"
+          },
+          "style_2": {
+            "label": "Schaltfläche 2 Stil",
+            "options": {
+              "primary": "Primär",
+              "secondary": "Sekundär"
+            }
+          },
+          "size": {
+            "label": "Schaltflächen-Größe",
+            "options": {
+              "small": "Klein",
+              "medium": "Mittel",
+              "large": "Groß",
+              "xlarge": "Extra Groß"
+            }
+          }
+        }
+      }
+    }
+  },
+  "testimonial_hero": {
+    "name": "Kundenstimme Hero",
+    "settings": {
+      "logo": {
+        "label": "Firmenlogo"
+      },
+      "author_image": {
+        "label": "Autorenbild"
+      },
+      "image_position": {
+        "label": "Bildposition",
+        "options": {
+          "left": "Links",
+          "right": "Rechts"
+        }
+      },
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Akkordeon",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Schaltflächen-Größe",
+            "options": {
+              "lg": "Groß",
+              "xl": "Extra Groß",
+              "2xl": "2X Groß",
+              "3xl": "3X Groß",
+              "4xl": "4X Groß",
+              "5xl": "5X Groß",
+              "6xl": "6X Groß",
+              "7xl": "7X Groß",
+              "8xl": "8X Groß",
+              "9xl": "9X Groß"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Akkordeon",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Größe",
+            "options": {
+              "sm": "Klein",
+              "base": "Basis",
+              "lg": "Groß"
+            }
+          },
+          "uppercase": {
+            "label": "Großbuchstaben"
+          },
+          "muted": {
+            "label": "Gedämpfte Farbe"
+          }
+        }
+      }
+    }
+  },
+  "testimonials": {
+    "name": "Kundenstimmen",
+    "blocks": {
+      "quote": {
+        "name": "Kundenstimme",
+        "settings": {
+          "quote": {
+            "label": "Zitattext"
+          },
+          "title": {
+            "label": "Titel / Unternehmen"
+          },
+          "rating": {
+            "label": "Sternebewertung",
+            "options": {
+              "3": "3 Sterne",
+              "4": "4 Sterne",
+              "5": "5 Sterne",
+              "": "Keine Bewertung"
+            }
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "avatar": {
+            "label": "Dachzeile"
+          },
+          "name": {
+            "label": "Name"
+          },
+          "display_header": {
+            "label": "Anzeige"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "layout": {
+        "label": "Dachzeile",
+        "options": {
+          "grid": "Raster",
+          "carousel": "Karussell"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop-Spalten"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "timeline": {
+    "name": "Zeitleiste",
+    "settings": {
+      "layout": {
+        "options": {
+          "centered": "Zentriert (Abwechselnd)",
+          "vertical": "Vertikal",
+          "horizontal": "Horizontal"
+        },
+        "label": "Dachzeile"
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Zeitleisten-Element",
+        "settings": {
+          "date": {
+            "label": "Datum/Phase"
+          },
+          "duration": {
+            "label": "Dauer (optional)"
+          },
+          "features": {
+            "label": "Merkmale/Aufzählungspunkte (eins pro Zeile)",
+            "description": "Zeile mit + für ein Häkchen oder - für ein Kreuz beginnen."
+          },
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "title": {
+            "label": "Überschrift"
+          },
+          "description": {
+            "label": "Unterüberschrift"
+          }
+        }
+      }
+    }
+  },
+  "trust_bar": {
+    "name": "Vertrauensleiste",
+    "settings": {
+      "show_dividers": {
+        "label": "Trennlinien anzeigen"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Element",
+        "settings": {
+          "content_header": {
+            "label": "Inhalt"
+          },
+          "icon": {
+            "label": "Symbol"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      }
+    }
+  },
+  "video_embed": {
+    "name": "YouTube/Vimeo",
+    "settings": {
+      "video_url": {
+        "label": "Video-URL (YouTube oder Vimeo)"
+      },
+      "video_title": {
+        "label": "Videotitel (für Barrierefreiheit)"
+      },
+      "aspect_ratio": {
+        "label": "Seitenverhältnis",
+        "options": {
+          "16:9": "16:9 (Breitbild)",
+          "4:3": "4:3 (Standard)",
+          "21:9": "21:9 (Kino)",
+          "1:1": "1:1 (Quadrat)"
+        }
+      },
+      "eyebrow": {
+        "label": "Dachzeile"
+      },
+      "title": {
+        "label": "Überschrift"
+      },
+      "description": {
+        "label": "Unterüberschrift"
+      },
+      "content_header": {
+        "label": "Inhalt"
+      },
+      "display_header": {
+        "label": "Anzeige"
+      },
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    }
+  },
+  "global": {
+    "layout": {
+      "settings": {
+        "layout_header": {
+          "label": "Animationen"
+        },
+        "enable_reveal_animations": {
+          "label": "Scroll-Einblendanimationen aktivieren",
+          "description": "Elemente beim Scrollen in den sichtbaren Bereich animieren"
+        }
+      }
+    },
+    "branding": {
+      "settings": {
+        "branding_header": {
+          "label": "Branding"
+        },
+        "favicon": {
+          "label": "Favicon",
+          "description": "Empfohlene Größe 180×180 px."
+        }
+      }
+    },
+    "colors": {
+      "name": "Farben",
+      "settings": {
+        "colors_standard_header": {
+          "label": "Standardfarben"
+        },
+        "highlight_bg_primary": {
+          "label": "Primärer Hintergrund"
+        },
+        "highlight_bg_secondary": {
+          "label": "Sekundärer Hintergrund"
+        },
+        "highlight_text_content": {
+          "label": "Inhaltstext"
+        },
+        "highlight_text_muted": {
+          "label": "Gedämpfter Text"
+        },
+        "highlight_border_color": {
+          "label": "Rahmenfarbe"
+        },
+        "highlight_accent": {
+          "label": "Akzentfarbe"
+        },
+        "highlight_accent_text": {
+          "label": "Akzent-Textfarbe"
+        },
+        "highlight_rating_star": {
+          "label": "Bewertungsstern-Farbe"
+        },
+        "colors_highlight_header": {
+          "label": "Hervorgehobene Farben"
+        },
+        "standard_bg_primary": {
+          "label": "Dachzeile"
+        },
+        "standard_bg_secondary": {
+          "label": "Dachzeile"
+        },
+        "standard_text_content": {
+          "label": "Dachzeile"
+        },
+        "standard_text_heading": {
+          "label": "Dachzeile"
+        },
+        "standard_text_muted": {
+          "label": "Dachzeile"
+        },
+        "standard_border_color": {
+          "label": "Dachzeile"
+        },
+        "standard_accent": {
+          "label": "Dachzeile"
+        },
+        "standard_accent_text": {
+          "label": "Dachzeile"
+        },
+        "standard_rating_star": {
+          "label": "Dachzeile"
+        },
+        "highlight_text_heading": {
+          "label": "Dachzeile"
+        }
+      }
+    },
+    "typography": {
+      "settings": {
+        "typography_header": {
+          "label": "Typografie"
+        },
+        "heading_font": {
+          "label": "Überschrift-Schrift"
+        },
+        "body_font": {
+          "label": "Fließtext-Schrift"
+        },
+        "heading_scale": {
+          "description": "Alle Überschrift-Größen hoch- oder herunterskalieren",
+          "label": "Dachzeile"
+        },
+        "body_scale": {
+          "label": "Fließtext-Größe",
+          "description": "Alle Fließtext-Größen hoch- oder herunterskalieren"
+        }
+      }
+    },
+    "social": {
+      "name": "Soziales",
+      "settings": {
+        "twitter_url": {
+          "label": "Twitter / X URL"
+        },
+        "mastodon_url": {
+          "label": "Mastodon URL"
+        },
+        "mail_url": {
+          "label": "E-Mail URL"
+        },
+        "social_header": {
+          "label": "Social Media"
+        },
+        "facebook_url": {
+          "label": "Dachzeile"
+        },
+        "instagram_url": {
+          "label": "Dachzeile"
+        },
+        "linkedin_url": {
+          "label": "Dachzeile"
+        },
+        "youtube_url": {
+          "label": "Dachzeile"
+        },
+        "tiktok_url": {
+          "label": "Dachzeile"
+        },
+        "pinterest_url": {
+          "label": "Dachzeile"
+        },
+        "github_url": {
+          "label": "Dachzeile"
+        },
+        "bluesky_url": {
+          "label": "Dachzeile"
+        },
+        "discord_url": {
+          "label": "Dachzeile"
+        },
+        "reddit_url": {
+          "label": "Dachzeile"
+        },
+        "telegram_url": {
+          "label": "Dachzeile"
+        },
+        "threads_url": {
+          "label": "Dachzeile"
+        },
+        "whatsapp_url": {
+          "label": "Dachzeile"
+        }
+      }
+    },
+    "privacy": {
+      "settings": {
+        "privacy_header": {
+          "label": "Datenschutz"
+        },
+        "use_bunny_fonts": {
+          "label": "Datenschutzfreundliches Font-CDN verwenden",
+          "description": "Aktivieren, um Google Fonts über Bunny CDN bereitzustellen (DSGVO-konform, kein Tracking)"
+        }
+      }
+    },
+    "advanced": {
+      "settings": {
+        "advanced_header": {
+          "label": "Erweitert"
+        },
+        "custom_css": {
+          "label": "Eigenes CSS",
+          "description": "Eigenes CSS hinzufügen, das im <head>-Bereich eingefügt wird."
+        },
+        "custom_head_scripts": {
+          "label": "Eigene Head-Skripte",
+          "description": "Eigene Skripte (z. B. Google Analytics) hinzufügen, die im <head>-Bereich eingefügt werden."
+        },
+        "custom_footer_scripts": {
+          "label": "Eigene Footer-Skripte",
+          "description": "Eigene Skripte hinzufügen, die vor dem schließenden </body>-Tag eingefügt werden."
+        }
+      }
+    }
+  }
+}

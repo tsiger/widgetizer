@@ -19,6 +19,7 @@ themes/arch/
   screenshot.png          # Root screenshot (also default preset fallback)
   assets/                 # Shared
   snippets/               # Shared
+  locales/                # Shared (theme locale i18n files)
   widgets/                # Shared
   templates/              # Default demo content (backward compatible)
   menus/                  # Default menus (backward compatible)

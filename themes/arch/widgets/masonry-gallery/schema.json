@@ -1,6 +1,6 @@
 {
   "type": "masonry-gallery",
-  "displayName": "Masonry Gallery",
+  "displayName": "tTheme:masonry_gallery.name",
   "aliases": [
     "pinterest style",
     "dynamic grid",
@@ -11,29 +11,29 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow Text"
+      "label": "tTheme:masonry_gallery.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:masonry_gallery.settings.title.label",
       "default": "Our Work"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading",
+      "label": "tTheme:masonry_gallery.settings.description.label",
       "default": "A collection of our recent projects and creative work."
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:masonry_gallery.settings.display_header.label"
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "Columns (Desktop)",
+      "label": "tTheme:masonry_gallery.settings.columns_desktop.label",
       "default": 3,
       "min": 2,
       "max": 5,
@@ -42,16 +42,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:masonry_gallery.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:masonry_gallery.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:masonry_gallery.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -59,27 +59,27 @@
   "blocks": [
     {
       "type": "item",
-      "displayName": "Gallery Item",
+      "displayName": "tTheme:masonry_gallery.blocks.item.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:masonry_gallery.blocks.item.settings.content_header.label"
         },
         {
           "type": "image",
           "id": "image",
-          "label": "Image"
+          "label": "tTheme:masonry_gallery.blocks.item.settings.image.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title"
+          "label": "tTheme:masonry_gallery.blocks.item.settings.title.label"
         },
         {
           "type": "text",
           "id": "category",
-          "label": "Category"
+          "label": "tTheme:masonry_gallery.blocks.item.settings.category.label"
         }
       ]
     }

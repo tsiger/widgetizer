@@ -1,139 +1,195 @@
 {
   "type": "split-hero",
-  "displayName": "Split Hero",
-  "aliases": ["hero split", "background hero", "split banner", "full width hero"],
+  "displayName": "tTheme:split_hero.name",
+  "aliases": [
+    "hero split",
+    "background hero",
+    "split banner",
+    "full width hero"
+  ],
   "settings": [
     {
       "type": "header",
       "id": "content_header",
-      "label": "Content"
+      "label": "tTheme:split_hero.settings.content_header.label"
     },
     {
       "type": "image",
       "id": "image",
-      "label": "Background image"
+      "label": "tTheme:split_hero.settings.image.label"
     },
     {
       "type": "color",
       "id": "overlay_color",
-      "label": "Overlay color",
+      "label": "tTheme:split_hero.settings.overlay_color.label",
       "default": "",
       "allow_alpha": true,
-      "description": "Applies only if there is a background image."
+      "description": "tTheme:split_hero.settings.overlay_color.description"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:split_hero.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "image_position",
-      "label": "Image position",
+      "label": "tTheme:split_hero.settings.image_position.label",
       "default": "left",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "left",
+          "label": "tTheme:split_hero.settings.image_position.options.left"
+        },
+        {
+          "value": "right",
+          "label": "tTheme:split_hero.settings.image_position.options.right"
+        }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:split_hero.settings.color_scheme.label",
       "default": "standard",
       "options": [
-        { "value": "standard", "label": "Standard" },
-        { "value": "highlight", "label": "Highlight" }
+        {
+          "value": "standard",
+          "label": "tTheme:split_hero.settings.color_scheme.options.standard"
+        },
+        {
+          "value": "highlight",
+          "label": "tTheme:split_hero.settings.color_scheme.options.highlight"
+        }
       ]
     }
   ],
   "blocks": [
     {
       "type": "heading",
-      "displayName": "Heading",
+      "displayName": "tTheme:split_hero.blocks.heading.name",
       "settings": [
         {
           "type": "text",
           "id": "text",
-          "label": "Text",
+          "label": "tTheme:split_hero.blocks.heading.settings.text.label",
           "default": "Built for Modern Teams"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "Size",
+          "label": "tTheme:split_hero.blocks.heading.settings.size.label",
           "default": "2xl",
           "options": [
-            { "value": "lg", "label": "Large" },
-            { "value": "xl", "label": "Extra Large" },
-            { "value": "2xl", "label": "2X Large" },
-            { "value": "3xl", "label": "3X Large" },
-            { "value": "4xl", "label": "4X Large" },
-            { "value": "5xl", "label": "5X Large" },
-            { "value": "6xl", "label": "6X Large" },
-            { "value": "7xl", "label": "7X Large" },
-            { "value": "8xl", "label": "8X Large" },
-            { "value": "9xl", "label": "9X Large" }
+            {
+              "value": "lg",
+              "label": "tTheme:split_hero.blocks.heading.settings.size.options.lg"
+            },
+            {
+              "value": "xl",
+              "label": "tTheme:split_hero.blocks.heading.settings.size.options.xl"
+            },
+            {
+              "value": "2xl",
+              "label": "tTheme:split_hero.blocks.heading.settings.size.options.2xl"
+            },
+            {
+              "value": "3xl",
+              "label": "tTheme:split_hero.blocks.heading.settings.size.options.3xl"
+            },
+            {
+              "value": "4xl",
+              "label": "tTheme:split_hero.blocks.heading.settings.size.options.4xl"
+            },
+            {
+              "value": "5xl",
+              "label": "tTheme:split_hero.blocks.heading.settings.size.options.5xl"
+            },
+            {
+              "value": "6xl",
+              "label": "tTheme:split_hero.blocks.heading.settings.size.options.6xl"
+            },
+            {
+              "value": "7xl",
+              "label": "tTheme:split_hero.blocks.heading.settings.size.options.7xl"
+            },
+            {
+              "value": "8xl",
+              "label": "tTheme:split_hero.blocks.heading.settings.size.options.8xl"
+            },
+            {
+              "value": "9xl",
+              "label": "tTheme:split_hero.blocks.heading.settings.size.options.9xl"
+            }
           ]
         }
       ]
     },
     {
       "type": "text",
-      "displayName": "Text",
+      "displayName": "tTheme:split_hero.blocks.text.name",
       "settings": [
         {
           "type": "richtext",
           "id": "text",
-          "label": "Text",
+          "label": "tTheme:split_hero.blocks.text.settings.text.label",
           "default": "<p>A paragraph of descriptive text goes here.</p>"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "Size",
+          "label": "tTheme:split_hero.blocks.text.settings.size.label",
           "default": "base",
           "options": [
-            { "value": "sm", "label": "Small" },
-            { "value": "base", "label": "Base" },
-            { "value": "lg", "label": "Large" }
+            {
+              "value": "sm",
+              "label": "tTheme:split_hero.blocks.text.settings.size.options.sm"
+            },
+            {
+              "value": "base",
+              "label": "tTheme:split_hero.blocks.text.settings.size.options.base"
+            },
+            {
+              "value": "lg",
+              "label": "tTheme:split_hero.blocks.text.settings.size.options.lg"
+            }
           ]
         },
         {
           "type": "checkbox",
           "id": "uppercase",
-          "label": "Uppercase",
+          "label": "tTheme:split_hero.blocks.text.settings.uppercase.label",
           "default": false
         },
         {
           "type": "checkbox",
           "id": "muted",
-          "label": "Muted color",
+          "label": "tTheme:split_hero.blocks.text.settings.muted.label",
           "default": false
         }
       ]
     },
     {
       "type": "features",
-      "displayName": "Features",
+      "displayName": "tTheme:split_hero.blocks.features.name",
       "settings": [
         {
           "type": "textarea",
           "id": "features",
-          "label": "Features (one per line)",
-          "description": "Start a line with + for a checkmark or - for a cross.",
+          "label": "tTheme:split_hero.blocks.features.settings.features.label",
+          "description": "tTheme:split_hero.blocks.features.settings.features.description",
           "default": "+ Feature 1\n+ Feature 2\n+ Feature 3"
         }
       ]
     },
     {
       "type": "button",
-      "displayName": "Button Group",
+      "displayName": "tTheme:split_hero.blocks.button.name",
       "settings": [
         {
           "type": "link",
           "id": "link",
-          "label": "Button 1",
+          "label": "tTheme:split_hero.blocks.button.settings.link.label",
           "default": {
             "text": "Learn More",
             "href": "#",
@@ -143,38 +199,62 @@
         {
           "type": "select",
           "id": "style",
-          "label": "Button 1 style",
+          "label": "tTheme:split_hero.blocks.button.settings.style.label",
           "default": "secondary",
           "options": [
-            { "value": "primary", "label": "Primary" },
-            { "value": "secondary", "label": "Secondary" }
+            {
+              "value": "primary",
+              "label": "tTheme:split_hero.blocks.button.settings.style.options.primary"
+            },
+            {
+              "value": "secondary",
+              "label": "tTheme:split_hero.blocks.button.settings.style.options.secondary"
+            }
           ]
         },
         {
           "type": "link",
           "id": "link_2",
-          "label": "Button 2"
+          "label": "tTheme:split_hero.blocks.button.settings.link_2.label"
         },
         {
           "type": "select",
           "id": "style_2",
-          "label": "Button 2 style",
+          "label": "tTheme:split_hero.blocks.button.settings.style_2.label",
           "default": "secondary",
           "options": [
-            { "value": "primary", "label": "Primary" },
-            { "value": "secondary", "label": "Secondary" }
+            {
+              "value": "primary",
+              "label": "tTheme:split_hero.blocks.button.settings.style_2.options.primary"
+            },
+            {
+              "value": "secondary",
+              "label": "tTheme:split_hero.blocks.button.settings.style_2.options.secondary"
+            }
           ]
         },
         {
           "type": "select",
           "id": "size",
-          "label": "Button size",
+          "label": "tTheme:split_hero.blocks.button.settings.size.label",
           "default": "medium",
           "options": [
-            { "value": "small", "label": "Small" },
-            { "value": "medium", "label": "Medium" },
-            { "value": "large", "label": "Large" },
-            { "value": "xlarge", "label": "Extra Large" }
+            {
+              "value": "small",
+              "label": "tTheme:split_hero.blocks.button.settings.size.options.small"
+            },
+            {
+              "value": "medium",
+              "label": "tTheme:split_hero.blocks.button.settings.size.options.medium"
+            },
+            {
+              "value": "large",
+              "label": "tTheme:split_hero.blocks.button.settings.size.options.large"
+            },
+            {
+              "value": "xlarge",
+              "label": "tTheme:split_hero.blocks.button.settings.size.options.xlarge"
+            }
           ]
         }
       ]

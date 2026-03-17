@@ -20,7 +20,7 @@ The `PageEditor` is composed of several specialized child components, each with 
 
 - **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page. It has been refactored to work declaratively. Instead of being told _how_ to change, it simply receives the latest application state from the editor and uses a central `updatePreview` function to synchronize the `<iframe>`'s DOM. In editor mode, link navigation is intercepted to avoid leaving the editor while still allowing widget/block selection. In standalone preview mode, internal `.html` links route to `/preview/:slug`, while external links remain disabled.
 
-- **`SettingsPanel`**: The right-hand panel. When a widget or block is selected, this panel dynamically displays the relevant configuration options based on its schema. All changes made here are immediately applied to the selected component and reflected in the preview.
+- **`SettingsPanel`**: The right-hand panel. When a widget or block is selected, this panel dynamically displays the relevant configuration options based on its schema. All changes made here are immediately applied to the selected component and reflected in the preview. Schema labels that use `tTheme:` prefixed keys are resolved at render time through the `useThemeLocale` hook's `tTheme()` function.
 
 - **`WidgetSelector`**: A modal dialog that opens when the user wants to add a new widget to the page. It presents a list of available widgets to choose from.
 

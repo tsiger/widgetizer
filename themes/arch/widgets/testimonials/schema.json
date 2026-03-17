@@ -1,6 +1,6 @@
 {
   "type": "testimonials",
-  "displayName": "Testimonials",
+  "displayName": "tTheme:testimonials.name",
   "aliases": [
     "reviews",
     "feedback",
@@ -11,44 +11,44 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:testimonials.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:testimonials.settings.title.label",
       "default": "What Our Customers Say"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:testimonials.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:testimonials.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "Layout",
+      "label": "tTheme:testimonials.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "Grid"
+          "label": "tTheme:testimonials.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "Carousel"
+          "label": "tTheme:testimonials.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "Columns (Desktop)",
+      "label": "tTheme:testimonials.settings.columns_desktop.label",
       "default": 4,
       "min": 2,
       "max": 5,
@@ -57,16 +57,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:testimonials.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:testimonials.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:testimonials.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -74,61 +74,61 @@
   "blocks": [
     {
       "type": "quote",
-      "displayName": "Testimonial",
+      "displayName": "tTheme:testimonials.blocks.quote.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:testimonials.blocks.quote.settings.content_header.label"
         },
         {
           "type": "textarea",
           "id": "quote",
-          "label": "Quote text",
+          "label": "tTheme:testimonials.blocks.quote.settings.quote.label",
           "default": "This product has completely transformed how we work. Highly recommended!"
         },
         {
           "type": "image",
           "id": "avatar",
-          "label": "Photo"
+          "label": "tTheme:testimonials.blocks.quote.settings.avatar.label"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "Name",
+          "label": "tTheme:testimonials.blocks.quote.settings.name.label",
           "default": "Jane Smith"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title / Company",
+          "label": "tTheme:testimonials.blocks.quote.settings.title.label",
           "default": "CEO, Acme Inc."
         },
         {
           "type": "header",
           "id": "display_header",
-          "label": "Display"
+          "label": "tTheme:testimonials.blocks.quote.settings.display_header.label"
         },
         {
           "type": "select",
           "id": "rating",
-          "label": "Star rating",
+          "label": "tTheme:testimonials.blocks.quote.settings.rating.label",
           "options": [
             {
               "value": "",
-              "label": "No rating"
+              "label": "tTheme:testimonials.blocks.quote.settings.rating.options."
             },
             {
               "value": "5",
-              "label": "5 stars"
+              "label": "tTheme:testimonials.blocks.quote.settings.rating.options.5"
             },
             {
               "value": "4",
-              "label": "4 stars"
+              "label": "tTheme:testimonials.blocks.quote.settings.rating.options.4"
             },
             {
               "value": "3",
-              "label": "3 stars"
+              "label": "tTheme:testimonials.blocks.quote.settings.rating.options.3"
             }
           ],
           "default": "5"

@@ -1,9 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
 import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../hooks/useThemeLocale";
 
 export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelectWidget, position, triggerRef }) {
   const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
   const dropdownRef = useRef(null);
   const inputRef = useRef(null);
   const listRef = useRef(null);
@@ -18,10 +20,10 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
 
   const availableWidgets = Object.values(widgetSchemas)
     .filter((schema) => schema.type !== "header" && schema.type !== "footer")
-    .sort((a, b) => (a.displayName || a.type).localeCompare(b.displayName || b.type));
+    .sort((a, b) => (tTheme(a.displayName) || a.type).localeCompare(tTheme(b.displayName) || b.type));
 
   const filteredWidgets = availableWidgets.filter((schema) => {
-    const name = schema.displayName || schema.type;
+    const name = tTheme(schema.displayName) || schema.type;
     const aliases = schema.aliases || [];
     const searchLower = searchTerm.toLowerCase();
 
@@ -230,7 +232,7 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
                     focusedIndex === index ? "text-pink-600" : "text-slate-800 group-hover:text-pink-600"
                   }`}
                 >
-                  {schema.displayName || schema.type}
+                  {tTheme(schema.displayName) || schema.type}
                 </div>
               </button>
             ))

@@ -1,6 +1,6 @@
 {
   "type": "numbered-cards",
-  "displayName": "Numbered Cards",
+  "displayName": "tTheme:numbered_cards.name",
   "aliases": [
     "steps",
     "process",
@@ -11,28 +11,28 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow Text"
+      "label": "tTheme:numbered_cards.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:numbered_cards.settings.title.label",
       "default": "Our Process"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:numbered_cards.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:numbered_cards.settings.display_header.label"
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "Columns (Desktop)",
+      "label": "tTheme:numbered_cards.settings.columns_desktop.label",
       "default": 4,
       "min": 2,
       "max": 5,
@@ -41,32 +41,32 @@
     {
       "type": "select",
       "id": "layout",
-      "label": "Layout",
+      "label": "tTheme:numbered_cards.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "Grid"
+          "label": "tTheme:numbered_cards.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "Carousel"
+          "label": "tTheme:numbered_cards.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:numbered_cards.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:numbered_cards.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:numbered_cards.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -74,23 +74,23 @@
   "blocks": [
     {
       "type": "step",
-      "displayName": "Step",
+      "displayName": "tTheme:numbered_cards.blocks.step.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:numbered_cards.blocks.step.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
+          "label": "tTheme:numbered_cards.blocks.step.settings.title.label",
           "default": "Step Title"
         },
         {
           "type": "richtext",
           "id": "description",
-          "label": "Description",
+          "label": "tTheme:numbered_cards.blocks.step.settings.description.label",
           "default": "<p>Describe this step in the process.</p>"
         }
       ]

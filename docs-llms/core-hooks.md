@@ -334,6 +334,35 @@ Provides comprehensive state management for application-wide settings including 
 
 Used by `AppSettings.jsx` page for managing system-wide configuration that affects all projects and users.
 
+## Theme Locale Hook
+
+### `useThemeLocale` Hook (`src/hooks/useThemeLocale.js`)
+
+Fetches theme locale JSON for the current language and provides a `tTheme()` resolver for `tTheme:`-prefixed i18n keys used in widget schemas.
+
+#### Purpose
+
+Widget `schema.json` files use `tTheme:` prefixed keys for displayName, label, description, and option labels instead of plain English strings. This hook loads the corresponding theme locale file and returns a resolver that translates those keys into localized strings at runtime.
+
+#### API Reference
+
+**Returns:**
+
+- `tTheme(str)` (function): If `str` starts with `tTheme:`, strips the prefix and walks the dot-path through the loaded locale object to return the translated string. Non-prefixed strings are returned as-is.
+
+#### Caching
+
+- Module-level locale cache shared across all component instances via `useSyncExternalStore`
+- 5-minute staleness window before re-fetching
+- Single in-flight promise deduplication to prevent duplicate API calls
+- Backend endpoint: `GET /api/projects/:id/theme/locale/:lang`
+
+#### Used In
+
+10 editor components including SettingsPanel, ThemeSelector, PreviewPanel, BlockList, WidgetList, WidgetSelector, BlockSelector, WidgetItem, BlockItem, and EditorTopBar.
+
+---
+
 ## Hook Design Patterns
 
 ### Common Patterns

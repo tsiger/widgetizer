@@ -1,6 +1,6 @@
 {
   "type": "content-switcher",
-  "displayName": "Content Switcher",
+  "displayName": "tTheme:content_switcher.name",
   "aliases": [
     "tabs",
     "toggle content",
@@ -11,74 +11,74 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text",
+      "label": "tTheme:content_switcher.settings.eyebrow.label",
       "default": "Pricing"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:content_switcher.settings.title.label",
       "default": "Choose Your Plan"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading",
+      "label": "tTheme:content_switcher.settings.description.label",
       "default": "Select the billing cycle that works best for you. All plans include our core features."
     },
     {
       "type": "header",
       "id": "switcher_header",
-      "label": "Switcher"
+      "label": "tTheme:content_switcher.settings.switcher_header.label"
     },
     {
       "type": "select",
       "id": "switcher_type",
-      "label": "Switcher Style",
+      "label": "tTheme:content_switcher.settings.switcher_type.label",
       "default": "toggle",
       "options": [
         {
           "value": "toggle",
-          "label": "Toggle (2 Options)"
+          "label": "tTheme:content_switcher.settings.switcher_type.options.toggle"
         },
         {
           "value": "tabs",
-          "label": "Tabs (Up to 3 Options)"
+          "label": "tTheme:content_switcher.settings.switcher_type.options.tabs"
         }
       ]
     },
     {
       "type": "header",
       "id": "labels_header",
-      "label": "Labels"
+      "label": "tTheme:content_switcher.settings.labels_header.label"
     },
     {
       "type": "text",
       "id": "option_1_label",
-      "label": "Option 1 Label",
+      "label": "tTheme:content_switcher.settings.option_1_label.label",
       "default": "Monthly"
     },
     {
       "type": "text",
       "id": "option_2_label",
-      "label": "Option 2 Label",
+      "label": "tTheme:content_switcher.settings.option_2_label.label",
       "default": "Yearly"
     },
     {
       "type": "text",
       "id": "option_3_label",
-      "label": "Option 3 Label (Tabs only)",
+      "label": "tTheme:content_switcher.settings.option_3_label.label",
       "default": "Lifetime"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:content_switcher.settings.display_header.label"
     },
     {
       "type": "range",
       "id": "columns",
-      "label": "Columns per state",
+      "label": "tTheme:content_switcher.settings.columns.label",
       "default": 3,
       "min": 2,
       "max": 5,
@@ -87,16 +87,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:content_switcher.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:content_switcher.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:content_switcher.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -104,62 +104,62 @@
   "blocks": [
     {
       "type": "item",
-      "displayName": "Content Item",
+      "displayName": "tTheme:content_switcher.blocks.item.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:content_switcher.blocks.item.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
+          "label": "tTheme:content_switcher.blocks.item.settings.title.label",
           "default": "Item Title"
         },
         {
           "type": "richtext",
           "id": "text",
-          "label": "Text",
+          "label": "tTheme:content_switcher.blocks.item.settings.text.label",
           "default": "<p>Item description goes here.</p>"
         },
         {
           "type": "image",
           "id": "image",
-          "label": "Image"
+          "label": "tTheme:content_switcher.blocks.item.settings.image.label"
         },
         {
           "type": "text",
           "id": "price",
-          "label": "Price / Value (Optional)"
+          "label": "tTheme:content_switcher.blocks.item.settings.price.label"
         },
         {
           "type": "link",
           "id": "link",
-          "label": "Link / CTA"
+          "label": "tTheme:content_switcher.blocks.item.settings.link.label"
         },
         {
           "type": "header",
           "id": "layout_header",
-          "label": "Layout"
+          "label": "tTheme:content_switcher.blocks.item.settings.layout_header.label"
         },
         {
           "type": "select",
           "id": "target_option",
-          "label": "Assign to Option",
+          "label": "tTheme:content_switcher.blocks.item.settings.target_option.label",
           "default": "1",
           "options": [
             {
               "value": "1",
-              "label": "Option 1"
+              "label": "tTheme:content_switcher.blocks.item.settings.target_option.options.1"
             },
             {
               "value": "2",
-              "label": "Option 2"
+              "label": "tTheme:content_switcher.blocks.item.settings.target_option.options.2"
             },
             {
               "value": "3",
-              "label": "Option 3"
+              "label": "tTheme:content_switcher.blocks.item.settings.target_option.options.3"
             }
           ]
         }

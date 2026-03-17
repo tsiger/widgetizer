@@ -1,6 +1,6 @@
 {
   "type": "comparison-slider",
-  "displayName": "Comparison Slider",
+  "displayName": "tTheme:comparison_slider.name",
   "aliases": [
     "before after",
     "visual comparison",
@@ -11,71 +11,71 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:comparison_slider.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:comparison_slider.settings.title.label",
       "default": "See the Transformation"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:comparison_slider.settings.description.label"
     },
     {
       "type": "image",
       "id": "before_image",
-      "label": "Before image"
+      "label": "tTheme:comparison_slider.settings.before_image.label"
     },
     {
       "type": "image",
       "id": "after_image",
-      "label": "After image"
+      "label": "tTheme:comparison_slider.settings.after_image.label"
     },
     {
       "type": "header",
       "id": "labels_header",
-      "label": "Labels"
+      "label": "tTheme:comparison_slider.settings.labels_header.label"
     },
     {
       "type": "text",
       "id": "before_label",
-      "label": "Before label",
+      "label": "tTheme:comparison_slider.settings.before_label.label",
       "default": "Before"
     },
     {
       "type": "text",
       "id": "after_label",
-      "label": "After label",
+      "label": "tTheme:comparison_slider.settings.after_label.label",
       "default": "After"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:comparison_slider.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "orientation",
-      "label": "Slider orientation",
+      "label": "tTheme:comparison_slider.settings.orientation.label",
       "default": "horizontal",
       "options": [
         {
           "value": "horizontal",
-          "label": "Horizontal"
+          "label": "tTheme:comparison_slider.settings.orientation.options.horizontal"
         },
         {
           "value": "vertical",
-          "label": "Vertical"
+          "label": "tTheme:comparison_slider.settings.orientation.options.vertical"
         }
       ]
     },
     {
       "type": "range",
       "id": "initial_position",
-      "label": "Initial slider position",
+      "label": "tTheme:comparison_slider.settings.initial_position.label",
       "default": 50,
       "min": 0,
       "max": 100,
@@ -85,22 +85,22 @@
     {
       "type": "checkbox",
       "id": "show_labels",
-      "label": "Show before/after labels",
+      "label": "tTheme:comparison_slider.settings.show_labels.label",
       "default": true
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:comparison_slider.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:comparison_slider.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:comparison_slider.settings.color_scheme.options.highlight"
         }
       ]
     }

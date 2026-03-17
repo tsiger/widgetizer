@@ -1,6 +1,6 @@
 {
   "type": "logo-cloud",
-  "displayName": "Logo Cloud",
+  "displayName": "tTheme:logo_cloud.name",
   "aliases": [
     "partners",
     "clients",
@@ -11,45 +11,45 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow Text",
+      "label": "tTheme:logo_cloud.settings.eyebrow.label",
       "default": "Trusted By"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:logo_cloud.settings.title.label",
       "default": "Join 500+ Companies Already Using Our Platform"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:logo_cloud.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:logo_cloud.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "Layout",
+      "label": "tTheme:logo_cloud.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "Grid"
+          "label": "tTheme:logo_cloud.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "Carousel"
+          "label": "tTheme:logo_cloud.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "Columns (Desktop)",
+      "label": "tTheme:logo_cloud.settings.columns_desktop.label",
       "default": 6,
       "min": 2,
       "max": 8,
@@ -58,16 +58,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:logo_cloud.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:logo_cloud.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:logo_cloud.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -75,28 +75,28 @@
   "blocks": [
     {
       "type": "logo",
-      "displayName": "Logo",
+      "displayName": "tTheme:logo_cloud.blocks.logo.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:logo_cloud.blocks.logo.settings.content_header.label"
         },
         {
           "type": "image",
           "id": "image",
-          "label": "Logo Image"
+          "label": "tTheme:logo_cloud.blocks.logo.settings.image.label"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "Company Name",
+          "label": "tTheme:logo_cloud.blocks.logo.settings.name.label",
           "default": "Company"
         },
         {
           "type": "link",
           "id": "link",
-          "label": "Link (optional)",
+          "label": "tTheme:logo_cloud.blocks.logo.settings.link.label",
           "hide_text": true
         }
       ]

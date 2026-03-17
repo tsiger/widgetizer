@@ -1,36 +1,41 @@
 {
   "type": "image",
-  "displayName": "Image",
-  "aliases": ["photo", "picture", "visual", "graphic"],
+  "displayName": "tTheme:image.name",
+  "aliases": [
+    "photo",
+    "picture",
+    "visual",
+    "graphic"
+  ],
   "settings": [
     {
       "type": "header",
       "id": "content_header",
-      "label": "Content"
+      "label": "tTheme:image.settings.content_header.label"
     },
     {
       "type": "image",
       "id": "image",
-      "label": "Image"
+      "label": "tTheme:image.settings.image.label"
     },
     {
       "type": "link",
       "id": "link",
-      "label": "Link",
-      "description": "Optional link when image is clicked.",
+      "label": "tTheme:image.settings.link.label",
+      "description": "tTheme:image.settings.link.description",
       "hide_text": true
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:image.settings.display_header.label"
     },
     {
       "type": "checkbox",
       "id": "fullwidth",
-      "label": "Full width",
+      "label": "tTheme:image.settings.fullwidth.label",
       "default": false,
-      "description": "When enabled, image spans full width. When disabled, image is contained within the theme grid."
+      "description": "tTheme:image.settings.fullwidth.description"
     }
   ]
 }

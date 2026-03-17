@@ -1,6 +1,6 @@
 {
   "type": "priced-list",
-  "displayName": "Priced List",
+  "displayName": "tTheme:priced_list.name",
   "aliases": [
     "menu",
     "catalog",
@@ -11,38 +11,38 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Category label",
+      "label": "tTheme:priced_list.settings.eyebrow.label",
       "default": "Starters"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Section heading",
+      "label": "tTheme:priced_list.settings.title.label",
       "default": "Appetizers"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:priced_list.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:priced_list.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:priced_list.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:priced_list.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:priced_list.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -50,35 +50,35 @@
   "blocks": [
     {
       "type": "item",
-      "displayName": "Menu Item",
+      "displayName": "tTheme:priced_list.blocks.item.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:priced_list.blocks.item.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "Item name",
+          "label": "tTheme:priced_list.blocks.item.settings.name.label",
           "default": "Dish Name"
         },
         {
           "type": "richtext",
           "id": "description",
-          "label": "Description",
+          "label": "tTheme:priced_list.blocks.item.settings.description.label",
           "default": "<p>A delicious dish made with fresh ingredients.</p>"
         },
         {
           "type": "text",
           "id": "price",
-          "label": "Price",
+          "label": "tTheme:priced_list.blocks.item.settings.price.label",
           "default": "$12"
         },
         {
           "type": "image",
           "id": "image",
-          "label": "Photo (optional)"
+          "label": "tTheme:priced_list.blocks.item.settings.image.label"
         }
       ]
     }

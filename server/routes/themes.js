@@ -35,6 +35,9 @@ router.get("/project/:projectId", themeController.getProjectThemeSettings);
 // POST /api/themes/project/:projectId - Save project theme settings
 router.post("/project/:projectId", themeController.saveProjectThemeSettings);
 
+// GET /api/themes/project/:projectId/locales/:lang - Get theme locale for a project
+router.get("/project/:projectId/locales/:lang", themeController.getProjectThemeLocale);
+
 // POST /api/themes/upload - Upload a new theme zip file
 router.post("/upload", themeController.handleThemeUpload, themeController.uploadTheme);
 

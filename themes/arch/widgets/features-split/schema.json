@@ -1,6 +1,6 @@
 {
   "type": "features-split",
-  "displayName": "Features Split",
+  "displayName": "tTheme:features_split.name",
   "aliases": [
     "services split",
     "markets",
@@ -12,61 +12,61 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow Text",
+      "label": "tTheme:features_split.settings.eyebrow.label",
       "default": "Our Markets"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:features_split.settings.title.label",
       "default": "Optimal Solution For Every Business"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading",
+      "label": "tTheme:features_split.settings.description.label",
       "default": "We combine industry expertise with innovative technology to deliver solutions that drive real results. Our approach is tailored to meet the unique challenges of each market segment we serve."
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:features_split.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "content_position",
-      "label": "Content position",
+      "label": "tTheme:features_split.settings.content_position.label",
       "default": "left",
       "options": [
         {
           "value": "left",
-          "label": "Left"
+          "label": "tTheme:features_split.settings.content_position.options.left"
         },
         {
           "value": "right",
-          "label": "Right"
+          "label": "tTheme:features_split.settings.content_position.options.right"
         }
       ]
     },
     {
       "type": "checkbox",
       "id": "show_divider",
-      "label": "Show divider",
+      "label": "tTheme:features_split.settings.show_divider.label",
       "default": true
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:features_split.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:features_split.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:features_split.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -74,28 +74,28 @@
   "blocks": [
     {
       "type": "feature",
-      "displayName": "Feature",
+      "displayName": "tTheme:features_split.blocks.feature.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:features_split.blocks.feature.settings.content_header.label"
         },
         {
           "type": "icon",
           "id": "icon",
-          "label": "Icon"
+          "label": "tTheme:features_split.blocks.feature.settings.icon.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
+          "label": "tTheme:features_split.blocks.feature.settings.title.label",
           "default": "Feature Title"
         },
         {
           "type": "richtext",
           "id": "description",
-          "label": "Description",
+          "label": "tTheme:features_split.blocks.feature.settings.description.label",
           "default": "<p>Feature description goes here.</p>"
         }
       ]

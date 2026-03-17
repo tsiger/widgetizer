@@ -1,6 +1,6 @@
 {
   "type": "countdown",
-  "displayName": "Countdown Timer",
+  "displayName": "tTheme:countdown.name",
   "aliases": [
     "timer",
     "launch date",
@@ -11,69 +11,69 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:countdown.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:countdown.settings.title.label",
       "default": "Coming Soon"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:countdown.settings.description.label"
     },
     {
       "type": "header",
       "id": "content_header",
-      "label": "Content"
+      "label": "tTheme:countdown.settings.content_header.label"
     },
     {
       "type": "text",
       "id": "target_date",
-      "label": "Target date (YYYY-MM-DD HH:MM)",
+      "label": "tTheme:countdown.settings.target_date.label",
       "default": "2027-01-01 00:00"
     },
     {
       "type": "text",
       "id": "expired_message",
-      "label": "Message when expired",
+      "label": "tTheme:countdown.settings.expired_message.label",
       "default": "The wait is over!"
     },
     {
       "type": "link",
       "id": "button",
-      "label": "Call-to-action button"
+      "label": "tTheme:countdown.settings.button.label"
     },
     {
       "type": "header",
       "id": "options_header",
-      "label": "Options"
+      "label": "tTheme:countdown.settings.options_header.label"
     },
     {
       "type": "checkbox",
       "id": "show_seconds",
-      "label": "Show seconds",
+      "label": "tTheme:countdown.settings.show_seconds.label",
       "default": true
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:countdown.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "style",
-      "label": "Style",
+      "label": "tTheme:countdown.settings.style.label",
       "options": [
         {
           "value": "cards",
-          "label": "Cards"
+          "label": "tTheme:countdown.settings.style.options.cards"
         },
         {
           "value": "minimal",
-          "label": "Minimal"
+          "label": "tTheme:countdown.settings.style.options.minimal"
         }
       ],
       "default": "cards"
@@ -81,16 +81,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:countdown.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:countdown.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:countdown.settings.color_scheme.options.highlight"
         }
       ]
     }

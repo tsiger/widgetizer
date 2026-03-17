@@ -1,6 +1,6 @@
 {
   "type": "icon-list",
-  "displayName": "Icon List",
+  "displayName": "tTheme:icon_list.name",
   "aliases": [
     "amenities",
     "features",
@@ -12,43 +12,43 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow Text"
+      "label": "tTheme:icon_list.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading"
+      "label": "tTheme:icon_list.settings.title.label"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:icon_list.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:icon_list.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "Layout",
+      "label": "tTheme:icon_list.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "Grid"
+          "label": "tTheme:icon_list.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "Carousel"
+          "label": "tTheme:icon_list.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "Columns (Desktop)",
+      "label": "tTheme:icon_list.settings.columns_desktop.label",
       "default": 4,
       "min": 2,
       "max": 8,
@@ -57,16 +57,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:icon_list.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:icon_list.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:icon_list.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -74,28 +74,28 @@
   "blocks": [
     {
       "type": "item",
-      "displayName": "Item",
+      "displayName": "tTheme:icon_list.blocks.item.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:icon_list.blocks.item.settings.content_header.label"
         },
         {
           "type": "icon",
           "id": "icon",
-          "label": "Icon"
+          "label": "tTheme:icon_list.blocks.item.settings.icon.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
+          "label": "tTheme:icon_list.blocks.item.settings.title.label",
           "default": "Feature"
         },
         {
           "type": "text",
           "id": "description",
-          "label": "Description"
+          "label": "tTheme:icon_list.blocks.item.settings.description.label"
         }
       ]
     }

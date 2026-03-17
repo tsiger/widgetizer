@@ -1,6 +1,6 @@
 {
   "type": "bento-grid",
-  "displayName": "Bento Grid",
+  "displayName": "tTheme:bento_grid.name",
   "aliases": [
     "dashboard",
     "tiles",
@@ -12,65 +12,65 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:bento_grid.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:bento_grid.settings.title.label",
       "default": "Feature Spotlight"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:bento_grid.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:bento_grid.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "gap",
-      "label": "Gap Size",
+      "label": "tTheme:bento_grid.settings.gap.label",
       "default": "var(--space-md)",
       "options": [
         {
           "value": "0",
-          "label": "None"
+          "label": "tTheme:bento_grid.settings.gap.options.0"
         },
         {
           "value": "var(--space-sm)",
-          "label": "Small"
+          "label": "tTheme:bento_grid.settings.gap.options.var(--space-sm)"
         },
         {
           "value": "var(--space-md)",
-          "label": "Medium"
+          "label": "tTheme:bento_grid.settings.gap.options.var(--space-md)"
         },
         {
           "value": "var(--space-lg)",
-          "label": "Large"
+          "label": "tTheme:bento_grid.settings.gap.options.var(--space-lg)"
         },
         {
           "value": "var(--space-xl)",
-          "label": "Extra Large"
+          "label": "tTheme:bento_grid.settings.gap.options.var(--space-xl)"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:bento_grid.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:bento_grid.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:bento_grid.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -78,45 +78,45 @@
   "blocks": [
     {
       "type": "item",
-      "displayName": "Bento Item",
+      "displayName": "tTheme:bento_grid.blocks.item.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:bento_grid.blocks.item.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
+          "label": "tTheme:bento_grid.blocks.item.settings.title.label",
           "default": "Bento Tile"
         },
         {
           "type": "textarea",
           "id": "text",
-          "label": "Text",
+          "label": "tTheme:bento_grid.blocks.item.settings.text.label",
           "default": "Describe this featured item here."
         },
         {
           "type": "image",
           "id": "image",
-          "label": "Background image"
+          "label": "tTheme:bento_grid.blocks.item.settings.image.label"
         },
         {
           "type": "link",
           "id": "link",
-          "label": "Link",
+          "label": "tTheme:bento_grid.blocks.item.settings.link.label",
           "hide_text": true
         },
         {
           "type": "header",
           "id": "layout_header",
-          "label": "Layout"
+          "label": "tTheme:bento_grid.blocks.item.settings.layout_header.label"
         },
         {
           "type": "range",
           "id": "col_span",
-          "label": "Column Span",
+          "label": "tTheme:bento_grid.blocks.item.settings.col_span.label",
           "min": 1,
           "max": 4,
           "step": 1,
@@ -125,7 +125,7 @@
         {
           "type": "range",
           "id": "row_span",
-          "label": "Row Span",
+          "label": "tTheme:bento_grid.blocks.item.settings.row_span.label",
           "min": 1,
           "max": 2,
           "step": 1,
@@ -134,50 +134,50 @@
         {
           "type": "header",
           "id": "display_header",
-          "label": "Display"
+          "label": "tTheme:bento_grid.blocks.item.settings.display_header.label"
         },
         {
           "type": "color",
           "id": "background_color",
-          "label": "Block Background"
+          "label": "tTheme:bento_grid.blocks.item.settings.background_color.label"
         },
         {
           "type": "color",
           "id": "overlay_color",
-          "label": "Image Overlay",
+          "label": "tTheme:bento_grid.blocks.item.settings.overlay_color.label",
           "default": "#0a1e38bf",
           "allow_alpha": true,
-          "description": "Applies only if there is a background image."
+          "description": "tTheme:bento_grid.blocks.item.settings.overlay_color.description"
         },
         {
           "type": "select",
           "id": "text_color",
-          "label": "Text Color",
+          "label": "tTheme:bento_grid.blocks.item.settings.text_color.label",
           "default": "dark",
           "options": [
             {
               "value": "dark",
-              "label": "Dark"
+              "label": "tTheme:bento_grid.blocks.item.settings.text_color.options.dark"
             },
             {
               "value": "light",
-              "label": "Light"
+              "label": "tTheme:bento_grid.blocks.item.settings.text_color.options.light"
             }
           ]
         },
         {
           "type": "select",
           "id": "alignment",
-          "label": "Text Alignment",
+          "label": "tTheme:bento_grid.blocks.item.settings.alignment.label",
           "default": "start",
           "options": [
             {
               "value": "start",
-              "label": "Left"
+              "label": "tTheme:bento_grid.blocks.item.settings.alignment.options.start"
             },
             {
               "value": "center",
-              "label": "Center"
+              "label": "tTheme:bento_grid.blocks.item.settings.alignment.options.center"
             }
           ]
         }

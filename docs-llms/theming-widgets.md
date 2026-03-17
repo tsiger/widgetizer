@@ -528,11 +528,11 @@ Add a color scheme setting to your widget schema:
 {
   "type": "select",
   "id": "color_scheme",
-  "label": "Color Scheme",
+  "label": "tTheme:my_widget.settings.color_scheme.label",
   "default": "light",
   "options": [
-    { "value": "light", "label": "Light" },
-    { "value": "dark", "label": "Dark" }
+    { "value": "light", "label": "tTheme:my_widget.settings.color_scheme.options.light" },
+    { "value": "dark", "label": "tTheme:my_widget.settings.color_scheme.options.dark" }
   ]
 }
 ```
@@ -1019,10 +1019,12 @@ Each increment adds 0.1s delay. So `--reveal-delay: 0` has no delay, `--reveal-d
 
 ### Schema File (`schema.json`)
 
+All user-facing strings in the schema (`displayName`, `label`, `description`, and option labels) use `tTheme:` prefixed keys that reference entries in the theme's locale files (`locales/*.json`). This keeps schemas language-independent and enables translation support.
+
 ```json
 {
   "type": "my-widget",
-  "displayName": "My Widget",
+  "displayName": "tTheme:my_widget.name",
   "maxBlocks": 10,
   "aliases": ["alternative name", "keyword"],
   "settings": [
@@ -1036,6 +1038,15 @@ Each increment adds 0.1s delay. So `--reveal-delay: 0` has no delay, `--reveal-d
   ]
 }
 ```
+
+**Key naming convention:** The `tTheme:` key path follows the pattern `{widget_type}.{path}`, where the widget type has hyphens converted to underscores (e.g., `bento-grid` becomes `bento_grid`). Common patterns:
+
+- `{widget_type}.name` -- widget `displayName`
+- `{widget_type}.settings.{setting_id}.label` -- setting label
+- `{widget_type}.settings.{setting_id}.description` -- setting help text
+- `{widget_type}.settings.{setting_id}.options.{value}` -- select/radio option label
+- `{widget_type}.blocks.{block_type}.name` -- block `displayName`
+- `{widget_type}.blocks.{block_type}.settings.{setting_id}.label` -- block setting label
 
 ### Block Limits
 
@@ -1053,7 +1064,7 @@ Use the `maxBlocks` property to limit how many blocks a widget can contain. This
 {
   "type": "slideshow",
   "maxBlocks": 10,
-  "displayName": "Slideshow",
+  "displayName": "tTheme:slideshow.name",
   ...
 }
 ```
@@ -1080,7 +1091,7 @@ Use `header` setting types to visually group related settings in the editor UI. 
 {
   "type": "header",
   "id": "content_header",
-  "label": "Content"
+  "label": "tTheme:my_widget.settings.content_header.label"
 }
 ```
 
@@ -1154,39 +1165,39 @@ Blocks should also use headers to organize their settings:
     {
       "type": "header",
       "id": "content_header",
-      "label": "Content"
+      "label": "tTheme:my_widget.settings.content_header.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading"
+      "label": "tTheme:my_widget.settings.title.label"
     },
     {
       "type": "image",
       "id": "image",
-      "label": "Image"
+      "label": "tTheme:my_widget.settings.image.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:my_widget.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "Layout",
+      "label": "tTheme:my_widget.settings.layout.label",
       "default": "cards"
     },
     {
       "type": "checkbox",
       "id": "animate",
-      "label": "Animate numbers",
+      "label": "tTheme:my_widget.settings.animate.label",
       "default": true
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:my_widget.settings.color_scheme.label",
       "default": "light"
     }
   ]
@@ -1213,11 +1224,11 @@ Use `header` setting types to organize block settings:
 {
   "type": "select",
   "id": "background",
-  "label": "Background",
+  "label": "tTheme:my_widget.settings.background.label",
   "default": "primary",
   "options": [
-    { "value": "primary", "label": "Primary" },
-    { "value": "secondary", "label": "Secondary" }
+    { "value": "primary", "label": "tTheme:my_widget.settings.background.options.primary" },
+    { "value": "secondary", "label": "tTheme:my_widget.settings.background.options.secondary" }
   ]
 }
 ```
@@ -1228,20 +1239,20 @@ Use `header` setting types to organize block settings:
 {
   "type": "image",
   "id": "image",
-  "label": "Background image"
+  "label": "tTheme:my_widget.blocks.item.settings.image.label"
 },
 {
   "type": "color",
   "id": "overlay_color",
-  "label": "Overlay color",
+  "label": "tTheme:my_widget.blocks.item.settings.overlay_color.label",
   "default": "#00000080",
   "allow_alpha": true,
-  "description": "Applies only if there is a background image."
+  "description": "tTheme:my_widget.blocks.item.settings.overlay_color.description"
 },
 {
   "type": "color",
   "id": "background_color",
-  "label": "Background color",
+  "label": "tTheme:my_widget.blocks.item.settings.background_color.label",
   "default": "#f9f9f9"
 }
 ```
@@ -1289,26 +1300,26 @@ To ensure consistency across widgets, use these standardized block definitions:
 ```json
 {
   "type": "heading",
-  "displayName": "Heading",
+  "displayName": "tTheme:my_widget.blocks.heading.name",
   "settings": [
     {
       "type": "text",
       "id": "text",
-      "label": "Text",
+      "label": "tTheme:my_widget.blocks.heading.settings.text.label",
       "default": "Section Heading"
     },
     {
       "type": "select",
       "id": "size",
-      "label": "Size",
+      "label": "tTheme:my_widget.blocks.heading.settings.size.label",
       "default": "2xl",
       "options": [
-        { "value": "lg", "label": "Large" },
-        { "value": "xl", "label": "Extra Large" },
-        { "value": "2xl", "label": "2X Large" },
-        { "value": "3xl", "label": "3X Large" },
-        { "value": "4xl", "label": "4X Large" },
-        { "value": "5xl", "label": "5X Large" }
+        { "value": "lg", "label": "tTheme:my_widget.blocks.heading.settings.size.options.lg" },
+        { "value": "xl", "label": "tTheme:my_widget.blocks.heading.settings.size.options.xl" },
+        { "value": "2xl", "label": "tTheme:my_widget.blocks.heading.settings.size.options.2xl" },
+        { "value": "3xl", "label": "tTheme:my_widget.blocks.heading.settings.size.options.3xl" },
+        { "value": "4xl", "label": "tTheme:my_widget.blocks.heading.settings.size.options.4xl" },
+        { "value": "5xl", "label": "tTheme:my_widget.blocks.heading.settings.size.options.5xl" }
       ]
     }
   ]
@@ -1335,35 +1346,35 @@ To ensure consistency across widgets, use these standardized block definitions:
 ```json
 {
   "type": "text",
-  "displayName": "Text",
+  "displayName": "tTheme:my_widget.blocks.text.name",
   "settings": [
     {
       "type": "textarea",
       "id": "text",
-      "label": "Text",
+      "label": "tTheme:my_widget.blocks.text.settings.text.label",
       "default": "Add your text content here."
     },
     {
       "type": "select",
       "id": "size",
-      "label": "Size",
+      "label": "tTheme:my_widget.blocks.text.settings.size.label",
       "default": "base",
       "options": [
-        { "value": "sm", "label": "Small" },
-        { "value": "base", "label": "Base" },
-        { "value": "lg", "label": "Large" }
+        { "value": "sm", "label": "tTheme:my_widget.blocks.text.settings.size.options.sm" },
+        { "value": "base", "label": "tTheme:my_widget.blocks.text.settings.size.options.base" },
+        { "value": "lg", "label": "tTheme:my_widget.blocks.text.settings.size.options.lg" }
       ]
     },
     {
       "type": "checkbox",
       "id": "uppercase",
-      "label": "Uppercase",
+      "label": "tTheme:my_widget.blocks.text.settings.uppercase.label",
       "default": false
     },
     {
       "type": "checkbox",
       "id": "muted",
-      "label": "Muted color",
+      "label": "tTheme:my_widget.blocks.text.settings.muted.label",
       "default": false
     }
   ]
@@ -1391,12 +1402,12 @@ To ensure consistency across widgets, use these standardized block definitions:
 ```json
 {
   "type": "button",
-  "displayName": "Button Group",
+  "displayName": "tTheme:my_widget.blocks.button.name",
   "settings": [
     {
       "type": "link",
       "id": "link",
-      "label": "Button 1",
+      "label": "tTheme:my_widget.blocks.button.settings.link.label",
       "default": {
         "text": "Learn More",
         "href": "#",
@@ -1406,38 +1417,38 @@ To ensure consistency across widgets, use these standardized block definitions:
     {
       "type": "select",
       "id": "style",
-      "label": "Button 1 style",
+      "label": "tTheme:my_widget.blocks.button.settings.style.label",
       "default": "secondary",
       "options": [
-        { "value": "primary", "label": "Primary" },
-        { "value": "secondary", "label": "Secondary" }
+        { "value": "primary", "label": "tTheme:my_widget.blocks.button.settings.style.options.primary" },
+        { "value": "secondary", "label": "tTheme:my_widget.blocks.button.settings.style.options.secondary" }
       ]
     },
     {
       "type": "link",
       "id": "link_2",
-      "label": "Button 2"
+      "label": "tTheme:my_widget.blocks.button.settings.link_2.label"
     },
     {
       "type": "select",
       "id": "style_2",
-      "label": "Button 2 style",
+      "label": "tTheme:my_widget.blocks.button.settings.style_2.label",
       "default": "secondary",
       "options": [
-        { "value": "primary", "label": "Primary" },
-        { "value": "secondary", "label": "Secondary" }
+        { "value": "primary", "label": "tTheme:my_widget.blocks.button.settings.style_2.options.primary" },
+        { "value": "secondary", "label": "tTheme:my_widget.blocks.button.settings.style_2.options.secondary" }
       ]
     },
     {
       "type": "select",
       "id": "size",
-      "label": "Button size",
+      "label": "tTheme:my_widget.blocks.button.settings.size.label",
       "default": "medium",
       "options": [
-        { "value": "small", "label": "Small" },
-        { "value": "medium", "label": "Medium" },
-        { "value": "large", "label": "Large" },
-        { "value": "xlarge", "label": "Extra Large" }
+        { "value": "small", "label": "tTheme:my_widget.blocks.button.settings.size.options.small" },
+        { "value": "medium", "label": "tTheme:my_widget.blocks.button.settings.size.options.medium" },
+        { "value": "large", "label": "tTheme:my_widget.blocks.button.settings.size.options.large" },
+        { "value": "xlarge", "label": "tTheme:my_widget.blocks.button.settings.size.options.xlarge" }
       ]
     }
   ]
@@ -1659,11 +1670,11 @@ Many card-based widgets support switching between grid and carousel layout via a
 {
   "type": "select",
   "id": "layout",
-  "label": "Layout",
+  "label": "tTheme:my_widget.settings.layout.label",
   "default": "grid",
   "options": [
-    { "value": "grid", "label": "Grid" },
-    { "value": "carousel", "label": "Carousel" }
+    { "value": "grid", "label": "tTheme:my_widget.settings.layout.options.grid" },
+    { "value": "carousel", "label": "tTheme:my_widget.settings.layout.options.carousel" }
   ]
 }
 ```
@@ -1744,6 +1755,7 @@ Before submitting a widget:
 - [ ] No duplicate CSS properties from `base.css`
 - [ ] Scroll reveal animations added to content elements (`.reveal .reveal-up` with `--reveal-delay`)
 - [ ] `maxBlocks` set for widgets where block count should be limited
+- [ ] All `tTheme:` keys in schema have matching entries in `locales/*.json` (run `npm run validate:theme-locales`)
 
 ---
 

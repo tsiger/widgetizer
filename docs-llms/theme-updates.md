@@ -35,6 +35,7 @@ themes/                          # Seed directory (source, git-tracked)
     screenshot.png
     widgets/
     assets/
+    locales/
     templates/
     menus/
     snippets/
@@ -58,6 +59,7 @@ data/themes/                     # User data directory (runtime, gitignored)
     layout.liquid
     widgets/
     assets/
+    locales/
     updates/                     # Synced from seed + any uploaded updates
       1.1.0/
       1.2.0/
@@ -101,6 +103,7 @@ themes/arch/updates/             # In the seed directory
 | `assets/`       | ✅ Yes          | Theme infrastructure   |
 | `widgets/`      | ✅ Yes          | Theme infrastructure   |
 | `snippets/`     | ✅ Yes          | Theme infrastructure   |
+| `locales/`      | ✅ Yes          | Theme infrastructure   |
 | `layout.liquid` | ✅ Yes          | Theme infrastructure   |
 | `templates/`    | ❌ No           | User content, add-only |
 | `menus/`        | ❌ No           | User content, add-only |
@@ -137,6 +140,7 @@ These theme files can be updated in projects:
 | `assets/`        | Entire folder replaced                |
 | `widgets/`       | Entire folder replaced                |
 | `snippets/`      | Entire folder replaced                |
+| `locales/`       | Entire folder replaced                |
 | `theme.json`     | **Merged** (see Settings Merge below) |
 | `screenshot.png` | Replaced with new version             |
 

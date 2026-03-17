@@ -1,5 +1,6 @@
 import { GripVertical, Copy, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../../hooks/useThemeLocale";
 import useWidgetStore from "../../../stores/widgetStore";
 import useAutoSave from "../../../stores/saveStore";
 
@@ -16,7 +17,8 @@ export default function BlockItem({
   onHover,
 }) {
   const { t } = useTranslation();
-  const blockName = blockSchema?.displayName || block.type || "Block";
+  const { tTheme } = useThemeLocale();
+  const blockName = tTheme(blockSchema?.displayName) || block.type || "Block";
   const duplicateBlock = useWidgetStore((state) => state.duplicateBlock);
   const deleteBlock = useWidgetStore((state) => state.deleteBlock);
   const markWidgetModified = useAutoSave((state) => state.markWidgetModified);

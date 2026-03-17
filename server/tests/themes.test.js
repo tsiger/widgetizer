@@ -75,6 +75,7 @@ const {
   saveProjectThemeSettings,
   resolvePresetPaths,
   getThemePresets,
+  getProjectThemeLocale,
 } = await import("../controllers/themeController.js");
 const { closeDb } = await import("../db/index.js");
 
@@ -1544,5 +1545,151 @@ describe("getThemePresets reads from source dir", () => {
     assert.equal(data.presets[0].id, "default");
     assert.equal(data.presets[1].id, "studio");
     assert.equal(data.default, "default");
+  });
+});
+
+// ============================================================================
+// getProjectThemeLocale
+// ============================================================================
+
+describe("getProjectThemeLocale", () => {
+  const LOCALE_THEME = "locale-test-theme";
+  const LOCALE_PROJECT_ID = "locale-test-project-uuid";
+  const LOCALE_PROJECT_FOLDER = "locale-test-project";
+
+  const NO_LOCALE_THEME = "no-locale-theme";
+  const NO_LOCALE_PROJECT_ID = "no-locale-project-uuid";
+  const NO_LOCALE_PROJECT_FOLDER = "no-locale-project";
+
+  before(async () => {
+    // Create a theme with locale files
+    await createThemeOnDisk(LOCALE_THEME);
+    const themeDir = getThemeDir(LOCALE_THEME);
+    const localesDir = path.join(themeDir, "locales");
+    await fs.ensureDir(localesDir);
+    await fs.writeFile(
+      path.join(localesDir, "en.json"),
+      JSON.stringify({ greeting: "Hello", nav: { home: "Home", about: "About" } }),
+    );
+    await fs.writeFile(
+      path.join(localesDir, "fr.json"),
+      JSON.stringify({ greeting: "Bonjour", nav: { home: "Accueil", about: "À propos" } }),
+    );
+
+    // Create a theme without locale files
+    await createThemeOnDisk(NO_LOCALE_THEME);
+
+    // Register projects in DB
+    const existing = projectRepo.readProjectsData();
+    projectRepo.writeProjectsData({
+      projects: [
+        ...existing.projects,
+        {
+          id: LOCALE_PROJECT_ID,
+          folderName: LOCALE_PROJECT_FOLDER,
+          name: "Locale Test Project",
+          theme: LOCALE_THEME,
+          siteUrl: "",
+          created: new Date().toISOString(),
+        },
+        {
+          id: NO_LOCALE_PROJECT_ID,
+          folderName: NO_LOCALE_PROJECT_FOLDER,
+          name: "No Locale Project",
+          theme: NO_LOCALE_THEME,
+          siteUrl: "",
+          created: new Date().toISOString(),
+        },
+      ],
+      activeProjectId: existing.activeProjectId,
+    });
+
+    // Create project directories
+    const projDir = getProjectDir(LOCALE_PROJECT_FOLDER, "local");
+    await fs.ensureDir(projDir);
+    await fs.ensureDir(getProjectPagesDir(LOCALE_PROJECT_FOLDER, "local"));
+
+    const noLocaleProjDir = getProjectDir(NO_LOCALE_PROJECT_FOLDER, "local");
+    await fs.ensureDir(noLocaleProjDir);
+    await fs.ensureDir(getProjectPagesDir(NO_LOCALE_PROJECT_FOLDER, "local"));
+  });
+
+  after(async () => {
+    await fs.remove(getThemeDir(LOCALE_THEME));
+    await fs.remove(getThemeDir(NO_LOCALE_THEME));
+  });
+
+  it("returns the correct locale JSON for a valid lang code", async () => {
+    const res = await callController(getProjectThemeLocale, {
+      params: { projectId: LOCALE_PROJECT_ID, lang: "fr" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.greeting, "Bonjour");
+    assert.deepStrictEqual(res._json.nav, { home: "Accueil", about: "À propos" });
+  });
+
+  it("returns English locale for lang 'en'", async () => {
+    const res = await callController(getProjectThemeLocale, {
+      params: { projectId: LOCALE_PROJECT_ID, lang: "en" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.greeting, "Hello");
+    assert.deepStrictEqual(res._json.nav, { home: "Home", about: "About" });
+  });
+
+  it("falls back to en.json when the requested language file does not exist", async () => {
+    const res = await callController(getProjectThemeLocale, {
+      params: { projectId: LOCALE_PROJECT_ID, lang: "ja" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.greeting, "Hello");
+    assert.deepStrictEqual(res._json.nav, { home: "Home", about: "About" });
+  });
+
+  it("returns 400 for invalid language codes", async () => {
+    // Too long
+    const res1 = await callController(getProjectThemeLocale, {
+      params: { projectId: LOCALE_PROJECT_ID, lang: "eng" },
+    });
+    assert.equal(res1._status, 400);
+    assert.equal(res1._json.error, "Invalid language code");
+
+    // Uppercase
+    const res2 = await callController(getProjectThemeLocale, {
+      params: { projectId: LOCALE_PROJECT_ID, lang: "EN" },
+    });
+    assert.equal(res2._status, 400);
+    assert.equal(res2._json.error, "Invalid language code");
+
+    // Contains numbers
+    const res3 = await callController(getProjectThemeLocale, {
+      params: { projectId: LOCALE_PROJECT_ID, lang: "e1" },
+    });
+    assert.equal(res3._status, 400);
+    assert.equal(res3._json.error, "Invalid language code");
+
+    // Empty string
+    const res4 = await callController(getProjectThemeLocale, {
+      params: { projectId: LOCALE_PROJECT_ID, lang: "" },
+    });
+    assert.equal(res4._status, 400);
+    assert.equal(res4._json.error, "Invalid language code");
+  });
+
+  it("returns empty object when theme has no locale files", async () => {
+    const res = await callController(getProjectThemeLocale, {
+      params: { projectId: NO_LOCALE_PROJECT_ID, lang: "en" },
+    });
+    assert.equal(res._status, 200);
+    assert.deepStrictEqual(res._json, {});
+  });
+
+  it("handles non-existent project gracefully", async () => {
+    const res = await callController(getProjectThemeLocale, {
+      params: { projectId: "nonexistent-project-uuid", lang: "en" },
+    });
+    // getProjectById returns null, so !themeId is true → returns {}
+    assert.equal(res._status, 200);
+    assert.deepStrictEqual(res._json, {});
   });
 });

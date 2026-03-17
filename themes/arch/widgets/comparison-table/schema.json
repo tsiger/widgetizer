@@ -1,6 +1,6 @@
 {
   "type": "comparison-table",
-  "displayName": "Comparison Table",
+  "displayName": "tTheme:comparison_table.name",
   "aliases": [
     "pricing table",
     "features comparison",
@@ -11,48 +11,48 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:comparison_table.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:comparison_table.settings.title.label",
       "default": "Compare Our Plans"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:comparison_table.settings.description.label"
     },
     {
       "type": "header",
       "id": "content_header",
-      "label": "Content"
+      "label": "tTheme:comparison_table.settings.content_header.label"
     },
     {
       "type": "text",
       "id": "feature_column_label",
-      "label": "Feature column label",
+      "label": "tTheme:comparison_table.settings.feature_column_label.label",
       "default": "Features"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:comparison_table.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:comparison_table.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:comparison_table.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:comparison_table.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -60,61 +60,61 @@
   "blocks": [
     {
       "type": "column",
-      "displayName": "Column",
+      "displayName": "tTheme:comparison_table.blocks.column.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:comparison_table.blocks.column.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "Column name",
+          "label": "tTheme:comparison_table.blocks.column.settings.name.label",
           "default": "Our Product"
         },
         {
           "type": "text",
           "id": "badge",
-          "label": "Badge text (optional)"
+          "label": "tTheme:comparison_table.blocks.column.settings.badge.label"
         },
         {
           "type": "header",
           "id": "options_header",
-          "label": "Options"
+          "label": "tTheme:comparison_table.blocks.column.settings.options_header.label"
         },
         {
           "type": "checkbox",
           "id": "featured",
-          "label": "Featured (highlighted)",
+          "label": "tTheme:comparison_table.blocks.column.settings.featured.label",
           "default": false
         },
         {
           "type": "link",
           "id": "link",
-          "label": "CTA Button"
+          "label": "tTheme:comparison_table.blocks.column.settings.link.label"
         }
       ]
     },
     {
       "type": "feature",
-      "displayName": "Feature Row",
+      "displayName": "tTheme:comparison_table.blocks.feature.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:comparison_table.blocks.feature.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "Feature name",
+          "label": "tTheme:comparison_table.blocks.feature.settings.name.label",
           "default": "Feature Name"
         },
         {
           "type": "textarea",
           "id": "values",
-          "label": "Values for each column (one per line: yes, no, or custom text)",
+          "label": "tTheme:comparison_table.blocks.feature.settings.values.label",
           "default": "yes\nyes\nno"
         }
       ]
@@ -126,7 +126,11 @@
       "settings": {
         "name": "Free",
         "featured": false,
-        "link": { "text": "Get Started", "href": "#", "target": "_self" }
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        }
       }
     },
     {
@@ -135,7 +139,11 @@
         "name": "Pro",
         "featured": true,
         "badge": "Popular",
-        "link": { "text": "Get Started", "href": "#", "target": "_self" }
+        "link": {
+          "text": "Get Started",
+          "href": "#",
+          "target": "_self"
+        }
       }
     },
     {
@@ -143,7 +151,11 @@
       "settings": {
         "name": "Enterprise",
         "featured": false,
-        "link": { "text": "Contact Us", "href": "#", "target": "_self" }
+        "link": {
+          "text": "Contact Us",
+          "href": "#",
+          "target": "_self"
+        }
       }
     },
     {

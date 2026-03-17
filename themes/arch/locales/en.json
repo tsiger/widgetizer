@@ -1,0 +1,3012 @@
+{
+  "accordion": {
+    "name": "Accordion",
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "style": {
+        "label": "Style",
+        "options": {
+          "separated": "Separated",
+          "connected": "Connected"
+        }
+      },
+      "allow_multiple": {
+        "label": "Allow multiple open"
+      },
+      "sidebar_position": {
+        "label": "Sidebar position",
+        "options": {
+          "left": "Left",
+          "right": "Right"
+        }
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Item",
+        "settings": {
+          "question": {
+            "label": "Question"
+          },
+          "answer": {
+            "label": "Answer"
+          }
+        }
+      },
+      "info": {
+        "name": "Info",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      },
+      "social": {
+        "name": "Social Icons"
+      }
+    }
+  },
+  "banner": {
+    "name": "Banner",
+    "settings": {
+      "image": {
+        "label": "Background image"
+      },
+      "overlay_color": {
+        "label": "Overlay color",
+        "description": "Applies only if there is a background image."
+      },
+      "height": {
+        "label": "Height",
+        "options": {
+          "auto": "Auto",
+          "small": "Small (300px)",
+          "medium": "Medium (450px)",
+          "large": "Large (600px)"
+        }
+      },
+      "fullwidth": {
+        "label": "Full width"
+      },
+      "alignment": {
+        "label": "Content alignment",
+        "options": {
+          "center": "Center",
+          "start": "Start"
+        }
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "button": {
+        "settings": {
+          "size": {
+            "options": {
+              "small": "Small",
+              "medium": "Medium",
+              "large": "Large",
+              "xlarge": "Extra Large"
+            },
+            "label": "Button size"
+          },
+          "link": {
+            "label": "Button 1"
+          },
+          "style": {
+            "label": "Button 1 style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "style_2": {
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            },
+            "label": "Button 2 style"
+          },
+          "link_2": {
+            "label": "Button 2"
+          }
+        },
+        "name": "Button Group"
+      },
+      "text": {
+        "settings": {
+          "size": {
+            "label": "Size",
+            "options": {
+              "base": "Base",
+              "sm": "Small",
+              "lg": "Large"
+            }
+          },
+          "uppercase": {
+            "label": "Uppercase"
+          },
+          "muted": {
+            "label": "Muted color"
+          },
+          "text": {
+            "label": "Text"
+          }
+        },
+        "name": "Accordion"
+      },
+      "heading": {
+        "settings": {
+          "size": {
+            "options": {
+              "2xl": "2X Large",
+              "3xl": "3X Large",
+              "4xl": "4X Large",
+              "5xl": "5X Large",
+              "6xl": "6X Large",
+              "7xl": "7X Large",
+              "8xl": "8X Large",
+              "9xl": "9X Large",
+              "lg": "Large",
+              "xl": "Extra Large"
+            },
+            "label": "Button size"
+          },
+          "text": {
+            "label": "Text"
+          }
+        },
+        "name": "Accordion"
+      }
+    }
+  },
+  "bento_grid": {
+    "name": "Bento Grid",
+    "settings": {
+      "gap": {
+        "label": "Gap Size",
+        "options": {
+          "0": "None",
+          "var(--space-sm)": "Small",
+          "var(--space-md)": "Medium",
+          "var(--space-lg)": "Large",
+          "var(--space-xl)": "Extra Large"
+        }
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Bento Item",
+        "settings": {
+          "content_header": {
+            "label": "Content"
+          },
+          "link": {
+            "label": "Link"
+          },
+          "layout_header": {
+            "label": "Layout"
+          },
+          "col_span": {
+            "label": "Column Span"
+          },
+          "row_span": {
+            "label": "Row Span"
+          },
+          "background_color": {
+            "label": "Block Background"
+          },
+          "overlay_color": {
+            "label": "Image Overlay",
+            "description": "Applies only if there is a background image."
+          },
+          "text_color": {
+            "label": "Text Color",
+            "options": {
+              "dark": "Dark",
+              "light": "Light"
+            }
+          },
+          "alignment": {
+            "label": "Text Alignment",
+            "options": {
+              "start": "Start",
+              "center": "Center"
+            }
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "text": {
+            "label": "Text"
+          },
+          "image": {
+            "label": "Photo (optional)"
+          },
+          "display_header": {
+            "label": "Display"
+          }
+        }
+      }
+    }
+  },
+  "card_grid": {
+    "name": "Card Grid",
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow Text"
+      },
+      "layout": {
+        "options": {
+          "grid": "Grid",
+          "carousel": "Carousel"
+        },
+        "label": "Eyebrow text"
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "card": {
+        "name": "Card",
+        "settings": {
+          "image": {
+            "label": "Image"
+          },
+          "subtitle": {
+            "label": "Subtitle"
+          },
+          "description": {
+            "label": "Description"
+          },
+          "button_link": {
+            "label": "Button Link"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "title": {
+            "label": "Heading"
+          }
+        }
+      }
+    }
+  },
+  "comparison_slider": {
+    "name": "Comparison Slider",
+    "settings": {
+      "before_image": {
+        "label": "Before image"
+      },
+      "after_image": {
+        "label": "After image"
+      },
+      "labels_header": {
+        "label": "Labels"
+      },
+      "before_label": {
+        "label": "Before label"
+      },
+      "after_label": {
+        "label": "After label"
+      },
+      "orientation": {
+        "label": "Slider orientation",
+        "options": {
+          "horizontal": "Horizontal",
+          "vertical": "Vertical"
+        }
+      },
+      "initial_position": {
+        "label": "Initial slider position"
+      },
+      "show_labels": {
+        "label": "Show before/after labels"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "comparison_table": {
+    "name": "Comparison Table",
+    "settings": {
+      "feature_column_label": {
+        "label": "Feature column label"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "content_header": {
+        "label": "Content"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "column": {
+        "name": "Column",
+        "settings": {
+          "name": {
+            "label": "Column name"
+          },
+          "badge": {
+            "label": "Badge text (optional)"
+          },
+          "options_header": {
+            "label": "Options"
+          },
+          "featured": {
+            "label": "Featured (highlighted)"
+          },
+          "link": {
+            "label": "CTA Button"
+          },
+          "content_header": {
+            "label": "Content"
+          }
+        }
+      },
+      "feature": {
+        "name": "Feature Row",
+        "settings": {
+          "name": {
+            "label": "Feature name"
+          },
+          "values": {
+            "label": "Values for each column (one per line: yes, no, or custom text)"
+          },
+          "content_header": {
+            "label": "Content"
+          }
+        }
+      }
+    }
+  },
+  "contact_form": {
+    "name": "Contact Form",
+    "settings": {
+      "form_header": {
+        "label": "Form"
+      },
+      "form_token": {
+        "label": "Form Token",
+        "description": "Auto-injected when published to Widgetizer. For self-hosted: paste your form token (starts with ft_)"
+      },
+      "form_name": {
+        "label": "Form Name",
+        "description": "Label to identify this form in your submissions dashboard"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "sidebar_position": {
+        "label": "Sidebar position",
+        "options": {
+          "left": "Left",
+          "right": "Right"
+        }
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "input": {
+        "name": "Input Field",
+        "settings": {
+          "input_type": {
+            "label": "Input type",
+            "options": {
+              "email": "Email",
+              "tel": "Phone",
+              "url": "URL",
+              "number": "Number",
+              "date": "Date",
+              "text": "Text"
+            }
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "label": {
+            "label": "Label"
+          },
+          "name": {
+            "label": "Field name (for form submission)"
+          },
+          "placeholder": {
+            "label": "Placeholder"
+          },
+          "options_header": {
+            "label": "Options"
+          },
+          "required": {
+            "label": "Required"
+          }
+        }
+      },
+      "checkbox": {
+        "settings": {
+          "label": {
+            "label": "Label"
+          },
+          "name": {
+            "label": "Field name (for form submission)"
+          },
+          "required": {
+            "label": "Required"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "options_header": {
+            "label": "Options"
+          }
+        },
+        "name": "Checkbox"
+      },
+      "textarea": {
+        "settings": {
+          "placeholder": {
+            "label": "Placeholder"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "label": {
+            "label": "Label"
+          },
+          "name": {
+            "label": "Field name (for form submission)"
+          },
+          "options_header": {
+            "label": "Options"
+          },
+          "required": {
+            "label": "Required"
+          }
+        },
+        "name": "Textarea"
+      },
+      "dropdown": {
+        "name": "Dropdown",
+        "settings": {
+          "options": {
+            "label": "Options (one per line)"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "label": {
+            "label": "Label"
+          },
+          "name": {
+            "label": "Field name (for form submission)"
+          },
+          "options_header": {
+            "label": "Options"
+          },
+          "required": {
+            "label": "Required"
+          }
+        }
+      },
+      "submit": {
+        "name": "Submit Button",
+        "settings": {
+          "text": {
+            "label": "Button text"
+          },
+          "content_header": {
+            "label": "Content"
+          }
+        }
+      },
+      "info": {
+        "name": "Contact Info",
+        "settings": {
+          "text": {
+            "label": "Text/Details"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "title": {
+            "label": "Title"
+          }
+        }
+      },
+      "social": {
+        "name": "Social Icons"
+      }
+    }
+  },
+  "content_switcher": {
+    "name": "Content Switcher",
+    "settings": {
+      "switcher_header": {
+        "label": "Switcher"
+      },
+      "switcher_type": {
+        "label": "Switcher Style",
+        "options": {
+          "toggle": "Toggle (2 Options)",
+          "tabs": "Tabs (Up to 3 Options)"
+        }
+      },
+      "option_1_label": {
+        "label": "Option 1 Label"
+      },
+      "option_2_label": {
+        "label": "Option 2 Label"
+      },
+      "option_3_label": {
+        "label": "Option 3 Label (Tabs only)"
+      },
+      "columns": {
+        "label": "Columns per state"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "labels_header": {
+        "label": "Labels"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Content Item",
+        "settings": {
+          "price": {
+            "label": "Price / Value (Optional)"
+          },
+          "link": {
+            "label": "Link / CTA"
+          },
+          "target_option": {
+            "label": "Assign to Option",
+            "options": {
+              "1": "Option 1",
+              "2": "Option 2",
+              "3": "Option 3"
+            }
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "text": {
+            "label": "Text"
+          },
+          "image": {
+            "label": "Photo (optional)"
+          },
+          "layout_header": {
+            "label": "Layout"
+          }
+        }
+      }
+    }
+  },
+  "countdown": {
+    "name": "Countdown Timer",
+    "settings": {
+      "target_date": {
+        "label": "Target date (YYYY-MM-DD HH:MM)"
+      },
+      "expired_message": {
+        "label": "Message when expired"
+      },
+      "button": {
+        "label": "Call-to-action button"
+      },
+      "show_seconds": {
+        "label": "Show seconds"
+      },
+      "style": {
+        "options": {
+          "cards": "Cards",
+          "minimal": "Minimal"
+        },
+        "label": "Style"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "content_header": {
+        "label": "Content"
+      },
+      "options_header": {
+        "label": "Options"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "embed": {
+    "name": "Embed Widget",
+    "settings": {
+      "code": {
+        "label": "Embed Code (HTML/JS/Iframe)"
+      },
+      "max_width": {
+        "label": "Container Width",
+        "options": {
+          "narrow": "Narrow",
+          "wide": "Wide",
+          "fullwidth": "Fullwidth",
+          "medium": "Medium"
+        }
+      },
+      "alignment": {
+        "label": "Alignment",
+        "options": {
+          "start": "Start",
+          "center": "Center",
+          "end": "End"
+        }
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "event_list": {
+    "name": "Event List",
+    "blocks": {
+      "event": {
+        "name": "Event",
+        "settings": {
+          "day": {
+            "label": "Day (number)"
+          },
+          "month": {
+            "label": "Month (short)"
+          },
+          "title": {
+            "label": "Event title"
+          },
+          "location": {
+            "label": "Location & time"
+          },
+          "button_link": {
+            "label": "Button"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "features_split": {
+    "name": "Features Split",
+    "settings": {
+      "content_position": {
+        "label": "Content position",
+        "options": {
+          "left": "Left",
+          "right": "Right"
+        }
+      },
+      "show_divider": {
+        "label": "Show divider"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "feature": {
+        "name": "Feature",
+        "settings": {
+          "icon": {
+            "label": "Icon"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "gallery": {
+    "name": "Gallery",
+    "settings": {
+      "columns_desktop": {
+        "label": "Columns (Desktop)"
+      },
+      "aspect_ratio": {
+        "label": "Image Aspect Ratio",
+        "options": {
+          "contain": "Show Full Image",
+          "1 / 1": "Square (1:1)",
+          "4 / 3": "Standard (4:3)",
+          "3 / 2": "Landscape (3:2)",
+          "3 / 4": "Portrait (3:4)",
+          "16 / 9": "Widescreen (16:9)",
+          "auto": "Auto"
+        }
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "layout": {
+        "label": "Eyebrow text",
+        "options": {
+          "grid": "Grid",
+          "carousel": "Carousel"
+        }
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "image": {
+        "settings": {
+          "caption": {
+            "label": "Caption"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "image": {
+            "label": "Background image"
+          }
+        },
+        "name": "Accordion"
+      }
+    }
+  },
+  "icon_card_grid": {
+    "name": "Icon Card Grid",
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      },
+      "layout": {
+        "label": "Eyebrow text",
+        "options": {
+          "grid": "Grid",
+          "carousel": "Carousel"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      }
+    },
+    "blocks": {
+      "card": {
+        "name": "Card",
+        "settings": {
+          "content_header": {
+            "label": "Content"
+          },
+          "icon": {
+            "label": "Icon"
+          },
+          "subtitle": {
+            "label": "Subtitle"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Description"
+          },
+          "button_link": {
+            "label": "Button Link"
+          }
+        }
+      }
+    }
+  },
+  "icon_list": {
+    "name": "Icon List",
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "layout": {
+        "label": "Eyebrow text",
+        "options": {
+          "grid": "Grid",
+          "carousel": "Carousel"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Item",
+        "settings": {
+          "content_header": {
+            "label": "Content"
+          },
+          "icon": {
+            "label": "Icon"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "image": {
+    "settings": {
+      "link": {
+        "description": "Optional link when image is clicked.",
+        "label": "Button 1"
+      },
+      "fullwidth": {
+        "description": "When enabled, image spans full width. When disabled, image is contained within the theme grid.",
+        "label": "Full width"
+      },
+      "content_header": {
+        "label": "Content"
+      },
+      "image": {
+        "label": "Background image"
+      },
+      "display_header": {
+        "label": "Display"
+      }
+    },
+    "name": "Accordion"
+  },
+  "image_callout": {
+    "name": "Image Callout",
+    "settings": {
+      "image_position": {
+        "label": "Image position",
+        "options": {
+          "left": "Left",
+          "right": "Right"
+        }
+      },
+      "content_header": {
+        "label": "Content"
+      },
+      "image": {
+        "label": "Background image"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "features": {
+        "name": "Features",
+        "settings": {
+          "features": {
+            "label": "Features (one per line)",
+            "description": "Start a line with + for a checkmark or - for a cross."
+          }
+        }
+      },
+      "heading": {
+        "name": "Accordion",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Button size",
+            "options": {
+              "lg": "Large",
+              "xl": "Extra Large",
+              "2xl": "2X Large",
+              "3xl": "3X Large",
+              "4xl": "4X Large",
+              "5xl": "5X Large",
+              "6xl": "6X Large",
+              "7xl": "7X Large",
+              "8xl": "8X Large",
+              "9xl": "9X Large"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Accordion",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Size",
+            "options": {
+              "sm": "Small",
+              "base": "Base",
+              "lg": "Large"
+            }
+          },
+          "uppercase": {
+            "label": "Uppercase"
+          },
+          "muted": {
+            "label": "Muted color"
+          }
+        }
+      },
+      "button": {
+        "name": "Button Group",
+        "settings": {
+          "link": {
+            "label": "Button 1"
+          },
+          "style": {
+            "label": "Button 1 style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "link_2": {
+            "label": "Button 2"
+          },
+          "style_2": {
+            "label": "Button 2 style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "size": {
+            "label": "Button size",
+            "options": {
+              "small": "Small",
+              "medium": "Medium",
+              "large": "Large",
+              "xlarge": "Extra Large"
+            }
+          }
+        }
+      }
+    }
+  },
+  "image_hotspots": {
+    "name": "Image Hotspots",
+    "settings": {
+      "image_alt": {
+        "label": "Image alt text"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "content_header": {
+        "label": "Content"
+      },
+      "image": {
+        "label": "Background image"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "hotspot": {
+        "name": "Hotspot",
+        "settings": {
+          "title": {
+            "label": "Tooltip title"
+          },
+          "description": {
+            "label": "Tooltip description"
+          },
+          "button_link": {
+            "label": "Button link"
+          },
+          "position_x": {
+            "label": "Horizontal position (%)"
+          },
+          "position_y": {
+            "label": "Vertical position (%)"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "layout_header": {
+            "label": "Layout"
+          }
+        }
+      }
+    }
+  },
+  "image_tabs": {
+    "name": "Image Tabs",
+    "blocks": {
+      "tab": {
+        "name": "Tab",
+        "settings": {
+          "title": {
+            "label": "Tab title"
+          },
+          "description": {
+            "label": "Tab description"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "image": {
+            "label": "Background image"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "image_position": {
+        "label": "Image position",
+        "options": {
+          "left": "Left",
+          "right": "Right"
+        }
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "image_text": {
+    "name": "Image + Text",
+    "settings": {
+      "content_header": {
+        "label": "Content"
+      },
+      "image": {
+        "label": "Background image"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "image_position": {
+        "label": "Image position",
+        "options": {
+          "left": "Left",
+          "right": "Right"
+        }
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Accordion",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Button size",
+            "options": {
+              "lg": "Large",
+              "xl": "Extra Large",
+              "2xl": "2X Large",
+              "3xl": "3X Large",
+              "4xl": "4X Large",
+              "5xl": "5X Large",
+              "6xl": "6X Large",
+              "7xl": "7X Large",
+              "8xl": "8X Large",
+              "9xl": "9X Large"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Accordion",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Size",
+            "options": {
+              "sm": "Small",
+              "base": "Base",
+              "lg": "Large"
+            }
+          },
+          "uppercase": {
+            "label": "Uppercase"
+          },
+          "muted": {
+            "label": "Muted color"
+          }
+        }
+      },
+      "features": {
+        "name": "Features",
+        "settings": {
+          "features": {
+            "label": "Features (one per line)",
+            "description": "Start a line with + for a checkmark or - for a cross."
+          }
+        }
+      },
+      "button": {
+        "name": "Button Group",
+        "settings": {
+          "link": {
+            "label": "Button 1"
+          },
+          "style": {
+            "label": "Button 1 style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "link_2": {
+            "label": "Button 2"
+          },
+          "style_2": {
+            "label": "Button 2 style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "size": {
+            "label": "Button size",
+            "options": {
+              "small": "Small",
+              "medium": "Medium",
+              "large": "Large",
+              "xlarge": "Extra Large"
+            }
+          }
+        }
+      }
+    }
+  },
+  "job_listing": {
+    "name": "Job Listing",
+    "settings": {
+      "show_filters": {
+        "label": "Show department filters"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "job": {
+        "name": "Job",
+        "settings": {
+          "title": {
+            "label": "Job title"
+          },
+          "department": {
+            "label": "Department"
+          },
+          "location": {
+            "label": "Location"
+          },
+          "type": {
+            "label": "Employment type",
+            "options": {
+              "full-time": "Full-Time",
+              "part-time": "Part-Time",
+              "contract": "Contract",
+              "internship": "Internship"
+            }
+          },
+          "apply_link": {
+            "label": "Apply button"
+          },
+          "content_header": {
+            "label": "Content"
+          }
+        }
+      }
+    }
+  },
+  "key_figures": {
+    "name": "Key Figures",
+    "settings": {
+      "layout": {
+        "options": {
+          "bar": "Horizontal Bar",
+          "cards": "Cards",
+          "carousel": "Carousel"
+        },
+        "label": "Eyebrow text"
+      },
+      "animate": {
+        "label": "Animate numbers"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "figure": {
+        "name": "Figure",
+        "settings": {
+          "suffix": {
+            "label": "Suffix"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "number": {
+            "label": "Eyebrow text"
+          },
+          "label": {
+            "label": "Label"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "logo_cloud": {
+    "name": "Logo Cloud",
+    "blocks": {
+      "logo": {
+        "name": "Logo",
+        "settings": {
+          "image": {
+            "label": "Logo Image"
+          },
+          "name": {
+            "label": "Company Name"
+          },
+          "link": {
+            "label": "Link (optional)"
+          },
+          "content_header": {
+            "label": "Content"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "layout": {
+        "label": "Eyebrow text",
+        "options": {
+          "grid": "Grid",
+          "carousel": "Carousel"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "map": {
+    "name": "Map",
+    "settings": {
+      "address": {
+        "label": "Address"
+      },
+      "embed_url": {
+        "label": "Google Maps embed URL"
+      },
+      "directions_link": {
+        "label": "Get directions link"
+      },
+      "height": {
+        "label": "Map height",
+        "options": {
+          "small": "Small (300px)",
+          "medium": "Medium (450px)",
+          "large": "Large (600px)"
+        }
+      },
+      "show_address": {
+        "label": "Show address below map"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "content_header": {
+        "label": "Content"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "masonry_gallery": {
+    "name": "Masonry Gallery",
+    "blocks": {
+      "item": {
+        "name": "Gallery Item",
+        "settings": {
+          "category": {
+            "label": "Category"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "image": {
+            "label": "Photo (optional)"
+          },
+          "title": {
+            "label": "Heading"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "numbered_cards": {
+    "name": "Numbered Cards",
+    "blocks": {
+      "step": {
+        "name": "Step",
+        "settings": {
+          "content_header": {
+            "label": "Content"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "layout": {
+        "label": "Eyebrow text",
+        "options": {
+          "grid": "Grid",
+          "carousel": "Carousel"
+        }
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "priced_list": {
+    "name": "Priced List",
+    "settings": {
+      "eyebrow": {
+        "label": "Category label"
+      },
+      "title": {
+        "label": "Section heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Menu Item",
+        "settings": {
+          "name": {
+            "label": "Item name"
+          },
+          "price": {
+            "label": "Price"
+          },
+          "image": {
+            "label": "Photo (optional)"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "pricing": {
+    "name": "Pricing",
+    "blocks": {
+      "plan": {
+        "name": "Plan",
+        "settings": {
+          "title": {
+            "label": "Plan name"
+          },
+          "period": {
+            "label": "Period"
+          },
+          "featured": {
+            "label": "Featured plan"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "price": {
+            "label": "Price / Value (Optional)"
+          },
+          "features": {
+            "label": "Features (one per line)",
+            "description": "Start a line with + for a checkmark or - for a cross."
+          },
+          "button_link": {
+            "label": "Button Link"
+          },
+          "options_header": {
+            "label": "Options"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "layout": {
+        "label": "Eyebrow text",
+        "options": {
+          "grid": "Grid",
+          "carousel": "Carousel"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "profile_grid": {
+    "name": "Profile Grid",
+    "blocks": {
+      "profile": {
+        "name": "Team Member",
+        "settings": {
+          "photo": {
+            "label": "Photo"
+          },
+          "name": {
+            "label": "Name"
+          },
+          "role": {
+            "label": "Role / Title"
+          },
+          "specialty": {
+            "label": "Specialty"
+          },
+          "bio": {
+            "label": "Bio"
+          },
+          "social_header": {
+            "label": "Social Media"
+          },
+          "linkedin": {
+            "label": "LinkedIn URL"
+          },
+          "twitter": {
+            "label": "Twitter URL"
+          },
+          "instagram": {
+            "label": "Instagram URL"
+          },
+          "facebook": {
+            "label": "Facebook URL"
+          },
+          "github": {
+            "label": "GitHub URL"
+          },
+          "youtube": {
+            "label": "YouTube URL"
+          },
+          "tiktok": {
+            "label": "TikTok URL"
+          },
+          "pinterest": {
+            "label": "Pinterest URL"
+          },
+          "bluesky": {
+            "label": "Bluesky URL"
+          },
+          "discord": {
+            "label": "Discord URL"
+          },
+          "meta": {
+            "label": "Meta URL"
+          },
+          "reddit": {
+            "label": "Reddit URL"
+          },
+          "telegram": {
+            "label": "Telegram URL"
+          },
+          "threads": {
+            "label": "Threads URL"
+          },
+          "whatsapp": {
+            "label": "WhatsApp URL"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "email": {
+            "label": "Eyebrow text"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "layout": {
+        "label": "Eyebrow text",
+        "options": {
+          "grid": "Grid",
+          "carousel": "Carousel"
+        }
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "project_showcase": {
+    "name": "Project Showcase",
+    "settings": {
+      "text_display": {
+        "label": "Text Display",
+        "options": {
+          "hover": "On Hover",
+          "always": "Always"
+        }
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "layout": {
+        "label": "Eyebrow text",
+        "options": {
+          "grid": "Grid",
+          "carousel": "Carousel"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "aspect_ratio": {
+        "label": "Image Aspect Ratio",
+        "options": {
+          "auto": "Auto",
+          "contain": "Show Full Image",
+          "1 / 1": "Square (1:1)",
+          "4 / 3": "Standard (4:3)",
+          "3 / 2": "Landscape (3:2)",
+          "3 / 4": "Portrait (3:4)",
+          "16 / 9": "Widescreen (16:9)"
+        }
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "project": {
+        "name": "Project",
+        "settings": {
+          "image": {
+            "label": "Project Image"
+          },
+          "title": {
+            "label": "Project Title"
+          },
+          "description": {
+            "label": "Short Description"
+          },
+          "link": {
+            "label": "Project Link"
+          },
+          "content_header": {
+            "label": "Content"
+          }
+        }
+      }
+    }
+  },
+  "rich_text": {
+    "name": "Rich Text",
+    "settings": {
+      "text_alignment": {
+        "label": "Text alignment",
+        "options": {
+          "start": "Start",
+          "end": "End",
+          "center": "Center"
+        }
+      },
+      "content_width": {
+        "label": "Content width",
+        "options": {
+          "narrow": "Narrow",
+          "medium": "Medium",
+          "wide": "Wide",
+          "fullwidth": "Fullwidth"
+        }
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Accordion",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Button size",
+            "options": {
+              "lg": "Large",
+              "xl": "Extra Large",
+              "2xl": "2X Large",
+              "3xl": "3X Large",
+              "4xl": "4X Large",
+              "5xl": "5X Large",
+              "6xl": "6X Large",
+              "7xl": "7X Large",
+              "8xl": "8X Large",
+              "9xl": "9X Large"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Accordion",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Size",
+            "options": {
+              "sm": "Small",
+              "base": "Base",
+              "lg": "Large"
+            }
+          },
+          "uppercase": {
+            "label": "Uppercase"
+          },
+          "muted": {
+            "label": "Muted color"
+          }
+        }
+      },
+      "button": {
+        "name": "Button Group",
+        "settings": {
+          "link": {
+            "label": "Button 1"
+          },
+          "style": {
+            "label": "Button 1 style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "link_2": {
+            "label": "Button 2"
+          },
+          "style_2": {
+            "label": "Button 2 style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "size": {
+            "label": "Button size",
+            "options": {
+              "small": "Small",
+              "medium": "Medium",
+              "large": "Large",
+              "xlarge": "Extra Large"
+            }
+          }
+        }
+      }
+    }
+  },
+  "schedule_table": {
+    "name": "Schedule Table",
+    "settings": {
+      "note": {
+        "label": "Additional note"
+      },
+      "week_start_day": {
+        "label": "Week starts on",
+        "options": {
+          "0": "Sunday",
+          "1": "Monday"
+        }
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "content_header": {
+        "label": "Content"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "sidebar_position": {
+        "label": "Sidebar position",
+        "options": {
+          "left": "Left",
+          "right": "Right"
+        }
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "day": {
+        "settings": {
+          "day": {
+            "label": "Day"
+          },
+          "hours": {
+            "label": "Hours"
+          },
+          "closed": {
+            "label": "Closed"
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "options_header": {
+            "label": "Options"
+          }
+        },
+        "name": "Accordion"
+      },
+      "info": {
+        "name": "Info",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      },
+      "social": {
+        "name": "Social Icons"
+      }
+    }
+  },
+  "slideshow": {
+    "name": "Slideshow",
+    "settings": {
+      "autoplay": {
+        "label": "Auto-rotate slides"
+      },
+      "autoplay_speed": {
+        "label": "Change slides every"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "height": {
+        "label": "Height",
+        "options": {
+          "auto": "Auto",
+          "small": "Small (300px)",
+          "medium": "Medium (450px)",
+          "large": "Large (600px)"
+        }
+      },
+      "fullwidth": {
+        "label": "Full width"
+      },
+      "alignment": {
+        "label": "Content alignment",
+        "options": {
+          "center": "Center",
+          "start": "Start"
+        }
+      }
+    },
+    "blocks": {
+      "slide": {
+        "name": "Slide",
+        "settings": {
+          "image": {
+            "label": "Background Image"
+          },
+          "heading_text": {
+            "label": "Heading Text"
+          },
+          "heading_size": {
+            "label": "Heading Size",
+            "options": {
+              "lg": "Large",
+              "xl": "Extra Large",
+              "2xl": "2X Large",
+              "3xl": "3X Large",
+              "4xl": "4X Large",
+              "5xl": "5X Large",
+              "6xl": "6X Large",
+              "7xl": "7X Large",
+              "8xl": "8X Large",
+              "9xl": "9X Large"
+            }
+          },
+          "text_content": {
+            "label": "Text Content"
+          },
+          "text_size": {
+            "label": "Text Size",
+            "options": {
+              "sm": "Small",
+              "base": "Base",
+              "lg": "Large"
+            }
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "text_uppercase": {
+            "label": "Eyebrow text"
+          },
+          "text_muted": {
+            "label": "Eyebrow text"
+          },
+          "button_link": {
+            "label": "Button Link"
+          },
+          "button_link_2": {
+            "label": "Eyebrow text"
+          },
+          "display_header": {
+            "label": "Display"
+          },
+          "button_style": {
+            "label": "Eyebrow text",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "button_style_2": {
+            "label": "Eyebrow text",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "button_size": {
+            "label": "Eyebrow text",
+            "options": {
+              "small": "Small",
+              "medium": "Medium",
+              "large": "Large",
+              "xlarge": "Extra Large"
+            }
+          },
+          "overlay_color": {
+            "label": "Overlay color",
+            "description": "Applies only if there is a background image."
+          },
+          "color_scheme": {
+            "label": "Color Scheme",
+            "options": {
+              "standard": "Standard",
+              "highlight": "Highlight"
+            }
+          }
+        }
+      }
+    }
+  },
+  "social_icons": {
+    "settings": {
+      "icon_size": {
+        "label": "Icon size"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "name": "Accordion"
+  },
+  "split_hero": {
+    "name": "Split Hero",
+    "settings": {
+      "content_header": {
+        "label": "Content"
+      },
+      "image": {
+        "label": "Background image"
+      },
+      "overlay_color": {
+        "label": "Overlay color",
+        "description": "Applies only if there is a background image."
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "image_position": {
+        "label": "Image position",
+        "options": {
+          "left": "Left",
+          "right": "Right"
+        }
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Accordion",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Button size",
+            "options": {
+              "lg": "Large",
+              "xl": "Extra Large",
+              "2xl": "2X Large",
+              "3xl": "3X Large",
+              "4xl": "4X Large",
+              "5xl": "5X Large",
+              "6xl": "6X Large",
+              "7xl": "7X Large",
+              "8xl": "8X Large",
+              "9xl": "9X Large"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Accordion",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Size",
+            "options": {
+              "sm": "Small",
+              "base": "Base",
+              "lg": "Large"
+            }
+          },
+          "uppercase": {
+            "label": "Uppercase"
+          },
+          "muted": {
+            "label": "Muted color"
+          }
+        }
+      },
+      "features": {
+        "name": "Features",
+        "settings": {
+          "features": {
+            "label": "Features (one per line)",
+            "description": "Start a line with + for a checkmark or - for a cross."
+          }
+        }
+      },
+      "button": {
+        "name": "Button Group",
+        "settings": {
+          "link": {
+            "label": "Button 1"
+          },
+          "style": {
+            "label": "Button 1 style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "link_2": {
+            "label": "Button 2"
+          },
+          "style_2": {
+            "label": "Button 2 style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "size": {
+            "label": "Button size",
+            "options": {
+              "small": "Small",
+              "medium": "Medium",
+              "large": "Large",
+              "xlarge": "Extra Large"
+            }
+          }
+        }
+      }
+    }
+  },
+  "testimonial_hero": {
+    "name": "Testimonial Hero",
+    "settings": {
+      "logo": {
+        "label": "Company Logo"
+      },
+      "author_image": {
+        "label": "Author Image"
+      },
+      "image_position": {
+        "label": "Image Position",
+        "options": {
+          "left": "Left",
+          "right": "Right"
+        }
+      },
+      "content_header": {
+        "label": "Content"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Accordion",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Button size",
+            "options": {
+              "lg": "Large",
+              "xl": "Extra Large",
+              "2xl": "2X Large",
+              "3xl": "3X Large",
+              "4xl": "4X Large",
+              "5xl": "5X Large",
+              "6xl": "6X Large",
+              "7xl": "7X Large",
+              "8xl": "8X Large",
+              "9xl": "9X Large"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Accordion",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Size",
+            "options": {
+              "sm": "Small",
+              "base": "Base",
+              "lg": "Large"
+            }
+          },
+          "uppercase": {
+            "label": "Uppercase"
+          },
+          "muted": {
+            "label": "Muted color"
+          }
+        }
+      }
+    }
+  },
+  "testimonials": {
+    "name": "Testimonials",
+    "blocks": {
+      "quote": {
+        "name": "Testimonial",
+        "settings": {
+          "quote": {
+            "label": "Quote text"
+          },
+          "title": {
+            "label": "Title / Company"
+          },
+          "rating": {
+            "label": "Star rating",
+            "options": {
+              "3": "3 stars",
+              "4": "4 stars",
+              "5": "5 stars",
+              "": "No rating"
+            }
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "avatar": {
+            "label": "Eyebrow text"
+          },
+          "name": {
+            "label": "Name"
+          },
+          "display_header": {
+            "label": "Display"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "layout": {
+        "label": "Eyebrow text",
+        "options": {
+          "grid": "Grid",
+          "carousel": "Carousel"
+        }
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "timeline": {
+    "name": "Timeline",
+    "settings": {
+      "layout": {
+        "options": {
+          "centered": "Centered (Alternating)",
+          "vertical": "Vertical",
+          "horizontal": "Horizontal"
+        },
+        "label": "Eyebrow text"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Timeline Item",
+        "settings": {
+          "date": {
+            "label": "Date/Phase"
+          },
+          "duration": {
+            "label": "Duration (optional)"
+          },
+          "features": {
+            "label": "Features/bullet points (one per line)",
+            "description": "Start a line with + for a checkmark or - for a cross."
+          },
+          "content_header": {
+            "label": "Content"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "trust_bar": {
+    "name": "Trust Bar",
+    "settings": {
+      "show_dividers": {
+        "label": "Show dividers"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Item",
+        "settings": {
+          "content_header": {
+            "label": "Content"
+          },
+          "icon": {
+            "label": "Icon"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      }
+    }
+  },
+  "video_embed": {
+    "name": "YouTube/Vimeo",
+    "settings": {
+      "video_url": {
+        "label": "Video URL (YouTube or Vimeo)"
+      },
+      "video_title": {
+        "label": "Video title (for accessibility)"
+      },
+      "aspect_ratio": {
+        "label": "Aspect ratio",
+        "options": {
+          "16:9": "16:9 (Widescreen)",
+          "4:3": "4:3 (Standard)",
+          "21:9": "21:9 (Cinematic)",
+          "1:1": "1:1 (Square)"
+        }
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "content_header": {
+        "label": "Content"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
+  "global": {
+    "layout": {
+      "settings": {
+        "layout_header": {
+          "label": "Animations"
+        },
+        "enable_reveal_animations": {
+          "label": "Enable scroll reveal animations",
+          "description": "Animate elements as they scroll into view"
+        }
+      }
+    },
+    "branding": {
+      "settings": {
+        "branding_header": {
+          "label": "Branding"
+        },
+        "favicon": {
+          "label": "Favicon",
+          "description": "Recommended size 180×180 px."
+        }
+      }
+    },
+    "colors": {
+      "name": "Colors",
+      "settings": {
+        "colors_standard_header": {
+          "label": "Standard Colors"
+        },
+        "highlight_bg_primary": {
+          "label": "Primary Background"
+        },
+        "highlight_bg_secondary": {
+          "label": "Secondary Background"
+        },
+        "highlight_text_content": {
+          "label": "Content Text"
+        },
+        "highlight_text_muted": {
+          "label": "Muted Text"
+        },
+        "highlight_border_color": {
+          "label": "Border Color"
+        },
+        "highlight_accent": {
+          "label": "Accent Color"
+        },
+        "highlight_accent_text": {
+          "label": "Accent Text Color"
+        },
+        "highlight_rating_star": {
+          "label": "Rating Star Color"
+        },
+        "colors_highlight_header": {
+          "label": "Highlight Colors"
+        },
+        "standard_bg_primary": {
+          "label": "Eyebrow text"
+        },
+        "standard_bg_secondary": {
+          "label": "Eyebrow text"
+        },
+        "standard_text_content": {
+          "label": "Eyebrow text"
+        },
+        "standard_text_heading": {
+          "label": "Eyebrow text"
+        },
+        "standard_text_muted": {
+          "label": "Eyebrow text"
+        },
+        "standard_border_color": {
+          "label": "Eyebrow text"
+        },
+        "standard_accent": {
+          "label": "Eyebrow text"
+        },
+        "standard_accent_text": {
+          "label": "Eyebrow text"
+        },
+        "standard_rating_star": {
+          "label": "Eyebrow text"
+        },
+        "highlight_text_heading": {
+          "label": "Eyebrow text"
+        }
+      }
+    },
+    "typography": {
+      "settings": {
+        "typography_header": {
+          "label": "Typography"
+        },
+        "heading_font": {
+          "label": "Heading Font"
+        },
+        "body_font": {
+          "label": "Body Font"
+        },
+        "heading_scale": {
+          "description": "Scale all heading text sizes up or down",
+          "label": "Eyebrow text"
+        },
+        "body_scale": {
+          "label": "Body Text Size",
+          "description": "Scale all body text sizes up or down"
+        }
+      }
+    },
+    "social": {
+      "name": "Social",
+      "settings": {
+        "twitter_url": {
+          "label": "Twitter / X URL"
+        },
+        "mastodon_url": {
+          "label": "Mastodon URL"
+        },
+        "mail_url": {
+          "label": "Email URL"
+        },
+        "social_header": {
+          "label": "Social Media"
+        },
+        "facebook_url": {
+          "label": "Eyebrow text"
+        },
+        "instagram_url": {
+          "label": "Eyebrow text"
+        },
+        "linkedin_url": {
+          "label": "Eyebrow text"
+        },
+        "youtube_url": {
+          "label": "Eyebrow text"
+        },
+        "tiktok_url": {
+          "label": "Eyebrow text"
+        },
+        "pinterest_url": {
+          "label": "Eyebrow text"
+        },
+        "github_url": {
+          "label": "Eyebrow text"
+        },
+        "bluesky_url": {
+          "label": "Eyebrow text"
+        },
+        "discord_url": {
+          "label": "Eyebrow text"
+        },
+        "reddit_url": {
+          "label": "Eyebrow text"
+        },
+        "telegram_url": {
+          "label": "Eyebrow text"
+        },
+        "threads_url": {
+          "label": "Eyebrow text"
+        },
+        "whatsapp_url": {
+          "label": "Eyebrow text"
+        }
+      }
+    },
+    "privacy": {
+      "settings": {
+        "privacy_header": {
+          "label": "Privacy"
+        },
+        "use_bunny_fonts": {
+          "label": "Use Privacy-Friendly Font CDN",
+          "description": "Enable to serve Google Fonts from Bunny CDN (GDPR-compliant, no tracking)"
+        }
+      }
+    },
+    "advanced": {
+      "settings": {
+        "advanced_header": {
+          "label": "Advanced"
+        },
+        "custom_css": {
+          "label": "Custom CSS",
+          "description": "Add custom CSS that will be injected in the <head> section."
+        },
+        "custom_head_scripts": {
+          "label": "Custom Head Scripts",
+          "description": "Add custom scripts (e.g., Google Analytics) that will be injected in the <head> section."
+        },
+        "custom_footer_scripts": {
+          "label": "Custom Footer Scripts",
+          "description": "Add custom scripts that will be injected before the closing </body> tag."
+        }
+      }
+    }
+  }
+}

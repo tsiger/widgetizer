@@ -333,6 +333,9 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
   - `getLatestVersion()` - Get latest from array
 - `server/utils/themeHelpers.js`:
   - `preprocessThemeSettings()` - Transform settings for access
+- `scripts/validate-theme-locales.js`:
+  - Validates all `tTheme:` keys in widget schemas resolve to entries in theme locale files
+  - Run via `npm run validate:theme-locales`; also runs as part of `predev:all` hook
 
 ---
 
@@ -637,6 +640,7 @@ Save button / Auto-save timer
 | `useAppSettings`         | App settings with caching               | Media, Pages, Projects, Export        |
 | `useConfirmationModal`   | Confirmation modal state                | Pages, Menus, Media, Projects, Export |
 | `useFormNavigationGuard` | Prevent navigation with unsaved changes | All forms                             |
+| `useThemeLocale`         | Fetches theme locale JSON, provides `tTheme()` resolver for `tTheme:`-prefixed i18n keys | Editor components (SettingsPanel, ThemeSelector, PreviewPanel, BlockList, etc.) |
 | `useToastStore`          | Toast notifications                     | All pages                             |
 
 ### Shared Stores

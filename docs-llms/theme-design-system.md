@@ -52,6 +52,9 @@ themes/arch/
 ├── snippets/           # Reusable Liquid partials
 │   ├── icon.liquid     # SVG icon rendering from icons.json
 │   └── social-icons.liquid  # Social media link icons (16 platforms)
+├── locales/            # Theme locale files (nested JSON per language)
+│   ├── en.json
+│   └── ...
 ├── templates/          # Page template definitions
 └── menus/              # Navigation menu JSON files
 ```
@@ -1055,11 +1058,13 @@ Settings with `"outputAsCssVar": true` (colors) and `font_picker` types are cand
 {
   "type": "color",
   "id": "standard_accent",
-  "label": "Accent Color",
+  "label": "tTheme:settings.colors.standard_accent",
   "default": "#DE1877",
   "outputAsCssVar": true
 }
 ```
+
+Labels, displayNames, descriptions, and option labels in widget `schema.json` files use `tTheme:` prefixed keys (e.g., `"displayName": "tTheme:carousel.name"`). These are resolved at runtime by the `useThemeLocale` hook's `tTheme()` function, which strips the prefix and walks dot-paths through the theme's locale JSON.
 
 ### 2. Processing (themeSettings.js)
 

@@ -1,6 +1,6 @@
 {
   "type": "gallery",
-  "displayName": "Gallery",
+  "displayName": "tTheme:gallery.name",
   "aliases": [
     "images",
     "photos",
@@ -11,44 +11,44 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow Text"
+      "label": "tTheme:gallery.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:gallery.settings.title.label",
       "default": "Project Gallery"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:gallery.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:gallery.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "Layout",
+      "label": "tTheme:gallery.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "Grid"
+          "label": "tTheme:gallery.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "Carousel"
+          "label": "tTheme:gallery.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "Columns (Desktop)",
+      "label": "tTheme:gallery.settings.columns_desktop.label",
       "default": 4,
       "min": 2,
       "max": 5,
@@ -57,52 +57,52 @@
     {
       "type": "select",
       "id": "aspect_ratio",
-      "label": "Image Aspect Ratio",
+      "label": "tTheme:gallery.settings.aspect_ratio.label",
       "default": "4 / 3",
       "options": [
         {
           "value": "auto",
-          "label": "Auto"
+          "label": "tTheme:gallery.settings.aspect_ratio.options.auto"
         },
         {
           "value": "contain",
-          "label": "Show Full Image"
+          "label": "tTheme:gallery.settings.aspect_ratio.options.contain"
         },
         {
           "value": "1 / 1",
-          "label": "Square (1:1)"
+          "label": "tTheme:gallery.settings.aspect_ratio.options.1 / 1"
         },
         {
           "value": "4 / 3",
-          "label": "Standard (4:3)"
+          "label": "tTheme:gallery.settings.aspect_ratio.options.4 / 3"
         },
         {
           "value": "3 / 2",
-          "label": "Landscape (3:2)"
+          "label": "tTheme:gallery.settings.aspect_ratio.options.3 / 2"
         },
         {
           "value": "3 / 4",
-          "label": "Portrait (3:4)"
+          "label": "tTheme:gallery.settings.aspect_ratio.options.3 / 4"
         },
         {
           "value": "16 / 9",
-          "label": "Widescreen (16:9)"
+          "label": "tTheme:gallery.settings.aspect_ratio.options.16 / 9"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:gallery.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:gallery.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:gallery.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -110,22 +110,22 @@
   "blocks": [
     {
       "type": "image",
-      "displayName": "Image",
+      "displayName": "tTheme:gallery.blocks.image.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:gallery.blocks.image.settings.content_header.label"
         },
         {
           "type": "image",
           "id": "image",
-          "label": "Image"
+          "label": "tTheme:gallery.blocks.image.settings.image.label"
         },
         {
           "type": "text",
           "id": "caption",
-          "label": "Caption"
+          "label": "tTheme:gallery.blocks.image.settings.caption.label"
         }
       ]
     }

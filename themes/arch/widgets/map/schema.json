@@ -1,6 +1,6 @@
 {
   "type": "map",
-  "displayName": "Map",
+  "displayName": "tTheme:map.name",
   "aliases": [
     "location",
     "directions",
@@ -11,62 +11,62 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:map.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:map.settings.title.label",
       "default": "Find Us"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:map.settings.description.label"
     },
     {
       "type": "header",
       "id": "content_header",
-      "label": "Content"
+      "label": "tTheme:map.settings.content_header.label"
     },
     {
       "type": "text",
       "id": "address",
-      "label": "Address",
+      "label": "tTheme:map.settings.address.label",
       "default": "123 Main Street, New York, NY 10001"
     },
     {
       "type": "textarea",
       "id": "embed_url",
-      "label": "Google Maps embed URL",
+      "label": "tTheme:map.settings.embed_url.label",
       "default": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.25280949928!2d-74.11976373946229!3d40.69766374859258!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1234567890"
     },
     {
       "type": "link",
       "id": "directions_link",
-      "label": "Get directions link"
+      "label": "tTheme:map.settings.directions_link.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:map.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "height",
-      "label": "Map height",
+      "label": "tTheme:map.settings.height.label",
       "options": [
         {
           "value": "small",
-          "label": "Small (300px)"
+          "label": "tTheme:map.settings.height.options.small"
         },
         {
           "value": "medium",
-          "label": "Medium (450px)"
+          "label": "tTheme:map.settings.height.options.medium"
         },
         {
           "value": "large",
-          "label": "Large (600px)"
+          "label": "tTheme:map.settings.height.options.large"
         }
       ],
       "default": "medium"
@@ -74,22 +74,22 @@
     {
       "type": "checkbox",
       "id": "show_address",
-      "label": "Show address below map",
+      "label": "tTheme:map.settings.show_address.label",
       "default": true
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:map.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:map.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:map.settings.color_scheme.options.highlight"
         }
       ]
     }

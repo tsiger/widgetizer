@@ -1,6 +1,6 @@
 {
   "type": "event-list",
-  "displayName": "Event List",
+  "displayName": "tTheme:event_list.name",
   "aliases": [
     "calendar",
     "schedule",
@@ -11,37 +11,37 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:event_list.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:event_list.settings.title.label",
       "default": "Upcoming Events"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:event_list.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:event_list.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:event_list.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:event_list.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:event_list.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -49,46 +49,46 @@
   "blocks": [
     {
       "type": "event",
-      "displayName": "Event",
+      "displayName": "tTheme:event_list.blocks.event.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:event_list.blocks.event.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "day",
-          "label": "Day (number)",
+          "label": "tTheme:event_list.blocks.event.settings.day.label",
           "default": "15"
         },
         {
           "type": "text",
           "id": "month",
-          "label": "Month (short)",
+          "label": "tTheme:event_list.blocks.event.settings.month.label",
           "default": "Dec"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Event title",
+          "label": "tTheme:event_list.blocks.event.settings.title.label",
           "default": "Event Name"
         },
         {
           "type": "text",
           "id": "location",
-          "label": "Location & time",
+          "label": "tTheme:event_list.blocks.event.settings.location.label",
           "default": "New York, NY · 6:00 PM"
         },
         {
           "type": "richtext",
           "id": "description",
-          "label": "Description"
+          "label": "tTheme:event_list.blocks.event.settings.description.label"
         },
         {
           "type": "link",
           "id": "button_link",
-          "label": "Button",
+          "label": "tTheme:event_list.blocks.event.settings.button_link.label",
           "default": {
             "text": "Register Now",
             "href": "#",

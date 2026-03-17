@@ -1,6 +1,6 @@
 {
   "type": "profile-grid",
-  "displayName": "Profile Grid",
+  "displayName": "tTheme:profile_grid.name",
   "aliases": [
     "team",
     "members",
@@ -11,29 +11,29 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text",
+      "label": "tTheme:profile_grid.settings.eyebrow.label",
       "default": "Our Team"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:profile_grid.settings.title.label",
       "default": "Meet Our Team"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:profile_grid.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:profile_grid.settings.display_header.label"
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "Columns (Desktop)",
+      "label": "tTheme:profile_grid.settings.columns_desktop.label",
       "default": 3,
       "min": 2,
       "max": 5,
@@ -42,32 +42,32 @@
     {
       "type": "select",
       "id": "layout",
-      "label": "Layout",
+      "label": "tTheme:profile_grid.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "Grid"
+          "label": "tTheme:profile_grid.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "Carousel"
+          "label": "tTheme:profile_grid.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:profile_grid.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:profile_grid.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:profile_grid.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -75,124 +75,124 @@
   "blocks": [
     {
       "type": "profile",
-      "displayName": "Team Member",
+      "displayName": "tTheme:profile_grid.blocks.profile.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:profile_grid.blocks.profile.settings.content_header.label"
         },
         {
           "type": "image",
           "id": "photo",
-          "label": "Photo"
+          "label": "tTheme:profile_grid.blocks.profile.settings.photo.label"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "Name",
+          "label": "tTheme:profile_grid.blocks.profile.settings.name.label",
           "default": "John Doe"
         },
         {
           "type": "text",
           "id": "role",
-          "label": "Role / Title",
+          "label": "tTheme:profile_grid.blocks.profile.settings.role.label",
           "default": "Team Member"
         },
         {
           "type": "text",
           "id": "specialty",
-          "label": "Specialty"
+          "label": "tTheme:profile_grid.blocks.profile.settings.specialty.label"
         },
         {
           "type": "textarea",
           "id": "bio",
-          "label": "Bio"
+          "label": "tTheme:profile_grid.blocks.profile.settings.bio.label"
         },
         {
           "type": "header",
           "id": "social_header",
-          "label": "Social Media"
+          "label": "tTheme:profile_grid.blocks.profile.settings.social_header.label"
         },
         {
           "type": "text",
           "id": "linkedin",
-          "label": "LinkedIn URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.linkedin.label"
         },
         {
           "type": "text",
           "id": "twitter",
-          "label": "Twitter URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.twitter.label"
         },
         {
           "type": "text",
           "id": "instagram",
-          "label": "Instagram URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.instagram.label"
         },
         {
           "type": "text",
           "id": "facebook",
-          "label": "Facebook URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.facebook.label"
         },
         {
           "type": "text",
           "id": "email",
-          "label": "Email"
+          "label": "tTheme:profile_grid.blocks.profile.settings.email.label"
         },
         {
           "type": "text",
           "id": "github",
-          "label": "GitHub URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.github.label"
         },
         {
           "type": "text",
           "id": "youtube",
-          "label": "YouTube URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.youtube.label"
         },
         {
           "type": "text",
           "id": "tiktok",
-          "label": "TikTok URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.tiktok.label"
         },
         {
           "type": "text",
           "id": "pinterest",
-          "label": "Pinterest URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.pinterest.label"
         },
         {
           "type": "text",
           "id": "bluesky",
-          "label": "Bluesky URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.bluesky.label"
         },
         {
           "type": "text",
           "id": "discord",
-          "label": "Discord URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.discord.label"
         },
         {
           "type": "text",
           "id": "meta",
-          "label": "Meta URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.meta.label"
         },
         {
           "type": "text",
           "id": "reddit",
-          "label": "Reddit URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.reddit.label"
         },
         {
           "type": "text",
           "id": "telegram",
-          "label": "Telegram URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.telegram.label"
         },
         {
           "type": "text",
           "id": "threads",
-          "label": "Threads URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.threads.label"
         },
         {
           "type": "text",
           "id": "whatsapp",
-          "label": "WhatsApp URL"
+          "label": "tTheme:profile_grid.blocks.profile.settings.whatsapp.label"
         }
       ]
     }

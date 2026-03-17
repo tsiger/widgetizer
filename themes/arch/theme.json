@@ -1,6 +1,6 @@
 {
   "name": "Arch",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "The default Widgetizer theme",
   "author": "Widgetizer",
   "settings": {
@@ -9,165 +9,165 @@
         {
           "type": "header",
           "id": "layout_header",
-          "label": "Animations"
+          "label": "tTheme:global.layout.settings.layout_header.label"
         },
         {
           "type": "checkbox",
           "id": "enable_reveal_animations",
-          "label": "Enable scroll reveal animations",
+          "label": "tTheme:global.layout.settings.enable_reveal_animations.label",
           "default": false,
-          "description": "Animate elements as they scroll into view"
+          "description": "tTheme:global.layout.settings.enable_reveal_animations.description"
         }
       ],
       "branding": [
         {
           "type": "header",
           "id": "branding_header",
-          "label": "Branding"
+          "label": "tTheme:global.branding.settings.branding_header.label"
         },
         {
           "type": "image",
           "id": "favicon",
-          "label": "Favicon",
+          "label": "tTheme:global.branding.settings.favicon.label",
           "default": "",
           "compact": true,
-          "description": "Recommended size 180×180 px."
+          "description": "tTheme:global.branding.settings.favicon.description"
         }
       ],
       "colors": [
         {
           "type": "header",
           "id": "colors_standard_header",
-          "label": "Standard Colors"
+          "label": "tTheme:global.colors.settings.colors_standard_header.label"
         },
         {
           "type": "color",
           "id": "standard_bg_primary",
-          "label": "Primary Background",
+          "label": "tTheme:global.colors.settings.standard_bg_primary.label",
           "default": "#ffffff",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "standard_bg_secondary",
-          "label": "Secondary Background",
+          "label": "tTheme:global.colors.settings.standard_bg_secondary.label",
           "default": "#f1f5f9",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "standard_text_content",
-          "label": "Content Text",
+          "label": "tTheme:global.colors.settings.standard_text_content.label",
           "default": "#1f2937",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "standard_text_heading",
-          "label": "Heading Text",
+          "label": "tTheme:global.colors.settings.standard_text_heading.label",
           "default": "#0f172a",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "standard_text_muted",
-          "label": "Muted Text",
+          "label": "tTheme:global.colors.settings.standard_text_muted.label",
           "default": "#6b7280",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "standard_border_color",
-          "label": "Border Color",
+          "label": "tTheme:global.colors.settings.standard_border_color.label",
           "default": "#e2e8f0",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "standard_accent",
-          "label": "Accent Color",
+          "label": "tTheme:global.colors.settings.standard_accent.label",
           "default": "#DE1877",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "standard_accent_text",
-          "label": "Accent Text Color",
+          "label": "tTheme:global.colors.settings.standard_accent_text.label",
           "default": "#ffffff",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "standard_rating_star",
-          "label": "Rating Star Color",
+          "label": "tTheme:global.colors.settings.standard_rating_star.label",
           "default": "#fbbf24",
           "outputAsCssVar": true
         },
         {
           "type": "header",
           "id": "colors_highlight_header",
-          "label": "Highlight Colors"
+          "label": "tTheme:global.colors.settings.colors_highlight_header.label"
         },
         {
           "type": "color",
           "id": "highlight_bg_primary",
-          "label": "Primary Background",
+          "label": "tTheme:global.colors.settings.highlight_bg_primary.label",
           "default": "#233c54",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_bg_secondary",
-          "label": "Secondary Background",
+          "label": "tTheme:global.colors.settings.highlight_bg_secondary.label",
           "default": "#152a3e",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_text_content",
-          "label": "Content Text",
+          "label": "tTheme:global.colors.settings.highlight_text_content.label",
           "default": "#eaf3fc",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_text_heading",
-          "label": "Heading Text",
+          "label": "tTheme:global.colors.settings.highlight_text_heading.label",
           "default": "#ffffff",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_text_muted",
-          "label": "Muted Text",
+          "label": "tTheme:global.colors.settings.highlight_text_muted.label",
           "default": "#64748b",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_border_color",
-          "label": "Border Color",
+          "label": "tTheme:global.colors.settings.highlight_border_color.label",
           "default": "#526884",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_accent",
-          "label": "Accent Color",
+          "label": "tTheme:global.colors.settings.highlight_accent.label",
           "default": "#DE1877",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_accent_text",
-          "label": "Accent Text Color",
+          "label": "tTheme:global.colors.settings.highlight_accent_text.label",
           "default": "#ffffff",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_rating_star",
-          "label": "Rating Star Color",
+          "label": "tTheme:global.colors.settings.highlight_rating_star.label",
           "default": "#fbbf24",
           "outputAsCssVar": true
         }
@@ -176,12 +176,12 @@
         {
           "type": "header",
           "id": "typography_header",
-          "label": "Typography"
+          "label": "tTheme:global.typography.settings.typography_header.label"
         },
         {
           "type": "font_picker",
           "id": "heading_font",
-          "label": "Heading Font",
+          "label": "tTheme:global.typography.settings.heading_font.label",
           "default": {
             "stack": "\"Fraunces\", serif",
             "weight": 600
@@ -190,7 +190,7 @@
         {
           "type": "font_picker",
           "id": "body_font",
-          "label": "Body Font",
+          "label": "tTheme:global.typography.settings.body_font.label",
           "default": {
             "stack": "\"Inter\", sans-serif",
             "weight": 400
@@ -199,8 +199,8 @@
         {
           "type": "range",
           "id": "heading_scale",
-          "label": "Heading Size",
-          "description": "Scale all heading text sizes up or down",
+          "label": "tTheme:global.typography.settings.heading_scale.label",
+          "description": "tTheme:global.typography.settings.heading_scale.description",
           "default": 100,
           "min": 80,
           "max": 120,
@@ -210,8 +210,8 @@
         {
           "type": "range",
           "id": "body_scale",
-          "label": "Body Text Size",
-          "description": "Scale all body text sizes up or down",
+          "label": "tTheme:global.typography.settings.body_scale.label",
+          "description": "tTheme:global.typography.settings.body_scale.description",
           "default": 100,
           "min": 80,
           "max": 120,
@@ -223,114 +223,114 @@
         {
           "type": "header",
           "id": "social_header",
-          "label": "Social Media"
+          "label": "tTheme:global.social.settings.social_header.label"
         },
         {
           "type": "text",
           "id": "facebook_url",
-          "label": "Facebook URL"
+          "label": "tTheme:global.social.settings.facebook_url.label"
         },
         {
           "type": "text",
           "id": "instagram_url",
-          "label": "Instagram URL"
+          "label": "tTheme:global.social.settings.instagram_url.label"
         },
         {
           "type": "text",
           "id": "twitter_url",
-          "label": "Twitter / X URL"
+          "label": "tTheme:global.social.settings.twitter_url.label"
         },
         {
           "type": "text",
           "id": "linkedin_url",
-          "label": "LinkedIn URL"
+          "label": "tTheme:global.social.settings.linkedin_url.label"
         },
         {
           "type": "text",
           "id": "youtube_url",
-          "label": "YouTube URL"
+          "label": "tTheme:global.social.settings.youtube_url.label"
         },
         {
           "type": "text",
           "id": "tiktok_url",
-          "label": "TikTok URL"
+          "label": "tTheme:global.social.settings.tiktok_url.label"
         },
         {
           "type": "text",
           "id": "pinterest_url",
-          "label": "Pinterest URL"
+          "label": "tTheme:global.social.settings.pinterest_url.label"
         },
         {
           "type": "text",
           "id": "github_url",
-          "label": "GitHub URL"
+          "label": "tTheme:global.social.settings.github_url.label"
         },
         {
           "type": "text",
           "id": "mastodon_url",
-          "label": "Mastodon URL"
+          "label": "tTheme:global.social.settings.mastodon_url.label"
         },
         {
           "type": "text",
           "id": "bluesky_url",
-          "label": "Bluesky URL"
+          "label": "tTheme:global.social.settings.bluesky_url.label"
         },
         {
           "type": "text",
           "id": "discord_url",
-          "label": "Discord URL"
+          "label": "tTheme:global.social.settings.discord_url.label"
         },
         {
           "type": "text",
           "id": "reddit_url",
-          "label": "Reddit URL"
+          "label": "tTheme:global.social.settings.reddit_url.label"
         },
         {
           "type": "text",
           "id": "telegram_url",
-          "label": "Telegram URL"
+          "label": "tTheme:global.social.settings.telegram_url.label"
         },
         {
           "type": "text",
           "id": "threads_url",
-          "label": "Threads URL"
+          "label": "tTheme:global.social.settings.threads_url.label"
         },
         {
           "type": "text",
           "id": "whatsapp_url",
-          "label": "WhatsApp URL"
+          "label": "tTheme:global.social.settings.whatsapp_url.label"
         },
         {
           "type": "text",
           "id": "mail_url",
-          "label": "Email URL"
+          "label": "tTheme:global.social.settings.mail_url.label"
         }
       ],
       "privacy": [
         {
           "type": "header",
           "id": "privacy_header",
-          "label": "Privacy"
+          "label": "tTheme:global.privacy.settings.privacy_header.label"
         },
         {
           "type": "checkbox",
           "id": "use_bunny_fonts",
-          "label": "Use Privacy-Friendly Font CDN",
+          "label": "tTheme:global.privacy.settings.use_bunny_fonts.label",
           "default": false,
-          "description": "Enable to serve Google Fonts from Bunny CDN (GDPR-compliant, no tracking)"
+          "description": "tTheme:global.privacy.settings.use_bunny_fonts.description"
         }
       ],
       "advanced": [
         {
           "type": "header",
           "id": "advanced_header",
-          "label": "Advanced"
+          "label": "tTheme:global.advanced.settings.advanced_header.label"
         },
         {
           "type": "code",
           "id": "custom_css",
-          "label": "Custom CSS",
-          "description": "Add custom CSS that will be injected in the <head> section.",
+          "label": "tTheme:global.advanced.settings.custom_css.label",
+          "description": "tTheme:global.advanced.settings.custom_css.description",
           "language": "css",
           "rows": 12,
           "default": ""
@@ -338,8 +338,8 @@
         {
           "type": "code",
           "id": "custom_head_scripts",
-          "label": "Custom Head Scripts",
-          "description": "Add custom scripts (e.g., Google Analytics) that will be injected in the <head> section.",
+          "label": "tTheme:global.advanced.settings.custom_head_scripts.label",
+          "description": "tTheme:global.advanced.settings.custom_head_scripts.description",
           "language": "html",
           "rows": 12,
           "default": ""
@@ -347,8 +347,8 @@
         {
           "type": "code",
           "id": "custom_footer_scripts",
-          "label": "Custom Footer Scripts",
-          "description": "Add custom scripts that will be injected before the closing </body> tag.",
+          "label": "tTheme:global.advanced.settings.custom_footer_scripts.label",
+          "description": "tTheme:global.advanced.settings.custom_footer_scripts.description",
           "language": "html",
           "rows": 12,
           "default": ""

@@ -1,6 +1,6 @@
 {
   "type": "key-figures",
-  "displayName": "Key Figures",
+  "displayName": "tTheme:key_figures.name",
   "aliases": [
     "stats",
     "metrics",
@@ -11,48 +11,48 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:key_figures.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:key_figures.settings.title.label",
       "default": "By The Numbers"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:key_figures.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:key_figures.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "Layout",
+      "label": "tTheme:key_figures.settings.layout.label",
       "default": "cards",
       "options": [
         {
           "value": "cards",
-          "label": "Cards"
+          "label": "tTheme:key_figures.settings.layout.options.cards"
         },
         {
           "value": "carousel",
-          "label": "Carousel"
+          "label": "tTheme:key_figures.settings.layout.options.carousel"
         },
         {
           "value": "bar",
-          "label": "Horizontal Bar"
+          "label": "tTheme:key_figures.settings.layout.options.bar"
         }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "Columns (Desktop)",
+      "label": "tTheme:key_figures.settings.columns_desktop.label",
       "default": 4,
       "min": 2,
       "max": 5,
@@ -61,22 +61,22 @@
     {
       "type": "checkbox",
       "id": "animate",
-      "label": "Animate numbers",
+      "label": "tTheme:key_figures.settings.animate.label",
       "default": true
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:key_figures.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:key_figures.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:key_figures.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -84,35 +84,35 @@
   "blocks": [
     {
       "type": "figure",
-      "displayName": "Figure",
+      "displayName": "tTheme:key_figures.blocks.figure.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:key_figures.blocks.figure.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "number",
-          "label": "Number",
+          "label": "tTheme:key_figures.blocks.figure.settings.number.label",
           "default": "500"
         },
         {
           "type": "text",
           "id": "suffix",
-          "label": "Suffix",
+          "label": "tTheme:key_figures.blocks.figure.settings.suffix.label",
           "default": "+"
         },
         {
           "type": "text",
           "id": "label",
-          "label": "Label",
+          "label": "tTheme:key_figures.blocks.figure.settings.label.label",
           "default": "Projects"
         },
         {
           "type": "text",
           "id": "description",
-          "label": "Description"
+          "label": "tTheme:key_figures.blocks.figure.settings.description.label"
         }
       ]
     }

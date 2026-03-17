@@ -1,6 +1,6 @@
 {
   "type": "contact-form",
-  "displayName": "Contact Form",
+  "displayName": "tTheme:contact_form.name",
   "aliases": [
     "lead capture",
     "inquiry",
@@ -11,71 +11,71 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:contact_form.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:contact_form.settings.title.label",
       "default": "Get in Touch"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:contact_form.settings.description.label"
     },
     {
       "type": "header",
       "id": "form_header",
-      "label": "Form"
+      "label": "tTheme:contact_form.settings.form_header.label"
     },
     {
       "type": "text",
       "id": "form_token",
-      "label": "Form Token",
-      "description": "Auto-injected when published to Widgetizer. For self-hosted: paste your form token (starts with ft_)"
+      "label": "tTheme:contact_form.settings.form_token.label",
+      "description": "tTheme:contact_form.settings.form_token.description"
     },
     {
       "type": "text",
       "id": "form_name",
-      "label": "Form Name",
+      "label": "tTheme:contact_form.settings.form_name.label",
       "default": "Contact Form",
-      "description": "Label to identify this form in your submissions dashboard"
+      "description": "tTheme:contact_form.settings.form_name.description"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:contact_form.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "sidebar_position",
-      "label": "Sidebar position",
+      "label": "tTheme:contact_form.settings.sidebar_position.label",
       "default": "right",
       "options": [
         {
           "value": "left",
-          "label": "Left"
+          "label": "tTheme:contact_form.settings.sidebar_position.options.left"
         },
         {
           "value": "right",
-          "label": "Right"
+          "label": "tTheme:contact_form.settings.sidebar_position.options.right"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:contact_form.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:contact_form.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:contact_form.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -83,231 +83,231 @@
   "blocks": [
     {
       "type": "input",
-      "displayName": "Input Field",
+      "displayName": "tTheme:contact_form.blocks.input.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:contact_form.blocks.input.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "label",
-          "label": "Label",
+          "label": "tTheme:contact_form.blocks.input.settings.label.label",
           "default": "Name"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "Field name (for form submission)",
+          "label": "tTheme:contact_form.blocks.input.settings.name.label",
           "default": "name"
         },
         {
           "type": "select",
           "id": "input_type",
-          "label": "Input type",
+          "label": "tTheme:contact_form.blocks.input.settings.input_type.label",
           "default": "text",
           "options": [
             {
               "value": "text",
-              "label": "Text"
+              "label": "tTheme:contact_form.blocks.input.settings.input_type.options.text"
             },
             {
               "value": "email",
-              "label": "Email"
+              "label": "tTheme:contact_form.blocks.input.settings.input_type.options.email"
             },
             {
               "value": "tel",
-              "label": "Phone"
+              "label": "tTheme:contact_form.blocks.input.settings.input_type.options.tel"
             },
             {
               "value": "url",
-              "label": "URL"
+              "label": "tTheme:contact_form.blocks.input.settings.input_type.options.url"
             },
             {
               "value": "number",
-              "label": "Number"
+              "label": "tTheme:contact_form.blocks.input.settings.input_type.options.number"
             },
             {
               "value": "date",
-              "label": "Date"
+              "label": "tTheme:contact_form.blocks.input.settings.input_type.options.date"
             }
           ]
         },
         {
           "type": "text",
           "id": "placeholder",
-          "label": "Placeholder"
+          "label": "tTheme:contact_form.blocks.input.settings.placeholder.label"
         },
         {
           "type": "header",
           "id": "options_header",
-          "label": "Options"
+          "label": "tTheme:contact_form.blocks.input.settings.options_header.label"
         },
         {
           "type": "checkbox",
           "id": "required",
-          "label": "Required",
+          "label": "tTheme:contact_form.blocks.input.settings.required.label",
           "default": false
         }
       ]
     },
     {
       "type": "textarea",
-      "displayName": "Textarea",
+      "displayName": "tTheme:contact_form.blocks.textarea.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:contact_form.blocks.textarea.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "label",
-          "label": "Label",
+          "label": "tTheme:contact_form.blocks.textarea.settings.label.label",
           "default": "Message"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "Field name (for form submission)",
+          "label": "tTheme:contact_form.blocks.textarea.settings.name.label",
           "default": "message"
         },
         {
           "type": "text",
           "id": "placeholder",
-          "label": "Placeholder"
+          "label": "tTheme:contact_form.blocks.textarea.settings.placeholder.label"
         },
         {
           "type": "header",
           "id": "options_header",
-          "label": "Options"
+          "label": "tTheme:contact_form.blocks.textarea.settings.options_header.label"
         },
         {
           "type": "checkbox",
           "id": "required",
-          "label": "Required",
+          "label": "tTheme:contact_form.blocks.textarea.settings.required.label",
           "default": false
         }
       ]
     },
     {
       "type": "dropdown",
-      "displayName": "Dropdown",
+      "displayName": "tTheme:contact_form.blocks.dropdown.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:contact_form.blocks.dropdown.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "label",
-          "label": "Label",
+          "label": "tTheme:contact_form.blocks.dropdown.settings.label.label",
           "default": "Subject"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "Field name (for form submission)",
+          "label": "tTheme:contact_form.blocks.dropdown.settings.name.label",
           "default": "subject"
         },
         {
           "type": "textarea",
           "id": "options",
-          "label": "Options (one per line)",
+          "label": "tTheme:contact_form.blocks.dropdown.settings.options.label",
           "default": "General Inquiry\\nSupport\\nSales\\nOther"
         },
         {
           "type": "header",
           "id": "options_header",
-          "label": "Options"
+          "label": "tTheme:contact_form.blocks.dropdown.settings.options_header.label"
         },
         {
           "type": "checkbox",
           "id": "required",
-          "label": "Required",
+          "label": "tTheme:contact_form.blocks.dropdown.settings.required.label",
           "default": false
         }
       ]
     },
     {
       "type": "checkbox",
-      "displayName": "Checkbox",
+      "displayName": "tTheme:contact_form.blocks.checkbox.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:contact_form.blocks.checkbox.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "label",
-          "label": "Label",
+          "label": "tTheme:contact_form.blocks.checkbox.settings.label.label",
           "default": "I agree to the terms"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "Field name (for form submission)",
+          "label": "tTheme:contact_form.blocks.checkbox.settings.name.label",
           "default": "agree"
         },
         {
           "type": "header",
           "id": "options_header",
-          "label": "Options"
+          "label": "tTheme:contact_form.blocks.checkbox.settings.options_header.label"
         },
         {
           "type": "checkbox",
           "id": "required",
-          "label": "Required",
+          "label": "tTheme:contact_form.blocks.checkbox.settings.required.label",
           "default": false
         }
       ]
     },
     {
       "type": "submit",
-      "displayName": "Submit Button",
+      "displayName": "tTheme:contact_form.blocks.submit.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:contact_form.blocks.submit.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "text",
-          "label": "Button text",
+          "label": "tTheme:contact_form.blocks.submit.settings.text.label",
           "default": "Send Message"
         }
       ]
     },
     {
       "type": "info",
-      "displayName": "Contact Info",
+      "displayName": "tTheme:contact_form.blocks.info.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:contact_form.blocks.info.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
+          "label": "tTheme:contact_form.blocks.info.settings.title.label",
           "default": "Email Us"
         },
         {
           "type": "richtext",
           "id": "text",
-          "label": "Text/Details",
+          "label": "tTheme:contact_form.blocks.info.settings.text.label",
           "default": "<p>hello@example.com</p>"
         }
       ]
     },
     {
       "type": "social",
-      "displayName": "Social Icons",
+      "displayName": "tTheme:contact_form.blocks.social.name",
       "settings": []
     }
   ],

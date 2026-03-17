@@ -54,6 +54,8 @@ A theme is organized as a directory with the following structure:
 │   └── global/             # Global template instances
 │       ├── header.json     # Global header configuration
 │       └── footer.json     # Global footer configuration
+├── locales/                # Theme locale translations
+│   └── en.json             # English locale (nested key-value pairs)
 ├── menus/                  # Navigation menu definitions
 │   └── main-nav.json       # Menu structure and items
 ├── presets/                # Optional preset variants
@@ -87,6 +89,7 @@ A theme is organized as a directory with the following structure:
 > - `widgets/`: Directory containing at least one widget.
 > - `templates/`: Directory containing page templates.
 > - `assets/`: Directory for theme assets.
+> - `locales/`: Directory with at least one locale file (e.g., `en.json`) providing translations for all `tTheme:` keys used in schemas.
 
 > **Note:** Each widget lives in its own subdirectory containing a `schema.json` (widget configuration) and `widget.liquid` (template). For comprehensive widget authoring guidance, see the [Widget Authoring Guide](theming-widgets.md).
 
@@ -150,35 +153,35 @@ The `settings.global` object defines customizable options organized into logical
       "colors": [
         {
           "id": "bg_primary",
-          "label": "Primary Background",
+          "label": "tTheme:global.colors.settings.bg_primary.label",
           "default": "#ffffff",
           "type": "color",
           "outputAsCssVar": true
         },
         {
           "id": "bg_secondary",
-          "label": "Secondary Background",
+          "label": "tTheme:global.colors.settings.bg_secondary.label",
           "default": "#f9f9f9",
           "type": "color",
           "outputAsCssVar": true
         },
         {
           "id": "text_content",
-          "label": "Content Text",
+          "label": "tTheme:global.colors.settings.text_content.label",
           "default": "#333333",
           "type": "color",
           "outputAsCssVar": true
         },
         {
           "id": "text_heading",
-          "label": "Heading Text",
+          "label": "tTheme:global.colors.settings.text_heading.label",
           "default": "#000000",
           "type": "color",
           "outputAsCssVar": true
         },
         {
           "id": "accent",
-          "label": "Accent Color",
+          "label": "tTheme:global.colors.settings.accent.label",
           "default": "#0d47b7",
           "type": "color",
           "outputAsCssVar": true
@@ -188,11 +191,11 @@ The `settings.global` object defines customizable options organized into logical
         {
           "id": "typography_header",
           "type": "header",
-          "label": "Typography"
+          "label": "tTheme:global.typography.settings.typography_header.label"
         },
         {
           "id": "heading_font",
-          "label": "Heading Font",
+          "label": "tTheme:global.typography.settings.heading_font.label",
           "type": "font_picker",
           "default": {
             "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
@@ -201,7 +204,7 @@ The `settings.global` object defines customizable options organized into logical
         },
         {
           "id": "body_font",
-          "label": "Body Font",
+          "label": "tTheme:global.typography.settings.body_font.label",
           "type": "font_picker",
           "default": {
             "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
@@ -213,14 +216,14 @@ The `settings.global` object defines customizable options organized into logical
         {
           "id": "privacy_header",
           "type": "header",
-          "label": "Privacy"
+          "label": "tTheme:global.privacy.settings.privacy_header.label"
         },
         {
           "id": "use_bunny_fonts",
           "type": "checkbox",
-          "label": "Use Privacy-Friendly Font CDN",
+          "label": "tTheme:global.privacy.settings.use_bunny_fonts.label",
           "default": false,
-          "description": "Enable to serve Google Fonts from Bunny CDN (GDPR-compliant, no tracking)"
+          "description": "tTheme:global.privacy.settings.use_bunny_fonts.description"
         }
       ]
     }
@@ -962,29 +965,31 @@ widgets/
 ```json
 {
   "type": "basic-text",
-  "displayName": "Basic Text",
+  "displayName": "tTheme:basic_text.name",
   "settings": [
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:basic_text.settings.title.label",
       "default": "Default Title"
     },
     {
       "type": "textarea",
       "id": "content",
-      "label": "Content",
+      "label": "tTheme:basic_text.settings.content.label",
       "default": "Default content..."
     },
     {
       "type": "color",
       "id": "textColor",
-      "label": "Text Color",
+      "label": "tTheme:basic_text.settings.textColor.label",
       "default": "#333333"
     }
   ]
 }
 ```
+
+> **Note:** All user-facing strings (`displayName`, `label`, `description`, option labels) use the `tTheme:` prefix to reference entries in the theme's locale files. See [Theme Locales](#theme-locales) for details.
 
 **Template file (`widget.liquid`):**
 
@@ -1114,60 +1119,60 @@ Blocks are defined in the widget's JSON schema using the `"blocks"` array:
 ```json
 {
   "type": "content-widget",
-  "displayName": "Content Widget",
+  "displayName": "tTheme:content_widget.name",
   "settings": [
     // Widget settings here
   ],
   "blocks": [
     {
       "type": "heading",
-      "displayName": "Heading Block",
+      "displayName": "tTheme:content_widget.blocks.heading.name",
       "settings": [
         {
           "type": "text",
           "id": "headingText",
-          "label": "Heading Text",
+          "label": "tTheme:content_widget.blocks.heading.settings.headingText.label",
           "default": "Your Heading"
         },
         {
           "type": "select",
           "id": "headingLevel",
-          "label": "Heading Level",
+          "label": "tTheme:content_widget.blocks.heading.settings.headingLevel.label",
           "default": "h2",
           "options": [
-            { "value": "h1", "label": "H1" },
-            { "value": "h2", "label": "H2" },
-            { "value": "h3", "label": "H3" }
+            { "value": "h1", "label": "tTheme:content_widget.blocks.heading.settings.headingLevel.options.h1" },
+            { "value": "h2", "label": "tTheme:content_widget.blocks.heading.settings.headingLevel.options.h2" },
+            { "value": "h3", "label": "tTheme:content_widget.blocks.heading.settings.headingLevel.options.h3" }
           ]
         }
       ]
     },
     {
       "type": "text",
-      "displayName": "Text Block",
+      "displayName": "tTheme:content_widget.blocks.text.name",
       "settings": [
         {
           "type": "textarea",
           "id": "text",
-          "label": "Text Content",
+          "label": "tTheme:content_widget.blocks.text.settings.text.label",
           "default": "Add your text here..."
         }
       ]
     },
     {
       "type": "button",
-      "displayName": "Button Block",
+      "displayName": "tTheme:content_widget.blocks.button.name",
       "settings": [
         {
           "type": "text",
           "id": "label",
-          "label": "Button Text",
+          "label": "tTheme:content_widget.blocks.button.settings.label.label",
           "default": "Click Me"
         },
         {
           "type": "link",
           "id": "link",
-          "label": "Button Link",
+          "label": "tTheme:content_widget.blocks.button.settings.link.label",
           "default": "#"
         }
       ]
@@ -1502,11 +1507,11 @@ Card-based widgets (e.g., `card-grid`, `icon-card-grid`) can offer a carousel la
 {
   "type": "select",
   "id": "layout",
-  "label": "Layout",
+  "label": "tTheme:my_widget.settings.layout.label",
   "default": "grid",
   "options": [
-    { "value": "grid", "label": "Grid" },
-    { "value": "carousel", "label": "Carousel" }
+    { "value": "grid", "label": "tTheme:my_widget.settings.layout.options.grid" },
+    { "value": "carousel", "label": "tTheme:my_widget.settings.layout.options.carousel" }
   ]
 }
 ```
@@ -1541,7 +1546,81 @@ When exporting a project to static HTML:
 
 > [!WARNING] Because widget assets are flattened during export, files with the same name from different widgets will collide. Always use unique, widget-prefixed filenames (e.g., `slideshow.css` instead of `styles.css`).
 
-## 11. Advanced Features
+## 11. Theme Locales
+
+Theme locale files provide the translated strings for all `tTheme:` prefixed keys used in widget schemas and global settings. They live in the `locales/` directory at the theme root.
+
+### File Format
+
+Each locale file (e.g., `locales/en.json`) is a nested JSON object. The dot-separated key path in a `tTheme:` reference maps directly to the nested structure:
+
+```json
+{
+  "basic_text": {
+    "name": "Basic Text",
+    "settings": {
+      "title": { "label": "Heading" },
+      "content": { "label": "Content" },
+      "textColor": { "label": "Text Color" }
+    }
+  },
+  "carousel": {
+    "name": "Carousel",
+    "settings": {
+      "title": { "label": "Title" },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": { "standard": "Standard", "highlight": "Highlight" }
+      }
+    },
+    "blocks": {
+      "slide": {
+        "name": "Slide",
+        "settings": {
+          "image": { "label": "Image" },
+          "caption": { "label": "Caption" }
+        }
+      }
+    }
+  },
+  "global": {
+    "colors": {
+      "name": "Colors",
+      "settings": {
+        "bg_primary": { "label": "Primary Background" },
+        "accent": { "label": "Accent Color" }
+      }
+    }
+  }
+}
+```
+
+### Key Convention
+
+| Schema field | Key pattern | Example |
+|---|---|---|
+| Widget `displayName` | `{widget_type}.name` | `tTheme:basic_text.name` |
+| Setting `label` | `{widget_type}.settings.{setting_id}.label` | `tTheme:basic_text.settings.title.label` |
+| Setting `description` | `{widget_type}.settings.{setting_id}.description` | `tTheme:basic_text.settings.title.description` |
+| Option `label` | `{widget_type}.settings.{setting_id}.options.{value}` | `tTheme:carousel.settings.color_scheme.options.standard` |
+| Block `displayName` | `{widget_type}.blocks.{block_type}.name` | `tTheme:carousel.blocks.slide.name` |
+| Block setting `label` | `{widget_type}.blocks.{block_type}.settings.{setting_id}.label` | `tTheme:carousel.blocks.slide.settings.image.label` |
+| Global setting `label` | `global.{group}.settings.{setting_id}.label` | `tTheme:global.colors.settings.accent.label` |
+| Global group name | `global.{group}.name` | `tTheme:global.colors.name` |
+
+Widget types with hyphens are converted to underscores in keys: `bento-grid` becomes `bento_grid`.
+
+### How Translations Work
+
+1. Schemas reference locale keys using the `tTheme:` prefix (e.g., `"label": "tTheme:carousel.settings.title.label"`).
+2. The frontend `useThemeLocale` hook provides a `tTheme()` resolver that looks up the key path in the active locale file and returns the translated string.
+3. If a key is missing from the locale file, the raw key path is shown as a fallback, making missing translations easy to spot.
+
+### Validation
+
+Run `npm run validate:theme-locales` to verify that every `tTheme:` key referenced in your schemas has a corresponding entry in the locale files.
+
+## 12. Advanced Features
 
 ### Scroll Reveal Animations
 
@@ -1611,14 +1690,14 @@ Add this to your `theme.json` under `settings.global`:
   {
     "type": "header",
     "id": "layout_header",
-    "label": "Animations"
+    "label": "tTheme:global.layout.settings.layout_header.label"
   },
   {
     "type": "checkbox",
     "id": "enable_reveal_animations",
-    "label": "Enable scroll reveal animations",
+    "label": "tTheme:global.layout.settings.enable_reveal_animations.label",
     "default": true,
-    "description": "Animate elements as they scroll into view"
+    "description": "tTheme:global.layout.settings.enable_reveal_animations.description"
   }
 ]
 ```
@@ -1787,13 +1866,13 @@ To enable these features in your theme, add the `advanced` settings group to you
         {
           "type": "header",
           "id": "advanced_header",
-          "label": "Advanced"
+          "label": "tTheme:global.advanced.settings.advanced_header.label"
         },
         {
           "type": "code",
           "id": "custom_css",
-          "label": "Custom CSS",
-          "description": "Add custom CSS that will be injected in the <head> section. Use the {% custom_css %} tag in your layout.liquid to render it.",
+          "label": "tTheme:global.advanced.settings.custom_css.label",
+          "description": "tTheme:global.advanced.settings.custom_css.description",
           "language": "css",
           "rows": 12,
           "default": ""
@@ -1801,8 +1880,8 @@ To enable these features in your theme, add the `advanced` settings group to you
         {
           "type": "code",
           "id": "custom_head_scripts",
-          "label": "Custom Head Scripts",
-          "description": "Add custom scripts (e.g., Google Analytics) that will be injected in the <head> section. Use the {% custom_head_scripts %} tag in your layout.liquid to render them.",
+          "label": "tTheme:global.advanced.settings.custom_head_scripts.label",
+          "description": "tTheme:global.advanced.settings.custom_head_scripts.description",
           "language": "html",
           "rows": 12,
           "default": ""
@@ -1810,8 +1889,8 @@ To enable these features in your theme, add the `advanced` settings group to you
         {
           "type": "code",
           "id": "custom_footer_scripts",
-          "label": "Custom Footer Scripts",
-          "description": "Add custom scripts that will be injected before the closing </body> tag. Use the {% custom_footer_scripts %} tag in your layout.liquid to render them.",
+          "label": "tTheme:global.advanced.settings.custom_footer_scripts.label",
+          "description": "tTheme:global.advanced.settings.custom_footer_scripts.description",
           "language": "html",
           "rows": 12,
           "default": ""
@@ -1824,7 +1903,7 @@ To enable these features in your theme, add the `advanced` settings group to you
 
 Then add the corresponding tags in your `layout.liquid` where you want the content to appear.
 
-## 12. Theme Presets
+## 13. Theme Presets
 
 Presets are named variants of a theme that can override **settings** (colors, fonts, etc.) and/or **demo content** (templates, menus, global widgets) while sharing the same theme codebase (layout, widgets, assets, snippets). Users pick a preset when creating a project. Once a project is created, it is independent from the preset.
 
@@ -1916,7 +1995,7 @@ When a user selects a theme with presets during project creation, a visual card 
 
 For detailed implementation information, see [Theme Presets](theme-presets.md).
 
-## 13. Theme Development Workflow
+## 14. Theme Development Workflow
 
 1. **Planning**: Define the theme's purpose, target audience, and key features
 2. **Setup**: Create the basic theme structure and `theme.json` with global settings
@@ -1936,7 +2015,7 @@ This theming system provides a powerful and flexible foundation for creating bea
 
 ---
 
-## 14. Theme Lifecycle in Projects
+## 15. Theme Lifecycle in Projects
 
 When a new project is created, the selected theme is copied into the project's data directory so it can be customized independently of the source theme:
 

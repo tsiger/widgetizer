@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { GripVertical, Trash2, Copy, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../../hooks/useThemeLocale";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
@@ -32,7 +33,8 @@ export default function WidgetItem({
   onRenameWidget,
 }) {
   const { t } = useTranslation();
-  const widgetName = widget.settings?.name || widgetSchema.displayName || widget.type;
+  const { tTheme } = useThemeLocale();
+  const widgetName = widget.settings?.name || tTheme(widgetSchema.displayName) || widget.type;
   const hasBlocks = widgetSchema.blocks && widgetSchema.blocks.length > 0;
   const blocks = widget.blocks || {};
   const blockOrder = widget.blocksOrder || [];
@@ -122,7 +124,7 @@ export default function WidgetItem({
               onKeyDown={handleKeyDown}
               onClick={(e) => e.stopPropagation()}
               className="font-medium text-xs text-slate-700 bg-white border border-pink-300 rounded px-1 py-0.5 w-full outline-none focus:ring-1 focus:ring-pink-400"
-              placeholder={widgetSchema.displayName || widget.type}
+              placeholder={tTheme(widgetSchema.displayName) || widget.type}
             />
           ) : (
             <span

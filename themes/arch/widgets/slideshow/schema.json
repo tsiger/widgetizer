@@ -1,52 +1,75 @@
 {
   "type": "slideshow",
-  "displayName": "Slideshow",
+  "displayName": "tTheme:slideshow.name",
   "maxBlocks": 5,
-  "aliases": ["carousel", "slider", "banner slider", "rotating banners"],
+  "aliases": [
+    "carousel",
+    "slider",
+    "banner slider",
+    "rotating banners"
+  ],
   "settings": [
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:slideshow.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "height",
-      "label": "Height",
+      "label": "tTheme:slideshow.settings.height.label",
       "default": "auto",
       "options": [
-        { "value": "auto", "label": "Auto" },
-        { "value": "small", "label": "Small" },
-        { "value": "medium", "label": "Medium" },
-        { "value": "large", "label": "Large" }
+        {
+          "value": "auto",
+          "label": "tTheme:slideshow.settings.height.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:slideshow.settings.height.options.small"
+        },
+        {
+          "value": "medium",
+          "label": "tTheme:slideshow.settings.height.options.medium"
+        },
+        {
+          "value": "large",
+          "label": "tTheme:slideshow.settings.height.options.large"
+        }
       ]
     },
     {
       "type": "checkbox",
       "id": "fullwidth",
-      "label": "Full width",
+      "label": "tTheme:slideshow.settings.fullwidth.label",
       "default": true
     },
     {
       "type": "select",
       "id": "alignment",
-      "label": "Content alignment",
+      "label": "tTheme:slideshow.settings.alignment.label",
       "default": "center",
       "options": [
-        { "value": "center", "label": "Center" },
-        { "value": "start", "label": "Left" }
+        {
+          "value": "center",
+          "label": "tTheme:slideshow.settings.alignment.options.center"
+        },
+        {
+          "value": "start",
+          "label": "tTheme:slideshow.settings.alignment.options.start"
+        }
       ]
     },
     {
       "type": "checkbox",
       "id": "autoplay",
-      "label": "Auto-rotate slides",
+      "label": "tTheme:slideshow.settings.autoplay.label",
       "default": true
     },
     {
       "type": "range",
       "id": "autoplay_speed",
-      "label": "Change slides every",
+      "label": "tTheme:slideshow.settings.autoplay_speed.label",
       "min": 3000,
       "max": 10000,
       "step": 1000,
@@ -57,75 +80,114 @@
   "blocks": [
     {
       "type": "slide",
-      "displayName": "Slide",
+      "displayName": "tTheme:slideshow.blocks.slide.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:slideshow.blocks.slide.settings.content_header.label"
         },
         {
           "type": "image",
           "id": "image",
-          "label": "Background Image"
+          "label": "tTheme:slideshow.blocks.slide.settings.image.label"
         },
         {
           "type": "text",
           "id": "heading_text",
-          "label": "Heading Text",
+          "label": "tTheme:slideshow.blocks.slide.settings.heading_text.label",
           "default": "Build your future"
         },
         {
           "type": "select",
           "id": "heading_size",
-          "label": "Heading Size",
+          "label": "tTheme:slideshow.blocks.slide.settings.heading_size.label",
           "default": "5xl",
           "options": [
-            { "value": "lg", "label": "Large" },
-            { "value": "xl", "label": "Extra Large" },
-            { "value": "2xl", "label": "2X Large" },
-            { "value": "3xl", "label": "3X Large" },
-            { "value": "4xl", "label": "4X Large" },
-            { "value": "5xl", "label": "5X Large" },
-            { "value": "6xl", "label": "6X Large" },
-            { "value": "7xl", "label": "7X Large" },
-            { "value": "8xl", "label": "8X Large" },
-            { "value": "9xl", "label": "9X Large" }
+            {
+              "value": "lg",
+              "label": "tTheme:slideshow.blocks.slide.settings.heading_size.options.lg"
+            },
+            {
+              "value": "xl",
+              "label": "tTheme:slideshow.blocks.slide.settings.heading_size.options.xl"
+            },
+            {
+              "value": "2xl",
+              "label": "tTheme:slideshow.blocks.slide.settings.heading_size.options.2xl"
+            },
+            {
+              "value": "3xl",
+              "label": "tTheme:slideshow.blocks.slide.settings.heading_size.options.3xl"
+            },
+            {
+              "value": "4xl",
+              "label": "tTheme:slideshow.blocks.slide.settings.heading_size.options.4xl"
+            },
+            {
+              "value": "5xl",
+              "label": "tTheme:slideshow.blocks.slide.settings.heading_size.options.5xl"
+            },
+            {
+              "value": "6xl",
+              "label": "tTheme:slideshow.blocks.slide.settings.heading_size.options.6xl"
+            },
+            {
+              "value": "7xl",
+              "label": "tTheme:slideshow.blocks.slide.settings.heading_size.options.7xl"
+            },
+            {
+              "value": "8xl",
+              "label": "tTheme:slideshow.blocks.slide.settings.heading_size.options.8xl"
+            },
+            {
+              "value": "9xl",
+              "label": "tTheme:slideshow.blocks.slide.settings.heading_size.options.9xl"
+            }
           ]
         },
         {
           "type": "textarea",
           "id": "text_content",
-          "label": "Text Content",
+          "label": "tTheme:slideshow.blocks.slide.settings.text_content.label",
           "default": "Start your journey with our powerful platform."
         },
         {
           "type": "select",
           "id": "text_size",
-          "label": "Text Size",
+          "label": "tTheme:slideshow.blocks.slide.settings.text_size.label",
           "default": "lg",
           "options": [
-            { "value": "sm", "label": "Small" },
-            { "value": "base", "label": "Base" },
-            { "value": "lg", "label": "Large" }
+            {
+              "value": "sm",
+              "label": "tTheme:slideshow.blocks.slide.settings.text_size.options.sm"
+            },
+            {
+              "value": "base",
+              "label": "tTheme:slideshow.blocks.slide.settings.text_size.options.base"
+            },
+            {
+              "value": "lg",
+              "label": "tTheme:slideshow.blocks.slide.settings.text_size.options.lg"
+            }
           ]
         },
         {
           "type": "checkbox",
           "id": "text_uppercase",
-          "label": "Uppercase",
+          "label": "tTheme:slideshow.blocks.slide.settings.text_uppercase.label",
           "default": false
         },
         {
           "type": "checkbox",
           "id": "text_muted",
-          "label": "Muted color",
+          "label": "tTheme:slideshow.blocks.slide.settings.text_muted.label",
           "default": false
         },
         {
           "type": "link",
           "id": "button_link",
-          "label": "Button 1",
+          "label": "tTheme:slideshow.blocks.slide.settings.button_link.label",
           "default": {
             "text": "Get Started",
             "href": "#",
@@ -135,61 +197,91 @@
         {
           "type": "link",
           "id": "button_link_2",
-          "label": "Button 2"
+          "label": "tTheme:slideshow.blocks.slide.settings.button_link_2.label"
         },
         {
           "type": "header",
           "id": "display_header",
-          "label": "Display"
+          "label": "tTheme:slideshow.blocks.slide.settings.display_header.label"
         },
         {
           "type": "select",
           "id": "button_style",
-          "label": "Button 1 style",
+          "label": "tTheme:slideshow.blocks.slide.settings.button_style.label",
           "default": "primary",
           "options": [
-            { "value": "primary", "label": "Primary" },
-            { "value": "secondary", "label": "Secondary" }
+            {
+              "value": "primary",
+              "label": "tTheme:slideshow.blocks.slide.settings.button_style.options.primary"
+            },
+            {
+              "value": "secondary",
+              "label": "tTheme:slideshow.blocks.slide.settings.button_style.options.secondary"
+            }
           ]
         },
         {
           "type": "select",
           "id": "button_style_2",
-          "label": "Button 2 style",
+          "label": "tTheme:slideshow.blocks.slide.settings.button_style_2.label",
           "default": "secondary",
           "options": [
-            { "value": "primary", "label": "Primary" },
-            { "value": "secondary", "label": "Secondary" }
+            {
+              "value": "primary",
+              "label": "tTheme:slideshow.blocks.slide.settings.button_style_2.options.primary"
+            },
+            {
+              "value": "secondary",
+              "label": "tTheme:slideshow.blocks.slide.settings.button_style_2.options.secondary"
+            }
           ]
         },
         {
           "type": "select",
           "id": "button_size",
-          "label": "Button size",
+          "label": "tTheme:slideshow.blocks.slide.settings.button_size.label",
           "default": "medium",
           "options": [
-            { "value": "small", "label": "Small" },
-            { "value": "medium", "label": "Medium" },
-            { "value": "large", "label": "Large" },
-            { "value": "xlarge", "label": "Extra Large" }
+            {
+              "value": "small",
+              "label": "tTheme:slideshow.blocks.slide.settings.button_size.options.small"
+            },
+            {
+              "value": "medium",
+              "label": "tTheme:slideshow.blocks.slide.settings.button_size.options.medium"
+            },
+            {
+              "value": "large",
+              "label": "tTheme:slideshow.blocks.slide.settings.button_size.options.large"
+            },
+            {
+              "value": "xlarge",
+              "label": "tTheme:slideshow.blocks.slide.settings.button_size.options.xlarge"
+            }
           ]
         },
         {
           "type": "color",
           "id": "overlay_color",
-          "label": "Overlay color",
+          "label": "tTheme:slideshow.blocks.slide.settings.overlay_color.label",
           "default": "#0a1e38bf",
           "allow_alpha": true,
-          "description": "Applies only if there is a background image."
+          "description": "tTheme:slideshow.blocks.slide.settings.overlay_color.description"
         },
         {
           "type": "select",
           "id": "color_scheme",
-          "label": "Color Scheme",
+          "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.label",
           "default": "highlight",
           "options": [
-            { "value": "standard", "label": "Standard" },
-            { "value": "highlight", "label": "Highlight" }
+            {
+              "value": "standard",
+              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.standard"
+            },
+            {
+              "value": "highlight",
+              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.highlight"
+            }
           ]
         }
       ]

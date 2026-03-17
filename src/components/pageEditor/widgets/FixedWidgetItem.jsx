@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../../hooks/useThemeLocale";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
@@ -24,7 +25,8 @@ export default function FixedWidgetItem({
   activeBlockTriggerKey,
 }) {
   const { t } = useTranslation();
-  const widgetName = widget.settings?.name || widgetSchema.displayName || widget.type;
+  const { tTheme } = useThemeLocale();
+  const widgetName = widget.settings?.name || tTheme(widgetSchema.displayName) || widget.type;
   const hasBlocks = widgetSchema.blocks && widgetSchema.blocks.length > 0;
   const blocks = widget.blocks || {};
   const blockOrder = widget.blocksOrder || [];

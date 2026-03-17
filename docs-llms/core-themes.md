@@ -21,6 +21,7 @@ themes/
     screenshot.png
     widgets/
     assets/
+    locales/
     templates/
     menus/
     snippets/
@@ -221,6 +222,7 @@ Handles applying theme updates to projects:
 - `assets/`
 - `widgets/`
 - `snippets/`
+- `locales/`
 - `theme.json` (merged, not replaced)
 - `screenshot.png`
 

@@ -14,7 +14,7 @@ import {
   getProjectDir,
   getProjectThemeJsonPath,
 } from "../config.js";
-import { getAllProjects } from "../db/repositories/projectRepository.js";
+import { getAllProjects, getProjectById } from "../db/repositories/projectRepository.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
@@ -1455,5 +1455,49 @@ export async function saveProjectThemeSettings(req, res) {
     if (handleProjectResolutionError(res, error)) return;
     console.error("Error saving project theme:", error);
     res.status(500).json({ message: "Error saving project theme" });
+  }
+}
+
+/**
+ * GET /api/themes/project/:projectId/locales/:lang
+ * Serve theme locale JSON for the project's active theme.
+ * Falls back to English if the requested language is not available.
+ */
+export async function getProjectThemeLocale(req, res) {
+  try {
+    const { projectId, lang } = req.params;
+
+    if (!lang || !/^[a-z]{2}$/.test(lang)) {
+      return res.status(400).json({ error: "Invalid language code" });
+    }
+
+    // Get the theme ID from the project's DB record
+    const project = getProjectById(projectId);
+    const themeId = project?.theme;
+
+    if (!themeId) {
+      return res.json({});
+    }
+
+    const sourceDir = await getThemeSourceDir(themeId);
+    const localePath = path.join(sourceDir, "locales", `${lang}.json`);
+
+    try {
+      const content = await fs.readFile(localePath, "utf-8");
+      return res.json(JSON.parse(content));
+    } catch {
+      // Fall back to English
+      const enPath = path.join(sourceDir, "locales", "en.json");
+      try {
+        const enContent = await fs.readFile(enPath, "utf-8");
+        return res.json(JSON.parse(enContent));
+      } catch {
+        return res.json({});
+      }
+    }
+  } catch (error) {
+    if (handleProjectResolutionError(res, error)) return;
+    console.error("Error reading theme locale:", error);
+    res.status(500).json({ error: "Failed to read theme locale" });
   }
 }

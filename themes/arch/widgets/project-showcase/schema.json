@@ -1,6 +1,6 @@
 {
   "type": "project-showcase",
-  "displayName": "Project Showcase",
+  "displayName": "tTheme:project_showcase.name",
   "aliases": [
     "portfolio",
     "works",
@@ -11,40 +11,46 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow Text",
+      "label": "tTheme:project_showcase.settings.eyebrow.label",
       "default": "Featured Projects"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:project_showcase.settings.title.label",
       "default": "Project Showcase"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading",
+      "label": "tTheme:project_showcase.settings.description.label",
       "default": "Browse through our collection of successful projects and client collaborations."
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:project_showcase.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "Layout",
+      "label": "tTheme:project_showcase.settings.layout.label",
       "default": "grid",
       "options": [
-        { "value": "grid", "label": "Grid" },
-        { "value": "carousel", "label": "Carousel" }
+        {
+          "value": "grid",
+          "label": "tTheme:project_showcase.settings.layout.options.grid"
+        },
+        {
+          "value": "carousel",
+          "label": "tTheme:project_showcase.settings.layout.options.carousel"
+        }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "Columns (Desktop)",
+      "label": "tTheme:project_showcase.settings.columns_desktop.label",
       "default": 3,
       "min": 2,
       "max": 5,
@@ -53,62 +59,68 @@
     {
       "type": "select",
       "id": "aspect_ratio",
-      "label": "Image Aspect Ratio",
+      "label": "tTheme:project_showcase.settings.aspect_ratio.label",
       "default": "4 / 3",
       "options": [
         {
           "value": "auto",
-          "label": "Auto"
+          "label": "tTheme:project_showcase.settings.aspect_ratio.options.auto"
         },
         {
           "value": "contain",
-          "label": "Show Full Image"
+          "label": "tTheme:project_showcase.settings.aspect_ratio.options.contain"
         },
         {
           "value": "1 / 1",
-          "label": "Square (1:1)"
+          "label": "tTheme:project_showcase.settings.aspect_ratio.options.1 / 1"
         },
         {
           "value": "4 / 3",
-          "label": "Standard (4:3)"
+          "label": "tTheme:project_showcase.settings.aspect_ratio.options.4 / 3"
         },
         {
           "value": "3 / 2",
-          "label": "Landscape (3:2)"
+          "label": "tTheme:project_showcase.settings.aspect_ratio.options.3 / 2"
         },
         {
           "value": "3 / 4",
-          "label": "Portrait (3:4)"
+          "label": "tTheme:project_showcase.settings.aspect_ratio.options.3 / 4"
         },
         {
           "value": "16 / 9",
-          "label": "Widescreen (16:9)"
+          "label": "tTheme:project_showcase.settings.aspect_ratio.options.16 / 9"
         }
       ]
     },
     {
       "type": "select",
       "id": "text_display",
-      "label": "Text Display",
+      "label": "tTheme:project_showcase.settings.text_display.label",
       "default": "hover",
       "options": [
-        { "value": "hover", "label": "On Hover" },
-        { "value": "always", "label": "Always" }
+        {
+          "value": "hover",
+          "label": "tTheme:project_showcase.settings.text_display.options.hover"
+        },
+        {
+          "value": "always",
+          "label": "tTheme:project_showcase.settings.text_display.options.always"
+        }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:project_showcase.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:project_showcase.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:project_showcase.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -116,33 +128,33 @@
   "blocks": [
     {
       "type": "project",
-      "displayName": "Project",
+      "displayName": "tTheme:project_showcase.blocks.project.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:project_showcase.blocks.project.settings.content_header.label"
         },
         {
           "type": "image",
           "id": "image",
-          "label": "Project Image"
+          "label": "tTheme:project_showcase.blocks.project.settings.image.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Project Title",
+          "label": "tTheme:project_showcase.blocks.project.settings.title.label",
           "default": "Project Name"
         },
         {
           "type": "text",
           "id": "description",
-          "label": "Short Description"
+          "label": "tTheme:project_showcase.blocks.project.settings.description.label"
         },
         {
           "type": "link",
           "id": "link",
-          "label": "Project Link",
+          "label": "tTheme:project_showcase.blocks.project.settings.link.label",
           "hide_text": true
         }
       ]

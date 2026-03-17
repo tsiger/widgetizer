@@ -1,6 +1,6 @@
 {
   "type": "timeline",
-  "displayName": "Timeline",
+  "displayName": "tTheme:timeline.name",
   "aliases": [
     "history",
     "roadmap",
@@ -11,57 +11,57 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow text"
+      "label": "tTheme:timeline.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
+      "label": "tTheme:timeline.settings.title.label",
       "default": "Our Process"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "Subheading"
+      "label": "tTheme:timeline.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "Display"
+      "label": "tTheme:timeline.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "Layout",
+      "label": "tTheme:timeline.settings.layout.label",
       "default": "vertical",
       "options": [
         {
           "value": "vertical",
-          "label": "Vertical"
+          "label": "tTheme:timeline.settings.layout.options.vertical"
         },
         {
           "value": "horizontal",
-          "label": "Horizontal"
+          "label": "tTheme:timeline.settings.layout.options.horizontal"
         },
         {
           "value": "centered",
-          "label": "Centered (Alternating)"
+          "label": "tTheme:timeline.settings.layout.options.centered"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "Color Scheme",
+      "label": "tTheme:timeline.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "Standard"
+          "label": "tTheme:timeline.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "Highlight"
+          "label": "tTheme:timeline.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -69,40 +69,40 @@
   "blocks": [
     {
       "type": "item",
-      "displayName": "Timeline Item",
+      "displayName": "tTheme:timeline.blocks.item.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "Content"
+          "label": "tTheme:timeline.blocks.item.settings.content_header.label"
         },
         {
           "type": "text",
           "id": "date",
-          "label": "Date/Phase",
+          "label": "tTheme:timeline.blocks.item.settings.date.label",
           "default": "Week  1"
         },
         {
           "type": "text",
           "id": "duration",
-          "label": "Duration (optional)"
+          "label": "tTheme:timeline.blocks.item.settings.duration.label"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
+          "label": "tTheme:timeline.blocks.item.settings.title.label",
           "default": "Discovery"
         },
         {
           "type": "textarea",
           "id": "features",
-          "label": "Features/bullet points (one per line)",
-          "description": "Start a line with + for a checkmark or - for a cross."
+          "label": "tTheme:timeline.blocks.item.settings.features.label",
+          "description": "tTheme:timeline.blocks.item.settings.features.description"
         },
         {
           "type": "richtext",
           "id": "description",
-          "label": "Description"
+          "label": "tTheme:timeline.blocks.item.settings.description.label"
         }
       ]
     }
