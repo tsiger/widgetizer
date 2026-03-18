@@ -81,25 +81,16 @@ export const getProjectThemeJsonPath = (projectId) =>
 // Project Media paths
 export const getProjectUploadsDir = (projectId) => path.join(getProjectDir(projectId), "uploads");
 export const getProjectImagesDir = (projectId) => path.join(getProjectUploadsDir(projectId), "images");
-export const getProjectVideosDir = (projectId) => path.join(getProjectUploadsDir(projectId), "videos");
-export const getProjectAudiosDir = (projectId) => path.join(getProjectUploadsDir(projectId), "audios");
 export const getImagePath = (projectId, filename) =>
   path.join(getProjectImagesDir(projectId), filename);
-export const getVideoPath = (projectId, filename) =>
-  path.join(getProjectVideosDir(projectId), filename);
-export const getAudioPath = (projectId, filename) =>
-  path.join(getProjectAudiosDir(projectId), filename);
 
 // Re-export from centralized MIME utils so existing importers keep working
 export { getMediaCategory };
 
 /**
- * Resolve the upload directory for a given project and MIME type.
+ * Resolve the upload directory for a given project.
  */
-export function getMediaDir(projectFolderName, mimeType) {
-  const category = getMediaCategory(mimeType);
-  if (category === "video") return getProjectVideosDir(projectFolderName);
-  if (category === "audio") return getProjectAudiosDir(projectFolderName);
+export function getMediaDir(projectFolderName) {
   return getProjectImagesDir(projectFolderName);
 }
 

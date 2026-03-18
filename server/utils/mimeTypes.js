@@ -24,12 +24,6 @@ const CONTENT_TYPES = {
   ".svg": "image/svg+xml",
   ".webp": "image/webp",
 
-  // Video
-  ".mp4": "video/mp4",
-
-  // Audio
-  ".mp3": "audio/mpeg",
-
   // Fonts
   ".woff": "font/woff",
   ".woff2": "font/woff2",
@@ -51,15 +45,13 @@ export function getContentType(ext, fallback = "application/octet-stream") {
 // Upload validation
 // ---------------------------------------------------------------------------
 
-/** MIME types accepted for media uploads (images, video, audio). */
+/** MIME types accepted for media uploads (images). */
 export const ALLOWED_MIME_TYPES = [
   "image/jpeg",
   "image/png",
   "image/gif",
   "image/webp",
   "image/svg+xml",
-  "video/mp4",
-  "audio/mpeg",
 ];
 
 /** MIME types that indicate a ZIP archive (used for theme / project imports). */
@@ -75,10 +67,8 @@ export const ZIP_MIME_TYPES = [
 /**
  * Classify a MIME type into a media category.
  * @param {string} mimeType
- * @returns {"video"|"audio"|"image"}
+ * @returns {"image"}
  */
-export function getMediaCategory(mimeType) {
-  if (mimeType && mimeType.startsWith("video/")) return "video";
-  if (mimeType && mimeType.startsWith("audio/")) return "audio";
+export function getMediaCategory() {
   return "image";
 }

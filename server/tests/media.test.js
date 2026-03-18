@@ -8,7 +8,7 @@
  * and refreshMediaUsage.
  *
  * Uses a realistic isolated project with actual image files processed
- * by sharp, videos, audios, and media.json metadata tracking.
+ * by sharp and media.json metadata tracking.
  *
  * Run with: node --test server/tests/media.test.js
  */
@@ -44,8 +44,6 @@ const {
   getProjectDir,
   getProjectPagesDir,
   getProjectImagesDir,
-  getProjectVideosDir,
-  getProjectAudiosDir,
 } = await import("../config.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
@@ -205,8 +203,6 @@ before(async () => {
   await fs.ensureDir(projectDir);
   await fs.ensureDir(getProjectPagesDir(PROJECT_FOLDER));
   await fs.ensureDir(getProjectImagesDir(PROJECT_FOLDER));
-  await fs.ensureDir(getProjectVideosDir(PROJECT_FOLDER));
-  await fs.ensureDir(getProjectAudiosDir(PROJECT_FOLDER));
 });
 
 // ============================================================================
@@ -411,8 +407,6 @@ describe("uploadProjectMedia", () => {
     await writeMediaFile(PROJECT_ID, { files: [] });
     // Clean upload directories
     await fs.emptyDir(getProjectImagesDir(PROJECT_FOLDER));
-    await fs.emptyDir(getProjectVideosDir(PROJECT_FOLDER));
-    await fs.emptyDir(getProjectAudiosDir(PROJECT_FOLDER));
   });
 
   it("uploads a JPEG image and processes with sharp", async () => {
@@ -538,57 +532,6 @@ describe("uploadProjectMedia", () => {
     assert.equal(processed.width, 300);
     assert.equal(processed.height, 250);
     assert.equal(processed.type, "image/png");
-  });
-
-  it("uploads a video file with basic metadata", async () => {
-    const vidDir = getProjectVideosDir(PROJECT_FOLDER);
-    const filePath = path.join(vidDir, "clip.mp4");
-    await fs.writeFile(filePath, "fake-mp4-data-here");
-
-    const res = await callController(uploadProjectMedia, {
-      params: { projectId: PROJECT_ID },
-      files: [
-        {
-          originalname: "clip.mp4",
-          filename: "clip.mp4",
-          mimetype: "video/mp4",
-          size: 18,
-          path: filePath,
-        },
-      ],
-    });
-
-    assert.equal(res._status, 201);
-    const processed = res._json.processedFiles[0];
-    assert.equal(processed.type, "video/mp4");
-    assert.equal(processed.path, "/uploads/videos/clip.mp4");
-    assert.equal(processed.thumbnail, null);
-    assert.deepEqual(processed.metadata, { title: "", description: "" });
-  });
-
-  it("uploads an audio file with basic metadata", async () => {
-    const audDir = getProjectAudiosDir(PROJECT_FOLDER);
-    const filePath = path.join(audDir, "track.mp3");
-    await fs.writeFile(filePath, "fake-mp3-data-here");
-
-    const res = await callController(uploadProjectMedia, {
-      params: { projectId: PROJECT_ID },
-      files: [
-        {
-          originalname: "track.mp3",
-          filename: "track.mp3",
-          mimetype: "audio/mpeg",
-          size: 18,
-          path: filePath,
-        },
-      ],
-    });
-
-    assert.equal(res._status, 201);
-    const processed = res._json.processedFiles[0];
-    assert.equal(processed.type, "audio/mpeg");
-    assert.equal(processed.path, "/uploads/audios/track.mp3");
-    assert.deepEqual(processed.metadata, { title: "", description: "" });
   });
 
   it("rejects files exceeding size limit", async () => {
@@ -807,8 +750,6 @@ describe("updateMediaMetadata", () => {
       {
         files: [
           { id: "meta-img", filename: "photo.jpg", type: "image/jpeg", metadata: { alt: "", title: "" } },
-          { id: "meta-vid", filename: "video.mp4", type: "video/mp4", metadata: { title: "", description: "" } },
-          { id: "meta-aud", filename: "song.mp3", type: "audio/mpeg", metadata: { title: "", description: "" } },
         ],
       },
     );
@@ -831,27 +772,6 @@ describe("updateMediaMetadata", () => {
     });
     assert.equal(res._status, 400);
     assert.ok(res._json.error.toLowerCase().includes("alt"));
-  });
-
-  it("updates video metadata (title + description, no alt)", async () => {
-    const res = await callController(updateMediaMetadata, {
-      params: { projectId: PROJECT_ID, fileId: "meta-vid" },
-      body: { title: "Intro Video", description: "Our company intro" },
-    });
-    assert.equal(res._status, 200);
-    assert.equal(res._json.file.metadata.title, "Intro Video");
-    assert.equal(res._json.file.metadata.description, "Our company intro");
-    // alt should not be present for video
-    assert.ok(!("alt" in res._json.file.metadata), "Video should not have alt");
-  });
-
-  it("updates audio metadata (title + description)", async () => {
-    const res = await callController(updateMediaMetadata, {
-      params: { projectId: PROJECT_ID, fileId: "meta-aud" },
-      body: { title: "Podcast Episode 1", description: "First episode" },
-    });
-    assert.equal(res._status, 200);
-    assert.equal(res._json.file.metadata.title, "Podcast Episode 1");
   });
 
   it("returns 404 for nonexistent file", async () => {
@@ -1083,11 +1003,9 @@ describe("serveProjectMedia", () => {
   before(async () => {
     // Create real files to serve
     const imgDir = getProjectImagesDir(PROJECT_FOLDER);
-    const vidDir = getProjectVideosDir(PROJECT_FOLDER);
 
     const jpegBuffer = await createTestJpeg(50, 50);
     await fs.writeFile(path.join(imgDir, "serve-test.jpg"), jpegBuffer);
-    await fs.writeFile(path.join(vidDir, "serve-test.mp4"), "fake-video-data");
 
     // Media data with file by ID
     await writeMediaFile(
@@ -1114,15 +1032,6 @@ describe("serveProjectMedia", () => {
     await serveProjectMedia(req, res);
 
     assert.equal(res._headers["Content-Type"], "image/jpeg");
-  });
-
-  it("serves video files with correct Content-Type", async () => {
-    const req = mockReq({
-      params: { projectId: PROJECT_ID, filename: "serve-test.mp4" },
-    });
-    const res = mockRes();
-    await serveProjectMedia(req, res);
-    assert.equal(res._headers["Content-Type"], "video/mp4");
   });
 
   it("returns 404 for nonexistent filename", async () => {

@@ -118,7 +118,7 @@ const menuPath = getMenuPath(projectFolderName, menuId);
 
 ### Media Controller (`mediaController.js`)
 
-**Rationale:** Media files (images, videos, audio) are stored in `data/projects/{folderName}/uploads/`. The controller handles file uploads and must ensure files are stored in the correct project directory.
+**Rationale:** Media files (images) are stored in `data/projects/{folderName}/uploads/`. The controller handles file uploads and must ensure files are stored in the correct project directory.
 
 **Pattern:**
 
@@ -130,7 +130,7 @@ const imagePath = getImagePath(projectFolderName, filename);
 
 **Key Functions:**
 
-- `uploadProjectMedia()`: Stores files in `{folderName}/uploads/images/`, `uploads/videos/`, or `uploads/audios/`
+- `uploadProjectMedia()`: Stores files in `{folderName}/uploads/images/`
 - `getProjectMedia()`: Reads media metadata from SQLite; media binaries still come from `{folderName}/uploads/*`
 - `deleteProjectMedia()`: Removes files from correct project directory
 - `serveProjectMedia()`: Serves files from `{folderName}/uploads/`, sets `Content-Type` via `getContentType()` from `server/utils/mimeTypes.js`

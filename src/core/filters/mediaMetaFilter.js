@@ -1,8 +1,8 @@
 /**
  * media_meta filter
  *
- * Usage: {{ 'path/to/file.mp3' | media_meta }} -> returns metadata object { title, description, alt, ... }
- * Usage: {{ 'path/to/file.mp3' | media_meta: 'title' }} -> returns "Song Title"
+ * Usage: {{ 'path/to/file.jpg' | media_meta }} -> returns metadata object { alt, title, ... }
+ * Usage: {{ 'path/to/file.jpg' | media_meta: 'alt' }} -> returns "Alt text"
  */
 
 export function registerMediaMetaFilter(engine) {

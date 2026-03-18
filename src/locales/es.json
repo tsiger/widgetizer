@@ -109,25 +109,10 @@
       "altHelp": "Describe el/la {{type}} para lectores de pantalla.",
       "titleLabel": "Título",
       "titleHelp": "Establece el atributo de título (a menudo se muestra al pasar el cursor).",
-      "descriptionLabel": "Descripción",
       "save": "Guardar Cambios",
       "saving": "Guardando...",
       "types": {
-        "image": "Imagen",
-        "video": "Video",
-        "audio": "Audio"
-      },
-      "placeholders": {
-        "audioTitle": "Título de la canción o episodio",
-        "videoTitle": "Título del video",
-        "audioDescription": "Artista, álbum o notas sobre este audio",
-        "videoDescription": "Descripción o notas sobre este video"
-      },
-      "help": {
-        "audioTitle": "El título de la pista de audio o del episodio del podcast.",
-        "videoTitle": "El título del video.",
-        "audioDescription": "Notas opcionales sobre este archivo de audio (artista, álbum, etc.).",
-        "videoDescription": "Descripción o notas opcionales sobre este video."
+        "image": "Imagen"
       }
     }
   },
@@ -161,17 +146,13 @@
       "refreshUsageTitle": "Actualizar Seguimiento de Uso",
       "searchPlaceholder": "Buscar medios...",
       "all": "Todos",
-      "images": "Imágenes",
-      "videos": "Videos",
-      "audio": "Audio"
+      "images": "Imágenes"
     },
     "mediaUploader": {
       "dropActive": "Suelte los archivos aquí...",
-      "dropInactive": "Arrastre y suelte imágenes y videos aquí o",
+      "dropInactive": "Arrastre y suelte imágenes aquí o",
       "selectFiles": "Seleccionar Archivos",
       "supportedImages": "Imágenes: JPG, PNG, GIF, WebP, SVG",
-      "supportedVideos": "Videos: MP4",
-      "supportedAudio": "Audio: MP3",
       "uploading": "Subiendo..."
     },
     "fileUploader": {
@@ -187,8 +168,6 @@
       "searchPlaceholder": "Buscar archivos de medios...",
       "noMatch": "No hay archivos que coincidan con tu búsqueda",
       "noFiles": "No hay archivos de medios disponibles",
-      "video": "Video",
-      "audio": "Audio",
       "closeLabel": "Cerrar selector de medios",
       "upload": "Subir",
       "uploaderTitle": "Subir Nuevos Medios",
@@ -582,7 +561,7 @@
     "emptyDesc": "Sube algunos archivos usando el cargador de arriba.",
     "uploader": {
       "title": "Subir Medios",
-      "description": "Arrastre y suelte imágenes o videos para subirlos a su biblioteca de proyectos"
+      "description": "Arrastre y suelte imágenes para subirlas a su biblioteca de proyectos"
     }
   },
   "themeSettings": {
@@ -678,14 +657,6 @@
       "maxFileSizeMB": {
         "label": "Tamaño Máximo de Carga de Imagen (MB)",
         "description": "Establece el tamaño máximo para cargas de imágenes individuales en todos los proyectos."
-      },
-      "maxVideoSizeMB": {
-        "label": "Tamaño Máximo de Carga de Video (MB)",
-        "description": "Establece el tamaño máximo para cargas de videos individuales en todos los proyectos."
-      },
-      "maxAudioSizeMB": {
-        "label": "Tamaño Máximo de Carga de Audio (MB)",
-        "description": "Establece el tamaño máximo para cargas de audio (MP3) individuales en todos los proyectos."
       },
       "imageProcessing": {
         "quality": {

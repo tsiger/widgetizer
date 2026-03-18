@@ -130,8 +130,6 @@ describe("getAppSettings (controller)", () => {
     const res = await callController(getAppSettings);
     assert.equal(res._json.general.language, "en");
     assert.equal(res._json.media.maxFileSizeMB, 5);
-    assert.equal(res._json.media.maxVideoSizeMB, 50);
-    assert.equal(res._json.media.maxAudioSizeMB, 25);
     assert.equal(res._json.export.maxVersionsToKeep, 10);
     assert.equal(res._json.export.maxImportSizeMB, 500);
     assert.equal(res._json.developer.enabled, false);

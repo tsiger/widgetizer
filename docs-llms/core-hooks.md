@@ -288,7 +288,7 @@ The media system uses a modular hook architecture that separates different aspec
 - File metadata editing (alt text, title)
 - API integration for saving metadata changes
 - Loading states for save operations
-- File viewing functionality for both images and videos
+- File viewing functionality for images
 
 ## Export Management Hooks
 

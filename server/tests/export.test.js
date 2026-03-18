@@ -376,24 +376,17 @@ before(async () => {
   );
 
   // -----------------------------------------------------------
-  // 8. Media files (images, videos, audios)
+  // 8. Media files (images)
   // -----------------------------------------------------------
   // Create actual media files on disk
   const uploadsDir = path.join(projectDir, "uploads");
   await fs.ensureDir(path.join(uploadsDir, "images"));
-  await fs.ensureDir(path.join(uploadsDir, "videos"));
-  await fs.ensureDir(path.join(uploadsDir, "audios"));
 
   // Dummy image files
   await fs.writeFile(path.join(uploadsDir, "images", "hero.jpg"), "fake-jpg-data");
   await fs.writeFile(path.join(uploadsDir, "images", "hero-medium.jpg"), "fake-jpg-medium");
   await fs.writeFile(path.join(uploadsDir, "images", "hero-thumb.jpg"), "fake-jpg-thumb");
   await fs.writeFile(path.join(uploadsDir, "images", "unused.png"), "fake-png-data");
-  // Dummy video
-  await fs.writeFile(path.join(uploadsDir, "videos", "intro.mp4"), "fake-mp4-data");
-  await fs.writeFile(path.join(uploadsDir, "videos", "unused.mp4"), "fake-unused-mp4");
-  // Dummy audio
-  await fs.writeFile(path.join(uploadsDir, "audios", "podcast.mp3"), "fake-mp3-data");
 
   await writeMediaFile(PROJECT_ID, {
     files: [
@@ -426,27 +419,6 @@ before(async () => {
         width: 500,
         height: 500,
         usedIn: [], // <-- not used anywhere
-      },
-      {
-        id: "vid-1",
-        filename: "intro.mp4",
-        path: "/uploads/videos/intro.mp4",
-        type: "video/mp4",
-        usedIn: ["index"],
-      },
-      {
-        id: "vid-2",
-        filename: "unused.mp4",
-        path: "/uploads/videos/unused.mp4",
-        type: "video/mp4",
-        usedIn: [], // <-- not used
-      },
-      {
-        id: "aud-1",
-        filename: "podcast.mp3",
-        path: "/uploads/audios/podcast.mp3",
-        type: "audio/mpeg",
-        usedIn: ["about"],
       },
     ],
   });
@@ -630,24 +602,6 @@ describe("exportProject", () => {
     const exportDir = await getLatestExportDir();
     const unusedPath = path.join(exportDir, "assets", "images", "unused.png");
     assert.ok(!(await fs.pathExists(unusedPath)), "Unused image should NOT be copied");
-  });
-
-  it("copies used videos to assets/videos/", async () => {
-    const exportDir = await getLatestExportDir();
-    const videoPath = path.join(exportDir, "assets", "videos", "intro.mp4");
-    assert.ok(await fs.pathExists(videoPath), "Used video should be in assets/videos/");
-  });
-
-  it("skips unused videos", async () => {
-    const exportDir = await getLatestExportDir();
-    const unusedPath = path.join(exportDir, "assets", "videos", "unused.mp4");
-    assert.ok(!(await fs.pathExists(unusedPath)), "Unused video should NOT be copied");
-  });
-
-  it("copies used audios to assets/audios/", async () => {
-    const exportDir = await getLatestExportDir();
-    const audioPath = path.join(exportDir, "assets", "audios", "podcast.mp3");
-    assert.ok(await fs.pathExists(audioPath), "Used audio should be in assets/audios/");
   });
 
   it("copies project assets (CSS/JS) to output", async () => {

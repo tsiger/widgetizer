@@ -1,17 +1,12 @@
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { X, Music } from "lucide-react";
+import { X } from "lucide-react";
 import Button from "../ui/Button";
 import { API_URL } from "../../config";
 
 export default function MediaDrawer({ visible, onClose, selectedFile, onSave, loading, activeProject }) {
   const { t } = useTranslation();
-
-  // Determine media type
-  const isVideo = selectedFile?.type?.startsWith("video/");
-  const isAudio = selectedFile?.type?.startsWith("audio/");
-  const isImage = !isVideo && !isAudio;
 
   const {
     register,
@@ -22,7 +17,6 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
     defaultValues: {
       alt: "",
       title: "",
-      description: "",
     },
   });
 
@@ -39,13 +33,12 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
         reset({
           alt: selectedFile.metadata?.alt || "",
           title: selectedFile.metadata?.title || "",
-          description: selectedFile.metadata?.description || "",
         });
         prevSelectedFileRef.current = currentSelectedFileStr;
       }
     } else if (!visible) {
       // Reset form when drawer is closed
-      reset({ alt: "", title: "", description: "" });
+      reset({ alt: "", title: "" });
       prevSelectedFileRef.current = JSON.stringify(null);
     }
   }, [visible, selectedFile, reset]);
@@ -65,11 +58,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
 
   const onSubmitHandler = (data) => {
     if (selectedFile) {
-      // Only send relevant fields based on media type
-      const metadata = isImage
-        ? { alt: data.alt, title: data.title }
-        : { title: data.title, description: data.description };
-      onSave(selectedFile.id, metadata);
+      onSave(selectedFile.id, { alt: data.alt, title: data.title });
     }
   };
 
@@ -96,12 +85,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
       ? API_URL(`/api/media/projects/${activeProject.id}/media/${selectedFile.id}`)
       : null;
 
-  // Get the media type label for the drawer title
-  const getMediaTypeLabel = () => {
-    if (isAudio) return t("forms.media.types.audio");
-    if (isVideo) return t("forms.media.types.video");
-    return t("forms.media.types.image");
-  };
+  const getMediaTypeLabel = () => t("forms.media.types.image");
 
   return (
     <div
@@ -133,103 +117,38 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
           {/* Preview section */}
           {fileUrl && (
             <div className="mb-4 p-2 border border-slate-200 rounded-sm bg-slate-50 flex items-center justify-center">
-              {isVideo ? (
-                <video
-                  src={fileUrl}
-                  className="max-h-40 max-w-full object-contain rounded-sm"
-                  controls
-                  preload="metadata"
-                >
-                  {t("common.error")}
-                </video>
-              ) : isAudio ? (
-                <div className="flex flex-col items-center py-4">
-                  <Music size={48} className="text-pink-500 mb-2" />
-                  <audio src={fileUrl} controls preload="metadata" className="w-full max-w-xs">
-                    {t("common.error")}
-                  </audio>
-                </div>
-              ) : (
-                <img src={fileUrl} alt="Preview" className="max-h-40 max-w-full object-contain rounded-sm" />
-              )}
+              <img src={fileUrl} alt="Preview" className="max-h-40 max-w-full object-contain rounded-sm" />
             </div>
           )}
 
-          {/* Image-specific fields: Alt Text (required) + Title */}
-          {isImage && (
-            <>
-              <div className="form-field">
-                <label htmlFor="alt" className="form-label">
-                  {t("forms.media.altLabel")}
-                </label>
-                <input
-                  type="text"
-                  id="alt"
-                  {...register("alt", {
-                    required: t("forms.media.altRequired"),
-                    validate: (value) => value.trim() !== "" || t("forms.media.altNotEmpty"),
-                  })}
-                  className="form-input"
-                  aria-required="true"
-                />
-                {errors.alt && <p className="form-error">{errors.alt.message}</p>}
-                <p className="form-description">
-                  {t("forms.media.altHelp", { type: t("forms.media.types.image").toLowerCase() })}
-                </p>
-              </div>
+          {/* Alt Text (required) + Title */}
+          <div className="form-field">
+            <label htmlFor="alt" className="form-label">
+              {t("forms.media.altLabel")}
+            </label>
+            <input
+              type="text"
+              id="alt"
+              {...register("alt", {
+                required: t("forms.media.altRequired"),
+                validate: (value) => value.trim() !== "" || t("forms.media.altNotEmpty"),
+              })}
+              className="form-input"
+              aria-required="true"
+            />
+            {errors.alt && <p className="form-error">{errors.alt.message}</p>}
+            <p className="form-description">
+              {t("forms.media.altHelp", { type: t("forms.media.types.image").toLowerCase() })}
+            </p>
+          </div>
 
-              <div className="form-field">
-                <label htmlFor="title" className="form-label-optional">
-                  {t("forms.media.titleLabel")}
-                </label>
-                <input type="text" id="title" {...register("title")} className="form-input" />
-                <p className="form-description">{t("forms.media.titleHelp")}</p>
-              </div>
-            </>
-          )}
-
-          {/* Video/Audio fields: Title + Description (both optional) */}
-          {(isVideo || isAudio) && (
-            <>
-              <div className="form-field">
-                <label htmlFor="title" className="form-label-optional">
-                  {t("forms.media.titleLabel")}
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  {...register("title")}
-                  className="form-input"
-                  placeholder={
-                    isAudio ? t("forms.media.placeholders.audioTitle") : t("forms.media.placeholders.videoTitle")
-                  }
-                />
-                <p className="form-description">
-                  {isAudio ? t("forms.media.help.audioTitle") : t("forms.media.help.videoTitle")}
-                </p>
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="description" className="form-label-optional">
-                  {t("forms.media.descriptionLabel")}
-                </label>
-                <textarea
-                  id="description"
-                  {...register("description")}
-                  className="form-input"
-                  rows={3}
-                  placeholder={
-                    isAudio
-                      ? t("forms.media.placeholders.audioDescription")
-                      : t("forms.media.placeholders.videoDescription")
-                  }
-                />
-                <p className="form-description">
-                  {isAudio ? t("forms.media.help.audioDescription") : t("forms.media.help.videoDescription")}
-                </p>
-              </div>
-            </>
-          )}
+          <div className="form-field">
+            <label htmlFor="title" className="form-label-optional">
+              {t("forms.media.titleLabel")}
+            </label>
+            <input type="text" id="title" {...register("title")} className="form-input" />
+            <p className="form-description">{t("forms.media.titleHelp")}</p>
+          </div>
 
           <div className="form-actions-separated">
             <Button type="button" onClick={onClose} variant="secondary">

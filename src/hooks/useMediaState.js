@@ -30,7 +30,7 @@ import useToastStore from "../stores/toastStore";
  * @property {Function} setViewMode - Change the view mode
  * @property {string} searchTerm - Current search filter text
  * @property {Function} setSearchTerm - Update the search filter
- * @property {string} filterType - Current type filter ('all', 'image', 'video', 'audio')
+ * @property {string} filterType - Current type filter ('all', 'image')
  * @property {Function} setFilterType - Update the type filter
  * @property {Array} filteredFiles - Files filtered by search term and type
  * @property {Object|null} activeProject - The currently active project
@@ -103,15 +103,7 @@ export default function useMediaState() {
   const filteredFiles = files.filter((file) => {
     const matchesSearch = file.originalName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType =
-      filterType === "all"
-        ? true
-        : filterType === "image"
-          ? file.type.startsWith("image/")
-          : filterType === "video"
-            ? file.type.startsWith("video/")
-            : filterType === "audio"
-              ? file.type.startsWith("audio/")
-              : true;
+      filterType === "all" ? true : filterType === "image" ? file.type.startsWith("image/") : true;
 
     return matchesSearch && matchesType;
   });

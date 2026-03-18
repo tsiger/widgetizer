@@ -243,7 +243,6 @@ The `settings.global` object defines customizable options organized into logical
 - `radio`: Radio buttons for single selection from options. _(Can be used with `outputAsCssVar` if the `value` of the selected option is a valid CSS value.)_
 - `font_picker`: Font family and weight selector with CSS variable output. _(Specially designed for `outputAsCssVar`; it generates multiple variables for font properties, e.g., `--group-id-family` and `--group-id-weight`.)_
 - `image`: Image uploader with preview, browse, and metadata editing. _(Can be used with `outputAsCssVar` to output the image URL, suitable for `background-image: url(var(--my-image-var));`)_
-- `video`: Video uploader with preview and media library integration. _(Value is a path; not typically used for CSS variables.)_
 - `menu`: Dropdown populated with available navigation menus. _(Value is a menu ID; not used for CSS.)_
 - `link`: Link builder for internal pages or custom URLs with text and target options. _(Value is a complex object; not used for CSS.)_
 
@@ -485,88 +484,6 @@ For cases where you need just the image URL (e.g., CSS background images), use t
 ```
 
 **How `srcset` works:** When `srcset: true`, the tag collects all available size variants (excluding `thumb`), includes the original if it's wider than all variants, sorts by width ascending, and emits a `srcset` attribute with `w` descriptors. The browser uses the `sizes` attribute and its own device pixel ratio to pick the best candidate. If fewer than 2 candidates are available, `srcset` is omitted. SVGs and path-only output modes are unaffected.
-
-### Video tag
-
-The `{% video %}` tag renders HTML5 video elements with proper attributes and fallbacks.
-
-#### Basic Usage
-
-```liquid
-{% video src: widget.settings.heroVideo %}
-```
-
-#### Advanced Usage with Parameters
-
-```liquid
-{% video src: widget.settings.heroVideo, controls: false, autoplay: true, muted: true, loop: true, class: 'hero-video' %}
-```
-
-#### Path-only output
-
-For cases where you need just the video URL (e.g., custom video players or JavaScript), use the `output` parameter with `'path'` or `'url'`:
-
-```liquid
-<!-- Get video path for custom player -->
-{% video src: widget.settings.backgroundVideo, output: 'path' %}
-
-<!-- Use in JavaScript -->
-<script>
-  const videoSrc = '{% video src: widget.settings.heroVideo, output: "path" %}';
-  // Use with custom video player
-</script>
-```
-
-#### Parameters (named; order does not matter)
-
-**For HTML `<video>` output:** `controls`, `autoplay`, `muted`, `loop` (booleans), `class` (string).
-
-**For path-only output:** use `output: 'path'` or `output: 'url'`.
-
-#### Usage Examples
-
-```liquid
-<!-- Full video tag with controls -->
-{% video src: widget.settings.heroVideo %}
-
-<!-- Autoplay muted video -->
-{% video src: widget.settings.backgroundVideo, controls: true, autoplay: true, muted: true %}
-
-<!-- Custom CSS class -->
-{% video src: widget.settings.introVideo, controls: true, autoplay: false, muted: false, loop: false, class: 'intro-video' %}
-
-<!-- Path-only for custom player -->
-{% video src: widget.settings.customVideo, output: 'path' %}
-{% video src: widget.settings.customVideo, output: 'url' %}
-```
-
-### Audio tag
-
-The `{% audio %}` tag returns the path to an audio file from the media library. Unlike the `{% video %}` tag, it does not render a full HTML element by default, giving you flexibility to use custom audio players or HTML5 `<audio>` tags.
-
-#### Basic Usage
-
-```liquid
-<!-- Get audio path -->
-{% audio src: widget.settings.backgroundMusic %}
-
-<!-- Use with HTML5 audio tag -->
-<audio controls>
-  <source src="{% audio src: widget.settings.backgroundMusic %}" type="audio/mpeg">
-</audio>
-```
-
-#### Path-only output
-
-The `{% audio %}` tag always returns just the path. You can explicitly use `output: 'path'` or `output: 'url'` for consistency with other media tags:
-
-```liquid
-{% audio src: widget.settings.soundEffect %}
-{% audio src: widget.settings.soundEffect, output: 'path' %}
-{% audio src: widget.settings.soundEffect, output: 'url' %}
-```
-
-All three forms return the same audio file path.
 
 ### YouTube tag
 
@@ -1325,12 +1242,6 @@ Use scoped CSS with widget IDs to style blocks without conflicts:
 - Link picker (internal pages or external URLs)
 - Style options (primary, secondary, etc.)
 - Target options (same window, new tab)
-
-**Video Block**
-
-- Video picker from media library
-- Autoplay, muted, loop options
-- Poster image override
 
 ## 8. Templates
 

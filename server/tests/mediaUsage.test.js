@@ -61,8 +61,6 @@ const PROJECT_FOLDER = "media-usage-test-project";
 
 const IMG1 = "img-1";
 const IMG2 = "img-2";
-const VID1 = "vid-1";
-const AUD1 = "aud-1";
 const IMG3 = "img-3";
 
 // ============================================================================
@@ -103,20 +101,6 @@ function defaultMediaFiles() {
       filename: "logo.png",
       path: "/uploads/images/logo.png",
       type: "image/png",
-      usedIn: [],
-    },
-    {
-      id: VID1,
-      filename: "intro.mp4",
-      path: "/uploads/videos/intro.mp4",
-      type: "video/mp4",
-      usedIn: [],
-    },
-    {
-      id: AUD1,
-      filename: "podcast.mp3",
-      path: "/uploads/audios/podcast.mp3",
-      type: "audio/mpeg",
       usedIn: [],
     },
     {
@@ -181,36 +165,6 @@ describe("updatePageMediaUsage", () => {
     assert.deepEqual(hero.usedIn, ["home"]);
   });
 
-  it("tracks video used in a widget setting", async () => {
-    const pageData = {
-      widgets: {
-        widget_1: {
-          settings: { video: "/uploads/videos/intro.mp4" },
-        },
-      },
-    };
-    await updatePageMediaUsage(PROJECT_ID, "home", pageData);
-
-    const media = await readMediaJson();
-    const video = media.files.find((f) => f.id === VID1);
-    assert.deepEqual(video.usedIn, ["home"]);
-  });
-
-  it("tracks audio used in a widget setting", async () => {
-    const pageData = {
-      widgets: {
-        widget_1: {
-          settings: { audio: "/uploads/audios/podcast.mp3" },
-        },
-      },
-    };
-    await updatePageMediaUsage(PROJECT_ID, "home", pageData);
-
-    const media = await readMediaJson();
-    const audio = media.files.find((f) => f.id === AUD1);
-    assert.deepEqual(audio.usedIn, ["home"]);
-  });
-
   it("tracks image from block settings", async () => {
     const pageData = {
       widgets: {
@@ -263,7 +217,7 @@ describe("updatePageMediaUsage", () => {
           settings: { image: "/uploads/images/logo.png" },
           blocks: {
             block_1: {
-              settings: { video: "/uploads/videos/intro.mp4" },
+              settings: { background: "/uploads/images/banner.jpg" },
             },
           },
         },
@@ -275,7 +229,7 @@ describe("updatePageMediaUsage", () => {
     const media = await readMediaJson();
     assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["home"]);
     assert.deepEqual(media.files.find((f) => f.id === IMG2).usedIn, ["home"]);
-    assert.deepEqual(media.files.find((f) => f.id === VID1).usedIn, ["home"]);
+    assert.deepEqual(media.files.find((f) => f.id === IMG3).usedIn, ["home"]);
   });
 
   it("deduplicates — same file used twice on same page", async () => {
@@ -527,7 +481,7 @@ describe("removePageFromMediaUsage", () => {
     const files = defaultMediaFiles();
     files[0].usedIn = ["home", "about"]; // hero used on two pages
     files[1].usedIn = ["home"]; // logo used on home
-    files[2].usedIn = ["about"]; // intro used on about
+    files[2].usedIn = ["about"]; // banner used on about
     await seedMediaJson(files);
   });
 
@@ -538,7 +492,7 @@ describe("removePageFromMediaUsage", () => {
     const media = await readMediaJson();
     assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["about"]);
     assert.deepEqual(media.files.find((f) => f.id === IMG2).usedIn, []);
-    assert.deepEqual(media.files.find((f) => f.id === VID1).usedIn, ["about"]);
+    assert.deepEqual(media.files.find((f) => f.id === IMG3).usedIn, ["about"]);
   });
 
   it("does not affect other pages' usage", async () => {
@@ -691,9 +645,6 @@ describe("refreshAllMediaUsage", () => {
     const banner = media.files.find((f) => f.id === IMG3);
     assert.deepEqual(banner.usedIn, ["about"]);
 
-    // video and audio: not used anywhere
-    assert.deepEqual(media.files.find((f) => f.id === VID1).usedIn, []);
-    assert.deepEqual(media.files.find((f) => f.id === AUD1).usedIn, []);
   });
 
   it("clears stale usage from deleted pages", async () => {

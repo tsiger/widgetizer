@@ -16,8 +16,6 @@ import { SeoTag } from "../../src/core/tags/SeoTag.js";
 import { FontsTag } from "../../src/core/tags/FontsTag.js";
 import { AssetTag } from "../../src/core/tags/assetTag.js";
 import { ImageTag } from "../../src/core/tags/imageTag.js";
-import { VideoTag } from "../../src/core/tags/videoTag.js";
-import { AudioTag } from "../../src/core/tags/audioTag.js";
 import { YouTubeTag } from "../../src/core/tags/youtubeTag.js";
 import { EnqueueStyleTag } from "../../src/core/tags/enqueueStyle.js";
 import { EnqueueScriptTag } from "../../src/core/tags/enqueueScript.js";
@@ -46,8 +44,6 @@ function setupEngine() {
   engine.registerTag("fonts", FontsTag);
   engine.registerTag("asset", AssetTag);
   engine.registerTag("image", ImageTag);
-  engine.registerTag("video", VideoTag);
-  engine.registerTag("audio", AudioTag);
   engine.registerTag("youtube", YouTubeTag);
   engine.registerTag("enqueue_style", EnqueueStyleTag);
   engine.registerTag("enqueue_script", EnqueueScriptTag);
@@ -177,22 +173,10 @@ async function render(template, context = {}, globals = {}) {
         width: 200,
         height: 50,
       },
-      "intro.mp4": {
-        filename: "intro.mp4",
-        path: "intro.mp4",
-        type: "video/mp4",
-      },
-      "podcast.mp3": {
-        filename: "podcast.mp3",
-        path: "podcast.mp3",
-        type: "audio/mp3",
-      },
     };
   }
 
   if (!context.imagePath) context.imagePath = "/uploads/images";
-  if (!context.videoPath) context.videoPath = "/uploads/videos";
-  if (!context.audioPath) context.audioPath = "/uploads/audios";
 
   return engine.parseAndRender(template, context, { globals });
 }
@@ -665,74 +649,6 @@ describe("ImageTag", () => {
     for (let i = 1; i < widths.length; i++) {
       assert.ok(widths[i] > widths[i - 1], `widths should be ascending: ${widths[i]} > ${widths[i - 1]}`);
     }
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Video Tag
-// ---------------------------------------------------------------------------
-
-describe("VideoTag", () => {
-  it("generates video tag with src", async () => {
-    const result = await render('{% video src: "intro.mp4" %}', {}, { renderMode: "preview" });
-    assert.match(result, /<video /);
-    assert.match(result, /src="\/uploads\/videos\/intro\.mp4"/);
-  });
-
-  it("includes controls attribute by default", async () => {
-    const result = await render('{% video src: "intro.mp4" %}', {}, { renderMode: "preview" });
-    assert.match(result, /\scontrols/);
-  });
-
-  it("includes preload=metadata", async () => {
-    const result = await render('{% video src: "intro.mp4" %}', {}, { renderMode: "preview" });
-    assert.match(result, /preload="metadata"/);
-  });
-
-  it("returns empty string when no src provided", async () => {
-    const result = await render("{% video %}", {}, { renderMode: "preview" });
-    assert.equal(result, "");
-  });
-
-  it("returns error comment when media file not found", async () => {
-    const result = await render('{% video src: "missing.mp4" %}', {}, { renderMode: "preview" });
-    assert.match(result, /<!-- Video tag error:.*not found -->/);
-  });
-
-  it("returns error comment when file is not a video", async () => {
-    const result = await render('{% video src: "hero.jpg" %}', {}, { renderMode: "preview" });
-    assert.match(result, /<!-- Video tag error:.*not a video file -->/);
-  });
-
-  it("returns URL only when output is 'url'", async () => {
-    const result = await render('{% video src: "intro.mp4", output: "url" %}', {}, { renderMode: "preview" });
-    assert.equal(result, "/uploads/videos/intro.mp4");
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Audio Tag
-// ---------------------------------------------------------------------------
-
-describe("AudioTag", () => {
-  it("generates audio URL", async () => {
-    const result = await render('{% audio src: "podcast.mp3" %}', {}, { renderMode: "preview" });
-    assert.equal(result.trim(), "/uploads/audios/podcast.mp3");
-  });
-
-  it("returns empty string when no src provided", async () => {
-    const result = await render("{% audio %}", {}, { renderMode: "preview" });
-    assert.equal(result, "");
-  });
-
-  it("returns error comment when media file not found", async () => {
-    const result = await render('{% audio src: "missing.mp3" %}', {}, { renderMode: "preview" });
-    assert.match(result, /<!-- Audio tag error:.*not found -->/);
-  });
-
-  it("returns error comment when file is not audio", async () => {
-    const result = await render('{% audio src: "hero.jpg" %}', {}, { renderMode: "preview" });
-    assert.match(result, /<!-- Audio tag error:.*not an audio file -->/);
   });
 });
 

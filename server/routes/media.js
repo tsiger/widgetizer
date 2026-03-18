@@ -103,28 +103,4 @@ router.get(
   },
 );
 
-// Serve media files directly from uploads/videos
-router.get(
-  "/projects/:projectId/uploads/videos/:filename",
-  [param("projectId").notEmpty(), param("filename").notEmpty()],
-  validateRequest,
-  (req, res) => {
-    const { filename } = req.params;
-    req.params.filename = filename;
-    serveProjectMedia(req, res);
-  },
-);
-
-// Serve media files directly from uploads/audios
-router.get(
-  "/projects/:projectId/uploads/audios/:filename",
-  [param("projectId").notEmpty(), param("filename").notEmpty()],
-  validateRequest,
-  (req, res) => {
-    const { filename } = req.params;
-    req.params.filename = filename;
-    serveProjectMedia(req, res);
-  },
-);
-
 export default router;

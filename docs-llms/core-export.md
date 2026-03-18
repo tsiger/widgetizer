@@ -140,13 +140,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
         - For each used image, copies the original file plus all generated sizes (small, medium, large) — `thumb` variants are excluded since they are only used for the media library UI
         - Images are copied to `assets/images/` (not `uploads/images/`)
         - Falls back to copying all images if media tracking fails
-      - **Optimized Video Copying**: Same usage-based approach for videos:
-        - Only copies videos that have a non-empty `usedIn` array
-        - Videos are copied to `assets/videos/`
-      - **Optimized Audio Copying**: Same usage-based approach for audio files:
-        - Only copies audio files that have a non-empty `usedIn` array
-        - Audio files are copied to `assets/audios/`
-      - **Export Optimization**: Logs how many media files were copied vs. skipped, often reducing export size significantly
+      - **Export Optimization**: Logs how many images were copied vs. skipped, often reducing export size significantly
 
 10. **Record Export History**:
     - The export metadata is recorded in the SQLite `exports` table with version number, timestamp, output directory, and status.

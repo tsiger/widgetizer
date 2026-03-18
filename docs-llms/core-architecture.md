@@ -441,8 +441,6 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 - `general.language` - Language selection
 - `general.dateFormat` - Date format
 - `media.maxFileSizeMB` - Max file size
-- `media.maxVideoSizeMB` - Max video size
-- `media.maxAudioSizeMB` - Max audio size
 - `media.imageProcessing.quality` - Image quality
 - `media.imageProcessing.sizes.*` - Size configurations
 - `export.maxVersionsToKeep` - Max export versions
@@ -623,13 +621,13 @@ Save button / Auto-save timer
 | ---------------------------- | -------------------------- |
 | `src/utils/slugUtils.js`     | `formatSlug()`             |
 | `src/utils/dateFormatter.js` | `formatDate()`             |
-| `src/config.js`              | `API_URL()`, `MEDIA_TYPES` |
+| `src/config.js`              | `API_URL()`, `MEDIA_TYPES` (image extensions) |
 
 ### Backend
 
 | File | Functions |
 | --- | --- |
-| `server/config.js` | Path helpers (`getProjectDir()`, `getPublishDir()`, `getThemeDir()`, `getThemesDir()`, etc.), `getMediaDir()`, `getMediaCategory()` (re-exported from mimeTypes.js) |
+| `server/config.js` | Path helpers (`getProjectDir()`, `getPublishDir()`, `getThemeDir()`, `getThemesDir()`, etc.), `getMediaDir()` |
 | `server/utils/mimeTypes.js` | `ALLOWED_MIME_TYPES`, `ZIP_MIME_TYPES`, `getContentType()`, `getMediaCategory()` |
 | `server/utils/semver.js` | `parseVersion()`, `compareVersions()`, `isNewerVersion()`, `sortVersions()`, `getLatestVersion()` |
 | `server/utils/themeHelpers.js` | `preprocessThemeSettings()` |

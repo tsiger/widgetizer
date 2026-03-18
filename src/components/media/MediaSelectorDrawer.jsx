@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { X, Search, Play, Upload, Music } from "lucide-react";
+import { X, Search, Upload } from "lucide-react";
 import { API_URL, MEDIA_TYPES } from "../../config";
 import { getProjectMedia } from "../../queries/mediaManager";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -69,14 +69,8 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
     .filter((file) => {
       const matchesSearch = file.originalName.toLowerCase().includes(searchTerm.toLowerCase());
 
-      if (filterType === "all") {
-        return matchesSearch;
-      } else if (filterType === "image") {
+      if (filterType === "image") {
         return matchesSearch && file.type && file.type.startsWith("image/");
-      } else if (filterType === "video") {
-        return matchesSearch && file.type && file.type.startsWith("video/");
-      } else if (filterType === "audio") {
-        return matchesSearch && file.type && file.type.startsWith("audio/");
       }
 
       return matchesSearch;
@@ -145,15 +139,7 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
               ref={fileInputRef}
               className="hidden"
               multiple
-              accept={
-                filterType === "image"
-                  ? MEDIA_TYPES.image.join(",")
-                  : filterType === "video"
-                    ? MEDIA_TYPES.video.join(",")
-                    : filterType === "audio"
-                      ? MEDIA_TYPES.audio.join(",")
-                      : [...MEDIA_TYPES.image, ...MEDIA_TYPES.video, ...MEDIA_TYPES.audio].join(",")
-              }
+              accept={MEDIA_TYPES.image.join(",")}
               onChange={handleFileInputChange}
             />
             <button
@@ -187,27 +173,11 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
                   onClick={() => onSelect(file)}
                 >
                   <div className="aspect-square relative bg-slate-100 flex items-center justify-center">
-                    {file.type && file.type.startsWith("video/") ? (
-                      <div className="flex flex-col items-center justify-center text-slate-500 p-2">
-                        <Play size={32} />
-                        <p className="text-xs text-center mt-1 font-medium truncate max-w-full">
-                          {t("components.mediaSelector.video")}
-                        </p>
-                      </div>
-                    ) : file.type && file.type.startsWith("audio/") ? (
-                      <div className="flex flex-col items-center justify-center text-slate-500 p-2">
-                        <Music size={32} />
-                        <p className="text-xs text-center mt-1 font-medium truncate max-w-full">
-                          {t("components.mediaSelector.audio")}
-                        </p>
-                      </div>
-                    ) : (
-                      <img
-                        src={API_URL(`/api/media/projects/${activeProject.id}${file.thumbnail || file.path}`)}
-                        alt={file.metadata?.alt || ""}
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    )}
+                    <img
+                      src={API_URL(`/api/media/projects/${activeProject.id}${file.thumbnail || file.path}`)}
+                      alt={file.metadata?.alt || ""}
+                      className="max-w-full max-h-full object-contain"
+                    />
                   </div>
                   <div className="p-2">
                     <p className="text-xs truncate" title={file.originalName}>

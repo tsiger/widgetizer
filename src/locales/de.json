@@ -109,25 +109,10 @@
       "altHelp": "Beschreibt das {{type}} für Screenreader.",
       "titleLabel": "Titel",
       "titleHelp": "Setzt das title-Attribut (oft beim Überfahren mit der Maus angezeigt).",
-      "descriptionLabel": "Beschreibung",
       "save": "Änderungen speichern",
       "saving": "Speichern...",
       "types": {
-        "image": "Bild",
-        "video": "Video",
-        "audio": "Audio"
-      },
-      "placeholders": {
-        "audioTitle": "Titel des Titels oder der Episode",
-        "videoTitle": "Videotitel",
-        "audioDescription": "Künstler, Album oder Notizen zu diesem Audio",
-        "videoDescription": "Beschreibung oder Notizen zu diesem Video"
-      },
-      "help": {
-        "audioTitle": "Der Titel des Audiotracks oder der Podcast-Episode.",
-        "videoTitle": "Der Titel des Videos.",
-        "audioDescription": "Optionale Notizen zu dieser Audiodatei (Künstler, Album usw.).",
-        "videoDescription": "Optionale Beschreibung oder Notizen zu diesem Video."
+        "image": "Bild"
       }
     }
   },
@@ -161,17 +146,13 @@
       "refreshUsageTitle": "Nutzungsverfolgung aktualisieren",
       "searchPlaceholder": "Medien suchen...",
       "all": "Alle",
-      "images": "Bilder",
-      "videos": "Videos",
-      "audio": "Audio"
+      "images": "Bilder"
     },
     "mediaUploader": {
       "dropActive": "Lassen Sie die Dateien hier fallen...",
-      "dropInactive": "Ziehen Sie Bilder und Videos hierher oder",
+      "dropInactive": "Ziehen Sie Bilder hierher oder",
       "selectFiles": "Dateien auswählen",
       "supportedImages": "Bilder: JPG, PNG, GIF, WebP, SVG",
-      "supportedVideos": "Videos: MP4",
-      "supportedAudio": "Audio: MP3",
       "uploading": "Wird hochgeladen..."
     },
     "fileUploader": {
@@ -187,8 +168,6 @@
       "searchPlaceholder": "Mediendateien suchen...",
       "noMatch": "Keine Mediendateien entsprechen Ihrer Suche",
       "noFiles": "Keine Mediendateien verfügbar",
-      "video": "Video",
-      "audio": "Audio",
       "closeLabel": "Medienauswahl schließen",
       "upload": "Hochladen",
       "uploaderTitle": "Neue Medien hochladen",
@@ -582,7 +561,7 @@
     "emptyDesc": "Laden Sie einige Dateien mit dem Uploader oben hoch.",
     "uploader": {
       "title": "Medien hochladen",
-      "description": "Ziehen Sie Bilder oder Videos hierher, um sie in Ihre Projektbibliothek hochzuladen"
+      "description": "Ziehen Sie Bilder hierher, um sie in Ihre Projektbibliothek hochzuladen"
     }
   },
   "themeSettings": {
@@ -678,14 +657,6 @@
       "maxFileSizeMB": {
         "label": "Maximale Upload-Größe für Bilder (MB)",
         "description": "Legen Sie die maximale Größe für einzelne Bild-Uploads in allen Projekten fest."
-      },
-      "maxVideoSizeMB": {
-        "label": "Maximale Upload-Größe für Videos (MB)",
-        "description": "Legen Sie die maximale Größe für einzelne Video-Uploads in allen Projekten fest."
-      },
-      "maxAudioSizeMB": {
-        "label": "Maximale Upload-Größe für Audio (MB)",
-        "description": "Legen Sie die maximale Größe für einzelne Audio-Uploads (MP3) in allen Projekten fest."
       },
       "imageProcessing": {
         "quality": {

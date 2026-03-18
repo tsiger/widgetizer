@@ -109,25 +109,10 @@
       "altHelp": "Décrit le/la {{type}} pour les lecteurs d'écran.",
       "titleLabel": "Titre",
       "titleHelp": "Définit l'attribut title (souvent affiché au survol).",
-      "descriptionLabel": "Description",
       "save": "Enregistrer les modifications",
       "saving": "Enregistrement...",
       "types": {
-        "image": "Image",
-        "video": "Vidéo",
-        "audio": "Audio"
-      },
-      "placeholders": {
-        "audioTitle": "Titre du morceau ou de l'épisode",
-        "videoTitle": "Titre de la vidéo",
-        "audioDescription": "Artiste, album ou notes sur cet audio",
-        "videoDescription": "Description ou notes sur cette vidéo"
-      },
-      "help": {
-        "audioTitle": "Le titre de la piste audio ou de l'épisode de podcast.",
-        "videoTitle": "Le titre de la vidéo.",
-        "audioDescription": "Notes facultatives sur ce fichier audio (artiste, album, etc.).",
-        "videoDescription": "Description ou notes facultatives sur cette vidéo."
+        "image": "Image"
       }
     }
   },
@@ -161,17 +146,13 @@
       "refreshUsageTitle": "Actualiser le suivi de l'utilisation",
       "searchPlaceholder": "Rechercher des médias...",
       "all": "Tout",
-      "images": "Images",
-      "videos": "Vidéos",
-      "audio": "Audio"
+      "images": "Images"
     },
     "mediaUploader": {
       "dropActive": "Déposez les fichiers ici...",
-      "dropInactive": "Glissez et déposez des images et des vidéos ici ou",
+      "dropInactive": "Glissez et déposez des images ici ou",
       "selectFiles": "Sélectionner des fichiers",
       "supportedImages": "Images : JPG, PNG, GIF, WebP, SVG",
-      "supportedVideos": "Vidéos : MP4",
-      "supportedAudio": "Audio : MP3",
       "uploading": "Téléchargement..."
     },
     "fileUploader": {
@@ -187,8 +168,6 @@
       "searchPlaceholder": "Rechercher des fichiers médias...",
       "noMatch": "Aucun fichier média ne correspond à votre recherche",
       "noFiles": "Aucun fichier média disponible",
-      "video": "Vidéo",
-      "audio": "Audio",
       "closeLabel": "Fermer le sélecteur de média",
       "upload": "Télécharger",
       "uploaderTitle": "Télécharger de nouveaux médias",
@@ -582,7 +561,7 @@
     "emptyDesc": "Téléversez des fichiers en utilisant le formulaire ci-dessus.",
     "uploader": {
       "title": "Télécharger des médias",
-      "description": "Glissez et déposez des images ou des vidéos pour les télécharger dans votre bibliothèque"
+      "description": "Glissez et déposez des images pour les télécharger dans votre bibliothèque"
     }
   },
   "themeSettings": {
@@ -678,14 +657,6 @@
       "maxFileSizeMB": {
         "label": "Taille max de téléchargement d'image (Mo)",
         "description": "Définir la taille maximale pour les téléchargements d'images individuelles sur tous les projets."
-      },
-      "maxVideoSizeMB": {
-        "label": "Taille max de téléchargement vidéo (Mo)",
-        "description": "Définir la taille maximale pour les téléchargements de vidéos individuelles sur tous les projets."
-      },
-      "maxAudioSizeMB": {
-        "label": "Taille max de téléchargement audio (Mo)",
-        "description": "Définir la taille maximale pour les téléchargements audio (MP3) individuels sur tous les projets."
       },
       "imageProcessing": {
         "quality": {

@@ -14,8 +14,6 @@ import {
   FontPickerInput,
   MenuSelectInput,
   ImageInput,
-  VideoInput,
-  AudioInput,
   LinkInput,
   YouTubeInput,
   IconInput,
@@ -100,10 +98,6 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
         return <MenuSelectInput {...inputProps} />;
       case "image":
         return <ImageInput {...inputProps} compact={compact} />;
-      case "video":
-        return <VideoInput {...inputProps} />;
-      case "audio":
-        return <AudioInput {...inputProps} />;
       case "link":
         return <LinkInput {...inputProps} setting={setting} />;
       case "youtube":

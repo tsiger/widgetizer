@@ -49,17 +49,12 @@ export default function Media() {
     setFiles: mediaState.setFiles,
   });
 
-  // Handle file view - open lightbox for images, new tab for videos/audio
+  // Handle file view - open lightbox for images
   const handleFileView = (file) => {
-    if (file.type?.startsWith("image/")) {
-      const imageIndex = imageFiles.findIndex((f) => f.id === file.id);
-      if (imageIndex !== -1) {
-        setLightboxImageIndex(imageIndex);
-        setLightboxOpen(true);
-      }
-    } else {
-      // For videos/audio, use the original behavior (open in new tab)
-      mediaMetadata.handleFileView(file);
+    const imageIndex = imageFiles.findIndex((f) => f.id === file.id);
+    if (imageIndex !== -1) {
+      setLightboxImageIndex(imageIndex);
+      setLightboxOpen(true);
     }
   };
 
@@ -104,13 +99,11 @@ export default function Media() {
         uploadProgress={mediaUpload.uploadProgress}
         accept={{
           "image/*": MEDIA_TYPES.image,
-          "video/*": MEDIA_TYPES.video,
-          "audio/*": MEDIA_TYPES.audio,
         }}
         multiple={true}
         title={t("media.uploader.title")}
         description={t("media.uploader.description")}
-        maxSizeText={`${t("components.mediaUploader.supportedImages")} • ${t("components.mediaUploader.supportedVideos")} • ${t("components.mediaUploader.supportedAudio")}`}
+        maxSizeText={t("components.mediaUploader.supportedImages")}
       />
 
       {mediaState.files.length > 0 && (

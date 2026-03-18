@@ -392,49 +392,6 @@ An image uploader that includes a preview, the ability to replace the image, and
 }
 ```
 
-### Video
-
-A video uploader that includes a preview with placeholder icon, the ability to replace the video, and a button to browse the media library. The value is the URL path to the video file.
-
-**Features:**
-
-- **Upload**: Direct file upload with support for MP4 video format
-- **Preview**: Shows video icon placeholder with filename and file size
-- **Browse**: Opens `MediaSelectorDrawer` to select from existing videos
-- **Metadata Editing**: Edit button opens `MediaDrawer` for alt text and title editing
-- **Replace**: Easy replacement of existing videos
-- **File Validation**: Automatic validation of video file types and size limits
-
-```json
-{
-  "id": "hero_video",
-  "type": "video",
-  "label": "tTheme:hero_banner.settings.hero_video.label",
-  "default": "/default-video.mp4",
-  "description": "tTheme:hero_banner.settings.hero_video.description"
-}
-```
-
-### Audio
-
-An audio uploader for selecting or uploading sound files. The value is the URL path to the audio file.
-
-**Features:**
-
-- **Upload**: Direct file upload (MP3 recommended)
-- **Preview**: Shows audio icon placeholder with filename and file size
-- **Browse**: Opens `MediaSelectorDrawer` to select from existing audio files
-- **Metadata Editing**: Edit button opens `MediaDrawer` for title and description editing
-
-```json
-{
-  "id": "background_music",
-  "type": "audio",
-  "label": "tTheme:my_widget.settings.background_music.label",
-  "description": "tTheme:my_widget.settings.background_music.description"
-}
-```
-
 ### YouTube
 
 A specialized input for YouTube videos. It allows users to paste a YouTube URL or Video ID and configure embed options.

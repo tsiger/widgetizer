@@ -10,12 +10,10 @@ import {
   getProjectDir,
   getProjectImagesDir,
   getImagePath,
-  getVideoPath,
-  getAudioPath,
   getThemeJsonPath,
   getMediaDir,
 } from "../config.js";
-import { ALLOWED_MIME_TYPES, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
+import { ALLOWED_MIME_TYPES, getContentType } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
@@ -183,7 +181,7 @@ const fileFilter = (req, file, cb) => {
   if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Only images and videos are allowed."), false);
+    cb(new Error("Invalid file type. Only images are allowed."), false);
   }
 };
 
@@ -248,10 +246,8 @@ export async function uploadProjectMedia(req, res) {
       return res.status(400).json({ error: "No valid files uploaded or received." });
     }
 
-    // Get the dynamic file size limits
+    // Get the dynamic file size limit
     const maxImageSizeMB = await getSetting("media.maxFileSizeMB");
-    const maxVideoSizeMB = await getSetting("media.maxVideoSizeMB");
-    const maxAudioSizeMB = await getSetting("media.maxAudioSizeMB");
     // Pass projectId to allow theme overrides
     const imageSizes = await getImageProcessingSettings(projectId);
 
@@ -261,12 +257,8 @@ export async function uploadProjectMedia(req, res) {
     // Process files in parallel instead of sequentially
     const filePromises = files.map(async (file) => {
       try {
-        // Check file size against the appropriate limit
-        const fileType = getMediaCategory(file.mimetype);
-        const maxSizeMB =
-          fileType === "video" ? (maxVideoSizeMB || 50) :
-          fileType === "audio" ? (maxAudioSizeMB || 25) :
-          (maxImageSizeMB || 5);
+        // Check file size against limit
+        const maxSizeMB = maxImageSizeMB || 5;
         const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
         if (file.size > maxSizeBytes) {
@@ -280,7 +272,7 @@ export async function uploadProjectMedia(req, res) {
             success: false,
             file: {
               originalName: file.originalname,
-              reason: `${fileType} size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds limit of ${maxSizeMB}MB.`,
+              reason: `Image size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds limit of ${maxSizeMB}MB.`,
               sizeBytes: file.size,
             },
           };
@@ -288,8 +280,7 @@ export async function uploadProjectMedia(req, res) {
 
         // --- File is within size limit, proceed with processing ---
         const fileId = uuidv4();
-        const uploadSubdir = fileType === "video" ? "videos" : fileType === "audio" ? "audios" : "images";
-        const uploadPath = `/uploads/${uploadSubdir}/${file.filename}`;
+        const uploadPath = `/uploads/images/${file.filename}`;
 
         const fileInfo = {
           id: fileId,
@@ -299,7 +290,7 @@ export async function uploadProjectMedia(req, res) {
           size: file.size,
           uploaded: new Date().toISOString(),
           path: uploadPath,
-          metadata: fileType === "image" ? { alt: "", title: "" } : { title: "", description: "" },
+          metadata: { alt: "", title: "" },
           sizes: {}, // Initialize sizes object
         };
 
@@ -402,11 +393,6 @@ export async function uploadProjectMedia(req, res) {
           await fs.writeFile(file.path, sanitizedSvg);
         }
 
-        // Process video files (basic metadata only)
-        if (file.mimetype.startsWith("video/")) {
-          fileInfo.thumbnail = null; // No thumbnail for videos
-        }
-
         return {
           success: true,
           file: fileInfo,
@@ -485,8 +471,6 @@ export async function updateMediaMetadata(req, res) {
     const { projectId, fileId } = req.params;
     const alt = stripHtmlTags(req.body.alt);
     const title = stripHtmlTags(req.body.title);
-    const description = stripHtmlTags(req.body.description);
-
     // Validate project ownership
     await getProjectFolderName(projectId);
 
@@ -496,11 +480,8 @@ export async function updateMediaMetadata(req, res) {
       return res.status(404).json({ error: "File not found" });
     }
 
-    const isImage = file.type && file.type.startsWith("image/");
-    const isVideoOrAudio = file.type && (file.type.startsWith("video/") || file.type.startsWith("audio/"));
-
-    // Validate input based on media type
-    if (isImage && typeof alt === "undefined") {
+    // Validate input
+    if (typeof alt === "undefined") {
       return res.status(400).json({ error: "Alt text is required for images" });
     }
 
@@ -508,14 +489,7 @@ export async function updateMediaMetadata(req, res) {
     mediaRepo.updateFileMetadata(projectId, fileId, { alt: alt || "", title: title || "" });
 
     // Build response metadata in the shape the frontend expects
-    let metadata;
-    if (isImage) {
-      metadata = { alt: alt || "", title: title || "" };
-    } else if (isVideoOrAudio) {
-      metadata = { title: title || "", description: description || "" };
-    } else {
-      metadata = { alt: alt || "", title: title || "", description: description || "" };
-    }
+    const metadata = { alt: alt || "", title: title || "" };
 
     res.json({
       message: "Metadata updated successfully",
@@ -614,19 +588,8 @@ export async function serveProjectMedia(req, res) {
 
     // If we have a filename directly, use it
     if (filename) {
-      // Determine file type by extension to choose correct directory
-      const ext = path.extname(filename).toLowerCase();
-      const videoExtensions = [".mp4"];
-      const audioExtensions = [".mp3"];
-
       const projectFolderName = await getProjectFolderName(projectId);
-      if (videoExtensions.includes(ext)) {
-        filePath = getVideoPath(projectFolderName, filename);
-      } else if (audioExtensions.includes(ext)) {
-        filePath = getAudioPath(projectFolderName, filename);
-      } else {
-        filePath = getImagePath(projectFolderName, filename);
-      }
+      filePath = getImagePath(projectFolderName, filename);
     }
     // Otherwise, look up the file by ID
     else if (fileId) {

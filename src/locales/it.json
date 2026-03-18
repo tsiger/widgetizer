@@ -109,25 +109,10 @@
       "altHelp": "Descrive il/la {{type}} per gli screen reader.",
       "titleLabel": "Titolo",
       "titleHelp": "Imposta l'attributo title (spesso mostrato al passaggio del mouse).",
-      "descriptionLabel": "Descrizione",
       "save": "Salva Modifiche",
       "saving": "Salvataggio...",
       "types": {
-        "image": "Immagine",
-        "video": "Video",
-        "audio": "Audio"
-      },
-      "placeholders": {
-        "audioTitle": "Titolo del brano o dell'episodio",
-        "videoTitle": "Titolo del video",
-        "audioDescription": "Artista, album o note su questo audio",
-        "videoDescription": "Descrizione o note su questo video"
-      },
-      "help": {
-        "audioTitle": "Il titolo della traccia audio o dell'episodio del podcast.",
-        "videoTitle": "Il titolo del video.",
-        "audioDescription": "Note opzionali su questo file audio (artista, album, ecc.).",
-        "videoDescription": "Descrizione o note opzionali su questo video."
+        "image": "Immagine"
       }
     }
   },
@@ -161,17 +146,13 @@
       "refreshUsageTitle": "Aggiorna Tracciamento Utilizzo",
       "searchPlaceholder": "Cerca media...",
       "all": "Tutti",
-      "images": "Immagini",
-      "videos": "Video",
-      "audio": "Audio"
+      "images": "Immagini"
     },
     "mediaUploader": {
       "dropActive": "Rilascia i file qui...",
-      "dropInactive": "Trascina e rilascia immagini e video qui o",
+      "dropInactive": "Trascina e rilascia immagini qui o",
       "selectFiles": "Seleziona file",
       "supportedImages": "Immagini: JPG, PNG, GIF, WebP, SVG",
-      "supportedVideos": "Video: MP4",
-      "supportedAudio": "Audio: MP3",
       "uploading": "Caricamento..."
     },
     "fileUploader": {
@@ -187,8 +168,6 @@
       "searchPlaceholder": "Cerca file media...",
       "noMatch": "Nessun file media corrisponde alla tua ricerca",
       "noFiles": "Nessun file media disponibile",
-      "video": "Video",
-      "audio": "Audio",
       "closeLabel": "Chiudi selettore media",
       "upload": "Carica",
       "uploaderTitle": "Carica Nuovi Media",
@@ -582,7 +561,7 @@
     "emptyDesc": "Carica alcuni file utilizzando l'uploader qui sopra.",
     "uploader": {
       "title": "Carica Media",
-      "description": "Trascina e rilascia immagini o video per caricarli nella tua libreria"
+      "description": "Trascina e rilascia immagini per caricarle nella tua libreria"
     }
   },
   "themeSettings": {
@@ -678,14 +657,6 @@
       "maxFileSizeMB": {
         "label": "Dimensione Massima Caricamento Immagine (MB)",
         "description": "Imposta la dimensione massima per i caricamenti di singole immagini in tutti i progetti."
-      },
-      "maxVideoSizeMB": {
-        "label": "Dimensione Massima Caricamento Video (MB)",
-        "description": "Imposta la dimensione massima per i caricamenti di singoli video in tutti i progetti."
-      },
-      "maxAudioSizeMB": {
-        "label": "Dimensione Massima Caricamento Audio (MB)",
-        "description": "Imposta la dimensione massima per i caricamenti di singoli file audio (MP3) in tutti i progetti."
       },
       "imageProcessing": {
         "quality": {

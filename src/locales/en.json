@@ -11,7 +11,7 @@
     "themes": "Themes",
     "tools": "Tools",
     "exportSite": "Export site",
-"general": "General",
+    "general": "General",
     "appSettings": "Settings"
   },
   "layout": {
@@ -109,25 +109,10 @@
       "altHelp": "Describes the {{type}} for screen readers.",
       "titleLabel": "Title",
       "titleHelp": "Sets the title attribute (often shown on hover).",
-      "descriptionLabel": "Description",
       "save": "Save Changes",
       "saving": "Saving...",
       "types": {
-        "image": "Image",
-        "video": "Video",
-        "audio": "Audio"
-      },
-      "placeholders": {
-        "audioTitle": "Song or episode title",
-        "videoTitle": "Video title",
-        "audioDescription": "Artist, album, or notes about this audio",
-        "videoDescription": "Description or notes about this video"
-      },
-      "help": {
-        "audioTitle": "The title of the audio track or podcast episode.",
-        "videoTitle": "The title of the video.",
-        "audioDescription": "Optional notes about this audio file (artist, album, etc.).",
-        "videoDescription": "Optional description or notes about this video."
+        "image": "Image"
       }
     }
   },
@@ -161,17 +146,13 @@
       "refreshUsageTitle": "Refresh Usage Tracking",
       "searchPlaceholder": "Search media...",
       "all": "All",
-      "images": "Images",
-      "videos": "Videos",
-      "audio": "Audio"
+      "images": "Images"
     },
     "mediaUploader": {
       "dropActive": "Drop the files here...",
-      "dropInactive": "Drag and drop images and videos here or",
+      "dropInactive": "Drag and drop images here or",
       "selectFiles": "Select Files",
       "supportedImages": "Images: JPG, PNG, GIF, WebP, SVG",
-      "supportedVideos": "Videos: MP4",
-      "supportedAudio": "Audio: MP3",
       "uploading": "Uploading..."
     },
     "fileUploader": {
@@ -186,8 +167,6 @@
       "searchPlaceholder": "Search media files...",
       "noMatch": "No media files match your search",
       "noFiles": "No media files available",
-      "video": "Video",
-      "audio": "Audio",
       "closeLabel": "Close media selector",
       "upload": "Upload",
       "uploaderTitle": "Upload New Media",
@@ -581,7 +560,7 @@
     "emptyDesc": "Upload some files using the uploader above.",
     "uploader": {
       "title": "Upload Media",
-      "description": "Drag and drop images or videos to upload them to your project library"
+      "description": "Drag and drop images to upload them to your project library"
     }
   },
   "themeSettings": {
@@ -677,14 +656,6 @@
       "maxFileSizeMB": {
         "label": "Max Image Upload Size (MB)",
         "description": "Set the maximum size for individual image uploads across all projects."
-      },
-      "maxVideoSizeMB": {
-        "label": "Max Video Upload Size (MB)",
-        "description": "Set the maximum size for individual video uploads across all projects."
-      },
-      "maxAudioSizeMB": {
-        "label": "Max Audio Upload Size (MB)",
-        "description": "Set the maximum size for individual audio (MP3) uploads across all projects."
       },
       "imageProcessing": {
         "quality": {

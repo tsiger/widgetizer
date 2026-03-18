@@ -52,8 +52,6 @@ export async function updateAppSettings(req, res) {
     if (newSettings.media) {
       const sizeLimits = [
         { key: "maxFileSizeMB", label: "Max Image Upload Size", min: 1, max: 100 },
-        { key: "maxVideoSizeMB", label: "Max Video Upload Size", min: 1, max: 500 },
-        { key: "maxAudioSizeMB", label: "Max Audio Upload Size", min: 1, max: 100 },
       ];
 
       for (const { key, label, min, max } of sizeLimits) {

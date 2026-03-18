@@ -83,8 +83,6 @@ export default function MediaToolbar({
         >
           <option value="all">{t("components.mediaToolbar.all")}</option>
           <option value="image">{t("components.mediaToolbar.images")}</option>
-          <option value="video">{t("components.mediaToolbar.videos")}</option>
-          <option value="audio">{t("components.mediaToolbar.audio")}</option>
         </select>
       </div>
     </div>

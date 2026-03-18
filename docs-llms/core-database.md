@@ -68,8 +68,6 @@ SQLite does **not** replace project content files. These remain file-based:
 - `data/projects/<folderName>/menus/*.json`
 - `data/projects/<folderName>/theme.json` (and theme assets/templates/widgets)
 - `data/projects/<folderName>/uploads/images/*`
-- `data/projects/<folderName>/uploads/videos/*`
-- `data/projects/<folderName>/uploads/audios/*`
 
 ---
 

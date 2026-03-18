@@ -32,8 +32,6 @@ const defaultSettings = {
   },
   media: {
     maxFileSizeMB: 5,
-    maxVideoSizeMB: 50,
-    maxAudioSizeMB: 25,
     imageProcessing: {
       quality: 85,
       sizes: {

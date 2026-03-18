@@ -8,7 +8,7 @@ import { getProjectFolderName } from "../utils/projectHelpers.js";
 const THEME_SETTINGS_USAGE_ID = "global:theme-settings";
 
 /**
- * Extract all media paths (images, videos, audios) from page content.
+ * Extract all media paths (images) from page content.
  * Scans all widget settings and block settings for upload paths.
  * @param {object} pageData - Page data object containing widgets
  * @returns {string[]} Array of unique media paths found (e.g., '/uploads/images/photo.jpg')
@@ -34,13 +34,7 @@ function extractMediaPathsFromPage(pageData) {
     if (!settings) return;
 
     Object.values(settings).forEach((value) => {
-      // Track images, videos, and audios
-      if (
-        typeof value === "string" &&
-        (value.startsWith("/uploads/images/") ||
-          value.startsWith("/uploads/videos/") ||
-          value.startsWith("/uploads/audios/"))
-      ) {
+      if (typeof value === "string" && value.startsWith("/uploads/images/")) {
         mediaPaths.add(value);
       }
     });
@@ -74,12 +68,7 @@ function extractMediaPathsFromGlobalWidget(widgetData) {
     if (!settings) return;
 
     Object.values(settings).forEach((value) => {
-      if (
-        typeof value === "string" &&
-        (value.startsWith("/uploads/images/") ||
-          value.startsWith("/uploads/videos/") ||
-          value.startsWith("/uploads/audios/"))
-      ) {
+      if (typeof value === "string" && value.startsWith("/uploads/images/")) {
         mediaPaths.add(value);
       }
     });
@@ -112,17 +101,9 @@ function extractMediaPathsFromThemeSettings(themeData) {
 
   function addIfMediaPath(value) {
     if (typeof value !== "string") return;
-    if (
-      value.startsWith("/uploads/images/") ||
-      value.startsWith("/uploads/videos/") ||
-      value.startsWith("/uploads/audios/")
-    ) {
+    if (value.startsWith("/uploads/images/")) {
       mediaPaths.add(value);
-    } else if (
-      value.startsWith("uploads/images/") ||
-      value.startsWith("uploads/videos/") ||
-      value.startsWith("uploads/audios/")
-    ) {
+    } else if (value.startsWith("uploads/images/")) {
       mediaPaths.add("/" + value);
     }
   }

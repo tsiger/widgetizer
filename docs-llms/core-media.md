@@ -10,14 +10,10 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
 
 - **Location**: Uploaded files are physically stored on the server's filesystem, scoped per project:
 - **Images**: `data/projects/{folderName}/uploads/images/`
-- **Videos**: `data/projects/{folderName}/uploads/videos/`
-- **Audio**: `data/projects/{folderName}/uploads/audios/`
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
 - **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original using `-{size}` suffixes (e.g., `photo-thumb.jpg`, `photo-small.jpg`).
 - **Smart Size Generation**: The system only creates image sizes that are meaningfully smaller than the original. If an image is 800px wide and the "large" size is configured for 1920px, no "large" size will be generated since it would be identical to a smaller size. The image tag automatically falls back to the best available size or original image.
 - **Original Compression**: When an uploaded image is smaller than the largest enabled size (meaning the original will be served via fallback), the original is compressed in-place using the configured quality setting. Dimensions are preserved — only file size is reduced. GIF images are excluded to preserve animation frames. When the original is larger than the largest enabled size, it is left untouched since the generated variant will be served instead.
-- **Video Processing**: Videos are stored without any processing - no thumbnail generation or metadata extraction. This keeps the upload process simple and fast.
-
 ### Image Processing Configuration
 
 The system's image processing behavior is controlled through **App Settings**, making it fully customizable:
@@ -76,8 +72,6 @@ Media metadata is stored in SQLite, while the uploaded binary files remain on di
   - `media_usage`: usage relationships (`used_in`) for pages, globals, and theme settings
 - **Filesystem**: original uploads and generated image variants still live in:
   - `data/projects/{folderName}/uploads/images/`
-  - `data/projects/{folderName}/uploads/videos/`
-  - `data/projects/{folderName}/uploads/audios/`
 
 ```json
 {
@@ -103,21 +97,6 @@ Media metadata is stored in SQLite, while the uploaded binary files remain on di
         "medium": { "path": "/uploads/images/my-awesome-picture-medium.jpg", "width": 1024, "height": 768 }
         // Note: "large" size omitted if disabled in settings
       }
-    },
-    {
-      "id": "v4e3b2c1-f6a5-4b9e-8d7c-6f5e4d3c2b1a",
-      "filename": "hero-video.mp4",
-      "originalName": "Hero Video.mp4",
-      "type": "video/mp4",
-      "size": 15728640,
-      "uploaded": "2023-10-29T11:00:00.000Z",
-      "path": "/uploads/videos/hero-video.mp4",
-      "metadata": {
-        "title": "Product Demo Video",
-        "description": "Hero background video"
-      },
-      "thumbnail": null,
-      "usedIn": []
     }
   ]
 }
@@ -137,51 +116,7 @@ The media library automatically tracks which pages and global widgets are using 
   - **Global widgets** (header/footer) are saved or updated (scans settings for media paths)
 - **Delete Protection**: Files with a non-empty `usedIn` array cannot be deleted
 - **Manual Refresh**: Users can manually refresh usage tracking to recalculate all relationships
-- **Media Types Tracked**: Images, videos, and audio files are all tracked
-
-### Video Support
-
-The media library supports video uploads alongside images with the following features:
-
-**Supported Video Formats:**
-
-- MP4
-
-**Video Processing:**
-
-- **No Processing**: Videos are uploaded and stored as-is without any processing
-- **No Thumbnails**: Videos do not generate thumbnail images
-- **No Metadata Extraction**: Video dimensions and duration are not extracted
-- **Simple Storage**: Videos maintain their original quality and file size
-- **Separate Directory**: Videos are stored in `/uploads/videos/` directory
-- **Size Limits**: Videos have separate size limits from images (configurable in App Settings)
-
-**Video-Specific Metadata:**
-
-- `thumbnail`: Always `null` for videos (no thumbnails generated)
-- Metadata includes `title` and `description` fields in API responses
-- No additional technical metadata (duration/codec) is extracted
-
-### Audio Support
-
-The media library supports audio uploads alongside images and videos with the following features:
-
-**Supported Audio Formats:**
-
-- MP3 (audio/mpeg)
-
-**Audio Processing:**
-
-- **No Processing**: Audio files are uploaded and stored as-is without any processing
-- **No Thumbnails**: Audio files do not generate thumbnail images
-- **Simple Storage**: Audio files maintain their original quality and file size
-- **Separate Directory**: Audio files are stored in `/uploads/audios/` directory
-- **Size Limits**: Audio files have separate size limits from images and videos (configurable in App Settings)
-
-**Audio-Specific Metadata:**
-
-- Metadata includes `title` and `description` (both optional)
-- No additional metadata is extracted or stored for audio files
+- **Media Types Tracked**: Images are tracked across pages and global widgets
 
 ### Media Type Configuration
 
@@ -190,15 +125,13 @@ The system uses centralized configuration for media types and MIME handling on b
 **Frontend** (`src/config.js`):
 - `MEDIA_TYPES` defines allowed file extensions for the upload UI:
   - `image`: `.jpeg`, `.jpg`, `.png`, `.gif`, `.webp`, `.svg`
-  - `video`: `.mp4`
-  - `audio`: `.mp3`
 
 **Backend** (`server/utils/mimeTypes.js`):
 All server-side MIME definitions live in a single module:
-- `ALLOWED_MIME_TYPES` — MIME types accepted for media uploads (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `video/mp4`, `audio/mpeg`)
+- `ALLOWED_MIME_TYPES` — MIME types accepted for media uploads (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`)
 - `ZIP_MIME_TYPES` — MIME types for ZIP archive validation (`application/zip`, `application/x-zip-compressed`), used by project import and theme upload
 - `getContentType(ext)` — resolves a file extension (e.g. `".png"`) to its MIME type, used by `serveProjectMedia`, `serveAsset`, and `serveExportFile` for setting `Content-Type` headers
-- `getMediaCategory(mimeType)` — classifies a MIME type as `"image"`, `"video"`, or `"audio"` (re-exported from `server/config.js` for backward compatibility)
+- `getMediaCategory(mimeType)` — classifies a MIME type as `"image"` (re-exported from `server/config.js` for backward compatibility)
 
 This ensures consistency across all server code — upload validation, file serving, and export content-type resolution all use the same definitions.
 
@@ -227,7 +160,7 @@ Manages core media state and data loading:
 - **State Management**: Files list, loading states, view mode, search filtering
 - **Data Loading**: Fetches project media on mount using `getProjectMedia`
 - **View Persistence**: Saves view mode preference to localStorage
-- **Type Filtering**: Supports filtering the media list by type (`all`, `image`, `video`, `audio`)
+- **Type Filtering**: Supports filtering the media list by type (`all`, `image`)
 - **Search Filtering**: Real-time filename filtering
 - **Usage Refresh**: Manual usage tracking refresh functionality
 
@@ -283,11 +216,9 @@ A specialized drawer component that allows users to browse and select existing m
 
 - **Direct Upload**: Includes an "Upload" button that triggers the OS file dialog, allowing users to add new files directly while browsing.
 - **Search Bar**: Integrated search functionality to quickly find files by name.
-- **File Type Filtering**: Supports filtering by file type (`image`, `video`, `audio`, or `all`). The filter can be pre-set via props.
+- **File Type Filtering**: Supports filtering by file type (`image` or `all`). The filter can be pre-set via props.
 - **Visual Indicators**:
   - **Images**: Displays the actual image thumbnail.
-  - **Videos**: Displays a play icon with a "Video" label.
-  - **Audio**: Displays a music icon with an "Audio" label.
 - **Keyboard Navigation**: Escape key support for closing the drawer
 - **Background Scroll Prevention**: Prevents body scrolling when drawer is open
 
@@ -296,7 +227,6 @@ A specialized drawer component that allows users to browse and select existing m
 The `MediaSelectorDrawer` is integrated into:
 
 - **`ImageInput`**: Browse for existing images when setting image widget properties or theme-level image settings like favicons
-- **`VideoInput`**: Browse for existing videos when setting video widget properties
 - **`PageForm`**: Select featured images for pages
 
 #### `ImageInput` Modes (`src/components/settings/inputs/ImageInput.jsx`)
@@ -312,7 +242,7 @@ The image setting input supports two presentation modes:
 - `onClose`: Function called when drawer should be closed
 - `onSelect`: Function called with selected file object
 - `activeProject`: Current project object for loading media
-- `filterType`: String to filter files (`'image'`, `'video'`, or `'all'`)
+- `filterType`: String to filter files (`'image'` or `'all'`)
 
 ### UI Improvements
 
@@ -356,8 +286,6 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 | `POST` | `/api/media/projects/:projectId/refresh-usage` |  | `refreshMediaUsage` | Manually refreshes usage tracking for all media files in the project. |
 | `GET` | `/api/media/projects/:projectId/media/:fileId` |  | `serveProjectMedia` | Serves a media file by metadata ID. |
 | `GET` | `/api/media/projects/:projectId/uploads/images/:filename` |  | `serveProjectMedia` | Serves an image file by filename. |
-| `GET` | `/api/media/projects/:projectId/uploads/videos/:filename` |  | `serveProjectMedia` | Serves a video file by filename. |
-| `GET` | `/api/media/projects/:projectId/uploads/audios/:filename` |  | `serveProjectMedia` | Serves an audio file by filename. |
 
 **Identifier contract:** `:projectId` is always the project UUID in API routes. The backend resolves it to `folderName` for filesystem paths. If the UUID cannot be resolved, the request fails (no fallback directories are created). Errors use standardized codes (for example `PROJECT_NOT_FOUND`, `PROJECT_DIR_MISSING`) to keep responses consistent.
 
@@ -370,8 +298,8 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
   // Returns only enabled sizes with their width and quality settings
   ```
 - **File Upload (`multer` + `uploadProjectMedia`)**:
-  1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (e.g. images: `data/projects/{folderName}/uploads/images/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (from `ALLOWED_MIME_TYPES` in `server/utils/mimeTypes.js`).
-  2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the appropriate size limit (`media.maxFileSizeMB` for images, `media.maxVideoSizeMB` for videos).
+  1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (`data/projects/{folderName}/uploads/images/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (from `ALLOWED_MIME_TYPES` in `server/utils/mimeTypes.js`).
+  2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the size limit (`media.maxFileSizeMB`).
   3.  For each valid file, it generates a unique ID (`uuidv4`).
   4.  **SVG Sanitization**: If the file is an SVG, it's sanitized using `DOMPurify` with SVG profile to prevent XSS attacks before being saved.
   5.  If the file is an image (not an SVG), it uses the `sharp` library to:
@@ -380,8 +308,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
       - Generate **only the enabled** image sizes with the configured quality setting
       - Apply the configured maximum widths for each enabled size
       - **Skip sizes larger than original**: Only creates sizes that are smaller than the original image dimensions to avoid storage waste
-  6.  If the file is a video, no processing is performed - it's simply stored as-is.
-  7.  It creates a metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants (images only)—and persists it to SQLite.
+  6.  It creates a metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants—and persists it to SQLite.
   8.  Files that are too large or have the wrong type are rejected and immediately deleted from the server.
   9.  **Parallel Processing**: All files are processed in parallel using `Promise.allSettled` for optimal performance.
   10. It returns a JSON response to the client with arrays of successfully processed and rejected files.
@@ -394,7 +321,6 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 - **Metadata Update (`updateMediaMetadata`)**:
   1.  The controller loads the file from SQLite by `fileId`.
   2.  It updates persisted metadata columns (`alt`, `title`).
-  3.  For video/audio responses, `description` is accepted in the request and echoed in response metadata, but persistence is currently limited to `title` in SQLite.
 
 ### Usage Tracking Service (`server/services/mediaUsageService.js`)
 
@@ -414,7 +340,7 @@ The media usage tracking is handled by a dedicated service that provides automat
 
 **Integration with Global Widget Operations:**
 
-- **Header/Footer Save**: Automatically triggers usage tracking updates for images used in global widgets
+- **Header/Footer Save**: Automatically triggers usage tracking updates for media used in global widgets
 - This ensures images used in the header logo, footer, etc. are protected from deletion
 
 ## Security Considerations

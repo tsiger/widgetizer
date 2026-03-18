@@ -27,13 +27,6 @@ You should have received a `beta-test-kit/` folder alongside this script. Verify
 | ------------------- | -------------------------------- | ----------------------- |
 | `svg-malicious.svg` | SVG with embedded `<script>` tag | SVG sanitization (5.14) |
 
-### Video & Audio (2 files)
-
-| File         | Size / Notes       | Used In            |
-| ------------ | ------------------ | ------------------ |
-| `clip.mp4`   | ~2 MB, short clip  | Video upload (5.2) |
-| `sample.mp3` | ~1 MB, short audio | Audio upload (5.2) |
-
 ### Theme Files (3 files)
 
 | File                | Notes                                                                                | Used In                          |
@@ -48,7 +41,7 @@ You should have received a `beta-test-kit/` folder alongside this script. Verify
 | ------------------ | ----------------------------------------- | ------------------------------- |
 | `random-files.zip` | ZIP of random files, NOT a project export | Project import rejection (2.14) |
 
-> **Total: 15 files.** If anything is missing, ask the person who sent you this script. You will also create test files during testing (project exports, additional uploads) — the kit covers what you can't easily make yourself.
+> **Total: 13 files.** If anything is missing, ask the person who sent you this script. You will also create test files during testing (project exports, additional uploads) — the kit covers what you can't easily make yourself.
 
 ---
 
@@ -186,7 +179,7 @@ You should have received a `beta-test-kit/` folder alongside this script. Verify
    - `pages/` folder with page JSON files
    - `menus/` folder (if menus exist)
    - `uploads/media.json` with media metadata (compatibility artifact in export ZIP; runtime source of truth is SQLite)
-   - `uploads/images/` (or videos/audios) with the actual media files
+   - `uploads/images/` with the actual media files
    - Theme files (`theme.json`, `layout.liquid`, etc.)
 
 ### 2.12 Import a Project
@@ -348,7 +341,6 @@ For all items below, start from the **Pages** list (click **Pages** in the sideb
 1. Add these specific widgets to stress-test the editor:
    - [ ] Add a **Slideshow** widget (tests block limits)
    - [ ] Add a **Pricing** widget (tests complex nested blocks & layout)
-   - [ ] Add a **Video** widget (tests media playback)
    - [ ] Add a **Card Grid** widget (tests image and text combinations)
 2. **Expected**: Each appears in the left list in order and renders in the preview.
 
@@ -553,16 +545,13 @@ These tests verify that images uploaded and used through the editor are properly
 ### 5.2 Upload Different File Types
 
 1. Upload an **SVG** file.
-2. Upload an **MP4 video**.
-3. Upload an **MP3 audio** file.
-4. **Expected**: All accepted. Each shows with appropriate icon/thumbnail.
-5. Go to the Page Editor. Add a **Logo Cloud** widget and select your SVG file. **Expected**: It displays properly.
-6. Add a **Video** widget (not Video Embed) and select your MP4 file. **Expected**: The video plays.
+2. **Expected**: Accepted. Shows with appropriate icon/thumbnail.
+3. Go to the Page Editor. Add a **Logo Cloud** widget and select your SVG file. **Expected**: It displays properly.
 
 ### 5.3 Upload Validation
 
 1. Try uploading a **.txt** file.
-2. **Expected**: The file dialog doesn't even show `.txt` files — the browser filters to only images, videos, and audio. You can't select it.
+2. **Expected**: The file dialog doesn't even show `.txt` files — the browser filters to only images. You can't select it.
 3. Try uploading an image larger than the max file size (check App Settings for the limit — default 5 MB).
 4. **Expected**: Rejected with clear error message about file size.
 
@@ -588,10 +577,8 @@ These tests verify that images uploaded and used through the editor are properly
 1. Use the **type filter** dropdown.
 2. Select **Images**.
 3. **Expected**: Only images shown.
-4. Select **Videos**.
-5. **Expected**: Only videos shown.
-6. Select **All**.
-7. **Expected**: Everything shown.
+4. Select **All**.
+5. **Expected**: Everything shown.
 
 ### 5.8 Edit Media Metadata
 
@@ -602,11 +589,6 @@ These tests verify that images uploaded and used through the editor are properly
    - **Title** field (optional)
 3. Edit the **alt text** and **title**. Save.
 4. **Expected**: Metadata saved. Toast confirms.
-5. Now open a video or audio file.
-6. **Expected**: The drawer shows:
-   - A preview (video player or audio player with music icon)
-   - **Title** field (optional)
-   - **Description** field (optional)
 
 ### 5.9 Delete Unused Media
 
@@ -952,7 +934,6 @@ Navigate to **Settings** in the sidebar and test these specific global inputs:
 Go to the **Page Editor**, and add or edit these specific widgets to test the remaining input types:
 
 - [ ] **Text input**: Add a **Banner** widget. Type text in the "Eyebrow" or "Title" field. **Expected**: Preview updates in real time as you type.
-- [ ] **Textarea**: Add a **Video** widget. Type text in the "Description" field. **Expected**: Preview updates in real time as you type.
 - [ ] **Select dropdown**: Add a **Banner** widget. Change the "Alignment" or "Size" dropdown. **Expected**: Preview updates immediately on selection.
 - [ ] **Range slider**: Add a **Pricing** widget. Drag the "Border Radius" slider. **Expected**: Preview updates in real time as you drag.
 - [ ] **Link input**: Add a **Banner** widget. Set an internal page link in the "Button Link" field. Then switch to an external URL. **Expected**: Both link types work. The internal page resolves to the correct href.
@@ -1035,7 +1016,7 @@ Go to the **Page Editor**, and add or edit these specific widgets to test the re
 2. **Expected**: ZIP file downloads.
 3. Extract the ZIP and check it contains:
    - HTML files for each page (e.g., `index.html`, `about.html`)
-   - `assets/` folder with CSS, JS, and your uploaded media (images, videos, audios)
+   - `assets/` folder with CSS, JS, and your uploaded media (images)
    - `manifest.json` — open it and verify it has: `generator`, `widgetizerVersion`, `themeId`, `themeVersion`, `exportVersion`, `exportedAt`, `projectName`
 4. Check that **only images you actually use** are in `assets/images/`. Unused uploads should NOT be included.
 5. If your project has a **Site URL** set (edit the project to check): the ZIP should also contain `sitemap.xml` and `robots.txt`. If there's no Site URL, these files should NOT be in the ZIP. (More on this in 9.4.)
@@ -1098,7 +1079,6 @@ Open an exported site (via View) and check all of these:
 - [ ] Homepage loads as `index.html`
 - [ ] All internal page links work (click through the menu)
 - [ ] Images display correctly (not broken)
-- [ ] Videos play (if you have any)
 - [ ] Fonts, colors, and spacing match the editor preview
 - [ ] Responsive design works (resize the browser window)
 - [ ] Menu navigation works
@@ -1139,7 +1119,7 @@ Open an exported site (via View) and check all of these:
 ### 10.3 Media Settings — File Size Limits
 
 1. Switch to the **Media** tab.
-2. Note the three file size limits: **Max Image Size** (default 5 MB), **Max Video Size** (default 50 MB), **Max Audio Size** (default 25 MB).
+2. Note the file size limit: **Max Image Size** (default 5 MB).
 3. Set **Max Image Size** to **1 MB**. Save.
 4. Go to **Media** and try uploading the `photo-1.5mb.jpg` test file (~1.5 MB).
 5. **Expected**: Upload rejected with a clear error about file size.

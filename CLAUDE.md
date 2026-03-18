@@ -47,7 +47,7 @@ data/                   # Runtime data (gitignored)
   widgetizer.db         # SQLite database (metadata)
   projects/<folder>/    # Per-project content
     pages/*.json        # Page content
-    uploads/            # Media binaries (images/, videos/, audios/)
+    uploads/            # Media binaries (images/)
     pages/global/       # header.json, footer.json (global widgets)
 ```
 

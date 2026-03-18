@@ -255,9 +255,6 @@ function insertMediaFile(db, projectId, fileData) {
  * Convert a database row + related data to the media file shape controllers expect.
  */
 function rowToMediaFile(row, sizeRows, usageList) {
-  const isImage = row.type && row.type.startsWith("image/");
-  const isVideoOrAudio = row.type && (row.type.startsWith("video/") || row.type.startsWith("audio/"));
-
   // Build sizes object
   const sizes = {};
   for (const size of sizeRows) {
@@ -268,14 +265,6 @@ function rowToMediaFile(row, sizeRows, usageList) {
     };
   }
 
-  // Build metadata object matching the controller's expected shape
-  let metadata;
-  if (isVideoOrAudio) {
-    metadata = { title: row.title || "", description: "" };
-  } else {
-    metadata = { alt: row.alt || "", title: row.title || "" };
-  }
-
   const file = {
     id: row.id,
     filename: row.filename,
@@ -284,19 +273,12 @@ function rowToMediaFile(row, sizeRows, usageList) {
     size: row.size,
     uploaded: row.uploaded,
     path: row.path,
-    metadata,
+    metadata: { alt: row.alt || "", title: row.title || "" },
     sizes,
     usedIn: usageList,
+    width: row.width,
+    height: row.height,
   };
-
-  if (isImage) {
-    file.width = row.width;
-    file.height = row.height;
-  }
-
-  if (row.type && row.type.startsWith("video/")) {
-    file.thumbnail = null;
-  }
 
   return file;
 }

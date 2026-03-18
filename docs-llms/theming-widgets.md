@@ -1603,16 +1603,6 @@ Example implementation:
 
 **Image sizes**: `thumb`, `small`, `medium`, `large`
 
-### Videos
-
-```liquid
-<!-- Render video tag -->
-{% video src: block.settings.video, controls: true, class: 'widget-video' %}
-
-<!-- Get video path only -->
-{% video src: block.settings.video, output: 'path' %}
-```
-
 ### YouTube
 
 ```liquid
