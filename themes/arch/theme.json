@@ -5,33 +5,31 @@
   "author": "Widgetizer",
   "settings": {
     "global": {
-      "layout": [
-        {
-          "type": "header",
-          "id": "layout_header",
-          "label": "tTheme:global.layout.settings.layout_header.label"
-        },
-        {
-          "type": "checkbox",
-          "id": "enable_reveal_animations",
-          "label": "tTheme:global.layout.settings.enable_reveal_animations.label",
-          "default": false,
-          "description": "tTheme:global.layout.settings.enable_reveal_animations.description"
-        }
-      ],
-      "branding": [
+      "general": [
         {
           "type": "header",
           "id": "branding_header",
-          "label": "tTheme:global.branding.settings.branding_header.label"
+          "label": "tTheme:global.general.settings.branding_header.label"
         },
         {
           "type": "image",
           "id": "favicon",
-          "label": "tTheme:global.branding.settings.favicon.label",
+          "label": "tTheme:global.general.settings.favicon.label",
           "default": "",
           "compact": true,
-          "description": "tTheme:global.branding.settings.favicon.description"
+          "description": "tTheme:global.general.settings.favicon.description"
+        },
+        {
+          "type": "header",
+          "id": "animations_header",
+          "label": "tTheme:global.general.settings.animations_header.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_reveal_animations",
+          "label": "tTheme:global.general.settings.enable_reveal_animations.label",
+          "default": false,
+          "description": "tTheme:global.general.settings.enable_reveal_animations.description"
         }
       ],
       "colors": [
@@ -306,21 +304,19 @@
           "label": "tTheme:global.social.settings.mail_url.label"
         }
       ],
-      "privacy": [
+      "advanced": [
         {
           "type": "header",
           "id": "privacy_header",
-          "label": "tTheme:global.privacy.settings.privacy_header.label"
+          "label": "tTheme:global.advanced.settings.privacy_header.label"
         },
         {
           "type": "checkbox",
           "id": "use_bunny_fonts",
-          "label": "tTheme:global.privacy.settings.use_bunny_fonts.label",
+          "label": "tTheme:global.advanced.settings.use_bunny_fonts.label",
           "default": false,
-          "description": "tTheme:global.privacy.settings.use_bunny_fonts.description"
-        }
-      ],
-      "advanced": [
+          "description": "tTheme:global.advanced.settings.use_bunny_fonts.description"
+        },
         {
           "type": "header",
           "id": "advanced_header",

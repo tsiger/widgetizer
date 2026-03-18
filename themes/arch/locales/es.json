@@ -2916,21 +2916,16 @@
     }
   },
   "global": {
-    "layout": {
-      "name": "Diseño",
+    "general": {
+      "name": "General",
       "settings": {
-        "layout_header": {
+        "animations_header": {
           "label": "Animaciones"
         },
         "enable_reveal_animations": {
           "label": "Activar animaciones al desplazar",
           "description": "Animar elementos al aparecer en pantalla"
-        }
-      }
-    },
-    "branding": {
-      "name": "Marca",
-      "settings": {
+        },
         "branding_header": {
           "label": "Marca"
         },
@@ -2946,6 +2941,36 @@
         "colors_standard_header": {
           "label": "Colores estándar"
         },
+        "standard_bg_primary": {
+          "label": "Fondo Principal"
+        },
+        "standard_bg_secondary": {
+          "label": "Fondo Secundario"
+        },
+        "standard_text_content": {
+          "label": "Texto de Contenido"
+        },
+        "standard_text_heading": {
+          "label": "Texto de Encabezado"
+        },
+        "standard_text_muted": {
+          "label": "Texto Atenuado"
+        },
+        "standard_border_color": {
+          "label": "Color de Borde"
+        },
+        "standard_accent": {
+          "label": "Color de Acento"
+        },
+        "standard_accent_text": {
+          "label": "Color de Texto de Acento"
+        },
+        "standard_rating_star": {
+          "label": "Color de Estrella de Calificación"
+        },
+        "colors_highlight_header": {
+          "label": "Colores de resaltado"
+        },
         "highlight_bg_primary": {
           "label": "Fondo primario"
         },
@@ -2954,6 +2979,9 @@
         },
         "highlight_text_content": {
           "label": "Texto del contenido"
+        },
+        "highlight_text_heading": {
+          "label": "Texto de Encabezado"
         },
         "highlight_text_muted": {
           "label": "Texto atenuado"
@@ -2969,39 +2997,6 @@
         },
         "highlight_rating_star": {
           "label": "Color de estrella de calificación"
-        },
-        "colors_highlight_header": {
-          "label": "Colores de resaltado"
-        },
-        "standard_bg_primary": {
-          "label": "Texto superior"
-        },
-        "standard_bg_secondary": {
-          "label": "Texto superior"
-        },
-        "standard_text_content": {
-          "label": "Texto superior"
-        },
-        "standard_text_heading": {
-          "label": "Texto superior"
-        },
-        "standard_text_muted": {
-          "label": "Texto superior"
-        },
-        "standard_border_color": {
-          "label": "Texto superior"
-        },
-        "standard_accent": {
-          "label": "Texto superior"
-        },
-        "standard_accent_text": {
-          "label": "Texto superior"
-        },
-        "standard_rating_star": {
-          "label": "Texto superior"
-        },
-        "highlight_text_heading": {
-          "label": "Texto superior"
         }
       }
     },
@@ -3018,8 +3013,8 @@
           "label": "Fuente del cuerpo"
         },
         "heading_scale": {
-          "description": "Escalar todos los tamaños de encabezado",
-          "label": "Texto superior"
+          "label": "Tamaño de texto de encabezado",
+          "description": "Escalar todos los tamaños de encabezado"
         },
         "body_scale": {
           "label": "Tamaño de texto del cuerpo",
@@ -3030,6 +3025,9 @@
     "social": {
       "name": "Redes sociales",
       "settings": {
+        "social_header": {
+          "label": "Redes sociales"
+        },
         "twitter_url": {
           "label": "URL de Twitter / X"
         },
@@ -3039,52 +3037,49 @@
         "mail_url": {
           "label": "URL de correo electrónico"
         },
-        "social_header": {
-          "label": "Redes sociales"
-        },
         "facebook_url": {
-          "label": "Texto superior"
+          "label": "URL de Facebook"
         },
         "instagram_url": {
-          "label": "Texto superior"
+          "label": "URL de Instagram"
         },
         "linkedin_url": {
-          "label": "Texto superior"
+          "label": "URL de LinkedIn"
         },
         "youtube_url": {
-          "label": "Texto superior"
+          "label": "URL de YouTube"
         },
         "tiktok_url": {
-          "label": "Texto superior"
+          "label": "URL de TikTok"
         },
         "pinterest_url": {
-          "label": "Texto superior"
+          "label": "URL de Pinterest"
         },
         "github_url": {
-          "label": "Texto superior"
+          "label": "URL de GitHub"
         },
         "bluesky_url": {
-          "label": "Texto superior"
+          "label": "URL de Bluesky"
         },
         "discord_url": {
-          "label": "Texto superior"
+          "label": "URL de Discord"
         },
         "reddit_url": {
-          "label": "Texto superior"
+          "label": "URL de Reddit"
         },
         "telegram_url": {
-          "label": "Texto superior"
+          "label": "URL de Telegram"
         },
         "threads_url": {
-          "label": "Texto superior"
+          "label": "URL de Threads"
         },
         "whatsapp_url": {
-          "label": "Texto superior"
+          "label": "URL de WhatsApp"
         }
       }
     },
-    "privacy": {
-      "name": "Privacidad",
+    "advanced": {
+      "name": "Avanzado",
       "settings": {
         "privacy_header": {
           "label": "Privacidad"
@@ -3092,14 +3087,9 @@
         "use_bunny_fonts": {
           "label": "Usar CDN de fuentes compatible con la privacidad",
           "description": "Activar para servir Google Fonts desde Bunny CDN (compatible con GDPR, sin rastreo)"
-        }
-      }
-    },
-    "advanced": {
-      "name": "Avanzado",
-      "settings": {
+        },
         "advanced_header": {
-          "label": "Avanzado"
+          "label": "Código Personalizado"
         },
         "custom_css": {
           "label": "CSS personalizado",

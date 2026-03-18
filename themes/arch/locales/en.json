@@ -2916,20 +2916,8 @@
     }
   },
   "global": {
-    "layout": {
-      "name": "Layout",
-      "settings": {
-        "layout_header": {
-          "label": "Animations"
-        },
-        "enable_reveal_animations": {
-          "label": "Enable scroll reveal animations",
-          "description": "Animate elements as they scroll into view"
-        }
-      }
-    },
-    "branding": {
-      "name": "Branding",
+    "general": {
+      "name": "General",
       "settings": {
         "branding_header": {
           "label": "Branding"
@@ -2937,6 +2925,13 @@
         "favicon": {
           "label": "Favicon",
           "description": "Recommended size 180×180 px."
+        },
+        "animations_header": {
+          "label": "Animations"
+        },
+        "enable_reveal_animations": {
+          "label": "Enable scroll reveal animations",
+          "description": "Animate elements as they scroll into view"
         }
       }
     },
@@ -2946,6 +2941,36 @@
         "colors_standard_header": {
           "label": "Standard Colors"
         },
+        "standard_bg_primary": {
+          "label": "Primary Background"
+        },
+        "standard_bg_secondary": {
+          "label": "Secondary Background"
+        },
+        "standard_text_content": {
+          "label": "Content Text"
+        },
+        "standard_text_heading": {
+          "label": "Heading Text"
+        },
+        "standard_text_muted": {
+          "label": "Muted Text"
+        },
+        "standard_border_color": {
+          "label": "Border Color"
+        },
+        "standard_accent": {
+          "label": "Accent Color"
+        },
+        "standard_accent_text": {
+          "label": "Accent Text Color"
+        },
+        "standard_rating_star": {
+          "label": "Rating Star Color"
+        },
+        "colors_highlight_header": {
+          "label": "Highlight Colors"
+        },
         "highlight_bg_primary": {
           "label": "Primary Background"
         },
@@ -2954,6 +2979,9 @@
         },
         "highlight_text_content": {
           "label": "Content Text"
+        },
+        "highlight_text_heading": {
+          "label": "Heading Text"
         },
         "highlight_text_muted": {
           "label": "Muted Text"
@@ -2969,39 +2997,6 @@
         },
         "highlight_rating_star": {
           "label": "Rating Star Color"
-        },
-        "colors_highlight_header": {
-          "label": "Highlight Colors"
-        },
-        "standard_bg_primary": {
-          "label": "Eyebrow text"
-        },
-        "standard_bg_secondary": {
-          "label": "Eyebrow text"
-        },
-        "standard_text_content": {
-          "label": "Eyebrow text"
-        },
-        "standard_text_heading": {
-          "label": "Eyebrow text"
-        },
-        "standard_text_muted": {
-          "label": "Eyebrow text"
-        },
-        "standard_border_color": {
-          "label": "Eyebrow text"
-        },
-        "standard_accent": {
-          "label": "Eyebrow text"
-        },
-        "standard_accent_text": {
-          "label": "Eyebrow text"
-        },
-        "standard_rating_star": {
-          "label": "Eyebrow text"
-        },
-        "highlight_text_heading": {
-          "label": "Eyebrow text"
         }
       }
     },
@@ -3018,8 +3013,8 @@
           "label": "Body Font"
         },
         "heading_scale": {
-          "description": "Scale all heading text sizes up or down",
-          "label": "Eyebrow text"
+          "label": "Heading Text Size",
+          "description": "Scale all heading text sizes up or down"
         },
         "body_scale": {
           "label": "Body Text Size",
@@ -3030,61 +3025,61 @@
     "social": {
       "name": "Social",
       "settings": {
-        "twitter_url": {
-          "label": "Twitter / X URL"
-        },
-        "mastodon_url": {
-          "label": "Mastodon URL"
-        },
-        "mail_url": {
-          "label": "Email URL"
-        },
         "social_header": {
           "label": "Social Media"
         },
         "facebook_url": {
-          "label": "Eyebrow text"
+          "label": "Facebook URL"
         },
         "instagram_url": {
-          "label": "Eyebrow text"
+          "label": "Instagram URL"
+        },
+        "twitter_url": {
+          "label": "Twitter / X URL"
         },
         "linkedin_url": {
-          "label": "Eyebrow text"
+          "label": "LinkedIn URL"
         },
         "youtube_url": {
-          "label": "Eyebrow text"
+          "label": "YouTube URL"
         },
         "tiktok_url": {
-          "label": "Eyebrow text"
+          "label": "TikTok URL"
         },
         "pinterest_url": {
-          "label": "Eyebrow text"
+          "label": "Pinterest URL"
         },
         "github_url": {
-          "label": "Eyebrow text"
+          "label": "GitHub URL"
+        },
+        "mastodon_url": {
+          "label": "Mastodon URL"
         },
         "bluesky_url": {
-          "label": "Eyebrow text"
+          "label": "Bluesky URL"
         },
         "discord_url": {
-          "label": "Eyebrow text"
+          "label": "Discord URL"
         },
         "reddit_url": {
-          "label": "Eyebrow text"
+          "label": "Reddit URL"
         },
         "telegram_url": {
-          "label": "Eyebrow text"
+          "label": "Telegram URL"
         },
         "threads_url": {
-          "label": "Eyebrow text"
+          "label": "Threads URL"
         },
         "whatsapp_url": {
-          "label": "Eyebrow text"
+          "label": "WhatsApp URL"
+        },
+        "mail_url": {
+          "label": "Email URL"
         }
       }
     },
-    "privacy": {
-      "name": "Privacy",
+    "advanced": {
+      "name": "Advanced",
       "settings": {
         "privacy_header": {
           "label": "Privacy"
@@ -3092,14 +3087,9 @@
         "use_bunny_fonts": {
           "label": "Use Privacy-Friendly Font CDN",
           "description": "Enable to serve Google Fonts from Bunny CDN (GDPR-compliant, no tracking)"
-        }
-      }
-    },
-    "advanced": {
-      "name": "Advanced",
-      "settings": {
+        },
         "advanced_header": {
-          "label": "Advanced"
+          "label": "Custom Code"
         },
         "custom_css": {
           "label": "Custom CSS",

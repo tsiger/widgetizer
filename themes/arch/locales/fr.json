@@ -2916,20 +2916,8 @@
     }
   },
   "global": {
-    "layout": {
-      "name": "Mise en page",
-      "settings": {
-        "layout_header": {
-          "label": "Animations"
-        },
-        "enable_reveal_animations": {
-          "label": "Activer les animations au défilement",
-          "description": "Animer les éléments lorsqu'ils apparaissent au défilement"
-        }
-      }
-    },
-    "branding": {
-      "name": "Image de marque",
+    "general": {
+      "name": "Général",
       "settings": {
         "branding_header": {
           "label": "Image de marque"
@@ -2937,6 +2925,13 @@
         "favicon": {
           "label": "Favicon",
           "description": "Taille recommandée 180×180 px."
+        },
+        "animations_header": {
+          "label": "Animations"
+        },
+        "enable_reveal_animations": {
+          "label": "Activer les animations au défilement",
+          "description": "Animer les éléments lorsqu'ils apparaissent au défilement"
         }
       }
     },
@@ -2946,6 +2941,36 @@
         "colors_standard_header": {
           "label": "Couleurs standard"
         },
+        "standard_bg_primary": {
+          "label": "Arrière-plan primaire"
+        },
+        "standard_bg_secondary": {
+          "label": "Arrière-plan secondaire"
+        },
+        "standard_text_content": {
+          "label": "Texte du contenu"
+        },
+        "standard_text_heading": {
+          "label": "Texte des titres"
+        },
+        "standard_text_muted": {
+          "label": "Texte atténué"
+        },
+        "standard_border_color": {
+          "label": "Couleur de bordure"
+        },
+        "standard_accent": {
+          "label": "Couleur d'accentuation"
+        },
+        "standard_accent_text": {
+          "label": "Couleur du texte d'accentuation"
+        },
+        "standard_rating_star": {
+          "label": "Couleur des étoiles de notation"
+        },
+        "colors_highlight_header": {
+          "label": "Couleurs d'accent"
+        },
         "highlight_bg_primary": {
           "label": "Arrière-plan primaire"
         },
@@ -2954,6 +2979,9 @@
         },
         "highlight_text_content": {
           "label": "Texte du contenu"
+        },
+        "highlight_text_heading": {
+          "label": "Texte des titres"
         },
         "highlight_text_muted": {
           "label": "Texte atténué"
@@ -2969,39 +2997,6 @@
         },
         "highlight_rating_star": {
           "label": "Couleur des étoiles de notation"
-        },
-        "colors_highlight_header": {
-          "label": "Couleurs d'accent"
-        },
-        "standard_bg_primary": {
-          "label": "Texte d'accroche"
-        },
-        "standard_bg_secondary": {
-          "label": "Texte d'accroche"
-        },
-        "standard_text_content": {
-          "label": "Texte d'accroche"
-        },
-        "standard_text_heading": {
-          "label": "Texte d'accroche"
-        },
-        "standard_text_muted": {
-          "label": "Texte d'accroche"
-        },
-        "standard_border_color": {
-          "label": "Texte d'accroche"
-        },
-        "standard_accent": {
-          "label": "Texte d'accroche"
-        },
-        "standard_accent_text": {
-          "label": "Texte d'accroche"
-        },
-        "standard_rating_star": {
-          "label": "Texte d'accroche"
-        },
-        "highlight_text_heading": {
-          "label": "Texte d'accroche"
         }
       }
     },
@@ -3018,8 +3013,8 @@
           "label": "Police du corps"
         },
         "heading_scale": {
-          "description": "Augmenter ou réduire toutes les tailles des titres",
-          "label": "Texte d'accroche"
+          "label": "Taille du texte des titres",
+          "description": "Augmenter ou réduire toutes les tailles des titres"
         },
         "body_scale": {
           "label": "Taille du texte du corps",
@@ -3030,61 +3025,61 @@
     "social": {
       "name": "Réseaux sociaux",
       "settings": {
-        "twitter_url": {
-          "label": "URL Twitter / X"
-        },
-        "mastodon_url": {
-          "label": "URL Mastodon"
-        },
-        "mail_url": {
-          "label": "URL e-mail"
-        },
         "social_header": {
           "label": "Réseaux sociaux"
         },
         "facebook_url": {
-          "label": "Texte d'accroche"
+          "label": "URL Facebook"
         },
         "instagram_url": {
-          "label": "Texte d'accroche"
+          "label": "URL Instagram"
+        },
+        "twitter_url": {
+          "label": "URL Twitter / X"
         },
         "linkedin_url": {
-          "label": "Texte d'accroche"
+          "label": "URL LinkedIn"
         },
         "youtube_url": {
-          "label": "Texte d'accroche"
+          "label": "URL YouTube"
         },
         "tiktok_url": {
-          "label": "Texte d'accroche"
+          "label": "URL TikTok"
         },
         "pinterest_url": {
-          "label": "Texte d'accroche"
+          "label": "URL Pinterest"
         },
         "github_url": {
-          "label": "Texte d'accroche"
+          "label": "URL GitHub"
+        },
+        "mastodon_url": {
+          "label": "URL Mastodon"
         },
         "bluesky_url": {
-          "label": "Texte d'accroche"
+          "label": "URL Bluesky"
         },
         "discord_url": {
-          "label": "Texte d'accroche"
+          "label": "URL Discord"
         },
         "reddit_url": {
-          "label": "Texte d'accroche"
+          "label": "URL Reddit"
         },
         "telegram_url": {
-          "label": "Texte d'accroche"
+          "label": "URL Telegram"
         },
         "threads_url": {
-          "label": "Texte d'accroche"
+          "label": "URL Threads"
         },
         "whatsapp_url": {
-          "label": "Texte d'accroche"
+          "label": "URL WhatsApp"
+        },
+        "mail_url": {
+          "label": "URL e-mail"
         }
       }
     },
-    "privacy": {
-      "name": "Confidentialité",
+    "advanced": {
+      "name": "Avancé",
       "settings": {
         "privacy_header": {
           "label": "Confidentialité"
@@ -3092,14 +3087,9 @@
         "use_bunny_fonts": {
           "label": "Utiliser un CDN de polices respectueux de la vie privée",
           "description": "Activer pour servir Google Fonts depuis Bunny CDN (conforme au GDPR, sans suivi)"
-        }
-      }
-    },
-    "advanced": {
-      "name": "Avancé",
-      "settings": {
+        },
         "advanced_header": {
-          "label": "Avancé"
+          "label": "Code Personnalisé"
         },
         "custom_css": {
           "label": "CSS personnalisé",

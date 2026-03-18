@@ -2916,20 +2916,8 @@
     }
   },
   "global": {
-    "layout": {
-      "name": "Διάταξη",
-      "settings": {
-        "layout_header": {
-          "label": "Κινούμενα εφέ"
-        },
-        "enable_reveal_animations": {
-          "label": "Ενεργοποίηση κινούμενων εφέ κύλισης",
-          "description": "Κινούμενα στοιχεία κατά την κύλιση στην οθόνη"
-        }
-      }
-    },
-    "branding": {
-      "name": "Επωνυμία",
+    "general": {
+      "name": "Γενικά",
       "settings": {
         "branding_header": {
           "label": "Επωνυμία"
@@ -2937,6 +2925,13 @@
         "favicon": {
           "label": "Εικονίδιο ιστοσελίδας",
           "description": "Προτεινόμενο μέγεθος 180×180 px."
+        },
+        "animations_header": {
+          "label": "Κινούμενα σχέδια"
+        },
+        "enable_reveal_animations": {
+          "label": "Ενεργοποίηση κινούμενων εφέ κύλισης",
+          "description": "Κινούμενα στοιχεία κατά την κύλιση στην οθόνη"
         }
       }
     },
@@ -2946,62 +2941,62 @@
         "colors_standard_header": {
           "label": "Τυπικά χρώματα"
         },
-        "highlight_bg_primary": {
-          "label": "Κύριο φόντο"
+        "standard_bg_primary": {
+          "label": "Κύριο Φόντο"
         },
-        "highlight_bg_secondary": {
-          "label": "Δευτερεύον φόντο"
+        "standard_bg_secondary": {
+          "label": "Δευτερεύον Φόντο"
         },
-        "highlight_text_content": {
-          "label": "Κείμενο περιεχομένου"
+        "standard_text_content": {
+          "label": "Κείμενο Περιεχομένου"
         },
-        "highlight_text_muted": {
-          "label": "Αχνό κείμενο"
+        "standard_text_heading": {
+          "label": "Κείμενο Επικεφαλίδων"
         },
-        "highlight_border_color": {
-          "label": "Χρώμα περιγράμματος"
+        "standard_text_muted": {
+          "label": "Αχνό Κείμενο"
         },
-        "highlight_accent": {
-          "label": "Χρώμα έμφασης"
+        "standard_border_color": {
+          "label": "Χρώμα Περιγράμματος"
         },
-        "highlight_accent_text": {
-          "label": "Χρώμα κειμένου έμφασης"
+        "standard_accent": {
+          "label": "Χρώμα Έμφασης"
         },
-        "highlight_rating_star": {
-          "label": "Χρώμα αστεριών βαθμολογίας"
+        "standard_accent_text": {
+          "label": "Χρώμα Κειμένου Έμφασης"
+        },
+        "standard_rating_star": {
+          "label": "Χρώμα Αστεριών Αξιολόγησης"
         },
         "colors_highlight_header": {
           "label": "Χρώματα τονισμού"
         },
-        "standard_bg_primary": {
-          "label": "Κείμενο επικεφαλίδας"
+        "highlight_bg_primary": {
+          "label": "Κύριο Φόντο"
         },
-        "standard_bg_secondary": {
-          "label": "Κείμενο επικεφαλίδας"
+        "highlight_bg_secondary": {
+          "label": "Δευτερεύον Φόντο"
         },
-        "standard_text_content": {
-          "label": "Κείμενο επικεφαλίδας"
-        },
-        "standard_text_heading": {
-          "label": "Κείμενο επικεφαλίδας"
-        },
-        "standard_text_muted": {
-          "label": "Κείμενο επικεφαλίδας"
-        },
-        "standard_border_color": {
-          "label": "Κείμενο επικεφαλίδας"
-        },
-        "standard_accent": {
-          "label": "Κείμενο επικεφαλίδας"
-        },
-        "standard_accent_text": {
-          "label": "Κείμενο επικεφαλίδας"
-        },
-        "standard_rating_star": {
-          "label": "Κείμενο επικεφαλίδας"
+        "highlight_text_content": {
+          "label": "Κείμενο Περιεχομένου"
         },
         "highlight_text_heading": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "Κείμενο Επικεφαλίδων"
+        },
+        "highlight_text_muted": {
+          "label": "Αχνό Κείμενο"
+        },
+        "highlight_border_color": {
+          "label": "Χρώμα Περιγράμματος"
+        },
+        "highlight_accent": {
+          "label": "Χρώμα Έμφασης"
+        },
+        "highlight_accent_text": {
+          "label": "Χρώμα Κειμένου Έμφασης"
+        },
+        "highlight_rating_star": {
+          "label": "Χρώμα Αστεριών Αξιολόγησης"
         }
       }
     },
@@ -3018,8 +3013,8 @@
           "label": "Γραμματοσειρά κειμένου"
         },
         "heading_scale": {
-          "description": "Κλιμάκωση όλων των μεγεθών επικεφαλίδων",
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "Μέγεθος κειμένου επικεφαλίδων",
+          "description": "Κλιμάκωση όλων των μεγεθών επικεφαλίδων"
         },
         "body_scale": {
           "label": "Μέγεθος κειμένου σώματος",
@@ -3030,61 +3025,61 @@
     "social": {
       "name": "Κοινωνικά",
       "settings": {
-        "twitter_url": {
-          "label": "Twitter / X URL"
-        },
-        "mastodon_url": {
-          "label": "Mastodon URL"
-        },
-        "mail_url": {
-          "label": "Email URL"
-        },
         "social_header": {
           "label": "Κοινωνικά δίκτυα"
         },
         "facebook_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL Facebook"
         },
         "instagram_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL Instagram"
+        },
+        "twitter_url": {
+          "label": "Twitter / X URL"
         },
         "linkedin_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL LinkedIn"
         },
         "youtube_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL YouTube"
         },
         "tiktok_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL TikTok"
         },
         "pinterest_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL Pinterest"
         },
         "github_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL GitHub"
+        },
+        "mastodon_url": {
+          "label": "Mastodon URL"
         },
         "bluesky_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL Bluesky"
         },
         "discord_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL Discord"
         },
         "reddit_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL Reddit"
         },
         "telegram_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL Telegram"
         },
         "threads_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL Threads"
         },
         "whatsapp_url": {
-          "label": "Κείμενο επικεφαλίδας"
+          "label": "URL WhatsApp"
+        },
+        "mail_url": {
+          "label": "Email URL"
         }
       }
     },
-    "privacy": {
-      "name": "Απόρρητο",
+    "advanced": {
+      "name": "Προχωρημένα",
       "settings": {
         "privacy_header": {
           "label": "Απόρρητο"
@@ -3092,14 +3087,9 @@
         "use_bunny_fonts": {
           "label": "Χρήση CDN γραμματοσειρών φιλικού προς το απόρρητο",
           "description": "Ενεργοποιήστε για παροχή Google Fonts μέσω Bunny CDN (συμβατό με GDPR, χωρίς παρακολούθηση)"
-        }
-      }
-    },
-    "advanced": {
-      "name": "Προχωρημένα",
-      "settings": {
+        },
         "advanced_header": {
-          "label": "Προχωρημένα"
+          "label": "Προσαρμοσμένος Κώδικας"
         },
         "custom_css": {
           "label": "Προσαρμοσμένο CSS",

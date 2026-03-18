@@ -2916,21 +2916,16 @@
     }
   },
   "global": {
-    "layout": {
-      "name": "Layout",
+    "general": {
+      "name": "Generale",
       "settings": {
-        "layout_header": {
+        "animations_header": {
           "label": "Animazioni"
         },
         "enable_reveal_animations": {
           "label": "Abilita animazioni allo scorrimento",
           "description": "Anima gli elementi quando scorrono nella vista"
-        }
-      }
-    },
-    "branding": {
-      "name": "Marchio",
-      "settings": {
+        },
         "branding_header": {
           "label": "Branding"
         },
@@ -2946,6 +2941,36 @@
         "colors_standard_header": {
           "label": "Colori standard"
         },
+        "standard_bg_primary": {
+          "label": "Sfondo Primario"
+        },
+        "standard_bg_secondary": {
+          "label": "Sfondo Secondario"
+        },
+        "standard_text_content": {
+          "label": "Testo del Contenuto"
+        },
+        "standard_text_heading": {
+          "label": "Testo dei Titoli"
+        },
+        "standard_text_muted": {
+          "label": "Testo Attenuato"
+        },
+        "standard_border_color": {
+          "label": "Colore del Bordo"
+        },
+        "standard_accent": {
+          "label": "Colore di Accento"
+        },
+        "standard_accent_text": {
+          "label": "Colore del Testo di Accento"
+        },
+        "standard_rating_star": {
+          "label": "Colore delle Stelle di Valutazione"
+        },
+        "colors_highlight_header": {
+          "label": "Colori evidenza"
+        },
         "highlight_bg_primary": {
           "label": "Sfondo primario"
         },
@@ -2954,6 +2979,9 @@
         },
         "highlight_text_content": {
           "label": "Testo contenuto"
+        },
+        "highlight_text_heading": {
+          "label": "Testo dei titoli"
         },
         "highlight_text_muted": {
           "label": "Testo attenuato"
@@ -2969,39 +2997,6 @@
         },
         "highlight_rating_star": {
           "label": "Colore stelle valutazione"
-        },
-        "colors_highlight_header": {
-          "label": "Colori evidenza"
-        },
-        "standard_bg_primary": {
-          "label": "Testo sopratitolo"
-        },
-        "standard_bg_secondary": {
-          "label": "Testo sopratitolo"
-        },
-        "standard_text_content": {
-          "label": "Testo sopratitolo"
-        },
-        "standard_text_heading": {
-          "label": "Testo sopratitolo"
-        },
-        "standard_text_muted": {
-          "label": "Testo sopratitolo"
-        },
-        "standard_border_color": {
-          "label": "Testo sopratitolo"
-        },
-        "standard_accent": {
-          "label": "Testo sopratitolo"
-        },
-        "standard_accent_text": {
-          "label": "Testo sopratitolo"
-        },
-        "standard_rating_star": {
-          "label": "Testo sopratitolo"
-        },
-        "highlight_text_heading": {
-          "label": "Testo sopratitolo"
         }
       }
     },
@@ -3018,8 +3013,8 @@
           "label": "Font corpo"
         },
         "heading_scale": {
-          "description": "Ridimensiona tutti i testi delle intestazioni",
-          "label": "Testo sopratitolo"
+          "label": "Dimensione testo dei titoli",
+          "description": "Ridimensiona tutti i testi delle intestazioni"
         },
         "body_scale": {
           "label": "Dimensione testo corpo",
@@ -3030,6 +3025,9 @@
     "social": {
       "name": "Social",
       "settings": {
+        "social_header": {
+          "label": "Social Media"
+        },
         "twitter_url": {
           "label": "URL Twitter / X"
         },
@@ -3039,52 +3037,49 @@
         "mail_url": {
           "label": "URL Email"
         },
-        "social_header": {
-          "label": "Social Media"
-        },
         "facebook_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di Facebook"
         },
         "instagram_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di Instagram"
         },
         "linkedin_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di LinkedIn"
         },
         "youtube_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di YouTube"
         },
         "tiktok_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di TikTok"
         },
         "pinterest_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di Pinterest"
         },
         "github_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di GitHub"
         },
         "bluesky_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di Bluesky"
         },
         "discord_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di Discord"
         },
         "reddit_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di Reddit"
         },
         "telegram_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di Telegram"
         },
         "threads_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di Threads"
         },
         "whatsapp_url": {
-          "label": "Testo sopratitolo"
+          "label": "URL di WhatsApp"
         }
       }
     },
-    "privacy": {
-      "name": "Privacy",
+    "advanced": {
+      "name": "Avanzate",
       "settings": {
         "privacy_header": {
           "label": "Privacy"
@@ -3092,14 +3087,9 @@
         "use_bunny_fonts": {
           "label": "Usa CDN font rispettoso della privacy",
           "description": "Abilita per servire Google Fonts da Bunny CDN (conforme al GDPR, senza tracciamento)"
-        }
-      }
-    },
-    "advanced": {
-      "name": "Avanzate",
-      "settings": {
+        },
         "advanced_header": {
-          "label": "Avanzate"
+          "label": "Codice Personalizzato"
         },
         "custom_css": {
           "label": "CSS personalizzato",

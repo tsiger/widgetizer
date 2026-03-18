@@ -2916,21 +2916,16 @@
     }
   },
   "global": {
-    "layout": {
-      "name": "Layout",
+    "general": {
+      "name": "Allgemein",
       "settings": {
-        "layout_header": {
+        "animations_header": {
           "label": "Animationen"
         },
         "enable_reveal_animations": {
           "label": "Scroll-Einblendanimationen aktivieren",
           "description": "Elemente beim Scrollen in den sichtbaren Bereich animieren"
-        }
-      }
-    },
-    "branding": {
-      "name": "Markendesign",
-      "settings": {
+        },
         "branding_header": {
           "label": "Branding"
         },
@@ -2946,6 +2941,36 @@
         "colors_standard_header": {
           "label": "Standardfarben"
         },
+        "standard_bg_primary": {
+          "label": "Primärer Hintergrund"
+        },
+        "standard_bg_secondary": {
+          "label": "Sekundärer Hintergrund"
+        },
+        "standard_text_content": {
+          "label": "Inhaltstext"
+        },
+        "standard_text_heading": {
+          "label": "Überschrifttext"
+        },
+        "standard_text_muted": {
+          "label": "Gedämpfter Text"
+        },
+        "standard_border_color": {
+          "label": "Rahmenfarbe"
+        },
+        "standard_accent": {
+          "label": "Akzentfarbe"
+        },
+        "standard_accent_text": {
+          "label": "Akzent-Textfarbe"
+        },
+        "standard_rating_star": {
+          "label": "Bewertungsstern-Farbe"
+        },
+        "colors_highlight_header": {
+          "label": "Hervorgehobene Farben"
+        },
         "highlight_bg_primary": {
           "label": "Primärer Hintergrund"
         },
@@ -2954,6 +2979,9 @@
         },
         "highlight_text_content": {
           "label": "Inhaltstext"
+        },
+        "highlight_text_heading": {
+          "label": "Überschrifttext"
         },
         "highlight_text_muted": {
           "label": "Gedämpfter Text"
@@ -2969,39 +2997,6 @@
         },
         "highlight_rating_star": {
           "label": "Bewertungsstern-Farbe"
-        },
-        "colors_highlight_header": {
-          "label": "Hervorgehobene Farben"
-        },
-        "standard_bg_primary": {
-          "label": "Dachzeile"
-        },
-        "standard_bg_secondary": {
-          "label": "Dachzeile"
-        },
-        "standard_text_content": {
-          "label": "Dachzeile"
-        },
-        "standard_text_heading": {
-          "label": "Dachzeile"
-        },
-        "standard_text_muted": {
-          "label": "Dachzeile"
-        },
-        "standard_border_color": {
-          "label": "Dachzeile"
-        },
-        "standard_accent": {
-          "label": "Dachzeile"
-        },
-        "standard_accent_text": {
-          "label": "Dachzeile"
-        },
-        "standard_rating_star": {
-          "label": "Dachzeile"
-        },
-        "highlight_text_heading": {
-          "label": "Dachzeile"
         }
       }
     },
@@ -3018,8 +3013,8 @@
           "label": "Fließtext-Schrift"
         },
         "heading_scale": {
-          "description": "Alle Überschrift-Größen hoch- oder herunterskalieren",
-          "label": "Dachzeile"
+          "label": "Überschrift-Textgröße",
+          "description": "Alle Überschrift-Größen hoch- oder herunterskalieren"
         },
         "body_scale": {
           "label": "Fließtext-Größe",
@@ -3030,6 +3025,9 @@
     "social": {
       "name": "Soziale Medien",
       "settings": {
+        "social_header": {
+          "label": "Social Media"
+        },
         "twitter_url": {
           "label": "Twitter / X URL"
         },
@@ -3039,52 +3037,49 @@
         "mail_url": {
           "label": "E-Mail URL"
         },
-        "social_header": {
-          "label": "Social Media"
-        },
         "facebook_url": {
-          "label": "Dachzeile"
+          "label": "Facebook URL"
         },
         "instagram_url": {
-          "label": "Dachzeile"
+          "label": "Instagram URL"
         },
         "linkedin_url": {
-          "label": "Dachzeile"
+          "label": "LinkedIn URL"
         },
         "youtube_url": {
-          "label": "Dachzeile"
+          "label": "YouTube URL"
         },
         "tiktok_url": {
-          "label": "Dachzeile"
+          "label": "TikTok URL"
         },
         "pinterest_url": {
-          "label": "Dachzeile"
+          "label": "Pinterest URL"
         },
         "github_url": {
-          "label": "Dachzeile"
+          "label": "GitHub URL"
         },
         "bluesky_url": {
-          "label": "Dachzeile"
+          "label": "Bluesky URL"
         },
         "discord_url": {
-          "label": "Dachzeile"
+          "label": "Discord URL"
         },
         "reddit_url": {
-          "label": "Dachzeile"
+          "label": "Reddit URL"
         },
         "telegram_url": {
-          "label": "Dachzeile"
+          "label": "Telegram URL"
         },
         "threads_url": {
-          "label": "Dachzeile"
+          "label": "Threads URL"
         },
         "whatsapp_url": {
-          "label": "Dachzeile"
+          "label": "WhatsApp URL"
         }
       }
     },
-    "privacy": {
-      "name": "Datenschutz",
+    "advanced": {
+      "name": "Erweitert",
       "settings": {
         "privacy_header": {
           "label": "Datenschutz"
@@ -3092,14 +3087,9 @@
         "use_bunny_fonts": {
           "label": "Datenschutzfreundliches Font-CDN verwenden",
           "description": "Aktivieren, um Google Fonts über Bunny CDN bereitzustellen (DSGVO-konform, kein Tracking)"
-        }
-      }
-    },
-    "advanced": {
-      "name": "Erweitert",
-      "settings": {
+        },
         "advanced_header": {
-          "label": "Erweitert"
+          "label": "Benutzerdefinierter Code"
         },
         "custom_css": {
           "label": "Eigenes CSS",
