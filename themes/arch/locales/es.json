@@ -1209,7 +1209,7 @@
         "label": "Visualización"
       }
     },
-    "name": "Acordeón"
+    "name": "Imagen"
   },
   "image_callout": {
     "name": "Destacado de imagen",
@@ -2511,7 +2511,7 @@
         }
       }
     },
-    "name": "Acordeón"
+    "name": "Iconos sociales"
   },
   "split_hero": {
     "name": "Hero dividido",

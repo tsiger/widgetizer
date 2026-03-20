@@ -1209,7 +1209,7 @@
         "label": "Affichage"
       }
     },
-    "name": "Accordéon"
+    "name": "Image"
   },
   "image_callout": {
     "name": "Mise en avant d'image",
@@ -2511,7 +2511,7 @@
         }
       }
     },
-    "name": "Accordéon"
+    "name": "Icônes sociales"
   },
   "split_hero": {
     "name": "Hero partagé",

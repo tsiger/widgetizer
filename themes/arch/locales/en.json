@@ -1209,7 +1209,7 @@
         "label": "Display"
       }
     },
-    "name": "Accordion"
+    "name": "Image"
   },
   "image_callout": {
     "name": "Image Callout",
@@ -2511,7 +2511,7 @@
         }
       }
     },
-    "name": "Accordion"
+    "name": "Social Icons"
   },
   "split_hero": {
     "name": "Split Hero",

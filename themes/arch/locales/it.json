@@ -1209,7 +1209,7 @@
         "label": "Visualizzazione"
       }
     },
-    "name": "Fisarmonica"
+    "name": "Immagine"
   },
   "image_callout": {
     "name": "Callout immagine",
@@ -2511,7 +2511,7 @@
         }
       }
     },
-    "name": "Fisarmonica"
+    "name": "Icone social"
   },
   "split_hero": {
     "name": "Hero diviso",

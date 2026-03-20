@@ -1209,7 +1209,7 @@
         "label": "Anzeige"
       }
     },
-    "name": "Akkordeon"
+    "name": "Bild"
   },
   "image_callout": {
     "name": "Bild-Hervorhebung",
@@ -2511,7 +2511,7 @@
         }
       }
     },
-    "name": "Akkordeon"
+    "name": "Soziale Symbole"
   },
   "split_hero": {
     "name": "Geteilter Hero",
