@@ -36,10 +36,7 @@ export default function SettingsPanel({ schema = {}, values = {}, onChange, erro
       </div>
 
       {/* Content area */}
-      <div className="flex-1 p-6 min-h-[400px]">
-        <h2 className="text-lg font-semibold mb-4 text-slate-800">
-          {tTheme("tTheme:global." + activeTab + ".name")}
-        </h2>
+      <div className="flex-1 px-6 pb-6 min-h-[400px]">
         <SettingsGroup settings={schema[activeTab]} values={values} onChange={onChange} errors={errors} />
       </div>
     </div>
