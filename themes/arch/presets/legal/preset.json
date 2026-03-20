@@ -19,6 +19,10 @@
     "highlight_accent_text": "#ffffff",
     "highlight_rating_star": "#fbbf24",
     "heading_font": { "stack": "\"Libre Baskerville\", serif", "weight": 700 },
-    "body_font": { "stack": "\"Libre Franklin\", sans-serif", "weight": 400 }
+    "body_font": { "stack": "\"Libre Franklin\", sans-serif", "weight": 400 },
+    "corner_style": "sharp",
+    "card_style": "bordered",
+    "spacing_density": "default",
+    "button_shape": "auto"
   }
 }

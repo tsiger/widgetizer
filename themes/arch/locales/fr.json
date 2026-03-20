@@ -3022,6 +3022,50 @@
         }
       }
     },
+    "style": {
+      "name": "Style",
+      "settings": {
+        "style_header": {
+          "label": "Style visuel"
+        },
+        "corner_style": {
+          "label": "Formes",
+          "description": "Contrôle l'arrondi des boutons, cartes, images et champs de formulaire",
+          "options": {
+            "sharp": "Anguleux",
+            "slightly_rounded": "Légèrement arrondi",
+            "rounded": "Arrondi"
+          }
+        },
+        "card_style": {
+          "label": "Boîtes de contenu",
+          "description": "Comment les blocs de contenu sont visuellement séparés",
+          "options": {
+            "bordered": "Avec bordure",
+            "shadow": "Ombre",
+            "flat": "Plat"
+          }
+        },
+        "spacing_density": {
+          "label": "Densité de mise en page",
+          "description": "Contrôle l'espace blanc entre les sections et les éléments",
+          "options": {
+            "compact": "Compact",
+            "default": "Par défaut",
+            "airy": "Aéré"
+          }
+        },
+        "button_shape": {
+          "label": "Forme des boutons",
+          "description": "Remplacer la forme des coins spécifiquement pour les boutons",
+          "options": {
+            "auto": "Identique à la forme des coins",
+            "pill": "Pilule",
+            "sharp": "Anguleux"
+          }
+        }
+      }
+    },
     "social": {
       "name": "Réseaux sociaux",
       "settings": {

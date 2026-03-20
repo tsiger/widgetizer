@@ -4,21 +4,30 @@
       "name": "System UI",
       "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
       "isGoogleFont": false,
-      "availableWeights": [400, 700],
+      "availableWeights": [
+        400,
+        700
+      ],
       "defaultWeight": 400
     },
     {
       "name": "Sans Serif",
       "stack": "Arial, Helvetica, sans-serif",
       "isGoogleFont": false,
-      "availableWeights": [400, 700],
+      "availableWeights": [
+        400,
+        700
+      ],
       "defaultWeight": 400
     },
     {
       "name": "Serif",
       "stack": "Georgia, serif",
       "isGoogleFont": false,
-      "availableWeights": [400, 700],
+      "availableWeights": [
+        400,
+        700
+      ],
       "defaultWeight": 400
     }
   ],
@@ -27,687 +36,3814 @@
       "name": "Abel",
       "stack": "\"Abel\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
     },
     {
       "name": "Abril Fatface",
       "stack": "\"Abril Fatface\", display",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Actor",
+      "stack": "\"Actor\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Alata",
+      "stack": "\"Alata\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Albert Sans",
+      "stack": "\"Albert Sans\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Alegreya",
       "stack": "\"Alegreya\", serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Alegreya Sans",
       "stack": "\"Alegreya Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 300, 400, 500, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        300,
+        400,
+        500,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Alfa Slab One",
+      "stack": "\"Alfa Slab One\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Alice",
+      "stack": "\"Alice\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Allerta Stencil",
+      "stack": "\"Allerta Stencil\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Amaranth",
+      "stack": "\"Amaranth\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Amatic SC",
+      "stack": "\"Amatic SC\", handwriting",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "hebrew",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Amiri",
+      "stack": "\"Amiri\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "arabic",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Antic Slab",
+      "stack": "\"Antic Slab\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
     },
     {
       "name": "Anton",
       "stack": "\"Anton\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Archivo",
       "stack": "\"Archivo\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
-      "name": "Archivo Black",
-      "stack": "\"Archivo Black\", sans-serif",
+      "name": "Arvo",
+      "stack": "\"Arvo\", serif",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
-    },
-    {
-      "name": "Arimo",
-      "stack": "\"Arimo\", sans-serif",
-      "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
     },
     {
       "name": "Asap",
       "stack": "\"Asap\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Asap Condensed",
+      "stack": "\"Asap Condensed\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Assistant",
       "stack": "\"Assistant\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "hebrew",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Baloo 2",
+      "stack": "\"Baloo 2\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "devanagari",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Balsamiq Sans",
+      "stack": "\"Balsamiq Sans\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Bangers",
+      "stack": "\"Bangers\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Barlow",
       "stack": "\"Barlow\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Barlow Condensed",
+      "stack": "\"Barlow Condensed\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Be Vietnam Pro",
+      "stack": "\"Be Vietnam Pro\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Bebas Neue",
       "stack": "\"Bebas Neue\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "BenchNine",
+      "stack": "\"BenchNine\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        300,
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Bitter",
       "stack": "\"Bitter\", serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Bodoni Moda",
+      "stack": "\"Bodoni Moda\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols"
+      ]
     },
     {
       "name": "Cabin",
       "stack": "\"Cabin\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Cabin Condensed",
+      "stack": "\"Cabin Condensed\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Cabin Sketch",
+      "stack": "\"Cabin Sketch\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Cairo",
+      "stack": "\"Cairo\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "arabic",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Candal",
+      "stack": "\"Candal\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Cantarell",
+      "stack": "\"Cantarell\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Cardo",
+      "stack": "\"Cardo\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "gothic",
+        "greek",
+        "greek-ext",
+        "hebrew",
+        "latin",
+        "latin-ext",
+        "old-italic",
+        "runic"
+      ]
+    },
+    {
+      "name": "Carter One",
+      "stack": "\"Carter One\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
     },
     {
       "name": "Catamaran",
       "stack": "\"Catamaran\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "tamil"
+      ]
     },
     {
       "name": "Caveat",
       "stack": "\"Caveat\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
-      "name": "Chakra Petch",
-      "stack": "\"Chakra Petch\", sans-serif",
+      "name": "Chewy",
+      "stack": "\"Chewy\", display",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Chivo",
+      "stack": "\"Chivo\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Cinzel",
       "stack": "\"Cinzel\", serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Cinzel Decorative",
+      "stack": "\"Cinzel Decorative\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Comfortaa",
       "stack": "\"Comfortaa\", display",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Cormorant Garamond",
       "stack": "\"Cormorant Garamond\", serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Courier Prime",
+      "stack": "\"Courier Prime\", monospace",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Cousine",
+      "stack": "\"Cousine\", monospace",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "hebrew",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Crimson Text",
       "stack": "\"Crimson Text\", serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Dancing Script",
       "stack": "\"Dancing Script\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Days One",
+      "stack": "\"Days One\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "latin"
+      ]
+    },
+    {
+      "name": "Didact Gothic",
+      "stack": "\"Didact Gothic\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "DM Sans",
       "stack": "\"DM Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Domine",
+      "stack": "\"Domine\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Dosis",
       "stack": "\"Dosis\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "EB Garamond",
       "stack": "\"EB Garamond\", serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700, 800],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
-      "name": "Encode Sans",
-      "stack": "\"Encode Sans\", sans-serif",
+      "name": "Epilogue",
+      "stack": "\"Epilogue\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Exo 2",
       "stack": "\"Exo 2\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Fira Code",
+      "stack": "\"Fira Code\", monospace",
+      "isGoogleFont": true,
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "symbols2"
+      ]
     },
     {
       "name": "Fira Sans",
       "stack": "\"Fira Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Fira Sans Condensed",
+      "stack": "\"Fira Sans Condensed\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Fjalla One",
       "stack": "\"Fjalla One\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Forum",
+      "stack": "\"Forum\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Francois One",
+      "stack": "\"Francois One\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Frank Ruhl Libre",
+      "stack": "\"Frank Ruhl Libre\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "hebrew",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Fraunces",
       "stack": "\"Fraunces\", serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Fredoka",
+      "stack": "\"Fredoka\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "hebrew",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Glegoo",
+      "stack": "\"Glegoo\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "devanagari",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Golos Text",
+      "stack": "\"Golos Text\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Gothic A1",
+      "stack": "\"Gothic A1\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "korean",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Great Vibes",
+      "stack": "\"Great Vibes\", handwriting",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Gudea",
+      "stack": "\"Gudea\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Handlee",
+      "stack": "\"Handlee\", handwriting",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Hedvig Letters Sans",
+      "stack": "\"Hedvig Letters Sans\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols"
+      ]
     },
     {
       "name": "Heebo",
       "stack": "\"Heebo\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "hebrew",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols"
+      ]
     },
     {
       "name": "Hind",
       "stack": "\"Hind\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "devanagari",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Hind Siliguri",
+      "stack": "\"Hind Siliguri\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "bengali",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "IBM Plex Mono",
       "stack": "\"IBM Plex Mono\", monospace",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "IBM Plex Sans",
       "stack": "\"IBM Plex Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "IBM Plex Serif",
       "stack": "\"IBM Plex Serif\", serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Inconsolata",
       "stack": "\"Inconsolata\", monospace",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Indie Flower",
       "stack": "\"Indie Flower\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Inter",
       "stack": "\"Inter\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Inter Tight",
+      "stack": "\"Inter Tight\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Istok Web",
+      "stack": "\"Istok Web\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "JetBrains Mono",
+      "stack": "\"JetBrains Mono\", monospace",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Josefin Sans",
       "stack": "\"Josefin Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Jost",
       "stack": "\"Jost\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Jura",
+      "stack": "\"Jura\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "kayah-li",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Kalam",
+      "stack": "\"Kalam\", handwriting",
+      "isGoogleFont": true,
+      "availableWeights": [
+        300,
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "devanagari",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Kameron",
+      "stack": "\"Kameron\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Kanit",
       "stack": "\"Kanit\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "thai",
+        "vietnamese"
+      ]
     },
     {
       "name": "Karla",
       "stack": "\"Karla\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Krona One",
+      "stack": "\"Krona One\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Lato",
       "stack": "\"Lato\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "League Spartan",
+      "stack": "\"League Spartan\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Lexend",
+      "stack": "\"Lexend\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Lexend Deca",
+      "stack": "\"Lexend Deca\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Libre Baskerville",
       "stack": "\"Libre Baskerville\", serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Libre Franklin",
       "stack": "\"Libre Franklin\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Literata",
+      "stack": "\"Literata\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Livvic",
+      "stack": "\"Livvic\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Lobster",
       "stack": "\"Lobster\", display",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Lobster Two",
+      "stack": "\"Lobster Two\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
     },
     {
       "name": "Lora",
       "stack": "\"Lora\", serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Lustria",
+      "stack": "\"Lustria\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "M PLUS Rounded 1c",
+      "stack": "\"M PLUS Rounded 1c\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        300,
+        400,
+        500,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "hebrew",
+        "japanese",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Macondo",
+      "stack": "\"Macondo\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Mada",
+      "stack": "\"Mada\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "arabic",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Manrope",
       "stack": "\"Manrope\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
-      "name": "Material Icons",
-      "stack": "\"Material Icons\", monospace",
+      "name": "Marcellus",
+      "stack": "\"Marcellus\", serif",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
-      "name": "Maven Pro",
-      "stack": "\"Maven Pro\", sans-serif",
+      "name": "Marmelad",
+      "stack": "\"Marmelad\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Marvel",
+      "stack": "\"Marvel\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
     },
     {
       "name": "Merriweather",
       "stack": "\"Merriweather\", serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Monda",
+      "stack": "\"Monda\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Monoton",
+      "stack": "\"Monoton\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Montserrat",
       "stack": "\"Montserrat\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Mukta",
       "stack": "\"Mukta\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "devanagari",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Mulish",
       "stack": "\"Mulish\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
-      "name": "Nanum Gothic",
-      "stack": "\"Nanum Gothic\", sans-serif",
+      "name": "News Cycle",
+      "stack": "\"News Cycle\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 700, 800],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Noto Sans",
       "stack": "\"Noto Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "devanagari",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Noto Sans Arabic",
+      "stack": "\"Noto Sans Arabic\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "arabic",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols"
+      ]
+    },
+    {
+      "name": "Noto Sans Hebrew",
+      "stack": "\"Noto Sans Hebrew\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic-ext",
+        "greek-ext",
+        "hebrew",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Noto Sans JP",
+      "stack": "\"Noto Sans JP\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "japanese",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Noto Sans KR",
       "stack": "\"Noto Sans KR\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "korean",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Noto Sans SC",
+      "stack": "\"Noto Sans SC\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "chinese-simplified",
+        "cyrillic",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Noto Sans TC",
       "stack": "\"Noto Sans TC\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "chinese-traditional",
+        "cyrillic",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Noto Serif",
       "stack": "\"Noto Serif\", serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "math",
+        "vietnamese"
+      ]
     },
     {
       "name": "Nunito",
       "stack": "\"Nunito\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Nunito Sans",
       "stack": "\"Nunito Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Oleo Script",
+      "stack": "\"Oleo Script\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Onest",
+      "stack": "\"Onest\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Open Sans",
       "stack": "\"Open Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "hebrew",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols",
+        "vietnamese"
+      ]
     },
     {
       "name": "Oswald",
       "stack": "\"Oswald\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Outfit",
       "stack": "\"Outfit\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Overpass",
       "stack": "\"Overpass\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Ovo",
+      "stack": "\"Ovo\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
     },
     {
       "name": "Oxygen",
       "stack": "\"Oxygen\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Pacifico",
       "stack": "\"Pacifico\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Pathway Gothic One",
       "stack": "\"Pathway Gothic One\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
-      "name": "Permanent Marker",
-      "stack": "\"Permanent Marker\", handwriting",
+      "name": "Patrick Hand",
+      "stack": "\"Patrick Hand\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
-      "name": "Play",
-      "stack": "\"Play\", sans-serif",
+      "name": "Patua One",
+      "stack": "\"Patua One\", display",
       "isGoogleFont": true,
-      "availableWeights": [400, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Paytone One",
+      "stack": "\"Paytone One\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Philosopher",
+      "stack": "\"Philosopher\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Playfair",
       "stack": "\"Playfair\", serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Playfair Display",
       "stack": "\"Playfair Display\", serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Plus Jakarta Sans",
       "stack": "\"Plus Jakarta Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700, 800],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Pontano Sans",
+      "stack": "\"Pontano Sans\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Poppins",
       "stack": "\"Poppins\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "devanagari",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Port Lligat Sans",
+      "stack": "\"Port Lligat Sans\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Prata",
+      "stack": "\"Prata\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Press Start 2P",
+      "stack": "\"Press Start 2P\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Prompt",
       "stack": "\"Prompt\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "thai",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "PT Mono",
+      "stack": "\"PT Mono\", monospace",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "PT Sans",
       "stack": "\"PT Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 700],
-      "defaultWeight": 400
-    },
-    {
-      "name": "PT Sans Narrow",
-      "stack": "\"PT Sans Narrow\", sans-serif",
-      "isGoogleFont": true,
-      "availableWeights": [400, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "PT Serif",
       "stack": "\"PT Serif\", serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Public Sans",
+      "stack": "\"Public Sans\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Questrial",
+      "stack": "\"Questrial\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Quicksand",
       "stack": "\"Quicksand\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Rajdhani",
+      "stack": "\"Rajdhani\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "devanagari",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Raleway",
       "stack": "\"Raleway\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Rambla",
+      "stack": "\"Rambla\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Red Hat Display",
       "stack": "\"Red Hat Display\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Righteous",
       "stack": "\"Righteous\", display",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Roboto",
       "stack": "\"Roboto\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols",
+        "vietnamese"
+      ]
     },
     {
       "name": "Roboto Mono",
       "stack": "\"Roboto Mono\", monospace",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Rokkitt",
+      "stack": "\"Rokkitt\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Rubik",
       "stack": "\"Rubik\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "arabic",
+        "cyrillic",
+        "cyrillic-ext",
+        "hebrew",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Ruda",
+      "stack": "\"Ruda\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Sacramento",
+      "stack": "\"Sacramento\", handwriting",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Salsa",
+      "stack": "\"Salsa\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
     },
     {
       "name": "Sarabun",
       "stack": "\"Sarabun\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "thai",
+        "vietnamese"
+      ]
     },
     {
-      "name": "Shadows Into Light",
-      "stack": "\"Shadows Into Light\", handwriting",
+      "name": "Satisfy",
+      "stack": "\"Satisfy\", handwriting",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Schibsted Grotesk",
+      "stack": "\"Schibsted Grotesk\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Secular One",
+      "stack": "\"Secular One\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "hebrew",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Sen",
+      "stack": "\"Sen\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Share Tech",
+      "stack": "\"Share Tech\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Share Tech Mono",
+      "stack": "\"Share Tech Mono\", monospace",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Shrikhand",
+      "stack": "\"Shrikhand\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "gujarati",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Signika",
+      "stack": "\"Signika\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Sniglet",
+      "stack": "\"Sniglet\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Sora",
+      "stack": "\"Sora\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Source Code Pro",
       "stack": "\"Source Code Pro\", monospace",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Source Sans 3",
+      "stack": "\"Source Sans 3\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Source Serif 4",
+      "stack": "\"Source Serif 4\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Space Grotesk",
       "stack": "\"Space Grotesk\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Space Mono",
       "stack": "\"Space Mono\", monospace",
       "isGoogleFont": true,
-      "availableWeights": [400, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Spinnaker",
+      "stack": "\"Spinnaker\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Staatliches",
+      "stack": "\"Staatliches\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Suez One",
+      "stack": "\"Suez One\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "hebrew",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Syne",
+      "stack": "\"Syne\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "greek",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Tajawal",
+      "stack": "\"Tajawal\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "arabic",
+        "latin"
+      ]
     },
     {
       "name": "Teko",
       "stack": "\"Teko\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "devanagari",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Tenor Sans",
+      "stack": "\"Tenor Sans\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Tinos",
+      "stack": "\"Tinos\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "hebrew",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Titillium Web",
       "stack": "\"Titillium Web\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 600, 700, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        600,
+        700,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Ubuntu",
       "stack": "\"Ubuntu\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext"
+      ]
+    },
+    {
+      "name": "Ubuntu Mono",
+      "stack": "\"Ubuntu Mono\", monospace",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext"
+      ]
     },
     {
       "name": "Varela Round",
       "stack": "\"Varela Round\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [400],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "hebrew",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
-      "name": "Vollkorn",
-      "stack": "\"Vollkorn\", serif",
+      "name": "Vidaloka",
+      "stack": "\"Vidaloka\", serif",
       "isGoogleFont": true,
-      "availableWeights": [400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "Volkhov",
+      "stack": "\"Volkhov\", serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin"
+      ]
+    },
+    {
+      "name": "VT323",
+      "stack": "\"VT323\", monospace",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Wix Madefor Display",
+      "stack": "\"Wix Madefor Display\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Wix Madefor Text",
+      "stack": "\"Wix Madefor Text\", sans-serif",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Work Sans",
       "stack": "\"Work Sans\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-      "defaultWeight": 400
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Yanone Kaffeesatz",
       "stack": "\"Yanone Kaffeesatz\", sans-serif",
       "isGoogleFont": true,
-      "availableWeights": [200, 300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols",
+        "vietnamese"
+      ]
+    },
+    {
+      "name": "Yeseva One",
+      "stack": "\"Yeseva One\", display",
+      "isGoogleFont": true,
+      "availableWeights": [
+        400
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ]
     },
     {
       "name": "Zilla Slab",
       "stack": "\"Zilla Slab\", serif",
       "isGoogleFont": true,
-      "availableWeights": [300, 400, 500, 600, 700],
-      "defaultWeight": 400
+      "availableWeights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "defaultWeight": 400,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ]
     }
   ]
 }

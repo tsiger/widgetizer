@@ -3022,6 +3022,50 @@
         }
       }
     },
+    "style": {
+      "name": "Stile",
+      "settings": {
+        "style_header": {
+          "label": "Stile visivo"
+        },
+        "corner_style": {
+          "label": "Forme",
+          "description": "Controlla l'arrotondamento di pulsanti, schede, immagini e campi del modulo",
+          "options": {
+            "sharp": "Spigoloso",
+            "slightly_rounded": "Leggermente arrotondato",
+            "rounded": "Arrotondato"
+          }
+        },
+        "card_style": {
+          "label": "Riquadri contenuto",
+          "description": "Come i blocchi di contenuto vengono separati visivamente",
+          "options": {
+            "bordered": "Con bordo",
+            "shadow": "Ombra",
+            "flat": "Piatto"
+          }
+        },
+        "spacing_density": {
+          "label": "Densità del layout",
+          "description": "Controlla lo spazio bianco tra sezioni ed elementi",
+          "options": {
+            "compact": "Compatto",
+            "default": "Predefinito",
+            "airy": "Arioso"
+          }
+        },
+        "button_shape": {
+          "label": "Forma dei pulsanti",
+          "description": "Sovrascrivere la forma degli angoli specificamente per i pulsanti",
+          "options": {
+            "auto": "Uguale alla forma degli angoli",
+            "pill": "Pillola",
+            "sharp": "Spigoloso"
+          }
+        }
+      }
+    },
     "social": {
       "name": "Social",
       "settings": {

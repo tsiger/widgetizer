@@ -301,6 +301,40 @@ function updateThemeSettings(iframe, settings) {
     );
     iframe.contentWindow.postMessage({ type: "LOAD_FONTS", payload: fontsPayload }, "*");
   }
+
+  const styleClasses = extractStyleClasses(settings);
+  if (Object.keys(styleClasses).length > 0) {
+    iframe.contentWindow.postMessage({ type: "UPDATE_STYLE_CLASSES", payload: styleClasses }, "*");
+  }
+}
+
+/**
+ * Extract style settings that map to body classes.
+ * Maps setting IDs to their class prefix and current value.
+ * @param {Object} settings - Theme settings object
+ * @returns {Object<string, string>} Map of class prefix to value, e.g. { "corner": "rounded", "cards": "shadow" }
+ */
+function extractStyleClasses(settings) {
+  const classMap = {
+    corner_style: "corner",
+    card_style: "cards",
+    spacing_density: "spacing",
+    button_shape: "buttons",
+  };
+
+  const classes = {};
+  if (!settings?.settings?.global?.style) return classes;
+
+  settings.settings.global.style.forEach((item) => {
+    if (item.id && classMap[item.id]) {
+      const value = item.value !== undefined ? item.value : item.default;
+      if (value !== undefined) {
+        classes[classMap[item.id]] = value;
+      }
+    }
+  });
+
+  return classes;
 }
 
 /**

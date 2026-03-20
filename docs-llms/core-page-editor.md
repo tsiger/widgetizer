@@ -60,6 +60,20 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 6.  The `PreviewPanel`, subscribed to all relevant stores, detects the state change.
 7.  It triggers a master `updatePreview` function located in `src/queries/previewManager.js`. This function intelligently diffs the new state against the previous state and applies only the necessary changes to the preview `<iframe>`. This ensures the preview is always a perfect, up-to-date reflection of the application state and resolves complex ordering and selection bugs.
 
+#### Preview Update Messages
+
+The preview iframe communicates via `postMessage`. For non-structural changes, `updatePreview` sends targeted messages instead of reloading:
+
+| Message | When | What it does |
+|---------|------|-------------|
+| `MORPH_WIDGET` | Widget settings/blocks change | Fetches re-rendered widget HTML and replaces the DOM node |
+| `UPDATE_CSS_VARIABLES` | Theme colors/fonts/scales change | Updates `<style id="theme-settings-styles">` with new CSS variable values |
+| `LOAD_FONTS` | Font picker changes | Injects/updates Google Fonts `<link>` tag |
+| `UPDATE_STYLE_CLASSES` | Theme style settings change (shapes, card style, spacing, etc.) | Swaps body classes (e.g., `corner-sharp` → `corner-rounded`) to activate different CSS rulesets |
+| `UPDATE_WIDGET_SETTINGS` | Simple text/image changes | Optimistic instant feedback before morph completes |
+
+Handlers live in `src/utils/previewRuntime.js` (injected into the iframe).
+
 ### Previewing a Page
 
 The editor provides a way to see a true, live preview of the page, exactly as an end-user would see it, free of any editor UI.

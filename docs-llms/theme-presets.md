@@ -73,12 +73,18 @@ themes/arch/
   "settings": {
     "standard_bg_primary": "#fefbf6",
     "standard_accent": "#c4540a",
-    "heading_font": { "stack": "\"Playfair Display\", serif", "weight": 700 }
+    "heading_font": { "stack": "\"Playfair Display\", serif", "weight": 700 },
+    "corner_style": "rounded",
+    "card_style": "shadow",
+    "spacing_density": "default",
+    "button_shape": "auto"
   }
 }
 ```
 
 Flat map of `setting_id → value`. Applied to the `default` field of matching settings in the project's `theme.json` at creation time. Only specifies what changes — schema stays in base `theme.json`.
+
+Settings can include both visual tokens (colors, fonts) and style settings (shapes, card style, spacing density, etc.). Style settings control body classes that cascade through the CSS design system — see [Theme Design System — Style Classes](theme-design-system.md#style-classes-body-class-pattern).
 
 ### Fallback chain
 

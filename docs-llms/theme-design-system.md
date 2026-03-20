@@ -21,10 +21,11 @@ For widget authoring patterns, see [theming-widgets.md](theming-widgets.md). For
 9. [Block System](#block-system)
 10. [Global Components](#global-components)
 11. [Utility Classes](#utility-classes)
-12. [Scroll Reveal Animations](#scroll-reveal-animations)
-13. [Responsive Breakpoints](#responsive-breakpoints)
-14. [CSS Variable Pipeline](#css-variable-pipeline)
-15. [Widget Template Conventions](#widget-template-conventions)
+12. [Style Classes (Body Class Pattern)](#style-classes-body-class-pattern)
+13. [Scroll Reveal Animations](#scroll-reveal-animations)
+14. [Responsive Breakpoints](#responsive-breakpoints)
+15. [CSS Variable Pipeline](#css-variable-pipeline)
+16. [Widget Template Conventions](#widget-template-conventions)
 
 ---
 
@@ -174,6 +175,20 @@ Section spacing scales automatically via nested media queries inside `:root`.
 | `--border-width-thin`   | `0.1rem` | 1px    |
 | `--border-width-medium` | `0.2rem` | 2px    |
 | `--border-width-thick`  | `0.3rem` | 3px    |
+
+#### Style Tokens (Class-Driven)
+
+These tokens control shapes, card appearance, and spacing density. Unlike other tokens, they are **not** set directly in `:root` — instead, they have default values in `:root` that are overridden by **body classes** applied from the `style` category in `theme.json`. See [Style Classes (Body Class Pattern)](#style-classes-body-class-pattern) below for details.
+
+| Token | Default (`:root`) | Purpose |
+| --- | --- | --- |
+| `--radius-sm` | `0` | Small radius (form inputs, tags, small cards) |
+| `--radius-md` | `0` | Medium radius (cards, images, video embeds) |
+| `--radius-lg` | `0` | Large radius (hero images, bento grids, callouts) |
+| `--radius-button` | `0` | Button border-radius (separate for pill override) |
+| `--card-border` | `var(--border-width-thin) solid var(--border-color)` | Card border style |
+| `--card-shadow` | `none` | Card box-shadow |
+| `--spacing-scale` | `1` | Multiplier applied to card padding and widget container spacing |
 
 #### Color Tokens (Dynamic)
 
@@ -718,12 +733,15 @@ Loaded globally via `layout.liquid`. Auto-initializes all `.carousel-container` 
   display: flex;
   flex-direction: column;
   background-color: var(--bg-primary);
-  border: var(--border-width-thin) solid var(--border-color);
-  padding: var(--space-lg); /* 24px mobile */
-  /* Responsive: --space-xl @750px, --space-2xl @990px */
-  transition: border-color var(--transition-speed-normal);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--radius-md);
+  padding: calc(var(--space-lg) * var(--spacing-scale)); /* Responsive, scaled by density */
+  transition: border-color var(--transition-speed-normal), box-shadow var(--transition-speed-normal);
 }
 ```
+
+Card appearance is driven by the [style tokens](#style-tokens-class-driven) (`--card-border`, `--card-shadow`, `--radius-md`, `--spacing-scale`), which are set by body classes from theme style settings.
 
 #### Card Sub-Components
 
@@ -754,6 +772,7 @@ The default button is a **secondary** (outlined) style:
   background-color: transparent;
   color: var(--text-content);
   border: var(--border-width-medium) solid var(--accent);
+  border-radius: var(--radius-button);
   transition: all 0.3s;
 }
 .widget-button:hover {
@@ -761,6 +780,8 @@ The default button is a **secondary** (outlined) style:
   color: var(--accent-text);
 }
 ```
+
+Button border-radius is driven by the `--radius-button` [style token](#style-tokens-class-driven), which responds to the `corner-*` and `buttons-*` body classes.
 
 #### Button Variants
 
@@ -951,6 +972,90 @@ For displaying lists of features or benefits:
 | ------------------ | ----------------------------------------------------------------------------------- |
 | `.visually-hidden` | Hides element visually but keeps it accessible to screen readers (1px clip rect)    |
 | `.skip-link`       | Hidden by default, becomes visible on focus — positioned absolute with z-index 9999 |
+
+---
+
+## Style Classes (Body Class Pattern)
+
+The Arch theme uses **body classes** to implement global style settings that affect shapes, card appearance, spacing density, heading treatment, and button shape. These classes are applied to `<body>` in `layout.liquid` based on theme settings from the `style` category in `theme.json`.
+
+### How It Works
+
+1. **`theme.json`** defines select settings in the `style` category (e.g., `corner_style`, `card_style`, `spacing_density`)
+2. **`layout.liquid`** renders body classes from setting values: `corner-{{ theme.style.corner_style | default: 'sharp' }}`
+3. **`base.css`** defines class-based rulesets that override the default `:root` tokens
+4. **Live preview**: The `UPDATE_STYLE_CLASSES` message swaps body classes without a full page reload (see [Page Editor docs](core-page-editor.md))
+
+### Setting-to-Class Mapping
+
+| Setting ID (`theme.json`) | Body Class Prefix | Default Value | Options |
+| --- | --- | --- | --- |
+| `corner_style` | `corner-` | `sharp` | `sharp`, `slightly-rounded`, `rounded` |
+| `card_style` | `cards-` | `bordered` | `bordered`, `shadow`, `flat` |
+| `spacing_density` | `spacing-` | `default` | `compact`, `default`, `airy` |
+| `button_shape` | `buttons-` | `auto` | `auto`, `pill`, `sharp` |
+
+### Class Rulesets
+
+#### Shapes (`corner-*`)
+
+| Class | Effect |
+| --- | --- |
+| `corner-sharp` (default) | All radii `0` — square corners everywhere |
+| `corner-slightly-rounded` | `--radius-sm: 0.4rem`, `--radius-md: 0.8rem`, `--radius-lg: 1.2rem`, `--radius-button: 0.4rem` |
+| `corner-rounded` | `--radius-sm: 0.8rem`, `--radius-md: 1.6rem`, `--radius-lg: 2.4rem`, `--radius-button: 0.8rem` |
+
+#### Content Boxes (`cards-*`)
+
+| Class | Effect |
+| --- | --- |
+| `cards-bordered` (default) | `--card-border` with standard border, `--card-shadow: none` |
+| `cards-shadow` | `--card-border: none`, `--card-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)` |
+| `cards-flat` | `--card-border: none`, `--card-shadow: none` (uses `--bg-secondary` background) |
+
+#### Layout Density (`spacing-*`)
+
+| Class | Effect |
+| --- | --- |
+| `spacing-compact` | `--spacing-scale: 0.85` — tighter card padding and widget spacing |
+| `spacing-default` | `--spacing-scale: 1` — standard spacing |
+| `spacing-airy` | `--spacing-scale: 1.2` — more generous breathing room |
+
+#### Button Shape (`buttons-*`)
+
+| Class | Effect |
+| --- | --- |
+| `buttons-auto` (default) | Buttons use `--radius-button` from the active `corner-*` class |
+| `buttons-pill` | `--radius-button: 99rem` — fully rounded pill buttons regardless of corner setting |
+| `buttons-sharp` | `--radius-button: 0` — square buttons regardless of corner setting |
+
+### Consuming Style Tokens in Widgets
+
+Widgets should reference the style tokens rather than hardcoding values:
+
+```css
+/* Correct — responds to style settings */
+.my-card {
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--radius-md);
+  padding: calc(var(--space-lg) * var(--spacing-scale));
+}
+
+.my-button {
+  border-radius: var(--radius-button);
+}
+
+.my-image {
+  border-radius: var(--radius-lg);
+}
+
+/* Wrong — hardcoded, ignores user's style choices */
+.my-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+```
 
 ---
 

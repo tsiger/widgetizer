@@ -3022,6 +3022,50 @@
         }
       }
     },
+    "style": {
+      "name": "Style",
+      "settings": {
+        "style_header": {
+          "label": "Visual Style"
+        },
+        "corner_style": {
+          "label": "Shapes",
+          "description": "Controls the roundness of buttons, cards, images, and form fields",
+          "options": {
+            "sharp": "Sharp",
+            "slightly_rounded": "Slightly rounded",
+            "rounded": "Rounded"
+          }
+        },
+        "card_style": {
+          "label": "Content boxes",
+          "description": "How content sections are visually separated",
+          "options": {
+            "bordered": "Bordered",
+            "shadow": "Shadow",
+            "flat": "Flat"
+          }
+        },
+        "spacing_density": {
+          "label": "Layout density",
+          "description": "Controls the amount of whitespace between sections and elements",
+          "options": {
+            "compact": "Compact",
+            "default": "Default",
+            "airy": "Airy"
+          }
+        },
+        "button_shape": {
+          "label": "Button shape",
+          "description": "Override corner shape specifically for buttons",
+          "options": {
+            "auto": "Same as corner shape",
+            "pill": "Pill",
+            "sharp": "Sharp"
+          }
+        }
+      }
+    },
     "social": {
       "name": "Social",
       "settings": {

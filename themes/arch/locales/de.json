@@ -3022,6 +3022,50 @@
         }
       }
     },
+    "style": {
+      "name": "Stil",
+      "settings": {
+        "style_header": {
+          "label": "Visueller Stil"
+        },
+        "corner_style": {
+          "label": "Formen",
+          "description": "Steuert die Rundung von Buttons, Karten, Bildern und Formularfeldern",
+          "options": {
+            "sharp": "Eckig",
+            "slightly_rounded": "Leicht abgerundet",
+            "rounded": "Abgerundet"
+          }
+        },
+        "card_style": {
+          "label": "Inhaltsboxen",
+          "description": "Wie Inhaltsblöcke visuell getrennt werden",
+          "options": {
+            "bordered": "Mit Rahmen",
+            "shadow": "Schatten",
+            "flat": "Flach"
+          }
+        },
+        "spacing_density": {
+          "label": "Layoutdichte",
+          "description": "Steuert den Leerraum zwischen Abschnitten und Elementen",
+          "options": {
+            "compact": "Kompakt",
+            "default": "Standard",
+            "airy": "Luftig"
+          }
+        },
+        "button_shape": {
+          "label": "Buttonform",
+          "description": "Eckenform speziell für Buttons überschreiben",
+          "options": {
+            "auto": "Wie Eckenform",
+            "pill": "Pillenform",
+            "sharp": "Eckig"
+          }
+        }
+      }
+    },
     "social": {
       "name": "Soziale Medien",
       "settings": {

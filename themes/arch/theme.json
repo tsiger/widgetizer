@@ -217,6 +217,97 @@
           "outputAsCssVar": true
         }
       ],
+      "style": [
+        {
+          "type": "header",
+          "id": "style_header",
+          "label": "tTheme:global.style.settings.style_header.label"
+        },
+        {
+          "type": "select",
+          "id": "corner_style",
+          "label": "tTheme:global.style.settings.corner_style.label",
+          "description": "tTheme:global.style.settings.corner_style.description",
+          "default": "sharp",
+          "options": [
+            {
+              "value": "sharp",
+              "label": "tTheme:global.style.settings.corner_style.options.sharp"
+            },
+            {
+              "value": "slightly-rounded",
+              "label": "tTheme:global.style.settings.corner_style.options.slightly_rounded"
+            },
+            {
+              "value": "rounded",
+              "label": "tTheme:global.style.settings.corner_style.options.rounded"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "card_style",
+          "label": "tTheme:global.style.settings.card_style.label",
+          "description": "tTheme:global.style.settings.card_style.description",
+          "default": "bordered",
+          "options": [
+            {
+              "value": "bordered",
+              "label": "tTheme:global.style.settings.card_style.options.bordered"
+            },
+            {
+              "value": "shadow",
+              "label": "tTheme:global.style.settings.card_style.options.shadow"
+            },
+            {
+              "value": "flat",
+              "label": "tTheme:global.style.settings.card_style.options.flat"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "spacing_density",
+          "label": "tTheme:global.style.settings.spacing_density.label",
+          "description": "tTheme:global.style.settings.spacing_density.description",
+          "default": "default",
+          "options": [
+            {
+              "value": "compact",
+              "label": "tTheme:global.style.settings.spacing_density.options.compact"
+            },
+            {
+              "value": "default",
+              "label": "tTheme:global.style.settings.spacing_density.options.default"
+            },
+            {
+              "value": "airy",
+              "label": "tTheme:global.style.settings.spacing_density.options.airy"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "button_shape",
+          "label": "tTheme:global.style.settings.button_shape.label",
+          "description": "tTheme:global.style.settings.button_shape.description",
+          "default": "auto",
+          "options": [
+            {
+              "value": "auto",
+              "label": "tTheme:global.style.settings.button_shape.options.auto"
+            },
+            {
+              "value": "pill",
+              "label": "tTheme:global.style.settings.button_shape.options.pill"
+            },
+            {
+              "value": "sharp",
+              "label": "tTheme:global.style.settings.button_shape.options.sharp"
+            }
+          ]
+        }
+      ],
       "social": [
         {
           "type": "header",

@@ -96,6 +96,22 @@ function loadFonts(fontsMetadata) {
   link.href = url;
 }
 
+function updateStyleClasses(styleClasses) {
+  Object.entries(styleClasses).forEach(([prefix, value]) => {
+    // Remove all existing classes with this prefix from body
+    const toRemove = [];
+    document.body.classList.forEach((cls) => {
+      if (cls.startsWith(prefix + "-")) {
+        toRemove.push(cls);
+      }
+    });
+    toRemove.forEach((cls) => document.body.classList.remove(cls));
+
+    // Add the new class
+    document.body.classList.add(`${prefix}-${value}`);
+  });
+}
+
 // ── Selection + Scroll State ────────────────────────────────────────────────
 
 let currentSelectedWidgetId = null;
@@ -735,6 +751,9 @@ function handleMessage(event) {
       break;
     case "LOAD_FONTS":
       loadFonts(payload);
+      break;
+    case "UPDATE_STYLE_CLASSES":
+      updateStyleClasses(payload);
       break;
     case "SCROLL_TO_WIDGET":
       scrollToWidget(payload.widgetId);

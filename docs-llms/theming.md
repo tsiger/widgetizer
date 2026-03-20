@@ -275,6 +275,19 @@ The `settings.global` object defines customizable options organized into logical
 
 The `theme` object structure follows your `theme.json` groups and setting IDs: `theme.{group}.{setting_id}`.
 
+### Style Settings (Body Class Pattern)
+
+Some global settings don't output CSS variables — instead they add **classes to `<body>`** that activate CSS rulesets. This is used for the `style` settings group:
+
+| Setting ID | Body class pattern | Options |
+|---|---|---|
+| `corner_style` | `corner-{value}` | `sharp`, `slightly-rounded`, `rounded` |
+| `card_style` | `cards-{value}` | `bordered`, `shadow`, `flat` |
+| `spacing_density` | `spacing-{value}` | `compact`, `default`, `airy` |
+| `button_shape` | `buttons-{value}` | `auto`, `pill`, `sharp` |
+
+These classes set CSS custom properties (e.g., `--radius-sm`, `--card-border`, `--spacing-scale`) which are consumed by component selectors in `base.css`. In the page editor, changes are reflected live via the `UPDATE_STYLE_CLASSES` postMessage to the preview iframe.
+
 For complete details on all available setting types and their properties, see the [Setting Types Reference](theming-setting-types.md).
 
 ## 4. Layout Template (layout.liquid)
@@ -298,7 +311,7 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
     {% custom_css %}            <!-- Custom CSS from theme settings (optional) -->
     {% custom_head_scripts %}   <!-- Custom scripts for head (e.g., Google Analytics) (optional) -->
 </head>
-<body class="{{ body_class }}">
+<body class="{{ body_class }} corner-{{ theme.style.corner_style | default: 'sharp' }} cards-{{ theme.style.card_style | default: 'bordered' }} spacing-{{ theme.style.spacing_density | default: 'default' }} buttons-{{ theme.style.button_shape | default: 'auto' }}">
     {{ header }}                <!-- Global header widget -->
 
     <main id="main-content">

@@ -240,6 +240,23 @@ img {
 
   --heading-scale: calc(var(--typography-heading_scale, 100) / 100);
   --body-scale: calc(var(--typography-body_scale, 100) / 100);
+
+  /* --------------------------------------------------------------------------
+     2.13 Style Tokens (driven by body classes)
+     -------------------------------------------------------------------------- */
+
+  /* Corner radius */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-button: 0;
+
+  /* Card presentation */
+  --card-border: var(--border-width-thin) solid var(--border-color);
+  --card-shadow: none;
+
+  /* Spacing density */
+  --spacing-scale: 1;
 }
 
 /* ==========================================================================
@@ -276,6 +293,66 @@ img {
   --accent: var(--colors-highlight_accent, #de1877);
   --accent-text: var(--colors-highlight_accent_text, #ffffff);
   --rating-star-color: var(--colors-highlight_rating_star, #fbbf24);
+}
+
+/* ==========================================================================
+   3.5 STYLE MODIFIERS (driven by body classes from theme settings)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   3.5.1 Corner Styles
+   -------------------------------------------------------------------------- */
+
+.corner-slightly-rounded {
+  --radius-sm: 0.4rem;
+  --radius-md: 0.6rem;
+  --radius-lg: 0.8rem;
+  --radius-button: 0.4rem;
+}
+
+.corner-rounded {
+  --radius-sm: 0.6rem;
+  --radius-md: 1.2rem;
+  --radius-lg: 1.6rem;
+  --radius-button: 0.8rem;
+}
+
+/* --------------------------------------------------------------------------
+   3.5.2 Button Shape Overrides
+   -------------------------------------------------------------------------- */
+
+.buttons-pill {
+  --radius-button: 99rem;
+}
+
+.buttons-sharp {
+  --radius-button: 0;
+}
+
+/* --------------------------------------------------------------------------
+   3.5.3 Card Styles
+   -------------------------------------------------------------------------- */
+
+.cards-shadow {
+  --card-border: none;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.cards-flat {
+  --card-border: none;
+  --card-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   3.5.4 Spacing Density
+   -------------------------------------------------------------------------- */
+
+.spacing-compact {
+  --spacing-scale: 0.8;
+}
+
+.spacing-airy {
+  --spacing-scale: 1.25;
 }
 
 /* ==========================================================================
@@ -641,13 +718,13 @@ b {
   width: 100%;
   max-width: var(--container-max-width);
   margin-inline: auto;
-  margin-block: var(--section-padding-block);
+  margin-block: calc(var(--section-padding-block) * var(--spacing-scale));
 }
 
 /* Padded variant: for widgets with different background (padding so background fills) */
 .widget-container-padded {
   margin-block: 0;
-  padding-block: var(--section-padding-block);
+  padding-block: calc(var(--section-padding-block) * var(--spacing-scale));
 }
 
 /* --------------------------------------------------------------------------
@@ -660,7 +737,7 @@ b {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-block-end: var(--space-2xl);
+  margin-block-end: calc(var(--space-2xl) * var(--spacing-scale));
   gap: var(--space-sm);
 
   & > * {
@@ -817,22 +894,26 @@ b {
   display: flex;
   flex-direction: column;
   background-color: var(--bg-primary);
-  border: var(--border-width-thin) solid var(--border-color);
-  padding: var(--space-lg);
-  transition: border-color var(--transition-speed-normal);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--radius-md);
+  padding: calc(var(--space-lg) * var(--spacing-scale));
+  transition: border-color var(--transition-speed-normal), box-shadow var(--transition-speed-normal);
 
   @media (min-width: 750px) {
-    padding: var(--space-xl);
+    padding: calc(var(--space-xl) * var(--spacing-scale));
   }
 
   @media (min-width: 990px) {
-    padding: var(--space-2xl);
+    padding: calc(var(--space-2xl) * var(--spacing-scale));
   }
 }
 
 /* Card variants */
 .widget-card-flat {
   background-color: var(--bg-secondary);
+  border: none;
+  box-shadow: none;
 }
 
 /* Card Header */
@@ -866,6 +947,7 @@ b {
   height: auto;
   aspect-ratio: 16/9;
   object-fit: cover;
+  border-radius: var(--radius-md);
   margin-block-end: var(--space-lg);
 }
 
@@ -926,6 +1008,7 @@ b {
   height: 4rem;
   background-color: var(--bg-primary);
   border: var(--border-width-medium) solid var(--border-color);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background-color 0.3s, border-color 0.3s;
   z-index: 2;
@@ -1017,6 +1100,7 @@ b {
   background-color: transparent;
   color: var(--text-content);
   border: var(--border-width-medium) solid var(--accent);
+  border-radius: var(--radius-button);
   text-decoration: none;
   cursor: pointer;
   transition: all 0.3s;
@@ -1113,6 +1197,7 @@ b {
   font-size: calc(var(--font-size-base) * var(--body-scale));
   font-family: inherit;
   border: var(--border-width-thin) solid var(--border-color);
+  border-radius: var(--radius-sm);
   background-color: var(--bg-primary);
   color: var(--text-content);
   transition: border-color 0.3s;
@@ -1178,6 +1263,7 @@ b {
   color: var(--text-content);
   background-color: var(--bg-primary);
   border: var(--border-width-thin) solid var(--border-color);
+  border-radius: var(--radius-sm);
   transition: border-color 0.3s;
 
   &:hover {
