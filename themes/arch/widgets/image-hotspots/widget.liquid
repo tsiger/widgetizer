@@ -15,6 +15,8 @@
       & .image-hotspots-wrapper {
         position: relative;
         border: var(--border-width-thin) solid var(--border-color);
+        border-radius: var(--radius-md);
+        overflow: hidden;
       }
 
       & .image-hotspots-image {
@@ -91,6 +93,7 @@
         max-width: calc(100vw - var(--space-xl));
         background-color: var(--bg-primary);
         border: var(--border-width-thin) solid var(--border-color);
+        border-radius: var(--radius-sm);
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.3s, visibility 0.3s;
@@ -126,6 +129,7 @@
         max-width: none;
         transform: none;
         border: var(--border-width-thin) solid var(--border-color);
+        border-radius: var(--radius-sm);
         margin-block-start: var(--space-sm);
 
         &::before,

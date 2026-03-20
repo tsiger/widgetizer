@@ -27,6 +27,10 @@
       & .image-wrapper {
         width: 100%;
         display: block;
+        {% unless widget.settings.fullwidth %}
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        {% endunless %}
 
         & img {
           width: 100%;
@@ -39,6 +43,10 @@
         display: block;
         width: 100%;
         text-decoration: none;
+        {% unless widget.settings.fullwidth %}
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        {% endunless %}
 
         &:hover img {
           opacity: 0.9;

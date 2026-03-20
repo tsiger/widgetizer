@@ -12,6 +12,7 @@
   &.slideshow-constrained {
     max-width: var(--container-max-width);
     margin-inline: auto;
+    border-radius: var(--radius-lg);
   }
 
   & .slideshow-track {
