@@ -39,10 +39,13 @@ themes/arch/
 ├── layout.liquid       # Master HTML template (loads all assets)
 ├── assets/
 │   ├── base.css        # Design system: tokens, resets, components, utilities
-│   ├── scripts.js      # Core JS (header, navigation)
+│   ├── scripts.js      # Core JS (header, navigation, sticky header scroll behavior)
 │   ├── reveal.js       # Scroll reveal animation engine
-│   └── carousel.js     # Carousel initialization and navigation
-├── widgets/            # 41 widget components
+│   ├── carousel.js     # Carousel initialization and navigation
+│   ├── lightbox.js     # Lightbox for gallery image viewing
+│   ├── masonry.js      # Masonry layout for gallery widgets
+│   └── video-modal.js  # Video popup modal (YouTube/Vimeo)
+├── widgets/            # 42 page widget components + 2 global
 │   ├── accordion/
 │   ├── banner/
 │   ├── card-grid/
@@ -73,7 +76,7 @@ Defined in `layout.liquid`, assets load in this sequence:
 7. `{% custom_head_scripts %}` — User's head scripts
 8. `{% header_assets %}` — Widget-enqueued CSS/JS
 9. Page content (header, main, footer)
-10. `{% asset src: "scripts.js", defer: true %}` — Core JS
+10. `{% asset src: "scripts.js", defer: true %}` — Core JS (header, navigation, sticky header scroll behavior, `--header-sticky-offset` CSS variable)
 11. `{% asset src: "reveal.js", defer: true %}` — Reveal animations (conditional)
 12. `{% footer_assets %}` — Widget-enqueued footer assets (e.g., `carousel.js` when carousel widgets are present)
 13. `{% custom_footer_scripts %}` — User's footer scripts
@@ -886,12 +889,34 @@ The header is a global widget with responsive behavior:
 - Desktop CTA button visible
 - Contact info visible in header bar
 
-#### Header Modifiers
+Modifiers: `.header-sticky`, `.header-scrolled`.
 
-| Class              | Effect                                                                   |
-| ------------------ | ------------------------------------------------------------------------ |
-| `.header-sticky`   | `position: sticky; top: 0; z-index: 999;` with `--bg-primary` background |
-| `.header-scrolled` | Adds `box-shadow: 0 2px 8px rgba(0,0,0,0.1)` — applied via JS on scroll  |
+#### Transparent Header
+
+The header supports a transparent overlay mode for hero-type widgets. When enabled, the header sits on top of the first widget rather than above it.
+
+**How it works:**
+
+1. The header schema has a `transparent_on_hero` checkbox setting
+2. Widgets declare support via `"supportsTransparentHeader": true` in their `schema.json`
+3. The backend checks the first widget on each page — if it supports transparent header and the setting is enabled, a `transparent-header` class is added to `<body>`
+4. CSS rules in `base.css` handle the visual states
+
+**Supporting widgets (Arch theme):** banner, slideshow, video-popup.
+
+**CSS states:**
+
+| Selector | Behavior |
+|----------|----------|
+| `.transparent-header .widget-site-header:not(.header-sticky)` | Absolute positioning, scrolls away with page |
+| `.transparent-header .widget-site-header.header-sticky:not(.header-scrolled)` | Fixed, transparent background |
+| `.transparent-header .widget-site-header.header-sticky.header-scrolled` | Fixed, solid background (normal header appearance) |
+
+**Colors:** The transparent state uses the highlight color scheme variables (`--colors-highlight_text_heading`, `--colors-highlight_accent`, etc.) without a background, ensuring consistency with the theme's color configuration.
+
+**Transparent logo:** An optional `transparent_logo` image setting allows a light logo variant to display when the header is transparent. CSS toggles `.header-logo-default` / `.header-logo-transparent` visibility based on the header state.
+
+**First widget padding:** `.transparent-header .main-content > :first-child` receives `padding-block-start: var(--header-sticky-offset)` to compensate for the overlapping header.
 
 #### Navigation Structure
 
@@ -1365,17 +1390,6 @@ Apply `.reveal` + direction class to elements, with staggered delays using `--re
 
 ## Available Widgets (Arch Theme)
 
-The Arch theme ships with 41 widgets organized by purpose:
-
-**Heroes & Banners**: banner, slideshow, split-hero, image-callout
-**Content**: rich-text, image-text, features-split, content-switcher
-**Cards & Grids**: card-grid, icon-card-grid, numbered-cards, bento-grid, profile-grid, project-showcase
-**Data & Lists**: accordion, comparison-table, icon-list, key-figures, pricing, priced-list, schedule-table, job-listing, event-list
-**Media**: image, gallery, masonry-gallery, video-embed, comparison-slider, image-hotspots, image-tabs
-**Social & Trust**: testimonials, testimonial-hero, logo-cloud, trust-bar, social-icons
-**Interactive**: countdown, map, embed
-**Forms**: contact-form
-**Timeline**: timeline
-**Global**: header (global), footer (global)
+44 widgets (42 page + 2 global): accordion, banner, bento-grid, card-grid, comparison-slider, comparison-table, contact-form, content-switcher, countdown, embed, event-list, features-split, gallery, icon-card-grid, icon-list, image, image-callout, image-hotspots, image-tabs, image-text, job-listing, key-figures, logo-cloud, map, masonry-gallery, numbered-cards, priced-list, pricing, profile-grid, project-showcase, rich-text, schedule-table, slideshow, social-icons, split-content, split-hero, testimonial-hero, testimonials, timeline, trust-bar, video-embed, video-popup, header (global), footer (global).
 
 Many card-based widgets (card-grid, icon-card-grid, profile-grid, testimonials, gallery, pricing, icon-list, key-figures, logo-cloud, numbered-cards, project-showcase) support a `layout` setting to switch between grid and carousel display modes. See [Carousel Layout](#carousel-layout) for details.

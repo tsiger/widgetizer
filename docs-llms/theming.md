@@ -77,7 +77,10 @@ A theme is organized as a directory with the following structure:
 └── assets/                 # Static assets
     ├── base.css            # Theme base styles (design tokens, utilities)
     ├── carousel.js         # Carousel layout logic for card-based widgets
-    ├── scripts.js          # Theme scripts
+    ├── lightbox.js         # Lightbox overlay for gallery image viewing
+    ├── masonry.js          # Masonry layout for gallery widgets
+    ├── video-modal.js      # Video popup modal (YouTube/Vimeo embed)
+    ├── scripts.js          # Theme scripts (header, navigation, sticky scroll)
     └── icons.json          # Icon definitions (optional)
 ```
 
@@ -921,6 +924,16 @@ widgets/
 
 > **Note:** All user-facing strings (`displayName`, `label`, `description`, option labels) use the `tTheme:` prefix to reference entries in the theme's locale files. See [Theme Locales](#theme-locales) for details.
 
+#### Schema Properties
+
+Beyond `type`, `displayName`, `settings`, `blocks`, and `defaultBlocks`, widget schemas support additional top-level properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `aliases` | `string[]` | Alternative names/keywords for the widget selector search |
+| `maxBlocks` | `number` | Maximum number of blocks the widget can contain |
+| `supportsTransparentHeader` | `boolean` | When `true`, the header becomes transparent when this widget is first on a page and the header's "Transparent on hero" setting is enabled |
+
 **Template file (`widget.liquid`):**
 
 ```liquid
@@ -994,6 +1007,7 @@ Global widgets are special widgets that appear on every page of the website. Cur
 - Can reference menu systems via `{% render 'menu', menu: widget.settings.headerNavigation %}`
 - Supports responsive navigation patterns
 - Supports blocks — define block types in `schema.json` with a `blocks` array (e.g., announcement bars, top bar buttons)
+- Supports transparent header overlay on hero widgets (controlled by `transparent_on_hero` and `transparent_logo` settings)
 - Paired with `templates/global/header.json` for default configuration
 
 #### Footer Widget (`widgets/global/footer/`)
@@ -1632,6 +1646,34 @@ The animation system automatically respects the user's `prefers-reduced-motion` 
 
 - **CSS**: Media query sets `.reveal` elements to visible with no transitions
 - **JavaScript**: Immediately adds `.revealed` class to all elements without animation
+
+### Transparent Header
+
+The header can overlay hero-type widgets with a transparent background, creating an immersive full-bleed look.
+
+#### How It Works
+
+1. **Header setting**: The header schema includes a `transparent_on_hero` checkbox. When enabled, the system checks each page's first widget.
+2. **Widget opt-in**: Widgets declare support by adding `"supportsTransparentHeader": true` to their `schema.json`. Only widgets with this flag will trigger the transparent header.
+3. **Body class injection**: The backend (`previewController.js` for editor, `exportController.js` for export) reads the first widget's schema. If it supports transparent header, a `transparent-header` class is added to `<body>`.
+4. **CSS handles the rest**: Rules in `base.css` position the header absolutely/fixed over the first widget, using highlight color scheme variables for text/button colors without a background.
+
+#### Transparent Logo
+
+A `transparent_logo` image setting in the header allows uploading an alternate (typically light) logo. CSS toggles between `.header-logo-default` and `.header-logo-transparent` based on the header state.
+
+#### Sticky + Transparent Interaction
+
+When both sticky header and transparent header are enabled:
+- The header starts fixed and transparent (no background, highlight scheme colors)
+- On scroll past ~10px, `header-scrolled` is added and the header transitions to its normal solid appearance
+- `scripts.js` manages the `--header-sticky-offset` CSS variable for proper spacing
+
+#### Editor Preview
+
+The editor handles transparent header changes live without requiring a full page reload:
+- Toggling `transparent_on_hero` sends an `UPDATE_BODY_CLASS` message to the preview iframe
+- The preview runtime toggles the `transparent-header` class on `<body>` and syncs `header-scrolled` state
 
 ### Responsive Design
 

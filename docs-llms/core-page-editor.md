@@ -70,9 +70,12 @@ The preview iframe communicates via `postMessage`. For non-structural changes, `
 | `UPDATE_CSS_VARIABLES` | Theme colors/fonts/scales change | Updates `<style id="theme-settings-styles">` with new CSS variable values |
 | `LOAD_FONTS` | Font picker changes | Injects/updates Google Fonts `<link>` tag |
 | `UPDATE_STYLE_CLASSES` | Theme style settings change (shapes, card style, spacing, etc.) | Swaps body classes (e.g., `corner-sharp` → `corner-rounded`) to activate different CSS rulesets |
+| `UPDATE_BODY_CLASS` | Header transparent setting changes | Toggles a CSS class on `<body>` (e.g., `transparent-header`) |
 | `UPDATE_WIDGET_SETTINGS` | Simple text/image changes | Optimistic instant feedback before morph completes |
 
 Handlers live in `src/utils/previewRuntime.js` (injected into the iframe).
+
+**Transparent header sync:** When the header's `transparent_on_hero` setting is toggled, the editor sends an `UPDATE_BODY_CLASS` message to add/remove the `transparent-header` class from the iframe's `<body>`. The preview runtime also manages `header-scrolled` state on the header element after morphs, since the theme's scroll listener (`scripts.js`) references the pre-morph element. A persistent scroll listener in the runtime re-queries the current header element from the DOM to keep the transparent/solid transition working correctly.
 
 ### Previewing a Page
 

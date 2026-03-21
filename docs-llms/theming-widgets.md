@@ -1027,6 +1027,7 @@ All user-facing strings in the schema (`displayName`, `label`, `description`, an
   "displayName": "tTheme:my_widget.name",
   "maxBlocks": 10,
   "aliases": ["alternative name", "keyword"],
+  "supportsTransparentHeader": false,
   "settings": [
     // Widget settings here
   ],
@@ -1047,6 +1048,16 @@ All user-facing strings in the schema (`displayName`, `label`, `description`, an
 - `{widget_type}.settings.{setting_id}.options.{value}` -- select/radio option label
 - `{widget_type}.blocks.{block_type}.name` -- block `displayName`
 - `{widget_type}.blocks.{block_type}.settings.{setting_id}.label` -- block setting label
+
+### Transparent Header Support
+
+Widgets can declare themselves as candidates for the transparent header feature by adding `"supportsTransparentHeader": true` to their `schema.json`. When this is set and the widget is the first on a page, the header overlays the widget transparently (if the header's "Transparent on hero" setting is enabled).
+
+- **Property**: `supportsTransparentHeader` (boolean, optional)
+- **Location**: Top level of `schema.json`, same level as `type` and `displayName`
+- **Default**: `false` (omitting the property is equivalent to `false`)
+- **Effect**: When `true` and this widget is first on a page, the backend adds a `transparent-header` class to `<body>`, causing the header to overlay the widget
+- **Typical use**: Full-bleed hero widgets with background images (banners, slideshows, video popups)
 
 ### Block Limits
 

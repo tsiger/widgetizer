@@ -107,6 +107,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
 
 4.  **Render Global Widgets**:
     - The header and footer widgets are rendered once into HTML strings using the `renderingService`. This is done in `"publish"` mode, which ensures that asset paths in the final HTML are relative (e.g., `assets/images/logo.png`) instead of absolute API URLs.
+    - **Transparent header detection**: If the header has `transparent_on_hero` enabled, the export controller checks the first widget on each page. If that widget's `schema.json` declares `"supportsTransparentHeader": true`, a `transparent-header` class is added to the page's `<body>`. This is determined per-page, so only pages whose first widget is a hero type get the transparent header.
 
 5.  **Iterate and Render Pages**:
     - The controller loops through each page of the project. For each page, it: a. Renders all the widgets assigned to that page into a single HTML string. b. Combines the rendered header, page widgets, and footer into the final page content. c. Passes this combined content to the main `layout.liquid` template via the `renderPageLayout` function. d. The final, complete HTML for the page is generated.
