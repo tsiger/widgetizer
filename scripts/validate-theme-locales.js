@@ -1,9 +1,10 @@
 /**
- * Validates theme locale files for completeness.
+ * Validates theme locale files for completeness and correctness.
  *
  * Checks:
  *   1. Every tTheme: key in widget schemas + theme.json exists in en.json
- *   2. Every non-English locale has the same keys as en.json
+ *   2. en.json contains no extra keys that aren't referenced by any schema
+ *   3. Every non-English locale has the same keys as en.json (no missing, no extra)
  *
  * Reads from latest/ snapshot if it exists, otherwise falls back to
  * the base theme directory.
@@ -16,7 +17,11 @@
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
-import { flattenKeys, extractThemeKeys } from "./validate-theme-locales-helpers.js";
+import {
+  flattenKeys,
+  extractThemeKeys,
+  findSchemaFiles,
+} from "./validate-theme-locales-helpers.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const rootDir = join(__dirname, "..");
@@ -53,23 +58,27 @@ function validateTheme(themeName) {
   const schemaKeys = [];
 
   const widgetsDir = join(dir, "widgets");
-  if (existsSync(widgetsDir)) {
-    for (const widget of readdirSync(widgetsDir)) {
-      const schemaPath = join(widgetsDir, widget, "schema.json");
-      if (existsSync(schemaPath)) {
-        const schema = JSON.parse(readFileSync(schemaPath, "utf-8"));
-        schemaKeys.push(...extractThemeKeys(schema));
-      }
-    }
+  for (const schemaPath of findSchemaFiles(widgetsDir)) {
+    const schema = JSON.parse(readFileSync(schemaPath, "utf-8"));
+    schemaKeys.push(...extractThemeKeys(schema));
   }
 
   const themeJsonPath = join(dir, "theme.json");
   if (existsSync(themeJsonPath)) {
     const themeJson = JSON.parse(readFileSync(themeJsonPath, "utf-8"));
     schemaKeys.push(...extractThemeKeys(themeJson));
+
+    // Section names are resolved dynamically in the frontend via
+    // tTheme("tTheme:global.<group>.name"), so add them explicitly.
+    if (themeJson.settings?.global) {
+      for (const groupKey of Object.keys(themeJson.settings.global)) {
+        schemaKeys.push(`global.${groupKey}.name`);
+      }
+    }
   }
 
   const uniqueSchemaKeys = [...new Set(schemaKeys)];
+  const schemaKeySet = new Set(uniqueSchemaKeys);
 
   // Load en.json
   const localesDir = join(dir, "locales");
@@ -116,6 +125,21 @@ function validateTheme(themeName) {
     console.log(
       `  ✓ All ${uniqueSchemaKeys.length} tTheme: keys present in en.json`,
     );
+  }
+
+  // ── Check 1b: en.json has no extra keys absent from schemas ────────
+
+  const extraInEn = [...enKeys].filter((k) => !schemaKeySet.has(k));
+  if (extraInEn.length > 0) {
+    hasErrors = true;
+    console.error(
+      `  ✗ ${extraInEn.length} extra key(s) in en.json not referenced by any schema:`,
+    );
+    for (const k of extraInEn) {
+      console.error(`    + ${k}`);
+    }
+  } else {
+    console.log(`  ✓ en.json has no orphaned keys`);
   }
 
   // ── Check 2: Non-English locales match en.json keys ───────────────

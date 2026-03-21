@@ -616,6 +616,20 @@
           "standard": "Estándar",
           "highlight": "Resaltado"
         }
+      },
+      "background_header": {
+        "label": "Fondo"
+      },
+      "image": {
+        "label": "Imagen de fondo"
+      },
+      "overlay_color": {
+        "label": "Color de superposición",
+        "description": "Color de tinte sobre la imagen de fondo."
+      },
+      "form_bg_color": {
+        "label": "Fondo del formulario",
+        "description": "Color de fondo de la tarjeta del formulario cuando se establece una imagen de fondo."
       }
     },
     "blocks": {
@@ -1060,16 +1074,72 @@
   "footer": {
     "name": "Pie de página",
     "settings": {
-      "content_header": { "label": "Contenido" },
-      "copyright": { "label": "Texto de derechos de autor" },
-      "display_header": { "label": "Visualización" },
-      "color_scheme": { "label": "Esquema de colores", "options": { "standard": "Estándar", "highlight": "Resaltado" } }
+      "content_header": {
+        "label": "Contenido"
+      },
+      "copyright": {
+        "label": "Texto de derechos de autor"
+      },
+      "display_header": {
+        "label": "Visualización"
+      },
+      "color_scheme": {
+        "label": "Esquema de colores",
+        "options": {
+          "standard": "Estándar",
+          "highlight": "Resaltado"
+        }
+      }
     },
     "blocks": {
-      "logo_text": { "name": "Logo y texto", "settings": { "logo_text": { "label": "Texto del logo" }, "logo": { "label": "Imagen del logo" }, "logo_width": { "label": "Ancho del logo" }, "text": { "label": "Texto" } } },
-      "text_block": { "name": "Texto", "settings": { "title": { "label": "Título" }, "text": { "label": "Texto" } } },
-      "menu_block": { "name": "Menú", "settings": { "title": { "label": "Título" }, "menu": { "label": "Menú de navegación", "description": "Selecciona el menú a mostrar" } } },
-      "social_block": { "name": "Iconos sociales", "settings": { "title": { "label": "Título" } } }
+      "logo_text": {
+        "name": "Logo y texto",
+        "settings": {
+          "logo_text": {
+            "label": "Texto del logo"
+          },
+          "logo": {
+            "label": "Imagen del logo"
+          },
+          "logo_width": {
+            "label": "Ancho del logo"
+          },
+          "text": {
+            "label": "Texto"
+          }
+        }
+      },
+      "text_block": {
+        "name": "Texto",
+        "settings": {
+          "title": {
+            "label": "Título"
+          },
+          "text": {
+            "label": "Texto"
+          }
+        }
+      },
+      "menu_block": {
+        "name": "Menú",
+        "settings": {
+          "title": {
+            "label": "Título"
+          },
+          "menu": {
+            "label": "Menú de navegación",
+            "description": "Selecciona el menú a mostrar"
+          }
+        }
+      },
+      "social_block": {
+        "name": "Iconos sociales",
+        "settings": {
+          "title": {
+            "label": "Título"
+          }
+        }
+      }
     }
   },
   "gallery": {
@@ -1804,7 +1874,9 @@
       "icon": {
         "name": "Icono",
         "settings": {
-          "icon": { "label": "Icono" },
+          "icon": {
+            "label": "Icono"
+          },
           "style": {
             "label": "Estilo del icono",
             "options": {
@@ -2184,6 +2256,52 @@
       }
     }
   },
+  "numbered_service_list": {
+    "name": "Lista numerada de servicios",
+    "blocks": {
+      "service": {
+        "name": "Servicio",
+        "settings": {
+          "content_header": {
+            "label": "Contenido"
+          },
+          "title": {
+            "label": "Encabezado"
+          },
+          "description": {
+            "label": "Descripción"
+          },
+          "link": {
+            "label": "Enlace"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Texto superior"
+      },
+      "title": {
+        "label": "Encabezado"
+      },
+      "description": {
+        "label": "Subtítulo"
+      },
+      "display_header": {
+        "label": "Visualización"
+      },
+      "show_dividers": {
+        "label": "Mostrar divisores"
+      },
+      "color_scheme": {
+        "label": "Esquema de colores",
+        "options": {
+          "standard": "Estándar",
+          "highlight": "Resaltado"
+        }
+      }
+    }
+  },
   "priced_list": {
     "name": "Lista de precios",
     "settings": {
@@ -2198,6 +2316,13 @@
       },
       "display_header": {
         "label": "Visualización"
+      },
+      "layout": {
+        "label": "Diseño",
+        "options": {
+          "single-column": "Una columna",
+          "two-column": "Dos columnas"
+        }
       },
       "color_scheme": {
         "label": "Esquema de colores",
@@ -2803,7 +2928,10 @@
     "settings": {
       "color_scheme": {
         "label": "Esquema de colores",
-        "options": { "standard": "Estándar", "highlight": "Resaltado" }
+        "options": {
+          "standard": "Estándar",
+          "highlight": "Resaltado"
+        }
       },
       "sticky_column": {
         "label": "Columna fija (escritorio)",
@@ -2818,54 +2946,137 @@
       "heading": {
         "name": "Encabezado",
         "settings": {
-          "text": { "label": "Texto" },
+          "text": {
+            "label": "Texto"
+          },
           "size": {
             "label": "Tamaño",
-            "options": { "lg": "Grande", "xl": "XL", "2xl": "2XL", "3xl": "3XL", "4xl": "4XL", "5xl": "5XL", "6xl": "6XL", "7xl": "7XL", "8xl": "8XL", "9xl": "9XL" }
+            "options": {
+              "lg": "Grande",
+              "xl": "XL",
+              "2xl": "2XL",
+              "3xl": "3XL",
+              "4xl": "4XL",
+              "5xl": "5XL",
+              "6xl": "6XL",
+              "7xl": "7XL",
+              "8xl": "8XL",
+              "9xl": "9XL"
+            }
           },
           "position": {
             "label": "Columna",
-            "options": { "left": "Izquierda", "right": "Derecha" }
+            "options": {
+              "left": "Izquierda",
+              "right": "Derecha"
+            }
           }
         }
       },
       "text": {
         "name": "Texto",
         "settings": {
-          "text": { "label": "Texto" },
+          "text": {
+            "label": "Texto"
+          },
           "size": {
             "label": "Tamaño",
-            "options": { "sm": "Pequeño", "base": "Predeterminado", "lg": "Grande" }
+            "options": {
+              "sm": "Pequeño",
+              "base": "Predeterminado",
+              "lg": "Grande"
+            }
           },
-          "muted": { "label": "Color atenuado" },
+          "muted": {
+            "label": "Color atenuado"
+          },
           "position": {
             "label": "Columna",
-            "options": { "left": "Izquierda", "right": "Derecha" }
+            "options": {
+              "left": "Izquierda",
+              "right": "Derecha"
+            }
           }
         }
       },
       "button": {
         "name": "Botón",
         "settings": {
-          "link": { "label": "Enlace del botón" },
+          "link": {
+            "label": "Enlace del botón"
+          },
           "style": {
             "label": "Estilo del botón",
-            "options": { "primary": "Primario", "secondary": "Secundario" }
+            "options": {
+              "primary": "Primario",
+              "secondary": "Secundario"
+            }
           },
-          "link_2": { "label": "Segundo enlace del botón" },
+          "link_2": {
+            "label": "Segundo enlace del botón"
+          },
           "style_2": {
             "label": "Segundo estilo del botón",
-            "options": { "primary": "Primario", "secondary": "Secundario" }
+            "options": {
+              "primary": "Primario",
+              "secondary": "Secundario"
+            }
           },
           "size": {
             "label": "Tamaño del botón",
-            "options": { "small": "Pequeño", "medium": "Mediano", "large": "Grande", "xlarge": "Extra Grande" }
+            "options": {
+              "small": "Pequeño",
+              "medium": "Mediano",
+              "large": "Grande",
+              "xlarge": "Extra Grande"
+            }
           },
           "position": {
             "label": "Columna",
-            "options": { "left": "Izquierda", "right": "Derecha" }
+            "options": {
+              "left": "Izquierda",
+              "right": "Derecha"
+            }
           }
         }
+      }
+    }
+  },
+  "scrolling_text": {
+    "name": "Texto desplazable",
+    "settings": {
+      "content_header": {
+        "label": "Contenido"
+      },
+      "text": {
+        "label": "Texto"
+      },
+      "separator": {
+        "label": "Separador"
+      },
+      "display_header": {
+        "label": "Visualización"
+      },
+      "speed": {
+        "label": "Velocidad"
+      },
+      "rotate": {
+        "label": "Ángulo de rotación"
+      },
+      "font_size": {
+        "label": "Tamaño de fuente",
+        "options": {
+          "sm": "Pequeño",
+          "md": "Mediano",
+          "lg": "Grande",
+          "xl": "Muy grande"
+        }
+      },
+      "bg_color": {
+        "label": "Color de fondo"
+      },
+      "text_color": {
+        "label": "Color del texto"
       }
     }
   },

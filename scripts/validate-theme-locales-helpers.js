@@ -1,3 +1,21 @@
+import { readdirSync, existsSync } from "node:fs";
+import { join } from "node:path";
+
+/** Recursively find all schema.json files under a directory. */
+export function findSchemaFiles(dir) {
+  const results = [];
+  if (!existsSync(dir)) return results;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...findSchemaFiles(fullPath));
+    } else if (entry.name === "schema.json") {
+      results.push(fullPath);
+    }
+  }
+  return results;
+}
+
 /** Flatten a nested object into dot-path keys. */
 export function flattenKeys(obj, prefix = "") {
   const keys = [];

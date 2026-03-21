@@ -616,6 +616,20 @@
           "standard": "Standard",
           "highlight": "Evidenza"
         }
+      },
+      "background_header": {
+        "label": "Sfondo"
+      },
+      "image": {
+        "label": "Immagine di sfondo"
+      },
+      "overlay_color": {
+        "label": "Colore sovrapposizione",
+        "description": "Colore di tinta sopra l'immagine di sfondo."
+      },
+      "form_bg_color": {
+        "label": "Sfondo del modulo",
+        "description": "Colore di sfondo della scheda del modulo quando è impostata un'immagine di sfondo."
       }
     },
     "blocks": {
@@ -1060,16 +1074,72 @@
   "footer": {
     "name": "Piè di pagina",
     "settings": {
-      "content_header": { "label": "Contenuto" },
-      "copyright": { "label": "Testo copyright" },
-      "display_header": { "label": "Visualizzazione" },
-      "color_scheme": { "label": "Schema colori", "options": { "standard": "Standard", "highlight": "In evidenza" } }
+      "content_header": {
+        "label": "Contenuto"
+      },
+      "copyright": {
+        "label": "Testo copyright"
+      },
+      "display_header": {
+        "label": "Visualizzazione"
+      },
+      "color_scheme": {
+        "label": "Schema colori",
+        "options": {
+          "standard": "Standard",
+          "highlight": "In evidenza"
+        }
+      }
     },
     "blocks": {
-      "logo_text": { "name": "Logo e testo", "settings": { "logo_text": { "label": "Testo del logo" }, "logo": { "label": "Immagine logo" }, "logo_width": { "label": "Larghezza logo" }, "text": { "label": "Testo" } } },
-      "text_block": { "name": "Testo", "settings": { "title": { "label": "Titolo" }, "text": { "label": "Testo" } } },
-      "menu_block": { "name": "Menu", "settings": { "title": { "label": "Titolo" }, "menu": { "label": "Menu di navigazione", "description": "Seleziona il menu da visualizzare" } } },
-      "social_block": { "name": "Icone social", "settings": { "title": { "label": "Titolo" } } }
+      "logo_text": {
+        "name": "Logo e testo",
+        "settings": {
+          "logo_text": {
+            "label": "Testo del logo"
+          },
+          "logo": {
+            "label": "Immagine logo"
+          },
+          "logo_width": {
+            "label": "Larghezza logo"
+          },
+          "text": {
+            "label": "Testo"
+          }
+        }
+      },
+      "text_block": {
+        "name": "Testo",
+        "settings": {
+          "title": {
+            "label": "Titolo"
+          },
+          "text": {
+            "label": "Testo"
+          }
+        }
+      },
+      "menu_block": {
+        "name": "Menu",
+        "settings": {
+          "title": {
+            "label": "Titolo"
+          },
+          "menu": {
+            "label": "Menu di navigazione",
+            "description": "Seleziona il menu da visualizzare"
+          }
+        }
+      },
+      "social_block": {
+        "name": "Icone social",
+        "settings": {
+          "title": {
+            "label": "Titolo"
+          }
+        }
+      }
     }
   },
   "gallery": {
@@ -1804,7 +1874,9 @@
       "icon": {
         "name": "Icona",
         "settings": {
-          "icon": { "label": "Icona" },
+          "icon": {
+            "label": "Icona"
+          },
           "style": {
             "label": "Stile icona",
             "options": {
@@ -2184,6 +2256,52 @@
       }
     }
   },
+  "numbered_service_list": {
+    "name": "Elenco numerato dei servizi",
+    "blocks": {
+      "service": {
+        "name": "Servizio",
+        "settings": {
+          "content_header": {
+            "label": "Contenuto"
+          },
+          "title": {
+            "label": "Titolo"
+          },
+          "description": {
+            "label": "Descrizione"
+          },
+          "link": {
+            "label": "Link"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Testo sopratitolo"
+      },
+      "title": {
+        "label": "Titolo"
+      },
+      "description": {
+        "label": "Sottotitolo"
+      },
+      "display_header": {
+        "label": "Visualizzazione"
+      },
+      "show_dividers": {
+        "label": "Mostra divisori"
+      },
+      "color_scheme": {
+        "label": "Schema colori",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Evidenza"
+        }
+      }
+    }
+  },
   "priced_list": {
     "name": "Listino prezzi",
     "settings": {
@@ -2198,6 +2316,13 @@
       },
       "display_header": {
         "label": "Visualizzazione"
+      },
+      "layout": {
+        "label": "Layout",
+        "options": {
+          "single-column": "Una colonna",
+          "two-column": "Due colonne"
+        }
       },
       "color_scheme": {
         "label": "Schema colori",
@@ -2803,7 +2928,10 @@
     "settings": {
       "color_scheme": {
         "label": "Schema colori",
-        "options": { "standard": "Standard", "highlight": "Evidenza" }
+        "options": {
+          "standard": "Standard",
+          "highlight": "Evidenza"
+        }
       },
       "sticky_column": {
         "label": "Colonna fissa (desktop)",
@@ -2818,54 +2946,137 @@
       "heading": {
         "name": "Intestazione",
         "settings": {
-          "text": { "label": "Testo" },
+          "text": {
+            "label": "Testo"
+          },
           "size": {
             "label": "Dimensione",
-            "options": { "lg": "Grande", "xl": "XL", "2xl": "2XL", "3xl": "3XL", "4xl": "4XL", "5xl": "5XL", "6xl": "6XL", "7xl": "7XL", "8xl": "8XL", "9xl": "9XL" }
+            "options": {
+              "lg": "Grande",
+              "xl": "XL",
+              "2xl": "2XL",
+              "3xl": "3XL",
+              "4xl": "4XL",
+              "5xl": "5XL",
+              "6xl": "6XL",
+              "7xl": "7XL",
+              "8xl": "8XL",
+              "9xl": "9XL"
+            }
           },
           "position": {
             "label": "Colonna",
-            "options": { "left": "Sinistra", "right": "Destra" }
+            "options": {
+              "left": "Sinistra",
+              "right": "Destra"
+            }
           }
         }
       },
       "text": {
         "name": "Testo",
         "settings": {
-          "text": { "label": "Testo" },
+          "text": {
+            "label": "Testo"
+          },
           "size": {
             "label": "Dimensione",
-            "options": { "sm": "Piccolo", "base": "Predefinito", "lg": "Grande" }
+            "options": {
+              "sm": "Piccolo",
+              "base": "Predefinito",
+              "lg": "Grande"
+            }
           },
-          "muted": { "label": "Colore attenuato" },
+          "muted": {
+            "label": "Colore attenuato"
+          },
           "position": {
             "label": "Colonna",
-            "options": { "left": "Sinistra", "right": "Destra" }
+            "options": {
+              "left": "Sinistra",
+              "right": "Destra"
+            }
           }
         }
       },
       "button": {
         "name": "Pulsante",
         "settings": {
-          "link": { "label": "Link del pulsante" },
+          "link": {
+            "label": "Link del pulsante"
+          },
           "style": {
             "label": "Stile del pulsante",
-            "options": { "primary": "Primario", "secondary": "Secondario" }
+            "options": {
+              "primary": "Primario",
+              "secondary": "Secondario"
+            }
           },
-          "link_2": { "label": "Secondo link del pulsante" },
+          "link_2": {
+            "label": "Secondo link del pulsante"
+          },
           "style_2": {
             "label": "Secondo stile del pulsante",
-            "options": { "primary": "Primario", "secondary": "Secondario" }
+            "options": {
+              "primary": "Primario",
+              "secondary": "Secondario"
+            }
           },
           "size": {
             "label": "Dimensione del pulsante",
-            "options": { "small": "Piccolo", "medium": "Medio", "large": "Grande", "xlarge": "Extra Grande" }
+            "options": {
+              "small": "Piccolo",
+              "medium": "Medio",
+              "large": "Grande",
+              "xlarge": "Extra Grande"
+            }
           },
           "position": {
             "label": "Colonna",
-            "options": { "left": "Sinistra", "right": "Destra" }
+            "options": {
+              "left": "Sinistra",
+              "right": "Destra"
+            }
           }
         }
+      }
+    }
+  },
+  "scrolling_text": {
+    "name": "Testo scorrevole",
+    "settings": {
+      "content_header": {
+        "label": "Contenuto"
+      },
+      "text": {
+        "label": "Testo"
+      },
+      "separator": {
+        "label": "Separatore"
+      },
+      "display_header": {
+        "label": "Visualizzazione"
+      },
+      "speed": {
+        "label": "Velocità"
+      },
+      "rotate": {
+        "label": "Angolo di rotazione"
+      },
+      "font_size": {
+        "label": "Dimensione carattere",
+        "options": {
+          "sm": "Piccolo",
+          "md": "Medio",
+          "lg": "Grande",
+          "xl": "Molto grande"
+        }
+      },
+      "bg_color": {
+        "label": "Colore di sfondo"
+      },
+      "text_color": {
+        "label": "Colore del testo"
       }
     }
   },

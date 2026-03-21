@@ -193,9 +193,9 @@
           "rating": {
             "label": "Rating",
             "options": {
-              "5": "5 Stars",
+              "3": "3 Stars",
               "4": "4 Stars",
-              "3": "3 Stars"
+              "5": "5 Stars"
             }
           }
         }
@@ -379,11 +379,11 @@
         "label": "Eyebrow Text"
       },
       "layout": {
+        "label": "Layout",
         "options": {
           "grid": "Grid",
           "carousel": "Carousel"
-        },
-        "label": "Layout"
+        }
       },
       "columns_desktop": {
         "label": "Desktop columns"
@@ -2316,6 +2316,13 @@
       },
       "display_header": {
         "label": "Display"
+      },
+      "layout": {
+        "label": "Layout",
+        "options": {
+          "single-column": "Single column",
+          "two-column": "Two columns"
+        }
       },
       "color_scheme": {
         "label": "Color Scheme",

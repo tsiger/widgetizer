@@ -32,6 +32,22 @@
     },
     {
       "type": "select",
+      "id": "layout",
+      "label": "tTheme:priced_list.settings.layout.label",
+      "default": "single-column",
+      "options": [
+        {
+          "value": "single-column",
+          "label": "tTheme:priced_list.settings.layout.options.single-column"
+        },
+        {
+          "value": "two-column",
+          "label": "tTheme:priced_list.settings.layout.options.two-column"
+        }
+      ]
+    },
+    {
+      "type": "select",
       "id": "color_scheme",
       "label": "tTheme:priced_list.settings.color_scheme.label",
       "default": "standard",
