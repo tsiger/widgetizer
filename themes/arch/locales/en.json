@@ -2989,6 +2989,44 @@
       }
     }
   },
+  "scrolling_text": {
+    "name": "Scrolling Text",
+    "settings": {
+      "content_header": {
+        "label": "Content"
+      },
+      "text": {
+        "label": "Text"
+      },
+      "separator": {
+        "label": "Separator"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "speed": {
+        "label": "Speed"
+      },
+      "rotate": {
+        "label": "Rotation angle"
+      },
+      "font_size": {
+        "label": "Font size",
+        "options": {
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large",
+          "xl": "Extra Large"
+        }
+      },
+      "bg_color": {
+        "label": "Background color"
+      },
+      "text_color": {
+        "label": "Text color"
+      }
+    }
+  },
   "social_icons": {
     "settings": {
       "icon_size": {

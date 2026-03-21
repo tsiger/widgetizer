@@ -1,0 +1,92 @@
+{
+  "type": "scrolling-text",
+  "displayName": "tTheme:scrolling_text.name",
+  "aliases": [
+    "marquee",
+    "ticker",
+    "scrolling banner",
+    "running text",
+    "text strip"
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "tTheme:scrolling_text.settings.content_header.label"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "tTheme:scrolling_text.settings.text.label",
+      "default": "We build modern brands."
+    },
+    {
+      "type": "text",
+      "id": "separator",
+      "label": "tTheme:scrolling_text.settings.separator.label",
+      "default": "★"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:scrolling_text.settings.display_header.label"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "tTheme:scrolling_text.settings.speed.label",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "rotate",
+      "label": "tTheme:scrolling_text.settings.rotate.label",
+      "min": -15,
+      "max": 15,
+      "step": 1,
+      "default": -5
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "tTheme:scrolling_text.settings.font_size.label",
+      "default": "md",
+      "options": [
+        {
+          "value": "sm",
+          "label": "tTheme:scrolling_text.settings.font_size.options.sm"
+        },
+        {
+          "value": "md",
+          "label": "tTheme:scrolling_text.settings.font_size.options.md"
+        },
+        {
+          "value": "lg",
+          "label": "tTheme:scrolling_text.settings.font_size.options.lg"
+        },
+        {
+          "value": "xl",
+          "label": "tTheme:scrolling_text.settings.font_size.options.xl"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "tTheme:scrolling_text.settings.bg_color.label",
+      "default": "#1e3a8a",
+      "allow_alpha": true
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "tTheme:scrolling_text.settings.text_color.label",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [],
+  "defaultBlocks": []
+}

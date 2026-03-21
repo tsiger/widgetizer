@@ -1,0 +1,108 @@
+{% assign scroll_duration = 21 | minus: widget.settings.speed | times: 3 %}
+{% assign strip_bg = widget.settings.bg_color | default: '#1e3a8a' %}
+{% assign strip_color = widget.settings.text_color | default: '#ffffff' %}
+{% assign strip_rotate = widget.settings.rotate | default: -5 %}
+
+{% case widget.settings.font_size %}
+  {% when 'sm' %}{% assign font_size_val = 'var(--font-size-base)' %}
+  {% when 'lg' %}{% assign font_size_val = 'var(--font-size-2xl)' %}
+  {% when 'xl' %}{% assign font_size_val = 'var(--font-size-3xl)' %}
+  {% else %}{% assign font_size_val = 'var(--font-size-xl)' %}
+{% endcase %}
+
+<section
+  id="{{ widget.id }}"
+  class="widget widget-scrolling-text widget-{{ widget.id }}"
+  style="--strip-bg: {{ strip_bg }}; --strip-color: {{ strip_color }}; --strip-rotate: {{ strip_rotate }}deg; --scroll-duration: {{ scroll_duration }}s; --strip-font-size: {{ font_size_val }};"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="scrolling-text"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    @keyframes scroll-x-{{ widget.id }} {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .widget-{{ widget.id }} {
+      padding-inline: 0;
+      padding-block: 0;
+      margin-block: 0;
+
+      & .scrolling-wrapper {
+        overflow: hidden;
+        padding-block: 6rem;
+      }
+
+      & .scrolling-strip {
+        background: var(--strip-bg);
+        transform: rotate(var(--strip-rotate, 0deg));
+        padding-block: var(--space-lg);
+        overflow: hidden;
+        width: 200%;
+        margin-inline: -50%;
+      }
+
+      & .scrolling-track-inner {
+        display: flex;
+        width: max-content;
+        animation: scroll-x-{{ widget.id }} var(--scroll-duration, 30s) linear infinite;
+      }
+
+      & .scrolling-track {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+      }
+
+      & .scrolling-item {
+        white-space: nowrap;
+        padding-inline: var(--space-xl);
+        color: var(--strip-color);
+        font-size: var(--strip-font-size);
+        font-weight: 600;
+        font-family: var(--font-heading, inherit);
+        letter-spacing: 0.01em;
+      }
+
+      & .scrolling-separator {
+        white-space: nowrap;
+        color: var(--strip-color);
+        font-size: var(--strip-font-size);
+        opacity: 0.6;
+        flex-shrink: 0;
+      }
+    }
+  </style>
+
+  <div class="scrolling-wrapper">
+    <div class="scrolling-strip" aria-label="{{ widget.settings.text }}">
+      <div class="scrolling-track-inner" aria-hidden="true">
+        <div class="scrolling-track">
+          {% for i in (1..20) %}
+            <span class="scrolling-item" data-setting="text">{{ widget.settings.text }}</span>
+            {% if widget.settings.separator != blank %}
+              <span class="scrolling-separator">{{ widget.settings.separator }}</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var widget = document.getElementById('{{ widget.id }}');
+      if (!widget || widget.dataset.initialized) return;
+      widget.dataset.initialized = 'true';
+
+      var inner = widget.querySelector('.scrolling-track-inner');
+      var track = widget.querySelector('.scrolling-track');
+      if (!inner || !track) return;
+
+      var clone = track.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      inner.appendChild(clone);
+    })();
+  </script>
+</section>
