@@ -3819,5 +3819,62 @@
         }
       }
     }
+  },
+  "team_highlight": {
+    "name": "Ανάδειξη Ομάδας",
+    "settings": {
+      "eyebrow": {
+        "label": "Υπέρτιτλος"
+      },
+      "title": {
+        "label": "Επικεφαλίδα"
+      },
+      "description": {
+        "label": "Περιγραφή"
+      },
+      "signature_image": {
+        "label": "Εικόνα υπογραφής"
+      },
+      "display_header": {
+        "label": "Εμφάνιση"
+      },
+      "columns_desktop": {
+        "label": "Στήλες επιφάνειας εργασίας"
+      },
+      "image_ratio": {
+        "label": "Αναλογία εικόνας",
+        "options": {
+          "portrait": "Πορτρέτο",
+          "square": "Τετράγωνο",
+          "auto": "Αυτόματο"
+        }
+      },
+      "color_scheme": {
+        "label": "Χρωματικό σχήμα",
+        "options": {
+          "standard": "Τυπικό",
+          "highlight": "Επισημασμένο"
+        }
+      }
+    },
+    "blocks": {
+      "member": {
+        "name": "Μέλος",
+        "settings": {
+          "photo": {
+            "label": "Φωτογραφία"
+          },
+          "name": {
+            "label": "Όνομα"
+          },
+          "role": {
+            "label": "Ρόλος"
+          },
+          "link": {
+            "label": "Σύνδεσμος"
+          }
+        }
+      }
+    }
   }
 }

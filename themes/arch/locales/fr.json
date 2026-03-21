@@ -3819,5 +3819,62 @@
         }
       }
     }
+  },
+  "team_highlight": {
+    "name": "Équipe en vedette",
+    "settings": {
+      "eyebrow": {
+        "label": "Sur-titre"
+      },
+      "title": {
+        "label": "Titre"
+      },
+      "description": {
+        "label": "Description"
+      },
+      "signature_image": {
+        "label": "Image de signature"
+      },
+      "display_header": {
+        "label": "Affichage"
+      },
+      "columns_desktop": {
+        "label": "Colonnes bureau"
+      },
+      "image_ratio": {
+        "label": "Ratio d image",
+        "options": {
+          "portrait": "Portrait",
+          "square": "Carré",
+          "auto": "Automatique"
+        }
+      },
+      "color_scheme": {
+        "label": "Schéma de couleurs",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Mis en avant"
+        }
+      }
+    },
+    "blocks": {
+      "member": {
+        "name": "Membre",
+        "settings": {
+          "photo": {
+            "label": "Photo"
+          },
+          "name": {
+            "label": "Nom"
+          },
+          "role": {
+            "label": "Rôle"
+          },
+          "link": {
+            "label": "Lien"
+          }
+        }
+      }
+    }
   }
 }

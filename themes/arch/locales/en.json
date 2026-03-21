@@ -3819,5 +3819,62 @@
         }
       }
     }
+  },
+  "team_highlight": {
+    "name": "Team Highlight",
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Description"
+      },
+      "signature_image": {
+        "label": "Signature image"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "image_ratio": {
+        "label": "Image ratio",
+        "options": {
+          "portrait": "Portrait",
+          "square": "Square",
+          "auto": "Auto"
+        }
+      },
+      "color_scheme": {
+        "label": "Color scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "member": {
+        "name": "Member",
+        "settings": {
+          "photo": {
+            "label": "Photo"
+          },
+          "name": {
+            "label": "Name"
+          },
+          "role": {
+            "label": "Role"
+          },
+          "link": {
+            "label": "Link"
+          }
+        }
+      }
+    }
   }
 }

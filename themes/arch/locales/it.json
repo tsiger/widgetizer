@@ -3819,5 +3819,62 @@
         }
       }
     }
+  },
+  "team_highlight": {
+    "name": "Team in evidenza",
+    "settings": {
+      "eyebrow": {
+        "label": "Sopratitolo"
+      },
+      "title": {
+        "label": "Titolo"
+      },
+      "description": {
+        "label": "Descrizione"
+      },
+      "signature_image": {
+        "label": "Immagine firma"
+      },
+      "display_header": {
+        "label": "Visualizzazione"
+      },
+      "columns_desktop": {
+        "label": "Colonne desktop"
+      },
+      "image_ratio": {
+        "label": "Proporzione immagine",
+        "options": {
+          "portrait": "Ritratto",
+          "square": "Quadrato",
+          "auto": "Automatico"
+        }
+      },
+      "color_scheme": {
+        "label": "Schema colori",
+        "options": {
+          "standard": "Standard",
+          "highlight": "In evidenza"
+        }
+      }
+    },
+    "blocks": {
+      "member": {
+        "name": "Membro",
+        "settings": {
+          "photo": {
+            "label": "Foto"
+          },
+          "name": {
+            "label": "Nome"
+          },
+          "role": {
+            "label": "Ruolo"
+          },
+          "link": {
+            "label": "Link"
+          }
+        }
+      }
+    }
   }
 }
