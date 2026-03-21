@@ -1084,7 +1084,139 @@ b {
 }
 
 /* --------------------------------------------------------------------------
-   7.2 Buttons
+   7.2 Lightbox
+   -------------------------------------------------------------------------- */
+
+.gallery-modal {
+  position: fixed;
+  inset: 0;
+  background-color: var(--bg-primary);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.gallery-modal-content {
+  width: fit-content;
+  max-width: 90%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gallery-modal-close {
+  position: absolute;
+  inset-block-start: -3.75rem;
+  inset-inline-end: -0.25rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: var(--border-width-thin) solid var(--border-color);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  color: var(--text-heading);
+  padding: var(--space-xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+
+  & svg {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+    background-color: #fff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+}
+
+.gallery-modal-nav {
+  position: absolute;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: var(--border-width-thin) solid var(--border-color);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  color: var(--text-heading);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+
+  & svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &:hover {
+    transform: translateY(-50%) scale(1.05);
+    background-color: #fff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--text-heading);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.gallery-modal-nav.is-prev {
+  inset-inline-start: -3.75rem;
+}
+
+.gallery-modal-nav.is-next {
+  inset-inline-end: -3.75rem;
+}
+
+.gallery-modal-image {
+  width: auto;
+  max-height: 80vh;
+  max-width: 90vw;
+  object-fit: contain;
+  display: block;
+  margin-inline: auto;
+  border: var(--border-width-thin) solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.gallery-modal-caption {
+  text-align: center;
+  padding-block-start: var(--space-md);
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   7.3 Buttons
    -------------------------------------------------------------------------- */
 
 /* Base Button - Secondary style by default */
@@ -1456,9 +1588,20 @@ b {
     border-inline-start: none;
   }
 
+  & .header-contact-right {
+    display: none;
+    text-align: end;
+    padding-inline-start: 0;
+    border-inline-start: none;
+  }
+
+  & .header-end {
+    display: none;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
   & .header-contact-line {
-    font-size: calc(var(--font-size-xs) * var(--body-scale));
-    color: var(--text-muted);
     line-height: var(--line-height-normal);
     white-space: nowrap;
   }
@@ -1874,6 +2017,14 @@ b {
       display: none;
     }
 
+    & .header-contact-right {
+      display: flex;
+    }
+
+    & .header-end {
+      display: flex;
+    }
+
     /* Centered navigation layout */
     & .header-inner.header-center-nav {
       display: grid;
@@ -1886,14 +2037,20 @@ b {
     }
 
     & .header-inner.header-center-nav .header-branding {
+      grid-column: 1;
+      grid-row: 1;
       justify-self: start;
     }
 
     & .header-inner.header-center-nav .header-nav {
+      grid-column: 2;
+      grid-row: 1;
       justify-self: center;
     }
 
-    & .header-inner.header-center-nav .desktop-cta {
+    & .header-inner.header-center-nav .header-end {
+      grid-column: 3;
+      grid-row: 1;
       justify-self: end;
     }
   }

@@ -81,9 +81,9 @@
         "label": "Altura",
         "options": {
           "auto": "Auto",
-          "small": "Pequeño (300px)",
-          "medium": "Mediano (450px)",
-          "large": "Grande (600px)"
+          "small": "Pequeño",
+          "medium": "Mediano",
+          "large": "Grande"
         }
       },
       "fullwidth": {
@@ -1744,9 +1744,9 @@
       "height": {
         "label": "Altura del mapa",
         "options": {
-          "small": "Pequeño (300px)",
-          "medium": "Mediano (450px)",
-          "large": "Grande (600px)"
+          "small": "Pequeño",
+          "medium": "Mediano",
+          "large": "Grande"
         }
       },
       "show_address": {
@@ -1812,6 +1812,14 @@
       },
       "columns_desktop": {
         "label": "Columnas de escritorio"
+      },
+      "gap": {
+        "label": "Espaciado",
+        "options": {
+          "small": "Pequeño",
+          "medium": "Mediano",
+          "large": "Grande"
+        }
       },
       "color_scheme": {
         "label": "Esquema de colores",
@@ -2378,9 +2386,9 @@
         "label": "Altura",
         "options": {
           "auto": "Auto",
-          "small": "Pequeño (300px)",
-          "medium": "Mediano (450px)",
-          "large": "Grande (600px)"
+          "small": "Pequeño",
+          "medium": "Mediano",
+          "large": "Grande"
         }
       },
       "fullwidth": {

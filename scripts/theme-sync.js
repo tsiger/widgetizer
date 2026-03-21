@@ -7,6 +7,12 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 
+function stamp() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
 // Directories excluded from the project destination (matches copyThemeToProject logic)
 const PROJECT_EXCLUDES = new Set(["templates", "presets", "updates", "latest"]);
 
@@ -26,7 +32,9 @@ const themeId = args.theme ?? "arch";
 const project = typeof args.project === "string" ? args.project.trim() : "";
 
 if (!project) {
-  console.error(`
+  console.error(
+    `[${stamp()}]`,
+    `
 Usage: node scripts/theme-sync.js --project <name> [--theme <id>]
 
   --project  Required. Project folder under data/projects/
@@ -35,7 +43,8 @@ Usage: node scripts/theme-sync.js --project <name> [--theme <id>]
 Example:
   npm run theme:sync -- --project myproject
   node scripts/theme-sync.js --project myproject --theme arch
-`.trim());
+`.trim(),
+  );
   process.exit(1);
 }
 
@@ -93,10 +102,10 @@ async function removeDir(relPath) {
 }
 
 function initialSync() {
-  console.log(`[sync] Full copy: themes/${themeId} → data/themes/${themeId}`);
+  console.log(`[${stamp()}] [sync] Full copy: themes/${themeId} → data/themes/${themeId}`);
   cpSync(srcDir, themeDest, { recursive: true });
 
-  console.log(`[sync] Full copy: themes/${themeId} → data/projects/${project} (filtered)`);
+  console.log(`[${stamp()}] [sync] Full copy: themes/${themeId} → data/projects/${project} (filtered)`);
   cpSync(srcDir, projectDest, {
     recursive: true,
     filter: (src) => {
@@ -116,23 +125,23 @@ function startWatcher() {
   watcher
     .on("add", (filePath) => {
       const rel = path.relative(srcDir, filePath);
-      console.log(`[sync] + ${rel}`);
+      console.log(`[${stamp()}] [sync] + ${rel}`);
       syncFile(rel);
     })
     .on("change", (filePath) => {
       const rel = path.relative(srcDir, filePath);
-      console.log(`[sync] ~ ${rel}`);
+      console.log(`[${stamp()}] [sync] ~ ${rel}`);
       syncFile(rel);
     })
     .on("unlink", (filePath) => {
       const rel = path.relative(srcDir, filePath);
-      console.log(`[sync] - ${rel}`);
+      console.log(`[${stamp()}] [sync] - ${rel}`);
       removeFile(rel);
     })
     .on("addDir", (dirPath) => {
       const rel = path.relative(srcDir, dirPath);
       if (!rel) return;
-      console.log(`[sync] +dir ${rel}`);
+      console.log(`[${stamp()}] [sync] +dir ${rel}`);
       const targets = [path.join(themeDest, rel)];
       if (!isExcludedForProject(rel)) targets.push(path.join(projectDest, rel));
       targets.forEach((d) => mkdir(d, { recursive: true }));
@@ -140,16 +149,16 @@ function startWatcher() {
     .on("unlinkDir", (dirPath) => {
       const rel = path.relative(srcDir, dirPath);
       if (!rel) return;
-      console.log(`[sync] -dir ${rel}`);
+      console.log(`[${stamp()}] [sync] -dir ${rel}`);
       removeDir(rel);
     })
-    .on("error", (err) => console.error("[sync] Watcher error:", err))
+    .on("error", (err) => console.error(`[${stamp()}] [sync] Watcher error:`, err))
     .on("ready", () => {
-      console.log(`[sync] Watching themes/${themeId} for changes…`);
-      console.log(`[sync] Destinations:`);
-      console.log(`[sync]   data/themes/${themeId}`);
-      console.log(`[sync]   data/projects/${project}`);
-      console.log(`[sync] Press Ctrl+C to stop.`);
+      console.log(`[${stamp()}] [sync] Watching themes/${themeId} for changes…`);
+      console.log(`[${stamp()}] [sync] Destinations:`);
+      console.log(`[${stamp()}] [sync]   data/themes/${themeId}`);
+      console.log(`[${stamp()}] [sync]   data/projects/${project}`);
+      console.log(`[${stamp()}] [sync] Press Ctrl+C to stop.`);
     });
 }
 

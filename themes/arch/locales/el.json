@@ -81,9 +81,9 @@
         "label": "Ύψος",
         "options": {
           "auto": "Αυτόματο",
-          "small": "Μικρό (300px)",
-          "medium": "Μεσαίο (450px)",
-          "large": "Μεγάλο (600px)"
+          "small": "Μικρό",
+          "medium": "Μεσαίο",
+          "large": "Μεγάλο"
         }
       },
       "fullwidth": {
@@ -1744,9 +1744,9 @@
       "height": {
         "label": "Ύψος χάρτη",
         "options": {
-          "small": "Μικρό (300px)",
-          "medium": "Μεσαίο (450px)",
-          "large": "Μεγάλο (600px)"
+          "small": "Μικρό",
+          "medium": "Μεσαίο",
+          "large": "Μεγάλο"
         }
       },
       "show_address": {
@@ -1812,6 +1812,14 @@
       },
       "columns_desktop": {
         "label": "Στήλες επιτραπέζιου"
+      },
+      "gap": {
+        "label": "Απόσταση",
+        "options": {
+          "small": "Μικρή",
+          "medium": "Μεσαία",
+          "large": "Μεγάλη"
+        }
       },
       "color_scheme": {
         "label": "Χρωματικό σχήμα",
@@ -2378,9 +2386,9 @@
         "label": "Ύψος",
         "options": {
           "auto": "Αυτόματο",
-          "small": "Μικρό (300px)",
-          "medium": "Μεσαίο (450px)",
-          "large": "Μεγάλο (600px)"
+          "small": "Μικρό",
+          "medium": "Μεσαίο",
+          "large": "Μεγάλο"
         }
       },
       "fullwidth": {

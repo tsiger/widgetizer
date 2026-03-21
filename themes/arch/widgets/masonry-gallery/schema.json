@@ -41,6 +41,26 @@
     },
     {
       "type": "select",
+      "id": "gap",
+      "label": "tTheme:masonry_gallery.settings.gap.label",
+      "default": "medium",
+      "options": [
+        {
+          "value": "small",
+          "label": "tTheme:masonry_gallery.settings.gap.options.small"
+        },
+        {
+          "value": "medium",
+          "label": "tTheme:masonry_gallery.settings.gap.options.medium"
+        },
+        {
+          "value": "large",
+          "label": "tTheme:masonry_gallery.settings.gap.options.large"
+        }
+      ]
+    },
+    {
+      "type": "select",
       "id": "color_scheme",
       "label": "tTheme:masonry_gallery.settings.color_scheme.label",
       "default": "standard",

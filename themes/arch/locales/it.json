@@ -81,9 +81,9 @@
         "label": "Altezza",
         "options": {
           "auto": "Auto",
-          "small": "Piccolo (300px)",
-          "medium": "Medio (450px)",
-          "large": "Grande (600px)"
+          "small": "Piccolo",
+          "medium": "Medio",
+          "large": "Grande"
         }
       },
       "fullwidth": {
@@ -1744,9 +1744,9 @@
       "height": {
         "label": "Altezza mappa",
         "options": {
-          "small": "Piccolo (300px)",
-          "medium": "Medio (450px)",
-          "large": "Grande (600px)"
+          "small": "Piccolo",
+          "medium": "Medio",
+          "large": "Grande"
         }
       },
       "show_address": {
@@ -1812,6 +1812,14 @@
       },
       "columns_desktop": {
         "label": "Colonne desktop"
+      },
+      "gap": {
+        "label": "Spaziatura",
+        "options": {
+          "small": "Piccolo",
+          "medium": "Medio",
+          "large": "Grande"
+        }
       },
       "color_scheme": {
         "label": "Schema colori",
@@ -2378,9 +2386,9 @@
         "label": "Altezza",
         "options": {
           "auto": "Auto",
-          "small": "Piccolo (300px)",
-          "medium": "Medio (450px)",
-          "large": "Grande (600px)"
+          "small": "Piccolo",
+          "medium": "Medio",
+          "large": "Grande"
         }
       },
       "fullwidth": {

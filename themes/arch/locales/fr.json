@@ -81,9 +81,9 @@
         "label": "Hauteur",
         "options": {
           "auto": "Auto",
-          "small": "Petit (300px)",
-          "medium": "Moyen (450px)",
-          "large": "Grand (600px)"
+          "small": "Petit",
+          "medium": "Moyen",
+          "large": "Grand"
         }
       },
       "fullwidth": {
@@ -1744,9 +1744,9 @@
       "height": {
         "label": "Hauteur de la carte",
         "options": {
-          "small": "Petit (300px)",
-          "medium": "Moyen (450px)",
-          "large": "Grand (600px)"
+          "small": "Petit",
+          "medium": "Moyen",
+          "large": "Grand"
         }
       },
       "show_address": {
@@ -1812,6 +1812,14 @@
       },
       "columns_desktop": {
         "label": "Colonnes bureau"
+      },
+      "gap": {
+        "label": "Espacement",
+        "options": {
+          "small": "Petit",
+          "medium": "Moyen",
+          "large": "Grand"
+        }
       },
       "color_scheme": {
         "label": "Jeu de couleurs",
@@ -2378,9 +2386,9 @@
         "label": "Hauteur",
         "options": {
           "auto": "Auto",
-          "small": "Petit (300px)",
-          "medium": "Moyen (450px)",
-          "large": "Grand (600px)"
+          "small": "Petit",
+          "medium": "Moyen",
+          "large": "Grand"
         }
       },
       "fullwidth": {

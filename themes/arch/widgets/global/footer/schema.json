@@ -26,7 +26,8 @@
       "type": "menu",
       "id": "footerNavigation",
       "label": "tTheme:footer.settings.footerNavigation.label",
-      "description": "tTheme:footer.settings.footerNavigation.description"
+      "description": "tTheme:footer.settings.footerNavigation.description",
+      "default": "footer-menu"
     },
     {
       "type": "textarea",

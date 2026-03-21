@@ -81,9 +81,9 @@
         "label": "Height",
         "options": {
           "auto": "Auto",
-          "small": "Small (300px)",
-          "medium": "Medium (450px)",
-          "large": "Large (600px)"
+          "small": "Small",
+          "medium": "Medium",
+          "large": "Large"
         }
       },
       "fullwidth": {
@@ -1042,6 +1042,13 @@
         "label": "Contact Details 2",
         "description": "Second line of contact info (e.g., address)"
       },
+      "contact_position": {
+        "label": "Contact details position",
+        "options": {
+          "logo": "Next to logo",
+          "menu": "Next to menu button"
+        }
+      },
       "navigation_header": {
         "label": "Navigation"
       },
@@ -1744,9 +1751,9 @@
       "height": {
         "label": "Map height",
         "options": {
-          "small": "Small (300px)",
-          "medium": "Medium (450px)",
-          "large": "Large (600px)"
+          "small": "Small",
+          "medium": "Medium",
+          "large": "Large"
         }
       },
       "show_address": {
@@ -1812,6 +1819,14 @@
       },
       "columns_desktop": {
         "label": "Desktop columns"
+      },
+      "gap": {
+        "label": "Spacing",
+        "options": {
+          "small": "Small",
+          "medium": "Medium",
+          "large": "Large"
+        }
       },
       "color_scheme": {
         "label": "Color Scheme",
@@ -2378,9 +2393,9 @@
         "label": "Height",
         "options": {
           "auto": "Auto",
-          "small": "Small (300px)",
-          "medium": "Medium (450px)",
-          "large": "Large (600px)"
+          "small": "Small",
+          "medium": "Medium",
+          "large": "Large"
         }
       },
       "fullwidth": {
