@@ -1,0 +1,89 @@
+{
+  "type": "video-popup",
+  "displayName": "tTheme:video_popup.name",
+  "aliases": [
+    "video lightbox",
+    "youtube popup",
+    "video modal",
+    "play video"
+  ],
+  "settings": [
+    {
+      "type": "image",
+      "id": "image",
+      "label": "tTheme:video_popup.settings.image.label"
+    },
+    {
+      "type": "header",
+      "id": "video_header",
+      "label": "tTheme:video_popup.settings.video_header.label"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "tTheme:video_popup.settings.video_url.label",
+      "default": "https://www.youtube.com/watch?v=2PuFyjAs7JA"
+    },
+    {
+      "type": "text",
+      "id": "video_title",
+      "label": "tTheme:video_popup.settings.video_title.label",
+      "default": "Video"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:video_popup.settings.display_header.label"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "tTheme:video_popup.settings.overlay_color.label",
+      "default": "#0a1e38bf",
+      "allow_alpha": true,
+      "description": "tTheme:video_popup.settings.overlay_color.description"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "tTheme:video_popup.settings.height.label",
+      "default": "medium",
+      "options": [
+        {
+          "value": "small",
+          "label": "tTheme:video_popup.settings.height.options.small"
+        },
+        {
+          "value": "medium",
+          "label": "tTheme:video_popup.settings.height.options.medium"
+        },
+        {
+          "value": "large",
+          "label": "tTheme:video_popup.settings.height.options.large"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth",
+      "label": "tTheme:video_popup.settings.fullwidth.label",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "play_button_style",
+      "label": "tTheme:video_popup.settings.play_button_style.label",
+      "default": "light",
+      "options": [
+        {
+          "value": "light",
+          "label": "tTheme:video_popup.settings.play_button_style.options.light"
+        },
+        {
+          "value": "dark",
+          "label": "tTheme:video_popup.settings.play_button_style.options.dark"
+        }
+      ]
+    }
+  ]
+}

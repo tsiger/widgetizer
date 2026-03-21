@@ -3317,6 +3317,48 @@
       }
     }
   },
+  "video_popup": {
+    "name": "Vidéo popup",
+    "settings": {
+      "image": {
+        "label": "Image d'arrière-plan"
+      },
+      "video_header": {
+        "label": "Vidéo"
+      },
+      "video_url": {
+        "label": "URL de la vidéo (YouTube ou Vimeo)"
+      },
+      "video_title": {
+        "label": "Titre de la vidéo (pour l'accessibilité)"
+      },
+      "display_header": {
+        "label": "Affichage"
+      },
+      "overlay_color": {
+        "label": "Couleur de superposition",
+        "description": "Ajustez l'alpha pour l'intensité de la superposition"
+      },
+      "height": {
+        "label": "Hauteur",
+        "options": {
+          "small": "Petit",
+          "medium": "Moyen",
+          "large": "Grand"
+        }
+      },
+      "fullwidth": {
+        "label": "Pleine largeur"
+      },
+      "play_button_style": {
+        "label": "Style du bouton de lecture",
+        "options": {
+          "light": "Clair",
+          "dark": "Sombre"
+        }
+      }
+    }
+  },
   "global": {
     "general": {
       "name": "Général",

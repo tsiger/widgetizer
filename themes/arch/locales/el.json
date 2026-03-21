@@ -3317,6 +3317,48 @@
       }
     }
   },
+  "video_popup": {
+    "name": "Αναδυόμενο βίντεο",
+    "settings": {
+      "image": {
+        "label": "Εικόνα φόντου"
+      },
+      "video_header": {
+        "label": "Βίντεο"
+      },
+      "video_url": {
+        "label": "URL βίντεο (YouTube ή Vimeo)"
+      },
+      "video_title": {
+        "label": "Τίτλος βίντεο (για προσβασιμότητα)"
+      },
+      "display_header": {
+        "label": "Εμφάνιση"
+      },
+      "overlay_color": {
+        "label": "Χρώμα επικάλυψης",
+        "description": "Ρυθμίστε το alpha για ένταση επικάλυψης"
+      },
+      "height": {
+        "label": "Ύψος",
+        "options": {
+          "small": "Μικρό",
+          "medium": "Μεσαίο",
+          "large": "Μεγάλο"
+        }
+      },
+      "fullwidth": {
+        "label": "Πλήρες πλάτος"
+      },
+      "play_button_style": {
+        "label": "Στυλ κουμπιού αναπαραγωγής",
+        "options": {
+          "light": "Φωτεινό",
+          "dark": "Σκούρο"
+        }
+      }
+    }
+  },
   "global": {
     "general": {
       "name": "Γενικά",

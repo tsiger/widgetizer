@@ -1,0 +1,55 @@
+{%- comment -%} Convert YouTube/Vimeo URL to embed URL {%- endcomment -%}
+{%- assign video_url = widget.settings.video_url -%}
+{%- assign embed_url = '' -%}
+
+{%- if video_url contains 'youtube.com/watch' -%}
+  {%- assign video_id = video_url | split: 'v=' | last | split: '&' | first -%}
+  {%- assign embed_url = 'https://www.youtube.com/embed/' | append: video_id -%}
+{%- elsif video_url contains 'youtu.be/' -%}
+  {%- assign video_id = video_url | split: 'youtu.be/' | last | split: '?' | first -%}
+  {%- assign embed_url = 'https://www.youtube.com/embed/' | append: video_id -%}
+{%- elsif video_url contains 'youtube.com/embed/' -%}
+  {%- assign embed_url = video_url -%}
+{%- elsif video_url contains 'vimeo.com/' -%}
+  {%- assign video_id = video_url | split: 'vimeo.com/' | last | split: '?' | first -%}
+  {%- assign embed_url = 'https://player.vimeo.com/video/' | append: video_id -%}
+{%- elsif video_url contains 'player.vimeo.com' -%}
+  {%- assign embed_url = video_url -%}
+{%- endif -%}
+
+{% enqueue_script src: "video-modal.js", defer: true, location: "footer", priority: 42, theme: true %}
+
+<section
+  id="{{ widget.id }}"
+  class="widget widget-video-popup widget-{{ widget.id }} has-bg-image has-overlay widget-height-{{ widget.settings.height }}"
+  style="background-image: url('{% image src: widget.settings.image, size: 'large', output: 'url' %}'); --widget-overlay-color: {{ widget.settings.overlay_color | default: '#0a1e38bf' }}; --widget-overlay-opacity: 1;"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="video-popup"
+  {% if embed_url != blank %}data-video-url="{{ embed_url }}"{% endif %}
+  data-video-title="{{ widget.settings.video_title | default: 'Video' }}"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      margin-block: 0;
+      padding-inline: 0;
+      cursor: pointer;
+
+      {% unless widget.settings.fullwidth %}
+      max-width: var(--container-max-width);
+      margin-inline: auto;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      {% endunless %}
+    }
+  </style>
+
+  <div class="video-popup-trigger" role="button" tabindex="0" aria-label="{{ widget.settings.video_title | default: 'Play video' }}">
+    <button class="video-popup-play video-popup-play-{{ widget.settings.play_button_style | default: 'light' }} reveal reveal-scale" type="button" aria-label="{{ widget.settings.video_title | default: 'Play video' }}">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="40" cy="40" r="39" stroke="currentColor" stroke-width="2" opacity="0.9"/>
+        <path d="M33 25L57 40L33 55V25Z" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
+</section>
