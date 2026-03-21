@@ -2256,6 +2256,52 @@
       }
     }
   },
+  "numbered_service_list": {
+    "name": "Numbered Service List",
+    "blocks": {
+      "service": {
+        "name": "Service",
+        "settings": {
+          "content_header": {
+            "label": "Content"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Description"
+          },
+          "link": {
+            "label": "Link"
+          }
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "show_dividers": {
+        "label": "Show dividers"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    }
+  },
   "priced_list": {
     "name": "Priced List",
     "settings": {

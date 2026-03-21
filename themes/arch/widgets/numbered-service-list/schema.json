@@ -1,0 +1,128 @@
+{
+  "type": "numbered-service-list",
+  "displayName": "tTheme:numbered_service_list.name",
+  "aliases": [
+    "services list",
+    "numbered list",
+    "service rows",
+    "indexed services"
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:numbered_service_list.settings.eyebrow.label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:numbered_service_list.settings.title.label",
+      "default": "Our Services"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:numbered_service_list.settings.description.label"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:numbered_service_list.settings.display_header.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dividers",
+      "label": "tTheme:numbered_service_list.settings.show_dividers.label",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:numbered_service_list.settings.color_scheme.label",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "tTheme:numbered_service_list.settings.color_scheme.options.standard"
+        },
+        {
+          "value": "highlight",
+          "label": "tTheme:numbered_service_list.settings.color_scheme.options.highlight"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "service",
+      "displayName": "tTheme:numbered_service_list.blocks.service.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:numbered_service_list.blocks.service.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:numbered_service_list.blocks.service.settings.title.label",
+          "default": "Strategic Advisory"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "tTheme:numbered_service_list.blocks.service.settings.description.label",
+          "default": "<p>Describe the service offering, business outcomes, and the value it creates for clients.</p>"
+        },
+        {
+          "type": "link",
+          "id": "link",
+          "label": "tTheme:numbered_service_list.blocks.service.settings.link.label",
+          "default": {
+            "text": "Learn More",
+            "href": "#",
+            "target": "_self"
+          }
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "service",
+      "settings": {
+        "title": "Strategic Advisory",
+        "description": "<p>We help leadership teams clarify priorities, align stakeholders, and define practical roadmaps for sustainable growth.</p>",
+        "link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "service",
+      "settings": {
+        "title": "Operational Excellence",
+        "description": "<p>Our team identifies inefficiencies, improves workflows, and helps organizations build resilient systems that scale with demand.</p>",
+        "link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "service",
+      "settings": {
+        "title": "Growth Enablement",
+        "description": "<p>We turn strategy into execution with focused initiatives across brand, sales, and customer experience to unlock measurable results.</p>",
+        "link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    }
+  ]
+}

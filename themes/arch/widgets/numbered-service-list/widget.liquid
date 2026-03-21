@@ -1,0 +1,206 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-numbered-service-list widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  {% if widget.settings.color_scheme == 'highlight' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endif %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="numbered-service-list"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .service-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        {% if widget.settings.show_dividers %}
+        border-block-start: var(--border-width-thin) solid var(--border-color);
+        {% endif %}
+      }
+
+      & .service-item {
+        {% if widget.settings.show_dividers %}
+        border-block-end: var(--border-width-thin) solid var(--border-color);
+        {% endif %}
+      }
+
+      & .service-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: var(--space-md) var(--space-lg);
+        align-items: start;
+        padding-block: var(--space-xl);
+        color: inherit;
+        text-decoration: none;
+      }
+
+      & .service-number {
+        grid-column: 1 / -1;
+        opacity: 0.3;
+      }
+
+      & .service-title-wrap {
+        min-width: 0;
+      }
+
+      & .service-description-wrap {
+        grid-column: 1 / -1;
+        min-width: 0;
+      }
+
+      & .service-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        align-self: center;
+      }
+
+      & .service-arrow-circle {
+        width: 5.6rem;
+        height: 5.6rem;
+        border-radius: 50%;
+        border: var(--border-width-thin) solid var(--border-color);
+        color: var(--text-heading);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          transform 0.25s ease,
+          border-color 0.25s ease,
+          background-color 0.25s ease,
+          color 0.25s ease;
+      }
+
+      & .service-arrow-circle svg {
+        width: 2rem;
+        height: 2rem;
+        stroke: currentColor;
+      }
+
+      & .service-row-link:hover .service-arrow-circle,
+      & .service-row-link:focus-visible .service-arrow-circle {
+        background-color: var(--text-heading);
+        border-color: var(--text-heading);
+        color: var(--bg-primary);
+        transform: translateX(0.2rem);
+      }
+
+      & .service-row-link:focus-visible {
+        outline: none;
+      }
+
+      & .service-row-link:focus-visible .service-title {
+        text-decoration: underline;
+        text-underline-offset: 0.2rem;
+      }
+
+      @media (min-width: 750px) {
+        & .service-row {
+          grid-template-columns: 10rem minmax(18rem, 32rem) minmax(0, 1fr) 7rem;
+          gap: var(--space-xl);
+          align-items: center;
+          padding-block: var(--space-2xl);
+        }
+
+        & .service-number {
+          grid-column: auto;
+        }
+
+        & .service-description-wrap {
+          grid-column: auto;
+        }
+
+        & .service-arrow {
+          justify-self: end;
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <ul class="service-list">
+        {% assign item_heading_level = 'h3' %}
+        {% if widget.settings.title == blank %}
+          {% assign item_heading_level = 'h2' %}
+        {% endif %}
+
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          {% assign step_number = forloop.index | prepend: '0' | slice: -2, 2 %}
+          {% assign has_link = false %}
+          {% if block.settings.link.href != blank %}
+            {% assign has_link = true %}
+          {% endif %}
+
+          <li class="service-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+            {% if has_link %}
+              <a
+                href="{{ block.settings.link.href }}"
+                class="service-row service-row-link"
+                data-setting="link"
+                aria-label="{{ block.settings.link.text | default: block.settings.title }}"
+                {% if block.settings.link.target == '_blank' %}
+                  target="_blank" rel="noopener"
+                {% endif %}
+              >
+            {% else %}
+              <div class="service-row">
+            {% endif %}
+                <div class="service-number w-meta t-4xl t-body-bold">{{ step_number }}</div>
+
+                <div class="service-title-wrap">
+                  {% if block.settings.title != blank %}
+                    <{{ item_heading_level }} class="service-title w-title t-2xl" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
+                  {% endif %}
+                </div>
+
+                <div class="service-description-wrap">
+                  {% if block.settings.description != blank %}
+                    <div class="w-body w-rte t-sm" data-setting="description">{{ block.settings.description | raw }}</div>
+                  {% endif %}
+                </div>
+
+                {% if has_link %}
+                  <span class="service-arrow" aria-hidden="true">
+                    <span class="service-arrow-circle">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12h14" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M13 6l6 6-6 6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </span>
+                  </span>
+                {% endif %}
+            {% if has_link %}
+              </a>
+            {% else %}
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
