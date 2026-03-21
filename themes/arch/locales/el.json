@@ -2796,6 +2796,14 @@
       "color_scheme": {
         "label": "Χρωματικό σχήμα",
         "options": { "standard": "Τυπικό", "highlight": "Τονισμένο" }
+      },
+      "sticky_column": {
+        "label": "Σταθερή στήλη (επιφάνεια εργασίας)",
+        "options": {
+          "none": "Καμία",
+          "left": "Αριστερά",
+          "right": "Δεξιά"
+        }
       }
     },
     "blocks": {

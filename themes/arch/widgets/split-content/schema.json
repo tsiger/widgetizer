@@ -23,6 +23,26 @@
           "label": "tTheme:split_content.settings.color_scheme.options.highlight"
         }
       ]
+    },
+    {
+      "type": "select",
+      "id": "sticky_column",
+      "label": "tTheme:split_content.settings.sticky_column.label",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "tTheme:split_content.settings.sticky_column.options.none"
+        },
+        {
+          "value": "left",
+          "label": "tTheme:split_content.settings.sticky_column.options.left"
+        },
+        {
+          "value": "right",
+          "label": "tTheme:split_content.settings.sticky_column.options.right"
+        }
+      ]
     }
   ],
   "blocks": [

@@ -2796,6 +2796,14 @@
       "color_scheme": {
         "label": "Schema colori",
         "options": { "standard": "Standard", "highlight": "Evidenza" }
+      },
+      "sticky_column": {
+        "label": "Colonna fissa (desktop)",
+        "options": {
+          "none": "Nessuna",
+          "left": "Sinistra",
+          "right": "Destra"
+        }
       }
     },
     "blocks": {

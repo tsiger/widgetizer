@@ -2801,6 +2801,14 @@
           "standard": "Standard",
           "highlight": "Hervorgehoben"
         }
+      },
+      "sticky_column": {
+        "label": "Fixierte Spalte (Desktop)",
+        "options": {
+          "none": "Keine",
+          "left": "Links",
+          "right": "Rechts"
+        }
       }
     },
     "blocks": {

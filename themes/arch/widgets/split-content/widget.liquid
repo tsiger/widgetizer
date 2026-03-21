@@ -38,6 +38,20 @@
         & .split-content-grid {
           gap: var(--space-4xl);
         }
+
+        {% if widget.settings.sticky_column == 'left' %}
+        & .split-content-column:first-child {
+          position: sticky;
+          top: calc(var(--header-sticky-offset, 0px) + var(--space-xl));
+          align-self: start;
+        }
+        {% elsif widget.settings.sticky_column == 'right' %}
+        & .split-content-column:last-child {
+          position: sticky;
+          top: calc(var(--header-sticky-offset, 0px) + var(--space-xl));
+          align-self: start;
+        }
+        {% endif %}
       }
     }
   </style>

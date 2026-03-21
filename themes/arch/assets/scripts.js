@@ -350,6 +350,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================================================================
 
   if (widgetElement.classList.contains("header-sticky")) {
+    const setHeaderOffset = () => {
+      const h = widgetElement.offsetHeight;
+      document.documentElement.style.setProperty("--header-sticky-offset", h + "px");
+    };
+    setHeaderOffset();
+    window.addEventListener("resize", debounce(setHeaderOffset, 150));
+
     const handleScroll = () => {
       const scrollY = window.scrollY || window.pageYOffset;
       if (scrollY > 10) {

@@ -2857,6 +2857,14 @@
           "standard": "Standard",
           "highlight": "Highlight"
         }
+      },
+      "sticky_column": {
+        "label": "Sticky column (desktop)",
+        "options": {
+          "none": "None",
+          "left": "Left",
+          "right": "Right"
+        }
       }
     },
     "blocks": {

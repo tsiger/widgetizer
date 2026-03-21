@@ -2796,6 +2796,14 @@
       "color_scheme": {
         "label": "Esquema de colores",
         "options": { "standard": "Estándar", "highlight": "Resaltado" }
+      },
+      "sticky_column": {
+        "label": "Columna fija (escritorio)",
+        "options": {
+          "none": "Ninguna",
+          "left": "Izquierda",
+          "right": "Derecha"
+        }
       }
     },
     "blocks": {

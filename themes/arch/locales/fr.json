@@ -2796,6 +2796,14 @@
       "color_scheme": {
         "label": "Jeu de couleurs",
         "options": { "standard": "Standard", "highlight": "Accent" }
+      },
+      "sticky_column": {
+        "label": "Colonne fixe (bureau)",
+        "options": {
+          "none": "Aucune",
+          "left": "Gauche",
+          "right": "Droite"
+        }
       }
     },
     "blocks": {
