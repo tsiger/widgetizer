@@ -13,6 +13,7 @@ npm test               # Run backend tests (Node test runner)
 npm run test:verbose   # Tests with full output
 npm run lint           # Lint src/ and server/
 npm run electron:dev   # Full Electron dev mode
+npm run theme:sync -- --project <name>  # Watch themes/ → data (requires --project)
 ```
 
 ## Architecture

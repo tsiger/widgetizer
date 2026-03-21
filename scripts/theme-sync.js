@@ -23,7 +23,21 @@ function parseArgs(argv) {
 
 const args = parseArgs(process.argv.slice(2));
 const themeId = args.theme ?? "arch";
-const project = args.project ?? "theme";
+const project = typeof args.project === "string" ? args.project.trim() : "";
+
+if (!project) {
+  console.error(`
+Usage: node scripts/theme-sync.js --project <name> [--theme <id>]
+
+  --project  Required. Project folder under data/projects/
+  --theme    Optional. Theme id under themes/ (default: arch)
+
+Example:
+  npm run theme:sync -- --project myproject
+  node scripts/theme-sync.js --project myproject --theme arch
+`.trim());
+  process.exit(1);
+}
 
 const srcDir = path.join(ROOT, "themes", themeId);
 const themeDest = path.join(ROOT, "data", "themes", themeId);
