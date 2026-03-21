@@ -748,6 +748,7 @@ async function renderPageLayout(
     const projectData = await getProjectData(projectId);
 
     // 4. Add page-specific context with separated content sections
+    const bodyClasses = [pageData?.slug || "", contentSections.extraBodyClasses || ""].filter(Boolean).join(" ");
     const renderContext = {
       ...baseContext,
       header: contentSections.headerContent || "",
@@ -755,7 +756,7 @@ async function renderPageLayout(
       footer: contentSections.footerContent || "",
       page: pageData,
       project: projectData,
-      body_class: pageData?.slug || "",
+      body_class: bodyClasses,
     };
 
     // 5. Render the layout with theme snippets path included
@@ -828,5 +829,29 @@ function renderEnqueuedAssetTags(sharedGlobals) {
   return output;
 }
 
-// Export the necessary functions
-export { renderWidget, renderPageLayout, renderEnqueuedAssetTags };
+/**
+ * Checks if a widget type declares transparent header support in its schema.
+ * Reads the widget's schema.json and looks for `"supportsTransparentHeader": true`.
+ */
+async function widgetSupportsTransparentHeader(projectId, widgetType) {
+  try {
+    const projectFolderName = await getProjectFolderName(projectId);
+    const projectDir = getProjectDir(projectFolderName);
+    const isCoreWidget = widgetType.startsWith("core-");
+
+    let schemaPath;
+    if (isCoreWidget) {
+      schemaPath = path.join(CORE_WIDGETS_DIR, widgetType, "schema.json");
+    } else {
+      schemaPath = path.join(projectDir, "widgets", widgetType, "schema.json");
+    }
+
+    const schemaContent = await fs.readFile(schemaPath, "utf-8");
+    const schema = JSON.parse(schemaContent);
+    return schema.supportsTransparentHeader === true;
+  } catch {
+    return false;
+  }
+}
+
+export { renderWidget, renderPageLayout, renderEnqueuedAssetTags, widgetSupportsTransparentHeader };

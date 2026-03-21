@@ -1,6 +1,7 @@
 {
   "type": "slideshow",
   "displayName": "tTheme:slideshow.name",
+  "supportsTransparentHeader": true,
   "maxBlocks": 5,
   "aliases": [
     "carousel",

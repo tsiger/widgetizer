@@ -1202,6 +1202,14 @@
         "label": "Encabezado fijo",
         "description": "Cuando está activado, el encabezado permanece fijo arriba al desplazarse"
       },
+      "transparent_on_hero": {
+        "label": "Transparente en hero",
+        "description": "El encabezado se vuelve transparente sobre widgets de banner, slideshow y video popup"
+      },
+      "transparent_logo": {
+        "label": "Logo de encabezado transparente",
+        "description": "Logo alternativo que se muestra cuando el encabezado es transparente (ej. una versión clara)"
+      },
       "center_nav": {
         "label": "Centrar navegación",
         "description": "Centra el menú de navegación en el encabezado con el logo a la izquierda y CTA a la derecha (solo escritorio)"

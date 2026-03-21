@@ -1258,6 +1258,14 @@
         "label": "Sticky Header",
         "description": "When enabled, the header stays fixed at the top when scrolling"
       },
+      "transparent_on_hero": {
+        "label": "Transparent on hero",
+        "description": "Header becomes transparent over banner, slideshow, and video popup widgets"
+      },
+      "transparent_logo": {
+        "label": "Transparent header logo",
+        "description": "Alternative logo displayed when the header is transparent (e.g. a light version)"
+      },
       "center_nav": {
         "label": "Center Navigation",
         "description": "Centers the navigation menu in the header with the logo on the left and CTA on the right (desktop only)"

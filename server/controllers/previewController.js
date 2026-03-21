@@ -7,7 +7,7 @@ import { getSetting } from "../db/repositories/settingsRepository.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { renderWidget, renderPageLayout, renderEnqueuedAssetTags } from "../services/renderingService.js";
+import { renderWidget, renderPageLayout, renderEnqueuedAssetTags, widgetSupportsTransparentHeader } from "../services/renderingService.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
@@ -174,9 +174,21 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
     }
   }
 
+  // Determine if transparent header should be active for this page
+  let extraBodyClasses = "";
+  const headerSettings = pageData.globalWidgets?.header?.settings;
+  if (headerSettings?.transparent_on_hero) {
+    const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets || {});
+    const firstWidgetId = widgetOrder[0];
+    const firstWidget = firstWidgetId && pageData.widgets?.[firstWidgetId];
+    if (firstWidget && await widgetSupportsTransparentHeader(activeProjectId, firstWidget.type)) {
+      extraBodyClasses = "transparent-header";
+    }
+  }
+
   let renderedHtml = await renderPageLayout(
     activeProjectId,
-    { headerContent, mainContent, footerContent },
+    { headerContent, mainContent, footerContent, extraBodyClasses },
     pageData,
     rawThemeSettings,
     "preview",

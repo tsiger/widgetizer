@@ -1202,6 +1202,14 @@
         "label": "En-tête fixe",
         "description": "Lorsqu'activé, l'en-tête reste fixe en haut lors du défilement"
       },
+      "transparent_on_hero": {
+        "label": "Transparent sur hero",
+        "description": "L'en-tête devient transparent au-dessus des widgets banner, slideshow et video popup"
+      },
+      "transparent_logo": {
+        "label": "Logo en-tête transparent",
+        "description": "Logo alternatif affiché lorsque l'en-tête est transparent (ex. une version claire)"
+      },
       "center_nav": {
         "label": "Centrer la navigation",
         "description": "Centre le menu de navigation dans l'en-tête avec le logo à gauche et le CTA à droite (bureau uniquement)"

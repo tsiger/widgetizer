@@ -384,6 +384,11 @@ body {
   flex: 1;
 }
 
+/* When transparent header is active, the first widget extends behind the header */
+.transparent-header .main-content > :first-child {
+  padding-block-start: var(--header-sticky-offset, 4.5rem);
+}
+
 /* --------------------------------------------------------------------------
    4.2 Headings
    -------------------------------------------------------------------------- */
@@ -1913,12 +1918,89 @@ b {
     position: sticky;
     top: 0;
     z-index: 999;
-    /* Use bg-primary from color scheme for proper background */
     background-color: var(--bg-primary);
     transition: box-shadow 0.2s ease-in-out;
 
     &.header-scrolled {
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  /* Transparent logo swap: hide alternate logo by default, show in transparent state.
+     Uses .header-logo-image compound selector to beat the inline <style> specificity. */
+  & .header-logo-image.header-logo-transparent {
+    display: none;
+  }
+
+  .transparent-header &:not(.header-sticky) .header-logo-image.header-logo-transparent,
+  .transparent-header &.header-sticky:not(.header-scrolled) .header-logo-image.header-logo-transparent {
+    display: block;
+  }
+
+  .transparent-header &:not(.header-sticky) .header-logo-image.header-logo-default,
+  .transparent-header &.header-sticky:not(.header-scrolled) .header-logo-image.header-logo-default {
+    display: none;
+  }
+
+  /* Transparent header (non-sticky): absolute, scrolls away with page */
+  .transparent-header &:not(.header-sticky) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background-color: transparent;
+    border-block-end-color: transparent;
+    color: var(--colors-highlight_text_heading, #fff);
+
+    & a,
+    & button,
+    & .header-contact-line {
+      color: var(--colors-highlight_text_content, #fff);
+    }
+
+    & .widget-button-primary {
+      background-color: var(--colors-highlight_accent, #de1877);
+      color: var(--colors-highlight_accent_text, #fff);
+      border-color: var(--colors-highlight_accent, #de1877);
+    }
+
+    & .widget-button-secondary {
+      color: var(--colors-highlight_text_heading, #fff);
+      border-color: var(--colors-highlight_border_color, rgba(255, 255, 255, 0.5));
+    }
+  }
+
+  /* Transparent + sticky: fixed, transparent until scrolled past hero */
+  .transparent-header &.header-sticky {
+    position: fixed;
+    left: 0;
+    right: 0;
+    width: 100%;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+
+    &:not(.header-scrolled) {
+      background-color: transparent;
+      border-block-end-color: transparent;
+      box-shadow: none;
+      color: var(--colors-highlight_text_heading, #fff);
+
+      & a,
+      & button,
+      & .header-contact-line {
+        color: var(--colors-highlight_text_content, #fff);
+      }
+
+      & .widget-button-primary {
+        background-color: var(--colors-highlight_accent, #de1877);
+        color: var(--colors-highlight_accent_text, #fff);
+        border-color: var(--colors-highlight_accent, #de1877);
+      }
+
+      & .widget-button-secondary {
+        color: var(--colors-highlight_text_heading, #fff);
+        border-color: var(--colors-highlight_border_color, rgba(255, 255, 255, 0.5));
+      }
     }
   }
 

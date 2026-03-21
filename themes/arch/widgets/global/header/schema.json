@@ -132,6 +132,19 @@
       "default": false
     },
     {
+      "type": "checkbox",
+      "id": "transparent_on_hero",
+      "label": "tTheme:header.settings.transparent_on_hero.label",
+      "description": "tTheme:header.settings.transparent_on_hero.description",
+      "default": false
+    },
+    {
+      "type": "image",
+      "id": "transparent_logo",
+      "label": "tTheme:header.settings.transparent_logo.label",
+      "description": "tTheme:header.settings.transparent_logo.description"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "tTheme:header.settings.color_scheme.label",

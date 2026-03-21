@@ -1202,6 +1202,14 @@
         "label": "Fixierte Kopfzeile",
         "description": "Wenn aktiviert, bleibt die Kopfzeile beim Scrollen oben fixiert"
       },
+      "transparent_on_hero": {
+        "label": "Transparent auf Hero",
+        "description": "Kopfzeile wird transparent über Banner-, Slideshow- und Video-Popup-Widgets"
+      },
+      "transparent_logo": {
+        "label": "Logo für transparente Kopfzeile",
+        "description": "Alternatives Logo, das bei transparenter Kopfzeile angezeigt wird (z.B. eine helle Version)"
+      },
       "center_nav": {
         "label": "Navigation zentrieren",
         "description": "Zentriert das Navigationsmenü in der Kopfzeile mit dem Logo links und CTA rechts (nur Desktop)"

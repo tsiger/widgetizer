@@ -1,5 +1,6 @@
 import { apiFetch } from "../lib/apiFetch";
 import useProjectStore from "../stores/projectStore";
+import useWidgetStore from "../stores/widgetStore";
 import fontDefinitions from "../core/config/fonts.json" with { type: "json" };
 
 /**
@@ -228,6 +229,27 @@ export async function updatePreview(iframe, newState, oldState) {
     } catch (error) {
       console.error("Error updating header:", error);
     }
+  }
+
+  // Sync transparent-header body class when header settings change
+  if (headerChanged) {
+    const transparentOn = !!newGlobalWidgets.header?.settings?.transparent_on_hero;
+    let shouldBeTransparent = false;
+
+    if (transparentOn) {
+      const widgetOrder = newState.page?.widgetsOrder || Object.keys(newWidgets);
+      const firstWidgetId = widgetOrder[0];
+      const firstWidget = firstWidgetId && newWidgets[firstWidgetId];
+      if (firstWidget) {
+        const schemas = useWidgetStore.getState().schemas;
+        shouldBeTransparent = schemas[firstWidget.type]?.supportsTransparentHeader === true;
+      }
+    }
+
+    iframe.contentWindow.postMessage(
+      { type: "UPDATE_BODY_CLASS", payload: { className: "transparent-header", enabled: shouldBeTransparent } },
+      "*",
+    );
   }
   if ((footerChanged || themeSettingsChanged) && newGlobalWidgets.footer) {
     try {

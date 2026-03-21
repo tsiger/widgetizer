@@ -5,7 +5,7 @@ import { getProjectDir, getPublishDir, APP_ROOT, STATIC_CORE_ASSETS_DIR } from "
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
-import { renderWidget, renderPageLayout } from "../services/renderingService.js";
+import { renderWidget, renderPageLayout, widgetSupportsTransparentHeader } from "../services/renderingService.js";
 import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
@@ -298,6 +298,17 @@ export async function exportProjectToDir(projectId, options = {}) {
         footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null);
       }
 
+      // Determine if transparent header should be active for this page
+      let extraBodyClasses = "";
+      if (headerData?.settings?.transparent_on_hero) {
+        const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets || {});
+        const firstWidgetId = widgetOrder[0];
+        const firstWidget = firstWidgetId && pageData.widgets?.[firstWidgetId];
+        if (firstWidget && await widgetSupportsTransparentHeader(projectId, firstWidget.type)) {
+          extraBodyClasses = "transparent-header";
+        }
+      }
+
       // Pass separated content sections to layout
       const renderedHtml = await renderPageLayout(
         projectId,
@@ -305,6 +316,7 @@ export async function exportProjectToDir(projectId, options = {}) {
           headerContent: headerHtml,
           mainContent: pageWidgetsHtml,
           footerContent: footerHtml,
+          extraBodyClasses,
         },
         pageData,
         rawThemeSettings,

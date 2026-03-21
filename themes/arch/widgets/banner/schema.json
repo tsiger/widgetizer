@@ -1,6 +1,7 @@
 {
   "type": "banner",
   "displayName": "tTheme:banner.name",
+  "supportsTransparentHeader": true,
   "aliases": [
     "hero",
     "intro",

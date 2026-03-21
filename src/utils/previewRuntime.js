@@ -785,6 +785,14 @@ function handleMessage(event) {
       }
       renderOverlay();
       break;
+    case "UPDATE_BODY_CLASS":
+      if (payload.className) {
+        document.body.classList.toggle(payload.className, !!payload.enabled);
+        if (payload.className === "transparent-header") {
+          syncHeaderScrollState();
+        }
+      }
+      break;
     case "RESTORE_SCROLL":
       // Instantly restore scroll position (no smooth animation)
       window.scrollTo(0, payload.scrollY || 0);
@@ -992,6 +1000,54 @@ function handleWidgetMorph(widgetId, newHtml) {
     console.log(`[Runtime] Failed to morph widget: ${widgetId}`);
     postToParent({ type: "WIDGET_MORPH_FAILED", payload: { widgetId } });
   }
+
+  if (widgetId === "header") {
+    syncHeaderScrollState();
+  }
+}
+
+// ── Header Scroll State ─────────────────────────────────────────────────────
+// After a header morph the theme's scroll listener targets a stale element.
+// This keeps `header-scrolled` in sync so transparent→solid transitions work.
+
+let headerScrollListenerActive = false;
+
+function syncHeaderScrollState() {
+  const header = document.querySelector('[data-widget-type="header"]');
+  if (!header) return;
+
+  const isSticky = header.classList.contains("header-sticky");
+  const isTransparent = document.body.classList.contains("transparent-header");
+
+  if (isSticky || isTransparent) {
+    const scrollY = window.scrollY || window.pageYOffset;
+    header.classList.toggle("header-scrolled", scrollY > 10);
+
+    const h = header.offsetHeight;
+    document.documentElement.style.setProperty("--header-sticky-offset", h + "px");
+  }
+
+  ensureHeaderScrollListener();
+}
+
+function ensureHeaderScrollListener() {
+  if (headerScrollListenerActive) return;
+  headerScrollListenerActive = true;
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      const header = document.querySelector('[data-widget-type="header"]');
+      if (!header) return;
+
+      const isSticky = header.classList.contains("header-sticky");
+      if (!isSticky) return;
+
+      const scrollY = window.scrollY || window.pageYOffset;
+      header.classList.toggle("header-scrolled", scrollY > 10);
+    },
+    { passive: true },
+  );
 }
 
 // ── Initialization ──────────────────────────────────────────────────────────

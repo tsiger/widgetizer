@@ -1,6 +1,7 @@
 {
   "type": "video-popup",
   "displayName": "tTheme:video_popup.name",
+  "supportsTransparentHeader": true,
   "aliases": [
     "video lightbox",
     "youtube popup",

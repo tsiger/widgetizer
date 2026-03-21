@@ -1202,6 +1202,14 @@
         "label": "Intestazione fissa",
         "description": "Quando attivato, l'intestazione rimane fissa in alto durante lo scorrimento"
       },
+      "transparent_on_hero": {
+        "label": "Trasparente su hero",
+        "description": "L'intestazione diventa trasparente sopra i widget banner, slideshow e video popup"
+      },
+      "transparent_logo": {
+        "label": "Logo intestazione trasparente",
+        "description": "Logo alternativo mostrato quando l'intestazione è trasparente (es. una versione chiara)"
+      },
       "center_nav": {
         "label": "Centra navigazione",
         "description": "Centra il menu di navigazione nell'intestazione con il logo a sinistra e il CTA a destra (solo desktop)"

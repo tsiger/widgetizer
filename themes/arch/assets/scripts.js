@@ -349,14 +349,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // Adds shadow when header is sticky and user has scrolled
   // ============================================================================
 
-  if (widgetElement.classList.contains("header-sticky")) {
+  const isTransparent = document.body.classList.contains("transparent-header");
+  const isSticky = widgetElement.classList.contains("header-sticky");
+
+  // Set header height offset (used by sticky columns, transparent header padding, etc.)
+  if (isSticky || isTransparent) {
     const setHeaderOffset = () => {
       const h = widgetElement.offsetHeight;
       document.documentElement.style.setProperty("--header-sticky-offset", h + "px");
     };
     setHeaderOffset();
     window.addEventListener("resize", debounce(setHeaderOffset, 150));
+  }
 
+  // Scroll handler only for sticky headers (transparent or not)
+  if (isSticky) {
     const handleScroll = () => {
       const scrollY = window.scrollY || window.pageYOffset;
       if (scrollY > 10) {
@@ -366,10 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    // Check initial scroll position
     handleScroll();
-
-    // Listen for scroll events
     window.addEventListener("scroll", handleScroll, { passive: true });
   }
 });

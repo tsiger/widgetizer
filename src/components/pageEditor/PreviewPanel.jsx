@@ -445,6 +445,25 @@ const PreviewPanel = forwardRef(function PreviewPanel(
           );
         }
       });
+
+      // Immediate transparent-header body class toggle when header setting changes
+      const oldTransparent = previousState.globalWidgets?.header?.settings?.transparent_on_hero;
+      const newTransparent = globalWidgets?.header?.settings?.transparent_on_hero;
+      if (oldTransparent !== newTransparent) {
+        let shouldBeTransparent = false;
+        if (newTransparent) {
+          const widgetOrder = page?.widgetsOrder || Object.keys(widgets || {});
+          const firstWidgetId = widgetOrder[0];
+          const firstWidget = firstWidgetId && widgets?.[firstWidgetId];
+          if (firstWidget) {
+            shouldBeTransparent = schemas[firstWidget.type]?.supportsTransparentHeader === true;
+          }
+        }
+        iframeRef.current.contentWindow.postMessage(
+          { type: "UPDATE_BODY_CLASS", payload: { className: "transparent-header", enabled: shouldBeTransparent } },
+          "*",
+        );
+      }
     }
 
     // Debounced update - either full reload or morph depending on change type
