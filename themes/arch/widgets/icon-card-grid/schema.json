@@ -34,6 +34,70 @@
     },
     {
       "type": "select",
+      "id": "icon_style",
+      "label": "tTheme:icon_card_grid.settings.icon_style.label",
+      "default": "plain",
+      "options": [
+        {
+          "value": "plain",
+          "label": "tTheme:icon_card_grid.settings.icon_style.options.plain"
+        },
+        {
+          "value": "outline",
+          "label": "tTheme:icon_card_grid.settings.icon_style.options.outline"
+        },
+        {
+          "value": "filled",
+          "label": "tTheme:icon_card_grid.settings.icon_style.options.filled"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "icon_size",
+      "label": "tTheme:icon_card_grid.settings.icon_size.label",
+      "default": "lg",
+      "options": [
+        {
+          "value": "sm",
+          "label": "tTheme:icon_card_grid.settings.icon_size.options.sm"
+        },
+        {
+          "value": "md",
+          "label": "tTheme:icon_card_grid.settings.icon_size.options.md"
+        },
+        {
+          "value": "lg",
+          "label": "tTheme:icon_card_grid.settings.icon_size.options.lg"
+        },
+        {
+          "value": "xl",
+          "label": "tTheme:icon_card_grid.settings.icon_size.options.xl"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "icon_shape",
+      "label": "tTheme:icon_card_grid.settings.icon_shape.label",
+      "default": "circle",
+      "options": [
+        {
+          "value": "sharp",
+          "label": "tTheme:icon_card_grid.settings.icon_shape.options.sharp"
+        },
+        {
+          "value": "rounded",
+          "label": "tTheme:icon_card_grid.settings.icon_shape.options.rounded"
+        },
+        {
+          "value": "circle",
+          "label": "tTheme:icon_card_grid.settings.icon_shape.options.circle"
+        }
+      ]
+    },
+    {
+      "type": "select",
       "id": "color_scheme",
       "label": "tTheme:icon_card_grid.settings.color_scheme.label",
       "default": "standard",

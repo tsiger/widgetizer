@@ -863,6 +863,31 @@
   "features_split": {
     "name": "Features Split",
     "settings": {
+      "icon_style": {
+        "label": "Icon style",
+        "options": {
+          "plain": "Plain",
+          "outline": "Outline",
+          "filled": "Filled"
+        }
+      },
+      "icon_size": {
+        "label": "Icon size",
+        "options": {
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large",
+          "xl": "Extra Large"
+        }
+      },
+      "icon_shape": {
+        "label": "Icon shape",
+        "options": {
+          "sharp": "Sharp",
+          "rounded": "Rounded",
+          "circle": "Circle"
+        }
+      },
       "content_position": {
         "label": "Content position",
         "options": {
@@ -982,7 +1007,7 @@
         "label": "Display"
       },
       "layout": {
-        "label": "Eyebrow text",
+        "label": "Layout",
         "options": {
           "grid": "Grid",
           "carousel": "Carousel"
@@ -1060,6 +1085,13 @@
         "label": "CTA Button",
         "description": "Call-to-action button (leave text empty to hide)"
       },
+      "ctaButtonStyle": {
+        "label": "Button style",
+        "options": {
+          "primary": "Primary",
+          "secondary": "Secondary"
+        }
+      },
       "display_header": {
         "label": "Display"
       },
@@ -1099,6 +1131,31 @@
       "display_header": {
         "label": "Display"
       },
+      "icon_style": {
+        "label": "Icon style",
+        "options": {
+          "plain": "Plain",
+          "outline": "Outline",
+          "filled": "Filled"
+        }
+      },
+      "icon_size": {
+        "label": "Icon size",
+        "options": {
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large",
+          "xl": "Extra Large"
+        }
+      },
+      "icon_shape": {
+        "label": "Icon shape",
+        "options": {
+          "sharp": "Sharp",
+          "rounded": "Rounded",
+          "circle": "Circle"
+        }
+      },
       "color_scheme": {
         "label": "Color Scheme",
         "options": {
@@ -1107,7 +1164,7 @@
         }
       },
       "layout": {
-        "label": "Eyebrow text",
+        "label": "Layout",
         "options": {
           "grid": "Grid",
           "carousel": "Carousel"
@@ -1158,8 +1215,33 @@
       "display_header": {
         "label": "Display"
       },
+      "icon_style": {
+        "label": "Icon style",
+        "options": {
+          "plain": "Plain",
+          "outline": "Outline",
+          "filled": "Filled"
+        }
+      },
+      "icon_size": {
+        "label": "Icon size",
+        "options": {
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large",
+          "xl": "Extra Large"
+        }
+      },
+      "icon_shape": {
+        "label": "Icon shape",
+        "options": {
+          "sharp": "Sharp",
+          "rounded": "Rounded",
+          "circle": "Circle"
+        }
+      },
       "layout": {
-        "label": "Eyebrow text",
+        "label": "Layout",
         "options": {
           "grid": "Grid",
           "carousel": "Carousel"
@@ -1466,6 +1548,14 @@
           "right": "Right"
         }
       },
+      "text_position": {
+        "label": "Text vertical position",
+        "options": {
+          "top": "Top",
+          "center": "Center",
+          "bottom": "Bottom"
+        }
+      },
       "color_scheme": {
         "label": "Color Scheme",
         "options": {
@@ -1475,14 +1565,38 @@
       }
     },
     "blocks": {
+      "rating": {
+        "name": "Star Rating",
+        "settings": {
+          "rating": {
+            "label": "Star rating",
+            "options": {
+              "3": "3 stars",
+              "4": "4 stars",
+              "5": "5 stars"
+            }
+          }
+        }
+      },
+      "image": {
+        "name": "Image",
+        "settings": {
+          "image": {
+            "label": "Image"
+          },
+          "width": {
+            "label": "Max width (%)"
+          }
+        }
+      },
       "heading": {
-        "name": "Accordion",
+        "name": "Heading",
         "settings": {
           "text": {
             "label": "Text"
           },
           "size": {
-            "label": "Button size",
+            "label": "Text size",
             "options": {
               "lg": "Large",
               "xl": "Extra Large",
@@ -1499,7 +1613,7 @@
         }
       },
       "text": {
-        "name": "Accordion",
+        "name": "Text",
         "settings": {
           "text": {
             "label": "Text"
@@ -1559,6 +1673,67 @@
               "medium": "Medium",
               "large": "Large",
               "xlarge": "Extra Large"
+            }
+          }
+        }
+      },
+      "icon": {
+        "name": "Icon",
+        "settings": {
+          "icon": {
+            "label": "Icon"
+          },
+          "style": {
+            "label": "Icon style",
+            "options": {
+              "plain": "Plain",
+              "outline": "Outline",
+              "filled": "Filled"
+            }
+          },
+          "size": {
+            "label": "Size",
+            "options": {
+              "sm": "Small",
+              "md": "Medium",
+              "lg": "Large",
+              "xl": "Extra Large"
+            }
+          },
+          "shape": {
+            "label": "Shape",
+            "options": {
+              "sharp": "Sharp",
+              "rounded": "Rounded",
+              "circle": "Circle"
+            }
+          }
+        }
+      },
+      "numbered_item": {
+        "name": "Numbered Item",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "description": {
+            "label": "Description"
+          },
+          "size": {
+            "label": "Size",
+            "options": {
+              "small": "Small",
+              "medium": "Medium",
+              "large": "Large",
+              "xlarge": "Extra Large"
+            }
+          },
+          "shape": {
+            "label": "Shape",
+            "options": {
+              "sharp": "Sharp",
+              "rounded": "Rounded",
+              "circle": "Circle"
             }
           }
         }
@@ -1718,7 +1893,7 @@
         "label": "Display"
       },
       "layout": {
-        "label": "Eyebrow text",
+        "label": "Layout",
         "options": {
           "grid": "Grid",
           "carousel": "Carousel"
@@ -1872,7 +2047,7 @@
         "label": "Desktop columns"
       },
       "layout": {
-        "label": "Eyebrow text",
+        "label": "Layout",
         "options": {
           "grid": "Grid",
           "carousel": "Carousel"
@@ -1981,7 +2156,7 @@
         "label": "Display"
       },
       "layout": {
-        "label": "Eyebrow text",
+        "label": "Layout",
         "options": {
           "grid": "Grid",
           "carousel": "Carousel"
@@ -2094,7 +2269,7 @@
         "label": "Desktop columns"
       },
       "layout": {
-        "label": "Eyebrow text",
+        "label": "Layout",
         "options": {
           "grid": "Grid",
           "carousel": "Carousel"
@@ -2132,7 +2307,7 @@
         "label": "Display"
       },
       "layout": {
-        "label": "Eyebrow text",
+        "label": "Layout",
         "options": {
           "grid": "Grid",
           "carousel": "Carousel"
@@ -2778,7 +2953,7 @@
         "label": "Display"
       },
       "layout": {
-        "label": "Eyebrow text",
+        "label": "Layout",
         "options": {
           "grid": "Grid",
           "carousel": "Carousel"
@@ -2857,6 +3032,31 @@
   "trust_bar": {
     "name": "Trust Bar",
     "settings": {
+      "icon_style": {
+        "label": "Icon style",
+        "options": {
+          "plain": "Plain",
+          "outline": "Outline",
+          "filled": "Filled"
+        }
+      },
+      "icon_size": {
+        "label": "Icon size",
+        "options": {
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large",
+          "xl": "Extra Large"
+        }
+      },
+      "icon_shape": {
+        "label": "Icon shape",
+        "options": {
+          "sharp": "Sharp",
+          "rounded": "Rounded",
+          "circle": "Circle"
+        }
+      },
       "show_dividers": {
         "label": "Show dividers"
       },

@@ -97,6 +97,22 @@
       }
     },
     {
+      "type": "select",
+      "id": "ctaButtonStyle",
+      "label": "tTheme:header.settings.ctaButtonStyle.label",
+      "default": "secondary",
+      "options": [
+        {
+          "value": "primary",
+          "label": "tTheme:header.settings.ctaButtonStyle.options.primary"
+        },
+        {
+          "value": "secondary",
+          "label": "tTheme:header.settings.ctaButtonStyle.options.secondary"
+        }
+      ]
+    },
+    {
       "type": "header",
       "id": "display_header",
       "label": "tTheme:header.settings.display_header.label"

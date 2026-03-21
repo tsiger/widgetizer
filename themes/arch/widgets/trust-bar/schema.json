@@ -15,6 +15,70 @@
       "label": "tTheme:trust_bar.settings.display_header.label"
     },
     {
+      "type": "select",
+      "id": "icon_style",
+      "label": "tTheme:trust_bar.settings.icon_style.label",
+      "default": "plain",
+      "options": [
+        {
+          "value": "plain",
+          "label": "tTheme:trust_bar.settings.icon_style.options.plain"
+        },
+        {
+          "value": "outline",
+          "label": "tTheme:trust_bar.settings.icon_style.options.outline"
+        },
+        {
+          "value": "filled",
+          "label": "tTheme:trust_bar.settings.icon_style.options.filled"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "icon_size",
+      "label": "tTheme:trust_bar.settings.icon_size.label",
+      "default": "lg",
+      "options": [
+        {
+          "value": "sm",
+          "label": "tTheme:trust_bar.settings.icon_size.options.sm"
+        },
+        {
+          "value": "md",
+          "label": "tTheme:trust_bar.settings.icon_size.options.md"
+        },
+        {
+          "value": "lg",
+          "label": "tTheme:trust_bar.settings.icon_size.options.lg"
+        },
+        {
+          "value": "xl",
+          "label": "tTheme:trust_bar.settings.icon_size.options.xl"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "icon_shape",
+      "label": "tTheme:trust_bar.settings.icon_shape.label",
+      "default": "circle",
+      "options": [
+        {
+          "value": "sharp",
+          "label": "tTheme:trust_bar.settings.icon_shape.options.sharp"
+        },
+        {
+          "value": "rounded",
+          "label": "tTheme:trust_bar.settings.icon_shape.options.rounded"
+        },
+        {
+          "value": "circle",
+          "label": "tTheme:trust_bar.settings.icon_shape.options.circle"
+        }
+      ]
+    },
+    {
       "type": "checkbox",
       "id": "show_dividers",
       "label": "tTheme:trust_bar.settings.show_dividers.label",

@@ -25,12 +25,8 @@
         gap: var(--space-md);
       }
 
-      & .trust-bar-icon {
+      & .trust-bar-icon-wrapper {
         flex-shrink: 0;
-        width: var(--icon-size-lg);
-        height: var(--icon-size-lg);
-        color: var(--accent);
-        stroke-width: 0.15rem;
       }
 
       & .trust-bar-text {
@@ -85,7 +81,9 @@
         {% assign block = widget.blocks[blockId] %}
         <li class="trust-bar-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
           {% if block.settings.icon != blank %}
-            {% render 'icon', icon: block.settings.icon, class: 'trust-bar-icon' %}
+            <span class="trust-bar-icon-wrapper {% if widget.settings.icon_style == 'plain' %}w-icon-plain{% else %}w-icon-{{ widget.settings.icon_style }} w-icon-{{ widget.settings.icon_shape }}{% endif %} w-icon-{{ widget.settings.icon_size }}">
+              {% render 'icon', icon: block.settings.icon, class: 'w-icon' %}
+            </span>
           {% endif %}
           <span class="trust-bar-text w-body t-sm" data-setting="text">{{ block.settings.text }}</span>
         </li>

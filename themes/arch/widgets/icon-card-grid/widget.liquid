@@ -85,7 +85,9 @@
 
               <li class="widget-card carousel-item" data-block-id="{{ blockId }}">
                 {% if block.settings.icon != blank %}
-                  {% render 'icon', icon: block.settings.icon, class: 'widget-card-icon' %}
+                  <span class="{% if widget.settings.icon_style == 'plain' %}w-icon-plain{% else %}w-icon-{{ widget.settings.icon_style }} w-icon-{{ widget.settings.icon_shape }}{% endif %} w-icon-{{ widget.settings.icon_size }}">
+                    {% render 'icon', icon: block.settings.icon, class: 'w-icon' %}
+                  </span>
                 {% endif %}
                 <div class="widget-card-content">
                   {% if block.settings.subtitle != blank %}
@@ -140,7 +142,9 @@
 
             <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
               {% if block.settings.icon != blank %}
-                {% render 'icon', icon: block.settings.icon, class: 'widget-card-icon' %}
+                <span class="{% if widget.settings.icon_style == 'plain' %}w-icon-plain{% else %}w-icon-{{ widget.settings.icon_style }} w-icon-{{ widget.settings.icon_shape }}{% endif %} w-icon-{{ widget.settings.icon_size }}">
+                  {% render 'icon', icon: block.settings.icon, class: 'w-icon' %}
+                </span>
               {% endif %}
               <div class="widget-card-content">
                 {% if block.settings.subtitle != blank %}

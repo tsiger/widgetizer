@@ -1431,6 +1431,85 @@ b {
   height: var(--icon-size-xl);
 }
 
+/* Icon Design System — style, size, shape */
+
+.w-icon {
+  color: var(--accent);
+  stroke-width: 0.15rem;
+}
+
+/* Plain — size applied directly to the SVG */
+.w-icon-plain {
+  flex-shrink: 0;
+}
+
+.w-icon-plain .w-icon {
+  width: var(--w-icon-size);
+  height: var(--w-icon-size);
+}
+
+.w-icon-plain.w-icon-sm  { --w-icon-size: 1.6rem; }
+.w-icon-plain.w-icon-md  { --w-icon-size: 2.4rem; }
+.w-icon-plain.w-icon-lg  { --w-icon-size: 3.2rem; }
+.w-icon-plain.w-icon-xl  { --w-icon-size: 4rem; }
+
+/* Outline & Filled — container with icon centered inside */
+.w-icon-outline,
+.w-icon-filled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.w-icon-outline .w-icon,
+.w-icon-filled .w-icon {
+  width: 50%;
+  height: 50%;
+}
+
+.w-icon-outline {
+  border: var(--border-width-medium) solid var(--accent);
+}
+
+.w-icon-filled {
+  background-color: var(--accent);
+}
+
+.w-icon-filled .w-icon {
+  color: var(--accent-text);
+}
+
+/* Container sizes (outline & filled) */
+.w-icon-outline.w-icon-sm,
+.w-icon-filled.w-icon-sm {
+  width: 2.8rem;
+  height: 2.8rem;
+}
+
+.w-icon-outline.w-icon-md,
+.w-icon-filled.w-icon-md {
+  width: 3.6rem;
+  height: 3.6rem;
+}
+
+.w-icon-outline.w-icon-lg,
+.w-icon-filled.w-icon-lg {
+  width: 4.8rem;
+  height: 4.8rem;
+}
+
+.w-icon-outline.w-icon-xl,
+.w-icon-filled.w-icon-xl {
+  width: 6rem;
+  height: 6rem;
+}
+
+/* Shape (outline & filled only) */
+.w-icon-sharp   { border-radius: 0; }
+.w-icon-rounded { border-radius: 0.6rem; }
+.w-icon-circle  { border-radius: 50%; }
+
 /* --------------------------------------------------------------------------
    7.5 Feature Lists
    -------------------------------------------------------------------------- */

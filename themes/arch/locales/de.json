@@ -863,6 +863,31 @@
   "features_split": {
     "name": "Merkmale geteilt",
     "settings": {
+      "icon_style": {
+        "label": "Icon-Stil",
+        "options": {
+          "plain": "Einfach",
+          "outline": "Umriss",
+          "filled": "Ausgefüllt"
+        }
+      },
+      "icon_size": {
+        "label": "Icon-Größe",
+        "options": {
+          "sm": "Klein",
+          "md": "Mittel",
+          "lg": "Groß",
+          "xl": "Extra Groß"
+        }
+      },
+      "icon_shape": {
+        "label": "Icon-Form",
+        "options": {
+          "sharp": "Eckig",
+          "rounded": "Abgerundet",
+          "circle": "Kreis"
+        }
+      },
       "content_position": {
         "label": "Inhaltsposition",
         "options": {
@@ -1060,6 +1085,13 @@
         "label": "CTA-Button",
         "description": "Call-to-Action-Button (Text leer lassen zum Ausblenden)"
       },
+      "ctaButtonStyle": {
+        "label": "Schaltflächen-Stil",
+        "options": {
+          "primary": "Primär",
+          "secondary": "Sekundär"
+        }
+      },
       "display_header": {
         "label": "Anzeige"
       },
@@ -1098,6 +1130,31 @@
       },
       "display_header": {
         "label": "Anzeige"
+      },
+      "icon_style": {
+        "label": "Icon-Stil",
+        "options": {
+          "plain": "Einfach",
+          "outline": "Umriss",
+          "filled": "Ausgefüllt"
+        }
+      },
+      "icon_size": {
+        "label": "Icon-Größe",
+        "options": {
+          "sm": "Klein",
+          "md": "Mittel",
+          "lg": "Groß",
+          "xl": "Extra Groß"
+        }
+      },
+      "icon_shape": {
+        "label": "Icon-Form",
+        "options": {
+          "sharp": "Eckig",
+          "rounded": "Abgerundet",
+          "circle": "Kreis"
+        }
       },
       "color_scheme": {
         "label": "Farbschema",
@@ -1157,6 +1214,31 @@
       },
       "display_header": {
         "label": "Anzeige"
+      },
+      "icon_style": {
+        "label": "Icon-Stil",
+        "options": {
+          "plain": "Einfach",
+          "outline": "Umriss",
+          "filled": "Ausgefüllt"
+        }
+      },
+      "icon_size": {
+        "label": "Icon-Größe",
+        "options": {
+          "sm": "Klein",
+          "md": "Mittel",
+          "lg": "Groß",
+          "xl": "Extra Groß"
+        }
+      },
+      "icon_shape": {
+        "label": "Icon-Form",
+        "options": {
+          "sharp": "Eckig",
+          "rounded": "Abgerundet",
+          "circle": "Kreis"
+        }
       },
       "layout": {
         "label": "Dachzeile",
@@ -1466,6 +1548,14 @@
           "right": "Rechts"
         }
       },
+      "text_position": {
+        "label": "Vertikale Textposition",
+        "options": {
+          "top": "Oben",
+          "center": "Mitte",
+          "bottom": "Unten"
+        }
+      },
       "color_scheme": {
         "label": "Farbschema",
         "options": {
@@ -1475,14 +1565,38 @@
       }
     },
     "blocks": {
+      "rating": {
+        "name": "Sternebewertung",
+        "settings": {
+          "rating": {
+            "label": "Sternebewertung",
+            "options": {
+              "3": "3 Sterne",
+              "4": "4 Sterne",
+              "5": "5 Sterne"
+            }
+          }
+        }
+      },
+      "image": {
+        "name": "Bild",
+        "settings": {
+          "image": {
+            "label": "Bild"
+          },
+          "width": {
+            "label": "Maximale Breite (%)"
+          }
+        }
+      },
       "heading": {
-        "name": "Akkordeon",
+        "name": "Überschrift",
         "settings": {
           "text": {
             "label": "Text"
           },
           "size": {
-            "label": "Schaltflächen-Größe",
+            "label": "Textgröße",
             "options": {
               "lg": "Groß",
               "xl": "Extra Groß",
@@ -1499,7 +1613,7 @@
         }
       },
       "text": {
-        "name": "Akkordeon",
+        "name": "Text",
         "settings": {
           "text": {
             "label": "Text"
@@ -1559,6 +1673,25 @@
               "medium": "Mittel",
               "large": "Groß",
               "xlarge": "Extra Groß"
+            }
+          }
+        }
+      },
+      "numbered_item": {
+        "name": "Nummerierter Punkt",
+        "settings": {
+          "title": {
+            "label": "Titel"
+          },
+          "description": {
+            "label": "Beschreibung"
+          },
+          "size": {
+            "label": "Kreisgröße",
+            "options": {
+              "small": "Klein",
+              "medium": "Mittel",
+              "large": "Groß"
             }
           }
         }
@@ -2857,6 +2990,31 @@
   "trust_bar": {
     "name": "Vertrauensleiste",
     "settings": {
+      "icon_style": {
+        "label": "Icon-Stil",
+        "options": {
+          "plain": "Einfach",
+          "outline": "Umriss",
+          "filled": "Ausgefüllt"
+        }
+      },
+      "icon_size": {
+        "label": "Icon-Größe",
+        "options": {
+          "sm": "Klein",
+          "md": "Mittel",
+          "lg": "Groß",
+          "xl": "Extra Groß"
+        }
+      },
+      "icon_shape": {
+        "label": "Icon-Form",
+        "options": {
+          "sharp": "Eckig",
+          "rounded": "Abgerundet",
+          "circle": "Kreis"
+        }
+      },
       "show_dividers": {
         "label": "Trennlinien anzeigen"
       },

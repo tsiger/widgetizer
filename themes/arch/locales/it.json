@@ -863,6 +863,31 @@
   "features_split": {
     "name": "Funzionalità divise",
     "settings": {
+      "icon_style": {
+        "label": "Stile icona",
+        "options": {
+          "plain": "Semplice",
+          "outline": "Contorno",
+          "filled": "Pieno"
+        }
+      },
+      "icon_size": {
+        "label": "Dimensione icona",
+        "options": {
+          "sm": "Piccolo",
+          "md": "Medio",
+          "lg": "Grande",
+          "xl": "Extra Grande"
+        }
+      },
+      "icon_shape": {
+        "label": "Forma icona",
+        "options": {
+          "sharp": "Squadrato",
+          "rounded": "Arrotondato",
+          "circle": "Cerchio"
+        }
+      },
       "content_position": {
         "label": "Posizione contenuto",
         "options": {
@@ -1060,6 +1085,13 @@
         "label": "Pulsante CTA",
         "description": "Pulsante di invito all'azione (lascia il testo vuoto per nascondere)"
       },
+      "ctaButtonStyle": {
+        "label": "Stile del pulsante",
+        "options": {
+          "primary": "Primario",
+          "secondary": "Secondario"
+        }
+      },
       "display_header": {
         "label": "Visualizzazione"
       },
@@ -1098,6 +1130,31 @@
       },
       "display_header": {
         "label": "Visualizzazione"
+      },
+      "icon_style": {
+        "label": "Stile icona",
+        "options": {
+          "plain": "Semplice",
+          "outline": "Contorno",
+          "filled": "Pieno"
+        }
+      },
+      "icon_size": {
+        "label": "Dimensione icona",
+        "options": {
+          "sm": "Piccolo",
+          "md": "Medio",
+          "lg": "Grande",
+          "xl": "Extra Grande"
+        }
+      },
+      "icon_shape": {
+        "label": "Forma icona",
+        "options": {
+          "sharp": "Squadrato",
+          "rounded": "Arrotondato",
+          "circle": "Cerchio"
+        }
       },
       "color_scheme": {
         "label": "Schema colori",
@@ -1157,6 +1214,31 @@
       },
       "display_header": {
         "label": "Visualizzazione"
+      },
+      "icon_style": {
+        "label": "Stile icona",
+        "options": {
+          "plain": "Semplice",
+          "outline": "Contorno",
+          "filled": "Pieno"
+        }
+      },
+      "icon_size": {
+        "label": "Dimensione icona",
+        "options": {
+          "sm": "Piccolo",
+          "md": "Medio",
+          "lg": "Grande",
+          "xl": "Extra Grande"
+        }
+      },
+      "icon_shape": {
+        "label": "Forma icona",
+        "options": {
+          "sharp": "Squadrato",
+          "rounded": "Arrotondato",
+          "circle": "Cerchio"
+        }
       },
       "layout": {
         "label": "Testo sopratitolo",
@@ -1466,6 +1548,14 @@
           "right": "Destra"
         }
       },
+      "text_position": {
+        "label": "Posizione verticale del testo",
+        "options": {
+          "top": "In alto",
+          "center": "Centro",
+          "bottom": "In basso"
+        }
+      },
       "color_scheme": {
         "label": "Schema colori",
         "options": {
@@ -1475,14 +1565,38 @@
       }
     },
     "blocks": {
+      "rating": {
+        "name": "Valutazione a Stelle",
+        "settings": {
+          "rating": {
+            "label": "Valutazione",
+            "options": {
+              "3": "3 stelle",
+              "4": "4 stelle",
+              "5": "5 stelle"
+            }
+          }
+        }
+      },
+      "image": {
+        "name": "Immagine",
+        "settings": {
+          "image": {
+            "label": "Immagine"
+          },
+          "width": {
+            "label": "Larghezza massima (%)"
+          }
+        }
+      },
       "heading": {
-        "name": "Fisarmonica",
+        "name": "Intestazione",
         "settings": {
           "text": {
             "label": "Testo"
           },
           "size": {
-            "label": "Dimensione pulsante",
+            "label": "Dimensione testo",
             "options": {
               "lg": "Grande",
               "xl": "Extra Grande",
@@ -1499,7 +1613,7 @@
         }
       },
       "text": {
-        "name": "Fisarmonica",
+        "name": "Testo",
         "settings": {
           "text": {
             "label": "Testo"
@@ -1559,6 +1673,25 @@
               "medium": "Medio",
               "large": "Grande",
               "xlarge": "Extra Grande"
+            }
+          }
+        }
+      },
+      "numbered_item": {
+        "name": "Elemento Numerato",
+        "settings": {
+          "title": {
+            "label": "Titolo"
+          },
+          "description": {
+            "label": "Descrizione"
+          },
+          "size": {
+            "label": "Dimensione cerchio",
+            "options": {
+              "small": "Piccolo",
+              "medium": "Medio",
+              "large": "Grande"
             }
           }
         }
@@ -2857,6 +2990,31 @@
   "trust_bar": {
     "name": "Barra di fiducia",
     "settings": {
+      "icon_style": {
+        "label": "Stile icona",
+        "options": {
+          "plain": "Semplice",
+          "outline": "Contorno",
+          "filled": "Pieno"
+        }
+      },
+      "icon_size": {
+        "label": "Dimensione icona",
+        "options": {
+          "sm": "Piccolo",
+          "md": "Medio",
+          "lg": "Grande",
+          "xl": "Extra Grande"
+        }
+      },
+      "icon_shape": {
+        "label": "Forma icona",
+        "options": {
+          "sharp": "Squadrato",
+          "rounded": "Arrotondato",
+          "circle": "Cerchio"
+        }
+      },
       "show_dividers": {
         "label": "Mostra separatori"
       },

@@ -863,6 +863,31 @@
   "features_split": {
     "name": "Características divididas",
     "settings": {
+      "icon_style": {
+        "label": "Estilo de icono",
+        "options": {
+          "plain": "Simple",
+          "outline": "Contorno",
+          "filled": "Relleno"
+        }
+      },
+      "icon_size": {
+        "label": "Tamaño de icono",
+        "options": {
+          "sm": "Pequeño",
+          "md": "Mediano",
+          "lg": "Grande",
+          "xl": "Extra Grande"
+        }
+      },
+      "icon_shape": {
+        "label": "Forma de icono",
+        "options": {
+          "sharp": "Cuadrado",
+          "rounded": "Redondeado",
+          "circle": "Círculo"
+        }
+      },
       "content_position": {
         "label": "Posición del contenido",
         "options": {
@@ -1060,6 +1085,13 @@
         "label": "Botón CTA",
         "description": "Botón de llamada a la acción (deja el texto vacío para ocultar)"
       },
+      "ctaButtonStyle": {
+        "label": "Estilo del botón",
+        "options": {
+          "primary": "Primario",
+          "secondary": "Secundario"
+        }
+      },
       "display_header": {
         "label": "Visualización"
       },
@@ -1098,6 +1130,31 @@
       },
       "display_header": {
         "label": "Visualización"
+      },
+      "icon_style": {
+        "label": "Estilo de icono",
+        "options": {
+          "plain": "Simple",
+          "outline": "Contorno",
+          "filled": "Relleno"
+        }
+      },
+      "icon_size": {
+        "label": "Tamaño de icono",
+        "options": {
+          "sm": "Pequeño",
+          "md": "Mediano",
+          "lg": "Grande",
+          "xl": "Extra Grande"
+        }
+      },
+      "icon_shape": {
+        "label": "Forma de icono",
+        "options": {
+          "sharp": "Cuadrado",
+          "rounded": "Redondeado",
+          "circle": "Círculo"
+        }
       },
       "color_scheme": {
         "label": "Esquema de colores",
@@ -1157,6 +1214,31 @@
       },
       "display_header": {
         "label": "Visualización"
+      },
+      "icon_style": {
+        "label": "Estilo de icono",
+        "options": {
+          "plain": "Simple",
+          "outline": "Contorno",
+          "filled": "Relleno"
+        }
+      },
+      "icon_size": {
+        "label": "Tamaño de icono",
+        "options": {
+          "sm": "Pequeño",
+          "md": "Mediano",
+          "lg": "Grande",
+          "xl": "Extra Grande"
+        }
+      },
+      "icon_shape": {
+        "label": "Forma de icono",
+        "options": {
+          "sharp": "Cuadrado",
+          "rounded": "Redondeado",
+          "circle": "Círculo"
+        }
       },
       "layout": {
         "label": "Texto superior",
@@ -1466,6 +1548,14 @@
           "right": "Derecha"
         }
       },
+      "text_position": {
+        "label": "Posición vertical del texto",
+        "options": {
+          "top": "Arriba",
+          "center": "Centro",
+          "bottom": "Abajo"
+        }
+      },
       "color_scheme": {
         "label": "Esquema de colores",
         "options": {
@@ -1475,14 +1565,38 @@
       }
     },
     "blocks": {
+      "rating": {
+        "name": "Calificación con Estrellas",
+        "settings": {
+          "rating": {
+            "label": "Calificación",
+            "options": {
+              "3": "3 estrellas",
+              "4": "4 estrellas",
+              "5": "5 estrellas"
+            }
+          }
+        }
+      },
+      "image": {
+        "name": "Imagen",
+        "settings": {
+          "image": {
+            "label": "Imagen"
+          },
+          "width": {
+            "label": "Ancho máximo (%)"
+          }
+        }
+      },
       "heading": {
-        "name": "Acordeón",
+        "name": "Encabezado",
         "settings": {
           "text": {
             "label": "Texto"
           },
           "size": {
-            "label": "Tamaño del botón",
+            "label": "Tamaño del texto",
             "options": {
               "lg": "Grande",
               "xl": "Extra grande",
@@ -1499,7 +1613,7 @@
         }
       },
       "text": {
-        "name": "Acordeón",
+        "name": "Texto",
         "settings": {
           "text": {
             "label": "Texto"
@@ -1559,6 +1673,25 @@
               "medium": "Mediano",
               "large": "Grande",
               "xlarge": "Extra grande"
+            }
+          }
+        }
+      },
+      "numbered_item": {
+        "name": "Elemento Numerado",
+        "settings": {
+          "title": {
+            "label": "Título"
+          },
+          "description": {
+            "label": "Descripción"
+          },
+          "size": {
+            "label": "Tamaño del círculo",
+            "options": {
+              "small": "Pequeño",
+              "medium": "Mediano",
+              "large": "Grande"
             }
           }
         }
@@ -2857,6 +2990,31 @@
   "trust_bar": {
     "name": "Barra de confianza",
     "settings": {
+      "icon_style": {
+        "label": "Estilo de icono",
+        "options": {
+          "plain": "Simple",
+          "outline": "Contorno",
+          "filled": "Relleno"
+        }
+      },
+      "icon_size": {
+        "label": "Tamaño de icono",
+        "options": {
+          "sm": "Pequeño",
+          "md": "Mediano",
+          "lg": "Grande",
+          "xl": "Extra Grande"
+        }
+      },
+      "icon_shape": {
+        "label": "Forma de icono",
+        "options": {
+          "sharp": "Cuadrado",
+          "rounded": "Redondeado",
+          "circle": "Círculo"
+        }
+      },
       "show_dividers": {
         "label": "Mostrar divisores"
       },
