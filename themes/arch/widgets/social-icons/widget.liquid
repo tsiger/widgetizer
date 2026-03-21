@@ -9,10 +9,11 @@
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   {% if widget.settings.icon_size != 2.4 %}
+    {% assign social_box_size = widget.settings.icon_size | default: 2.4 | plus: 1.6 %}
     <style>
       .widget-{{ widget.id }} .social-link {
-        width: {{ widget.settings.icon_size | default: 2.4 }}rem;
-        height: {{ widget.settings.icon_size | default: 2.4 }}rem;
+        width: {{ social_box_size }}rem;
+        height: {{ social_box_size }}rem;
       }
     </style>
   {% endif %}

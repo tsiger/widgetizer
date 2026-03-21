@@ -28,6 +28,27 @@
       "default": "A responsive grid layout showcasing services with icons, descriptions, and call-to-action buttons."
     },
     {
+      "type": "image",
+      "id": "featured_image",
+      "label": "tTheme:icon_card_grid.settings.featured_image.label"
+    },
+    {
+      "type": "select",
+      "id": "featured_image_position",
+      "label": "tTheme:icon_card_grid.settings.featured_image_position.label",
+      "default": "start",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:icon_card_grid.settings.featured_image_position.options.start"
+        },
+        {
+          "value": "end",
+          "label": "tTheme:icon_card_grid.settings.featured_image_position.options.end"
+        }
+      ]
+    },
+    {
       "type": "header",
       "id": "display_header",
       "label": "tTheme:icon_card_grid.settings.display_header.label"
@@ -93,6 +114,22 @@
         {
           "value": "circle",
           "label": "tTheme:icon_card_grid.settings.icon_shape.options.circle"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "tTheme:icon_card_grid.settings.alignment.label",
+      "default": "start",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:icon_card_grid.settings.alignment.options.start"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:icon_card_grid.settings.alignment.options.center"
         }
       ]
     },

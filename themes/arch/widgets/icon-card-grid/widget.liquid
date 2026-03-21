@@ -1,6 +1,12 @@
 {% if widget.settings.layout == 'carousel' %}
   {% enqueue_script src: "carousel.js", defer: true, location: "footer", priority: 40, theme: true %}
 {% endif %}
+
+{% assign has_featured_image = false %}
+{% if widget.settings.featured_image != blank %}
+  {% assign has_featured_image = true %}
+{% endif %}
+
 <section
   id="{{ widget.id }}"
   class="widget widget-type-icon-card-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
@@ -84,12 +90,10 @@
               {% endif %}
 
               <li class="widget-card carousel-item" data-block-id="{{ blockId }}">
-                {% if block.settings.icon != blank %}
-                  <span class="{% if widget.settings.icon_style == 'plain' %}w-icon-plain{% else %}w-icon-{{ widget.settings.icon_style }} w-icon-{{ widget.settings.icon_shape }}{% endif %} w-icon-{{ widget.settings.icon_size }}">
-                    {% render 'icon', icon: block.settings.icon, class: 'w-icon' %}
-                  </span>
-                {% endif %}
-                <div class="widget-card-content">
+                <div class="widget-card-content{% if widget.settings.alignment == 'center' %} widget-content-align-center{% endif %}">
+                  {% if block.settings.icon != blank %}
+                    {% render 'icon', icon: block.settings.icon, class: 'w-icon', style: widget.settings.icon_style, size: widget.settings.icon_size, shape: widget.settings.icon_shape %}
+                  {% endif %}
                   {% if block.settings.subtitle != blank %}
                     <span class="w-eyebrow" data-setting="subtitle">{{ block.settings.subtitle }}</span>
                   {% endif %}
@@ -120,17 +124,64 @@
 
         </div>
 
+      {% elsif has_featured_image %}
+        <div class="icon-card-grid-split{% if widget.settings.featured_image_position == 'end' %} icon-card-grid-split-reversed{% endif %}">
+          <div class="icon-card-grid-featured reveal reveal-scale" role="img" aria-label="Featured image" style="background-image: url('{% image src: widget.settings.featured_image, size: 'large', output: 'path' %}');"></div>
+          <ul class="widget-card-grid widget-grid" style="--grid-cols-desktop: 2;">
+            {% for blockId in widget.blocksOrder %}
+              {% assign block = widget.blocks[blockId] %}
+
+              {% assign current_card_level = card_heading_level %}
+              {% if has_widget_title == false and widget.index == 1 %}
+                {% if forloop.first %}
+                  {% assign current_card_level = 'h1' %}
+                {% else %}
+                  {% assign current_card_level = 'h2' %}
+                {% endif %}
+              {% endif %}
+
+              <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+                <div class="widget-card-content{% if widget.settings.alignment == 'center' %} widget-content-align-center{% endif %}">
+                  {% if block.settings.icon != blank %}
+                    {% render 'icon', icon: block.settings.icon, class: 'w-icon', style: widget.settings.icon_style, size: widget.settings.icon_size, shape: widget.settings.icon_shape %}
+                  {% endif %}
+                  {% if block.settings.subtitle != blank %}
+                    <span class="w-eyebrow" data-setting="subtitle">{{ block.settings.subtitle }}</span>
+                  {% endif %}
+                  {% if block.settings.title != blank %}
+                    <{{ current_card_level }} class="w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ current_card_level }}>
+                  {% endif %}
+                  {% if block.settings.description != blank %}
+                    <div class="w-body w-rte t-sm" data-setting="description">
+                      {{ block.settings.description | raw }}
+                    </div>
+                  {% endif %}
+                  {% if block.settings.button_link.text != blank %}
+                    <div class="widget-card-footer">
+                      <a
+                        href="{{ block.settings.button_link.href }}"
+                        class="widget-button widget-button-secondary"
+                        data-setting="button_link"
+                        target="{{ block.settings.button_link.target | default: '_self' }}"
+                      >
+                        {{- block.settings.button_link.text -}}
+                      </a>
+                    </div>
+                  {% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
       {% else %}
         <ul
           class="widget-card-grid widget-grid"
-          style="
-            --grid-cols-desktop: {{ widget.settings.columns_desktop }};
-          "
+          style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
         >
           {% for blockId in widget.blocksOrder %}
             {% assign block = widget.blocks[blockId] %}
 
-            {% comment %} Per-card level logic for the NO-TITLE + INDEX-1 case {% endcomment %}
             {% assign current_card_level = card_heading_level %}
             {% if has_widget_title == false and widget.index == 1 %}
               {% if forloop.first %}
@@ -141,12 +192,10 @@
             {% endif %}
 
             <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
-              {% if block.settings.icon != blank %}
-                <span class="{% if widget.settings.icon_style == 'plain' %}w-icon-plain{% else %}w-icon-{{ widget.settings.icon_style }} w-icon-{{ widget.settings.icon_shape }}{% endif %} w-icon-{{ widget.settings.icon_size }}">
-                  {% render 'icon', icon: block.settings.icon, class: 'w-icon' %}
-                </span>
-              {% endif %}
-              <div class="widget-card-content">
+              <div class="widget-card-content{% if widget.settings.alignment == 'center' %} widget-content-align-center{% endif %}">
+                {% if block.settings.icon != blank %}
+                  {% render 'icon', icon: block.settings.icon, class: 'w-icon', style: widget.settings.icon_style, size: widget.settings.icon_size, shape: widget.settings.icon_shape %}
+                {% endif %}
                 {% if block.settings.subtitle != blank %}
                   <span class="w-eyebrow" data-setting="subtitle">{{ block.settings.subtitle }}</span>
                 {% endif %}

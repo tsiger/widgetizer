@@ -256,10 +256,6 @@
               "label": "tTheme:global.style.settings.card_style.options.bordered"
             },
             {
-              "value": "shadow",
-              "label": "tTheme:global.style.settings.card_style.options.shadow"
-            },
-            {
               "value": "flat",
               "label": "tTheme:global.style.settings.card_style.options.flat"
             }

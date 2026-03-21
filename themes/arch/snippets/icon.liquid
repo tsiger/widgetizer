@@ -1,8 +1,15 @@
 {%- comment -%}
   Icon snippet
-  Usage: {% render 'icon', icon: 'lightning' %}
+  Usage:
+    {% render 'icon', icon: 'lightning' %}
+    {% render 'icon', icon: 'star', style: 'filled', size: 'lg', shape: 'circle' %}
 
-  Now uses dynamic lookup from assets/icons.json
+  Params:
+    icon   — icon name (required)
+    class  — extra CSS class for the SVG element
+    style  — 'plain' (default), 'outline', or 'filled'
+    size   — 'sm', 'md', 'lg', 'xl', 'xxl'
+    shape  — 'sharp', 'rounded', 'circle'
 {%- endcomment -%}
 
 {%- assign icon_handle = icon | default: settings.icon -%}
@@ -13,18 +20,32 @@
 {%- endif -%}
 {%- capture svg_open -%}<svg class="{{ class_attr }}" {%- endcapture -%}
 
+{%- capture icon_svg -%}
 {%- if current_icon -%}
-  {%- assign icon_svg = current_icon.body | replace: '<svg', svg_open -%}
-  {{ icon_svg | raw }}
+  {%- assign rendered_svg = current_icon.body | replace: '<svg', svg_open -%}
+  {{ rendered_svg | raw }}
 {%- else -%}
   {%- assign fallback_icon = icons['help-circle'] -%}
   {%- if fallback_icon -%}
     {%- assign fallback_svg = fallback_icon.body | replace: '<svg', svg_open -%}
     {{ fallback_svg | raw }}
   {%- else -%}
-    {%- comment -%} Ultimate fallback: simple circle with question mark {%- endcomment -%}
     <svg class="{{ class_attr }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>
     </svg>
   {%- endif -%}
+{%- endif -%}
+{%- endcapture -%}
+
+{%- if style != blank -%}
+  {%- assign icon_style = style | default: 'plain' -%}
+  {%- assign icon_size = size | default: 'md' -%}
+  {%- if icon_style == 'plain' -%}
+    <span class="w-icon-plain w-icon-{{ icon_size }}">{{ icon_svg | raw }}</span>
+  {%- else -%}
+    {%- assign icon_shape = shape | default: 'circle' -%}
+    <span class="w-icon-{{ icon_style }} w-icon-{{ icon_shape }} w-icon-{{ icon_size }}">{{ icon_svg | raw }}</span>
+  {%- endif -%}
+{%- else -%}
+  {{ icon_svg | raw }}
 {%- endif -%}

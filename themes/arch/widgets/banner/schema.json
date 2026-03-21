@@ -94,6 +94,52 @@
   ],
   "blocks": [
     {
+      "type": "rating",
+      "displayName": "tTheme:banner.blocks.rating.name",
+      "settings": [
+        {
+          "type": "select",
+          "id": "rating",
+          "label": "tTheme:banner.blocks.rating.settings.rating.label",
+          "options": [
+            {
+              "value": "5",
+              "label": "tTheme:banner.blocks.rating.settings.rating.options.5"
+            },
+            {
+              "value": "4",
+              "label": "tTheme:banner.blocks.rating.settings.rating.options.4"
+            },
+            {
+              "value": "3",
+              "label": "tTheme:banner.blocks.rating.settings.rating.options.3"
+            }
+          ],
+          "default": "5"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "displayName": "tTheme:banner.blocks.image.name",
+      "settings": [
+        {
+          "type": "image",
+          "id": "image",
+          "label": "tTheme:banner.blocks.image.settings.image.label"
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "label": "tTheme:banner.blocks.image.settings.width.label",
+          "default": 20,
+          "min": 5,
+          "max": 100,
+          "step": 5
+        }
+      ]
+    },
+    {
       "type": "heading",
       "displayName": "tTheme:banner.blocks.heading.name",
       "settings": [
@@ -194,6 +240,157 @@
           "id": "muted",
           "label": "tTheme:banner.blocks.text.settings.muted.label",
           "default": false
+        }
+      ]
+    },
+    {
+      "type": "features",
+      "displayName": "tTheme:banner.blocks.features.name",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "features",
+          "label": "tTheme:banner.blocks.features.settings.features.label",
+          "description": "tTheme:banner.blocks.features.settings.features.description",
+          "default": "+ Feature 1\n+ Feature 2\n+ Feature 3"
+        }
+      ]
+    },
+    {
+      "type": "icon",
+      "displayName": "tTheme:banner.blocks.icon.name",
+      "settings": [
+        {
+          "type": "icon",
+          "id": "icon",
+          "label": "tTheme:banner.blocks.icon.settings.icon.label",
+          "default": "star"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "tTheme:banner.blocks.icon.settings.style.label",
+          "default": "plain",
+          "options": [
+            {
+              "value": "plain",
+              "label": "tTheme:banner.blocks.icon.settings.style.options.plain"
+            },
+            {
+              "value": "outline",
+              "label": "tTheme:banner.blocks.icon.settings.style.options.outline"
+            },
+            {
+              "value": "filled",
+              "label": "tTheme:banner.blocks.icon.settings.style.options.filled"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "tTheme:banner.blocks.icon.settings.size.label",
+          "default": "md",
+          "options": [
+            {
+              "value": "sm",
+              "label": "tTheme:banner.blocks.icon.settings.size.options.sm"
+            },
+            {
+              "value": "md",
+              "label": "tTheme:banner.blocks.icon.settings.size.options.md"
+            },
+            {
+              "value": "lg",
+              "label": "tTheme:banner.blocks.icon.settings.size.options.lg"
+            },
+            {
+              "value": "xl",
+              "label": "tTheme:banner.blocks.icon.settings.size.options.xl"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "shape",
+          "label": "tTheme:banner.blocks.icon.settings.shape.label",
+          "default": "circle",
+          "options": [
+            {
+              "value": "sharp",
+              "label": "tTheme:banner.blocks.icon.settings.shape.options.sharp"
+            },
+            {
+              "value": "rounded",
+              "label": "tTheme:banner.blocks.icon.settings.shape.options.rounded"
+            },
+            {
+              "value": "circle",
+              "label": "tTheme:banner.blocks.icon.settings.shape.options.circle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "numbered-item",
+      "displayName": "tTheme:banner.blocks.numbered_item.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:banner.blocks.numbered_item.settings.title.label",
+          "default": "Feature Title"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "tTheme:banner.blocks.numbered_item.settings.description.label",
+          "default": "A short description of this feature."
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "tTheme:banner.blocks.numbered_item.settings.size.label",
+          "default": "medium",
+          "options": [
+            {
+              "value": "small",
+              "label": "tTheme:banner.blocks.numbered_item.settings.size.options.small"
+            },
+            {
+              "value": "medium",
+              "label": "tTheme:banner.blocks.numbered_item.settings.size.options.medium"
+            },
+            {
+              "value": "large",
+              "label": "tTheme:banner.blocks.numbered_item.settings.size.options.large"
+            },
+            {
+              "value": "xlarge",
+              "label": "tTheme:banner.blocks.numbered_item.settings.size.options.xlarge"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "shape",
+          "label": "tTheme:banner.blocks.numbered_item.settings.shape.label",
+          "default": "circle",
+          "options": [
+            {
+              "value": "sharp",
+              "label": "tTheme:banner.blocks.numbered_item.settings.shape.options.sharp"
+            },
+            {
+              "value": "rounded",
+              "label": "tTheme:banner.blocks.numbered_item.settings.shape.options.rounded"
+            },
+            {
+              "value": "circle",
+              "label": "tTheme:banner.blocks.numbered_item.settings.shape.options.circle"
+            }
+          ]
         }
       ]
     },

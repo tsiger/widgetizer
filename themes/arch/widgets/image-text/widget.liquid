@@ -26,90 +26,6 @@
         }
       }
 
-      & .image-text-block-image {
-        max-width: var(--block-image-width, 20%);
-
-        & img {
-          width: 100%;
-          height: auto;
-          display: block;
-          border-radius: var(--radius-md);
-        }
-      }
-
-      & .image-text-rating {
-        display: flex;
-        gap: 0.2rem;
-      }
-
-      & .image-text-star {
-        color: var(--rating-star-color);
-        font-size: var(--font-size-lg);
-        line-height: 1;
-      }
-
-      & .image-text-star.empty {
-        color: var(--border-color);
-      }
-
-      & .numbered-item {
-        display: flex;
-        align-items: flex-start;
-        gap: var(--space-md);
-      }
-
-      & .numbered-item-circle {
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--accent);
-        color: var(--accent-text);
-        font-weight: var(--font-weight-semibold);
-        line-height: 1;
-      }
-
-      & .numbered-item-circle-small {
-        width: 2.8rem;
-        height: 2.8rem;
-        font-size: var(--font-size-xs);
-      }
-
-      & .numbered-item-circle-medium {
-        width: 3.6rem;
-        height: 3.6rem;
-        font-size: var(--font-size-sm);
-      }
-
-      & .numbered-item-circle-large {
-        width: 4.8rem;
-        height: 4.8rem;
-        font-size: var(--font-size-base);
-      }
-
-      & .numbered-item-circle-xlarge {
-        width: 6rem;
-        height: 6rem;
-        font-size: var(--font-size-lg);
-      }
-
-      & .numbered-item-shape-sharp {
-        border-radius: 0;
-      }
-
-      & .numbered-item-shape-rounded {
-        border-radius: var(--radius-md);
-      }
-
-      & .numbered-item-shape-circle {
-        border-radius: 50%;
-      }
-
-      & .numbered-item-content {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-xs);
-      }
 
       @media (min-width: 990px) {
         & .image-text-wrapper {
@@ -149,13 +65,13 @@
             {% case block.type %}
               {% when 'rating' %}
                 {% assign rating = block.settings.rating | plus: 0 %}
-                <div class="image-text-rating reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+                <div class="widget-rating reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
                   <span class="stars" aria-hidden="true">
                     {% for i in (1..5) %}
                       {% if i <= rating %}
-                        <span class="image-text-star">★</span>
+                        <span class="widget-rating-star">★</span>
                       {% else %}
-                        <span class="image-text-star empty">★</span>
+                        <span class="widget-rating-star empty">★</span>
                       {% endif %}
                     {% endfor %}
                   </span>
@@ -164,7 +80,7 @@
                   </span>
                 </div>
               {% when 'image' %}
-                <div class="image-text-block-image reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}; --block-image-width: {{ block.settings.width }}%;" data-block-id="{{ blockId }}">
+                <div class="widget-block-image reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}; --block-image-width: {{ block.settings.width }}%;" data-block-id="{{ blockId }}">
                   {% if block.settings.image != blank %}
                     {% image src: block.settings.image, size: 'small', srcset: true %}
                   {% else %}
@@ -172,9 +88,9 @@
                   {% endif %}
                 </div>
               {% when 'icon' %}
-                <div class="{% if block.settings.style == 'plain' %}w-icon-plain{% else %}w-icon-{{ block.settings.style }} w-icon-{{ block.settings.shape }}{% endif %} w-icon-{{ block.settings.size }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+                <div class="reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
                   {% if block.settings.icon != blank %}
-                    {% render 'icon', icon: block.settings.icon, class: 'w-icon' %}
+                    {% render 'icon', icon: block.settings.icon, class: 'w-icon', style: block.settings.style, size: block.settings.size, shape: block.settings.shape %}
                   {% endif %}
                 </div>
               {% when 'heading' %}

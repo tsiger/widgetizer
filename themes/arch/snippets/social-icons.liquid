@@ -3,6 +3,15 @@
   Usage: {% render 'social-icons', social: theme.social %}
 {% endcomment %}
 
+{% assign has_social = false %}
+{% if social.facebook_url != blank or social.instagram_url != blank or social.twitter_url != blank or social.linkedin_url != blank or social.youtube_url != blank or social.tiktok_url != blank or social.pinterest_url != blank or social.github_url != blank or social.mastodon_url != blank or social.bluesky_url != blank or social.discord_url != blank or social.reddit_url != blank or social.telegram_url != blank or social.threads_url != blank or social.whatsapp_url != blank or social.mail_url != blank %}
+  {% assign has_social = true %}
+{% endif %}
+
+{% unless has_social %}
+  <p class="social-empty-hint w-meta t-sm t-muted">Set your social links in Theme Settings &rsaquo; Social Media</p>
+{% endunless %}
+
 {% if social.facebook_url != blank %}
   <a href="{{ social.facebook_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
     {% render 'icon', icon: 'facebook' %}

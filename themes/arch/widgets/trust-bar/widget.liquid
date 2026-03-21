@@ -23,14 +23,24 @@
         display: flex;
         align-items: center;
         gap: var(--space-md);
+        {% if widget.settings.alignment == 'centered' %}
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        {% endif %}
       }
 
       & .trust-bar-icon-wrapper {
         flex-shrink: 0;
       }
 
-      & .trust-bar-text {
+      & .trust-bar-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+        {% if widget.settings.alignment != 'centered' %}
         flex: 1;
+        {% endif %}
       }
 
       @media (min-width: 750px) {
@@ -81,11 +91,16 @@
         {% assign block = widget.blocks[blockId] %}
         <li class="trust-bar-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
           {% if block.settings.icon != blank %}
-            <span class="trust-bar-icon-wrapper {% if widget.settings.icon_style == 'plain' %}w-icon-plain{% else %}w-icon-{{ widget.settings.icon_style }} w-icon-{{ widget.settings.icon_shape }}{% endif %} w-icon-{{ widget.settings.icon_size }}">
-              {% render 'icon', icon: block.settings.icon, class: 'w-icon' %}
-            </span>
+            {% render 'icon', icon: block.settings.icon, class: 'w-icon', style: widget.settings.icon_style, size: widget.settings.icon_size, shape: widget.settings.icon_shape %}
           {% endif %}
-          <span class="trust-bar-text w-body t-sm" data-setting="text">{{ block.settings.text }}</span>
+          <div class="trust-bar-content">
+            {% if block.settings.title != blank %}
+              <span class="w-title t-heading-font" data-setting="title">{{ block.settings.title }}</span>
+            {% endif %}
+            {% if block.settings.text != blank %}
+              <span class="trust-bar-text w-body t-sm" data-setting="text">{{ block.settings.text }}</span>
+            {% endif %}
+          </div>
         </li>
       {% endfor %}
     </ul>

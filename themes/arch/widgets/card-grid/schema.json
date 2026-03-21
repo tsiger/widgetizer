@@ -72,6 +72,54 @@
       "min": 2,
       "max": 5,
       "step": 1
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "tTheme:card_grid.settings.alignment.label",
+      "default": "start",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:card_grid.settings.alignment.options.start"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:card_grid.settings.alignment.options.center"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "tTheme:card_grid.settings.aspect_ratio.label",
+      "default": "4 / 3",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:card_grid.settings.aspect_ratio.options.auto"
+        },
+        {
+          "value": "1 / 1",
+          "label": "tTheme:card_grid.settings.aspect_ratio.options.1 / 1"
+        },
+        {
+          "value": "4 / 3",
+          "label": "tTheme:card_grid.settings.aspect_ratio.options.4 / 3"
+        },
+        {
+          "value": "3 / 2",
+          "label": "tTheme:card_grid.settings.aspect_ratio.options.3 / 2"
+        },
+        {
+          "value": "3 / 4",
+          "label": "tTheme:card_grid.settings.aspect_ratio.options.3 / 4"
+        },
+        {
+          "value": "16 / 9",
+          "label": "tTheme:card_grid.settings.aspect_ratio.options.16 / 9"
+        }
+      ]
     }
   ],
   "blocks": [

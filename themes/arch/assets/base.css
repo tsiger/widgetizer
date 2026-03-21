@@ -253,7 +253,6 @@ img {
 
   /* Card presentation */
   --card-border: var(--border-width-thin) solid var(--border-color);
-  --card-shadow: none;
 
   /* Spacing density */
   --spacing-scale: 1;
@@ -333,14 +332,8 @@ img {
    3.5.3 Card Styles
    -------------------------------------------------------------------------- */
 
-.cards-shadow {
-  --card-border: none;
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
-}
-
 .cards-flat {
   --card-border: none;
-  --card-shadow: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -856,8 +849,13 @@ b {
 /* Content alignment modifiers */
 .widget-content-align-center {
   text-align: center;
+  align-items: center;
 
   & .widget-actions {
+    justify-content: center;
+  }
+
+  & .widget-card-footer {
     justify-content: center;
   }
 }
@@ -895,10 +893,9 @@ b {
   flex-direction: column;
   background-color: var(--bg-primary);
   border: var(--card-border);
-  box-shadow: var(--card-shadow);
   border-radius: var(--radius-md);
   padding: calc(var(--space-lg) * var(--spacing-scale));
-  transition: border-color var(--transition-speed-normal), box-shadow var(--transition-speed-normal);
+  transition: border-color var(--transition-speed-normal);
 
   @media (min-width: 750px) {
     padding: calc(var(--space-xl) * var(--spacing-scale));
@@ -945,7 +942,7 @@ b {
 .widget-card-image {
   width: 100%;
   height: auto;
-  aspect-ratio: 16/9;
+  aspect-ratio: var(--card-image-ratio, 16/9);
   object-fit: cover;
   border-radius: var(--radius-md);
   margin-block-end: var(--space-lg);
@@ -967,6 +964,36 @@ b {
   margin: 0;
 }
 
+/* Icon Card Grid — Featured Image Split Layout */
+.icon-card-grid-split {
+  display: grid;
+  gap: var(--space-lg);
+
+  @media (min-width: 990px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.icon-card-grid-split-reversed {
+  & .icon-card-grid-featured {
+    @media (min-width: 990px) {
+      order: 2;
+    }
+  }
+}
+
+.icon-card-grid-featured {
+  border-radius: var(--radius-md);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 30rem;
+
+  @media (min-width: 990px) {
+    min-height: 0;
+  }
+}
+
 /* --------------------------------------------------------------------------
    7.1 Carousel
    -------------------------------------------------------------------------- */
@@ -983,8 +1010,10 @@ b {
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding-block: var(--space-2xs);
-  max-width: 100%;
+  padding-block: var(--space-sm);
+  padding-inline: var(--space-2xs);
+  margin-inline: calc(-1 * var(--space-2xs));
+  max-width: none;
 
   &::-webkit-scrollbar {
     display: none;
@@ -1550,7 +1579,123 @@ b {
 }
 
 /* --------------------------------------------------------------------------
-   7.6 Block Items
+   7.6 Rating Stars
+   -------------------------------------------------------------------------- */
+
+.widget-rating {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.widget-content-align-center {
+  & .widget-rating {
+    justify-content: center;
+  }
+
+  & .features-list {
+    width: fit-content;
+    margin-inline: auto;
+  }
+
+  & .widget-block-image {
+    margin-inline: auto;
+  }
+
+  & .numbered-item {
+    justify-content: center;
+  }
+}
+
+.widget-rating-star {
+  color: var(--rating-star-color);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+}
+
+.widget-rating-star.empty {
+  color: var(--border-color);
+}
+
+/* --------------------------------------------------------------------------
+   7.7 Block Image
+   -------------------------------------------------------------------------- */
+
+.widget-block-image {
+  max-width: var(--block-image-width, 20%);
+}
+
+.widget-block-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+/* --------------------------------------------------------------------------
+   7.8 Numbered Items
+   -------------------------------------------------------------------------- */
+
+.numbered-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.numbered-item-circle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+}
+
+.numbered-item-circle-small {
+  width: 2.8rem;
+  height: 2.8rem;
+  font-size: var(--font-size-xs);
+}
+
+.numbered-item-circle-medium {
+  width: 3.6rem;
+  height: 3.6rem;
+  font-size: var(--font-size-sm);
+}
+
+.numbered-item-circle-large {
+  width: 4.8rem;
+  height: 4.8rem;
+  font-size: var(--font-size-base);
+}
+
+.numbered-item-circle-xlarge {
+  width: 6rem;
+  height: 6rem;
+  font-size: var(--font-size-lg);
+}
+
+.numbered-item-shape-sharp {
+  border-radius: 0;
+}
+
+.numbered-item-shape-rounded {
+  border-radius: 0.6rem;
+}
+
+.numbered-item-shape-circle {
+  border-radius: 50%;
+}
+
+.numbered-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+/* --------------------------------------------------------------------------
+   7.9 Block Items
    -------------------------------------------------------------------------- */
 
 .block-item {
@@ -1578,20 +1723,28 @@ b {
 .social-links {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-md);
+  gap: var(--space-sm);
+}
+
+.social-empty-hint {
+  margin: 0;
 }
 
 .social-link {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  padding: 0.8rem;
+  border: var(--border-width-thin) solid var(--border-color);
+  border-radius: var(--radius-sm);
   color: var(--text-content);
-  transition: color var(--transition-speed-fast);
-  width: 2.4rem;
-  height: 2.4rem;
+  transition: color var(--transition-speed-fast), border-color var(--transition-speed-fast);
 
   &:hover {
     color: var(--accent);
+    border-color: var(--accent);
   }
 
   & svg {
@@ -2144,16 +2297,25 @@ b {
   background-color: var(--widget-bg-color, transparent);
   background-image: none;
 
-  padding-block: var(--space-3xl);
+  padding-block: 8rem 2rem;
   padding-inline: var(--space-xl);
-  text-align: center;
   border-block-start: var(--border-width-thin) solid var(--border-color);
 
   & .footer-content {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: var(--space-sm);
+    gap: var(--space-xl);
+    margin-block: 0;
+  }
+
+  & .footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+
+    &:first-child {
+      grid-column: span 2;
+    }
   }
 
   & .footer-logo {
@@ -2163,9 +2325,8 @@ b {
 
   & .footer-menu {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-lg);
+    flex-direction: column;
+    gap: var(--space-xs);
     list-style: none;
     padding: 0;
     margin: 0;
@@ -2184,15 +2345,19 @@ b {
   }
 
   & .footer-social {
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   & .footer-copyright {
     color: var(--text-muted);
     font-size: calc(var(--font-size-xs) * var(--body-scale));
     margin: 0;
+    text-align: center;
+    padding-block-start: var(--space-lg);
+    border-block-start: var(--border-width-thin) solid var(--border-color);
   }
 }
+
 
 /* ==========================================================================
    9. UTILITIES

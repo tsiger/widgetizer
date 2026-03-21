@@ -162,7 +162,7 @@
             "label": "Text"
           }
         },
-        "name": "Accordion"
+        "name": "Text"
       },
       "heading": {
         "settings": {
@@ -179,13 +179,107 @@
               "lg": "Large",
               "xl": "Extra Large"
             },
-            "label": "Button size"
+            "label": "Size"
           },
           "text": {
             "label": "Text"
           }
         },
-        "name": "Accordion"
+        "name": "Heading"
+      },
+      "rating": {
+        "name": "Star Rating",
+        "settings": {
+          "rating": {
+            "label": "Rating",
+            "options": {
+              "5": "5 Stars",
+              "4": "4 Stars",
+              "3": "3 Stars"
+            }
+          }
+        }
+      },
+      "image": {
+        "name": "Image",
+        "settings": {
+          "image": {
+            "label": "Image"
+          },
+          "width": {
+            "label": "Width (%)"
+          }
+        }
+      },
+      "features": {
+        "name": "Feature List",
+        "settings": {
+          "features": {
+            "label": "Features",
+            "description": "One feature per line. Use + for check icon or - for X icon."
+          }
+        }
+      },
+      "icon": {
+        "name": "Icon",
+        "settings": {
+          "icon": {
+            "label": "Icon"
+          },
+          "style": {
+            "label": "Icon style",
+            "options": {
+              "plain": "Plain",
+              "outline": "Outline",
+              "filled": "Filled"
+            }
+          },
+          "size": {
+            "label": "Icon size",
+            "options": {
+              "sm": "Small",
+              "md": "Medium",
+              "lg": "Large",
+              "xl": "Extra Large"
+            }
+          },
+          "shape": {
+            "label": "Icon shape",
+            "options": {
+              "sharp": "Sharp",
+              "rounded": "Rounded",
+              "circle": "Circle"
+            }
+          }
+        }
+      },
+      "numbered_item": {
+        "name": "Numbered Item",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "description": {
+            "label": "Description"
+          },
+          "size": {
+            "label": "Number size",
+            "options": {
+              "small": "Small",
+              "medium": "Medium",
+              "large": "Large",
+              "xlarge": "Extra Large"
+            }
+          },
+          "shape": {
+            "label": "Number shape",
+            "options": {
+              "sharp": "Sharp",
+              "rounded": "Rounded",
+              "circle": "Circle"
+            }
+          }
+        }
       }
     }
   },
@@ -289,10 +383,28 @@
           "grid": "Grid",
           "carousel": "Carousel"
         },
-        "label": "Eyebrow text"
+        "label": "Layout"
       },
       "columns_desktop": {
         "label": "Desktop columns"
+      },
+      "alignment": {
+        "label": "Alignment",
+        "options": {
+          "start": "Left",
+          "center": "Center"
+        }
+      },
+      "aspect_ratio": {
+        "label": "Image ratio",
+        "options": {
+          "auto": "Auto",
+          "1 / 1": "Square (1:1)",
+          "4 / 3": "Landscape (4:3)",
+          "3 / 2": "Landscape (3:2)",
+          "3 / 4": "Portrait (3:4)",
+          "16 / 9": "Widescreen (16:9)"
+        }
       },
       "title": {
         "label": "Heading"
@@ -944,25 +1056,8 @@
       "content_header": {
         "label": "Content"
       },
-      "logo": {
-        "label": "Logo image"
-      },
-      "logo_width": {
-        "label": "Logo width"
-      },
-      "footerNavigation": {
-        "label": "Navigation Menu",
-        "description": "Select the menu to display in the footer"
-      },
       "copyright": {
         "label": "Copyright text"
-      },
-      "social_header": {
-        "label": "Social Media"
-      },
-      "show_social": {
-        "label": "Show social icons",
-        "description": "Display social media icons from theme settings"
       },
       "display_header": {
         "label": "Display"
@@ -972,6 +1067,56 @@
         "options": {
           "standard": "Standard",
           "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "logo_text": {
+        "name": "Logo & Text",
+        "settings": {
+          "logo_text": {
+            "label": "Logo text"
+          },
+          "logo": {
+            "label": "Logo image"
+          },
+          "logo_width": {
+            "label": "Logo width"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      },
+      "text_block": {
+        "name": "Text",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      },
+      "menu_block": {
+        "name": "Menu",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "menu": {
+            "label": "Navigation Menu",
+            "description": "Select the menu to display"
+          }
+        }
+      },
+      "social_block": {
+        "name": "Social Icons",
+        "settings": {
+          "title": {
+            "label": "Title"
+          }
         }
       }
     }
@@ -1156,6 +1301,13 @@
           "circle": "Circle"
         }
       },
+      "alignment": {
+        "label": "Alignment",
+        "options": {
+          "start": "Left",
+          "center": "Center"
+        }
+      },
       "color_scheme": {
         "label": "Color Scheme",
         "options": {
@@ -1172,6 +1324,16 @@
       },
       "columns_desktop": {
         "label": "Desktop columns"
+      },
+      "featured_image": {
+        "label": "Featured image"
+      },
+      "featured_image_position": {
+        "label": "Image position",
+        "options": {
+          "start": "Left",
+          "end": "Right"
+        }
       }
     },
     "blocks": {
@@ -3057,6 +3219,13 @@
           "circle": "Circle"
         }
       },
+      "alignment": {
+        "label": "Alignment",
+        "options": {
+          "left": "Left",
+          "centered": "Centered"
+        }
+      },
       "show_dividers": {
         "label": "Show dividers"
       },
@@ -3081,8 +3250,11 @@
           "icon": {
             "label": "Icon"
           },
+          "title": {
+            "label": "Title"
+          },
           "text": {
-            "label": "Text"
+            "label": "Description"
           }
         }
       }
@@ -3257,7 +3429,6 @@
           "description": "How content sections are visually separated",
           "options": {
             "bordered": "Bordered",
-            "shadow": "Shadow",
             "flat": "Flat"
           }
         },

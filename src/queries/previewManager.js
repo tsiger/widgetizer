@@ -192,6 +192,16 @@ export async function updatePreview(iframe, newState, oldState) {
 
   const themeSettingsChanged = JSON.stringify(newThemeSettings) !== JSON.stringify(oldThemeSettings);
 
+  // When theme settings change, re-render all widgets since any setting
+  // could be referenced in templates via {{ theme.* }}
+  if (themeSettingsChanged) {
+    for (const id of Object.keys(newWidgets)) {
+      if (!changedWidgetIds.includes(id)) {
+        changedWidgetIds.push(id);
+      }
+    }
+  }
+
   // Morph changed widgets
   console.log("[PreviewManager] Morphing widgets:", changedWidgetIds);
   for (const widgetId of changedWidgetIds) {
@@ -208,7 +218,7 @@ export async function updatePreview(iframe, newState, oldState) {
   }
 
   // Update global widgets if changed
-  if (headerChanged && newGlobalWidgets.header) {
+  if ((headerChanged || themeSettingsChanged) && newGlobalWidgets.header) {
     try {
       const renderedHtml = await fetchRenderedWidget("header", newGlobalWidgets.header, newThemeSettings);
       iframe.contentWindow.postMessage(
@@ -219,7 +229,7 @@ export async function updatePreview(iframe, newState, oldState) {
       console.error("Error updating header:", error);
     }
   }
-  if (footerChanged && newGlobalWidgets.footer) {
+  if ((footerChanged || themeSettingsChanged) && newGlobalWidgets.footer) {
     try {
       const renderedHtml = await fetchRenderedWidget("footer", newGlobalWidgets.footer, newThemeSettings);
       iframe.contentWindow.postMessage(

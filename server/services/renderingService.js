@@ -583,6 +583,19 @@ async function renderWidget(
       });
     }
 
+    // Also collect menu-type setting IDs from block schemas
+    const blockMenuSettingIds = {};
+    for (const [blockType, blockSettings] of Object.entries(blockSchemas)) {
+      if (Array.isArray(blockSettings)) {
+        blockSettings.forEach((setting) => {
+          if (setting.type === "menu") {
+            if (!blockMenuSettingIds[blockType]) blockMenuSettingIds[blockType] = new Set();
+            blockMenuSettingIds[blockType].add(setting.id);
+          }
+        });
+      }
+    }
+
     // Load menu maps (UUID and slug-based) — cached in sharedGlobals across widgets
     let menuMaps;
     if (sharedGlobals && sharedGlobals.menuMaps) {
@@ -608,6 +621,26 @@ async function renderWidget(
         } catch (err) {
           console.error(`Error loading menu data for setting ${key}:`, err);
           enhancedSettings[key] = { items: [] }; // Fallback to empty menu on error
+        }
+      }
+    }
+
+    // Resolve menu-type settings inside blocks
+    for (const [blockId, block] of Object.entries(enhancedBlocks)) {
+      const menuIds = block.type && blockMenuSettingIds[block.type];
+      if (!menuIds || !block.settings) continue;
+      for (const settingId of menuIds) {
+        const value = block.settings[settingId];
+        try {
+          if (value) {
+            const menuData = menuMaps.byUuid.get(value) || menuMaps.bySlug.get(value);
+            block.settings[settingId] = resolveMenuPageLinks(menuData, pagesByUuid) || { items: [] };
+          } else {
+            block.settings[settingId] = { items: [] };
+          }
+        } catch (err) {
+          console.error(`Error loading menu data for block ${blockId} setting ${settingId}:`, err);
+          block.settings[settingId] = { items: [] };
         }
       }
     }

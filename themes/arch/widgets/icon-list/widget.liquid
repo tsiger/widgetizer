@@ -91,9 +91,7 @@
               {% assign block = widget.blocks[blockId] %}
               <li class="icon-list-item carousel-item" data-block-id="{{ blockId }}">
                 {% if block.settings.icon != blank %}
-                  <span class="{% if widget.settings.icon_style == 'plain' %}w-icon-plain{% else %}w-icon-{{ widget.settings.icon_style }} w-icon-{{ widget.settings.icon_shape }}{% endif %} w-icon-{{ widget.settings.icon_size }}">
-                    {% render 'icon', icon: block.settings.icon, class: 'w-icon' %}
-                  </span>
+                  {% render 'icon', icon: block.settings.icon, class: 'w-icon', style: widget.settings.icon_style, size: widget.settings.icon_size, shape: widget.settings.icon_shape %}
                 {% endif %}
                 {% if block.settings.title != blank %}
                   <span class="icon-list-title t-heading-font" data-setting="title">{{ block.settings.title }}</span>
@@ -115,9 +113,7 @@
             {% assign block = widget.blocks[blockId] %}
             <li class="icon-list-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
               {% if block.settings.icon != blank %}
-                <span class="{% if widget.settings.icon_style == 'plain' %}w-icon-plain{% else %}w-icon-{{ widget.settings.icon_style }} w-icon-{{ widget.settings.icon_shape }}{% endif %} w-icon-{{ widget.settings.icon_size }}">
-                  {% render 'icon', icon: block.settings.icon, class: 'w-icon' %}
-                </span>
+                {% render 'icon', icon: block.settings.icon, class: 'w-icon', style: widget.settings.icon_style, size: widget.settings.icon_size, shape: widget.settings.icon_shape %}
               {% endif %}
               {% if block.settings.title != blank %}
                 <span class="icon-list-title t-heading-font" data-setting="title">{{ block.settings.title }}</span>

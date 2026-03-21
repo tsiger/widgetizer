@@ -79,6 +79,22 @@
       ]
     },
     {
+      "type": "select",
+      "id": "alignment",
+      "label": "tTheme:trust_bar.settings.alignment.label",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "tTheme:trust_bar.settings.alignment.options.left"
+        },
+        {
+          "value": "centered",
+          "label": "tTheme:trust_bar.settings.alignment.options.centered"
+        }
+      ]
+    },
+    {
       "type": "checkbox",
       "id": "show_dividers",
       "label": "tTheme:trust_bar.settings.show_dividers.label",
@@ -118,6 +134,12 @@
         },
         {
           "type": "text",
+          "id": "title",
+          "label": "tTheme:trust_bar.blocks.item.settings.title.label",
+          "default": "Feature title"
+        },
+        {
+          "type": "text",
           "id": "text",
           "label": "tTheme:trust_bar.blocks.item.settings.text.label",
           "default": "Feature description"
@@ -130,6 +152,7 @@
       "type": "item",
       "settings": {
         "icon": "medal",
+        "title": "Industry Experts",
         "text": "Experienced industry professionals"
       }
     },
@@ -137,6 +160,7 @@
       "type": "item",
       "settings": {
         "icon": "star",
+        "title": "Strategic Planning",
         "text": "Modern marketing & strategic planning"
       }
     },
@@ -144,6 +168,7 @@
       "type": "item",
       "settings": {
         "icon": "shield",
+        "title": "Web Solutions",
         "text": "Modern web design & ecommerce solutions"
       }
     },
@@ -151,6 +176,7 @@
       "type": "item",
       "settings": {
         "icon": "headset",
+        "title": "Client Support",
         "text": "24/7 online client support"
       }
     }

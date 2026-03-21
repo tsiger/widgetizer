@@ -162,7 +162,7 @@
             "label": "Text"
           }
         },
-        "name": "Akkordeon"
+        "name": "Text"
       },
       "heading": {
         "settings": {
@@ -179,13 +179,106 @@
               "lg": "Groß",
               "xl": "Extra Groß"
             },
-            "label": "Schaltflächen-Größe"
+            "label": "Größe"
           },
           "text": {
             "label": "Text"
           }
         },
-        "name": "Akkordeon"
+        "name": "Überschrift"
+      },
+      "rating": {
+        "name": "Sternebewertung",
+        "settings": {
+          "rating": {
+            "label": "Sternebewertung",
+            "options": {
+              "3": "3 Sterne",
+              "4": "4 Sterne",
+              "5": "5 Sterne"
+            }
+          }
+        }
+      },
+      "image": {
+        "name": "Bild",
+        "settings": {
+          "image": {
+            "label": "Bild"
+          },
+          "width": {
+            "label": "Maximale Breite (%)"
+          }
+        }
+      },
+      "features": {
+        "name": "Merkmale",
+        "settings": {
+          "features": {
+            "label": "Merkmale (eins pro Zeile)",
+            "description": "Zeile mit + für ein Häkchen oder - für ein Kreuz beginnen."
+          }
+        }
+      },
+      "icon": {
+        "name": "Symbol",
+        "settings": {
+          "icon": {
+            "label": "Symbol"
+          },
+          "style": {
+            "label": "Symbolstil",
+            "options": {
+              "plain": "Einfach",
+              "outline": "Umriss",
+              "filled": "Gefüllt"
+            }
+          },
+          "size": {
+            "label": "Größe",
+            "options": {
+              "sm": "Klein",
+              "md": "Mittel",
+              "lg": "Groß",
+              "xl": "Extra Groß"
+            }
+          },
+          "shape": {
+            "label": "Form",
+            "options": {
+              "sharp": "Eckig",
+              "rounded": "Abgerundet",
+              "circle": "Kreis"
+            }
+          }
+        }
+      },
+      "numbered_item": {
+        "name": "Nummerierter Punkt",
+        "settings": {
+          "title": {
+            "label": "Titel"
+          },
+          "description": {
+            "label": "Beschreibung"
+          },
+          "size": {
+            "label": "Kreisgröße",
+            "options": {
+              "small": "Klein",
+              "medium": "Mittel",
+              "large": "Groß"
+            }
+          },
+          "shape": {
+            "label": "Form",
+            "options": {
+              "sharp": "Eckig",
+              "rounded": "Abgerundet",
+              "circle": "Kreis"
+            }
+          }
+        }
       }
     }
   },
@@ -289,10 +382,28 @@
           "grid": "Raster",
           "carousel": "Karussell"
         },
-        "label": "Dachzeile"
+        "label": "Layout"
       },
       "columns_desktop": {
         "label": "Desktop-Spalten"
+      },
+      "alignment": {
+        "label": "Ausrichtung",
+        "options": {
+          "start": "Links",
+          "center": "Zentriert"
+        }
+      },
+      "aspect_ratio": {
+        "label": "Bildverhältnis",
+        "options": {
+          "auto": "Automatisch",
+          "1 / 1": "Quadratisch (1:1)",
+          "4 / 3": "Querformat (4:3)",
+          "3 / 2": "Querformat (3:2)",
+          "3 / 4": "Hochformat (3:4)",
+          "16 / 9": "Breitbild (16:9)"
+        }
       },
       "title": {
         "label": "Überschrift"
@@ -941,39 +1052,16 @@
   "footer": {
     "name": "Fußzeile",
     "settings": {
-      "content_header": {
-        "label": "Inhalt"
-      },
-      "logo": {
-        "label": "Logo-Bild"
-      },
-      "logo_width": {
-        "label": "Logo-Breite"
-      },
-      "footerNavigation": {
-        "label": "Navigationsmenü",
-        "description": "Wählen Sie das Menü für die Fußzeile"
-      },
-      "copyright": {
-        "label": "Urheberrechtstext"
-      },
-      "social_header": {
-        "label": "Soziale Medien"
-      },
-      "show_social": {
-        "label": "Social-Media-Icons anzeigen",
-        "description": "Social-Media-Icons aus den Theme-Einstellungen anzeigen"
-      },
-      "display_header": {
-        "label": "Anzeige"
-      },
-      "color_scheme": {
-        "label": "Farbschema",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Hervorgehoben"
-        }
-      }
+      "content_header": { "label": "Inhalt" },
+      "copyright": { "label": "Urheberrechtstext" },
+      "display_header": { "label": "Anzeige" },
+      "color_scheme": { "label": "Farbschema", "options": { "standard": "Standard", "highlight": "Hervorgehoben" } }
+    },
+    "blocks": {
+      "logo_text": { "name": "Logo & Text", "settings": { "logo_text": { "label": "Logo-Text" }, "logo": { "label": "Logo-Bild" }, "logo_width": { "label": "Logo-Breite" }, "text": { "label": "Text" } } },
+      "text_block": { "name": "Text", "settings": { "title": { "label": "Titel" }, "text": { "label": "Text" } } },
+      "menu_block": { "name": "Menü", "settings": { "title": { "label": "Titel" }, "menu": { "label": "Navigationsmenü", "description": "Wählen Sie das anzuzeigende Menü" } } },
+      "social_block": { "name": "Social-Media-Icons", "settings": { "title": { "label": "Titel" } } }
     }
   },
   "gallery": {
@@ -1156,6 +1244,13 @@
           "circle": "Kreis"
         }
       },
+      "alignment": {
+        "label": "Ausrichtung",
+        "options": {
+          "start": "Links",
+          "center": "Zentriert"
+        }
+      },
       "color_scheme": {
         "label": "Farbschema",
         "options": {
@@ -1172,6 +1267,16 @@
       },
       "columns_desktop": {
         "label": "Desktop-Spalten"
+      },
+      "featured_image": {
+        "label": "Hervorgehobenes Bild"
+      },
+      "featured_image_position": {
+        "label": "Bildposition",
+        "options": {
+          "start": "Links",
+          "end": "Rechts"
+        }
       }
     },
     "blocks": {
@@ -3015,6 +3120,13 @@
           "circle": "Kreis"
         }
       },
+      "alignment": {
+        "label": "Ausrichtung",
+        "options": {
+          "left": "Links",
+          "centered": "Zentriert"
+        }
+      },
       "show_dividers": {
         "label": "Trennlinien anzeigen"
       },
@@ -3039,8 +3151,11 @@
           "icon": {
             "label": "Symbol"
           },
+          "title": {
+            "label": "Titel"
+          },
           "text": {
-            "label": "Text"
+            "label": "Beschreibung"
           }
         }
       }
@@ -3215,7 +3330,6 @@
           "description": "Wie Inhaltsblöcke visuell getrennt werden",
           "options": {
             "bordered": "Mit Rahmen",
-            "shadow": "Schatten",
             "flat": "Flach"
           }
         },

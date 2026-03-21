@@ -1,6 +1,7 @@
 {
   "type": "footer",
   "displayName": "tTheme:footer.name",
+  "maxBlocks": 4,
   "settings": [
     {
       "type": "header",
@@ -8,44 +9,10 @@
       "label": "tTheme:footer.settings.content_header.label"
     },
     {
-      "type": "image",
-      "id": "logo",
-      "label": "tTheme:footer.settings.logo.label"
-    },
-    {
-      "type": "range",
-      "id": "logo_width",
-      "label": "tTheme:footer.settings.logo_width.label",
-      "min": 50,
-      "max": 300,
-      "step": 10,
-      "default": 100,
-      "unit": "px"
-    },
-    {
-      "type": "menu",
-      "id": "footerNavigation",
-      "label": "tTheme:footer.settings.footerNavigation.label",
-      "description": "tTheme:footer.settings.footerNavigation.description",
-      "default": "footer-menu"
-    },
-    {
       "type": "textarea",
       "id": "copyright",
       "label": "tTheme:footer.settings.copyright.label",
       "default": "© 2026 Widgetizer. All rights are yours to keep."
-    },
-    {
-      "type": "header",
-      "id": "social_header",
-      "label": "tTheme:footer.settings.social_header.label"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_social",
-      "label": "tTheme:footer.settings.show_social.label",
-      "default": true,
-      "description": "tTheme:footer.settings.show_social.description"
     },
     {
       "type": "header",
@@ -67,6 +34,117 @@
           "label": "tTheme:footer.settings.color_scheme.options.highlight"
         }
       ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo_text",
+      "displayName": "tTheme:footer.blocks.logo_text.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "logo_text",
+          "label": "tTheme:footer.blocks.logo_text.settings.logo_text.label",
+          "default": "Widgetizer"
+        },
+        {
+          "type": "image",
+          "id": "logo",
+          "label": "tTheme:footer.blocks.logo_text.settings.logo.label"
+        },
+        {
+          "type": "range",
+          "id": "logo_width",
+          "label": "tTheme:footer.blocks.logo_text.settings.logo_width.label",
+          "min": 50,
+          "max": 300,
+          "step": 10,
+          "default": 100,
+          "unit": "px"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "tTheme:footer.blocks.logo_text.settings.text.label",
+          "default": "<p>A leading company dedicated to delivering high-quality solutions.</p>"
+        }
+      ]
+    },
+    {
+      "type": "text_block",
+      "displayName": "tTheme:footer.blocks.text_block.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:footer.blocks.text_block.settings.title.label",
+          "default": "Contact"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "tTheme:footer.blocks.text_block.settings.text.label",
+          "default": "<p>info@example.com</p><p>123 Main Street,<br>City, State 12345</p>"
+        }
+      ]
+    },
+    {
+      "type": "menu_block",
+      "displayName": "tTheme:footer.blocks.menu_block.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:footer.blocks.menu_block.settings.title.label",
+          "default": "Links"
+        },
+        {
+          "type": "menu",
+          "id": "menu",
+          "label": "tTheme:footer.blocks.menu_block.settings.menu.label",
+          "description": "tTheme:footer.blocks.menu_block.settings.menu.description",
+          "default": "footer-menu"
+        }
+      ]
+    },
+    {
+      "type": "social_block",
+      "displayName": "tTheme:footer.blocks.social_block.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:footer.blocks.social_block.settings.title.label",
+          "default": "Get in Touch"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>A leading company dedicated to delivering high-quality solutions.</p>"
+      }
+    },
+    {
+      "type": "text_block",
+      "settings": {
+        "title": "Contact",
+        "text": "<p>info@example.com</p><p>123 Main Street,<br>City, State 12345</p>"
+      }
+    },
+    {
+      "type": "menu_block",
+      "settings": {
+        "title": "Links"
+      }
+    },
+    {
+      "type": "social_block",
+      "settings": {
+        "title": "Get in Touch"
+      }
     }
   ]
 }

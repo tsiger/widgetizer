@@ -402,16 +402,42 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         if (!globalWidget || !oldGlobalWidget) return;
 
         const settingsChanged = JSON.stringify(globalWidget.settings) !== JSON.stringify(oldGlobalWidget.settings);
+        const blocksSettingsChanged = globalWidget.blocksOrder?.some((blockId) => {
+          const newBlock = globalWidget.blocks?.[blockId];
+          const oldBlock = oldGlobalWidget.blocks?.[blockId];
+          return newBlock && oldBlock && JSON.stringify(newBlock.settings) !== JSON.stringify(oldBlock.settings);
+        });
 
-        if (settingsChanged) {
-          const changes = { settings: {} };
-          Object.entries(globalWidget.settings || {}).forEach(([key, value]) => {
-            if (JSON.stringify(value) !== JSON.stringify(oldGlobalWidget.settings?.[key])) {
-              changes.settings[key] = value;
-            }
-          });
+        if (settingsChanged || blocksSettingsChanged) {
+          const changes = { settings: {}, blocks: {} };
 
-          const fieldTypes = buildFieldTypes(globalWidget, changes.settings, {}, schemas);
+          if (settingsChanged) {
+            Object.entries(globalWidget.settings || {}).forEach(([key, value]) => {
+              if (JSON.stringify(value) !== JSON.stringify(oldGlobalWidget.settings?.[key])) {
+                changes.settings[key] = value;
+              }
+            });
+          }
+
+          if (blocksSettingsChanged) {
+            globalWidget.blocksOrder?.forEach((blockId) => {
+              const newBlock = globalWidget.blocks?.[blockId];
+              const oldBlock = oldGlobalWidget.blocks?.[blockId];
+              if (newBlock && oldBlock) {
+                const changedBlockSettings = {};
+                Object.entries(newBlock.settings || {}).forEach(([key, value]) => {
+                  if (JSON.stringify(value) !== JSON.stringify(oldBlock.settings?.[key])) {
+                    changedBlockSettings[key] = value;
+                  }
+                });
+                if (Object.keys(changedBlockSettings).length > 0) {
+                  changes.blocks[blockId] = { settings: changedBlockSettings };
+                }
+              }
+            });
+          }
+
+          const fieldTypes = buildFieldTypes(globalWidget, changes.settings, changes.blocks, schemas);
 
           iframeRef.current.contentWindow.postMessage(
             { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId: globalWidgetKey, changes, fieldTypes } },

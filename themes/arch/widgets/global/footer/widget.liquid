@@ -1,40 +1,64 @@
 <footer
   id="{{ widget.id }}"
-  class="widget widget-footer color-scheme-{{ widget.settings.color_scheme }}"
+  class="widget widget-footer widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="footer"
-  {% if widget.settings.color_scheme == 'highlight' %}style="--widget-bg-color: var(--bg-primary);"{% endif %}
+  style="{% if widget.settings.color_scheme == 'highlight' %}--widget-bg-color: var(--bg-primary);{% endif %}{% if widget.settings.copyright == blank %} padding-block: 8rem;{% endif %}"
 >
-  <style>
-    .widget-{{ widget.id }} .footer-logo {
-      max-width: {{ widget.settings.logo_width | default: 100 }}px;
-    }
-  </style>
+  <div class="widget-container footer-content">
+    <div class="widget-grid" style="--grid-cols-desktop: 5; --grid-gap: var(--space-3xl);">
+      {% for blockId in widget.blocksOrder %}
+        {% assign block = widget.blocks[blockId] %}
 
+        <div class="footer-column" data-block-id="{{ blockId }}">
+          {% case block.type %}
+          {% when 'logo_text' %}
+            {% if block.settings.logo != blank %}
+              <style>.widget-{{ widget.id }} [data-block-id="{{ blockId }}"] .footer-logo { max-width: {{ block.settings.logo_width | default: 100 }}px; height: auto; display: block; }</style>
+              {% image src: block.settings.logo, size: 'small', class: 'footer-logo', alt: 'Logo' %}
+            {% elsif block.settings.logo_text != blank %}
+              <span class="footer-logo-text w-title t-xl t-heading-font" data-setting="logo_text">{{ block.settings.logo_text }}</span>
+            {% endif %}
+            {% if block.settings.text != blank %}
+              <div class="w-body w-rte t-sm" data-setting="text">{{ block.settings.text | raw }}</div>
+            {% endif %}
 
-  <div class="footer-content">
-    {% if widget.settings.logo != blank %}
-      {% image src: widget.settings.logo, size: 'small', class: 'footer-logo', alt: 'Footer Logo' %}
-    {% endif %}
+          {% when 'text_block' %}
+            {% if block.settings.title != blank %}
+              <h3 class="w-title t-lg" data-setting="title">{{ block.settings.title }}</h3>
+            {% endif %}
+            {% if block.settings.text != blank %}
+              <div class="w-body w-rte t-sm" data-setting="text">{{ block.settings.text | raw }}</div>
+            {% endif %}
 
-    {% if widget.settings.footerNavigation %}
-      {% render 'menu',
-        menu: widget.settings.footerNavigation,
-        aria_label: 'Footer',
-        class_nav: 'footer-nav',
-        class_list: 'footer-menu',
-        class_item: 'footer-menu-item',
-        class_link: 'footer-menu-link',
-        class_submenu: 'hidden',
-        class_has_submenu: 'hidden'
-      %}
-    {% endif %}
+          {% when 'menu_block' %}
+            {% if block.settings.title != blank %}
+              <h3 class="w-title t-lg" data-setting="title">{{ block.settings.title }}</h3>
+            {% endif %}
+            {% if block.settings.menu %}
+              {% render 'menu',
+                menu: block.settings.menu,
+                aria_label: block.settings.title,
+                class_nav: 'footer-nav',
+                class_list: 'footer-menu',
+                class_item: 'footer-menu-item',
+                class_link: 'footer-menu-link',
+                class_submenu: 'hidden',
+                class_has_submenu: 'hidden'
+              %}
+            {% endif %}
 
-    {% if widget.settings.show_social %}
-      <div class="social-links footer-social">
-        {% render 'social-icons', social: theme.social %}
-      </div>
-    {% endif %}
+          {% when 'social_block' %}
+            {% if block.settings.title != blank %}
+              <h3 class="w-title t-lg" data-setting="title">{{ block.settings.title }}</h3>
+            {% endif %}
+            <div class="social-links footer-social">
+              {% render 'social-icons', social: theme.social %}
+            </div>
+          {% endcase %}
+        </div>
+      {% endfor %}
+    </div>
 
     {% if widget.settings.copyright != blank %}
       <p class="footer-copyright" data-setting="copyright">

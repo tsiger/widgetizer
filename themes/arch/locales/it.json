@@ -162,7 +162,7 @@
             "label": "Testo"
           }
         },
-        "name": "Fisarmonica"
+        "name": "Testo"
       },
       "heading": {
         "settings": {
@@ -179,13 +179,106 @@
               "lg": "Grande",
               "xl": "Extra Grande"
             },
-            "label": "Dimensione pulsante"
+            "label": "Dimensione"
           },
           "text": {
             "label": "Testo"
           }
         },
-        "name": "Fisarmonica"
+        "name": "Intestazione"
+      },
+      "rating": {
+        "name": "Valutazione a Stelle",
+        "settings": {
+          "rating": {
+            "label": "Valutazione",
+            "options": {
+              "3": "3 stelle",
+              "4": "4 stelle",
+              "5": "5 stelle"
+            }
+          }
+        }
+      },
+      "image": {
+        "name": "Immagine",
+        "settings": {
+          "image": {
+            "label": "Immagine"
+          },
+          "width": {
+            "label": "Larghezza massima (%)"
+          }
+        }
+      },
+      "features": {
+        "name": "Funzionalità",
+        "settings": {
+          "features": {
+            "label": "Funzionalità (una per riga)",
+            "description": "Inizia una riga con + per un segno di spunta o - per una croce."
+          }
+        }
+      },
+      "icon": {
+        "name": "Icona",
+        "settings": {
+          "icon": {
+            "label": "Icona"
+          },
+          "style": {
+            "label": "Stile icona",
+            "options": {
+              "plain": "Semplice",
+              "outline": "Contorno",
+              "filled": "Pieno"
+            }
+          },
+          "size": {
+            "label": "Dimensione",
+            "options": {
+              "sm": "Piccolo",
+              "md": "Medio",
+              "lg": "Grande",
+              "xl": "Extra Grande"
+            }
+          },
+          "shape": {
+            "label": "Forma",
+            "options": {
+              "sharp": "Angolare",
+              "rounded": "Arrotondato",
+              "circle": "Cerchio"
+            }
+          }
+        }
+      },
+      "numbered_item": {
+        "name": "Elemento Numerato",
+        "settings": {
+          "title": {
+            "label": "Titolo"
+          },
+          "description": {
+            "label": "Descrizione"
+          },
+          "size": {
+            "label": "Dimensione cerchio",
+            "options": {
+              "small": "Piccolo",
+              "medium": "Medio",
+              "large": "Grande"
+            }
+          },
+          "shape": {
+            "label": "Forma",
+            "options": {
+              "sharp": "Angolare",
+              "rounded": "Arrotondato",
+              "circle": "Cerchio"
+            }
+          }
+        }
       }
     }
   },
@@ -289,10 +382,28 @@
           "grid": "Griglia",
           "carousel": "Carosello"
         },
-        "label": "Testo sopratitolo"
+        "label": "Layout"
       },
       "columns_desktop": {
         "label": "Colonne desktop"
+      },
+      "alignment": {
+        "label": "Allineamento",
+        "options": {
+          "start": "Sinistra",
+          "center": "Centrato"
+        }
+      },
+      "aspect_ratio": {
+        "label": "Rapporto immagine",
+        "options": {
+          "auto": "Automatico",
+          "1 / 1": "Quadrato (1:1)",
+          "4 / 3": "Orizzontale (4:3)",
+          "3 / 2": "Orizzontale (3:2)",
+          "3 / 4": "Verticale (3:4)",
+          "16 / 9": "Panoramico (16:9)"
+        }
       },
       "title": {
         "label": "Intestazione"
@@ -941,39 +1052,16 @@
   "footer": {
     "name": "Piè di pagina",
     "settings": {
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "logo": {
-        "label": "Immagine logo"
-      },
-      "logo_width": {
-        "label": "Larghezza logo"
-      },
-      "footerNavigation": {
-        "label": "Menu di navigazione",
-        "description": "Seleziona il menu da visualizzare nel piè di pagina"
-      },
-      "copyright": {
-        "label": "Testo copyright"
-      },
-      "social_header": {
-        "label": "Social media"
-      },
-      "show_social": {
-        "label": "Mostra icone social",
-        "description": "Mostra le icone social dalle impostazioni del tema"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "In evidenza"
-        }
-      }
+      "content_header": { "label": "Contenuto" },
+      "copyright": { "label": "Testo copyright" },
+      "display_header": { "label": "Visualizzazione" },
+      "color_scheme": { "label": "Schema colori", "options": { "standard": "Standard", "highlight": "In evidenza" } }
+    },
+    "blocks": {
+      "logo_text": { "name": "Logo e testo", "settings": { "logo_text": { "label": "Testo del logo" }, "logo": { "label": "Immagine logo" }, "logo_width": { "label": "Larghezza logo" }, "text": { "label": "Testo" } } },
+      "text_block": { "name": "Testo", "settings": { "title": { "label": "Titolo" }, "text": { "label": "Testo" } } },
+      "menu_block": { "name": "Menu", "settings": { "title": { "label": "Titolo" }, "menu": { "label": "Menu di navigazione", "description": "Seleziona il menu da visualizzare" } } },
+      "social_block": { "name": "Icone social", "settings": { "title": { "label": "Titolo" } } }
     }
   },
   "gallery": {
@@ -1156,6 +1244,13 @@
           "circle": "Cerchio"
         }
       },
+      "alignment": {
+        "label": "Allineamento",
+        "options": {
+          "start": "Sinistra",
+          "center": "Centrato"
+        }
+      },
       "color_scheme": {
         "label": "Schema colori",
         "options": {
@@ -1172,6 +1267,16 @@
       },
       "columns_desktop": {
         "label": "Colonne desktop"
+      },
+      "featured_image": {
+        "label": "Immagine in evidenza"
+      },
+      "featured_image_position": {
+        "label": "Posizione immagine",
+        "options": {
+          "start": "Sinistra",
+          "end": "Destra"
+        }
       }
     },
     "blocks": {
@@ -3015,6 +3120,13 @@
           "circle": "Cerchio"
         }
       },
+      "alignment": {
+        "label": "Allineamento",
+        "options": {
+          "left": "Sinistra",
+          "centered": "Centrato"
+        }
+      },
       "show_dividers": {
         "label": "Mostra separatori"
       },
@@ -3039,8 +3151,11 @@
           "icon": {
             "label": "Icona"
           },
+          "title": {
+            "label": "Titolo"
+          },
           "text": {
-            "label": "Testo"
+            "label": "Descrizione"
           }
         }
       }
@@ -3215,7 +3330,6 @@
           "description": "Come i blocchi di contenuto vengono separati visivamente",
           "options": {
             "bordered": "Con bordo",
-            "shadow": "Ombra",
             "flat": "Piatto"
           }
         },

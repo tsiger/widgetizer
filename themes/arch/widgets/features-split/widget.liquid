@@ -121,9 +121,7 @@
             {% assign block = widget.blocks[blockId] %}
             <li class="features-split-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
               {% if block.settings.icon != blank %}
-                <span class="{% if widget.settings.icon_style == 'plain' %}w-icon-plain{% else %}w-icon-{{ widget.settings.icon_style }} w-icon-{{ widget.settings.icon_shape }}{% endif %} w-icon-{{ widget.settings.icon_size }}">
-                  {% render 'icon', icon: block.settings.icon, class: 'w-icon' %}
-                </span>
+                {% render 'icon', icon: block.settings.icon, class: 'w-icon', style: widget.settings.icon_style, size: widget.settings.icon_size, shape: widget.settings.icon_shape %}
               {% endif %}
               <div class="features-split-item-content">
                 <{{ item_heading_level }} class="features-split-item-title w-title t-2xl" data-setting="title">
