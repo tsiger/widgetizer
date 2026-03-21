@@ -957,6 +957,18 @@ b {
   stroke-width: 0.15rem;
 }
 
+/* Card Grid — Image Bottom */
+.card-grid-image-bottom {
+  & .widget-card {
+    flex-direction: column-reverse;
+  }
+
+  & .widget-card-image {
+    margin-block-end: 0;
+    margin-block-start: var(--space-lg);
+  }
+}
+
 /* Card Grid Container (list reset — pair with .widget-grid for column layout) */
 .widget-card-grid {
   list-style: none;

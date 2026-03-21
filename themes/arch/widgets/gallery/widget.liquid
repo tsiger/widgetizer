@@ -74,6 +74,17 @@
       }
 
       /* Lightbox Styles - see base.css */
+
+      {% if widget.settings.staggered %}
+        @media (min-width: 750px) {
+          & .widget-card-grid {
+            align-items: start;
+          }
+          & .widget-card:nth-child(even) {
+            margin-block-start: var(--space-3xl);
+          }
+        }
+      {% endif %}
     }
   </style>
 

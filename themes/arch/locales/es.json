@@ -267,7 +267,8 @@
             "options": {
               "small": "Pequeño",
               "medium": "Mediano",
-              "large": "Grande"
+              "large": "Grande",
+              "xlarge": "Extra Grande"
             }
           },
           "shape": {
@@ -392,6 +393,13 @@
         "options": {
           "start": "Izquierda",
           "center": "Centro"
+        }
+      },
+      "image_position": {
+        "label": "Posición de imagen",
+        "options": {
+          "top": "Arriba",
+          "bottom": "Abajo"
         }
       },
       "aspect_ratio": {
@@ -1070,6 +1078,9 @@
       "columns_desktop": {
         "label": "Columnas (Escritorio)"
       },
+      "staggered": {
+        "label": "Diseño escalonado"
+      },
       "aspect_ratio": {
         "label": "Relación de aspecto de imagen",
         "options": {
@@ -1111,6 +1122,7 @@
     },
     "blocks": {
       "image": {
+        "name": "Imagen",
         "settings": {
           "caption": {
             "label": "Leyenda"
@@ -1121,8 +1133,7 @@
           "image": {
             "label": "Imagen de fondo"
           }
-        },
-        "name": "Acordeón"
+        }
       }
     }
   },
@@ -1782,6 +1793,37 @@
           }
         }
       },
+      "icon": {
+        "name": "Icono",
+        "settings": {
+          "icon": { "label": "Icono" },
+          "style": {
+            "label": "Estilo del icono",
+            "options": {
+              "plain": "Simple",
+              "outline": "Contorno",
+              "filled": "Relleno"
+            }
+          },
+          "size": {
+            "label": "Tamaño",
+            "options": {
+              "sm": "Pequeño",
+              "md": "Mediano",
+              "lg": "Grande",
+              "xl": "Extra Grande"
+            }
+          },
+          "shape": {
+            "label": "Forma",
+            "options": {
+              "sharp": "Angular",
+              "rounded": "Redondeado",
+              "circle": "Círculo"
+            }
+          }
+        }
+      },
       "numbered_item": {
         "name": "Elemento Numerado",
         "settings": {
@@ -1796,7 +1838,16 @@
             "options": {
               "small": "Pequeño",
               "medium": "Mediano",
-              "large": "Grande"
+              "large": "Grande",
+              "xlarge": "Extra Grande"
+            }
+          },
+          "shape": {
+            "label": "Forma",
+            "options": {
+              "sharp": "Angular",
+              "rounded": "Redondeado",
+              "circle": "Círculo"
             }
           }
         }
@@ -2734,6 +2785,69 @@
               "standard": "Estándar",
               "highlight": "Resaltado"
             }
+          }
+        }
+      }
+    }
+  },
+  "split_content": {
+    "name": "Contenido Dividido",
+    "settings": {
+      "color_scheme": {
+        "label": "Esquema de colores",
+        "options": { "standard": "Estándar", "highlight": "Resaltado" }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Encabezado",
+        "settings": {
+          "text": { "label": "Texto" },
+          "size": {
+            "label": "Tamaño",
+            "options": { "lg": "Grande", "xl": "XL", "2xl": "2XL", "3xl": "3XL", "4xl": "4XL", "5xl": "5XL", "6xl": "6XL", "7xl": "7XL", "8xl": "8XL", "9xl": "9XL" }
+          },
+          "position": {
+            "label": "Columna",
+            "options": { "left": "Izquierda", "right": "Derecha" }
+          }
+        }
+      },
+      "text": {
+        "name": "Texto",
+        "settings": {
+          "text": { "label": "Texto" },
+          "size": {
+            "label": "Tamaño",
+            "options": { "sm": "Pequeño", "base": "Predeterminado", "lg": "Grande" }
+          },
+          "muted": { "label": "Color atenuado" },
+          "position": {
+            "label": "Columna",
+            "options": { "left": "Izquierda", "right": "Derecha" }
+          }
+        }
+      },
+      "button": {
+        "name": "Botón",
+        "settings": {
+          "link": { "label": "Enlace del botón" },
+          "style": {
+            "label": "Estilo del botón",
+            "options": { "primary": "Primario", "secondary": "Secundario" }
+          },
+          "link_2": { "label": "Segundo enlace del botón" },
+          "style_2": {
+            "label": "Segundo estilo del botón",
+            "options": { "primary": "Primario", "secondary": "Secundario" }
+          },
+          "size": {
+            "label": "Tamaño del botón",
+            "options": { "small": "Pequeño", "medium": "Mediano", "large": "Grande", "xlarge": "Extra Grande" }
+          },
+          "position": {
+            "label": "Columna",
+            "options": { "left": "Izquierda", "right": "Derecha" }
           }
         }
       }

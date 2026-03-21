@@ -267,7 +267,8 @@
             "options": {
               "small": "Μικρό",
               "medium": "Μεσαίο",
-              "large": "Μεγάλο"
+              "large": "Μεγάλο",
+              "xlarge": "Πολύ Μεγάλο"
             }
           },
           "shape": {
@@ -392,6 +393,13 @@
         "options": {
           "start": "Αριστερά",
           "center": "Κεντραρισμένο"
+        }
+      },
+      "image_position": {
+        "label": "Θέση εικόνας",
+        "options": {
+          "top": "Πάνω",
+          "bottom": "Κάτω"
         }
       },
       "aspect_ratio": {
@@ -1070,6 +1078,9 @@
       "columns_desktop": {
         "label": "Στήλες (Επιτραπέζιος)"
       },
+      "staggered": {
+        "label": "Κλιμακωτή διάταξη"
+      },
       "aspect_ratio": {
         "label": "Αναλογία διαστάσεων εικόνας",
         "options": {
@@ -1111,6 +1122,7 @@
     },
     "blocks": {
       "image": {
+        "name": "Εικόνα",
         "settings": {
           "caption": {
             "label": "Λεζάντα"
@@ -1121,8 +1133,7 @@
           "image": {
             "label": "Εικόνα φόντου"
           }
-        },
-        "name": "Ακορντεόν"
+        }
       }
     }
   },
@@ -1782,6 +1793,37 @@
           }
         }
       },
+      "icon": {
+        "name": "Εικονίδιο",
+        "settings": {
+          "icon": { "label": "Εικονίδιο" },
+          "style": {
+            "label": "Στυλ εικονιδίου",
+            "options": {
+              "plain": "Απλό",
+              "outline": "Περίγραμμα",
+              "filled": "Γεμάτο"
+            }
+          },
+          "size": {
+            "label": "Μέγεθος",
+            "options": {
+              "sm": "Μικρό",
+              "md": "Μεσαίο",
+              "lg": "Μεγάλο",
+              "xl": "Πολύ Μεγάλο"
+            }
+          },
+          "shape": {
+            "label": "Σχήμα",
+            "options": {
+              "sharp": "Αιχμηρό",
+              "rounded": "Στρογγυλεμένο",
+              "circle": "Κύκλος"
+            }
+          }
+        }
+      },
       "numbered_item": {
         "name": "Αριθμημένο Στοιχείο",
         "settings": {
@@ -1796,7 +1838,16 @@
             "options": {
               "small": "Μικρό",
               "medium": "Μεσαίο",
-              "large": "Μεγάλο"
+              "large": "Μεγάλο",
+              "xlarge": "Πολύ Μεγάλο"
+            }
+          },
+          "shape": {
+            "label": "Σχήμα",
+            "options": {
+              "sharp": "Αιχμηρό",
+              "rounded": "Στρογγυλεμένο",
+              "circle": "Κύκλος"
             }
           }
         }
@@ -2734,6 +2785,69 @@
               "standard": "Τυπικό",
               "highlight": "Τονισμένο"
             }
+          }
+        }
+      }
+    }
+  },
+  "split_content": {
+    "name": "Διαχωρισμένο Περιεχόμενο",
+    "settings": {
+      "color_scheme": {
+        "label": "Χρωματικό σχήμα",
+        "options": { "standard": "Τυπικό", "highlight": "Τονισμένο" }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Επικεφαλίδα",
+        "settings": {
+          "text": { "label": "Κείμενο" },
+          "size": {
+            "label": "Μέγεθος",
+            "options": { "lg": "Μεγάλο", "xl": "XL", "2xl": "2XL", "3xl": "3XL", "4xl": "4XL", "5xl": "5XL", "6xl": "6XL", "7xl": "7XL", "8xl": "8XL", "9xl": "9XL" }
+          },
+          "position": {
+            "label": "Στήλη",
+            "options": { "left": "Αριστερά", "right": "Δεξιά" }
+          }
+        }
+      },
+      "text": {
+        "name": "Κείμενο",
+        "settings": {
+          "text": { "label": "Κείμενο" },
+          "size": {
+            "label": "Μέγεθος",
+            "options": { "sm": "Μικρό", "base": "Προεπιλογή", "lg": "Μεγάλο" }
+          },
+          "muted": { "label": "Αμυδρό χρώμα" },
+          "position": {
+            "label": "Στήλη",
+            "options": { "left": "Αριστερά", "right": "Δεξιά" }
+          }
+        }
+      },
+      "button": {
+        "name": "Κουμπί",
+        "settings": {
+          "link": { "label": "Σύνδεσμος κουμπιού" },
+          "style": {
+            "label": "Στυλ κουμπιού",
+            "options": { "primary": "Κύριο", "secondary": "Δευτερεύον" }
+          },
+          "link_2": { "label": "Δεύτερος σύνδεσμος κουμπιού" },
+          "style_2": {
+            "label": "Δεύτερο στυλ κουμπιού",
+            "options": { "primary": "Κύριο", "secondary": "Δευτερεύον" }
+          },
+          "size": {
+            "label": "Μέγεθος κουμπιού",
+            "options": { "small": "Μικρό", "medium": "Μεσαίο", "large": "Μεγάλο", "xlarge": "Πολύ Μεγάλο" }
+          },
+          "position": {
+            "label": "Στήλη",
+            "options": { "left": "Αριστερά", "right": "Δεξιά" }
           }
         }
       }

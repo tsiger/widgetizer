@@ -267,7 +267,8 @@
             "options": {
               "small": "Klein",
               "medium": "Mittel",
-              "large": "Groß"
+              "large": "Groß",
+              "xlarge": "Extra Groß"
             }
           },
           "shape": {
@@ -392,6 +393,13 @@
         "options": {
           "start": "Links",
           "center": "Zentriert"
+        }
+      },
+      "image_position": {
+        "label": "Bildposition",
+        "options": {
+          "top": "Oben",
+          "bottom": "Unten"
         }
       },
       "aspect_ratio": {
@@ -1070,6 +1078,9 @@
       "columns_desktop": {
         "label": "Spalten (Desktop)"
       },
+      "staggered": {
+        "label": "Versetztes Layout"
+      },
       "aspect_ratio": {
         "label": "Bild-Seitenverhältnis",
         "options": {
@@ -1111,6 +1122,7 @@
     },
     "blocks": {
       "image": {
+        "name": "Bild",
         "settings": {
           "caption": {
             "label": "Bildunterschrift"
@@ -1121,8 +1133,7 @@
           "image": {
             "label": "Hintergrundbild"
           }
-        },
-        "name": "Akkordeon"
+        }
       }
     }
   },
@@ -1782,6 +1793,39 @@
           }
         }
       },
+      "icon": {
+        "name": "Symbol",
+        "settings": {
+          "icon": {
+            "label": "Symbol"
+          },
+          "style": {
+            "label": "Symbolstil",
+            "options": {
+              "plain": "Einfach",
+              "outline": "Umriss",
+              "filled": "Gefüllt"
+            }
+          },
+          "size": {
+            "label": "Größe",
+            "options": {
+              "sm": "Klein",
+              "md": "Mittel",
+              "lg": "Groß",
+              "xl": "Extra Groß"
+            }
+          },
+          "shape": {
+            "label": "Form",
+            "options": {
+              "sharp": "Eckig",
+              "rounded": "Abgerundet",
+              "circle": "Kreis"
+            }
+          }
+        }
+      },
       "numbered_item": {
         "name": "Nummerierter Punkt",
         "settings": {
@@ -1796,7 +1840,16 @@
             "options": {
               "small": "Klein",
               "medium": "Mittel",
-              "large": "Groß"
+              "large": "Groß",
+              "xlarge": "Extra Groß"
+            }
+          },
+          "shape": {
+            "label": "Form",
+            "options": {
+              "sharp": "Eckig",
+              "rounded": "Abgerundet",
+              "circle": "Kreis"
             }
           }
         }
@@ -2734,6 +2787,72 @@
               "standard": "Standard",
               "highlight": "Hervorgehoben"
             }
+          }
+        }
+      }
+    }
+  },
+  "split_content": {
+    "name": "Geteilter Inhalt",
+    "settings": {
+      "color_scheme": {
+        "label": "Farbschema",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Hervorgehoben"
+        }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Überschrift",
+        "settings": {
+          "text": { "label": "Text" },
+          "size": {
+            "label": "Größe",
+            "options": { "lg": "Groß", "xl": "XL", "2xl": "2XL", "3xl": "3XL", "4xl": "4XL", "5xl": "5XL", "6xl": "6XL", "7xl": "7XL", "8xl": "8XL", "9xl": "9XL" }
+          },
+          "position": {
+            "label": "Spalte",
+            "options": { "left": "Links", "right": "Rechts" }
+          }
+        }
+      },
+      "text": {
+        "name": "Text",
+        "settings": {
+          "text": { "label": "Text" },
+          "size": {
+            "label": "Größe",
+            "options": { "sm": "Klein", "base": "Standard", "lg": "Groß" }
+          },
+          "muted": { "label": "Gedämpfte Farbe" },
+          "position": {
+            "label": "Spalte",
+            "options": { "left": "Links", "right": "Rechts" }
+          }
+        }
+      },
+      "button": {
+        "name": "Schaltfläche",
+        "settings": {
+          "link": { "label": "Schaltflächen-Link" },
+          "style": {
+            "label": "Schaltflächen-Stil",
+            "options": { "primary": "Primär", "secondary": "Sekundär" }
+          },
+          "link_2": { "label": "Zweiter Schaltflächen-Link" },
+          "style_2": {
+            "label": "Zweiter Schaltflächen-Stil",
+            "options": { "primary": "Primär", "secondary": "Sekundär" }
+          },
+          "size": {
+            "label": "Schaltflächen-Größe",
+            "options": { "small": "Klein", "medium": "Mittel", "large": "Groß", "xlarge": "Extra Groß" }
+          },
+          "position": {
+            "label": "Spalte",
+            "options": { "left": "Links", "right": "Rechts" }
           }
         }
       }

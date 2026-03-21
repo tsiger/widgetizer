@@ -395,6 +395,13 @@
           "center": "Center"
         }
       },
+      "image_position": {
+        "label": "Image position",
+        "options": {
+          "top": "Top",
+          "bottom": "Bottom"
+        }
+      },
       "aspect_ratio": {
         "label": "Image ratio",
         "options": {
@@ -1127,6 +1134,9 @@
       "columns_desktop": {
         "label": "Columns (Desktop)"
       },
+      "staggered": {
+        "label": "Staggered layout"
+      },
       "aspect_ratio": {
         "label": "Image Aspect Ratio",
         "options": {
@@ -1168,6 +1178,7 @@
     },
     "blocks": {
       "image": {
+        "name": "Image",
         "settings": {
           "caption": {
             "label": "Caption"
@@ -1178,8 +1189,7 @@
           "image": {
             "label": "Background image"
           }
-        },
-        "name": "Accordion"
+        }
       }
     }
   },
@@ -2832,6 +2842,117 @@
             "options": {
               "standard": "Standard",
               "highlight": "Highlight"
+            }
+          }
+        }
+      }
+    }
+  },
+  "split_content": {
+    "name": "Split Content",
+    "settings": {
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Heading",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Size",
+            "options": {
+              "lg": "Large",
+              "xl": "XL",
+              "2xl": "2XL",
+              "3xl": "3XL",
+              "4xl": "4XL",
+              "5xl": "5XL",
+              "6xl": "6XL",
+              "7xl": "7XL",
+              "8xl": "8XL",
+              "9xl": "9XL"
+            }
+          },
+          "position": {
+            "label": "Column",
+            "options": {
+              "left": "Left",
+              "right": "Right"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Text",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Size",
+            "options": {
+              "sm": "Small",
+              "base": "Default",
+              "lg": "Large"
+            }
+          },
+          "muted": {
+            "label": "Muted color"
+          },
+          "position": {
+            "label": "Column",
+            "options": {
+              "left": "Left",
+              "right": "Right"
+            }
+          }
+        }
+      },
+      "button": {
+        "name": "Button",
+        "settings": {
+          "link": {
+            "label": "Button link"
+          },
+          "style": {
+            "label": "Button style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "link_2": {
+            "label": "Second button link"
+          },
+          "style_2": {
+            "label": "Second button style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "size": {
+            "label": "Button size",
+            "options": {
+              "small": "Small",
+              "medium": "Medium",
+              "large": "Large",
+              "xlarge": "Extra Large"
+            }
+          },
+          "position": {
+            "label": "Column",
+            "options": {
+              "left": "Left",
+              "right": "Right"
             }
           }
         }

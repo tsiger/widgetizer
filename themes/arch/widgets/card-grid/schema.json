@@ -91,6 +91,22 @@
     },
     {
       "type": "select",
+      "id": "image_position",
+      "label": "tTheme:card_grid.settings.image_position.label",
+      "default": "top",
+      "options": [
+        {
+          "value": "top",
+          "label": "tTheme:card_grid.settings.image_position.options.top"
+        },
+        {
+          "value": "bottom",
+          "label": "tTheme:card_grid.settings.image_position.options.bottom"
+        }
+      ]
+    },
+    {
+      "type": "select",
       "id": "aspect_ratio",
       "label": "tTheme:card_grid.settings.aspect_ratio.label",
       "default": "4 / 3",
