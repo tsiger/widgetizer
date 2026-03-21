@@ -6,10 +6,17 @@
   {% endif %}
 {% endfor %}
 
+{% assign has_bg_image = false %}
+{% if widget.settings.image != blank %}
+  {% assign has_bg_image = true %}
+{% endif %}
+
 <section
   id="{{ widget.id }}"
-  class="widget widget-contact widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if has_sidebar_blocks and widget.settings.sidebar_position == 'left' %}layout-reverse{% endif %}"
-  {% if widget.settings.color_scheme == 'highlight' %}
+  class="widget widget-contact widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if has_sidebar_blocks and widget.settings.sidebar_position == 'left' %}layout-reverse{% endif %} {% if has_bg_image %}has-bg-image has-overlay{% endif %}"
+  {% if has_bg_image %}
+    style="background-image: url('{% image src: widget.settings.image, size: 'large', output: 'url' %}'); --widget-overlay-color: {{ widget.settings.overlay_color | default: '#0a1e38bf' }}; --widget-overlay-opacity: 1;"
+  {% elsif widget.settings.color_scheme == 'highlight' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endif %}
   data-widget-id="{{ widget.id }}"
@@ -74,29 +81,64 @@
         border: var(--border-width-thin) solid var(--border-error, #fecaca);
       }
 
+      {% if has_bg_image %}
+      & .widget-header {
+        color: #fff;
+      }
+
+      & .contact-form-card {
+        background: {{ widget.settings.form_bg_color | default: '#ffffffee' }};
+        padding: var(--space-2xl);
+        border-radius: var(--radius-lg);
+      }
+
+      & .contact-info {
+        color: #fff;
+      }
+
+      & .contact-info-link {
+        color: inherit;
+      }
+      {% endif %}
+
+      & .contact-form-wrapper {
+        --bg-primary: var(--colors-standard_bg_primary, #ffffff);
+        --border-color: var(--colors-standard_border_color, #e2e8f0);
+        --text-muted: var(--colors-standard_text_muted, #6b7280);
+        {% if has_bg_image %}
+        --text-content: var(--colors-standard_text_content, #1f2937);
+        --text-heading: var(--colors-standard_text_heading, #0f172a);
+        width: min(calc(var(--content-width-sm) + var(--space-2xl) * 2), 100%);
+        {% else %}
+        width: min(var(--content-width-sm), 100%);
+        {% endif %}
+        flex-shrink: 0;
+      }
+
+      & .contact-content.no-sidebar .contact-form-wrapper {
+        margin-inline: auto;
+      }
+
       @media (min-width: 750px) {
         & .contact-content:not(.no-sidebar) {
-          grid-template-columns: 7fr 3fr;
+          display: flex;
+          flex-direction: row;
+          align-items: flex-start;
           gap: var(--space-3xl);
         }
 
-        /* Variant: Reverse Layout (sidebar left) */
+        & .contact-info {
+          flex: 1;
+        }
+
         &.layout-reverse .contact-content:not(.no-sidebar) {
-          grid-template-columns: 3fr 7fr;
-        }
-
-        &.layout-reverse .contact-form-wrapper {
-          order: 2;
-        }
-
-        &.layout-reverse .contact-info {
-          order: 1;
+          flex-direction: row-reverse;
         }
       }
     }
   </style>
 
-  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+  <div class="widget-container {% if has_bg_image %}widget-container-padded{% elsif widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header">
         {% assign header_delay = 0 %}
@@ -118,127 +160,127 @@
       </div>
     {% endif %}
 
-    <div class="widget-content {% if has_sidebar_blocks %}widget-content-md{% else %}widget-content-sm{% endif %}">
+    <div class="widget-content">
       <div class="contact-content {% unless has_sidebar_blocks %}no-sidebar{% endunless %}">
-        <!-- Contact Form -->
         <div class="contact-form-wrapper">
-          <form
-            class="contact-form reveal reveal-up"
-            data-widgetizer-form
-            data-form-name="{{ widget.settings.form_name }}"
-            {% if widget.settings.form_token != blank %}
-              data-form-token="{{ widget.settings.form_token }}"
-            {% endif %}
-          >
-            {% for blockId in widget.blocksOrder %}
-              {% assign block = widget.blocks[blockId] %}
-              {% if block.type != 'info' and block.type != 'social' %}
-                {% assign field_id = widget.id | append: '-' | append: block.settings.name %}
+          <div class="{% if has_bg_image %}contact-form-card{% endif %}">
+            <form
+              class="contact-form reveal reveal-up"
+              data-widgetizer-form
+              data-form-name="{{ widget.settings.form_name }}"
+              {% if widget.settings.form_token != blank %}
+                data-form-token="{{ widget.settings.form_token }}"
+              {% endif %}
+            >
+              {% for blockId in widget.blocksOrder %}
+                {% assign block = widget.blocks[blockId] %}
+                {% if block.type != 'info' and block.type != 'social' %}
+                  {% assign field_id = widget.id | append: '-' | append: block.settings.name %}
 
-                {% case block.type %}
-                  {% when 'input' %}
-                    <div class="form-group" data-block-id="{{ blockId }}">
-                      <label for="{{ field_id }}" class="form-label">
-                        {{ block.settings.label -}}
-                        {%- if block.settings.required %} *{% endif %}
-                      </label>
-                      <input
-                        type="{{ block.settings.input_type }}"
-                        id="{{ field_id }}"
-                        name="{{ block.settings.name }}"
-                        class="form-input"
-                        {% if block.settings.placeholder != blank %}
-                          placeholder="{{ block.settings.placeholder }}"
-                        {% endif %}
-                        {% if block.settings.required %}
-                          required aria-required="true"
-                        {% endif %}
-                      >
-                    </div>
-
-                  {% when 'textarea' %}
-                    <div class="form-group" data-block-id="{{ blockId }}">
-                      <label for="{{ field_id }}" class="form-label">
-                        {{ block.settings.label -}}
-                        {%- if block.settings.required %} *{% endif %}
-                      </label>
-                      <textarea
-                        id="{{ field_id }}"
-                        name="{{ block.settings.name }}"
-                        class="form-textarea"
-                        {% if block.settings.placeholder != blank %}
-                          placeholder="{{ block.settings.placeholder }}"
-                        {% endif %}
-                        {% if block.settings.required %}
-                          required aria-required="true"
-                        {% endif %}
-                      ></textarea>
-                    </div>
-
-                  {% when 'dropdown' %}
-                    <div class="form-group" data-block-id="{{ blockId }}">
-                      <label for="{{ field_id }}" class="form-label">
-                        {{ block.settings.label -}}
-                        {%- if block.settings.required %} *{% endif %}
-                      </label>
-                      <select
-                        id="{{ field_id }}"
-                        name="{{ block.settings.name }}"
-                        class="form-select"
-                        {% if block.settings.required %}
-                          required aria-required="true"
-                        {% endif %}
-                      >
-                        <option value="">Select an option</option>
-                        {% assign options = block.settings.options | split: '\n' %}
-                        {% for option in options %}
-                          {% assign trimmed_option = option | strip %}
-                          {% if trimmed_option != blank %}
-                            <option value="{{ trimmed_option | handleize }}">{{ trimmed_option }}</option>
-                          {% endif %}
-                        {% endfor %}
-                      </select>
-                    </div>
-
-                  {% when 'checkbox' %}
-                    <div class="form-group" data-block-id="{{ blockId }}">
-                      <div class="form-checkbox-group">
+                  {% case block.type %}
+                    {% when 'input' %}
+                      <div class="form-group" data-block-id="{{ blockId }}">
+                        <label for="{{ field_id }}" class="form-label">
+                          {{ block.settings.label -}}
+                          {%- if block.settings.required %} *{% endif %}
+                        </label>
                         <input
-                          type="checkbox"
+                          type="{{ block.settings.input_type }}"
                           id="{{ field_id }}"
                           name="{{ block.settings.name }}"
-                          class="form-checkbox"
+                          class="form-input"
+                          {% if block.settings.placeholder != blank %}
+                            placeholder="{{ block.settings.placeholder }}"
+                          {% endif %}
                           {% if block.settings.required %}
                             required aria-required="true"
                           {% endif %}
                         >
-                        <label for="{{ field_id }}" class="form-checkbox-label">
+                      </div>
+
+                    {% when 'textarea' %}
+                      <div class="form-group" data-block-id="{{ blockId }}">
+                        <label for="{{ field_id }}" class="form-label">
                           {{ block.settings.label -}}
                           {%- if block.settings.required %} *{% endif %}
                         </label>
+                        <textarea
+                          id="{{ field_id }}"
+                          name="{{ block.settings.name }}"
+                          class="form-textarea"
+                          {% if block.settings.placeholder != blank %}
+                            placeholder="{{ block.settings.placeholder }}"
+                          {% endif %}
+                          {% if block.settings.required %}
+                            required aria-required="true"
+                          {% endif %}
+                        ></textarea>
                       </div>
-                    </div>
 
-                  {% when 'submit' %}
-                    <div class="form-group" data-block-id="{{ blockId }}">
-                      {% if globals.turnstileSiteKey != blank %}
-                        <div class="cf-turnstile" data-sitekey="{{ globals.turnstileSiteKey }}" data-theme="auto"></div>
-                      {% endif %}
-                      <button type="submit" class="widget-button widget-button-primary" data-text="{{ block.settings.text }}">
-                        {{ block.settings.text }}
-                      </button>
-                    </div>
-                {% endcase %}
-              {% endif %}
-            {% endfor %}
-          </form>
+                    {% when 'dropdown' %}
+                      <div class="form-group" data-block-id="{{ blockId }}">
+                        <label for="{{ field_id }}" class="form-label">
+                          {{ block.settings.label -}}
+                          {%- if block.settings.required %} *{% endif %}
+                        </label>
+                        <select
+                          id="{{ field_id }}"
+                          name="{{ block.settings.name }}"
+                          class="form-select"
+                          {% if block.settings.required %}
+                            required aria-required="true"
+                          {% endif %}
+                        >
+                          <option value="">Select an option</option>
+                          {% assign options = block.settings.options | split: '\n' %}
+                          {% for option in options %}
+                            {% assign trimmed_option = option | strip %}
+                            {% if trimmed_option != blank %}
+                              <option value="{{ trimmed_option | handleize }}">{{ trimmed_option }}</option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
+                      </div>
 
-          <div class="form-status form-status-success" style="display:none;">Thank you! Your message has been sent.</div>
-          <div class="form-status form-status-error" style="display:none;"></div>
+                    {% when 'checkbox' %}
+                      <div class="form-group" data-block-id="{{ blockId }}">
+                        <div class="form-checkbox-group">
+                          <input
+                            type="checkbox"
+                            id="{{ field_id }}"
+                            name="{{ block.settings.name }}"
+                            class="form-checkbox"
+                            {% if block.settings.required %}
+                              required aria-required="true"
+                            {% endif %}
+                          >
+                          <label for="{{ field_id }}" class="form-checkbox-label">
+                            {{ block.settings.label -}}
+                            {%- if block.settings.required %} *{% endif %}
+                          </label>
+                        </div>
+                      </div>
+
+                    {% when 'submit' %}
+                      <div class="form-group" data-block-id="{{ blockId }}">
+                        {% if globals.turnstileSiteKey != blank %}
+                          <div class="cf-turnstile" data-sitekey="{{ globals.turnstileSiteKey }}" data-theme="auto"></div>
+                        {% endif %}
+                        <button type="submit" class="widget-button widget-button-primary" data-text="{{ block.settings.text }}">
+                          {{ block.settings.text }}
+                        </button>
+                      </div>
+                  {% endcase %}
+                {% endif %}
+              {% endfor %}
+            </form>
+
+            <div class="form-status form-status-success" style="display:none;">Thank you! Your message has been sent.</div>
+            <div class="form-status form-status-error" style="display:none;"></div>
+          </div>
         </div>
 
         {% if has_sidebar_blocks %}
-          <!-- Contact Information Sidebar -->
           <div class="contact-info">
             {% for blockId in widget.blocksOrder %}
               {% assign block = widget.blocks[blockId] %}

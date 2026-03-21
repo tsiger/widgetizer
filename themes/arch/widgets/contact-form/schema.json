@@ -78,6 +78,32 @@
           "label": "tTheme:contact_form.settings.color_scheme.options.highlight"
         }
       ]
+    },
+    {
+      "type": "header",
+      "id": "background_header",
+      "label": "tTheme:contact_form.settings.background_header.label"
+    },
+    {
+      "type": "image",
+      "id": "image",
+      "label": "tTheme:contact_form.settings.image.label"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "tTheme:contact_form.settings.overlay_color.label",
+      "default": "#0a1e38bf",
+      "allow_alpha": true,
+      "description": "tTheme:contact_form.settings.overlay_color.description"
+    },
+    {
+      "type": "color",
+      "id": "form_bg_color",
+      "label": "tTheme:contact_form.settings.form_bg_color.label",
+      "default": "#ffffffee",
+      "allow_alpha": true,
+      "description": "tTheme:contact_form.settings.form_bg_color.description"
     }
   ],
   "blocks": [

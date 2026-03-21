@@ -616,6 +616,20 @@
           "standard": "Standard",
           "highlight": "Highlight"
         }
+      },
+      "background_header": {
+        "label": "Background"
+      },
+      "image": {
+        "label": "Background image"
+      },
+      "overlay_color": {
+        "label": "Overlay color",
+        "description": "Tint color over the background image"
+      },
+      "form_bg_color": {
+        "label": "Form background",
+        "description": "Background color for the form card when a background image is set"
       }
     },
     "blocks": {
