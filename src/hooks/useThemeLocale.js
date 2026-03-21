@@ -21,13 +21,18 @@ function notify() {
   for (const cb of listeners) cb();
 }
 
-// Snapshot: returns the locale data for a given lang (or null)
+// Snapshot: returns the locale data for a given lang (or null).
+// Returns stale data while a re-fetch is in progress to avoid
+// a flash of raw keys when the cache expires.
 function getSnapshot(lang) {
   const cached = localeCache[lang];
-  if (cached && Date.now() - cached.timestamp < STALE_TIME) {
-    return cached.data;
-  }
-  return null;
+  if (!cached) return null;
+  return cached.data;
+}
+
+function isStale(lang) {
+  const cached = localeCache[lang];
+  return !cached || Date.now() - cached.timestamp >= STALE_TIME;
 }
 
 /**
@@ -57,10 +62,10 @@ export function useThemeLocale() {
   // Subscribe to locale cache changes — re-renders when notify() is called
   const locale = useSyncExternalStore(subscribe, () => getSnapshot(lang));
 
-  // Fetch when cache is empty/stale
+  // Fetch when cache is empty/stale (keeps serving stale data until refresh completes)
   useEffect(() => {
     if (!projectId) return;
-    if (getSnapshot(lang)) return;
+    if (!isStale(lang)) return;
 
     // Another instance is already fetching this lang
     if (inflightLang === lang && inflightPromise) return;
