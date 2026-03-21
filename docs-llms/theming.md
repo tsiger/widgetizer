@@ -305,22 +305,22 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 
     {% seo %}                    <!-- SEO meta tags -->
     {% fonts %}                  <!-- Font preconnect links and stylesheet (recommended) -->
-    {% asset src: "base.css" %}      <!-- Load theme CSS -->
-    {% header_assets %}         <!-- Render enqueued header styles and scripts (sorted by priority) -->
     {% theme_settings %}        <!-- Output CSS variables from global settings -->
+    {% asset src: "base.css" %} <!-- Load theme CSS (after theme_settings so variables are available) -->
     {% custom_css %}            <!-- Custom CSS from theme settings (optional) -->
     {% custom_head_scripts %}   <!-- Custom scripts for head (e.g., Google Analytics) (optional) -->
+    {% header_assets %}         <!-- Render enqueued header styles and scripts (sorted by priority) -->
 </head>
 <body class="{{ body_class }} corner-{{ theme.style.corner_style | default: 'sharp' }} cards-{{ theme.style.card_style | default: 'bordered' }} spacing-{{ theme.style.spacing_density | default: 'default' }} buttons-{{ theme.style.button_shape | default: 'auto' }}">
-    {{ header }}                <!-- Global header widget -->
+    {{ header | raw }}          <!-- Global header widget -->
 
     <main id="main-content">
-        {{ main_content }}      <!-- Page content insertion point -->
+        {{ main_content | raw }} <!-- Page content insertion point -->
     </main>
 
-    {{ footer }}                <!-- Global footer widget -->
+    {{ footer | raw }}          <!-- Global footer widget -->
 
-    {% asset src: "scripts.js" %}
+    {% asset src: "scripts.js", defer: true %}
     {% footer_assets %}         <!-- Render enqueued footer styles and scripts (sorted by priority) -->
     {% custom_footer_scripts %} <!-- Custom scripts before closing body tag (optional) -->
 </body>

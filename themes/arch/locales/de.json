@@ -1042,6 +1042,13 @@
         "label": "Kontaktdaten 2",
         "description": "Zweite Zeile der Kontaktdaten (z.B. Adresse)"
       },
+      "contact_position": {
+        "label": "Position der Kontaktdaten",
+        "options": {
+          "logo": "Neben dem Logo",
+          "menu": "Neben dem Menü-Button"
+        }
+      },
       "navigation_header": {
         "label": "Navigation"
       },

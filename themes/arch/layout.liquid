@@ -7,14 +7,14 @@
     {% seo %}
     {% fonts %}
     
-    {% if theme.branding and theme.branding.favicon != blank %}
-    <link rel="icon" href="{% image src: theme.branding.favicon, output: 'path' %}">
+    {% if theme.general and theme.general.favicon != blank %}
+    <link rel="icon" href="{% image src: theme.general.favicon, output: 'path' %}">
     {% endif %}
 
     {% theme_settings %}
 
     {% asset src: "base.css" %}
-    {% unless theme.layout.enable_reveal_animations %}
+    {% unless theme.general.enable_reveal_animations %}
       <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
     {% endunless %}
     {% custom_css %}
@@ -30,7 +30,7 @@
     {{ footer | raw }}
     
     {% asset src: "scripts.js", defer: true %}
-    {% if theme.layout.enable_reveal_animations %}
+    {% if theme.general.enable_reveal_animations %}
       {% asset src: "reveal.js", defer: true %}
     {% endif %}
     {% footer_assets %}

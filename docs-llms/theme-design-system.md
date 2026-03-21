@@ -1002,8 +1002,8 @@ The Arch theme uses **body classes** to implement global style settings that aff
 | Class | Effect |
 | --- | --- |
 | `corner-sharp` (default) | All radii `0` — square corners everywhere |
-| `corner-slightly-rounded` | `--radius-sm: 0.4rem`, `--radius-md: 0.8rem`, `--radius-lg: 1.2rem`, `--radius-button: 0.4rem` |
-| `corner-rounded` | `--radius-sm: 0.8rem`, `--radius-md: 1.6rem`, `--radius-lg: 2.4rem`, `--radius-button: 0.8rem` |
+| `corner-slightly-rounded` | `--radius-sm: 0.4rem`, `--radius-md: 0.6rem`, `--radius-lg: 0.8rem`, `--radius-button: 0.4rem` |
+| `corner-rounded` | `--radius-sm: 0.6rem`, `--radius-md: 1.2rem`, `--radius-lg: 1.6rem`, `--radius-button: 0.8rem` |
 
 #### Content Boxes (`cards-*`)
 
@@ -1017,9 +1017,9 @@ The Arch theme uses **body classes** to implement global style settings that aff
 
 | Class | Effect |
 | --- | --- |
-| `spacing-compact` | `--spacing-scale: 0.85` — tighter card padding and widget spacing |
+| `spacing-compact` | `--spacing-scale: 0.8` — tighter card padding and widget spacing |
 | `spacing-default` | `--spacing-scale: 1` — standard spacing |
-| `spacing-airy` | `--spacing-scale: 1.2` — more generous breathing room |
+| `spacing-airy` | `--spacing-scale: 1.25` — more generous breathing room |
 
 #### Button Shape (`buttons-*`)
 
@@ -1056,6 +1056,48 @@ Widgets should reference the style tokens rather than hardcoding values:
   border-radius: 8px;
 }
 ```
+
+### Per-Widget Token Usage
+
+Widgets that already inherit via `.widget-card` class (no extra work needed):
+card-grid, icon-card-grid, pricing, testimonials, numbered-cards, key-figures, event-list, job-listing, content-switcher, project-showcase, gallery, masonry-gallery
+
+Widgets with custom token usage:
+
+| Widget | Element | Token |
+|---|---|---|
+| image | `.image-wrapper`, `.image-link` (when not fullwidth) | `--radius-lg` |
+| slideshow | `.slideshow-constrained` (slideshow.css) | `--radius-lg` |
+| banner | section (when not fullwidth) | `--radius-lg` |
+| accordion | `.accordion-item`, `.accordion-list` (bordered) | `--radius-sm` |
+| comparison-table | `.comparison-table-badge` | `--radius-sm` |
+| content-switcher | `.switcher-btn` | `--radius-button` |
+| image-tabs | `.image-tabs-image-area` | `--radius-md` |
+| image-hotspots | `.image-hotspots-wrapper` | `--radius-md` |
+| image-hotspots | `.image-hotspot-tooltip` | `--radius-sm` |
+| testimonial-hero | `.testimonial-image-wrapper` | `--radius-lg` |
+| event-list | `.event-date` | `--radius-sm` |
+| timeline | `.timeline-content` | `--radius-sm` |
+| logo-cloud | `.logo-item` | `--radius-sm` |
+| job-listing | `.job-badge` | `--radius-sm` |
+| job-listing | `.job-filter-btn` | `--radius-button` |
+| gallery | `.gallery-modal-image` | `--radius-md` |
+| image-text | image container | `--radius-lg` |
+| image-callout | `.callout-image` / `.callout-content` | `--radius-lg` / `--radius-md` |
+| bento-grid | bento items | `--radius-lg` |
+| countdown | `.style-cards .countdown-unit` | `--radius-lg` |
+| contact-form | `.form-status` | `--radius-md` |
+| comparison-slider | wrapper | `--radius-md` |
+| video-embed | iframe | `--radius-md` |
+| map | `.map-container` | `--radius-md` |
+| priced-list | `.priced-item-image` | `--radius-sm` |
+
+Widgets intentionally **not** affected by shapes:
+- banner/slideshow/split-hero when fullwidth (edge-to-edge backgrounds)
+- profile-grid/testimonials avatars (`border-radius: 50%` — always circular)
+- timeline markers, hotspot buttons (`border-radius: 50%`)
+- gallery/masonry `.widget-card-image` (`border-radius: 0` — images fill card, card has radius)
+- project-showcase `.project-image` (`border-radius: 0` — same pattern)
 
 ---
 

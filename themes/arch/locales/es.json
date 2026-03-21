@@ -1042,6 +1042,13 @@
         "label": "Datos de contacto 2",
         "description": "Segunda línea de contacto (ej. dirección)"
       },
+      "contact_position": {
+        "label": "Posición de los datos de contacto",
+        "options": {
+          "logo": "Junto al logotipo",
+          "menu": "Junto al botón de menú"
+        }
+      },
       "navigation_header": {
         "label": "Navegación"
       },

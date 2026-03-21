@@ -1042,6 +1042,13 @@
         "label": "Coordonnées 2",
         "description": "Deuxième ligne de contact (ex. adresse)"
       },
+      "contact_position": {
+        "label": "Position des coordonnées",
+        "options": {
+          "logo": "À côté du logo",
+          "menu": "À côté du bouton de menu"
+        }
+      },
       "navigation_header": {
         "label": "Navigation"
       },

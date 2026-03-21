@@ -1042,6 +1042,13 @@
         "label": "Dettagli contatto 2",
         "description": "Seconda riga delle informazioni di contatto (es. indirizzo)"
       },
+      "contact_position": {
+        "label": "Posizione dei dettagli di contatto",
+        "options": {
+          "logo": "Accanto al logo",
+          "menu": "Accanto al pulsante menu"
+        }
+      },
       "navigation_header": {
         "label": "Navigazione"
       },
