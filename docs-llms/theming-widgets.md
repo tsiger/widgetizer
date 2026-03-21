@@ -1756,7 +1756,7 @@ Before submitting a widget:
 - [ ] No duplicate CSS properties from `base.css`
 - [ ] Scroll reveal animations added to content elements (`.reveal .reveal-up` with `--reveal-delay`)
 - [ ] `maxBlocks` set for widgets where block count should be limited
-- [ ] All `tTheme:` keys in schema have matching entries in `locales/*.json` (run `npm run validate:theme-locales`)
+- [ ] All `tTheme:` keys in schema have matching entries in `locales/*.json`, and no orphaned keys exist (run `npm run validate:theme-locales`)
 
 ---
 

@@ -354,6 +354,7 @@ Widget `schema.json` files use `tTheme:` prefixed keys for displayName, label, d
 
 - Module-level locale cache shared across all component instances via `useSyncExternalStore`
 - 5-minute staleness window before re-fetching
+- **Stale-while-revalidate**: When the cache expires, stale data continues to be served while the re-fetch happens in the background. This prevents a flash of raw keys between cache expiry and fetch completion.
 - Single in-flight promise deduplication to prevent duplicate API calls
 - Backend endpoint: `GET /api/projects/:id/theme/locale/:lang`
 

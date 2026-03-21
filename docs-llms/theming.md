@@ -1556,7 +1556,11 @@ Widget types with hyphens are converted to underscores in keys: `bento-grid` bec
 
 ### Validation
 
-Run `npm run validate:theme-locales` to verify that every `tTheme:` key referenced in your schemas has a corresponding entry in the locale files.
+Run `npm run validate:theme-locales` to validate theme locale files. The validator performs three checks:
+
+1. Every `tTheme:` key referenced in widget schemas and `theme.json` exists in `en.json`
+2. `en.json` contains no orphaned keys that aren't referenced by any schema (catches accidentally added entries)
+3. Every non-English locale has the same keys as `en.json` (no missing, no extra)
 
 ## 12. Advanced Features
 

@@ -338,8 +338,11 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
   - `getLatestVersion()` - Get latest from array
 - `server/utils/themeHelpers.js`:
   - `preprocessThemeSettings()` - Transform settings for access
-- `scripts/validate-theme-locales.js`:
+- `scripts/validate-theme-locales.js` + `validate-theme-locales-helpers.js`:
   - Validates all `tTheme:` keys in widget schemas resolve to entries in theme locale files
+  - Detects orphaned keys in `en.json` not referenced by any schema
+  - Checks non-English locales match `en.json` (missing and extra keys)
+  - Recursively scans widget directories (including `widgets/global/header/`, `widgets/global/footer/`)
   - Run via `npm run validate:theme-locales`; also runs as part of `predev:all` hook
 
 ---
