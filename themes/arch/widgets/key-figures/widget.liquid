@@ -30,6 +30,42 @@
         font-variant-numeric: tabular-nums;
       }
 
+      & .odometer {
+        display: inline-flex;
+        align-items: flex-end;
+      }
+
+      & .odometer-digit {
+        display: inline-block;
+        height: 1em;
+        overflow: hidden;
+      }
+
+      & .odometer-strip {
+        display: flex;
+        flex-direction: column;
+        transform: translateY(0);
+        transition: transform var(--odometer-duration, 1200ms) cubic-bezier(0.16, 1, 0.3, 1);
+        transition-delay: var(--odometer-delay, 0ms);
+      }
+
+      & .odometer-strip > span {
+        height: 1em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      & .odometer-digit.odometer-active .odometer-strip {
+        transform: translateY(calc(var(--digit-target) * -1em));
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        & .odometer-strip {
+          transition: none;
+        }
+      }
+
       & .w-title {
         margin-block-end: var(--space-xs);
       }
@@ -178,36 +214,88 @@
         if (!widget || widget.dataset.initialized) return;
         widget.dataset.initialized = 'true';
 
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        widget.querySelectorAll('.stats-number[data-count]').forEach((el) => {
+          const raw = el.getAttribute('data-count') || '';
+          const suffix = el.getAttribute('data-suffix') || '';
+          const fullText = raw + suffix;
+
+          const odometer = document.createElement('span');
+          odometer.className = 'odometer';
+          odometer.setAttribute('aria-label', fullText);
+
+          const allChars = (raw + suffix).split('');
+          const digitChars = raw.split('').filter((ch) => /\d/.test(ch));
+          const totalDigits = digitChars.length;
+          let digitIndex = 0;
+
+          allChars.forEach((ch, i) => {
+            const isNumberPart = i < raw.length;
+            const isDigit = isNumberPart && /\d/.test(ch);
+
+            if (isDigit) {
+              const digit = document.createElement('span');
+              digit.className = 'odometer-digit';
+              digit.setAttribute('aria-hidden', 'true');
+
+              const posFromRight = totalDigits - 1 - digitIndex;
+              const duration = 1200 + posFromRight * 400;
+              const delay = digitIndex * 80;
+              digit.style.setProperty('--digit-target', ch);
+              digit.style.setProperty('--odometer-duration', duration + 'ms');
+              digit.style.setProperty('--odometer-delay', delay + 'ms');
+
+              const strip = document.createElement('span');
+              strip.className = 'odometer-strip';
+              for (let n = 0; n <= 9; n++) {
+                const s = document.createElement('span');
+                s.textContent = n;
+                strip.appendChild(s);
+              }
+              digit.appendChild(strip);
+              odometer.appendChild(digit);
+              digitIndex++;
+            } else {
+              const staticEl = document.createElement('span');
+              staticEl.className = 'odometer-static';
+              staticEl.setAttribute('aria-hidden', 'true');
+              staticEl.textContent = ch;
+              odometer.appendChild(staticEl);
+            }
+          });
+
+          el.textContent = '';
+          el.appendChild(odometer);
+
+          if (reducedMotion) {
+            el.querySelectorAll('.odometer-digit').forEach((d) => d.classList.add('odometer-active'));
+          }
+        });
+
+        if (reducedMotion) return;
+
         const observer = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
+              const digits = entry.target.querySelectorAll('.odometer-digit');
               if (entry.isIntersecting) {
-                const el = entry.target;
-                const target = parseFloat(el.getAttribute('data-count'));
-                const suffix = el.getAttribute('data-suffix') || '';
-                const duration = 2000;
-                const startTime = performance.now();
-
-                const animate = (currentTime) => {
-                  const elapsed = currentTime - startTime;
-                  const progress = Math.min(elapsed / duration, 1);
-                  const ease = 1 - Math.pow(1 - progress, 4); // Ease out quart
-
-                  el.textContent = Math.floor(ease * target) + suffix;
-
-                  if (progress < 1) requestAnimationFrame(animate);
-                  else el.textContent = target + suffix;
-                };
-
-                requestAnimationFrame(animate);
-                observer.unobserve(el);
+                digits.forEach((d) => d.classList.add('odometer-active'));
+              } else {
+                digits.forEach((d) => {
+                  const strip = d.querySelector('.odometer-strip');
+                  strip.style.transition = 'none';
+                  d.classList.remove('odometer-active');
+                  strip.offsetHeight;
+                  strip.style.transition = '';
+                });
               }
             });
           },
           { threshold: 0.2 },
         );
 
-        widget.querySelectorAll('.stats-number').forEach((el) => observer.observe(el));
+        widget.querySelectorAll('.stats-number[data-count]').forEach((el) => observer.observe(el));
       })();
     </script>
   {% endif %}
