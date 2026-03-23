@@ -577,6 +577,48 @@
       }
     }
   },
+  "core_divider": {
+    "name": "Divisor",
+    "description": "Añadir una línea divisoria horizontal",
+    "category": "Diseño",
+    "settings": {
+      "color": {
+        "label": "Color de línea",
+        "description": "Color de la línea divisoria"
+      },
+      "thickness": {
+        "label": "Grosor",
+        "description": "Grosor de la línea divisoria en píxeles"
+      },
+      "width": {
+        "label": "Ancho",
+        "description": "Ancho del divisor como porcentaje del contenedor"
+      },
+      "padding": {
+        "label": "Relleno",
+        "description": "Relleno vertical alrededor del divisor en píxeles"
+      }
+    }
+  },
+  "core_spacer": {
+    "name": "Espaciador",
+    "description": "Añadir espacio vertical entre secciones de contenido",
+    "category": "Diseño",
+    "settings": {
+      "height": {
+        "label": "Altura",
+        "description": "La altura del espaciador en píxeles"
+      },
+      "showOnMobile": {
+        "label": "Mostrar en móvil",
+        "description": "Si se muestra el espaciador en dispositivos móviles"
+      },
+      "mobileHeight": {
+        "label": "Altura en móvil",
+        "description": "La altura del espaciador en dispositivos móviles en píxeles"
+      }
+    }
+  },
   "contact_form": {
     "name": "Formulario de contacto",
     "settings": {

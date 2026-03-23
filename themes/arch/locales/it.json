@@ -577,6 +577,48 @@
       }
     }
   },
+  "core_divider": {
+    "name": "Divisore",
+    "description": "Aggiungi una linea divisoria orizzontale",
+    "category": "Layout",
+    "settings": {
+      "color": {
+        "label": "Colore linea",
+        "description": "Colore della linea divisoria"
+      },
+      "thickness": {
+        "label": "Spessore",
+        "description": "Spessore della linea divisoria in pixel"
+      },
+      "width": {
+        "label": "Larghezza",
+        "description": "Larghezza del divisore come percentuale del contenitore"
+      },
+      "padding": {
+        "label": "Spaziatura",
+        "description": "Spaziatura verticale intorno al divisore in pixel"
+      }
+    }
+  },
+  "core_spacer": {
+    "name": "Spaziatore",
+    "description": "Aggiungi spazio verticale tra le sezioni di contenuto",
+    "category": "Layout",
+    "settings": {
+      "height": {
+        "label": "Altezza",
+        "description": "L'altezza dello spaziatore in pixel"
+      },
+      "showOnMobile": {
+        "label": "Mostra su mobile",
+        "description": "Se mostrare lo spaziatore sui dispositivi mobili"
+      },
+      "mobileHeight": {
+        "label": "Altezza su mobile",
+        "description": "L'altezza dello spaziatore sui dispositivi mobili in pixel"
+      }
+    }
+  },
   "contact_form": {
     "name": "Modulo di contatto",
     "settings": {

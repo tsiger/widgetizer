@@ -1,15 +1,15 @@
 {
   "type": "core-spacer",
-  "displayName": "Spacer",
-  "description": "Add vertical spacing between content sections",
-  "category": "Layout",
+  "displayName": "tTheme:core_spacer.name",
+  "description": "tTheme:core_spacer.description",
+  "category": "tTheme:core_spacer.category",
   "isCore": true,
   "settings": [
     {
       "type": "range",
       "id": "height",
-      "label": "Height",
-      "description": "The height of the spacer in pixels",
+      "label": "tTheme:core_spacer.settings.height.label",
+      "description": "tTheme:core_spacer.settings.height.description",
       "default": 40,
       "min": 10,
       "max": 200,
@@ -18,15 +18,15 @@
     {
       "type": "checkbox",
       "id": "showOnMobile",
-      "label": "Show on Mobile",
-      "description": "Whether to show the spacer on mobile devices",
+      "label": "tTheme:core_spacer.settings.showOnMobile.label",
+      "description": "tTheme:core_spacer.settings.showOnMobile.description",
       "default": true
     },
     {
       "type": "range",
       "id": "mobileHeight",
-      "label": "Mobile Height",
-      "description": "The height of the spacer on mobile devices in pixels",
+      "label": "tTheme:core_spacer.settings.mobileHeight.label",
+      "description": "tTheme:core_spacer.settings.mobileHeight.description",
       "default": 20,
       "min": 0,
       "max": 100,

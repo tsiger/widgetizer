@@ -577,6 +577,48 @@
       }
     }
   },
+  "core_divider": {
+    "name": "Trennlinie",
+    "description": "Eine horizontale Trennlinie hinzufügen",
+    "category": "Layout",
+    "settings": {
+      "color": {
+        "label": "Linienfarbe",
+        "description": "Farbe der Trennlinie"
+      },
+      "thickness": {
+        "label": "Stärke",
+        "description": "Stärke der Trennlinie in Pixeln"
+      },
+      "width": {
+        "label": "Breite",
+        "description": "Breite der Trennlinie als Prozentsatz des Containers"
+      },
+      "padding": {
+        "label": "Abstand",
+        "description": "Vertikaler Abstand um die Trennlinie in Pixeln"
+      }
+    }
+  },
+  "core_spacer": {
+    "name": "Abstandhalter",
+    "description": "Vertikalen Abstand zwischen Inhaltsbereichen hinzufügen",
+    "category": "Layout",
+    "settings": {
+      "height": {
+        "label": "Höhe",
+        "description": "Die Höhe des Abstandhalters in Pixeln"
+      },
+      "showOnMobile": {
+        "label": "Auf Mobilgeräten anzeigen",
+        "description": "Ob der Abstandhalter auf Mobilgeräten angezeigt wird"
+      },
+      "mobileHeight": {
+        "label": "Mobile Höhe",
+        "description": "Die Höhe des Abstandhalters auf Mobilgeräten in Pixeln"
+      }
+    }
+  },
   "contact_form": {
     "name": "Kontaktformular",
     "settings": {
