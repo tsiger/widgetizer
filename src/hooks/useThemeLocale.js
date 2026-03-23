@@ -7,6 +7,21 @@ import useProjectStore from "../stores/projectStore";
 const localeCache = {};
 const STALE_TIME = 5 * 60 * 1000; // 5 minutes
 
+// Developer mode flag — when true, cache is always considered stale
+let devModeEnabled = false;
+let devModeChecked = false;
+
+function checkDevMode() {
+  if (devModeChecked) return;
+  devModeChecked = true;
+  apiFetch("/api/settings")
+    .then((res) => (res.ok ? res.json() : {}))
+    .then((settings) => {
+      devModeEnabled = !!settings?.developer?.enabled;
+    })
+    .catch(() => {});
+}
+
 // Module-level in-flight tracking — shared across ALL hook instances
 let inflightPromise = null;
 let inflightLang = null;
@@ -31,6 +46,7 @@ function getSnapshot(lang) {
 }
 
 function isStale(lang) {
+  if (devModeEnabled) return true;
   const cached = localeCache[lang];
   return !cached || Date.now() - cached.timestamp >= STALE_TIME;
 }
@@ -58,6 +74,9 @@ export function useThemeLocale() {
   const lang = i18n.language || "en";
   const activeProject = useProjectStore((s) => s.activeProject);
   const projectId = activeProject?.id;
+
+  // Check developer mode once on first use
+  checkDevMode();
 
   // Subscribe to locale cache changes — re-renders when notify() is called
   const locale = useSyncExternalStore(subscribe, () => getSnapshot(lang));
