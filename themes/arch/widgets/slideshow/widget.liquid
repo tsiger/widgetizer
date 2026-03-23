@@ -8,9 +8,10 @@
   {% enqueue_script src: "slideshow.js", priority: 30, defer: true %}
 {% endif %}
 
+{% assign first_block = widget.blocks[widget.blocksOrder.first] %}
 <section
   id="{{ widget.id }}"
-  class="widget widget-slideshow widget-{{ widget.id }} {% unless widget.settings.fullwidth %} slideshow-constrained{% endunless %}"
+  class="widget widget-slideshow widget-{{ widget.id }} color-scheme-{{ first_block.settings.color_scheme | default: 'highlight' }}{% unless widget.settings.fullwidth %} slideshow-constrained{% endunless %}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="slideshow"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}

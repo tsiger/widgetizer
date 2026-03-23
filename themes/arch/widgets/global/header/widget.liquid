@@ -36,6 +36,8 @@
           {% image src: widget.settings.logoImage, size: 'medium', class: 'header-logo-image header-logo-default', lazy: false %}
           {% if widget.settings.transparent_logo != blank %}
             {% image src: widget.settings.transparent_logo, size: 'medium', class: 'header-logo-image header-logo-transparent', lazy: false %}
+          {% else %}
+            {% image src: widget.settings.logoImage, size: 'medium', class: 'header-logo-image header-logo-transparent', lazy: false %}
           {% endif %}
         {% else %}
           <span data-setting="logoText">{{ widget.settings.logoText | default: 'Widgetizer' }}</span>

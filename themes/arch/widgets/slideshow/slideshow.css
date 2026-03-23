@@ -3,7 +3,7 @@
  */
 .widget-slideshow {
   overflow: hidden;
-  background-color: var(--color-black);
+  background-color: var(--bg-primary);
   /* Reset default widget spacing for full-bleed */
   margin-block: 0;
   padding-inline: 0;
