@@ -100,7 +100,7 @@ export default function ColorInput({ id, value = "#000000", onChange, allow_alph
       </div>
 
       {isOpen && (
-        <div className="absolute z-10 mt-2 right-0">
+        <div className="absolute z-10 mt-2 left-0">
           <div className="bg-white rounded-lg shadow-lg p-3 border border-slate-200">
             <div
               ref={colorPickerRef}
