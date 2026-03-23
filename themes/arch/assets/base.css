@@ -2170,7 +2170,7 @@ b {
       padding-inline: 0;
       text-decoration: none;
       color: var(--text-content);
-      font-weight: var(--typography-body_font_weight, 400);
+      font-weight: var(--typography-body_font-weight, 400);
       font-size: calc(var(--font-size-lg) * var(--body-scale));
       background: transparent;
       border: none;

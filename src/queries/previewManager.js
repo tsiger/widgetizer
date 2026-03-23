@@ -3,6 +3,8 @@ import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import fontDefinitions from "../core/config/fonts.json" with { type: "json" };
 
+const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
+
 /**
  * Extract Google fonts used in theme typography settings.
  * @param {Object} settings - Theme settings object
@@ -293,6 +295,22 @@ function settingsToCssVariables(settings) {
             const cssVarBase = `--${category}-${item.id}`;
             variables[`${cssVarBase}-family`] = value.stack;
             variables[`${cssVarBase}-weight`] = value.weight;
+
+            if (item.id === "body_font") {
+              if (value.weight === 400) {
+                const fontInfo = ALL_FONTS_LIST.find((f) => f.stack === value.stack);
+                if (fontInfo && fontInfo.isGoogleFont) {
+                  const availableWeights = fontInfo.availableWeights || [];
+                  let boldWeight = 700;
+                  if (availableWeights.includes(700)) boldWeight = 700;
+                  else if (availableWeights.includes(600)) boldWeight = 600;
+                  else if (availableWeights.includes(500)) boldWeight = 500;
+                  variables[`${cssVarBase}_bold-weight`] = boldWeight;
+                }
+              } else {
+                variables[`${cssVarBase}_bold-weight`] = value.weight;
+              }
+            }
           }
         } else if (item.id && item.outputAsCssVar === true) {
           let value = item.value !== undefined ? item.value : item.default;
