@@ -220,7 +220,7 @@ export default function ProjectForm({
               <option value="">{t("forms.project.selectTheme")}</option>
               {themes.map((theme) => (
                 <option key={theme.id} value={theme.id}>
-                  {theme.name} {theme.latestVersion && `(v${theme.latestVersion})`}
+                  {theme.name} {theme.version && `(v${theme.version})`}
                 </option>
               ))}
             </select>

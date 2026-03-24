@@ -31,7 +31,15 @@ import { readAppSettingsFile } from "./appSettingsController.js";
  * @returns {Promise<void>}
  * @throws {Error} If directory creation or seed copy fails
  */
-export async function ensureThemesDirectory() {
+let _ensurePromise = null;
+export function ensureThemesDirectory() {
+  if (!_ensurePromise) {
+    _ensurePromise = _ensureThemesDirectoryOnce();
+  }
+  return _ensurePromise;
+}
+
+async function _ensureThemesDirectoryOnce() {
   const userThemesDir = getThemesDir();
   const alreadyExists = await fs.pathExists(userThemesDir);
 
