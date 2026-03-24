@@ -5,14 +5,16 @@ Visual website builder with theme support. Runs as an Electron desktop app or as
 ## Quick Reference
 
 ```bash
-npm run dev:all        # Start backend + frontend together
-npm run server         # Backend only (port 3001, nodemon)
-npm run dev            # Frontend only (port 3000, Vite)
-npm run build          # Production frontend build
-npm test               # Run backend tests (Node test runner)
-npm run test:verbose   # Tests with full output
-npm run lint           # Lint src/ and server/
-npm run electron:dev   # Full Electron dev mode
+npm run dev:all                    # Start backend + frontend together
+npm run server                     # Backend only (port 3001, nodemon)
+npm run dev                        # Frontend only (port 3000, Vite)
+npm run build                      # Production frontend build
+npm test                           # Run backend tests (Node test runner)
+npm run test:verbose               # Tests with full output
+npm run lint                       # Lint src/ and server/
+npm run electron:dev               # Full Electron dev mode
+npm run electron:build:mac         # Build Mac installer (signed)
+npm run electron:build:win         # Build Windows installer (signed, run on Windows)
 npm run theme:sync -- --project <name>  # Watch themes/ → data (requires --project)
 ```
 
@@ -108,6 +110,50 @@ Copy `.env.example` to `.env`. Key variables:
 - `VITE_API_URL` — Frontend API base URL
 - `SERVER_URL` — Server's self-referencing URL
 - `NODE_ENV` — development/production
+
+## Electron Desktop App
+
+### Development
+
+```bash
+npm run electron:dev   # Starts Vite + Express + Electron together
+```
+
+### Building Installers
+
+Mac (run on Mac):
+```bash
+npm run electron:build:mac            # Signed + notarized (requires certs)
+npm run electron:build:mac:unsigned   # Unsigned (local testing only)
+```
+
+Windows (run on Windows):
+```bash
+npm run electron:build:win            # Signed
+npm run electron:build:win:unsigned   # Unsigned (local testing only)
+```
+
+Output goes to `dist-electron/`.
+
+### Releasing a New Version
+
+1. Bump `version` in `package.json`
+2. Commit, tag, and push
+3. Build Mac artifacts on Mac (`npm run electron:build:mac`)
+4. Build Windows artifacts on Windows (`npm run electron:build:win`)
+5. Create a GitHub release manually at `github.com/tsiger/widgetizer/releases`
+6. Attach **all** of these files from `dist-electron/`:
+   - Mac: `.dmg`, `.zip`, `latest-mac.yml`
+   - Windows: `.exe`, `latest.yml`
+7. The `latest-mac.yml` and `latest.yml` files are critical — electron-updater reads them to detect new versions
+
+### Auto-Updates
+
+- electron-updater checks GitHub releases 10 seconds after app start
+- Compares the running app version against `latest-mac.yml` / `latest.yml`
+- If a newer version exists, the in-app update banner appears
+- Update flow: detect → user clicks Update → download with progress → user clicks Restart Now → install
+- Config in `package.json` under `build.publish` (provider: github, owner: tsiger, repo: widgetizer)
 
 ## Important Patterns
 

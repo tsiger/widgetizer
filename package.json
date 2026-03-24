@@ -40,8 +40,7 @@
     "electron:build:mac:unsigned": "npm run build && node electron/prepareMacSharp.cjs && npx @electron/rebuild --force && CSC_IDENTITY_AUTO_DISCOVERY=false SKIP_NOTARIZE=1 electron-builder --mac dir",
     "electron:build:win": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --win",
     "electron:build:win:unsigned": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --win -c.win.signtoolOptions=null",
-    "electron:publish:mac": "npm run build && node electron/prepareMacSharp.cjs && npx @electron/rebuild --force && electron-builder --mac --publish always",
-    "electron:publish:win": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --win --publish always"
+    "electron:build:validate": "npm run validate:all-locales && npm run lint:all"
   },
   "build": {
     "appId": "com.widgetizer.app",

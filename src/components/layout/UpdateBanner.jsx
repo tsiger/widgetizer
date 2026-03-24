@@ -28,7 +28,7 @@ export default function UpdateBanner() {
   if (!state) return null;
 
   return (
-    <div className="bg-indigo-600 text-white px-4 py-2 flex items-center justify-center gap-3 text-sm">
+    <div className="bg-pink-600 text-white px-4 h-10 flex items-center justify-center gap-3 text-sm">
       {state === "available" && (
         <>
           <span>Version {version} is available</span>
@@ -37,7 +37,7 @@ export default function UpdateBanner() {
             className="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 rounded px-3 py-1 text-xs font-medium transition-colors"
           >
             <Download size={14} />
-            Download
+            Update
           </button>
           <button
             onClick={() => setState(null)}
