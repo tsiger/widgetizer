@@ -143,9 +143,9 @@ Output goes to `dist-electron/`.
 4. Build Windows artifacts on Windows (`npm run electron:build:win`)
 5. Create a GitHub release manually at `github.com/tsiger/widgetizer/releases`
 6. Attach **all** of these files from `dist-electron/`:
-   - Mac: `.dmg`, `.zip`, `latest-mac.yml`
-   - Windows: `.exe`, `latest.yml`
-7. The `latest-mac.yml` and `latest.yml` files are critical — electron-updater reads them to detect new versions
+   - Mac: `.dmg`, `.dmg.blockmap`, `.zip`, `.zip.blockmap`, `latest-mac.yml`
+   - Windows: `.exe`, `.exe.blockmap`, `latest.yml`
+7. The `latest-mac.yml` and `latest.yml` files are critical — electron-updater reads them to detect new versions. The `.blockmap` files enable delta updates.
 
 ### Auto-Updates
 

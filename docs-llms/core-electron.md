@@ -237,8 +237,8 @@ In-app auto-updates are implemented via `electron-updater` with GitHub Releases 
 
 1. On startup (10s delay), the main process checks GitHub Releases for a newer version
 2. If found, an IPC message is sent to the renderer via `window.electronUpdater`
-3. The `UpdateBanner` component shows a notification bar: "Version X.Y.Z is available" with a Download button
-4. User clicks Download → progress bar shown → "Restart Now" button appears when done
+3. The `UpdateBanner` component shows a notification bar: "Version X.Y.Z is available" with an Update button
+4. User clicks Update → progress bar shown → "Restart Now" button appears when done
 5. `autoUpdater.autoDownload = false` (user-initiated), `autoInstallOnAppQuit = true`
 
 **Build targets for auto-update:**
@@ -246,26 +246,23 @@ In-app auto-updates are implemented via `electron-updater` with GitHub Releases 
 - macOS: DMG (for first-time installs) + ZIP (for seamless auto-updates via electron-updater)
 - Windows: NSIS installer (required for auto-update support)
 
-**Publishing a release:**
+**Releasing a new version:**
 
-```bash
-# 1. Bump version and tag
-npm version patch && git push && git push --tags
+1. Bump `version` in `package.json`, commit, tag, and push
+2. Build Mac artifacts on Mac:
+   ```bash
+   export $(cat .env.mac | xargs) && npm run electron:build:mac
+   ```
+3. Build Windows artifacts on Windows:
+   ```bash
+   npm run electron:build:win
+   ```
+4. Create a GitHub release manually at `github.com/tsiger/widgetizer/releases`
+5. Attach **all** of these files from `dist-electron/`:
+   - Mac: `.dmg`, `.dmg.blockmap`, `.zip`, `.zip.blockmap`, `latest-mac.yml`
+   - Windows: `.exe`, `.exe.blockmap`, `latest.yml`
 
-# 2. Create draft release
-gh release create v0.9.7 --draft --title "v0.9.7"
-
-# 3. Build & publish (uploads to GitHub Release)
-# Mac:
-export $(cat .env.mac | xargs) && GH_TOKEN=<token> npm run electron:publish:mac
-# Win (on Windows):
-set GH_TOKEN=<token> && npm run electron:publish:win
-
-# 4. Un-draft
-gh release edit v0.9.7 --draft=false
-```
-
-`GH_TOKEN` is a GitHub PAT with `repo` scope, needed at build time only. The public repo allows anonymous update checks at runtime.
+The `latest-mac.yml` and `latest.yml` files are critical — electron-updater reads them to detect new versions. The `.blockmap` files enable delta updates (only changed blocks are downloaded). The public repo allows anonymous update checks at runtime.
 
 **Implementation files:**
 
@@ -273,6 +270,14 @@ gh release edit v0.9.7 --draft=false
 - `electron/preload.js` — `contextBridge` exposing `window.electronUpdater` API
 - `src/components/layout/UpdateBanner.jsx` — Notification bar UI
 - `src/components/layout/Layout.jsx` — Mounts `UpdateBanner`
+
+## Error Handling
+
+- **React ErrorBoundary** (`src/components/ui/ErrorBoundary.jsx`) — wraps the entire app in `App.jsx`. Catches render errors and shows a recovery screen with Dashboard and Reload buttons. Shows stack trace in dev mode.
+- **Unresponsive window** — dialog offers "Wait" or "Reload" when the renderer hangs.
+- **Renderer crash** (`render-process-gone`) — shows the error page with a Retry button.
+- **Blocked window close** (`will-prevent-unload`) — forces close when a stuck `beforeunload` handler tries to block it.
+- **Uncaught exceptions** — logs the error and shows a dialog, but skips the dialog during app quit to prevent blocking shutdown.
 
 ## Technical Notes
 
