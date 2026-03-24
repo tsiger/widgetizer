@@ -519,6 +519,32 @@ Here's a minimal but complete testimonial widget:
 </section>
 ```
 
+# Transparent Header Support
+
+Widgets can declare support for transparent/overlay headers. When the header widget has `transparent_on_hero` enabled and the first widget on a page supports it, the body gets a `transparent-header` CSS class, allowing the header to overlay the widget content.
+
+### Declaring Support
+
+Add `"supportsTransparentHeader": true` to your widget's `schema.json`:
+
+```json
+{
+  "type": "hero",
+  "displayName": "Hero Banner",
+  "supportsTransparentHeader": true,
+  "settings": [ ... ]
+}
+```
+
+### How It Works
+
+1. The global header widget has a `transparent_on_hero` checkbox setting and an optional `transparent_logo` image
+2. When rendering a page, Widgetizer checks if the **first widget** on that page has `supportsTransparentHeader: true`
+3. If both conditions are met, a `transparent-header` class is added to `<body>`
+4. Your header CSS and widget CSS can then style accordingly (e.g., absolute positioning, light text on dark hero images)
+
+This is typically used for hero banners and full-width image widgets where the header should float over the content.
+
 # Editor Lifecycle Events
 
 When your widget has blocks that aren't all visible at once — slides in a slideshow, panels in an accordion, tabs in a switcher — the editor needs a way to reveal the right block when a user selects it in the sidebar. Widgetizer dispatches custom DOM events on widget elements to make this possible.

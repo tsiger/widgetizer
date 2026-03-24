@@ -6,9 +6,9 @@ You can use Widgetizer either as a standalone desktop application or by running 
 
 # Standalone Desktop Apps
 
-> **Coming Soon!** We're putting the finishing touches on native desktop applications for **Windows** and **macOS**. These standalone apps will let you build websites without any setup—just download, install, and start creating. Check back soon or follow us on GitHub for release announcements!
+Native desktop applications are available for **Windows** and **macOS**. Download the latest installer from the [GitHub Releases](https://github.com/tsiger/widgetizer/releases) page — just install and start creating. The desktop app includes automatic updates, so you'll be notified when new versions are available.
 
-In the meantime, you can run Widgetizer using Node.js (see below).
+Alternatively, you can run Widgetizer using Node.js (see below).
 
 # Using Node.js
 

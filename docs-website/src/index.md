@@ -30,12 +30,12 @@ A [Theme](themes.html) is a ready-made design package that defines the "look and
 
 Building pages in Widgetizer is as easy as arranging building blocks.
 
-- **What is a Widget?** Widgets are the main building blocks of your page. Examples include a **Hero Banner**, a **Text Widget**, a **Contact Form**, or a **Gallery**. Each widget is self-contained and comes with its own set of customization options (like background colors, alignment, and spacing).
+- **What is a Widget?** Widgets are the main building blocks of your page. Examples include a **Hero Banner**, a **Text Widget**, a **Gallery**, or a **Video Popup**. Each widget is self-contained and comes with its own set of customization options (like background colors, alignment, and spacing).
 - **What is a Block?** Blocks are smaller, flexible units _inside_ certain widgets. For example, if you have a "Features" widget, each individual feature is a **block**. This allows you to add as many features as you need, reorder them, or remove them without affecting the overall layout of the widget.
 
 ### Media Library
 
-The [Media Library](media.html) is your central hub for images, videos, and audio files.
+The [Media Library](media.html) is your central hub for images.
 
 - **Automatic Optimization**: When you upload an image, Widgetizer automatically creates different sizes to ensure your site loads instantly on both mobile and desktop.
 - **Usage Tracking**: The system knows exactly which page is using which image, protecting you from accidentally deleting something that's currently live on your site.

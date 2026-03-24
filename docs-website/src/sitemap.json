@@ -18,6 +18,11 @@
       "path": "license.md"
     },
     {
+      "type": "page",
+      "title": "Changelog",
+      "path": "changelog.md"
+    },
+    {
       "type": "header",
       "title": "Core Concepts"
     },

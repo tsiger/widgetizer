@@ -57,24 +57,6 @@ Sets the maximum size for individual image files (JPEG, PNG, GIF, WebP, SVG).
 - **Range:** 1 MB to 100 MB
 - **Applies to:** All image uploads across all projects
 
-#### Maximum Video Upload Size
-
-Sets the maximum size for individual video files (MP4).
-
-- **Default:** 50 MB
-- **Range:** 1 MB to 500 MB
-- **Applies to:** All video uploads across all projects
-
-> **Note:** Videos are not automatically optimized or resized. Consider compressing large videos before uploading to keep file sizes manageable.
-
-#### Maximum Audio Upload Size
-
-Sets the maximum size for individual audio files (MP3).
-
-- **Default:** 25 MB
-- **Range:** 1 MB to 100 MB
-- **Applies to:** All audio uploads across all projects
-
 ### Image Processing Configuration
 
 When you upload an image, Widgetizer automatically creates multiple sizes to optimize your website's performance. These settings control how images are processed.

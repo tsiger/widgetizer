@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.9.6] - 2026-03-24
+
+### Added
+
+- 7 new widgets: Split Content (with sticky option), Video Popup, Gallery variants, Scrolling Text, Numbered Service List, Team Highlight, Key Figures
+- Theme localization (i18n) for widget schemas and global settings
+- Theme-level modifiers (style modifiers applied across widgets)
+- Icon modifiers for widget elements
+- Responsive images (`srcset`) rolled out to all applicable widgets
+- Carousel/slider layout for card-based widgets
+- Improved typography selection in theme settings
+- 20+ new theme presets
+- Per-page transparent header option
+- Asset enqueue system with theme-level resolution
+
+### Changed
+
+- Theme settings panel reorganized
+- Header/footer block rendering improved
+- Preview updates live on theme settings change
+- Theme sync script improved
+- Media-by-ID operations no longer scoped to a single project
+- Audio/video file uploads no longer allowed
+- Contact form widget removed from OSS edition
+
+### Fixed
+
+- Widget display names corrected
+- Minor Arch theme styling issues
+- Media handling improvements
+
 ## [0.9.4] - 2026-02-25
 
 ### Added

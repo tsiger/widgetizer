@@ -90,6 +90,18 @@ Registers a script for deferred output.
 | `location` | `"footer"` | Where to output: `"header"` or `"footer"` |
 | `defer`    | `false`    | Add `defer` attribute                     |
 | `async`    | `false`    | Add `async` attribute                     |
+| `theme`    | `false`    | Load from theme `assets/` instead of widget folder |
+
+### Theme-Level Script Resolution
+
+By default, `{% enqueue_script %}` inside a widget loads from the widget's own folder. Set `theme: true` to load a shared script from the theme's `assets/` folder instead. This is useful for scripts shared across multiple widgets (e.g., a carousel library):
+
+```liquid
+{# In widgets/gallery/widget.liquid — loads from assets/carousel.js, not widgets/gallery/ #}
+{% enqueue_script src: "carousel.js", theme: true, defer: true %}
+```
+
+Scripts are deduplicated by filename, so multiple widgets can enqueue the same theme script without it loading twice.
 
 `{% enqueue_preload %}`
 
@@ -262,35 +274,38 @@ Renders an `<img>` tag or returns a path.
 {% image src: widget.settings.heroImage, size: 'large', output: 'path' %}
 ```
 
-**Parameters (named):** `size` (default `'medium'`), `class`, `lazy` (default `true`), `alt`, `title`. For path-only output use `output: 'path'` or `output: 'url'`.
+**Parameters:**
 
-`{% video %}`
+| Parameter       | Default    | Description                                                    |
+| :-------------- | :--------- | :------------------------------------------------------------- |
+| `src`           | (required) | Image filename from widget/block settings                      |
+| `size`          | `'medium'` | Which image size variant to use (`thumb`, `small`, `medium`, `large`, or custom theme sizes) |
+| `class`         | `null`     | CSS class for the `<img>` element                              |
+| `lazy`          | `true`     | Enable lazy loading (`loading="lazy"`)                         |
+| `alt`           | `null`     | Alt text (falls back to media library alt text)                |
+| `title`         | `null`     | Title attribute                                                |
+| `output`        | `null`     | Set to `'path'` or `'url'` to return the URL string only      |
+| `srcset`        | `false`    | Enable responsive `srcset` generation                          |
+| `sizes`         | `null`     | The `sizes` attribute for responsive images (e.g., `"(max-width: 640px) 100vw, 50vw"`) |
+| `loading`       | `null`     | Explicit `loading` attribute (`lazy`, `eager`)                 |
+| `fetchpriority` | `null`     | Fetch priority hint (`high`, `low`, `auto`)                    |
+| `decoding`      | `null`     | Decoding hint (`async`, `sync`, `auto`)                        |
 
-Renders a `<video>` tag or returns a path.
+### Responsive Images (srcset)
+
+When `srcset: true` is set, the tag generates a `srcset` attribute containing all available size variants for the image (excluding thumbnails). This lets browsers pick the best size for the viewport.
 
 ```liquid
-{# Full <video> tag #}
-{% video src: widget.settings.bgVideo %}
-{% video src: widget.settings.bgVideo, controls: true, autoplay: true, muted: true, loop: true, class: 'bg-video' %}
-
-{# Path only #}
-{% video src: widget.settings.bgVideo, output: 'path' %}
+{% image src: widget.settings.heroImage, srcset: true, sizes: "(max-width: 768px) 100vw, 50vw" %}
 ```
 
-**Parameters (named):** `controls`, `autoplay`, `muted`, `loop`, `class`. For path-only output use `output: 'path'` or `output: 'url'`.
+Output:
 
-`{% audio %}`
-
-Returns an audio file path (no HTML element).
-
-```liquid
-{% audio src: widget.settings.backgroundMusic %}
-
-{# Use with HTML5 audio #}
-<audio controls>
-  <source src="{% audio src: widget.settings.music %}" type="audio/mpeg">
-</audio>
+```html
+<img src="medium_hero.jpg" srcset="small_hero.jpg 480w, medium_hero.jpg 1024w, large_hero.jpg 1920w" sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" alt="">
 ```
+
+SVG images are never given srcset since they scale at any size. The tag automatically deduplicates sizes and only includes variants smaller than or equal to the original image.
 
 `{% youtube %}`
 

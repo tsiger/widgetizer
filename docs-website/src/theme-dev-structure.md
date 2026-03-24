@@ -51,6 +51,10 @@ themes/my-theme/
 │   └── main-menu.json
 ├── snippets/
 │   └── icon.liquid
+├── locales/              # Translation files for i18n
+│   ├── en.json
+│   ├── fr.json
+│   └── ...
 ├── updates/              # Version update folders (for distributing updates)
 │   ├── 1.1.0/
 │   │   ├── theme.json    # Required, version must match folder name
@@ -96,6 +100,10 @@ A folder for theme-wide CSS, JavaScript, and shared assets (for example, `base.c
 
 Menu and snippet structures are covered in [Menus & Snippets](theme-dev-menus-snippets.html).
 
+**`locales/`** (optional)
+
+A folder containing translation JSON files for theme localization. Each file is named by language code (e.g., `en.json`, `fr.json`). When present, labels in `theme.json` and widget schemas can use translation keys instead of hardcoded strings. See [Theme Manifest & Settings](theme-dev-manifest-settings.html#theme-localization-i18n) for details.
+
 # What Widgetizer Loads
 
 When a theme is selected for a project, the system loads:
@@ -107,6 +115,7 @@ When a theme is selected for a project, the system loads:
 - `assets/` for theme-level assets
 - `menus/` for navigation menus
 - `snippets/` for reusable Liquid partials
+- `locales/` for translation strings (when present)
 
 # Arch Theme Example
 

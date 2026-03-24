@@ -120,8 +120,6 @@ Theme settings use the same types as widgets. Common types include:
 - `radio`
 - `font_picker`
 - `image`
-- `video`
-- `audio`
 - `youtube`
 - `menu`
 - `link`
@@ -181,6 +179,87 @@ If you include the `advanced` group, users can inject:
 - Custom scripts before `</body>` via `{% custom_footer_scripts %}`
 
 These tags must be present in `layout.liquid` for the settings to take effect. See [Layout & Templates](theme-dev-layout-templates.html) for required placeholders and tag placement.
+
+# Theme Localization (i18n)
+
+Themes can provide translated labels for all settings and widget fields. This allows the Theme Settings panel and widget editor to display in the user's chosen language.
+
+### Locale Files
+
+Create a `locales/` folder in your theme root with one JSON file per language:
+
+```
+themes/my-theme/
+├── locales/
+│   ├── en.json
+│   ├── fr.json
+│   ├── de.json
+│   └── es.json
+```
+
+Each file contains nested keys matching your settings structure:
+
+```json
+{
+  "global": {
+    "colors": {
+      "settings": {
+        "standard_bg_primary": {
+          "label": "Primary Background"
+        }
+      }
+    }
+  },
+  "hero": {
+    "displayName": "Hero Banner",
+    "settings": {
+      "layout": {
+        "label": "Layout"
+      }
+    }
+  }
+}
+```
+
+### Using Translation Keys
+
+In `theme.json` and widget `schema.json` files, use the `tTheme:` prefix followed by a dot-notation path instead of a hardcoded string:
+
+```json
+{
+  "type": "color",
+  "id": "standard_bg_primary",
+  "label": "tTheme:global.colors.settings.standard_bg_primary.label",
+  "default": "#ffffff"
+}
+```
+
+The system resolves `tTheme:global.colors.settings.standard_bg_primary.label` by looking up `global.colors.settings.standard_bg_primary.label` in the active locale file. If the key is not found or no locale file exists for the current language, the raw key string is displayed as a fallback.
+
+### Widget Schema Localization
+
+Widget `displayName` and setting `label` fields support the same `tTheme:` prefix:
+
+```json
+{
+  "type": "hero",
+  "displayName": "tTheme:hero.displayName",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "tTheme:hero.settings.layout.label",
+      "options": [
+        { "value": "centered", "label": "tTheme:hero.settings.layout.options.centered" }
+      ]
+    }
+  ]
+}
+```
+
+### Supported Languages
+
+Widgetizer's admin interface supports English, French, German, Greek, Italian, and Spanish. Your theme can provide locale files for any of these languages. The active locale matches the user's language setting in [App Settings](settings.html).
 
 # Practical Guidance
 

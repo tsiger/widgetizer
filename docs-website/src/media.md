@@ -1,8 +1,8 @@
 ---
-description: Manage images, videos, and audio in the Widgetizer Media Library. Automatic image optimization, usage tracking, and bulk operations.
+description: Manage images in the Widgetizer Media Library. Automatic image optimization, usage tracking, and bulk operations.
 ---
 
-The Media Library is your central hub for all the images, videos, and audio files used in your website. Widgetizer automatically optimizes your images and tracks where they're being used to help you manage your media efficiently.
+The Media Library is your central hub for all the images used in your website. Widgetizer automatically optimizes your images and tracks where they're being used to help you manage your media efficiently.
 
 # Uploading Files
 
@@ -16,31 +16,17 @@ You can upload multiple files at once. Widgetizer will process them in batches.
 
 ### Supported File Types
 
-**Images:**
-
 - JPEG/JPG
 - PNG
 - GIF
 - WebP
 - SVG
 
-**Videos:**
-
-- MP4
-
-**Audio:**
-
-- MP3
+> **Note:** Audio and video file uploads are not supported. Use embed widgets (e.g. YouTube) for video and audio content.
 
 ### Upload Limits
 
-File size limits can be configured in [App Settings](settings.html):
-
-- **Images**: Default maximum size per file
-- **Videos**: Separate maximum size per file
-- **Audio**: Separate maximum size per file
-
-If a file exceeds the limit, it will be rejected with an error message.
+The maximum image upload size can be configured in [App Settings](settings.html). If a file exceeds the limit, it will be rejected with an error message.
 
 # Automatic Image Optimization
 
@@ -117,12 +103,7 @@ Use the search bar to filter files by filename. The search updates in real-time 
 
 ### Filtering by Type
 
-Use the type filter dropdown to show:
-
-- **All files**
-- **Images only**
-- **Videos only**
-- **Audio only**
+Use the type filter dropdown to filter files by type.
 
 # Managing Files
 
@@ -202,11 +183,7 @@ When you upload a file, Widgetizer:
 
 ### Storage Location
 
-Files are stored in your project directory:
-
-- **Images**: `/data/projects/your-project/uploads/images/`
-- **Videos**: `/data/projects/your-project/uploads/videos/`
-- **Audio**: `/data/projects/your-project/uploads/audios/`
+Files are stored in your project directory at `/data/projects/your-project/uploads/images/`.
 
 Generated image sizes are stored with prefixes:
 
@@ -234,12 +211,6 @@ Generated image sizes are stored with prefixes:
 - Let Widgetizer's automatic sizing do the work
 - Configure image quality in App Settings (80-85 is usually perfect)
 - Disable size variants you don't use to save storage
-
-### Videos
-
-- Videos are NOT processed or optimized automatically
-- Compress videos before uploading to keep file sizes manageable
-- MP4 is the most compatible format across browsers
 
 ### Bulk Operations
 

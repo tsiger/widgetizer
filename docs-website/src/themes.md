@@ -9,7 +9,7 @@ A **Theme** in Widgetizer is a starter kit that provides the foundation for your
 A theme is a complete package that includes:
 
 - **Visual Design**: Colors, typography, spacing, and layout styles
-- **Widgets**: Pre-built content components specific to that theme (like hero banners, text sections, contact forms, galleries, etc.)
+- **Widgets**: Pre-built content components specific to that theme (like hero banners, text sections, galleries, video popups, etc.)
 - **Layout Templates**: The HTML structure that wraps your content
 - **Global Settings**: Theme-wide customization options (colors, fonts, etc.)
 
@@ -134,7 +134,7 @@ When creating a new project, consider:
 
 - **Design Style**: Does the theme match the aesthetic you want for your site?
 - **Presets**: Does the theme offer preset variants that match your use case?
-- **Widgets**: Does the theme include the types of widgets you need (forms, galleries, testimonials, etc.)?
+- **Widgets**: Does the theme include the types of widgets you need (galleries, testimonials, etc.)?
 - **Flexibility**: Does the theme offer enough customization options for your needs?
 - **Purpose**: Is the theme designed for your type of site (portfolio, blog, business, etc.)?
 
@@ -147,7 +147,7 @@ While you can't change themes, you have significant customization options within
 - **Global Settings**: Customize colors, fonts, and other theme-wide settings
 - **Widget Settings**: Each widget has its own settings for content, layout, and styling
 - **Content**: Add, remove, and rearrange widgets and blocks to create your desired layout
-- **Media**: Upload and use your own images, videos, and audio files
+- **Media**: Upload and use your own images
 
 These customization options allow you to create a unique website while staying within your theme's design system.
 
