@@ -209,8 +209,6 @@ export default function EditorTopBar({
 
         <Link
           to={`/preview/${pageId}`}
-          target="_blank"
-          rel="noopener noreferrer"
           className="flex items-center gap-2 px-3 h-9 rounded-sm text-sm bg-slate-200 hover:bg-slate-300 text-slate-800"
         >
           <Eye size={18} />

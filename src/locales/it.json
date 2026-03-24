@@ -615,7 +615,8 @@
   },
   "pagePreview": {
     "title": "Anteprima: {{name}}",
-    "loading": "Caricamento pagina..."
+    "loading": "Caricamento pagina...",
+    "backToEditor": "Indietro"
   },
   "appSettings": {
     "tabs": {

@@ -57,10 +57,21 @@ function validateTheme(themeName) {
   // Collect all tTheme: keys from schemas + theme.json
   const schemaKeys = [];
 
+  // Theme widgets
   const widgetsDir = join(dir, "widgets");
   for (const schemaPath of findSchemaFiles(widgetsDir)) {
     const schema = JSON.parse(readFileSync(schemaPath, "utf-8"));
     schemaKeys.push(...extractThemeKeys(schema));
+  }
+
+  // Core widgets (src/core/widgets/) — their schemas use tTheme: keys
+  // resolved against the theme's locale files
+  const coreWidgetsDir = join(rootDir, "src", "core", "widgets");
+  if (existsSync(coreWidgetsDir)) {
+    for (const schemaPath of findSchemaFiles(coreWidgetsDir)) {
+      const schema = JSON.parse(readFileSync(schemaPath, "utf-8"));
+      schemaKeys.push(...extractThemeKeys(schema));
+    }
   }
 
   const themeJsonPath = join(dir, "theme.json");

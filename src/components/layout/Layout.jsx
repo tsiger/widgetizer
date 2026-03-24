@@ -1,5 +1,6 @@
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
+import UpdateBanner from "./UpdateBanner";
 import { Outlet, useLocation } from "react-router-dom";
 
 export default function Layout() {
@@ -11,6 +12,7 @@ export default function Layout() {
       {!isPageEditor && <Sidebar />}
 
       <div className={`flex-1 flex flex-col relative z-30 ${!isPageEditor ? "ml-[72px] md:ml-48" : ""}`}>
+        <UpdateBanner />
         <div className={`flex-1 ${isPageEditor ? "overflow-hidden" : "overflow-y-auto p-14"} bg-slate-100`}>
           <Outlet />
         </div>

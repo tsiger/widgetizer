@@ -615,7 +615,8 @@
   },
   "pagePreview": {
     "title": "Vorschau: {{name}}",
-    "loading": "Seite wird geladen..."
+    "loading": "Seite wird geladen...",
+    "backToEditor": "Zurück"
   },
   "appSettings": {
     "tabs": {

@@ -614,7 +614,8 @@
   },
   "pagePreview": {
     "title": "Προεπισκόπηση: {{name}}",
-    "loading": "Φόρτωση σελίδας..."
+    "loading": "Φόρτωση σελίδας...",
+    "backToEditor": "Πίσω"
   },
   "appSettings": {
     "tabs": {

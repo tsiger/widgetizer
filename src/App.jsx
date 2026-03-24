@@ -22,6 +22,7 @@ import MenuStructure from "./pages/MenuStructure";
 import NotFound from "./pages/NotFound";
 import RouteError from "./pages/RouteError";
 import ToastContainer from "./components/ui/ToastContainer";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
 import RequireActiveProject from "./components/layout/RequireActiveProject";
 import useProjectStore from "./stores/projectStore";
 import { registerProjectStore } from "./lib/activeProjectId";
@@ -144,7 +145,11 @@ function App() {
     useProjectStore.getState().fetchActiveProject();
   }, []);
 
-  return <AppWithToast />;
+  return (
+    <ErrorBoundary>
+      <AppWithToast />
+    </ErrorBoundary>
+  );
 }
 
 export default App;

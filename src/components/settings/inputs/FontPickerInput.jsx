@@ -67,20 +67,9 @@ function loadFontPreview(fontName, weight) {
   link.href = url;
 }
 
-function FontListItem({ font, isSelected, onClick, observerRef }) {
-  const itemRef = useRef(null);
-
-  useEffect(() => {
-    const el = itemRef.current;
-    const obs = observerRef.current;
-    if (!el || !obs) return;
-    obs.observe(el);
-    return () => obs.unobserve(el);
-  }, [observerRef]);
-
+function FontListItem({ font, isSelected, onClick }) {
   return (
     <button
-      ref={itemRef}
       type="button"
       data-font-name={font.isGoogleFont ? font.name : null}
       className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between gap-2 transition-colors ${
@@ -124,7 +113,6 @@ export default function FontPickerInput({
   const containerRef = useRef(null);
   const listRef = useRef(null);
   const searchInputRef = useRef(null);
-  const observerRef = useRef(null);
 
   useEffect(() => {
     setSelectedStack(currentVal.stack);
@@ -138,28 +126,6 @@ export default function FontPickerInput({
     if (!weight) return;
     loadFontPreview(selectedFontObject.name, weight);
   }, [selectedFontObject, selectedWeight]);
-
-  // IntersectionObserver to lazy-load fonts as they scroll into view
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const obs = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const name = entry.target.dataset.fontName;
-          if (!name) continue;
-          const font = GOOGLE_FONTS.find((f) => f.name === name);
-          if (font) loadFontForPreview(font);
-          obs.unobserve(entry.target);
-        }
-      },
-      { root: listRef.current, rootMargin: "100px" },
-    );
-
-    observerRef.current = obs;
-    return () => obs.disconnect();
-  }, [isOpen]);
 
   // Focus search when dropdown opens
   useEffect(() => {
@@ -193,6 +159,32 @@ export default function FontPickerInput({
     return ALL_FONTS_LIST.filter((f) => f.name.toLowerCase().includes(q));
   }, [search]);
 
+  // IntersectionObserver to lazy-load fonts as they scroll into view
+  useEffect(() => {
+    if (!isOpen || !listRef.current) return;
+
+    const list = listRef.current;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const name = entry.target.dataset.fontName;
+          if (!name) continue;
+          const font = GOOGLE_FONTS.find((f) => f.name === name);
+          if (font) loadFontForPreview(font);
+          obs.unobserve(entry.target);
+        }
+      },
+      { root: list, rootMargin: "100px" },
+    );
+
+    for (const el of list.querySelectorAll("[data-font-name]")) {
+      obs.observe(el);
+    }
+
+    return () => obs.disconnect();
+  }, [isOpen, filteredFonts]);
+
   const handleFontSelect = useCallback(
     (font) => {
       const canKeepWeight = font.availableWeights?.includes(selectedWeight);
@@ -225,7 +217,7 @@ export default function FontPickerInput({
           font={font}
           isSelected={font.stack === selectedStack}
           onClick={handleFontSelect}
-          observerRef={observerRef}
+
         />
       ));
     }
@@ -239,7 +231,7 @@ export default function FontPickerInput({
             font={font}
             isSelected={font.stack === selectedStack}
             onClick={handleFontSelect}
-            observerRef={observerRef}
+  
           />
         ))}
         <div className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-t border-slate-100">
@@ -251,7 +243,7 @@ export default function FontPickerInput({
             font={font}
             isSelected={font.stack === selectedStack}
             onClick={handleFontSelect}
-            observerRef={observerRef}
+  
           />
         ))}
       </>

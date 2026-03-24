@@ -1,4 +1,6 @@
-import { app, BrowserWindow, dialog, Menu, shell, utilityProcess } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu, shell, utilityProcess } from "electron";
+import pkg from "electron-updater";
+const { autoUpdater } = pkg;
 import fs from "fs";
 import path from "path";
 import http from "http";
@@ -290,6 +292,50 @@ function createWindow() {
     log(`Page failed to load: ${errorDescription} (${errorCode}) - URL: ${validatedURL}`);
   });
 
+  // Handle unresponsive renderer — offer to wait or force-reload
+  mainWindow.on("unresponsive", () => {
+    log("Window became unresponsive");
+    dialog
+      .showMessageBox(mainWindow, {
+        type: "warning",
+        title: "Widgetizer is not responding",
+        message: "The application is not responding. Would you like to reload it?",
+        buttons: ["Wait", "Reload"],
+        defaultId: 1,
+        cancelId: 0,
+      })
+      .then(({ response }) => {
+        if (response === 1 && mainWindow) {
+          log("User chose to reload unresponsive window");
+          mainWindow.webContents.reload();
+        }
+      });
+  });
+
+  mainWindow.on("responsive", () => {
+    log("Window became responsive again");
+  });
+
+  // Handle renderer process crash — reload or show error page
+  mainWindow.webContents.on("render-process-gone", (event, details) => {
+    log(`Renderer process gone: reason=${details.reason}, exitCode=${details.exitCode}`);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      if (details.reason === "clean-exit") return;
+      showError(
+        `The renderer process crashed unexpectedly.\n\n` +
+          `Reason: ${details.reason}\n` +
+          `Exit code: ${details.exitCode}\n\n` +
+          `Click Retry to reload the application.`,
+      );
+    }
+  });
+
+  // Don't let a stuck beforeunload handler prevent window close
+  mainWindow.webContents.on("will-prevent-unload", (event) => {
+    log("Renderer attempted to prevent unload — allowing close");
+    event.preventDefault();
+  });
+
   return mainWindow;
 }
 
@@ -519,6 +565,68 @@ function createAppMenu() {
   Menu.setApplicationMenu(menu);
 }
 
+// Auto-updater setup
+function setupAutoUpdater() {
+  if (getIsDev()) return;
+
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.logger = {
+    info: (msg) => log(`[updater] ${msg}`),
+    warn: (msg) => log(`[updater WARN] ${msg}`),
+    error: (msg) => log(`[updater ERROR] ${msg}`),
+  };
+
+  autoUpdater.on("update-available", (info) => {
+    log(`Update available: ${info.version}`);
+    if (mainWindow) {
+      mainWindow.webContents.send("update-available", {
+        version: info.version,
+        releaseDate: info.releaseDate,
+      });
+    }
+  });
+
+  autoUpdater.on("update-not-available", () => {
+    log("No updates available");
+  });
+
+  autoUpdater.on("download-progress", (progress) => {
+    if (mainWindow) {
+      mainWindow.webContents.send("update-download-progress", {
+        percent: Math.round(progress.percent),
+      });
+    }
+  });
+
+  autoUpdater.on("update-downloaded", () => {
+    log("Update downloaded, will install on quit");
+    if (mainWindow) {
+      mainWindow.webContents.send("update-downloaded");
+    }
+  });
+
+  autoUpdater.on("error", (err) => {
+    log(`Update error: ${err.message}`);
+  });
+
+  ipcMain.on("download-update", () => {
+    autoUpdater.downloadUpdate();
+  });
+
+  ipcMain.on("install-update", () => {
+    autoUpdater.quitAndInstall();
+  });
+
+  // Check for updates after a short delay to avoid slowing down startup
+  setTimeout(() => {
+    autoUpdater.checkForUpdates().catch((err) => {
+      log(`Update check failed: ${err.message}`);
+    });
+  }, 10000);
+}
+
 // App lifecycle
 app.whenReady().then(async () => {
   log("App ready event fired");
@@ -528,6 +636,7 @@ app.whenReady().then(async () => {
     initPaths();
     ensureDataDirectories();
     createAppMenu();
+    setupAutoUpdater();
 
     // Create window first so user sees something
     createWindow();
@@ -565,6 +674,7 @@ app.on("activate", () => {
 
 app.on("before-quit", () => {
   log("App before-quit event");
+  isQuitting = true;
   stopServer();
 });
 
@@ -575,10 +685,14 @@ app.on("window-all-closed", () => {
   }
 });
 
-// Handle uncaught exceptions
+// Handle uncaught exceptions — avoid blocking dialog during quit
+let isQuitting = false;
+
 process.on("uncaughtException", (err) => {
   log(`Uncaught exception: ${err.message}\n${err.stack}`);
-  dialog.showErrorBox("Widgetizer Error", `Uncaught exception: ${err.message}`);
+  if (!isQuitting) {
+    dialog.showErrorBox("Widgetizer Error", `Uncaught exception: ${err.message}`);
+  }
 });
 
 process.on("unhandledRejection", (reason) => {

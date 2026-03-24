@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { ArrowLeft } from "lucide-react";
 
 import usePageStore from "../stores/pageStore";
 import PreviewPanel from "../components/pageEditor/PreviewPanel";
@@ -57,18 +58,29 @@ export default function PagePreview() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-900">
-      <PreviewPanel
-        page={page}
-        widgets={page?.widgets || {}}
-        themeSettings={themeSettings}
-        previewMode="desktop"
-        runtimeMode="standalone"
-        showSelectionOverlay={false}
-        selectedWidgetId={null}
-        selectedBlockId={null}
-        selectedGlobalWidgetId={null}
-      />
+    <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <div className="bg-white border-b border-slate-200 p-2 flex items-center">
+        <button
+          onClick={() => navigate(`/page-editor?pageId=${pageId}`)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm hover:bg-slate-100 text-slate-600 hover:text-slate-800"
+        >
+          <ArrowLeft size={18} />
+          {t("pagePreview.backToEditor")}
+        </button>
+      </div>
+      <div className="flex flex-1 min-h-0">
+        <PreviewPanel
+          page={page}
+          widgets={page?.widgets || {}}
+          themeSettings={themeSettings}
+          previewMode="desktop"
+          runtimeMode="standalone"
+          showSelectionOverlay={false}
+          selectedWidgetId={null}
+          selectedBlockId={null}
+          selectedGlobalWidgetId={null}
+        />
+      </div>
     </div>
   );
 }

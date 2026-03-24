@@ -4,7 +4,18 @@
  * This is the bridge between the renderer process and Node.js.
  */
 
-// Currently no APIs are exposed to the renderer.
-// The app communicates with the backend via HTTP, not IPC.
+const { contextBridge, ipcRenderer } = require("electron");
 
-console.log("Widgetizer preload script loaded");
+contextBridge.exposeInMainWorld("electronUpdater", {
+  onUpdateAvailable: (callback) => {
+    ipcRenderer.on("update-available", (_event, info) => callback(info));
+  },
+  onDownloadProgress: (callback) => {
+    ipcRenderer.on("update-download-progress", (_event, info) => callback(info));
+  },
+  onUpdateDownloaded: (callback) => {
+    ipcRenderer.on("update-downloaded", () => callback());
+  },
+  downloadUpdate: () => ipcRenderer.send("download-update"),
+  installUpdate: () => ipcRenderer.send("install-update"),
+});

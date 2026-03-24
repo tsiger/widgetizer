@@ -615,7 +615,8 @@
   },
   "pagePreview": {
     "title": "Vista previa: {{name}}",
-    "loading": "Cargando página..."
+    "loading": "Cargando página...",
+    "backToEditor": "Volver"
   },
   "appSettings": {
     "tabs": {

@@ -26,6 +26,7 @@
     "dev:frontend": "wait-on http://localhost:3001/health && npm run dev",
     "dev:all": "concurrently \"npm run server\" \"npm run dev:frontend\"",
     "start:prod": "cross-env NODE_ENV=production npm start",
+    "preelectron:dev": "npm rebuild better-sqlite3 && npm run validate:all-locales",
     "electron:dev": "concurrently -k \"cross-env NODE_ENV=development npm run server\" \"cross-env NODE_ENV=development npm run dev\" \"wait-on http://localhost:3000 && cross-env ELECTRON_DEV=1 ELECTRON_DISABLE_INTERNAL_SERVER=1 VITE_DEV_SERVER_URL=http://localhost:3000 electron .\"",
     "test": "node --test --test-reporter ./server/tests/reporter.js server/tests/*.test.js",
     "test:verbose": "VERBOSE=1 node --test --test-reporter ./server/tests/reporter.js server/tests/*.test.js",
@@ -36,7 +37,11 @@
     "validate:all-locales": "node scripts/validate-locales.js && node scripts/validate-theme-locales.js",
     "electron:build": "npm run build && electron-builder",
     "electron:build:mac": "npm run build && node electron/prepareMacSharp.cjs && npx @electron/rebuild --force && electron-builder --mac",
-    "electron:build:win": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --win"
+    "electron:build:mac:unsigned": "npm run build && node electron/prepareMacSharp.cjs && npx @electron/rebuild --force && CSC_IDENTITY_AUTO_DISCOVERY=false SKIP_NOTARIZE=1 electron-builder --mac dir",
+    "electron:build:win": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --win",
+    "electron:build:win:unsigned": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --win -c.win.signtoolOptions=null",
+    "electron:publish:mac": "npm run build && node electron/prepareMacSharp.cjs && npx @electron/rebuild --force && electron-builder --mac --publish always",
+    "electron:publish:win": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --win --publish always"
   },
   "build": {
     "appId": "com.widgetizer.app",
@@ -75,6 +80,13 @@
             "arm64",
             "x64"
           ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
         }
       ],
       "category": "public.app-category.productivity",
@@ -84,10 +96,15 @@
       "entitlementsInherit": "electron/entitlements.mac.plist"
     },
     "afterSign": "scripts/notarize.cjs",
+    "publish": {
+      "provider": "github",
+      "owner": "tsiger",
+      "repo": "widgetizer"
+    },
     "win": {
       "target": [
         {
-          "target": "zip",
+          "target": "nsis",
           "arch": [
             "x64"
           ]
@@ -117,6 +134,7 @@
     "cors": "^2.8.5",
     "dompurify": "^3.3.1",
     "dotenv": "^17.2.3",
+    "electron-updater": "^6.8.3",
     "express": "^5.2.1",
     "express-validator": "^7.2.1",
     "fs-extra": "^11.3.0",

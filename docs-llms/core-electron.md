@@ -27,8 +27,14 @@ npm run electron:build
 # macOS only (loads signing credentials from .env.mac first)
 export $(cat .env.mac | xargs) && npm run electron:build:mac
 
+# macOS unsigned (fast, skips signing + notarization, local testing only)
+npm run electron:build:mac:unsigned
+
 # Windows only
 npm run electron:build:win
+
+# Windows unsigned (fast, skips Authenticode signing, local testing only)
+npm run electron:build:win:unsigned
 ```
 
 Output directory: `dist-electron/`
@@ -41,7 +47,8 @@ If you build the Windows app on macOS, native modules like `sharp` may be missin
 
 - Windows builds run successfully on Windows.
 - Windows signing is working with `electron-builder` 26.
-- The current Windows target is still `zip`, not an installer.
+- Windows target is `nsis` (installer), required for auto-updates.
+- macOS targets are `dmg` (first-time install) + `zip` (for seamless auto-updates via electron-updater).
 - macOS builds are signed and notarized with a Developer ID Application certificate.
 
 ### macOS Output
@@ -220,11 +227,52 @@ What is done:
 
 What is left for Windows:
 
-- switch the build target from `zip` to `nsis`
-- decide how releases will be published on GitHub Releases
-- add in-app update support with `electron-updater`
-- decide how users should be notified about available updates
 - optionally clean up the `electron:build:win` script to avoid the npm `--platform` / `--arch` warnings
+
+## Auto-Updates
+
+In-app auto-updates are implemented via `electron-updater` with GitHub Releases as the provider.
+
+**How it works:**
+
+1. On startup (10s delay), the main process checks GitHub Releases for a newer version
+2. If found, an IPC message is sent to the renderer via `window.electronUpdater`
+3. The `UpdateBanner` component shows a notification bar: "Version X.Y.Z is available" with a Download button
+4. User clicks Download → progress bar shown → "Restart Now" button appears when done
+5. `autoUpdater.autoDownload = false` (user-initiated), `autoInstallOnAppQuit = true`
+
+**Build targets for auto-update:**
+
+- macOS: DMG (for first-time installs) + ZIP (for seamless auto-updates via electron-updater)
+- Windows: NSIS installer (required for auto-update support)
+
+**Publishing a release:**
+
+```bash
+# 1. Bump version and tag
+npm version patch && git push && git push --tags
+
+# 2. Create draft release
+gh release create v0.9.7 --draft --title "v0.9.7"
+
+# 3. Build & publish (uploads to GitHub Release)
+# Mac:
+export $(cat .env.mac | xargs) && GH_TOKEN=<token> npm run electron:publish:mac
+# Win (on Windows):
+set GH_TOKEN=<token> && npm run electron:publish:win
+
+# 4. Un-draft
+gh release edit v0.9.7 --draft=false
+```
+
+`GH_TOKEN` is a GitHub PAT with `repo` scope, needed at build time only. The public repo allows anonymous update checks at runtime.
+
+**Implementation files:**
+
+- `electron/main.js` — `setupAutoUpdater()` function, IPC handlers
+- `electron/preload.js` — `contextBridge` exposing `window.electronUpdater` API
+- `src/components/layout/UpdateBanner.jsx` — Notification bar UI
+- `src/components/layout/Layout.jsx` — Mounts `UpdateBanner`
 
 ## Technical Notes
 
