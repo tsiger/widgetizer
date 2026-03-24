@@ -70,7 +70,7 @@
     "mac": {
       "target": [
         {
-          "target": "zip",
+          "target": "dmg",
           "arch": [
             "arm64",
             "x64"
@@ -78,8 +78,12 @@
         }
       ],
       "category": "public.app-category.productivity",
-      "identity": null
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "electron/entitlements.mac.plist",
+      "entitlementsInherit": "electron/entitlements.mac.plist"
     },
+    "afterSign": "scripts/notarize.cjs",
     "win": {
       "target": [
         {
@@ -103,7 +107,7 @@
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-"@tiptap/extension-link": "^3.18.0",
+    "@tiptap/extension-link": "^3.18.0",
     "@tiptap/pm": "^3.18.0",
     "@tiptap/react": "^3.18.0",
     "@tiptap/starter-kit": "^3.18.0",
@@ -142,9 +146,10 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@electron/notarize": "^3.1.1",
     "@eslint/js": "^9.24.0",
     "@tailwindcss/postcss": "^4.1.3",
-"@vitejs/plugin-react": "^5.1.2",
+    "@vitejs/plugin-react": "^5.1.2",
     "chokidar": "^5.0.0",
     "concurrently": "^9.1.2",
     "cross-env": "^10.1.0",

@@ -24,8 +24,8 @@ Build the React frontend and package the Electron app:
 # Both platforms
 npm run electron:build
 
-# macOS only
-npm run electron:build:mac
+# macOS only (loads signing credentials from .env.mac first)
+export $(cat .env.mac | xargs) && npm run electron:build:mac
 
 # Windows only
 npm run electron:build:win
@@ -40,20 +40,20 @@ If you build the Windows app on macOS, native modules like `sharp` may be missin
 ### Current Packaging Status
 
 - Windows builds run successfully on Windows.
-- Windows signing is now working with `electron-builder` 26.
+- Windows signing is working with `electron-builder` 26.
 - The current Windows target is still `zip`, not an installer.
-- macOS builds are still unsigned (`identity: null`).
+- macOS builds are signed and notarized with a Developer ID Application certificate.
 
 ### macOS Output
 
 ```
 dist-electron/
 ├── mac-arm64/
-│   └── Widgetizer.app          # Apple Silicon (M1/M2/M3/M4)
+│   └── Widgetizer.app               # Apple Silicon (M1/M2/M3/M4)
 ├── mac/
-│   └── Widgetizer.app          # Intel Macs
-├── Widgetizer-x.x.x-arm64-mac.zip   # Apple Silicon distribution
-└── Widgetizer-x.x.x-mac.zip         # Intel distribution
+│   └── Widgetizer.app               # Intel Macs
+├── Widgetizer-x.x.x-arm64.dmg      # Apple Silicon distribution
+└── Widgetizer-x.x.x.dmg            # Intel distribution
 ```
 
 ### Windows Output
@@ -134,18 +134,19 @@ iconutil -c icns icon.iconset -o icon.icns
 
 | Recipient's Mac             | File to share                    |
 | --------------------------- | -------------------------------- |
-| Apple Silicon (M1/M2/M3/M4) | `Widgetizer-x.x.x-arm64-mac.zip` |
-| Intel Mac                   | `Widgetizer-x.x.x-mac.zip`       |
-| Windows                     | `Widgetizer-x.x.x-win.zip`       |
+| Apple Silicon (M1/M2/M3/M4) | `Widgetizer-x.x.x-arm64.dmg`    |
+| Intel Mac                   | `Widgetizer-x.x.x.dmg`          |
+| Windows                     | `Widgetizer-x.x.x-win.zip`      |
 
-### First-run instructions for recipients
+### First-run instructions for recipients (macOS)
 
-1. Unzip the file
-2. Move `Widgetizer.app` to Applications (optional)
+macOS builds are signed and notarized, so Gatekeeper should not block them.
+
+1. Open the `.dmg`
+2. Drag `Widgetizer.app` to Applications
 3. Double-click to run
-4. If Gatekeeper warning appears: right-click → Open → Open
 
-Or run in Terminal:
+If Gatekeeper still warns (e.g. on an older OS or an unsigned dev build), right-click → Open → Open, or run:
 
 ```bash
 xattr -cr /path/to/Widgetizer.app
@@ -155,32 +156,57 @@ xattr -cr /path/to/Widgetizer.app
 
 ### macOS
 
-We have not implemented macOS signing or notarization yet. Leave this for later.
+macOS signing and notarization are fully implemented.
 
-Current macOS status:
-
-- `identity: null` in the Electron build config
-- unsigned macOS builds are acceptable for local/internal testing
-- Gatekeeper warnings are still expected for public distribution
-
-When we come back to macOS, we will need:
+**Requirements:**
 
 - Apple Developer Program membership
-- Developer ID Application certificate
-- notarization
-- hardened runtime and entitlements review
+- Developer ID Application certificate (in macOS Keychain)
+- An app-specific password generated at [appleid.apple.com](https://appleid.apple.com)
 
-Expected config shape later:
+**Credentials file — `.env.mac`** (gitignored):
+
+```
+APPLE_ID=your@apple.id
+APPLE_APP_SPECIFIC_PASSWORD=xxxx-xxxx-xxxx-xxxx
+APPLE_TEAM_ID=XXXXXXXXXX
+```
+
+**Build command:**
+
+```bash
+export $(cat .env.mac | xargs) && npm run electron:build:mac
+```
+
+**How it works:**
+
+1. `electron-builder` packages the app with `hardenedRuntime: true`
+2. The `afterSign` hook runs `scripts/notarize.cjs`
+3. `@electron/notarize` submits the `.app` to Apple's notarization service via `notarytool`
+4. Notarization typically takes 5–30 minutes
+5. `electron-builder` then staples the notarization ticket to the `.dmg`
+
+**Active `package.json` build config:**
 
 ```json
 "mac": {
+  "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }],
+  "category": "public.app-category.productivity",
   "hardenedRuntime": true,
   "gatekeeperAssess": false,
-  "entitlements": "electron/resources/entitlements.mac.plist",
-  "entitlementsInherit": "electron/resources/entitlements.mac.plist",
-  "notarize": true
-}
+  "entitlements": "electron/entitlements.mac.plist",
+  "entitlementsInherit": "electron/entitlements.mac.plist"
+},
+"afterSign": "scripts/notarize.cjs"
 ```
+
+**Entitlements (`electron/entitlements.mac.plist`):**
+
+- `com.apple.security.cs.allow-jit` — required for V8 JIT
+- `com.apple.security.cs.allow-unsigned-executable-memory` — required for Node.js
+- `com.apple.security.cs.disable-library-validation` — required for native modules (sharp, better-sqlite3)
+
+**`scripts/notarize.cjs`** — CJS module required by `electron-builder`'s `afterSign` hook. Uses `@electron/notarize` (`^3.1.1`) with `notarytool`. Skips automatically on non-darwin platforms.
 
 ### Windows
 

@@ -21,6 +21,7 @@ data/projects/*
 .env.development
 .env.test
 .env.production
+.env.mac
 logs/
 .claude/
 .electron-home/
