@@ -577,6 +577,48 @@
       }
     }
   },
+  "core_divider": {
+    "name": "Séparateur",
+    "description": "Ajouter une ligne de séparation horizontale",
+    "category": "Mise en page",
+    "settings": {
+      "color": {
+        "label": "Couleur de ligne",
+        "description": "Couleur de la ligne de séparation"
+      },
+      "thickness": {
+        "label": "Épaisseur",
+        "description": "Épaisseur de la ligne de séparation en pixels"
+      },
+      "width": {
+        "label": "Largeur",
+        "description": "Largeur du séparateur en pourcentage du conteneur"
+      },
+      "padding": {
+        "label": "Espacement",
+        "description": "Espacement vertical autour du séparateur en pixels"
+      }
+    }
+  },
+  "core_spacer": {
+    "name": "Espacement",
+    "description": "Ajouter un espace vertical entre les sections de contenu",
+    "category": "Mise en page",
+    "settings": {
+      "height": {
+        "label": "Hauteur",
+        "description": "La hauteur de l'espacement en pixels"
+      },
+      "showOnMobile": {
+        "label": "Afficher sur mobile",
+        "description": "Afficher l'espacement sur les appareils mobiles"
+      },
+      "mobileHeight": {
+        "label": "Hauteur sur mobile",
+        "description": "La hauteur de l'espacement sur les appareils mobiles en pixels"
+      }
+    }
+  },
   "contact_form": {
     "name": "Formulaire de contact",
     "settings": {
