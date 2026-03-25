@@ -188,7 +188,7 @@
         {
           "type": "link",
           "id": "button_link",
-          "label": "tTheme:slideshow.blocks.slide.settings.button_link.label",
+          "label": "tTheme:global.widgets.settings.link.label",
           "default": {
             "text": "Get Started",
             "href": "#",
@@ -208,56 +208,56 @@
         {
           "type": "select",
           "id": "button_style",
-          "label": "tTheme:slideshow.blocks.slide.settings.button_style.label",
+          "label": "tTheme:global.widgets.settings.button_style.label",
           "default": "primary",
           "options": [
             {
               "value": "primary",
-              "label": "tTheme:slideshow.blocks.slide.settings.button_style.options.primary"
+              "label": "tTheme:global.widgets.settings.button_style.options.primary"
             },
             {
               "value": "secondary",
-              "label": "tTheme:slideshow.blocks.slide.settings.button_style.options.secondary"
+              "label": "tTheme:global.widgets.settings.button_style.options.secondary"
             }
           ]
         },
         {
           "type": "select",
           "id": "button_style_2",
-          "label": "tTheme:slideshow.blocks.slide.settings.button_style_2.label",
+          "label": "tTheme:global.widgets.settings.button_style_2.label",
           "default": "secondary",
           "options": [
             {
               "value": "primary",
-              "label": "tTheme:slideshow.blocks.slide.settings.button_style_2.options.primary"
+              "label": "tTheme:global.widgets.settings.button_style_2.options.primary"
             },
             {
               "value": "secondary",
-              "label": "tTheme:slideshow.blocks.slide.settings.button_style_2.options.secondary"
+              "label": "tTheme:global.widgets.settings.button_style_2.options.secondary"
             }
           ]
         },
         {
           "type": "select",
           "id": "button_size",
-          "label": "tTheme:slideshow.blocks.slide.settings.button_size.label",
+          "label": "tTheme:global.widgets.settings.button_size.label",
           "default": "medium",
           "options": [
             {
               "value": "small",
-              "label": "tTheme:slideshow.blocks.slide.settings.button_size.options.small"
+              "label": "tTheme:global.widgets.settings.button_size.options.small"
             },
             {
               "value": "medium",
-              "label": "tTheme:slideshow.blocks.slide.settings.button_size.options.medium"
+              "label": "tTheme:global.widgets.settings.button_size.options.medium"
             },
             {
               "value": "large",
-              "label": "tTheme:slideshow.blocks.slide.settings.button_size.options.large"
+              "label": "tTheme:global.widgets.settings.button_size.options.large"
             },
             {
               "value": "xlarge",
-              "label": "tTheme:slideshow.blocks.slide.settings.button_size.options.xlarge"
+              "label": "tTheme:global.widgets.settings.button_size.options.xlarge"
             }
           ]
         },

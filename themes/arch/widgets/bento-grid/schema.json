@@ -105,7 +105,7 @@
         {
           "type": "link",
           "id": "link",
-          "label": "tTheme:bento_grid.blocks.item.settings.link.label",
+          "label": "tTheme:global.widgets.settings.link.label",
           "hide_text": true
         },
         {

@@ -21,7 +21,7 @@
     {
       "type": "link",
       "id": "link",
-      "label": "tTheme:image.settings.link.label",
+      "label": "tTheme:global.widgets.settings.link.label",
       "description": "tTheme:image.settings.link.description",
       "hide_text": true
     },

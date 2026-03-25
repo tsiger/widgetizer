@@ -96,7 +96,7 @@
         {
           "type": "link",
           "id": "link",
-          "label": "tTheme:logo_cloud.blocks.logo.settings.link.label",
+          "label": "tTheme:global.widgets.settings.link.label",
           "hide_text": true
         }
       ]

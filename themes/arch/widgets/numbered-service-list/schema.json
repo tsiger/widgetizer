@@ -77,7 +77,7 @@
         {
           "type": "link",
           "id": "link",
-          "label": "tTheme:numbered_service_list.blocks.service.settings.link.label",
+          "label": "tTheme:global.widgets.settings.link.label",
           "default": {
             "text": "Learn More",
             "href": "#",

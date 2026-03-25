@@ -81,7 +81,7 @@
         {
           "type": "link",
           "id": "button_link",
-          "label": "tTheme:checkerboard.blocks.card.settings.button_link.label",
+          "label": "tTheme:global.widgets.settings.button_link.label",
           "default": {
             "text": "Learn More",
             "href": "#",

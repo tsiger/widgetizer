@@ -108,7 +108,7 @@
         {
           "type": "link",
           "id": "link",
-          "label": "tTheme:team_highlight.blocks.member.settings.link.label"
+          "label": "tTheme:global.widgets.settings.link.label"
         }
       ]
     }

@@ -1,4 +1,632 @@
 {
+  "global": {
+    "general": {
+      "name": "General",
+      "settings": {
+        "branding_header": {
+          "label": "Branding"
+        },
+        "favicon": {
+          "label": "Favicon",
+          "description": "Recommended size 180×180 px."
+        },
+        "animations_header": {
+          "label": "Animations"
+        },
+        "enable_reveal_animations": {
+          "label": "Enable scroll reveal animations",
+          "description": "Animate elements as they scroll into view"
+        }
+      }
+    },
+    "colors": {
+      "name": "Colors",
+      "settings": {
+        "colors_standard_header": {
+          "label": "Standard Colors"
+        },
+        "standard_bg_primary": {
+          "label": "Primary Background"
+        },
+        "standard_bg_secondary": {
+          "label": "Secondary Background"
+        },
+        "standard_text_content": {
+          "label": "Content Text"
+        },
+        "standard_text_heading": {
+          "label": "Heading Text"
+        },
+        "standard_text_muted": {
+          "label": "Muted Text"
+        },
+        "standard_border_color": {
+          "label": "Border Color"
+        },
+        "standard_accent": {
+          "label": "Accent Color"
+        },
+        "standard_accent_text": {
+          "label": "Accent Text Color"
+        },
+        "standard_rating_star": {
+          "label": "Rating Star Color"
+        },
+        "colors_highlight_header": {
+          "label": "Highlight Colors"
+        },
+        "highlight_bg_primary": {
+          "label": "Primary Background"
+        },
+        "highlight_bg_secondary": {
+          "label": "Secondary Background"
+        },
+        "highlight_text_content": {
+          "label": "Content Text"
+        },
+        "highlight_text_heading": {
+          "label": "Heading Text"
+        },
+        "highlight_text_muted": {
+          "label": "Muted Text"
+        },
+        "highlight_border_color": {
+          "label": "Border Color"
+        },
+        "highlight_accent": {
+          "label": "Accent Color"
+        },
+        "highlight_accent_text": {
+          "label": "Accent Text Color"
+        },
+        "highlight_rating_star": {
+          "label": "Rating Star Color"
+        }
+      }
+    },
+    "typography": {
+      "name": "Typography",
+      "settings": {
+        "typography_header": {
+          "label": "Typography"
+        },
+        "heading_font": {
+          "label": "Heading Font"
+        },
+        "body_font": {
+          "label": "Body Font"
+        },
+        "heading_scale": {
+          "label": "Heading Text Size",
+          "description": "Scale all heading text sizes up or down"
+        },
+        "body_scale": {
+          "label": "Body Text Size",
+          "description": "Scale all body text sizes up or down"
+        }
+      }
+    },
+    "style": {
+      "name": "Style",
+      "settings": {
+        "style_header": {
+          "label": "Visual Style"
+        },
+        "corner_style": {
+          "label": "Shapes",
+          "description": "Controls the roundness of buttons, cards, images, and form fields",
+          "options": {
+            "sharp": "Sharp",
+            "slightly_rounded": "Slightly rounded",
+            "rounded": "Rounded"
+          }
+        },
+        "card_style": {
+          "label": "Content boxes",
+          "description": "How content sections are visually separated",
+          "options": {
+            "bordered": "Bordered",
+            "flat": "Flat"
+          }
+        },
+        "spacing_density": {
+          "label": "Layout density",
+          "description": "Controls the amount of whitespace between sections and elements",
+          "options": {
+            "compact": "Compact",
+            "default": "Default",
+            "airy": "Airy"
+          }
+        },
+        "button_shape": {
+          "label": "Button shape",
+          "description": "Override corner shape specifically for buttons",
+          "options": {
+            "auto": "Same as corner shape",
+            "pill": "Pill",
+            "sharp": "Sharp"
+          }
+        }
+      }
+    },
+    "social": {
+      "name": "Social",
+      "settings": {
+        "social_header": {
+          "label": "Social Media"
+        },
+        "facebook_url": {
+          "label": "Facebook URL"
+        },
+        "instagram_url": {
+          "label": "Instagram URL"
+        },
+        "twitter_url": {
+          "label": "Twitter / X URL"
+        },
+        "linkedin_url": {
+          "label": "LinkedIn URL"
+        },
+        "youtube_url": {
+          "label": "YouTube URL"
+        },
+        "tiktok_url": {
+          "label": "TikTok URL"
+        },
+        "pinterest_url": {
+          "label": "Pinterest URL"
+        },
+        "github_url": {
+          "label": "GitHub URL"
+        },
+        "mastodon_url": {
+          "label": "Mastodon URL"
+        },
+        "bluesky_url": {
+          "label": "Bluesky URL"
+        },
+        "discord_url": {
+          "label": "Discord URL"
+        },
+        "reddit_url": {
+          "label": "Reddit URL"
+        },
+        "telegram_url": {
+          "label": "Telegram URL"
+        },
+        "threads_url": {
+          "label": "Threads URL"
+        },
+        "whatsapp_url": {
+          "label": "WhatsApp URL"
+        },
+        "mail_url": {
+          "label": "Email URL"
+        }
+      }
+    },
+    "advanced": {
+      "name": "Advanced",
+      "settings": {
+        "privacy_header": {
+          "label": "Privacy"
+        },
+        "use_bunny_fonts": {
+          "label": "Use Privacy-Friendly Font CDN",
+          "description": "Enable to serve Google Fonts from Bunny CDN (GDPR-compliant, no tracking)"
+        },
+        "advanced_header": {
+          "label": "Custom Code"
+        },
+        "custom_css": {
+          "label": "Custom CSS",
+          "description": "Add custom CSS that will be injected in the <head> section."
+        },
+        "custom_head_scripts": {
+          "label": "Custom Head Scripts",
+          "description": "Add custom scripts (e.g., Google Analytics) that will be injected in the <head> section."
+        },
+        "custom_footer_scripts": {
+          "label": "Custom Footer Scripts",
+          "description": "Add custom scripts that will be injected before the closing </body> tag."
+        }
+      }
+    },
+    "widgets": {
+      "settings": {
+        "display_header": {
+          "label": "Display"
+        },
+        "content_header": {
+          "label": "Content"
+        },
+        "options_header": {
+          "label": "Options"
+        },
+        "labels_header": {
+          "label": "Labels"
+        },
+        "eyebrow": {
+          "label": "Eyebrow text"
+        },
+        "title": {
+          "label": "Heading"
+        },
+        "description": {
+          "label": "Subheading"
+        },
+        "color_scheme": {
+          "label": "Color Scheme",
+          "options": {
+            "standard": "Standard",
+            "highlight": "Highlight"
+          }
+        },
+        "columns_desktop": {
+          "label": "Desktop columns"
+        },
+        "layout": {
+          "label": "Layout",
+          "options": {
+            "grid": "Grid",
+            "carousel": "Carousel"
+          }
+        },
+        "fullwidth": {
+          "label": "Full width"
+        },
+        "image_position": {
+          "label": "Image position",
+          "options": {
+            "left": "Left",
+            "right": "Right"
+          }
+        },
+        "aspect_ratio": {
+          "label": "Aspect ratio",
+          "options": {
+            "auto": "Auto",
+            "contain": "Contain",
+            "1 / 1": "1:1",
+            "4 / 3": "4:3",
+            "3 / 2": "3:2",
+            "3 / 4": "3:4",
+            "16 / 9": "16:9",
+            "21:9": "21:9"
+          }
+        },
+        "alignment": {
+          "label": "Alignment",
+          "options": {
+            "start": "Left",
+            "center": "Center"
+          }
+        },
+        "video_url": {
+          "label": "Video URL (YouTube or Vimeo)"
+        },
+        "video_title": {
+          "label": "Video title (for accessibility)"
+        },
+        "icon_style": {
+          "label": "Icon style",
+          "options": {
+            "plain": "Plain",
+            "outline": "Outline",
+            "filled": "Filled"
+          }
+        },
+        "icon_size": {
+          "label": "Icon size",
+          "options": {
+            "sm": "Small",
+            "md": "Medium",
+            "lg": "Large",
+            "xl": "Extra Large"
+          }
+        },
+        "icon_shape": {
+          "label": "Icon shape",
+          "options": {
+            "sharp": "Sharp",
+            "rounded": "Rounded",
+            "circle": "Circle"
+          }
+        },
+        "overlay_color": {
+          "label": "Overlay color",
+          "description": "Applies only if there is a background image."
+        },
+        "link": {
+          "label": "Link"
+        },
+        "button_link": {
+          "label": "Button Link"
+        },
+        "button_style": {
+          "label": "Button style",
+          "options": {
+            "primary": "Primary",
+            "secondary": "Secondary"
+          }
+        },
+        "button_style_2": {
+          "label": "Button 2 style",
+          "options": {
+            "primary": "Primary",
+            "secondary": "Secondary"
+          }
+        },
+        "button_size": {
+          "label": "Button size",
+          "options": {
+            "small": "Small",
+            "medium": "Medium",
+            "large": "Large",
+            "xlarge": "Extra Large"
+          }
+        },
+        "options": {
+          "left": "Left",
+          "right": "Right",
+          "top": "Top",
+          "bottom": "Bottom",
+          "center": "Center",
+          "start": "Start",
+          "end": "End",
+          "none": "None"
+        }
+      },
+      "blocks": {
+        "heading": {
+          "name": "Heading",
+          "settings": {
+            "text": {
+              "label": "Text"
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "lg": "Large",
+                "xl": "Extra Large",
+                "2xl": "2X Large",
+                "3xl": "3X Large",
+                "4xl": "4X Large",
+                "5xl": "5X Large",
+                "6xl": "6X Large",
+                "7xl": "7X Large",
+                "8xl": "8X Large",
+                "9xl": "9X Large"
+              }
+            }
+          }
+        },
+        "text": {
+          "name": "Text",
+          "settings": {
+            "text": {
+              "label": "Text"
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "sm": "Small",
+                "base": "Base",
+                "lg": "Large"
+              }
+            },
+            "uppercase": {
+              "label": "Uppercase"
+            },
+            "muted": {
+              "label": "Muted color"
+            }
+          }
+        },
+        "button": {
+          "name": "Button Group",
+          "settings": {
+            "link": {
+              "label": "Button 1"
+            },
+            "style": {
+              "label": "Button 1 style",
+              "options": {
+                "primary": "Primary",
+                "secondary": "Secondary"
+              }
+            },
+            "link_2": {
+              "label": "Button 2"
+            },
+            "style_2": {
+              "label": "Button 2 style",
+              "options": {
+                "primary": "Primary",
+                "secondary": "Secondary"
+              }
+            },
+            "size": {
+              "label": "Button size",
+              "options": {
+                "small": "Small",
+                "medium": "Medium",
+                "large": "Large",
+                "xlarge": "Extra Large"
+              }
+            }
+          }
+        },
+        "icon": {
+          "name": "Icon",
+          "settings": {
+            "icon": {
+              "label": "Icon"
+            },
+            "style": {
+              "label": "Style",
+              "options": {
+                "plain": "Plain",
+                "outline": "Outline",
+                "filled": "Filled"
+              }
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "sm": "Small",
+                "md": "Medium",
+                "lg": "Large",
+                "xl": "Extra Large"
+              }
+            },
+            "shape": {
+              "label": "Shape",
+              "options": {
+                "sharp": "Sharp",
+                "rounded": "Rounded",
+                "circle": "Circle"
+              }
+            }
+          }
+        },
+        "rating": {
+          "name": "Rating",
+          "settings": {
+            "rating": {
+              "label": "Rating",
+              "options": {
+                "3": "★★★",
+                "4": "★★★★",
+                "5": "★★★★★"
+              }
+            }
+          }
+        },
+        "quote": {
+          "settings": {
+            "quote": {
+              "label": "Quote"
+            },
+            "avatar": {
+              "label": "Avatar"
+            },
+            "name": {
+              "label": "Name"
+            },
+            "title": {
+              "label": "Title / Company"
+            },
+            "rating": {
+              "label": "Star rating",
+              "options": {
+                "3": "3 stars",
+                "4": "4 stars",
+                "5": "5 stars",
+                "": "No rating"
+              }
+            }
+          }
+        },
+        "image": {
+          "name": "Image",
+          "settings": {
+            "image": {
+              "label": "Image"
+            },
+            "width": {
+              "label": "Width"
+            }
+          }
+        },
+        "card": {
+          "name": "Card",
+          "settings": {
+            "subtitle": {
+              "label": "Subtitle"
+            },
+            "title": {
+              "label": "Heading"
+            },
+            "description": {
+              "label": "Description"
+            },
+            "button_link": {
+              "label": "Button Link"
+            }
+          }
+        },
+        "text_block": {
+          "name": "Text",
+          "settings": {
+            "title": {
+              "label": "Title"
+            },
+            "text": {
+              "label": "Text"
+            }
+          }
+        },
+        "menu_block": {
+          "name": "Menu",
+          "settings": {
+            "title": {
+              "label": "Title"
+            },
+            "menu": {
+              "label": "Navigation Menu",
+              "description": "Select the menu to display"
+            }
+          }
+        },
+        "social_block": {
+          "name": "Social Icons",
+          "settings": {
+            "title": {
+              "label": "Title"
+            }
+          }
+        },
+        "features": {
+          "name": "Features",
+          "settings": {
+            "features": {
+              "label": "Features (one per line)",
+              "description": "Start a line with + for a checkmark or - for a cross."
+            }
+          }
+        },
+        "numbered_item": {
+          "name": "Numbered Item",
+          "settings": {
+            "title": {
+              "label": "Title"
+            },
+            "description": {
+              "label": "Description"
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "small": "Small",
+                "medium": "Medium",
+                "large": "Large",
+                "xlarge": "Extra Large"
+              }
+            },
+            "shape": {
+              "label": "Shape",
+              "options": {
+                "sharp": "Sharp",
+                "rounded": "Rounded",
+                "circle": "Circle"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
   "accordion": {
     "name": "Accordion",
     "settings": {
@@ -85,9 +713,6 @@
       "item": {
         "name": "Bento Item",
         "settings": {
-          "link": {
-            "label": "Link"
-          },
           "layout_header": {
             "label": "Layout"
           },
@@ -154,9 +779,6 @@
           },
           "description": {
             "label": "Description"
-          },
-          "button_link": {
-            "label": "Button Link"
           }
         }
       }
@@ -613,8 +1235,7 @@
   "image": {
     "settings": {
       "link": {
-        "description": "Optional link when image is clicked.",
-        "label": "Link"
+        "description": "Optional link when image is clicked."
       },
       "image": {
         "label": "Background image"
@@ -652,9 +1273,6 @@
           },
           "description": {
             "label": "Tooltip description"
-          },
-          "button_link": {
-            "label": "Button link"
           },
           "position_x": {
             "label": "Horizontal position (%)"
@@ -789,9 +1407,6 @@
           },
           "name": {
             "label": "Company Name"
-          },
-          "link": {
-            "label": "Link (optional)"
           }
         }
       }
@@ -878,9 +1493,6 @@
           },
           "description": {
             "label": "Description"
-          },
-          "link": {
-            "label": "Link"
           }
         }
       }
@@ -943,9 +1555,6 @@
           "features": {
             "label": "Features (one per line)",
             "description": "Start a line with + for a checkmark or - for a cross."
-          },
-          "button_link": {
-            "label": "Button Link"
           }
         }
       }
@@ -1137,9 +1746,6 @@
           },
           "subtitle": {
             "label": "Subtitle"
-          },
-          "button_link": {
-            "label": "Link"
           }
         }
       }
@@ -1206,34 +1812,8 @@
           "text_muted": {
             "label": "Muted color"
           },
-          "button_link": {
-            "label": "Button Link"
-          },
           "button_link_2": {
             "label": "Button 2"
-          },
-          "button_style": {
-            "label": "Button style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "button_style_2": {
-            "label": "Button 2 style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "button_size": {
-            "label": "Button size",
-            "options": {
-              "small": "Small",
-              "medium": "Medium",
-              "large": "Large",
-              "xlarge": "Extra Large"
-            }
           },
           "color_scheme": {
             "label": "Color Scheme",
@@ -1347,9 +1927,6 @@
           },
           "description": {
             "label": "Description"
-          },
-          "button_link": {
-            "label": "Button Link"
           }
         }
       }
@@ -1486,605 +2063,6 @@
       }
     }
   },
-  "global": {
-    "general": {
-      "name": "General",
-      "settings": {
-        "branding_header": {
-          "label": "Branding"
-        },
-        "favicon": {
-          "label": "Favicon",
-          "description": "Recommended size 180×180 px."
-        },
-        "animations_header": {
-          "label": "Animations"
-        },
-        "enable_reveal_animations": {
-          "label": "Enable scroll reveal animations",
-          "description": "Animate elements as they scroll into view"
-        }
-      }
-    },
-    "colors": {
-      "name": "Colors",
-      "settings": {
-        "colors_standard_header": {
-          "label": "Standard Colors"
-        },
-        "standard_bg_primary": {
-          "label": "Primary Background"
-        },
-        "standard_bg_secondary": {
-          "label": "Secondary Background"
-        },
-        "standard_text_content": {
-          "label": "Content Text"
-        },
-        "standard_text_heading": {
-          "label": "Heading Text"
-        },
-        "standard_text_muted": {
-          "label": "Muted Text"
-        },
-        "standard_border_color": {
-          "label": "Border Color"
-        },
-        "standard_accent": {
-          "label": "Accent Color"
-        },
-        "standard_accent_text": {
-          "label": "Accent Text Color"
-        },
-        "standard_rating_star": {
-          "label": "Rating Star Color"
-        },
-        "colors_highlight_header": {
-          "label": "Highlight Colors"
-        },
-        "highlight_bg_primary": {
-          "label": "Primary Background"
-        },
-        "highlight_bg_secondary": {
-          "label": "Secondary Background"
-        },
-        "highlight_text_content": {
-          "label": "Content Text"
-        },
-        "highlight_text_heading": {
-          "label": "Heading Text"
-        },
-        "highlight_text_muted": {
-          "label": "Muted Text"
-        },
-        "highlight_border_color": {
-          "label": "Border Color"
-        },
-        "highlight_accent": {
-          "label": "Accent Color"
-        },
-        "highlight_accent_text": {
-          "label": "Accent Text Color"
-        },
-        "highlight_rating_star": {
-          "label": "Rating Star Color"
-        }
-      }
-    },
-    "typography": {
-      "name": "Typography",
-      "settings": {
-        "typography_header": {
-          "label": "Typography"
-        },
-        "heading_font": {
-          "label": "Heading Font"
-        },
-        "body_font": {
-          "label": "Body Font"
-        },
-        "heading_scale": {
-          "label": "Heading Text Size",
-          "description": "Scale all heading text sizes up or down"
-        },
-        "body_scale": {
-          "label": "Body Text Size",
-          "description": "Scale all body text sizes up or down"
-        }
-      }
-    },
-    "style": {
-      "name": "Style",
-      "settings": {
-        "style_header": {
-          "label": "Visual Style"
-        },
-        "corner_style": {
-          "label": "Shapes",
-          "description": "Controls the roundness of buttons, cards, images, and form fields",
-          "options": {
-            "sharp": "Sharp",
-            "slightly_rounded": "Slightly rounded",
-            "rounded": "Rounded"
-          }
-        },
-        "card_style": {
-          "label": "Content boxes",
-          "description": "How content sections are visually separated",
-          "options": {
-            "bordered": "Bordered",
-            "flat": "Flat"
-          }
-        },
-        "spacing_density": {
-          "label": "Layout density",
-          "description": "Controls the amount of whitespace between sections and elements",
-          "options": {
-            "compact": "Compact",
-            "default": "Default",
-            "airy": "Airy"
-          }
-        },
-        "button_shape": {
-          "label": "Button shape",
-          "description": "Override corner shape specifically for buttons",
-          "options": {
-            "auto": "Same as corner shape",
-            "pill": "Pill",
-            "sharp": "Sharp"
-          }
-        }
-      }
-    },
-    "social": {
-      "name": "Social",
-      "settings": {
-        "social_header": {
-          "label": "Social Media"
-        },
-        "facebook_url": {
-          "label": "Facebook URL"
-        },
-        "instagram_url": {
-          "label": "Instagram URL"
-        },
-        "twitter_url": {
-          "label": "Twitter / X URL"
-        },
-        "linkedin_url": {
-          "label": "LinkedIn URL"
-        },
-        "youtube_url": {
-          "label": "YouTube URL"
-        },
-        "tiktok_url": {
-          "label": "TikTok URL"
-        },
-        "pinterest_url": {
-          "label": "Pinterest URL"
-        },
-        "github_url": {
-          "label": "GitHub URL"
-        },
-        "mastodon_url": {
-          "label": "Mastodon URL"
-        },
-        "bluesky_url": {
-          "label": "Bluesky URL"
-        },
-        "discord_url": {
-          "label": "Discord URL"
-        },
-        "reddit_url": {
-          "label": "Reddit URL"
-        },
-        "telegram_url": {
-          "label": "Telegram URL"
-        },
-        "threads_url": {
-          "label": "Threads URL"
-        },
-        "whatsapp_url": {
-          "label": "WhatsApp URL"
-        },
-        "mail_url": {
-          "label": "Email URL"
-        }
-      }
-    },
-    "advanced": {
-      "name": "Advanced",
-      "settings": {
-        "privacy_header": {
-          "label": "Privacy"
-        },
-        "use_bunny_fonts": {
-          "label": "Use Privacy-Friendly Font CDN",
-          "description": "Enable to serve Google Fonts from Bunny CDN (GDPR-compliant, no tracking)"
-        },
-        "advanced_header": {
-          "label": "Custom Code"
-        },
-        "custom_css": {
-          "label": "Custom CSS",
-          "description": "Add custom CSS that will be injected in the <head> section."
-        },
-        "custom_head_scripts": {
-          "label": "Custom Head Scripts",
-          "description": "Add custom scripts (e.g., Google Analytics) that will be injected in the <head> section."
-        },
-        "custom_footer_scripts": {
-          "label": "Custom Footer Scripts",
-          "description": "Add custom scripts that will be injected before the closing </body> tag."
-        }
-      }
-    },
-    "widgets": {
-      "settings": {
-        "display_header": {
-          "label": "Display"
-        },
-        "content_header": {
-          "label": "Content"
-        },
-        "options_header": {
-          "label": "Options"
-        },
-        "labels_header": {
-          "label": "Labels"
-        },
-        "eyebrow": {
-          "label": "Eyebrow text"
-        },
-        "title": {
-          "label": "Heading"
-        },
-        "description": {
-          "label": "Subheading"
-        },
-        "color_scheme": {
-          "label": "Color Scheme",
-          "options": {
-            "standard": "Standard",
-            "highlight": "Highlight"
-          }
-        },
-        "columns_desktop": {
-          "label": "Desktop columns"
-        },
-        "layout": {
-          "label": "Layout",
-          "options": {
-            "grid": "Grid",
-            "carousel": "Carousel"
-          }
-        },
-        "fullwidth": {
-          "label": "Full width"
-        },
-        "image_position": {
-          "label": "Image position",
-          "options": {
-            "left": "Left",
-            "right": "Right"
-          }
-        },
-        "aspect_ratio": {
-          "label": "Aspect ratio",
-          "options": {
-            "auto": "Auto",
-            "contain": "Contain",
-            "1 / 1": "1:1",
-            "4 / 3": "4:3",
-            "3 / 2": "3:2",
-            "3 / 4": "3:4",
-            "16 / 9": "16:9",
-            "21:9": "21:9"
-          }
-        },
-        "alignment": {
-          "label": "Alignment",
-          "options": {
-            "start": "Left",
-            "center": "Center"
-          }
-        },
-        "video_url": {
-          "label": "Video URL (YouTube or Vimeo)"
-        },
-        "video_title": {
-          "label": "Video title (for accessibility)"
-        },
-        "icon_style": {
-          "label": "Icon style",
-          "options": {
-            "plain": "Plain",
-            "outline": "Outline",
-            "filled": "Filled"
-          }
-        },
-        "icon_size": {
-          "label": "Icon size",
-          "options": {
-            "sm": "Small",
-            "md": "Medium",
-            "lg": "Large",
-            "xl": "Extra Large"
-          }
-        },
-        "icon_shape": {
-          "label": "Icon shape",
-          "options": {
-            "sharp": "Sharp",
-            "rounded": "Rounded",
-            "circle": "Circle"
-          }
-        },
-        "overlay_color": {
-          "label": "Overlay color",
-          "description": "Applies only if there is a background image."
-        },
-        "options": {
-          "left": "Left",
-          "right": "Right",
-          "top": "Top",
-          "bottom": "Bottom",
-          "center": "Center",
-          "start": "Start",
-          "end": "End",
-          "none": "None"
-        }
-      },
-      "blocks": {
-        "heading": {
-          "name": "Heading",
-          "settings": {
-            "text": {
-              "label": "Text"
-            },
-            "size": {
-              "label": "Size",
-              "options": {
-                "lg": "Large",
-                "xl": "Extra Large",
-                "2xl": "2X Large",
-                "3xl": "3X Large",
-                "4xl": "4X Large",
-                "5xl": "5X Large",
-                "6xl": "6X Large",
-                "7xl": "7X Large",
-                "8xl": "8X Large",
-                "9xl": "9X Large"
-              }
-            }
-          }
-        },
-        "text": {
-          "name": "Text",
-          "settings": {
-            "text": {
-              "label": "Text"
-            },
-            "size": {
-              "label": "Size",
-              "options": {
-                "sm": "Small",
-                "base": "Base",
-                "lg": "Large"
-              }
-            },
-            "uppercase": {
-              "label": "Uppercase"
-            },
-            "muted": {
-              "label": "Muted color"
-            }
-          }
-        },
-        "button": {
-          "name": "Button Group",
-          "settings": {
-            "link": {
-              "label": "Button 1"
-            },
-            "style": {
-              "label": "Button 1 style",
-              "options": {
-                "primary": "Primary",
-                "secondary": "Secondary"
-              }
-            },
-            "link_2": {
-              "label": "Button 2"
-            },
-            "style_2": {
-              "label": "Button 2 style",
-              "options": {
-                "primary": "Primary",
-                "secondary": "Secondary"
-              }
-            },
-            "size": {
-              "label": "Button size",
-              "options": {
-                "small": "Small",
-                "medium": "Medium",
-                "large": "Large",
-                "xlarge": "Extra Large"
-              }
-            }
-          }
-        },
-        "icon": {
-          "name": "Icon",
-          "settings": {
-            "icon": {
-              "label": "Icon"
-            },
-            "style": {
-              "label": "Style",
-              "options": {
-                "plain": "Plain",
-                "outline": "Outline",
-                "filled": "Filled"
-              }
-            },
-            "size": {
-              "label": "Size",
-              "options": {
-                "sm": "Small",
-                "md": "Medium",
-                "lg": "Large",
-                "xl": "Extra Large"
-              }
-            },
-            "shape": {
-              "label": "Shape",
-              "options": {
-                "sharp": "Sharp",
-                "rounded": "Rounded",
-                "circle": "Circle"
-              }
-            }
-          }
-        },
-        "rating": {
-          "name": "Rating",
-          "settings": {
-            "rating": {
-              "label": "Rating",
-              "options": {
-                "3": "★★★",
-                "4": "★★★★",
-                "5": "★★★★★"
-              }
-            }
-          }
-        },
-        "quote": {
-          "settings": {
-            "quote": {
-              "label": "Quote"
-            },
-            "avatar": {
-              "label": "Avatar"
-            },
-            "name": {
-              "label": "Name"
-            },
-            "title": {
-              "label": "Title / Company"
-            },
-            "rating": {
-              "label": "Star rating",
-              "options": {
-                "3": "3 stars",
-                "4": "4 stars",
-                "5": "5 stars",
-                "": "No rating"
-              }
-            }
-          }
-        },
-        "image": {
-          "name": "Image",
-          "settings": {
-            "image": {
-              "label": "Image"
-            },
-            "width": {
-              "label": "Width"
-            }
-          }
-        },
-        "card": {
-          "name": "Card",
-          "settings": {
-            "subtitle": {
-              "label": "Subtitle"
-            },
-            "title": {
-              "label": "Heading"
-            },
-            "description": {
-              "label": "Description"
-            },
-            "button_link": {
-              "label": "Button Link"
-            }
-          }
-        },
-        "text_block": {
-          "name": "Text",
-          "settings": {
-            "title": {
-              "label": "Title"
-            },
-            "text": {
-              "label": "Text"
-            }
-          }
-        },
-        "menu_block": {
-          "name": "Menu",
-          "settings": {
-            "title": {
-              "label": "Title"
-            },
-            "menu": {
-              "label": "Navigation Menu",
-              "description": "Select the menu to display"
-            }
-          }
-        },
-        "social_block": {
-          "name": "Social Icons",
-          "settings": {
-            "title": {
-              "label": "Title"
-            }
-          }
-        },
-        "features": {
-          "name": "Features",
-          "settings": {
-            "features": {
-              "label": "Features (one per line)",
-              "description": "Start a line with + for a checkmark or - for a cross."
-            }
-          }
-        },
-        "numbered_item": {
-          "name": "Numbered Item",
-          "settings": {
-            "title": {
-              "label": "Title"
-            },
-            "description": {
-              "label": "Description"
-            },
-            "size": {
-              "label": "Size",
-              "options": {
-                "small": "Small",
-                "medium": "Medium",
-                "large": "Large",
-                "xlarge": "Extra Large"
-              }
-            },
-            "shape": {
-              "label": "Shape",
-              "options": {
-                "sharp": "Sharp",
-                "rounded": "Rounded",
-                "circle": "Circle"
-              }
-            }
-          }
-        }
-      }
-    }
-  },
   "team_highlight": {
     "name": "Team Highlight",
     "settings": {
@@ -2112,9 +2090,6 @@
           },
           "role": {
             "label": "Role"
-          },
-          "link": {
-            "label": "Link"
           }
         }
       }
