@@ -11,44 +11,44 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:testimonials.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:testimonials.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "What Our Customers Say"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:testimonials.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:testimonials.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "tTheme:testimonials.settings.layout.label",
+      "label": "tTheme:global.widgets.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "tTheme:testimonials.settings.layout.options.grid"
+          "label": "tTheme:global.widgets.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "tTheme:testimonials.settings.layout.options.carousel"
+          "label": "tTheme:global.widgets.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "tTheme:testimonials.settings.columns_desktop.label",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "default": 4,
       "min": 2,
       "max": 5,
@@ -57,16 +57,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:testimonials.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:testimonials.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:testimonials.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -79,56 +79,56 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:testimonials.blocks.quote.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "textarea",
           "id": "quote",
-          "label": "tTheme:testimonials.blocks.quote.settings.quote.label",
+          "label": "tTheme:global.widgets.blocks.quote.settings.quote.label",
           "default": "This product has completely transformed how we work. Highly recommended!"
         },
         {
           "type": "image",
           "id": "avatar",
-          "label": "tTheme:testimonials.blocks.quote.settings.avatar.label"
+          "label": "tTheme:global.widgets.blocks.quote.settings.avatar.label"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "tTheme:testimonials.blocks.quote.settings.name.label",
+          "label": "tTheme:global.widgets.blocks.quote.settings.name.label",
           "default": "Jane Smith"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "tTheme:testimonials.blocks.quote.settings.title.label",
+          "label": "tTheme:global.widgets.blocks.quote.settings.title.label",
           "default": "CEO, Acme Inc."
         },
         {
           "type": "header",
           "id": "display_header",
-          "label": "tTheme:testimonials.blocks.quote.settings.display_header.label"
+          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "select",
           "id": "rating",
-          "label": "tTheme:testimonials.blocks.quote.settings.rating.label",
+          "label": "tTheme:global.widgets.blocks.quote.settings.rating.label",
           "options": [
             {
               "value": "",
-              "label": "tTheme:testimonials.blocks.quote.settings.rating.options."
+              "label": "tTheme:global.widgets.blocks.quote.settings.rating.options."
             },
             {
               "value": "5",
-              "label": "tTheme:testimonials.blocks.quote.settings.rating.options.5"
+              "label": "tTheme:global.widgets.blocks.quote.settings.rating.options.5"
             },
             {
               "value": "4",
-              "label": "tTheme:testimonials.blocks.quote.settings.rating.options.4"
+              "label": "tTheme:global.widgets.blocks.quote.settings.rating.options.4"
             },
             {
               "value": "3",
-              "label": "tTheme:testimonials.blocks.quote.settings.rating.options.3"
+              "label": "tTheme:global.widgets.blocks.quote.settings.rating.options.3"
             }
           ],
           "default": "5"

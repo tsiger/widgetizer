@@ -12,19 +12,19 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:team_highlight.settings.eyebrow.label",
+      "label": "tTheme:global.widgets.settings.eyebrow.label",
       "default": "Meet Our Team"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:team_highlight.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Our leaders"
     },
     {
       "type": "textarea",
       "id": "description",
-      "label": "tTheme:team_highlight.settings.description.label",
+      "label": "tTheme:global.widgets.settings.description.label",
       "default": "We're 120+ individuals from across the world driven by bold ideas"
     },
     {
@@ -35,12 +35,12 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:team_highlight.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "tTheme:team_highlight.settings.columns_desktop.label",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "default": 2,
       "min": 2,
       "max": 4,
@@ -69,16 +69,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:team_highlight.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:team_highlight.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:team_highlight.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }

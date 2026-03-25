@@ -11,7 +11,7 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:testimonial_slider.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "checkbox",
@@ -32,16 +32,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:testimonial_slider.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:testimonial_slider.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:testimonial_slider.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -55,56 +55,56 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:testimonial_slider.blocks.quote.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "textarea",
           "id": "quote",
-          "label": "tTheme:testimonial_slider.blocks.quote.settings.quote.label",
+          "label": "tTheme:global.widgets.blocks.quote.settings.quote.label",
           "default": "This product has completely transformed how we work. Highly recommended!"
         },
         {
           "type": "image",
           "id": "avatar",
-          "label": "tTheme:testimonial_slider.blocks.quote.settings.avatar.label"
+          "label": "tTheme:global.widgets.blocks.quote.settings.avatar.label"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "tTheme:testimonial_slider.blocks.quote.settings.name.label",
+          "label": "tTheme:global.widgets.blocks.quote.settings.name.label",
           "default": "Jane Smith"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "tTheme:testimonial_slider.blocks.quote.settings.title.label",
+          "label": "tTheme:global.widgets.blocks.quote.settings.title.label",
           "default": "CEO, Acme Inc."
         },
         {
           "type": "header",
           "id": "display_header",
-          "label": "tTheme:testimonial_slider.blocks.quote.settings.display_header.label"
+          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "select",
           "id": "rating",
-          "label": "tTheme:testimonial_slider.blocks.quote.settings.rating.label",
+          "label": "tTheme:global.widgets.blocks.quote.settings.rating.label",
           "options": [
             {
               "value": "",
-              "label": "tTheme:testimonial_slider.blocks.quote.settings.rating.options."
+              "label": "tTheme:global.widgets.blocks.quote.settings.rating.options."
             },
             {
               "value": "5",
-              "label": "tTheme:testimonial_slider.blocks.quote.settings.rating.options.5"
+              "label": "tTheme:global.widgets.blocks.quote.settings.rating.options.5"
             },
             {
               "value": "4",
-              "label": "tTheme:testimonial_slider.blocks.quote.settings.rating.options.4"
+              "label": "tTheme:global.widgets.blocks.quote.settings.rating.options.4"
             },
             {
               "value": "3",
-              "label": "tTheme:testimonial_slider.blocks.quote.settings.rating.options.3"
+              "label": "tTheme:global.widgets.blocks.quote.settings.rating.options.3"
             }
           ],
           "default": "5"

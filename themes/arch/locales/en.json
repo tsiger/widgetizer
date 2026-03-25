@@ -2,18 +2,6 @@
   "accordion": {
     "name": "Accordion",
     "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
       "style": {
         "label": "Style",
         "options": {
@@ -25,18 +13,7 @@
         "label": "Allow multiple open"
       },
       "sidebar_position": {
-        "label": "Sidebar position",
-        "options": {
-          "left": "Left",
-          "right": "Right"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
+        "label": "Sidebar position"
       }
     },
     "blocks": {
@@ -68,113 +45,13 @@
     }
   },
   "action_bar": {
-    "name": "Action Bar",
-    "settings": {
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      },
-      "fullwidth": {
-        "label": "Full width"
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Heading",
-        "settings": {
-          "text": {
-            "label": "Heading text"
-          },
-          "size": {
-            "label": "Size",
-            "options": {
-              "lg": "Large",
-              "xl": "Extra Large",
-              "2xl": "2XL",
-              "3xl": "3XL",
-              "4xl": "4XL",
-              "5xl": "5XL",
-              "6xl": "6XL",
-              "7xl": "7XL",
-              "8xl": "8XL",
-              "9xl": "9XL"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Text",
-        "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Size",
-            "options": {
-              "sm": "Small",
-              "base": "Base",
-              "lg": "Large"
-            }
-          },
-          "uppercase": {
-            "label": "Uppercase"
-          },
-          "muted": {
-            "label": "Muted"
-          }
-        }
-      },
-      "button": {
-        "name": "Button Group",
-        "settings": {
-          "link": {
-            "label": "Primary button"
-          },
-          "style": {
-            "label": "Primary style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "link_2": {
-            "label": "Secondary button"
-          },
-          "style_2": {
-            "label": "Secondary style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "size": {
-            "label": "Button size",
-            "options": {
-              "small": "Small",
-              "medium": "Medium",
-              "large": "Large",
-              "xlarge": "Extra Large"
-            }
-          }
-        }
-      }
-    }
+    "name": "Action Bar"
   },
   "banner": {
     "name": "Banner",
     "settings": {
       "image": {
         "label": "Background image"
-      },
-      "overlay_color": {
-        "label": "Overlay color",
-        "description": "Applies only if there is a background image."
       },
       "height": {
         "label": "Height",
@@ -185,200 +62,8 @@
           "large": "Large"
         }
       },
-      "fullwidth": {
-        "label": "Full width"
-      },
-      "alignment": {
-        "label": "Content alignment",
-        "options": {
-          "center": "Center",
-          "start": "Start"
-        }
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      }
-    },
-    "blocks": {
-      "button": {
-        "settings": {
-          "size": {
-            "options": {
-              "small": "Small",
-              "medium": "Medium",
-              "large": "Large",
-              "xlarge": "Extra Large"
-            },
-            "label": "Button size"
-          },
-          "link": {
-            "label": "Button 1"
-          },
-          "style": {
-            "label": "Button 1 style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "style_2": {
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            },
-            "label": "Button 2 style"
-          },
-          "link_2": {
-            "label": "Button 2"
-          }
-        },
-        "name": "Button Group"
-      },
-      "text": {
-        "settings": {
-          "size": {
-            "label": "Size",
-            "options": {
-              "base": "Base",
-              "sm": "Small",
-              "lg": "Large"
-            }
-          },
-          "uppercase": {
-            "label": "Uppercase"
-          },
-          "muted": {
-            "label": "Muted color"
-          },
-          "text": {
-            "label": "Text"
-          }
-        },
-        "name": "Text"
-      },
-      "heading": {
-        "settings": {
-          "size": {
-            "options": {
-              "2xl": "2X Large",
-              "3xl": "3X Large",
-              "4xl": "4X Large",
-              "5xl": "5X Large",
-              "6xl": "6X Large",
-              "7xl": "7X Large",
-              "8xl": "8X Large",
-              "9xl": "9X Large",
-              "lg": "Large",
-              "xl": "Extra Large"
-            },
-            "label": "Size"
-          },
-          "text": {
-            "label": "Text"
-          }
-        },
-        "name": "Heading"
-      },
-      "rating": {
-        "name": "Star Rating",
-        "settings": {
-          "rating": {
-            "label": "Rating",
-            "options": {
-              "3": "3 Stars",
-              "4": "4 Stars",
-              "5": "5 Stars"
-            }
-          }
-        }
-      },
-      "image": {
-        "name": "Image",
-        "settings": {
-          "image": {
-            "label": "Image"
-          },
-          "width": {
-            "label": "Width (%)"
-          }
-        }
-      },
-      "features": {
-        "name": "Feature List",
-        "settings": {
-          "features": {
-            "label": "Features",
-            "description": "One feature per line. Use + for check icon or - for X icon."
-          }
-        }
-      },
-      "icon": {
-        "name": "Icon",
-        "settings": {
-          "icon": {
-            "label": "Icon"
-          },
-          "style": {
-            "label": "Icon style",
-            "options": {
-              "plain": "Plain",
-              "outline": "Outline",
-              "filled": "Filled"
-            }
-          },
-          "size": {
-            "label": "Icon size",
-            "options": {
-              "sm": "Small",
-              "md": "Medium",
-              "lg": "Large",
-              "xl": "Extra Large"
-            }
-          },
-          "shape": {
-            "label": "Icon shape",
-            "options": {
-              "sharp": "Sharp",
-              "rounded": "Rounded",
-              "circle": "Circle"
-            }
-          }
-        }
-      },
-      "numbered_item": {
-        "name": "Numbered Item",
-        "settings": {
-          "title": {
-            "label": "Title"
-          },
-          "description": {
-            "label": "Description"
-          },
-          "size": {
-            "label": "Number size",
-            "options": {
-              "small": "Small",
-              "medium": "Medium",
-              "large": "Large",
-              "xlarge": "Extra Large"
-            }
-          },
-          "shape": {
-            "label": "Number shape",
-            "options": {
-              "sharp": "Sharp",
-              "rounded": "Rounded",
-              "circle": "Circle"
-            }
-          }
-        }
+      "vertical_alignment": {
+        "label": "Vertical alignment"
       }
     }
   },
@@ -394,34 +79,12 @@
           "var(--space-lg)": "Large",
           "var(--space-xl)": "Extra Large"
         }
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "blocks": {
       "item": {
         "name": "Bento Item",
         "settings": {
-          "content_header": {
-            "label": "Content"
-          },
           "link": {
             "label": "Link"
           },
@@ -437,23 +100,15 @@
           "background_color": {
             "label": "Block Background"
           },
-          "overlay_color": {
-            "label": "Image Overlay",
-            "description": "Applies only if there is a background image."
-          },
           "text_color": {
-            "label": "Text Color",
+            "label": "Text color",
             "options": {
               "dark": "Dark",
               "light": "Light"
             }
           },
           "alignment": {
-            "label": "Text Alignment",
-            "options": {
-              "start": "Start",
-              "center": "Center"
-            }
+            "label": "Text Alignment"
           },
           "title": {
             "label": "Heading"
@@ -463,9 +118,6 @@
           },
           "image": {
             "label": "Photo (optional)"
-          },
-          "display_header": {
-            "label": "Display"
           }
         }
       }
@@ -474,82 +126,15 @@
   "card_grid": {
     "name": "Card Grid",
     "settings": {
-      "eyebrow": {
-        "label": "Eyebrow Text"
-      },
-      "layout": {
-        "label": "Layout",
-        "options": {
-          "grid": "Grid",
-          "carousel": "Carousel"
-        }
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
-      "alignment": {
-        "label": "Alignment",
-        "options": {
-          "start": "Left",
-          "center": "Center"
-        }
-      },
       "image_position": {
-        "label": "Image position",
-        "options": {
-          "top": "Top",
-          "bottom": "Bottom"
-        }
-      },
-      "aspect_ratio": {
-        "label": "Image ratio",
-        "options": {
-          "auto": "Auto",
-          "1 / 1": "Square (1:1)",
-          "4 / 3": "Landscape (4:3)",
-          "3 / 2": "Landscape (3:2)",
-          "3 / 4": "Portrait (3:4)",
-          "16 / 9": "Widescreen (16:9)"
-        }
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
+        "label": "Image position"
       }
     },
     "blocks": {
       "card": {
-        "name": "Card",
         "settings": {
           "image": {
             "label": "Image"
-          },
-          "subtitle": {
-            "label": "Subtitle"
-          },
-          "description": {
-            "label": "Description"
-          },
-          "button_link": {
-            "label": "Button Link"
-          },
-          "content_header": {
-            "label": "Content"
-          },
-          "title": {
-            "label": "Heading"
           }
         }
       }
@@ -557,30 +142,6 @@
   },
   "checkerboard": {
     "name": "Checkerboard",
-    "settings": {
-      "eyebrow": {
-        "label": "Eyebrow Text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      }
-    },
     "blocks": {
       "card": {
         "name": "Card",
@@ -610,9 +171,6 @@
       "after_image": {
         "label": "After image"
       },
-      "labels_header": {
-        "label": "Labels"
-      },
       "before_label": {
         "label": "Before label"
       },
@@ -631,25 +189,6 @@
       },
       "show_labels": {
         "label": "Show before/after labels"
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     }
   },
@@ -658,28 +197,6 @@
     "settings": {
       "feature_column_label": {
         "label": "Feature column label"
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "content_header": {
-        "label": "Content"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "blocks": {
@@ -692,17 +209,11 @@
           "badge": {
             "label": "Badge text (optional)"
           },
-          "options_header": {
-            "label": "Options"
-          },
           "featured": {
             "label": "Featured (highlighted)"
           },
           "link": {
             "label": "CTA Button"
-          },
-          "content_header": {
-            "label": "Content"
           }
         }
       },
@@ -714,9 +225,6 @@
           },
           "values": {
             "label": "Values for each column (one per line: yes, no, or custom text)"
-          },
-          "content_header": {
-            "label": "Content"
           }
         }
       }
@@ -766,30 +274,6 @@
   },
   "contact_details": {
     "name": "Contact Details",
-    "settings": {
-      "content_header": {
-        "label": "Content"
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      }
-    },
     "blocks": {
       "info": {
         "name": "Info",
@@ -799,37 +283,6 @@
           },
           "text": {
             "label": "Text"
-          }
-        }
-      },
-      "text_block": {
-        "name": "Text",
-        "settings": {
-          "title": {
-            "label": "Title"
-          },
-          "text": {
-            "label": "Text"
-          }
-        }
-      },
-      "menu_block": {
-        "name": "Menu",
-        "settings": {
-          "title": {
-            "label": "Title"
-          },
-          "menu": {
-            "label": "Navigation Menu",
-            "description": "Select the menu to display"
-          }
-        }
-      },
-      "social_block": {
-        "name": "Social Icons",
-        "settings": {
-          "title": {
-            "label": "Title"
           }
         }
       }
@@ -859,28 +312,6 @@
       },
       "columns": {
         "label": "Columns per state"
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "labels_header": {
-        "label": "Labels"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "blocks": {
@@ -900,9 +331,6 @@
               "2": "Option 2",
               "3": "Option 3"
             }
-          },
-          "content_header": {
-            "label": "Content"
           },
           "title": {
             "label": "Heading"
@@ -941,31 +369,6 @@
           "minimal": "Minimal"
         },
         "label": "Style"
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "content_header": {
-        "label": "Content"
-      },
-      "options_header": {
-        "label": "Options"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     }
   },
@@ -985,31 +388,7 @@
         }
       },
       "alignment": {
-        "label": "Alignment",
-        "options": {
-          "start": "Start",
-          "center": "Center",
-          "end": "End"
-        }
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
+        "label": "Alignment"
       }
     }
   },
@@ -1034,33 +413,9 @@
           "button_link": {
             "label": "Button"
           },
-          "content_header": {
-            "label": "Content"
-          },
           "description": {
             "label": "Subheading"
           }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
         }
       }
     }
@@ -1068,59 +423,11 @@
   "features_split": {
     "name": "Features Split",
     "settings": {
-      "icon_style": {
-        "label": "Icon style",
-        "options": {
-          "plain": "Plain",
-          "outline": "Outline",
-          "filled": "Filled"
-        }
-      },
-      "icon_size": {
-        "label": "Icon size",
-        "options": {
-          "sm": "Small",
-          "md": "Medium",
-          "lg": "Large",
-          "xl": "Extra Large"
-        }
-      },
-      "icon_shape": {
-        "label": "Icon shape",
-        "options": {
-          "sharp": "Sharp",
-          "rounded": "Rounded",
-          "circle": "Circle"
-        }
-      },
       "content_position": {
-        "label": "Content position",
-        "options": {
-          "left": "Left",
-          "right": "Right"
-        }
+        "label": "Content position"
       },
       "show_divider": {
         "label": "Show divider"
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "blocks": {
@@ -1129,9 +436,6 @@
         "settings": {
           "icon": {
             "label": "Icon"
-          },
-          "content_header": {
-            "label": "Content"
           },
           "title": {
             "label": "Heading"
@@ -1146,21 +450,8 @@
   "footer": {
     "name": "Footer",
     "settings": {
-      "content_header": {
-        "label": "Content"
-      },
       "copyright": {
         "label": "Copyright text"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "blocks": {
@@ -1180,100 +471,25 @@
             "label": "Text"
           }
         }
-      },
-      "text_block": {
-        "name": "Text",
-        "settings": {
-          "title": {
-            "label": "Title"
-          },
-          "text": {
-            "label": "Text"
-          }
-        }
-      },
-      "menu_block": {
-        "name": "Menu",
-        "settings": {
-          "title": {
-            "label": "Title"
-          },
-          "menu": {
-            "label": "Navigation Menu",
-            "description": "Select the menu to display"
-          }
-        }
-      },
-      "social_block": {
-        "name": "Social Icons",
-        "settings": {
-          "title": {
-            "label": "Title"
-          }
-        }
       }
     }
   },
   "gallery": {
     "name": "Gallery",
     "settings": {
-      "columns_desktop": {
-        "label": "Columns (Desktop)"
-      },
       "staggered": {
         "label": "Staggered layout"
-      },
-      "aspect_ratio": {
-        "label": "Image Aspect Ratio",
-        "options": {
-          "contain": "Show Full Image",
-          "1 / 1": "Square (1:1)",
-          "4 / 3": "Standard (4:3)",
-          "3 / 2": "Landscape (3:2)",
-          "3 / 4": "Portrait (3:4)",
-          "16 / 9": "Widescreen (16:9)",
-          "auto": "Auto"
-        }
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "layout": {
-        "label": "Layout",
-        "options": {
-          "grid": "Grid",
-          "carousel": "Carousel"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "blocks": {
       "image": {
         "name": "Image",
         "settings": {
+          "image": {
+            "label": "Image"
+          },
           "caption": {
             "label": "Caption"
-          },
-          "content_header": {
-            "label": "Content"
-          },
-          "image": {
-            "label": "Background image"
           }
         }
       }
@@ -1286,7 +502,7 @@
         "label": "Logo"
       },
       "logoImage": {
-        "label": "Logo Image",
+        "label": "Logo image",
         "description": "Upload a logo image. If provided, this will be displayed instead of the text logo."
       },
       "logoMaxWidth": {
@@ -1333,9 +549,6 @@
           "secondary": "Secondary"
         }
       },
-      "display_header": {
-        "label": "Display"
-      },
       "full_width": {
         "label": "Full Width",
         "description": "When enabled, the header stretches across the full viewport. When disabled, it stays centered in a container."
@@ -1355,112 +568,24 @@
       "center_nav": {
         "label": "Center Navigation",
         "description": "Centers the navigation menu in the header with the logo on the left and CTA on the right (desktop only)"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     }
   },
   "icon_card_grid": {
     "name": "Icon Card Grid",
     "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "icon_style": {
-        "label": "Icon style",
-        "options": {
-          "plain": "Plain",
-          "outline": "Outline",
-          "filled": "Filled"
-        }
-      },
-      "icon_size": {
-        "label": "Icon size",
-        "options": {
-          "sm": "Small",
-          "md": "Medium",
-          "lg": "Large",
-          "xl": "Extra Large"
-        }
-      },
-      "icon_shape": {
-        "label": "Icon shape",
-        "options": {
-          "sharp": "Sharp",
-          "rounded": "Rounded",
-          "circle": "Circle"
-        }
-      },
-      "alignment": {
-        "label": "Alignment",
-        "options": {
-          "start": "Left",
-          "center": "Center"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      },
-      "layout": {
-        "label": "Layout",
-        "options": {
-          "grid": "Grid",
-          "carousel": "Carousel"
-        }
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
       "featured_image": {
         "label": "Featured image"
       },
       "featured_image_position": {
-        "label": "Image position",
-        "options": {
-          "start": "Left",
-          "end": "Right"
-        }
+        "label": "Image position"
       }
     },
     "blocks": {
       "card": {
-        "name": "Card",
         "settings": {
-          "content_header": {
-            "label": "Content"
-          },
           "icon": {
             "label": "Icon"
-          },
-          "subtitle": {
-            "label": "Subtitle"
-          },
-          "title": {
-            "label": "Heading"
-          },
-          "description": {
-            "label": "Description"
-          },
-          "button_link": {
-            "label": "Button Link"
           }
         }
       }
@@ -1468,69 +593,10 @@
   },
   "icon_list": {
     "name": "Icon List",
-    "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "icon_style": {
-        "label": "Icon style",
-        "options": {
-          "plain": "Plain",
-          "outline": "Outline",
-          "filled": "Filled"
-        }
-      },
-      "icon_size": {
-        "label": "Icon size",
-        "options": {
-          "sm": "Small",
-          "md": "Medium",
-          "lg": "Large",
-          "xl": "Extra Large"
-        }
-      },
-      "icon_shape": {
-        "label": "Icon shape",
-        "options": {
-          "sharp": "Sharp",
-          "rounded": "Rounded",
-          "circle": "Circle"
-        }
-      },
-      "layout": {
-        "label": "Layout",
-        "options": {
-          "grid": "Grid",
-          "carousel": "Carousel"
-        }
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      }
-    },
     "blocks": {
       "item": {
         "name": "Item",
         "settings": {
-          "content_header": {
-            "label": "Content"
-          },
           "icon": {
             "label": "Icon"
           },
@@ -1548,20 +614,13 @@
     "settings": {
       "link": {
         "description": "Optional link when image is clicked.",
-        "label": "Button 1"
-      },
-      "fullwidth": {
-        "description": "When enabled, image spans full width. When disabled, image is contained within the theme grid.",
-        "label": "Full width"
-      },
-      "content_header": {
-        "label": "Content"
+        "label": "Link"
       },
       "image": {
         "label": "Background image"
       },
-      "display_header": {
-        "label": "Display"
+      "fullwidth": {
+        "description": "Display image at full browser width."
       }
     },
     "name": "Image"
@@ -1569,118 +628,8 @@
   "image_callout": {
     "name": "Image Callout",
     "settings": {
-      "image_position": {
-        "label": "Image position",
-        "options": {
-          "left": "Left",
-          "right": "Right"
-        }
-      },
-      "content_header": {
-        "label": "Content"
-      },
       "image": {
         "label": "Background image"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      }
-    },
-    "blocks": {
-      "features": {
-        "name": "Features",
-        "settings": {
-          "features": {
-            "label": "Features (one per line)",
-            "description": "Start a line with + for a checkmark or - for a cross."
-          }
-        }
-      },
-      "heading": {
-        "name": "Accordion",
-        "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Button size",
-            "options": {
-              "lg": "Large",
-              "xl": "Extra Large",
-              "2xl": "2X Large",
-              "3xl": "3X Large",
-              "4xl": "4X Large",
-              "5xl": "5X Large",
-              "6xl": "6X Large",
-              "7xl": "7X Large",
-              "8xl": "8X Large",
-              "9xl": "9X Large"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Accordion",
-        "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Size",
-            "options": {
-              "sm": "Small",
-              "base": "Base",
-              "lg": "Large"
-            }
-          },
-          "uppercase": {
-            "label": "Uppercase"
-          },
-          "muted": {
-            "label": "Muted color"
-          }
-        }
-      },
-      "button": {
-        "name": "Button Group",
-        "settings": {
-          "link": {
-            "label": "Button 1"
-          },
-          "style": {
-            "label": "Button 1 style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "link_2": {
-            "label": "Button 2"
-          },
-          "style_2": {
-            "label": "Button 2 style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "size": {
-            "label": "Button size",
-            "options": {
-              "small": "Small",
-              "medium": "Medium",
-              "large": "Large",
-              "xlarge": "Extra Large"
-            }
-          }
-        }
       }
     }
   },
@@ -1690,30 +639,8 @@
       "image_alt": {
         "label": "Image alt text"
       },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "content_header": {
-        "label": "Content"
-      },
       "image": {
         "label": "Background image"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "blocks": {
@@ -1735,9 +662,6 @@
           "position_y": {
             "label": "Vertical position (%)"
           },
-          "content_header": {
-            "label": "Content"
-          },
           "layout_header": {
             "label": "Layout"
           }
@@ -1757,40 +681,9 @@
           "description": {
             "label": "Tab description"
           },
-          "content_header": {
-            "label": "Content"
-          },
           "image": {
             "label": "Background image"
           }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "image_position": {
-        "label": "Image position",
-        "options": {
-          "left": "Left",
-          "right": "Right"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
         }
       }
     }
@@ -1798,36 +691,11 @@
   "image_text": {
     "name": "Image + Text",
     "settings": {
-      "content_header": {
-        "label": "Content"
-      },
       "image": {
         "label": "Background image"
       },
-      "display_header": {
-        "label": "Display"
-      },
-      "image_position": {
-        "label": "Image position",
-        "options": {
-          "left": "Left",
-          "right": "Right"
-        }
-      },
       "text_position": {
-        "label": "Text vertical position",
-        "options": {
-          "top": "Top",
-          "center": "Center",
-          "bottom": "Bottom"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
+        "label": "Text vertical position"
       },
       "content_color_scheme": {
         "label": "Content color scheme",
@@ -1837,181 +705,6 @@
           "highlight": "Highlight"
         }
       }
-    },
-    "blocks": {
-      "rating": {
-        "name": "Star Rating",
-        "settings": {
-          "rating": {
-            "label": "Star rating",
-            "options": {
-              "3": "3 stars",
-              "4": "4 stars",
-              "5": "5 stars"
-            }
-          }
-        }
-      },
-      "image": {
-        "name": "Image",
-        "settings": {
-          "image": {
-            "label": "Image"
-          },
-          "width": {
-            "label": "Max width (%)"
-          }
-        }
-      },
-      "heading": {
-        "name": "Heading",
-        "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Text size",
-            "options": {
-              "lg": "Large",
-              "xl": "Extra Large",
-              "2xl": "2X Large",
-              "3xl": "3X Large",
-              "4xl": "4X Large",
-              "5xl": "5X Large",
-              "6xl": "6X Large",
-              "7xl": "7X Large",
-              "8xl": "8X Large",
-              "9xl": "9X Large"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Text",
-        "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Size",
-            "options": {
-              "sm": "Small",
-              "base": "Base",
-              "lg": "Large"
-            }
-          },
-          "uppercase": {
-            "label": "Uppercase"
-          },
-          "muted": {
-            "label": "Muted color"
-          }
-        }
-      },
-      "features": {
-        "name": "Features",
-        "settings": {
-          "features": {
-            "label": "Features (one per line)",
-            "description": "Start a line with + for a checkmark or - for a cross."
-          }
-        }
-      },
-      "button": {
-        "name": "Button Group",
-        "settings": {
-          "link": {
-            "label": "Button 1"
-          },
-          "style": {
-            "label": "Button 1 style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "link_2": {
-            "label": "Button 2"
-          },
-          "style_2": {
-            "label": "Button 2 style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "size": {
-            "label": "Button size",
-            "options": {
-              "small": "Small",
-              "medium": "Medium",
-              "large": "Large",
-              "xlarge": "Extra Large"
-            }
-          }
-        }
-      },
-      "icon": {
-        "name": "Icon",
-        "settings": {
-          "icon": {
-            "label": "Icon"
-          },
-          "style": {
-            "label": "Icon style",
-            "options": {
-              "plain": "Plain",
-              "outline": "Outline",
-              "filled": "Filled"
-            }
-          },
-          "size": {
-            "label": "Size",
-            "options": {
-              "sm": "Small",
-              "md": "Medium",
-              "lg": "Large",
-              "xl": "Extra Large"
-            }
-          },
-          "shape": {
-            "label": "Shape",
-            "options": {
-              "sharp": "Sharp",
-              "rounded": "Rounded",
-              "circle": "Circle"
-            }
-          }
-        }
-      },
-      "numbered_item": {
-        "name": "Numbered Item",
-        "settings": {
-          "title": {
-            "label": "Title"
-          },
-          "description": {
-            "label": "Description"
-          },
-          "size": {
-            "label": "Size",
-            "options": {
-              "small": "Small",
-              "medium": "Medium",
-              "large": "Large",
-              "xlarge": "Extra Large"
-            }
-          },
-          "shape": {
-            "label": "Shape",
-            "options": {
-              "sharp": "Sharp",
-              "rounded": "Rounded",
-              "circle": "Circle"
-            }
-          }
-        }
-      }
     }
   },
   "job_listing": {
@@ -2019,25 +712,6 @@
     "settings": {
       "show_filters": {
         "label": "Show department filters"
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "blocks": {
@@ -2064,9 +738,6 @@
           },
           "apply_link": {
             "label": "Apply button"
-          },
-          "content_header": {
-            "label": "Content"
           }
         }
       }
@@ -2081,32 +752,10 @@
           "cards": "Cards",
           "carousel": "Carousel"
         },
-        "label": "Eyebrow text"
+        "label": "Layout"
       },
       "animate": {
         "label": "Animate numbers"
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "blocks": {
@@ -2116,11 +765,8 @@
           "suffix": {
             "label": "Suffix"
           },
-          "content_header": {
-            "label": "Content"
-          },
           "number": {
-            "label": "Eyebrow text"
+            "label": "Number"
           },
           "label": {
             "label": "Label"
@@ -2146,41 +792,7 @@
           },
           "link": {
             "label": "Link (optional)"
-          },
-          "content_header": {
-            "label": "Content"
           }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "layout": {
-        "label": "Layout",
-        "options": {
-          "grid": "Grid",
-          "carousel": "Carousel"
-        }
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
         }
       }
     }
@@ -2207,28 +819,6 @@
       },
       "show_address": {
         "label": "Show address below map"
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "content_header": {
-        "label": "Content"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     }
   },
@@ -2241,9 +831,6 @@
           "category": {
             "label": "Category"
           },
-          "content_header": {
-            "label": "Content"
-          },
           "image": {
             "label": "Photo (optional)"
           },
@@ -2254,34 +841,12 @@
       }
     },
     "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
       "gap": {
         "label": "Spacing",
         "options": {
           "small": "Small",
           "medium": "Medium",
           "large": "Large"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
         }
       }
     }
@@ -2292,46 +857,12 @@
       "step": {
         "name": "Step",
         "settings": {
-          "content_header": {
-            "label": "Content"
-          },
           "title": {
             "label": "Heading"
           },
           "description": {
             "label": "Subheading"
           }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
-      "layout": {
-        "label": "Layout",
-        "options": {
-          "grid": "Grid",
-          "carousel": "Carousel"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
         }
       }
     }
@@ -2342,9 +873,6 @@
       "service": {
         "name": "Service",
         "settings": {
-          "content_header": {
-            "label": "Content"
-          },
           "title": {
             "label": "Heading"
           },
@@ -2358,57 +886,19 @@
       }
     },
     "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
       "show_dividers": {
         "label": "Show dividers"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     }
   },
   "priced_list": {
     "name": "Priced List",
     "settings": {
-      "eyebrow": {
-        "label": "Category label"
-      },
-      "title": {
-        "label": "Section heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
       "layout": {
         "label": "Layout",
         "options": {
           "single-column": "Single column",
           "two-column": "Two columns"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
         }
       }
     },
@@ -2424,9 +914,6 @@
           },
           "image": {
             "label": "Photo (optional)"
-          },
-          "content_header": {
-            "label": "Content"
           },
           "description": {
             "label": "Subheading"
@@ -2450,9 +937,6 @@
           "featured": {
             "label": "Featured plan"
           },
-          "content_header": {
-            "label": "Content"
-          },
           "price": {
             "label": "Price / Value (Optional)"
           },
@@ -2462,41 +946,7 @@
           },
           "button_link": {
             "label": "Button Link"
-          },
-          "options_header": {
-            "label": "Options"
           }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "layout": {
-        "label": "Layout",
-        "options": {
-          "grid": "Grid",
-          "carousel": "Carousel"
-        }
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
         }
       }
     }
@@ -2570,43 +1020,9 @@
           "whatsapp": {
             "label": "WhatsApp URL"
           },
-          "content_header": {
-            "label": "Content"
-          },
           "email": {
-            "label": "Eyebrow text"
+            "label": "Email"
           }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
-      "layout": {
-        "label": "Layout",
-        "options": {
-          "grid": "Grid",
-          "carousel": "Carousel"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
         }
       }
     }
@@ -2619,47 +1035,6 @@
         "options": {
           "hover": "On Hover",
           "always": "Always"
-        }
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "layout": {
-        "label": "Layout",
-        "options": {
-          "grid": "Grid",
-          "carousel": "Carousel"
-        }
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
-      "aspect_ratio": {
-        "label": "Image Aspect Ratio",
-        "options": {
-          "auto": "Auto",
-          "contain": "Show Full Image",
-          "1 / 1": "Square (1:1)",
-          "4 / 3": "Standard (4:3)",
-          "3 / 2": "Landscape (3:2)",
-          "3 / 4": "Portrait (3:4)",
-          "16 / 9": "Widescreen (16:9)"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
         }
       }
     },
@@ -2678,9 +1053,6 @@
           },
           "link": {
             "label": "Project Link"
-          },
-          "content_header": {
-            "label": "Content"
           }
         }
       }
@@ -2690,12 +1062,7 @@
     "name": "Rich Text",
     "settings": {
       "text_alignment": {
-        "label": "Text alignment",
-        "options": {
-          "start": "Start",
-          "end": "End",
-          "center": "Center"
-        }
+        "label": "Text alignment"
       },
       "content_width": {
         "label": "Content width",
@@ -2704,97 +1071,6 @@
           "medium": "Medium",
           "wide": "Wide",
           "fullwidth": "Fullwidth"
-        }
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Accordion",
-        "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Button size",
-            "options": {
-              "lg": "Large",
-              "xl": "Extra Large",
-              "2xl": "2X Large",
-              "3xl": "3X Large",
-              "4xl": "4X Large",
-              "5xl": "5X Large",
-              "6xl": "6X Large",
-              "7xl": "7X Large",
-              "8xl": "8X Large",
-              "9xl": "9X Large"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Accordion",
-        "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Size",
-            "options": {
-              "sm": "Small",
-              "base": "Base",
-              "lg": "Large"
-            }
-          },
-          "uppercase": {
-            "label": "Uppercase"
-          },
-          "muted": {
-            "label": "Muted color"
-          }
-        }
-      },
-      "button": {
-        "name": "Button Group",
-        "settings": {
-          "link": {
-            "label": "Button 1"
-          },
-          "style": {
-            "label": "Button 1 style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "link_2": {
-            "label": "Button 2"
-          },
-          "style_2": {
-            "label": "Button 2 style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "size": {
-            "label": "Button size",
-            "options": {
-              "small": "Small",
-              "medium": "Medium",
-              "large": "Large",
-              "xlarge": "Extra Large"
-            }
-          }
         }
       }
     }
@@ -2812,34 +1088,8 @@
           "1": "Monday"
         }
       },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "content_header": {
-        "label": "Content"
-      },
-      "display_header": {
-        "label": "Display"
-      },
       "sidebar_position": {
-        "label": "Sidebar position",
-        "options": {
-          "left": "Left",
-          "right": "Right"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
+        "label": "Sidebar position"
       }
     },
     "blocks": {
@@ -2853,15 +1103,9 @@
           },
           "closed": {
             "label": "Closed"
-          },
-          "content_header": {
-            "label": "Content"
-          },
-          "options_header": {
-            "label": "Options"
           }
         },
-        "name": "Accordion"
+        "name": "Day"
       },
       "info": {
         "name": "Info",
@@ -2881,27 +1125,6 @@
   },
   "sliding_panels": {
     "name": "Sliding Panels",
-    "settings": {
-      "eyebrow": {
-        "label": "Eyebrow Text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      }
-    },
     "blocks": {
       "panel": {
         "name": "Panel",
@@ -2931,9 +1154,6 @@
       "autoplay_speed": {
         "label": "Change slides every"
       },
-      "display_header": {
-        "label": "Display"
-      },
       "height": {
         "label": "Height",
         "options": {
@@ -2942,16 +1162,6 @@
           "medium": "Medium",
           "large": "Large"
         }
-      },
-      "fullwidth": {
-        "label": "Full width"
-      },
-      "alignment": {
-        "label": "Content alignment",
-        "options": {
-          "center": "Center",
-          "start": "Start"
-        }
       }
     },
     "blocks": {
@@ -2959,7 +1169,7 @@
         "name": "Slide",
         "settings": {
           "image": {
-            "label": "Background Image"
+            "label": "Background image"
           },
           "heading_text": {
             "label": "Heading Text"
@@ -2990,50 +1200,40 @@
               "lg": "Large"
             }
           },
-          "content_header": {
-            "label": "Content"
-          },
           "text_uppercase": {
-            "label": "Eyebrow text"
+            "label": "Uppercase"
           },
           "text_muted": {
-            "label": "Eyebrow text"
+            "label": "Muted color"
           },
           "button_link": {
             "label": "Button Link"
           },
           "button_link_2": {
-            "label": "Eyebrow text"
-          },
-          "display_header": {
-            "label": "Display"
+            "label": "Button 2"
           },
           "button_style": {
-            "label": "Eyebrow text",
+            "label": "Button style",
             "options": {
               "primary": "Primary",
               "secondary": "Secondary"
             }
           },
           "button_style_2": {
-            "label": "Eyebrow text",
+            "label": "Button 2 style",
             "options": {
               "primary": "Primary",
               "secondary": "Secondary"
             }
           },
           "button_size": {
-            "label": "Eyebrow text",
+            "label": "Button size",
             "options": {
               "small": "Small",
               "medium": "Medium",
               "large": "Large",
               "xlarge": "Extra Large"
             }
-          },
-          "overlay_color": {
-            "label": "Overlay color",
-            "description": "Applies only if there is a background image."
           },
           "color_scheme": {
             "label": "Color Scheme",
@@ -3049,117 +1249,37 @@
   "split_content": {
     "name": "Split Content",
     "settings": {
-      "color_scheme": {
-        "label": "Color Scheme",
+      "balance": {
+        "label": "Balance",
         "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
+          "left_heavy": "Left heavy",
+          "equal": "Equal",
+          "right_heavy": "Right heavy"
         }
       },
       "sticky_column": {
-        "label": "Sticky column (desktop)",
-        "options": {
-          "none": "None",
-          "left": "Left",
-          "right": "Right"
-        }
+        "label": "Sticky column (desktop)"
       }
     },
     "blocks": {
       "heading": {
-        "name": "Heading",
         "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Size",
-            "options": {
-              "lg": "Large",
-              "xl": "XL",
-              "2xl": "2XL",
-              "3xl": "3XL",
-              "4xl": "4XL",
-              "5xl": "5XL",
-              "6xl": "6XL",
-              "7xl": "7XL",
-              "8xl": "8XL",
-              "9xl": "9XL"
-            }
-          },
           "position": {
-            "label": "Column",
-            "options": {
-              "left": "Left",
-              "right": "Right"
-            }
+            "label": "Column"
           }
         }
       },
       "text": {
-        "name": "Text",
         "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Size",
-            "options": {
-              "sm": "Small",
-              "base": "Base",
-              "lg": "Large"
-            }
-          },
-          "muted": {
-            "label": "Muted color"
-          },
           "position": {
-            "label": "Column",
-            "options": {
-              "left": "Left",
-              "right": "Right"
-            }
+            "label": "Column"
           }
         }
       },
       "button": {
-        "name": "Button",
         "settings": {
-          "link": {
-            "label": "Button link"
-          },
-          "style": {
-            "label": "Button style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "link_2": {
-            "label": "Second button link"
-          },
-          "style_2": {
-            "label": "Second button style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "size": {
-            "label": "Button size",
-            "options": {
-              "small": "Small",
-              "medium": "Medium",
-              "large": "Large",
-              "xlarge": "Extra Large"
-            }
-          },
           "position": {
-            "label": "Column",
-            "options": {
-              "left": "Left",
-              "right": "Right"
-            }
+            "label": "Column"
           }
         }
       }
@@ -3168,17 +1288,11 @@
   "scrolling_text": {
     "name": "Scrolling Text",
     "settings": {
-      "content_header": {
-        "label": "Content"
-      },
       "text": {
         "label": "Text"
       },
       "separator": {
         "label": "Separator"
-      },
-      "display_header": {
-        "label": "Display"
       },
       "speed": {
         "label": "Speed"
@@ -3207,25 +1321,6 @@
     "settings": {
       "icon_size": {
         "label": "Icon size"
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "name": "Social Icons"
@@ -3233,148 +1328,13 @@
   "split_hero": {
     "name": "Split Hero",
     "settings": {
-      "content_header": {
-        "label": "Content"
-      },
       "image": {
         "label": "Background image"
-      },
-      "overlay_color": {
-        "label": "Overlay color",
-        "description": "Applies only if there is a background image."
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "image_position": {
-        "label": "Image position",
-        "options": {
-          "left": "Left",
-          "right": "Right"
-        }
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Accordion",
-        "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Button size",
-            "options": {
-              "lg": "Large",
-              "xl": "Extra Large",
-              "2xl": "2X Large",
-              "3xl": "3X Large",
-              "4xl": "4X Large",
-              "5xl": "5X Large",
-              "6xl": "6X Large",
-              "7xl": "7X Large",
-              "8xl": "8X Large",
-              "9xl": "9X Large"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Accordion",
-        "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Size",
-            "options": {
-              "sm": "Small",
-              "base": "Base",
-              "lg": "Large"
-            }
-          },
-          "uppercase": {
-            "label": "Uppercase"
-          },
-          "muted": {
-            "label": "Muted color"
-          }
-        }
-      },
-      "features": {
-        "name": "Features",
-        "settings": {
-          "features": {
-            "label": "Features (one per line)",
-            "description": "Start a line with + for a checkmark or - for a cross."
-          }
-        }
-      },
-      "button": {
-        "name": "Button Group",
-        "settings": {
-          "link": {
-            "label": "Button 1"
-          },
-          "style": {
-            "label": "Button 1 style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "link_2": {
-            "label": "Button 2"
-          },
-          "style_2": {
-            "label": "Button 2 style",
-            "options": {
-              "primary": "Primary",
-              "secondary": "Secondary"
-            }
-          },
-          "size": {
-            "label": "Button size",
-            "options": {
-              "small": "Small",
-              "medium": "Medium",
-              "large": "Large",
-              "xlarge": "Extra Large"
-            }
-          }
-        }
       }
     }
   },
   "steps": {
     "name": "Steps",
-    "settings": {
-      "eyebrow": {
-        "label": "Eyebrow Text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      }
-    },
     "blocks": {
       "step": {
         "name": "Step",
@@ -3398,55 +1358,16 @@
   "testimonial_slider": {
     "name": "Testimonial Slider",
     "settings": {
-      "display_header": {
-        "label": "Display"
-      },
       "autoplay": {
         "label": "Autoplay"
       },
       "autoplay_speed": {
         "label": "Autoplay speed"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "blocks": {
       "quote": {
-        "name": "Quote",
-        "settings": {
-          "content_header": {
-            "label": "Content"
-          },
-          "quote": {
-            "label": "Quote"
-          },
-          "avatar": {
-            "label": "Avatar"
-          },
-          "name": {
-            "label": "Name"
-          },
-          "title": {
-            "label": "Title"
-          },
-          "display_header": {
-            "label": "Display"
-          },
-          "rating": {
-            "label": "Rating",
-            "options": {
-              "": "None",
-              "5": "★★★★★",
-              "4": "★★★★",
-              "3": "★★★"
-            }
-          }
-        }
+        "name": "Quote"
       }
     }
   },
@@ -3458,73 +1379,6 @@
       },
       "author_image": {
         "label": "Author Image"
-      },
-      "image_position": {
-        "label": "Image Position",
-        "options": {
-          "left": "Left",
-          "right": "Right"
-        }
-      },
-      "content_header": {
-        "label": "Content"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Accordion",
-        "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Button size",
-            "options": {
-              "lg": "Large",
-              "xl": "Extra Large",
-              "2xl": "2X Large",
-              "3xl": "3X Large",
-              "4xl": "4X Large",
-              "5xl": "5X Large",
-              "6xl": "6X Large",
-              "7xl": "7X Large",
-              "8xl": "8X Large",
-              "9xl": "9X Large"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Accordion",
-        "settings": {
-          "text": {
-            "label": "Text"
-          },
-          "size": {
-            "label": "Size",
-            "options": {
-              "sm": "Small",
-              "base": "Base",
-              "lg": "Large"
-            }
-          },
-          "uppercase": {
-            "label": "Uppercase"
-          },
-          "muted": {
-            "label": "Muted color"
-          }
-        }
       }
     }
   },
@@ -3532,67 +1386,7 @@
     "name": "Testimonials",
     "blocks": {
       "quote": {
-        "name": "Testimonial",
-        "settings": {
-          "quote": {
-            "label": "Quote text"
-          },
-          "title": {
-            "label": "Title / Company"
-          },
-          "rating": {
-            "label": "Star rating",
-            "options": {
-              "3": "3 stars",
-              "4": "4 stars",
-              "5": "5 stars",
-              "": "No rating"
-            }
-          },
-          "content_header": {
-            "label": "Content"
-          },
-          "avatar": {
-            "label": "Eyebrow text"
-          },
-          "name": {
-            "label": "Name"
-          },
-          "display_header": {
-            "label": "Display"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "layout": {
-        "label": "Layout",
-        "options": {
-          "grid": "Grid",
-          "carousel": "Carousel"
-        }
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
+        "name": "Testimonial"
       }
     }
   },
@@ -3605,26 +1399,7 @@
           "vertical": "Vertical",
           "horizontal": "Horizontal"
         },
-        "label": "Eyebrow text"
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
+        "label": "Layout"
       }
     },
     "blocks": {
@@ -3641,9 +1416,6 @@
             "label": "Features/bullet points (one per line)",
             "description": "Start a line with + for a checkmark or - for a cross."
           },
-          "content_header": {
-            "label": "Content"
-          },
           "title": {
             "label": "Heading"
           },
@@ -3657,59 +1429,17 @@
   "trust_bar": {
     "name": "Trust Bar",
     "settings": {
-      "icon_style": {
-        "label": "Icon style",
-        "options": {
-          "plain": "Plain",
-          "outline": "Outline",
-          "filled": "Filled"
-        }
-      },
-      "icon_size": {
-        "label": "Icon size",
-        "options": {
-          "sm": "Small",
-          "md": "Medium",
-          "lg": "Large",
-          "xl": "Extra Large"
-        }
-      },
-      "icon_shape": {
-        "label": "Icon shape",
-        "options": {
-          "sharp": "Sharp",
-          "rounded": "Rounded",
-          "circle": "Circle"
-        }
-      },
       "alignment": {
-        "label": "Alignment",
-        "options": {
-          "left": "Left",
-          "centered": "Centered"
-        }
+        "label": "Alignment"
       },
       "show_dividers": {
         "label": "Show dividers"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
       }
     },
     "blocks": {
       "item": {
         "name": "Item",
         "settings": {
-          "content_header": {
-            "label": "Content"
-          },
           "icon": {
             "label": "Icon"
           },
@@ -3725,45 +1455,7 @@
   },
   "video_embed": {
     "name": "YouTube/Vimeo",
-    "settings": {
-      "video_url": {
-        "label": "Video URL (YouTube or Vimeo)"
-      },
-      "video_title": {
-        "label": "Video title (for accessibility)"
-      },
-      "aspect_ratio": {
-        "label": "Aspect ratio",
-        "options": {
-          "16:9": "16:9 (Widescreen)",
-          "4:3": "4:3 (Standard)",
-          "21:9": "21:9 (Cinematic)",
-          "1:1": "1:1 (Square)"
-        }
-      },
-      "eyebrow": {
-        "label": "Eyebrow text"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Subheading"
-      },
-      "content_header": {
-        "label": "Content"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "color_scheme": {
-        "label": "Color Scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
-        }
-      }
-    }
+    "settings": {}
   },
   "video_popup": {
     "name": "Video Popup",
@@ -3774,17 +1466,7 @@
       "video_header": {
         "label": "Video"
       },
-      "video_url": {
-        "label": "Video URL (YouTube or Vimeo)"
-      },
-      "video_title": {
-        "label": "Video title (for accessibility)"
-      },
-      "display_header": {
-        "label": "Display"
-      },
       "overlay_color": {
-        "label": "Overlay color",
         "description": "Adjust alpha for overlay intensity"
       },
       "height": {
@@ -3794,9 +1476,6 @@
           "medium": "Medium",
           "large": "Large"
         }
-      },
-      "fullwidth": {
-        "label": "Full width"
       },
       "play_button_style": {
         "label": "Play button style",
@@ -4039,28 +1718,378 @@
           "description": "Add custom scripts that will be injected before the closing </body> tag."
         }
       }
+    },
+    "widgets": {
+      "settings": {
+        "display_header": {
+          "label": "Display"
+        },
+        "content_header": {
+          "label": "Content"
+        },
+        "options_header": {
+          "label": "Options"
+        },
+        "labels_header": {
+          "label": "Labels"
+        },
+        "eyebrow": {
+          "label": "Eyebrow text"
+        },
+        "title": {
+          "label": "Heading"
+        },
+        "description": {
+          "label": "Subheading"
+        },
+        "color_scheme": {
+          "label": "Color Scheme",
+          "options": {
+            "standard": "Standard",
+            "highlight": "Highlight"
+          }
+        },
+        "columns_desktop": {
+          "label": "Desktop columns"
+        },
+        "layout": {
+          "label": "Layout",
+          "options": {
+            "grid": "Grid",
+            "carousel": "Carousel"
+          }
+        },
+        "fullwidth": {
+          "label": "Full width"
+        },
+        "image_position": {
+          "label": "Image position",
+          "options": {
+            "left": "Left",
+            "right": "Right"
+          }
+        },
+        "aspect_ratio": {
+          "label": "Aspect ratio",
+          "options": {
+            "auto": "Auto",
+            "contain": "Contain",
+            "1 / 1": "1:1",
+            "4 / 3": "4:3",
+            "3 / 2": "3:2",
+            "3 / 4": "3:4",
+            "16 / 9": "16:9",
+            "21:9": "21:9"
+          }
+        },
+        "alignment": {
+          "label": "Alignment",
+          "options": {
+            "start": "Left",
+            "center": "Center"
+          }
+        },
+        "video_url": {
+          "label": "Video URL (YouTube or Vimeo)"
+        },
+        "video_title": {
+          "label": "Video title (for accessibility)"
+        },
+        "icon_style": {
+          "label": "Icon style",
+          "options": {
+            "plain": "Plain",
+            "outline": "Outline",
+            "filled": "Filled"
+          }
+        },
+        "icon_size": {
+          "label": "Icon size",
+          "options": {
+            "sm": "Small",
+            "md": "Medium",
+            "lg": "Large",
+            "xl": "Extra Large"
+          }
+        },
+        "icon_shape": {
+          "label": "Icon shape",
+          "options": {
+            "sharp": "Sharp",
+            "rounded": "Rounded",
+            "circle": "Circle"
+          }
+        },
+        "overlay_color": {
+          "label": "Overlay color",
+          "description": "Applies only if there is a background image."
+        },
+        "options": {
+          "left": "Left",
+          "right": "Right",
+          "top": "Top",
+          "bottom": "Bottom",
+          "center": "Center",
+          "start": "Start",
+          "end": "End",
+          "none": "None"
+        }
+      },
+      "blocks": {
+        "heading": {
+          "name": "Heading",
+          "settings": {
+            "text": {
+              "label": "Text"
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "lg": "Large",
+                "xl": "Extra Large",
+                "2xl": "2X Large",
+                "3xl": "3X Large",
+                "4xl": "4X Large",
+                "5xl": "5X Large",
+                "6xl": "6X Large",
+                "7xl": "7X Large",
+                "8xl": "8X Large",
+                "9xl": "9X Large"
+              }
+            }
+          }
+        },
+        "text": {
+          "name": "Text",
+          "settings": {
+            "text": {
+              "label": "Text"
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "sm": "Small",
+                "base": "Base",
+                "lg": "Large"
+              }
+            },
+            "uppercase": {
+              "label": "Uppercase"
+            },
+            "muted": {
+              "label": "Muted color"
+            }
+          }
+        },
+        "button": {
+          "name": "Button Group",
+          "settings": {
+            "link": {
+              "label": "Button 1"
+            },
+            "style": {
+              "label": "Button 1 style",
+              "options": {
+                "primary": "Primary",
+                "secondary": "Secondary"
+              }
+            },
+            "link_2": {
+              "label": "Button 2"
+            },
+            "style_2": {
+              "label": "Button 2 style",
+              "options": {
+                "primary": "Primary",
+                "secondary": "Secondary"
+              }
+            },
+            "size": {
+              "label": "Button size",
+              "options": {
+                "small": "Small",
+                "medium": "Medium",
+                "large": "Large",
+                "xlarge": "Extra Large"
+              }
+            }
+          }
+        },
+        "icon": {
+          "name": "Icon",
+          "settings": {
+            "icon": {
+              "label": "Icon"
+            },
+            "style": {
+              "label": "Style",
+              "options": {
+                "plain": "Plain",
+                "outline": "Outline",
+                "filled": "Filled"
+              }
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "sm": "Small",
+                "md": "Medium",
+                "lg": "Large",
+                "xl": "Extra Large"
+              }
+            },
+            "shape": {
+              "label": "Shape",
+              "options": {
+                "sharp": "Sharp",
+                "rounded": "Rounded",
+                "circle": "Circle"
+              }
+            }
+          }
+        },
+        "rating": {
+          "name": "Rating",
+          "settings": {
+            "rating": {
+              "label": "Rating",
+              "options": {
+                "3": "★★★",
+                "4": "★★★★",
+                "5": "★★★★★"
+              }
+            }
+          }
+        },
+        "quote": {
+          "settings": {
+            "quote": {
+              "label": "Quote"
+            },
+            "avatar": {
+              "label": "Avatar"
+            },
+            "name": {
+              "label": "Name"
+            },
+            "title": {
+              "label": "Title / Company"
+            },
+            "rating": {
+              "label": "Star rating",
+              "options": {
+                "3": "3 stars",
+                "4": "4 stars",
+                "5": "5 stars",
+                "": "No rating"
+              }
+            }
+          }
+        },
+        "image": {
+          "name": "Image",
+          "settings": {
+            "image": {
+              "label": "Image"
+            },
+            "width": {
+              "label": "Width"
+            }
+          }
+        },
+        "card": {
+          "name": "Card",
+          "settings": {
+            "subtitle": {
+              "label": "Subtitle"
+            },
+            "title": {
+              "label": "Heading"
+            },
+            "description": {
+              "label": "Description"
+            },
+            "button_link": {
+              "label": "Button Link"
+            }
+          }
+        },
+        "text_block": {
+          "name": "Text",
+          "settings": {
+            "title": {
+              "label": "Title"
+            },
+            "text": {
+              "label": "Text"
+            }
+          }
+        },
+        "menu_block": {
+          "name": "Menu",
+          "settings": {
+            "title": {
+              "label": "Title"
+            },
+            "menu": {
+              "label": "Navigation Menu",
+              "description": "Select the menu to display"
+            }
+          }
+        },
+        "social_block": {
+          "name": "Social Icons",
+          "settings": {
+            "title": {
+              "label": "Title"
+            }
+          }
+        },
+        "features": {
+          "name": "Features",
+          "settings": {
+            "features": {
+              "label": "Features (one per line)",
+              "description": "Start a line with + for a checkmark or - for a cross."
+            }
+          }
+        },
+        "numbered_item": {
+          "name": "Numbered Item",
+          "settings": {
+            "title": {
+              "label": "Title"
+            },
+            "description": {
+              "label": "Description"
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "small": "Small",
+                "medium": "Medium",
+                "large": "Large",
+                "xlarge": "Extra Large"
+              }
+            },
+            "shape": {
+              "label": "Shape",
+              "options": {
+                "sharp": "Sharp",
+                "rounded": "Rounded",
+                "circle": "Circle"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "team_highlight": {
     "name": "Team Highlight",
     "settings": {
-      "eyebrow": {
-        "label": "Eyebrow"
-      },
-      "title": {
-        "label": "Heading"
-      },
-      "description": {
-        "label": "Description"
-      },
       "signature_image": {
         "label": "Signature image"
-      },
-      "display_header": {
-        "label": "Display"
-      },
-      "columns_desktop": {
-        "label": "Desktop columns"
       },
       "image_ratio": {
         "label": "Image ratio",
@@ -4068,13 +2097,6 @@
           "portrait": "Portrait",
           "square": "Square",
           "auto": "Auto"
-        }
-      },
-      "color_scheme": {
-        "label": "Color scheme",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Highlight"
         }
       }
     },

@@ -11,18 +11,18 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:comparison_slider.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:comparison_slider.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "See the Transformation"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:comparison_slider.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "image",
@@ -37,7 +37,7 @@
     {
       "type": "header",
       "id": "labels_header",
-      "label": "tTheme:comparison_slider.settings.labels_header.label"
+      "label": "tTheme:global.widgets.settings.labels_header.label"
     },
     {
       "type": "text",
@@ -54,7 +54,7 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:comparison_slider.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
@@ -91,16 +91,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:comparison_slider.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:comparison_slider.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:comparison_slider.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }

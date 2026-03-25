@@ -13,7 +13,7 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:slideshow.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
@@ -42,22 +42,22 @@
     {
       "type": "checkbox",
       "id": "fullwidth",
-      "label": "tTheme:slideshow.settings.fullwidth.label",
+      "label": "tTheme:global.widgets.settings.fullwidth.label",
       "default": true
     },
     {
       "type": "select",
       "id": "alignment",
-      "label": "tTheme:slideshow.settings.alignment.label",
+      "label": "tTheme:global.widgets.settings.alignment.label",
       "default": "center",
       "options": [
         {
           "value": "center",
-          "label": "tTheme:slideshow.settings.alignment.options.center"
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
         },
         {
           "value": "start",
-          "label": "tTheme:slideshow.settings.alignment.options.start"
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
         }
       ]
     },
@@ -86,7 +86,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:slideshow.blocks.slide.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "image",
@@ -203,7 +203,7 @@
         {
           "type": "header",
           "id": "display_header",
-          "label": "tTheme:slideshow.blocks.slide.settings.display_header.label"
+          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "select",
@@ -264,10 +264,10 @@
         {
           "type": "color",
           "id": "overlay_color",
-          "label": "tTheme:slideshow.blocks.slide.settings.overlay_color.label",
+          "label": "tTheme:global.widgets.settings.overlay_color.label",
           "default": "#0a1e38bf",
           "allow_alpha": true,
-          "description": "tTheme:slideshow.blocks.slide.settings.overlay_color.description"
+          "description": "tTheme:global.widgets.settings.overlay_color.description"
         },
         {
           "type": "select",

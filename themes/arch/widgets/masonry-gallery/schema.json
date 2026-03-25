@@ -11,29 +11,29 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:masonry_gallery.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:masonry_gallery.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Our Work"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:masonry_gallery.settings.description.label",
+      "label": "tTheme:global.widgets.settings.description.label",
       "default": "A collection of our recent projects and creative work."
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:masonry_gallery.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "tTheme:masonry_gallery.settings.columns_desktop.label",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "default": 3,
       "min": 2,
       "max": 5,
@@ -62,16 +62,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:masonry_gallery.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:masonry_gallery.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:masonry_gallery.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -84,7 +84,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:masonry_gallery.blocks.item.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "image",

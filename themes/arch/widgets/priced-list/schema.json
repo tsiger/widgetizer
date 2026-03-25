@@ -11,24 +11,24 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:priced_list.settings.eyebrow.label",
+      "label": "tTheme:global.widgets.settings.eyebrow.label",
       "default": "Starters"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:priced_list.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Appetizers"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:priced_list.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:priced_list.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
@@ -49,16 +49,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:priced_list.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:priced_list.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:priced_list.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -71,7 +71,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:priced_list.blocks.item.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "text",

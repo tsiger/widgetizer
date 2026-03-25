@@ -22,24 +22,24 @@
     {
       "type": "text",
       "id": "video_url",
-      "label": "tTheme:video_popup.settings.video_url.label",
+      "label": "tTheme:global.widgets.settings.video_url.label",
       "default": "https://www.youtube.com/watch?v=2PuFyjAs7JA"
     },
     {
       "type": "text",
       "id": "video_title",
-      "label": "tTheme:video_popup.settings.video_title.label",
+      "label": "tTheme:global.widgets.settings.video_title.label",
       "default": "Video"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:video_popup.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "color",
       "id": "overlay_color",
-      "label": "tTheme:video_popup.settings.overlay_color.label",
+      "label": "tTheme:global.widgets.settings.overlay_color.label",
       "default": "#0a1e38bf",
       "allow_alpha": true,
       "description": "tTheme:video_popup.settings.overlay_color.description"
@@ -67,7 +67,7 @@
     {
       "type": "checkbox",
       "id": "fullwidth",
-      "label": "tTheme:video_popup.settings.fullwidth.label",
+      "label": "tTheme:global.widgets.settings.fullwidth.label",
       "default": true
     },
     {

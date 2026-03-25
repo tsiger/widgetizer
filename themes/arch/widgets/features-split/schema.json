@@ -12,87 +12,87 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:features_split.settings.eyebrow.label",
+      "label": "tTheme:global.widgets.settings.eyebrow.label",
       "default": "Our Markets"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:features_split.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Optimal Solution For Every Business"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:features_split.settings.description.label",
+      "label": "tTheme:global.widgets.settings.description.label",
       "default": "We combine industry expertise with innovative technology to deliver solutions that drive real results. Our approach is tailored to meet the unique challenges of each market segment we serve."
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:features_split.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "icon_style",
-      "label": "tTheme:features_split.settings.icon_style.label",
+      "label": "tTheme:global.widgets.settings.icon_style.label",
       "default": "plain",
       "options": [
         {
           "value": "plain",
-          "label": "tTheme:features_split.settings.icon_style.options.plain"
+          "label": "tTheme:global.widgets.settings.icon_style.options.plain"
         },
         {
           "value": "outline",
-          "label": "tTheme:features_split.settings.icon_style.options.outline"
+          "label": "tTheme:global.widgets.settings.icon_style.options.outline"
         },
         {
           "value": "filled",
-          "label": "tTheme:features_split.settings.icon_style.options.filled"
+          "label": "tTheme:global.widgets.settings.icon_style.options.filled"
         }
       ]
     },
     {
       "type": "select",
       "id": "icon_size",
-      "label": "tTheme:features_split.settings.icon_size.label",
+      "label": "tTheme:global.widgets.settings.icon_size.label",
       "default": "xl",
       "options": [
         {
           "value": "sm",
-          "label": "tTheme:features_split.settings.icon_size.options.sm"
+          "label": "tTheme:global.widgets.settings.icon_size.options.sm"
         },
         {
           "value": "md",
-          "label": "tTheme:features_split.settings.icon_size.options.md"
+          "label": "tTheme:global.widgets.settings.icon_size.options.md"
         },
         {
           "value": "lg",
-          "label": "tTheme:features_split.settings.icon_size.options.lg"
+          "label": "tTheme:global.widgets.settings.icon_size.options.lg"
         },
         {
           "value": "xl",
-          "label": "tTheme:features_split.settings.icon_size.options.xl"
+          "label": "tTheme:global.widgets.settings.icon_size.options.xl"
         }
       ]
     },
     {
       "type": "select",
       "id": "icon_shape",
-      "label": "tTheme:features_split.settings.icon_shape.label",
+      "label": "tTheme:global.widgets.settings.icon_shape.label",
       "default": "circle",
       "options": [
         {
           "value": "sharp",
-          "label": "tTheme:features_split.settings.icon_shape.options.sharp"
+          "label": "tTheme:global.widgets.settings.icon_shape.options.sharp"
         },
         {
           "value": "rounded",
-          "label": "tTheme:features_split.settings.icon_shape.options.rounded"
+          "label": "tTheme:global.widgets.settings.icon_shape.options.rounded"
         },
         {
           "value": "circle",
-          "label": "tTheme:features_split.settings.icon_shape.options.circle"
+          "label": "tTheme:global.widgets.settings.icon_shape.options.circle"
         }
       ]
     },
@@ -104,11 +104,11 @@
       "options": [
         {
           "value": "left",
-          "label": "tTheme:features_split.settings.content_position.options.left"
+          "label": "tTheme:global.widgets.settings.options.left"
         },
         {
           "value": "right",
-          "label": "tTheme:features_split.settings.content_position.options.right"
+          "label": "tTheme:global.widgets.settings.options.right"
         }
       ]
     },
@@ -121,16 +121,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:features_split.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:features_split.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:features_split.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -143,7 +143,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:features_split.blocks.feature.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "icon",

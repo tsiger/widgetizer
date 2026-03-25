@@ -11,23 +11,23 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:schedule_table.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:schedule_table.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Opening Hours"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:schedule_table.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "content_header",
-      "label": "tTheme:schedule_table.settings.content_header.label"
+      "label": "tTheme:global.widgets.settings.content_header.label"
     },
     {
       "type": "text",
@@ -38,7 +38,7 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:schedule_table.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
@@ -48,11 +48,11 @@
       "options": [
         {
           "value": "left",
-          "label": "tTheme:schedule_table.settings.sidebar_position.options.left"
+          "label": "tTheme:global.widgets.settings.options.left"
         },
         {
           "value": "right",
-          "label": "tTheme:schedule_table.settings.sidebar_position.options.right"
+          "label": "tTheme:global.widgets.settings.options.right"
         }
       ]
     },
@@ -75,16 +75,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:schedule_table.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:schedule_table.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:schedule_table.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -97,7 +97,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:schedule_table.blocks.day.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "text",
@@ -114,7 +114,7 @@
         {
           "type": "header",
           "id": "options_header",
-          "label": "tTheme:schedule_table.blocks.day.settings.options_header.label"
+          "label": "tTheme:global.widgets.settings.options_header.label"
         },
         {
           "type": "checkbox",

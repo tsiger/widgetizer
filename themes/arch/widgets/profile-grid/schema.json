@@ -11,29 +11,29 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:profile_grid.settings.eyebrow.label",
+      "label": "tTheme:global.widgets.settings.eyebrow.label",
       "default": "Our Team"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:profile_grid.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Meet Our Team"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:profile_grid.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:profile_grid.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "tTheme:profile_grid.settings.columns_desktop.label",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "default": 3,
       "min": 2,
       "max": 5,
@@ -42,32 +42,32 @@
     {
       "type": "select",
       "id": "layout",
-      "label": "tTheme:profile_grid.settings.layout.label",
+      "label": "tTheme:global.widgets.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "tTheme:profile_grid.settings.layout.options.grid"
+          "label": "tTheme:global.widgets.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "tTheme:profile_grid.settings.layout.options.carousel"
+          "label": "tTheme:global.widgets.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:profile_grid.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:profile_grid.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:profile_grid.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -80,7 +80,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:profile_grid.blocks.profile.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "image",

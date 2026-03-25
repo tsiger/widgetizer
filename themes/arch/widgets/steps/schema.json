@@ -12,37 +12,37 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:steps.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:steps.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "How It Works"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:steps.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:steps.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:steps.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:steps.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:steps.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }

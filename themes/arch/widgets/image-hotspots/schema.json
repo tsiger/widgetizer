@@ -11,23 +11,23 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:image_hotspots.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:image_hotspots.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Interactive Image"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:image_hotspots.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "content_header",
-      "label": "tTheme:image_hotspots.settings.content_header.label"
+      "label": "tTheme:global.widgets.settings.content_header.label"
     },
     {
       "type": "image",
@@ -43,21 +43,21 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:image_hotspots.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:image_hotspots.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:image_hotspots.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:image_hotspots.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -70,7 +70,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:image_hotspots.blocks.hotspot.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "text",

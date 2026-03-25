@@ -11,53 +11,53 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:image_tabs.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:image_tabs.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Our Features"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:image_tabs.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:image_tabs.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "image_position",
-      "label": "tTheme:image_tabs.settings.image_position.label",
+      "label": "tTheme:global.widgets.settings.image_position.label",
       "default": "left",
       "options": [
         {
           "value": "left",
-          "label": "tTheme:image_tabs.settings.image_position.options.left"
+          "label": "tTheme:global.widgets.settings.image_position.options.left"
         },
         {
           "value": "right",
-          "label": "tTheme:image_tabs.settings.image_position.options.right"
+          "label": "tTheme:global.widgets.settings.image_position.options.right"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:image_tabs.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:image_tabs.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:image_tabs.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -70,7 +70,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:image_tabs.blocks.tab.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "text",

@@ -11,45 +11,45 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:pricing.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:pricing.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Pricing Plans"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:pricing.settings.description.label",
+      "label": "tTheme:global.widgets.settings.description.label",
       "default": "Choose the plan that fits your needs."
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:pricing.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "tTheme:pricing.settings.layout.label",
+      "label": "tTheme:global.widgets.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "tTheme:pricing.settings.layout.options.grid"
+          "label": "tTheme:global.widgets.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "tTheme:pricing.settings.layout.options.carousel"
+          "label": "tTheme:global.widgets.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "tTheme:pricing.settings.columns_desktop.label",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "default": 3,
       "min": 2,
       "max": 5,
@@ -58,16 +58,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:pricing.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:pricing.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:pricing.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -80,7 +80,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:pricing.blocks.plan.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "text",
@@ -120,7 +120,7 @@
         {
           "type": "header",
           "id": "options_header",
-          "label": "tTheme:pricing.blocks.plan.settings.options_header.label"
+          "label": "tTheme:global.widgets.settings.options_header.label"
         },
         {
           "type": "checkbox",

@@ -11,7 +11,7 @@
     {
       "type": "header",
       "id": "content_header",
-      "label": "tTheme:image_text.settings.content_header.label"
+      "label": "tTheme:global.widgets.settings.content_header.label"
     },
     {
       "type": "image",
@@ -21,21 +21,21 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:image_text.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "image_position",
-      "label": "tTheme:image_text.settings.image_position.label",
+      "label": "tTheme:global.widgets.settings.image_position.label",
       "default": "left",
       "options": [
         {
           "value": "left",
-          "label": "tTheme:image_text.settings.image_position.options.left"
+          "label": "tTheme:global.widgets.settings.image_position.options.left"
         },
         {
           "value": "right",
-          "label": "tTheme:image_text.settings.image_position.options.right"
+          "label": "tTheme:global.widgets.settings.image_position.options.right"
         }
       ]
     },
@@ -47,31 +47,31 @@
       "options": [
         {
           "value": "flex-start",
-          "label": "tTheme:image_text.settings.text_position.options.top"
+          "label": "tTheme:global.widgets.settings.options.top"
         },
         {
           "value": "center",
-          "label": "tTheme:image_text.settings.text_position.options.center"
+          "label": "tTheme:global.widgets.settings.options.center"
         },
         {
           "value": "flex-end",
-          "label": "tTheme:image_text.settings.text_position.options.bottom"
+          "label": "tTheme:global.widgets.settings.options.bottom"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:image_text.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:image_text.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:image_text.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     },
@@ -99,24 +99,24 @@
   "blocks": [
     {
       "type": "rating",
-      "displayName": "tTheme:image_text.blocks.rating.name",
+      "displayName": "tTheme:global.widgets.blocks.rating.name",
       "settings": [
         {
           "type": "select",
           "id": "rating",
-          "label": "tTheme:image_text.blocks.rating.settings.rating.label",
+          "label": "tTheme:global.widgets.blocks.rating.settings.rating.label",
           "options": [
             {
               "value": "5",
-              "label": "tTheme:image_text.blocks.rating.settings.rating.options.5"
+              "label": "tTheme:global.widgets.blocks.rating.settings.rating.options.5"
             },
             {
               "value": "4",
-              "label": "tTheme:image_text.blocks.rating.settings.rating.options.4"
+              "label": "tTheme:global.widgets.blocks.rating.settings.rating.options.4"
             },
             {
               "value": "3",
-              "label": "tTheme:image_text.blocks.rating.settings.rating.options.3"
+              "label": "tTheme:global.widgets.blocks.rating.settings.rating.options.3"
             }
           ],
           "default": "5"
@@ -125,17 +125,17 @@
     },
     {
       "type": "image",
-      "displayName": "tTheme:image_text.blocks.image.name",
+      "displayName": "tTheme:global.widgets.blocks.image.name",
       "settings": [
         {
           "type": "image",
           "id": "image",
-          "label": "tTheme:image_text.blocks.image.settings.image.label"
+          "label": "tTheme:global.widgets.blocks.image.settings.image.label"
         },
         {
           "type": "range",
           "id": "width",
-          "label": "tTheme:image_text.blocks.image.settings.width.label",
+          "label": "tTheme:global.widgets.blocks.image.settings.width.label",
           "default": 20,
           "min": 5,
           "max": 100,
@@ -145,59 +145,59 @@
     },
     {
       "type": "heading",
-      "displayName": "tTheme:image_text.blocks.heading.name",
+      "displayName": "tTheme:global.widgets.blocks.heading.name",
       "settings": [
         {
           "type": "text",
           "id": "text",
-          "label": "tTheme:image_text.blocks.heading.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.heading.settings.text.label",
           "default": "Built for Modern Teams"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:image_text.blocks.heading.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.heading.settings.size.label",
           "default": "2xl",
           "options": [
             {
               "value": "lg",
-              "label": "tTheme:image_text.blocks.heading.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.lg"
             },
             {
               "value": "xl",
-              "label": "tTheme:image_text.blocks.heading.settings.size.options.xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.xl"
             },
             {
               "value": "2xl",
-              "label": "tTheme:image_text.blocks.heading.settings.size.options.2xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.2xl"
             },
             {
               "value": "3xl",
-              "label": "tTheme:image_text.blocks.heading.settings.size.options.3xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.3xl"
             },
             {
               "value": "4xl",
-              "label": "tTheme:image_text.blocks.heading.settings.size.options.4xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.4xl"
             },
             {
               "value": "5xl",
-              "label": "tTheme:image_text.blocks.heading.settings.size.options.5xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.5xl"
             },
             {
               "value": "6xl",
-              "label": "tTheme:image_text.blocks.heading.settings.size.options.6xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.6xl"
             },
             {
               "value": "7xl",
-              "label": "tTheme:image_text.blocks.heading.settings.size.options.7xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.7xl"
             },
             {
               "value": "8xl",
-              "label": "tTheme:image_text.blocks.heading.settings.size.options.8xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.8xl"
             },
             {
               "value": "9xl",
-              "label": "tTheme:image_text.blocks.heading.settings.size.options.9xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.9xl"
             }
           ]
         }
@@ -205,132 +205,132 @@
     },
     {
       "type": "text",
-      "displayName": "tTheme:image_text.blocks.text.name",
+      "displayName": "tTheme:global.widgets.blocks.text.name",
       "settings": [
         {
           "type": "richtext",
           "id": "text",
-          "label": "tTheme:image_text.blocks.text.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.text.label",
           "default": "<p>A paragraph of descriptive text goes here.</p>"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:image_text.blocks.text.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.size.label",
           "default": "base",
           "options": [
             {
               "value": "sm",
-              "label": "tTheme:image_text.blocks.text.settings.size.options.sm"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.sm"
             },
             {
               "value": "base",
-              "label": "tTheme:image_text.blocks.text.settings.size.options.base"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.base"
             },
             {
               "value": "lg",
-              "label": "tTheme:image_text.blocks.text.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.lg"
             }
           ]
         },
         {
           "type": "checkbox",
           "id": "uppercase",
-          "label": "tTheme:image_text.blocks.text.settings.uppercase.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.uppercase.label",
           "default": false
         },
         {
           "type": "checkbox",
           "id": "muted",
-          "label": "tTheme:image_text.blocks.text.settings.muted.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.muted.label",
           "default": false
         }
       ]
     },
     {
       "type": "features",
-      "displayName": "tTheme:image_text.blocks.features.name",
+      "displayName": "tTheme:global.widgets.blocks.features.name",
       "settings": [
         {
           "type": "textarea",
           "id": "features",
-          "label": "tTheme:image_text.blocks.features.settings.features.label",
-          "description": "tTheme:image_text.blocks.features.settings.features.description",
+          "label": "tTheme:global.widgets.blocks.features.settings.features.label",
+          "description": "tTheme:global.widgets.blocks.features.settings.features.description",
           "default": "+ Feature 1\n+ Feature 2\n+ Feature 3"
         }
       ]
     },
     {
       "type": "icon",
-      "displayName": "tTheme:image_text.blocks.icon.name",
+      "displayName": "tTheme:global.widgets.blocks.icon.name",
       "settings": [
         {
           "type": "icon",
           "id": "icon",
-          "label": "tTheme:image_text.blocks.icon.settings.icon.label",
+          "label": "tTheme:global.widgets.blocks.icon.settings.icon.label",
           "default": "star"
         },
         {
           "type": "select",
           "id": "style",
-          "label": "tTheme:image_text.blocks.icon.settings.style.label",
+          "label": "tTheme:global.widgets.blocks.icon.settings.style.label",
           "default": "plain",
           "options": [
             {
               "value": "plain",
-              "label": "tTheme:image_text.blocks.icon.settings.style.options.plain"
+              "label": "tTheme:global.widgets.blocks.icon.settings.style.options.plain"
             },
             {
               "value": "outline",
-              "label": "tTheme:image_text.blocks.icon.settings.style.options.outline"
+              "label": "tTheme:global.widgets.blocks.icon.settings.style.options.outline"
             },
             {
               "value": "filled",
-              "label": "tTheme:image_text.blocks.icon.settings.style.options.filled"
+              "label": "tTheme:global.widgets.blocks.icon.settings.style.options.filled"
             }
           ]
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:image_text.blocks.icon.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.icon.settings.size.label",
           "default": "md",
           "options": [
             {
               "value": "sm",
-              "label": "tTheme:image_text.blocks.icon.settings.size.options.sm"
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.sm"
             },
             {
               "value": "md",
-              "label": "tTheme:image_text.blocks.icon.settings.size.options.md"
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.md"
             },
             {
               "value": "lg",
-              "label": "tTheme:image_text.blocks.icon.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.lg"
             },
             {
               "value": "xl",
-              "label": "tTheme:image_text.blocks.icon.settings.size.options.xl"
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.xl"
             }
           ]
         },
         {
           "type": "select",
           "id": "shape",
-          "label": "tTheme:image_text.blocks.icon.settings.shape.label",
+          "label": "tTheme:global.widgets.blocks.icon.settings.shape.label",
           "default": "circle",
           "options": [
             {
               "value": "sharp",
-              "label": "tTheme:image_text.blocks.icon.settings.shape.options.sharp"
+              "label": "tTheme:global.widgets.blocks.icon.settings.shape.options.sharp"
             },
             {
               "value": "rounded",
-              "label": "tTheme:image_text.blocks.icon.settings.shape.options.rounded"
+              "label": "tTheme:global.widgets.blocks.icon.settings.shape.options.rounded"
             },
             {
               "value": "circle",
-              "label": "tTheme:image_text.blocks.icon.settings.shape.options.circle"
+              "label": "tTheme:global.widgets.blocks.icon.settings.shape.options.circle"
             }
           ]
         }
@@ -338,61 +338,61 @@
     },
     {
       "type": "numbered-item",
-      "displayName": "tTheme:image_text.blocks.numbered_item.name",
+      "displayName": "tTheme:global.widgets.blocks.numbered_item.name",
       "settings": [
         {
           "type": "text",
           "id": "title",
-          "label": "tTheme:image_text.blocks.numbered_item.settings.title.label",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.title.label",
           "default": "Feature Title"
         },
         {
           "type": "text",
           "id": "description",
-          "label": "tTheme:image_text.blocks.numbered_item.settings.description.label",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.description.label",
           "default": "A short description of this feature."
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:image_text.blocks.numbered_item.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.label",
           "default": "medium",
           "options": [
             {
               "value": "small",
-              "label": "tTheme:image_text.blocks.numbered_item.settings.size.options.small"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.small"
             },
             {
               "value": "medium",
-              "label": "tTheme:image_text.blocks.numbered_item.settings.size.options.medium"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.medium"
             },
             {
               "value": "large",
-              "label": "tTheme:image_text.blocks.numbered_item.settings.size.options.large"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.large"
             },
             {
               "value": "xlarge",
-              "label": "tTheme:image_text.blocks.numbered_item.settings.size.options.xlarge"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.xlarge"
             }
           ]
         },
         {
           "type": "select",
           "id": "shape",
-          "label": "tTheme:image_text.blocks.numbered_item.settings.shape.label",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.label",
           "default": "circle",
           "options": [
             {
               "value": "sharp",
-              "label": "tTheme:image_text.blocks.numbered_item.settings.shape.options.sharp"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.options.sharp"
             },
             {
               "value": "rounded",
-              "label": "tTheme:image_text.blocks.numbered_item.settings.shape.options.rounded"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.options.rounded"
             },
             {
               "value": "circle",
-              "label": "tTheme:image_text.blocks.numbered_item.settings.shape.options.circle"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.options.circle"
             }
           ]
         }
@@ -400,12 +400,12 @@
     },
     {
       "type": "button",
-      "displayName": "tTheme:image_text.blocks.button.name",
+      "displayName": "tTheme:global.widgets.blocks.button.name",
       "settings": [
         {
           "type": "link",
           "id": "link",
-          "label": "tTheme:image_text.blocks.button.settings.link.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.link.label",
           "default": {
             "text": "Learn More",
             "href": "#",
@@ -415,61 +415,61 @@
         {
           "type": "select",
           "id": "style",
-          "label": "tTheme:image_text.blocks.button.settings.style.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.style.label",
           "default": "secondary",
           "options": [
             {
               "value": "primary",
-              "label": "tTheme:image_text.blocks.button.settings.style.options.primary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style.options.primary"
             },
             {
               "value": "secondary",
-              "label": "tTheme:image_text.blocks.button.settings.style.options.secondary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style.options.secondary"
             }
           ]
         },
         {
           "type": "link",
           "id": "link_2",
-          "label": "tTheme:image_text.blocks.button.settings.link_2.label"
+          "label": "tTheme:global.widgets.blocks.button.settings.link_2.label"
         },
         {
           "type": "select",
           "id": "style_2",
-          "label": "tTheme:image_text.blocks.button.settings.style_2.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.style_2.label",
           "default": "secondary",
           "options": [
             {
               "value": "primary",
-              "label": "tTheme:image_text.blocks.button.settings.style_2.options.primary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style_2.options.primary"
             },
             {
               "value": "secondary",
-              "label": "tTheme:image_text.blocks.button.settings.style_2.options.secondary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style_2.options.secondary"
             }
           ]
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:image_text.blocks.button.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.size.label",
           "default": "medium",
           "options": [
             {
               "value": "small",
-              "label": "tTheme:image_text.blocks.button.settings.size.options.small"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.small"
             },
             {
               "value": "medium",
-              "label": "tTheme:image_text.blocks.button.settings.size.options.medium"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.medium"
             },
             {
               "value": "large",
-              "label": "tTheme:image_text.blocks.button.settings.size.options.large"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.large"
             },
             {
               "value": "xlarge",
-              "label": "tTheme:image_text.blocks.button.settings.size.options.xlarge"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.xlarge"
             }
           ]
         }

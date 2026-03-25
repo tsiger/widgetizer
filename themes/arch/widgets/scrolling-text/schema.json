@@ -12,7 +12,7 @@
     {
       "type": "header",
       "id": "content_header",
-      "label": "tTheme:scrolling_text.settings.content_header.label"
+      "label": "tTheme:global.widgets.settings.content_header.label"
     },
     {
       "type": "text",
@@ -29,7 +29,7 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:scrolling_text.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "range",

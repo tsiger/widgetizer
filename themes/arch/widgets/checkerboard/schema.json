@@ -11,28 +11,28 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:checkerboard.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:checkerboard.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "What We Do"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:checkerboard.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:checkerboard.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "tTheme:checkerboard.settings.columns_desktop.label",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "min": 2,
       "max": 4,
       "step": 1,
@@ -41,16 +41,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:checkerboard.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:checkerboard.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:checkerboard.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }

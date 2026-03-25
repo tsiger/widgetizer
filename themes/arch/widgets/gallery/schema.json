@@ -11,44 +11,44 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:gallery.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:gallery.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Project Gallery"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:gallery.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:gallery.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "tTheme:gallery.settings.layout.label",
+      "label": "tTheme:global.widgets.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "tTheme:gallery.settings.layout.options.grid"
+          "label": "tTheme:global.widgets.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "tTheme:gallery.settings.layout.options.carousel"
+          "label": "tTheme:global.widgets.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "tTheme:gallery.settings.columns_desktop.label",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "default": 4,
       "min": 2,
       "max": 5,
@@ -63,52 +63,52 @@
     {
       "type": "select",
       "id": "aspect_ratio",
-      "label": "tTheme:gallery.settings.aspect_ratio.label",
+      "label": "tTheme:global.widgets.settings.aspect_ratio.label",
       "default": "4 / 3",
       "options": [
         {
           "value": "auto",
-          "label": "tTheme:gallery.settings.aspect_ratio.options.auto"
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.auto"
         },
         {
           "value": "contain",
-          "label": "tTheme:gallery.settings.aspect_ratio.options.contain"
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.contain"
         },
         {
           "value": "1 / 1",
-          "label": "tTheme:gallery.settings.aspect_ratio.options.1 / 1"
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.1 / 1"
         },
         {
           "value": "4 / 3",
-          "label": "tTheme:gallery.settings.aspect_ratio.options.4 / 3"
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.4 / 3"
         },
         {
           "value": "3 / 2",
-          "label": "tTheme:gallery.settings.aspect_ratio.options.3 / 2"
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.3 / 2"
         },
         {
           "value": "3 / 4",
-          "label": "tTheme:gallery.settings.aspect_ratio.options.3 / 4"
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.3 / 4"
         },
         {
           "value": "16 / 9",
-          "label": "tTheme:gallery.settings.aspect_ratio.options.16 / 9"
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.16 / 9"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:gallery.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:gallery.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:gallery.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -121,7 +121,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:gallery.blocks.image.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "image",

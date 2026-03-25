@@ -11,7 +11,7 @@
     {
       "type": "header",
       "id": "content_header",
-      "label": "tTheme:image.settings.content_header.label"
+      "label": "tTheme:global.widgets.settings.content_header.label"
     },
     {
       "type": "image",
@@ -28,12 +28,12 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:image.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "checkbox",
       "id": "fullwidth",
-      "label": "tTheme:image.settings.fullwidth.label",
+      "label": "tTheme:global.widgets.settings.fullwidth.label",
       "default": false,
       "description": "tTheme:image.settings.fullwidth.description"
     }

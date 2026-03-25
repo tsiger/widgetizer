@@ -20,15 +20,15 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:banner.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "color",
       "id": "overlay_color",
-      "label": "tTheme:banner.settings.overlay_color.label",
+      "label": "tTheme:global.widgets.settings.overlay_color.label",
       "default": "#0a1e38bf",
       "allow_alpha": true,
-      "description": "tTheme:banner.settings.overlay_color.description"
+      "description": "tTheme:global.widgets.settings.overlay_color.description"
     },
     {
       "type": "select",
@@ -57,38 +57,58 @@
     {
       "type": "checkbox",
       "id": "fullwidth",
-      "label": "tTheme:banner.settings.fullwidth.label",
+      "label": "tTheme:global.widgets.settings.fullwidth.label",
       "default": true
     },
     {
       "type": "select",
       "id": "alignment",
-      "label": "tTheme:banner.settings.alignment.label",
+      "label": "tTheme:global.widgets.settings.alignment.label",
       "default": "center",
       "options": [
         {
           "value": "center",
-          "label": "tTheme:banner.settings.alignment.options.center"
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
         },
         {
           "value": "start",
-          "label": "tTheme:banner.settings.alignment.options.start"
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "tTheme:banner.settings.vertical_alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.options.top"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.options.center"
+        },
+        {
+          "value": "end",
+          "label": "tTheme:global.widgets.settings.options.bottom"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:banner.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "highlight",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:banner.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:banner.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -96,24 +116,24 @@
   "blocks": [
     {
       "type": "rating",
-      "displayName": "tTheme:banner.blocks.rating.name",
+      "displayName": "tTheme:global.widgets.blocks.rating.name",
       "settings": [
         {
           "type": "select",
           "id": "rating",
-          "label": "tTheme:banner.blocks.rating.settings.rating.label",
+          "label": "tTheme:global.widgets.blocks.rating.settings.rating.label",
           "options": [
             {
               "value": "5",
-              "label": "tTheme:banner.blocks.rating.settings.rating.options.5"
+              "label": "tTheme:global.widgets.blocks.rating.settings.rating.options.5"
             },
             {
               "value": "4",
-              "label": "tTheme:banner.blocks.rating.settings.rating.options.4"
+              "label": "tTheme:global.widgets.blocks.rating.settings.rating.options.4"
             },
             {
               "value": "3",
-              "label": "tTheme:banner.blocks.rating.settings.rating.options.3"
+              "label": "tTheme:global.widgets.blocks.rating.settings.rating.options.3"
             }
           ],
           "default": "5"
@@ -122,17 +142,17 @@
     },
     {
       "type": "image",
-      "displayName": "tTheme:banner.blocks.image.name",
+      "displayName": "tTheme:global.widgets.blocks.image.name",
       "settings": [
         {
           "type": "image",
           "id": "image",
-          "label": "tTheme:banner.blocks.image.settings.image.label"
+          "label": "tTheme:global.widgets.blocks.image.settings.image.label"
         },
         {
           "type": "range",
           "id": "width",
-          "label": "tTheme:banner.blocks.image.settings.width.label",
+          "label": "tTheme:global.widgets.blocks.image.settings.width.label",
           "default": 20,
           "min": 5,
           "max": 100,
@@ -142,59 +162,59 @@
     },
     {
       "type": "heading",
-      "displayName": "tTheme:banner.blocks.heading.name",
+      "displayName": "tTheme:global.widgets.blocks.heading.name",
       "settings": [
         {
           "type": "text",
           "id": "text",
-          "label": "tTheme:banner.blocks.heading.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.heading.settings.text.label",
           "default": "Build your future"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:banner.blocks.heading.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.heading.settings.size.label",
           "default": "5xl",
           "options": [
             {
               "value": "lg",
-              "label": "tTheme:banner.blocks.heading.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.lg"
             },
             {
               "value": "xl",
-              "label": "tTheme:banner.blocks.heading.settings.size.options.xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.xl"
             },
             {
               "value": "2xl",
-              "label": "tTheme:banner.blocks.heading.settings.size.options.2xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.2xl"
             },
             {
               "value": "3xl",
-              "label": "tTheme:banner.blocks.heading.settings.size.options.3xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.3xl"
             },
             {
               "value": "4xl",
-              "label": "tTheme:banner.blocks.heading.settings.size.options.4xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.4xl"
             },
             {
               "value": "5xl",
-              "label": "tTheme:banner.blocks.heading.settings.size.options.5xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.5xl"
             },
             {
               "value": "6xl",
-              "label": "tTheme:banner.blocks.heading.settings.size.options.6xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.6xl"
             },
             {
               "value": "7xl",
-              "label": "tTheme:banner.blocks.heading.settings.size.options.7xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.7xl"
             },
             {
               "value": "8xl",
-              "label": "tTheme:banner.blocks.heading.settings.size.options.8xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.8xl"
             },
             {
               "value": "9xl",
-              "label": "tTheme:banner.blocks.heading.settings.size.options.9xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.9xl"
             }
           ]
         }
@@ -202,132 +222,132 @@
     },
     {
       "type": "text",
-      "displayName": "tTheme:banner.blocks.text.name",
+      "displayName": "tTheme:global.widgets.blocks.text.name",
       "settings": [
         {
           "type": "richtext",
           "id": "text",
-          "label": "tTheme:banner.blocks.text.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.text.label",
           "default": "<p>Start your journey with our powerful platform.</p>"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:banner.blocks.text.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.size.label",
           "default": "lg",
           "options": [
             {
               "value": "sm",
-              "label": "tTheme:banner.blocks.text.settings.size.options.sm"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.sm"
             },
             {
               "value": "base",
-              "label": "tTheme:banner.blocks.text.settings.size.options.base"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.base"
             },
             {
               "value": "lg",
-              "label": "tTheme:banner.blocks.text.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.lg"
             }
           ]
         },
         {
           "type": "checkbox",
           "id": "uppercase",
-          "label": "tTheme:banner.blocks.text.settings.uppercase.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.uppercase.label",
           "default": false
         },
         {
           "type": "checkbox",
           "id": "muted",
-          "label": "tTheme:banner.blocks.text.settings.muted.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.muted.label",
           "default": false
         }
       ]
     },
     {
       "type": "features",
-      "displayName": "tTheme:banner.blocks.features.name",
+      "displayName": "tTheme:global.widgets.blocks.features.name",
       "settings": [
         {
           "type": "textarea",
           "id": "features",
-          "label": "tTheme:banner.blocks.features.settings.features.label",
-          "description": "tTheme:banner.blocks.features.settings.features.description",
+          "label": "tTheme:global.widgets.blocks.features.settings.features.label",
+          "description": "tTheme:global.widgets.blocks.features.settings.features.description",
           "default": "+ Feature 1\n+ Feature 2\n+ Feature 3"
         }
       ]
     },
     {
       "type": "icon",
-      "displayName": "tTheme:banner.blocks.icon.name",
+      "displayName": "tTheme:global.widgets.blocks.icon.name",
       "settings": [
         {
           "type": "icon",
           "id": "icon",
-          "label": "tTheme:banner.blocks.icon.settings.icon.label",
+          "label": "tTheme:global.widgets.blocks.icon.settings.icon.label",
           "default": "star"
         },
         {
           "type": "select",
           "id": "style",
-          "label": "tTheme:banner.blocks.icon.settings.style.label",
+          "label": "tTheme:global.widgets.blocks.icon.settings.style.label",
           "default": "plain",
           "options": [
             {
               "value": "plain",
-              "label": "tTheme:banner.blocks.icon.settings.style.options.plain"
+              "label": "tTheme:global.widgets.blocks.icon.settings.style.options.plain"
             },
             {
               "value": "outline",
-              "label": "tTheme:banner.blocks.icon.settings.style.options.outline"
+              "label": "tTheme:global.widgets.blocks.icon.settings.style.options.outline"
             },
             {
               "value": "filled",
-              "label": "tTheme:banner.blocks.icon.settings.style.options.filled"
+              "label": "tTheme:global.widgets.blocks.icon.settings.style.options.filled"
             }
           ]
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:banner.blocks.icon.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.icon.settings.size.label",
           "default": "md",
           "options": [
             {
               "value": "sm",
-              "label": "tTheme:banner.blocks.icon.settings.size.options.sm"
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.sm"
             },
             {
               "value": "md",
-              "label": "tTheme:banner.blocks.icon.settings.size.options.md"
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.md"
             },
             {
               "value": "lg",
-              "label": "tTheme:banner.blocks.icon.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.lg"
             },
             {
               "value": "xl",
-              "label": "tTheme:banner.blocks.icon.settings.size.options.xl"
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.xl"
             }
           ]
         },
         {
           "type": "select",
           "id": "shape",
-          "label": "tTheme:banner.blocks.icon.settings.shape.label",
+          "label": "tTheme:global.widgets.blocks.icon.settings.shape.label",
           "default": "circle",
           "options": [
             {
               "value": "sharp",
-              "label": "tTheme:banner.blocks.icon.settings.shape.options.sharp"
+              "label": "tTheme:global.widgets.blocks.icon.settings.shape.options.sharp"
             },
             {
               "value": "rounded",
-              "label": "tTheme:banner.blocks.icon.settings.shape.options.rounded"
+              "label": "tTheme:global.widgets.blocks.icon.settings.shape.options.rounded"
             },
             {
               "value": "circle",
-              "label": "tTheme:banner.blocks.icon.settings.shape.options.circle"
+              "label": "tTheme:global.widgets.blocks.icon.settings.shape.options.circle"
             }
           ]
         }
@@ -335,61 +355,61 @@
     },
     {
       "type": "numbered-item",
-      "displayName": "tTheme:banner.blocks.numbered_item.name",
+      "displayName": "tTheme:global.widgets.blocks.numbered_item.name",
       "settings": [
         {
           "type": "text",
           "id": "title",
-          "label": "tTheme:banner.blocks.numbered_item.settings.title.label",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.title.label",
           "default": "Feature Title"
         },
         {
           "type": "text",
           "id": "description",
-          "label": "tTheme:banner.blocks.numbered_item.settings.description.label",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.description.label",
           "default": "A short description of this feature."
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:banner.blocks.numbered_item.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.label",
           "default": "medium",
           "options": [
             {
               "value": "small",
-              "label": "tTheme:banner.blocks.numbered_item.settings.size.options.small"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.small"
             },
             {
               "value": "medium",
-              "label": "tTheme:banner.blocks.numbered_item.settings.size.options.medium"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.medium"
             },
             {
               "value": "large",
-              "label": "tTheme:banner.blocks.numbered_item.settings.size.options.large"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.large"
             },
             {
               "value": "xlarge",
-              "label": "tTheme:banner.blocks.numbered_item.settings.size.options.xlarge"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.xlarge"
             }
           ]
         },
         {
           "type": "select",
           "id": "shape",
-          "label": "tTheme:banner.blocks.numbered_item.settings.shape.label",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.label",
           "default": "circle",
           "options": [
             {
               "value": "sharp",
-              "label": "tTheme:banner.blocks.numbered_item.settings.shape.options.sharp"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.options.sharp"
             },
             {
               "value": "rounded",
-              "label": "tTheme:banner.blocks.numbered_item.settings.shape.options.rounded"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.options.rounded"
             },
             {
               "value": "circle",
-              "label": "tTheme:banner.blocks.numbered_item.settings.shape.options.circle"
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.options.circle"
             }
           ]
         }
@@ -397,12 +417,12 @@
     },
     {
       "type": "button",
-      "displayName": "tTheme:banner.blocks.button.name",
+      "displayName": "tTheme:global.widgets.blocks.button.name",
       "settings": [
         {
           "type": "link",
           "id": "link",
-          "label": "tTheme:banner.blocks.button.settings.link.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.link.label",
           "default": {
             "text": "Get Started",
             "href": "#",
@@ -412,61 +432,61 @@
         {
           "type": "select",
           "id": "style",
-          "label": "tTheme:banner.blocks.button.settings.style.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.style.label",
           "default": "primary",
           "options": [
             {
               "value": "primary",
-              "label": "tTheme:banner.blocks.button.settings.style.options.primary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style.options.primary"
             },
             {
               "value": "secondary",
-              "label": "tTheme:banner.blocks.button.settings.style.options.secondary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style.options.secondary"
             }
           ]
         },
         {
           "type": "link",
           "id": "link_2",
-          "label": "tTheme:banner.blocks.button.settings.link_2.label"
+          "label": "tTheme:global.widgets.blocks.button.settings.link_2.label"
         },
         {
           "type": "select",
           "id": "style_2",
-          "label": "tTheme:banner.blocks.button.settings.style_2.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.style_2.label",
           "default": "secondary",
           "options": [
             {
               "value": "primary",
-              "label": "tTheme:banner.blocks.button.settings.style_2.options.primary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style_2.options.primary"
             },
             {
               "value": "secondary",
-              "label": "tTheme:banner.blocks.button.settings.style_2.options.secondary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style_2.options.secondary"
             }
           ]
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:banner.blocks.button.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.size.label",
           "default": "medium",
           "options": [
             {
               "value": "small",
-              "label": "tTheme:banner.blocks.button.settings.size.options.small"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.small"
             },
             {
               "value": "medium",
-              "label": "tTheme:banner.blocks.button.settings.size.options.medium"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.medium"
             },
             {
               "value": "large",
-              "label": "tTheme:banner.blocks.button.settings.size.options.large"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.large"
             },
             {
               "value": "xlarge",
-              "label": "tTheme:banner.blocks.button.settings.size.options.xlarge"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.xlarge"
             }
           ]
         }

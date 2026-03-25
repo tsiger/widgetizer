@@ -12,23 +12,23 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:bento_grid.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:bento_grid.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Feature Spotlight"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:bento_grid.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:bento_grid.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
@@ -61,16 +61,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:bento_grid.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:bento_grid.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:bento_grid.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -83,7 +83,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:bento_grid.blocks.item.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "text",
@@ -134,7 +134,7 @@
         {
           "type": "header",
           "id": "display_header",
-          "label": "tTheme:bento_grid.blocks.item.settings.display_header.label"
+          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "color",
@@ -144,10 +144,10 @@
         {
           "type": "color",
           "id": "overlay_color",
-          "label": "tTheme:bento_grid.blocks.item.settings.overlay_color.label",
+          "label": "tTheme:global.widgets.settings.overlay_color.label",
           "default": "#0a1e38bf",
           "allow_alpha": true,
-          "description": "tTheme:bento_grid.blocks.item.settings.overlay_color.description"
+          "description": "tTheme:global.widgets.settings.overlay_color.description"
         },
         {
           "type": "select",
@@ -173,11 +173,11 @@
           "options": [
             {
               "value": "start",
-              "label": "tTheme:bento_grid.blocks.item.settings.alignment.options.start"
+              "label": "tTheme:global.widgets.settings.options.start"
             },
             {
               "value": "center",
-              "label": "tTheme:bento_grid.blocks.item.settings.alignment.options.center"
+              "label": "tTheme:global.widgets.settings.options.center"
             }
           ]
         }

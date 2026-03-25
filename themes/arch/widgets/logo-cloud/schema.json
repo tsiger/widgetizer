@@ -11,45 +11,45 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:logo_cloud.settings.eyebrow.label",
+      "label": "tTheme:global.widgets.settings.eyebrow.label",
       "default": "Trusted By"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:logo_cloud.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Join 500+ Companies Already Using Our Platform"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:logo_cloud.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:logo_cloud.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "tTheme:logo_cloud.settings.layout.label",
+      "label": "tTheme:global.widgets.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "tTheme:logo_cloud.settings.layout.options.grid"
+          "label": "tTheme:global.widgets.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "tTheme:logo_cloud.settings.layout.options.carousel"
+          "label": "tTheme:global.widgets.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "tTheme:logo_cloud.settings.columns_desktop.label",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "default": 6,
       "min": 2,
       "max": 8,
@@ -58,16 +58,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:logo_cloud.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:logo_cloud.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:logo_cloud.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -80,7 +80,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:logo_cloud.blocks.logo.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "image",

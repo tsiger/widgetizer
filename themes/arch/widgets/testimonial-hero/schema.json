@@ -10,7 +10,7 @@
     {
       "type": "header",
       "id": "content_header",
-      "label": "tTheme:testimonial_hero.settings.content_header.label"
+      "label": "tTheme:global.widgets.settings.content_header.label"
     },
     {
       "type": "image",
@@ -25,37 +25,37 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:testimonial_hero.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "image_position",
-      "label": "tTheme:testimonial_hero.settings.image_position.label",
+      "label": "tTheme:global.widgets.settings.image_position.label",
       "default": "right",
       "options": [
         {
           "value": "left",
-          "label": "tTheme:testimonial_hero.settings.image_position.options.left"
+          "label": "tTheme:global.widgets.settings.image_position.options.left"
         },
         {
           "value": "right",
-          "label": "tTheme:testimonial_hero.settings.image_position.options.right"
+          "label": "tTheme:global.widgets.settings.image_position.options.right"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:testimonial_hero.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:testimonial_hero.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:testimonial_hero.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -63,59 +63,59 @@
   "blocks": [
     {
       "type": "heading",
-      "displayName": "tTheme:testimonial_hero.blocks.heading.name",
+      "displayName": "tTheme:global.widgets.blocks.heading.name",
       "settings": [
         {
           "type": "text",
           "id": "text",
-          "label": "tTheme:testimonial_hero.blocks.heading.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.heading.settings.text.label",
           "default": "Megan Taylor"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:testimonial_hero.blocks.heading.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.heading.settings.size.label",
           "default": "lg",
           "options": [
             {
               "value": "lg",
-              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.lg"
             },
             {
               "value": "xl",
-              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.xl"
             },
             {
               "value": "2xl",
-              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.2xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.2xl"
             },
             {
               "value": "3xl",
-              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.3xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.3xl"
             },
             {
               "value": "4xl",
-              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.4xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.4xl"
             },
             {
               "value": "5xl",
-              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.5xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.5xl"
             },
             {
               "value": "6xl",
-              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.6xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.6xl"
             },
             {
               "value": "7xl",
-              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.7xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.7xl"
             },
             {
               "value": "8xl",
-              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.8xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.8xl"
             },
             {
               "value": "9xl",
-              "label": "tTheme:testimonial_hero.blocks.heading.settings.size.options.9xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.9xl"
             }
           ]
         }
@@ -123,44 +123,44 @@
     },
     {
       "type": "text",
-      "displayName": "tTheme:testimonial_hero.blocks.text.name",
+      "displayName": "tTheme:global.widgets.blocks.text.name",
       "settings": [
         {
           "type": "richtext",
           "id": "text",
-          "label": "tTheme:testimonial_hero.blocks.text.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.text.label",
           "default": "<p>They took our ideas and turned them into visuals and content that really connected with our audience. The results exceeded our expectations!</p>"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:testimonial_hero.blocks.text.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.size.label",
           "default": "lg",
           "options": [
             {
               "value": "sm",
-              "label": "tTheme:testimonial_hero.blocks.text.settings.size.options.sm"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.sm"
             },
             {
               "value": "base",
-              "label": "tTheme:testimonial_hero.blocks.text.settings.size.options.base"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.base"
             },
             {
               "value": "lg",
-              "label": "tTheme:testimonial_hero.blocks.text.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.lg"
             }
           ]
         },
         {
           "type": "checkbox",
           "id": "uppercase",
-          "label": "tTheme:testimonial_hero.blocks.text.settings.uppercase.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.uppercase.label",
           "default": false
         },
         {
           "type": "checkbox",
           "id": "muted",
-          "label": "tTheme:testimonial_hero.blocks.text.settings.muted.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.muted.label",
           "default": false
         }
       ]

@@ -11,23 +11,23 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:countdown.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:countdown.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Coming Soon"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:countdown.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "content_header",
-      "label": "tTheme:countdown.settings.content_header.label"
+      "label": "tTheme:global.widgets.settings.content_header.label"
     },
     {
       "type": "text",
@@ -49,7 +49,7 @@
     {
       "type": "header",
       "id": "options_header",
-      "label": "tTheme:countdown.settings.options_header.label"
+      "label": "tTheme:global.widgets.settings.options_header.label"
     },
     {
       "type": "checkbox",
@@ -60,7 +60,7 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:countdown.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
@@ -81,16 +81,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:countdown.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:countdown.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:countdown.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }

@@ -11,28 +11,28 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:numbered_cards.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:numbered_cards.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Our Process"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:numbered_cards.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:numbered_cards.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "tTheme:numbered_cards.settings.columns_desktop.label",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "default": 4,
       "min": 2,
       "max": 5,
@@ -41,32 +41,32 @@
     {
       "type": "select",
       "id": "layout",
-      "label": "tTheme:numbered_cards.settings.layout.label",
+      "label": "tTheme:global.widgets.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "tTheme:numbered_cards.settings.layout.options.grid"
+          "label": "tTheme:global.widgets.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "tTheme:numbered_cards.settings.layout.options.carousel"
+          "label": "tTheme:global.widgets.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:numbered_cards.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:numbered_cards.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:numbered_cards.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -79,7 +79,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:numbered_cards.blocks.step.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "text",

@@ -11,78 +11,78 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:video_embed.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:video_embed.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Watch the Video"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:video_embed.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "content_header",
-      "label": "tTheme:video_embed.settings.content_header.label"
+      "label": "tTheme:global.widgets.settings.content_header.label"
     },
     {
       "type": "text",
       "id": "video_url",
-      "label": "tTheme:video_embed.settings.video_url.label",
+      "label": "tTheme:global.widgets.settings.video_url.label",
       "default": "https://www.youtube.com/watch?v=2PuFyjAs7JA"
     },
     {
       "type": "text",
       "id": "video_title",
-      "label": "tTheme:video_embed.settings.video_title.label",
+      "label": "tTheme:global.widgets.settings.video_title.label",
       "default": "Video"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:video_embed.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "aspect_ratio",
-      "label": "tTheme:video_embed.settings.aspect_ratio.label",
-      "default": "16:9",
+      "label": "tTheme:global.widgets.settings.aspect_ratio.label",
+      "default": "16 / 9",
       "options": [
         {
-          "value": "16:9",
-          "label": "tTheme:video_embed.settings.aspect_ratio.options.16:9"
+          "value": "16 / 9",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.16 / 9"
         },
         {
-          "value": "4:3",
-          "label": "tTheme:video_embed.settings.aspect_ratio.options.4:3"
+          "value": "4 / 3",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.4 / 3"
         },
         {
           "value": "21:9",
-          "label": "tTheme:video_embed.settings.aspect_ratio.options.21:9"
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.21:9"
         },
         {
-          "value": "1:1",
-          "label": "tTheme:video_embed.settings.aspect_ratio.options.1:1"
+          "value": "1 / 1",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.1 / 1"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:video_embed.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:video_embed.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:video_embed.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }

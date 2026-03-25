@@ -28,7 +28,13 @@
 
       @media (min-width: 750px) {
         & .split-content-grid {
+          {% if widget.settings.balance == 'left-heavy' %}
+          grid-template-columns: 7fr 3fr;
+          {% elsif widget.settings.balance == 'right-heavy' %}
+          grid-template-columns: 3fr 7fr;
+          {% else %}
           grid-template-columns: 1fr 1fr;
+          {% endif %}
           gap: var(--space-3xl);
           align-items: start;
         }

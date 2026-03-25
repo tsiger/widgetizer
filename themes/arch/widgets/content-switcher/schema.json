@@ -11,19 +11,19 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:content_switcher.settings.eyebrow.label",
+      "label": "tTheme:global.widgets.settings.eyebrow.label",
       "default": "Pricing"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:content_switcher.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Choose Your Plan"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:content_switcher.settings.description.label",
+      "label": "tTheme:global.widgets.settings.description.label",
       "default": "Select the billing cycle that works best for you. All plans include our core features."
     },
     {
@@ -50,7 +50,7 @@
     {
       "type": "header",
       "id": "labels_header",
-      "label": "tTheme:content_switcher.settings.labels_header.label"
+      "label": "tTheme:global.widgets.settings.labels_header.label"
     },
     {
       "type": "text",
@@ -73,7 +73,7 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:content_switcher.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "range",
@@ -87,16 +87,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:content_switcher.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:content_switcher.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:content_switcher.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -109,7 +109,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:content_switcher.blocks.item.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "text",

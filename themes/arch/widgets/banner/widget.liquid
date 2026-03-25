@@ -18,7 +18,9 @@
     .widget-{{ widget.id }} {
       /* Reset default widget spacing for full-bleed layouts */
       margin-block: 0;
-      padding-inline: 0;
+      padding-inline: var(--space-xl);
+      display: flex;
+      flex-direction: column;
 
       {% unless widget.settings.fullwidth %}
       max-width: var(--container-max-width);
@@ -29,8 +31,15 @@
 
     }
 
-    @media (max-width: 749px) {
-      .widget-{{ widget.id }} .widget-container {
+    .widget-{{ widget.id }} .widget-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: {{ widget.settings.vertical_alignment }};
+      flex: 1;
+    }
+
+@media (max-width: 749px) {
+      .widget-{{ widget.id }} {
         padding-inline: var(--space-md);
       }
     }

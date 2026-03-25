@@ -11,25 +11,25 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:accordion.settings.eyebrow.label",
+      "label": "tTheme:global.widgets.settings.eyebrow.label",
       "default": "Support"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:accordion.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "Frequently Asked Questions"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:accordion.settings.description.label",
+      "label": "tTheme:global.widgets.settings.description.label",
       "default": "Everything you need to know about the product and billing."
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:accordion.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
@@ -61,27 +61,27 @@
       "options": [
         {
           "value": "left",
-          "label": "tTheme:accordion.settings.sidebar_position.options.left"
+          "label": "tTheme:global.widgets.settings.options.left"
         },
         {
           "value": "right",
-          "label": "tTheme:accordion.settings.sidebar_position.options.right"
+          "label": "tTheme:global.widgets.settings.options.right"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:accordion.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:accordion.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:accordion.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }

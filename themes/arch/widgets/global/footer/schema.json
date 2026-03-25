@@ -6,7 +6,7 @@
     {
       "type": "header",
       "id": "content_header",
-      "label": "tTheme:footer.settings.content_header.label"
+      "label": "tTheme:global.widgets.settings.content_header.label"
     },
     {
       "type": "textarea",
@@ -17,21 +17,21 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:footer.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:footer.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "highlight",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:footer.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:footer.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -72,49 +72,49 @@
     },
     {
       "type": "text_block",
-      "displayName": "tTheme:footer.blocks.text_block.name",
+      "displayName": "tTheme:global.widgets.blocks.text_block.name",
       "settings": [
         {
           "type": "text",
           "id": "title",
-          "label": "tTheme:footer.blocks.text_block.settings.title.label",
+          "label": "tTheme:global.widgets.blocks.text_block.settings.title.label",
           "default": "Contact"
         },
         {
           "type": "richtext",
           "id": "text",
-          "label": "tTheme:footer.blocks.text_block.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.text_block.settings.text.label",
           "default": "<p>info@example.com</p><p>123 Main Street,<br>City, State 12345</p>"
         }
       ]
     },
     {
       "type": "menu_block",
-      "displayName": "tTheme:footer.blocks.menu_block.name",
+      "displayName": "tTheme:global.widgets.blocks.menu_block.name",
       "settings": [
         {
           "type": "text",
           "id": "title",
-          "label": "tTheme:footer.blocks.menu_block.settings.title.label",
+          "label": "tTheme:global.widgets.blocks.menu_block.settings.title.label",
           "default": "Links"
         },
         {
           "type": "menu",
           "id": "menu",
-          "label": "tTheme:footer.blocks.menu_block.settings.menu.label",
-          "description": "tTheme:footer.blocks.menu_block.settings.menu.description",
+          "label": "tTheme:global.widgets.blocks.menu_block.settings.menu.label",
+          "description": "tTheme:global.widgets.blocks.menu_block.settings.menu.description",
           "default": "footer-menu"
         }
       ]
     },
     {
       "type": "social_block",
-      "displayName": "tTheme:footer.blocks.social_block.name",
+      "displayName": "tTheme:global.widgets.blocks.social_block.name",
       "settings": [
         {
           "type": "text",
           "id": "title",
-          "label": "tTheme:footer.blocks.social_block.settings.title.label",
+          "label": "tTheme:global.widgets.blocks.social_block.settings.title.label",
           "default": "Get in Touch"
         }
       ]

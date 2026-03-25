@@ -7,87 +7,87 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:action_bar.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:action_bar.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "highlight",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:action_bar.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:action_bar.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     },
     {
       "type": "checkbox",
       "id": "fullwidth",
-      "label": "tTheme:action_bar.settings.fullwidth.label",
+      "label": "tTheme:global.widgets.settings.fullwidth.label",
       "default": true
     }
   ],
   "blocks": [
     {
       "type": "heading",
-      "displayName": "tTheme:action_bar.blocks.heading.name",
+      "displayName": "tTheme:global.widgets.blocks.heading.name",
       "settings": [
         {
           "type": "text",
           "id": "text",
-          "label": "tTheme:action_bar.blocks.heading.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.heading.settings.text.label",
           "default": "Ready to get started?"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:action_bar.blocks.heading.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.heading.settings.size.label",
           "default": "2xl",
           "options": [
             {
               "value": "lg",
-              "label": "tTheme:action_bar.blocks.heading.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.lg"
             },
             {
               "value": "xl",
-              "label": "tTheme:action_bar.blocks.heading.settings.size.options.xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.xl"
             },
             {
               "value": "2xl",
-              "label": "tTheme:action_bar.blocks.heading.settings.size.options.2xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.2xl"
             },
             {
               "value": "3xl",
-              "label": "tTheme:action_bar.blocks.heading.settings.size.options.3xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.3xl"
             },
             {
               "value": "4xl",
-              "label": "tTheme:action_bar.blocks.heading.settings.size.options.4xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.4xl"
             },
             {
               "value": "5xl",
-              "label": "tTheme:action_bar.blocks.heading.settings.size.options.5xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.5xl"
             },
             {
               "value": "6xl",
-              "label": "tTheme:action_bar.blocks.heading.settings.size.options.6xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.6xl"
             },
             {
               "value": "7xl",
-              "label": "tTheme:action_bar.blocks.heading.settings.size.options.7xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.7xl"
             },
             {
               "value": "8xl",
-              "label": "tTheme:action_bar.blocks.heading.settings.size.options.8xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.8xl"
             },
             {
               "value": "9xl",
-              "label": "tTheme:action_bar.blocks.heading.settings.size.options.9xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.9xl"
             }
           ]
         }
@@ -95,56 +95,56 @@
     },
     {
       "type": "text",
-      "displayName": "tTheme:action_bar.blocks.text.name",
+      "displayName": "tTheme:global.widgets.blocks.text.name",
       "settings": [
         {
           "type": "richtext",
           "id": "text",
-          "label": "tTheme:action_bar.blocks.text.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.text.label",
           "default": "<p>Get in touch with our team today.</p>"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:action_bar.blocks.text.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.size.label",
           "default": "base",
           "options": [
             {
               "value": "sm",
-              "label": "tTheme:action_bar.blocks.text.settings.size.options.sm"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.sm"
             },
             {
               "value": "base",
-              "label": "tTheme:action_bar.blocks.text.settings.size.options.base"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.base"
             },
             {
               "value": "lg",
-              "label": "tTheme:action_bar.blocks.text.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.lg"
             }
           ]
         },
         {
           "type": "checkbox",
           "id": "uppercase",
-          "label": "tTheme:action_bar.blocks.text.settings.uppercase.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.uppercase.label",
           "default": false
         },
         {
           "type": "checkbox",
           "id": "muted",
-          "label": "tTheme:action_bar.blocks.text.settings.muted.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.muted.label",
           "default": true
         }
       ]
     },
     {
       "type": "button",
-      "displayName": "tTheme:action_bar.blocks.button.name",
+      "displayName": "tTheme:global.widgets.blocks.button.name",
       "settings": [
         {
           "type": "link",
           "id": "link",
-          "label": "tTheme:action_bar.blocks.button.settings.link.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.link.label",
           "default": {
             "text": "Book An Appointment",
             "href": "contact.html",
@@ -154,61 +154,61 @@
         {
           "type": "select",
           "id": "style",
-          "label": "tTheme:action_bar.blocks.button.settings.style.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.style.label",
           "default": "primary",
           "options": [
             {
               "value": "primary",
-              "label": "tTheme:action_bar.blocks.button.settings.style.options.primary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style.options.primary"
             },
             {
               "value": "secondary",
-              "label": "tTheme:action_bar.blocks.button.settings.style.options.secondary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style.options.secondary"
             }
           ]
         },
         {
           "type": "link",
           "id": "link_2",
-          "label": "tTheme:action_bar.blocks.button.settings.link_2.label"
+          "label": "tTheme:global.widgets.blocks.button.settings.link_2.label"
         },
         {
           "type": "select",
           "id": "style_2",
-          "label": "tTheme:action_bar.blocks.button.settings.style_2.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.style_2.label",
           "default": "secondary",
           "options": [
             {
               "value": "primary",
-              "label": "tTheme:action_bar.blocks.button.settings.style_2.options.primary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style_2.options.primary"
             },
             {
               "value": "secondary",
-              "label": "tTheme:action_bar.blocks.button.settings.style_2.options.secondary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style_2.options.secondary"
             }
           ]
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:action_bar.blocks.button.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.size.label",
           "default": "medium",
           "options": [
             {
               "value": "small",
-              "label": "tTheme:action_bar.blocks.button.settings.size.options.small"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.small"
             },
             {
               "value": "medium",
-              "label": "tTheme:action_bar.blocks.button.settings.size.options.medium"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.medium"
             },
             {
               "value": "large",
-              "label": "tTheme:action_bar.blocks.button.settings.size.options.large"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.large"
             },
             {
               "value": "xlarge",
-              "label": "tTheme:action_bar.blocks.button.settings.size.options.xlarge"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.xlarge"
             }
           ]
         }

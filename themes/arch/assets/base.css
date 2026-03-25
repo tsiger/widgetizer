@@ -109,10 +109,10 @@ img {
   --font-size-3xl: 2.8rem; /* 28px */
   --font-size-4xl: 3.2rem; /* 32px */
   --font-size-5xl: 3.6rem; /* 36px */
-  --font-size-6xl: 4rem; /* 40px */
-  --font-size-7xl: 4.4rem; /* 44px */
-  --font-size-8xl: 4.8rem; /* 48px */
-  --font-size-9xl: 5.2rem; /* 52px */
+  --font-size-6xl: 4.4rem; /* 44px */
+  --font-size-7xl: 5.4rem; /* 54px */
+  --font-size-8xl: 6.8rem; /* 68px */
+  --font-size-9xl: 8.4rem; /* 84px */
 
   /* --------------------------------------------------------------------------
      2.2 Typography Weights & Line Heights
@@ -563,6 +563,21 @@ b {
 .t-9xl {
   font-size: calc(var(--font-size-9xl) * var(--heading-scale));
   line-height: 1.1;
+}
+
+@media (max-width: 749px) {
+  .t-6xl {
+    font-size: calc(var(--font-size-4xl) * var(--heading-scale));
+  }
+  .t-7xl {
+    font-size: calc(var(--font-size-4xl) * var(--heading-scale));
+  }
+  .t-8xl {
+    font-size: calc(var(--font-size-5xl) * var(--heading-scale));
+  }
+  .t-9xl {
+    font-size: calc(var(--font-size-5xl) * var(--heading-scale));
+  }
 }
 
 /* --------------------------------------------------------------------------

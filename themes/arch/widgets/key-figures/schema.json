@@ -11,23 +11,23 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:key_figures.settings.eyebrow.label"
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:key_figures.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "By The Numbers"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:key_figures.settings.description.label"
+      "label": "tTheme:global.widgets.settings.description.label"
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:key_figures.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
@@ -52,7 +52,7 @@
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "tTheme:key_figures.settings.columns_desktop.label",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "default": 4,
       "min": 2,
       "max": 5,
@@ -67,16 +67,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:key_figures.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:key_figures.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:key_figures.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -89,7 +89,7 @@
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:key_figures.blocks.figure.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "text",

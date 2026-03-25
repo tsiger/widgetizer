@@ -11,7 +11,7 @@
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:rich_text.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
@@ -21,15 +21,15 @@
       "options": [
         {
           "value": "start",
-          "label": "tTheme:rich_text.settings.text_alignment.options.start"
+          "label": "tTheme:global.widgets.settings.options.start"
         },
         {
           "value": "center",
-          "label": "tTheme:rich_text.settings.text_alignment.options.center"
+          "label": "tTheme:global.widgets.settings.options.center"
         },
         {
           "value": "end",
-          "label": "tTheme:rich_text.settings.text_alignment.options.end"
+          "label": "tTheme:global.widgets.settings.options.end"
         }
       ]
     },
@@ -60,16 +60,16 @@
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:rich_text.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:rich_text.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:rich_text.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     }
@@ -77,59 +77,59 @@
   "blocks": [
     {
       "type": "heading",
-      "displayName": "tTheme:rich_text.blocks.heading.name",
+      "displayName": "tTheme:global.widgets.blocks.heading.name",
       "settings": [
         {
           "type": "text",
           "id": "text",
-          "label": "tTheme:rich_text.blocks.heading.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.heading.settings.text.label",
           "default": "Section Heading"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:rich_text.blocks.heading.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.heading.settings.size.label",
           "default": "2xl",
           "options": [
             {
               "value": "lg",
-              "label": "tTheme:rich_text.blocks.heading.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.lg"
             },
             {
               "value": "xl",
-              "label": "tTheme:rich_text.blocks.heading.settings.size.options.xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.xl"
             },
             {
               "value": "2xl",
-              "label": "tTheme:rich_text.blocks.heading.settings.size.options.2xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.2xl"
             },
             {
               "value": "3xl",
-              "label": "tTheme:rich_text.blocks.heading.settings.size.options.3xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.3xl"
             },
             {
               "value": "4xl",
-              "label": "tTheme:rich_text.blocks.heading.settings.size.options.4xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.4xl"
             },
             {
               "value": "5xl",
-              "label": "tTheme:rich_text.blocks.heading.settings.size.options.5xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.5xl"
             },
             {
               "value": "6xl",
-              "label": "tTheme:rich_text.blocks.heading.settings.size.options.6xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.6xl"
             },
             {
               "value": "7xl",
-              "label": "tTheme:rich_text.blocks.heading.settings.size.options.7xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.7xl"
             },
             {
               "value": "8xl",
-              "label": "tTheme:rich_text.blocks.heading.settings.size.options.8xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.8xl"
             },
             {
               "value": "9xl",
-              "label": "tTheme:rich_text.blocks.heading.settings.size.options.9xl"
+              "label": "tTheme:global.widgets.blocks.heading.settings.size.options.9xl"
             }
           ]
         }
@@ -137,56 +137,56 @@
     },
     {
       "type": "text",
-      "displayName": "tTheme:rich_text.blocks.text.name",
+      "displayName": "tTheme:global.widgets.blocks.text.name",
       "settings": [
         {
           "type": "richtext",
           "id": "text",
-          "label": "tTheme:rich_text.blocks.text.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.text.label",
           "default": "<p>Add your text content here.</p>"
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:rich_text.blocks.text.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.size.label",
           "default": "base",
           "options": [
             {
               "value": "sm",
-              "label": "tTheme:rich_text.blocks.text.settings.size.options.sm"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.sm"
             },
             {
               "value": "base",
-              "label": "tTheme:rich_text.blocks.text.settings.size.options.base"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.base"
             },
             {
               "value": "lg",
-              "label": "tTheme:rich_text.blocks.text.settings.size.options.lg"
+              "label": "tTheme:global.widgets.blocks.text.settings.size.options.lg"
             }
           ]
         },
         {
           "type": "checkbox",
           "id": "uppercase",
-          "label": "tTheme:rich_text.blocks.text.settings.uppercase.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.uppercase.label",
           "default": false
         },
         {
           "type": "checkbox",
           "id": "muted",
-          "label": "tTheme:rich_text.blocks.text.settings.muted.label",
+          "label": "tTheme:global.widgets.blocks.text.settings.muted.label",
           "default": false
         }
       ]
     },
     {
       "type": "button",
-      "displayName": "tTheme:rich_text.blocks.button.name",
+      "displayName": "tTheme:global.widgets.blocks.button.name",
       "settings": [
         {
           "type": "link",
           "id": "link",
-          "label": "tTheme:rich_text.blocks.button.settings.link.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.link.label",
           "default": {
             "text": "Learn More",
             "href": "#",
@@ -196,61 +196,61 @@
         {
           "type": "select",
           "id": "style",
-          "label": "tTheme:rich_text.blocks.button.settings.style.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.style.label",
           "default": "primary",
           "options": [
             {
               "value": "primary",
-              "label": "tTheme:rich_text.blocks.button.settings.style.options.primary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style.options.primary"
             },
             {
               "value": "secondary",
-              "label": "tTheme:rich_text.blocks.button.settings.style.options.secondary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style.options.secondary"
             }
           ]
         },
         {
           "type": "link",
           "id": "link_2",
-          "label": "tTheme:rich_text.blocks.button.settings.link_2.label"
+          "label": "tTheme:global.widgets.blocks.button.settings.link_2.label"
         },
         {
           "type": "select",
           "id": "style_2",
-          "label": "tTheme:rich_text.blocks.button.settings.style_2.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.style_2.label",
           "default": "secondary",
           "options": [
             {
               "value": "primary",
-              "label": "tTheme:rich_text.blocks.button.settings.style_2.options.primary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style_2.options.primary"
             },
             {
               "value": "secondary",
-              "label": "tTheme:rich_text.blocks.button.settings.style_2.options.secondary"
+              "label": "tTheme:global.widgets.blocks.button.settings.style_2.options.secondary"
             }
           ]
         },
         {
           "type": "select",
           "id": "size",
-          "label": "tTheme:rich_text.blocks.button.settings.size.label",
+          "label": "tTheme:global.widgets.blocks.button.settings.size.label",
           "default": "medium",
           "options": [
             {
               "value": "small",
-              "label": "tTheme:rich_text.blocks.button.settings.size.options.small"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.small"
             },
             {
               "value": "medium",
-              "label": "tTheme:rich_text.blocks.button.settings.size.options.medium"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.medium"
             },
             {
               "value": "large",
-              "label": "tTheme:rich_text.blocks.button.settings.size.options.large"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.large"
             },
             {
               "value": "xlarge",
-              "label": "tTheme:rich_text.blocks.button.settings.size.options.xlarge"
+              "label": "tTheme:global.widgets.blocks.button.settings.size.options.xlarge"
             }
           ]
         }

@@ -12,19 +12,19 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "tTheme:icon_card_grid.settings.eyebrow.label",
+      "label": "tTheme:global.widgets.settings.eyebrow.label",
       "default": "Our Services"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "tTheme:icon_card_grid.settings.title.label",
+      "label": "tTheme:global.widgets.settings.title.label",
       "default": "What We Offer"
     },
     {
       "type": "text",
       "id": "description",
-      "label": "tTheme:icon_card_grid.settings.description.label",
+      "label": "tTheme:global.widgets.settings.description.label",
       "default": "A responsive grid layout showcasing services with icons, descriptions, and call-to-action buttons."
     },
     {
@@ -40,135 +40,135 @@
       "options": [
         {
           "value": "start",
-          "label": "tTheme:icon_card_grid.settings.featured_image_position.options.start"
+          "label": "tTheme:global.widgets.settings.options.left"
         },
         {
           "value": "end",
-          "label": "tTheme:icon_card_grid.settings.featured_image_position.options.end"
+          "label": "tTheme:global.widgets.settings.options.right"
         }
       ]
     },
     {
       "type": "header",
       "id": "display_header",
-      "label": "tTheme:icon_card_grid.settings.display_header.label"
+      "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
       "type": "select",
       "id": "icon_style",
-      "label": "tTheme:icon_card_grid.settings.icon_style.label",
+      "label": "tTheme:global.widgets.settings.icon_style.label",
       "default": "plain",
       "options": [
         {
           "value": "plain",
-          "label": "tTheme:icon_card_grid.settings.icon_style.options.plain"
+          "label": "tTheme:global.widgets.settings.icon_style.options.plain"
         },
         {
           "value": "outline",
-          "label": "tTheme:icon_card_grid.settings.icon_style.options.outline"
+          "label": "tTheme:global.widgets.settings.icon_style.options.outline"
         },
         {
           "value": "filled",
-          "label": "tTheme:icon_card_grid.settings.icon_style.options.filled"
+          "label": "tTheme:global.widgets.settings.icon_style.options.filled"
         }
       ]
     },
     {
       "type": "select",
       "id": "icon_size",
-      "label": "tTheme:icon_card_grid.settings.icon_size.label",
+      "label": "tTheme:global.widgets.settings.icon_size.label",
       "default": "lg",
       "options": [
         {
           "value": "sm",
-          "label": "tTheme:icon_card_grid.settings.icon_size.options.sm"
+          "label": "tTheme:global.widgets.settings.icon_size.options.sm"
         },
         {
           "value": "md",
-          "label": "tTheme:icon_card_grid.settings.icon_size.options.md"
+          "label": "tTheme:global.widgets.settings.icon_size.options.md"
         },
         {
           "value": "lg",
-          "label": "tTheme:icon_card_grid.settings.icon_size.options.lg"
+          "label": "tTheme:global.widgets.settings.icon_size.options.lg"
         },
         {
           "value": "xl",
-          "label": "tTheme:icon_card_grid.settings.icon_size.options.xl"
+          "label": "tTheme:global.widgets.settings.icon_size.options.xl"
         }
       ]
     },
     {
       "type": "select",
       "id": "icon_shape",
-      "label": "tTheme:icon_card_grid.settings.icon_shape.label",
+      "label": "tTheme:global.widgets.settings.icon_shape.label",
       "default": "circle",
       "options": [
         {
           "value": "sharp",
-          "label": "tTheme:icon_card_grid.settings.icon_shape.options.sharp"
+          "label": "tTheme:global.widgets.settings.icon_shape.options.sharp"
         },
         {
           "value": "rounded",
-          "label": "tTheme:icon_card_grid.settings.icon_shape.options.rounded"
+          "label": "tTheme:global.widgets.settings.icon_shape.options.rounded"
         },
         {
           "value": "circle",
-          "label": "tTheme:icon_card_grid.settings.icon_shape.options.circle"
+          "label": "tTheme:global.widgets.settings.icon_shape.options.circle"
         }
       ]
     },
     {
       "type": "select",
       "id": "alignment",
-      "label": "tTheme:icon_card_grid.settings.alignment.label",
+      "label": "tTheme:global.widgets.settings.alignment.label",
       "default": "start",
       "options": [
         {
           "value": "start",
-          "label": "tTheme:icon_card_grid.settings.alignment.options.start"
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
         },
         {
           "value": "center",
-          "label": "tTheme:icon_card_grid.settings.alignment.options.center"
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
         }
       ]
     },
     {
       "type": "select",
       "id": "color_scheme",
-      "label": "tTheme:icon_card_grid.settings.color_scheme.label",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
       "options": [
         {
           "value": "standard",
-          "label": "tTheme:icon_card_grid.settings.color_scheme.options.standard"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
           "value": "highlight",
-          "label": "tTheme:icon_card_grid.settings.color_scheme.options.highlight"
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
         }
       ]
     },
     {
       "type": "select",
       "id": "layout",
-      "label": "tTheme:icon_card_grid.settings.layout.label",
+      "label": "tTheme:global.widgets.settings.layout.label",
       "default": "grid",
       "options": [
         {
           "value": "grid",
-          "label": "tTheme:icon_card_grid.settings.layout.options.grid"
+          "label": "tTheme:global.widgets.settings.layout.options.grid"
         },
         {
           "value": "carousel",
-          "label": "tTheme:icon_card_grid.settings.layout.options.carousel"
+          "label": "tTheme:global.widgets.settings.layout.options.carousel"
         }
       ]
     },
     {
       "type": "range",
       "id": "columns_desktop",
-      "label": "tTheme:icon_card_grid.settings.columns_desktop.label",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "default": 4,
       "min": 2,
       "max": 5,
@@ -178,12 +178,12 @@
   "blocks": [
     {
       "type": "card",
-      "displayName": "tTheme:icon_card_grid.blocks.card.name",
+      "displayName": "tTheme:global.widgets.blocks.card.name",
       "settings": [
         {
           "type": "header",
           "id": "content_header",
-          "label": "tTheme:icon_card_grid.blocks.card.settings.content_header.label"
+          "label": "tTheme:global.widgets.settings.content_header.label"
         },
         {
           "type": "icon",
@@ -193,25 +193,25 @@
         {
           "type": "text",
           "id": "subtitle",
-          "label": "tTheme:icon_card_grid.blocks.card.settings.subtitle.label",
+          "label": "tTheme:global.widgets.blocks.card.settings.subtitle.label",
           "default": "Subtitle"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "tTheme:icon_card_grid.blocks.card.settings.title.label",
+          "label": "tTheme:global.widgets.blocks.card.settings.title.label",
           "default": "Card Title"
         },
         {
           "type": "richtext",
           "id": "description",
-          "label": "tTheme:icon_card_grid.blocks.card.settings.description.label",
+          "label": "tTheme:global.widgets.blocks.card.settings.description.label",
           "default": "<p>Card description text goes here.</p>"
         },
         {
           "type": "link",
           "id": "button_link",
-          "label": "tTheme:icon_card_grid.blocks.card.settings.button_link.label",
+          "label": "tTheme:global.widgets.blocks.card.settings.button_link.label",
           "default": {
             "text": "Learn More",
             "href": "#",
