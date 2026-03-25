@@ -1,0 +1,248 @@
+{
+  "type": "action-bar",
+  "displayName": "tTheme:action_bar.name",
+  "aliases": ["cta", "call to action", "promo", "bar", "strip"],
+  "maxBlocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:action_bar.settings.display_header.label"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:action_bar.settings.color_scheme.label",
+      "default": "highlight",
+      "options": [
+        {
+          "value": "standard",
+          "label": "tTheme:action_bar.settings.color_scheme.options.standard"
+        },
+        {
+          "value": "highlight",
+          "label": "tTheme:action_bar.settings.color_scheme.options.highlight"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "displayName": "tTheme:action_bar.blocks.heading.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "tTheme:action_bar.blocks.heading.settings.text.label",
+          "default": "Ready to get started?"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "tTheme:action_bar.blocks.heading.settings.size.label",
+          "default": "2xl",
+          "options": [
+            {
+              "value": "lg",
+              "label": "tTheme:action_bar.blocks.heading.settings.size.options.lg"
+            },
+            {
+              "value": "xl",
+              "label": "tTheme:action_bar.blocks.heading.settings.size.options.xl"
+            },
+            {
+              "value": "2xl",
+              "label": "tTheme:action_bar.blocks.heading.settings.size.options.2xl"
+            },
+            {
+              "value": "3xl",
+              "label": "tTheme:action_bar.blocks.heading.settings.size.options.3xl"
+            },
+            {
+              "value": "4xl",
+              "label": "tTheme:action_bar.blocks.heading.settings.size.options.4xl"
+            },
+            {
+              "value": "5xl",
+              "label": "tTheme:action_bar.blocks.heading.settings.size.options.5xl"
+            },
+            {
+              "value": "6xl",
+              "label": "tTheme:action_bar.blocks.heading.settings.size.options.6xl"
+            },
+            {
+              "value": "7xl",
+              "label": "tTheme:action_bar.blocks.heading.settings.size.options.7xl"
+            },
+            {
+              "value": "8xl",
+              "label": "tTheme:action_bar.blocks.heading.settings.size.options.8xl"
+            },
+            {
+              "value": "9xl",
+              "label": "tTheme:action_bar.blocks.heading.settings.size.options.9xl"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "displayName": "tTheme:action_bar.blocks.text.name",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "tTheme:action_bar.blocks.text.settings.text.label",
+          "default": "<p>Get in touch with our team today.</p>"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "tTheme:action_bar.blocks.text.settings.size.label",
+          "default": "base",
+          "options": [
+            {
+              "value": "sm",
+              "label": "tTheme:action_bar.blocks.text.settings.size.options.sm"
+            },
+            {
+              "value": "base",
+              "label": "tTheme:action_bar.blocks.text.settings.size.options.base"
+            },
+            {
+              "value": "lg",
+              "label": "tTheme:action_bar.blocks.text.settings.size.options.lg"
+            }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "uppercase",
+          "label": "tTheme:action_bar.blocks.text.settings.uppercase.label",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "muted",
+          "label": "tTheme:action_bar.blocks.text.settings.muted.label",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "displayName": "tTheme:action_bar.blocks.button.name",
+      "settings": [
+        {
+          "type": "link",
+          "id": "link",
+          "label": "tTheme:action_bar.blocks.button.settings.link.label",
+          "default": {
+            "text": "Book An Appointment",
+            "href": "contact.html",
+            "target": "_self"
+          }
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "tTheme:action_bar.blocks.button.settings.style.label",
+          "default": "primary",
+          "options": [
+            {
+              "value": "primary",
+              "label": "tTheme:action_bar.blocks.button.settings.style.options.primary"
+            },
+            {
+              "value": "secondary",
+              "label": "tTheme:action_bar.blocks.button.settings.style.options.secondary"
+            }
+          ]
+        },
+        {
+          "type": "link",
+          "id": "link_2",
+          "label": "tTheme:action_bar.blocks.button.settings.link_2.label"
+        },
+        {
+          "type": "select",
+          "id": "style_2",
+          "label": "tTheme:action_bar.blocks.button.settings.style_2.label",
+          "default": "secondary",
+          "options": [
+            {
+              "value": "primary",
+              "label": "tTheme:action_bar.blocks.button.settings.style_2.options.primary"
+            },
+            {
+              "value": "secondary",
+              "label": "tTheme:action_bar.blocks.button.settings.style_2.options.secondary"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "tTheme:action_bar.blocks.button.settings.size.label",
+          "default": "medium",
+          "options": [
+            {
+              "value": "small",
+              "label": "tTheme:action_bar.blocks.button.settings.size.options.small"
+            },
+            {
+              "value": "medium",
+              "label": "tTheme:action_bar.blocks.button.settings.size.options.medium"
+            },
+            {
+              "value": "large",
+              "label": "tTheme:action_bar.blocks.button.settings.size.options.large"
+            },
+            {
+              "value": "xlarge",
+              "label": "tTheme:action_bar.blocks.button.settings.size.options.xlarge"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "heading",
+      "settings": {
+        "text": "Ready to get started?",
+        "size": "2xl"
+      }
+    },
+    {
+      "type": "text",
+      "settings": {
+        "text": "<p>Get in touch with our team today.</p>",
+        "size": "base",
+        "uppercase": false,
+        "muted": true
+      }
+    },
+    {
+      "type": "button",
+      "settings": {
+        "link": {
+          "text": "Book An Appointment",
+          "href": "contact.html",
+          "target": "_self"
+        },
+        "style": "primary",
+        "link_2": {
+          "text": "Chat With Us",
+          "href": "contact.html",
+          "target": "_self"
+        },
+        "style_2": "secondary",
+        "size": "medium"
+      }
+    }
+  ]
+}

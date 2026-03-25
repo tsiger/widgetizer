@@ -67,6 +67,102 @@
       }
     }
   },
+  "action_bar": {
+    "name": "Action Bar",
+    "settings": {
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "heading": {
+        "name": "Heading",
+        "settings": {
+          "text": {
+            "label": "Heading text"
+          },
+          "size": {
+            "label": "Size",
+            "options": {
+              "lg": "Large",
+              "xl": "Extra Large",
+              "2xl": "2XL",
+              "3xl": "3XL",
+              "4xl": "4XL",
+              "5xl": "5XL",
+              "6xl": "6XL",
+              "7xl": "7XL",
+              "8xl": "8XL",
+              "9xl": "9XL"
+            }
+          }
+        }
+      },
+      "text": {
+        "name": "Text",
+        "settings": {
+          "text": {
+            "label": "Text"
+          },
+          "size": {
+            "label": "Size",
+            "options": {
+              "sm": "Small",
+              "base": "Base",
+              "lg": "Large"
+            }
+          },
+          "uppercase": {
+            "label": "Uppercase"
+          },
+          "muted": {
+            "label": "Muted"
+          }
+        }
+      },
+      "button": {
+        "name": "Button Group",
+        "settings": {
+          "link": {
+            "label": "Primary button"
+          },
+          "style": {
+            "label": "Primary style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "link_2": {
+            "label": "Secondary button"
+          },
+          "style_2": {
+            "label": "Secondary style",
+            "options": {
+              "primary": "Primary",
+              "secondary": "Secondary"
+            }
+          },
+          "size": {
+            "label": "Button size",
+            "options": {
+              "small": "Small",
+              "medium": "Medium",
+              "large": "Large",
+              "xlarge": "Extra Large"
+            }
+          }
+        }
+      }
+    }
+  },
   "banner": {
     "name": "Banner",
     "settings": {
@@ -616,6 +712,77 @@
       "mobileHeight": {
         "label": "Mobile Height",
         "description": "The height of the spacer on mobile devices in pixels"
+      }
+    }
+  },
+  "contact_details": {
+    "name": "Contact Details",
+    "settings": {
+      "content_header": {
+        "label": "Content"
+      },
+      "eyebrow": {
+        "label": "Eyebrow text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "info": {
+        "name": "Info",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      },
+      "text_block": {
+        "name": "Text",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      },
+      "menu_block": {
+        "name": "Menu",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "menu": {
+            "label": "Navigation Menu",
+            "description": "Select the menu to display"
+          }
+        }
+      },
+      "social_block": {
+        "name": "Social Icons",
+        "settings": {
+          "title": {
+            "label": "Title"
+          }
+        }
       }
     }
   },
@@ -2839,7 +3006,7 @@
             "label": "Size",
             "options": {
               "sm": "Small",
-              "base": "Default",
+              "base": "Base",
               "lg": "Large"
             }
           },

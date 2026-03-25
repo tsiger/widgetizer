@@ -1,0 +1,120 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-action-bar widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="action-bar"
+  {% if widget.settings.color_scheme == 'highlight' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .action-bar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-xl);
+      }
+
+      & .action-bar-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2xs);
+        flex: 1;
+        min-width: 0;
+      }
+
+      & .action-bar-actions {
+        display: flex;
+        flex-shrink: 0;
+      }
+
+      @media (max-width: 749px) {
+        & .action-bar-inner {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        & .action-bar-actions {
+          justify-content: center;
+        }
+      }
+    }
+  </style>
+
+  <div class="{% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% else %}widget-container{% endif %}">
+    <div class="action-bar-inner">
+      <div class="action-bar-content">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          {% case block.type %}
+            {% when 'heading' %}
+              {% assign size_class = 't-' | append: block.settings.size %}
+              <h2 class="w-headline {{ size_class }}" data-block-id="{{ blockId }}" data-setting="text">
+                {{ block.settings.text }}
+              </h2>
+            {% when 'text' %}
+              {% assign size_class = 't-' | append: block.settings.size %}
+              {% assign style_class = '' %}
+              {% if block.settings.uppercase %}{% assign style_class = style_class | append: ' t-uppercase' %}{% endif %}
+              {% if block.settings.muted %}{% assign style_class = style_class | append: ' t-muted' %}{% endif %}
+              <div class="w-body w-rte {{ size_class }}{{ style_class }}" data-block-id="{{ blockId }}" data-setting="text">
+                {{ block.settings.text | raw }}
+              </div>
+          {% endcase %}
+        {% endfor %}
+      </div>
+
+      {% for blockId in widget.blocksOrder %}
+        {% assign block = widget.blocks[blockId] %}
+        {% if block.type == 'button' %}
+          {% if block.settings.link.text != blank or block.settings.link_2.text != blank %}
+            {% assign gap_value = 'var(--space-md)' %}
+            {% case block.settings.size %}
+              {% when 'small' %}{% assign gap_value = 'var(--space-sm)' %}
+              {% when 'medium' %}{% assign gap_value = 'var(--space-md)' %}
+              {% when 'large' %}{% assign gap_value = 'var(--space-lg)' %}
+              {% when 'xlarge' %}{% assign gap_value = 'var(--space-xl)' %}
+            {% endcase %}
+            <div class="widget-actions action-bar-actions" style="gap: {{ gap_value }};" data-block-id="{{ blockId }}">
+              {% if block.settings.link.text != blank %}
+                {% if block.settings.size != 'small' and block.settings.size != blank %}
+                  {% assign size_class = 'widget-button-' | append: block.settings.size %}
+                {% else %}
+                  {% assign size_class = '' %}
+                {% endif %}
+                <a
+                  href="{{ block.settings.link.href }}"
+                  class="widget-button {{ size_class }} {% if block.settings.style == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
+                  data-setting="link"
+                  {% if block.settings.link.target == '_blank' %}
+                    target="_blank" rel="noopener"
+                  {% endif %}
+                >
+                  {{ block.settings.link.text }}
+                </a>
+              {% endif %}
+              {% if block.settings.link_2.text != blank %}
+                {% if block.settings.size != 'small' and block.settings.size != blank %}
+                  {% assign size_class = 'widget-button-' | append: block.settings.size %}
+                {% else %}
+                  {% assign size_class = '' %}
+                {% endif %}
+                <a
+                  href="{{ block.settings.link_2.href }}"
+                  class="widget-button {{ size_class }} {% if block.settings.style_2 == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
+                  data-setting="link_2"
+                  {% if block.settings.link_2.target == '_blank' %}
+                    target="_blank" rel="noopener"
+                  {% endif %}
+                >
+                  {{ block.settings.link_2.text }}
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>

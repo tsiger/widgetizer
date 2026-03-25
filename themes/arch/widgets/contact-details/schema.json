@@ -1,0 +1,146 @@
+{
+  "type": "contact-details",
+  "displayName": "tTheme:contact_details.name",
+  "aliases": ["contact", "footer", "info", "details", "address"],
+  "maxBlocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "tTheme:contact_details.settings.content_header.label"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:contact_details.settings.eyebrow.label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:contact_details.settings.title.label"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:contact_details.settings.description.label"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:contact_details.settings.display_header.label"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:contact_details.settings.color_scheme.label",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "tTheme:contact_details.settings.color_scheme.options.standard"
+        },
+        {
+          "value": "highlight",
+          "label": "tTheme:contact_details.settings.color_scheme.options.highlight"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "info",
+      "displayName": "tTheme:contact_details.blocks.info.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:contact_details.blocks.info.settings.title.label",
+          "default": "Saffron"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "tTheme:contact_details.blocks.info.settings.text.label",
+          "default": "<p>A neighborhood restaurant serving seasonal dishes made with locally sourced ingredients.</p>"
+        }
+      ]
+    },
+    {
+      "type": "text_block",
+      "displayName": "tTheme:contact_details.blocks.text_block.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:contact_details.blocks.text_block.settings.title.label",
+          "default": "Hours"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "tTheme:contact_details.blocks.text_block.settings.text.label",
+          "default": "<p>Mon – Fri: 11am – 10pm</p><p>Sat – Sun: 10am – 11pm</p>"
+        }
+      ]
+    },
+    {
+      "type": "menu_block",
+      "displayName": "tTheme:contact_details.blocks.menu_block.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:contact_details.blocks.menu_block.settings.title.label",
+          "default": "Links"
+        },
+        {
+          "type": "menu",
+          "id": "menu",
+          "label": "tTheme:contact_details.blocks.menu_block.settings.menu.label",
+          "description": "tTheme:contact_details.blocks.menu_block.settings.menu.description",
+          "default": "footer-menu"
+        }
+      ]
+    },
+    {
+      "type": "social_block",
+      "displayName": "tTheme:contact_details.blocks.social_block.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:contact_details.blocks.social_block.settings.title.label",
+          "default": "Follow Us"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "info",
+      "settings": {
+        "title": "Saffron",
+        "text": "<p>A neighborhood restaurant serving seasonal dishes made with locally sourced ingredients.</p>"
+      }
+    },
+    {
+      "type": "text_block",
+      "settings": {
+        "title": "Hours",
+        "text": "<p>Mon – Fri: 11am – 10pm</p><p>Sat – Sun: 10am – 11pm</p>"
+      }
+    },
+    {
+      "type": "menu_block",
+      "settings": {
+        "title": "Links"
+      }
+    },
+    {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow Us"
+      }
+    }
+  ]
+}
