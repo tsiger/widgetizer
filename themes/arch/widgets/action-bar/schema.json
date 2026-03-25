@@ -24,6 +24,12 @@
           "label": "tTheme:action_bar.settings.color_scheme.options.highlight"
         }
       ]
+    },
+    {
+      "type": "checkbox",
+      "id": "fullwidth",
+      "label": "tTheme:action_bar.settings.fullwidth.label",
+      "default": true
     }
   ],
   "blocks": [

@@ -74,6 +74,26 @@
           "label": "tTheme:image_text.settings.color_scheme.options.highlight"
         }
       ]
+    },
+    {
+      "type": "select",
+      "id": "content_color_scheme",
+      "label": "tTheme:image_text.settings.content_color_scheme.label",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "tTheme:image_text.settings.content_color_scheme.options.none"
+        },
+        {
+          "value": "standard",
+          "label": "tTheme:image_text.settings.content_color_scheme.options.standard"
+        },
+        {
+          "value": "highlight",
+          "label": "tTheme:image_text.settings.content_color_scheme.options.highlight"
+        }
+      ]
     }
   ],
   "blocks": [

@@ -1,0 +1,104 @@
+{
+  "type": "steps",
+  "displayName": "tTheme:steps.name",
+  "aliases": [
+    "process",
+    "numbered steps",
+    "how it works",
+    "timeline",
+    "workflow"
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:steps.settings.eyebrow.label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:steps.settings.title.label",
+      "default": "How It Works"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:steps.settings.description.label"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:steps.settings.display_header.label"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:steps.settings.color_scheme.label",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "tTheme:steps.settings.color_scheme.options.standard"
+        },
+        {
+          "value": "highlight",
+          "label": "tTheme:steps.settings.color_scheme.options.highlight"
+        }
+      ]
+    }
+  ],
+  "maxBlocks": 8,
+  "blocks": [
+    {
+      "type": "step",
+      "displayName": "tTheme:steps.blocks.step.name",
+      "settings": [
+        {
+          "type": "image",
+          "id": "image",
+          "label": "tTheme:steps.blocks.step.settings.image.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:steps.blocks.step.settings.title.label",
+          "default": "Step Title"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "tTheme:steps.blocks.step.settings.description.label",
+          "default": "<p>Describe this step in your process.</p>"
+        },
+        {
+          "type": "link",
+          "id": "button_link",
+          "label": "tTheme:steps.blocks.step.settings.button_link.label"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "step",
+      "settings": {
+        "title": "We provide exceptional design services",
+        "description": "<p>Don't miss out on the chance to transform your space into something extraordinary. Reach out to us for a complimentary consultation.</p>"
+      }
+    },
+    {
+      "type": "step",
+      "settings": {
+        "title": "Your partner in design excellence",
+        "description": "<p>Take the first step towards success today by contacting us for a free consultation. Let's achieve your goals together.</p>"
+      }
+    },
+    {
+      "type": "step",
+      "settings": {
+        "title": "Bringing your vision to life",
+        "description": "<p>We work closely with you to ensure every detail is perfect. From concept to completion, we're with you every step of the way.</p>"
+      }
+    }
+  ]
+}

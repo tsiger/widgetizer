@@ -1,0 +1,113 @@
+{
+  "type": "sliding-panels",
+  "displayName": "tTheme:sliding_panels.name",
+  "aliases": [
+    "panel slider",
+    "image panels",
+    "expandable cards",
+    "accordion panels"
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:sliding_panels.settings.eyebrow.label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:sliding_panels.settings.title.label",
+      "default": "Our Work"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:sliding_panels.settings.description.label"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:sliding_panels.settings.display_header.label"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:sliding_panels.settings.color_scheme.label",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "tTheme:sliding_panels.settings.color_scheme.options.standard"
+        },
+        {
+          "value": "highlight",
+          "label": "tTheme:sliding_panels.settings.color_scheme.options.highlight"
+        }
+      ]
+    }
+  ],
+  "maxBlocks": 6,
+  "blocks": [
+    {
+      "type": "panel",
+      "displayName": "tTheme:sliding_panels.blocks.panel.name",
+      "settings": [
+        {
+          "type": "image",
+          "id": "image",
+          "label": "tTheme:sliding_panels.blocks.panel.settings.image.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:sliding_panels.blocks.panel.settings.title.label",
+          "default": "Panel Title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "tTheme:sliding_panels.blocks.panel.settings.subtitle.label"
+        },
+        {
+          "type": "link",
+          "id": "button_link",
+          "label": "tTheme:sliding_panels.blocks.panel.settings.button_link.label"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "panel",
+      "settings": {
+        "title": "Transforming Outdoor Spaces",
+        "subtitle": "Stunning landscapes await you!",
+        "button_link": { "text": "Learn More", "href": "#", "target": "_self" }
+      }
+    },
+    {
+      "type": "panel",
+      "settings": {
+        "title": "Transform Your Outdoor Space",
+        "subtitle": "Landscape Transformation",
+        "button_link": { "text": "Learn More", "href": "#", "target": "_self" }
+      }
+    },
+    {
+      "type": "panel",
+      "settings": {
+        "title": "Innovative Garden Solutions",
+        "subtitle": "Creative Outdoor Spaces",
+        "button_link": { "text": "Learn More", "href": "#", "target": "_self" }
+      }
+    },
+    {
+      "type": "panel",
+      "settings": {
+        "title": "Sustainable Landscaping",
+        "subtitle": "Eco-Friendly Design",
+        "button_link": { "text": "Learn More", "href": "#", "target": "_self" }
+      }
+    }
+  ]
+}

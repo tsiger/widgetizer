@@ -1,0 +1,144 @@
+{
+  "type": "testimonial-slider",
+  "displayName": "tTheme:testimonial_slider.name",
+  "aliases": [
+    "review slider",
+    "quote carousel",
+    "single testimonial",
+    "review carousel"
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:testimonial_slider.settings.display_header.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "tTheme:testimonial_slider.settings.autoplay.label",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "tTheme:testimonial_slider.settings.autoplay_speed.label",
+      "min": 3000,
+      "max": 10000,
+      "step": 1000,
+      "default": 5000,
+      "unit": "ms"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:testimonial_slider.settings.color_scheme.label",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "tTheme:testimonial_slider.settings.color_scheme.options.standard"
+        },
+        {
+          "value": "highlight",
+          "label": "tTheme:testimonial_slider.settings.color_scheme.options.highlight"
+        }
+      ]
+    }
+  ],
+  "maxBlocks": 8,
+  "blocks": [
+    {
+      "type": "quote",
+      "displayName": "tTheme:testimonial_slider.blocks.quote.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:testimonial_slider.blocks.quote.settings.content_header.label"
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "tTheme:testimonial_slider.blocks.quote.settings.quote.label",
+          "default": "This product has completely transformed how we work. Highly recommended!"
+        },
+        {
+          "type": "image",
+          "id": "avatar",
+          "label": "tTheme:testimonial_slider.blocks.quote.settings.avatar.label"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "tTheme:testimonial_slider.blocks.quote.settings.name.label",
+          "default": "Jane Smith"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:testimonial_slider.blocks.quote.settings.title.label",
+          "default": "CEO, Acme Inc."
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:testimonial_slider.blocks.quote.settings.display_header.label"
+        },
+        {
+          "type": "select",
+          "id": "rating",
+          "label": "tTheme:testimonial_slider.blocks.quote.settings.rating.label",
+          "options": [
+            {
+              "value": "",
+              "label": "tTheme:testimonial_slider.blocks.quote.settings.rating.options."
+            },
+            {
+              "value": "5",
+              "label": "tTheme:testimonial_slider.blocks.quote.settings.rating.options.5"
+            },
+            {
+              "value": "4",
+              "label": "tTheme:testimonial_slider.blocks.quote.settings.rating.options.4"
+            },
+            {
+              "value": "3",
+              "label": "tTheme:testimonial_slider.blocks.quote.settings.rating.options.3"
+            }
+          ],
+          "default": "5"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "quote",
+      "settings": {
+        "quote": "Working with this team has been an absolute pleasure. They delivered beyond our expectations and the results speak for themselves.",
+        "name": "Sarah Johnson",
+        "title": "Marketing Director, TechCorp",
+        "rating": "5"
+      }
+    },
+    {
+      "type": "quote",
+      "settings": {
+        "quote": "The attention to detail and commitment to quality is unmatched. I've recommended them to everyone I know.",
+        "name": "Michael Chen",
+        "title": "Founder, StartupXYZ",
+        "rating": "5"
+      }
+    },
+    {
+      "type": "quote",
+      "settings": {
+        "quote": "From start to finish, the experience was seamless. They truly understand what their customers need.",
+        "name": "Emily Rodriguez",
+        "title": "Operations Manager",
+        "rating": "5"
+      }
+    }
+  ]
+}

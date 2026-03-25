@@ -79,6 +79,9 @@
           "standard": "Standard",
           "highlight": "Highlight"
         }
+      },
+      "fullwidth": {
+        "label": "Full width"
       }
     },
     "blocks": {
@@ -547,6 +550,52 @@
           },
           "title": {
             "label": "Heading"
+          }
+        }
+      }
+    }
+  },
+  "checkerboard": {
+    "name": "Checkerboard",
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow Text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "columns_desktop": {
+        "label": "Desktop columns"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "card": {
+        "name": "Card",
+        "settings": {
+          "image": {
+            "label": "Image"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Description"
+          },
+          "button_link": {
+            "label": "Button Link"
           }
         }
       }
@@ -1779,6 +1828,14 @@
           "standard": "Standard",
           "highlight": "Highlight"
         }
+      },
+      "content_color_scheme": {
+        "label": "Content color scheme",
+        "options": {
+          "none": "None",
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
       }
     },
     "blocks": {
@@ -2822,6 +2879,49 @@
       }
     }
   },
+  "sliding_panels": {
+    "name": "Sliding Panels",
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow Text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "panel": {
+        "name": "Panel",
+        "settings": {
+          "image": {
+            "label": "Image"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "subtitle": {
+            "label": "Subtitle"
+          },
+          "button_link": {
+            "label": "Link"
+          }
+        }
+      }
+    }
+  },
   "slideshow": {
     "name": "Slideshow",
     "settings": {
@@ -3246,6 +3346,104 @@
               "medium": "Medium",
               "large": "Large",
               "xlarge": "Extra Large"
+            }
+          }
+        }
+      }
+    }
+  },
+  "steps": {
+    "name": "Steps",
+    "settings": {
+      "eyebrow": {
+        "label": "Eyebrow Text"
+      },
+      "title": {
+        "label": "Heading"
+      },
+      "description": {
+        "label": "Subheading"
+      },
+      "display_header": {
+        "label": "Display"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "step": {
+        "name": "Step",
+        "settings": {
+          "image": {
+            "label": "Image"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Description"
+          },
+          "button_link": {
+            "label": "Button Link"
+          }
+        }
+      }
+    }
+  },
+  "testimonial_slider": {
+    "name": "Testimonial Slider",
+    "settings": {
+      "display_header": {
+        "label": "Display"
+      },
+      "autoplay": {
+        "label": "Autoplay"
+      },
+      "autoplay_speed": {
+        "label": "Autoplay speed"
+      },
+      "color_scheme": {
+        "label": "Color Scheme",
+        "options": {
+          "standard": "Standard",
+          "highlight": "Highlight"
+        }
+      }
+    },
+    "blocks": {
+      "quote": {
+        "name": "Quote",
+        "settings": {
+          "content_header": {
+            "label": "Content"
+          },
+          "quote": {
+            "label": "Quote"
+          },
+          "avatar": {
+            "label": "Avatar"
+          },
+          "name": {
+            "label": "Name"
+          },
+          "title": {
+            "label": "Title"
+          },
+          "display_header": {
+            "label": "Display"
+          },
+          "rating": {
+            "label": "Rating",
+            "options": {
+              "": "None",
+              "5": "★★★★★",
+              "4": "★★★★",
+              "3": "★★★"
             }
           }
         }

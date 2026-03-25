@@ -1,0 +1,172 @@
+{
+  "type": "checkerboard",
+  "displayName": "tTheme:checkerboard.name",
+  "aliases": [
+    "alternating grid",
+    "feature cards",
+    "image text grid",
+    "services grid"
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:checkerboard.settings.eyebrow.label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:checkerboard.settings.title.label",
+      "default": "What We Do"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:checkerboard.settings.description.label"
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:checkerboard.settings.display_header.label"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "tTheme:checkerboard.settings.columns_desktop.label",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:checkerboard.settings.color_scheme.label",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "tTheme:checkerboard.settings.color_scheme.options.standard"
+        },
+        {
+          "value": "highlight",
+          "label": "tTheme:checkerboard.settings.color_scheme.options.highlight"
+        }
+      ]
+    }
+  ],
+  "maxBlocks": 12,
+  "blocks": [
+    {
+      "type": "card",
+      "displayName": "tTheme:checkerboard.blocks.card.name",
+      "settings": [
+        {
+          "type": "image",
+          "id": "image",
+          "label": "tTheme:checkerboard.blocks.card.settings.image.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:checkerboard.blocks.card.settings.title.label",
+          "default": "Feature Title"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "tTheme:checkerboard.blocks.card.settings.description.label",
+          "default": "<p>A short description of this feature or service.</p>"
+        },
+        {
+          "type": "link",
+          "id": "button_link",
+          "label": "tTheme:checkerboard.blocks.card.settings.button_link.label",
+          "default": {
+            "text": "Learn More",
+            "href": "#",
+            "target": "_self"
+          }
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "card",
+      "settings": {
+        "title": "Landscape Design",
+        "description": "<p>Custom landscape design to elevate your outdoor space.</p>",
+        "button_link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "card",
+      "settings": {
+        "title": "",
+        "description": ""
+      }
+    },
+    {
+      "type": "card",
+      "settings": {
+        "title": "Garden Maintenance",
+        "description": "<p>Comprehensive garden maintenance for a lush, healthy yard.</p>",
+        "button_link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "card",
+      "settings": {
+        "title": "",
+        "description": ""
+      }
+    },
+    {
+      "type": "card",
+      "settings": {
+        "title": "",
+        "description": ""
+      }
+    },
+    {
+      "type": "card",
+      "settings": {
+        "title": "Gardening Services",
+        "description": "<p>Tailored gardening solutions for your needs.</p>",
+        "button_link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    },
+    {
+      "type": "card",
+      "settings": {
+        "title": "",
+        "description": ""
+      }
+    },
+    {
+      "type": "card",
+      "settings": {
+        "title": "Irrigation & Drainage",
+        "description": "<p>Sustainable landscaping and maintenance to enhance your outdoors.</p>",
+        "button_link": {
+          "text": "Learn More",
+          "href": "#",
+          "target": "_self"
+        }
+      }
+    }
+  ]
+}
