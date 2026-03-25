@@ -1714,7 +1714,7 @@
             "label": "Fermé"
           }
         },
-        "name": "Accordéon"
+        "name": "Jour"
       },
       "info": {
         "name": "Info",
@@ -1819,7 +1819,7 @@
             "label": "Jeu de couleurs",
             "options": {
               "standard": "Standard",
-              "highlight": "Accent"
+              "highlight": "Mis en avant"
             }
           }
         }
@@ -2044,6 +2044,7 @@
         "label": "Vidéo"
       },
       "overlay_color": {
+        "label": "Couleur de superposition",
         "description": "Ajustez l'alpha pour l'intensité de la superposition"
       },
       "height": {
@@ -2070,7 +2071,7 @@
         "label": "Image de signature"
       },
       "image_ratio": {
-        "label": "Ratio d image",
+        "label": "Ratio d'image",
         "options": {
           "portrait": "Portrait",
           "square": "Carré",

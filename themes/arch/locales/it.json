@@ -491,14 +491,14 @@
           }
         },
         "rating": {
-          "name": "Valutazione a Stelle",
+          "name": "Valutazione a stelle",
           "settings": {
             "rating": {
               "label": "Valutazione",
               "options": {
-                "3": "3 stelle",
-                "4": "4 stelle",
-                "5": "5 stelle"
+                "3": "★★★",
+                "4": "★★★★",
+                "5": "★★★★★"
               }
             }
           }
@@ -1241,7 +1241,7 @@
         "label": "Immagine di sfondo"
       },
       "fullwidth": {
-        "description": "Se abilitato, l'immagine occupa l'intera larghezza. Se disabilitato, l'immagine è contenuta nella griglia del tema."
+        "description": "Mostra l'immagine a piena larghezza del browser."
       }
     },
     "name": "Immagine"
@@ -1714,7 +1714,7 @@
             "label": "Chiuso"
           }
         },
-        "name": "Fisarmonica"
+        "name": "Giorno"
       },
       "info": {
         "name": "Info",
@@ -2044,6 +2044,7 @@
         "label": "Video"
       },
       "overlay_color": {
+        "label": "Colore sovrapposizione",
         "description": "Regola l'alfa per l'intensità della sovrapposizione"
       },
       "height": {

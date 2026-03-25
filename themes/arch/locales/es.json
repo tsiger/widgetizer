@@ -1241,7 +1241,7 @@
         "label": "Imagen de fondo"
       },
       "fullwidth": {
-        "description": "Cuando está activado, la imagen ocupa el ancho completo. Cuando está desactivado, la imagen se contiene dentro de la cuadrícula del tema."
+        "description": "Mostrar imagen al ancho completo del navegador."
       }
     },
     "name": "Imagen"
@@ -1714,7 +1714,7 @@
             "label": "Cerrado"
           }
         },
-        "name": "Acordeón"
+        "name": "Día"
       },
       "info": {
         "name": "Información",
@@ -1784,7 +1784,7 @@
             "label": "Tamaño de encabezado",
             "options": {
               "lg": "Grande",
-              "xl": "Extra grande",
+              "xl": "Extra Grande",
               "2xl": "2X Grande",
               "3xl": "3X Grande",
               "4xl": "4X Grande",
@@ -1886,7 +1886,7 @@
           "sm": "Pequeño",
           "md": "Mediano",
           "lg": "Grande",
-          "xl": "Muy grande"
+          "xl": "Extra Grande"
         }
       },
       "bg_color": {
@@ -2044,6 +2044,7 @@
         "label": "Video"
       },
       "overlay_color": {
+        "label": "Color de superposición",
         "description": "Ajusta el alfa para la intensidad de la superposición"
       },
       "height": {

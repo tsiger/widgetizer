@@ -2044,6 +2044,7 @@
         "label": "Video"
       },
       "overlay_color": {
+        "label": "Overlay Color",
         "description": "Adjust alpha for overlay intensity"
       },
       "height": {

@@ -2044,6 +2044,7 @@
         "label": "Video"
       },
       "overlay_color": {
+        "label": "Overlay-Farbe",
         "description": "Alpha-Wert für Overlay-Intensität anpassen"
       },
       "height": {
