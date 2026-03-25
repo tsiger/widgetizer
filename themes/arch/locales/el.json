@@ -1,3447 +1,4 @@
 {
-  "accordion": {
-    "name": "Ακορντεόν",
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "style": {
-        "label": "Στυλ",
-        "options": {
-          "separated": "Διαχωρισμένο",
-          "connected": "Συνδεδεμένο"
-        }
-      },
-      "allow_multiple": {
-        "label": "Να επιτρέπονται πολλαπλά ανοιχτά"
-      },
-      "sidebar_position": {
-        "label": "Θέση πλαϊνής μπάρας",
-        "options": {
-          "left": "Αριστερά",
-          "right": "Δεξιά"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Στοιχείο",
-        "settings": {
-          "question": {
-            "label": "Ερώτηση"
-          },
-          "answer": {
-            "label": "Απάντηση"
-          }
-        }
-      },
-      "info": {
-        "name": "Πληροφορίες",
-        "settings": {
-          "title": {
-            "label": "Τίτλος"
-          },
-          "text": {
-            "label": "Κείμενο"
-          }
-        }
-      },
-      "social": {
-        "name": "Εικονίδια κοινωνικών δικτύων"
-      }
-    }
-  },
-  "banner": {
-    "name": "Πανό",
-    "settings": {
-      "image": {
-        "label": "Εικόνα φόντου"
-      },
-      "overlay_color": {
-        "label": "Χρώμα επικάλυψης",
-        "description": "Ισχύει μόνο αν υπάρχει εικόνα φόντου."
-      },
-      "height": {
-        "label": "Ύψος",
-        "options": {
-          "auto": "Αυτόματο",
-          "small": "Μικρό",
-          "medium": "Μεσαίο",
-          "large": "Μεγάλο"
-        }
-      },
-      "fullwidth": {
-        "label": "Πλήρες πλάτος"
-      },
-      "alignment": {
-        "label": "Στοίχιση περιεχομένου",
-        "options": {
-          "center": "Κέντρο",
-          "start": "Αρχή"
-        }
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "button": {
-        "settings": {
-          "size": {
-            "options": {
-              "small": "Μικρό",
-              "medium": "Μεσαίο",
-              "large": "Μεγάλο",
-              "xlarge": "Πολύ μεγάλο"
-            },
-            "label": "Μέγεθος κουμπιού"
-          },
-          "link": {
-            "label": "Κουμπί 1"
-          },
-          "style": {
-            "label": "Στυλ κουμπιού 1",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "style_2": {
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            },
-            "label": "Στυλ κουμπιού 2"
-          },
-          "link_2": {
-            "label": "Κουμπί 2"
-          }
-        },
-        "name": "Ομάδα κουμπιών"
-      },
-      "text": {
-        "settings": {
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "base": "Βάση",
-              "sm": "Μικρό",
-              "lg": "Μεγάλο"
-            }
-          },
-          "uppercase": {
-            "label": "Κεφαλαία"
-          },
-          "muted": {
-            "label": "Αχνό χρώμα"
-          },
-          "text": {
-            "label": "Κείμενο"
-          }
-        },
-        "name": "Κείμενο"
-      },
-      "heading": {
-        "settings": {
-          "size": {
-            "options": {
-              "2xl": "2X Μεγάλο",
-              "3xl": "3X Μεγάλο",
-              "4xl": "4X Μεγάλο",
-              "5xl": "5X Μεγάλο",
-              "6xl": "6X Μεγάλο",
-              "7xl": "7X Μεγάλο",
-              "8xl": "8X Μεγάλο",
-              "9xl": "9X Μεγάλο",
-              "lg": "Μεγάλο",
-              "xl": "Πολύ μεγάλο"
-            },
-            "label": "Μέγεθος"
-          },
-          "text": {
-            "label": "Κείμενο"
-          }
-        },
-        "name": "Επικεφαλίδα"
-      },
-      "rating": {
-        "name": "Αξιολόγηση με Αστέρια",
-        "settings": {
-          "rating": {
-            "label": "Αξιολόγηση",
-            "options": {
-              "3": "3 αστέρια",
-              "4": "4 αστέρια",
-              "5": "5 αστέρια"
-            }
-          }
-        }
-      },
-      "image": {
-        "name": "Εικόνα",
-        "settings": {
-          "image": {
-            "label": "Εικόνα"
-          },
-          "width": {
-            "label": "Μέγιστο πλάτος (%)"
-          }
-        }
-      },
-      "features": {
-        "name": "Χαρακτηριστικά",
-        "settings": {
-          "features": {
-            "label": "Χαρακτηριστικά (ένα ανά γραμμή)",
-            "description": "Ξεκινήστε μια γραμμή με + για σημάδι ελέγχου ή - για σταυρό."
-          }
-        }
-      },
-      "icon": {
-        "name": "Εικονίδιο",
-        "settings": {
-          "icon": {
-            "label": "Εικονίδιο"
-          },
-          "style": {
-            "label": "Στυλ εικονιδίου",
-            "options": {
-              "plain": "Απλό",
-              "outline": "Περίγραμμα",
-              "filled": "Γεμάτο"
-            }
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "sm": "Μικρό",
-              "md": "Μεσαίο",
-              "lg": "Μεγάλο",
-              "xl": "Πολύ μεγάλο"
-            }
-          },
-          "shape": {
-            "label": "Σχήμα",
-            "options": {
-              "sharp": "Αιχμηρό",
-              "rounded": "Στρογγυλεμένο",
-              "circle": "Κύκλος"
-            }
-          }
-        }
-      },
-      "numbered_item": {
-        "name": "Αριθμημένο Στοιχείο",
-        "settings": {
-          "title": {
-            "label": "Τίτλος"
-          },
-          "description": {
-            "label": "Περιγραφή"
-          },
-          "size": {
-            "label": "Μέγεθος κύκλου",
-            "options": {
-              "small": "Μικρό",
-              "medium": "Μεσαίο",
-              "large": "Μεγάλο",
-              "xlarge": "Πολύ Μεγάλο"
-            }
-          },
-          "shape": {
-            "label": "Σχήμα",
-            "options": {
-              "sharp": "Αιχμηρό",
-              "rounded": "Στρογγυλεμένο",
-              "circle": "Κύκλος"
-            }
-          }
-        }
-      }
-    }
-  },
-  "bento_grid": {
-    "name": "Πλέγμα Bento",
-    "settings": {
-      "gap": {
-        "label": "Μέγεθος κενού",
-        "options": {
-          "0": "Κανένα",
-          "var(--space-sm)": "Μικρό",
-          "var(--space-md)": "Μεσαίο",
-          "var(--space-lg)": "Μεγάλο",
-          "var(--space-xl)": "Πολύ μεγάλο"
-        }
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Στοιχείο Bento",
-        "settings": {
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "link": {
-            "label": "Σύνδεσμος"
-          },
-          "layout_header": {
-            "label": "Διάταξη"
-          },
-          "col_span": {
-            "label": "Εύρος στήλης"
-          },
-          "row_span": {
-            "label": "Εύρος σειράς"
-          },
-          "background_color": {
-            "label": "Φόντο μπλοκ"
-          },
-          "overlay_color": {
-            "label": "Επικάλυψη εικόνας",
-            "description": "Ισχύει μόνο αν υπάρχει εικόνα φόντου."
-          },
-          "text_color": {
-            "label": "Χρώμα κειμένου",
-            "options": {
-              "dark": "Σκούρο",
-              "light": "Φωτεινό"
-            }
-          },
-          "alignment": {
-            "label": "Στοίχιση κειμένου",
-            "options": {
-              "start": "Αρχή",
-              "center": "Κέντρο"
-            }
-          },
-          "title": {
-            "label": "Επικεφαλίδα"
-          },
-          "text": {
-            "label": "Κείμενο"
-          },
-          "image": {
-            "label": "Φωτογραφία (προαιρετική)"
-          },
-          "display_header": {
-            "label": "Εμφάνιση"
-          }
-        }
-      }
-    }
-  },
-  "card_grid": {
-    "name": "Πλέγμα καρτών",
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "layout": {
-        "options": {
-          "grid": "Πλέγμα",
-          "carousel": "Καρουζέλ"
-        },
-        "label": "Διάταξη"
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιτραπέζιου"
-      },
-      "alignment": {
-        "label": "Στοίχιση",
-        "options": {
-          "start": "Αριστερά",
-          "center": "Κεντραρισμένο"
-        }
-      },
-      "image_position": {
-        "label": "Θέση εικόνας",
-        "options": {
-          "top": "Πάνω",
-          "bottom": "Κάτω"
-        }
-      },
-      "aspect_ratio": {
-        "label": "Αναλογία εικόνας",
-        "options": {
-          "auto": "Αυτόματο",
-          "1 / 1": "Τετράγωνο (1:1)",
-          "4 / 3": "Οριζόντιο (4:3)",
-          "3 / 2": "Οριζόντιο (3:2)",
-          "3 / 4": "Κατακόρυφο (3:4)",
-          "16 / 9": "Ευρεία οθόνη (16:9)"
-        }
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "card": {
-        "name": "Κάρτα",
-        "settings": {
-          "image": {
-            "label": "Εικόνα"
-          },
-          "subtitle": {
-            "label": "Υπότιτλος"
-          },
-          "description": {
-            "label": "Περιγραφή"
-          },
-          "button_link": {
-            "label": "Σύνδεσμος κουμπιού"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "title": {
-            "label": "Επικεφαλίδα"
-          }
-        }
-      }
-    }
-  },
-  "comparison_slider": {
-    "name": "Ολισθητής σύγκρισης",
-    "settings": {
-      "before_image": {
-        "label": "Εικόνα πριν"
-      },
-      "after_image": {
-        "label": "Εικόνα μετά"
-      },
-      "labels_header": {
-        "label": "Ετικέτες"
-      },
-      "before_label": {
-        "label": "Ετικέτα πριν"
-      },
-      "after_label": {
-        "label": "Ετικέτα μετά"
-      },
-      "orientation": {
-        "label": "Προσανατολισμός ολισθητή",
-        "options": {
-          "horizontal": "Οριζόντιο",
-          "vertical": "Κάθετο"
-        }
-      },
-      "initial_position": {
-        "label": "Αρχική θέση ολισθητή"
-      },
-      "show_labels": {
-        "label": "Εμφάνιση ετικετών πριν/μετά"
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "comparison_table": {
-    "name": "Πίνακας σύγκρισης",
-    "settings": {
-      "feature_column_label": {
-        "label": "Ετικέτα στήλης χαρακτηριστικών"
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "column": {
-        "name": "Στήλη",
-        "settings": {
-          "name": {
-            "label": "Όνομα στήλης"
-          },
-          "badge": {
-            "label": "Κείμενο σήματος (προαιρετικό)"
-          },
-          "options_header": {
-            "label": "Επιλογές"
-          },
-          "featured": {
-            "label": "Προτεινόμενο (επισημασμένο)"
-          },
-          "link": {
-            "label": "Κουμπί CTA"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          }
-        }
-      },
-      "feature": {
-        "name": "Σειρά χαρακτηριστικών",
-        "settings": {
-          "name": {
-            "label": "Όνομα χαρακτηριστικού"
-          },
-          "values": {
-            "label": "Τιμές για κάθε στήλη (μία ανά γραμμή: yes, no ή προσαρμοσμένο κείμενο)"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          }
-        }
-      }
-    }
-  },
-  "core_divider": {
-    "name": "Διαχωριστικό",
-    "description": "Προσθήκη οριζόντιας γραμμής διαχωρισμού",
-    "category": "Διάταξη",
-    "settings": {
-      "color": {
-        "label": "Χρώμα γραμμής",
-        "description": "Χρώμα της γραμμής διαχωρισμού"
-      },
-      "thickness": {
-        "label": "Πάχος",
-        "description": "Πάχος της γραμμής διαχωρισμού σε εικονοστοιχεία"
-      },
-      "width": {
-        "label": "Πλάτος",
-        "description": "Πλάτος του διαχωριστικού ως ποσοστό του κοντέινερ"
-      },
-      "padding": {
-        "label": "Περιθώριο",
-        "description": "Κάθετο περιθώριο γύρω από το διαχωριστικό σε εικονοστοιχεία"
-      }
-    }
-  },
-  "core_spacer": {
-    "name": "Αποστάτης",
-    "description": "Προσθήκη κάθετου κενού μεταξύ ενοτήτων περιεχομένου",
-    "category": "Διάταξη",
-    "settings": {
-      "height": {
-        "label": "Ύψος",
-        "description": "Το ύψος του αποστάτη σε εικονοστοιχεία"
-      },
-      "showOnMobile": {
-        "label": "Εμφάνιση σε κινητό",
-        "description": "Εμφάνιση του αποστάτη σε κινητές συσκευές"
-      },
-      "mobileHeight": {
-        "label": "Ύψος σε κινητό",
-        "description": "Το ύψος του αποστάτη σε κινητές συσκευές σε εικονοστοιχεία"
-      }
-    }
-  },
-  "content_switcher": {
-    "name": "Εναλλάκτης περιεχομένου",
-    "settings": {
-      "switcher_header": {
-        "label": "Εναλλάκτης"
-      },
-      "switcher_type": {
-        "label": "Στυλ εναλλάκτη",
-        "options": {
-          "toggle": "Εναλλαγή (2 Επιλογές)",
-          "tabs": "Καρτέλες (Έως 3 επιλογές)"
-        }
-      },
-      "option_1_label": {
-        "label": "Ετικέτα επιλογής 1"
-      },
-      "option_2_label": {
-        "label": "Ετικέτα επιλογής 2"
-      },
-      "option_3_label": {
-        "label": "Ετικέτα επιλογής 3 (μόνο καρτέλες)"
-      },
-      "columns": {
-        "label": "Στήλες ανά κατάσταση"
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "labels_header": {
-        "label": "Ετικέτες"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Στοιχείο περιεχομένου",
-        "settings": {
-          "price": {
-            "label": "Τιμή / Αξία (Προαιρετικό)"
-          },
-          "link": {
-            "label": "Σύνδεσμος / CTA"
-          },
-          "target_option": {
-            "label": "Αντιστοίχιση σε επιλογή",
-            "options": {
-              "1": "Επιλογή 1",
-              "2": "Επιλογή 2",
-              "3": "Επιλογή 3"
-            }
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "title": {
-            "label": "Επικεφαλίδα"
-          },
-          "text": {
-            "label": "Κείμενο"
-          },
-          "image": {
-            "label": "Φωτογραφία (προαιρετική)"
-          },
-          "layout_header": {
-            "label": "Διάταξη"
-          }
-        }
-      }
-    }
-  },
-  "countdown": {
-    "name": "Χρονόμετρο αντίστροφης μέτρησης",
-    "settings": {
-      "target_date": {
-        "label": "Ημερομηνία-στόχος (YYYY-MM-DD HH:MM)"
-      },
-      "expired_message": {
-        "label": "Μήνυμα κατά τη λήξη"
-      },
-      "button": {
-        "label": "Κουμπί προτροπής"
-      },
-      "show_seconds": {
-        "label": "Εμφάνιση δευτερολέπτων"
-      },
-      "style": {
-        "options": {
-          "cards": "Κάρτες",
-          "minimal": "Ελάχιστο"
-        },
-        "label": "Στυλ"
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "options_header": {
-        "label": "Επιλογές"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "embed": {
-    "name": "Ενσωματωμένο widget",
-    "settings": {
-      "code": {
-        "label": "Κώδικας ενσωμάτωσης (HTML/JS/Iframe)"
-      },
-      "max_width": {
-        "label": "Πλάτος δοχείου",
-        "options": {
-          "narrow": "Στενό",
-          "wide": "Φαρδύ",
-          "fullwidth": "Πλήρες πλάτος",
-          "medium": "Μεσαίο"
-        }
-      },
-      "alignment": {
-        "label": "Στοίχιση",
-        "options": {
-          "start": "Αρχή",
-          "center": "Κέντρο",
-          "end": "Τέλος"
-        }
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "event_list": {
-    "name": "Λίστα εκδηλώσεων",
-    "blocks": {
-      "event": {
-        "name": "Εκδήλωση",
-        "settings": {
-          "day": {
-            "label": "Ημέρα (αριθμός)"
-          },
-          "month": {
-            "label": "Μήνας (σύντομος)"
-          },
-          "title": {
-            "label": "Τίτλος εκδήλωσης"
-          },
-          "location": {
-            "label": "Τοποθεσία & ώρα"
-          },
-          "button_link": {
-            "label": "Κουμπί"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "description": {
-            "label": "Υποεπικεφαλίδα"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "features_split": {
-    "name": "Διαχωρισμένα χαρακτηριστικά",
-    "settings": {
-      "icon_style": {
-        "label": "Στυλ εικονιδίου",
-        "options": {
-          "plain": "Απλό",
-          "outline": "Περίγραμμα",
-          "filled": "Γεμάτο"
-        }
-      },
-      "icon_size": {
-        "label": "Μέγεθος εικονιδίου",
-        "options": {
-          "sm": "Μικρό",
-          "md": "Μεσαίο",
-          "lg": "Μεγάλο",
-          "xl": "Πολύ μεγάλο"
-        }
-      },
-      "icon_shape": {
-        "label": "Σχήμα εικονιδίου",
-        "options": {
-          "sharp": "Αιχμηρό",
-          "rounded": "Στρογγυλεμένο",
-          "circle": "Κύκλος"
-        }
-      },
-      "content_position": {
-        "label": "Θέση περιεχομένου",
-        "options": {
-          "left": "Αριστερά",
-          "right": "Δεξιά"
-        }
-      },
-      "show_divider": {
-        "label": "Εμφάνιση διαχωριστικού"
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "feature": {
-        "name": "Χαρακτηριστικό",
-        "settings": {
-          "icon": {
-            "label": "Εικονίδιο"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "title": {
-            "label": "Επικεφαλίδα"
-          },
-          "description": {
-            "label": "Υποεπικεφαλίδα"
-          }
-        }
-      }
-    }
-  },
-  "footer": {
-    "name": "Υποσέλιδο",
-    "settings": {
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "copyright": {
-        "label": "Κείμενο πνευματικών δικαιωμάτων"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Έντονο"
-        }
-      }
-    },
-    "blocks": {
-      "logo_text": {
-        "name": "Λογότυπο & Κείμενο",
-        "settings": {
-          "logo_text": {
-            "label": "Κείμενο λογοτύπου"
-          },
-          "logo": {
-            "label": "Εικόνα λογοτύπου"
-          },
-          "logo_width": {
-            "label": "Πλάτος λογοτύπου"
-          },
-          "text": {
-            "label": "Κείμενο"
-          }
-        }
-      },
-      "text_block": {
-        "name": "Κείμενο",
-        "settings": {
-          "title": {
-            "label": "Τίτλος"
-          },
-          "text": {
-            "label": "Κείμενο"
-          }
-        }
-      },
-      "menu_block": {
-        "name": "Μενού",
-        "settings": {
-          "title": {
-            "label": "Τίτλος"
-          },
-          "menu": {
-            "label": "Μενού πλοήγησης",
-            "description": "Επιλέξτε το μενού προς εμφάνιση"
-          }
-        }
-      },
-      "social_block": {
-        "name": "Εικονίδια κοινωνικών δικτύων",
-        "settings": {
-          "title": {
-            "label": "Τίτλος"
-          }
-        }
-      }
-    }
-  },
-  "gallery": {
-    "name": "Συλλογή",
-    "settings": {
-      "columns_desktop": {
-        "label": "Στήλες (Επιτραπέζιος)"
-      },
-      "staggered": {
-        "label": "Κλιμακωτή διάταξη"
-      },
-      "aspect_ratio": {
-        "label": "Αναλογία διαστάσεων εικόνας",
-        "options": {
-          "contain": "Εμφάνιση πλήρους εικόνας",
-          "1 / 1": "Τετράγωνο (1:1)",
-          "4 / 3": "Τυπικό (4:3)",
-          "3 / 2": "Τοπίο (3:2)",
-          "3 / 4": "Πορτρέτο (3:4)",
-          "16 / 9": "Ευρεία οθόνη (16:9)",
-          "auto": "Αυτόματο"
-        }
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "layout": {
-        "label": "Διάταξη",
-        "options": {
-          "grid": "Πλέγμα",
-          "carousel": "Καρουζέλ"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "image": {
-        "name": "Εικόνα",
-        "settings": {
-          "caption": {
-            "label": "Λεζάντα"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "image": {
-            "label": "Εικόνα φόντου"
-          }
-        }
-      }
-    }
-  },
-  "header": {
-    "name": "Κεφαλίδα",
-    "settings": {
-      "logo_header": {
-        "label": "Λογότυπο"
-      },
-      "logoImage": {
-        "label": "Εικόνα λογοτύπου",
-        "description": "Ανεβάστε μια εικόνα λογοτύπου. Αν υπάρχει, θα εμφανίζεται αντί του κειμένου λογοτύπου."
-      },
-      "logoMaxWidth": {
-        "label": "Μέγιστο πλάτος λογοτύπου",
-        "description": "Μέγιστο πλάτος της εικόνας λογοτύπου"
-      },
-      "logoText": {
-        "label": "Κείμενο λογοτύπου",
-        "description": "Κείμενο για εμφάνιση στο λογότυπο κεφαλίδας"
-      },
-      "contact_header": {
-        "label": "Στοιχεία επικοινωνίας"
-      },
-      "contactDetailsLine1": {
-        "label": "Στοιχεία επικοινωνίας 1",
-        "description": "Πρώτη γραμμή στοιχείων επικοινωνίας (π.χ. τηλέφωνο)"
-      },
-      "contactDetailsLine2": {
-        "label": "Στοιχεία επικοινωνίας 2",
-        "description": "Δεύτερη γραμμή στοιχείων επικοινωνίας (π.χ. διεύθυνση)"
-      },
-      "contact_position": {
-        "label": "Θέση στοιχείων επικοινωνίας",
-        "options": {
-          "logo": "Δίπλα στο λογότυπο",
-          "menu": "Δίπλα στο κουμπί μενού"
-        }
-      },
-      "navigation_header": {
-        "label": "Πλοήγηση"
-      },
-      "headerNavigation": {
-        "label": "Μενού πλοήγησης",
-        "description": "Επιλέξτε το μενού για την κεφαλίδα"
-      },
-      "ctaButtonLink": {
-        "label": "Κουμπί CTA",
-        "description": "Κουμπί κλήσης σε δράση (αφήστε κενό το κείμενο για απόκρυψη)"
-      },
-      "ctaButtonStyle": {
-        "label": "Στυλ κουμπιού",
-        "options": {
-          "primary": "Κύριο",
-          "secondary": "Δευτερεύον"
-        }
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "full_width": {
-        "label": "Πλήρες πλάτος",
-        "description": "Όταν ενεργοποιηθεί, η κεφαλίδα εκτείνεται σε όλο το πλάτος. Όταν απενεργοποιηθεί, παραμένει κεντραρισμένη."
-      },
-      "sticky": {
-        "label": "Σταθερή κεφαλίδα",
-        "description": "Όταν ενεργοποιηθεί, η κεφαλίδα παραμένει σταθερή στην κορυφή κατά την κύλιση"
-      },
-      "transparent_on_hero": {
-        "label": "Διαφανές σε hero",
-        "description": "Η κεφαλίδα γίνεται διαφανής πάνω σε banner, slideshow και video popup widgets"
-      },
-      "transparent_logo": {
-        "label": "Λογότυπο διαφανούς κεφαλίδας",
-        "description": "Εναλλακτικό λογότυπο που εμφανίζεται όταν η κεφαλίδα είναι διαφανής (π.χ. φωτεινή έκδοση)"
-      },
-      "center_nav": {
-        "label": "Κεντράρισμα πλοήγησης",
-        "description": "Κεντράρει το μενού πλοήγησης στην κεφαλίδα με το λογότυπο αριστερά και το CTA δεξιά (μόνο desktop)"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Έντονο"
-        }
-      }
-    }
-  },
-  "icon_card_grid": {
-    "name": "Πλέγμα καρτών εικονιδίων",
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "icon_style": {
-        "label": "Στυλ εικονιδίου",
-        "options": {
-          "plain": "Απλό",
-          "outline": "Περίγραμμα",
-          "filled": "Γεμάτο"
-        }
-      },
-      "icon_size": {
-        "label": "Μέγεθος εικονιδίου",
-        "options": {
-          "sm": "Μικρό",
-          "md": "Μεσαίο",
-          "lg": "Μεγάλο",
-          "xl": "Πολύ μεγάλο"
-        }
-      },
-      "icon_shape": {
-        "label": "Σχήμα εικονιδίου",
-        "options": {
-          "sharp": "Αιχμηρό",
-          "rounded": "Στρογγυλεμένο",
-          "circle": "Κύκλος"
-        }
-      },
-      "alignment": {
-        "label": "Στοίχιση",
-        "options": {
-          "start": "Αριστερά",
-          "center": "Κεντραρισμένο"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      },
-      "layout": {
-        "label": "Διάταξη",
-        "options": {
-          "grid": "Πλέγμα",
-          "carousel": "Καρουζέλ"
-        }
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιτραπέζιου"
-      },
-      "featured_image": {
-        "label": "Προτεινόμενη εικόνα"
-      },
-      "featured_image_position": {
-        "label": "Θέση εικόνας",
-        "options": {
-          "start": "Αριστερά",
-          "end": "Δεξιά"
-        }
-      }
-    },
-    "blocks": {
-      "card": {
-        "name": "Κάρτα",
-        "settings": {
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "icon": {
-            "label": "Εικονίδιο"
-          },
-          "subtitle": {
-            "label": "Υπότιτλος"
-          },
-          "title": {
-            "label": "Επικεφαλίδα"
-          },
-          "description": {
-            "label": "Περιγραφή"
-          },
-          "button_link": {
-            "label": "Σύνδεσμος κουμπιού"
-          }
-        }
-      }
-    }
-  },
-  "icon_list": {
-    "name": "Λίστα εικονιδίων",
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "icon_style": {
-        "label": "Στυλ εικονιδίου",
-        "options": {
-          "plain": "Απλό",
-          "outline": "Περίγραμμα",
-          "filled": "Γεμάτο"
-        }
-      },
-      "icon_size": {
-        "label": "Μέγεθος εικονιδίου",
-        "options": {
-          "sm": "Μικρό",
-          "md": "Μεσαίο",
-          "lg": "Μεγάλο",
-          "xl": "Πολύ μεγάλο"
-        }
-      },
-      "icon_shape": {
-        "label": "Σχήμα εικονιδίου",
-        "options": {
-          "sharp": "Αιχμηρό",
-          "rounded": "Στρογγυλεμένο",
-          "circle": "Κύκλος"
-        }
-      },
-      "layout": {
-        "label": "Διάταξη",
-        "options": {
-          "grid": "Πλέγμα",
-          "carousel": "Καρουζέλ"
-        }
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιτραπέζιου"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Στοιχείο",
-        "settings": {
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "icon": {
-            "label": "Εικονίδιο"
-          },
-          "title": {
-            "label": "Επικεφαλίδα"
-          },
-          "description": {
-            "label": "Υποεπικεφαλίδα"
-          }
-        }
-      }
-    }
-  },
-  "image": {
-    "settings": {
-      "link": {
-        "description": "Προαιρετικός σύνδεσμος όταν πατηθεί η εικόνα.",
-        "label": "Κουμπί 1"
-      },
-      "fullwidth": {
-        "description": "Όταν είναι ενεργοποιημένο, η εικόνα καλύπτει πλήρες πλάτος. Όταν είναι απενεργοποιημένο, η εικόνα περιέχεται εντός του πλέγματος του θέματος.",
-        "label": "Πλήρες πλάτος"
-      },
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "image": {
-        "label": "Εικόνα φόντου"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      }
-    },
-    "name": "Εικόνα"
-  },
-  "image_callout": {
-    "name": "Επεξήγηση εικόνας",
-    "settings": {
-      "image_position": {
-        "label": "Θέση εικόνας",
-        "options": {
-          "left": "Αριστερά",
-          "right": "Δεξιά"
-        }
-      },
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "image": {
-        "label": "Εικόνα φόντου"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "features": {
-        "name": "Χαρακτηριστικά",
-        "settings": {
-          "features": {
-            "label": "Χαρακτηριστικά (ένα ανά γραμμή)",
-            "description": "Ξεκινήστε μια γραμμή με + για σημάδι ελέγχου ή - για σταυρό."
-          }
-        }
-      },
-      "heading": {
-        "name": "Επικεφαλίδα",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "lg": "Μεγάλο",
-              "xl": "Πολύ μεγάλο",
-              "2xl": "2X Μεγάλο",
-              "3xl": "3X Μεγάλο",
-              "4xl": "4X Μεγάλο",
-              "5xl": "5X Μεγάλο",
-              "6xl": "6X Μεγάλο",
-              "7xl": "7X Μεγάλο",
-              "8xl": "8X Μεγάλο",
-              "9xl": "9X Μεγάλο"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Κείμενο",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "sm": "Μικρό",
-              "base": "Βάση",
-              "lg": "Μεγάλο"
-            }
-          },
-          "uppercase": {
-            "label": "Κεφαλαία"
-          },
-          "muted": {
-            "label": "Αχνό χρώμα"
-          }
-        }
-      },
-      "button": {
-        "name": "Ομάδα κουμπιών",
-        "settings": {
-          "link": {
-            "label": "Κουμπί 1"
-          },
-          "style": {
-            "label": "Στυλ κουμπιού 1",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "link_2": {
-            "label": "Κουμπί 2"
-          },
-          "style_2": {
-            "label": "Στυλ κουμπιού 2",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "size": {
-            "label": "Μέγεθος κουμπιού",
-            "options": {
-              "small": "Μικρό",
-              "medium": "Μεσαίο",
-              "large": "Μεγάλο",
-              "xlarge": "Πολύ μεγάλο"
-            }
-          }
-        }
-      }
-    }
-  },
-  "image_hotspots": {
-    "name": "Σημεία ενδιαφέροντος εικόνας",
-    "settings": {
-      "image_alt": {
-        "label": "Εναλλακτικό κείμενο εικόνας"
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "image": {
-        "label": "Εικόνα φόντου"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "hotspot": {
-        "name": "Σημείο ενδιαφέροντος",
-        "settings": {
-          "title": {
-            "label": "Τίτλος tooltip"
-          },
-          "description": {
-            "label": "Περιγραφή tooltip"
-          },
-          "button_link": {
-            "label": "Σύνδεσμος κουμπιού"
-          },
-          "position_x": {
-            "label": "Οριζόντια θέση (%)"
-          },
-          "position_y": {
-            "label": "Κάθετη θέση (%)"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "layout_header": {
-            "label": "Διάταξη"
-          }
-        }
-      }
-    }
-  },
-  "image_tabs": {
-    "name": "Καρτέλες εικόνων",
-    "blocks": {
-      "tab": {
-        "name": "Καρτέλα",
-        "settings": {
-          "title": {
-            "label": "Τίτλος καρτέλας"
-          },
-          "description": {
-            "label": "Περιγραφή καρτέλας"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "image": {
-            "label": "Εικόνα φόντου"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "image_position": {
-        "label": "Θέση εικόνας",
-        "options": {
-          "left": "Αριστερά",
-          "right": "Δεξιά"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "image_text": {
-    "name": "Εικόνα + Κείμενο",
-    "settings": {
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "image": {
-        "label": "Εικόνα φόντου"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "image_position": {
-        "label": "Θέση εικόνας",
-        "options": {
-          "left": "Αριστερά",
-          "right": "Δεξιά"
-        }
-      },
-      "text_position": {
-        "label": "Κάθετη θέση κειμένου",
-        "options": {
-          "top": "Πάνω",
-          "center": "Κέντρο",
-          "bottom": "Κάτω"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "rating": {
-        "name": "Αξιολόγηση με Αστέρια",
-        "settings": {
-          "rating": {
-            "label": "Αξιολόγηση",
-            "options": {
-              "3": "3 αστέρια",
-              "4": "4 αστέρια",
-              "5": "5 αστέρια"
-            }
-          }
-        }
-      },
-      "image": {
-        "name": "Εικόνα",
-        "settings": {
-          "image": {
-            "label": "Εικόνα"
-          },
-          "width": {
-            "label": "Μέγιστο πλάτος (%)"
-          }
-        }
-      },
-      "heading": {
-        "name": "Επικεφαλίδα",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος κειμένου",
-            "options": {
-              "lg": "Μεγάλο",
-              "xl": "Πολύ μεγάλο",
-              "2xl": "2X Μεγάλο",
-              "3xl": "3X Μεγάλο",
-              "4xl": "4X Μεγάλο",
-              "5xl": "5X Μεγάλο",
-              "6xl": "6X Μεγάλο",
-              "7xl": "7X Μεγάλο",
-              "8xl": "8X Μεγάλο",
-              "9xl": "9X Μεγάλο"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Κείμενο",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "sm": "Μικρό",
-              "base": "Βάση",
-              "lg": "Μεγάλο"
-            }
-          },
-          "uppercase": {
-            "label": "Κεφαλαία"
-          },
-          "muted": {
-            "label": "Αχνό χρώμα"
-          }
-        }
-      },
-      "features": {
-        "name": "Χαρακτηριστικά",
-        "settings": {
-          "features": {
-            "label": "Χαρακτηριστικά (ένα ανά γραμμή)",
-            "description": "Ξεκινήστε μια γραμμή με + για σημάδι ελέγχου ή - για σταυρό."
-          }
-        }
-      },
-      "button": {
-        "name": "Ομάδα κουμπιών",
-        "settings": {
-          "link": {
-            "label": "Κουμπί 1"
-          },
-          "style": {
-            "label": "Στυλ κουμπιού 1",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "link_2": {
-            "label": "Κουμπί 2"
-          },
-          "style_2": {
-            "label": "Στυλ κουμπιού 2",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "size": {
-            "label": "Μέγεθος κουμπιού",
-            "options": {
-              "small": "Μικρό",
-              "medium": "Μεσαίο",
-              "large": "Μεγάλο",
-              "xlarge": "Πολύ μεγάλο"
-            }
-          }
-        }
-      },
-      "icon": {
-        "name": "Εικονίδιο",
-        "settings": {
-          "icon": {
-            "label": "Εικονίδιο"
-          },
-          "style": {
-            "label": "Στυλ εικονιδίου",
-            "options": {
-              "plain": "Απλό",
-              "outline": "Περίγραμμα",
-              "filled": "Γεμάτο"
-            }
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "sm": "Μικρό",
-              "md": "Μεσαίο",
-              "lg": "Μεγάλο",
-              "xl": "Πολύ Μεγάλο"
-            }
-          },
-          "shape": {
-            "label": "Σχήμα",
-            "options": {
-              "sharp": "Αιχμηρό",
-              "rounded": "Στρογγυλεμένο",
-              "circle": "Κύκλος"
-            }
-          }
-        }
-      },
-      "numbered_item": {
-        "name": "Αριθμημένο Στοιχείο",
-        "settings": {
-          "title": {
-            "label": "Τίτλος"
-          },
-          "description": {
-            "label": "Περιγραφή"
-          },
-          "size": {
-            "label": "Μέγεθος κύκλου",
-            "options": {
-              "small": "Μικρό",
-              "medium": "Μεσαίο",
-              "large": "Μεγάλο",
-              "xlarge": "Πολύ Μεγάλο"
-            }
-          },
-          "shape": {
-            "label": "Σχήμα",
-            "options": {
-              "sharp": "Αιχμηρό",
-              "rounded": "Στρογγυλεμένο",
-              "circle": "Κύκλος"
-            }
-          }
-        }
-      }
-    }
-  },
-  "job_listing": {
-    "name": "Αγγελία εργασίας",
-    "settings": {
-      "show_filters": {
-        "label": "Εμφάνιση φίλτρων τμήματος"
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "job": {
-        "name": "Θέση εργασίας",
-        "settings": {
-          "title": {
-            "label": "Τίτλος εργασίας"
-          },
-          "department": {
-            "label": "Τμήμα"
-          },
-          "location": {
-            "label": "Τοποθεσία"
-          },
-          "type": {
-            "label": "Τύπος απασχόλησης",
-            "options": {
-              "full-time": "Πλήρης απασχόληση",
-              "part-time": "Μερική απασχόληση",
-              "contract": "Σύμβαση",
-              "internship": "Πρακτική άσκηση"
-            }
-          },
-          "apply_link": {
-            "label": "Κουμπί εφαρμογής"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          }
-        }
-      }
-    }
-  },
-  "key_figures": {
-    "name": "Βασικά στοιχεία",
-    "settings": {
-      "layout": {
-        "options": {
-          "bar": "Οριζόντια μπάρα",
-          "cards": "Κάρτες",
-          "carousel": "Καρουζέλ"
-        },
-        "label": "Διάταξη"
-      },
-      "animate": {
-        "label": "Κινούμενοι αριθμοί"
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιτραπέζιου"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "figure": {
-        "name": "Στοιχείο",
-        "settings": {
-          "suffix": {
-            "label": "Επίθημα"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "number": {
-            "label": "Αριθμός"
-          },
-          "label": {
-            "label": "Ετικέτα"
-          },
-          "description": {
-            "label": "Υποεπικεφαλίδα"
-          }
-        }
-      }
-    }
-  },
-  "logo_cloud": {
-    "name": "Σύννεφο λογοτύπων",
-    "blocks": {
-      "logo": {
-        "name": "Λογότυπο",
-        "settings": {
-          "image": {
-            "label": "Εικόνα λογοτύπου"
-          },
-          "name": {
-            "label": "Όνομα εταιρείας"
-          },
-          "link": {
-            "label": "Σύνδεσμος (προαιρετικό)"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "layout": {
-        "label": "Διάταξη",
-        "options": {
-          "grid": "Πλέγμα",
-          "carousel": "Καρουζέλ"
-        }
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιτραπέζιου"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "map": {
-    "name": "Χάρτης",
-    "settings": {
-      "address": {
-        "label": "Διεύθυνση"
-      },
-      "embed_url": {
-        "label": "URL ενσωμάτωσης Google Maps"
-      },
-      "directions_link": {
-        "label": "Σύνδεσμος οδηγιών"
-      },
-      "height": {
-        "label": "Ύψος χάρτη",
-        "options": {
-          "small": "Μικρό",
-          "medium": "Μεσαίο",
-          "large": "Μεγάλο"
-        }
-      },
-      "show_address": {
-        "label": "Εμφάνιση διεύθυνσης κάτω από τον χάρτη"
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "masonry_gallery": {
-    "name": "Συλλογή τύπου πλινθοδομής",
-    "blocks": {
-      "item": {
-        "name": "Στοιχείο συλλογής",
-        "settings": {
-          "category": {
-            "label": "Κατηγορία"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "image": {
-            "label": "Φωτογραφία (προαιρετική)"
-          },
-          "title": {
-            "label": "Επικεφαλίδα"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιτραπέζιου"
-      },
-      "gap": {
-        "label": "Απόσταση",
-        "options": {
-          "small": "Μικρή",
-          "medium": "Μεσαία",
-          "large": "Μεγάλη"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "numbered_cards": {
-    "name": "Αριθμημένες κάρτες",
-    "blocks": {
-      "step": {
-        "name": "Βήμα",
-        "settings": {
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "title": {
-            "label": "Επικεφαλίδα"
-          },
-          "description": {
-            "label": "Υποεπικεφαλίδα"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιτραπέζιου"
-      },
-      "layout": {
-        "label": "Διάταξη",
-        "options": {
-          "grid": "Πλέγμα",
-          "carousel": "Καρουζέλ"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "numbered_service_list": {
-    "name": "Αριθμημένη λίστα υπηρεσιών",
-    "blocks": {
-      "service": {
-        "name": "Υπηρεσία",
-        "settings": {
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "title": {
-            "label": "Επικεφαλίδα"
-          },
-          "description": {
-            "label": "Περιγραφή"
-          },
-          "link": {
-            "label": "Σύνδεσμος"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "show_dividers": {
-        "label": "Εμφάνιση διαχωριστικών"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "priced_list": {
-    "name": "Τιμοκατάλογος",
-    "settings": {
-      "eyebrow": {
-        "label": "Ετικέτα κατηγορίας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα ενότητας"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "layout": {
-        "label": "Διάταξη",
-        "options": {
-          "single-column": "Μία στήλη",
-          "two-column": "Δύο στήλες"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Στοιχείο μενού",
-        "settings": {
-          "name": {
-            "label": "Όνομα στοιχείου"
-          },
-          "price": {
-            "label": "Τιμή"
-          },
-          "image": {
-            "label": "Φωτογραφία (προαιρετική)"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "description": {
-            "label": "Υποεπικεφαλίδα"
-          }
-        }
-      }
-    }
-  },
-  "pricing": {
-    "name": "Τιμολόγηση",
-    "blocks": {
-      "plan": {
-        "name": "Πλάνο",
-        "settings": {
-          "title": {
-            "label": "Όνομα πλάνου"
-          },
-          "period": {
-            "label": "Περίοδος"
-          },
-          "featured": {
-            "label": "Προτεινόμενο πλάνο"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "price": {
-            "label": "Τιμή / Αξία (Προαιρετικό)"
-          },
-          "features": {
-            "label": "Χαρακτηριστικά (ένα ανά γραμμή)",
-            "description": "Ξεκινήστε μια γραμμή με + για σημάδι ελέγχου ή - για σταυρό."
-          },
-          "button_link": {
-            "label": "Σύνδεσμος κουμπιού"
-          },
-          "options_header": {
-            "label": "Επιλογές"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "layout": {
-        "label": "Διάταξη",
-        "options": {
-          "grid": "Πλέγμα",
-          "carousel": "Καρουζέλ"
-        }
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιτραπέζιου"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "profile_grid": {
-    "name": "Πλέγμα προφίλ",
-    "blocks": {
-      "profile": {
-        "name": "Μέλος ομάδας",
-        "settings": {
-          "photo": {
-            "label": "Φωτογραφία"
-          },
-          "name": {
-            "label": "Όνομα"
-          },
-          "role": {
-            "label": "Ρόλος / Τίτλος"
-          },
-          "specialty": {
-            "label": "Ειδικότητα"
-          },
-          "bio": {
-            "label": "Βιογραφικό"
-          },
-          "social_header": {
-            "label": "Κοινωνικά δίκτυα"
-          },
-          "linkedin": {
-            "label": "LinkedIn URL"
-          },
-          "twitter": {
-            "label": "Twitter URL"
-          },
-          "instagram": {
-            "label": "Instagram URL"
-          },
-          "facebook": {
-            "label": "Facebook URL"
-          },
-          "github": {
-            "label": "GitHub URL"
-          },
-          "youtube": {
-            "label": "YouTube URL"
-          },
-          "tiktok": {
-            "label": "TikTok URL"
-          },
-          "pinterest": {
-            "label": "Pinterest URL"
-          },
-          "bluesky": {
-            "label": "Bluesky URL"
-          },
-          "discord": {
-            "label": "Discord URL"
-          },
-          "meta": {
-            "label": "Meta URL"
-          },
-          "reddit": {
-            "label": "Reddit URL"
-          },
-          "telegram": {
-            "label": "Telegram URL"
-          },
-          "threads": {
-            "label": "Threads URL"
-          },
-          "whatsapp": {
-            "label": "WhatsApp URL"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "email": {
-            "label": "Email"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιτραπέζιου"
-      },
-      "layout": {
-        "label": "Διάταξη",
-        "options": {
-          "grid": "Πλέγμα",
-          "carousel": "Καρουζέλ"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "project_showcase": {
-    "name": "Βιτρίνα έργων",
-    "settings": {
-      "text_display": {
-        "label": "Εμφάνιση κειμένου",
-        "options": {
-          "hover": "Κατά την αιώρηση",
-          "always": "Πάντα"
-        }
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "layout": {
-        "label": "Διάταξη",
-        "options": {
-          "grid": "Πλέγμα",
-          "carousel": "Καρουζέλ"
-        }
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιτραπέζιου"
-      },
-      "aspect_ratio": {
-        "label": "Αναλογία διαστάσεων εικόνας",
-        "options": {
-          "auto": "Αυτόματο",
-          "contain": "Εμφάνιση πλήρους εικόνας",
-          "1 / 1": "Τετράγωνο (1:1)",
-          "4 / 3": "Τυπικό (4:3)",
-          "3 / 2": "Τοπίο (3:2)",
-          "3 / 4": "Πορτρέτο (3:4)",
-          "16 / 9": "Ευρεία οθόνη (16:9)"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "project": {
-        "name": "Έργο",
-        "settings": {
-          "image": {
-            "label": "Εικόνα έργου"
-          },
-          "title": {
-            "label": "Τίτλος έργου"
-          },
-          "description": {
-            "label": "Σύντομη περιγραφή"
-          },
-          "link": {
-            "label": "Σύνδεσμος έργου"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          }
-        }
-      }
-    }
-  },
-  "rich_text": {
-    "name": "Μορφοποιημένο κείμενο",
-    "settings": {
-      "text_alignment": {
-        "label": "Στοίχιση κειμένου",
-        "options": {
-          "start": "Αρχή",
-          "end": "Τέλος",
-          "center": "Κέντρο"
-        }
-      },
-      "content_width": {
-        "label": "Πλάτος περιεχομένου",
-        "options": {
-          "narrow": "Στενό",
-          "medium": "Μεσαίο",
-          "wide": "Φαρδύ",
-          "fullwidth": "Πλήρες πλάτος"
-        }
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Επικεφαλίδα",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "lg": "Μεγάλο",
-              "xl": "Πολύ μεγάλο",
-              "2xl": "2X Μεγάλο",
-              "3xl": "3X Μεγάλο",
-              "4xl": "4X Μεγάλο",
-              "5xl": "5X Μεγάλο",
-              "6xl": "6X Μεγάλο",
-              "7xl": "7X Μεγάλο",
-              "8xl": "8X Μεγάλο",
-              "9xl": "9X Μεγάλο"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Κείμενο",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "sm": "Μικρό",
-              "base": "Βάση",
-              "lg": "Μεγάλο"
-            }
-          },
-          "uppercase": {
-            "label": "Κεφαλαία"
-          },
-          "muted": {
-            "label": "Αχνό χρώμα"
-          }
-        }
-      },
-      "button": {
-        "name": "Ομάδα κουμπιών",
-        "settings": {
-          "link": {
-            "label": "Κουμπί 1"
-          },
-          "style": {
-            "label": "Στυλ κουμπιού 1",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "link_2": {
-            "label": "Κουμπί 2"
-          },
-          "style_2": {
-            "label": "Στυλ κουμπιού 2",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "size": {
-            "label": "Μέγεθος κουμπιού",
-            "options": {
-              "small": "Μικρό",
-              "medium": "Μεσαίο",
-              "large": "Μεγάλο",
-              "xlarge": "Πολύ μεγάλο"
-            }
-          }
-        }
-      }
-    }
-  },
-  "schedule_table": {
-    "name": "Πίνακας προγράμματος",
-    "settings": {
-      "note": {
-        "label": "Πρόσθετη σημείωση"
-      },
-      "week_start_day": {
-        "label": "Η εβδομάδα ξεκινά",
-        "options": {
-          "0": "Κυριακή",
-          "1": "Δευτέρα"
-        }
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "sidebar_position": {
-        "label": "Θέση πλαϊνής μπάρας",
-        "options": {
-          "left": "Αριστερά",
-          "right": "Δεξιά"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "day": {
-        "settings": {
-          "day": {
-            "label": "Ημέρα"
-          },
-          "hours": {
-            "label": "Ώρες"
-          },
-          "closed": {
-            "label": "Κλειστό"
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "options_header": {
-            "label": "Επιλογές"
-          }
-        },
-        "name": "Ημέρα"
-      },
-      "info": {
-        "name": "Πληροφορίες",
-        "settings": {
-          "title": {
-            "label": "Τίτλος"
-          },
-          "text": {
-            "label": "Κείμενο"
-          }
-        }
-      },
-      "social": {
-        "name": "Εικονίδια κοινωνικών δικτύων"
-      }
-    }
-  },
-  "slideshow": {
-    "name": "Παρουσίαση",
-    "settings": {
-      "autoplay": {
-        "label": "Αυτόματη εναλλαγή διαφανειών"
-      },
-      "autoplay_speed": {
-        "label": "Αλλαγή διαφάνειας κάθε"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "height": {
-        "label": "Ύψος",
-        "options": {
-          "auto": "Αυτόματο",
-          "small": "Μικρό",
-          "medium": "Μεσαίο",
-          "large": "Μεγάλο"
-        }
-      },
-      "fullwidth": {
-        "label": "Πλήρες πλάτος"
-      },
-      "alignment": {
-        "label": "Στοίχιση περιεχομένου",
-        "options": {
-          "center": "Κέντρο",
-          "start": "Αρχή"
-        }
-      }
-    },
-    "blocks": {
-      "slide": {
-        "name": "Διαφάνεια",
-        "settings": {
-          "image": {
-            "label": "Εικόνα φόντου"
-          },
-          "heading_text": {
-            "label": "Κείμενο επικεφαλίδας"
-          },
-          "heading_size": {
-            "label": "Μέγεθος επικεφαλίδας",
-            "options": {
-              "lg": "Μεγάλο",
-              "xl": "Πολύ μεγάλο",
-              "2xl": "2X Μεγάλο",
-              "3xl": "3X Μεγάλο",
-              "4xl": "4X Μεγάλο",
-              "5xl": "5X Μεγάλο",
-              "6xl": "6X Μεγάλο",
-              "7xl": "7X Μεγάλο",
-              "8xl": "8X Μεγάλο",
-              "9xl": "9X Μεγάλο"
-            }
-          },
-          "text_content": {
-            "label": "Περιεχόμενο κειμένου"
-          },
-          "text_size": {
-            "label": "Μέγεθος κειμένου",
-            "options": {
-              "sm": "Μικρό",
-              "base": "Βάση",
-              "lg": "Μεγάλο"
-            }
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "text_uppercase": {
-            "label": "Κεφαλαία"
-          },
-          "text_muted": {
-            "label": "Αχνό χρώμα"
-          },
-          "button_link": {
-            "label": "Σύνδεσμος κουμπιού"
-          },
-          "button_link_2": {
-            "label": "Κουμπί 2"
-          },
-          "display_header": {
-            "label": "Εμφάνιση"
-          },
-          "button_style": {
-            "label": "Στυλ κουμπιού 1",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "button_style_2": {
-            "label": "Στυλ κουμπιού 2",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "button_size": {
-            "label": "Μέγεθος κουμπιού",
-            "options": {
-              "small": "Μικρό",
-              "medium": "Μεσαίο",
-              "large": "Μεγάλο",
-              "xlarge": "Πολύ μεγάλο"
-            }
-          },
-          "overlay_color": {
-            "label": "Χρώμα επικάλυψης",
-            "description": "Ισχύει μόνο αν υπάρχει εικόνα φόντου."
-          },
-          "color_scheme": {
-            "label": "Χρωματικό σχήμα",
-            "options": {
-              "standard": "Τυπικό",
-              "highlight": "Τονισμένο"
-            }
-          }
-        }
-      }
-    }
-  },
-  "split_content": {
-    "name": "Διαχωρισμένο Περιεχόμενο",
-    "settings": {
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      },
-      "sticky_column": {
-        "label": "Σταθερή στήλη (επιφάνεια εργασίας)",
-        "options": {
-          "none": "Καμία",
-          "left": "Αριστερά",
-          "right": "Δεξιά"
-        }
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Επικεφαλίδα",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "lg": "Μεγάλο",
-              "xl": "XL",
-              "2xl": "2XL",
-              "3xl": "3XL",
-              "4xl": "4XL",
-              "5xl": "5XL",
-              "6xl": "6XL",
-              "7xl": "7XL",
-              "8xl": "8XL",
-              "9xl": "9XL"
-            }
-          },
-          "position": {
-            "label": "Στήλη",
-            "options": {
-              "left": "Αριστερά",
-              "right": "Δεξιά"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Κείμενο",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "sm": "Μικρό",
-              "base": "Προεπιλογή",
-              "lg": "Μεγάλο"
-            }
-          },
-          "muted": {
-            "label": "Αμυδρό χρώμα"
-          },
-          "position": {
-            "label": "Στήλη",
-            "options": {
-              "left": "Αριστερά",
-              "right": "Δεξιά"
-            }
-          }
-        }
-      },
-      "button": {
-        "name": "Κουμπί",
-        "settings": {
-          "link": {
-            "label": "Σύνδεσμος κουμπιού"
-          },
-          "style": {
-            "label": "Στυλ κουμπιού",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "link_2": {
-            "label": "Δεύτερος σύνδεσμος κουμπιού"
-          },
-          "style_2": {
-            "label": "Δεύτερο στυλ κουμπιού",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "size": {
-            "label": "Μέγεθος κουμπιού",
-            "options": {
-              "small": "Μικρό",
-              "medium": "Μεσαίο",
-              "large": "Μεγάλο",
-              "xlarge": "Πολύ Μεγάλο"
-            }
-          },
-          "position": {
-            "label": "Στήλη",
-            "options": {
-              "left": "Αριστερά",
-              "right": "Δεξιά"
-            }
-          }
-        }
-      }
-    }
-  },
-  "scrolling_text": {
-    "name": "Κυλιόμενο κείμενο",
-    "settings": {
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "text": {
-        "label": "Κείμενο"
-      },
-      "separator": {
-        "label": "Διαχωριστικό"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "speed": {
-        "label": "Ταχύτητα"
-      },
-      "rotate": {
-        "label": "Γωνία περιστροφής"
-      },
-      "font_size": {
-        "label": "Μέγεθος γραμματοσειράς",
-        "options": {
-          "sm": "Μικρό",
-          "md": "Μεσαίο",
-          "lg": "Μεγάλο",
-          "xl": "Πολύ μεγάλο"
-        }
-      },
-      "bg_color": {
-        "label": "Χρώμα φόντου"
-      },
-      "text_color": {
-        "label": "Χρώμα κειμένου"
-      }
-    }
-  },
-  "social_icons": {
-    "settings": {
-      "icon_size": {
-        "label": "Μέγεθος εικονιδίου"
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "name": "Εικονίδια κοινωνικών δικτύων"
-  },
-  "split_hero": {
-    "name": "Διαχωρισμένο hero",
-    "settings": {
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "image": {
-        "label": "Εικόνα φόντου"
-      },
-      "overlay_color": {
-        "label": "Χρώμα επικάλυψης",
-        "description": "Ισχύει μόνο αν υπάρχει εικόνα φόντου."
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "image_position": {
-        "label": "Θέση εικόνας",
-        "options": {
-          "left": "Αριστερά",
-          "right": "Δεξιά"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Επικεφαλίδα",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "lg": "Μεγάλο",
-              "xl": "Πολύ μεγάλο",
-              "2xl": "2X Μεγάλο",
-              "3xl": "3X Μεγάλο",
-              "4xl": "4X Μεγάλο",
-              "5xl": "5X Μεγάλο",
-              "6xl": "6X Μεγάλο",
-              "7xl": "7X Μεγάλο",
-              "8xl": "8X Μεγάλο",
-              "9xl": "9X Μεγάλο"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Κείμενο",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "sm": "Μικρό",
-              "base": "Βάση",
-              "lg": "Μεγάλο"
-            }
-          },
-          "uppercase": {
-            "label": "Κεφαλαία"
-          },
-          "muted": {
-            "label": "Αχνό χρώμα"
-          }
-        }
-      },
-      "features": {
-        "name": "Χαρακτηριστικά",
-        "settings": {
-          "features": {
-            "label": "Χαρακτηριστικά (ένα ανά γραμμή)",
-            "description": "Ξεκινήστε μια γραμμή με + για σημάδι ελέγχου ή - για σταυρό."
-          }
-        }
-      },
-      "button": {
-        "name": "Ομάδα κουμπιών",
-        "settings": {
-          "link": {
-            "label": "Κουμπί 1"
-          },
-          "style": {
-            "label": "Στυλ κουμπιού 1",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "link_2": {
-            "label": "Κουμπί 2"
-          },
-          "style_2": {
-            "label": "Στυλ κουμπιού 2",
-            "options": {
-              "primary": "Κύριο",
-              "secondary": "Δευτερεύον"
-            }
-          },
-          "size": {
-            "label": "Μέγεθος κουμπιού",
-            "options": {
-              "small": "Μικρό",
-              "medium": "Μεσαίο",
-              "large": "Μεγάλο",
-              "xlarge": "Πολύ μεγάλο"
-            }
-          }
-        }
-      }
-    }
-  },
-  "testimonial_hero": {
-    "name": "Hero μαρτυρίας",
-    "settings": {
-      "logo": {
-        "label": "Λογότυπο εταιρείας"
-      },
-      "author_image": {
-        "label": "Εικόνα συγγραφέα"
-      },
-      "image_position": {
-        "label": "Θέση εικόνας",
-        "options": {
-          "left": "Αριστερά",
-          "right": "Δεξιά"
-        }
-      },
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Επικεφαλίδα",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "lg": "Μεγάλο",
-              "xl": "Πολύ μεγάλο",
-              "2xl": "2X Μεγάλο",
-              "3xl": "3X Μεγάλο",
-              "4xl": "4X Μεγάλο",
-              "5xl": "5X Μεγάλο",
-              "6xl": "6X Μεγάλο",
-              "7xl": "7X Μεγάλο",
-              "8xl": "8X Μεγάλο",
-              "9xl": "9X Μεγάλο"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Κείμενο",
-        "settings": {
-          "text": {
-            "label": "Κείμενο"
-          },
-          "size": {
-            "label": "Μέγεθος",
-            "options": {
-              "sm": "Μικρό",
-              "base": "Βάση",
-              "lg": "Μεγάλο"
-            }
-          },
-          "uppercase": {
-            "label": "Κεφαλαία"
-          },
-          "muted": {
-            "label": "Αχνό χρώμα"
-          }
-        }
-      }
-    }
-  },
-  "testimonials": {
-    "name": "Μαρτυρίες",
-    "blocks": {
-      "quote": {
-        "name": "Μαρτυρία",
-        "settings": {
-          "quote": {
-            "label": "Κείμενο παράθεσης"
-          },
-          "title": {
-            "label": "Τίτλος / Εταιρεία"
-          },
-          "rating": {
-            "label": "Βαθμολογία αστεριών",
-            "options": {
-              "3": "3 αστέρια",
-              "4": "4 αστέρια",
-              "5": "5 αστέρια",
-              "": "Χωρίς βαθμολογία"
-            }
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "avatar": {
-            "label": "Φωτογραφία"
-          },
-          "name": {
-            "label": "Όνομα"
-          },
-          "display_header": {
-            "label": "Εμφάνιση"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "layout": {
-        "label": "Διάταξη",
-        "options": {
-          "grid": "Πλέγμα",
-          "carousel": "Καρουζέλ"
-        }
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιτραπέζιου"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "timeline": {
-    "name": "Χρονολόγιο",
-    "settings": {
-      "layout": {
-        "options": {
-          "centered": "Κεντραρισμένο (Εναλλασσόμενο)",
-          "vertical": "Κάθετο",
-          "horizontal": "Οριζόντιο"
-        },
-        "label": "Διάταξη"
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Στοιχείο χρονολογίου",
-        "settings": {
-          "date": {
-            "label": "Ημερομηνία/Φάση"
-          },
-          "duration": {
-            "label": "Διάρκεια (προαιρετική)"
-          },
-          "features": {
-            "label": "Χαρακτηριστικά/κουκκίδες (ένα ανά γραμμή)",
-            "description": "Ξεκινήστε μια γραμμή με + για σημάδι ελέγχου ή - για σταυρό."
-          },
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "title": {
-            "label": "Επικεφαλίδα"
-          },
-          "description": {
-            "label": "Υποεπικεφαλίδα"
-          }
-        }
-      }
-    }
-  },
-  "trust_bar": {
-    "name": "Μπάρα εμπιστοσύνης",
-    "settings": {
-      "icon_style": {
-        "label": "Στυλ εικονιδίου",
-        "options": {
-          "plain": "Απλό",
-          "outline": "Περίγραμμα",
-          "filled": "Γεμάτο"
-        }
-      },
-      "icon_size": {
-        "label": "Μέγεθος εικονιδίου",
-        "options": {
-          "sm": "Μικρό",
-          "md": "Μεσαίο",
-          "lg": "Μεγάλο",
-          "xl": "Πολύ μεγάλο"
-        }
-      },
-      "icon_shape": {
-        "label": "Σχήμα εικονιδίου",
-        "options": {
-          "sharp": "Αιχμηρό",
-          "rounded": "Στρογγυλεμένο",
-          "circle": "Κύκλος"
-        }
-      },
-      "alignment": {
-        "label": "Στοίχιση",
-        "options": {
-          "left": "Αριστερά",
-          "centered": "Κεντραρισμένο"
-        }
-      },
-      "show_dividers": {
-        "label": "Εμφάνιση διαχωριστικών"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Στοιχείο",
-        "settings": {
-          "content_header": {
-            "label": "Περιεχόμενο"
-          },
-          "icon": {
-            "label": "Εικονίδιο"
-          },
-          "title": {
-            "label": "Τίτλος"
-          },
-          "text": {
-            "label": "Περιγραφή"
-          }
-        }
-      }
-    }
-  },
-  "video_embed": {
-    "name": "YouTube/Vimeo",
-    "settings": {
-      "video_url": {
-        "label": "URL βίντεο (YouTube ή Vimeo)"
-      },
-      "video_title": {
-        "label": "Τίτλος βίντεο (για προσβασιμότητα)"
-      },
-      "aspect_ratio": {
-        "label": "Αναλογία διαστάσεων",
-        "options": {
-          "16:9": "16:9 (Ευρεία οθόνη)",
-          "4:3": "4:3 (Τυπικό)",
-          "21:9": "21:9 (Κινηματογραφικό)",
-          "1:1": "1:1 (Τετράγωνο)"
-        }
-      },
-      "eyebrow": {
-        "label": "Κείμενο επικεφαλίδας"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Υποεπικεφαλίδα"
-      },
-      "content_header": {
-        "label": "Περιεχόμενο"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Τονισμένο"
-        }
-      }
-    }
-  },
-  "video_popup": {
-    "name": "Αναδυόμενο βίντεο",
-    "settings": {
-      "image": {
-        "label": "Εικόνα φόντου"
-      },
-      "video_header": {
-        "label": "Βίντεο"
-      },
-      "video_url": {
-        "label": "URL βίντεο (YouTube ή Vimeo)"
-      },
-      "video_title": {
-        "label": "Τίτλος βίντεο (για προσβασιμότητα)"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "overlay_color": {
-        "label": "Χρώμα επικάλυψης",
-        "description": "Ρυθμίστε το alpha για ένταση επικάλυψης"
-      },
-      "height": {
-        "label": "Ύψος",
-        "options": {
-          "small": "Μικρό",
-          "medium": "Μεσαίο",
-          "large": "Μεγάλο"
-        }
-      },
-      "fullwidth": {
-        "label": "Πλήρες πλάτος"
-      },
-      "play_button_style": {
-        "label": "Στυλ κουμπιού αναπαραγωγής",
-        "options": {
-          "light": "Φωτεινό",
-          "dark": "Σκούρο"
-        }
-      }
-    }
-  },
   "global": {
     "general": {
       "name": "Γενικά",
@@ -3674,28 +231,1843 @@
           "description": "Προσθέστε προσαρμοσμένα scripts που θα εισαχθούν πριν από το κλείσιμο της ετικέτας </body>."
         }
       }
+    },
+    "widgets": {
+      "settings": {
+        "display_header": {
+          "label": "Εμφάνιση"
+        },
+        "content_header": {
+          "label": "Περιεχόμενο"
+        },
+        "options_header": {
+          "label": "Επιλογές"
+        },
+        "labels_header": {
+          "label": "Ετικέτες"
+        },
+        "eyebrow": {
+          "label": "Κείμενο επικεφαλίδας"
+        },
+        "title": {
+          "label": "Επικεφαλίδα"
+        },
+        "description": {
+          "label": "Υποεπικεφαλίδα"
+        },
+        "color_scheme": {
+          "label": "Χρωματικό σχήμα",
+          "options": {
+            "standard": "Τυπικό",
+            "highlight": "Τονισμένο"
+          }
+        },
+        "columns_desktop": {
+          "label": "Στήλες επιτραπέζιου"
+        },
+        "layout": {
+          "label": "Διάταξη",
+          "options": {
+            "grid": "Πλέγμα",
+            "carousel": "Καρουζέλ"
+          }
+        },
+        "fullwidth": {
+          "label": "Πλήρες πλάτος"
+        },
+        "image_position": {
+          "label": "Θέση εικόνας",
+          "options": {
+            "left": "Αριστερά",
+            "right": "Δεξιά"
+          }
+        },
+        "aspect_ratio": {
+          "label": "Αναλογία εικόνας",
+          "options": {
+            "auto": "Αυτόματο",
+            "contain": "Εμφάνιση πλήρους εικόνας",
+            "1 / 1": "Τετράγωνο (1:1)",
+            "4 / 3": "Οριζόντιο (4:3)",
+            "3 / 2": "Οριζόντιο (3:2)",
+            "3 / 4": "Κατακόρυφο (3:4)",
+            "16 / 9": "Ευρεία οθόνη (16:9)",
+            "21:9": "21:9 (Κινηματογραφικό)"
+          }
+        },
+        "alignment": {
+          "label": "Στοίχιση περιεχομένου",
+          "options": {
+            "start": "Αρχή",
+            "center": "Κέντρο"
+          }
+        },
+        "video_url": {
+          "label": "URL βίντεο (YouTube ή Vimeo)"
+        },
+        "video_title": {
+          "label": "Τίτλος βίντεο (για προσβασιμότητα)"
+        },
+        "icon_style": {
+          "label": "Στυλ εικονιδίου",
+          "options": {
+            "plain": "Απλό",
+            "outline": "Περίγραμμα",
+            "filled": "Γεμάτο"
+          }
+        },
+        "icon_size": {
+          "label": "Μέγεθος εικονιδίου",
+          "options": {
+            "sm": "Μικρό",
+            "md": "Μεσαίο",
+            "lg": "Μεγάλο",
+            "xl": "Πολύ μεγάλο"
+          }
+        },
+        "icon_shape": {
+          "label": "Σχήμα εικονιδίου",
+          "options": {
+            "sharp": "Αιχμηρό",
+            "rounded": "Στρογγυλεμένο",
+            "circle": "Κύκλος"
+          }
+        },
+        "overlay_color": {
+          "label": "Χρώμα επικάλυψης",
+          "description": "Ισχύει μόνο αν υπάρχει εικόνα φόντου."
+        },
+        "link": {
+          "label": "Κουμπί 1"
+        },
+        "button_link": {
+          "label": "Σύνδεσμος κουμπιού"
+        },
+        "button_style": {
+          "label": "Στυλ κουμπιού 1",
+          "options": {
+            "primary": "Κύριο",
+            "secondary": "Δευτερεύον"
+          }
+        },
+        "button_style_2": {
+          "label": "Στυλ κουμπιού 2",
+          "options": {
+            "primary": "Κύριο",
+            "secondary": "Δευτερεύον"
+          }
+        },
+        "button_size": {
+          "label": "Μέγεθος κουμπιού",
+          "options": {
+            "small": "Μικρό",
+            "medium": "Μεσαίο",
+            "large": "Μεγάλο",
+            "xlarge": "Πολύ μεγάλο"
+          }
+        },
+        "options": {
+          "left": "Αριστερά",
+          "right": "Δεξιά",
+          "top": "Πάνω",
+          "bottom": "Κάτω",
+          "center": "Κέντρο",
+          "start": "Αρχή",
+          "end": "Τέλος",
+          "none": "Κανένα"
+        }
+      },
+      "blocks": {
+        "heading": {
+          "name": "Επικεφαλίδα",
+          "settings": {
+            "text": {
+              "label": "Κείμενο"
+            },
+            "size": {
+              "label": "Μέγεθος",
+              "options": {
+                "lg": "Μεγάλο",
+                "xl": "Πολύ μεγάλο",
+                "2xl": "2X Μεγάλο",
+                "3xl": "3X Μεγάλο",
+                "4xl": "4X Μεγάλο",
+                "5xl": "5X Μεγάλο",
+                "6xl": "6X Μεγάλο",
+                "7xl": "7X Μεγάλο",
+                "8xl": "8X Μεγάλο",
+                "9xl": "9X Μεγάλο"
+              }
+            }
+          }
+        },
+        "text": {
+          "name": "Κείμενο",
+          "settings": {
+            "text": {
+              "label": "Κείμενο"
+            },
+            "size": {
+              "label": "Μέγεθος",
+              "options": {
+                "sm": "Μικρό",
+                "base": "Βάση",
+                "lg": "Μεγάλο"
+              }
+            },
+            "uppercase": {
+              "label": "Κεφαλαία"
+            },
+            "muted": {
+              "label": "Αχνό χρώμα"
+            }
+          }
+        },
+        "button": {
+          "name": "Ομάδα κουμπιών",
+          "settings": {
+            "link": {
+              "label": "Κουμπί 1"
+            },
+            "style": {
+              "label": "Στυλ κουμπιού 1",
+              "options": {
+                "primary": "Κύριο",
+                "secondary": "Δευτερεύον"
+              }
+            },
+            "link_2": {
+              "label": "Κουμπί 2"
+            },
+            "style_2": {
+              "label": "Στυλ κουμπιού 2",
+              "options": {
+                "primary": "Κύριο",
+                "secondary": "Δευτερεύον"
+              }
+            },
+            "size": {
+              "label": "Μέγεθος κουμπιού",
+              "options": {
+                "small": "Μικρό",
+                "medium": "Μεσαίο",
+                "large": "Μεγάλο",
+                "xlarge": "Πολύ μεγάλο"
+              }
+            }
+          }
+        },
+        "icon": {
+          "name": "Εικονίδιο",
+          "settings": {
+            "icon": {
+              "label": "Εικονίδιο"
+            },
+            "style": {
+              "label": "Στυλ εικονιδίου",
+              "options": {
+                "plain": "Απλό",
+                "outline": "Περίγραμμα",
+                "filled": "Γεμάτο"
+              }
+            },
+            "size": {
+              "label": "Μέγεθος",
+              "options": {
+                "sm": "Μικρό",
+                "md": "Μεσαίο",
+                "lg": "Μεγάλο",
+                "xl": "Πολύ μεγάλο"
+              }
+            },
+            "shape": {
+              "label": "Σχήμα",
+              "options": {
+                "sharp": "Αιχμηρό",
+                "rounded": "Στρογγυλεμένο",
+                "circle": "Κύκλος"
+              }
+            }
+          }
+        },
+        "rating": {
+          "name": "Αξιολόγηση με Αστέρια",
+          "settings": {
+            "rating": {
+              "label": "Αξιολόγηση",
+              "options": {
+                "3": "3 αστέρια",
+                "4": "4 αστέρια",
+                "5": "5 αστέρια"
+              }
+            }
+          }
+        },
+        "quote": {
+          "settings": {
+            "quote": {
+              "label": "Κείμενο παράθεσης"
+            },
+            "avatar": {
+              "label": "Φωτογραφία"
+            },
+            "name": {
+              "label": "Όνομα"
+            },
+            "title": {
+              "label": "Τίτλος / Εταιρεία"
+            },
+            "rating": {
+              "label": "Βαθμολογία αστεριών",
+              "options": {
+                "3": "3 αστέρια",
+                "4": "4 αστέρια",
+                "5": "5 αστέρια",
+                "": "Χωρίς βαθμολογία"
+              }
+            }
+          }
+        },
+        "image": {
+          "name": "Εικόνα",
+          "settings": {
+            "image": {
+              "label": "Εικόνα"
+            },
+            "width": {
+              "label": "Μέγιστο πλάτος (%)"
+            }
+          }
+        },
+        "card": {
+          "name": "Κάρτα",
+          "settings": {
+            "subtitle": {
+              "label": "Υπότιτλος"
+            },
+            "title": {
+              "label": "Επικεφαλίδα"
+            },
+            "description": {
+              "label": "Περιγραφή"
+            },
+            "button_link": {
+              "label": "Σύνδεσμος κουμπιού"
+            }
+          }
+        },
+        "text_block": {
+          "name": "Κείμενο",
+          "settings": {
+            "title": {
+              "label": "Τίτλος"
+            },
+            "text": {
+              "label": "Κείμενο"
+            }
+          }
+        },
+        "menu_block": {
+          "name": "Μενού",
+          "settings": {
+            "title": {
+              "label": "Τίτλος"
+            },
+            "menu": {
+              "label": "Μενού πλοήγησης",
+              "description": "Επιλέξτε το μενού προς εμφάνιση"
+            }
+          }
+        },
+        "social_block": {
+          "name": "Εικονίδια κοινωνικών δικτύων",
+          "settings": {
+            "title": {
+              "label": "Τίτλος"
+            }
+          }
+        },
+        "features": {
+          "name": "Χαρακτηριστικά",
+          "settings": {
+            "features": {
+              "label": "Χαρακτηριστικά (ένα ανά γραμμή)",
+              "description": "Ξεκινήστε μια γραμμή με + για σημάδι ελέγχου ή - για σταυρό."
+            }
+          }
+        },
+        "numbered_item": {
+          "name": "Αριθμημένο Στοιχείο",
+          "settings": {
+            "title": {
+              "label": "Τίτλος"
+            },
+            "description": {
+              "label": "Περιγραφή"
+            },
+            "size": {
+              "label": "Μέγεθος κύκλου",
+              "options": {
+                "small": "Μικρό",
+                "medium": "Μεσαίο",
+                "large": "Μεγάλο",
+                "xlarge": "Πολύ Μεγάλο"
+              }
+            },
+            "shape": {
+              "label": "Σχήμα",
+              "options": {
+                "sharp": "Αιχμηρό",
+                "rounded": "Στρογγυλεμένο",
+                "circle": "Κύκλος"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "accordion": {
+    "name": "Ακορντεόν",
+    "settings": {
+      "style": {
+        "label": "Στυλ",
+        "options": {
+          "separated": "Διαχωρισμένο",
+          "connected": "Συνδεδεμένο"
+        }
+      },
+      "allow_multiple": {
+        "label": "Να επιτρέπονται πολλαπλά ανοιχτά"
+      },
+      "sidebar_position": {
+        "label": "Θέση πλαϊνής μπάρας"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Στοιχείο",
+        "settings": {
+          "question": {
+            "label": "Ερώτηση"
+          },
+          "answer": {
+            "label": "Απάντηση"
+          }
+        }
+      },
+      "info": {
+        "name": "Πληροφορίες",
+        "settings": {
+          "title": {
+            "label": "Τίτλος"
+          },
+          "text": {
+            "label": "Κείμενο"
+          }
+        }
+      },
+      "social": {
+        "name": "Εικονίδια κοινωνικών δικτύων"
+      }
+    }
+  },
+  "action_bar": {
+    "name": "Μπάρα Ενεργειών"
+  },
+  "banner": {
+    "name": "Πανό",
+    "settings": {
+      "image": {
+        "label": "Εικόνα φόντου"
+      },
+      "height": {
+        "label": "Ύψος",
+        "options": {
+          "auto": "Αυτόματο",
+          "small": "Μικρό",
+          "medium": "Μεσαίο",
+          "large": "Μεγάλο"
+        }
+      },
+      "vertical_alignment": {
+        "label": "Κάθετη στοίχιση"
+      }
+    }
+  },
+  "bento_grid": {
+    "name": "Πλέγμα Bento",
+    "settings": {
+      "gap": {
+        "label": "Μέγεθος κενού",
+        "options": {
+          "0": "Κανένα",
+          "var(--space-sm)": "Μικρό",
+          "var(--space-md)": "Μεσαίο",
+          "var(--space-lg)": "Μεγάλο",
+          "var(--space-xl)": "Πολύ μεγάλο"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Στοιχείο Bento",
+        "settings": {
+          "layout_header": {
+            "label": "Διάταξη"
+          },
+          "col_span": {
+            "label": "Εύρος στήλης"
+          },
+          "row_span": {
+            "label": "Εύρος σειράς"
+          },
+          "background_color": {
+            "label": "Φόντο μπλοκ"
+          },
+          "text_color": {
+            "label": "Χρώμα κειμένου",
+            "options": {
+              "dark": "Σκούρο",
+              "light": "Φωτεινό"
+            }
+          },
+          "alignment": {
+            "label": "Στοίχιση κειμένου"
+          },
+          "title": {
+            "label": "Επικεφαλίδα"
+          },
+          "text": {
+            "label": "Κείμενο"
+          },
+          "image": {
+            "label": "Φωτογραφία (προαιρετική)"
+          }
+        }
+      }
+    }
+  },
+  "card_grid": {
+    "name": "Πλέγμα καρτών",
+    "settings": {
+      "image_position": {
+        "label": "Θέση εικόνας"
+      }
+    },
+    "blocks": {
+      "card": {
+        "settings": {
+          "image": {
+            "label": "Εικόνα"
+          }
+        }
+      }
+    }
+  },
+  "checkerboard": {
+    "name": "Σκακιέρα",
+    "blocks": {
+      "card": {
+        "name": "Κάρτα",
+        "settings": {
+          "image": {
+            "label": "Εικόνα"
+          },
+          "title": {
+            "label": "Επικεφαλίδα"
+          },
+          "description": {
+            "label": "Περιγραφή"
+          }
+        }
+      }
+    }
+  },
+  "comparison_slider": {
+    "name": "Ολισθητής σύγκρισης",
+    "settings": {
+      "before_image": {
+        "label": "Εικόνα πριν"
+      },
+      "after_image": {
+        "label": "Εικόνα μετά"
+      },
+      "before_label": {
+        "label": "Ετικέτα πριν"
+      },
+      "after_label": {
+        "label": "Ετικέτα μετά"
+      },
+      "orientation": {
+        "label": "Προσανατολισμός ολισθητή",
+        "options": {
+          "horizontal": "Οριζόντιο",
+          "vertical": "Κάθετο"
+        }
+      },
+      "initial_position": {
+        "label": "Αρχική θέση ολισθητή"
+      },
+      "show_labels": {
+        "label": "Εμφάνιση ετικετών πριν/μετά"
+      }
+    }
+  },
+  "comparison_table": {
+    "name": "Πίνακας σύγκρισης",
+    "settings": {
+      "feature_column_label": {
+        "label": "Ετικέτα στήλης χαρακτηριστικών"
+      }
+    },
+    "blocks": {
+      "column": {
+        "name": "Στήλη",
+        "settings": {
+          "name": {
+            "label": "Όνομα στήλης"
+          },
+          "badge": {
+            "label": "Κείμενο σήματος (προαιρετικό)"
+          },
+          "featured": {
+            "label": "Προτεινόμενο (επισημασμένο)"
+          },
+          "link": {
+            "label": "Κουμπί CTA"
+          }
+        }
+      },
+      "feature": {
+        "name": "Σειρά χαρακτηριστικών",
+        "settings": {
+          "name": {
+            "label": "Όνομα χαρακτηριστικού"
+          },
+          "values": {
+            "label": "Τιμές για κάθε στήλη (μία ανά γραμμή: yes, no ή προσαρμοσμένο κείμενο)"
+          }
+        }
+      }
+    }
+  },
+  "core_divider": {
+    "name": "Διαχωριστικό",
+    "description": "Προσθήκη οριζόντιας γραμμής διαχωρισμού",
+    "category": "Διάταξη",
+    "settings": {
+      "color": {
+        "label": "Χρώμα γραμμής",
+        "description": "Χρώμα της γραμμής διαχωρισμού"
+      },
+      "thickness": {
+        "label": "Πάχος",
+        "description": "Πάχος της γραμμής διαχωρισμού σε εικονοστοιχεία"
+      },
+      "width": {
+        "label": "Πλάτος",
+        "description": "Πλάτος του διαχωριστικού ως ποσοστό του κοντέινερ"
+      },
+      "padding": {
+        "label": "Περιθώριο",
+        "description": "Κάθετο περιθώριο γύρω από το διαχωριστικό σε εικονοστοιχεία"
+      }
+    }
+  },
+  "core_spacer": {
+    "name": "Αποστάτης",
+    "description": "Προσθήκη κάθετου κενού μεταξύ ενοτήτων περιεχομένου",
+    "category": "Διάταξη",
+    "settings": {
+      "height": {
+        "label": "Ύψος",
+        "description": "Το ύψος του αποστάτη σε εικονοστοιχεία"
+      },
+      "showOnMobile": {
+        "label": "Εμφάνιση σε κινητό",
+        "description": "Εμφάνιση του αποστάτη σε κινητές συσκευές"
+      },
+      "mobileHeight": {
+        "label": "Ύψος σε κινητό",
+        "description": "Το ύψος του αποστάτη σε κινητές συσκευές σε εικονοστοιχεία"
+      }
+    }
+  },
+  "contact_details": {
+    "name": "Στοιχεία Επικοινωνίας",
+    "blocks": {
+      "info": {
+        "name": "Πληροφορίες",
+        "settings": {
+          "title": {
+            "label": "Τίτλος"
+          },
+          "text": {
+            "label": "Κείμενο"
+          }
+        }
+      }
+    }
+  },
+  "content_switcher": {
+    "name": "Εναλλάκτης περιεχομένου",
+    "settings": {
+      "switcher_header": {
+        "label": "Εναλλάκτης"
+      },
+      "switcher_type": {
+        "label": "Στυλ εναλλάκτη",
+        "options": {
+          "toggle": "Εναλλαγή (2 Επιλογές)",
+          "tabs": "Καρτέλες (Έως 3 επιλογές)"
+        }
+      },
+      "option_1_label": {
+        "label": "Ετικέτα επιλογής 1"
+      },
+      "option_2_label": {
+        "label": "Ετικέτα επιλογής 2"
+      },
+      "option_3_label": {
+        "label": "Ετικέτα επιλογής 3 (μόνο καρτέλες)"
+      },
+      "columns": {
+        "label": "Στήλες ανά κατάσταση"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Στοιχείο περιεχομένου",
+        "settings": {
+          "price": {
+            "label": "Τιμή / Αξία (Προαιρετικό)"
+          },
+          "link": {
+            "label": "Σύνδεσμος / CTA"
+          },
+          "target_option": {
+            "label": "Αντιστοίχιση σε επιλογή",
+            "options": {
+              "1": "Επιλογή 1",
+              "2": "Επιλογή 2",
+              "3": "Επιλογή 3"
+            }
+          },
+          "title": {
+            "label": "Επικεφαλίδα"
+          },
+          "text": {
+            "label": "Κείμενο"
+          },
+          "image": {
+            "label": "Φωτογραφία (προαιρετική)"
+          },
+          "layout_header": {
+            "label": "Διάταξη"
+          }
+        }
+      }
+    }
+  },
+  "countdown": {
+    "name": "Χρονόμετρο αντίστροφης μέτρησης",
+    "settings": {
+      "target_date": {
+        "label": "Ημερομηνία-στόχος (YYYY-MM-DD HH:MM)"
+      },
+      "expired_message": {
+        "label": "Μήνυμα κατά τη λήξη"
+      },
+      "button": {
+        "label": "Κουμπί προτροπής"
+      },
+      "show_seconds": {
+        "label": "Εμφάνιση δευτερολέπτων"
+      },
+      "style": {
+        "options": {
+          "cards": "Κάρτες",
+          "minimal": "Ελάχιστο"
+        },
+        "label": "Στυλ"
+      }
+    }
+  },
+  "embed": {
+    "name": "Ενσωματωμένο widget",
+    "settings": {
+      "code": {
+        "label": "Κώδικας ενσωμάτωσης (HTML/JS/Iframe)"
+      },
+      "max_width": {
+        "label": "Πλάτος δοχείου",
+        "options": {
+          "narrow": "Στενό",
+          "wide": "Φαρδύ",
+          "fullwidth": "Πλήρες πλάτος",
+          "medium": "Μεσαίο"
+        }
+      },
+      "alignment": {
+        "label": "Στοίχιση"
+      }
+    }
+  },
+  "event_list": {
+    "name": "Λίστα εκδηλώσεων",
+    "blocks": {
+      "event": {
+        "name": "Εκδήλωση",
+        "settings": {
+          "day": {
+            "label": "Ημέρα (αριθμός)"
+          },
+          "month": {
+            "label": "Μήνας (σύντομος)"
+          },
+          "title": {
+            "label": "Τίτλος εκδήλωσης"
+          },
+          "location": {
+            "label": "Τοποθεσία & ώρα"
+          },
+          "button_link": {
+            "label": "Κουμπί"
+          },
+          "description": {
+            "label": "Υποεπικεφαλίδα"
+          }
+        }
+      }
+    }
+  },
+  "features_split": {
+    "name": "Διαχωρισμένα χαρακτηριστικά",
+    "settings": {
+      "content_position": {
+        "label": "Θέση περιεχομένου"
+      },
+      "show_divider": {
+        "label": "Εμφάνιση διαχωριστικού"
+      }
+    },
+    "blocks": {
+      "feature": {
+        "name": "Χαρακτηριστικό",
+        "settings": {
+          "icon": {
+            "label": "Εικονίδιο"
+          },
+          "title": {
+            "label": "Επικεφαλίδα"
+          },
+          "description": {
+            "label": "Υποεπικεφαλίδα"
+          }
+        }
+      }
+    }
+  },
+  "footer": {
+    "name": "Υποσέλιδο",
+    "settings": {
+      "copyright": {
+        "label": "Κείμενο πνευματικών δικαιωμάτων"
+      }
+    },
+    "blocks": {
+      "logo_text": {
+        "name": "Λογότυπο & Κείμενο",
+        "settings": {
+          "logo_text": {
+            "label": "Κείμενο λογοτύπου"
+          },
+          "logo": {
+            "label": "Εικόνα λογοτύπου"
+          },
+          "logo_width": {
+            "label": "Πλάτος λογοτύπου"
+          },
+          "text": {
+            "label": "Κείμενο"
+          }
+        }
+      }
+    }
+  },
+  "gallery": {
+    "name": "Συλλογή",
+    "settings": {
+      "staggered": {
+        "label": "Κλιμακωτή διάταξη"
+      }
+    },
+    "blocks": {
+      "image": {
+        "name": "Εικόνα",
+        "settings": {
+          "image": {
+            "label": "Εικόνα φόντου"
+          },
+          "caption": {
+            "label": "Λεζάντα"
+          }
+        }
+      }
+    }
+  },
+  "header": {
+    "name": "Κεφαλίδα",
+    "settings": {
+      "logo_header": {
+        "label": "Λογότυπο"
+      },
+      "logoImage": {
+        "label": "Εικόνα λογοτύπου",
+        "description": "Ανεβάστε μια εικόνα λογοτύπου. Αν υπάρχει, θα εμφανίζεται αντί του κειμένου λογοτύπου."
+      },
+      "logoMaxWidth": {
+        "label": "Μέγιστο πλάτος λογοτύπου",
+        "description": "Μέγιστο πλάτος της εικόνας λογοτύπου"
+      },
+      "logoText": {
+        "label": "Κείμενο λογοτύπου",
+        "description": "Κείμενο για εμφάνιση στο λογότυπο κεφαλίδας"
+      },
+      "contact_header": {
+        "label": "Στοιχεία επικοινωνίας"
+      },
+      "contactDetailsLine1": {
+        "label": "Στοιχεία επικοινωνίας 1",
+        "description": "Πρώτη γραμμή στοιχείων επικοινωνίας (π.χ. τηλέφωνο)"
+      },
+      "contactDetailsLine2": {
+        "label": "Στοιχεία επικοινωνίας 2",
+        "description": "Δεύτερη γραμμή στοιχείων επικοινωνίας (π.χ. διεύθυνση)"
+      },
+      "contact_position": {
+        "label": "Θέση στοιχείων επικοινωνίας",
+        "options": {
+          "logo": "Δίπλα στο λογότυπο",
+          "menu": "Δίπλα στο κουμπί μενού"
+        }
+      },
+      "navigation_header": {
+        "label": "Πλοήγηση"
+      },
+      "headerNavigation": {
+        "label": "Μενού πλοήγησης",
+        "description": "Επιλέξτε το μενού για την κεφαλίδα"
+      },
+      "ctaButtonLink": {
+        "label": "Κουμπί CTA",
+        "description": "Κουμπί κλήσης σε δράση (αφήστε κενό το κείμενο για απόκρυψη)"
+      },
+      "ctaButtonStyle": {
+        "label": "Στυλ κουμπιού",
+        "options": {
+          "primary": "Κύριο",
+          "secondary": "Δευτερεύον"
+        }
+      },
+      "full_width": {
+        "label": "Πλήρες πλάτος",
+        "description": "Όταν ενεργοποιηθεί, η κεφαλίδα εκτείνεται σε όλο το πλάτος. Όταν απενεργοποιηθεί, παραμένει κεντραρισμένη."
+      },
+      "sticky": {
+        "label": "Σταθερή κεφαλίδα",
+        "description": "Όταν ενεργοποιηθεί, η κεφαλίδα παραμένει σταθερή στην κορυφή κατά την κύλιση"
+      },
+      "transparent_on_hero": {
+        "label": "Διαφανές σε hero",
+        "description": "Η κεφαλίδα γίνεται διαφανής πάνω σε banner, slideshow και video popup widgets"
+      },
+      "transparent_logo": {
+        "label": "Λογότυπο διαφανούς κεφαλίδας",
+        "description": "Εναλλακτικό λογότυπο που εμφανίζεται όταν η κεφαλίδα είναι διαφανής (π.χ. φωτεινή έκδοση)"
+      },
+      "center_nav": {
+        "label": "Κεντράρισμα πλοήγησης",
+        "description": "Κεντράρει το μενού πλοήγησης στην κεφαλίδα με το λογότυπο αριστερά και το CTA δεξιά (μόνο desktop)"
+      }
+    }
+  },
+  "icon_card_grid": {
+    "name": "Πλέγμα καρτών εικονιδίων",
+    "settings": {
+      "featured_image": {
+        "label": "Προτεινόμενη εικόνα"
+      },
+      "featured_image_position": {
+        "label": "Θέση εικόνας"
+      }
+    },
+    "blocks": {
+      "card": {
+        "settings": {
+          "icon": {
+            "label": "Εικονίδιο"
+          }
+        }
+      }
+    }
+  },
+  "icon_list": {
+    "name": "Λίστα εικονιδίων",
+    "blocks": {
+      "item": {
+        "name": "Στοιχείο",
+        "settings": {
+          "icon": {
+            "label": "Εικονίδιο"
+          },
+          "title": {
+            "label": "Επικεφαλίδα"
+          },
+          "description": {
+            "label": "Υποεπικεφαλίδα"
+          }
+        }
+      }
+    }
+  },
+  "image": {
+    "settings": {
+      "link": {
+        "description": "Προαιρετικός σύνδεσμος όταν πατηθεί η εικόνα."
+      },
+      "image": {
+        "label": "Εικόνα φόντου"
+      },
+      "fullwidth": {
+        "description": "Όταν είναι ενεργοποιημένο, η εικόνα καλύπτει πλήρες πλάτος. Όταν είναι απενεργοποιημένο, η εικόνα περιέχεται εντός του πλέγματος του θέματος."
+      }
+    },
+    "name": "Εικόνα"
+  },
+  "image_callout": {
+    "name": "Επεξήγηση εικόνας",
+    "settings": {
+      "image": {
+        "label": "Εικόνα φόντου"
+      }
+    }
+  },
+  "image_hotspots": {
+    "name": "Σημεία ενδιαφέροντος εικόνας",
+    "settings": {
+      "image_alt": {
+        "label": "Εναλλακτικό κείμενο εικόνας"
+      },
+      "image": {
+        "label": "Εικόνα φόντου"
+      }
+    },
+    "blocks": {
+      "hotspot": {
+        "name": "Σημείο ενδιαφέροντος",
+        "settings": {
+          "title": {
+            "label": "Τίτλος tooltip"
+          },
+          "description": {
+            "label": "Περιγραφή tooltip"
+          },
+          "position_x": {
+            "label": "Οριζόντια θέση (%)"
+          },
+          "position_y": {
+            "label": "Κάθετη θέση (%)"
+          },
+          "layout_header": {
+            "label": "Διάταξη"
+          }
+        }
+      }
+    }
+  },
+  "image_tabs": {
+    "name": "Καρτέλες εικόνων",
+    "blocks": {
+      "tab": {
+        "name": "Καρτέλα",
+        "settings": {
+          "title": {
+            "label": "Τίτλος καρτέλας"
+          },
+          "description": {
+            "label": "Περιγραφή καρτέλας"
+          },
+          "image": {
+            "label": "Εικόνα φόντου"
+          }
+        }
+      }
+    }
+  },
+  "image_text": {
+    "name": "Εικόνα + Κείμενο",
+    "settings": {
+      "image": {
+        "label": "Εικόνα φόντου"
+      },
+      "text_position": {
+        "label": "Κάθετη θέση κειμένου"
+      },
+      "content_color_scheme": {
+        "label": "Χρωματικό σχήμα περιεχομένου",
+        "options": {
+          "none": "Κανένα",
+          "standard": "Τυπικό",
+          "highlight": "Τονισμένο"
+        }
+      }
+    }
+  },
+  "job_listing": {
+    "name": "Αγγελία εργασίας",
+    "settings": {
+      "show_filters": {
+        "label": "Εμφάνιση φίλτρων τμήματος"
+      }
+    },
+    "blocks": {
+      "job": {
+        "name": "Θέση εργασίας",
+        "settings": {
+          "title": {
+            "label": "Τίτλος εργασίας"
+          },
+          "department": {
+            "label": "Τμήμα"
+          },
+          "location": {
+            "label": "Τοποθεσία"
+          },
+          "type": {
+            "label": "Τύπος απασχόλησης",
+            "options": {
+              "full-time": "Πλήρης απασχόληση",
+              "part-time": "Μερική απασχόληση",
+              "contract": "Σύμβαση",
+              "internship": "Πρακτική άσκηση"
+            }
+          },
+          "apply_link": {
+            "label": "Κουμπί εφαρμογής"
+          }
+        }
+      }
+    }
+  },
+  "key_figures": {
+    "name": "Βασικά στοιχεία",
+    "settings": {
+      "layout": {
+        "options": {
+          "bar": "Οριζόντια μπάρα",
+          "cards": "Κάρτες",
+          "carousel": "Καρουζέλ"
+        },
+        "label": "Διάταξη"
+      },
+      "animate": {
+        "label": "Κινούμενοι αριθμοί"
+      }
+    },
+    "blocks": {
+      "figure": {
+        "name": "Στοιχείο",
+        "settings": {
+          "suffix": {
+            "label": "Επίθημα"
+          },
+          "number": {
+            "label": "Αριθμός"
+          },
+          "label": {
+            "label": "Ετικέτα"
+          },
+          "description": {
+            "label": "Υποεπικεφαλίδα"
+          }
+        }
+      }
+    }
+  },
+  "logo_cloud": {
+    "name": "Σύννεφο λογοτύπων",
+    "blocks": {
+      "logo": {
+        "name": "Λογότυπο",
+        "settings": {
+          "image": {
+            "label": "Εικόνα λογοτύπου"
+          },
+          "name": {
+            "label": "Όνομα εταιρείας"
+          }
+        }
+      }
+    }
+  },
+  "map": {
+    "name": "Χάρτης",
+    "settings": {
+      "address": {
+        "label": "Διεύθυνση"
+      },
+      "embed_url": {
+        "label": "URL ενσωμάτωσης Google Maps"
+      },
+      "directions_link": {
+        "label": "Σύνδεσμος οδηγιών"
+      },
+      "height": {
+        "label": "Ύψος χάρτη",
+        "options": {
+          "small": "Μικρό",
+          "medium": "Μεσαίο",
+          "large": "Μεγάλο"
+        }
+      },
+      "show_address": {
+        "label": "Εμφάνιση διεύθυνσης κάτω από τον χάρτη"
+      }
+    }
+  },
+  "masonry_gallery": {
+    "name": "Συλλογή τύπου πλινθοδομής",
+    "blocks": {
+      "item": {
+        "name": "Στοιχείο συλλογής",
+        "settings": {
+          "category": {
+            "label": "Κατηγορία"
+          },
+          "image": {
+            "label": "Φωτογραφία (προαιρετική)"
+          },
+          "title": {
+            "label": "Επικεφαλίδα"
+          }
+        }
+      }
+    },
+    "settings": {
+      "gap": {
+        "label": "Απόσταση",
+        "options": {
+          "small": "Μικρή",
+          "medium": "Μεσαία",
+          "large": "Μεγάλη"
+        }
+      }
+    }
+  },
+  "numbered_cards": {
+    "name": "Αριθμημένες κάρτες",
+    "blocks": {
+      "step": {
+        "name": "Βήμα",
+        "settings": {
+          "title": {
+            "label": "Επικεφαλίδα"
+          },
+          "description": {
+            "label": "Υποεπικεφαλίδα"
+          }
+        }
+      }
+    }
+  },
+  "numbered_service_list": {
+    "name": "Αριθμημένη λίστα υπηρεσιών",
+    "blocks": {
+      "service": {
+        "name": "Υπηρεσία",
+        "settings": {
+          "title": {
+            "label": "Επικεφαλίδα"
+          },
+          "description": {
+            "label": "Περιγραφή"
+          }
+        }
+      }
+    },
+    "settings": {
+      "show_dividers": {
+        "label": "Εμφάνιση διαχωριστικών"
+      }
+    }
+  },
+  "priced_list": {
+    "name": "Τιμοκατάλογος",
+    "settings": {
+      "layout": {
+        "label": "Διάταξη",
+        "options": {
+          "single-column": "Μία στήλη",
+          "two-column": "Δύο στήλες"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Στοιχείο μενού",
+        "settings": {
+          "name": {
+            "label": "Όνομα στοιχείου"
+          },
+          "price": {
+            "label": "Τιμή"
+          },
+          "image": {
+            "label": "Φωτογραφία (προαιρετική)"
+          },
+          "description": {
+            "label": "Υποεπικεφαλίδα"
+          }
+        }
+      }
+    }
+  },
+  "pricing": {
+    "name": "Τιμολόγηση",
+    "blocks": {
+      "plan": {
+        "name": "Πλάνο",
+        "settings": {
+          "title": {
+            "label": "Όνομα πλάνου"
+          },
+          "period": {
+            "label": "Περίοδος"
+          },
+          "featured": {
+            "label": "Προτεινόμενο πλάνο"
+          },
+          "price": {
+            "label": "Τιμή / Αξία (Προαιρετικό)"
+          },
+          "features": {
+            "label": "Χαρακτηριστικά (ένα ανά γραμμή)",
+            "description": "Ξεκινήστε μια γραμμή με + για σημάδι ελέγχου ή - για σταυρό."
+          }
+        }
+      }
+    }
+  },
+  "profile_grid": {
+    "name": "Πλέγμα προφίλ",
+    "blocks": {
+      "profile": {
+        "name": "Μέλος ομάδας",
+        "settings": {
+          "photo": {
+            "label": "Φωτογραφία"
+          },
+          "name": {
+            "label": "Όνομα"
+          },
+          "role": {
+            "label": "Ρόλος / Τίτλος"
+          },
+          "specialty": {
+            "label": "Ειδικότητα"
+          },
+          "bio": {
+            "label": "Βιογραφικό"
+          },
+          "social_header": {
+            "label": "Κοινωνικά δίκτυα"
+          },
+          "linkedin": {
+            "label": "LinkedIn URL"
+          },
+          "twitter": {
+            "label": "Twitter URL"
+          },
+          "instagram": {
+            "label": "Instagram URL"
+          },
+          "facebook": {
+            "label": "Facebook URL"
+          },
+          "github": {
+            "label": "GitHub URL"
+          },
+          "youtube": {
+            "label": "YouTube URL"
+          },
+          "tiktok": {
+            "label": "TikTok URL"
+          },
+          "pinterest": {
+            "label": "Pinterest URL"
+          },
+          "bluesky": {
+            "label": "Bluesky URL"
+          },
+          "discord": {
+            "label": "Discord URL"
+          },
+          "meta": {
+            "label": "Meta URL"
+          },
+          "reddit": {
+            "label": "Reddit URL"
+          },
+          "telegram": {
+            "label": "Telegram URL"
+          },
+          "threads": {
+            "label": "Threads URL"
+          },
+          "whatsapp": {
+            "label": "WhatsApp URL"
+          },
+          "email": {
+            "label": "Email"
+          }
+        }
+      }
+    }
+  },
+  "project_showcase": {
+    "name": "Βιτρίνα έργων",
+    "settings": {
+      "text_display": {
+        "label": "Εμφάνιση κειμένου",
+        "options": {
+          "hover": "Κατά την αιώρηση",
+          "always": "Πάντα"
+        }
+      }
+    },
+    "blocks": {
+      "project": {
+        "name": "Έργο",
+        "settings": {
+          "image": {
+            "label": "Εικόνα έργου"
+          },
+          "title": {
+            "label": "Τίτλος έργου"
+          },
+          "description": {
+            "label": "Σύντομη περιγραφή"
+          },
+          "link": {
+            "label": "Σύνδεσμος έργου"
+          }
+        }
+      }
+    }
+  },
+  "rich_text": {
+    "name": "Μορφοποιημένο κείμενο",
+    "settings": {
+      "text_alignment": {
+        "label": "Στοίχιση κειμένου"
+      },
+      "content_width": {
+        "label": "Πλάτος περιεχομένου",
+        "options": {
+          "narrow": "Στενό",
+          "medium": "Μεσαίο",
+          "wide": "Φαρδύ",
+          "fullwidth": "Πλήρες πλάτος"
+        }
+      }
+    }
+  },
+  "schedule_table": {
+    "name": "Πίνακας προγράμματος",
+    "settings": {
+      "note": {
+        "label": "Πρόσθετη σημείωση"
+      },
+      "week_start_day": {
+        "label": "Η εβδομάδα ξεκινά",
+        "options": {
+          "0": "Κυριακή",
+          "1": "Δευτέρα"
+        }
+      },
+      "sidebar_position": {
+        "label": "Θέση πλαϊνής μπάρας"
+      }
+    },
+    "blocks": {
+      "day": {
+        "settings": {
+          "day": {
+            "label": "Ημέρα"
+          },
+          "hours": {
+            "label": "Ώρες"
+          },
+          "closed": {
+            "label": "Κλειστό"
+          }
+        },
+        "name": "Ημέρα"
+      },
+      "info": {
+        "name": "Πληροφορίες",
+        "settings": {
+          "title": {
+            "label": "Τίτλος"
+          },
+          "text": {
+            "label": "Κείμενο"
+          }
+        }
+      },
+      "social": {
+        "name": "Εικονίδια κοινωνικών δικτύων"
+      }
+    }
+  },
+  "sliding_panels": {
+    "name": "Συρόμενα Πάνελ",
+    "blocks": {
+      "panel": {
+        "name": "Πάνελ",
+        "settings": {
+          "image": {
+            "label": "Εικόνα"
+          },
+          "title": {
+            "label": "Επικεφαλίδα"
+          },
+          "subtitle": {
+            "label": "Υπότιτλος"
+          }
+        }
+      }
+    }
+  },
+  "slideshow": {
+    "name": "Παρουσίαση",
+    "settings": {
+      "autoplay": {
+        "label": "Αυτόματη εναλλαγή διαφανειών"
+      },
+      "autoplay_speed": {
+        "label": "Αλλαγή διαφάνειας κάθε"
+      },
+      "height": {
+        "label": "Ύψος",
+        "options": {
+          "auto": "Αυτόματο",
+          "small": "Μικρό",
+          "medium": "Μεσαίο",
+          "large": "Μεγάλο"
+        }
+      }
+    },
+    "blocks": {
+      "slide": {
+        "name": "Διαφάνεια",
+        "settings": {
+          "image": {
+            "label": "Εικόνα φόντου"
+          },
+          "heading_text": {
+            "label": "Κείμενο επικεφαλίδας"
+          },
+          "heading_size": {
+            "label": "Μέγεθος επικεφαλίδας",
+            "options": {
+              "lg": "Μεγάλο",
+              "xl": "Πολύ μεγάλο",
+              "2xl": "2X Μεγάλο",
+              "3xl": "3X Μεγάλο",
+              "4xl": "4X Μεγάλο",
+              "5xl": "5X Μεγάλο",
+              "6xl": "6X Μεγάλο",
+              "7xl": "7X Μεγάλο",
+              "8xl": "8X Μεγάλο",
+              "9xl": "9X Μεγάλο"
+            }
+          },
+          "text_content": {
+            "label": "Περιεχόμενο κειμένου"
+          },
+          "text_size": {
+            "label": "Μέγεθος κειμένου",
+            "options": {
+              "sm": "Μικρό",
+              "base": "Βάση",
+              "lg": "Μεγάλο"
+            }
+          },
+          "text_uppercase": {
+            "label": "Κεφαλαία"
+          },
+          "text_muted": {
+            "label": "Αχνό χρώμα"
+          },
+          "button_link_2": {
+            "label": "Κουμπί 2"
+          },
+          "color_scheme": {
+            "label": "Χρωματικό σχήμα",
+            "options": {
+              "standard": "Τυπικό",
+              "highlight": "Τονισμένο"
+            }
+          }
+        }
+      }
+    }
+  },
+  "split_content": {
+    "name": "Διαχωρισμένο Περιεχόμενο",
+    "settings": {
+      "balance": {
+        "label": "Ισορροπία",
+        "options": {
+          "left_heavy": "Βαρύτητα αριστερά",
+          "equal": "Ισο",
+          "right_heavy": "Βαρύτητα δεξιά"
+        }
+      },
+      "sticky_column": {
+        "label": "Σταθερή στήλη (επιφάνεια εργασίας)"
+      }
+    },
+    "blocks": {
+      "heading": {
+        "settings": {
+          "position": {
+            "label": "Στήλη"
+          }
+        }
+      },
+      "text": {
+        "settings": {
+          "position": {
+            "label": "Στήλη"
+          }
+        }
+      },
+      "button": {
+        "settings": {
+          "position": {
+            "label": "Στήλη"
+          }
+        }
+      }
+    }
+  },
+  "scrolling_text": {
+    "name": "Κυλιόμενο κείμενο",
+    "settings": {
+      "text": {
+        "label": "Κείμενο"
+      },
+      "separator": {
+        "label": "Διαχωριστικό"
+      },
+      "speed": {
+        "label": "Ταχύτητα"
+      },
+      "rotate": {
+        "label": "Γωνία περιστροφής"
+      },
+      "font_size": {
+        "label": "Μέγεθος γραμματοσειράς",
+        "options": {
+          "sm": "Μικρό",
+          "md": "Μεσαίο",
+          "lg": "Μεγάλο",
+          "xl": "Πολύ μεγάλο"
+        }
+      },
+      "bg_color": {
+        "label": "Χρώμα φόντου"
+      },
+      "text_color": {
+        "label": "Χρώμα κειμένου"
+      }
+    }
+  },
+  "social_icons": {
+    "settings": {
+      "icon_size": {
+        "label": "Μέγεθος εικονιδίου"
+      }
+    },
+    "name": "Εικονίδια κοινωνικών δικτύων"
+  },
+  "split_hero": {
+    "name": "Διαχωρισμένο hero",
+    "settings": {
+      "image": {
+        "label": "Εικόνα φόντου"
+      }
+    }
+  },
+  "steps": {
+    "name": "Βήματα",
+    "blocks": {
+      "step": {
+        "name": "Βήμα",
+        "settings": {
+          "image": {
+            "label": "Εικόνα"
+          },
+          "title": {
+            "label": "Επικεφαλίδα"
+          },
+          "description": {
+            "label": "Περιγραφή"
+          }
+        }
+      }
+    }
+  },
+  "testimonial_slider": {
+    "name": "Ολισθητής Μαρτυριών",
+    "settings": {
+      "autoplay": {
+        "label": "Αυτόματη αναπαραγωγή"
+      },
+      "autoplay_speed": {
+        "label": "Ταχύτητα αυτόματης αναπαραγωγής"
+      }
+    },
+    "blocks": {
+      "quote": {
+        "name": "Απόσπασμα"
+      }
+    }
+  },
+  "testimonial_hero": {
+    "name": "Hero μαρτυρίας",
+    "settings": {
+      "logo": {
+        "label": "Λογότυπο εταιρείας"
+      },
+      "author_image": {
+        "label": "Εικόνα συγγραφέα"
+      }
+    }
+  },
+  "testimonials": {
+    "name": "Μαρτυρίες",
+    "blocks": {
+      "quote": {
+        "name": "Μαρτυρία"
+      }
+    }
+  },
+  "timeline": {
+    "name": "Χρονολόγιο",
+    "settings": {
+      "layout": {
+        "options": {
+          "centered": "Κεντραρισμένο (Εναλλασσόμενο)",
+          "vertical": "Κάθετο",
+          "horizontal": "Οριζόντιο"
+        },
+        "label": "Διάταξη"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Στοιχείο χρονολογίου",
+        "settings": {
+          "date": {
+            "label": "Ημερομηνία/Φάση"
+          },
+          "duration": {
+            "label": "Διάρκεια (προαιρετική)"
+          },
+          "features": {
+            "label": "Χαρακτηριστικά/κουκκίδες (ένα ανά γραμμή)",
+            "description": "Ξεκινήστε μια γραμμή με + για σημάδι ελέγχου ή - για σταυρό."
+          },
+          "title": {
+            "label": "Επικεφαλίδα"
+          },
+          "description": {
+            "label": "Υποεπικεφαλίδα"
+          }
+        }
+      }
+    }
+  },
+  "trust_bar": {
+    "name": "Μπάρα εμπιστοσύνης",
+    "settings": {
+      "alignment": {
+        "label": "Στοίχιση"
+      },
+      "show_dividers": {
+        "label": "Εμφάνιση διαχωριστικών"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Στοιχείο",
+        "settings": {
+          "icon": {
+            "label": "Εικονίδιο"
+          },
+          "title": {
+            "label": "Τίτλος"
+          },
+          "text": {
+            "label": "Περιγραφή"
+          }
+        }
+      }
+    }
+  },
+  "video_embed": {
+    "name": "YouTube/Vimeo",
+    "settings": {}
+  },
+  "video_popup": {
+    "name": "Αναδυόμενο βίντεο",
+    "settings": {
+      "image": {
+        "label": "Εικόνα φόντου"
+      },
+      "video_header": {
+        "label": "Βίντεο"
+      },
+      "overlay_color": {
+        "description": "Ρυθμίστε το alpha για ένταση επικάλυψης"
+      },
+      "height": {
+        "label": "Ύψος",
+        "options": {
+          "small": "Μικρό",
+          "medium": "Μεσαίο",
+          "large": "Μεγάλο"
+        }
+      },
+      "play_button_style": {
+        "label": "Στυλ κουμπιού αναπαραγωγής",
+        "options": {
+          "light": "Φωτεινό",
+          "dark": "Σκούρο"
+        }
+      }
     }
   },
   "team_highlight": {
     "name": "Ανάδειξη Ομάδας",
     "settings": {
-      "eyebrow": {
-        "label": "Υπέρτιτλος"
-      },
-      "title": {
-        "label": "Επικεφαλίδα"
-      },
-      "description": {
-        "label": "Περιγραφή"
-      },
       "signature_image": {
         "label": "Εικόνα υπογραφής"
-      },
-      "display_header": {
-        "label": "Εμφάνιση"
-      },
-      "columns_desktop": {
-        "label": "Στήλες επιφάνειας εργασίας"
       },
       "image_ratio": {
         "label": "Αναλογία εικόνας",
@@ -3703,13 +2075,6 @@
           "portrait": "Πορτρέτο",
           "square": "Τετράγωνο",
           "auto": "Αυτόματο"
-        }
-      },
-      "color_scheme": {
-        "label": "Χρωματικό σχήμα",
-        "options": {
-          "standard": "Τυπικό",
-          "highlight": "Επισημασμένο"
         }
       }
     },
@@ -3725,9 +2090,6 @@
           },
           "role": {
             "label": "Ρόλος"
-          },
-          "link": {
-            "label": "Σύνδεσμος"
           }
         }
       }

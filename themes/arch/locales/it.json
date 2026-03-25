@@ -1,3464 +1,21 @@
 {
-  "accordion": {
-    "name": "Fisarmonica",
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "style": {
-        "label": "Stile",
-        "options": {
-          "separated": "Separato",
-          "connected": "Connesso"
-        }
-      },
-      "allow_multiple": {
-        "label": "Consenti apertura multipla"
-      },
-      "sidebar_position": {
-        "label": "Posizione barra laterale",
-        "options": {
-          "left": "Sinistra",
-          "right": "Destra"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Elemento",
-        "settings": {
-          "question": {
-            "label": "Domanda"
-          },
-          "answer": {
-            "label": "Risposta"
-          }
-        }
-      },
-      "info": {
-        "name": "Info",
-        "settings": {
-          "title": {
-            "label": "Titolo"
-          },
-          "text": {
-            "label": "Testo"
-          }
-        }
-      },
-      "social": {
-        "name": "Icone social"
-      }
-    }
-  },
-  "banner": {
-    "name": "Banner",
-    "settings": {
-      "image": {
-        "label": "Immagine di sfondo"
-      },
-      "overlay_color": {
-        "label": "Colore sovrapposizione",
-        "description": "Si applica solo se è presente un'immagine di sfondo."
-      },
-      "height": {
-        "label": "Altezza",
-        "options": {
-          "auto": "Auto",
-          "small": "Piccolo",
-          "medium": "Medio",
-          "large": "Grande"
-        }
-      },
-      "fullwidth": {
-        "label": "Larghezza piena"
-      },
-      "alignment": {
-        "label": "Allineamento contenuto",
-        "options": {
-          "center": "Centro",
-          "start": "Inizio"
-        }
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "button": {
-        "settings": {
-          "size": {
-            "options": {
-              "small": "Piccolo",
-              "medium": "Medio",
-              "large": "Grande",
-              "xlarge": "Extra Grande"
-            },
-            "label": "Dimensione pulsante"
-          },
-          "link": {
-            "label": "Pulsante 1"
-          },
-          "style": {
-            "label": "Stile pulsante 1",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "style_2": {
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            },
-            "label": "Stile pulsante 2"
-          },
-          "link_2": {
-            "label": "Pulsante 2"
-          }
-        },
-        "name": "Gruppo pulsanti"
-      },
-      "text": {
-        "settings": {
-          "size": {
-            "label": "Dimensione",
-            "options": {
-              "base": "Base",
-              "sm": "Piccolo",
-              "lg": "Grande"
-            }
-          },
-          "uppercase": {
-            "label": "Maiuscolo"
-          },
-          "muted": {
-            "label": "Colore attenuato"
-          },
-          "text": {
-            "label": "Testo"
-          }
-        },
-        "name": "Testo"
-      },
-      "heading": {
-        "settings": {
-          "size": {
-            "options": {
-              "2xl": "2X Grande",
-              "3xl": "3X Grande",
-              "4xl": "4X Grande",
-              "5xl": "5X Grande",
-              "6xl": "6X Grande",
-              "7xl": "7X Grande",
-              "8xl": "8X Grande",
-              "9xl": "9X Grande",
-              "lg": "Grande",
-              "xl": "Extra Grande"
-            },
-            "label": "Dimensione"
-          },
-          "text": {
-            "label": "Testo"
-          }
-        },
-        "name": "Intestazione"
-      },
-      "rating": {
-        "name": "Valutazione a Stelle",
-        "settings": {
-          "rating": {
-            "label": "Valutazione",
-            "options": {
-              "3": "3 stelle",
-              "4": "4 stelle",
-              "5": "5 stelle"
-            }
-          }
-        }
-      },
-      "image": {
-        "name": "Immagine",
-        "settings": {
-          "image": {
-            "label": "Immagine"
-          },
-          "width": {
-            "label": "Larghezza massima (%)"
-          }
-        }
-      },
-      "features": {
-        "name": "Funzionalità",
-        "settings": {
-          "features": {
-            "label": "Funzionalità (una per riga)",
-            "description": "Inizia una riga con + per un segno di spunta o - per una croce."
-          }
-        }
-      },
-      "icon": {
-        "name": "Icona",
-        "settings": {
-          "icon": {
-            "label": "Icona"
-          },
-          "style": {
-            "label": "Stile icona",
-            "options": {
-              "plain": "Semplice",
-              "outline": "Contorno",
-              "filled": "Pieno"
-            }
-          },
-          "size": {
-            "label": "Dimensione",
-            "options": {
-              "sm": "Piccolo",
-              "md": "Medio",
-              "lg": "Grande",
-              "xl": "Extra Grande"
-            }
-          },
-          "shape": {
-            "label": "Forma",
-            "options": {
-              "sharp": "Angolare",
-              "rounded": "Arrotondato",
-              "circle": "Cerchio"
-            }
-          }
-        }
-      },
-      "numbered_item": {
-        "name": "Elemento Numerato",
-        "settings": {
-          "title": {
-            "label": "Titolo"
-          },
-          "description": {
-            "label": "Descrizione"
-          },
-          "size": {
-            "label": "Dimensione cerchio",
-            "options": {
-              "small": "Piccolo",
-              "medium": "Medio",
-              "large": "Grande",
-              "xlarge": "Extra Grande"
-            }
-          },
-          "shape": {
-            "label": "Forma",
-            "options": {
-              "sharp": "Angolare",
-              "rounded": "Arrotondato",
-              "circle": "Cerchio"
-            }
-          }
-        }
-      }
-    }
-  },
-  "bento_grid": {
-    "name": "Griglia Bento",
-    "settings": {
-      "gap": {
-        "label": "Dimensione spazio",
-        "options": {
-          "0": "Nessuno",
-          "var(--space-sm)": "Piccolo",
-          "var(--space-md)": "Medio",
-          "var(--space-lg)": "Grande",
-          "var(--space-xl)": "Extra Grande"
-        }
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Elemento Bento",
-        "settings": {
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "link": {
-            "label": "Link"
-          },
-          "layout_header": {
-            "label": "Layout"
-          },
-          "col_span": {
-            "label": "Estensione colonna"
-          },
-          "row_span": {
-            "label": "Estensione riga"
-          },
-          "background_color": {
-            "label": "Sfondo blocco"
-          },
-          "overlay_color": {
-            "label": "Sovrapposizione immagine",
-            "description": "Si applica solo se è presente un'immagine di sfondo."
-          },
-          "text_color": {
-            "label": "Colore testo",
-            "options": {
-              "dark": "Scuro",
-              "light": "Chiaro"
-            }
-          },
-          "alignment": {
-            "label": "Allineamento testo",
-            "options": {
-              "start": "Inizio",
-              "center": "Centro"
-            }
-          },
-          "title": {
-            "label": "Intestazione"
-          },
-          "text": {
-            "label": "Testo"
-          },
-          "image": {
-            "label": "Foto (opzionale)"
-          },
-          "display_header": {
-            "label": "Visualizzazione"
-          }
-        }
-      }
-    }
-  },
-  "card_grid": {
-    "name": "Griglia schede",
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "layout": {
-        "options": {
-          "grid": "Griglia",
-          "carousel": "Carosello"
-        },
-        "label": "Layout"
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
-      },
-      "alignment": {
-        "label": "Allineamento",
-        "options": {
-          "start": "Sinistra",
-          "center": "Centrato"
-        }
-      },
-      "image_position": {
-        "label": "Posizione immagine",
-        "options": {
-          "top": "Alto",
-          "bottom": "Basso"
-        }
-      },
-      "aspect_ratio": {
-        "label": "Rapporto immagine",
-        "options": {
-          "auto": "Automatico",
-          "1 / 1": "Quadrato (1:1)",
-          "4 / 3": "Orizzontale (4:3)",
-          "3 / 2": "Orizzontale (3:2)",
-          "3 / 4": "Verticale (3:4)",
-          "16 / 9": "Panoramico (16:9)"
-        }
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "card": {
-        "name": "Scheda",
-        "settings": {
-          "image": {
-            "label": "Immagine"
-          },
-          "subtitle": {
-            "label": "Sottotitolo"
-          },
-          "description": {
-            "label": "Descrizione"
-          },
-          "button_link": {
-            "label": "Link pulsante"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "title": {
-            "label": "Intestazione"
-          }
-        }
-      }
-    }
-  },
-  "comparison_slider": {
-    "name": "Cursore confronto",
-    "settings": {
-      "before_image": {
-        "label": "Immagine prima"
-      },
-      "after_image": {
-        "label": "Immagine dopo"
-      },
-      "labels_header": {
-        "label": "Etichette"
-      },
-      "before_label": {
-        "label": "Etichetta prima"
-      },
-      "after_label": {
-        "label": "Etichetta dopo"
-      },
-      "orientation": {
-        "label": "Orientamento cursore",
-        "options": {
-          "horizontal": "Orizzontale",
-          "vertical": "Verticale"
-        }
-      },
-      "initial_position": {
-        "label": "Posizione iniziale cursore"
-      },
-      "show_labels": {
-        "label": "Mostra etichette prima/dopo"
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "comparison_table": {
-    "name": "Tabella confronto",
-    "settings": {
-      "feature_column_label": {
-        "label": "Etichetta colonna funzionalità"
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "column": {
-        "name": "Colonna",
-        "settings": {
-          "name": {
-            "label": "Nome colonna"
-          },
-          "badge": {
-            "label": "Testo badge (opzionale)"
-          },
-          "options_header": {
-            "label": "Opzioni"
-          },
-          "featured": {
-            "label": "In evidenza (evidenziato)"
-          },
-          "link": {
-            "label": "Pulsante CTA"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          }
-        }
-      },
-      "feature": {
-        "name": "Riga funzionalità",
-        "settings": {
-          "name": {
-            "label": "Nome funzionalità"
-          },
-          "values": {
-            "label": "Valori per ogni colonna (uno per riga: sì, no, o testo personalizzato)"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          }
-        }
-      }
-    }
-  },
-  "core_divider": {
-    "name": "Divisore",
-    "description": "Aggiungi una linea divisoria orizzontale",
-    "category": "Layout",
-    "settings": {
-      "color": {
-        "label": "Colore linea",
-        "description": "Colore della linea divisoria"
-      },
-      "thickness": {
-        "label": "Spessore",
-        "description": "Spessore della linea divisoria in pixel"
-      },
-      "width": {
-        "label": "Larghezza",
-        "description": "Larghezza del divisore come percentuale del contenitore"
-      },
-      "padding": {
-        "label": "Spaziatura",
-        "description": "Spaziatura verticale intorno al divisore in pixel"
-      }
-    }
-  },
-  "core_spacer": {
-    "name": "Spaziatore",
-    "description": "Aggiungi spazio verticale tra le sezioni di contenuto",
-    "category": "Layout",
-    "settings": {
-      "height": {
-        "label": "Altezza",
-        "description": "L'altezza dello spaziatore in pixel"
-      },
-      "showOnMobile": {
-        "label": "Mostra su mobile",
-        "description": "Se mostrare lo spaziatore sui dispositivi mobili"
-      },
-      "mobileHeight": {
-        "label": "Altezza su mobile",
-        "description": "L'altezza dello spaziatore sui dispositivi mobili in pixel"
-      }
-    }
-  },
-  "content_switcher": {
-    "name": "Selettore contenuto",
-    "settings": {
-      "switcher_header": {
-        "label": "Selettore"
-      },
-      "switcher_type": {
-        "label": "Stile selettore",
-        "options": {
-          "toggle": "Interruttore (2 opzioni)",
-          "tabs": "Tab (Fino a 3 opzioni)"
-        }
-      },
-      "option_1_label": {
-        "label": "Etichetta opzione 1"
-      },
-      "option_2_label": {
-        "label": "Etichetta opzione 2"
-      },
-      "option_3_label": {
-        "label": "Etichetta opzione 3 (solo Tab)"
-      },
-      "columns": {
-        "label": "Colonne per stato"
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "labels_header": {
-        "label": "Etichette"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Elemento contenuto",
-        "settings": {
-          "price": {
-            "label": "Prezzo / Valore (Opzionale)"
-          },
-          "link": {
-            "label": "Link / CTA"
-          },
-          "target_option": {
-            "label": "Assegna a opzione",
-            "options": {
-              "1": "Opzione 1",
-              "2": "Opzione 2",
-              "3": "Opzione 3"
-            }
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "title": {
-            "label": "Intestazione"
-          },
-          "text": {
-            "label": "Testo"
-          },
-          "image": {
-            "label": "Foto (opzionale)"
-          },
-          "layout_header": {
-            "label": "Layout"
-          }
-        }
-      }
-    }
-  },
-  "countdown": {
-    "name": "Timer conto alla rovescia",
-    "settings": {
-      "target_date": {
-        "label": "Data obiettivo (YYYY-MM-DD HH:MM)"
-      },
-      "expired_message": {
-        "label": "Messaggio alla scadenza"
-      },
-      "button": {
-        "label": "Pulsante call-to-action"
-      },
-      "show_seconds": {
-        "label": "Mostra secondi"
-      },
-      "style": {
-        "options": {
-          "cards": "Schede",
-          "minimal": "Minimale"
-        },
-        "label": "Stile"
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "options_header": {
-        "label": "Opzioni"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "embed": {
-    "name": "Widget incorporato",
-    "settings": {
-      "code": {
-        "label": "Codice incorporato (HTML/JS/Iframe)"
-      },
-      "max_width": {
-        "label": "Larghezza contenitore",
-        "options": {
-          "narrow": "Stretto",
-          "wide": "Largo",
-          "fullwidth": "Larghezza piena",
-          "medium": "Medio"
-        }
-      },
-      "alignment": {
-        "label": "Allineamento",
-        "options": {
-          "start": "Inizio",
-          "center": "Centro",
-          "end": "Fine"
-        }
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "event_list": {
-    "name": "Elenco eventi",
-    "blocks": {
-      "event": {
-        "name": "Evento",
-        "settings": {
-          "day": {
-            "label": "Giorno (numero)"
-          },
-          "month": {
-            "label": "Mese (abbreviato)"
-          },
-          "title": {
-            "label": "Titolo evento"
-          },
-          "location": {
-            "label": "Luogo e orario"
-          },
-          "button_link": {
-            "label": "Pulsante"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "description": {
-            "label": "Sottotitolo"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "features_split": {
-    "name": "Funzionalità divise",
-    "settings": {
-      "icon_style": {
-        "label": "Stile icona",
-        "options": {
-          "plain": "Semplice",
-          "outline": "Contorno",
-          "filled": "Pieno"
-        }
-      },
-      "icon_size": {
-        "label": "Dimensione icona",
-        "options": {
-          "sm": "Piccolo",
-          "md": "Medio",
-          "lg": "Grande",
-          "xl": "Extra Grande"
-        }
-      },
-      "icon_shape": {
-        "label": "Forma icona",
-        "options": {
-          "sharp": "Squadrato",
-          "rounded": "Arrotondato",
-          "circle": "Cerchio"
-        }
-      },
-      "content_position": {
-        "label": "Posizione contenuto",
-        "options": {
-          "left": "Sinistra",
-          "right": "Destra"
-        }
-      },
-      "show_divider": {
-        "label": "Mostra separatore"
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "feature": {
-        "name": "Funzionalità",
-        "settings": {
-          "icon": {
-            "label": "Icona"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "title": {
-            "label": "Intestazione"
-          },
-          "description": {
-            "label": "Sottotitolo"
-          }
-        }
-      }
-    }
-  },
-  "footer": {
-    "name": "Piè di pagina",
-    "settings": {
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "copyright": {
-        "label": "Testo copyright"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "In evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "logo_text": {
-        "name": "Logo e testo",
-        "settings": {
-          "logo_text": {
-            "label": "Testo del logo"
-          },
-          "logo": {
-            "label": "Immagine logo"
-          },
-          "logo_width": {
-            "label": "Larghezza logo"
-          },
-          "text": {
-            "label": "Testo"
-          }
-        }
-      },
-      "text_block": {
-        "name": "Testo",
-        "settings": {
-          "title": {
-            "label": "Titolo"
-          },
-          "text": {
-            "label": "Testo"
-          }
-        }
-      },
-      "menu_block": {
-        "name": "Menu",
-        "settings": {
-          "title": {
-            "label": "Titolo"
-          },
-          "menu": {
-            "label": "Menu di navigazione",
-            "description": "Seleziona il menu da visualizzare"
-          }
-        }
-      },
-      "social_block": {
-        "name": "Icone social",
-        "settings": {
-          "title": {
-            "label": "Titolo"
-          }
-        }
-      }
-    }
-  },
-  "gallery": {
-    "name": "Galleria",
-    "settings": {
-      "columns_desktop": {
-        "label": "Colonne (Desktop)"
-      },
-      "staggered": {
-        "label": "Layout sfalsato"
-      },
-      "aspect_ratio": {
-        "label": "Proporzioni immagine",
-        "options": {
-          "contain": "Mostra immagine intera",
-          "1 / 1": "Quadrato (1:1)",
-          "4 / 3": "Standard (4:3)",
-          "3 / 2": "Orizzontale (3:2)",
-          "3 / 4": "Verticale (3:4)",
-          "16 / 9": "Panoramico (16:9)",
-          "auto": "Auto"
-        }
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "layout": {
-        "label": "Testo sopratitolo",
-        "options": {
-          "grid": "Griglia",
-          "carousel": "Carosello"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "image": {
-        "name": "Immagine",
-        "settings": {
-          "caption": {
-            "label": "Didascalia"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "image": {
-            "label": "Immagine di sfondo"
-          }
-        }
-      }
-    }
-  },
-  "header": {
-    "name": "Intestazione",
-    "settings": {
-      "logo_header": {
-        "label": "Logo"
-      },
-      "logoImage": {
-        "label": "Immagine logo",
-        "description": "Carica un'immagine logo. Se fornita, verrà visualizzata al posto del logo testuale."
-      },
-      "logoMaxWidth": {
-        "label": "Larghezza massima logo",
-        "description": "Larghezza massima dell'immagine del logo"
-      },
-      "logoText": {
-        "label": "Testo logo",
-        "description": "Testo da visualizzare nel logo dell'intestazione"
-      },
-      "contact_header": {
-        "label": "Dettagli contatto"
-      },
-      "contactDetailsLine1": {
-        "label": "Dettagli contatto 1",
-        "description": "Prima riga delle informazioni di contatto (es. telefono)"
-      },
-      "contactDetailsLine2": {
-        "label": "Dettagli contatto 2",
-        "description": "Seconda riga delle informazioni di contatto (es. indirizzo)"
-      },
-      "contact_position": {
-        "label": "Posizione dei dettagli di contatto",
-        "options": {
-          "logo": "Accanto al logo",
-          "menu": "Accanto al pulsante menu"
-        }
-      },
-      "navigation_header": {
-        "label": "Navigazione"
-      },
-      "headerNavigation": {
-        "label": "Menu di navigazione",
-        "description": "Seleziona il menu da visualizzare nell'intestazione"
-      },
-      "ctaButtonLink": {
-        "label": "Pulsante CTA",
-        "description": "Pulsante di invito all'azione (lascia il testo vuoto per nascondere)"
-      },
-      "ctaButtonStyle": {
-        "label": "Stile del pulsante",
-        "options": {
-          "primary": "Primario",
-          "secondary": "Secondario"
-        }
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "full_width": {
-        "label": "Larghezza piena",
-        "description": "Quando attivato, l'intestazione si estende su tutta la larghezza. Quando disattivato, rimane centrata in un contenitore."
-      },
-      "sticky": {
-        "label": "Intestazione fissa",
-        "description": "Quando attivato, l'intestazione rimane fissa in alto durante lo scorrimento"
-      },
-      "transparent_on_hero": {
-        "label": "Trasparente su hero",
-        "description": "L'intestazione diventa trasparente sopra i widget banner, slideshow e video popup"
-      },
-      "transparent_logo": {
-        "label": "Logo intestazione trasparente",
-        "description": "Logo alternativo mostrato quando l'intestazione è trasparente (es. una versione chiara)"
-      },
-      "center_nav": {
-        "label": "Centra navigazione",
-        "description": "Centra il menu di navigazione nell'intestazione con il logo a sinistra e il CTA a destra (solo desktop)"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "In evidenza"
-        }
-      }
-    }
-  },
-  "icon_card_grid": {
-    "name": "Griglia schede con icona",
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "icon_style": {
-        "label": "Stile icona",
-        "options": {
-          "plain": "Semplice",
-          "outline": "Contorno",
-          "filled": "Pieno"
-        }
-      },
-      "icon_size": {
-        "label": "Dimensione icona",
-        "options": {
-          "sm": "Piccolo",
-          "md": "Medio",
-          "lg": "Grande",
-          "xl": "Extra Grande"
-        }
-      },
-      "icon_shape": {
-        "label": "Forma icona",
-        "options": {
-          "sharp": "Squadrato",
-          "rounded": "Arrotondato",
-          "circle": "Cerchio"
-        }
-      },
-      "alignment": {
-        "label": "Allineamento",
-        "options": {
-          "start": "Sinistra",
-          "center": "Centrato"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      },
-      "layout": {
-        "label": "Testo sopratitolo",
-        "options": {
-          "grid": "Griglia",
-          "carousel": "Carosello"
-        }
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
-      },
-      "featured_image": {
-        "label": "Immagine in evidenza"
-      },
-      "featured_image_position": {
-        "label": "Posizione immagine",
-        "options": {
-          "start": "Sinistra",
-          "end": "Destra"
-        }
-      }
-    },
-    "blocks": {
-      "card": {
-        "name": "Scheda",
-        "settings": {
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "icon": {
-            "label": "Icona"
-          },
-          "subtitle": {
-            "label": "Sottotitolo"
-          },
-          "title": {
-            "label": "Intestazione"
-          },
-          "description": {
-            "label": "Descrizione"
-          },
-          "button_link": {
-            "label": "Link pulsante"
-          }
-        }
-      }
-    }
-  },
-  "icon_list": {
-    "name": "Elenco icone",
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "icon_style": {
-        "label": "Stile icona",
-        "options": {
-          "plain": "Semplice",
-          "outline": "Contorno",
-          "filled": "Pieno"
-        }
-      },
-      "icon_size": {
-        "label": "Dimensione icona",
-        "options": {
-          "sm": "Piccolo",
-          "md": "Medio",
-          "lg": "Grande",
-          "xl": "Extra Grande"
-        }
-      },
-      "icon_shape": {
-        "label": "Forma icona",
-        "options": {
-          "sharp": "Squadrato",
-          "rounded": "Arrotondato",
-          "circle": "Cerchio"
-        }
-      },
-      "layout": {
-        "label": "Testo sopratitolo",
-        "options": {
-          "grid": "Griglia",
-          "carousel": "Carosello"
-        }
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Elemento",
-        "settings": {
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "icon": {
-            "label": "Icona"
-          },
-          "title": {
-            "label": "Intestazione"
-          },
-          "description": {
-            "label": "Sottotitolo"
-          }
-        }
-      }
-    }
-  },
-  "image": {
-    "settings": {
-      "link": {
-        "description": "Link opzionale al clic sull'immagine.",
-        "label": "Pulsante 1"
-      },
-      "fullwidth": {
-        "description": "Se abilitato, l'immagine occupa l'intera larghezza. Se disabilitato, l'immagine è contenuta nella griglia del tema.",
-        "label": "Larghezza piena"
-      },
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "image": {
-        "label": "Immagine di sfondo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      }
-    },
-    "name": "Immagine"
-  },
-  "image_callout": {
-    "name": "Callout immagine",
-    "settings": {
-      "image_position": {
-        "label": "Posizione immagine",
-        "options": {
-          "left": "Sinistra",
-          "right": "Destra"
-        }
-      },
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "image": {
-        "label": "Immagine di sfondo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "features": {
-        "name": "Funzionalità",
-        "settings": {
-          "features": {
-            "label": "Funzionalità (una per riga)",
-            "description": "Inizia una riga con + per un segno di spunta o - per una croce."
-          }
-        }
-      },
-      "heading": {
-        "name": "Fisarmonica",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione pulsante",
-            "options": {
-              "lg": "Grande",
-              "xl": "Extra Grande",
-              "2xl": "2X Grande",
-              "3xl": "3X Grande",
-              "4xl": "4X Grande",
-              "5xl": "5X Grande",
-              "6xl": "6X Grande",
-              "7xl": "7X Grande",
-              "8xl": "8X Grande",
-              "9xl": "9X Grande"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Fisarmonica",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione",
-            "options": {
-              "sm": "Piccolo",
-              "base": "Base",
-              "lg": "Grande"
-            }
-          },
-          "uppercase": {
-            "label": "Maiuscolo"
-          },
-          "muted": {
-            "label": "Colore attenuato"
-          }
-        }
-      },
-      "button": {
-        "name": "Gruppo pulsanti",
-        "settings": {
-          "link": {
-            "label": "Pulsante 1"
-          },
-          "style": {
-            "label": "Stile pulsante 1",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "link_2": {
-            "label": "Pulsante 2"
-          },
-          "style_2": {
-            "label": "Stile pulsante 2",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "size": {
-            "label": "Dimensione pulsante",
-            "options": {
-              "small": "Piccolo",
-              "medium": "Medio",
-              "large": "Grande",
-              "xlarge": "Extra Grande"
-            }
-          }
-        }
-      }
-    }
-  },
-  "image_hotspots": {
-    "name": "Punti attivi immagine",
-    "settings": {
-      "image_alt": {
-        "label": "Testo alternativo immagine"
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "image": {
-        "label": "Immagine di sfondo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "hotspot": {
-        "name": "Punto attivo",
-        "settings": {
-          "title": {
-            "label": "Titolo tooltip"
-          },
-          "description": {
-            "label": "Descrizione tooltip"
-          },
-          "button_link": {
-            "label": "Link pulsante"
-          },
-          "position_x": {
-            "label": "Posizione orizzontale (%)"
-          },
-          "position_y": {
-            "label": "Posizione verticale (%)"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "layout_header": {
-            "label": "Layout"
-          }
-        }
-      }
-    }
-  },
-  "image_tabs": {
-    "name": "Tab immagine",
-    "blocks": {
-      "tab": {
-        "name": "Tab",
-        "settings": {
-          "title": {
-            "label": "Titolo tab"
-          },
-          "description": {
-            "label": "Descrizione tab"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "image": {
-            "label": "Immagine di sfondo"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "image_position": {
-        "label": "Posizione immagine",
-        "options": {
-          "left": "Sinistra",
-          "right": "Destra"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "image_text": {
-    "name": "Immagine + Testo",
-    "settings": {
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "image": {
-        "label": "Immagine di sfondo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "image_position": {
-        "label": "Posizione immagine",
-        "options": {
-          "left": "Sinistra",
-          "right": "Destra"
-        }
-      },
-      "text_position": {
-        "label": "Posizione verticale del testo",
-        "options": {
-          "top": "In alto",
-          "center": "Centro",
-          "bottom": "In basso"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "rating": {
-        "name": "Valutazione a Stelle",
-        "settings": {
-          "rating": {
-            "label": "Valutazione",
-            "options": {
-              "3": "3 stelle",
-              "4": "4 stelle",
-              "5": "5 stelle"
-            }
-          }
-        }
-      },
-      "image": {
-        "name": "Immagine",
-        "settings": {
-          "image": {
-            "label": "Immagine"
-          },
-          "width": {
-            "label": "Larghezza massima (%)"
-          }
-        }
-      },
-      "heading": {
-        "name": "Intestazione",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione testo",
-            "options": {
-              "lg": "Grande",
-              "xl": "Extra Grande",
-              "2xl": "2X Grande",
-              "3xl": "3X Grande",
-              "4xl": "4X Grande",
-              "5xl": "5X Grande",
-              "6xl": "6X Grande",
-              "7xl": "7X Grande",
-              "8xl": "8X Grande",
-              "9xl": "9X Grande"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Testo",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione",
-            "options": {
-              "sm": "Piccolo",
-              "base": "Base",
-              "lg": "Grande"
-            }
-          },
-          "uppercase": {
-            "label": "Maiuscolo"
-          },
-          "muted": {
-            "label": "Colore attenuato"
-          }
-        }
-      },
-      "features": {
-        "name": "Funzionalità",
-        "settings": {
-          "features": {
-            "label": "Funzionalità (una per riga)",
-            "description": "Inizia una riga con + per un segno di spunta o - per una croce."
-          }
-        }
-      },
-      "button": {
-        "name": "Gruppo pulsanti",
-        "settings": {
-          "link": {
-            "label": "Pulsante 1"
-          },
-          "style": {
-            "label": "Stile pulsante 1",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "link_2": {
-            "label": "Pulsante 2"
-          },
-          "style_2": {
-            "label": "Stile pulsante 2",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "size": {
-            "label": "Dimensione pulsante",
-            "options": {
-              "small": "Piccolo",
-              "medium": "Medio",
-              "large": "Grande",
-              "xlarge": "Extra Grande"
-            }
-          }
-        }
-      },
-      "icon": {
-        "name": "Icona",
-        "settings": {
-          "icon": {
-            "label": "Icona"
-          },
-          "style": {
-            "label": "Stile icona",
-            "options": {
-              "plain": "Semplice",
-              "outline": "Contorno",
-              "filled": "Pieno"
-            }
-          },
-          "size": {
-            "label": "Dimensione",
-            "options": {
-              "sm": "Piccolo",
-              "md": "Medio",
-              "lg": "Grande",
-              "xl": "Extra Grande"
-            }
-          },
-          "shape": {
-            "label": "Forma",
-            "options": {
-              "sharp": "Netto",
-              "rounded": "Arrotondato",
-              "circle": "Cerchio"
-            }
-          }
-        }
-      },
-      "numbered_item": {
-        "name": "Elemento Numerato",
-        "settings": {
-          "title": {
-            "label": "Titolo"
-          },
-          "description": {
-            "label": "Descrizione"
-          },
-          "size": {
-            "label": "Dimensione cerchio",
-            "options": {
-              "small": "Piccolo",
-              "medium": "Medio",
-              "large": "Grande",
-              "xlarge": "Extra Grande"
-            }
-          },
-          "shape": {
-            "label": "Forma",
-            "options": {
-              "sharp": "Netto",
-              "rounded": "Arrotondato",
-              "circle": "Cerchio"
-            }
-          }
-        }
-      }
-    }
-  },
-  "job_listing": {
-    "name": "Annuncio di lavoro",
-    "settings": {
-      "show_filters": {
-        "label": "Mostra filtri reparto"
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "job": {
-        "name": "Lavoro",
-        "settings": {
-          "title": {
-            "label": "Titolo lavorativo"
-          },
-          "department": {
-            "label": "Reparto"
-          },
-          "location": {
-            "label": "Luogo"
-          },
-          "type": {
-            "label": "Tipo di impiego",
-            "options": {
-              "full-time": "Tempo pieno",
-              "part-time": "Part-time",
-              "contract": "Contratto",
-              "internship": "Stage"
-            }
-          },
-          "apply_link": {
-            "label": "Pulsante applica"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          }
-        }
-      }
-    }
-  },
-  "key_figures": {
-    "name": "Cifre chiave",
-    "settings": {
-      "layout": {
-        "options": {
-          "bar": "Barra orizzontale",
-          "cards": "Schede",
-          "carousel": "Carosello"
-        },
-        "label": "Testo sopratitolo"
-      },
-      "animate": {
-        "label": "Anima numeri"
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "figure": {
-        "name": "Cifra",
-        "settings": {
-          "suffix": {
-            "label": "Suffisso"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "number": {
-            "label": "Testo sopratitolo"
-          },
-          "label": {
-            "label": "Etichetta"
-          },
-          "description": {
-            "label": "Sottotitolo"
-          }
-        }
-      }
-    }
-  },
-  "logo_cloud": {
-    "name": "Galleria loghi",
-    "blocks": {
-      "logo": {
-        "name": "Logo",
-        "settings": {
-          "image": {
-            "label": "Immagine logo"
-          },
-          "name": {
-            "label": "Nome azienda"
-          },
-          "link": {
-            "label": "Link (opzionale)"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "layout": {
-        "label": "Testo sopratitolo",
-        "options": {
-          "grid": "Griglia",
-          "carousel": "Carosello"
-        }
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "map": {
-    "name": "Mappa",
-    "settings": {
-      "address": {
-        "label": "Indirizzo"
-      },
-      "embed_url": {
-        "label": "URL incorporamento Google Maps"
-      },
-      "directions_link": {
-        "label": "Link indicazioni stradali"
-      },
-      "height": {
-        "label": "Altezza mappa",
-        "options": {
-          "small": "Piccolo",
-          "medium": "Medio",
-          "large": "Grande"
-        }
-      },
-      "show_address": {
-        "label": "Mostra indirizzo sotto la mappa"
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "masonry_gallery": {
-    "name": "Galleria mosaico",
-    "blocks": {
-      "item": {
-        "name": "Elemento galleria",
-        "settings": {
-          "category": {
-            "label": "Categoria"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "image": {
-            "label": "Foto (opzionale)"
-          },
-          "title": {
-            "label": "Intestazione"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
-      },
-      "gap": {
-        "label": "Spaziatura",
-        "options": {
-          "small": "Piccolo",
-          "medium": "Medio",
-          "large": "Grande"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "numbered_cards": {
-    "name": "Schede numerate",
-    "blocks": {
-      "step": {
-        "name": "Passaggio",
-        "settings": {
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "title": {
-            "label": "Intestazione"
-          },
-          "description": {
-            "label": "Sottotitolo"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
-      },
-      "layout": {
-        "label": "Testo sopratitolo",
-        "options": {
-          "grid": "Griglia",
-          "carousel": "Carosello"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "numbered_service_list": {
-    "name": "Elenco numerato dei servizi",
-    "blocks": {
-      "service": {
-        "name": "Servizio",
-        "settings": {
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "title": {
-            "label": "Titolo"
-          },
-          "description": {
-            "label": "Descrizione"
-          },
-          "link": {
-            "label": "Link"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Titolo"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "show_dividers": {
-        "label": "Mostra divisori"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "priced_list": {
-    "name": "Listino prezzi",
-    "settings": {
-      "eyebrow": {
-        "label": "Etichetta categoria"
-      },
-      "title": {
-        "label": "Intestazione sezione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "layout": {
-        "label": "Layout",
-        "options": {
-          "single-column": "Una colonna",
-          "two-column": "Due colonne"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Voce di menu",
-        "settings": {
-          "name": {
-            "label": "Nome elemento"
-          },
-          "price": {
-            "label": "Prezzo"
-          },
-          "image": {
-            "label": "Foto (opzionale)"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "description": {
-            "label": "Sottotitolo"
-          }
-        }
-      }
-    }
-  },
-  "pricing": {
-    "name": "Prezzi",
-    "blocks": {
-      "plan": {
-        "name": "Piano",
-        "settings": {
-          "title": {
-            "label": "Nome piano"
-          },
-          "period": {
-            "label": "Periodo"
-          },
-          "featured": {
-            "label": "Piano in evidenza"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "price": {
-            "label": "Prezzo / Valore (Opzionale)"
-          },
-          "features": {
-            "label": "Funzionalità (una per riga)",
-            "description": "Inizia una riga con + per un segno di spunta o - per una croce."
-          },
-          "button_link": {
-            "label": "Link pulsante"
-          },
-          "options_header": {
-            "label": "Opzioni"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "layout": {
-        "label": "Testo sopratitolo",
-        "options": {
-          "grid": "Griglia",
-          "carousel": "Carosello"
-        }
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "profile_grid": {
-    "name": "Griglia profili",
-    "blocks": {
-      "profile": {
-        "name": "Membro del team",
-        "settings": {
-          "photo": {
-            "label": "Foto"
-          },
-          "name": {
-            "label": "Nome"
-          },
-          "role": {
-            "label": "Ruolo / Titolo"
-          },
-          "specialty": {
-            "label": "Specialità"
-          },
-          "bio": {
-            "label": "Bio"
-          },
-          "social_header": {
-            "label": "Social Media"
-          },
-          "linkedin": {
-            "label": "URL LinkedIn"
-          },
-          "twitter": {
-            "label": "URL Twitter"
-          },
-          "instagram": {
-            "label": "URL Instagram"
-          },
-          "facebook": {
-            "label": "URL Facebook"
-          },
-          "github": {
-            "label": "URL GitHub"
-          },
-          "youtube": {
-            "label": "URL YouTube"
-          },
-          "tiktok": {
-            "label": "URL TikTok"
-          },
-          "pinterest": {
-            "label": "URL Pinterest"
-          },
-          "bluesky": {
-            "label": "URL Bluesky"
-          },
-          "discord": {
-            "label": "URL Discord"
-          },
-          "meta": {
-            "label": "URL Meta"
-          },
-          "reddit": {
-            "label": "URL Reddit"
-          },
-          "telegram": {
-            "label": "URL Telegram"
-          },
-          "threads": {
-            "label": "URL Threads"
-          },
-          "whatsapp": {
-            "label": "URL WhatsApp"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "email": {
-            "label": "Testo sopratitolo"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
-      },
-      "layout": {
-        "label": "Testo sopratitolo",
-        "options": {
-          "grid": "Griglia",
-          "carousel": "Carosello"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "project_showcase": {
-    "name": "Vetrina progetti",
-    "settings": {
-      "text_display": {
-        "label": "Visualizzazione testo",
-        "options": {
-          "hover": "Al passaggio",
-          "always": "Sempre"
-        }
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "layout": {
-        "label": "Testo sopratitolo",
-        "options": {
-          "grid": "Griglia",
-          "carousel": "Carosello"
-        }
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
-      },
-      "aspect_ratio": {
-        "label": "Proporzioni immagine",
-        "options": {
-          "auto": "Auto",
-          "contain": "Mostra immagine intera",
-          "1 / 1": "Quadrato (1:1)",
-          "4 / 3": "Standard (4:3)",
-          "3 / 2": "Orizzontale (3:2)",
-          "3 / 4": "Verticale (3:4)",
-          "16 / 9": "Panoramico (16:9)"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "project": {
-        "name": "Progetto",
-        "settings": {
-          "image": {
-            "label": "Immagine progetto"
-          },
-          "title": {
-            "label": "Titolo progetto"
-          },
-          "description": {
-            "label": "Descrizione breve"
-          },
-          "link": {
-            "label": "Link progetto"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          }
-        }
-      }
-    }
-  },
-  "rich_text": {
-    "name": "Testo formattato",
-    "settings": {
-      "text_alignment": {
-        "label": "Allineamento testo",
-        "options": {
-          "start": "Inizio",
-          "end": "Fine",
-          "center": "Centro"
-        }
-      },
-      "content_width": {
-        "label": "Larghezza contenuto",
-        "options": {
-          "narrow": "Stretto",
-          "medium": "Medio",
-          "wide": "Largo",
-          "fullwidth": "Larghezza piena"
-        }
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Fisarmonica",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione pulsante",
-            "options": {
-              "lg": "Grande",
-              "xl": "Extra Grande",
-              "2xl": "2X Grande",
-              "3xl": "3X Grande",
-              "4xl": "4X Grande",
-              "5xl": "5X Grande",
-              "6xl": "6X Grande",
-              "7xl": "7X Grande",
-              "8xl": "8X Grande",
-              "9xl": "9X Grande"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Fisarmonica",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione",
-            "options": {
-              "sm": "Piccolo",
-              "base": "Base",
-              "lg": "Grande"
-            }
-          },
-          "uppercase": {
-            "label": "Maiuscolo"
-          },
-          "muted": {
-            "label": "Colore attenuato"
-          }
-        }
-      },
-      "button": {
-        "name": "Gruppo pulsanti",
-        "settings": {
-          "link": {
-            "label": "Pulsante 1"
-          },
-          "style": {
-            "label": "Stile pulsante 1",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "link_2": {
-            "label": "Pulsante 2"
-          },
-          "style_2": {
-            "label": "Stile pulsante 2",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "size": {
-            "label": "Dimensione pulsante",
-            "options": {
-              "small": "Piccolo",
-              "medium": "Medio",
-              "large": "Grande",
-              "xlarge": "Extra Grande"
-            }
-          }
-        }
-      }
-    }
-  },
-  "schedule_table": {
-    "name": "Tabella orari",
-    "settings": {
-      "note": {
-        "label": "Nota aggiuntiva"
-      },
-      "week_start_day": {
-        "label": "La settimana inizia il",
-        "options": {
-          "0": "Domenica",
-          "1": "Lunedì"
-        }
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "sidebar_position": {
-        "label": "Posizione barra laterale",
-        "options": {
-          "left": "Sinistra",
-          "right": "Destra"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "day": {
-        "settings": {
-          "day": {
-            "label": "Giorno"
-          },
-          "hours": {
-            "label": "Ore"
-          },
-          "closed": {
-            "label": "Chiuso"
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "options_header": {
-            "label": "Opzioni"
-          }
-        },
-        "name": "Fisarmonica"
-      },
-      "info": {
-        "name": "Info",
-        "settings": {
-          "title": {
-            "label": "Titolo"
-          },
-          "text": {
-            "label": "Testo"
-          }
-        }
-      },
-      "social": {
-        "name": "Icone social"
-      }
-    }
-  },
-  "slideshow": {
-    "name": "Presentazione",
-    "settings": {
-      "autoplay": {
-        "label": "Rotazione automatica diapositive"
-      },
-      "autoplay_speed": {
-        "label": "Cambia diapositiva ogni"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "height": {
-        "label": "Altezza",
-        "options": {
-          "auto": "Auto",
-          "small": "Piccolo",
-          "medium": "Medio",
-          "large": "Grande"
-        }
-      },
-      "fullwidth": {
-        "label": "Larghezza piena"
-      },
-      "alignment": {
-        "label": "Allineamento contenuto",
-        "options": {
-          "center": "Centro",
-          "start": "Inizio"
-        }
-      }
-    },
-    "blocks": {
-      "slide": {
-        "name": "Diapositiva",
-        "settings": {
-          "image": {
-            "label": "Immagine di sfondo"
-          },
-          "heading_text": {
-            "label": "Testo intestazione"
-          },
-          "heading_size": {
-            "label": "Dimensione intestazione",
-            "options": {
-              "lg": "Grande",
-              "xl": "Extra grande",
-              "2xl": "2X Grande",
-              "3xl": "3X Grande",
-              "4xl": "4X Grande",
-              "5xl": "5X Grande",
-              "6xl": "6X Grande",
-              "7xl": "7X Grande",
-              "8xl": "8X Grande",
-              "9xl": "9X Grande"
-            }
-          },
-          "text_content": {
-            "label": "Contenuto testo"
-          },
-          "text_size": {
-            "label": "Dimensione testo",
-            "options": {
-              "sm": "Piccolo",
-              "base": "Base",
-              "lg": "Grande"
-            }
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "text_uppercase": {
-            "label": "Testo sopratitolo"
-          },
-          "text_muted": {
-            "label": "Testo sopratitolo"
-          },
-          "button_link": {
-            "label": "Link pulsante"
-          },
-          "button_link_2": {
-            "label": "Testo sopratitolo"
-          },
-          "display_header": {
-            "label": "Visualizzazione"
-          },
-          "button_style": {
-            "label": "Testo sopratitolo",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "button_style_2": {
-            "label": "Testo sopratitolo",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "button_size": {
-            "label": "Testo sopratitolo",
-            "options": {
-              "small": "Piccolo",
-              "medium": "Medio",
-              "large": "Grande",
-              "xlarge": "Extra Grande"
-            }
-          },
-          "overlay_color": {
-            "label": "Colore sovrapposizione",
-            "description": "Si applica solo se è presente un'immagine di sfondo."
-          },
-          "color_scheme": {
-            "label": "Schema colori",
-            "options": {
-              "standard": "Standard",
-              "highlight": "Evidenza"
-            }
-          }
-        }
-      }
-    }
-  },
-  "split_content": {
-    "name": "Contenuto Diviso",
-    "settings": {
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      },
-      "sticky_column": {
-        "label": "Colonna fissa (desktop)",
-        "options": {
-          "none": "Nessuna",
-          "left": "Sinistra",
-          "right": "Destra"
-        }
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Intestazione",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione",
-            "options": {
-              "lg": "Grande",
-              "xl": "XL",
-              "2xl": "2XL",
-              "3xl": "3XL",
-              "4xl": "4XL",
-              "5xl": "5XL",
-              "6xl": "6XL",
-              "7xl": "7XL",
-              "8xl": "8XL",
-              "9xl": "9XL"
-            }
-          },
-          "position": {
-            "label": "Colonna",
-            "options": {
-              "left": "Sinistra",
-              "right": "Destra"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Testo",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione",
-            "options": {
-              "sm": "Piccolo",
-              "base": "Predefinito",
-              "lg": "Grande"
-            }
-          },
-          "muted": {
-            "label": "Colore attenuato"
-          },
-          "position": {
-            "label": "Colonna",
-            "options": {
-              "left": "Sinistra",
-              "right": "Destra"
-            }
-          }
-        }
-      },
-      "button": {
-        "name": "Pulsante",
-        "settings": {
-          "link": {
-            "label": "Link del pulsante"
-          },
-          "style": {
-            "label": "Stile del pulsante",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "link_2": {
-            "label": "Secondo link del pulsante"
-          },
-          "style_2": {
-            "label": "Secondo stile del pulsante",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "size": {
-            "label": "Dimensione del pulsante",
-            "options": {
-              "small": "Piccolo",
-              "medium": "Medio",
-              "large": "Grande",
-              "xlarge": "Extra Grande"
-            }
-          },
-          "position": {
-            "label": "Colonna",
-            "options": {
-              "left": "Sinistra",
-              "right": "Destra"
-            }
-          }
-        }
-      }
-    }
-  },
-  "scrolling_text": {
-    "name": "Testo scorrevole",
-    "settings": {
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "text": {
-        "label": "Testo"
-      },
-      "separator": {
-        "label": "Separatore"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "speed": {
-        "label": "Velocità"
-      },
-      "rotate": {
-        "label": "Angolo di rotazione"
-      },
-      "font_size": {
-        "label": "Dimensione carattere",
-        "options": {
-          "sm": "Piccolo",
-          "md": "Medio",
-          "lg": "Grande",
-          "xl": "Molto grande"
-        }
-      },
-      "bg_color": {
-        "label": "Colore di sfondo"
-      },
-      "text_color": {
-        "label": "Colore del testo"
-      }
-    }
-  },
-  "social_icons": {
-    "settings": {
-      "icon_size": {
-        "label": "Dimensione icona"
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "name": "Icone social"
-  },
-  "split_hero": {
-    "name": "Hero diviso",
-    "settings": {
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "image": {
-        "label": "Immagine di sfondo"
-      },
-      "overlay_color": {
-        "label": "Colore sovrapposizione",
-        "description": "Si applica solo se è presente un'immagine di sfondo."
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "image_position": {
-        "label": "Posizione immagine",
-        "options": {
-          "left": "Sinistra",
-          "right": "Destra"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Fisarmonica",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione pulsante",
-            "options": {
-              "lg": "Grande",
-              "xl": "Extra Grande",
-              "2xl": "2X Grande",
-              "3xl": "3X Grande",
-              "4xl": "4X Grande",
-              "5xl": "5X Grande",
-              "6xl": "6X Grande",
-              "7xl": "7X Grande",
-              "8xl": "8X Grande",
-              "9xl": "9X Grande"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Fisarmonica",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione",
-            "options": {
-              "sm": "Piccolo",
-              "base": "Base",
-              "lg": "Grande"
-            }
-          },
-          "uppercase": {
-            "label": "Maiuscolo"
-          },
-          "muted": {
-            "label": "Colore attenuato"
-          }
-        }
-      },
-      "features": {
-        "name": "Funzionalità",
-        "settings": {
-          "features": {
-            "label": "Funzionalità (una per riga)",
-            "description": "Inizia una riga con + per un segno di spunta o - per una croce."
-          }
-        }
-      },
-      "button": {
-        "name": "Gruppo pulsanti",
-        "settings": {
-          "link": {
-            "label": "Pulsante 1"
-          },
-          "style": {
-            "label": "Stile pulsante 1",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "link_2": {
-            "label": "Pulsante 2"
-          },
-          "style_2": {
-            "label": "Stile pulsante 2",
-            "options": {
-              "primary": "Primario",
-              "secondary": "Secondario"
-            }
-          },
-          "size": {
-            "label": "Dimensione pulsante",
-            "options": {
-              "small": "Piccolo",
-              "medium": "Medio",
-              "large": "Grande",
-              "xlarge": "Extra Grande"
-            }
-          }
-        }
-      }
-    }
-  },
-  "testimonial_hero": {
-    "name": "Hero testimonianza",
-    "settings": {
-      "logo": {
-        "label": "Logo aziendale"
-      },
-      "author_image": {
-        "label": "Immagine autore"
-      },
-      "image_position": {
-        "label": "Posizione immagine",
-        "options": {
-          "left": "Sinistra",
-          "right": "Destra"
-        }
-      },
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "heading": {
-        "name": "Fisarmonica",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione pulsante",
-            "options": {
-              "lg": "Grande",
-              "xl": "Extra Grande",
-              "2xl": "2X Grande",
-              "3xl": "3X Grande",
-              "4xl": "4X Grande",
-              "5xl": "5X Grande",
-              "6xl": "6X Grande",
-              "7xl": "7X Grande",
-              "8xl": "8X Grande",
-              "9xl": "9X Grande"
-            }
-          }
-        }
-      },
-      "text": {
-        "name": "Fisarmonica",
-        "settings": {
-          "text": {
-            "label": "Testo"
-          },
-          "size": {
-            "label": "Dimensione",
-            "options": {
-              "sm": "Piccolo",
-              "base": "Base",
-              "lg": "Grande"
-            }
-          },
-          "uppercase": {
-            "label": "Maiuscolo"
-          },
-          "muted": {
-            "label": "Colore attenuato"
-          }
-        }
-      }
-    }
-  },
-  "testimonials": {
-    "name": "Testimonianze",
-    "blocks": {
-      "quote": {
-        "name": "Testimonianza",
-        "settings": {
-          "quote": {
-            "label": "Testo citazione"
-          },
-          "title": {
-            "label": "Titolo / Azienda"
-          },
-          "rating": {
-            "label": "Valutazione a stelle",
-            "options": {
-              "3": "3 stelle",
-              "4": "4 stelle",
-              "5": "5 stelle",
-              "": "Nessuna valutazione"
-            }
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "avatar": {
-            "label": "Testo sopratitolo"
-          },
-          "name": {
-            "label": "Nome"
-          },
-          "display_header": {
-            "label": "Visualizzazione"
-          }
-        }
-      }
-    },
-    "settings": {
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "layout": {
-        "label": "Testo sopratitolo",
-        "options": {
-          "grid": "Griglia",
-          "carousel": "Carosello"
-        }
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "timeline": {
-    "name": "Cronologia",
-    "settings": {
-      "layout": {
-        "options": {
-          "centered": "Centrato (Alternato)",
-          "vertical": "Verticale",
-          "horizontal": "Orizzontale"
-        },
-        "label": "Testo sopratitolo"
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Elemento cronologia",
-        "settings": {
-          "date": {
-            "label": "Data/Fase"
-          },
-          "duration": {
-            "label": "Durata (opzionale)"
-          },
-          "features": {
-            "label": "Funzionalità/punti elenco (uno per riga)",
-            "description": "Inizia una riga con + per un segno di spunta o - per una croce."
-          },
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "title": {
-            "label": "Intestazione"
-          },
-          "description": {
-            "label": "Sottotitolo"
-          }
-        }
-      }
-    }
-  },
-  "trust_bar": {
-    "name": "Barra di fiducia",
-    "settings": {
-      "icon_style": {
-        "label": "Stile icona",
-        "options": {
-          "plain": "Semplice",
-          "outline": "Contorno",
-          "filled": "Pieno"
-        }
-      },
-      "icon_size": {
-        "label": "Dimensione icona",
-        "options": {
-          "sm": "Piccolo",
-          "md": "Medio",
-          "lg": "Grande",
-          "xl": "Extra Grande"
-        }
-      },
-      "icon_shape": {
-        "label": "Forma icona",
-        "options": {
-          "sharp": "Squadrato",
-          "rounded": "Arrotondato",
-          "circle": "Cerchio"
-        }
-      },
-      "alignment": {
-        "label": "Allineamento",
-        "options": {
-          "left": "Sinistra",
-          "centered": "Centrato"
-        }
-      },
-      "show_dividers": {
-        "label": "Mostra separatori"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    },
-    "blocks": {
-      "item": {
-        "name": "Elemento",
-        "settings": {
-          "content_header": {
-            "label": "Contenuto"
-          },
-          "icon": {
-            "label": "Icona"
-          },
-          "title": {
-            "label": "Titolo"
-          },
-          "text": {
-            "label": "Descrizione"
-          }
-        }
-      }
-    }
-  },
-  "video_embed": {
-    "name": "YouTube/Vimeo",
-    "settings": {
-      "video_url": {
-        "label": "URL video (YouTube o Vimeo)"
-      },
-      "video_title": {
-        "label": "Titolo video (per accessibilità)"
-      },
-      "aspect_ratio": {
-        "label": "Proporzioni",
-        "options": {
-          "16:9": "16:9 (Panoramico)",
-          "4:3": "4:3 (Standard)",
-          "21:9": "21:9 (Cinematografico)",
-          "1:1": "1:1 (Quadrato)"
-        }
-      },
-      "eyebrow": {
-        "label": "Testo sopratitolo"
-      },
-      "title": {
-        "label": "Intestazione"
-      },
-      "description": {
-        "label": "Sottotitolo"
-      },
-      "content_header": {
-        "label": "Contenuto"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "Evidenza"
-        }
-      }
-    }
-  },
-  "video_popup": {
-    "name": "Video popup",
-    "settings": {
-      "image": {
-        "label": "Immagine di sfondo"
-      },
-      "video_header": {
-        "label": "Video"
-      },
-      "video_url": {
-        "label": "URL video (YouTube o Vimeo)"
-      },
-      "video_title": {
-        "label": "Titolo video (per accessibilità)"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "overlay_color": {
-        "label": "Colore sovrapposizione",
-        "description": "Regola l'alfa per l'intensità della sovrapposizione"
-      },
-      "height": {
-        "label": "Altezza",
-        "options": {
-          "small": "Piccolo",
-          "medium": "Medio",
-          "large": "Grande"
-        }
-      },
-      "fullwidth": {
-        "label": "Larghezza piena"
-      },
-      "play_button_style": {
-        "label": "Stile pulsante di riproduzione",
-        "options": {
-          "light": "Chiaro",
-          "dark": "Scuro"
-        }
-      }
-    }
-  },
   "global": {
     "general": {
       "name": "Generale",
       "settings": {
-        "animations_header": {
-          "label": "Animazioni"
-        },
-        "enable_reveal_animations": {
-          "label": "Abilita animazioni allo scorrimento",
-          "description": "Anima gli elementi quando scorrono nella vista"
-        },
         "branding_header": {
           "label": "Branding"
         },
         "favicon": {
           "label": "Favicon",
           "description": "Dimensione consigliata 180×180 px."
+        },
+        "animations_header": {
+          "label": "Animazioni"
+        },
+        "enable_reveal_animations": {
+          "label": "Abilita animazioni allo scorrimento",
+          "description": "Anima gli elementi quando scorrono nella vista"
         }
       }
     },
@@ -3598,20 +155,14 @@
         "social_header": {
           "label": "Social Media"
         },
-        "twitter_url": {
-          "label": "URL Twitter / X"
-        },
-        "mastodon_url": {
-          "label": "URL Mastodon"
-        },
-        "mail_url": {
-          "label": "URL Email"
-        },
         "facebook_url": {
           "label": "URL di Facebook"
         },
         "instagram_url": {
           "label": "URL di Instagram"
+        },
+        "twitter_url": {
+          "label": "URL Twitter / X"
         },
         "linkedin_url": {
           "label": "URL di LinkedIn"
@@ -3627,6 +178,9 @@
         },
         "github_url": {
           "label": "URL di GitHub"
+        },
+        "mastodon_url": {
+          "label": "URL Mastodon"
         },
         "bluesky_url": {
           "label": "URL di Bluesky"
@@ -3645,6 +199,9 @@
         },
         "whatsapp_url": {
           "label": "URL di WhatsApp"
+        },
+        "mail_url": {
+          "label": "URL Email"
         }
       }
     },
@@ -3674,28 +231,1843 @@
           "description": "Aggiungi script personalizzati che verranno iniettati prima del tag di chiusura </body>."
         }
       }
+    },
+    "widgets": {
+      "settings": {
+        "display_header": {
+          "label": "Visualizzazione"
+        },
+        "content_header": {
+          "label": "Contenuto"
+        },
+        "options_header": {
+          "label": "Opzioni"
+        },
+        "labels_header": {
+          "label": "Etichette"
+        },
+        "eyebrow": {
+          "label": "Testo sopratitolo"
+        },
+        "title": {
+          "label": "Intestazione"
+        },
+        "description": {
+          "label": "Sottotitolo"
+        },
+        "color_scheme": {
+          "label": "Schema colori",
+          "options": {
+            "standard": "Standard",
+            "highlight": "Evidenza"
+          }
+        },
+        "columns_desktop": {
+          "label": "Colonne desktop"
+        },
+        "layout": {
+          "label": "Layout",
+          "options": {
+            "grid": "Griglia",
+            "carousel": "Carosello"
+          }
+        },
+        "fullwidth": {
+          "label": "Larghezza piena"
+        },
+        "image_position": {
+          "label": "Posizione immagine",
+          "options": {
+            "left": "Sinistra",
+            "right": "Destra"
+          }
+        },
+        "aspect_ratio": {
+          "label": "Rapporto immagine",
+          "options": {
+            "auto": "Automatico",
+            "contain": "Adatta",
+            "1 / 1": "Quadrato (1:1)",
+            "4 / 3": "Orizzontale (4:3)",
+            "3 / 2": "Orizzontale (3:2)",
+            "3 / 4": "Verticale (3:4)",
+            "16 / 9": "Panoramico (16:9)",
+            "21:9": "21:9 (Cinematografico)"
+          }
+        },
+        "alignment": {
+          "label": "Allineamento contenuto",
+          "options": {
+            "start": "Inizio",
+            "center": "Centro"
+          }
+        },
+        "video_url": {
+          "label": "URL video (YouTube o Vimeo)"
+        },
+        "video_title": {
+          "label": "Titolo video (per accessibilità)"
+        },
+        "icon_style": {
+          "label": "Stile icona",
+          "options": {
+            "plain": "Semplice",
+            "outline": "Contorno",
+            "filled": "Pieno"
+          }
+        },
+        "icon_size": {
+          "label": "Dimensione icona",
+          "options": {
+            "sm": "Piccolo",
+            "md": "Medio",
+            "lg": "Grande",
+            "xl": "Extra Grande"
+          }
+        },
+        "icon_shape": {
+          "label": "Forma icona",
+          "options": {
+            "sharp": "Squadrato",
+            "rounded": "Arrotondato",
+            "circle": "Cerchio"
+          }
+        },
+        "overlay_color": {
+          "label": "Colore sovrapposizione",
+          "description": "Si applica solo se è presente un'immagine di sfondo."
+        },
+        "link": {
+          "label": "Link"
+        },
+        "button_link": {
+          "label": "Link pulsante"
+        },
+        "button_style": {
+          "label": "Stile pulsante",
+          "options": {
+            "primary": "Primario",
+            "secondary": "Secondario"
+          }
+        },
+        "button_style_2": {
+          "label": "Stile pulsante 2",
+          "options": {
+            "primary": "Primario",
+            "secondary": "Secondario"
+          }
+        },
+        "button_size": {
+          "label": "Dimensione pulsante",
+          "options": {
+            "small": "Piccolo",
+            "medium": "Medio",
+            "large": "Grande",
+            "xlarge": "Extra Grande"
+          }
+        },
+        "options": {
+          "left": "Sinistra",
+          "right": "Destra",
+          "top": "Alto",
+          "bottom": "Basso",
+          "center": "Centro",
+          "start": "Inizio",
+          "end": "Fine",
+          "none": "Nessuno"
+        }
+      },
+      "blocks": {
+        "heading": {
+          "name": "Intestazione",
+          "settings": {
+            "text": {
+              "label": "Testo"
+            },
+            "size": {
+              "label": "Dimensione",
+              "options": {
+                "lg": "Grande",
+                "xl": "Extra Grande",
+                "2xl": "2X Grande",
+                "3xl": "3X Grande",
+                "4xl": "4X Grande",
+                "5xl": "5X Grande",
+                "6xl": "6X Grande",
+                "7xl": "7X Grande",
+                "8xl": "8X Grande",
+                "9xl": "9X Grande"
+              }
+            }
+          }
+        },
+        "text": {
+          "name": "Testo",
+          "settings": {
+            "text": {
+              "label": "Testo"
+            },
+            "size": {
+              "label": "Dimensione",
+              "options": {
+                "sm": "Piccolo",
+                "base": "Base",
+                "lg": "Grande"
+              }
+            },
+            "uppercase": {
+              "label": "Maiuscolo"
+            },
+            "muted": {
+              "label": "Colore attenuato"
+            }
+          }
+        },
+        "button": {
+          "name": "Gruppo pulsanti",
+          "settings": {
+            "link": {
+              "label": "Pulsante 1"
+            },
+            "style": {
+              "label": "Stile pulsante 1",
+              "options": {
+                "primary": "Primario",
+                "secondary": "Secondario"
+              }
+            },
+            "link_2": {
+              "label": "Pulsante 2"
+            },
+            "style_2": {
+              "label": "Stile pulsante 2",
+              "options": {
+                "primary": "Primario",
+                "secondary": "Secondario"
+              }
+            },
+            "size": {
+              "label": "Dimensione pulsante",
+              "options": {
+                "small": "Piccolo",
+                "medium": "Medio",
+                "large": "Grande",
+                "xlarge": "Extra Grande"
+              }
+            }
+          }
+        },
+        "icon": {
+          "name": "Icona",
+          "settings": {
+            "icon": {
+              "label": "Icona"
+            },
+            "style": {
+              "label": "Stile icona",
+              "options": {
+                "plain": "Semplice",
+                "outline": "Contorno",
+                "filled": "Pieno"
+              }
+            },
+            "size": {
+              "label": "Dimensione",
+              "options": {
+                "sm": "Piccolo",
+                "md": "Medio",
+                "lg": "Grande",
+                "xl": "Extra Grande"
+              }
+            },
+            "shape": {
+              "label": "Forma",
+              "options": {
+                "sharp": "Angolare",
+                "rounded": "Arrotondato",
+                "circle": "Cerchio"
+              }
+            }
+          }
+        },
+        "rating": {
+          "name": "Valutazione a Stelle",
+          "settings": {
+            "rating": {
+              "label": "Valutazione",
+              "options": {
+                "3": "3 stelle",
+                "4": "4 stelle",
+                "5": "5 stelle"
+              }
+            }
+          }
+        },
+        "quote": {
+          "settings": {
+            "quote": {
+              "label": "Testo citazione"
+            },
+            "avatar": {
+              "label": "Avatar"
+            },
+            "name": {
+              "label": "Nome"
+            },
+            "title": {
+              "label": "Titolo / Azienda"
+            },
+            "rating": {
+              "label": "Valutazione a stelle",
+              "options": {
+                "3": "3 stelle",
+                "4": "4 stelle",
+                "5": "5 stelle",
+                "": "Nessuna valutazione"
+              }
+            }
+          }
+        },
+        "image": {
+          "name": "Immagine",
+          "settings": {
+            "image": {
+              "label": "Immagine"
+            },
+            "width": {
+              "label": "Larghezza massima (%)"
+            }
+          }
+        },
+        "card": {
+          "name": "Scheda",
+          "settings": {
+            "subtitle": {
+              "label": "Sottotitolo"
+            },
+            "title": {
+              "label": "Intestazione"
+            },
+            "description": {
+              "label": "Descrizione"
+            },
+            "button_link": {
+              "label": "Link pulsante"
+            }
+          }
+        },
+        "text_block": {
+          "name": "Testo",
+          "settings": {
+            "title": {
+              "label": "Titolo"
+            },
+            "text": {
+              "label": "Testo"
+            }
+          }
+        },
+        "menu_block": {
+          "name": "Menu",
+          "settings": {
+            "title": {
+              "label": "Titolo"
+            },
+            "menu": {
+              "label": "Menu di navigazione",
+              "description": "Seleziona il menu da visualizzare"
+            }
+          }
+        },
+        "social_block": {
+          "name": "Icone social",
+          "settings": {
+            "title": {
+              "label": "Titolo"
+            }
+          }
+        },
+        "features": {
+          "name": "Funzionalità",
+          "settings": {
+            "features": {
+              "label": "Funzionalità (una per riga)",
+              "description": "Inizia una riga con + per un segno di spunta o - per una croce."
+            }
+          }
+        },
+        "numbered_item": {
+          "name": "Elemento Numerato",
+          "settings": {
+            "title": {
+              "label": "Titolo"
+            },
+            "description": {
+              "label": "Descrizione"
+            },
+            "size": {
+              "label": "Dimensione cerchio",
+              "options": {
+                "small": "Piccolo",
+                "medium": "Medio",
+                "large": "Grande",
+                "xlarge": "Extra Grande"
+              }
+            },
+            "shape": {
+              "label": "Forma",
+              "options": {
+                "sharp": "Angolare",
+                "rounded": "Arrotondato",
+                "circle": "Cerchio"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "accordion": {
+    "name": "Fisarmonica",
+    "settings": {
+      "style": {
+        "label": "Stile",
+        "options": {
+          "separated": "Separato",
+          "connected": "Connesso"
+        }
+      },
+      "allow_multiple": {
+        "label": "Consenti apertura multipla"
+      },
+      "sidebar_position": {
+        "label": "Posizione barra laterale"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Elemento",
+        "settings": {
+          "question": {
+            "label": "Domanda"
+          },
+          "answer": {
+            "label": "Risposta"
+          }
+        }
+      },
+      "info": {
+        "name": "Info",
+        "settings": {
+          "title": {
+            "label": "Titolo"
+          },
+          "text": {
+            "label": "Testo"
+          }
+        }
+      },
+      "social": {
+        "name": "Icone social"
+      }
+    }
+  },
+  "action_bar": {
+    "name": "Barra azione"
+  },
+  "banner": {
+    "name": "Banner",
+    "settings": {
+      "image": {
+        "label": "Immagine di sfondo"
+      },
+      "height": {
+        "label": "Altezza",
+        "options": {
+          "auto": "Auto",
+          "small": "Piccolo",
+          "medium": "Medio",
+          "large": "Grande"
+        }
+      },
+      "vertical_alignment": {
+        "label": "Allineamento verticale"
+      }
+    }
+  },
+  "bento_grid": {
+    "name": "Griglia Bento",
+    "settings": {
+      "gap": {
+        "label": "Dimensione spazio",
+        "options": {
+          "0": "Nessuno",
+          "var(--space-sm)": "Piccolo",
+          "var(--space-md)": "Medio",
+          "var(--space-lg)": "Grande",
+          "var(--space-xl)": "Extra Grande"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Elemento Bento",
+        "settings": {
+          "layout_header": {
+            "label": "Layout"
+          },
+          "col_span": {
+            "label": "Estensione colonna"
+          },
+          "row_span": {
+            "label": "Estensione riga"
+          },
+          "background_color": {
+            "label": "Sfondo blocco"
+          },
+          "text_color": {
+            "label": "Colore testo",
+            "options": {
+              "dark": "Scuro",
+              "light": "Chiaro"
+            }
+          },
+          "alignment": {
+            "label": "Allineamento testo"
+          },
+          "title": {
+            "label": "Intestazione"
+          },
+          "text": {
+            "label": "Testo"
+          },
+          "image": {
+            "label": "Foto (opzionale)"
+          }
+        }
+      }
+    }
+  },
+  "card_grid": {
+    "name": "Griglia schede",
+    "settings": {
+      "image_position": {
+        "label": "Posizione immagine"
+      }
+    },
+    "blocks": {
+      "card": {
+        "settings": {
+          "image": {
+            "label": "Immagine"
+          }
+        }
+      }
+    }
+  },
+  "checkerboard": {
+    "name": "Scacchiera",
+    "blocks": {
+      "card": {
+        "name": "Scheda",
+        "settings": {
+          "image": {
+            "label": "Immagine"
+          },
+          "title": {
+            "label": "Intestazione"
+          },
+          "description": {
+            "label": "Descrizione"
+          }
+        }
+      }
+    }
+  },
+  "comparison_slider": {
+    "name": "Cursore confronto",
+    "settings": {
+      "before_image": {
+        "label": "Immagine prima"
+      },
+      "after_image": {
+        "label": "Immagine dopo"
+      },
+      "before_label": {
+        "label": "Etichetta prima"
+      },
+      "after_label": {
+        "label": "Etichetta dopo"
+      },
+      "orientation": {
+        "label": "Orientamento cursore",
+        "options": {
+          "horizontal": "Orizzontale",
+          "vertical": "Verticale"
+        }
+      },
+      "initial_position": {
+        "label": "Posizione iniziale cursore"
+      },
+      "show_labels": {
+        "label": "Mostra etichette prima/dopo"
+      }
+    }
+  },
+  "comparison_table": {
+    "name": "Tabella confronto",
+    "settings": {
+      "feature_column_label": {
+        "label": "Etichetta colonna funzionalità"
+      }
+    },
+    "blocks": {
+      "column": {
+        "name": "Colonna",
+        "settings": {
+          "name": {
+            "label": "Nome colonna"
+          },
+          "badge": {
+            "label": "Testo badge (opzionale)"
+          },
+          "featured": {
+            "label": "In evidenza (evidenziato)"
+          },
+          "link": {
+            "label": "Pulsante CTA"
+          }
+        }
+      },
+      "feature": {
+        "name": "Riga funzionalità",
+        "settings": {
+          "name": {
+            "label": "Nome funzionalità"
+          },
+          "values": {
+            "label": "Valori per ogni colonna (uno per riga: sì, no, o testo personalizzato)"
+          }
+        }
+      }
+    }
+  },
+  "core_divider": {
+    "name": "Divisore",
+    "description": "Aggiungi una linea divisoria orizzontale",
+    "category": "Layout",
+    "settings": {
+      "color": {
+        "label": "Colore linea",
+        "description": "Colore della linea divisoria"
+      },
+      "thickness": {
+        "label": "Spessore",
+        "description": "Spessore della linea divisoria in pixel"
+      },
+      "width": {
+        "label": "Larghezza",
+        "description": "Larghezza del divisore come percentuale del contenitore"
+      },
+      "padding": {
+        "label": "Spaziatura",
+        "description": "Spaziatura verticale intorno al divisore in pixel"
+      }
+    }
+  },
+  "core_spacer": {
+    "name": "Spaziatore",
+    "description": "Aggiungi spazio verticale tra le sezioni di contenuto",
+    "category": "Layout",
+    "settings": {
+      "height": {
+        "label": "Altezza",
+        "description": "L'altezza dello spaziatore in pixel"
+      },
+      "showOnMobile": {
+        "label": "Mostra su mobile",
+        "description": "Se mostrare lo spaziatore sui dispositivi mobili"
+      },
+      "mobileHeight": {
+        "label": "Altezza su mobile",
+        "description": "L'altezza dello spaziatore sui dispositivi mobili in pixel"
+      }
+    }
+  },
+  "contact_details": {
+    "name": "Dettagli contatto",
+    "blocks": {
+      "info": {
+        "name": "Info",
+        "settings": {
+          "title": {
+            "label": "Titolo"
+          },
+          "text": {
+            "label": "Testo"
+          }
+        }
+      }
+    }
+  },
+  "content_switcher": {
+    "name": "Selettore contenuto",
+    "settings": {
+      "switcher_header": {
+        "label": "Selettore"
+      },
+      "switcher_type": {
+        "label": "Stile selettore",
+        "options": {
+          "toggle": "Interruttore (2 opzioni)",
+          "tabs": "Tab (Fino a 3 opzioni)"
+        }
+      },
+      "option_1_label": {
+        "label": "Etichetta opzione 1"
+      },
+      "option_2_label": {
+        "label": "Etichetta opzione 2"
+      },
+      "option_3_label": {
+        "label": "Etichetta opzione 3 (solo Tab)"
+      },
+      "columns": {
+        "label": "Colonne per stato"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Elemento contenuto",
+        "settings": {
+          "price": {
+            "label": "Prezzo / Valore (Opzionale)"
+          },
+          "link": {
+            "label": "Link / CTA"
+          },
+          "target_option": {
+            "label": "Assegna a opzione",
+            "options": {
+              "1": "Opzione 1",
+              "2": "Opzione 2",
+              "3": "Opzione 3"
+            }
+          },
+          "title": {
+            "label": "Intestazione"
+          },
+          "text": {
+            "label": "Testo"
+          },
+          "image": {
+            "label": "Foto (opzionale)"
+          },
+          "layout_header": {
+            "label": "Layout"
+          }
+        }
+      }
+    }
+  },
+  "countdown": {
+    "name": "Timer conto alla rovescia",
+    "settings": {
+      "target_date": {
+        "label": "Data obiettivo (YYYY-MM-DD HH:MM)"
+      },
+      "expired_message": {
+        "label": "Messaggio alla scadenza"
+      },
+      "button": {
+        "label": "Pulsante call-to-action"
+      },
+      "show_seconds": {
+        "label": "Mostra secondi"
+      },
+      "style": {
+        "options": {
+          "cards": "Schede",
+          "minimal": "Minimale"
+        },
+        "label": "Stile"
+      }
+    }
+  },
+  "embed": {
+    "name": "Widget incorporato",
+    "settings": {
+      "code": {
+        "label": "Codice incorporato (HTML/JS/Iframe)"
+      },
+      "max_width": {
+        "label": "Larghezza contenitore",
+        "options": {
+          "narrow": "Stretto",
+          "wide": "Largo",
+          "fullwidth": "Larghezza piena",
+          "medium": "Medio"
+        }
+      },
+      "alignment": {
+        "label": "Allineamento"
+      }
+    }
+  },
+  "event_list": {
+    "name": "Elenco eventi",
+    "blocks": {
+      "event": {
+        "name": "Evento",
+        "settings": {
+          "day": {
+            "label": "Giorno (numero)"
+          },
+          "month": {
+            "label": "Mese (abbreviato)"
+          },
+          "title": {
+            "label": "Titolo evento"
+          },
+          "location": {
+            "label": "Luogo e orario"
+          },
+          "button_link": {
+            "label": "Pulsante"
+          },
+          "description": {
+            "label": "Sottotitolo"
+          }
+        }
+      }
+    }
+  },
+  "features_split": {
+    "name": "Funzionalità divise",
+    "settings": {
+      "content_position": {
+        "label": "Posizione contenuto"
+      },
+      "show_divider": {
+        "label": "Mostra separatore"
+      }
+    },
+    "blocks": {
+      "feature": {
+        "name": "Funzionalità",
+        "settings": {
+          "icon": {
+            "label": "Icona"
+          },
+          "title": {
+            "label": "Intestazione"
+          },
+          "description": {
+            "label": "Sottotitolo"
+          }
+        }
+      }
+    }
+  },
+  "footer": {
+    "name": "Piè di pagina",
+    "settings": {
+      "copyright": {
+        "label": "Testo copyright"
+      }
+    },
+    "blocks": {
+      "logo_text": {
+        "name": "Logo e testo",
+        "settings": {
+          "logo_text": {
+            "label": "Testo del logo"
+          },
+          "logo": {
+            "label": "Immagine logo"
+          },
+          "logo_width": {
+            "label": "Larghezza logo"
+          },
+          "text": {
+            "label": "Testo"
+          }
+        }
+      }
+    }
+  },
+  "gallery": {
+    "name": "Galleria",
+    "settings": {
+      "staggered": {
+        "label": "Layout sfalsato"
+      }
+    },
+    "blocks": {
+      "image": {
+        "name": "Immagine",
+        "settings": {
+          "image": {
+            "label": "Immagine di sfondo"
+          },
+          "caption": {
+            "label": "Didascalia"
+          }
+        }
+      }
+    }
+  },
+  "header": {
+    "name": "Intestazione",
+    "settings": {
+      "logo_header": {
+        "label": "Logo"
+      },
+      "logoImage": {
+        "label": "Immagine logo",
+        "description": "Carica un'immagine logo. Se fornita, verrà visualizzata al posto del logo testuale."
+      },
+      "logoMaxWidth": {
+        "label": "Larghezza massima logo",
+        "description": "Larghezza massima dell'immagine del logo"
+      },
+      "logoText": {
+        "label": "Testo logo",
+        "description": "Testo da visualizzare nel logo dell'intestazione"
+      },
+      "contact_header": {
+        "label": "Dettagli contatto"
+      },
+      "contactDetailsLine1": {
+        "label": "Dettagli contatto 1",
+        "description": "Prima riga delle informazioni di contatto (es. telefono)"
+      },
+      "contactDetailsLine2": {
+        "label": "Dettagli contatto 2",
+        "description": "Seconda riga delle informazioni di contatto (es. indirizzo)"
+      },
+      "contact_position": {
+        "label": "Posizione dei dettagli di contatto",
+        "options": {
+          "logo": "Accanto al logo",
+          "menu": "Accanto al pulsante menu"
+        }
+      },
+      "navigation_header": {
+        "label": "Navigazione"
+      },
+      "headerNavigation": {
+        "label": "Menu di navigazione",
+        "description": "Seleziona il menu da visualizzare nell'intestazione"
+      },
+      "ctaButtonLink": {
+        "label": "Pulsante CTA",
+        "description": "Pulsante di invito all'azione (lascia il testo vuoto per nascondere)"
+      },
+      "ctaButtonStyle": {
+        "label": "Stile del pulsante",
+        "options": {
+          "primary": "Primario",
+          "secondary": "Secondario"
+        }
+      },
+      "full_width": {
+        "label": "Larghezza piena",
+        "description": "Quando attivato, l'intestazione si estende su tutta la larghezza. Quando disattivato, rimane centrata in un contenitore."
+      },
+      "sticky": {
+        "label": "Intestazione fissa",
+        "description": "Quando attivato, l'intestazione rimane fissa in alto durante lo scorrimento"
+      },
+      "transparent_on_hero": {
+        "label": "Trasparente su hero",
+        "description": "L'intestazione diventa trasparente sopra i widget banner, slideshow e video popup"
+      },
+      "transparent_logo": {
+        "label": "Logo intestazione trasparente",
+        "description": "Logo alternativo mostrato quando l'intestazione è trasparente (es. una versione chiara)"
+      },
+      "center_nav": {
+        "label": "Centra navigazione",
+        "description": "Centra il menu di navigazione nell'intestazione con il logo a sinistra e il CTA a destra (solo desktop)"
+      }
+    }
+  },
+  "icon_card_grid": {
+    "name": "Griglia schede con icona",
+    "settings": {
+      "featured_image": {
+        "label": "Immagine in evidenza"
+      },
+      "featured_image_position": {
+        "label": "Posizione immagine"
+      }
+    },
+    "blocks": {
+      "card": {
+        "settings": {
+          "icon": {
+            "label": "Icona"
+          }
+        }
+      }
+    }
+  },
+  "icon_list": {
+    "name": "Elenco icone",
+    "blocks": {
+      "item": {
+        "name": "Elemento",
+        "settings": {
+          "icon": {
+            "label": "Icona"
+          },
+          "title": {
+            "label": "Intestazione"
+          },
+          "description": {
+            "label": "Sottotitolo"
+          }
+        }
+      }
+    }
+  },
+  "image": {
+    "settings": {
+      "link": {
+        "description": "Link opzionale al clic sull'immagine."
+      },
+      "image": {
+        "label": "Immagine di sfondo"
+      },
+      "fullwidth": {
+        "description": "Se abilitato, l'immagine occupa l'intera larghezza. Se disabilitato, l'immagine è contenuta nella griglia del tema."
+      }
+    },
+    "name": "Immagine"
+  },
+  "image_callout": {
+    "name": "Callout immagine",
+    "settings": {
+      "image": {
+        "label": "Immagine di sfondo"
+      }
+    }
+  },
+  "image_hotspots": {
+    "name": "Punti attivi immagine",
+    "settings": {
+      "image_alt": {
+        "label": "Testo alternativo immagine"
+      },
+      "image": {
+        "label": "Immagine di sfondo"
+      }
+    },
+    "blocks": {
+      "hotspot": {
+        "name": "Punto attivo",
+        "settings": {
+          "title": {
+            "label": "Titolo tooltip"
+          },
+          "description": {
+            "label": "Descrizione tooltip"
+          },
+          "position_x": {
+            "label": "Posizione orizzontale (%)"
+          },
+          "position_y": {
+            "label": "Posizione verticale (%)"
+          },
+          "layout_header": {
+            "label": "Layout"
+          }
+        }
+      }
+    }
+  },
+  "image_tabs": {
+    "name": "Tab immagine",
+    "blocks": {
+      "tab": {
+        "name": "Tab",
+        "settings": {
+          "title": {
+            "label": "Titolo tab"
+          },
+          "description": {
+            "label": "Descrizione tab"
+          },
+          "image": {
+            "label": "Immagine di sfondo"
+          }
+        }
+      }
+    }
+  },
+  "image_text": {
+    "name": "Immagine + Testo",
+    "settings": {
+      "image": {
+        "label": "Immagine di sfondo"
+      },
+      "text_position": {
+        "label": "Posizione verticale del testo"
+      },
+      "content_color_scheme": {
+        "label": "Schema colori contenuto",
+        "options": {
+          "none": "Nessuno",
+          "standard": "Standard",
+          "highlight": "In evidenza"
+        }
+      }
+    }
+  },
+  "job_listing": {
+    "name": "Annuncio di lavoro",
+    "settings": {
+      "show_filters": {
+        "label": "Mostra filtri reparto"
+      }
+    },
+    "blocks": {
+      "job": {
+        "name": "Lavoro",
+        "settings": {
+          "title": {
+            "label": "Titolo lavorativo"
+          },
+          "department": {
+            "label": "Reparto"
+          },
+          "location": {
+            "label": "Luogo"
+          },
+          "type": {
+            "label": "Tipo di impiego",
+            "options": {
+              "full-time": "Tempo pieno",
+              "part-time": "Part-time",
+              "contract": "Contratto",
+              "internship": "Stage"
+            }
+          },
+          "apply_link": {
+            "label": "Pulsante applica"
+          }
+        }
+      }
+    }
+  },
+  "key_figures": {
+    "name": "Cifre chiave",
+    "settings": {
+      "layout": {
+        "options": {
+          "bar": "Barra orizzontale",
+          "cards": "Schede",
+          "carousel": "Carosello"
+        },
+        "label": "Layout"
+      },
+      "animate": {
+        "label": "Anima numeri"
+      }
+    },
+    "blocks": {
+      "figure": {
+        "name": "Cifra",
+        "settings": {
+          "suffix": {
+            "label": "Suffisso"
+          },
+          "number": {
+            "label": "Numero"
+          },
+          "label": {
+            "label": "Etichetta"
+          },
+          "description": {
+            "label": "Sottotitolo"
+          }
+        }
+      }
+    }
+  },
+  "logo_cloud": {
+    "name": "Galleria loghi",
+    "blocks": {
+      "logo": {
+        "name": "Logo",
+        "settings": {
+          "image": {
+            "label": "Immagine logo"
+          },
+          "name": {
+            "label": "Nome azienda"
+          }
+        }
+      }
+    }
+  },
+  "map": {
+    "name": "Mappa",
+    "settings": {
+      "address": {
+        "label": "Indirizzo"
+      },
+      "embed_url": {
+        "label": "URL incorporamento Google Maps"
+      },
+      "directions_link": {
+        "label": "Link indicazioni stradali"
+      },
+      "height": {
+        "label": "Altezza mappa",
+        "options": {
+          "small": "Piccolo",
+          "medium": "Medio",
+          "large": "Grande"
+        }
+      },
+      "show_address": {
+        "label": "Mostra indirizzo sotto la mappa"
+      }
+    }
+  },
+  "masonry_gallery": {
+    "name": "Galleria mosaico",
+    "blocks": {
+      "item": {
+        "name": "Elemento galleria",
+        "settings": {
+          "category": {
+            "label": "Categoria"
+          },
+          "image": {
+            "label": "Foto (opzionale)"
+          },
+          "title": {
+            "label": "Intestazione"
+          }
+        }
+      }
+    },
+    "settings": {
+      "gap": {
+        "label": "Spaziatura",
+        "options": {
+          "small": "Piccolo",
+          "medium": "Medio",
+          "large": "Grande"
+        }
+      }
+    }
+  },
+  "numbered_cards": {
+    "name": "Schede numerate",
+    "blocks": {
+      "step": {
+        "name": "Passaggio",
+        "settings": {
+          "title": {
+            "label": "Intestazione"
+          },
+          "description": {
+            "label": "Sottotitolo"
+          }
+        }
+      }
+    }
+  },
+  "numbered_service_list": {
+    "name": "Elenco numerato dei servizi",
+    "blocks": {
+      "service": {
+        "name": "Servizio",
+        "settings": {
+          "title": {
+            "label": "Titolo"
+          },
+          "description": {
+            "label": "Descrizione"
+          }
+        }
+      }
+    },
+    "settings": {
+      "show_dividers": {
+        "label": "Mostra divisori"
+      }
+    }
+  },
+  "priced_list": {
+    "name": "Listino prezzi",
+    "settings": {
+      "layout": {
+        "label": "Layout",
+        "options": {
+          "single-column": "Una colonna",
+          "two-column": "Due colonne"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Voce di menu",
+        "settings": {
+          "name": {
+            "label": "Nome elemento"
+          },
+          "price": {
+            "label": "Prezzo"
+          },
+          "image": {
+            "label": "Foto (opzionale)"
+          },
+          "description": {
+            "label": "Sottotitolo"
+          }
+        }
+      }
+    }
+  },
+  "pricing": {
+    "name": "Prezzi",
+    "blocks": {
+      "plan": {
+        "name": "Piano",
+        "settings": {
+          "title": {
+            "label": "Nome piano"
+          },
+          "period": {
+            "label": "Periodo"
+          },
+          "featured": {
+            "label": "Piano in evidenza"
+          },
+          "price": {
+            "label": "Prezzo / Valore (Opzionale)"
+          },
+          "features": {
+            "label": "Funzionalità (una per riga)",
+            "description": "Inizia una riga con + per un segno di spunta o - per una croce."
+          }
+        }
+      }
+    }
+  },
+  "profile_grid": {
+    "name": "Griglia profili",
+    "blocks": {
+      "profile": {
+        "name": "Membro del team",
+        "settings": {
+          "photo": {
+            "label": "Foto"
+          },
+          "name": {
+            "label": "Nome"
+          },
+          "role": {
+            "label": "Ruolo / Titolo"
+          },
+          "specialty": {
+            "label": "Specialità"
+          },
+          "bio": {
+            "label": "Bio"
+          },
+          "social_header": {
+            "label": "Social Media"
+          },
+          "linkedin": {
+            "label": "URL LinkedIn"
+          },
+          "twitter": {
+            "label": "URL Twitter"
+          },
+          "instagram": {
+            "label": "URL Instagram"
+          },
+          "facebook": {
+            "label": "URL Facebook"
+          },
+          "github": {
+            "label": "URL GitHub"
+          },
+          "youtube": {
+            "label": "URL YouTube"
+          },
+          "tiktok": {
+            "label": "URL TikTok"
+          },
+          "pinterest": {
+            "label": "URL Pinterest"
+          },
+          "bluesky": {
+            "label": "URL Bluesky"
+          },
+          "discord": {
+            "label": "URL Discord"
+          },
+          "meta": {
+            "label": "URL Meta"
+          },
+          "reddit": {
+            "label": "URL Reddit"
+          },
+          "telegram": {
+            "label": "URL Telegram"
+          },
+          "threads": {
+            "label": "URL Threads"
+          },
+          "whatsapp": {
+            "label": "URL WhatsApp"
+          },
+          "email": {
+            "label": "Email"
+          }
+        }
+      }
+    }
+  },
+  "project_showcase": {
+    "name": "Vetrina progetti",
+    "settings": {
+      "text_display": {
+        "label": "Visualizzazione testo",
+        "options": {
+          "hover": "Al passaggio",
+          "always": "Sempre"
+        }
+      }
+    },
+    "blocks": {
+      "project": {
+        "name": "Progetto",
+        "settings": {
+          "image": {
+            "label": "Immagine progetto"
+          },
+          "title": {
+            "label": "Titolo progetto"
+          },
+          "description": {
+            "label": "Descrizione breve"
+          },
+          "link": {
+            "label": "Link progetto"
+          }
+        }
+      }
+    }
+  },
+  "rich_text": {
+    "name": "Testo formattato",
+    "settings": {
+      "text_alignment": {
+        "label": "Allineamento testo"
+      },
+      "content_width": {
+        "label": "Larghezza contenuto",
+        "options": {
+          "narrow": "Stretto",
+          "medium": "Medio",
+          "wide": "Largo",
+          "fullwidth": "Larghezza piena"
+        }
+      }
+    }
+  },
+  "schedule_table": {
+    "name": "Tabella orari",
+    "settings": {
+      "note": {
+        "label": "Nota aggiuntiva"
+      },
+      "week_start_day": {
+        "label": "La settimana inizia il",
+        "options": {
+          "0": "Domenica",
+          "1": "Lunedì"
+        }
+      },
+      "sidebar_position": {
+        "label": "Posizione barra laterale"
+      }
+    },
+    "blocks": {
+      "day": {
+        "settings": {
+          "day": {
+            "label": "Giorno"
+          },
+          "hours": {
+            "label": "Ore"
+          },
+          "closed": {
+            "label": "Chiuso"
+          }
+        },
+        "name": "Fisarmonica"
+      },
+      "info": {
+        "name": "Info",
+        "settings": {
+          "title": {
+            "label": "Titolo"
+          },
+          "text": {
+            "label": "Testo"
+          }
+        }
+      },
+      "social": {
+        "name": "Icone social"
+      }
+    }
+  },
+  "sliding_panels": {
+    "name": "Pannelli scorrevoli",
+    "blocks": {
+      "panel": {
+        "name": "Pannello",
+        "settings": {
+          "image": {
+            "label": "Immagine"
+          },
+          "title": {
+            "label": "Intestazione"
+          },
+          "subtitle": {
+            "label": "Sottotitolo"
+          }
+        }
+      }
+    }
+  },
+  "slideshow": {
+    "name": "Presentazione",
+    "settings": {
+      "autoplay": {
+        "label": "Rotazione automatica diapositive"
+      },
+      "autoplay_speed": {
+        "label": "Cambia diapositiva ogni"
+      },
+      "height": {
+        "label": "Altezza",
+        "options": {
+          "auto": "Auto",
+          "small": "Piccolo",
+          "medium": "Medio",
+          "large": "Grande"
+        }
+      }
+    },
+    "blocks": {
+      "slide": {
+        "name": "Diapositiva",
+        "settings": {
+          "image": {
+            "label": "Immagine di sfondo"
+          },
+          "heading_text": {
+            "label": "Testo intestazione"
+          },
+          "heading_size": {
+            "label": "Dimensione intestazione",
+            "options": {
+              "lg": "Grande",
+              "xl": "Extra grande",
+              "2xl": "2X Grande",
+              "3xl": "3X Grande",
+              "4xl": "4X Grande",
+              "5xl": "5X Grande",
+              "6xl": "6X Grande",
+              "7xl": "7X Grande",
+              "8xl": "8X Grande",
+              "9xl": "9X Grande"
+            }
+          },
+          "text_content": {
+            "label": "Contenuto testo"
+          },
+          "text_size": {
+            "label": "Dimensione testo",
+            "options": {
+              "sm": "Piccolo",
+              "base": "Base",
+              "lg": "Grande"
+            }
+          },
+          "text_uppercase": {
+            "label": "Maiuscolo"
+          },
+          "text_muted": {
+            "label": "Colore attenuato"
+          },
+          "button_link_2": {
+            "label": "Pulsante 2"
+          },
+          "color_scheme": {
+            "label": "Schema colori",
+            "options": {
+              "standard": "Standard",
+              "highlight": "Evidenza"
+            }
+          }
+        }
+      }
+    }
+  },
+  "split_content": {
+    "name": "Contenuto Diviso",
+    "settings": {
+      "balance": {
+        "label": "Bilanciamento",
+        "options": {
+          "left_heavy": "Sinistra predominante",
+          "equal": "Uguale",
+          "right_heavy": "Destra predominante"
+        }
+      },
+      "sticky_column": {
+        "label": "Colonna fissa (desktop)"
+      }
+    },
+    "blocks": {
+      "heading": {
+        "settings": {
+          "position": {
+            "label": "Colonna"
+          }
+        }
+      },
+      "text": {
+        "settings": {
+          "position": {
+            "label": "Colonna"
+          }
+        }
+      },
+      "button": {
+        "settings": {
+          "position": {
+            "label": "Colonna"
+          }
+        }
+      }
+    }
+  },
+  "scrolling_text": {
+    "name": "Testo scorrevole",
+    "settings": {
+      "text": {
+        "label": "Testo"
+      },
+      "separator": {
+        "label": "Separatore"
+      },
+      "speed": {
+        "label": "Velocità"
+      },
+      "rotate": {
+        "label": "Angolo di rotazione"
+      },
+      "font_size": {
+        "label": "Dimensione carattere",
+        "options": {
+          "sm": "Piccolo",
+          "md": "Medio",
+          "lg": "Grande",
+          "xl": "Molto grande"
+        }
+      },
+      "bg_color": {
+        "label": "Colore di sfondo"
+      },
+      "text_color": {
+        "label": "Colore del testo"
+      }
+    }
+  },
+  "social_icons": {
+    "settings": {
+      "icon_size": {
+        "label": "Dimensione icona"
+      }
+    },
+    "name": "Icone social"
+  },
+  "split_hero": {
+    "name": "Hero diviso",
+    "settings": {
+      "image": {
+        "label": "Immagine di sfondo"
+      }
+    }
+  },
+  "steps": {
+    "name": "Passaggi",
+    "blocks": {
+      "step": {
+        "name": "Passaggio",
+        "settings": {
+          "image": {
+            "label": "Immagine"
+          },
+          "title": {
+            "label": "Intestazione"
+          },
+          "description": {
+            "label": "Descrizione"
+          }
+        }
+      }
+    }
+  },
+  "testimonial_slider": {
+    "name": "Slider testimonianze",
+    "settings": {
+      "autoplay": {
+        "label": "Riproduzione automatica"
+      },
+      "autoplay_speed": {
+        "label": "Velocit\u00e0 riproduzione automatica"
+      }
+    },
+    "blocks": {
+      "quote": {
+        "name": "Citazione"
+      }
+    }
+  },
+  "testimonial_hero": {
+    "name": "Hero testimonianza",
+    "settings": {
+      "logo": {
+        "label": "Logo aziendale"
+      },
+      "author_image": {
+        "label": "Immagine autore"
+      }
+    }
+  },
+  "testimonials": {
+    "name": "Testimonianze",
+    "blocks": {
+      "quote": {
+        "name": "Testimonianza"
+      }
+    }
+  },
+  "timeline": {
+    "name": "Cronologia",
+    "settings": {
+      "layout": {
+        "options": {
+          "centered": "Centrato (Alternato)",
+          "vertical": "Verticale",
+          "horizontal": "Orizzontale"
+        },
+        "label": "Layout"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Elemento cronologia",
+        "settings": {
+          "date": {
+            "label": "Data/Fase"
+          },
+          "duration": {
+            "label": "Durata (opzionale)"
+          },
+          "features": {
+            "label": "Funzionalità/punti elenco (uno per riga)",
+            "description": "Inizia una riga con + per un segno di spunta o - per una croce."
+          },
+          "title": {
+            "label": "Intestazione"
+          },
+          "description": {
+            "label": "Sottotitolo"
+          }
+        }
+      }
+    }
+  },
+  "trust_bar": {
+    "name": "Barra di fiducia",
+    "settings": {
+      "alignment": {
+        "label": "Allineamento"
+      },
+      "show_dividers": {
+        "label": "Mostra separatori"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Elemento",
+        "settings": {
+          "icon": {
+            "label": "Icona"
+          },
+          "title": {
+            "label": "Titolo"
+          },
+          "text": {
+            "label": "Descrizione"
+          }
+        }
+      }
+    }
+  },
+  "video_embed": {
+    "name": "YouTube/Vimeo",
+    "settings": {}
+  },
+  "video_popup": {
+    "name": "Video popup",
+    "settings": {
+      "image": {
+        "label": "Immagine di sfondo"
+      },
+      "video_header": {
+        "label": "Video"
+      },
+      "overlay_color": {
+        "description": "Regola l'alfa per l'intensità della sovrapposizione"
+      },
+      "height": {
+        "label": "Altezza",
+        "options": {
+          "small": "Piccolo",
+          "medium": "Medio",
+          "large": "Grande"
+        }
+      },
+      "play_button_style": {
+        "label": "Stile pulsante di riproduzione",
+        "options": {
+          "light": "Chiaro",
+          "dark": "Scuro"
+        }
+      }
     }
   },
   "team_highlight": {
     "name": "Team in evidenza",
     "settings": {
-      "eyebrow": {
-        "label": "Sopratitolo"
-      },
-      "title": {
-        "label": "Titolo"
-      },
-      "description": {
-        "label": "Descrizione"
-      },
       "signature_image": {
         "label": "Immagine firma"
-      },
-      "display_header": {
-        "label": "Visualizzazione"
-      },
-      "columns_desktop": {
-        "label": "Colonne desktop"
       },
       "image_ratio": {
         "label": "Proporzione immagine",
@@ -3703,13 +2075,6 @@
           "portrait": "Ritratto",
           "square": "Quadrato",
           "auto": "Automatico"
-        }
-      },
-      "color_scheme": {
-        "label": "Schema colori",
-        "options": {
-          "standard": "Standard",
-          "highlight": "In evidenza"
         }
       }
     },
@@ -3725,9 +2090,6 @@
           },
           "role": {
             "label": "Ruolo"
-          },
-          "link": {
-            "label": "Link"
           }
         }
       }
