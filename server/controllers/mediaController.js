@@ -296,9 +296,10 @@ export async function uploadProjectMedia(req, res) {
 
         // Process image files (thumbnails, dimensions etc.)
         if (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") {
-          const useBufferBackedWebp =
-            process.platform === "win32" && file.mimetype === "image/webp";
-          const imageSource = useBufferBackedWebp
+          const useBufferBackedSource =
+            process.platform === "win32"
+            && ["image/gif", "image/webp"].includes(file.mimetype);
+          const imageSource = useBufferBackedSource
             ? await fs.readFile(file.path)
             : file.path;
           const image = sharp(imageSource, {

@@ -195,6 +195,30 @@ async function createTestWebp(width = 100, height = 100) {
     .toBuffer();
 }
 
+/**
+ * Create a tiny valid GIF buffer.
+ */
+function createTestGif() {
+  return Buffer.from(
+    "47494638396101000100800000000000ffffff21f90401000000002c00000000010001000002024401003b",
+    "hex",
+  );
+}
+
+async function withMockedPlatform(platform, fn) {
+  const originalDescriptor = Object.getOwnPropertyDescriptor(process, "platform");
+  Object.defineProperty(process, "platform", {
+    configurable: true,
+    value: platform,
+  });
+
+  try {
+    return await fn();
+  } finally {
+    Object.defineProperty(process, "platform", originalDescriptor);
+  }
+}
+
 // ============================================================================
 // Setup
 // ============================================================================
@@ -580,6 +604,38 @@ describe("uploadProjectMedia", () => {
     assert.equal(meta.format, "webp");
     assert.equal(meta.width, 300);
     assert.equal(meta.height, 250);
+  });
+
+  it("uploads and deletes a GIF cleanly with Windows-safe processing", async () => {
+    const gifBuffer = createTestGif();
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const filePath = path.join(imgDir, "test.gif");
+    await fs.writeFile(filePath, gifBuffer);
+
+    const uploadRes = await withMockedPlatform("win32", async () => callController(uploadProjectMedia, {
+      params: { projectId: PROJECT_ID },
+      files: [
+        {
+          originalname: "test.gif",
+          filename: "test.gif",
+          mimetype: "image/gif",
+          size: gifBuffer.length,
+          path: filePath,
+        },
+      ],
+    }));
+
+    assert.equal(uploadRes._status, 201);
+    const processed = uploadRes._json.processedFiles[0];
+    assert.equal(processed.type, "image/gif");
+    assert.ok(processed.id);
+
+    const deleteRes = await callController(deleteProjectMedia, {
+      params: { projectId: PROJECT_ID, fileId: processed.id },
+    });
+
+    assert.equal(deleteRes._status, 200);
+    assert.ok(!(await fs.pathExists(filePath)));
   });
 
   it("rejects files exceeding size limit", async () => {
