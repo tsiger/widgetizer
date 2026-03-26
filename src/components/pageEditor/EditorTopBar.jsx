@@ -141,11 +141,12 @@ export default function EditorTopBar({
       </div>
 
       <div className="flex items-center gap-3">
+        <span className="text-sm font-medium text-slate-500">{t("navigation.pages")}:</span>
         <div className="relative" ref={dropdownRef}>
           {hasMultiplePages ? (
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="font-medium px-4 py-2 rounded-sm hover:bg-slate-100 flex items-center gap-2"
+              className="font-medium px-4 py-2 rounded-md border border-slate-200 hover:bg-slate-100 flex items-center gap-2"
             >
               {pageName} {hasUnsavedChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
               <ChevronDown
@@ -179,12 +180,11 @@ export default function EditorTopBar({
             </div>
           )}
         </div>
-
-        {/* Render injected children (e.g. ThemeSelector) */}
-        {children}
       </div>
 
       <div className="flex items-center gap-3">
+        {children}
+
         {/* Desktop/Mobile switcher */}
         <div className="flex gap-1 p-1 h-9 bg-slate-200 rounded-md items-center">
           <button
