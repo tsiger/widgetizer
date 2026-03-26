@@ -179,6 +179,22 @@ async function createTestPng(width = 100, height = 100) {
     .toBuffer();
 }
 
+/**
+ * Create a real test WebP image using sharp.
+ */
+async function createTestWebp(width = 100, height = 100) {
+  return sharp({
+    create: {
+      width,
+      height,
+      channels: 4,
+      background: { r: 0, g: 120, b: 255, alpha: 1 },
+    },
+  })
+    .webp({ quality: 100 })
+    .toBuffer();
+}
+
 // ============================================================================
 // Setup
 // ============================================================================
@@ -532,6 +548,38 @@ describe("uploadProjectMedia", () => {
     assert.equal(processed.width, 300);
     assert.equal(processed.height, 250);
     assert.equal(processed.type, "image/png");
+  });
+
+  it("uploads a WebP image and preserves a valid original file", async () => {
+    const webpBuffer = await createTestWebp(300, 250);
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const filePath = path.join(imgDir, "test.webp");
+    await fs.writeFile(filePath, webpBuffer);
+
+    const res = await callController(uploadProjectMedia, {
+      params: { projectId: PROJECT_ID },
+      files: [
+        {
+          originalname: "test.webp",
+          filename: "test.webp",
+          mimetype: "image/webp",
+          size: webpBuffer.length,
+          path: filePath,
+        },
+      ],
+    });
+
+    assert.equal(res._status, 201);
+    const processed = res._json.processedFiles[0];
+    assert.equal(processed.width, 300);
+    assert.equal(processed.height, 250);
+    assert.equal(processed.type, "image/webp");
+
+    const storedWebpBuffer = await fs.readFile(filePath);
+    const meta = await sharp(storedWebpBuffer).metadata();
+    assert.equal(meta.format, "webp");
+    assert.equal(meta.width, 300);
+    assert.equal(meta.height, 250);
   });
 
   it("rejects files exceeding size limit", async () => {

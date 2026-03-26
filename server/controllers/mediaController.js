@@ -296,7 +296,12 @@ export async function uploadProjectMedia(req, res) {
 
         // Process image files (thumbnails, dimensions etc.)
         if (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") {
-          const image = sharp(file.path, {
+          const useBufferBackedWebp =
+            process.platform === "win32" && file.mimetype === "image/webp";
+          const imageSource = useBufferBackedWebp
+            ? await fs.readFile(file.path)
+            : file.path;
+          const image = sharp(imageSource, {
             limitInputPixels: 100_000_000,
           });
           const metadata = await image.metadata();
@@ -339,16 +344,14 @@ export async function uploadProjectMedia(req, res) {
               resizeOp.webp({ quality: sizeConfig.quality });
             }
 
-            await resizeOp.toFile(resizedPath);
-
-            const resizedImageMetadata = await sharp(resizedPath).metadata();
+            const resizedImageInfo = await resizeOp.toFile(resizedPath);
 
             return {
               sizeName,
               data: {
                 path: `/uploads/images/${resizedFilename}`,
-                width: resizedImageMetadata.width,
-                height: resizedImageMetadata.height,
+                width: resizedImageInfo.width,
+                height: resizedImageInfo.height,
               },
             };
           });
@@ -370,7 +373,7 @@ export async function uploadProjectMedia(req, res) {
             if (metadata.width <= largestEnabledWidth) {
               const quality = Math.max(...Object.values(imageSizes).map((s) => s.quality));
               const tempPath = file.path + ".tmp";
-              const compressOp = sharp(file.path);
+              const compressOp = sharp(imageSource);
 
               if (file.mimetype === "image/jpeg") {
                 compressOp.jpeg({ quality });
