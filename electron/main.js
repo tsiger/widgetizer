@@ -10,6 +10,7 @@ import { fileURLToPath } from "url";
 const DEFAULT_PORT = "3001";
 const SERVER_STARTUP_TIMEOUT_MS = 30000;
 const SERVER_POLL_INTERVAL_MS = 500;
+const DOCS_URL = "https://docs.widgetizer.org";
 
 // State
 let mainWindow = null;
@@ -474,6 +475,18 @@ function showError(message) {
 }
 
 // Create application menu
+function showAboutDialog() {
+  const version = app.getVersion();
+
+  dialog.showMessageBox({
+    type: "info",
+    title: "About Widgetizer",
+    message: "Widgetizer",
+    detail: `Version ${version}`,
+    buttons: ["OK"],
+  });
+}
+
 function createAppMenu() {
   const isMac = process.platform === "darwin";
   const isDev = getIsDev();
@@ -557,6 +570,24 @@ function createAppMenu() {
         ...(isMac
           ? [{ type: "separator" }, { role: "front" }, { type: "separator" }, { role: "window" }]
           : [{ role: "close" }]),
+      ],
+    },
+    // Help menu
+    {
+      role: "help",
+      submenu: [
+        {
+          label: "Documentation",
+          click: () => {
+            shell.openExternal(DOCS_URL);
+          },
+        },
+        {
+          label: "About Widgetizer",
+          click: () => {
+            showAboutDialog();
+          },
+        },
       ],
     },
   ];
