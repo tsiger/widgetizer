@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Download, RefreshCw, X } from "lucide-react";
 
+const CHANGELOG_URL = "https://docs.widgetizer.org/changelog";
+
 export default function UpdateBanner() {
   const [state, setState] = useState(null); // null | "available" | "downloading" | "ready"
   const [version, setVersion] = useState("");
@@ -25,16 +27,31 @@ export default function UpdateBanner() {
     });
   }, []);
 
+  const openChangelog = () => {
+    if (window.electronUpdater?.openExternal) {
+      window.electronUpdater.openExternal(CHANGELOG_URL);
+      return;
+    }
+
+    window.open(CHANGELOG_URL, "_blank", "noopener,noreferrer");
+  };
+
   if (!state) return null;
 
   return (
-    <div className="bg-pink-600 text-white px-4 h-10 flex items-center justify-center gap-3 text-sm">
+    <div className="bg-pink-600 text-white px-4 min-h-10 py-2 flex items-center justify-center gap-3 text-sm flex-wrap">
       {state === "available" && (
         <>
           <span>Version {version} is available</span>
           <button
+            onClick={openChangelog}
+            className="inline-flex items-center gap-1.5 bg-white/12 hover:bg-white/22 rounded px-3 py-1 text-xs font-medium transition-colors"
+          >
+            View changelog
+          </button>
+          <button
             onClick={() => window.electronUpdater.downloadUpdate()}
-            className="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 rounded px-3 py-1 text-xs font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 rounded px-3 py-1 text-xs font-medium text-white transition-colors"
           >
             <Download size={14} />
             Update

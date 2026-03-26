@@ -6,6 +6,29 @@ description: Release notes and version history for Widgetizer. See what's new in
 
 All notable changes to Widgetizer are documented here.
 
+## 0.9.7 - 2026-03-26
+
+### New Widgets
+
+- **Action Bar** — Compact CTA strip for announcements, offers, and quick actions
+- **Contact Details** — Structured business contact information with icons and links
+- **Checkerboard** — Alternating content layout for visual variety across sections
+- **Sliding Panels** — Panel-based layout with interactive transitions
+- **Steps** — Sequential process/timeline presentation with stronger visual hierarchy
+- **Testimonial Slider** — Rotating testimonial carousel with dedicated slider behavior
+
+### Changed
+
+- **Translation consolidation** — Arch theme translations were reorganized and aligned across all supported languages
+- **Locale cleanup** — App and theme locale files were refactored and cleaned up for consistency
+- **Minor polish** — Small theme/editor refinements and release housekeeping for `0.9.7`
+
+### Fixed
+
+- **Windows media uploads** — `.webp` files now handle correctly on Windows
+- **Windows media uploads** — `.gif` files now handle correctly on Windows
+- **Locale/theme cleanup** — Leftover locale inconsistencies and minor theme metadata issues resolved
+
 ## 0.9.6 - 2026-03-24
 
 ### New Widgets

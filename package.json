@@ -35,88 +35,11 @@
     "validate:locales": "node scripts/validate-locales.js",
     "validate:theme-locales": "node scripts/validate-theme-locales.js",
     "validate:all-locales": "node scripts/validate-locales.js && node scripts/validate-theme-locales.js",
-    "electron:build": "npm run build && electron-builder",
-    "electron:build:mac": "npm run build && node electron/prepareMacSharp.cjs && npx @electron/rebuild --force && electron-builder --mac",
-    "electron:build:mac:unsigned": "npm run build && node electron/prepareMacSharp.cjs && npx @electron/rebuild --force && CSC_IDENTITY_AUTO_DISCOVERY=false SKIP_NOTARIZE=1 electron-builder --mac dir",
-    "electron:build:win": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --win",
-    "electron:build:win:unsigned": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --win -c.win.signtoolOptions=null",
+    "electron:build:mac": "npm run build && node electron/prepareMacSharp.cjs && npx @electron/rebuild --force && electron-builder --config electron-builder.config.mjs --mac",
+    "electron:build:mac:unsigned": "npm run build && node electron/prepareMacSharp.cjs && npx @electron/rebuild --force && CSC_IDENTITY_AUTO_DISCOVERY=false SKIP_NOTARIZE=1 electron-builder --config electron-builder.config.mjs --mac dir",
+    "electron:build:win": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --config electron-builder.config.mjs --win",
+    "electron:build:win:unsigned": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && cross-env WIN_UNSIGNED=1 CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --config electron-builder.config.mjs --win",
     "electron:build:validate": "npm run validate:all-locales && npm run lint:all"
-  },
-  "build": {
-    "appId": "com.widgetizer.app",
-    "productName": "Widgetizer",
-    "npmRebuild": false,
-    "directories": {
-      "output": "dist-electron",
-      "buildResources": "electron/resources"
-    },
-    "files": [
-      "dist",
-      "server",
-      "src/core",
-      "src/utils",
-      "src/locales",
-      "themes",
-      "electron",
-      "package.json"
-    ],
-    "asar": true,
-    "asarUnpack": [
-      "themes/**",
-      "dist/**",
-      "src/core/assets/**",
-      "src/utils/previewRuntime.js",
-      "node_modules/sharp/**",
-      "node_modules/@img/sharp-*/**",
-      "node_modules/@img/sharp-libvips-*/**",
-      "node_modules/better-sqlite3/**"
-    ],
-    "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "arm64",
-            "x64"
-          ]
-        },
-        {
-          "target": "zip",
-          "arch": [
-            "arm64",
-            "x64"
-          ]
-        }
-      ],
-      "category": "public.app-category.productivity",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "electron/entitlements.mac.plist",
-      "entitlementsInherit": "electron/entitlements.mac.plist"
-    },
-    "afterSign": "scripts/notarize.cjs",
-    "publish": {
-      "provider": "github",
-      "owner": "tsiger",
-      "repo": "widgetizer"
-    },
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "signtoolOptions": {
-        "signingHashAlgorithms": [
-          "sha256"
-        ],
-        "certificateSubjectName": "Open Source Developer Gerasimos Tsiamalos",
-        "rfc3161TimeStampServer": "http://time.certum.pl"
-      }
-    }
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -21,9 +21,6 @@ Use this when testing Electron-specific features (menus, native dialogs). For re
 Build the React frontend and package the Electron app:
 
 ```bash
-# Both platforms
-npm run electron:build
-
 # macOS only (loads signing credentials from .env.mac first)
 export $(cat .env.mac | xargs) && npm run electron:build:mac
 
@@ -263,6 +260,40 @@ In-app auto-updates are implemented via `electron-updater` with GitHub Releases 
    - Windows: `.exe`, `.exe.blockmap`, `latest.yml`
 
 The `latest-mac.yml` and `latest.yml` files are critical — electron-updater reads them to detect new versions. The `.blockmap` files enable delta updates (only changed blocks are downloaded). The public repo allows anonymous update checks at runtime.
+
+### Local Windows Update Test
+
+For local Windows testing, the app can override the normal GitHub feed by launching the installed app with `--updater-url=http://127.0.0.1:5500`.
+
+Use this flow:
+
+1. Build and install the current version:
+   ```powershell
+   npm run electron:build:win:unsigned
+   Copy-Item ".\dist-electron" ".\dist-electron-current" -Recurse
+   & ".\dist-electron-current\Widgetizer-Setup-<current>.exe"
+   ```
+2. Bump `package.json` to the next version and build again:
+   ```powershell
+   npm run electron:build:win:unsigned
+   Copy-Item ".\dist-electron" ".\dist-electron-next" -Recurse
+   ```
+3. Serve the new build folder:
+   ```powershell
+   npx http-server ".\dist-electron-next" -p 5500 --cors
+   ```
+4. In a second terminal, launch the already-installed old app against that local feed:
+   ```powershell
+   & "$env:LOCALAPPDATA\Programs\Widgetizer\Widgetizer.exe" --updater-url=http://127.0.0.1:5500
+   ```
+5. Wait ~10 seconds for the update check, then click `Update` and `Restart Now`.
+
+Notes:
+
+- Keep the HTTP server running while the update downloads.
+- The served folder must contain `latest.yml`, the Windows `.exe`, and the matching `.exe.blockmap`.
+- Windows artifact naming is forced via `electron-builder.config.mjs`, so `latest.yml` and the generated files stay aligned.
+- If differential download fails, `electron-updater` falls back to a full installer download automatically.
 
 **Implementation files:**
 

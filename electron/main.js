@@ -95,6 +95,36 @@ function log(message) {
   }
 }
 
+function getUpdaterOverrideUrl() {
+  const envUrl = process.env.ELECTRON_UPDATER_URL?.trim();
+  if (envUrl) {
+    return envUrl;
+  }
+
+  const arg = process.argv.find((value) => value.startsWith("--updater-url="));
+  if (!arg) {
+    return null;
+  }
+
+  return arg.slice("--updater-url=".length).trim() || null;
+}
+
+function normalizeUpdaterUrl(url) {
+  if (!url) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(url);
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return null;
+    }
+    return parsed.toString().replace(/\/$/, "");
+  } catch {
+    return null;
+  }
+}
+
 function initLogging() {
   try {
     const logsPath = path.join(app.getPath("userData"), "logs");
@@ -609,6 +639,21 @@ function setupAutoUpdater() {
     error: (msg) => log(`[updater ERROR] ${msg}`),
   };
 
+  const requestedUpdaterUrl = getUpdaterOverrideUrl();
+  const updaterUrl = normalizeUpdaterUrl(requestedUpdaterUrl);
+
+  if (requestedUpdaterUrl && !updaterUrl) {
+    log(`Invalid updater override URL ignored: ${requestedUpdaterUrl}`);
+  }
+
+  if (updaterUrl) {
+    log(`Using updater override feed: ${updaterUrl}`);
+    autoUpdater.setFeedURL({
+      provider: "generic",
+      url: updaterUrl,
+    });
+  }
+
   autoUpdater.on("update-available", (info) => {
     log(`Update available: ${info.version}`);
     if (mainWindow) {
@@ -648,6 +693,12 @@ function setupAutoUpdater() {
 
   ipcMain.on("install-update", () => {
     autoUpdater.quitAndInstall();
+  });
+
+  ipcMain.on("open-external", (_event, url) => {
+    if (typeof url === "string" && /^https?:\/\//.test(url)) {
+      shell.openExternal(url);
+    }
   });
 
   // Check for updates after a short delay to avoid slowing down startup

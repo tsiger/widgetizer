@@ -135,7 +135,6 @@ npm run electron:dev
 Build the desktop app:
 
 ```bash
-npm run electron:build          # Current platform
 npm run electron:build:mac      # macOS
 npm run electron:build:win      # Windows
 ```
