@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.9.7] - 2026-03-26
+
+### Added
+
+- 6 new widgets for the Arch theme: Action Bar, Contact Details, Checkerboard, Sliding Panels, Steps, and Testimonial Slider
+
+### Changed
+
+- Arch theme translations were consolidated and aligned across all supported languages
+- Theme and app locale files were refactored and cleaned up
+- Minor theme/editor polish and release housekeeping for `0.9.7`
+
+### Fixed
+
+- Windows media handling for `.webp` uploads
+- Windows media handling for `.gif` uploads
+- Leftover locale inconsistencies and minor theme metadata issues
+
 ## [0.9.6] - 2026-03-24
 
 ### Added
