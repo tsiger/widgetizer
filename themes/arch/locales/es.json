@@ -2044,7 +2044,6 @@
         "label": "Video"
       },
       "overlay_color": {
-        "label": "Color de superposición",
         "description": "Ajusta el alfa para la intensidad de la superposición"
       },
       "height": {

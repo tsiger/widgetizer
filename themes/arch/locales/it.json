@@ -2044,7 +2044,6 @@
         "label": "Video"
       },
       "overlay_color": {
-        "label": "Colore sovrapposizione",
         "description": "Regola l'alfa per l'intensità della sovrapposizione"
       },
       "height": {

@@ -2044,7 +2044,6 @@
         "label": "Βίντεο"
       },
       "overlay_color": {
-        "label": "Χρώμα επικάλυψης",
         "description": "Ρυθμίστε το alpha για ένταση επικάλυψης"
       },
       "height": {
