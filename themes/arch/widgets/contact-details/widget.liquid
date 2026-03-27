@@ -3,7 +3,7 @@
   class="widget widget-contact-details widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="contact-details"
-  style="{% if widget.settings.color_scheme == 'highlight' %}--widget-bg-color: var(--bg-primary);{% endif %}"
+  style="{% unless widget.settings.color_scheme == 'standard' %}--widget-bg-color: var(--bg-primary);{% endunless %}"
 >
   <style>
     .widget-{{ widget.id }} {
@@ -44,7 +44,7 @@
     }
   </style>
 
-  <div class="{% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% else %}widget-container{% endif %}">
+  <div class="widget-container{% unless widget.settings.color_scheme == 'standard' %} widget-container-padded{% endunless %}">
     {% if widget.settings.eyebrow != blank or widget.settings.title != blank or widget.settings.description != blank %}
       <div class="widget-header{% if widget.settings.heading_alignment == 'left' %} widget-header--align-start{% endif %}">
         {% if widget.settings.eyebrow != blank %}

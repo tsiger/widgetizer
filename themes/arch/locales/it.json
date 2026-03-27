@@ -259,7 +259,9 @@
           "label": "Schema colori",
           "options": {
             "standard": "Standard",
-            "highlight": "Evidenza"
+            "standard_accent": "Standard Accent",
+            "highlight": "Evidenza",
+            "highlight_accent": "Highlight Accent"
           }
         },
         "columns_desktop": {
@@ -1307,7 +1309,9 @@
         "options": {
           "none": "Nessuno",
           "standard": "Standard",
-          "highlight": "In evidenza"
+          "standard_accent": "Standard Accent",
+          "highlight": "In evidenza",
+          "highlight_accent": "Highlight Accent"
         }
       }
     }
@@ -1789,7 +1793,9 @@
             "label": "Schema colori",
             "options": {
               "standard": "Standard",
-              "highlight": "Evidenza"
+              "standard_accent": "Standard Accent",
+              "highlight": "Evidenza",
+              "highlight_accent": "Highlight Accent"
             }
           }
         }
@@ -1909,7 +1915,7 @@
         "label": "Riproduzione automatica"
       },
       "autoplay_speed": {
-        "label": "Velocit\u00e0 riproduzione automatica"
+        "label": "Velocità riproduzione automatica"
       }
     },
     "blocks": {

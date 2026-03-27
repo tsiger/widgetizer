@@ -9,9 +9,9 @@
 <section
   id="{{ widget.id }}"
   class="widget widget-accordion widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.style == 'connected' %}accordion-bordered{% endif %} {% if has_sidebar_blocks and widget.settings.sidebar_position == 'left' %}layout-reverse{% endif %}"
-  {% if widget.settings.color_scheme == 'highlight' %}
+  {% unless widget.settings.color_scheme == 'standard' %}
     style="--widget-bg-color: var(--bg-primary);"
-  {% endif %}
+  {% endunless %}
   {% if widget.settings.allow_multiple %}
     data-multi-open="true"
   {% endif %}
@@ -175,7 +175,7 @@
     }
   </style>
 
-  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard' %}widget-container-padded{% endunless %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header{% if widget.settings.heading_alignment == 'left' %} widget-header--align-start{% endif %}">
         {% assign header_delay = 0 %}

@@ -259,7 +259,9 @@
           "label": "Palette de couleurs",
           "options": {
             "standard": "Standard",
-            "highlight": "Mis en avant"
+            "standard_accent": "Standard Accent",
+            "highlight": "Mis en avant",
+            "highlight_accent": "Highlight Accent"
           }
         },
         "columns_desktop": {
@@ -1307,7 +1309,9 @@
         "options": {
           "none": "Aucun",
           "standard": "Standard",
-          "highlight": "Mis en avant"
+          "standard_accent": "Standard Accent",
+          "highlight": "Mis en avant",
+          "highlight_accent": "Highlight Accent"
         }
       }
     }
@@ -1789,7 +1793,9 @@
             "label": "Jeu de couleurs",
             "options": {
               "standard": "Standard",
-              "highlight": "Mis en avant"
+              "standard_accent": "Standard Accent",
+              "highlight": "Mis en avant",
+              "highlight_accent": "Highlight Accent"
             }
           }
         }

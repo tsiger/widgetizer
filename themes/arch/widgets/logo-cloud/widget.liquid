@@ -4,9 +4,9 @@
 <section
   id="{{ widget.id }}"
   class="widget widget-type-logo-cloud widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
-  {% if widget.settings.color_scheme == 'highlight' %}
+  {% unless widget.settings.color_scheme == 'standard' %}
     style="--widget-bg-color: var(--bg-primary);"
-  {% endif %}
+  {% endunless %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="logo-cloud"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
@@ -77,7 +77,7 @@
     }
   </style>
 
-  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard' %}widget-container-padded{% endunless %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header{% if widget.settings.heading_alignment == 'left' %} widget-header--align-start{% endif %}">
         {% assign header_delay = 0 %}

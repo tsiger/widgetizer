@@ -2,7 +2,7 @@
 <section
   id="{{ widget.id }}"
   class="widget widget-type-testimonial-slider widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
-  {% if widget.settings.color_scheme == 'highlight' %}style="--widget-bg-color: var(--bg-primary);"{% endif %}
+  {% unless widget.settings.color_scheme == 'standard' %}style="--widget-bg-color: var(--bg-primary);"{% endunless %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="testimonial-slider"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
@@ -119,7 +119,7 @@
     }
   </style>
 
-  <div class="{% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% else %}widget-container{% endif %}">
+  <div class="widget-container{% unless widget.settings.color_scheme == 'standard' %} widget-container-padded{% endunless %}">
     <div class="widget-content">
       <div class="testimonial-slider-track">
         {% for blockId in widget.blocksOrder %}

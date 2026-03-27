@@ -1,9 +1,9 @@
 <section
   id="{{ widget.id }}"
   class="widget widget-split-content widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
-  {% if widget.settings.color_scheme == 'highlight' %}
+  {% unless widget.settings.color_scheme == 'standard' %}
     style="--widget-bg-color: var(--bg-primary);"
-  {% endif %}
+  {% endunless %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="split-content"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
@@ -62,7 +62,7 @@
     }
   </style>
 
-  <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard' %}widget-container-padded{% endunless %}">
     <div class="split-content-grid">
       {% assign sides = "left,right" | split: "," %}
       {% for side in sides %}

@@ -40,8 +40,16 @@
           "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
         },
         {
+          "value": "standard-accent",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_accent"
+        },
+        {
           "value": "highlight",
           "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
+        },
+        {
+          "value": "highlight-accent",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_accent"
         }
       ]
     }

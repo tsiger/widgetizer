@@ -259,7 +259,9 @@
           "label": "Farbschema",
           "options": {
             "standard": "Standard",
-            "highlight": "Hervorgehoben"
+            "standard_accent": "Standard Accent",
+            "highlight": "Hervorgehoben",
+            "highlight_accent": "Highlight Accent"
           }
         },
         "columns_desktop": {
@@ -1307,7 +1309,9 @@
         "options": {
           "none": "Keine",
           "standard": "Standard",
-          "highlight": "Hervorgehoben"
+          "standard_accent": "Standard Accent",
+          "highlight": "Hervorgehoben",
+          "highlight_accent": "Highlight Accent"
         }
       }
     }
@@ -1789,7 +1793,9 @@
             "label": "Farbschema",
             "options": {
               "standard": "Standard",
-              "highlight": "Hervorgehoben"
+              "standard_accent": "Standard Accent",
+              "highlight": "Hervorgehoben",
+              "highlight_accent": "Highlight Accent"
             }
           }
         }

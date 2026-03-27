@@ -280,8 +280,16 @@
               "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.standard"
             },
             {
+              "value": "standard-accent",
+              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.standard_accent"
+            },
+            {
               "value": "highlight",
               "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.highlight"
+            },
+            {
+              "value": "highlight-accent",
+              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.highlight_accent"
             }
           ]
         }

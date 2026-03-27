@@ -259,7 +259,9 @@
           "label": "Color Scheme",
           "options": {
             "standard": "Standard",
-            "highlight": "Highlight"
+            "standard_accent": "Standard Accent",
+            "highlight": "Highlight",
+            "highlight_accent": "Highlight Accent"
           }
         },
         "columns_desktop": {
@@ -1307,7 +1309,9 @@
         "options": {
           "none": "None",
           "standard": "Standard",
-          "highlight": "Highlight"
+          "standard_accent": "Standard Accent",
+          "highlight": "Highlight",
+          "highlight_accent": "Highlight Accent"
         }
       }
     }
@@ -1789,7 +1793,9 @@
             "label": "Color Scheme",
             "options": {
               "standard": "Standard",
-              "highlight": "Highlight"
+              "standard_accent": "Standard Accent",
+              "highlight": "Highlight",
+              "highlight_accent": "Highlight Accent"
             }
           }
         }
