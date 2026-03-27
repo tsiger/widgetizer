@@ -88,7 +88,11 @@
   </a>
 {% endif %}
 {% if social.mail_url != blank %}
-  <a href="{{ social.mail_url }}" class="social-link" target="_blank" rel="noopener" aria-label="Email">
+  {% assign email_href = social.mail_url | strip %}
+  {% unless email_href contains 'mailto:' %}
+    {% assign email_href = 'mailto:' | append: email_href %}
+  {% endunless %}
+  <a href="{{ email_href }}" class="social-link" aria-label="Email">
     {% render 'icon', icon: 'mail' %}
   </a>
 {% endif %}
