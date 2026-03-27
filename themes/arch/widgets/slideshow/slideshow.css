@@ -153,3 +153,13 @@
     }
   }
 }
+
+/* Make slideshow heroes extend behind transparent headers like banner does */
+.transparent-header .main-content > &:first-child {
+  padding-block-start: 0;
+  background-color: transparent;
+
+  & .slideshow-slide {
+    padding-block-start: var(--header-sticky-offset, 4.5rem);
+  }
+}
