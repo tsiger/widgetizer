@@ -43,7 +43,7 @@
     {
       "type": "select",
       "id": "sidebar_position",
-      "label": "tTheme:schedule_table.settings.sidebar_position.label",
+      "label": "tTheme:global.widgets.settings.sidebar_position.label",
       "default": "right",
       "options": [
         {
@@ -126,25 +126,25 @@
     },
     {
       "type": "info",
-      "displayName": "tTheme:schedule_table.blocks.info.name",
+      "displayName": "tTheme:global.widgets.blocks.info.name",
       "settings": [
         {
           "type": "text",
           "id": "title",
-          "label": "tTheme:schedule_table.blocks.info.settings.title.label",
+          "label": "tTheme:global.widgets.blocks.info.settings.title.label",
           "default": "Contact Us"
         },
         {
           "type": "richtext",
           "id": "text",
-          "label": "tTheme:schedule_table.blocks.info.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.info.settings.text.label",
           "default": "<p>hello@example.com</p>"
         }
       ]
     },
     {
       "type": "social",
-      "displayName": "tTheme:schedule_table.blocks.social.name",
+      "displayName": "tTheme:global.widgets.blocks.social.name",
       "settings": []
     }
   ],

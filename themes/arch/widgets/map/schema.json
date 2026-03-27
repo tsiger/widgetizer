@@ -79,6 +79,22 @@
     },
     {
       "type": "select",
+      "id": "sidebar_position",
+      "label": "tTheme:global.widgets.settings.sidebar_position.label",
+      "default": "right",
+      "options": [
+        {
+          "value": "left",
+          "label": "tTheme:global.widgets.settings.options.left"
+        },
+        {
+          "value": "right",
+          "label": "tTheme:global.widgets.settings.options.right"
+        }
+      ]
+    },
+    {
+      "type": "select",
       "id": "color_scheme",
       "label": "tTheme:global.widgets.settings.color_scheme.label",
       "default": "standard",
@@ -94,6 +110,38 @@
       ]
     }
   ],
-  "blocks": [],
-  "defaultBlocks": []
+  "blocks": [
+    {
+      "type": "info",
+      "displayName": "tTheme:global.widgets.blocks.info.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.info.settings.title.label",
+          "default": "Need Help?"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "tTheme:global.widgets.blocks.info.settings.text.label",
+          "default": "<p>hello@example.com</p>"
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "displayName": "tTheme:global.widgets.blocks.social.name",
+      "settings": []
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "info",
+      "settings": {
+        "title": "Need Help?",
+        "text": "<p>hello@example.com</p>"
+      }
+    }
+  ]
 }

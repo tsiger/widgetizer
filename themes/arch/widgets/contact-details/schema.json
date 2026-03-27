@@ -49,18 +49,18 @@
   "blocks": [
     {
       "type": "info",
-      "displayName": "tTheme:contact_details.blocks.info.name",
+      "displayName": "tTheme:global.widgets.blocks.info.name",
       "settings": [
         {
           "type": "text",
           "id": "title",
-          "label": "tTheme:contact_details.blocks.info.settings.title.label",
+          "label": "tTheme:global.widgets.blocks.info.settings.title.label",
           "default": "Saffron"
         },
         {
           "type": "richtext",
           "id": "text",
-          "label": "tTheme:contact_details.blocks.info.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.info.settings.text.label",
           "default": "<p>A neighborhood restaurant serving seasonal dishes made with locally sourced ingredients.</p>"
         }
       ]

@@ -375,9 +375,26 @@
           "start": "Anfang",
           "end": "Ende",
           "none": "Keine"
+        },
+        "sidebar_position": {
+          "label": "Seitenleisten-Position"
         }
       },
       "blocks": {
+        "info": {
+          "name": "Info",
+          "settings": {
+            "title": {
+              "label": "Titel"
+            },
+            "text": {
+              "label": "Text"
+            }
+          }
+        },
+        "social": {
+          "name": "Social-Media-Icons"
+        },
         "heading": {
           "name": "Überschrift",
           "settings": {
@@ -639,9 +656,6 @@
       },
       "allow_multiple": {
         "label": "Mehrere gleichzeitig öffnen"
-      },
-      "sidebar_position": {
-        "label": "Seitenleisten-Position"
       }
     },
     "blocks": {
@@ -655,20 +669,6 @@
             "label": "Antwort"
           }
         }
-      },
-      "info": {
-        "name": "Info",
-        "settings": {
-          "title": {
-            "label": "Titel"
-          },
-          "text": {
-            "label": "Text"
-          }
-        }
-      },
-      "social": {
-        "name": "Social-Media-Icons"
       }
     }
   },
@@ -895,20 +895,7 @@
     }
   },
   "contact_details": {
-    "name": "Kontaktdaten",
-    "blocks": {
-      "info": {
-        "name": "Info",
-        "settings": {
-          "title": {
-            "label": "Titel"
-          },
-          "text": {
-            "label": "Text"
-          }
-        }
-      }
-    }
+    "name": "Kontaktdaten"
   },
   "content_switcher": {
     "name": "Inhaltsumschalter",
@@ -1696,9 +1683,6 @@
           "0": "Sonntag",
           "1": "Montag"
         }
-      },
-      "sidebar_position": {
-        "label": "Seitenleisten-Position"
       }
     },
     "blocks": {
@@ -1715,20 +1699,6 @@
           }
         },
         "name": "Tag"
-      },
-      "info": {
-        "name": "Info",
-        "settings": {
-          "title": {
-            "label": "Titel"
-          },
-          "text": {
-            "label": "Text"
-          }
-        }
-      },
-      "social": {
-        "name": "Social-Media-Icons"
       }
     }
   },

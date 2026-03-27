@@ -56,7 +56,7 @@
     {
       "type": "select",
       "id": "sidebar_position",
-      "label": "tTheme:accordion.settings.sidebar_position.label",
+      "label": "tTheme:global.widgets.settings.sidebar_position.label",
       "default": "right",
       "options": [
         {
@@ -107,25 +107,25 @@
     },
     {
       "type": "info",
-      "displayName": "tTheme:accordion.blocks.info.name",
+      "displayName": "tTheme:global.widgets.blocks.info.name",
       "settings": [
         {
           "type": "text",
           "id": "title",
-          "label": "tTheme:accordion.blocks.info.settings.title.label",
+          "label": "tTheme:global.widgets.blocks.info.settings.title.label",
           "default": "Need Help?"
         },
         {
           "type": "richtext",
           "id": "text",
-          "label": "tTheme:accordion.blocks.info.settings.text.label",
+          "label": "tTheme:global.widgets.blocks.info.settings.text.label",
           "default": "<p>hello@example.com</p>"
         }
       ]
     },
     {
       "type": "social",
-      "displayName": "tTheme:accordion.blocks.social.name",
+      "displayName": "tTheme:global.widgets.blocks.social.name",
       "settings": []
     }
   ],

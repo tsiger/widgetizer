@@ -375,9 +375,26 @@
           "start": "Inicio",
           "end": "Fin",
           "none": "Ninguno"
+        },
+        "sidebar_position": {
+          "label": "Posición de la barra lateral"
         }
       },
       "blocks": {
+        "info": {
+          "name": "Información",
+          "settings": {
+            "title": {
+              "label": "Título"
+            },
+            "text": {
+              "label": "Texto"
+            }
+          }
+        },
+        "social": {
+          "name": "Iconos sociales"
+        },
         "heading": {
           "name": "Encabezado",
           "settings": {
@@ -639,9 +656,6 @@
       },
       "allow_multiple": {
         "label": "Permitir múltiples abiertos"
-      },
-      "sidebar_position": {
-        "label": "Posición de la barra lateral"
       }
     },
     "blocks": {
@@ -655,20 +669,6 @@
             "label": "Respuesta"
           }
         }
-      },
-      "info": {
-        "name": "Información",
-        "settings": {
-          "title": {
-            "label": "Título"
-          },
-          "text": {
-            "label": "Texto"
-          }
-        }
-      },
-      "social": {
-        "name": "Iconos sociales"
       }
     }
   },
@@ -895,20 +895,7 @@
     }
   },
   "contact_details": {
-    "name": "Datos de contacto",
-    "blocks": {
-      "info": {
-        "name": "Información",
-        "settings": {
-          "title": {
-            "label": "Título"
-          },
-          "text": {
-            "label": "Texto"
-          }
-        }
-      }
-    }
+    "name": "Datos de contacto"
   },
   "content_switcher": {
     "name": "Selector de contenido",
@@ -1696,9 +1683,6 @@
           "0": "Domingo",
           "1": "Lunes"
         }
-      },
-      "sidebar_position": {
-        "label": "Posición de la barra lateral"
       }
     },
     "blocks": {
@@ -1715,20 +1699,6 @@
           }
         },
         "name": "Día"
-      },
-      "info": {
-        "name": "Información",
-        "settings": {
-          "title": {
-            "label": "Título"
-          },
-          "text": {
-            "label": "Texto"
-          }
-        }
-      },
-      "social": {
-        "name": "Iconos sociales"
       }
     }
   },

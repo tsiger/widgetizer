@@ -375,9 +375,26 @@
           "start": "Start",
           "end": "End",
           "none": "None"
+        },
+        "sidebar_position": {
+          "label": "Sidebar position"
         }
       },
       "blocks": {
+        "info": {
+          "name": "Info",
+          "settings": {
+            "title": {
+              "label": "Title"
+            },
+            "text": {
+              "label": "Text"
+            }
+          }
+        },
+        "social": {
+          "name": "Social Icons"
+        },
         "heading": {
           "name": "Heading",
           "settings": {
@@ -639,9 +656,6 @@
       },
       "allow_multiple": {
         "label": "Allow multiple open"
-      },
-      "sidebar_position": {
-        "label": "Sidebar position"
       }
     },
     "blocks": {
@@ -655,20 +669,6 @@
             "label": "Answer"
           }
         }
-      },
-      "info": {
-        "name": "Info",
-        "settings": {
-          "title": {
-            "label": "Title"
-          },
-          "text": {
-            "label": "Text"
-          }
-        }
-      },
-      "social": {
-        "name": "Social Icons"
       }
     }
   },
@@ -895,20 +895,7 @@
     }
   },
   "contact_details": {
-    "name": "Contact Details",
-    "blocks": {
-      "info": {
-        "name": "Info",
-        "settings": {
-          "title": {
-            "label": "Title"
-          },
-          "text": {
-            "label": "Text"
-          }
-        }
-      }
-    }
+    "name": "Contact Details"
   },
   "content_switcher": {
     "name": "Content Switcher",
@@ -1696,9 +1683,6 @@
           "0": "Sunday",
           "1": "Monday"
         }
-      },
-      "sidebar_position": {
-        "label": "Sidebar position"
       }
     },
     "blocks": {
@@ -1715,20 +1699,6 @@
           }
         },
         "name": "Day"
-      },
-      "info": {
-        "name": "Info",
-        "settings": {
-          "title": {
-            "label": "Title"
-          },
-          "text": {
-            "label": "Text"
-          }
-        }
-      },
-      "social": {
-        "name": "Social Icons"
       }
     }
   },
