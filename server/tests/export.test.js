@@ -237,7 +237,7 @@ before(async () => {
 <head>
   <meta charset="UTF-8">
   <title>{{ page.seo.title }}</title>
-  {{ seo_tags | raw }}
+  {% seo %}
 </head>
 <body class="{{ body_class }}">
   {{ header | raw }}
@@ -385,7 +385,10 @@ before(async () => {
   // Dummy image files
   await fs.writeFile(path.join(uploadsDir, "images", "hero.jpg"), "fake-jpg-data");
   await fs.writeFile(path.join(uploadsDir, "images", "hero-medium.jpg"), "fake-jpg-medium");
+  await fs.writeFile(path.join(uploadsDir, "images", "hero-large.jpg"), "fake-jpg-large");
   await fs.writeFile(path.join(uploadsDir, "images", "hero-thumb.jpg"), "fake-jpg-thumb");
+  await fs.writeFile(path.join(uploadsDir, "images", "inline.jpg"), "fake-inline-data");
+  await fs.writeFile(path.join(uploadsDir, "images", "inline-medium.jpg"), "fake-inline-medium");
   await fs.writeFile(path.join(uploadsDir, "images", "unused.png"), "fake-png-data");
 
   await writeMediaFile(PROJECT_ID, {
@@ -409,10 +412,31 @@ before(async () => {
             width: 1024,
             height: 576,
           },
+          large: {
+            path: "/uploads/images/hero-large.jpg",
+            width: 1600,
+            height: 900,
+          },
         },
       },
       {
         id: "img-2",
+        filename: "inline.jpg",
+        path: "/uploads/images/inline.jpg",
+        type: "image/jpeg",
+        width: 1200,
+        height: 800,
+        usedIn: ["index"],
+        sizes: {
+          medium: {
+            path: "/uploads/images/inline-medium.jpg",
+            width: 1024,
+            height: 683,
+          },
+        },
+      },
+      {
+        id: "img-3",
         filename: "unused.png",
         path: "/uploads/images/unused.png",
         type: "image/png",
@@ -536,6 +560,13 @@ describe("exportProject", () => {
     assert.ok(html.includes("core-spacer"), "Should render core-spacer widget");
   });
 
+  it("rendered HTML points social images at the public large asset", async () => {
+    const exportDir = await getLatestExportDir();
+    const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
+    assert.ok(html.includes('property="og:image" content="https://mysite.example.com/assets/images/hero-large.jpg"'));
+    assert.ok(html.includes('name="twitter:image" content="https://mysite.example.com/assets/images/hero-large.jpg"'));
+  });
+
   it("generates sitemap.xml with site URL", async () => {
     const exportDir = await getLatestExportDir();
     const sitemapPath = path.join(exportDir, "sitemap.xml");
@@ -577,19 +608,26 @@ describe("exportProject", () => {
     assert.ok(robots.includes("Disallow: /hidden.html"), "Should disallow hidden page");
   });
 
-  it("copies used images to assets/images/, not uploads/", async () => {
+  it("does not export the original when a large variant exists", async () => {
     const exportDir = await getLatestExportDir();
     const heroPath = path.join(exportDir, "assets", "images", "hero.jpg");
-    assert.ok(await fs.pathExists(heroPath), "Used image hero.jpg should be in assets/images/");
-    // Verify content matches
-    const content = await fs.readFile(heroPath, "utf8");
-    assert.equal(content, "fake-jpg-data");
+    assert.ok(!(await fs.pathExists(heroPath)), "Original hero.jpg should be omitted when hero-large.jpg exists");
   });
 
   it("copies image size variants", async () => {
     const exportDir = await getLatestExportDir();
     const mediumPath = path.join(exportDir, "assets", "images", "hero-medium.jpg");
     assert.ok(await fs.pathExists(mediumPath), "Medium size image should be copied");
+    const largePath = path.join(exportDir, "assets", "images", "hero-large.jpg");
+    assert.ok(await fs.pathExists(largePath), "Large size image should be copied");
+  });
+
+  it("still exports the original when no large variant exists", async () => {
+    const exportDir = await getLatestExportDir();
+    const inlinePath = path.join(exportDir, "assets", "images", "inline.jpg");
+    assert.ok(await fs.pathExists(inlinePath), "Original inline.jpg should still be exported when no large variant exists");
+    const content = await fs.readFile(inlinePath, "utf8");
+    assert.equal(content, "fake-inline-data");
   });
 
   it("skips thumb variants in export", async () => {

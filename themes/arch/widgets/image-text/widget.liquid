@@ -84,7 +84,7 @@
       <div class="image-text-wrapper">
         <div class="image-wrapper reveal reveal-fade">
           {% if widget.settings.image != blank %}
-            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: '(max-width: 768px) 100vw, 50vw', class: 'image-text-image' %}
+            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: '(max-width: 989px) 100vw, (max-width: 1420px) 50vw, 710px', class: 'image-text-image' %}
           {% else %}
             {% placeholder_image aspect: 'landscape', class: 'image-text-image' %}
           {% endif %}
@@ -114,7 +114,9 @@
               {% when 'image' %}
                 <div class="widget-block-image reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}; --block-image-width: {{ block.settings.width }}%;" data-block-id="{{ blockId }}">
                   {% if block.settings.image != blank %}
-                    {% image src: block.settings.image, size: 'small', srcset: true %}
+                    {% assign block_image_cap = block.settings.width | times: 7.1 %}
+                    {% capture block_image_sizes %}(max-width: 989px) {{ block.settings.width }}vw, {{ block_image_cap }}px{% endcapture %}
+                    {% image src: block.settings.image, size: 'small', srcset: true, sizes: block_image_sizes %}
                   {% else %}
                     {% placeholder_image aspect: 'square' %}
                   {% endif %}

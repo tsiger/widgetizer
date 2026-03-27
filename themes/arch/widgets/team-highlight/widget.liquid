@@ -123,6 +123,10 @@
     }
   </style>
 
+  {% assign team_cols = widget.settings.columns_desktop | default: 3 %}
+  {% assign team_member_vw = 60 | divided_by: team_cols %}
+  {% assign team_member_cap = 852 | divided_by: team_cols %}
+  {% assign team_member_sizes = '(max-width: 749px) 45vw, (max-width: 1420px) ' | append: team_member_vw | append: 'vw, ' | append: team_member_cap | append: 'px' %}
   <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
     <div class="team-highlight-grid">
       {% assign has_intro = false %}
@@ -178,7 +182,7 @@
 
               <div class="member-photo-wrap">
                 {% if block.settings.photo != blank and block.settings.photo != 'placeholder' %}
-                  {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '(max-width: 749px) 45vw, 30vw', class: 'member-photo' %}
+                  {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: team_member_sizes, class: 'member-photo' %}
                 {% else %}
                   <div class="member-photo-placeholder" style="background-image: url({% placeholder_image aspect: 'portrait', output: 'url' %});"></div>
                 {% endif %}

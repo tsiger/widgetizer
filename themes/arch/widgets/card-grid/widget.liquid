@@ -4,7 +4,7 @@
 <section
   id="{{ widget.id }}"
   class="widget widget-type-card-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.image_position == 'bottom' %} card-grid-image-bottom{% endif %}"
-  style="{% if widget.settings.aspect_ratio != 'auto' %}--card-image-ratio: {{ widget.settings.aspect_ratio }};{% endif %}{% if widget.settings.color_scheme == 'highlight' %} --widget-bg-color: var(--bg-primary);{% endif %}"
+  style="--card-image-ratio: {{ widget.settings.aspect_ratio | default: '4 / 3' }};{% if widget.settings.color_scheme == 'highlight' %} --widget-bg-color: var(--bg-primary);{% endif %}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="card-grid"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
@@ -83,7 +83,7 @@
 
               <li class="widget-card carousel-item" data-block-id="{{ blockId }}">
                 {% if block.settings.image != blank %}
-                  {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
+                  {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
                 {% endif %}
                 <div class="widget-card-content{% if widget.settings.alignment == 'center' %} widget-content-align-center{% endif %}">
                   {% if block.settings.subtitle != blank %}
@@ -138,7 +138,7 @@
 
             <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
               {% if block.settings.image != blank %}
-                {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
+                {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
               {% endif %}
               <div class="widget-card-content{% if widget.settings.alignment == 'center' %} widget-content-align-center{% endif %}">
                 {% if block.settings.subtitle != blank %}

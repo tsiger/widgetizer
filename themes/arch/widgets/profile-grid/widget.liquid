@@ -138,7 +138,7 @@
               {% assign block = widget.blocks[blockId] %}
               <li class="profile-card carousel-item" data-block-id="{{ blockId }}">
                 {% if block.settings.photo != blank and block.settings.photo != 'placeholder' %}
-                  {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '(max-width: 768px) 50vw, 300px', class: 'profile-image' %}
+                  {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '160px', class: 'profile-image' %}
                 {% else %}
                   <div class="profile-image-placeholder t-4xl t-muted" style="background-image: url({% placeholder_image aspect: 'square', output: 'url' %}); background-size: cover; background-position: center;"></div>
                 {% endif %}
@@ -263,7 +263,7 @@
             {% assign block = widget.blocks[blockId] %}
             <li class="profile-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
               {% if block.settings.photo != blank and block.settings.photo != 'placeholder' %}
-                {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '(max-width: 768px) 50vw, 300px', class: 'profile-image' %}
+                {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '160px', class: 'profile-image' %}
               {% else %}
                 <div class="profile-image-placeholder t-4xl t-muted" style="background-image: url({% placeholder_image aspect: 'square', output: 'url' %}); background-size: cover; background-position: center;"></div>
               {% endif %}

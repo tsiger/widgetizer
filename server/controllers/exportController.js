@@ -485,16 +485,22 @@ Per aspera ad astra
           const sourceImagePath = path.join(projectDir, imageFile.path.replace(/^\//, ""));
           // Changed: Export images to assets/images/ instead of uploads/images/
           const targetImagePath = path.join(outputDir, "assets", "images", path.basename(imageFile.path));
+          const hasLargeVariant = Boolean(imageFile.sizes?.large?.path);
+          const isSvg = imageFile.type === "image/svg+xml" || imageFile.filename?.toLowerCase().endsWith(".svg");
 
-          // Copy original image
-          try {
-            if (await fs.pathExists(sourceImagePath)) {
-              await fs.ensureDir(path.dirname(targetImagePath));
-              await fs.copy(sourceImagePath, targetImagePath);
-              copiedCount++;
+          // Keep originals internal when a public large raster variant exists.
+          const shouldCopyOriginal = isSvg || !hasLargeVariant;
+
+          if (shouldCopyOriginal) {
+            try {
+              if (await fs.pathExists(sourceImagePath)) {
+                await fs.ensureDir(path.dirname(targetImagePath));
+                await fs.copy(sourceImagePath, targetImagePath);
+                copiedCount++;
+              }
+            } catch (copyError) {
+              console.error(`Error copying image ${imageFile.filename}:`, copyError);
             }
-          } catch (copyError) {
-            console.error(`Error copying image ${imageFile.filename}:`, copyError);
           }
 
           // Copy all generated sizes for this image

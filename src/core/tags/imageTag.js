@@ -99,9 +99,13 @@ export const ImageTag = {
         }
       }
 
-      // Include original if wider than all candidates
+      const hasLargeVariant = Boolean(mediaFile.sizes?.large?.path);
+
+      // Include original only when no public large variant exists.
+      // Once a large variant is available, it becomes the delivery ceiling.
       const maxCandidateWidth = candidates.reduce((max, c) => Math.max(max, c.width), 0);
       if (
+        !hasLargeVariant &&
         typeof mediaFile.width === "number" &&
         mediaFile.width > maxCandidateWidth &&
         !seenWidths.has(mediaFile.width)

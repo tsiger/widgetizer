@@ -10,6 +10,7 @@ export const SeoTag = {
       const allVars = context.getAll();
       const page = allVars.page;
       const project = allVars.project;
+      const mediaFiles = allVars.mediaFiles || {};
       const imagePath = (allVars.imagePath || "uploads/images").replace(/^\/+/, "");
 
       if (!page) {
@@ -56,7 +57,7 @@ export const SeoTag = {
 
       // Open Graph image - only if specified
       if (hasImage) {
-        const ogImageUrl = resolveImageUrl(seo.og_image, imagePath, project?.siteUrl);
+        const ogImageUrl = resolveImageUrl(seo.og_image, imagePath, project?.siteUrl, mediaFiles);
         metaTags.push(`<meta property="og:image" content="${escapeHtml(ogImageUrl)}">`);
       }
 
@@ -72,7 +73,7 @@ export const SeoTag = {
 
       // Twitter image (use same as og:image) - only if image exists
       if (hasImage) {
-        const twitterImageUrl = resolveImageUrl(seo.og_image, imagePath, project?.siteUrl);
+        const twitterImageUrl = resolveImageUrl(seo.og_image, imagePath, project?.siteUrl, mediaFiles);
         metaTags.push(`<meta name="twitter:image" content="${escapeHtml(twitterImageUrl)}">`);
       }
 
@@ -91,7 +92,7 @@ export const SeoTag = {
  * preview mode uses the API URL and publish mode uses "assets/images".
  * Fully-qualified URLs (http/https) are returned unchanged.
  */
-function resolveImageUrl(rawValue, imagePath, siteUrl) {
+function resolveImageUrl(rawValue, imagePath, siteUrl, mediaFiles = {}) {
   if (!rawValue) return "";
 
   // Already an absolute URL — use as-is
@@ -102,7 +103,8 @@ function resolveImageUrl(rawValue, imagePath, siteUrl) {
   // Extract just the filename from the stored path
   // e.g. "/uploads/images/hero.jpg" → "hero.jpg"
   const filename = rawValue.split("/").pop();
-  const resolvedPath = `/${imagePath}/${filename}`;
+  const publicFilename = getPublicImageFilename(filename, mediaFiles);
+  const resolvedPath = `/${imagePath}/${publicFilename}`;
 
   if (siteUrl) {
     const cleanSiteUrl = siteUrl.replace(/\/$/, "");
@@ -110,6 +112,18 @@ function resolveImageUrl(rawValue, imagePath, siteUrl) {
   }
 
   return resolvedPath;
+}
+
+function getPublicImageFilename(filename, mediaFiles) {
+  const mediaFile = mediaFiles?.[filename];
+  const isSvg = mediaFile?.type === "image/svg+xml" || filename?.toLowerCase().endsWith(".svg");
+  const largePath = mediaFile?.sizes?.large?.path;
+
+  if (!isSvg && largePath) {
+    return largePath.split("/").pop();
+  }
+
+  return filename;
 }
 
 // Helper function to escape HTML entities

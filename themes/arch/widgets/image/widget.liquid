@@ -56,6 +56,10 @@
     }
   </style>
 
+  {% assign image_sizes = '100vw' %}
+  {% unless widget.settings.fullwidth %}
+    {% assign image_sizes = '(max-width: 1420px) 100vw, 1420px' %}
+  {% endunless %}
   <div class="widget-container">
     <div class="widget-content">
       {% if widget.settings.image != blank %}
@@ -68,11 +72,11 @@
             {% endif %}
             data-setting="link"
           >
-            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: '100vw', class: 'widget-image' %}
+            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: image_sizes, class: 'widget-image' %}
           </a>
         {% else %}
           <div class="image-wrapper reveal reveal-fade">
-            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: '100vw', class: 'widget-image' %}
+            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: image_sizes, class: 'widget-image' %}
           </div>
         {% endif %}
       {% else %}

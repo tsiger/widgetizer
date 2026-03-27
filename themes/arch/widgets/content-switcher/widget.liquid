@@ -1,9 +1,7 @@
 <section
   id="{{ widget.id }}"
   class="widget widget-content-switcher widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
-  {% if widget.settings.color_scheme == 'highlight' %}
-    style="--widget-bg-color: var(--bg-primary);"
-  {% endif %}
+  style="--card-image-ratio: {{ widget.settings.aspect_ratio | default: '4 / 3' }};{% if widget.settings.color_scheme == 'highlight' %} --widget-bg-color: var(--bg-primary);{% endif %}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="content-switcher"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
@@ -192,7 +190,7 @@
                 {% endif %}
                 <li class="widget-card" data-block-id="{{ blockId }}">
                   {% if block.settings.image != blank %}
-                    {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
+                    {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
                   {% endif %}
 
                   <div class="widget-card-content">
@@ -254,7 +252,7 @@
                 {% endif %}
                 <li class="widget-card" data-block-id="{{ blockId }}">
                   {% if block.settings.image != blank %}
-                    {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
+                    {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
                   {% endif %}
 
                   <div class="widget-card-content">
@@ -316,7 +314,7 @@
                 {% endif %}
                 <li class="widget-card" data-block-id="{{ blockId }}">
                   {% if block.settings.image != blank %}
-                    {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 768px) 100vw, 400px', class: 'widget-card-image' %}
+                    {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
                   {% endif %}
 
                   <div class="widget-card-content">

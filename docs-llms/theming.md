@@ -499,7 +499,7 @@ For cases where you need just the image URL (e.g., CSS background images), use t
 {% image src: widget.settings.backgroundImage, size: 'medium', output: 'url' %}
 ```
 
-**How `srcset` works:** When `srcset: true`, the tag collects all available size variants (excluding `thumb`), includes the original if it's wider than all variants, sorts by width ascending, and emits a `srcset` attribute with `w` descriptors. The browser uses the `sizes` attribute and its own device pixel ratio to pick the best candidate. If fewer than 2 candidates are available, `srcset` is omitted. SVGs and path-only output modes are unaffected.
+**How `srcset` works:** When `srcset: true`, the tag collects all available size variants (excluding `thumb`), sorts them by width ascending, and emits a `srcset` attribute with `w` descriptors. If a `large` variant exists, it becomes the maximum public candidate and the original upload is not included in `srcset`. If no `large` variant exists, the original may still be included as the top fallback candidate. The browser uses the `sizes` attribute and its own device pixel ratio to pick the best asset. If fewer than 2 candidates are available, `srcset` is omitted. SVGs and path-only output modes are unaffected. The same public-delivery rule also applies to SEO/social image URLs so published metadata does not reference an omitted original file.
 
 ### YouTube tag
 

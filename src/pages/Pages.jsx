@@ -25,6 +25,7 @@ export default function Pages() {
   const [searchTerm, setSearchTerm] = useState("");
   const { selectedPages, togglePageSelection, selectAllPages, clearSelection, isAllSelected } = usePageSelection();
   const showToast = useToastStore((state) => state.showToast);
+  const activeProject = useProjectStore((state) => state.activeProject);
 
   // Get app settings for date formatting
   const { settings: appSettings } = useAppSettings();
@@ -39,6 +40,9 @@ export default function Pages() {
       } else {
         await deletePage(data.pageId);
         showToast(t("pages.toasts.deleteSuccess"), "success");
+      }
+      if (activeProject) {
+        invalidateMediaCache(activeProject.id);
       }
       loadPages();
     } catch (error) {
@@ -100,7 +104,6 @@ export default function Pages() {
       showToast(t("pages.toasts.duplicateSuccess"), "success");
       loadPages();
       // Invalidate media cache since the duplicate may reference the same images
-      const activeProject = useProjectStore.getState().activeProject;
       if (activeProject) {
         invalidateMediaCache(activeProject.id);
       }

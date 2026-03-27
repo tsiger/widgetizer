@@ -212,8 +212,8 @@ describe("SeoTag", () => {
   it("generates og:image with absolute URL from stored /uploads/ path", async () => {
     const result = await render("{% seo %}", { page: fixtures.basicPage, project: fixtures.project });
     // og_image is stored as "/uploads/images/hero.jpg" — SeoTag extracts filename
-    // and combines with imagePath ("/uploads/images" in preview mode)
-    assert.match(result, /og:image" content="https:\/\/example\.com\/uploads\/images\/hero\.jpg"/);
+    // and combines with imagePath using the public delivery asset in preview mode
+    assert.match(result, /og:image" content="https:\/\/example\.com\/uploads\/images\/hero-large\.jpg"/);
     assert.doesNotMatch(result, /\/\/uploads/, "should not produce double slashes in path");
   });
 
@@ -251,7 +251,7 @@ describe("SeoTag", () => {
 
   it("generates twitter:image matching og:image", async () => {
     const result = await render("{% seo %}", { page: fixtures.basicPage, project: fixtures.project });
-    assert.match(result, /twitter:image" content="https:\/\/example\.com\/uploads\/images\/hero\.jpg"/);
+    assert.match(result, /twitter:image" content="https:\/\/example\.com\/uploads\/images\/hero-large\.jpg"/);
   });
 
   it("handles og:image that is already an absolute URL", async () => {
@@ -313,14 +313,38 @@ describe("SeoTag", () => {
   it("handles bare filename og_image (no path prefix)", async () => {
     const page = {
       name: "Bare Filename",
-      seo: { og_image: "banner.jpg" },
+      seo: { og_image: "hero.jpg" },
     };
     const result = await render("{% seo %}", {
       page,
       project: fixtures.project,
       imagePath: "assets/images",
     });
-    assert.match(result, /og:image" content="https:\/\/example\.com\/assets\/images\/banner\.jpg"/);
+    assert.match(result, /og:image" content="https:\/\/example\.com\/assets\/images\/hero-large\.jpg"/);
+  });
+
+  it("keeps the original SEO image when no large variant exists", async () => {
+    const result = await render(
+      "{% seo %}",
+      {
+        page: fixtures.basicPage,
+        project: fixtures.project,
+        mediaFiles: {
+          "hero.jpg": {
+            filename: "hero.jpg",
+            path: "hero.jpg",
+            type: "image/jpeg",
+            width: 800,
+            height: 600,
+            sizes: {
+              medium: { path: "hero-medium.jpg", width: 400, height: 300 },
+            },
+          },
+        },
+        imagePath: "assets/images",
+      },
+    );
+    assert.match(result, /og:image" content="https:\/\/example\.com\/assets\/images\/hero\.jpg"/);
   });
 });
 
@@ -575,7 +599,7 @@ describe("ImageTag", () => {
     assert.match(result, /hero-small\.jpg 300w/);
     assert.match(result, /hero-medium\.jpg 400w/);
     assert.match(result, /hero-large\.jpg 700w/);
-    assert.match(result, /hero\.jpg 800w/, "original should be included as largest candidate");
+    assert.doesNotMatch(result, /hero\.jpg 800w/, "original should be omitted when a large variant exists");
   });
 
   it("excludes thumb from srcset candidates", async () => {
@@ -634,6 +658,28 @@ describe("ImageTag", () => {
       imagePath: "/uploads/images",
     });
     assert.doesNotMatch(result, /srcset=/, "should not emit srcset with only 1 candidate");
+  });
+
+  it("keeps the original in srcset when no large variant exists", async () => {
+    const result = await render('{% image src: "hero.jpg", srcset: true %}', {
+      mediaFiles: {
+        "hero.jpg": {
+          filename: "hero.jpg",
+          path: "hero.jpg",
+          type: "image/jpeg",
+          width: 800,
+          height: 600,
+          sizes: {
+            small: { path: "hero-small.jpg", width: 300, height: 225 },
+            medium: { path: "hero-medium.jpg", width: 400, height: 300 },
+          },
+        },
+      },
+      imagePath: "/uploads/images",
+    });
+    assert.match(result, /hero-small\.jpg 300w/);
+    assert.match(result, /hero-medium\.jpg 400w/);
+    assert.match(result, /hero\.jpg 800w/, "original should remain available when no large variant exists");
   });
 
   it("does not emit srcset by default for backward compatibility", async () => {
