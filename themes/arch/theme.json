@@ -16,7 +16,7 @@
           "id": "favicon",
           "label": "tTheme:global.general.settings.favicon.label",
           "default": "",
-          "compact": true,
+          "size": "narrow",
           "description": "tTheme:global.general.settings.favicon.description"
         },
         {

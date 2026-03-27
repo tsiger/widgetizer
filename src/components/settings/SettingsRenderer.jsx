@@ -27,7 +27,8 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
   const { t } = useTranslation();
   const { tTheme } = useThemeLocale();
 
-  const { type, id, label, description, options, min, max, step, unit, allow_alpha, language, compact } = setting || {};
+  const { type, id, label, description, options, min, max, step, unit, allow_alpha, language, size, compact } =
+    setting || {};
 
   // Translate options (select/radio) via theme locale
   const translatedOptions = useMemo(() => {
@@ -96,8 +97,11 @@ export default function SettingsRenderer({ setting, value, onChange, error }) {
         return <FontPickerInput {...inputProps} />;
       case "menu":
         return <MenuSelectInput {...inputProps} />;
-      case "image":
-        return <ImageInput {...inputProps} compact={compact} />;
+      case "image": {
+        // `size` replaces legacy `compact` for image width; prefer `size` when both exist
+        const imageSize = size || (compact ? "narrow" : "full");
+        return <ImageInput {...inputProps} size={imageSize} />;
+      }
       case "link":
         return <LinkInput {...inputProps} setting={setting} />;
       case "youtube":

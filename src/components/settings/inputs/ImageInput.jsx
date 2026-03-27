@@ -10,7 +10,10 @@ import MediaDrawer from "../../../components/media/MediaDrawer";
 import MediaSelectorDrawer from "../../../components/media/MediaSelectorDrawer";
 import Button from "../../ui/Button";
 
-export default function ImageInput({ id, value = "", onChange, compact = false }) {
+/**
+ * @param {"full"|"narrow"} [size="full"] — Constrains overall width: `narrow` caps at 14rem (e.g. favicon in theme settings).
+ */
+export default function ImageInput({ id, value = "", onChange, size = "full" }) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
   const activeProject = useProjectStore((state) => state.activeProject);
@@ -22,6 +25,8 @@ export default function ImageInput({ id, value = "", onChange, compact = false }
   const [selectorDrawerVisible, setSelectorDrawerVisible] = useState(false);
   const [currentImageFile, setCurrentImageFile] = useState(null);
   const [isSavingMetadata, setIsSavingMetadata] = useState(false);
+
+  const isNarrow = size === "narrow";
 
   // Get the current image metadata when value changes
   useEffect(() => {
@@ -113,20 +118,17 @@ export default function ImageInput({ id, value = "", onChange, compact = false }
     }
   };
 
-  const previewClassName = compact
-    ? "relative h-56 w-56 rounded-md bg-slate-100 flex items-center justify-center group overflow-hidden"
+  const rootClassName = isNarrow ? "w-full max-w-56" : "w-full";
+  const mediaClassName = isNarrow
+    ? "relative w-full aspect-square bg-slate-100 rounded-md flex items-center justify-center group overflow-hidden"
     : "relative w-full aspect-video bg-slate-100 rounded-md flex items-center justify-center group overflow-hidden";
 
-  const emptyStateClassName = compact
-    ? "h-56 w-56 rounded-md border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors"
+  const emptyStateClassName = isNarrow
+    ? "w-full aspect-square rounded-md border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors px-2"
     : "w-full aspect-video bg-slate-50 rounded-md border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors";
 
-  const actionWrapperClassName = compact ? "flex w-40 flex-col gap-2" : "mt-2 flex items-center gap-2";
-  const primaryButtonClassName = compact ? "w-full" : "flex-1";
-  const secondaryButtonClassName = compact ? "w-full" : "flex-1";
-
   return (
-    <div className={compact ? "flex items-start gap-3" : ""}>
+    <div className={rootClassName}>
       <input
         ref={fileInputRef}
         type="file"
@@ -137,7 +139,7 @@ export default function ImageInput({ id, value = "", onChange, compact = false }
         className="hidden"
       />
       {value && currentImageFile ? (
-        <div className={previewClassName}>
+        <div className={mediaClassName}>
           <img
             src={API_URL(`/api/media/projects/${activeProject.id}${currentImageFile.path}`)}
             alt={currentImageFile.metadata?.alt || "Preview"}
@@ -153,28 +155,22 @@ export default function ImageInput({ id, value = "", onChange, compact = false }
           </div>
         </div>
       ) : (
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className={emptyStateClassName}
-        >
-          <UploadCloud size={compact ? 32 : 32} />
-          <p className={`mt-2 font-semibold ${compact ? "text-sm text-center" : "text-sm"}`}>Click to upload</p>
-          <p className={`text-xs ${compact ? "text-center" : ""}`}>PNG, JPG, GIF</p>
+        <div onClick={() => fileInputRef.current?.click()} className={emptyStateClassName}>
+          <UploadCloud size={32} />
+          <p className={`mt-2 font-semibold text-sm ${isNarrow ? "text-center" : ""}`}>Click to upload</p>
+          <p className={`text-xs ${isNarrow ? "text-center" : ""}`}>PNG, JPG, GIF</p>
         </div>
       )}
 
-      <div className={actionWrapperClassName}>
-        <Button onClick={() => fileInputRef.current?.click()} disabled={uploading} className={primaryButtonClassName} type="button">
-          {uploading ? "Uploading..." : "Upload"}
-        </Button>
+      <div className="mt-2 flex flex-col gap-2">
         <Button
           onClick={handleOpenMediaSelector}
           disabled={uploading}
           variant="secondary"
-          className={secondaryButtonClassName}
+          className="w-full"
           type="button"
         >
-          Browse
+          Browse media
         </Button>
       </div>
 
