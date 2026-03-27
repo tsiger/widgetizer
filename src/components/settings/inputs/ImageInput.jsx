@@ -119,13 +119,10 @@ export default function ImageInput({ id, value = "", onChange, size = "full" }) 
   };
 
   const rootClassName = isNarrow ? "w-full max-w-56" : "w-full";
-  const mediaClassName = isNarrow
-    ? "relative w-full aspect-square bg-slate-100 rounded-md flex items-center justify-center group overflow-hidden"
-    : "relative w-full aspect-video bg-slate-100 rounded-md flex items-center justify-center group overflow-hidden";
-
-  const emptyStateClassName = isNarrow
-    ? "w-full aspect-square rounded-md border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors px-2"
-    : "w-full aspect-video bg-slate-50 rounded-md border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors";
+  const mediaClassName =
+    "relative w-full aspect-video bg-slate-100 rounded-md flex items-center justify-center group overflow-hidden";
+  const emptyStateClassName =
+    "w-full aspect-video bg-slate-50 rounded-md border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-100 hover:border-slate-400 cursor-pointer transition-colors";
 
   return (
     <div className={rootClassName}>
@@ -157,8 +154,8 @@ export default function ImageInput({ id, value = "", onChange, size = "full" }) 
       ) : (
         <div onClick={() => fileInputRef.current?.click()} className={emptyStateClassName}>
           <UploadCloud size={32} />
-          <p className={`mt-2 font-semibold text-sm ${isNarrow ? "text-center" : ""}`}>Click to upload</p>
-          <p className={`text-xs ${isNarrow ? "text-center" : ""}`}>PNG, JPG, GIF</p>
+          <p className="mt-2 text-sm font-semibold">Click to upload</p>
+          <p className="text-xs">PNG, JPG, GIF</p>
         </div>
       )}
 
