@@ -43,6 +43,13 @@
         overflow: hidden;
       }
 
+      &.color-scheme-standard-accent,
+      &.color-scheme-highlight-accent {
+        & .accordion-item {
+          background-color: var(--bg-secondary);
+        }
+      }
+
       & .accordion-trigger {
         width: 100%;
         padding: var(--space-md) var(--space-lg);

@@ -38,6 +38,13 @@
         padding: var(--space-lg);
       }
 
+      &.color-scheme-standard-accent,
+      &.color-scheme-highlight-accent {
+        & .style-cards .countdown-unit {
+          background: var(--bg-secondary);
+        }
+      }
+
       & .countdown-number {
         font-size: calc(var(--font-size-4xl) * var(--heading-scale));
         line-height: 1;

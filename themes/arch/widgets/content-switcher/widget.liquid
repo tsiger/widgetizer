@@ -29,6 +29,7 @@
         font-size: calc(var(--font-size-sm) * var(--body-scale));
         line-height: var(--line-height-relaxed);
         margin: 0;
+        color: var(--text-content);
         background-color: var(--bg-primary);
         border: var(--border-width-thin) solid var(--border-color);
         border-radius: var(--radius-button);
@@ -82,6 +83,21 @@
       & .widget-card {
         text-align: center;
         align-items: center;
+      }
+
+      &.color-scheme-standard-accent,
+      &.color-scheme-highlight-accent {
+        & .widget-card {
+          background-color: var(--bg-secondary);
+        }
+      }
+
+      &.color-scheme-standard-accent,
+      &.color-scheme-highlight,
+      &.color-scheme-highlight-accent {
+        & .widget-card {
+          border: var(--border-width-thin) solid var(--border-color);
+        }
       }
 
       & .switcher-item-price {
