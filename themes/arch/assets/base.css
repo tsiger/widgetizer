@@ -1081,8 +1081,15 @@ b {
   border: var(--border-width-medium) solid var(--border-color);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background-color 0.3s, border-color 0.3s;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    opacity 0.2s ease,
+    visibility 0.2s ease;
   z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 
   &:hover {
     border-color: var(--text-heading);
@@ -1094,8 +1101,10 @@ b {
   }
 
   &:disabled {
-    opacity: 0.3;
     cursor: default;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 
     &:hover {
       border-color: var(--border-color);
@@ -1138,6 +1147,13 @@ b {
     display: flex;
     width: 4.4rem;
     height: 4.4rem;
+  }
+
+  .carousel-container:hover .carousel-btn:not(:disabled),
+  .carousel-container:focus-within .carousel-btn:not(:disabled) {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .carousel-btn-prev {
