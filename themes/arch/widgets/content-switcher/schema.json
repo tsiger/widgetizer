@@ -27,6 +27,22 @@
       "default": "Select the billing cycle that works best for you. All plans include our core features."
     },
     {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "tTheme:global.widgets.settings.options.left"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.options.center"
+        }
+      ]
+    },
+    {
       "type": "header",
       "id": "switcher_header",
       "label": "tTheme:content_switcher.settings.switcher_header.label"

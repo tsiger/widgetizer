@@ -1,7 +1,13 @@
 {
   "type": "contact-details",
   "displayName": "tTheme:contact_details.name",
-  "aliases": ["contact", "footer", "info", "details", "address"],
+  "aliases": [
+    "contact",
+    "footer",
+    "info",
+    "details",
+    "address"
+  ],
   "maxBlocks": 4,
   "settings": [
     {
@@ -23,6 +29,22 @@
       "type": "text",
       "id": "description",
       "label": "tTheme:global.widgets.settings.description.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "tTheme:global.widgets.settings.options.left"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.options.center"
+        }
+      ]
     },
     {
       "type": "header",

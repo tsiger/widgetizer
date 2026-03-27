@@ -136,22 +136,28 @@
 
       {% if has_intro %}
         <div class="team-highlight-intro">
-          {% assign intro_delay = 0 %}
-          {% if widget.settings.eyebrow != blank %}
-            <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ intro_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
-            {% assign intro_delay = intro_delay | plus: 1 %}
-          {% endif %}
-          {% if widget.settings.title != blank %}
-            {% if widget.index == 1 %}
-              <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ intro_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
-            {% else %}
-              <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ intro_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
-            {% endif %}
-            {% assign intro_delay = intro_delay | plus: 1 %}
-          {% endif %}
-          {% if widget.settings.description != blank %}
-            <p class="w-description reveal reveal-up" style="--reveal-delay: {{ intro_delay }}" data-setting="description">{{ widget.settings.description }}</p>
-            {% assign intro_delay = intro_delay | plus: 1 %}
+          {% if widget.settings.eyebrow != blank or widget.settings.title != blank or widget.settings.description != blank %}
+            <div class="widget-header{% if widget.settings.heading_alignment == 'left' %} widget-header--align-start{% endif %}">
+              {% assign intro_delay = 0 %}
+              {% if widget.settings.eyebrow != blank %}
+                <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ intro_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+                {% assign intro_delay = intro_delay | plus: 1 %}
+              {% endif %}
+              {% if widget.settings.title != blank %}
+                {% if widget.index == 1 %}
+                  <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ intro_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+                {% else %}
+                  <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ intro_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+                {% endif %}
+                {% assign intro_delay = intro_delay | plus: 1 %}
+              {% endif %}
+              {% if widget.settings.description != blank %}
+                <p class="w-description reveal reveal-up" style="--reveal-delay: {{ intro_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+                {% assign intro_delay = intro_delay | plus: 1 %}
+              {% endif %}
+            </div>
+          {% else %}
+            {% assign intro_delay = 0 %}
           {% endif %}
           {% if widget.settings.signature_image != blank and widget.settings.signature_image != 'placeholder' %}
             {% image src: widget.settings.signature_image, size: 'small', class: 'team-highlight-signature reveal reveal-up', style: '--reveal-delay: ' | append: intro_delay %}

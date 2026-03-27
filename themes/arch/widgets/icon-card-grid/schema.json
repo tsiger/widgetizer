@@ -28,6 +28,22 @@
       "default": "A responsive grid layout showcasing services with icons, descriptions, and call-to-action buttons."
     },
     {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "tTheme:global.widgets.settings.options.left"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.options.center"
+        }
+      ]
+    },
+    {
       "type": "image",
       "id": "featured_image",
       "label": "tTheme:icon_card_grid.settings.featured_image.label"

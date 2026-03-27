@@ -763,6 +763,16 @@ b {
   }
 }
 
+/* Trio left/start alignment only — default remains centered `.widget-header` above */
+.widget-header.widget-header--align-start {
+  align-items: flex-start;
+  text-align: start;
+
+  & .w-description {
+    margin-inline: 0;
+  }
+}
+
 /* Widget content (main content area) */
 .widget-content {
   /* Intentionally minimal - widgets define their own content layout */

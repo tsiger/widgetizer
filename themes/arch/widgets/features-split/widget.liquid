@@ -92,22 +92,24 @@
   <div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
     <div class="features-split-grid">
       <div class="features-split-content">
-        {% assign content_delay = 0 %}
-        {% if widget.settings.eyebrow != blank %}
-          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
-          {% assign content_delay = content_delay | plus: 1 %}
-        {% endif %}
-        {% if widget.settings.title != blank %}
-          {% if widget.index == 1 %}
-            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
-          {% else %}
-            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+        <div class="widget-header{% if widget.settings.heading_alignment == 'left' %} widget-header--align-start{% endif %}">
+          {% assign content_delay = 0 %}
+          {% if widget.settings.eyebrow != blank %}
+            <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+            {% assign content_delay = content_delay | plus: 1 %}
           {% endif %}
-          {% assign content_delay = content_delay | plus: 1 %}
-        {% endif %}
-        {% if widget.settings.description != blank %}
-          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="description">{{ widget.settings.description }}</p>
-        {% endif %}
+          {% if widget.settings.title != blank %}
+            {% if widget.index == 1 %}
+              <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+            {% else %}
+              <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+            {% endif %}
+            {% assign content_delay = content_delay | plus: 1 %}
+          {% endif %}
+          {% if widget.settings.description != blank %}
+            <p class="w-description reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+          {% endif %}
+        </div>
       </div>
 
       <div class="features-split-features">

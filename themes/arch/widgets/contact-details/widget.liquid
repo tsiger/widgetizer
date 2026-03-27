@@ -46,7 +46,7 @@
 
   <div class="{% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% else %}widget-container{% endif %}">
     {% if widget.settings.eyebrow != blank or widget.settings.title != blank or widget.settings.description != blank %}
-      <div class="widget-header">
+      <div class="widget-header{% if widget.settings.heading_alignment == 'left' %} widget-header--align-start{% endif %}">
         {% if widget.settings.eyebrow != blank %}
           <p class="w-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</p>
         {% endif %}

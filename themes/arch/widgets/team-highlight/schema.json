@@ -28,6 +28,22 @@
       "default": "We're 120+ individuals from across the world driven by bold ideas"
     },
     {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "tTheme:global.widgets.settings.options.left"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.options.center"
+        }
+      ]
+    },
+    {
       "type": "image",
       "id": "signature_image",
       "label": "tTheme:team_highlight.settings.signature_image.label"

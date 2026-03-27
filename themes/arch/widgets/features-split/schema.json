@@ -28,6 +28,22 @@
       "default": "We combine industry expertise with innovative technology to deliver solutions that drive real results. Our approach is tailored to meet the unique challenges of each market segment we serve."
     },
     {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "tTheme:global.widgets.settings.options.left"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.options.center"
+        }
+      ]
+    },
+    {
       "type": "header",
       "id": "display_header",
       "label": "tTheme:global.widgets.settings.display_header.label"

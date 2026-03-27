@@ -26,6 +26,22 @@
       "default": "Learn more about our product in this quick video overview."
     },
     {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "tTheme:global.widgets.settings.options.left"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.options.center"
+        }
+      ]
+    },
+    {
       "type": "code",
       "id": "code",
       "label": "tTheme:embed.settings.code.label",
