@@ -19,7 +19,7 @@
 
       & .timeline-item {
         position: relative;
-        padding-inline-start: 4rem;
+        padding-inline-start: 6rem;
         padding-block-end: var(--space-3xl);
 
         &:last-child {
@@ -29,8 +29,8 @@
         &::before {
           content: "";
           position: absolute;
-          inset-inline-start: 1.4375rem;
-          inset-block-start: 3.5rem;
+          inset-inline-start: 2.35rem;
+          inset-block-start: 4.8rem;
           inset-block-end: 0;
           width: var(--border-width-medium);
           background-color: var(--border-color);
@@ -45,20 +45,17 @@
         position: absolute;
         inset-inline-start: 0;
         inset-block-start: 0;
-        width: 3rem;
-        height: 3rem;
-        background-color: var(--text-heading);
-        border: 0.3rem solid var(--bg-primary);
-        box-shadow: 0 0 0 var(--border-width-medium) var(--text-heading);
+        width: 4.8rem;
+        height: 4.8rem;
+        background-color: var(--accent);
+        color: var(--accent-text);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: var(--font-size-lg);
+        font-weight: 600;
         z-index: 1;
-      }
-
-      & .marker-number {
-        color: var(--bg-primary);
       }
 
       & .timeline-content {
@@ -101,23 +98,12 @@
 
       @media (min-width: 750px) {
         & .timeline-item {
-          padding-inline-start: 5rem;
-        }
-
-        & .timeline-marker {
-          width: 3.5rem;
-          height: 3.5rem;
-        }
-
-
-        & .timeline-item::before {
-          inset-inline-start: 1.6875rem;
+          padding-inline-start: 6.5rem;
         }
 
         & .timeline-content {
           padding: var(--space-xl);
         }
-
       }
 
       /* Layout: Horizontal */
@@ -134,7 +120,7 @@
               position: absolute;
               inset-inline-start: 2rem;
               inset-inline-end: 2rem;
-              inset-block-start: 1.75rem;
+              inset-block-start: 2.4rem;
               height: var(--border-width-medium);
               background-color: var(--border-color);
               z-index: 0;
@@ -215,7 +201,7 @@
 
               & .timeline-marker {
                 inset-inline-start: auto;
-                inset-inline-end: -1.75rem;
+                inset-inline-end: -2.4rem;
               }
 
               & .timeline-content {
@@ -230,7 +216,7 @@
               padding-inline-start: var(--space-3xl);
 
               & .timeline-marker {
-                inset-inline-start: -1.75rem;
+                inset-inline-start: -2.4rem;
               }
             }
 
@@ -277,7 +263,7 @@
           {% assign item_index = item_index | plus: 1 %}
           <li class="timeline-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             <div class="timeline-marker">
-              <span class="marker-number w-label t-base">{{ item_index }}</span>
+              <span class="marker-number">{{ item_index }}</span>
             </div>
 
             <div class="timeline-content">

@@ -66,6 +66,21 @@
         color: var(--accent);
       }
 
+      &.color-scheme-standard-accent,
+      &.color-scheme-highlight-accent {
+        & .widget-card {
+          background-color: var(--bg-secondary);
+        }
+      }
+
+      &.color-scheme-standard-accent,
+      &.color-scheme-highlight,
+      &.color-scheme-highlight-accent {
+        & .widget-card:not(.is-featured) {
+          border: var(--border-width-thin) solid var(--border-color);
+        }
+      }
+
       /* Smart layout for different item counts */
     }
   </style>

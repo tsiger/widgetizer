@@ -37,7 +37,9 @@
 
       & .service-number {
         grid-column: 1 / -1;
-        opacity: 0.3;
+        font-size: calc(var(--font-size-5xl) * var(--heading-scale));
+        line-height: 1;
+        color: var(--text-muted);
       }
 
       & .service-title-wrap {
@@ -169,7 +171,7 @@
             {% else %}
               <div class="service-row">
             {% endif %}
-                <div class="service-number w-meta t-4xl t-body-bold">{{ step_number }}</div>
+                <div class="service-number">{{ step_number }}</div>
 
                 <div class="service-title-wrap">
                   {% if block.settings.title != blank %}

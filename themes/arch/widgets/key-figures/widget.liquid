@@ -76,6 +76,21 @@
         }
       }
 
+      &.color-scheme-standard-accent,
+      &.color-scheme-highlight-accent {
+        & .widget-card {
+          background-color: var(--bg-secondary);
+        }
+      }
+
+      &.color-scheme-standard-accent,
+      &.color-scheme-highlight,
+      &.color-scheme-highlight-accent {
+        & .widget-card {
+          border: var(--border-width-thin) solid var(--border-color);
+        }
+      }
+
       /* Variant: Bar (Horizontal) */
       &.layout-bar {
         & .widget-card-grid {

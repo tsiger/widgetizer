@@ -54,7 +54,7 @@
         top: calc(-1 * var(--space-2xl));
         bottom: calc(-1 * var(--space-2xl));
         left: 50%;
-        width: var(--border-width-thin);
+        width: var(--border-width-medium);
         background-color: var(--border-color);
         transform: translateX(-50%);
       }
@@ -64,7 +64,7 @@
       }
 
       & .steps-item:last-child .steps-badge-col::before {
-        bottom: 2.4rem;
+        bottom: calc(100% - 2.4rem);
       }
 
       & .steps-badge {

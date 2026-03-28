@@ -20,6 +20,21 @@
         margin-block-end: var(--space-md);
         color: var(--text-muted);
       }
+
+      &.color-scheme-standard-accent,
+      &.color-scheme-highlight-accent {
+        & .widget-card {
+          background-color: var(--bg-secondary);
+        }
+      }
+
+      &.color-scheme-standard-accent,
+      &.color-scheme-highlight,
+      &.color-scheme-highlight-accent {
+        & .widget-card {
+          border: var(--border-width-thin) solid var(--border-color);
+        }
+      }
     }
   </style>
   <div class="widget-container {% unless widget.settings.color_scheme == 'standard' %}widget-container-padded{% endunless %}">
