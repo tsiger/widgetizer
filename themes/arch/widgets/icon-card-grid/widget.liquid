@@ -9,7 +9,7 @@
 
 <section
   id="{{ widget.id }}"
-  class="widget widget-type-icon-card-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
+  class="widget widget-type-icon-card-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.card_layout == 'flat' %} card-layout-flat{% endif %}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
   {% unless widget.settings.color_scheme == 'standard' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endunless %}
@@ -19,16 +19,16 @@
 >
   <style>
     .widget-{{ widget.id }} {
-      &.color-scheme-standard-accent,
-      &.color-scheme-highlight-accent {
+      &:not(.card-layout-flat).color-scheme-standard-accent,
+      &:not(.card-layout-flat).color-scheme-highlight-accent {
         & .widget-card {
           background-color: var(--bg-secondary);
         }
       }
 
-      &.color-scheme-standard-accent,
-      &.color-scheme-highlight,
-      &.color-scheme-highlight-accent {
+      &:not(.card-layout-flat).color-scheme-standard-accent,
+      &:not(.card-layout-flat).color-scheme-highlight,
+      &:not(.card-layout-flat).color-scheme-highlight-accent {
         & .widget-card {
           border: var(--border-width-thin) solid var(--border-color);
         }

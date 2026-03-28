@@ -74,6 +74,11 @@
       ]
     },
     {
+      "type": "header",
+      "id": "widget_header",
+      "label": "Widget"
+    },
+    {
       "type": "color",
       "id": "bg_color",
       "label": "tTheme:scrolling_text.settings.bg_color.label",

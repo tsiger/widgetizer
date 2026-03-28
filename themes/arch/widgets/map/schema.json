@@ -110,6 +110,11 @@
       ]
     },
     {
+      "type": "header",
+      "id": "widget_header",
+      "label": "Widget"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "tTheme:global.widgets.settings.color_scheme.label",
@@ -171,6 +176,11 @@
       "type": "info",
       "displayName": "tTheme:global.widgets.blocks.info.name",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
         {
           "type": "text",
           "id": "title",

@@ -60,6 +60,11 @@
       ]
     },
     {
+      "type": "header",
+      "id": "widget_header",
+      "label": "Widget"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "tTheme:global.widgets.settings.color_scheme.label",
@@ -150,6 +155,11 @@
       "displayName": "tTheme:global.widgets.blocks.rating.name",
       "settings": [
         {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
+        },
+        {
           "type": "select",
           "id": "rating",
           "label": "tTheme:global.widgets.blocks.rating.settings.rating.label",
@@ -176,9 +186,19 @@
       "displayName": "tTheme:global.widgets.blocks.image.name",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
           "type": "image",
           "id": "image",
           "label": "tTheme:global.widgets.blocks.image.settings.image.label"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "range",
@@ -196,10 +216,20 @@
       "displayName": "tTheme:global.widgets.blocks.heading.name",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
           "type": "text",
           "id": "text",
           "label": "tTheme:global.widgets.blocks.heading.settings.text.label",
           "default": "Built for Modern Teams"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "select",
@@ -256,10 +286,20 @@
       "displayName": "tTheme:global.widgets.blocks.text.name",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
           "type": "richtext",
           "id": "text",
           "label": "tTheme:global.widgets.blocks.text.settings.text.label",
           "default": "<p>A paragraph of descriptive text goes here.</p>"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "select",
@@ -300,6 +340,11 @@
       "displayName": "tTheme:global.widgets.blocks.features.name",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
           "type": "textarea",
           "id": "features",
           "label": "tTheme:global.widgets.blocks.features.settings.features.label",
@@ -313,10 +358,20 @@
       "displayName": "tTheme:global.widgets.blocks.icon.name",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
           "type": "icon",
           "id": "icon",
           "label": "tTheme:global.widgets.blocks.icon.settings.icon.label",
           "default": "star"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "select",
@@ -389,6 +444,11 @@
       "displayName": "tTheme:global.widgets.blocks.numbered_item.name",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
           "type": "text",
           "id": "title",
           "label": "tTheme:global.widgets.blocks.numbered_item.settings.title.label",
@@ -399,6 +459,11 @@
           "id": "description",
           "label": "tTheme:global.widgets.blocks.numbered_item.settings.description.label",
           "default": "A short description of this feature."
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "select",
@@ -451,6 +516,11 @@
       "displayName": "tTheme:global.widgets.blocks.button.name",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
           "type": "link",
           "id": "link",
           "label": "tTheme:global.widgets.blocks.button.settings.link.label",
@@ -459,6 +529,16 @@
             "href": "#",
             "target": "_self"
           }
+        },
+        {
+          "type": "link",
+          "id": "link_2",
+          "label": "tTheme:global.widgets.blocks.button.settings.link_2.label"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "select",
@@ -475,11 +555,6 @@
               "label": "tTheme:global.widgets.blocks.button.settings.style.options.secondary"
             }
           ]
-        },
-        {
-          "type": "link",
-          "id": "link_2",
-          "label": "tTheme:global.widgets.blocks.button.settings.link_2.label"
         },
         {
           "type": "select",

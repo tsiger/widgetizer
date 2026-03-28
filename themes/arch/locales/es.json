@@ -256,6 +256,13 @@
             "highlight_accent": "Highlight Accent"
           }
         },
+        "card_layout": {
+          "label": "Diseño de tarjeta",
+          "options": {
+            "box": "Caja",
+            "flat": "Plano"
+          }
+        },
         "columns_desktop": {
           "label": "Columnas de escritorio"
         },
@@ -1349,8 +1356,7 @@
     "settings": {
       "layout": {
         "options": {
-          "bar": "Barra horizontal",
-          "cards": "Tarjetas",
+          "grid": "Cuadrícula",
           "carousel": "Carrusel"
         },
         "label": "Diseño"

@@ -256,6 +256,13 @@
             "highlight_accent": "Highlight Accent"
           }
         },
+        "card_layout": {
+          "label": "Διάταξη κάρτας",
+          "options": {
+            "box": "Box",
+            "flat": "Επίπεδο"
+          }
+        },
         "columns_desktop": {
           "label": "Στήλες επιτραπέζιου"
         },
@@ -1349,8 +1356,7 @@
     "settings": {
       "layout": {
         "options": {
-          "bar": "Οριζόντια μπάρα",
-          "cards": "Κάρτες",
+          "grid": "Πλέγμα",
           "carousel": "Καρουζέλ"
         },
         "label": "Διάταξη"

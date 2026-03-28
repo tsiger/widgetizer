@@ -47,6 +47,36 @@
     },
     {
       "type": "select",
+      "id": "layout",
+      "label": "tTheme:global.widgets.settings.layout.label",
+      "default": "grid",
+      "options": [
+        {
+          "value": "grid",
+          "label": "tTheme:global.widgets.settings.layout.options.grid"
+        },
+        {
+          "value": "carousel",
+          "label": "tTheme:global.widgets.settings.layout.options.carousel"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
+      "default": 4,
+      "min": 2,
+      "max": 8,
+      "step": 1
+    },
+    {
+      "type": "header",
+      "id": "icon_header",
+      "label": "Icon"
+    },
+    {
+      "type": "select",
       "id": "icon_style",
       "label": "tTheme:global.widgets.settings.icon_style.label",
       "default": "plain",
@@ -110,29 +140,9 @@
       ]
     },
     {
-      "type": "select",
-      "id": "layout",
-      "label": "tTheme:global.widgets.settings.layout.label",
-      "default": "grid",
-      "options": [
-        {
-          "value": "grid",
-          "label": "tTheme:global.widgets.settings.layout.options.grid"
-        },
-        {
-          "value": "carousel",
-          "label": "tTheme:global.widgets.settings.layout.options.carousel"
-        }
-      ]
-    },
-    {
-      "type": "range",
-      "id": "columns_desktop",
-      "label": "tTheme:global.widgets.settings.columns_desktop.label",
-      "default": 4,
-      "min": 2,
-      "max": 8,
-      "step": 1
+      "type": "header",
+      "id": "widget_header",
+      "label": "Widget"
     },
     {
       "type": "select",

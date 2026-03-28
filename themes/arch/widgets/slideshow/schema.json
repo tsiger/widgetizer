@@ -100,6 +100,32 @@
           "default": "Build your future"
         },
         {
+          "type": "textarea",
+          "id": "text_content",
+          "label": "tTheme:slideshow.blocks.slide.settings.text_content.label",
+          "default": "Start your journey with our powerful platform."
+        },
+        {
+          "type": "link",
+          "id": "button_link",
+          "label": "tTheme:global.widgets.settings.link.label",
+          "default": {
+            "text": "Get Started",
+            "href": "#",
+            "target": "_self"
+          }
+        },
+        {
+          "type": "link",
+          "id": "button_link_2",
+          "label": "tTheme:slideshow.blocks.slide.settings.button_link_2.label"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
+        },
+        {
           "type": "select",
           "id": "heading_size",
           "label": "tTheme:slideshow.blocks.slide.settings.heading_size.label",
@@ -148,12 +174,6 @@
           ]
         },
         {
-          "type": "textarea",
-          "id": "text_content",
-          "label": "tTheme:slideshow.blocks.slide.settings.text_content.label",
-          "default": "Start your journey with our powerful platform."
-        },
-        {
           "type": "select",
           "id": "text_size",
           "label": "tTheme:slideshow.blocks.slide.settings.text_size.label",
@@ -184,26 +204,6 @@
           "id": "text_muted",
           "label": "tTheme:slideshow.blocks.slide.settings.text_muted.label",
           "default": false
-        },
-        {
-          "type": "link",
-          "id": "button_link",
-          "label": "tTheme:global.widgets.settings.link.label",
-          "default": {
-            "text": "Get Started",
-            "href": "#",
-            "target": "_self"
-          }
-        },
-        {
-          "type": "link",
-          "id": "button_link_2",
-          "label": "tTheme:slideshow.blocks.slide.settings.button_link_2.label"
-        },
-        {
-          "type": "header",
-          "id": "display_header",
-          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "select",

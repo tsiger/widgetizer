@@ -42,8 +42,8 @@
     },
     {
       "type": "header",
-      "id": "display_header",
-      "label": "tTheme:global.widgets.settings.display_header.label"
+      "id": "widget_header",
+      "label": "Widget"
     },
     {
       "type": "select",
@@ -108,6 +108,11 @@
       "type": "panel",
       "displayName": "tTheme:sliding_panels.blocks.panel.name",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
         {
           "type": "image",
           "id": "image",

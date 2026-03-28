@@ -270,6 +270,13 @@
             "none": "None"
           }
         },
+        "card_layout": {
+          "label": "Card layout",
+          "options": {
+            "box": "Box",
+            "flat": "Flat"
+          }
+        },
         "columns_desktop": {
           "label": "Desktop columns"
         },
@@ -1363,8 +1370,7 @@
     "settings": {
       "layout": {
         "options": {
-          "bar": "Horizontal Bar",
-          "cards": "Cards",
+          "grid": "Grid",
           "carousel": "Carousel"
         },
         "label": "Layout"

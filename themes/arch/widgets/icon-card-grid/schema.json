@@ -71,6 +71,73 @@
     },
     {
       "type": "select",
+      "id": "layout",
+      "label": "tTheme:global.widgets.settings.layout.label",
+      "default": "grid",
+      "options": [
+        {
+          "value": "grid",
+          "label": "tTheme:global.widgets.settings.layout.options.grid"
+        },
+        {
+          "value": "carousel",
+          "label": "tTheme:global.widgets.settings.layout.options.carousel"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
+      "default": 4,
+      "min": 2,
+      "max": 5,
+      "step": 1
+    },
+    {
+      "type": "header",
+      "id": "cards_header",
+      "label": "Cards"
+    },
+    {
+      "type": "select",
+      "id": "card_layout",
+      "label": "tTheme:global.widgets.settings.card_layout.label",
+      "default": "box",
+      "options": [
+        {
+          "value": "box",
+          "label": "tTheme:global.widgets.settings.card_layout.options.box"
+        },
+        {
+          "value": "flat",
+          "label": "tTheme:global.widgets.settings.card_layout.options.flat"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "start",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "icon_header",
+      "label": "Icon"
+    },
+    {
+      "type": "select",
       "id": "icon_style",
       "label": "tTheme:global.widgets.settings.icon_style.label",
       "default": "plain",
@@ -134,20 +201,9 @@
       ]
     },
     {
-      "type": "select",
-      "id": "alignment",
-      "label": "tTheme:global.widgets.settings.alignment.label",
-      "default": "start",
-      "options": [
-        {
-          "value": "start",
-          "label": "tTheme:global.widgets.settings.alignment.options.start"
-        },
-        {
-          "value": "center",
-          "label": "tTheme:global.widgets.settings.alignment.options.center"
-        }
-      ]
+      "type": "header",
+      "id": "widget_header",
+      "label": "Widget"
     },
     {
       "type": "select",
@@ -204,31 +260,6 @@
           "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
         }
       ]
-    },
-    {
-      "type": "select",
-      "id": "layout",
-      "label": "tTheme:global.widgets.settings.layout.label",
-      "default": "grid",
-      "options": [
-        {
-          "value": "grid",
-          "label": "tTheme:global.widgets.settings.layout.options.grid"
-        },
-        {
-          "value": "carousel",
-          "label": "tTheme:global.widgets.settings.layout.options.carousel"
-        }
-      ]
-    },
-    {
-      "type": "range",
-      "id": "columns_desktop",
-      "label": "tTheme:global.widgets.settings.columns_desktop.label",
-      "default": 4,
-      "min": 2,
-      "max": 5,
-      "step": 1
     }
   ],
   "blocks": [

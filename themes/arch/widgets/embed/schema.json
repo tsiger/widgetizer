@@ -42,6 +42,11 @@
       ]
     },
     {
+      "type": "header",
+      "id": "content_header",
+      "label": "tTheme:global.widgets.settings.content_header.label"
+    },
+    {
       "type": "code",
       "id": "code",
       "label": "tTheme:embed.settings.code.label",
@@ -95,6 +100,11 @@
           "label": "tTheme:global.widgets.settings.options.end"
         }
       ]
+    },
+    {
+      "type": "header",
+      "id": "widget_header",
+      "label": "Widget"
     },
     {
       "type": "select",

@@ -71,6 +71,32 @@
       "step": 1
     },
     {
+      "type": "header",
+      "id": "cards_header",
+      "label": "Cards"
+    },
+    {
+      "type": "select",
+      "id": "card_layout",
+      "label": "tTheme:global.widgets.settings.card_layout.label",
+      "default": "box",
+      "options": [
+        {
+          "value": "box",
+          "label": "tTheme:global.widgets.settings.card_layout.options.box"
+        },
+        {
+          "value": "flat",
+          "label": "tTheme:global.widgets.settings.card_layout.options.flat"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "widget_header",
+      "label": "Widget"
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "label": "tTheme:global.widgets.settings.color_scheme.label",

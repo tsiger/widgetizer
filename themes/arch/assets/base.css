@@ -365,11 +365,11 @@ img {
    -------------------------------------------------------------------------- */
 
 .spacing-compact {
-  --spacing-scale: 0.6;
+  --spacing-scale: 0.8;
 }
 
 .spacing-airy {
-  --spacing-scale: 1.5;
+  --spacing-scale: 1.2;
 }
 
 /* ==========================================================================
@@ -966,10 +966,6 @@ b {
   @media (min-width: 750px) {
     padding: calc(var(--space-xl) * var(--spacing-scale));
   }
-
-  @media (min-width: 990px) {
-    padding: calc(var(--space-2xl) * var(--spacing-scale));
-  }
 }
 
 /* Card variants */
@@ -977,6 +973,18 @@ b {
   background-color: var(--bg-secondary);
   border: none;
   box-shadow: none;
+}
+
+.widget.card-layout-flat .widget-card {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.widget.card-layout-flat .widget-card-image {
+  border-radius: 0;
 }
 
 /* Card Header */
@@ -1042,6 +1050,10 @@ b {
   margin: 0;
 }
 
+.widget.card-layout-flat .widget-card-grid.widget-grid {
+  --grid-gap: var(--space-2xl);
+}
+
 /* Icon Card Grid — Featured Image Split Layout */
 .icon-card-grid-split {
   display: grid;
@@ -1096,6 +1108,15 @@ b {
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+.widget.card-layout-flat .carousel-track {
+  gap: var(--space-xl);
+  padding-block: var(--space-md);
+}
+
+.widget.card-layout-flat .carousel-item {
+  flex: 0 0 calc(85% - var(--space-xl));
 }
 
 .carousel-item {
@@ -1168,6 +1189,10 @@ b {
   .carousel-item {
     flex: 0 0 calc(50% - var(--space-md) / 2);
   }
+
+  .widget.card-layout-flat .carousel-item {
+    flex: 0 0 calc(50% - var(--space-xl) / 2);
+  }
 }
 
 @media (min-width: 990px) {
@@ -1177,6 +1202,10 @@ b {
 
   .carousel-item {
     flex: 0 0 calc(100% / var(--carousel-cols, 4) - var(--space-lg) * (var(--carousel-cols, 4) - 1) / var(--carousel-cols, 4));
+  }
+
+  .widget.card-layout-flat .carousel-item {
+    flex: 0 0 calc(100% / var(--carousel-cols, 4) - var(--space-xl) * (var(--carousel-cols, 4) - 1) / var(--carousel-cols, 4));
   }
 
   .carousel-btn {

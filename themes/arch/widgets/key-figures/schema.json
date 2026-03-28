@@ -49,19 +49,15 @@
       "type": "select",
       "id": "layout",
       "label": "tTheme:key_figures.settings.layout.label",
-      "default": "cards",
+      "default": "grid",
       "options": [
         {
-          "value": "cards",
-          "label": "tTheme:key_figures.settings.layout.options.cards"
+          "value": "grid",
+          "label": "tTheme:key_figures.settings.layout.options.grid"
         },
         {
           "value": "carousel",
           "label": "tTheme:key_figures.settings.layout.options.carousel"
-        },
-        {
-          "value": "bar",
-          "label": "tTheme:key_figures.settings.layout.options.bar"
         }
       ]
     },
@@ -75,10 +71,36 @@
       "step": 1
     },
     {
+      "type": "header",
+      "id": "cards_header",
+      "label": "Cards"
+    },
+    {
+      "type": "select",
+      "id": "card_layout",
+      "label": "tTheme:global.widgets.settings.card_layout.label",
+      "default": "box",
+      "options": [
+        {
+          "value": "box",
+          "label": "tTheme:global.widgets.settings.card_layout.options.box"
+        },
+        {
+          "value": "flat",
+          "label": "tTheme:global.widgets.settings.card_layout.options.flat"
+        }
+      ]
+    },
+    {
       "type": "checkbox",
       "id": "animate",
       "label": "tTheme:key_figures.settings.animate.label",
       "default": true
+    },
+    {
+      "type": "header",
+      "id": "widget_header",
+      "label": "Widget"
     },
     {
       "type": "select",

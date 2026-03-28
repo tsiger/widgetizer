@@ -256,6 +256,13 @@
             "highlight_accent": "Highlight Accent"
           }
         },
+        "card_layout": {
+          "label": "Disposition des cartes",
+          "options": {
+            "box": "Boîte",
+            "flat": "À plat"
+          }
+        },
         "columns_desktop": {
           "label": "Colonnes bureau"
         },
@@ -1349,8 +1356,7 @@
     "settings": {
       "layout": {
         "options": {
-          "bar": "Barre horizontale",
-          "cards": "Cartes",
+          "grid": "Grille",
           "carousel": "Carrousel"
         },
         "label": "Disposition"

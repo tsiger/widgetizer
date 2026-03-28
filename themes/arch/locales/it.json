@@ -256,6 +256,13 @@
             "highlight_accent": "Highlight Accent"
           }
         },
+        "card_layout": {
+          "label": "Layout scheda",
+          "options": {
+            "box": "Box",
+            "flat": "Piatto"
+          }
+        },
         "columns_desktop": {
           "label": "Colonne desktop"
         },
@@ -1349,8 +1356,7 @@
     "settings": {
       "layout": {
         "options": {
-          "bar": "Barra orizzontale",
-          "cards": "Schede",
+          "grid": "Griglia",
           "carousel": "Carosello"
         },
         "label": "Layout"

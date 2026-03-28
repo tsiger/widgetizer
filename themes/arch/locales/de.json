@@ -256,6 +256,13 @@
             "highlight_accent": "Highlight Accent"
           }
         },
+        "card_layout": {
+          "label": "Kartenlayout",
+          "options": {
+            "box": "Box",
+            "flat": "Flach"
+          }
+        },
         "columns_desktop": {
           "label": "Desktop-Spalten"
         },
@@ -1349,8 +1356,7 @@
     "settings": {
       "layout": {
         "options": {
-          "bar": "Horizontale Leiste",
-          "cards": "Karten",
+          "grid": "Raster",
           "carousel": "Karussell"
         },
         "label": "Layout"

@@ -38,6 +38,11 @@
       "description": "tTheme:image.settings.fullwidth.description"
     },
     {
+      "type": "header",
+      "id": "widget_header",
+      "label": "Widget"
+    },
+    {
       "type": "select",
       "id": "top_spacing",
       "label": "tTheme:global.widgets.settings.top_spacing.label",

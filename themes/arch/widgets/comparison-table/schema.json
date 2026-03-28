@@ -53,8 +53,8 @@
     },
     {
       "type": "header",
-      "id": "display_header",
-      "label": "tTheme:global.widgets.settings.display_header.label"
+      "id": "widget_header",
+      "label": "Widget"
     },
     {
       "type": "select",
@@ -135,20 +135,20 @@
           "label": "tTheme:comparison_table.blocks.column.settings.badge.label"
         },
         {
+          "type": "link",
+          "id": "link",
+          "label": "tTheme:comparison_table.blocks.column.settings.link.label"
+        },
+        {
           "type": "header",
-          "id": "options_header",
-          "label": "tTheme:global.widgets.settings.options_header.label"
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
         },
         {
           "type": "checkbox",
           "id": "featured",
           "label": "tTheme:comparison_table.blocks.column.settings.featured.label",
           "default": false
-        },
-        {
-          "type": "link",
-          "id": "link",
-          "label": "tTheme:comparison_table.blocks.column.settings.link.label"
         }
       ]
     },

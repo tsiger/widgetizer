@@ -72,6 +72,27 @@
     },
     {
       "type": "select",
+      "id": "play_button_style",
+      "label": "tTheme:video_popup.settings.play_button_style.label",
+      "default": "light",
+      "options": [
+        {
+          "value": "light",
+          "label": "tTheme:video_popup.settings.play_button_style.options.light"
+        },
+        {
+          "value": "dark",
+          "label": "tTheme:video_popup.settings.play_button_style.options.dark"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "widget_header",
+      "label": "Widget"
+    },
+    {
+      "type": "select",
       "id": "top_spacing",
       "label": "tTheme:global.widgets.settings.top_spacing.label",
       "default": "auto",
@@ -99,22 +120,6 @@
         {
           "value": "none",
           "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
-        }
-      ]
-    },
-    {
-      "type": "select",
-      "id": "play_button_style",
-      "label": "tTheme:video_popup.settings.play_button_style.label",
-      "default": "light",
-      "options": [
-        {
-          "value": "light",
-          "label": "tTheme:video_popup.settings.play_button_style.options.light"
-        },
-        {
-          "value": "dark",
-          "label": "tTheme:video_popup.settings.play_button_style.options.dark"
         }
       ]
     }

@@ -48,8 +48,8 @@
     },
     {
       "type": "header",
-      "id": "display_header",
-      "label": "tTheme:global.widgets.settings.display_header.label"
+      "id": "widget_header",
+      "label": "Widget"
     },
     {
       "type": "select",
@@ -114,6 +114,11 @@
       "displayName": "tTheme:global.widgets.blocks.info.name",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
           "type": "text",
           "id": "title",
           "label": "tTheme:global.widgets.blocks.info.settings.title.label",
@@ -131,6 +136,11 @@
       "type": "text_block",
       "displayName": "tTheme:global.widgets.blocks.text_block.name",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
         {
           "type": "text",
           "id": "title",
@@ -150,6 +160,11 @@
       "displayName": "tTheme:global.widgets.blocks.menu_block.name",
       "settings": [
         {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
           "type": "text",
           "id": "title",
           "label": "tTheme:global.widgets.blocks.menu_block.settings.title.label",
@@ -168,6 +183,11 @@
       "type": "social_block",
       "displayName": "tTheme:global.widgets.blocks.social_block.name",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
         {
           "type": "text",
           "id": "title",

@@ -43,8 +43,8 @@
     },
     {
       "type": "header",
-      "id": "display_header",
-      "label": "tTheme:global.widgets.settings.display_header.label"
+      "id": "widget_header",
+      "label": "Widget"
     },
     {
       "type": "select",
@@ -109,6 +109,11 @@
       "type": "step",
       "displayName": "tTheme:steps.blocks.step.name",
       "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
         {
           "type": "image",
           "id": "image",
