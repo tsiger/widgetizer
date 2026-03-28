@@ -772,6 +772,18 @@ b {
   padding-block: calc(var(--section-padding-block) * var(--spacing-scale));
 }
 
+/* Per-widget spacing overrides
+   (Descendant selector: many widgets inject a <style> before .widget-container, so it is not a direct child of the section.) */
+.widget.spacing-top-none .widget-container {
+  margin-block-start: 0;
+  padding-block-start: 0;
+}
+
+.widget.spacing-bottom-none .widget-container {
+  margin-block-end: 0;
+  padding-block-end: 0;
+}
+
 /* --------------------------------------------------------------------------
    6.2 Widget Header & Content
    -------------------------------------------------------------------------- */

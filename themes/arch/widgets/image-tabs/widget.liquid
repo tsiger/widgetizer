@@ -1,6 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-image-tabs widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}"
+  class="widget widget-image-tabs widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.image_position == 'right' %}layout-image-right{% endif %}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
   {% unless widget.settings.color_scheme == 'standard' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endunless %}

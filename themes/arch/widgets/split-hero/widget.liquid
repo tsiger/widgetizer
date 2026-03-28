@@ -1,6 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-split-hero widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% unless widget.settings.color_scheme == 'standard' %} has-highlight-background{% endunless %}{% if widget.settings.image_position == 'right' %} layout-image-right{% endif %}"
+  class="widget widget-split-hero widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% unless widget.settings.color_scheme == 'standard' %} has-highlight-background{% endunless %}{% if widget.settings.image_position == 'right' %} layout-image-right{% endif %}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="split-hero"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}

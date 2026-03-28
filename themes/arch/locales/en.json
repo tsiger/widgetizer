@@ -264,6 +264,20 @@
             "highlight_accent": "Highlight Accent"
           }
         },
+        "top_spacing": {
+          "label": "Top spacing",
+          "options": {
+            "auto": "Auto",
+            "none": "None"
+          }
+        },
+        "bottom_spacing": {
+          "label": "Bottom spacing",
+          "options": {
+            "auto": "Auto",
+            "none": "None"
+          }
+        },
         "columns_desktop": {
           "label": "Desktop columns"
         },

@@ -12,7 +12,7 @@
 
 <section
   id="{{ widget.id }}"
-  class="widget widget-scrolling-text widget-{{ widget.id }}"
+  class="widget widget-scrolling-text widget-{{ widget.id }}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
   style="--strip-bg: {{ strip_bg }}; --strip-color: {{ strip_color }}; --strip-rotate: {{ strip_rotate }}deg; --scroll-duration: {{ scroll_duration }}s; --strip-font-size: {{ font_size_val }};"
   data-widget-id="{{ widget.id }}"
   data-widget-type="scrolling-text"
@@ -32,6 +32,14 @@
       & .scrolling-wrapper {
         overflow: hidden;
         padding-block: 6rem;
+      }
+
+      &.spacing-top-none .scrolling-wrapper {
+        padding-block-start: 0;
+      }
+
+      &.spacing-bottom-none .scrolling-wrapper {
+        padding-block-end: 0;
       }
 
       & .scrolling-strip {
