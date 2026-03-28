@@ -1479,7 +1479,10 @@ When exporting a project to static HTML:
 
 - **Theme Assets**: All files from `/assets/` are copied to the output directory
 - **Widget Assets**: All `.css` and `.js` files found in the `/widgets/` directory are **flattened** into the output `/assets/` directory
-- **Uploaded Images**: All images from `/uploads/images/` are copied to maintain relative paths
+- **Used Images Only**: Only tracked images in active use are copied during normal export
+- **Image Variants**: Public generated variants are copied into `assets/images/`, but `thumb` variants are skipped because they are only used by the media library UI
+- **Original Raster Files**: The original image is copied only when no public `large` variant exists; if `large` exists, it becomes the public delivery ceiling
+- **SVG Originals**: SVG files are always copied as-is
 - **Path Optimization**: Asset paths are converted to relative URLs for optimal static hosting
 
 > [!WARNING] Because widget assets are flattened during export, files with the same name from different widgets will collide. Always use unique, widget-prefixed filenames (e.g., `slideshow.css` instead of `styles.css`).
@@ -1508,7 +1511,12 @@ Each locale file (e.g., `locales/en.json`) is a nested JSON object. The dot-sepa
       "title": { "label": "Title" },
       "color_scheme": {
         "label": "Color Scheme",
-        "options": { "standard": "Standard", "highlight": "Highlight" }
+        "options": {
+          "standard": "Standard",
+          "standard_accent": "Standard Accent",
+          "highlight": "Highlight",
+          "highlight_accent": "Highlight Accent"
+        }
       }
     },
     "blocks": {

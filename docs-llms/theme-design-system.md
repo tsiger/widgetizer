@@ -247,9 +247,16 @@ Default values for widget background control (overridden inline per-widget):
 
 ## Color System
 
-### Two Color Schemes
+### Four Color Schemes
 
-The Arch theme ships with two color schemes: **Standard** (light) and **Highlight** (dark/emphasis). These are activated by CSS classes that remap the shorthand color tokens to point at different source variables.
+The Arch theme ships with four color schemes:
+
+- **Standard**: default light surface
+- **Standard Accent**: light alternate surface using the standard palette
+- **Highlight**: default dark/emphasis surface
+- **Highlight Accent**: dark alternate surface using the highlight palette
+
+These are activated by CSS classes that remap the shorthand color tokens to point at different source variables.
 
 #### Standard Color Scheme (`.color-scheme-standard`)
 
@@ -287,6 +294,22 @@ Remaps all shorthand tokens to `--colors-highlight_*` variables:
 }
 ```
 
+#### Accent Variants
+
+The accent variants keep the same text/border/accent palette as their parent scheme but swap `--bg-primary` and `--bg-secondary` so widgets can get a filled alternate surface without introducing a second palette:
+
+```css
+.color-scheme-standard-accent {
+  --bg-primary: var(--colors-standard_bg_secondary, #f1f5f9);
+  --bg-secondary: var(--colors-standard_bg_primary, #ffffff);
+}
+
+.color-scheme-highlight-accent {
+  --bg-primary: var(--colors-highlight_bg_secondary, #152a3e);
+  --bg-secondary: var(--colors-highlight_bg_primary, #233c54);
+}
+```
+
 #### How Color Schemes Work
 
 Every widget applies a color scheme class on its root element. All child elements use the shorthand tokens (`--text-content`, `--bg-primary`, etc.) which resolve to different values depending on which scheme class is active:
@@ -297,12 +320,12 @@ Every widget applies a color scheme class on its root element. All child element
 </section>
 ```
 
-When a widget uses the `highlight` scheme, it also sets its background:
+When a widget uses any non-`standard` scheme, it also sets its background:
 
 ```liquid
-{% if widget.settings.color_scheme == 'highlight' %}
+{% unless widget.settings.color_scheme == 'standard' %}
   style="--widget-bg-color: var(--bg-primary);"
-{% endif %}
+{% endunless %}
 ```
 
 #### Default Color Palette (theme.json)

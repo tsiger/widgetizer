@@ -302,10 +302,17 @@ When `srcset: true` is set, the tag generates a `srcset` attribute containing al
 Output:
 
 ```html
-<img src="medium_hero.jpg" srcset="small_hero.jpg 480w, medium_hero.jpg 1024w, large_hero.jpg 1920w" sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" alt="">
+<img src="hero-medium.jpg" srcset="hero-small.jpg 480w, hero-medium.jpg 1024w, hero-large.jpg 1920w" sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" alt="">
 ```
 
-SVG images are never given srcset since they scale at any size. The tag automatically deduplicates sizes and only includes variants smaller than or equal to the original image.
+SVG images are never given `srcset` since they scale at any size. For raster images, the tag:
+
+- Skips the `thumb` variant
+- Deduplicates widths automatically
+- Includes the original image only when no public `large` variant exists
+- Omits `srcset` entirely when there are fewer than 2 useful candidates
+
+Always pair `srcset: true` with a realistic `sizes` string. `sizes` should describe the image's rendered slot width in the layout, not the image's intrinsic dimensions.
 
 `{% youtube %}`
 
@@ -322,6 +329,13 @@ Renders a responsive YouTube embed or returns the embed URL.
 
 # Export Behavior
 
-During export, widget `.css` and `.js` files are flattened into a single `assets/` folder. If two widgets have files with the same name, the last one wins.
+During export:
+
+- Theme assets are copied into `assets/`
+- Widget `.css` and `.js` files are flattened into a single `assets/` folder
+- Only media files that are actually used are copied
+- For images, public generated variants are copied into `assets/images/`
+- `thumb` variants are skipped
+- Raster originals are copied only when no public `large` variant exists
 
 > **Warning:** Always use unique, widget-prefixed filenames (e.g., `slideshow.css` instead of `styles.css`) to avoid collisions.

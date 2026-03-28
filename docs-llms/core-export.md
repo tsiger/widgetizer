@@ -135,10 +135,15 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
       - **Theme Assets**: All files from the project's `/assets` directory (e.g., `base.css`, `scripts.js`) are copied to `/assets` in the output directory.
       - **Core Assets**: Placeholder images (SVG) from the core assets are copied to ensure widgets using placeholders work correctly.
       - **Widget Assets**: The controller recursively searches the project's `/widgets` directory for any `.css` or `.js` files and copies them into the output `/assets` directory.
+        - Widget asset filenames are flattened, so name collisions are possible during export
+        - If two widgets ship the same filename, the later copy wins and overwrites the earlier file
+        - Theme authors should use unique, widget-prefixed filenames such as `slideshow.css` or `comparison-slider.js`
       - **Optimized Image Copying**: Uses media usage tracking to selectively copy only images that are actually used:
         - Reads project media metadata from SQLite (via `readMediaFile` from `mediaService.js`) to identify images with non-empty `usedIn`
-        - Only copies images that are referenced in at least one page
-        - For each used image, copies the original file plus all generated sizes (small, medium, large) — `thumb` variants are excluded since they are only used for the media library UI
+        - Only copies images that are referenced somewhere in tracked content (`usedIn` is non-empty)
+        - For each used image, copies all generated public sizes except `thumb`
+        - Raster originals are copied only when no public `large` variant exists
+        - SVG originals are always copied as-is
         - Images are copied to `assets/images/` (not `uploads/images/`)
         - Falls back to copying all images if media tracking fails
       - **Export Optimization**: Logs how many images were copied vs. skipped, often reducing export size significantly

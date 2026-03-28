@@ -229,6 +229,77 @@ Use `widget.settings.{id}` to access values:
 </section>
 ```
 
+## Common Display Controls
+
+Many Arch widgets now use the same display-control pattern:
+
+- `color_scheme` on the root `<section>`
+- `top_spacing` / `bottom_spacing` as per-widget spacing overrides
+- `.widget-container` as the element that receives the shared spacing rules
+
+Example schema:
+
+```json
+[
+  {
+    "type": "select",
+    "id": "color_scheme",
+    "label": "tTheme:global.widgets.settings.color_scheme.label",
+    "default": "standard",
+    "options": [
+      { "value": "standard", "label": "tTheme:global.widgets.settings.color_scheme.options.standard" },
+      { "value": "standard-accent", "label": "tTheme:global.widgets.settings.color_scheme.options.standard_accent" },
+      { "value": "highlight", "label": "tTheme:global.widgets.settings.color_scheme.options.highlight" },
+      { "value": "highlight-accent", "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_accent" }
+    ]
+  },
+  {
+    "type": "select",
+    "id": "top_spacing",
+    "label": "tTheme:global.widgets.settings.top_spacing.label",
+    "default": "auto",
+    "options": [
+      { "value": "auto", "label": "tTheme:global.widgets.settings.top_spacing.options.auto" },
+      { "value": "none", "label": "tTheme:global.widgets.settings.top_spacing.options.none" }
+    ]
+  },
+  {
+    "type": "select",
+    "id": "bottom_spacing",
+    "label": "tTheme:global.widgets.settings.bottom_spacing.label",
+    "default": "auto",
+    "options": [
+      { "value": "auto", "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto" },
+      { "value": "none", "label": "tTheme:global.widgets.settings.bottom_spacing.options.none" }
+    ]
+  }
+]
+```
+
+Example template:
+
+```liquid
+<section
+  id="{{ widget.id }}"
+  class="widget widget-testimonial widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
+  {% unless widget.settings.color_scheme == 'standard' %}style="--widget-bg-color: var(--bg-primary);"{% endunless %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="testimonial"
+>
+  <style>
+    .widget-{{ widget.id }} {
+      /* widget-specific styles */
+    }
+  </style>
+
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard' %}widget-container-padded{% endunless %}">
+    <!-- widget content -->
+  </div>
+</section>
+```
+
+The shared spacing rules target descendants (`.widget.spacing-top-none .widget-container`) rather than direct children, so they still work when a widget injects a `<style>` block before the container.
+
 ## Rendering Blocks
 
 Loop through `widget.blocksOrder` and look up each block in `widget.blocks`:

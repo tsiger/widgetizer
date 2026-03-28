@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Responsive image delivery now treats the `large` variant as the public ceiling when available, while still falling back to the original when no `large` variant exists
+- Export documentation now reflects usage-aware media copying, `thumb` exclusion, and flattened widget asset behavior
+- Arch theme documentation now covers the new `standard-accent` and `highlight-accent` color schemes
+- Arch widget documentation now covers per-widget `top_spacing` / `bottom_spacing` controls and the shared spacing override classes
+
 ## [0.9.7] - 2026-03-26
 
 ### Added

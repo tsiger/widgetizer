@@ -49,6 +49,8 @@ Widgetizer is smart about which sizes to create:
 
 - If your original image is 800px wide, it won't create a "large" size (1920px would just be a stretched copy)
 - Only sizes that are **smaller** than your original are generated
+- When a public `large` variant exists, that variant becomes the largest browser-delivered image and the original file stays internal
+- If no `large` variant exists, the original file can still be used as the top delivery asset
 - This saves storage space and keeps your project lean
 
 ### Configuring Image Processing
@@ -185,12 +187,12 @@ When you upload a file, Widgetizer:
 
 Files are stored in your project directory at `/data/projects/your-project/uploads/images/`.
 
-Generated image sizes are stored with prefixes:
+Generated image sizes are stored with `-{size}` suffixes:
 
-- `thumb_my-image.jpg`
-- `small_my-image.jpg`
-- `medium_my-image.jpg`
-- `large_my-image.jpg`
+- `my-image-thumb.jpg`
+- `my-image-small.jpg`
+- `my-image-medium.jpg`
+- `my-image-large.jpg`
 
 # Tips & Best Practices
 

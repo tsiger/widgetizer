@@ -506,16 +506,25 @@ Or set the desktop column count directly:
 
 ### Color Scheme Classes
 
-Widgets support two color schemes defined in theme settings:
+Arch widgets support four color schemes defined in theme settings:
 
 ```liquid
-<!-- Light color scheme (default) -->
-<section class="widget color-scheme-light">
+<!-- Default light scheme -->
+<section class="widget color-scheme-standard">
   <!-- Content -->
 </section>
 
-<!-- Dark color scheme -->
-<section class="widget color-scheme-dark">
+<!-- Default dark/emphasis scheme -->
+<section class="widget color-scheme-highlight">
+  <!-- Content -->
+</section>
+
+<!-- Accent variants swap the background pair -->
+<section class="widget color-scheme-standard-accent">
+  <!-- Content -->
+</section>
+
+<section class="widget color-scheme-highlight-accent">
   <!-- Content -->
 </section>
 ```
@@ -529,10 +538,12 @@ Add a color scheme setting to your widget schema:
   "type": "select",
   "id": "color_scheme",
   "label": "tTheme:my_widget.settings.color_scheme.label",
-  "default": "light",
+  "default": "standard",
   "options": [
-    { "value": "light", "label": "tTheme:my_widget.settings.color_scheme.options.light" },
-    { "value": "dark", "label": "tTheme:my_widget.settings.color_scheme.options.dark" }
+    { "value": "standard", "label": "tTheme:my_widget.settings.color_scheme.options.standard" },
+    { "value": "standard-accent", "label": "tTheme:my_widget.settings.color_scheme.options.standard_accent" },
+    { "value": "highlight", "label": "tTheme:my_widget.settings.color_scheme.options.highlight" },
+    { "value": "highlight-accent", "label": "tTheme:my_widget.settings.color_scheme.options.highlight_accent" }
   ]
 }
 ```
@@ -542,11 +553,11 @@ Add a color scheme setting to your widget schema:
 ```liquid
 <section
   class="widget widget-{name} widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
-  {% if widget.settings.color_scheme == 'dark' %}
+  {% unless widget.settings.color_scheme == 'standard' %}
     style="--widget-bg-color: var(--bg-primary);"
-  {% endif %}
+  {% endunless %}
 >
-  <div class="widget-container {% if widget.settings.color_scheme == 'dark' %}widget-container-padded{% endif %}">
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard' %}widget-container-padded{% endunless %}">
     <!-- Content -->
   </div>
 </section>
@@ -555,9 +566,48 @@ Add a color scheme setting to your widget schema:
 **How it works:**
 
 1. `color-scheme-{{ widget.settings.color_scheme }}` adds the appropriate class
-2. Dark scheme automatically sets dark background via inline style
-3. `widget-container-padded` adds padding for dark scheme widgets
+2. Non-`standard` schemes automatically set the widget background via inline style
+3. `widget-container-padded` adds padding for widgets with a filled background
 4. All text, borders, and accent colors automatically switch based on scheme
+
+### Per-Widget Spacing Overrides
+
+Many Arch widgets also expose `top_spacing` and `bottom_spacing` settings so authors can suppress section spacing without creating widget-specific CSS.
+
+Schema pattern:
+
+```json
+{
+  "type": "select",
+  "id": "top_spacing",
+  "label": "tTheme:global.widgets.settings.top_spacing.label",
+  "default": "auto",
+  "options": [
+    { "value": "auto", "label": "tTheme:global.widgets.settings.top_spacing.options.auto" },
+    { "value": "none", "label": "tTheme:global.widgets.settings.top_spacing.options.none" }
+  ]
+}
+```
+
+Template pattern:
+
+```liquid
+<section
+  class="widget widget-{name} widget-{{ widget.id }}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
+>
+  <style>
+    .widget-{{ widget.id }} {
+      /* widget-specific styles */
+    }
+  </style>
+
+  <div class="widget-container">
+    <!-- Content -->
+  </div>
+</section>
+```
+
+Global rules in `base.css` target descendants (`.widget.spacing-top-none .widget-container`) rather than direct children, which keeps spacing overrides working even when a widget injects a `<style>` block before `.widget-container`.
 
 ### Background System
 

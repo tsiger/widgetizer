@@ -33,15 +33,20 @@ The export includes all assets your site needs:
 | :------------ | :--------------------------------------------------- | :-------------------------------------- |
 | `assets/`     | `assets/`                                            | Theme CSS, JS, icons                    |
 | `widgets/*/`  | `assets/`                                            | Widget CSS and JS files (flattened)     |
-| Media library | `assets/images/`, `assets/videos/`, `assets/audios/` | Only media files actually used on pages |
+| Media library | `assets/images/`, `assets/videos/`, `assets/audios/` | Only media files actually in use        |
 | Core assets   | `assets/`                                            | Placeholder images                      |
+
+> **Note:** Widget `.css` and `.js` files are flattened into a single `assets/` folder during export. Use unique, widget-prefixed filenames like `slideshow.css` or `testimonial-slider.js` to avoid collisions.
 
 ### Optimized Media
 
 Widgetizer tracks which media files are actually used on your pages (see [Media Library](media.html)). During export:
 
 - Only images, videos, and audio files referenced in your content are copied
-- For images, all size variants (thumb, small, medium, large) are included
+- For images, public generated variants are copied to `assets/images/`
+- `thumb` variants are skipped because they are only used by the media library UI
+- Raster originals are copied only when no public `large` variant exists
+- SVG originals are always copied as-is
 - Unused media is skipped, reducing export size
 
 ### Optional Markdown Files

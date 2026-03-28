@@ -6,6 +6,15 @@ description: Release notes and version history for Widgetizer. See what's new in
 
 All notable changes to Widgetizer are documented here.
 
+## Unreleased
+
+### Changed
+
+- **Responsive image delivery refined** — `srcset` and export behavior now treat the `large` variant as the public delivery ceiling when it exists, while still falling back to the original when no `large` variant is available
+- **Export media handling clarified** — docs now reflect that exports copy only used media, skip `thumb` image variants, and flatten widget assets into a shared `assets/` folder
+- **Arch color schemes expanded** — widget docs now cover `standard-accent` and `highlight-accent` in addition to the existing `standard` and `highlight` options
+- **Per-widget spacing controls** — Arch widget documentation now covers the new `top_spacing` / `bottom_spacing` options and the shared `spacing-top-none` / `spacing-bottom-none` class behavior
+
 ## 0.9.7 - 2026-03-26
 
 ### New Widgets
