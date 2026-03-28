@@ -227,11 +227,11 @@ img {
      -------------------------------------------------------------------------- */
 
   @media (min-width: 750px) {
-    --section-padding-block: var(--space-5xl);
+    --section-padding-block: var(--space-4xl);
   }
 
   @media (min-width: 990px) {
-    --section-padding-block: var(--space-6xl);
+    --section-padding-block: var(--space-5xl);
   }
 
   /* --------------------------------------------------------------------------
@@ -373,11 +373,11 @@ img {
    -------------------------------------------------------------------------- */
 
 .spacing-compact {
-  --spacing-scale: 0.8;
+  --spacing-scale: 0.6;
 }
 
 .spacing-airy {
-  --spacing-scale: 1.25;
+  --spacing-scale: 1.5;
 }
 
 /* ==========================================================================
