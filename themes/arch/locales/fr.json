@@ -121,14 +121,6 @@
             "rounded": "Arrondi"
           }
         },
-        "card_style": {
-          "label": "Boîtes de contenu",
-          "description": "Comment les blocs de contenu sont visuellement séparés",
-          "options": {
-            "bordered": "Avec bordure",
-            "flat": "Plat"
-          }
-        },
         "spacing_density": {
           "label": "Densité de mise en page",
           "description": "Contrôle l'espace blanc entre les sections et les éléments",

@@ -1025,11 +1025,11 @@ For displaying lists of features or benefits:
 
 ## Style Classes (Body Class Pattern)
 
-The Arch theme uses **body classes** to implement global style settings that affect shapes, card appearance, spacing density, heading treatment, and button shape. These classes are applied to `<body>` in `layout.liquid` based on theme settings from the `style` category in `theme.json`.
+The Arch theme uses **body classes** to implement global style settings that affect shapes, spacing density, heading treatment, and button shape. These classes are applied to `<body>` in `layout.liquid` based on theme settings from the `style` category in `theme.json`.
 
 ### How It Works
 
-1. **`theme.json`** defines select settings in the `style` category (e.g., `corner_style`, `card_style`, `spacing_density`)
+1. **`theme.json`** defines select settings in the `style` category (e.g., `corner_style`, `spacing_density`)
 2. **`layout.liquid`** renders body classes from setting values: `corner-{{ theme.style.corner_style | default: 'sharp' }}`
 3. **`base.css`** defines class-based rulesets that override the default `:root` tokens
 4. **Live preview**: The `UPDATE_STYLE_CLASSES` message swaps body classes without a full page reload (see [Page Editor docs](core-page-editor.md))
@@ -1039,7 +1039,6 @@ The Arch theme uses **body classes** to implement global style settings that aff
 | Setting ID (`theme.json`) | Body Class Prefix | Default Value | Options |
 | --- | --- | --- | --- |
 | `corner_style` | `corner-` | `sharp` | `sharp`, `slightly-rounded`, `rounded` |
-| `card_style` | `cards-` | `bordered` | `bordered`, `shadow`, `flat` |
 | `spacing_density` | `spacing-` | `default` | `compact`, `default`, `airy` |
 | `button_shape` | `buttons-` | `auto` | `auto`, `pill`, `sharp` |
 
@@ -1052,14 +1051,6 @@ The Arch theme uses **body classes** to implement global style settings that aff
 | `corner-sharp` (default) | All radii `0` — square corners everywhere |
 | `corner-slightly-rounded` | `--radius-sm: 0.4rem`, `--radius-md: 0.6rem`, `--radius-lg: 0.8rem`, `--radius-button: 0.4rem` |
 | `corner-rounded` | `--radius-sm: 0.6rem`, `--radius-md: 1.2rem`, `--radius-lg: 1.6rem`, `--radius-button: 0.8rem` |
-
-#### Content Boxes (`cards-*`)
-
-| Class | Effect |
-| --- | --- |
-| `cards-bordered` (default) | `--card-border` with standard border, `--card-shadow: none` |
-| `cards-shadow` | `--card-border: none`, `--card-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)` |
-| `cards-flat` | `--card-border: none`, `--card-shadow: none` (uses `--bg-secondary` background) |
 
 #### Layout Density (`spacing-*`)
 

@@ -121,14 +121,6 @@
             "rounded": "Redondeado"
           }
         },
-        "card_style": {
-          "label": "Cajas de contenido",
-          "description": "Cómo se separan visualmente los bloques de contenido",
-          "options": {
-            "bordered": "Con borde",
-            "flat": "Plano"
-          }
-        },
         "spacing_density": {
           "label": "Densidad del diseño",
           "description": "Controla la cantidad de espacio en blanco entre secciones y elementos",

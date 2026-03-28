@@ -121,14 +121,6 @@
             "rounded": "Rounded"
           }
         },
-        "card_style": {
-          "label": "Content boxes",
-          "description": "How content sections are visually separated",
-          "options": {
-            "bordered": "Bordered",
-            "flat": "Flat"
-          }
-        },
         "spacing_density": {
           "label": "Layout density",
           "description": "Controls the amount of whitespace between sections and elements",

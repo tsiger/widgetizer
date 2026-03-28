@@ -362,12 +362,11 @@ function updateThemeSettings(iframe, settings) {
  * Extract style settings that map to body classes.
  * Maps setting IDs to their class prefix and current value.
  * @param {Object} settings - Theme settings object
- * @returns {Object<string, string>} Map of class prefix to value, e.g. { "corner": "rounded", "cards": "shadow" }
+ * @returns {Object<string, string>} Map of class prefix to value, e.g. { "corner": "rounded", "spacing": "airy" }
  */
 function extractStyleClasses(settings) {
   const classMap = {
     corner_style: "corner",
-    card_style: "cards",
     spacing_density: "spacing",
     button_shape: "buttons",
   };

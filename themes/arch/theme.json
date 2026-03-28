@@ -246,23 +246,6 @@
         },
         {
           "type": "select",
-          "id": "card_style",
-          "label": "tTheme:global.style.settings.card_style.label",
-          "description": "tTheme:global.style.settings.card_style.description",
-          "default": "bordered",
-          "options": [
-            {
-              "value": "bordered",
-              "label": "tTheme:global.style.settings.card_style.options.bordered"
-            },
-            {
-              "value": "flat",
-              "label": "tTheme:global.style.settings.card_style.options.flat"
-            }
-          ]
-        },
-        {
-          "type": "select",
           "id": "spacing_density",
           "label": "tTheme:global.style.settings.spacing_density.label",
           "description": "tTheme:global.style.settings.spacing_density.description",

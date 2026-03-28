@@ -121,14 +121,6 @@
             "rounded": "Abgerundet"
           }
         },
-        "card_style": {
-          "label": "Inhaltsboxen",
-          "description": "Wie Inhaltsblöcke visuell getrennt werden",
-          "options": {
-            "bordered": "Mit Rahmen",
-            "flat": "Flach"
-          }
-        },
         "spacing_density": {
           "label": "Layoutdichte",
           "description": "Steuert den Leerraum zwischen Abschnitten und Elementen",

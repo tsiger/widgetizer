@@ -285,7 +285,6 @@ Some global settings don't output CSS variables — instead they add **classes t
 | Setting ID | Body class pattern | Options |
 |---|---|---|
 | `corner_style` | `corner-{value}` | `sharp`, `slightly-rounded`, `rounded` |
-| `card_style` | `cards-{value}` | `bordered`, `shadow`, `flat` |
 | `spacing_density` | `spacing-{value}` | `compact`, `default`, `airy` |
 | `button_shape` | `buttons-{value}` | `auto`, `pill`, `sharp` |
 
@@ -314,7 +313,7 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
     {% custom_head_scripts %}   <!-- Custom scripts for head (e.g., Google Analytics) (optional) -->
     {% header_assets %}         <!-- Render enqueued header styles and scripts (sorted by priority) -->
 </head>
-<body class="{{ body_class }} corner-{{ theme.style.corner_style | default: 'sharp' }} cards-{{ theme.style.card_style | default: 'bordered' }} spacing-{{ theme.style.spacing_density | default: 'default' }} buttons-{{ theme.style.button_shape | default: 'auto' }}">
+<body class="{{ body_class }} corner-{{ theme.style.corner_style | default: 'sharp' }} spacing-{{ theme.style.spacing_density | default: 'default' }} buttons-{{ theme.style.button_shape | default: 'auto' }}">
     {{ header | raw }}          <!-- Global header widget -->
 
     <main id="main-content">

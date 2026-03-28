@@ -21,7 +21,7 @@
     {% custom_head_scripts %}
     {% header_assets %}
   </head>
-  <body class="{{ body_class }} corner-{{ theme.style.corner_style | default: 'sharp' }} cards-{{ theme.style.card_style | default: 'bordered' }} spacing-{{ theme.style.spacing_density | default: 'default' }} buttons-{{ theme.style.button_shape | default: 'auto' }}">
+  <body class="{{ body_class }} corner-{{ theme.style.corner_style | default: 'sharp' }} spacing-{{ theme.style.spacing_density | default: 'default' }} buttons-{{ theme.style.button_shape | default: 'auto' }}">
     <a href="#main-content" class="visually-hidden skip-link">Skip to main content</a>
     {{ header | raw }}
     <main id="main-content" class="main-content">
