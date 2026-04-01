@@ -1,11 +1,15 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { X, Search, Upload } from "lucide-react";
-import { API_URL, MEDIA_TYPES } from "../../config";
+import { X, Search } from "lucide-react";
+import { API_URL } from "../../config";
 import { getProjectMedia } from "../../queries/mediaManager";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import FileUploader from "../ui/FileUploader";
 import useMediaUpload from "../../hooks/useMediaUpload";
+import useAppSettings from "../../hooks/useAppSettings";
 import useToastStore from "../../stores/toastStore";
+import { showRejectedFiles } from "../../utils/uploadFeedback";
+import { IMAGE_ACCEPT, mapDropzoneRejections } from "../../utils/uploadValidation";
 
 export default function MediaSelectorDrawer({ visible, onClose, onSelect, activeProject, filterType = "all" }) {
   const { t } = useTranslation();
@@ -13,22 +17,15 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const showToast = useToastStore((state) => state.showToast);
-  const fileInputRef = useRef(null);
+  const { settings } = useAppSettings();
+  const maxSizeMB = settings?.media?.maxFileSizeMB ?? 5;
 
   // Initialize media upload hook
-  const { uploading, handleUpload } = useMediaUpload({
+  const { uploading, uploadProgress, handleUpload } = useMediaUpload({
     activeProject,
     showToast,
     setFiles: setMediaFiles,
   });
-
-  const handleFileInputChange = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      handleUpload(Array.from(e.target.files));
-      // Reset the input so the same file can be selected again if needed
-      e.target.value = "";
-    }
-  };
 
   const loadMediaFiles = useCallback(async () => {
     if (!activeProject) return;
@@ -97,6 +94,10 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
     };
   }, [visible, onClose]);
 
+  const handleUploaderReject = (fileRejections) => {
+    showRejectedFiles(showToast, mapDropzoneRejections(fileRejections));
+  };
+
   if (!visible) return null;
 
   return (
@@ -123,35 +124,28 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
         </div>
 
         <div className="p-4 border-b border-slate-200">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={t("components.mediaSelector.searchPlaceholder")}
-                className="form-input pl-10"
-              />
-              <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
-            </div>
+          <div className="relative">
             <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              multiple
-              accept={MEDIA_TYPES.image.join(",")}
-              onChange={handleFileInputChange}
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={t("components.mediaSelector.searchPlaceholder")}
+              className="form-input pl-10"
             />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="flex items-center gap-2 px-3 py-2 rounded-md border bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Upload size={16} />
-              <span className="text-sm font-medium">
-                {uploading ? t("components.fileUploader.uploading") : t("components.mediaSelector.upload")}
-              </span>
-            </button>
+            <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
+          </div>
+          <div className="mt-3">
+            <FileUploader
+              onUpload={handleUpload}
+              onReject={handleUploaderReject}
+              uploading={uploading}
+              uploadProgress={uploadProgress}
+              accept={IMAGE_ACCEPT}
+              multiple={true}
+              maxSize={maxSizeMB * 1024 * 1024}
+              title={t("components.mediaSelector.upload")}
+              maxSizeText={`${t("components.mediaUploader.supportedImages")} - ${maxSizeMB}MB max`}
+            />
           </div>
         </div>
 

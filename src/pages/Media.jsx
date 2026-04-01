@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Image } from "lucide-react";
-import { MEDIA_TYPES, API_URL } from "../config";
+import { API_URL } from "../config";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -17,11 +17,16 @@ import useMediaState from "../hooks/useMediaState";
 import useMediaUpload from "../hooks/useMediaUpload";
 import useMediaSelection from "../hooks/useMediaSelection";
 import useMediaMetadata from "../hooks/useMediaMetadata";
+import useAppSettings from "../hooks/useAppSettings";
+import { showRejectedFiles } from "../utils/uploadFeedback";
+import { IMAGE_ACCEPT, mapDropzoneRejections } from "../utils/uploadValidation";
 
 export default function Media() {
   const { t } = useTranslation();
+  const { settings } = useAppSettings();
   // Use our custom hooks to manage different aspects of media functionality
   const mediaState = useMediaState();
+  const maxSizeMB = settings?.media?.maxFileSizeMB ?? 5;
 
   // Lightbox state
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -76,6 +81,10 @@ export default function Media() {
     setLightboxImageIndex(-1);
   };
 
+  const handleUploaderReject = (fileRejections) => {
+    showRejectedFiles(mediaState.showToast, mapDropzoneRejections(fileRejections));
+  };
+
   // Get current lightbox image
   const currentLightboxImage = lightboxImageIndex >= 0 ? imageFiles[lightboxImageIndex] : null;
   const lightboxImageUrl = currentLightboxImage
@@ -95,15 +104,15 @@ export default function Media() {
     <PageLayout title={t("media.title")}>
       <FileUploader
         onUpload={mediaUpload.handleUpload}
+        onReject={handleUploaderReject}
         uploading={mediaUpload.uploading}
         uploadProgress={mediaUpload.uploadProgress}
-        accept={{
-          "image/*": MEDIA_TYPES.image,
-        }}
+        accept={IMAGE_ACCEPT}
         multiple={true}
+        maxSize={maxSizeMB * 1024 * 1024}
         title={t("media.uploader.title")}
         description={t("media.uploader.description")}
-        maxSizeText={t("components.mediaUploader.supportedImages")}
+        maxSizeText={`${t("components.mediaUploader.supportedImages")} - ${maxSizeMB}MB max`}
       />
 
       {mediaState.files.length > 0 && (

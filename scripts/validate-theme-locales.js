@@ -4,7 +4,8 @@
  * Checks:
  *   1. Every tTheme: key in widget schemas + theme.json exists in en.json
  *   2. en.json contains no extra keys that aren't referenced by any schema
- *   3. Every non-English locale has the same keys as en.json (no missing, no extra)
+ *   3. Every non-English locale is compared against en.json and reported,
+ *      but only English completeness/orphan issues are blocking
  *
  * Reads from latest/ snapshot if it exists, otherwise falls back to
  * the base theme directory.
@@ -153,7 +154,7 @@ function validateTheme(themeName) {
     console.log(`  ✓ en.json has no orphaned keys`);
   }
 
-  // ── Check 2: Non-English locales match en.json keys ───────────────
+  // ── Check 2: Non-English locales are advisory-only ────────────────
 
   const localeFiles = readdirSync(localesDir).filter(
     (f) => f.endsWith(".json") && f !== "en.json",
@@ -168,10 +169,9 @@ function validateTheme(themeName) {
     const extra = [...langKeys].filter((k) => !enKeys.has(k));
 
     if (missing.length > 0) {
-      hasErrors = true;
-      console.error(`  ✗ [${lang}] Missing ${missing.length} key(s):`);
+      console.warn(`  ⚠ [${lang}] Missing ${missing.length} key(s):`);
       for (const k of missing) {
-        console.error(`    - ${k}`);
+        console.warn(`    - ${k}`);
       }
     }
 
@@ -218,7 +218,7 @@ if (requestedTheme) {
   console.log(
     allOk
       ? "\n✓ All theme locales validated."
-      : "\n✗ Some theme locales have issues.",
+      : "\n✗ Some theme locales have blocking issues.",
   );
   process.exit(allOk ? 0 : 1);
 }

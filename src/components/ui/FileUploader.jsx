@@ -6,13 +6,16 @@ import Button from "./Button";
 
 export default function FileUploader({
   onUpload,
+  onReject,
   uploading = false,
   accept,
   multiple = false,
   title,
   description,
   maxSizeText,
+  maxSize,
   uploadProgress = {},
+  uploadingFiles = [],
 }) {
   const { t } = useTranslation();
 
@@ -24,12 +27,28 @@ export default function FileUploader({
     [onUpload],
   );
 
+  const onDropRejected = useCallback(
+    (fileRejections) => {
+      if (fileRejections.length === 0 || !onReject) return;
+      onReject(fileRejections);
+    },
+    [onReject],
+  );
+
   const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
     onDrop,
+    onDropRejected,
     accept,
     multiple,
+    maxSize,
     disabled: uploading,
   });
+
+  const progressEntries = Object.entries(uploadProgress);
+  const uploadItems =
+    progressEntries.length > 0
+      ? progressEntries.map(([filename, progress]) => ({ filename, progress }))
+      : uploadingFiles.map((filename) => ({ filename, progress: null }));
 
   // Determine styles based on state
   let borderColor = "border-slate-300";
@@ -88,20 +107,22 @@ export default function FileUploader({
       </div>
 
       {/* Progress Bars */}
-      {uploading && Object.keys(uploadProgress).length > 0 && (
+      {uploading && uploadItems.length > 0 && (
         <div className="mt-4 p-4 border border-slate-200 rounded-sm bg-slate-50">
           <h3 className="font-medium text-sm text-slate-700 mb-3">{t("components.fileUploader.uploading")}</h3>
           <div className="space-y-3">
-            {Object.entries(uploadProgress).map(([filename, progress]) => (
+            {uploadItems.map(({ filename, progress }) => (
               <div key={filename}>
                 <div className="flex justify-between text-xs mb-1">
                   <span className="font-medium truncate max-w-[200px]">{filename}</span>
-                  <span className="text-slate-500">{progress}%</span>
+                  <span className="text-slate-500">
+                    {typeof progress === "number" ? `${progress}%` : t("components.fileUploader.uploading")}
+                  </span>
                 </div>
                 <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className="bg-pink-500 h-full rounded-full transition-all duration-300 ease-out"
-                    style={{ width: `${progress}%` }}
+                    className={`bg-pink-500 h-full rounded-full ${typeof progress === "number" ? "transition-all duration-300 ease-out" : "animate-pulse w-1/2"}`}
+                    style={typeof progress === "number" ? { width: `${progress}%` } : undefined}
                   />
                 </div>
               </div>

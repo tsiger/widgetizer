@@ -1,5 +1,5 @@
-import { API_URL } from "../config";
 import { apiFetch } from "../lib/apiFetch";
+import { uploadFormData } from "../lib/uploadRequest";
 
 /**
  * @typedef {Object} MediaFile
@@ -148,39 +148,37 @@ export async function uploadProjectMedia(projectId, files, onProgress) {
     formData.append("files", file);
   });
 
-  const xhr = new XMLHttpRequest();
+  try {
+    const response = await uploadFormData(`/api/media/projects/${projectId}/media`, formData, { onProgress });
+    const responseJson = response.data || {};
 
-  return new Promise((resolve, reject) => {
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable && onProgress) {
-        const percentComplete = Math.round((event.loaded / event.total) * 100);
-        onProgress(percentComplete);
-      }
+    // Update the cache with newly uploaded files
+    if (responseJson.processedFiles && responseJson.processedFiles.length > 0) {
+      updateMediaCache(projectId, responseJson.processedFiles);
+    }
+
+    return {
+      ...responseJson,
+      processedFiles: responseJson.processedFiles || [],
+      rejectedFiles: responseJson.rejectedFiles || [],
+      error: responseJson.error || null,
+      status: response.status,
     };
+  } catch (error) {
+    const responseJson = error.data || {};
 
-    xhr.onload = () => {
-      try {
-        const responseJson = JSON.parse(xhr.responseText);
+    if (responseJson.processedFiles || responseJson.rejectedFiles) {
+      return {
+        ...responseJson,
+        processedFiles: responseJson.processedFiles || [],
+        rejectedFiles: responseJson.rejectedFiles || [],
+        error: responseJson.error || error.message || null,
+        status: error.status || 0,
+      };
+    }
 
-        // Update the cache with newly uploaded files
-        if (responseJson.processedFiles && responseJson.processedFiles.length > 0) {
-          updateMediaCache(projectId, responseJson.processedFiles);
-        }
-
-        resolve({ ...responseJson, status: xhr.status });
-      } catch (parseError) {
-        console.error("Failed to parse upload response:", parseError);
-        reject({ message: "Failed to parse server response after upload." });
-      }
-    };
-
-    xhr.onerror = () => {
-      reject({ message: "Upload failed due to a network error or server issue." });
-    };
-
-    xhr.open("POST", API_URL(`/api/media/projects/${projectId}/media`));
-    xhr.send(formData);
-  });
+    throw error;
+  }
 }
 
 /**

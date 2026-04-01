@@ -9,12 +9,15 @@ import { X, Edit, UploadCloud } from "lucide-react";
 import MediaDrawer from "../../../components/media/MediaDrawer";
 import MediaSelectorDrawer from "../../../components/media/MediaSelectorDrawer";
 import Button from "../../ui/Button";
+import { showRejectedFiles, showUploadOutcome } from "../../../utils/uploadFeedback";
+import { IMAGE_ACCEPT, validateFileSizes } from "../../../utils/uploadValidation";
 
 /**
  * @param {"full"|"narrow"} [size="full"] — Constrains overall width: `narrow` caps at 14rem (e.g. favicon in theme settings).
  */
 export default function ImageInput({ id, value = "", onChange, size = "full" }) {
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
   const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
@@ -53,32 +56,42 @@ export default function ImageInput({ id, value = "", onChange, size = "full" }) 
     if (!file || !activeProject) return;
 
     const limitMB = settings?.media?.maxFileSizeMB ?? 5;
-    if (file.size > limitMB * 1024 * 1024) {
-      const fileSizeMB = (file.size / 1024 / 1024).toFixed(1);
-      showToast(`File is too large (${fileSizeMB}MB). Maximum allowed size is ${limitMB}MB.`, "error");
+    const { valid, rejected } = validateFileSizes([file], { maxSizeMB: limitMB });
+    if (rejected.length > 0) {
+      showRejectedFiles(showToast, rejected);
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
     setUploading(true);
+    setUploadProgress(0);
     try {
-      const result = await uploadProjectMedia(activeProject.id, [file]);
+      const result = await uploadProjectMedia(activeProject.id, valid, (progress) => {
+        setUploadProgress(progress);
+      });
       const { processedFiles, rejectedFiles, error } = result;
 
       if (processedFiles?.length > 0) {
         onChange(processedFiles[0].path);
-        showToast("Image uploaded successfully.", "success");
-      } else if (rejectedFiles?.length > 0) {
-        showToast(rejectedFiles[0].reason || "Image rejected by server.", "error");
-      } else if (error) {
-        showToast(error, "error");
-      } else {
-        showToast("Upload failed unexpectedly.", "error");
       }
+
+      showUploadOutcome(
+        showToast,
+        {
+          processedFiles,
+          rejectedFiles,
+          error,
+        },
+        {
+          successMessage: "Image uploaded successfully.",
+          networkErrorMessage: "Upload failed.",
+        },
+      );
     } catch (err) {
-      showToast(err?.message || "Upload failed.", "error");
+      showRejectedFiles(showToast, [{ originalName: file.name, reason: err?.message || "Upload failed." }]);
     } finally {
       setUploading(false);
+      setUploadProgress(0);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
@@ -130,7 +143,7 @@ export default function ImageInput({ id, value = "", onChange, size = "full" }) 
         ref={fileInputRef}
         type="file"
         id={id}
-        accept="image/*"
+        accept={Object.values(IMAGE_ACCEPT).flat().join(",")}
         onChange={handleFileChange}
         disabled={uploading}
         className="hidden"
@@ -152,10 +165,10 @@ export default function ImageInput({ id, value = "", onChange, size = "full" }) 
           </div>
         </div>
       ) : (
-        <div onClick={() => fileInputRef.current?.click()} className={emptyStateClassName}>
+        <div onClick={() => !uploading && fileInputRef.current?.click()} className={emptyStateClassName}>
           <UploadCloud size={32} />
-          <p className="mt-2 text-sm font-semibold">Click to upload</p>
-          <p className="text-xs">PNG, JPG, GIF</p>
+          <p className="mt-2 text-sm font-semibold">{uploading ? `Uploading... ${uploadProgress}%` : "Click to upload"}</p>
+          <p className="text-xs">PNG, JPG, GIF, WEBP, SVG</p>
         </div>
       )}
 

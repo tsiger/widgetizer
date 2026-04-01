@@ -1,4 +1,5 @@
 import { apiFetch } from "../lib/apiFetch";
+import { uploadFormData } from "../lib/uploadRequest";
 
 /**
  * @typedef {Object} Project
@@ -246,28 +247,31 @@ export async function exportProject(projectId) {
 /**
  * Import a project from a ZIP file previously exported from the application.
  * @param {File} file - The ZIP file to import (from file input or drag-drop)
+ * @param {function(number): void} [onProgress] - Progress callback receiving percentage (0-100)
  * @returns {Promise<Project>} The imported project object
  * @throws {Error} If import fails or the ZIP is invalid
  */
-export async function importProject(file) {
+export async function importProject(file, onProgress) {
   try {
     const formData = new FormData();
     formData.append("projectZip", file);
 
-    const response = await apiFetch("/api/projects/import", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await uploadFormData("/api/projects/import", formData, { onProgress });
+    const data = response.data || {};
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to import project");
-    }
-
-    return await response.json();
+    return {
+      ...data,
+      processedFiles: data?.id ? [data] : [],
+      rejectedFiles: [],
+      error: null,
+      status: response.status,
+    };
   } catch (error) {
     if (error.message && !error.message.includes("Failed to fetch")) {
-      throw error;
+      const normalizedError = new Error(error.message);
+      normalizedError.status = error.status;
+      normalizedError.data = error.data;
+      throw normalizedError;
     }
     throw new Error("Failed to import project");
   }

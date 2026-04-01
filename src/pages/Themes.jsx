@@ -12,7 +12,10 @@ import { getAllThemes, getThemeScreenshotUrl, uploadThemeZip, updateTheme, delet
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
 import useThemeUpdateStore from "../stores/themeUpdateStore";
+import useAppSettings from "../hooks/useAppSettings";
 import FileUploader from "../components/ui/FileUploader";
+import { showRejectedFiles, showUploadOutcome } from "../utils/uploadFeedback";
+import { ZIP_ACCEPT, mapDropzoneRejections, validateZipFiles } from "../utils/uploadValidation";
 
 export default function Themes() {
   const { t } = useTranslation();
@@ -38,6 +41,8 @@ export default function Themes() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
   const fetchUpdateCount = useThemeUpdateStore((state) => state.fetchUpdateCount);
+  const { settings } = useAppSettings();
+  const maxSizeMB = settings?.export?.maxImportSizeMB || 500;
 
   const fetchThemes = useCallback(async () => {
     try {
@@ -56,7 +61,7 @@ export default function Themes() {
     fetchThemes();
   }, [fetchThemes]);
 
-  const handleUploadSuccess = (newTheme) => {
+  const handleUploadSuccess = useCallback((newTheme) => {
     if (newTheme.isUpdate) {
       // Update existing theme in the list
       setThemes((prevThemes) =>
@@ -66,7 +71,7 @@ export default function Themes() {
       // Add new theme to the list
       setThemes((prevThemes) => [...prevThemes, newTheme]);
     }
-  };
+  }, []);
 
   const handleUpdateTheme = useCallback(
     async (themeId) => {
@@ -129,39 +134,54 @@ export default function Themes() {
 
   const onThemeDrop = useCallback(
     async (files) => {
-      if (files.length !== 1) {
-        showToast(t("themes.toasts.singleFileError"), "error");
+      const { valid, rejected } = validateZipFiles(files, { maxSizeMB, multiple: false });
+      if (rejected.length > 0) {
+        showRejectedFiles(showToast, rejected, {
+          summaryMessage: rejected.length === 1 ? null : t("themes.toasts.singleFileError"),
+        });
+      }
+
+      if (valid.length !== 1) {
         return;
       }
-      const file = files[0];
+
+      const file = valid[0];
       setIsUploading(true);
-      // Fake progress for now since uploadThemeZip doesn't support it yet match interface
       setUploadProgress({ [file.name]: 0 });
 
       try {
-        // Simulate progress
-        const interval = setInterval(() => {
-          setUploadProgress((prev) => ({ ...prev, [file.name]: Math.min((prev[file.name] || 0) + 10, 90) }));
-        }, 100);
+        const result = await uploadThemeZip(file, (progress) => {
+          setUploadProgress((prev) => ({ ...prev, [file.name]: progress }));
+        });
 
-        const result = await uploadThemeZip(file);
-
-        clearInterval(interval);
         setUploadProgress({ [file.name]: 100 });
 
-        if (result.theme) {
-          handleUploadSuccess(result.theme);
+        if (result.processedFiles?.[0]) {
+          handleUploadSuccess(result.processedFiles[0]);
         }
-        showToast(result.message || t("themes.toasts.uploadSuccess"), "success");
+
+        showUploadOutcome(showToast, result, {
+          successMessage: t("themes.toasts.uploadSuccess"),
+          networkErrorMessage: t("themes.toasts.uploadError"),
+        });
       } catch (error) {
         console.error("Theme upload error:", error);
-        showToast(error.message || t("themes.toasts.uploadError"), "error");
+        showRejectedFiles(showToast, [{ originalName: file.name, reason: error.message || t("themes.toasts.uploadError") }], {
+          summaryMessage: t("themes.toasts.uploadError"),
+        });
       } finally {
         setIsUploading(false);
         setUploadProgress({});
       }
     },
-    [showToast, t],
+    [handleUploadSuccess, maxSizeMB, showToast, t],
+  );
+
+  const onThemeReject = useCallback(
+    (fileRejections) => {
+      showRejectedFiles(showToast, mapDropzoneRejections(fileRejections));
+    },
+    [showToast],
   );
 
   if (loading) {
@@ -177,13 +197,16 @@ export default function Themes() {
       <div className="mb-6">
         <FileUploader
           onUpload={onThemeDrop}
+          onReject={onThemeReject}
           uploading={isUploading}
           uploadProgress={uploadProgress}
-          accept={{ "application/zip": [".zip"] }}
+          uploadingFiles={Object.keys(uploadProgress)}
+          accept={ZIP_ACCEPT}
           multiple={false}
+          maxSize={maxSizeMB * 1024 * 1024}
           title={t("themes.uploader.title")}
           description={t("themes.uploader.description")}
-          maxSizeText={t("themes.uploader.supported")}
+          maxSizeText={`${t("themes.uploader.supported")} - ${maxSizeMB}MB max`}
         />
       </div>
 

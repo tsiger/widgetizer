@@ -1,5 +1,6 @@
 import { API_URL } from "../config";
 import { apiFetch } from "../lib/apiFetch";
+import { uploadFormData } from "../lib/uploadRequest";
 import { getActiveProject } from "./projectManager";
 
 /**
@@ -185,33 +186,32 @@ export async function saveThemeSettings(projectId, data) {
  * Upload and install a theme from a ZIP file.
  * The ZIP should contain a valid theme structure with config and templates.
  * @param {File} zipFile - The theme ZIP file to upload
+ * @param {function(number): void} [onProgress] - Progress callback receiving percentage (0-100)
  * @returns {Promise<{message: string, theme: Theme|null}>} Upload result with installed theme
  * @throws {Error} If the ZIP is invalid or upload fails
  */
-export async function uploadThemeZip(zipFile) {
+export async function uploadThemeZip(zipFile, onProgress) {
   const formData = new FormData();
   formData.append("themeZip", zipFile);
 
   try {
-    const response = await apiFetch("/api/themes/upload", {
-      method: "POST",
-      body: formData,
-      // Note: Don't set Content-Type header when using FormData,
-      // the browser will set it correctly with the boundary
-    });
+    const response = await uploadFormData("/api/themes/upload", formData, { onProgress });
+    const data = response.data || {};
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to upload theme");
-    }
-
-    // The response now contains { message: string, theme: object | null }
-    return await response.json();
+    return {
+      ...data,
+      processedFiles: data.theme ? [data.theme] : [],
+      rejectedFiles: [],
+      error: null,
+      status: response.status,
+    };
   } catch (error) {
     console.error("Error uploading theme zip:", error);
-    throw error; // Re-throw the error to be caught by the caller
+    const normalizedError = new Error(error.message || "Failed to upload theme");
+    normalizedError.status = error.status;
+    normalizedError.data = error.data;
+    throw normalizedError;
   }
-  // TODO: Implement actual progress tracking
 }
 
 /**

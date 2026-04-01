@@ -3,6 +3,7 @@ import DOMPurify from "dompurify";
 import { uploadProjectMedia } from "../queries/mediaManager";
 import useAppSettings from "./useAppSettings";
 import { validateFileSizes } from "../utils/mediaValidation";
+import { showUploadOutcome } from "../utils/uploadFeedback";
 
 const CHUNK_SIZE = 5; // Process 5 files at a time
 
@@ -128,9 +129,21 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
         allProcessedFiles.push(...processed);
         allRejectedFiles.push(...rejected);
 
-        // Mark completed files as 100%
-        chunk.forEach((file) => {
-          setUploadProgress((prev) => ({ ...prev, [file.name]: 100 }));
+        const processedNames = new Set(processed.map((file) => file.originalName));
+        const rejectedNames = new Set(rejected.map((file) => file.originalName));
+
+        setUploadProgress((prev) => {
+          const next = { ...prev };
+
+          chunk.forEach((file) => {
+            if (processedNames.has(file.name)) {
+              next[file.name] = 100;
+            } else if (rejectedNames.has(file.name)) {
+              delete next[file.name];
+            }
+          });
+
+          return next;
         });
       }
 
@@ -145,8 +158,20 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
         setFiles((prevFiles) => [...prevFiles, ...newFilesWithMetadata]);
       }
 
-      // Handle toast notifications with proper unique IDs
-      handleUploadToasts(allProcessedFiles, allRejectedFiles, chunks.length > 1);
+      const chunkInfo = chunks.length > 1 ? " (processed in batches)" : "";
+      showUploadOutcome(
+        showToast,
+        {
+          processedFiles: allProcessedFiles,
+          rejectedFiles: allRejectedFiles,
+        },
+        {
+          successMessage: `Successfully uploaded ${allProcessedFiles.length} file(s)${chunkInfo}.`,
+          partialMessage: `Uploaded ${allProcessedFiles.length} file(s). ${allRejectedFiles.length} file(s) rejected${chunkInfo}.`,
+          rejectedMessage: `Upload failed. ${allRejectedFiles.length} file(s) rejected${chunkInfo}.`,
+          networkErrorMessage: "Failed to upload files due to a network or client error.",
+        },
+      );
     } catch (error) {
       // Catch network errors or errors from mediaManager itself
       const uniqueTimestamp = Date.now();
@@ -157,58 +182,6 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
     } finally {
       setUploading(false);
       setUploadProgress({});
-    }
-  };
-
-  const handleUploadToasts = (processed, rejected, wasChunked) => {
-    const uniqueTimestamp = Date.now();
-    const chunkInfo = wasChunked ? " (processed in batches)" : "";
-
-    if (processed.length > 0 && rejected.length === 0) {
-      // All successful
-      showToast(`Successfully uploaded ${processed.length} file(s)${chunkInfo}.`, "success", {
-        id: `success-${uniqueTimestamp}-${Math.random().toString(36).substring(2, 9)}`,
-      });
-    } else if (processed.length > 0 && rejected.length > 0) {
-      // Partial success - Summary Toast
-      showToast(`Uploaded ${processed.length} file(s). ${rejected.length} file(s) rejected${chunkInfo}.`, "warning", {
-        duration: 5000,
-        id: `summary-partial-${uniqueTimestamp}`,
-      });
-      // Individual Rejection Toasts (limit to first 5 to avoid spam)
-      rejected.slice(0, 5).forEach((rf, index) =>
-        showToast(`${rf.originalName}: ${rf.reason}`, "error", {
-          duration: 7000,
-          id: `reject-${uniqueTimestamp}-${index}-${rf.originalName}`,
-        }),
-      );
-      if (rejected.length > 5) {
-        showToast(`... and ${rejected.length - 5} more files were rejected.`, "error", {
-          duration: 5000,
-          id: `reject-overflow-${uniqueTimestamp}`,
-        });
-      }
-      console.warn("Rejected files details:", rejected);
-    } else if (processed.length === 0 && rejected.length > 0) {
-      // All rejected - Summary Toast
-      showToast(`Upload failed. ${rejected.length} file(s) rejected${chunkInfo}.`, "error", {
-        duration: 5000,
-        id: `summary-rejected-${uniqueTimestamp}`,
-      });
-      // Individual Rejection Toasts (limit to first 5)
-      rejected.slice(0, 5).forEach((rf, index) =>
-        showToast(`${rf.originalName}: ${rf.reason}`, "error", {
-          duration: 7000,
-          id: `reject-${uniqueTimestamp}-${index}-${rf.originalName}`,
-        }),
-      );
-      if (rejected.length > 5) {
-        showToast(`... and ${rejected.length - 5} more files were rejected.`, "error", {
-          duration: 5000,
-          id: `reject-overflow-${uniqueTimestamp}`,
-        });
-      }
-      console.error("Rejected files details:", rejected);
     }
   };
 

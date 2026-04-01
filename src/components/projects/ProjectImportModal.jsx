@@ -2,15 +2,19 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { X, Upload, CheckCircle, AlertCircle } from "lucide-react";
 import FileUploader from "../ui/FileUploader";
-import LoadingSpinner from "../ui/LoadingSpinner";
 import { importProject } from "../../queries/projectManager";
 import useAppSettings from "../../hooks/useAppSettings";
+import useToastStore from "../../stores/toastStore";
+import { showRejectedFiles, showUploadOutcome } from "../../utils/uploadFeedback";
+import { ZIP_ACCEPT, mapDropzoneRejections, validateZipFiles } from "../../utils/uploadValidation";
 
 export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
   const { t } = useTranslation();
   const { settings } = useAppSettings();
+  const showToast = useToastStore((state) => state.showToast);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({});
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
@@ -19,36 +23,20 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
   if (!isOpen) return null;
 
   const handleFileSelect = (files) => {
-    if (files.length > 0) {
-      const file = files[0];
-      // Validate file type
-      if (
-        !file.name.endsWith(".zip") &&
-        file.type !== "application/zip" &&
-        file.type !== "application/x-zip-compressed"
-      ) {
-        setError(t("projects.importModal.invalidFileType"));
-        setSelectedFile(null);
-        return;
-      }
+    const { valid, rejected } = validateZipFiles(files, { maxSizeMB, multiple: false });
 
-      // Validate file size
-      const fileSizeMB = file.size / 1024 / 1024;
-      if (fileSizeMB > maxSizeMB) {
-        setError(
-          t("projects.importModal.fileTooLarge", {
-            size: fileSizeMB.toFixed(2),
-            max: maxSizeMB,
-          }),
-        );
-        setSelectedFile(null);
-        return;
-      }
-
-      setSelectedFile(file);
-      setError(null);
-      setSuccess(null);
+    if (rejected.length > 0) {
+      setError(rejected[0].reason);
+      setSelectedFile(null);
+      showRejectedFiles(showToast, rejected);
+      return;
     }
+
+    if (valid.length === 0) return;
+
+    setSelectedFile(valid[0]);
+    setError(null);
+    setSuccess(null);
   };
 
   const handleImport = async () => {
@@ -58,23 +46,41 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
     }
 
     setUploading(true);
+    setUploadProgress({ [selectedFile.name]: 0 });
     setError(null);
     setSuccess(null);
 
     try {
-      const result = await importProject(selectedFile);
-      setSuccess(result);
+      const result = await importProject(selectedFile, (progress) => {
+        setUploadProgress((prev) => ({ ...prev, [selectedFile.name]: progress }));
+      });
+
+      setUploadProgress({ [selectedFile.name]: 100 });
+      const importedProject = result.processedFiles?.[0] || result;
+
+      setSuccess(importedProject);
       if (onSuccess) {
-        onSuccess(result);
+        onSuccess(importedProject);
       }
+      showUploadOutcome(showToast, result, {
+        successMessage: importedProject?.name
+          ? t("projects.importModal.successMessage", { name: importedProject.name })
+          : undefined,
+        networkErrorMessage: t("projects.importModal.importError"),
+      });
       // Auto-close after 2 seconds on success
       setTimeout(() => {
         handleClose();
       }, 2000);
     } catch (err) {
-      setError(err.message || t("projects.importModal.importError"));
+      const message = err.message || t("projects.importModal.importError");
+      setError(message);
+      showRejectedFiles(showToast, [{ originalName: selectedFile.name, reason: message }], {
+        summaryMessage: t("projects.importModal.importError"),
+      });
     } finally {
       setUploading(false);
+      setUploadProgress({});
     }
   };
 
@@ -83,7 +89,17 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
     setError(null);
     setSuccess(null);
     setUploading(false);
+    setUploadProgress({});
     onClose();
+  };
+
+  const handleReject = (fileRejections) => {
+    const rejected = mapDropzoneRejections(fileRejections);
+    if (rejected.length > 0) {
+      setSelectedFile(null);
+      setError(rejected[0].reason);
+      showRejectedFiles(showToast, rejected);
+    }
   };
 
   // Prevent clicks inside the modal from closing it
@@ -127,12 +143,13 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
 
               <FileUploader
                 onUpload={handleFileSelect}
+                onReject={handleReject}
                 uploading={uploading}
-                accept={{
-                  "application/zip": [".zip"],
-                  "application/x-zip-compressed": [".zip"],
-                }}
+                uploadProgress={uploadProgress}
+                uploadingFiles={selectedFile ? [selectedFile.name] : []}
+                accept={ZIP_ACCEPT}
                 multiple={false}
+                maxSize={maxSizeMB * 1024 * 1024}
                 title={t("projects.importModal.uploadTitle")}
                 description={t("projects.importModal.uploadDescription")}
                 maxSizeText={t("projects.importModal.maxSize", { max: maxSizeMB })}
@@ -152,12 +169,6 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-sm flex items-start gap-2">
                   <AlertCircle size={20} className="text-red-500 shrink-0 mt-0.5" />
                   <p className="text-sm text-red-600">{error}</p>
-                </div>
-              )}
-
-              {uploading && (
-                <div className="mt-4">
-                  <LoadingSpinner message={t("projects.importModal.importing")} />
                 </div>
               )}
             </>
