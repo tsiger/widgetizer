@@ -36,12 +36,12 @@ class MockXMLHttpRequest {
 describe("uploadFormData", () => {
   beforeEach(() => {
     xhrInstances.length = 0;
-    global.XMLHttpRequest = MockXMLHttpRequest;
+    globalThis.XMLHttpRequest = MockXMLHttpRequest;
   });
 
   afterEach(() => {
     vi.clearAllMocks();
-    delete global.XMLHttpRequest;
+    delete globalThis.XMLHttpRequest;
   });
 
   it("uploads form data, reports progress, and resolves parsed JSON", async () => {
