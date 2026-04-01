@@ -12,7 +12,7 @@ export default function Table({
   ...props
 }) {
   return (
-    <table className={`w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden ${className}`} {...props}>
+    <table className={`w-full border-collapse bg-white rounded-lg shadow-sm ${className}`} {...props}>
       <thead>
         <tr className="bg-slate-50 border-b border-slate-200">
           {headers.map((header, index) => (

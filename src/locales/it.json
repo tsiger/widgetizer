@@ -220,6 +220,7 @@
       "currentActive": "Progetto attivo corrente",
       "setActive": "Imposta come progetto attivo",
       "edit": "Modifica progetto",
+      "editDetails": "Modifica dettagli progetto",
       "duplicate": "Duplica progetto",
       "export": "Esporta progetto",
       "delete": "Elimina progetto",

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Palette, Pencil, Trash2, Copy, Search, Check, FileText, CirclePlus } from "lucide-react";
+import { Palette, Pencil, Trash2, Copy, Search, Check, FileText, CirclePlus, MoreVertical } from "lucide-react";
 import { getAllPages, deletePage, duplicatePage, bulkDeletePages } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import { usePageSelection } from "../hooks/usePageSelection";
@@ -23,6 +23,8 @@ export default function Pages() {
   const [pages, setPages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const menuRef = useRef(null);
   const { selectedPages, togglePageSelection, selectAllPages, clearSelection, isAllSelected } = usePageSelection();
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
@@ -60,6 +62,28 @@ export default function Pages() {
   useEffect(() => {
     loadPages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenMenuId(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setOpenMenuId(null);
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const loadPages = async () => {
@@ -184,6 +208,7 @@ export default function Pages() {
           </div>
 
           <Table
+            className="[&_th:first-child]:w-12 [&_th:first-child]:!pl-4 [&_th:first-child]:!pr-1 [&_td:first-child]:w-12 [&_td:first-child]:!pl-4 [&_td:first-child]:!pr-1 [&_th:nth-child(2)]:!pl-[11px] [&_td:nth-child(2)]:!pl-[11px]"
             headers={[
               <IconButton onClick={handleSelectAll} variant="neutral" size="sm" key="select-all">
                 {isAllSelected(filteredPages) && filteredPages.length > 0 ? (
@@ -195,8 +220,6 @@ export default function Pages() {
                 )}
               </IconButton>,
               t("pages.headers.title"),
-              t("pages.headers.filename"),
-              t("pages.headers.created"),
               t("pages.headers.updated"),
               t("pages.headers.actions"),
             ]}
@@ -214,12 +237,14 @@ export default function Pages() {
             }
             renderRow={(page) => {
               const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
+              const isSelected = selectedPages.includes(page.id);
+              const menuButtonClass = "w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors";
 
               return (
                 <>
-                  <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
+                  <td className={`py-3 px-4 ${isSelected ? "bg-pink-50" : ""}`}>
                     <IconButton onClick={() => togglePageSelection(page.id)} variant="neutral" size="sm">
-                      {selectedPages.includes(page.id) ? (
+                      {isSelected ? (
                         <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
                           <Check size={12} />
                         </div>
@@ -228,46 +253,75 @@ export default function Pages() {
                       )}
                     </IconButton>
                   </td>
-                  <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
-                    <div className="font-medium text-slate-900">{page.name}</div>
+                  <td className={`py-3 px-4 ${isSelected ? "bg-pink-50" : ""}`}>
+                    <Link
+                      to={`/page-editor?pageId=${page.id}`}
+                      className="block w-full min-w-0 rounded-sm font-medium text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
+                    >
+                      <span className="block truncate">{page.name}</span>
+                    </Link>
                   </td>
-                  <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
-                    <div className="text-slate-600 font-mono text-sm">{page.slug}.html</div>
-                  </td>
-                  <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
-                    <div className="text-slate-600 text-sm">{formatDate(page.created, dateFormat)}</div>
-                  </td>
-                  <td className={`py-3 px-4 ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
+                  <td className={`py-3 px-4 whitespace-nowrap ${isSelected ? "bg-pink-50" : ""}`}>
                     <div className="text-slate-600 text-sm">{formatDate(page.updated, dateFormat)}</div>
                   </td>
-                  <td className={`py-3 px-4 text-right ${selectedPages.includes(page.id) ? "bg-pink-50" : ""}`}>
-                    <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                      <div className="flex gap-2 pr-2 border-r border-slate-200">
-                        <Tooltip content={t("pages.actions.design")}>
-                          <Link to={`/page-editor?pageId=${page.id}`}>
-                            <IconButton variant="neutral" size="sm">
-                              <Palette size={18} />
-                            </IconButton>
+                  <td className={`py-3 px-4 text-right ${isSelected ? "bg-pink-50" : ""}`}>
+                    <div className="relative inline-flex items-center justify-end" ref={openMenuId === page.id ? menuRef : null}>
+                      <Tooltip content={t("pages.actions.menu", "Page actions")}>
+                        <IconButton
+                          onClick={() => setOpenMenuId(openMenuId === page.id ? null : page.id)}
+                          variant="neutral"
+                          size="sm"
+                          aria-label={t("pages.actions.menu", "Page actions")}
+                          aria-haspopup="menu"
+                          aria-expanded={openMenuId === page.id}
+                        >
+                          <MoreVertical size={18} />
+                        </IconButton>
+                      </Tooltip>
+
+                      {openMenuId === page.id && (
+                        <div className="absolute right-0 top-full z-10 mt-1 w-56 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
+                          <Link
+                            to={`/page-editor?pageId=${page.id}`}
+                            onClick={() => setOpenMenuId(null)}
+                            className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                          >
+                            <Palette size={14} />
+                            {t("pages.actions.design")}
                           </Link>
-                        </Tooltip>
-                      </div>
-                      <Tooltip content={t("pages.actions.edit")}>
-                        <Link to={`/pages/${page.id}/edit`}>
-                          <IconButton variant="neutral" size="sm">
-                            <Pencil size={18} />
-                          </IconButton>
-                        </Link>
-                      </Tooltip>
-                      <Tooltip content={t("pages.actions.duplicate")}>
-                        <IconButton onClick={() => handleDuplicatePage(page.id)} variant="neutral" size="sm">
-                          <Copy size={18} />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip content={t("pages.actions.delete")}>
-                        <IconButton onClick={() => handleDeletePage(page.id, page.name)} variant="danger" size="sm">
-                          <Trash2 size={18} />
-                        </IconButton>
-                      </Tooltip>
+                          <Link
+                            to={`/pages/${page.id}/edit`}
+                            onClick={() => setOpenMenuId(null)}
+                            className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                          >
+                            <Pencil size={14} />
+                            {t("pages.actions.edit")}
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              handleDuplicatePage(page.id);
+                            }}
+                            className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                          >
+                            <Copy size={14} />
+                            {t("pages.actions.duplicate")}
+                          </button>
+                          <div className="my-1 border-t border-slate-200" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              handleDeletePage(page.id, page.name);
+                            }}
+                            className={`${menuButtonClass} text-red-600 hover:bg-red-50`}
+                          >
+                            <Trash2 size={14} />
+                            {t("pages.actions.delete")}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </td>
                 </>

@@ -216,9 +216,10 @@
       "updateAvailable": "Update available"
     },
     "actions": {
-      "currentActive": "Current active project",
-      "setActive": "Set as active project",
+      "currentActive": "Current project",
+      "setActive": "Work on this project",
       "edit": "Edit project",
+      "editDetails": "Edit project details",
       "duplicate": "Duplicate project",
       "export": "Export project",
       "delete": "Delete project",
@@ -293,7 +294,7 @@
     "createFirstPage": "Create your first page to get started.",
     "actions": {
       "design": "Design page",
-      "edit": "Edit page",
+      "edit": "Edit page details",
       "duplicate": "Duplicate page",
       "delete": "Delete page"
     },

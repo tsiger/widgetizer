@@ -220,6 +220,7 @@
       "currentActive": "Derzeit aktives Projekt",
       "setActive": "Als aktives Projekt festlegen",
       "edit": "Projekt bearbeiten",
+      "editDetails": "Projektdetails bearbeiten",
       "duplicate": "Projekt duplizieren",
       "export": "Projekt exportieren",
       "delete": "Projekt löschen",

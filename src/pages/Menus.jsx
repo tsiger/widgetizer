@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Menu, Trash2, Pencil, CirclePlus, Copy } from "lucide-react";
+import { ListTree, Trash2, Pencil, CirclePlus, Copy, MoreVertical } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -22,6 +22,8 @@ export default function Menus() {
   const { t } = useTranslation();
   const [menus, setMenus] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const menuRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
   const showToast = useToastStore((state) => state.showToast);
@@ -35,6 +37,28 @@ export default function Menus() {
     loadMenus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key, activeProject?.id]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenMenuId(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setOpenMenuId(null);
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const loadMenus = async () => {
     try {
@@ -108,8 +132,6 @@ export default function Menus() {
         <Table
           headers={[
             t("menus.headers.title"),
-            t("menus.headers.description"),
-            t("menus.headers.created"),
             t("menus.headers.updated"),
             t("menus.headers.actions"),
           ]}
@@ -117,61 +139,80 @@ export default function Menus() {
           emptyMessage={t("menus.noMenus")}
           renderRow={(menu) => {
             const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
+            const menuButtonClass = "w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors";
 
             return (
               <>
-                <td className="py-3 px-4 font-semibold">{menu.name}</td>
-                <td className="py-3 px-4 text-slate-600">{menu.description}</td>
                 <td className="py-3 px-4">
-                  <div className="text-slate-600 text-sm">{formatDate(menu.created, dateFormat)}</div>
+                  <Link
+                    to={`/menus/${menu.id}/structure`}
+                    className="block w-full min-w-0 rounded-sm font-semibold text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
+                    title={menu.name}
+                  >
+                    <span className="block truncate">{menu.name}</span>
+                  </Link>
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-3 px-4 whitespace-nowrap">
                   <div className="text-slate-600 text-sm">{formatDate(menu.updated, dateFormat)}</div>
                 </td>
                 <td className="py-3 px-4 text-right">
-                  <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                    <div className="flex gap-2 pr-2 border-r border-slate-200">
-                      <Tooltip content={t("menus.actions.editStructure")}>
-                        <IconButton
-                          onClick={() => navigate(`/menus/${menu.id}/structure`)}
-                          variant="neutral"
-                          size="sm"
-                          title={t("menus.actions.editStructure")}
+                  <div className="relative inline-flex items-center justify-end" ref={openMenuId === menu.id ? menuRef : null}>
+                    <Tooltip content={t("menus.actions.menu", "Menu actions")}>
+                      <IconButton
+                        onClick={() => setOpenMenuId(openMenuId === menu.id ? null : menu.id)}
+                        variant="neutral"
+                        size="sm"
+                        aria-label={t("menus.actions.menu", "Menu actions")}
+                        aria-haspopup="menu"
+                        aria-expanded={openMenuId === menu.id}
+                      >
+                        <MoreVertical size={18} />
+                      </IconButton>
+                    </Tooltip>
+
+                    {openMenuId === menu.id && (
+                      <div className="absolute right-0 top-full z-10 mt-1 w-60 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
+                        <Link
+                          to={`/menus/${menu.id}/structure`}
+                          onClick={() => setOpenMenuId(null)}
+                          className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                         >
-                          <Menu size={18} />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                    <Tooltip content={t("menus.actions.duplicate")}>
-                      <IconButton
-                        onClick={() => handleDuplicate(menu.id)}
-                        variant="neutral"
-                        size="sm"
-                        title={t("menus.actions.duplicate")}
-                      >
-                        <Copy size={18} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip content={t("menus.actions.editSettings")}>
-                      <IconButton
-                        onClick={() => navigate(`/menus/edit/${menu.id}`)}
-                        variant="neutral"
-                        size="sm"
-                        title={t("menus.actions.editSettings")}
-                      >
-                        <Pencil size={18} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip content={t("menus.actions.delete")}>
-                      <IconButton
-                        onClick={() => openDeleteConfirmation(menu.id, menu.name)}
-                        variant="danger"
-                        size="sm"
-                        title={t("menus.actions.delete")}
-                      >
-                        <Trash2 size={18} />
-                      </IconButton>
-                    </Tooltip>
+                          <ListTree size={14} />
+                          {t("menus.actions.editStructure")}
+                        </Link>
+                        <Link
+                          to={`/menus/edit/${menu.id}`}
+                          onClick={() => setOpenMenuId(null)}
+                          className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                        >
+                          <Pencil size={14} />
+                          {t("menus.actions.editSettings")}
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenMenuId(null);
+                            handleDuplicate(menu.id);
+                          }}
+                          className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                        >
+                          <Copy size={14} />
+                          {t("menus.actions.duplicate")}
+                        </button>
+                        <div className="my-1 border-t border-slate-200" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenMenuId(null);
+                            openDeleteConfirmation(menu.id, menu.name);
+                          }}
+                          className={`${menuButtonClass} text-red-600 hover:bg-red-50`}
+                        >
+                          <Trash2 size={14} />
+                          {t("menus.actions.delete")}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </td>
               </>

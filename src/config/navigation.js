@@ -1,4 +1,4 @@
-import { Home, Folder, File, Menu, Image, Settings, Rocket, SlidersHorizontal, Layers } from "lucide-react";
+import { Home, Folder, File, ListTree, Image, Settings, Rocket, SlidersHorizontal, Layers } from "lucide-react";
 
 export const navigationSections = [
   {
@@ -33,7 +33,7 @@ export const navigationSections = [
         id: "menus",
         labelKey: "navigation.menus",
         path: "/menus",
-        icon: Menu,
+        icon: ListTree,
         requiresProject: true,
       },
       {
