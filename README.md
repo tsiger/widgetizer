@@ -5,14 +5,7 @@
 
 <p align="center">A powerful, yet simple, visual website builder for creating high-performance static websites.</p>
 
-<p align="center">
-  <a href="LICENSE">
-    <img src="https://img.shields.io/github/license/tsiger/widgetizer" alt="GitHub License">
-  </a>
-  <a href="https://github.com/tsiger/widgetizer/releases">
-    <img src="https://img.shields.io/github/v/release/tsiger/widgetizer" alt="GitHub Release">
-  </a>
-</p>
+<p align="center"><a href="LICENSE"><img src="https://img.shields.io/github/license/tsiger/widgetizer" alt="GitHub License"></a><a href="https://github.com/tsiger/widgetizer/releases"><img src="https://img.shields.io/github/v/release/tsiger/widgetizer" alt="GitHub Release"></a></p>
 
 ## ✨ Features
 
