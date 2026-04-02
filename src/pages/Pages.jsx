@@ -217,7 +217,7 @@ export default function Pages() {
                 variant="neutral"
                 size="sm"
                 key="select-all"
-                className="border border-transparent bg-white/80 shadow-sm hover:border-slate-200 hover:bg-white hover:shadow-md"
+                className="border border-transparent bg-white/80 hover:border-slate-200 hover:bg-white"
               >
                 {isAllSelected(filteredPages) && filteredPages.length > 0 ? (
                   <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
@@ -255,7 +255,7 @@ export default function Pages() {
                       onClick={() => togglePageSelection(page.id)}
                       variant="neutral"
                       size="sm"
-                      className="border border-transparent bg-white/80 shadow-sm hover:border-slate-200 hover:bg-white hover:shadow-md"
+                      className="border border-transparent bg-white/80 hover:border-slate-200 hover:bg-white"
                     >
                       {isSelected ? (
                         <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
@@ -283,10 +283,10 @@ export default function Pages() {
                         onClick={() => setOpenMenuId(openMenuId === page.id ? null : page.id)}
                         variant="neutral"
                         size="sm"
-                        className={`border shadow-sm transition-all ${
+                        className={`border transition-all ${
                           openMenuId === page.id
                             ? "border-pink-200 bg-pink-50 text-pink-600"
-                            : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:shadow-md hover:text-slate-900"
+                            : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:text-slate-900"
                         }`}
                         aria-label={t("pages.actions.menu", "Page actions")}
                         aria-haspopup="menu"

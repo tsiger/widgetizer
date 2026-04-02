@@ -163,10 +163,10 @@ export default function Menus() {
                       onClick={() => setOpenMenuId(openMenuId === menu.id ? null : menu.id)}
                       variant="neutral"
                       size="sm"
-                      className={`border shadow-sm transition-all ${
+                      className={`border transition-all ${
                         openMenuId === menu.id
                           ? "border-pink-200 bg-pink-50 text-pink-600"
-                          : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:shadow-md hover:text-slate-900"
+                          : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:text-slate-900"
                       }`}
                       aria-label={t("menus.actions.menu", "Menu actions")}
                       aria-haspopup="menu"
