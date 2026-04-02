@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/widgetizer_logo_light.png">
-    <source media="(prefers-color-scheme: light)" srcset="assets/widgetizer_logo_dark.png">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/widgetizer_logo_dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="assets/widgetizer_logo_light.png">
     <img src="assets/widgetizer_logo_light.png" alt="Widgetizer logo" width="400">
   </picture>
 </p>
@@ -9,8 +9,12 @@
 <p align="center">A powerful, yet simple, visual website builder for creating high-performance static websites.</p>
 
 <p align="center">
-![GitHub License](https://img.shields.io/github/license/tsiger/widgetizer)
-![GitHub Release](https://img.shields.io/github/v/release/tsiger/widgetizer)
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/tsiger/widgetizer" alt="GitHub License">
+  </a>
+  <a href="https://github.com/tsiger/widgetizer/releases">
+    <img src="https://img.shields.io/github/v/release/tsiger/widgetizer" alt="GitHub Release">
+  </a>
 </p>
 
 ## ✨ Features
