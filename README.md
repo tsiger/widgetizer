@@ -2,13 +2,16 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/widgetizer_logo_light.png">
     <source media="(prefers-color-scheme: light)" srcset="assets/widgetizer_logo_dark.png">
-    <img src="assets/widgetizer_logo_light.png" alt="Widgetizer logo" width="500">
+    <img src="assets/widgetizer_logo_light.png" alt="Widgetizer logo" width="400">
   </picture>
 </p>
 
-# Widgetizer
+<p align="center">A powerful, yet simple, visual website builder for creating high-performance static websites.</p>
 
-A powerful, yet simple, visual website builder for creating high-performance static websites. Build pages with drag-and-drop widgets, customize themes, and export blazing-fast static HTML—no database required.
+<p align="center">
+![GitHub License](https://img.shields.io/github/license/tsiger/widgetizer)
+![GitHub Release](https://img.shields.io/github/v/release/tsiger/widgetizer)
+</p>
 
 ## ✨ Features
 
