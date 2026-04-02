@@ -71,6 +71,7 @@ before(async () => {
         id: PROJECT_ID,
         folderName: PROJECT_FOLDER,
         name: "Render Test Project",
+        siteTitle: "Render Test Site",
         theme: "__render_test_theme__",
         siteUrl: "https://example.com",
         created: new Date().toISOString(),
@@ -669,6 +670,7 @@ describe("renderPageLayout", () => {
     );
 
     assert.ok(html.includes("<title>SEO Page</title>"));
+    assert.ok(html.includes("<title>SEO Page - Render Test Site</title>"));
     assert.ok(html.includes("og:title"));
     assert.ok(html.includes("SEO Title"));
     assert.ok(html.includes("A page with SEO"));

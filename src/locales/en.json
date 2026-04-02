@@ -85,6 +85,8 @@
       "folderNameHelp": "The folder name where your project will be saved and exported.",
       "descriptionLabel": "Notes",
       "descriptionHelp": "Add notes about your project for your own reference.",
+      "siteTitleLabel": "Site Title",
+      "siteTitleHelp": "Used in exported browser tab titles, such as \"Page Name - Site Title\".",
       "themeLabel": "Theme",
       "themeRequired": "Please select a theme",
       "themeHelp": "The theme determines the styling and available widgets for your site.",

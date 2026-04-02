@@ -99,6 +99,19 @@ function getProjectData(projectId) {
   }
 }
 
+function buildPageTitle(pageData, projectData) {
+  const pageTitle =
+    pageData?.seo?.title && typeof pageData.seo.title === "string" && pageData.seo.title.trim()
+      ? pageData.seo.title.trim()
+      : pageData?.name || "";
+  const siteTitle =
+    projectData?.siteTitle && typeof projectData.siteTitle === "string" && projectData.siteTitle.trim()
+      ? projectData.siteTitle.trim()
+      : "";
+
+  return siteTitle ? `${pageTitle} - ${siteTitle}` : pageTitle;
+}
+
 /**
  * Check if a value is a link object (has href property and is an object)
  */
@@ -756,6 +769,7 @@ async function renderPageLayout(
       footer: contentSections.footerContent || "",
       page: pageData,
       project: projectData,
+      page_title: buildPageTitle(pageData, projectData),
       body_class: bodyClasses,
     };
 

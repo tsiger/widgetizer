@@ -10,7 +10,7 @@ import useToastStore from "../../stores/toastStore";
 import { getThemePresets, getPresetScreenshotUrl } from "../../queries/themeManager";
 
 export default function ProjectForm({
-  initialData = { name: "", description: "", theme: "", siteUrl: "" },
+  initialData = { name: "", description: "", siteTitle: "", theme: "", siteUrl: "" },
   onSubmit,
   isSubmitting,
   submitLabel = "Save",
@@ -42,6 +42,7 @@ export default function ProjectForm({
       name: initialData.name || "",
       folderName: initialData.folderName || initialData.id || "",
       description: initialData.description || "",
+      siteTitle: initialData.siteTitle || "",
       theme: initialData.theme || "",
       siteUrl: initialData.siteUrl || "",
       receiveThemeUpdates: initialData.receiveThemeUpdates || false,
@@ -78,6 +79,7 @@ export default function ProjectForm({
         name: initialData.name || "",
         folderName: initialData.folderName || initialData.id || "",
         description: initialData.description || "",
+        siteTitle: initialData.siteTitle || "",
         theme: initialData.theme || "",
         siteUrl: initialData.siteUrl || "",
         receiveThemeUpdates: initialData.receiveThemeUpdates || false,
@@ -155,6 +157,7 @@ export default function ProjectForm({
       // Normalize siteUrl: trim and convert empty/whitespace to empty string
       const normalizedData = {
         ...data,
+        siteTitle: data.siteTitle && data.siteTitle.trim() !== "" ? data.siteTitle.trim() : "",
         siteUrl: data.siteUrl && data.siteUrl.trim() !== "" ? data.siteUrl.trim() : "",
       };
 
@@ -166,6 +169,7 @@ export default function ProjectForm({
           name: "",
           folderName: "",
           description: "",
+          siteTitle: "",
           theme: "",
           siteUrl: "",
           receiveThemeUpdates: false,
@@ -325,6 +329,14 @@ export default function ProjectForm({
               </label>
               <textarea id="description" {...register("description")} rows="4" className="form-textarea" />
               <p className="form-description">{t("forms.project.descriptionHelp")}</p>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="siteTitle" className="form-label-optional">
+                {t("forms.project.siteTitleLabel")}
+              </label>
+              <input type="text" id="siteTitle" {...register("siteTitle")} className="form-input" />
+              <p className="form-description">{t("forms.project.siteTitleHelp")}</p>
             </div>
 
             <div className="form-field">

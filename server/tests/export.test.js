@@ -177,6 +177,7 @@ before(async () => {
           id: PROJECT_ID,
           folderName: PROJECT_FOLDER,
           name: "Export Test Project",
+          siteTitle: "Export Test Site",
           theme: "__export_test_theme__",
           themeVersion: "1.0.0",
           siteUrl: SITE_URL,
@@ -552,6 +553,12 @@ describe("exportProject", () => {
     // The rendering service exposes page data as `page` object in Liquid context
     // so {{ page.seo.title }} resolves to the SEO title from the page JSON.
     assert.ok(html.includes("Home | Export Test"), "Should contain page SEO title via {{ page.seo.title }}");
+  });
+
+  it("rendered HTML appends the project site title to the document title", async () => {
+    const exportDir = await getLatestExportDir();
+    const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
+    assert.ok(html.includes("<title>Home | Export Test - Export Test Site</title>"));
   });
 
   it("rendered HTML contains the core-spacer widget output", async () => {

@@ -363,6 +363,7 @@ describe("readProjectsData / writeProjectsData", () => {
         name: "Round Trip Test",
         folderName: "round-trip-test",
         description: "",
+        siteTitle: "",
         theme: null,
         themeVersion: null,
         preset: null,
@@ -547,6 +548,11 @@ describe("createProject", () => {
     assert.equal(project.receiveThemeUpdates, true);
   });
 
+  it("stores siteTitle", async () => {
+    const project = await createTestProject("Site Title Project", { siteTitle: "Widgetizer Demo" });
+    assert.equal(project.siteTitle, "Widgetizer Demo");
+  });
+
   it("defaults receiveThemeUpdates to false", async () => {
     const project = await createTestProject("No Updates Flag");
     assert.equal(project.receiveThemeUpdates, false);
@@ -587,6 +593,14 @@ describe("createProject", () => {
     });
     assert.ok(!project.siteUrl.includes("<script>"), "siteUrl should not contain script tags");
     assert.ok(project.siteUrl.includes("https://example.com/"), "siteUrl should preserve the valid URL part");
+  });
+
+  it("strips HTML from siteTitle", async () => {
+    const project = await createTestProject("SiteTitle Sanitize", {
+      siteTitle: 'My Site <script>alert(1)</script>',
+    });
+    assert.ok(!project.siteTitle.includes("<script>"), "siteTitle should not contain script tags");
+    assert.ok(project.siteTitle.includes("My Site"), "siteTitle should preserve the valid text");
   });
 });
 
@@ -722,6 +736,14 @@ describe("updateProject", () => {
       body: { name: "Original Name", siteUrl: "https://example.com" },
     });
     assert.equal(res._json.siteUrl, "https://example.com");
+  });
+
+  it("updates siteTitle", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", siteTitle: "Updated Site Title" },
+    });
+    assert.equal(res._json.siteTitle, "Updated Site Title");
   });
 
   it("clears siteUrl when set to empty string", async () => {
@@ -1162,11 +1184,15 @@ describe("exportProject", () => {
     assert.equal(manifest.project.theme, TEST_THEME_ID);
   });
 
-  it("manifest includes receiveThemeUpdates and preset", async () => {
+  it("manifest includes siteTitle, receiveThemeUpdates and preset", async () => {
     // Create a project with receiveThemeUpdates enabled
-    const p = await createTestProject("Export Flags Test", { receiveThemeUpdates: true });
+    const p = await createTestProject("Export Flags Test", {
+      siteTitle: "Export Test Site",
+      receiveThemeUpdates: true,
+    });
     const { manifest } = await exportTestProject(p.id);
 
+    assert.equal(manifest.project.siteTitle, "Export Test Site");
     assert.equal(manifest.project.receiveThemeUpdates, true);
     // preset is null by default for non-preset projects
     assert.equal(manifest.project.preset, null);
@@ -1229,6 +1255,7 @@ describe("importProject", () => {
     project: {
       name: "Imported Project",
       description: "Imported via test",
+      siteTitle: "Imported Site Title",
       theme: "__test_theme__",
       themeVersion: "1.0.0",
       receiveThemeUpdates: false,
@@ -1252,6 +1279,7 @@ describe("importProject", () => {
     assert.equal(res._status, 201);
     assert.equal(res._json.name, "Imported Project");
     assert.equal(res._json.description, "Imported via test");
+    assert.equal(res._json.siteTitle, "Imported Site Title");
     assert.equal(res._json.theme, TEST_THEME_ID);
     assert.equal(res._json.siteUrl, "https://example.com");
     assert.ok(res._json.id, "Should have a generated ID");
@@ -1305,7 +1333,7 @@ describe("importProject", () => {
         siteUrl: "",
         created: "2024-01-01T00:00:00.000Z",
         updated: "2024-01-01T00:00:00.000Z",
-        // no receiveThemeUpdates or preset
+        // no siteTitle, receiveThemeUpdates or preset
       },
     };
     const zipFile = buildImportZip(oldManifest, {
@@ -1317,6 +1345,7 @@ describe("importProject", () => {
     });
 
     assert.equal(res._status, 201);
+    assert.equal(res._json.siteTitle, "");
     assert.equal(res._json.receiveThemeUpdates, false);
     assert.equal(res._json.preset, null);
   });

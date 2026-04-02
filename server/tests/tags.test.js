@@ -86,6 +86,7 @@ const fixtures = {
 
   project: {
     siteUrl: "https://example.com",
+    siteTitle: "Widgetizer Site",
   },
 
   themeWithGoogleFonts: {
@@ -194,9 +195,26 @@ before(() => {
 // ---------------------------------------------------------------------------
 
 describe("SeoTag", () => {
-  it("generates title from page name", async () => {
-    const result = await render("{% seo %}", { page: fixtures.basicPage, project: fixtures.project });
+  it("generates title from page name when no site title exists", async () => {
+    const result = await render("{% seo %}", { page: fixtures.basicPage, project: { siteUrl: "https://example.com" } });
     assert.match(result, /<title>Test Page<\/title>/);
+  });
+
+  it("appends project site title to the HTML title", async () => {
+    const result = await render("{% seo %}", { page: fixtures.basicPage, project: fixtures.project });
+    assert.match(result, /<title>Test Page - Widgetizer Site<\/title>/);
+  });
+
+  it("prefers page seo.title for the HTML title before appending site title", async () => {
+    const page = {
+      ...fixtures.basicPage,
+      seo: {
+        ...fixtures.basicPage.seo,
+        title: "Custom SEO Title",
+      },
+    };
+    const result = await render("{% seo %}", { page, project: fixtures.project });
+    assert.match(result, /<title>Custom SEO Title - Widgetizer Site<\/title>/);
   });
 
   it("generates meta description", async () => {

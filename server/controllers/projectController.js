@@ -120,7 +120,7 @@ export async function getActiveProject(req, res) {
  */
 export async function createProject(req, res) {
   try {
-    const { name, folderName: providedFolderName, description, theme, siteUrl, receiveThemeUpdates, preset } = req.body;
+    const { name, folderName: providedFolderName, description, theme, siteTitle, siteUrl, receiveThemeUpdates, preset } = req.body;
 
     // Defensive check: ensure name is not empty after sanitization
     if (!name || typeof name !== "string" || name.trim() === "") {
@@ -195,6 +195,7 @@ export async function createProject(req, res) {
       folderName, // Folder identifier
       name,
       description,
+      siteTitle: siteTitle && siteTitle.trim() !== "" ? stripHtmlTags(siteTitle.trim()) : "",
       theme,
       themeVersion, // Version that was installed
       preset: preset || null, // Track which preset was used
@@ -369,7 +370,10 @@ export async function updateProject(req, res) {
       }
     }
 
-    // Sanitize siteUrl if provided
+    // Sanitize site title and siteUrl if provided
+    const sanitizedSiteTitle = updates.siteTitle !== undefined
+      ? (updates.siteTitle && updates.siteTitle.trim() !== "" ? stripHtmlTags(updates.siteTitle.trim()) : "")
+      : undefined;
     const sanitizedSiteUrl = updates.siteUrl !== undefined
       ? (updates.siteUrl && updates.siteUrl.trim() !== "" ? stripHtmlTags(updates.siteUrl.trim()) : "")
       : undefined;
@@ -378,6 +382,7 @@ export async function updateProject(req, res) {
       folderName: updates.folderName || currentFolderName,
       name: updates.name,
       description: updates.description,
+      siteTitle: sanitizedSiteTitle,
       siteUrl: sanitizedSiteUrl,
       receiveThemeUpdates: updates.receiveThemeUpdates,
     });
@@ -681,6 +686,7 @@ export async function exportProject(req, res) {
       project: {
         name: project.name,
         description: project.description || "",
+        siteTitle: project.siteTitle || "",
         theme: project.theme,
         themeVersion: project.themeVersion || null,
         receiveThemeUpdates: project.receiveThemeUpdates || false,
@@ -942,6 +948,7 @@ export async function importProject(req, res) {
         folderName,
         name: manifest.project.name,
         description: manifest.project.description || "",
+        siteTitle: manifest.project.siteTitle || "",
         theme: manifest.project.theme,
         themeVersion,
         receiveThemeUpdates: manifest.project.receiveThemeUpdates || false,

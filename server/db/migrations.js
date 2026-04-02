@@ -9,6 +9,7 @@ const migrations = [
           folder_name TEXT NOT NULL UNIQUE,
           name TEXT NOT NULL,
           description TEXT DEFAULT '',
+          site_title TEXT DEFAULT '',
           theme TEXT,
           theme_version TEXT,
           preset TEXT,

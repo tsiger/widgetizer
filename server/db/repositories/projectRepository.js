@@ -39,13 +39,14 @@ export function getProjectFolderName(projectId) {
 export function createProject(project) {
   const db = getDb();
   db.prepare(`
-    INSERT INTO projects (id, folder_name, name, description, theme, theme_version, preset, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated)
-    VALUES (@id, @folderName, @name, @description, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
+    INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated)
+    VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
   `).run({
     id: project.id,
     folderName: project.folderName,
     name: project.name,
     description: project.description || "",
+    siteTitle: project.siteTitle || "",
     theme: project.theme || null,
     themeVersion: project.themeVersion || null,
     preset: project.preset || null,
@@ -74,6 +75,7 @@ export function updateProject(id, updates) {
     folderName: updates.folderName ?? current.folder_name,
     name: updates.name ?? current.name,
     description: updates.description !== undefined ? updates.description : current.description,
+    siteTitle: updates.siteTitle !== undefined ? (updates.siteTitle || "") : current.site_title,
     theme: updates.theme !== undefined ? updates.theme : current.theme,
     themeVersion: updates.themeVersion !== undefined ? updates.themeVersion : current.theme_version,
     preset: updates.preset !== undefined ? updates.preset : current.preset,
@@ -92,6 +94,7 @@ export function updateProject(id, updates) {
       folder_name = @folderName,
       name = @name,
       description = @description,
+      site_title = @siteTitle,
       theme = @theme,
       theme_version = @themeVersion,
       preset = @preset,
@@ -214,12 +217,13 @@ export function writeProjectsData(data) {
 
     // Upsert each project
     const upsert = db.prepare(`
-      INSERT INTO projects (id, folder_name, name, description, theme, theme_version, preset, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated)
-      VALUES (@id, @folderName, @name, @description, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
+      INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated)
+      VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
       ON CONFLICT(id) DO UPDATE SET
         folder_name = @folderName,
         name = @name,
         description = @description,
+        site_title = @siteTitle,
         theme = @theme,
         theme_version = @themeVersion,
         preset = @preset,
@@ -236,6 +240,7 @@ export function writeProjectsData(data) {
         folderName: p.folderName,
         name: p.name,
         description: p.description || "",
+        siteTitle: p.siteTitle || "",
         theme: p.theme || null,
         themeVersion: p.themeVersion || null,
         preset: p.preset || null,
@@ -264,6 +269,7 @@ function rowToProject(row) {
     folderName: row.folder_name,
     name: row.name,
     description: row.description,
+    siteTitle: row.site_title,
     theme: row.theme,
     themeVersion: row.theme_version,
     preset: row.preset,

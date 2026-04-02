@@ -7,6 +7,7 @@ import { uploadFormData } from "../lib/uploadRequest";
  * @property {string} name - Project name
  * @property {string} theme - Theme identifier used by the project
  * @property {string} [description] - Optional project description
+ * @property {string} [siteTitle] - Optional site title used for exported metadata
  * @property {boolean} [themeUpdatesEnabled] - Whether theme updates are enabled
  * @property {string} [themeVersion] - Current theme version
  * @property {string} createdAt - ISO timestamp of creation

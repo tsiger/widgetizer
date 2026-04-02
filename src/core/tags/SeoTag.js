@@ -24,9 +24,10 @@ export const SeoTag = {
       // Check if we have an image for conditional logic
       const hasImage = seo.og_image && seo.og_image.trim();
 
-      // HTML title - use page name
-      const title = page.name || "Untitled Page";
-      metaTags.push(`<title>${escapeHtml(title)}</title>`);
+      const pageTitle = seo.title && seo.title.trim() ? seo.title.trim() : page.name || "";
+      const siteTitle = project?.siteTitle && project.siteTitle.trim() ? project.siteTitle.trim() : "";
+      const htmlTitle = siteTitle ? `${pageTitle} - ${siteTitle}` : pageTitle;
+      metaTags.push(`<title>${escapeHtml(htmlTitle)}</title>`);
 
       // Meta description - use seo.description if available
       const description = seo.description && seo.description.trim() ? seo.description : "";
@@ -44,7 +45,7 @@ export const SeoTag = {
       }
 
       // Open Graph tags
-      const ogTitle = seo.og_title && seo.og_title.trim() ? seo.og_title : title;
+      const ogTitle = seo.og_title && seo.og_title.trim() ? seo.og_title : pageTitle;
       metaTags.push(`<meta property="og:title" content="${escapeHtml(ogTitle)}">`);
 
       const ogDescription = description; // Use the same description as meta description
