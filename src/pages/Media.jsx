@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Image } from "lucide-react";
 import { API_URL } from "../config";
@@ -18,6 +18,7 @@ import useMediaUpload from "../hooks/useMediaUpload";
 import useMediaSelection from "../hooks/useMediaSelection";
 import useMediaMetadata from "../hooks/useMediaMetadata";
 import useAppSettings from "../hooks/useAppSettings";
+import { getAllPages } from "../queries/pageManager";
 import { showRejectedFiles } from "../utils/uploadFeedback";
 import { IMAGE_ACCEPT, mapDropzoneRejections } from "../utils/uploadValidation";
 
@@ -27,6 +28,7 @@ export default function Media() {
   // Use our custom hooks to manage different aspects of media functionality
   const mediaState = useMediaState();
   const maxSizeMB = settings?.media?.maxFileSizeMB ?? 5;
+  const [usageTitleMap, setUsageTitleMap] = useState({});
 
   // Lightbox state
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -91,6 +93,40 @@ export default function Media() {
     ? API_URL(`/api/media/projects/${mediaState.activeProject?.id}${currentLightboxImage.path}`)
     : null;
 
+  useEffect(() => {
+    async function loadUsageTitles() {
+      if (!mediaState.activeProject) {
+        setUsageTitleMap({});
+        return;
+      }
+
+      try {
+        const pages = await getAllPages();
+        const nextMap = {
+          "global:header": "Header (Global)",
+          "global:footer": "Footer (Global)",
+          "global:theme-settings": "Theme Settings (Global)",
+        };
+
+        for (const page of pages) {
+          const pageTitle = page.name || page.title || page.slug;
+          if (page.id) nextMap[page.id] = pageTitle;
+          if (page.slug) nextMap[page.slug] = pageTitle;
+        }
+
+        setUsageTitleMap(nextMap);
+      } catch {
+        setUsageTitleMap({
+          "global:header": "Header (Global)",
+          "global:footer": "Footer (Global)",
+          "global:theme-settings": "Theme Settings (Global)",
+        });
+      }
+    }
+
+    loadUsageTitles();
+  }, [mediaState.activeProject]);
+
   // Early returns for various states
   if (mediaState.loading) {
     return (
@@ -138,6 +174,7 @@ export default function Media() {
               onFileView={handleFileView}
               onFileEdit={mediaMetadata.handleEditMetadata}
               activeProject={mediaState.activeProject}
+              usageTitleMap={usageTitleMap}
             />
           ) : (
             <MediaList
@@ -149,6 +186,7 @@ export default function Media() {
               onFileView={handleFileView}
               onFileEdit={mediaMetadata.handleEditMetadata}
               activeProject={mediaState.activeProject}
+              usageTitleMap={usageTitleMap}
             />
           )}
         </>

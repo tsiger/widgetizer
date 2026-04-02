@@ -5,7 +5,7 @@ import { API_URL } from "../../config";
 import { formatDate as formatDateUtil } from "../../utils/dateFormatter";
 import useAppSettings from "../../hooks/useAppSettings";
 
-export default function MediaListItem({ file, isSelected, onSelect, onDelete, onView, onEdit, activeProject }) {
+export default function MediaListItem({ file, isSelected, onSelect, onDelete, onView, onEdit, activeProject, usageTitleMap = {} }) {
   // Get app settings for date formatting
   const { settings: appSettings } = useAppSettings();
 
@@ -21,11 +21,41 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
   };
 
   const cellClass = `py-3 px-4 ${isSelected ? "bg-pink-50" : ""}`;
+  const usageBadgeClass =
+    "inline-flex shrink-0 items-center whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800";
+  const usageEntries = Array.isArray(file.usedIn) ? file.usedIn : [];
+  const isInUse = usageEntries.length > 0;
+
+  const resolveUsageTitle = (usageEntry) => {
+    if (!usageEntry) return null;
+
+    if (typeof usageEntry === "object") {
+      return usageEntry.title || usageEntry.name || usageEntry.id || null;
+    }
+
+    if (usageTitleMap[usageEntry]) {
+      return usageTitleMap[usageEntry];
+    }
+
+    if (usageEntry.startsWith("global:")) {
+      const globalKey = usageEntry.replace("global:", "");
+      return `${globalKey.charAt(0).toUpperCase() + globalKey.slice(1)} (Global)`;
+    }
+
+    return usageEntry;
+  };
+
+  const usageTitles = usageEntries.map(resolveUsageTitle).filter(Boolean);
 
   return (
     <>
       <td className={cellClass}>
-        <IconButton onClick={onSelect} variant="neutral" size="sm">
+        <IconButton
+          onClick={onSelect}
+          variant="neutral"
+          size="sm"
+          className="border border-transparent bg-white/80 shadow-sm hover:border-slate-200 hover:bg-white hover:shadow-md"
+        >
           {isSelected ? (
             <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
               <Check size={12} />
@@ -57,21 +87,26 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
       <td className={cellClass}>{file.width && file.height ? `${file.width}×${file.height}` : "-"}</td>
       <td className={cellClass}>{formatDate(file.uploaded)}</td>
       <td className={cellClass}>
-        {file.usedIn && file.usedIn.length > 0 ? (
-          <div
-            className="inline-flex items-center bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
-            title={`Used in: ${file.usedIn
-              .map((u) => {
-                if (u.startsWith("global:")) {
-                  const type = u.split(":")[1];
-                  return `${type.charAt(0).toUpperCase() + type.slice(1)} (Global)`;
-                }
-                return u;
-              })
-              .join(", ")}`}
+        {isInUse ? (
+          <Tooltip
+            content={
+              <div className="min-w-44 max-w-64">
+                <div className="mb-1 font-medium">Used in</div>
+                <ul className="space-y-1">
+                  {usageTitles.map((usageTitle) => (
+                    <li key={usageTitle} className="leading-relaxed">
+                      {usageTitle}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            }
+            contentClassName="max-w-64 whitespace-normal text-left"
           >
-            {file.usedIn.length} place{file.usedIn.length > 1 ? "s" : ""}
-          </div>
+            <div className={usageBadgeClass}>
+              Used in {usageEntries.length} place{usageEntries.length > 1 ? "s" : ""}
+            </div>
+          </Tooltip>
         ) : (
           <span className="text-slate-400 text-xs">Unused</span>
         )}
@@ -88,11 +123,13 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
               <Edit2 size={18} />
             </IconButton>
           </Tooltip>
-          <Tooltip content="Delete">
-            <IconButton onClick={onDelete} variant="danger" size="sm">
-              <Trash2 size={18} />
-            </IconButton>
-          </Tooltip>
+          {!isInUse && (
+            <Tooltip content="Delete">
+              <IconButton onClick={onDelete} variant="danger" size="sm">
+                <Trash2 size={18} />
+              </IconButton>
+            </Tooltip>
+          )}
         </div>
       </td>
     </>

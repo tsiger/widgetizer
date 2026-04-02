@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -16,7 +15,6 @@ import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function Settings() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [themeData, setThemeData] = useState(null);
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -142,6 +140,22 @@ export default function Settings() {
           {hasChanges && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
         </span>
       }
+      additionalButtons={
+        <Button onClick={handleCancel} variant="secondary" disabled={!hasChanges}>
+          {t("common.reset")}
+        </Button>
+      }
+      buttonProps={{
+        onClick: handleSave,
+        disabled: loading || !themeData || !hasChanges,
+        variant: hasChanges ? "dark" : "primary",
+        children: (
+          <>
+            {t("common.save")}
+            {hasChanges && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
+          </>
+        ),
+      }}
     >
       <>
         {/* Settings panel container */}
@@ -157,17 +171,10 @@ export default function Settings() {
           )}
         </div>
 
-        {/* Save button */}
-        <div className="mt-6 flex justify-end gap-3">
-          <Button onClick={() => navigate(-1)} variant="secondary">
-            {t("forms.common.cancel")}
+        <div className="form-actions-separated justify-end mt-6">
+          <Button onClick={handleCancel} variant="secondary" disabled={!hasChanges}>
+            {t("common.reset")}
           </Button>
-          {hasChanges && (
-            <Button onClick={handleCancel} variant="secondary">
-              {t("common.reset")}
-            </Button>
-          )}
-
           <Button
             onClick={handleSave}
             disabled={loading || !themeData || !hasChanges}

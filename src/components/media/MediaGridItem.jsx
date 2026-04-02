@@ -1,14 +1,50 @@
 import { Check, Search, Trash2, Image, Edit2 } from "lucide-react";
 import { API_URL } from "../../config";
+import Tooltip from "../ui/Tooltip";
 
-export default function MediaGridItem({ file, isSelected, onSelect, onDelete, onView, onEdit, activeProject }) {
+export default function MediaGridItem({
+  file,
+  isSelected,
+  onSelect,
+  onDelete,
+  onView,
+  onEdit,
+  activeProject,
+  usageTitleMap = {},
+}) {
+  const usageEntries = Array.isArray(file.usedIn) ? file.usedIn : [];
+  const isInUse = usageEntries.length > 0;
+  const usageBadgeClass =
+    "inline-flex shrink-0 items-center whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800";
+
+  const resolveUsageTitle = (usageEntry) => {
+    if (!usageEntry) return null;
+
+    if (typeof usageEntry === "object") {
+      return usageEntry.title || usageEntry.name || usageEntry.id || null;
+    }
+
+    if (usageTitleMap[usageEntry]) {
+      return usageTitleMap[usageEntry];
+    }
+
+    if (usageEntry.startsWith("global:")) {
+      const globalKey = usageEntry.replace("global:", "");
+      return `${globalKey.charAt(0).toUpperCase() + globalKey.slice(1)} (Global)`;
+    }
+
+    return usageEntry;
+  };
+
+  const usageTitles = usageEntries.map(resolveUsageTitle).filter(Boolean);
+
   return (
     <div
       className={`group relative bg-white border ${
         isSelected ? "border-pink-500 ring-2 ring-pink-500" : "border-slate-200"
-      } rounded-lg overflow-hidden`}
+      } rounded-lg`}
     >
-      <div className="aspect-square bg-slate-100 flex items-center justify-center">
+      <div className="aspect-square overflow-hidden rounded-t-lg bg-slate-100 flex items-center justify-center">
         {file.type?.startsWith("image/") ? (
           <img
             src={API_URL(
@@ -39,13 +75,26 @@ export default function MediaGridItem({ file, isSelected, onSelect, onDelete, on
         </button>
 
         {/* Usage indicator */}
-        {file.usedIn && file.usedIn.length > 0 && (
-          <div
-            className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full font-semibold"
-            title={`Used in ${file.usedIn.length} page${file.usedIn.length > 1 ? "s" : ""}: ${file.usedIn.join(", ")}`}
+        {isInUse && (
+          <Tooltip
+            content={
+              <div className="min-w-44 max-w-64">
+                <div className="mb-1 font-medium">Used in</div>
+                <ul className="space-y-1">
+                  {usageTitles.map((usageTitle) => (
+                    <li key={usageTitle} className="leading-relaxed">
+                      {usageTitle}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            }
+            contentClassName="max-w-64 whitespace-normal text-left"
           >
-            {file.usedIn.length}
-          </div>
+            <div className={usageBadgeClass}>
+              Used in {usageEntries.length} place{usageEntries.length > 1 ? "s" : ""}
+            </div>
+          </Tooltip>
         )}
       </div>
 
@@ -70,16 +119,18 @@ export default function MediaGridItem({ file, isSelected, onSelect, onDelete, on
         >
           <Edit2 size={16} className="text-slate-600" />
         </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-          className="p-2 bg-white rounded-full hover:bg-slate-100 transition-colors"
-          title="Delete"
-        >
-          <Trash2 size={16} className="text-red-500" />
-        </button>
+        {!isInUse && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="p-2 bg-white rounded-full hover:bg-slate-100 transition-colors"
+            title="Delete"
+          >
+            <Trash2 size={16} className="text-red-500" />
+          </button>
+        )}
       </div>
     </div>
   );

@@ -41,9 +41,7 @@ import useToastStore from "../stores/toastStore";
 export default function useMediaState() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState(() => {
-    return localStorage.getItem("mediaViewMode") || "grid";
-  });
+  const [viewMode, setViewMode] = useState("list");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
 

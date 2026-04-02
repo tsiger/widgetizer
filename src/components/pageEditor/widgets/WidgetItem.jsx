@@ -31,6 +31,7 @@ export default function WidgetItem({
   onBlockDragEnd,
   onHover,
   onRenameWidget,
+  isCollapsed = false,
 }) {
   const { t } = useTranslation();
   const { tTheme } = useThemeLocale();
@@ -90,7 +91,7 @@ export default function WidgetItem({
 
   return (
     <div
-      className={`rounded-sm border border-1 transition-all duration-200 ${
+      className={`min-w-0 flex-1 rounded-sm border border-1 transition-all duration-200 ${
         isSelected
           ? "border-pink-300 bg-white ring-2 ring-pink-200 shadow-lg shadow-pink-100"
           : isModified
@@ -168,7 +169,7 @@ export default function WidgetItem({
         </div>
       </div>
 
-      {hasBlocks && isSelected && !isDraggingAny && (
+      {hasBlocks && isSelected && !isDraggingAny && !isCollapsed && (
         <div className="border-t border-slate-100">
           <div className="p-2">
             <DndContext

@@ -5,7 +5,6 @@ import { ListTree, Trash2, Pencil, CirclePlus, Copy, MoreVertical } from "lucide
 
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
-import Tooltip from "../components/ui/Tooltip";
 import Table from "../components/ui/Table";
 import { IconButton } from "../components/ui/Button";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
@@ -157,18 +156,21 @@ export default function Menus() {
                 </td>
                 <td className="py-3 px-4 text-right">
                   <div className="relative inline-flex items-center justify-end" ref={openMenuId === menu.id ? menuRef : null}>
-                    <Tooltip content={t("menus.actions.menu", "Menu actions")}>
-                      <IconButton
-                        onClick={() => setOpenMenuId(openMenuId === menu.id ? null : menu.id)}
-                        variant="neutral"
-                        size="sm"
-                        aria-label={t("menus.actions.menu", "Menu actions")}
-                        aria-haspopup="menu"
-                        aria-expanded={openMenuId === menu.id}
-                      >
-                        <MoreVertical size={18} />
-                      </IconButton>
-                    </Tooltip>
+                    <IconButton
+                      onClick={() => setOpenMenuId(openMenuId === menu.id ? null : menu.id)}
+                      variant="neutral"
+                      size="sm"
+                      className={`border shadow-sm transition-all ${
+                        openMenuId === menu.id
+                          ? "border-pink-200 bg-pink-50 text-pink-600"
+                          : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:shadow-md hover:text-slate-900"
+                      }`}
+                      aria-label={t("menus.actions.menu", "Menu actions")}
+                      aria-haspopup="menu"
+                      aria-expanded={openMenuId === menu.id}
+                    >
+                      <MoreVertical size={18} />
+                    </IconButton>
 
                     {openMenuId === menu.id && (
                       <div className="absolute right-0 top-full z-10 mt-1 w-60 rounded-md border border-slate-200 bg-white py-1 shadow-lg">

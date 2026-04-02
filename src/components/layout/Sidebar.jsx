@@ -105,7 +105,7 @@ export default function Sidebar() {
         {topSections.map(renderSection)}
       </div>
 
-      <div className="px-2 md:px-4 pb-2">
+      <div className="px-2 md:px-4 pb-4">
         {bottomSections.map(renderSection)}
       </div>
     </div>

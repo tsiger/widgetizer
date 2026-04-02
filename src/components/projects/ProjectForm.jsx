@@ -374,16 +374,16 @@ export default function ProjectForm({
         )}
       </div>
 
-      <div className="form-actions">
-        <Button type="submit" disabled={isSubmitting || !isDirtyProp} variant={isDirtyProp ? "dark" : "primary"}>
-          {isSubmitting ? t("forms.common.saving") : submitLabel}
-          {isDirtyProp && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
-        </Button>
+      <div className="form-actions-separated justify-end">
         {onCancel && (
           <Button type="button" onClick={onCancel} variant="secondary">
             {t("forms.common.cancel")}
           </Button>
         )}
+        <Button type="submit" disabled={isSubmitting || !isDirtyProp} variant={isDirtyProp ? "dark" : "primary"}>
+          {isSubmitting ? t("forms.common.saving") : submitLabel}
+          {isDirtyProp && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
+        </Button>
       </div>
     </form>
   );

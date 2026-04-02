@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Tooltip({ children, content }) {
+export default function Tooltip({ children, content, contentClassName = "" }) {
   const [isVisible, setIsVisible] = useState(false);
 
   return (
@@ -16,7 +16,7 @@ export default function Tooltip({ children, content }) {
         ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none"}
       `}
       >
-        <div className="px-2 py-1 text-xs text-white bg-black/75 rounded whitespace-nowrap">{content}</div>
+        <div className={`rounded bg-black/75 px-2 py-1 text-xs text-white ${contentClassName}`}>{content}</div>
         {/* Triangle pointer - made bigger and more visible */}
         <div
           className="absolute left-1/2 -translate-x-1/2 w-0 h-0

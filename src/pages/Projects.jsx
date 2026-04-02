@@ -276,18 +276,21 @@ export default function Projects() {
                 <td className="py-3 px-4 whitespace-nowrap text-slate-600">{formatDate(project.updated, dateFormat)}</td>
                 <td className="py-3 px-4 text-right">
                   <div className="relative inline-flex items-center justify-end gap-1.5" ref={openMenuId === project.id ? menuRef : null}>
-                    <Tooltip content={t("projects.actions.menu", "Project actions")}>
-                      <IconButton
-                        onClick={() => setOpenMenuId(openMenuId === project.id ? null : project.id)}
-                        variant="neutral"
-                        size="sm"
-                        aria-label={t("projects.actions.menu", "Project actions")}
-                        aria-haspopup="menu"
-                        aria-expanded={openMenuId === project.id}
-                      >
-                        <MoreVertical size={18} />
-                      </IconButton>
-                    </Tooltip>
+                    <IconButton
+                      onClick={() => setOpenMenuId(openMenuId === project.id ? null : project.id)}
+                      variant="neutral"
+                      size="sm"
+                      className={`border shadow-sm transition-all ${
+                        openMenuId === project.id
+                          ? "border-pink-200 bg-pink-50 text-pink-600"
+                          : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:shadow-md hover:text-slate-900"
+                      }`}
+                      aria-label={t("projects.actions.menu", "Project actions")}
+                      aria-haspopup="menu"
+                      aria-expanded={openMenuId === project.id}
+                    >
+                      <MoreVertical size={18} />
+                    </IconButton>
 
                     {openMenuId === project.id && (
                       <div className="absolute right-0 top-full z-10 mt-1 w-64 rounded-md border border-slate-200 bg-white py-1 shadow-lg">

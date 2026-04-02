@@ -20,18 +20,18 @@ export default function MediaToolbar({
     <div className="mt-4 flex flex-wrap justify-between mb-4 items-center">
       <div className="flex items-center mb-2 sm:mb-0">
         <IconButton
-          variant={viewMode === "grid" ? "primary" : "neutral"}
-          onClick={() => onViewModeChange("grid")}
-          title={t("components.mediaToolbar.gridView")}
-        >
-          <Grid size={20} />
-        </IconButton>
-        <IconButton
           variant={viewMode === "list" ? "primary" : "neutral"}
           onClick={() => onViewModeChange("list")}
           title={t("components.mediaToolbar.listView")}
         >
           <List size={20} />
+        </IconButton>
+        <IconButton
+          variant={viewMode === "grid" ? "primary" : "neutral"}
+          onClick={() => onViewModeChange("grid")}
+          title={t("components.mediaToolbar.gridView")}
+        >
+          <Grid size={20} />
         </IconButton>
 
         <div className="ml-4 flex items-center space-x-2">

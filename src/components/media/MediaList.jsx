@@ -12,11 +12,18 @@ export default function MediaList({
   onFileView,
   onFileEdit,
   activeProject,
+  usageTitleMap,
 }) {
   return (
     <Table
       headers={[
-        <IconButton onClick={onSelectAll} variant="neutral" size="sm" key="select-all">
+        <IconButton
+          onClick={onSelectAll}
+          variant="neutral"
+          size="sm"
+          key="select-all"
+          className="border border-transparent bg-white/80 shadow-sm hover:border-slate-200 hover:bg-white hover:shadow-md"
+        >
           {selectedFiles.length === files.length && files.length > 0 ? (
             <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
               <Check size={12} />
@@ -50,6 +57,7 @@ export default function MediaList({
           onView={() => onFileView(file)}
           onEdit={() => onFileEdit(file)}
           activeProject={activeProject}
+          usageTitleMap={usageTitleMap}
         />
       )}
     />

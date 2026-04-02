@@ -11,7 +11,6 @@ import useProjectStore from "../stores/projectStore";
 import useAppSettings from "../hooks/useAppSettings";
 import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
-import Tooltip from "../components/ui/Tooltip";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import Table from "../components/ui/Table";
 import { formatDate } from "../utils/dateFormatter";
@@ -210,7 +209,13 @@ export default function Pages() {
           <Table
             className="[&_th:first-child]:w-12 [&_th:first-child]:!pl-4 [&_th:first-child]:!pr-1 [&_td:first-child]:w-12 [&_td:first-child]:!pl-4 [&_td:first-child]:!pr-1 [&_th:nth-child(2)]:!pl-[11px] [&_td:nth-child(2)]:!pl-[11px]"
             headers={[
-              <IconButton onClick={handleSelectAll} variant="neutral" size="sm" key="select-all">
+              <IconButton
+                onClick={handleSelectAll}
+                variant="neutral"
+                size="sm"
+                key="select-all"
+                className="border border-transparent bg-white/80 shadow-sm hover:border-slate-200 hover:bg-white hover:shadow-md"
+              >
                 {isAllSelected(filteredPages) && filteredPages.length > 0 ? (
                   <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
                     <Check size={12} />
@@ -243,7 +248,12 @@ export default function Pages() {
               return (
                 <>
                   <td className={`py-3 px-4 ${isSelected ? "bg-pink-50" : ""}`}>
-                    <IconButton onClick={() => togglePageSelection(page.id)} variant="neutral" size="sm">
+                    <IconButton
+                      onClick={() => togglePageSelection(page.id)}
+                      variant="neutral"
+                      size="sm"
+                      className="border border-transparent bg-white/80 shadow-sm hover:border-slate-200 hover:bg-white hover:shadow-md"
+                    >
                       {isSelected ? (
                         <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
                           <Check size={12} />
@@ -266,18 +276,21 @@ export default function Pages() {
                   </td>
                   <td className={`py-3 px-4 text-right ${isSelected ? "bg-pink-50" : ""}`}>
                     <div className="relative inline-flex items-center justify-end" ref={openMenuId === page.id ? menuRef : null}>
-                      <Tooltip content={t("pages.actions.menu", "Page actions")}>
-                        <IconButton
-                          onClick={() => setOpenMenuId(openMenuId === page.id ? null : page.id)}
-                          variant="neutral"
-                          size="sm"
-                          aria-label={t("pages.actions.menu", "Page actions")}
-                          aria-haspopup="menu"
-                          aria-expanded={openMenuId === page.id}
-                        >
-                          <MoreVertical size={18} />
-                        </IconButton>
-                      </Tooltip>
+                      <IconButton
+                        onClick={() => setOpenMenuId(openMenuId === page.id ? null : page.id)}
+                        variant="neutral"
+                        size="sm"
+                        className={`border shadow-sm transition-all ${
+                          openMenuId === page.id
+                            ? "border-pink-200 bg-pink-50 text-pink-600"
+                            : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:shadow-md hover:text-slate-900"
+                        }`}
+                        aria-label={t("pages.actions.menu", "Page actions")}
+                        aria-haspopup="menu"
+                        aria-expanded={openMenuId === page.id}
+                      >
+                        <MoreVertical size={18} />
+                      </IconButton>
 
                       {openMenuId === page.id && (
                         <div className="absolute right-0 top-full z-10 mt-1 w-56 rounded-md border border-slate-200 bg-white py-1 shadow-lg">

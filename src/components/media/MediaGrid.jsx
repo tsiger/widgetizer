@@ -9,6 +9,7 @@ export default function MediaGrid({
   onFileView,
   onFileEdit,
   activeProject,
+  usageTitleMap,
 }) {
   if (files.length === 0) {
     return (
@@ -32,6 +33,7 @@ export default function MediaGrid({
           onView={() => onFileView(file)}
           onEdit={() => onFileEdit(file)}
           activeProject={activeProject}
+          usageTitleMap={usageTitleMap}
         />
       ))}
     </div>

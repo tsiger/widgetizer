@@ -44,6 +44,7 @@ export default function WidgetList({
 }) {
   const { t } = useTranslation();
   const [activeId, setActiveId] = useState(null);
+  const [collapsedWidgets, setCollapsedWidgets] = useState({});
 
   // WidgetSelector modal state
   const [isWidgetSelectorOpen, setIsWidgetSelectorOpen] = useState(false);
@@ -197,11 +198,24 @@ export default function WidgetList({
     }
   }, [selectedWidgetId, selectedGlobalWidgetId]);
 
+  // Keep externally selected content widgets expanded so their blocks remain accessible.
+  useEffect(() => {
+    if (!selectedWidgetId) return;
+
+    setCollapsedWidgets((prev) => {
+      if (!prev[selectedWidgetId]) return prev;
+      return {
+        ...prev,
+        [selectedWidgetId]: false,
+      };
+    });
+  }, [selectedWidgetId]);
+
   const activeWidget = activeId ? sortableWidgets.find((item) => item.id === activeId) : null;
   const activeWidgetSchema = activeWidget ? widgetSchemas[activeWidget.type] || {} : {};
 
   return (
-    <div className="w-60 bg-white border-r border-slate-200 flex flex-col h-full overflow-hidden">
+    <div className="w-70 bg-white border-r border-slate-200 flex flex-col h-full overflow-hidden">
       <div className="overflow-y-auto flex-grow p-3">
         {headerWidget && (
           <WidgetSection>
@@ -250,6 +264,7 @@ export default function WidgetList({
                     const widgetId = widget.id;
                     const widgetSchema = widgetSchemas[widget.type] || {};
                     const isModified = modifiedWidgets.has(widgetId);
+                    const isCollapsed = !!collapsedWidgets[widgetId];
 
                     return (
                       <div key={widgetId} id={`sidebar-widget-${widgetId}`}>
@@ -272,6 +287,17 @@ export default function WidgetList({
                           activeBlockTriggerKey={activeBlockTriggerKey}
                           onHover={handleHover}
                           onRenameWidget={handleRenameWidget}
+                          isCollapsed={isCollapsed}
+                          onToggleCollapse={(nextCollapsed) => {
+                            setCollapsedWidgets((prev) => ({
+                              ...prev,
+                              [widgetId]: nextCollapsed,
+                            }));
+
+                            if (nextCollapsed && selectedWidgetId === widgetId && selectedBlockId && onBlockSelect) {
+                              onBlockSelect(null);
+                            }
+                          }}
                         />
                         {index < sortableWidgets.length - 1 && (
                           <WidgetInsertionZone
