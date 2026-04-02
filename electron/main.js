@@ -14,6 +14,7 @@ const DOCS_URL = "https://docs.widgetizer.org";
 
 // State
 let mainWindow = null;
+let previewWindow = null;
 let serverProcess = null;
 let logFile = null;
 
@@ -284,6 +285,19 @@ function waitForServerReady() {
   });
 }
 
+function getRendererBaseUrl() {
+  if (getIsDev()) {
+    return process.env.VITE_DEV_SERVER_URL || "http://localhost:5173";
+  }
+
+  return `http://127.0.0.1:${serverPort}`;
+}
+
+function getRendererUrl(routePath = "/") {
+  const normalizedRoute = routePath.startsWith("/") ? routePath : `/${routePath}`;
+  return new URL(normalizedRoute, `${getRendererBaseUrl().replace(/\/$/, "")}/`).toString();
+}
+
 // Create the main browser window
 function createWindow() {
   log("Creating main window...");
@@ -368,6 +382,83 @@ function createWindow() {
   });
 
   return mainWindow;
+}
+
+function createPreviewWindow() {
+  log("Creating preview window...");
+
+  const preloadPath = path.join(appRoot, "electron", "preload.js");
+  const fallbackBounds = { width: 1280, height: 800 };
+  const sourceWindow = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
+  const bounds = sourceWindow ? sourceWindow.getBounds() : fallbackBounds;
+
+  previewWindow = new BrowserWindow({
+    width: bounds.width,
+    height: bounds.height,
+    minWidth: 1024,
+    minHeight: 640,
+    show: false,
+    backgroundColor: "#1a1a2e",
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      preload: preloadPath,
+    },
+  });
+
+  previewWindow.on("closed", () => {
+    log("Preview window closed");
+    previewWindow = null;
+  });
+
+  previewWindow.on("ready-to-show", () => {
+    if (!previewWindow) return;
+
+    log("Preview window ready to show");
+    previewWindow.maximize();
+    previewWindow.show();
+    previewWindow.focus();
+  });
+
+  previewWindow.webContents.on("did-fail-load", (_event, errorCode, errorDescription, validatedURL) => {
+    log(`Preview failed to load: ${errorDescription} (${errorCode}) - URL: ${validatedURL}`);
+  });
+
+  previewWindow.webContents.on("will-prevent-unload", (event) => {
+    log("Preview renderer attempted to prevent unload — allowing close");
+    event.preventDefault();
+  });
+
+  return previewWindow;
+}
+
+async function openPreviewWindow(pageId) {
+  if (pageId === null || pageId === undefined || pageId === "") {
+    return;
+  }
+
+  const previewUrl = getRendererUrl(`/preview/${encodeURIComponent(String(pageId))}`);
+
+  if (previewWindow && !previewWindow.isDestroyed()) {
+    log(`Reusing preview window for URL: ${previewUrl}`);
+
+    if (previewWindow.webContents.getURL() !== previewUrl) {
+      await previewWindow.loadURL(previewUrl);
+    }
+
+    if (previewWindow.isMinimized()) {
+      previewWindow.restore();
+    }
+
+    previewWindow.maximize();
+    previewWindow.show();
+    previewWindow.focus();
+    return;
+  }
+
+  const window = createPreviewWindow();
+  log(`Loading preview URL: ${previewUrl}`);
+  await window.loadURL(previewUrl);
 }
 
 // Show a lightweight loading page while services start
@@ -626,6 +717,20 @@ function createAppMenu() {
   Menu.setApplicationMenu(menu);
 }
 
+function setupIpcHandlers() {
+  ipcMain.on("open-external", (_event, url) => {
+    if (typeof url === "string" && /^https?:\/\//.test(url)) {
+      shell.openExternal(url);
+    }
+  });
+
+  ipcMain.on("open-preview-window", (_event, pageId) => {
+    openPreviewWindow(pageId).catch((err) => {
+      log(`Failed to open preview window: ${err.message}`);
+    });
+  });
+}
+
 // Auto-updater setup
 function setupAutoUpdater() {
   if (getIsDev()) return;
@@ -695,12 +800,6 @@ function setupAutoUpdater() {
     autoUpdater.quitAndInstall();
   });
 
-  ipcMain.on("open-external", (_event, url) => {
-    if (typeof url === "string" && /^https?:\/\//.test(url)) {
-      shell.openExternal(url);
-    }
-  });
-
   // Check for updates after a short delay to avoid slowing down startup
   setTimeout(() => {
     autoUpdater.checkForUpdates().catch((err) => {
@@ -718,6 +817,7 @@ app.whenReady().then(async () => {
     initPaths();
     ensureDataDirectories();
     createAppMenu();
+    setupIpcHandlers();
     setupAutoUpdater();
 
     // Create window first so user sees something

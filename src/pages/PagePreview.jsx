@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft } from "lucide-react";
+import { Monitor, Smartphone } from "lucide-react";
 
 import usePageStore from "../stores/pageStore";
 import PreviewPanel from "../components/pageEditor/PreviewPanel";
@@ -13,6 +13,7 @@ export default function PagePreview() {
   const { t } = useTranslation();
   const { pageId } = useParams();
   const navigate = useNavigate();
+  const [previewMode, setPreviewMode] = useState(() => localStorage.getItem("editorPreviewMode") || "desktop");
 
   const { page, loading, error, loadPage, themeSettings } = usePageStore();
 
@@ -59,21 +60,40 @@ export default function PagePreview() {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden">
-      <div className="bg-white border-b border-slate-200 p-2 flex items-center">
-        <button
-          onClick={() => navigate(`/page-editor?pageId=${pageId}`)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm hover:bg-slate-100 text-slate-600 hover:text-slate-800"
-        >
-          <ArrowLeft size={18} />
-          {t("pagePreview.backToEditor")}
-        </button>
+      <div className="bg-white border-b border-slate-200 p-2 flex items-center justify-center">
+        <div className="flex gap-1 p-1 h-9 bg-slate-200 rounded-md items-center">
+          <button
+            onClick={() => {
+              setPreviewMode("desktop");
+              localStorage.setItem("editorPreviewMode", "desktop");
+            }}
+            title={t("pageEditor.toolbar.desktopView")}
+            className={`p-1.5 rounded ${
+              previewMode === "desktop" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <Monitor size={18} />
+          </button>
+          <button
+            onClick={() => {
+              setPreviewMode("mobile");
+              localStorage.setItem("editorPreviewMode", "mobile");
+            }}
+            title={t("pageEditor.toolbar.mobileView")}
+            className={`p-1.5 rounded ${
+              previewMode === "mobile" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <Smartphone size={18} />
+          </button>
+        </div>
       </div>
       <div className="flex flex-1 min-h-0">
         <PreviewPanel
           page={page}
           widgets={page?.widgets || {}}
           themeSettings={themeSettings}
-          previewMode="desktop"
+          previewMode={previewMode}
           runtimeMode="standalone"
           showSelectionOverlay={false}
           selectedWidgetId={null}

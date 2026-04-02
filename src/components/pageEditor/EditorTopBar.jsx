@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAllPages } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
@@ -125,6 +125,20 @@ export default function EditorTopBar({
     onPreviewModeChange?.(mode);
   };
 
+  const handleOpenPreview = useCallback(() => {
+    if (!pageId) return;
+
+    const electronOpenPreview = window.electronUpdater?.openPreviewWindow;
+    if (typeof electronOpenPreview === "function") {
+      electronOpenPreview(pageId);
+      return;
+    }
+
+    const previewUrl = new URL(`/preview/${pageId}`, window.location.origin).toString();
+    const previewWindow = window.open(previewUrl, "widgetizer-preview");
+    previewWindow?.focus();
+  }, [pageId]);
+
   const hasMultiplePages = pages.length > 1;
 
   return (
@@ -207,13 +221,13 @@ export default function EditorTopBar({
           </button>
         </div>
 
-        <Link
-          to={`/preview/${pageId}`}
+        <button
+          onClick={handleOpenPreview}
           className="flex items-center gap-2 px-3 h-9 rounded-sm text-sm bg-slate-200 hover:bg-slate-300 text-slate-800"
         >
           <Eye size={18} />
           {t("pageEditor.toolbar.preview")}
-        </Link>
+        </button>
 
         {/* Vertical divider */}
         <div className="h-6 w-px bg-slate-300"></div>
