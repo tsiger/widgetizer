@@ -232,7 +232,7 @@ export default function Projects() {
           data={projects}
           emptyMessage={t("projects.noProjects")}
           renderRow={(project) => {
-            const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
+            const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
             const isCurrentProject = activeProject && project.id === activeProject.id;
             const themeLabel = project.themeName || project.theme || "Unknown";
             const isExporting = exportingProjectId === project.id;

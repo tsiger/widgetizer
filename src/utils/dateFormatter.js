@@ -85,7 +85,7 @@ const MONTHS_FULL = [
  * @param {string} format - The format string (one of DATE_FORMATS keys)
  * @returns {string} The formatted date string
  */
-export function formatDate(date, format = "MM/DD/YYYY") {
+export function formatDate(date, format = "MMMM D, YYYY h:mm A") {
   if (!date) return "";
 
   const dateObj = new Date(date);
@@ -142,7 +142,7 @@ export function formatDate(date, format = "MM/DD/YYYY") {
     case "D MMM YYYY HH:mm":
       return `${day} ${monthShort} ${year} ${hh24}:${min}`;
     default:
-      return `${mm}/${dd}/${year}`;
+      return `${monthFull} ${day}, ${year} ${hh12}:${min} ${ampm}`;
   }
 }
 
@@ -151,7 +151,7 @@ export function formatDate(date, format = "MM/DD/YYYY") {
  * @param {string} format - The format string (one of DATE_FORMATS keys)
  * @returns {string} The formatted current date string
  */
-export function formatCurrentDate(format = "MM/DD/YYYY") {
+export function formatCurrentDate(format = "MMMM D, YYYY h:mm A") {
   return formatDate(new Date(), format);
 }
 

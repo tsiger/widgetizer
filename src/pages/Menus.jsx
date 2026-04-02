@@ -137,7 +137,7 @@ export default function Menus() {
           data={menus}
           emptyMessage={t("menus.noMenus")}
           renderRow={(menu) => {
-            const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
+            const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
             const menuButtonClass = "w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors";
 
             return (

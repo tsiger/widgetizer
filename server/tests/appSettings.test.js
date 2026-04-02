@@ -276,7 +276,7 @@ describe("updateAppSettings", () => {
     assert.equal(res._status, 200);
     const saved = await readAppSettingsFile();
     assert.equal(saved.general.language, "de");
-    assert.equal(saved.general.dateFormat, "MM/DD/YYYY");
+    assert.equal(saved.general.dateFormat, "MMMM D, YYYY h:mm A");
   });
 
   it("deep merges: partial media update preserves imageProcessing", async () => {

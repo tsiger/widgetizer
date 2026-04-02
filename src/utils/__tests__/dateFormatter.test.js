@@ -145,12 +145,12 @@ describe("formatDate — edge cases", () => {
     expect(formatDate("not-a-date")).toBe("");
   });
 
-  it("falls back to MM/DD/YYYY for unknown format", () => {
-    expect(formatDate(DEC_31, "UNKNOWN_FORMAT")).toBe("12/31/2024");
+  it("falls back to the default long datetime format for unknown format", () => {
+    expect(formatDate(DEC_31, "UNKNOWN_FORMAT")).toBe("December 31, 2024 2:15 PM");
   });
 
-  it("defaults to MM/DD/YYYY when no format is given", () => {
-    expect(formatDate(DEC_31)).toBe("12/31/2024");
+  it("defaults to the long datetime format when no format is given", () => {
+    expect(formatDate(DEC_31)).toBe("December 31, 2024 2:15 PM");
   });
 
   it("accepts a date string", () => {
@@ -174,9 +174,8 @@ describe("formatCurrentDate", () => {
     expect(formatCurrentDate()).toBeTruthy();
   });
 
-  it("defaults to MM/DD/YYYY format", () => {
-    // Should match pattern: XX/XX/XXXX
-    expect(formatCurrentDate()).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+  it("defaults to the long datetime format", () => {
+    expect(formatCurrentDate()).toMatch(/^[A-Z][a-z]+ \d{1,2}, \d{4} \d{1,2}:\d{2} (AM|PM)$/);
   });
 
   it("respects the format argument", () => {

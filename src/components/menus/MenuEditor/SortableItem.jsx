@@ -88,10 +88,12 @@ const SortableItem = memo(function SortableItem({
           link: `${page.slug}.html`,
         });
       } else {
-        // Custom URL - remove pageUuid if present, store link directly
-         
-        const { pageUuid: _pageUuid, ...rest } = item;
-        onEdit(item.id, { ...rest, link: value });
+        // Custom URL - explicitly clear pageUuid because menu item updates are merged.
+        onEdit(item.id, {
+          ...item,
+          pageUuid: undefined,
+          link: value,
+        });
       }
     },
     [onEdit, item, pages],

@@ -38,7 +38,7 @@ export default function ExportHistoryTable({
   const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDelete);
 
   const formatDate = (isoString) => {
-    const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
+    const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
     return formatDateUtil(isoString, dateFormat);
   };
 

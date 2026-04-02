@@ -28,7 +28,7 @@ export function deepMerge(target, source) {
 const defaultSettings = {
   general: {
     language: "en",
-    dateFormat: "MM/DD/YYYY",
+    dateFormat: "MMMM D, YYYY h:mm A",
   },
   media: {
     maxFileSizeMB: 5,

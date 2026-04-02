@@ -16,7 +16,7 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
   };
 
   const formatDate = (dateString) => {
-    const dateFormat = appSettings?.general?.dateFormat || "MM/DD/YYYY";
+    const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
     return formatDateUtil(dateString, dateFormat);
   };
 
