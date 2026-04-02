@@ -13,6 +13,7 @@ import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import Table from "../components/ui/Table";
+import { sortItemsByCopyName } from "../utils/copyNameSort";
 import { formatDate } from "../utils/dateFormatter";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
@@ -145,10 +146,12 @@ export default function Pages() {
   };
 
   // Filter pages based on search term
-  const filteredPages = pages.filter(
-    (page) =>
-      page.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      page.slug.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredPages = sortItemsByCopyName(
+    pages.filter(
+      (page) =>
+        page.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        page.slug.toLowerCase().includes(searchTerm.toLowerCase()),
+    ),
   );
 
   if (loading) {

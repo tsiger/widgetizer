@@ -31,6 +31,7 @@ import {
   setActiveProject,
   exportProject,
 } from "../queries/projectManager";
+import { sortItemsByCopyName } from "../utils/copyNameSort";
 import { formatDate } from "../utils/dateFormatter";
 
 import ConfirmationModal from "../components/ui/ConfirmationModal";
@@ -207,6 +208,8 @@ export default function Projects() {
     );
   }
 
+  const sortedProjects = sortItemsByCopyName(projects);
+
   return (
     <PageLayout
       title={t("projects.title")}
@@ -229,7 +232,7 @@ export default function Projects() {
             t("projects.headers.updated"),
             t("projects.headers.actions"),
           ]}
-          data={projects}
+          data={sortedProjects}
           emptyMessage={t("projects.noProjects")}
           renderRow={(project) => {
             const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";

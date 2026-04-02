@@ -611,14 +611,14 @@ describe("duplicateMenu", () => {
     assert.ok(res._json);
   });
 
-  it("names the duplicate 'Copy of <original>'", async () => {
+  it("names the duplicate '<original> (Copy)'", async () => {
     const res = await callController(duplicateMenu, { params: { id: "source-menu" } });
-    assert.equal(res._json.name, "Copy of Source Menu");
+    assert.equal(res._json.name, "Source Menu (Copy)");
   });
 
   it("generates a new slugified ID from the copy name", async () => {
     const res = await callController(duplicateMenu, { params: { id: "source-menu" } });
-    assert.equal(res._json.id, "copy-of-source-menu");
+    assert.equal(res._json.id, "source-menu-copy");
   });
 
   it("preserves all menu items", async () => {
@@ -685,11 +685,11 @@ describe("duplicateMenu", () => {
   it("handles duplicate of a duplicate (incremental naming)", async () => {
     // First duplicate
     await callController(duplicateMenu, { params: { id: "source-menu" } });
-    // Second duplicate of original -- "Copy of Source Menu" exists, so it becomes "Copy 2 of Source Menu"
+    // Second duplicate of original -- "Source Menu (Copy)" exists, so it becomes "Source Menu (Copy 2)"
     const res2 = await callController(duplicateMenu, { params: { id: "source-menu" } });
     assert.equal(res2._status, 201);
-    assert.equal(res2._json.id, "copy-2-of-source-menu");
-    assert.equal(res2._json.name, "Copy 2 of Source Menu");
+    assert.equal(res2._json.id, "source-menu-copy-2");
+    assert.equal(res2._json.name, "Source Menu (Copy 2)");
   });
 });
 

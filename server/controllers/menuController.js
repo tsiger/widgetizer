@@ -285,7 +285,7 @@ function generateNewMenuItemIds(items) {
 }
 
 /**
- * Duplicates an existing menu with a new unique ID and "Copy of" prefix.
+ * Duplicates an existing menu with a new unique ID and copy suffix naming.
  * Generates new IDs for all menu items to prevent conflicts.
  * @param {import('express').Request} req - Express request object with menu ID in params
  * @param {import('express').Response} res - Express response object

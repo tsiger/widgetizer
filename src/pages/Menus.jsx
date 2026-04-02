@@ -11,6 +11,7 @@ import ConfirmationModal from "../components/ui/ConfirmationModal";
 import useConfirmationModal from "../hooks/useConfirmationModal";
 
 import { getAllMenus, deleteMenu, duplicateMenu } from "../queries/menuManager";
+import { sortItemsByCopyName } from "../utils/copyNameSort";
 import { formatDate } from "../utils/dateFormatter";
 
 import useToastStore from "../stores/toastStore";
@@ -118,6 +119,8 @@ export default function Menus() {
     );
   }
 
+  const sortedMenus = sortItemsByCopyName(menus);
+
   return (
     <PageLayout
       title={t("menus.title")}
@@ -134,7 +137,7 @@ export default function Menus() {
             t("menus.headers.updated"),
             t("menus.headers.actions"),
           ]}
-          data={menus}
+          data={sortedMenus}
           emptyMessage={t("menus.noMenus")}
           renderRow={(menu) => {
             const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";

@@ -591,7 +591,7 @@ export async function savePageContent(req, res) {
 }
 
 /**
- * Duplicates an existing page with a new unique slug and "Copy of" prefix.
+ * Duplicates an existing page with a new unique slug and copy suffix naming.
  * Preserves all page content including widgets and SEO settings.
  * @param {import('express').Request} req - Express request object with page ID in params
  * @param {import('express').Response} res - Express response object

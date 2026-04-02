@@ -1037,10 +1037,10 @@ describe("duplicateProject", () => {
     original = await createTestProject("Original Project");
   });
 
-  it("creates a copy with 'Copy of' prefix", async () => {
+  it("creates a copy with a '(Copy)' suffix", async () => {
     const res = await callController(duplicateProject, { params: { id: original.id } });
     assert.equal(res._status, 201);
-    assert.equal(res._json.name, "Copy of Original Project");
+    assert.equal(res._json.name, "Original Project (Copy)");
   });
 
   it("generates a unique folderName for the copy", async () => {
@@ -1082,13 +1082,13 @@ describe("duplicateProject", () => {
 
   it("increments copy number for multiple duplicates", async () => {
     const first = await callController(duplicateProject, { params: { id: original.id } });
-    assert.equal(first._json.name, "Copy of Original Project");
+    assert.equal(first._json.name, "Original Project (Copy)");
 
     const second = await callController(duplicateProject, { params: { id: original.id } });
-    assert.equal(second._json.name, "Copy 2 of Original Project");
+    assert.equal(second._json.name, "Original Project (Copy 2)");
 
     const third = await callController(duplicateProject, { params: { id: original.id } });
-    assert.equal(third._json.name, "Copy 3 of Original Project");
+    assert.equal(third._json.name, "Original Project (Copy 3)");
   });
 
   it("adds the duplicate to the database", async () => {

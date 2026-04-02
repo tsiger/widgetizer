@@ -734,12 +734,12 @@ describe("duplicatePage", () => {
     await resetPages();
   });
 
-  it("creates a copy with 'Copy of' prefix", async () => {
+  it("creates a copy with a '(Copy)' suffix", async () => {
     const page = await createTestPage("Original Page");
 
     const res = await callController(duplicatePage, { params: { id: page.slug } });
     assert.equal(res._status, 201);
-    assert.equal(res._json.name, "Copy of Original Page");
+    assert.equal(res._json.name, "Original Page (Copy)");
   });
 
   it("assigns a new UUID to the copy", async () => {
@@ -755,7 +755,7 @@ describe("duplicatePage", () => {
 
     const res = await callController(duplicatePage, { params: { id: page.slug } });
     assert.notEqual(res._json.slug, page.slug);
-    assert.match(res._json.slug, /copy-of-slug-page/);
+    assert.equal(res._json.slug, "slug-page-copy");
   });
 
   it("preserves widgets from the original", async () => {
@@ -774,22 +774,22 @@ describe("duplicatePage", () => {
     const page = await createTestPage("Multi Copy");
 
     const first = await callController(duplicatePage, { params: { id: page.slug } });
-    assert.equal(first._json.name, "Copy of Multi Copy");
+    assert.equal(first._json.name, "Multi Copy (Copy)");
 
     const second = await callController(duplicatePage, { params: { id: page.slug } });
-    assert.equal(second._json.name, "Copy 2 of Multi Copy");
+    assert.equal(second._json.name, "Multi Copy (Copy 2)");
 
     const third = await callController(duplicatePage, { params: { id: page.slug } });
-    assert.equal(third._json.name, "Copy 3 of Multi Copy");
+    assert.equal(third._json.name, "Multi Copy (Copy 3)");
   });
 
-  it("duplicating a copy names correctly (strips existing Copy prefix)", async () => {
+  it("duplicating a copy names correctly (strips existing copy suffix)", async () => {
     const page = await createTestPage("Base Page");
     const copy1 = await callController(duplicatePage, { params: { id: page.slug } });
     // Now duplicate the copy itself
     const copy2 = await callController(duplicatePage, { params: { id: copy1._json.slug } });
-    // Should be "Copy 2 of Base Page", not "Copy of Copy of Base Page"
-    assert.equal(copy2._json.name, "Copy 2 of Base Page");
+    // Should be "Base Page (Copy 2)", not "Base Page (Copy) (Copy)"
+    assert.equal(copy2._json.name, "Base Page (Copy 2)");
   });
 
   it("returns 500 when page does not exist", async () => {
