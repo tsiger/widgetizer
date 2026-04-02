@@ -1,0 +1,16 @@
+{
+  "default": "blank",
+  "presets": [
+    {
+      "id": "blank",
+      "name": "Blank",
+      "description": "A minimal blank slate with neutral styling and no starter pages or menus."
+    },
+    {
+      "id": "consulting",
+      "name": "Consulting firm",
+      "description": "A polished demo site with pages, menus, and content for a modern consulting brand.",
+      "liveDemo": "https://example.com/widgetizer-consulting-demo"
+    }
+  ]
+}

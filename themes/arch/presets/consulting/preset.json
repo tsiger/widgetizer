@@ -1,0 +1,18 @@
+{
+  "settings": {
+    "standard_bg_secondary": "#f1f5f9",
+    "standard_text_content": "#1f2937",
+    "standard_accent": "#DE1877",
+    "highlight_bg_primary": "#233c54",
+    "highlight_bg_secondary": "#152a3e",
+    "highlight_text_content": "#eaf3fc",
+    "highlight_text_muted": "#64748b",
+    "highlight_border_color": "#526884",
+    "highlight_accent": "#DE1877",
+    "highlight_accent_text": "#ffffff",
+    "heading_font": {
+      "stack": "\"Fraunces\", serif",
+      "weight": 600
+    }
+  }
+}

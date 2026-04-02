@@ -73,6 +73,7 @@ after(async () => {
 // ============================================================================
 
 const TEST_THEME_ID = "__test_theme__";
+const BLANK_PRESET_THEME_ID = "__blank_preset_theme__";
 
 /** Create a minimal theme with templates and menus for project creation */
 async function createTestTheme(themeId = "__test_theme__") {
@@ -135,6 +136,87 @@ async function createTestTheme(themeId = "__test_theme__") {
   // widgets/
   await fs.ensureDir(path.join(themeDir, "widgets", "hero"));
   await fs.writeJson(path.join(themeDir, "widgets", "hero", "schema.json"), { name: "Hero", version: "1.0.0" });
+
+  return themeId;
+}
+
+/** Create a theme whose root is blank and demo content lives in presets/ */
+async function createBlankPresetTheme(themeId = BLANK_PRESET_THEME_ID) {
+  const themeDir = getThemeDir(themeId);
+  await fs.ensureDir(themeDir);
+
+  await fs.writeJson(path.join(themeDir, "theme.json"), {
+    name: "Blank Preset Theme",
+    version: "1.0.0",
+    settings: {
+      global: {
+        colors: [
+          { id: "standard_accent", label: "Accent", default: "#111111" },
+        ],
+      },
+    },
+  });
+
+  await fs.writeFile(path.join(themeDir, "layout.liquid"), "<html><body>{{ main_content | raw }}</body></html>");
+  await fs.ensureDir(path.join(themeDir, "assets"));
+  await fs.writeFile(path.join(themeDir, "assets", "base.css"), "body { margin: 0; }");
+  await fs.ensureDir(path.join(themeDir, "widgets", "hero"));
+  await fs.writeJson(path.join(themeDir, "widgets", "hero", "schema.json"), { name: "Hero", version: "1.0.0" });
+  await fs.outputJson(path.join(themeDir, "templates", "global", "header.json"), {
+    type: "header",
+    settings: {
+      logoText: "Arch",
+      headerNavigation: "",
+      ctaButtonLink: { href: "", text: "", target: "_self" },
+    },
+  });
+  await fs.outputJson(path.join(themeDir, "templates", "global", "footer.json"), {
+    type: "footer",
+    settings: {
+      copyright: "Built with Widgetizer",
+      color_scheme: "standard",
+    },
+    blocks: {},
+    blocksOrder: [],
+  });
+
+  await fs.outputJson(path.join(themeDir, "presets", "presets.json"), {
+    default: "blank",
+    presets: [
+      { id: "blank", name: "Blank" },
+      { id: "consulting", name: "Consulting" },
+    ],
+  });
+  await fs.outputJson(path.join(themeDir, "presets", "blank", "preset.json"), {
+    settings: {
+      standard_accent: "#111111",
+    },
+  });
+  await fs.outputJson(path.join(themeDir, "presets", "consulting", "preset.json"), {
+    settings: {
+      standard_accent: "#ff3366",
+    },
+  });
+  await fs.outputJson(path.join(themeDir, "presets", "consulting", "templates", "index.json"), {
+    name: "Home",
+    slug: "index",
+    widgets: {},
+  });
+  await fs.outputJson(path.join(themeDir, "presets", "consulting", "templates", "global", "header.json"), {
+    type: "header",
+    widgets: {},
+  });
+  await fs.outputJson(path.join(themeDir, "presets", "consulting", "templates", "global", "footer.json"), {
+    type: "footer",
+    widgets: {},
+  });
+  await fs.outputJson(path.join(themeDir, "presets", "consulting", "menus", "main-menu.json"), {
+    id: "main-menu",
+    name: "Main Menu",
+    items: [
+      { id: "item_1", label: "Home", link: "index.html" },
+    ],
+  });
 
   return themeId;
 }
@@ -328,6 +410,7 @@ function buildImportZip(manifestObj, extraFiles = {}) {
 before(async () => {
   await fs.ensureDir(DATA_DIR);
   await createTestTheme();
+  await createBlankPresetTheme();
 });
 
 // ============================================================================
@@ -551,6 +634,55 @@ describe("createProject", () => {
   it("stores siteTitle", async () => {
     const project = await createTestProject("Site Title Project", { siteTitle: "Widgetizer Demo" });
     assert.equal(project.siteTitle, "Widgetizer Demo");
+  });
+
+  it("supports a blank preset with no starter pages or menus and minimal global widgets", async () => {
+    const res = await callController(createProject, {
+      body: {
+        name: "Blank Preset Project",
+        description: "A blank preset project",
+        theme: BLANK_PRESET_THEME_ID,
+        preset: "blank",
+      },
+    });
+    assert.equal(res._status, 201);
+    assert.equal(res._json.preset, "blank");
+
+    const projectDir = getProjectDir(res._json.folderName);
+    const pagesDir = getProjectPagesDir(res._json.folderName);
+    assert.ok(await fs.pathExists(projectDir));
+    assert.ok(await fs.pathExists(path.join(pagesDir, "global", "header.json")));
+    assert.ok(await fs.pathExists(path.join(pagesDir, "global", "footer.json")));
+    const pageEntries = await fs.readdir(pagesDir, { withFileTypes: true });
+    const rootPageFiles = pageEntries.filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
+    assert.equal(rootPageFiles.length, 0);
+    assert.ok(!(await fs.pathExists(getProjectMenusDir(res._json.folderName))));
+  });
+
+  it("creates preset-backed starter content when a non-blank preset is selected", async () => {
+    const res = await callController(createProject, {
+      body: {
+        name: "Consulting Preset Project",
+        description: "A consulting preset project",
+        theme: BLANK_PRESET_THEME_ID,
+        preset: "consulting",
+      },
+    });
+    assert.equal(res._status, 201);
+    assert.equal(res._json.preset, "consulting");
+
+    const pagesDir = getProjectPagesDir(res._json.folderName);
+    const menusDir = getProjectMenusDir(res._json.folderName);
+    assert.ok(await fs.pathExists(path.join(pagesDir, "index.json")));
+    assert.ok(await fs.pathExists(path.join(pagesDir, "global", "header.json")));
+    assert.ok(await fs.pathExists(path.join(menusDir, "main-menu.json")));
+
+    const menu = await fs.readJson(path.join(menusDir, "main-menu.json"));
+    assert.ok(menu.items[0].pageUuid, "consulting preset menu should be enriched with pageUuid");
+
+    const projectTheme = await fs.readJson(path.join(getProjectDir(res._json.folderName), "theme.json"));
+    const accent = projectTheme.settings.global.colors.find((setting) => setting.id === "standard_accent");
+    assert.equal(accent.default, "#ff3366");
   });
 
   it("defaults receiveThemeUpdates to false", async () => {

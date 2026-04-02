@@ -49,14 +49,14 @@
           "type": "color",
           "id": "standard_bg_secondary",
           "label": "tTheme:global.colors.settings.standard_bg_secondary.label",
-          "default": "#f1f5f9",
+          "default": "#f8fafc",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "standard_text_content",
           "label": "tTheme:global.colors.settings.standard_text_content.label",
-          "default": "#1f2937",
+          "default": "#334155",
           "outputAsCssVar": true
         },
         {
@@ -84,7 +84,7 @@
           "type": "color",
           "id": "standard_accent",
           "label": "tTheme:global.colors.settings.standard_accent.label",
-          "default": "#DE1877",
+          "default": "#0f172a",
           "outputAsCssVar": true
         },
         {
@@ -110,21 +110,21 @@
           "type": "color",
           "id": "highlight_bg_primary",
           "label": "tTheme:global.colors.settings.highlight_bg_primary.label",
-          "default": "#233c54",
+          "default": "#0f172a",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_bg_secondary",
           "label": "tTheme:global.colors.settings.highlight_bg_secondary.label",
-          "default": "#152a3e",
+          "default": "#020617",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_text_content",
           "label": "tTheme:global.colors.settings.highlight_text_content.label",
-          "default": "#eaf3fc",
+          "default": "#cbd5e1",
           "outputAsCssVar": true
         },
         {
@@ -138,28 +138,28 @@
           "type": "color",
           "id": "highlight_text_muted",
           "label": "tTheme:global.colors.settings.highlight_text_muted.label",
-          "default": "#64748b",
+          "default": "#94a3b8",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_border_color",
           "label": "tTheme:global.colors.settings.highlight_border_color.label",
-          "default": "#526884",
+          "default": "#334155",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_accent",
           "label": "tTheme:global.colors.settings.highlight_accent.label",
-          "default": "#DE1877",
+          "default": "#ffffff",
           "outputAsCssVar": true
         },
         {
           "type": "color",
           "id": "highlight_accent_text",
           "label": "tTheme:global.colors.settings.highlight_accent_text.label",
-          "default": "#ffffff",
+          "default": "#0f172a",
           "outputAsCssVar": true
         },
         {
@@ -181,7 +181,7 @@
           "id": "heading_font",
           "label": "tTheme:global.typography.settings.heading_font.label",
           "default": {
-            "stack": "\"Fraunces\", serif",
+            "stack": "\"Inter\", sans-serif",
             "weight": 600
           }
         },

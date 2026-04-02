@@ -1,3 +1,11 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/widgetizer_logo_dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="assets/widgetizer_logo_light.png">
+    <img src="assets/widgetizer_logo_light.png" alt="Widgetizer logo" width="1000">
+  </picture>
+</p>
+
 # Widgetizer
 
 A powerful, yet simple, visual website builder for creating high-performance static websites. Build pages with drag-and-drop widgets, customize themes, and export blazing-fast static HTML—no database required.

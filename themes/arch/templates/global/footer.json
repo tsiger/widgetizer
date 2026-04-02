@@ -1,32 +1,9 @@
 {
   "type": "footer",
-  "settings": {},
-  "blocks": {
-    "logo_text_1": {
-      "type": "logo_text",
-      "settings": {
-        "text": "<p>A leading company dedicated to delivering high-quality solutions.</p>"
-      }
-    },
-    "text_block_1": {
-      "type": "text_block",
-      "settings": {
-        "title": "Contact",
-        "text": "<p>info@example.com</p><p>123 Main Street,<br>City, State 12345</p>"
-      }
-    },
-    "menu_block_1": {
-      "type": "menu_block",
-      "settings": {
-        "title": "Links"
-      }
-    },
-    "social_block_1": {
-      "type": "social_block",
-      "settings": {
-        "title": "Get in Touch"
-      }
-    }
+  "settings": {
+    "copyright": "Built with Widgetizer",
+    "color_scheme": "standard"
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocks": {},
+  "blocksOrder": []
 }

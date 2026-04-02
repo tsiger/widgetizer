@@ -127,18 +127,18 @@ export default function FixedWidgetItem({
             </DndContext>
 
             {blockOrder.length === 0 && (
-              <div className="text-center py-2 px-2">
+              <div className="py-2 px-2">
                 <button
                   ref={(ref) => {
                     if (ref) {
                       ref.triggerRef = { current: ref };
                     }
                   }}
-                  className={`w-full flex items-center justify-center py-2 rounded-md border-2 border-dashed transition-all ${
-                    isSelected && !selectedBlockId
-                      ? "text-blue-600 hover:bg-blue-50 border-blue-300 hover:border-blue-400"
-                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-50 border-slate-300 hover:border-slate-400"
-                  } ${isBlockSelectorOpen && activeBlockTriggerKey === `${widgetId}-add` ? "opacity-100 bg-blue-50 border-blue-400" : ""}`}
+                  className={`flex items-center justify-center w-full py-2 rounded-md border border-dashed transition-colors ${
+                    isBlockSelectorOpen && activeBlockTriggerKey === `${widgetId}-add`
+                      ? "border-slate-400 bg-slate-100 text-slate-700"
+                      : "border-slate-300 text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                  }`}
                   onClick={(e) => {
                     e.stopPropagation();
                     const triggerRef = { current: e.currentTarget };

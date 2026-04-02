@@ -713,6 +713,18 @@ describe("getThemeTemplates", () => {
     const res = await callController(getThemeTemplates, { params: { id: "no-such-theme" } });
     assert.equal(res._status, 404);
   });
+
+  it("returns an empty array when a theme has no templates directory", async () => {
+    const blankTheme = "templates-missing-theme";
+    await createThemeOnDisk(blankTheme, { templateCount: 0 });
+    await fs.remove(path.join(getThemeDir(blankTheme), "templates"));
+
+    const res = await callController(getThemeTemplates, { params: { id: blankTheme } });
+    assert.equal(res._status, 200);
+    assert.deepEqual(res._json, []);
+
+    await fs.remove(getThemeDir(blankTheme));
+  });
 });
 
 // ============================================================================

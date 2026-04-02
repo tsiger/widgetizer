@@ -673,20 +673,33 @@ export async function getThemeWidgets(req, res) {
 export async function getThemeTemplates(req, res) {
   try {
     const { id } = req.params;
+    const themeDir = getThemeDir(id);
+    if (!(await fs.pathExists(themeDir))) {
+      return res.status(404).json({ error: `Failed to get templates: Theme '${id}' not found` });
+    }
+
     // Use source directory for reading templates
     const sourceDir = await getThemeSourceDir(id);
     const templatesDir = path.join(sourceDir, "templates");
-    const templates = await fs.readdir(templatesDir);
+    if (!(await fs.pathExists(templatesDir))) {
+      return res.json([]);
+    }
+
+    const templates = await fs.readdir(templatesDir, { withFileTypes: true });
 
     const templatesList = await Promise.all(
       templates.map(async (template) => {
-        const templatePath = path.join(templatesDir, template);
+        if (!template.isFile() || !template.name.endsWith(".json")) {
+          return null;
+        }
+
+        const templatePath = path.join(templatesDir, template.name);
         const content = await fs.readFile(templatePath, "utf8");
         return JSON.parse(content);
       }),
     );
 
-    res.json(templatesList);
+    res.json(templatesList.filter(Boolean));
   } catch (error) {
     res.status(404).json({ error: `Failed to get templates: ${error.message}` });
   }

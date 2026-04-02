@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { apiFetch } from "../../lib/apiFetch";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import Button from "../ui/Button";
@@ -110,8 +110,8 @@ export default function ProjectForm({
         const data = await getThemePresets(selectedTheme);
         setPresets(data);
 
-        if (data.presets.length > 0) {
-          const defaultPresetId = data.default || data.presets[0].id;
+        if (data.default && data.presets.some((preset) => preset.id === data.default)) {
+          const defaultPresetId = data.default;
           setSelectedPreset(defaultPresetId);
           setValue("preset", defaultPresetId);
         } else {
@@ -121,6 +121,7 @@ export default function ProjectForm({
       } catch {
         setPresets({ default: null, presets: [] });
         setSelectedPreset(null);
+        setValue("preset", "");
       } finally {
         setPresetsLoading(false);
       }
@@ -240,37 +241,44 @@ export default function ProjectForm({
             {presetsLoading ? (
               <p className="text-sm text-gray-500">{t("forms.project.loadingPresets")}</p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-5">
                 {presets.presets.map((preset) => (
-                  <button
-                    key={preset.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedPreset(preset.id);
-                      setValue("preset", preset.id, { shouldDirty: true });
-                    }}
-                    className={`relative rounded-lg border-2 overflow-hidden text-left transition-all ${
-                      selectedPreset === preset.id
-                        ? "border-pink-500 ring-2 ring-pink-500/20"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-                    }`}
-                  >
-                    <img
-                      src={getPresetScreenshotUrl(selectedTheme, preset.id, preset.hasScreenshot)}
-                      alt={preset.name}
-                      className="w-full aspect-video object-cover"
-                    />
-                    <div className="p-2">
-                      <p className="text-sm font-medium truncate">{preset.name}</p>
-                      {preset.description && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{preset.description}</p>
-                      )}
-                    </div>
-                  </button>
+                  <div key={preset.id} className="min-w-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextPresetId = selectedPreset === preset.id ? null : preset.id;
+                        setSelectedPreset(nextPresetId);
+                        setValue("preset", nextPresetId || "", { shouldDirty: true });
+                      }}
+                      className={`relative w-full rounded-lg border-2 overflow-hidden text-left transition-all ${
+                        selectedPreset === preset.id
+                          ? "border-pink-500 ring-2 ring-pink-500/20"
+                          : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                      }`}
+                    >
+                      <img
+                        src={getPresetScreenshotUrl(selectedTheme, preset.id, preset.hasScreenshot)}
+                        alt={preset.name}
+                        className="w-full aspect-video object-cover"
+                      />
+                    </button>
+                    <p className="mt-2 text-center text-base font-medium leading-tight">{preset.name}</p>
+                    {preset.liveDemo && (
+                      <a
+                        href={preset.liveDemo}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 flex items-center justify-center gap-1 text-sm text-pink-600 hover:text-pink-700 hover:underline"
+                      >
+                        Live demo
+                        <ExternalLink size={14} />
+                      </a>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
-            <p className="form-description">{t("forms.project.presetHelp")}</p>
           </div>
         )}
 

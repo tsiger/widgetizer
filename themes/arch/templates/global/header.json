@@ -1,4 +1,15 @@
 {
   "type": "header",
-  "settings": {}
+  "settings": {
+    "logoText": "Arch",
+    "contactDetailsLine1": "Call us: (555) 203-9844",
+    "contactDetailsLine2": "1450 Market St, Suite 200",
+    "headerNavigation": "",
+    "ctaButtonLink": {
+      "href": "",
+      "text": "",
+      "target": "_self"
+    },
+    "color_scheme": "standard"
+  }
 }
