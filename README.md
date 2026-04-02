@@ -1,9 +1,6 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/widgetizer_logo_dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="assets/widgetizer_logo_light.png">
-    <img src="assets/widgetizer_logo_light.png" alt="Widgetizer logo" width="400">
-  </picture>
+  <img src="assets/widgetizer_logo_light.png#gh-light-mode-only" alt="Widgetizer logo" width="400">
+  <img src="assets/widgetizer_logo_dark.png#gh-dark-mode-only" alt="Widgetizer logo" width="400">
 </p>
 
 <p align="center">A powerful, yet simple, visual website builder for creating high-performance static websites.</p>
