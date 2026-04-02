@@ -536,6 +536,7 @@ export async function getThemePresets(req, res) {
 export async function getAllThemes(req, res) {
   try {
     const userThemesDir = getThemesDir();
+    const projects = getAllProjects();
 
     // Ensure user themes directory exists (provisions default themes on first access)
     await ensureThemesDirectory();
@@ -581,6 +582,9 @@ export async function getAllThemes(req, res) {
 
           // Check if theme has pending updates
           const hasPendingUpdate = latestVersion && isNewerVersion(theme.version, latestVersion);
+          const projectsUsingTheme = projects
+            .filter((project) => project.theme === themeId)
+            .map((project) => ({ id: project.id, name: project.name }));
 
           return {
             id: themeId,
@@ -593,6 +597,8 @@ export async function getAllThemes(req, res) {
             widgets: widgetCount,
             presets: presetCount,
             author: theme.author,
+            projectsUsingTheme,
+            projectsUsingThemeCount: projectsUsingTheme.length,
           };
         } catch {
           return null;

@@ -12,6 +12,8 @@ import { getActiveProject } from "./projectManager";
  * @property {string} [author] - Theme author
  * @property {boolean} [hasUpdate] - Whether an update is available
  * @property {string} [latestVersion] - Latest available version
+ * @property {Array<{id: string, name: string}>} [projectsUsingTheme] - Projects currently using this theme
+ * @property {number} [projectsUsingThemeCount] - Number of projects currently using this theme
  * @property {string} screenshotUrl - URL to theme screenshot
  */
 

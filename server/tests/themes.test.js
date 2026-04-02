@@ -609,6 +609,16 @@ describe("getAllThemes", () => {
     assert.ok(themeA.latestVersion);
   });
 
+  it("includes project usage metadata", async () => {
+    await createThemeOnDisk("in-use-theme");
+    const res = await callController(getAllThemes);
+    const inUseTheme = res._json.find((t) => t.id === "in-use-theme");
+    assert.ok(inUseTheme);
+    assert.equal(inUseTheme.projectsUsingThemeCount, 1);
+    assert.deepEqual(inUseTheme.projectsUsingTheme, [{ id: "theme-test-project-uuid", name: "Theme Test Project" }]);
+    await fs.remove(getThemeDir("in-use-theme"));
+  });
+
   it("skips themes with invalid theme.json", async () => {
     // Create a broken theme
     const brokenDir = getThemeDir("broken-theme");

@@ -214,6 +214,17 @@ export default function Themes() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {themes.map((theme) => {
             const isActiveTheme = activeProject && activeProject.theme === theme.id;
+            const projectsUsingTheme = theme.projectsUsingTheme || [];
+            const isThemeInUse = projectsUsingTheme.length > 0;
+            const cannotDeleteThemeLabel = isThemeInUse
+              ? t("themes.buttons.cannotDeleteInUse", {
+                  count: projectsUsingTheme.length,
+                  defaultValue:
+                    projectsUsingTheme.length === 1
+                      ? "Cannot delete theme in use by 1 project"
+                      : `Cannot delete theme in use by ${projectsUsingTheme.length} projects`,
+                })
+              : t("themes.buttons.delete", "Delete");
 
             return (
               <div
@@ -288,16 +299,28 @@ export default function Themes() {
                       <MoreVertical size={16} />
                     </button>
                     {openMenuId === theme.id && (
-                      <div className="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg border border-slate-200 py-1 z-10">
+                      <div className="absolute right-0 mt-1 w-64 bg-white rounded-md shadow-lg border border-slate-200 py-1 z-10">
                         <button
                           onClick={() => {
                             setOpenMenuId(null);
-                            handleDeleteTheme(theme.id, theme.name);
+                            if (!isThemeInUse) {
+                              handleDeleteTheme(theme.id, theme.name);
+                            }
                           }}
-                          className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                          disabled={isThemeInUse}
+                          title={
+                            isThemeInUse
+                              ? projectsUsingTheme.map((project) => project.name).join(", ")
+                              : undefined
+                          }
+                          className={`w-full px-3 py-2 text-left text-sm whitespace-normal flex items-center gap-2 ${
+                            isThemeInUse
+                              ? "text-red-300 cursor-not-allowed"
+                              : "text-red-600 hover:bg-red-50"
+                          }`}
                         >
                           <Trash2 size={14} />
-                          {t("themes.buttons.delete", "Delete")}
+                          {cannotDeleteThemeLabel}
                         </button>
                       </div>
                     )}
