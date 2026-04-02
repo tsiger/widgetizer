@@ -10,8 +10,8 @@ The App Settings system has been **refactored** to use a clean, modular architec
 
 ### General Settings
 
-- **Default Language**: Sets the application's user interface language (English, French, German, Greek, Italian, Spanish).
-- **Date Format**: Configures how dates are displayed throughout the platform (e.g., MM/DD/YYYY, YYYY-MM-DD, etc.).
+- **Default Language**: Sets the application's user interface language. The current shipped UI exposes **English only** while the locale infrastructure remains in place for future re-expansion.
+- **Date Format**: Configures how dates are displayed throughout the platform. The current default is `MMMM D, YYYY h:mm A` (for example, `December 31, 2024 2:15 PM`).
 
 ### Media Settings
 
@@ -54,8 +54,8 @@ The App Settings system has been **refactored** to use a clean, modular architec
 These settings are intended for theme developers and advanced users.
 
 - **Enable Developer Mode**: When enabled, shows additional developer tools throughout the application
-  - Reserved for future developer-focused features
   - Enables advanced debugging and development workflows
+  - Also enables export-time HTML validation and generation of `__export__issues.html` during static site exports
 
 ## Architecture Overview
 

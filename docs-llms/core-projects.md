@@ -12,7 +12,7 @@ The project management UI is primarily handled by three pages:
 
 These pages rely on a central form component for handling user input:
 
-- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, description, website address)
+- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, description, site title, website address)
   - Migrated to **react-hook-form** for improved validation and state management
   - Fully **localized** using `react-i18next` for all labels, errors, and help text
   - Exposes `isDirty` state to parent components for navigation guard integration
@@ -59,7 +59,7 @@ This file contains functions that make API calls to the backend:
 2.  **Rendering**: The `ProjectsAdd.jsx` page is rendered. It contains the `ProjectForm.jsx` component.
 3.  **Navigation Guard**: The page integrates `useFormNavigationGuard` to prevent accidental navigation with unsaved changes.
 4.  **Theme Loading**: `ProjectForm.jsx` makes an API call via `/api/themes` to fetch the list of available themes and populates the "Theme" dropdown.
-5.  **User Input**: The user fills in the title and selects a theme. Additional fields (folder name, description, website address) are available under "More settings". The "Theme" dropdown is only enabled during project creation.
+5.  **User Input**: The user fills in the title and selects a theme. Additional fields (folder name, description, site title, website address) are available under "More settings". The "Theme" dropdown is only enabled during project creation.
 5b. **Preset Selection**: If the selected theme has presets, a visual card grid appears below the theme dropdown showing available presets (screenshot, name, description). The default preset is pre-selected. The user can click a different preset card to switch. Presets are fetched from `GET /api/themes/{themeId}/presets` via `getThemePresets()` in `themeManager.js`.
 6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
 7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
@@ -87,7 +87,7 @@ If a user navigates to any project-scoped route without an active project select
 3.  **Actions**: For each project in the list, a set of actions are available on hover:
     - **Set Active (`Star` icon)**: Calls `handleSetActive`, which uses the `setActiveProject(id)` project query to update the backend. It then re-fetches the active project information to update the global store and UI. You cannot deactivate the active project; you must set another as active.
     - **Edit (`Pencil` icon)**: Navigates the user to `/projects/edit/:id`.
-    - **Duplicate (`Copy` icon)**: Calls `handleDuplicate`, which uses `duplicateProject(id)` to make an API call. The duplication process includes UUID regeneration for all pages and automatic updating of all `pageUuid` references in widgets and menus to point to the new UUIDs. The project list is then reloaded.
+    - **Duplicate (`Copy` icon)**: Calls `handleDuplicate`, which uses `duplicateProject(id)` to make an API call. The duplication process includes UUID regeneration for all pages and automatic updating of all `pageUuid` references in widgets and menus to point to the new UUIDs. Duplicates are named with the suffix pattern `Project Name (Copy)`, `Project Name (Copy 2)`, etc., and the list sorting groups them after the original project. The project list is then reloaded.
     - **Delete (`Trash2` icon)**: Calls `openDeleteConfirmation`, which opens a localized confirmation modal. You cannot delete the currently active project. If confirmed, the `deleteProject(id)` function is called (via `deleteProjectById()` from `projectService.js`), and the list is reloaded.
 
 ### 3. Exporting a Project
@@ -98,7 +98,7 @@ Projects can be exported as ZIP files for backup or transfer to another installa
 2.  **Loading Feedback**: A persistent toast notification immediately appears showing "Exporting project..." and remains visible throughout the export process.
 3.  **Backend Processing**: The `exportProject(id)` function sends a `POST` request to `/api/projects/:projectId/export`.
 4.  **ZIP Creation**: The backend creates a ZIP archive containing:
-    - **`project-export.json`**: A manifest file with project metadata (name, description, theme, siteUrl, timestamps).
+    - **`project-export.json`**: A manifest file with `formatVersion: "1.1"`, `exportedAt`, `widgetizerVersion`, and a nested `project` object. That nested object includes project metadata such as `name`, `description`, `siteTitle`, `theme`, `themeVersion`, `receiveThemeUpdates`, `preset`, `siteUrl`, `created`, and `updated`.
     - **All project files**: Pages, menus, widgets, uploads, theme.json, collections, and other project assets.
 5.  **Download**: The ZIP file is streamed to the browser and automatically downloaded with a timestamped filename (e.g., `my-project-export-2024-01-15T10-30-00.zip`).
 6.  **Completion**: The loading toast is dismissed and replaced with a success toast.
@@ -122,6 +122,7 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
     - A unique `folderName` is generated (checking existing project metadata in SQLite and existing directories)
     - Files are copied from the temp directory to the new project directory
     - Project metadata is written to SQLite only after successful file copy
+    - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, and `siteUrl` in addition to the core project fields
 7.  **Cleanup**: Temporary files are removed on both success and failure.
 8.  **Feedback**: Success modal shows the imported project name, then auto-closes after 2 seconds.
 
@@ -136,7 +137,8 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
     - **Theme Restriction**: The "Theme" dropdown is disabled, as themes cannot be changed after creation to maintain consistency
     - **Project Folder Name**: Editable field for the project's folder name, independent of the project title
     - **Description Field**: Optional field for project description
-    - **Website Address Field**: Optional field for setting the base URL for the project, used for generating absolute URLs in social media meta tags and SEO
+    - **Site Title Field**: Optional field used for exported browser-tab titles and related site-level metadata
+    - **Website Address Field**: Optional field for setting the base URL for the project, used for generating absolute URLs in social media meta tags, SEO, and exported site metadata
 5.  **Form Features**:
     - **Independent Fields**: Project title and folder name can be edited independently
     - **URL Validation**: The website address field is optional, but if provided, includes validation to ensure proper URL format (via react-hook-form)

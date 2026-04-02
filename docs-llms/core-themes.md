@@ -75,7 +75,7 @@ The frontend component provides a clean interface for theme management.
 - **Active Theme Indicator**: Visual indication of which theme is currently active for the project.
 - **Update Indicators**: Shows when themes have pending updates available.
 - **Per-Theme Update Buttons**: Allows updating individual themes.
-- **Theme Deletion**: Three-dot menu on each card with "Delete"; confirmation dialog; deletion blocked with 409 + error toast when theme is used by any project.
+- **Theme Deletion**: Three-dot menu on each card with "Delete"; when a theme is used by one or more projects, the delete action is disabled up front and the UI shows that the theme is in use.
 - **Localization**: Fully integrated with `react-i18next` for all user-facing text.
 
 ### Displaying Themes
@@ -170,7 +170,7 @@ The backend handles the logic for listing themes, processing uploads, and managi
 
 #### Theme Deletion
 
-- `deleteTheme`: Removes the theme directory from the filesystem. Before deletion, checks if any project metadata row in SQLite references this theme; if so, returns 409 with message that the theme is in use. On success, returns 200 with success message.
+- `deleteTheme`: Removes the theme directory from the filesystem. Before deletion, checks if any project metadata row in SQLite references this theme; if so, returns 409 with message that the theme is in use. `getAllThemes` also enriches each theme with `projectsUsingTheme` and `projectsUsingThemeCount`, allowing the frontend to disable the action before the user clicks it.
 
 #### Theme Presets
 
@@ -274,6 +274,12 @@ The sidebar displays a badge next to "Themes" showing the count of themes with p
   - User updates a theme
   - Page loads/refreshes
 - Hidden when count is 0
+
+## 5. Theme Locales and Site Icon Markup
+
+- Theme locale infrastructure remains supported (`locales/`, `tTheme:` keys, snippet/widget resolution), but the current shipped app + Arch theme are trimmed to English-only locale files for now.
+- Arch's site-icon head markup lives in `themes/arch/snippets/site-icons.liquid`, rendered from `layout.liquid`.
+- The visible setting label is **Site Icon**, but the underlying theme setting key remains `favicon` for compatibility with stored theme settings and existing Liquid access patterns.
 
 ## Security Considerations
 

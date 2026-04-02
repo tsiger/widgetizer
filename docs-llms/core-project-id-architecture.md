@@ -438,7 +438,7 @@ An alternative architecture would use **UUIDs exclusively** for all filesystem o
 - Guaranteed uniqueness (mathematical certainty)
 - No folderName sanitization or conflict detection
 - Simpler project creation flow
-- No "Copy of Copy 2" scenarios
+- No awkward chained duplicate naming scenarios
 
 #### 3. Trivial Rename Operations
 

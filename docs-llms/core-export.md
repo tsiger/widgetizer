@@ -114,6 +114,8 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
 
 6.  **Generate SEO Files**:
     - **`sitemap.xml`** and **`robots.txt`** (conditional on `siteUrl`): If the project has a `siteUrl` defined, static versions are generated with absolute URLs baked in. These are for users who know their deployment URL upfront.
+    - **Document title composition**: The rendered HTML title uses `page.seo.title` when present, otherwise the page name. If the project defines a `siteTitle`, the export appends ` - {siteTitle}` to the browser title.
+    - **Site icon outputs**: If the theme's `general.favicon` setting is populated, the export generates site icon assets at the export root: `favicon.svg` (when the uploaded source is SVG), `favicon-32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, and `site.webmanifest`.
 
 7.  **Format and Validate HTML Files**:
     - The generated HTML for each page is run through **Prettier** to ensure clean, readable formatting.
@@ -148,14 +150,18 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
         - Falls back to copying all images if media tracking fails
       - **Export Optimization**: Logs how many images were copied vs. skipped, often reducing export size significantly
 
-10. **Record Export History**:
+10. **Write Export Metadata Files**:
+    - Each static export directory receives a root **`manifest.json`** metadata file describing the export itself (`generator`, `widgetizerVersion`, `themeId`, `themeVersion`, `exportVersion`, `exportedAt`, `projectName`).
+    - If site icons were generated, the export also includes a root **`site.webmanifest`** with icon entries for `icon-192.png` and `icon-512.png`.
+
+11. **Record Export History**:
     - The export metadata is recorded in the SQLite `exports` table with version number, timestamp, output directory, and status.
     - **Automatic Cleanup**: If the number of exports exceeds the user's configured limit (from App Settings), the oldest exports are automatically deleted:
       - Physical export directories are removed from the file system
       - Export history entries are cleaned up
       - The cleanup process respects the `export.maxVersionsToKeep` setting
 
-11. **Send Response**:
+12. **Send Response**:
     - Once all steps are complete, the server sends a success response to the client, including the export record with version information.
 
 ## 3. Export Management Features
@@ -199,6 +205,7 @@ Exports can be downloaded as ZIP files containing:
 
 - All generated HTML files
 - Complete asset directories (CSS, JS, images)
+- Root metadata files such as `manifest.json` and, when applicable, `site.webmanifest` plus generated site icon files
 - Preserved directory structure
 - Ready for deployment to any static hosting service
 

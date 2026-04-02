@@ -11,7 +11,7 @@ npm run electron:dev
 ```
 
 - API server: `http://localhost:3001`
-- Vite dev server: `http://localhost:3000`
+- Vite dev server: `http://localhost:5173` (or `VITE_DEV_SERVER_URL` when provided)
 - Electron loads the Vite URL
 
 Use this when testing Electron-specific features (menus, native dialogs). For regular development, use `npm run dev:all` and open `http://localhost:3000` in your browser.
@@ -106,6 +106,13 @@ The Electron app stores user data separately from the application bundle:
 | Themes    | Bundled inside the app                                  |
 
 Access these from the app menu: **File → Open Data Folder** or **File → Open Logs Folder**.
+
+## Preview Window Behavior
+
+- The editor preview is opened through a dedicated Electron `BrowserWindow` rather than replacing the editor view.
+- Repeated preview opens reuse the same preview window if it already exists.
+- The preview window is maximized and focused when opened or reused.
+- In web builds, the editor uses a named browser tab for the same reuse behavior.
 
 ## App Icon
 

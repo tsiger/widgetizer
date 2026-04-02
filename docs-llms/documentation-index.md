@@ -156,7 +156,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Troubleshooting project state management
 - Working with the project store (Zustand)
 
-**Key topics**: Project CRUD operations, active project management, state management, backend API endpoints, preset selection during creation
+**Key topics**: Project CRUD operations, active project management, project ZIP import/export, `siteTitle`, state management, backend API endpoints, preset selection during creation
 
 ---
 
@@ -169,7 +169,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with page metadata and widgets
 - Managing page routing and slugs
 
-**Key topics**: Page JSON structure, CRUD operations, slug generation, widget integration
+**Key topics**: Page JSON structure, CRUD operations, slug generation, widget integration, SEO title behavior
 
 ---
 
@@ -226,7 +226,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing theme management UI
 - Troubleshooting theme installation
 
-**Key topics**: Theme display, upload process, validation, theme switching, theme presets, preset API
+**Key topics**: Theme display, upload process, validation, theme switching, theme presets, preset API, deletion safeguards, theme locale behavior, site icon snippet
 
 ---
 
@@ -240,7 +240,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Managing export versions and storage limits
 - Troubleshooting export issues
 
-**Key topics**: Export workflow, version control system, asset copying, HTML generation, export history API, ZIP downloads, automatic cleanup, smart file detection
+**Key topics**: Export workflow, version control system, asset copying, HTML generation, export history API, ZIP downloads, automatic cleanup, smart file detection, root export metadata, site icons
 
 ---
 
@@ -255,7 +255,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing setting validation
 - Working with nested setting objects
 
-**Key topics**: Global settings management, server-side validation, setting persistence
+**Key topics**: Global settings management, server-side validation, setting persistence, English-only language availability, default date format, developer mode export validation
 
 ---
 

@@ -10,7 +10,7 @@ The editor's interface is divided into three main columns: a component list on t
 
 The `PageEditor` is composed of several specialized child components, each with a distinct responsibility:
 
-- **`EditorTopBar`**: Located at the top of the page, this component displays the page name and provides global actions. It contains controls for manual saving, opening a live preview in a new tab, changing the preview mode (e.g., desktop, tablet, mobile), and shows the current save status (e.g., "All changes saved", "Saving..."). Fully localized.
+- **`EditorTopBar`**: Located at the top of the page, this component displays the page name and provides global actions. It contains controls for manual saving, opening a live preview in a reusable browser tab (web) or dedicated preview window (Electron), changing the preview mode (e.g., desktop, tablet, mobile), and shows the current save status (e.g., "All changes saved", "Saving..."). Fully localized.
 
 - **`WidgetList`**: The left-hand panel that displays the hierarchical structure of all widgets and their inner blocks for the current page. It's the main interface for:
   - Selecting widgets or blocks for editing.
@@ -35,8 +35,8 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 - **`useProjectStore`**: Manages the currently active project. The editor requires an active project to know which database or context to load the page from.
 - **`usePageStore`**: Responsible for fetching and holding the core page data itself, including its name and the top-level list of widgets it contains.
 - **`useWidgetStore`**: Manages all state related to widgets. This includes loading the available widget schemas, tracking the currently selected widget/block, and handling all actions for manipulating widgets and blocks (add, delete, update settings, reorder, etc.).
-- **`useThemeStore`**: Loads and provides global theme settings (e.g., fonts, colors) that affect the overall appearance of the page in the `PreviewPanel`.
-- **`useAutoSave`**: A critical store that manages the saving mechanism. It tracks whether there are unsaved changes and performs automatic background saves, reducing the need for constant manual saving.
+- **`usePageStore`**: Also holds `themeSettings` and `globalWidgets` used by the editor and preview pipeline, in addition to the current page data itself.
+- **`saveStore.js`** (exported as `useAutoSave`): A critical store that manages the saving mechanism. It tracks whether there are unsaved changes and performs automatic background saves, reducing the need for constant manual saving.
 
 ## Core Workflows
 
@@ -45,7 +45,7 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 1.  The `PageEditor` mounts and reads the `pageId` from the URL search parameters.
 2.  A `useEffect` hook, dependent on the `pageId` and an `activeProject`, triggers the data loading functions from the relevant stores.
 3.  It calls `usePageStore.getState().loadPage(pageId)` to fetch the page structure.
-4.  Simultaneously, it calls `useWidgetStore.getState().loadSchemas()` and `useThemeStore.getState().loadSettings()` to get required widget definitions and theme data.
+4.  Simultaneously, it calls `useWidgetStore.getState().loadSchemas()` and the page-store loading actions that fetch theme/global data needed by the editor and preview.
 5.  While data is being fetched, `LoadingSpinner` components are displayed to inform the user.
 
 ### Editing a Widget
@@ -82,11 +82,12 @@ Handlers live in `src/utils/previewRuntime.js` (injected into the iframe).
 The editor provides a way to see a true, live preview of the page, exactly as an end-user would see it, free of any editor UI.
 
 1.  The user clicks the **Preview** button in the `EditorTopBar`.
-2.  This opens a new browser tab at the `/preview/:pageId` URL.
-3.  This route is handled by the `PagePreview` component, which is separate from the main editor layout.
-4.  `PagePreview` fetches the page data and its corresponding server-rendered HTML.
-5.  The raw HTML is then displayed within an `<iframe>`, providing an accurate representation of the final published page.
-6.  Internal `.html` links in the preview navigate to other `/preview/:slug` pages, while external links remain disabled.
+2.  In the web app, this opens or reuses a named browser tab at the `/preview/:pageId` URL.
+3.  In Electron, the toolbar uses IPC to open or reuse a dedicated `BrowserWindow` for preview, maximizing and focusing that window on subsequent opens.
+4.  This route is handled by the `PagePreview` component, which is separate from the main editor layout.
+5.  `PagePreview` fetches the page data and its corresponding server-rendered HTML.
+6.  The raw HTML is then displayed within an `<iframe>`, providing an accurate representation of the final published page.
+7.  Internal `.html` links in the preview navigate to other `/preview/:slug` pages, while external links remain disabled.
 
 ### Saving Changes
 

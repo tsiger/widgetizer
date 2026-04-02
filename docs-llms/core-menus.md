@@ -118,7 +118,7 @@ The controller handles the logic for interacting with the menu JSON files on the
   - `updateMenu`: Overwrites the existing menu file in place. The menu filename/ID remains stable even if the menu name changes.
   - `duplicateMenu`: Creates a complete copy of an existing menu with:
     - **New unique ID**: Generated using `generateUniqueSlug()` from `slugHelpers`
-    - **New name**: Follows the pattern "Copy of {original-name}"
+    - **New name**: Follows the suffix pattern `{original-name} (Copy)`, `{original-name} (Copy 2)`, etc.
     - **Deep cloning**: All menu data is completely duplicated
     - **Unique item IDs**: All nested menu items get new unique IDs to prevent conflicts
     - **Fresh timestamps**: New `created` and `updated` timestamps

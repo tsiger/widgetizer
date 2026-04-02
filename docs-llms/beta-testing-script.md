@@ -141,25 +141,25 @@ You should have received a `beta-test-kit/` folder alongside this script. Verify
 
 1. Click **Projects** in the sidebar to go to the Projects list.
 2. On the "My Renamed Site" row, hover to reveal the action icons and click the **copy icon** (duplicate).
-3. **Expected**: Toast says project duplicated. A new project appears in the list with the title "Copy of My Renamed Site".
-4. Click the **pencil icon** on the duplicate to open the edit form. Click **"More settings"**. Verify the folder name has a "copy-of-" prefix (e.g., "copy-of-renamed-site"). Verify it has the same theme, notes, and website address as the original.
+3. **Expected**: Toast says project duplicated. A new project appears in the list with the title "My Renamed Site (Copy)".
+4. Click the **pencil icon** on the duplicate to open the edit form. Click **"More settings"**. Verify the folder name is a unique copy slug derived from the original (for example, `my-renamed-site-copy`). Verify it has the same theme, notes, website address, and site title as the original.
 5. Click **"Cancel"** or **Projects** in the sidebar to return to the Projects list.
-6. Click the **star icon** on "Copy of My Renamed Site" to mark it as active.
-7. **Expected**: Toast confirms. "Copy of My Renamed Site" now shows the pink **Active** badge.
+6. Click the **star icon** on "My Renamed Site (Copy)" to mark it as active.
+7. **Expected**: Toast confirms. "My Renamed Site (Copy)" now shows the pink **Active** badge.
 8. Click **Media** in the sidebar.
 9. **Expected**: Same media files as the original — all images you uploaded in step 2.6 should appear in the media library, not be missing.
 
 ### 2.8 Try to Deactivate the Active Project
 
 1. Click **Projects** in the sidebar to go to the Projects list.
-2. The active project ("Copy of My Renamed Site") should show a pink **Active** badge and filled yellow star.
+2. The active project ("My Renamed Site (Copy)") should show a pink **Active** badge and filled yellow star.
 3. Try to click the **star icon** on the active project.
 4. **Expected**: Nothing happens — the star stays yellow but clicking it has no effect. You can only switch active to a different project, not deactivate the current one.
 
 ### 2.9 Try to Delete the Active Project
 
 1. You should be on the Projects list (from step 2.8).
-2. Try to click the **trash icon** on the active project ("Copy of My Renamed Site").
+2. Try to click the **trash icon** on the active project ("My Renamed Site (Copy)").
 3. **Expected**: Clicking the trash icon does nothing. Hovering over it shows a tooltip saying you cannot delete the active project. Deletion is blocked.
 
 ### 2.10 Delete a Non-Active Project
@@ -279,7 +279,7 @@ For all items below, start from the **Projects** list (click **Projects** in the
 
 1. Click **Pages** in the sidebar to go to the Pages list.
 2. Click the **copy icon** on any page (e.g., a Contact page).
-3. **Expected**: Toast confirms. New page appears with "Copy of [Page Name]" as the name and a "-copy" suffix in the filename.
+3. **Expected**: Toast confirms. New page appears with a name like "[Page Name] (Copy)" and a `-copy`-style unique filename.
 4. Click the **pencil icon** on the duplicate. Click **"More settings"** to expand the SEO section.
 5. **Expected**: SEO fields are copied from the original page (if it had any set).
 6. If the original page had a **Social Media Image** set, click **Media** in the sidebar.

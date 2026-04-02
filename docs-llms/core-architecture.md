@@ -11,7 +11,7 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 - `src/pages/Projects.jsx` - List view with CRUD operations
 - `src/pages/ProjectsAdd.jsx` - Create project form
 - `src/pages/ProjectsEdit.jsx` - Edit project with theme update UI
-- `src/components/projects/ProjectForm.jsx` - Reusable form component
+- `src/components/projects/ProjectForm.jsx` - Reusable form component (includes `siteTitle`, `siteUrl`, description, preset/theme selection)
 - `src/components/projects/ProjectImportModal.jsx` - ZIP import modal
 - `src/components/layout/RequireActiveProject.jsx` - Route guard wrapping all content routes. Shows EmptyState with link to `/projects` if no active project.
 - `src/components/layout/Breadcrumb.jsx` - Navigation breadcrumb in the footer.
@@ -130,7 +130,7 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 | `updatePage()`      | Update page, handle slug changes   |
 | `deletePage()`      | Delete page, update media usage, clean up references |
 | `bulkDeletePages()` | Delete multiple pages, clean up references            |
-| `duplicatePage()`   | Clone page with "Copy of" naming   |
+| `duplicatePage()`   | Clone page with `Name (Copy)` naming   |
 | `savePageContent()` | Save page content from editor      |
 
 ### Internal Helpers
@@ -341,7 +341,7 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 - `scripts/validate-theme-locales.js` + `validate-theme-locales-helpers.js`:
   - Validates all `tTheme:` keys in widget schemas resolve to entries in theme locale files
   - Detects orphaned keys in `en.json` not referenced by any schema
-  - Checks non-English locales match `en.json` (missing and extra keys)
+  - Checks non-English locales match `en.json` (missing and extra keys) when additional locales are present
   - Recursively scans widget directories (including `widgets/global/header/`, `widgets/global/footer/`)
   - Run via `npm run validate:theme-locales`; also runs as part of `predev:all` hook
 
@@ -449,6 +449,8 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 - `export.maxVersionsToKeep` - Max export versions
 - `export.maxImportSizeMB` - Max import size
 - `developer.enabled` - Developer mode toggle
+
+**Current shipped defaults:** the UI currently exposes English only for `general.language`, and `general.dateFormat` defaults to `MMMM D, YYYY h:mm A`.
 
 ---
 

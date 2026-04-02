@@ -35,7 +35,7 @@ Runtime DB settings:
 ### Tables (v1)
 
 - `projects`
-  - project metadata (`id`, `folder_name`, `name`, theme fields, timestamps)
+  - project metadata (`id`, `folder_name`, `name`, `description`, `site_title`, theme fields, timestamps)
 - `app_settings`
   - key/value settings store (`activeProjectId`, app config)
 - `media_files`

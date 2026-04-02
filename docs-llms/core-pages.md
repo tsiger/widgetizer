@@ -16,10 +16,10 @@ A typical page JSON file (`about-us.json`) looks like this:
   "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "name": "About Us",
   "slug": "about-us",
-  "title": "About Us | My Awesome Site",
   "created": "2023-10-27T10:00:00.000Z",
   "updated": "2023-10-27T12:30:00.000Z",
   "seo": {
+    "title": "About Us",
     "description": "Learn more about our company and team",
     "og_title": "About Us - Company Name",
     "og_image": "uploads/images/about-social.jpg",
@@ -79,6 +79,7 @@ The `PageForm.jsx` component includes several advanced features for comprehensiv
   - **Without Image**: Uses basic `summary` Twitter card type without image tags
 - **Absolute URL Generation**: Social media image URLs are automatically converted to absolute URLs using the project's configured site URL for proper social sharing
 - **Fallback Handling**: Gracefully handles cases where no site URL is configured, preventing broken meta tags
+- **Browser title composition**: The final HTML `<title>` uses `page.seo.title` when present, otherwise the page name. If the current project defines a `siteTitle`, the browser title becomes `{page title} - {siteTitle}`.
 
 ### Client-Side API (`src/queries/pageManager.js`)
 
@@ -157,7 +158,7 @@ This is the core of the backend logic. The controller functions interact with th
   5.  It writes the complete page data to the corresponding `.json` file.
   6.  **Media Usage Tracking**: Updates media file usage tracking to reflect which images are used by this page.
 - **Delete Operation**: The controller finds the correct file by its slug and deletes it from the filesystem. Also removes the page from all media usage tracking. After deletion, **automatic reference cleanup** runs: all menu items and widget link settings across the project that reference the deleted page's `pageUuid` are cleared (link set to empty, `pageUuid` removed). This includes page widgets, global widgets (header/footer), and all menus.
-- **Duplicate Operation**: The controller reads the source page's data, generates a new unique slug (e.g., by appending `-copy`), **generates a new UUID** (to ensure the duplicate is a distinct entity), updates the `name` and `slug` fields, and writes it to a new file. Updates media usage tracking for the duplicated page.
+- **Duplicate Operation**: The controller reads the source page's data, generates a new unique slug (e.g., by appending `-copy`), **generates a new UUID** (to ensure the duplicate is a distinct entity), updates the `name` and `slug` fields, and writes it to a new file. Duplicated pages use the suffix naming pattern `Page Name (Copy)`, `Page Name (Copy 2)`, etc. Updates media usage tracking for the duplicated page.
 
 ### Security Considerations
 
