@@ -16,150 +16,65 @@
 
 ## ✨ Features
 
-- **Visual Page Builder** – Compose pages using drag-and-drop widgets and blocks
-- **Theme System** – Choose from pre-built themes and customize colors, typography, and global styles
-- **Media Library** – Automatic image optimization with usage tracking
-- **File-Based Architecture** – No database; all content stored in portable, human-readable files
-- **Static Export** – Publish secure, lightning-fast static HTML sites
-- **Desktop App** – Available as an Electron app for offline use
+- **Visual Page Builder** - Build pages fast with drag-and-drop widgets, blocks, and live preview
+- **Theme Presets** - Start from a blank slate or polished presets, then fine-tune colors, typography, layouts, and global styles
+- **Hybrid Storage** - SQLite keeps project metadata reliable while pages, menus, themes, and uploads stay portable on disk
+- **Media Pipeline** - Upload once, get optimized image variants, metadata editing, and usage tracking built in
+- **Static Export** - Ship secure, high-performance static sites with clean output and no runtime dependency
+- **Desktop App** - Run Widgetizer as a native Electron app on Windows and macOS
+
+## Download
+
+Get the latest desktop builds from the latest GitHub release:
+
+- [Download for Windows](https://github.com/tsiger/widgetizer/releases/latest)
+- [Download for macOS](https://github.com/tsiger/widgetizer/releases/latest)
+
+On the release page, grab the `.exe` installer for Windows or the `.dmg` file for macOS.
 
 ## 📚 Documentation
 
-Visit **[docs.widgetizer.org](https://docs.widgetizer.org)** for comprehensive documentation, tutorials, and guides.
+Visit **[docs.widgetizer.org](https://docs.widgetizer.org)** for guides on themes, presets, project workflows, export, and customization.
 
-## Requirements
+## Develop Locally
 
-- **Node.js:** >= 20.19.5 (LTS recommended)
-- **npm:** >= 8.0.0
+### Requirements
 
-## Quick Start
+- **Node.js:** `>= 20.19.5`
+- **npm:** `>= 8`
 
-For first-time users, here's the fastest way to get up and running:
+### Web App
 
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Create environment file
-cp .env.example .env  # macOS/Linux
-# or
 copy .env.example .env  # Windows
-
-# 3. Start development environment
-npm run dev:all
-
-# 4. Open your browser to http://localhost:3000
-```
-
-That's it! The app should now be running. See the [Getting Started](#getting-started) section below for more details.
-
-## Getting Started
-
-### Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/tsiger/widgetizer.git
-cd widgetizer
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Create your environment file:
-
-```bash
-# Windows
-copy .env.example .env
-
-# macOS/Linux
-cp .env.example .env
-```
-
-The `.env` file contains default settings that work out of the box for local development. You can modify it later if needed.
-
-### Development
-
-**Recommended:** Run the full development environment (backend + frontend with hot reload):
-
-```bash
+# cp .env.example .env  # macOS/Linux
 npm run dev:all
 ```
 
-This starts:
+This starts the API on `http://localhost:3001` and the frontend on `http://localhost:3000`.
 
-- **Backend server** at `http://localhost:3001`
-- **Frontend dev server** at `http://localhost:3000`
-
-**👉 Visit `http://localhost:3000` in your browser** to use the application.
-
-The frontend dev server provides hot module replacement (HMR) for instant updates as you code.
-
-Other development commands:
-
-| Command          | Description                                                    |
-| ---------------- | -------------------------------------------------------------- |
-| `npm run dev`    | Start Vite frontend only (requires backend running separately) |
-| `npm run server` | Start backend server with nodemon (auto-reload)                |
-
-### Production
-
-To run the application in production mode:
-
-1. **Build the frontend:**
-
-```bash
-npm run build
-```
-
-This creates an optimized production build in the `dist` folder.
-
-2. **Start the production server:**
-
-```bash
-npm run start:prod
-```
-
-This starts the server in production mode with the built frontend.
-
-**👉 Visit `http://localhost:3001` in your browser** to use the application.
-
-> **Note:** In production mode, the backend serves the built frontend files. Unlike development where the frontend runs on port 3000, production serves everything from port 3001.
-
-Preview the production build locally (alternative to `start:prod`):
-
-```bash
-npm run preview
-```
-
-### Electron (Desktop App)
-
-Run the desktop app in development mode:
+### Electron App
 
 ```bash
 npm run electron:dev
 ```
 
-Build the desktop app:
+For local desktop testing, this runs the API server, the frontend dev server, and Electron together.
+
+### Useful Commands
 
 ```bash
-npm run electron:build:mac      # macOS
-npm run electron:build:win      # Windows
+npm run server              # Backend only
+npm run dev                 # Frontend only
+npm run test                # Backend tests
+npm run test:frontend       # Frontend tests
+npm run lint                # Lint src/ and server/
+npm run electron:build:mac  # Build macOS app
+npm run electron:build:win  # Build Windows app
 ```
 
-> **⚠️ Platform Note:** It is strongly recommended to build the Windows Electron app on a Windows machine and the macOS Electron app on a Mac machine. Cross-platform builds may encounter compatibility issues or fail entirely.
-
-### Linting
-
-```bash
-npm run lint           # Lint src and server
-npm run lint:electron  # Lint electron folder
-npm run lint:all       # Lint entire project
-```
+For the normal browser-based development flow, open `http://localhost:3000` after `npm run dev:all`.
 
 ## License
 
