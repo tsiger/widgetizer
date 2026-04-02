@@ -7,8 +7,8 @@
           "label": "Branding"
         },
         "favicon": {
-          "label": "Favicon",
-          "description": "Recommended size 180×180 px."
+          "label": "Site Icon",
+          "description": "Used in browser tabs, bookmarks, and saved home screen shortcuts. Upload a square SVG for best results, or a square PNG at 512×512 or larger."
         },
         "animations_header": {
           "label": "Animations"

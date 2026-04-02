@@ -10,6 +10,8 @@ import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { formatHtml, formatXml, validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
+import { preprocessThemeSettings } from "../utils/themeHelpers.js";
+import { generateExportSiteIcons } from "../utils/siteIconHelpers.js";
 import TurndownService from "turndown";
 import * as exportRepo from "../db/repositories/exportRepository.js";
 
@@ -152,6 +154,14 @@ export async function exportProjectToDir(projectId, options = {}) {
     await fs.ensureDir(outputAssetsDir);
     await fs.ensureDir(outputImagesDir);
     const rawThemeSettings = await readProjectThemeData(projectId);
+    const processedThemeSettings = preprocessThemeSettings(rawThemeSettings);
+    const generatedSiteIcons = await generateExportSiteIcons({
+      outputDir,
+      projectDir,
+      projectName: projectData.name,
+      siteTitle: projectData.siteTitle,
+      siteIconSrc: processedThemeSettings?.general?.favicon || "",
+    });
 
     // Fetch list of page data using the helper function
     const pagesDataArray = await listProjectPagesData(projectFolderName);
@@ -256,6 +266,7 @@ export async function exportProjectToDir(projectId, options = {}) {
         apiUrl: "",
         renderMode: "publish",
         themeSettingsRaw: rawThemeSettings,
+        siteIcons: generatedSiteIcons,
         enqueuedStyles: new Map(),
         enqueuedScripts: new Map(),
         exportVersion: version, // For cache busting

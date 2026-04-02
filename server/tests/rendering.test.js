@@ -45,6 +45,7 @@ const PROJECT_FOLDER = "render-test-project";
 const RAW_THEME_SETTINGS = {
   settings: {
     global: {
+      general: [{ id: "favicon", value: "/uploads/images/site-icon.svg", default: "" }],
       colors: [{ id: "primary_color", value: "#0066cc", default: "#000000" }],
     },
   },
@@ -105,6 +106,15 @@ before(async () => {
           usedIn: [],
           sizes: { medium: { path: "/uploads/images/hero-medium.jpg", width: 400, height: 300 } },
         },
+        {
+          id: "img-2",
+          filename: "site-icon.svg",
+          path: "/uploads/images/site-icon.svg",
+          type: "image/svg+xml",
+          width: 512,
+          height: 512,
+          usedIn: [],
+        },
       ],
     },
   );
@@ -127,6 +137,8 @@ before(async () => {
 <html lang="en">
 <head>
   <title>{{ page.name }}</title>
+  {% if site_icons.primaryIconHref != blank %}<link rel="icon" href="{{ site_icons.primaryIconHref }}" {% if site_icons.primaryIconType != blank %}type="{{ site_icons.primaryIconType }}"{% endif %}{% if site_icons.primaryIconSizes != blank %} sizes="{{ site_icons.primaryIconSizes }}"{% endif %}>{% endif %}
+  {% if site_icons.appleTouchIconHref != blank %}<link rel="apple-touch-icon" href="{{ site_icons.appleTouchIconHref }}" sizes="180x180">{% endif %}
   {% seo %}
 </head>
 <body class="{{ body_class }}">
@@ -621,6 +633,28 @@ describe("renderPageLayout", () => {
 
     assert.ok(html.includes("<!DOCTYPE html>") || html.includes("<!doctype html>"));
     assert.ok(html.includes("<title>Test Page</title>"));
+  });
+
+  it("injects runtime site icon links into the layout", async () => {
+    const html = await renderPageLayout(
+      PROJECT_ID,
+      {
+        headerContent: "",
+        mainContent: "<p>Content</p>",
+        footerContent: "",
+      },
+      { name: "Icon Page", slug: "icon-page" },
+      RAW_THEME_SETTINGS,
+      "preview",
+      null,
+    );
+
+    assert.ok(
+      html.includes(`rel="icon" href="http://localhost:3001/api/media/projects/${PROJECT_ID}/uploads/images/site-icon.svg"`),
+    );
+    assert.ok(
+      html.includes(`rel="apple-touch-icon" href="http://localhost:3001/api/media/projects/${PROJECT_ID}/uploads/images/site-icon.svg"`),
+    );
   });
 
   it("injects header, main content, and footer", async () => {

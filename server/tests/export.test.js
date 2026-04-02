@@ -215,6 +215,9 @@ before(async () => {
       {
         settings: {
           global: {
+            general: [
+              { id: "favicon", value: "/uploads/images/site-icon.svg", default: "" },
+            ],
             colors: [
               { id: "primary_color", value: "#0066cc", default: "#000000" },
               { id: "body_bg", value: "#ffffff", default: "#ffffff" },
@@ -238,6 +241,10 @@ before(async () => {
 <head>
   <meta charset="UTF-8">
   <title>{{ page.seo.title }}</title>
+  {% if site_icons.primaryIconHref != blank %}<link rel="icon" href="{{ site_icons.primaryIconHref }}" {% if site_icons.primaryIconType != blank %}type="{{ site_icons.primaryIconType }}"{% endif %}{% if site_icons.primaryIconSizes != blank %} sizes="{{ site_icons.primaryIconSizes }}"{% endif %}>{% endif %}
+  {% if site_icons.legacyIconHref != blank and site_icons.legacyIconHref != site_icons.primaryIconHref %}<link rel="icon" href="{{ site_icons.legacyIconHref }}" type="image/png" sizes="32x32">{% endif %}
+  {% if site_icons.appleTouchIconHref != blank %}<link rel="apple-touch-icon" href="{{ site_icons.appleTouchIconHref }}" sizes="180x180">{% endif %}
+  {% if site_icons.manifestHref != blank %}<link rel="manifest" href="{{ site_icons.manifestHref }}">{% endif %}
   {% seo %}
 </head>
 <body class="{{ body_class }}">
@@ -391,6 +398,10 @@ before(async () => {
   await fs.writeFile(path.join(uploadsDir, "images", "inline.jpg"), "fake-inline-data");
   await fs.writeFile(path.join(uploadsDir, "images", "inline-medium.jpg"), "fake-inline-medium");
   await fs.writeFile(path.join(uploadsDir, "images", "unused.png"), "fake-png-data");
+  await fs.writeFile(
+    path.join(uploadsDir, "images", "site-icon.svg"),
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#de1877"/><circle cx="256" cy="256" r="128" fill="#ffffff"/></svg>',
+  );
 
   await writeMediaFile(PROJECT_ID, {
     files: [
@@ -444,6 +455,15 @@ before(async () => {
         width: 500,
         height: 500,
         usedIn: [], // <-- not used anywhere
+      },
+      {
+        id: "img-4",
+        filename: "site-icon.svg",
+        path: "/uploads/images/site-icon.svg",
+        type: "image/svg+xml",
+        width: 512,
+        height: 512,
+        usedIn: [],
       },
     ],
   });
@@ -561,6 +581,15 @@ describe("exportProject", () => {
     assert.ok(html.includes("<title>Home | Export Test - Export Test Site</title>"));
   });
 
+  it("rendered HTML includes generated site icon links", async () => {
+    const exportDir = await getLatestExportDir();
+    const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
+    assert.ok(html.includes('rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any"'));
+    assert.ok(html.includes('rel="icon" href="favicon-32.png" type="image/png" sizes="32x32"'));
+    assert.ok(html.includes('rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180"'));
+    assert.ok(html.includes('rel="manifest" href="site.webmanifest"'));
+  });
+
   it("rendered HTML contains the core-spacer widget output", async () => {
     const exportDir = await getLatestExportDir();
     const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
@@ -572,6 +601,16 @@ describe("exportProject", () => {
     const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
     assert.ok(html.includes('property="og:image" content="https://mysite.example.com/assets/images/hero-large.jpg"'));
     assert.ok(html.includes('name="twitter:image" content="https://mysite.example.com/assets/images/hero-large.jpg"'));
+  });
+
+  it("generates derived site icon files", async () => {
+    const exportDir = await getLatestExportDir();
+    assert.ok(await fs.pathExists(path.join(exportDir, "favicon.svg")));
+    assert.ok(await fs.pathExists(path.join(exportDir, "favicon-32.png")));
+    assert.ok(await fs.pathExists(path.join(exportDir, "apple-touch-icon.png")));
+    assert.ok(await fs.pathExists(path.join(exportDir, "icon-192.png")));
+    assert.ok(await fs.pathExists(path.join(exportDir, "icon-512.png")));
+    assert.ok(await fs.pathExists(path.join(exportDir, "site.webmanifest")));
   });
 
   it("generates sitemap.xml with site URL", async () => {

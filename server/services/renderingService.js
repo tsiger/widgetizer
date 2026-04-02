@@ -25,6 +25,7 @@ import { EnqueuePreloadTag } from "../../src/core/tags/enqueuePreload.js";
 import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
 import { registerHandleizeFilter } from "../../src/core/filters/handleizeFilter.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
+import { buildRuntimeSiteIcons } from "../utils/siteIconHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { sanitizeWidgetData } from "./sanitizationService.js";
@@ -342,6 +343,8 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   const imageBasePath =
     renderMode === "publish" ? "assets/images" : `${apiUrl}/api/media/projects/${projectId}/uploads/images`;
 
+  const siteIconSrc = processedThemeSettings?.general?.favicon || "";
+
   // Load media metadata and create a useful map
   let mediaFiles = {};
   try {
@@ -463,6 +466,7 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     mediaFiles,
     globals,
     imagePath: imageBasePath,
+    site_icons: globals.siteIcons || buildRuntimeSiteIcons(siteIconSrc, mediaFiles, imageBasePath),
   };
 }
 

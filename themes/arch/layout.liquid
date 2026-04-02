@@ -7,9 +7,7 @@
     {% seo %}
     {% fonts %}
     
-    {% if theme.general and theme.general.favicon != blank %}
-    <link rel="icon" href="{% image src: theme.general.favicon, output: 'path' %}">
-    {% endif %}
+    {% render 'site-icons', site_icons: site_icons %}
 
     {% theme_settings %}
 

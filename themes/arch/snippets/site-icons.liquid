@@ -1,0 +1,12 @@
+{% if site_icons.primaryIconHref != blank %}
+<link rel="icon" href="{{ site_icons.primaryIconHref }}" {% if site_icons.primaryIconType != blank %}type="{{ site_icons.primaryIconType }}"{% endif %}{% if site_icons.primaryIconSizes != blank %} sizes="{{ site_icons.primaryIconSizes }}"{% endif %}>
+{% endif %}
+{% if site_icons.legacyIconHref != blank and site_icons.legacyIconHref != site_icons.primaryIconHref %}
+<link rel="icon" href="{{ site_icons.legacyIconHref }}" type="image/png" sizes="32x32">
+{% endif %}
+{% if site_icons.appleTouchIconHref != blank %}
+<link rel="apple-touch-icon" href="{{ site_icons.appleTouchIconHref }}" sizes="180x180">
+{% endif %}
+{% if site_icons.manifestHref != blank %}
+<link rel="manifest" href="{{ site_icons.manifestHref }}">
+{% endif %}
