@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/widgetizer_logo_dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="assets/widgetizer_logo_light.png">
-    <img src="assets/widgetizer_logo_light.png" alt="Widgetizer logo" width="1000">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/widgetizer_logo_light.png">
+    <source media="(prefers-color-scheme: light)" srcset="assets/widgetizer_logo_dark.png">
+    <img src="assets/widgetizer_logo_light.png" alt="Widgetizer logo" width="500">
   </picture>
 </p>
 
