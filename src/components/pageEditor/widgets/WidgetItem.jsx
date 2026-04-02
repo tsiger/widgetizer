@@ -169,7 +169,7 @@ export default function WidgetItem({
         </div>
       </div>
 
-      {hasBlocks && isSelected && !isDraggingAny && !isCollapsed && (
+      {hasBlocks && isSelected && !isCollapsed && !isOverlay && (
         <div className="border-t border-slate-100">
           <div className="p-2">
             <DndContext

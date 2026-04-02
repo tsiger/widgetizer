@@ -89,16 +89,17 @@ export default function WidgetList({
   const handleDragStart = (event) => {
     const draggedId = event.active.id;
     setActiveId(draggedId);
-
-    if (selectedWidgetId !== draggedId && onWidgetSelect) {
-      onWidgetSelect(draggedId);
-    }
   };
 
   const handleDragEnd = (event) => {
     setActiveId(null);
 
     const { active, over } = event;
+    const draggedId = active?.id;
+
+    if (draggedId && selectedWidgetId !== draggedId && onWidgetSelect) {
+      onWidgetSelect(draggedId);
+    }
 
     if (over && active.id !== over.id) {
       const oldWidgetIds = sortableWidgets.map((item) => item.id);
