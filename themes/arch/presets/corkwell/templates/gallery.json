@@ -1,0 +1,180 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "gallery_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "Moody lighting, dark wood, and glasses worth raising. A look inside Corkwell.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "atmosphere": {
+      "type": "bento-grid",
+      "settings": {
+        "eyebrow": "The Atmosphere",
+        "title": "After Dark",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "bento-1": {
+          "type": "item",
+          "settings": {
+            "title": "The main bar",
+            "col_span": 2,
+            "row_span": 2
+          }
+        },
+        "bento-2": {
+          "type": "item",
+          "settings": {
+            "title": "Wine wall"
+          }
+        },
+        "bento-3": {
+          "type": "item",
+          "settings": {
+            "title": "Cellar room"
+          }
+        },
+        "bento-4": {
+          "type": "item",
+          "settings": {
+            "title": "Patio seating"
+          }
+        },
+        "bento-5": {
+          "type": "item",
+          "settings": {
+            "title": "Cocktail prep",
+            "col_span": 2
+          }
+        }
+      },
+      "blocksOrder": ["bento-1", "bento-2", "bento-3", "bento-4", "bento-5"]
+    },
+    "food_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "From the Kitchen",
+        "title": "Small Plates, Big Moments",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": false,
+        "aspect_ratio": "1 / 1",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "food-1": {
+          "type": "image",
+          "settings": {
+            "caption": "Charcuterie board"
+          }
+        },
+        "food-2": {
+          "type": "image",
+          "settings": {
+            "caption": "Wood-fired flatbread"
+          }
+        },
+        "food-3": {
+          "type": "image",
+          "settings": {
+            "caption": "Cheese selection"
+          }
+        },
+        "food-4": {
+          "type": "image",
+          "settings": {
+            "caption": "Burrata & tomato"
+          }
+        },
+        "food-5": {
+          "type": "image",
+          "settings": {
+            "caption": "Steak frites"
+          }
+        },
+        "food-6": {
+          "type": "image",
+          "settings": {
+            "caption": "Seasonal dessert"
+          }
+        }
+      },
+      "blocksOrder": ["food-1", "food-2", "food-3", "food-4", "food-5", "food-6"]
+    },
+    "events_cta": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "events-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Private Events",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "events-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "The Cellar Room Is Yours",
+            "size": "4xl"
+          }
+        },
+        "events-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our cellar room seats up to 24 guests for private tastings, birthday dinners, and corporate events. We'll build a custom wine and food pairing — you just bring the people.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "events-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book the Cellar Room",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["events-eyebrow", "events-heading", "events-text", "events-button"]
+    }
+  },
+  "widgetsOrder": ["gallery_hero", "atmosphere", "food_gallery", "events_cta"],
+  "id": "gallery",
+  "created": "2026-04-02T16:00:00.000Z",
+  "updated": "2026-04-02T16:00:00.000Z"
+}

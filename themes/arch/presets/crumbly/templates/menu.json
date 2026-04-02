@@ -1,0 +1,289 @@
+{
+  "name": "Menu",
+  "slug": "menu",
+  "widgets": {
+    "menu_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What We Bake",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "Everything on this menu is made from scratch in our kitchen. Availability changes daily — if you see something you love, grab it before it's gone.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "breads": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "The Foundation",
+        "title": "Bread & Sourdough",
+        "heading_alignment": "left",
+        "layout": "single-column",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "bread-1": {
+          "type": "item",
+          "settings": {
+            "name": "Classic Sourdough Loaf",
+            "description": "<p>24-hour ferment, dark crust, tangy crumb. Our signature since day one</p>",
+            "price": "$8"
+          }
+        },
+        "bread-2": {
+          "type": "item",
+          "settings": {
+            "name": "Olive & Rosemary Focaccia",
+            "description": "<p>Thick, dimpled, drizzled with extra virgin olive oil and flaky salt</p>",
+            "price": "$10"
+          }
+        },
+        "bread-3": {
+          "type": "item",
+          "settings": {
+            "name": "Seeded Multigrain",
+            "description": "<p>Sunflower, flax, sesame, and poppy seeds. Nutty and wholesome</p>",
+            "price": "$9"
+          }
+        },
+        "bread-4": {
+          "type": "item",
+          "settings": {
+            "name": "French Baguette",
+            "description": "<p>Crisp crust, airy crumb. Baked in batches throughout the day</p>",
+            "price": "$5"
+          }
+        },
+        "bread-5": {
+          "type": "item",
+          "settings": {
+            "name": "Cinnamon Raisin Swirl",
+            "description": "<p>Soft sandwich bread with ribbons of cinnamon sugar and plump raisins</p>",
+            "price": "$9"
+          }
+        }
+      },
+      "blocksOrder": ["bread-1", "bread-2", "bread-3", "bread-4", "bread-5"]
+    },
+    "pastries": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Morning Favorites",
+        "title": "Pastries & Viennoiserie",
+        "heading_alignment": "left",
+        "layout": "two-column",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "pastry-1": {
+          "type": "item",
+          "settings": {
+            "name": "Butter Croissant",
+            "description": "<p>French butter, hand-laminated, 48 layers of flaky perfection</p>",
+            "price": "$4.50"
+          }
+        },
+        "pastry-2": {
+          "type": "item",
+          "settings": {
+            "name": "Almond Croissant",
+            "description": "<p>Filled with frangipane, topped with sliced almonds and powdered sugar</p>",
+            "price": "$5.50"
+          }
+        },
+        "pastry-3": {
+          "type": "item",
+          "settings": {
+            "name": "Pain au Chocolat",
+            "description": "<p>Dark chocolate batons wrapped in buttery croissant dough</p>",
+            "price": "$5"
+          }
+        },
+        "pastry-4": {
+          "type": "item",
+          "settings": {
+            "name": "Morning Bun",
+            "description": "<p>Orange zest, cinnamon sugar, and laminated dough. Best warm</p>",
+            "price": "$5"
+          }
+        },
+        "pastry-5": {
+          "type": "item",
+          "settings": {
+            "name": "Raspberry Danish",
+            "description": "<p>Puff pastry, vanilla custard, fresh raspberries, and a honey glaze</p>",
+            "price": "$5.50"
+          }
+        },
+        "pastry-6": {
+          "type": "item",
+          "settings": {
+            "name": "Cinnamon Roll",
+            "description": "<p>Brioche dough, brown butter cinnamon filling, cream cheese icing</p>",
+            "price": "$5"
+          }
+        }
+      },
+      "blocksOrder": ["pastry-1", "pastry-2", "pastry-3", "pastry-4", "pastry-5", "pastry-6"]
+    },
+    "cakes": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Celebrations",
+        "title": "Cakes & Tarts",
+        "heading_alignment": "left",
+        "layout": "single-column",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "cake-1": {
+          "type": "item",
+          "settings": {
+            "name": "Lemon Olive Oil Cake",
+            "description": "<p>Whole slice or full cake. Light, moist, and fragrant with citrus</p>",
+            "price": "$6 / $38"
+          }
+        },
+        "cake-2": {
+          "type": "item",
+          "settings": {
+            "name": "Chocolate Layer Cake",
+            "description": "<p>Three layers of dark chocolate cake, ganache frosting, cocoa nibs</p>",
+            "price": "$7 / $45"
+          }
+        },
+        "cake-3": {
+          "type": "item",
+          "settings": {
+            "name": "Seasonal Fruit Tart",
+            "description": "<p>Butter shortcrust, pastry cream, and whatever fruit the season brings</p>",
+            "price": "$6 / $32"
+          }
+        },
+        "cake-4": {
+          "type": "item",
+          "settings": {
+            "name": "Custom Celebration Cake",
+            "description": "<p>Made to order for birthdays, weddings, and milestones. Contact us to design yours</p>",
+            "price": "From $65"
+          }
+        }
+      },
+      "blocksOrder": ["cake-1", "cake-2", "cake-3", "cake-4"]
+    },
+    "cookies": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Sweet Treats",
+        "title": "Cookies & Bars",
+        "heading_alignment": "left",
+        "layout": "two-column",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "cookie-1": {
+          "type": "item",
+          "settings": {
+            "name": "Chocolate Chip Cookie",
+            "description": "<p>Brown butter, dark chocolate chunks, flaky salt. Crisp edges, chewy center</p>",
+            "price": "$3.50"
+          }
+        },
+        "cookie-2": {
+          "type": "item",
+          "settings": {
+            "name": "Snickerdoodle",
+            "description": "<p>Soft, pillowy, rolled in cinnamon sugar</p>",
+            "price": "$3"
+          }
+        },
+        "cookie-3": {
+          "type": "item",
+          "settings": {
+            "name": "Fudge Brownie",
+            "description": "<p>Dense, rich, and intensely chocolatey. Walnuts optional</p>",
+            "price": "$4"
+          }
+        },
+        "cookie-4": {
+          "type": "item",
+          "settings": {
+            "name": "Lemon Bar",
+            "description": "<p>Shortbread base, tangy lemon curd, dusted with powdered sugar</p>",
+            "price": "$4"
+          }
+        }
+      },
+      "blocksOrder": ["cookie-1", "cookie-2", "cookie-3", "cookie-4"]
+    },
+    "custom_callout": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "custom-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Made for You",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "custom-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Custom Orders & Catering",
+            "size": "4xl"
+          }
+        },
+        "custom-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Planning a party, a wedding, or just need three dozen cookies for the office? We love custom work. Tell us what you're dreaming of and we'll make it happen — with at least 72 hours notice for most orders.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "custom-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Place a Custom Order",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["custom-eyebrow", "custom-heading", "custom-text", "custom-button"]
+    }
+  },
+  "widgetsOrder": ["menu_hero", "breads", "pastries", "cakes", "cookies", "custom_callout"],
+  "id": "menu",
+  "created": "2026-04-02T14:00:00.000Z",
+  "updated": "2026-04-02T14:00:00.000Z"
+}

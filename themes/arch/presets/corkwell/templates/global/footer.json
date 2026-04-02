@@ -1,0 +1,35 @@
+{
+  "type": "footer",
+  "settings": {
+    "color_scheme": "highlight",
+    "copyright": "2024 Corkwell Wine Bar. All rights reserved."
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>A neighborhood wine bar with a curated cellar, seasonal small plates, and the kind of atmosphere that turns strangers into friends.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Hours",
+        "text": "<p>Tuesday — Thursday: 4 PM – 12 AM<br>Friday — Saturday: 4 PM – 1 AM<br>Sunday: 3 PM – 10 PM<br>Monday: Closed</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Navigate"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Stay Connected"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

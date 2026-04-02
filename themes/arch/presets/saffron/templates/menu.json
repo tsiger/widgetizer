@@ -1,0 +1,280 @@
+{
+  "name": "Menu",
+  "slug": "menu",
+  "widgets": {
+    "menu_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Menu",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "Seasonal ingredients, timeless techniques. Our menu changes with the harvest — here's what's inspiring us right now.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "starters": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "To Begin",
+        "title": "Starters",
+        "heading_alignment": "left",
+        "layout": "single-column",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "starter-1": {
+          "type": "item",
+          "settings": {
+            "name": "Roasted Beet & Burrata",
+            "description": "<p>Heirloom beets, creamy burrata, toasted hazelnuts, honey-thyme vinaigrette</p>",
+            "price": "$18"
+          }
+        },
+        "starter-2": {
+          "type": "item",
+          "settings": {
+            "name": "Charred Octopus",
+            "description": "<p>Grilled Spanish octopus, crispy potatoes, smoked paprika aioli, fresh herbs</p>",
+            "price": "$22"
+          }
+        },
+        "starter-3": {
+          "type": "item",
+          "settings": {
+            "name": "Wild Mushroom Soup",
+            "description": "<p>Foraged mushroom blend, truffle cream, sourdough croutons, chive oil</p>",
+            "price": "$15"
+          }
+        },
+        "starter-4": {
+          "type": "item",
+          "settings": {
+            "name": "Tuna Tartare",
+            "description": "<p>Yellowfin tuna, avocado, sesame-ginger dressing, wonton crisps</p>",
+            "price": "$21"
+          }
+        },
+        "starter-5": {
+          "type": "item",
+          "settings": {
+            "name": "Seasonal Salad",
+            "description": "<p>Market greens, shaved vegetables, toasted seeds, house vinaigrette</p>",
+            "price": "$14"
+          }
+        }
+      },
+      "blocksOrder": ["starter-1", "starter-2", "starter-3", "starter-4", "starter-5"]
+    },
+    "mains": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Main Course",
+        "title": "Entrées",
+        "heading_alignment": "left",
+        "layout": "two-column",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "main-1": {
+          "type": "item",
+          "settings": {
+            "name": "Pan-Seared Halibut",
+            "description": "<p>Saffron risotto, roasted fennel, lemon-caper beurre blanc</p>",
+            "price": "$38"
+          }
+        },
+        "main-2": {
+          "type": "item",
+          "settings": {
+            "name": "Braised Lamb Shank",
+            "description": "<p>Eight-hour braise, root vegetables, red wine jus, creamy polenta</p>",
+            "price": "$34"
+          }
+        },
+        "main-3": {
+          "type": "item",
+          "settings": {
+            "name": "Handmade Pappardelle",
+            "description": "<p>Slow-cooked wild boar ragù, pecorino, fresh herbs</p>",
+            "price": "$28"
+          }
+        },
+        "main-4": {
+          "type": "item",
+          "settings": {
+            "name": "Dry-Aged Ribeye",
+            "description": "<p>28-day aged, bone marrow butter, roasted shallots, truffle fries</p>",
+            "price": "$52"
+          }
+        },
+        "main-5": {
+          "type": "item",
+          "settings": {
+            "name": "Roasted Duck Breast",
+            "description": "<p>Cherry gastrique, sweet potato purée, wilted greens</p>",
+            "price": "$36"
+          }
+        },
+        "main-6": {
+          "type": "item",
+          "settings": {
+            "name": "Seared Salmon",
+            "description": "<p>Miso glaze, bok choy, crispy rice, yuzu vinaigrette</p>",
+            "price": "$32"
+          }
+        },
+        "main-7": {
+          "type": "item",
+          "settings": {
+            "name": "Mushroom Risotto",
+            "description": "<p>Arborio rice, foraged mushrooms, truffle oil, aged parmesan</p>",
+            "price": "$26"
+          }
+        },
+        "main-8": {
+          "type": "item",
+          "settings": {
+            "name": "Grilled Swordfish",
+            "description": "<p>Romesco sauce, charred broccolini, olive tapenade, capers</p>",
+            "price": "$36"
+          }
+        }
+      },
+      "blocksOrder": ["main-1", "main-2", "main-3", "main-4", "main-5", "main-6", "main-7", "main-8"]
+    },
+    "desserts": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "To Finish",
+        "title": "Desserts",
+        "heading_alignment": "left",
+        "layout": "single-column",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "dessert-1": {
+          "type": "item",
+          "settings": {
+            "name": "Dark Chocolate Fondant",
+            "description": "<p>Warm chocolate cake, molten center, salted caramel gelato, candied orange</p>",
+            "price": "$14"
+          }
+        },
+        "dessert-2": {
+          "type": "item",
+          "settings": {
+            "name": "Lemon Posset",
+            "description": "<p>Silky citrus cream, fresh berries, shortbread crumble</p>",
+            "price": "$12"
+          }
+        },
+        "dessert-3": {
+          "type": "item",
+          "settings": {
+            "name": "Tiramisu",
+            "description": "<p>House-made mascarpone cream, espresso-soaked ladyfingers, cocoa</p>",
+            "price": "$13"
+          }
+        },
+        "dessert-4": {
+          "type": "item",
+          "settings": {
+            "name": "Seasonal Sorbet Trio",
+            "description": "<p>Three scoops of house-churned sorbet — flavors change with the season</p>",
+            "price": "$10"
+          }
+        }
+      },
+      "blocksOrder": ["dessert-1", "dessert-2", "dessert-3", "dessert-4"]
+    },
+    "drinks_callout": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "drinks-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Curated Wine & Cocktails",
+            "size": "4xl"
+          }
+        },
+        "drinks-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our beverage program is built around discovery. From small-batch natural wines to handcrafted seasonal cocktails, every glass is chosen to complement what's on your plate. Ask your server about pairings — they love this part.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "drinks-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Ask About Pairings",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["drinks-heading", "drinks-text", "drinks-button"]
+    },
+    "menu_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": true,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Join Us Tonight",
+            "size": "3xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Reserve a Table",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["menu_hero", "starters", "mains", "desserts", "drinks_callout", "menu_cta"],
+  "id": "menu",
+  "created": "2026-04-02T10:00:00.000Z",
+  "updated": "2026-04-02T10:00:00.000Z"
+}

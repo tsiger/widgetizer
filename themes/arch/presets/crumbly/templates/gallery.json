@@ -1,0 +1,181 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "gallery_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "Golden crusts, flour-dusted counters, and the faces behind the oven. This is what mornings at Crumbly look like.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "baked_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "From the Oven",
+        "title": "Our Bakes",
+        "layout": "carousel",
+        "columns_desktop": 3,
+        "aspect_ratio": "1 / 1",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "bake-1": {
+          "type": "image",
+          "settings": {
+            "caption": "Sourdough loaves cooling"
+          }
+        },
+        "bake-2": {
+          "type": "image",
+          "settings": {
+            "caption": "Almond croissants"
+          }
+        },
+        "bake-3": {
+          "type": "image",
+          "settings": {
+            "caption": "Chocolate layer cake"
+          }
+        },
+        "bake-4": {
+          "type": "image",
+          "settings": {
+            "caption": "Morning buns, fresh out"
+          }
+        },
+        "bake-5": {
+          "type": "image",
+          "settings": {
+            "caption": "Seasonal fruit tart"
+          }
+        },
+        "bake-6": {
+          "type": "image",
+          "settings": {
+            "caption": "Cookie spread"
+          }
+        }
+      },
+      "blocksOrder": ["bake-1", "bake-2", "bake-3", "bake-4", "bake-5", "bake-6"]
+    },
+    "bakery_gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "The Bakery",
+        "title": "Behind the Counter",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "space-1": {
+          "type": "item",
+          "settings": {
+            "title": "The display case",
+            "category": "Shop"
+          }
+        },
+        "space-2": {
+          "type": "item",
+          "settings": {
+            "title": "Dough shaping",
+            "category": "Process"
+          }
+        },
+        "space-3": {
+          "type": "item",
+          "settings": {
+            "title": "Our deck oven",
+            "category": "Process"
+          }
+        },
+        "space-4": {
+          "type": "item",
+          "settings": {
+            "title": "Café seating",
+            "category": "Shop"
+          }
+        },
+        "space-5": {
+          "type": "item",
+          "settings": {
+            "title": "Flour-dusted hands",
+            "category": "Process"
+          }
+        },
+        "space-6": {
+          "type": "item",
+          "settings": {
+            "title": "The bread wall",
+            "category": "Shop"
+          }
+        }
+      },
+      "blocksOrder": ["space-1", "space-2", "space-3", "space-4", "space-5", "space-6"]
+    },
+    "custom_cta": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Dreaming of a Custom Cake?",
+            "size": "4xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Weddings, birthdays, baby showers — we design cakes for life's biggest moments. Every one is made from scratch, decorated by hand, and tailored to your taste.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start Your Order",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["gallery_hero", "baked_gallery", "bakery_gallery", "custom_cta"],
+  "id": "gallery",
+  "created": "2026-04-02T14:00:00.000Z",
+  "updated": "2026-04-02T14:00:00.000Z"
+}

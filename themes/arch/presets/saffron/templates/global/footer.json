@@ -1,0 +1,35 @@
+{
+  "type": "footer",
+  "settings": {
+    "color_scheme": "highlight",
+    "copyright": "2024 Saffron Restaurant. All rights reserved."
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>A neighborhood restaurant celebrating local flavors, seasonal ingredients, and the art of gathering around a shared table.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Opening Hours",
+        "text": "<p>Monday — Thursday: 5 PM – 10 PM<br>Friday — Saturday: 5 PM – 11 PM<br>Sunday: 10 AM – 3 PM (Brunch)<br>Sunday: 5 PM – 9 PM (Dinner)</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Quick Links"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Connect With Us"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

@@ -1,0 +1,302 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "slideshow",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "alignment": "center",
+        "autoplay": true,
+        "autoplay_speed": 5000
+      },
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Baked Fresh Every Morning",
+            "heading_size": "6xl",
+            "text_content": "Sourdough, pastries, and cakes made from scratch with local ingredients — because good bread takes time.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "See Our Menu",
+              "href": "menu.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_size": "large",
+            "color_scheme": "highlight"
+          }
+        },
+        "slide-2": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Custom Cakes for Every Occasion",
+            "heading_size": "6xl",
+            "text_content": "Birthdays, weddings, and everything in between. Tell us your vision — we'll make it delicious.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "Get in Touch",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_size": "large",
+            "color_scheme": "highlight"
+          }
+        }
+      },
+      "blocksOrder": ["slide-1", "slide-2"]
+    },
+    "trust_bar": {
+      "type": "trust-bar",
+      "settings": {
+        "alignment": "centered",
+        "show_dividers": true,
+        "icon_style": "plain",
+        "icon_size": "md",
+        "icon_shape": "rounded",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "clock",
+            "title": "Baked Daily",
+            "text": "Everything made fresh before sunrise"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "title": "Real Ingredients",
+            "text": "Organic flour, local butter, free-range eggs"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "heart",
+            "title": "Made With Love",
+            "text": "Family recipes passed down three generations"
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3"]
+    },
+    "intro": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Our Story",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Three Generations of Flour-Dusted Hands",
+            "size": "5xl",
+            "position": "left"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Crumbly started with our grandmother's sourdough starter and a cast-iron oven in the backyard. Today, we bake in a proper kitchen — but we still use the same starter, the same recipes, and the same belief that bread should taste like something.</p><p>We don't rush. Our sourdough ferments for 24 hours. Our croissants are laminated by hand. Our cakes are frosted to order. This is baking the way it used to be.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Read Our Story",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-text", "intro-button"]
+    },
+    "categories": {
+      "type": "checkerboard",
+      "settings": {
+        "eyebrow": "What We Bake",
+        "title": "From the Oven to Your Table",
+        "columns_desktop": 4,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "cat-1": {
+          "type": "card",
+          "settings": {
+            "title": "Sourdough & Bread",
+            "description": "24-hour fermented loaves, baguettes, and focaccia",
+            "button_link": {
+              "text": "See Menu",
+              "href": "menu.html",
+              "target": "_self"
+            }
+          }
+        },
+        "cat-2": {
+          "type": "card",
+          "settings": {}
+        },
+        "cat-3": {
+          "type": "card",
+          "settings": {}
+        },
+        "cat-4": {
+          "type": "card",
+          "settings": {
+            "title": "Pastries & Viennoiserie",
+            "description": "Croissants, danishes, pain au chocolat, morning buns",
+            "button_link": {
+              "text": "See Menu",
+              "href": "menu.html",
+              "target": "_self"
+            }
+          }
+        },
+        "cat-5": {
+          "type": "card",
+          "settings": {
+            "title": "Cakes & Celebration",
+            "description": "Custom cakes, layer cakes, tarts, and seasonal specials",
+            "button_link": {
+              "text": "See Menu",
+              "href": "menu.html",
+              "target": "_self"
+            }
+          }
+        },
+        "cat-6": {
+          "type": "card",
+          "settings": {}
+        },
+        "cat-7": {
+          "type": "card",
+          "settings": {}
+        },
+        "cat-8": {
+          "type": "card",
+          "settings": {
+            "title": "Cookies & Treats",
+            "description": "Chocolate chip, snickerdoodle, brownies, and blondies",
+            "button_link": {
+              "text": "See Menu",
+              "href": "menu.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["cat-1", "cat-2", "cat-3", "cat-4", "cat-5", "cat-6", "cat-7", "cat-8"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Kind Words",
+        "title": "What Our Neighbors Say",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "card_layout": "flat",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "The sourdough is life-changing. I've tried every bakery in town and nothing comes close. My kids fight over the last slice every morning.",
+            "name": "Lisa P.",
+            "title": "Weekly regular",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "They made the most beautiful cake for our daughter's first birthday. Three tiers, wildflowers, and it tasted even better than it looked.",
+            "name": "Tom & Maria K.",
+            "title": "Custom cake order",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "The almond croissants sell out by 9 AM for a reason. Get there early or prepare to be heartbroken. Trust me on this.",
+            "name": "Derek H.",
+            "title": "Morning devotee",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Smells Better in Person",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "Come visit us — we're open Tuesday through Sunday.",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Find the Bakery",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "trust_bar", "intro", "categories", "testimonials", "cta"],
+  "id": "index",
+  "created": "2026-04-02T14:00:00.000Z",
+  "updated": "2026-04-02T14:00:00.000Z"
+}

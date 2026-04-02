@@ -1,0 +1,35 @@
+{
+  "type": "footer",
+  "settings": {
+    "color_scheme": "highlight",
+    "copyright": "2024 Crumbly Bakery. All rights reserved."
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>A neighborhood bakery where everything is made from scratch, every single morning. Real ingredients, no shortcuts, just the good stuff.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Bakery Hours",
+        "text": "<p>Tuesday — Friday: 7 AM – 5 PM<br>Saturday: 7 AM – 4 PM<br>Sunday: 8 AM – 2 PM<br>Monday: Closed</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Explore"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow Us"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

@@ -1,0 +1,289 @@
+{
+  "name": "Menu",
+  "slug": "menu",
+  "widgets": {
+    "menu_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Menu",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "Specialty coffee, house-made pastries, and seasonal bites. Everything is crafted with care, every single day.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "coffee": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "The Good Stuff",
+        "title": "Coffee & Espresso",
+        "heading_alignment": "left",
+        "layout": "two-column",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "coffee-1": {
+          "type": "item",
+          "settings": {
+            "name": "Espresso",
+            "description": "<p>Double shot, house blend or single-origin</p>",
+            "price": "$3.50"
+          }
+        },
+        "coffee-2": {
+          "type": "item",
+          "settings": {
+            "name": "Americano",
+            "description": "<p>Double espresso, hot water</p>",
+            "price": "$4"
+          }
+        },
+        "coffee-3": {
+          "type": "item",
+          "settings": {
+            "name": "Latte",
+            "description": "<p>Double espresso, steamed milk. Oat, almond, or dairy</p>",
+            "price": "$5.50"
+          }
+        },
+        "coffee-4": {
+          "type": "item",
+          "settings": {
+            "name": "Cappuccino",
+            "description": "<p>Double espresso, steamed milk, thick foam</p>",
+            "price": "$5"
+          }
+        },
+        "coffee-5": {
+          "type": "item",
+          "settings": {
+            "name": "Pour Over",
+            "description": "<p>Single-origin, hand-poured. Ask about today's selection</p>",
+            "price": "$5.50"
+          }
+        },
+        "coffee-6": {
+          "type": "item",
+          "settings": {
+            "name": "Cold Brew",
+            "description": "<p>20-hour steeped, served over ice. Bold and smooth</p>",
+            "price": "$5"
+          }
+        },
+        "coffee-7": {
+          "type": "item",
+          "settings": {
+            "name": "Cortado",
+            "description": "<p>Double espresso, equal part steamed milk</p>",
+            "price": "$4.50"
+          }
+        },
+        "coffee-8": {
+          "type": "item",
+          "settings": {
+            "name": "Flat White",
+            "description": "<p>Ristretto shots, velvety microfoam milk</p>",
+            "price": "$5.50"
+          }
+        }
+      },
+      "blocksOrder": ["coffee-1", "coffee-2", "coffee-3", "coffee-4", "coffee-5", "coffee-6", "coffee-7", "coffee-8"]
+    },
+    "seasonal": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Limited Time",
+        "title": "Seasonal Specials",
+        "heading_alignment": "left",
+        "layout": "single-column",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "seasonal-1": {
+          "type": "item",
+          "settings": {
+            "name": "Honey Lavender Latte",
+            "description": "<p>Local honey, house-made lavender syrup, oat milk, double espresso</p>",
+            "price": "$6.50"
+          }
+        },
+        "seasonal-2": {
+          "type": "item",
+          "settings": {
+            "name": "Cardamom Cold Brew",
+            "description": "<p>Our signature cold brew infused with cardamom and vanilla, served over ice</p>",
+            "price": "$6"
+          }
+        },
+        "seasonal-3": {
+          "type": "item",
+          "settings": {
+            "name": "Matcha Oat Latte",
+            "description": "<p>Ceremonial-grade matcha, oat milk, lightly sweetened with maple</p>",
+            "price": "$6"
+          }
+        }
+      },
+      "blocksOrder": ["seasonal-1", "seasonal-2", "seasonal-3"]
+    },
+    "pastries": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Baked Fresh Daily",
+        "title": "Pastries & Bites",
+        "heading_alignment": "left",
+        "layout": "two-column",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "pastry-1": {
+          "type": "item",
+          "settings": {
+            "name": "Almond Croissant",
+            "description": "<p>Butter croissant, almond frangipane, toasted almonds</p>",
+            "price": "$5"
+          }
+        },
+        "pastry-2": {
+          "type": "item",
+          "settings": {
+            "name": "Banana Bread",
+            "description": "<p>Brown butter, walnuts, toasted coconut. Vegan option available</p>",
+            "price": "$4.50"
+          }
+        },
+        "pastry-3": {
+          "type": "item",
+          "settings": {
+            "name": "Morning Bun",
+            "description": "<p>Orange zest, cinnamon sugar, flaky laminated dough</p>",
+            "price": "$4.50"
+          }
+        },
+        "pastry-4": {
+          "type": "item",
+          "settings": {
+            "name": "Avocado Toast",
+            "description": "<p>Sourdough, smashed avocado, chili flake, pickled onion, soft egg</p>",
+            "price": "$9"
+          }
+        },
+        "pastry-5": {
+          "type": "item",
+          "settings": {
+            "name": "Granola Bowl",
+            "description": "<p>House-made granola, Greek yogurt, seasonal fruit, local honey</p>",
+            "price": "$8"
+          }
+        },
+        "pastry-6": {
+          "type": "item",
+          "settings": {
+            "name": "Breakfast Sandwich",
+            "description": "<p>Scrambled egg, cheddar, arugula, herb aioli on a brioche bun</p>",
+            "price": "$9.50"
+          }
+        }
+      },
+      "blocksOrder": ["pastry-1", "pastry-2", "pastry-3", "pastry-4", "pastry-5", "pastry-6"]
+    },
+    "beans_callout": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "beans-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Take It Home",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "beans-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Whole Bean & Retail",
+            "size": "4xl"
+          }
+        },
+        "beans-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Bring the Brewline experience home. We sell all of our house-roasted beans by the bag — whole bean or ground to your preferred method. Subscriptions available for the truly committed.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "beans-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Visit Us to Browse",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["beans-eyebrow", "beans-heading", "beans-text", "beans-button"]
+    },
+    "menu_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": true,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "See You Tomorrow Morning",
+            "size": "3xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Find Us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["menu_hero", "coffee", "seasonal", "pastries", "beans_callout", "menu_cta"],
+  "id": "menu",
+  "created": "2026-04-02T12:00:00.000Z",
+  "updated": "2026-04-02T12:00:00.000Z"
+}

@@ -331,7 +331,27 @@ Location pattern: `themes/arch/widgets/{widget-name}/insights.md` (e.g., `themes
 
 ---
 
-## 6. Differentiation Checklist
+## 6. Common Mistakes
+
+### Action Bar: don't always use fullwidth
+
+The `action-bar` widget has a `fullwidth` setting. **Do not default it to `true` on every instance.** Vary between fullwidth (edge-to-edge band) and contained (centered strip with padding) across presets and even within the same preset. A contained action-bar feels more like a nudge; fullwidth feels like a section divider. Both are valid — pick based on context.
+
+### Contact page: don't duplicate the footer
+
+The `contact-details` widget (with info, text, menu, and social blocks) serves nearly the same purpose as the global `footer` widget. **Never place contact-details as the last widget on the Contact page** — the footer renders right below it, creating visual and informational redundancy (same hours, same links, same social icons twice in a row).
+
+Instead, end the Contact page with:
+- An `action-bar` CTA (e.g., "Call us today")
+- A `testimonial-slider` or `testimonials` section
+- A `rich-text` closing message
+- Or simply let the map be the last widget — the footer handles the rest
+
+The footer already carries hours, links, and social. Trust it to do its job.
+
+---
+
+## 7. Differentiation Checklist
 
 Before finalizing a preset's `preset.json`, verify:
 
@@ -342,3 +362,5 @@ Before finalizing a preset's `preset.json`, verify:
 - [ ] **Color temperature** matches the industry (warm for food/hospitality, cool for professional/tech)
 - [ ] **Contrast ratios** pass WCAG AA minimum (4.5:1 for body text, 3:1 for large text)
 - [ ] **Body font** is genuinely readable at 16px — avoid display/decorative fonts for body
+- [ ] **Action bars** mix fullwidth and contained — not all `fullwidth: true`
+- [ ] **Contact page** doesn't end with contact-details duplicating the footer

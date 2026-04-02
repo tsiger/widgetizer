@@ -1,0 +1,109 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "md",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Visit the Bakery",
+            "size": "5xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We're on the corner of Maple and 3rd, right next to the park. Follow the smell of fresh bread — you can't miss it. For custom cake orders, give us at least 72 hours notice.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-text"]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "address": "58 Maple Avenue, Asheville, NC 28801",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "info-1": {
+          "type": "info",
+          "settings": {
+            "title": "Phone",
+            "text": "(828) 555-0234"
+          }
+        },
+        "info-2": {
+          "type": "info",
+          "settings": {
+            "title": "Email",
+            "text": "hello@crumblybakery.com"
+          }
+        },
+        "info-3": {
+          "type": "info",
+          "settings": {
+            "title": "Hours",
+            "text": "Tue–Fri: 7 AM–5 PM\nSat: 7 AM–4 PM\nSun: 8 AM–2 PM\nMon: Closed"
+          }
+        }
+      },
+      "blocksOrder": ["info-1", "info-2", "info-3"]
+    },
+    "custom_orders": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "custom-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Custom Cake Inquiries",
+            "size": "4xl"
+          }
+        },
+        "custom-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Dreaming up a celebration cake? We'd love to hear about it. Send us an email with your date, guest count, and any flavor or design ideas. We'll get back to you within 24 hours with a quote.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "custom-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Email Us About a Cake",
+              "href": "mailto:cakes@crumblybakery.com",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["custom-heading", "custom-text", "custom-button"]
+    }
+  },
+  "widgetsOrder": ["contact_intro", "contact_map", "custom_orders"],
+  "id": "contact",
+  "created": "2026-04-02T14:00:00.000Z",
+  "updated": "2026-04-02T14:00:00.000Z"
+}

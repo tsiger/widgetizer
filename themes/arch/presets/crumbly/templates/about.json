@@ -1,0 +1,226 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Story",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "Three generations, one sourdough starter, and an unwavering belief that bread should taste like something.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "origin": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "origin-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "How It Started",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "origin-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "It Started With a Sourdough Starter",
+            "size": "4xl"
+          }
+        },
+        "origin-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>In 2010, Nina Kowalski inherited two things from her grandmother: a 40-year-old sourdough starter and a handwritten recipe book held together with a rubber band. She'd been baking since she could reach the counter, but it was the starter — alive, temperamental, demanding — that turned a hobby into an obsession.</p><p>What started as loaves for friends and neighbors became a farmers market stand, then a tiny storefront, and eventually the bakery you see today. Nina still feeds the starter every morning. Some things you don't mess with.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["origin-eyebrow", "origin-heading", "origin-text"]
+    },
+    "values": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "What We Believe",
+        "title": "The Crumbly Way",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "rounded",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "value-1": {
+          "type": "card",
+          "settings": {
+            "icon": "clock",
+            "title": "Slow Is Better",
+            "description": "Long ferments, hand-laminated dough, and patience. We never rush the process because the flavor needs time to develop."
+          }
+        },
+        "value-2": {
+          "type": "card",
+          "settings": {
+            "icon": "leaf",
+            "title": "Know Your Ingredients",
+            "description": "Organic flour from a family mill upstate. Local butter. Free-range eggs. We know where everything comes from."
+          }
+        },
+        "value-3": {
+          "type": "card",
+          "settings": {
+            "icon": "users",
+            "title": "Feed Your Neighbors",
+            "description": "We donate unsold bread to the community kitchen every evening. Good food shouldn't go to waste."
+          }
+        }
+      },
+      "blocksOrder": ["value-1", "value-2", "value-3"]
+    },
+    "key_figures": {
+      "type": "key-figures",
+      "settings": {
+        "columns_desktop": 4,
+        "layout": "flat",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "figure-1": {
+          "type": "figure",
+          "settings": {
+            "number": "14",
+            "suffix": "",
+            "label": "Years Baking"
+          }
+        },
+        "figure-2": {
+          "type": "figure",
+          "settings": {
+            "number": "200",
+            "suffix": "+",
+            "label": "Loaves Per Week"
+          }
+        },
+        "figure-3": {
+          "type": "figure",
+          "settings": {
+            "number": "1",
+            "suffix": "",
+            "label": "Sourdough Starter"
+          }
+        },
+        "figure-4": {
+          "type": "figure",
+          "settings": {
+            "number": "4.9",
+            "suffix": "",
+            "label": "Google Rating"
+          }
+        }
+      },
+      "blocksOrder": ["figure-1", "figure-2", "figure-3", "figure-4"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The Bakers",
+        "title": "The Hands Behind the Bread",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "profile-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Nina Kowalski",
+            "role": "Founder & Head Baker",
+            "specialty": "Sourdough & artisan bread",
+            "bio": "Third-generation baker with an inherited sourdough starter and an obsession with crust. Nina opens the bakery at 4 AM and wouldn't have it any other way."
+          }
+        },
+        "profile-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Jordan Bell",
+            "role": "Pastry Chef",
+            "specialty": "Laminated doughs & viennoiserie",
+            "bio": "Trained in Paris, happiest elbow-deep in croissant dough. Jordan's almond croissants have a cult following for a reason."
+          }
+        },
+        "profile-3": {
+          "type": "profile",
+          "settings": {
+            "name": "Priya Sharma",
+            "role": "Cake Decorator",
+            "specialty": "Custom cakes & celebration designs",
+            "bio": "Priya turns sugar, flour, and butter into edible art. If you've seen a Crumbly wedding cake, her hands built it."
+          }
+        }
+      },
+      "blocksOrder": ["profile-1", "profile-2", "profile-3"]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Come Smell the Bread",
+            "size": "3xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Find the Bakery",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["about_hero", "origin", "values", "key_figures", "team", "about_cta"],
+  "id": "about",
+  "created": "2026-04-02T14:00:00.000Z",
+  "updated": "2026-04-02T14:00:00.000Z"
+}

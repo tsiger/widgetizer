@@ -1,0 +1,196 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "gallery_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "A glimpse inside Saffron — the food, the space, and the moments that make it all worthwhile.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "food_gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "The Food",
+        "title": "From Our Kitchen",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "food-1": {
+          "type": "item",
+          "settings": {
+            "title": "Roasted Beet & Burrata",
+            "category": "Seasonal"
+          }
+        },
+        "food-2": {
+          "type": "item",
+          "settings": {
+            "title": "Pan-Seared Halibut",
+            "category": "Signature"
+          }
+        },
+        "food-3": {
+          "type": "item",
+          "settings": {
+            "title": "Braised Lamb Shank",
+            "category": "Signature"
+          }
+        },
+        "food-4": {
+          "type": "item",
+          "settings": {
+            "title": "Handmade Pappardelle",
+            "category": "Seasonal"
+          }
+        },
+        "food-5": {
+          "type": "item",
+          "settings": {
+            "title": "Dark Chocolate Fondant",
+            "category": "Dessert"
+          }
+        },
+        "food-6": {
+          "type": "item",
+          "settings": {
+            "title": "Seasonal Cocktails",
+            "category": "Bar"
+          }
+        }
+      },
+      "blocksOrder": ["food-1", "food-2", "food-3", "food-4", "food-5", "food-6"]
+    },
+    "space_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "The Space",
+        "title": "Inside Saffron",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": true,
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "space-1": {
+          "type": "image",
+          "settings": {
+            "caption": "Main dining room"
+          }
+        },
+        "space-2": {
+          "type": "image",
+          "settings": {
+            "caption": "Open kitchen"
+          }
+        },
+        "space-3": {
+          "type": "image",
+          "settings": {
+            "caption": "Bar area"
+          }
+        },
+        "space-4": {
+          "type": "image",
+          "settings": {
+            "caption": "Outdoor patio"
+          }
+        },
+        "space-5": {
+          "type": "image",
+          "settings": {
+            "caption": "Private dining room"
+          }
+        },
+        "space-6": {
+          "type": "image",
+          "settings": {
+            "caption": "Chef's table"
+          }
+        }
+      },
+      "blocksOrder": ["space-1", "space-2", "space-3", "space-4", "space-5", "space-6"]
+    },
+    "events_section": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "events-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Private Events",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "events-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Host Your Next Gathering",
+            "size": "4xl"
+          }
+        },
+        "events-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From intimate dinners to milestone celebrations, our private dining room and garden patio offer the perfect backdrop. We'll work with you to create a custom menu that fits the occasion — and the memory.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "events-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Dedicated menu planning\n+ Flexible seating for 10–40 guests\n+ Sommelier-led wine pairing\n+ Indoor and outdoor spaces"
+          }
+        },
+        "events-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Inquire About Events",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["events-eyebrow", "events-heading", "events-text", "events-features", "events-button"]
+    }
+  },
+  "widgetsOrder": ["gallery_hero", "food_gallery", "space_gallery", "events_section"],
+  "id": "gallery",
+  "created": "2026-04-02T10:00:00.000Z",
+  "updated": "2026-04-02T10:00:00.000Z"
+}

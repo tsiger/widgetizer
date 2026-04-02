@@ -1,0 +1,245 @@
+{
+  "name": "Menu",
+  "slug": "menu",
+  "widgets": {
+    "menu_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "The Menu",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "A curated wine list, craft cocktails, and seasonal small plates made for sharing.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "wines_by_glass": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "By the Glass",
+        "title": "Wine",
+        "description": "Our by-the-glass selection rotates weekly. Ask your server what's open tonight.",
+        "heading_alignment": "left",
+        "layout": "two-column",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "wine-1": {
+          "type": "item",
+          "settings": {
+            "name": "Sancerre, Domaine Vacheron",
+            "description": "<p>Loire Valley, France — crisp, mineral, white flowers</p>",
+            "price": "$18"
+          }
+        },
+        "wine-2": {
+          "type": "item",
+          "settings": {
+            "name": "Albariño, Pazo de Señoráns",
+            "description": "<p>Rías Baixas, Spain — citrus, stone fruit, saline finish</p>",
+            "price": "$16"
+          }
+        },
+        "wine-3": {
+          "type": "item",
+          "settings": {
+            "name": "Côtes du Rhône, E. Guigal",
+            "description": "<p>Rhône, France — dark fruit, spice, medium body</p>",
+            "price": "$15"
+          }
+        },
+        "wine-4": {
+          "type": "item",
+          "settings": {
+            "name": "Barolo, Pio Cesare",
+            "description": "<p>Piedmont, Italy — rose, tar, cherry. Bold and structured</p>",
+            "price": "$24"
+          }
+        },
+        "wine-5": {
+          "type": "item",
+          "settings": {
+            "name": "Malbec, Catena Zapata",
+            "description": "<p>Mendoza, Argentina — plum, dark chocolate, velvet tannins</p>",
+            "price": "$16"
+          }
+        },
+        "wine-6": {
+          "type": "item",
+          "settings": {
+            "name": "Rosé, Château d'Esclans",
+            "description": "<p>Provence, France — pale pink, strawberry, dry and refreshing</p>",
+            "price": "$17"
+          }
+        }
+      },
+      "blocksOrder": ["wine-1", "wine-2", "wine-3", "wine-4", "wine-5", "wine-6"]
+    },
+    "cocktails": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Mixed & Shaken",
+        "title": "Cocktails",
+        "heading_alignment": "left",
+        "layout": "single-column",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "cocktail-1": {
+          "type": "item",
+          "settings": {
+            "name": "The Corkwell Negroni",
+            "description": "<p>Gin, Campari, sweet vermouth, orange peel. Our house version with a barrel-aged twist</p>",
+            "price": "$16"
+          }
+        },
+        "cocktail-2": {
+          "type": "item",
+          "settings": {
+            "name": "Lavender Spritz",
+            "description": "<p>Prosecco, elderflower liqueur, lavender bitters, soda. Light and floral</p>",
+            "price": "$14"
+          }
+        },
+        "cocktail-3": {
+          "type": "item",
+          "settings": {
+            "name": "Smoke & Honey Old Fashioned",
+            "description": "<p>Bourbon, honey syrup, smoked with applewood. Served over a single large ice cube</p>",
+            "price": "$17"
+          }
+        },
+        "cocktail-4": {
+          "type": "item",
+          "settings": {
+            "name": "Fig Manhattan",
+            "description": "<p>Rye whiskey, fig-infused sweet vermouth, Angostura, brandied cherry</p>",
+            "price": "$16"
+          }
+        }
+      },
+      "blocksOrder": ["cocktail-1", "cocktail-2", "cocktail-3", "cocktail-4"]
+    },
+    "small_plates": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "From the Kitchen",
+        "title": "Small Plates",
+        "description": "Designed for sharing — order a few and let the table decide.",
+        "heading_alignment": "left",
+        "layout": "two-column",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "plate-1": {
+          "type": "item",
+          "settings": {
+            "name": "Charcuterie Board",
+            "description": "<p>Rotating selection of cured meats, house pickles, mustard, grilled bread</p>",
+            "price": "$24"
+          }
+        },
+        "plate-2": {
+          "type": "item",
+          "settings": {
+            "name": "Cheese Selection",
+            "description": "<p>Three or five cheeses, honeycomb, dried fruit, marcona almonds</p>",
+            "price": "$18 / $28"
+          }
+        },
+        "plate-3": {
+          "type": "item",
+          "settings": {
+            "name": "Wood-Fired Flatbread",
+            "description": "<p>Roasted garlic, taleggio, truffle honey, fresh thyme</p>",
+            "price": "$16"
+          }
+        },
+        "plate-4": {
+          "type": "item",
+          "settings": {
+            "name": "Burrata & Tomato",
+            "description": "<p>Creamy burrata, heirloom tomatoes, basil oil, balsamic reduction</p>",
+            "price": "$17"
+          }
+        },
+        "plate-5": {
+          "type": "item",
+          "settings": {
+            "name": "Marinated Olives",
+            "description": "<p>Castelvetrano and Kalamata, citrus zest, chili, fresh herbs</p>",
+            "price": "$9"
+          }
+        },
+        "plate-6": {
+          "type": "item",
+          "settings": {
+            "name": "Steak Frites",
+            "description": "<p>Hanger steak, herb butter, hand-cut fries, béarnaise</p>",
+            "price": "$26"
+          }
+        }
+      },
+      "blocksOrder": ["plate-1", "plate-2", "plate-3", "plate-4", "plate-5", "plate-6"]
+    },
+    "cellar_callout": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "cellar-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Explore the Full Cellar",
+            "size": "4xl"
+          }
+        },
+        "cellar-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our full bottle list runs 200+ labels deep — from everyday pours to special-occasion splurges. Ask your server for the book, or let our sommelier guide you. We promise to meet you where you are.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "cellar-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Ask About a Bottle",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cellar-heading", "cellar-text", "cellar-button"]
+    }
+  },
+  "widgetsOrder": ["menu_hero", "wines_by_glass", "cocktails", "small_plates", "cellar_callout"],
+  "id": "menu",
+  "created": "2026-04-02T16:00:00.000Z",
+  "updated": "2026-04-02T16:00:00.000Z"
+}

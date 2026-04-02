@@ -1,0 +1,181 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "gallery_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "Latte art, morning light, and the details that make Brewline feel like home.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "coffee_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "The Coffee",
+        "title": "Every Cup, a Small Work of Art",
+        "layout": "carousel",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "img-1": {
+          "type": "image",
+          "settings": {
+            "caption": "Morning pour over ritual"
+          }
+        },
+        "img-2": {
+          "type": "image",
+          "settings": {
+            "caption": "Latte art in progress"
+          }
+        },
+        "img-3": {
+          "type": "image",
+          "settings": {
+            "caption": "Single-origin espresso"
+          }
+        },
+        "img-4": {
+          "type": "image",
+          "settings": {
+            "caption": "Cold brew on tap"
+          }
+        },
+        "img-5": {
+          "type": "image",
+          "settings": {
+            "caption": "Fresh roast cooling"
+          }
+        },
+        "img-6": {
+          "type": "image",
+          "settings": {
+            "caption": "Seasonal lavender latte"
+          }
+        }
+      },
+      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"]
+    },
+    "space_gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "The Space",
+        "title": "Where the Magic Happens",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "space-1": {
+          "type": "item",
+          "settings": {
+            "title": "The counter",
+            "category": "Interior"
+          }
+        },
+        "space-2": {
+          "type": "item",
+          "settings": {
+            "title": "Window seating",
+            "category": "Interior"
+          }
+        },
+        "space-3": {
+          "type": "item",
+          "settings": {
+            "title": "The roaster",
+            "category": "Behind the scenes"
+          }
+        },
+        "space-4": {
+          "type": "item",
+          "settings": {
+            "title": "Back patio",
+            "category": "Outdoor"
+          }
+        },
+        "space-5": {
+          "type": "item",
+          "settings": {
+            "title": "Community table",
+            "category": "Interior"
+          }
+        },
+        "space-6": {
+          "type": "item",
+          "settings": {
+            "title": "Bean display wall",
+            "category": "Details"
+          }
+        }
+      },
+      "blocksOrder": ["space-1", "space-2", "space-3", "space-4", "space-5", "space-6"]
+    },
+    "community_section": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "comm-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "More Than a Coffee Shop",
+            "size": "4xl"
+          }
+        },
+        "comm-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Brewline is a gathering place. We host weekly cupping sessions, local art shows, and the occasional acoustic set on Saturday mornings. Whether you're here for a quick espresso or a slow afternoon, you're always welcome.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "comm-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get in Touch",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["comm-heading", "comm-text", "comm-button"]
+    }
+  },
+  "widgetsOrder": ["gallery_hero", "coffee_gallery", "space_gallery", "community_section"],
+  "id": "gallery",
+  "created": "2026-04-02T12:00:00.000Z",
+  "updated": "2026-04-02T12:00:00.000Z"
+}

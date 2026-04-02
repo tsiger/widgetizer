@@ -1,0 +1,8 @@
+{
+  "type": "header",
+  "settings": {
+    "contact_position": "none",
+    "cta_text": "Visit Us",
+    "cta_link": "contact.html"
+  }
+}

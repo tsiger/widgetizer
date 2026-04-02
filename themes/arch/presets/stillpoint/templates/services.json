@@ -1,0 +1,195 @@
+{
+  "name": "Classes",
+  "slug": "services",
+  "widgets": {
+    "services_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Classes",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "Movement for every body, every level, every intention. Find the practice that fits your life.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "class_list": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Class Descriptions",
+        "title": "What We Teach",
+        "description": "Every class is led by a certified instructor. Mats and props are always provided.",
+        "style": "separated",
+        "allow_multiple": true,
+        "sidebar_position": "none",
+        "heading_alignment": "center",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "class-1": {
+          "type": "item",
+          "settings": {
+            "title": "Vinyasa Flow",
+            "content": "<p>A dynamic, breath-linked practice that builds strength, flexibility, and body awareness through flowing sequences. Each class is different — guided by the teacher's training and the energy in the room. Expect to move, sweat, and leave feeling lighter.</p><p><strong>Level:</strong> All levels (modifications offered)<br><strong>Duration:</strong> 60 or 75 minutes<br><strong>What to bring:</strong> Water, a towel. Mats provided.</p>"
+          }
+        },
+        "class-2": {
+          "type": "item",
+          "settings": {
+            "title": "Power Flow",
+            "content": "<p>A faster-paced, strength-focused vinyasa practice designed to challenge experienced practitioners. Longer holds, arm balances, and inversions woven into a continuous flow. Not for the faint of heart — but deeply rewarding.</p><p><strong>Level:</strong> Intermediate to advanced<br><strong>Duration:</strong> 60 minutes<br><strong>What to bring:</strong> Water, towel, willingness to be humbled.</p>"
+          }
+        },
+        "class-3": {
+          "type": "item",
+          "settings": {
+            "title": "Restorative Yoga",
+            "content": "<p>Long-held, fully supported poses that invite the body and nervous system to release deeply. Bolsters, blankets, and blocks do the work — you just have to let go. The most underrated class on the schedule.</p><p><strong>Level:</strong> All levels, especially beginners<br><strong>Duration:</strong> 75 minutes<br><strong>What to bring:</strong> Comfortable clothes. Everything else is provided.</p>"
+          }
+        },
+        "class-4": {
+          "type": "item",
+          "settings": {
+            "title": "Yin Yoga",
+            "content": "<p>Slow, passive stretching targeting deep connective tissues and fascia. Poses are held for 3–5 minutes in stillness. Meditative, introspective, and deeply restorative for both body and mind.</p><p><strong>Level:</strong> All levels<br><strong>Duration:</strong> 60 minutes</p>"
+          }
+        },
+        "class-5": {
+          "type": "item",
+          "settings": {
+            "title": "Mat Pilates",
+            "content": "<p>Core-focused, full-body conditioning inspired by Joseph Pilates' original mat work. Build stability, alignment, and functional strength through precise, controlled movements. Great cross-training for runners, cyclists, and desk workers.</p><p><strong>Level:</strong> All levels<br><strong>Duration:</strong> 50 minutes</p>"
+          }
+        },
+        "class-6": {
+          "type": "item",
+          "settings": {
+            "title": "Guided Meditation",
+            "content": "<p>A 30-minute seated meditation session, guided by a teacher. Techniques rotate between breath awareness, body scan, loving-kindness, and visualization. No experience needed — just a willingness to sit.</p><p><strong>Level:</strong> All levels<br><strong>Duration:</strong> 30 minutes</p>"
+          }
+        }
+      },
+      "blocksOrder": ["class-1", "class-2", "class-3", "class-4", "class-5", "class-6"]
+    },
+    "pricing": {
+      "type": "pricing",
+      "settings": {
+        "eyebrow": "Pricing",
+        "title": "Simple, Honest Pricing",
+        "description": "No contracts. Cancel anytime. Your first class is always free.",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "plan-1": {
+          "type": "plan",
+          "settings": {
+            "name": "Drop-In",
+            "price": "$22",
+            "description": "per class",
+            "features": "+ Any class, any time\n+ Mat & props included\n+ No commitment",
+            "button_link": {
+              "text": "Book a Class",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "plan-2": {
+          "type": "plan",
+          "settings": {
+            "name": "Unlimited Monthly",
+            "price": "$145",
+            "description": "per month",
+            "features": "+ Unlimited classes\n+ Priority workshop spots\n+ 10% off retail\n+ 2 guest passes per month",
+            "featured": true,
+            "button_link": {
+              "text": "Start Today",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "plan-3": {
+          "type": "plan",
+          "settings": {
+            "name": "10-Class Pack",
+            "price": "$180",
+            "description": "valid 3 months",
+            "features": "+ 10 classes, any type\n+ Shareable with a friend\n+ Mat & props included",
+            "button_link": {
+              "text": "Buy a Pack",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["plan-1", "plan-2", "plan-3"]
+    },
+    "private_sessions": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "private-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Private Sessions",
+            "size": "4xl"
+          }
+        },
+        "private-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>One-on-one sessions tailored to your goals — whether you're recovering from injury, preparing for a challenge, or just want undivided attention. Available with any of our senior instructors.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "private-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Personalized sequencing\n+ Injury-aware modifications\n+ 60 or 90 minute sessions\n+ In-studio or virtual"
+          }
+        },
+        "private-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Private",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["private-heading", "private-text", "private-features", "private-button"]
+    }
+  },
+  "widgetsOrder": ["services_hero", "class_list", "pricing", "private_sessions"],
+  "id": "services",
+  "created": "2026-04-02T18:00:00.000Z",
+  "updated": "2026-04-02T18:00:00.000Z"
+}

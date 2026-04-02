@@ -11,6 +11,31 @@
       "name": "Consulting firm",
       "description": "A polished demo site with pages, menus, and content for a modern consulting brand.",
       "liveDemo": "https://example.com/widgetizer-consulting-demo"
+    },
+    {
+      "id": "saffron",
+      "name": "Saffron",
+      "description": "A warm, inviting restaurant site with seasonal menus, food gallery, team profiles, and reservations."
+    },
+    {
+      "id": "brewline",
+      "name": "Brewline",
+      "description": "A modern specialty coffee shop with artisan vibes, seasonal drinks, pastries, and community spirit."
+    },
+    {
+      "id": "crumbly",
+      "name": "Crumbly",
+      "description": "A charming neighborhood bakery with artisan bread, pastries, custom cakes, and a generations-old sourdough starter."
+    },
+    {
+      "id": "corkwell",
+      "name": "Corkwell",
+      "description": "A moody, sophisticated wine bar with a curated cellar, craft cocktails, seasonal small plates, and private event space."
+    },
+    {
+      "id": "stillpoint",
+      "name": "Stillpoint",
+      "description": "A serene yoga and Pilates studio with class schedules, pricing plans, instructor profiles, and a calming aesthetic."
     }
   ]
 }

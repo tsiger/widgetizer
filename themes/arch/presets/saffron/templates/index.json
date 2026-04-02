@@ -1,0 +1,317 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero_banner": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Farm to Table, Heart to Plate",
+            "size": "6xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "Seasonal dishes crafted from the finest local ingredients, served in a warm and inviting atmosphere in the heart of the city.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "View Our Menu",
+              "href": "menu.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Reserve a Table",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text", "hero-buttons"]
+    },
+    "trust_bar": {
+      "type": "trust-bar",
+      "settings": {
+        "alignment": "centered",
+        "show_dividers": true,
+        "icon_style": "plain",
+        "icon_size": "md",
+        "icon_shape": "circle",
+        "color_scheme": "standard-accent",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "calendar",
+            "title": "Seasonal Menu",
+            "text": "Rotating dishes that celebrate what's fresh"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "title": "Farm to Table",
+            "text": "Sourced from local farms within 50 miles"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "flame",
+            "title": "Open Kitchen",
+            "text": "Watch our chefs craft your meal"
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "wine",
+            "title": "Private Events",
+            "text": "Intimate gatherings for up to 40 guests"
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+    },
+    "intro_section": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Our Story",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A Celebration of Local Flavors",
+            "size": "4xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What started as a shared dream between two chefs has grown into one of the city's most beloved dining destinations. At Saffron, every dish tells a story — of the farmer who grew the heirloom tomatoes, the fisherman who caught the morning's halibut, and the hands that shaped the pasta by hand.</p><p>We believe great food is about more than what's on the plate. It's about the people around the table, the conversations that linger, and the moments that become memories.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "About Us",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-text", "intro-button"]
+    },
+    "featured_dishes": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "From the Kitchen",
+        "title": "Seasonal Highlights",
+        "description": "A taste of what's on our menu this season — crafted daily with the freshest local ingredients.",
+        "heading_alignment": "center",
+        "layout": "single-column",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "dish-1": {
+          "type": "item",
+          "settings": {
+            "name": "Roasted Beet & Burrata",
+            "description": "<p>Heirloom beets, creamy burrata, toasted hazelnuts, and a honey-thyme vinaigrette. A vibrant starter that sets the tone.</p>",
+            "price": "$18"
+          }
+        },
+        "dish-2": {
+          "type": "item",
+          "settings": {
+            "name": "Pan-Seared Halibut",
+            "description": "<p>Wild-caught halibut over a bed of saffron risotto, with roasted fennel and a lemon-caper beurre blanc.</p>",
+            "price": "$38"
+          }
+        },
+        "dish-3": {
+          "type": "item",
+          "settings": {
+            "name": "Braised Lamb Shank",
+            "description": "<p>Slow-braised for eight hours with root vegetables, red wine, and fresh rosemary. Served with creamy polenta.</p>",
+            "price": "$34"
+          }
+        },
+        "dish-4": {
+          "type": "item",
+          "settings": {
+            "name": "Dark Chocolate Fondant",
+            "description": "<p>Warm chocolate cake with a molten center, served with salted caramel gelato and candied orange peel.</p>",
+            "price": "$14"
+          }
+        }
+      },
+      "blocksOrder": ["dish-1", "dish-2", "dish-3", "dish-4"]
+    },
+    "experience_callout": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "exp-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "An Experience Worth Savoring",
+            "size": "4xl"
+          }
+        },
+        "exp-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Step into a space where exposed brick meets soft candlelight, where the hum of conversation blends with the rhythm of our open kitchen. Saffron was designed for lingering — for long dinners that turn into late nights.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "exp-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Exposed brick & warm wood interiors\n+ Candlelit tables for two or twelve\n+ Curated wine list with 200+ labels\n+ Open kitchen with chef's counter seating"
+          }
+        },
+        "exp-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Table",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["exp-heading", "exp-text", "exp-features", "exp-button"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "What Our Guests Say",
+        "title": "Words from the Table",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "card_layout": "box",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "The braised lamb shank might be the best thing I've eaten this year. The atmosphere is warm without being stuffy, and the staff made us feel like regulars from the moment we walked in.",
+            "name": "Sarah M.",
+            "title": "Local food blogger",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "We hosted our anniversary dinner in the private room and it was absolutely perfect. The seasonal tasting menu was a revelation — every course told a story.",
+            "name": "James & Olivia R.",
+            "title": "Anniversary celebration",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Finally, a restaurant that takes farm-to-table seriously. You can taste the difference when ingredients are this fresh. The Sunday brunch is not to be missed.",
+            "name": "David K.",
+            "title": "Sunday brunch regular",
+            "rating": "4"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+    },
+    "cta_banner": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": true,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready for an Unforgettable Evening?",
+            "size": "3xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Reserve a Table",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View Menu",
+              "href": "menu.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero_banner", "trust_bar", "intro_section", "featured_dishes", "experience_callout", "testimonials", "cta_banner"],
+  "id": "index",
+  "created": "2026-04-02T10:00:00.000Z",
+  "updated": "2026-04-02T10:00:00.000Z"
+}

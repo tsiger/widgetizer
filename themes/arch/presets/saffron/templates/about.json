@@ -1,0 +1,230 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Story",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "A neighborhood restaurant with a global palate, rooted in community and driven by the seasons.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "founders_story": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "founders-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "The Founders",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "founders-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Marco & Elena Reyes",
+            "size": "4xl"
+          }
+        },
+        "founders-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Marco and Elena met in the kitchen of a small trattoria in Bologna. He was there for the technique; she was there for the people. Together, they discovered that the best meals happen when both passions collide.</p><p>After a decade cooking in kitchens across Europe and South America, they settled down and opened Saffron in 2012 — a place where world-class technique meets the warmth of a family dinner. Twelve years later, the philosophy hasn't changed: source the best, cook it simply, and make everyone feel at home.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "founders-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Meet the Team",
+              "href": "#team",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["founders-eyebrow", "founders-heading", "founders-text", "founders-button"]
+    },
+    "philosophy": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "phil-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Philosophy",
+            "size": "4xl"
+          }
+        },
+        "phil-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We believe that great cooking starts long before anything hits the pan. It starts with the soil, the season, and the relationship with the people who grow our food. Every ingredient on our menu can be traced back to a name and a place.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "phil-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Local farms within 50 miles\n+ Seasonal menu rotations every 6 weeks\n+ Zero-waste kitchen practices\n+ House-made pasta, bread, and charcuterie"
+          }
+        }
+      },
+      "blocksOrder": ["phil-heading", "phil-text", "phil-features"]
+    },
+    "key_figures": {
+      "type": "key-figures",
+      "settings": {
+        "columns_desktop": 4,
+        "layout": "flat",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "figure-1": {
+          "type": "figure",
+          "settings": {
+            "number": "12",
+            "suffix": "+",
+            "label": "Years Open"
+          }
+        },
+        "figure-2": {
+          "type": "figure",
+          "settings": {
+            "number": "40",
+            "suffix": "",
+            "label": "Local Farm Partners"
+          }
+        },
+        "figure-3": {
+          "type": "figure",
+          "settings": {
+            "number": "850",
+            "suffix": "+",
+            "label": "Wines Tasted"
+          }
+        },
+        "figure-4": {
+          "type": "figure",
+          "settings": {
+            "number": "4.8",
+            "suffix": "",
+            "label": "Average Rating"
+          }
+        }
+      },
+      "blocksOrder": ["figure-1", "figure-2", "figure-3", "figure-4"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The Team",
+        "title": "The People Behind Saffron",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "profile-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Marco Reyes",
+            "role": "Executive Chef",
+            "specialty": "Modern European cuisine",
+            "bio": "Trained in Bologna and Buenos Aires, Marco brings a global perspective to every plate. His cooking is rooted in tradition but never afraid to surprise."
+          }
+        },
+        "profile-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Elena Reyes",
+            "role": "General Manager",
+            "specialty": "Hospitality & wine",
+            "bio": "Elena runs the front of house with warmth and precision. A certified sommelier, she curates our wine list and trains every member of the team."
+          }
+        },
+        "profile-3": {
+          "type": "profile",
+          "settings": {
+            "name": "Aisha Okafor",
+            "role": "Pastry Chef",
+            "specialty": "French-African fusion desserts",
+            "bio": "Aisha joined Saffron in 2018, bringing her signature blend of French technique and West African flavors to the dessert menu."
+          }
+        }
+      },
+      "blocksOrder": ["profile-1", "profile-2", "profile-3"]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": true,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Come Taste the Difference",
+            "size": "3xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Reserve a Table",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["about_hero", "founders_story", "philosophy", "key_figures", "team", "about_cta"],
+  "id": "about",
+  "created": "2026-04-02T10:00:00.000Z",
+  "updated": "2026-04-02T10:00:00.000Z"
+}

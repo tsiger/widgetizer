@@ -1,0 +1,325 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Find Your Stillness",
+            "size": "7xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "Yoga, Pilates, and meditation in a studio designed for presence. All levels welcome.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "View Class Schedule",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "First Class Free",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text", "hero-button"]
+    },
+    "intro": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "The Studio",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A Space to Breathe",
+            "size": "4xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Stillpoint is a yoga and movement studio built around one idea: that the most powerful thing you can do is slow down. Our classes blend traditional practice with modern understanding of the body — accessible to beginners, challenging for experienced practitioners.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "About the Studio",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-text", "intro-button"]
+    },
+    "classes": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "What We Offer",
+        "title": "Classes for Every Body",
+        "description": "Whether you're stepping onto the mat for the first time or deepening a lifelong practice, there's a class here for you.",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "class-1": {
+          "type": "card",
+          "settings": {
+            "title": "Vinyasa Flow",
+            "description": "Dynamic, breath-linked movement. Build strength, flexibility, and focus through flowing sequences that challenge and restore.",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-2": {
+          "type": "card",
+          "settings": {
+            "title": "Restorative Yoga",
+            "description": "Long-held, supported poses that calm the nervous system. The antidote to a busy life. Props provided, no experience needed.",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-3": {
+          "type": "card",
+          "settings": {
+            "title": "Mat Pilates",
+            "description": "Core-focused, full-body conditioning. Build stability and alignment through precise, controlled movements on the mat.",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["class-1", "class-2", "class-3"]
+    },
+    "schedule_preview": {
+      "type": "schedule-table",
+      "settings": {
+        "eyebrow": "This Week",
+        "title": "Class Schedule",
+        "description": "Drop in anytime — no booking required for regular classes. Workshops and privates by appointment.",
+        "week_start_day": "monday",
+        "sidebar_position": "none",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "day-1": {
+          "type": "day",
+          "settings": {
+            "day": "Monday",
+            "hours": "6:30 AM Vinyasa · 9 AM Restorative · 12 PM Pilates · 5:30 PM Vinyasa · 7 PM Yin"
+          }
+        },
+        "day-2": {
+          "type": "day",
+          "settings": {
+            "day": "Tuesday",
+            "hours": "7 AM Pilates · 9:30 AM Gentle Flow · 12 PM Vinyasa · 5:30 PM Power Flow · 7:30 PM Meditation"
+          }
+        },
+        "day-3": {
+          "type": "day",
+          "settings": {
+            "day": "Wednesday",
+            "hours": "6:30 AM Vinyasa · 9 AM Restorative · 12 PM Pilates · 5:30 PM Vinyasa · 7 PM Yin"
+          }
+        },
+        "day-4": {
+          "type": "day",
+          "settings": {
+            "day": "Thursday",
+            "hours": "7 AM Pilates · 9:30 AM Gentle Flow · 12 PM Vinyasa · 5:30 PM Power Flow · 7:30 PM Meditation"
+          }
+        },
+        "day-5": {
+          "type": "day",
+          "settings": {
+            "day": "Friday",
+            "hours": "6:30 AM Vinyasa · 9 AM Restorative · 12 PM Pilates · 4:30 PM Gentle Flow"
+          }
+        },
+        "day-6": {
+          "type": "day",
+          "settings": {
+            "day": "Saturday",
+            "hours": "8 AM Community Vinyasa · 10 AM Pilates · 11:30 AM Restorative"
+          }
+        },
+        "day-7": {
+          "type": "day",
+          "settings": {
+            "day": "Sunday",
+            "hours": "9 AM Gentle Flow · 10:30 AM Yin · 12 PM Meditation"
+          }
+        }
+      },
+      "blocksOrder": ["day-1", "day-2", "day-3", "day-4", "day-5", "day-6", "day-7"]
+    },
+    "testimonials": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "test-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "\"Stillpoint changed my relationship with my body. I came for the yoga, I stayed for the community.\"",
+            "size": "3xl"
+          }
+        },
+        "test-text": {
+          "type": "text",
+          "settings": {
+            "text": "— Mara J., practicing for 3 years",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["test-heading", "test-text"]
+    },
+    "pricing": {
+      "type": "pricing",
+      "settings": {
+        "eyebrow": "Membership",
+        "title": "Find Your Plan",
+        "description": "No contracts, no hidden fees. Start with a free class and see how it feels.",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "plan-1": {
+          "type": "plan",
+          "settings": {
+            "name": "Drop-In",
+            "price": "$22",
+            "description": "per class",
+            "features": "+ Single class access\n+ Any class type\n+ Mat & props included",
+            "button_link": {
+              "text": "Get Started",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "plan-2": {
+          "type": "plan",
+          "settings": {
+            "name": "Unlimited",
+            "price": "$145",
+            "description": "per month",
+            "features": "+ Unlimited classes\n+ Priority workshop booking\n+ 10% off retail\n+ Guest passes (2/month)",
+            "featured": true,
+            "button_link": {
+              "text": "Join Now",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "plan-3": {
+          "type": "plan",
+          "settings": {
+            "name": "10-Class Pack",
+            "price": "$180",
+            "description": "valid 3 months",
+            "features": "+ 10 classes, any type\n+ Mat & props included\n+ Shareable with a friend",
+            "button_link": {
+              "text": "Buy a Pack",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["plan-1", "plan-2", "plan-3"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your First Class Is On Us",
+            "size": "3xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Claim Your Free Class",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "intro", "classes", "schedule_preview", "testimonials", "pricing", "cta"],
+  "id": "index",
+  "created": "2026-04-02T18:00:00.000Z",
+  "updated": "2026-04-02T18:00:00.000Z"
+}

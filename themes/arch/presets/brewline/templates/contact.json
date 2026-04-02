@@ -1,0 +1,162 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "md",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Find Us",
+            "size": "5xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We're tucked into the corner of Oak and 5th, right next to the bookshop. Look for the green awning — and follow the smell of fresh-roasted coffee.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-text"]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "address": "142 Oak Street, Portland, OR 97214",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "info-1": {
+          "type": "info",
+          "settings": {
+            "title": "Phone",
+            "text": "(503) 555-0187"
+          }
+        },
+        "info-2": {
+          "type": "info",
+          "settings": {
+            "title": "Email",
+            "text": "hello@brewlinecoffee.com"
+          }
+        }
+      },
+      "blocksOrder": ["info-1", "info-2"]
+    },
+    "hours": {
+      "type": "schedule-table",
+      "settings": {
+        "eyebrow": "Hours",
+        "title": "When We're Open",
+        "week_start_day": "monday",
+        "sidebar_position": "none",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "day-1": {
+          "type": "day",
+          "settings": {
+            "day": "Monday",
+            "hours": "6:30 AM – 6:00 PM"
+          }
+        },
+        "day-2": {
+          "type": "day",
+          "settings": {
+            "day": "Tuesday",
+            "hours": "6:30 AM – 6:00 PM"
+          }
+        },
+        "day-3": {
+          "type": "day",
+          "settings": {
+            "day": "Wednesday",
+            "hours": "6:30 AM – 6:00 PM"
+          }
+        },
+        "day-4": {
+          "type": "day",
+          "settings": {
+            "day": "Thursday",
+            "hours": "6:30 AM – 6:00 PM"
+          }
+        },
+        "day-5": {
+          "type": "day",
+          "settings": {
+            "day": "Friday",
+            "hours": "6:30 AM – 6:00 PM"
+          }
+        },
+        "day-6": {
+          "type": "day",
+          "settings": {
+            "day": "Saturday",
+            "hours": "7:00 AM – 5:00 PM"
+          }
+        },
+        "day-7": {
+          "type": "day",
+          "settings": {
+            "day": "Sunday",
+            "hours": "7:00 AM – 5:00 PM"
+          }
+        }
+      },
+      "blocksOrder": ["day-1", "day-2", "day-3", "day-4", "day-5", "day-6", "day-7"]
+    },
+    "contact_footer": {
+      "type": "contact-details",
+      "settings": {
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "info_block": {
+          "type": "info",
+          "settings": {
+            "address": "142 Oak Street\nPortland, OR 97214",
+            "phone": "(503) 555-0187",
+            "email": "hello@brewlinecoffee.com"
+          }
+        },
+        "text_block_1": {
+          "type": "text_block",
+          "settings": {
+            "title": "Good to Know",
+            "text": "<p>Free wifi on all visits<br>Dog-friendly patio<br>Laptop-free zone at the bar<br>Retail beans available daily</p>"
+          }
+        },
+        "menu_block_1": {
+          "type": "menu_block",
+          "settings": {
+            "title": "Explore"
+          }
+        },
+        "social_block_1": {
+          "type": "social_block",
+          "settings": {
+            "title": "Follow Along"
+          }
+        }
+      },
+      "blocksOrder": ["info_block", "text_block_1", "menu_block_1", "social_block_1"]
+    }
+  },
+  "widgetsOrder": ["contact_intro", "contact_map", "hours", "contact_footer"],
+  "id": "contact",
+  "created": "2026-04-02T12:00:00.000Z",
+  "updated": "2026-04-02T12:00:00.000Z"
+}

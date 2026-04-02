@@ -1,0 +1,8 @@
+{
+  "type": "header",
+  "settings": {
+    "contact_position": "none",
+    "cta_text": "Order Online",
+    "cta_link": "menu.html"
+  }
+}

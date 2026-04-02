@@ -1,0 +1,234 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight",
+        "fullwidth": true
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Story",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "A tiny roastery that grew into a neighborhood staple — one cup at a time.",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "origin_story": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "origin-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "How It Started",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "origin-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "From a Garage Roaster to Your Morning Ritual",
+            "size": "4xl"
+          }
+        },
+        "origin-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Brewline started in 2017 when Sam Chen traded a career in tech for a second-hand drum roaster in his parents' garage. Armed with a notebook full of flavor profiles and a stubborn belief that specialty coffee shouldn't feel pretentious, he started selling bags at the local farmers market.</p><p>Two years later, the first Brewline shop opened — a 500-square-foot space with exactly six seats and the same roaster that started it all. Today, we've grown, but the ethos hasn't changed: great coffee, good people, no attitude.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["origin-eyebrow", "origin-heading", "origin-text"]
+    },
+    "process_steps": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "Bean to Cup",
+        "title": "How We Brew",
+        "description": "Every cup of Brewline coffee follows the same journey — from farm to your hands.",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Source",
+            "description": "<p>We build direct relationships with small-lot farmers in Ethiopia, Colombia, and Guatemala. We visit the farms, cup the harvests, and choose only what excites us.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Roast",
+            "description": "<p>Every batch is roasted in-house on our Probat roaster. Light to medium profiles that honor the origin — never over-roasted, never bitter.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Dial In",
+            "description": "<p>Each morning, we dial in every grinder and every method. Water temp, grind size, dose — it all matters, and we adjust until it's right.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "Serve",
+            "description": "<p>Your coffee is brewed to order by baristas who care about the craft. We'll happily talk you through the menu — no question is too basic.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "key_figures": {
+      "type": "key-figures",
+      "settings": {
+        "columns_desktop": 4,
+        "layout": "flat",
+        "animate": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "figure-1": {
+          "type": "figure",
+          "settings": {
+            "number": "7",
+            "suffix": "",
+            "label": "Years Roasting"
+          }
+        },
+        "figure-2": {
+          "type": "figure",
+          "settings": {
+            "number": "12",
+            "suffix": "",
+            "label": "Farm Partners"
+          }
+        },
+        "figure-3": {
+          "type": "figure",
+          "settings": {
+            "number": "300",
+            "suffix": "K+",
+            "label": "Cups Served"
+          }
+        },
+        "figure-4": {
+          "type": "figure",
+          "settings": {
+            "number": "4.9",
+            "suffix": "",
+            "label": "Google Rating"
+          }
+        }
+      },
+      "blocksOrder": ["figure-1", "figure-2", "figure-3", "figure-4"]
+    },
+    "team": {
+      "type": "team-highlight",
+      "settings": {
+        "eyebrow": "The Crew",
+        "title": "Meet the People Behind the Counter",
+        "description": "A small team with big passion for great coffee.",
+        "image_ratio": "square",
+        "columns_desktop": 4,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "member-1": {
+          "type": "member",
+          "settings": {
+            "name": "Sam Chen",
+            "role": "Founder & Head Roaster"
+          }
+        },
+        "member-2": {
+          "type": "member",
+          "settings": {
+            "name": "Maya Torres",
+            "role": "Lead Barista"
+          }
+        },
+        "member-3": {
+          "type": "member",
+          "settings": {
+            "name": "Kai Okonkwo",
+            "role": "Pastry Chef"
+          }
+        },
+        "member-4": {
+          "type": "member",
+          "settings": {
+            "name": "Lena Bergström",
+            "role": "Green Buyer"
+          }
+        }
+      },
+      "blocksOrder": ["member-1", "member-2", "member-3", "member-4"]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": true,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Come Say Hi",
+            "size": "3xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Find Us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View Menu",
+              "href": "menu.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["about_hero", "origin_story", "process_steps", "key_figures", "team", "about_cta"],
+  "id": "about",
+  "created": "2026-04-02T12:00:00.000Z",
+  "updated": "2026-04-02T12:00:00.000Z"
+}

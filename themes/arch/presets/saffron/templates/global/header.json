@@ -1,0 +1,10 @@
+{
+  "type": "header",
+  "settings": {
+    "contact_position": "top",
+    "phone": "(555) 234-5678",
+    "email": "hello@saffronrestaurant.com",
+    "cta_text": "Reserve a Table",
+    "cta_link": "contact.html"
+  }
+}

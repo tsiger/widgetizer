@@ -1,0 +1,107 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "md",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Visit Saffron",
+            "size": "5xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We'd love to welcome you to our table. Stop by for dinner, join us for Sunday brunch, or get in touch to plan a private event. Walk-ins are always welcome, but reservations are recommended for weekend evenings.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-text"]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "address": "247 Elm Street, Brooklyn, NY 11201",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "info-1": {
+          "type": "info",
+          "settings": {
+            "title": "Phone",
+            "text": "(555) 234-5678"
+          }
+        },
+        "info-2": {
+          "type": "info",
+          "settings": {
+            "title": "Email",
+            "text": "hello@saffronrestaurant.com"
+          }
+        },
+        "info-3": {
+          "type": "info",
+          "settings": {
+            "title": "Hours",
+            "text": "Mon–Thu: 5–10 PM\nFri–Sat: 5–11 PM\nSun: 10 AM–3 PM, 5–9 PM"
+          }
+        }
+      },
+      "blocksOrder": ["info-1", "info-2", "info-3"]
+    },
+    "contact_details": {
+      "type": "contact-details",
+      "settings": {
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "info_block": {
+          "type": "info",
+          "settings": {
+            "address": "247 Elm Street\nBrooklyn, NY 11201",
+            "phone": "(555) 234-5678",
+            "email": "hello@saffronrestaurant.com"
+          }
+        },
+        "text_block_1": {
+          "type": "text_block",
+          "settings": {
+            "title": "Hours",
+            "text": "<p>Monday — Thursday: 5 PM – 10 PM<br>Friday — Saturday: 5 PM – 11 PM<br>Sunday Brunch: 10 AM – 3 PM<br>Sunday Dinner: 5 PM – 9 PM</p>"
+          }
+        },
+        "menu_block_1": {
+          "type": "menu_block",
+          "settings": {
+            "title": "Quick Links"
+          }
+        },
+        "social_block_1": {
+          "type": "social_block",
+          "settings": {
+            "title": "Connect"
+          }
+        }
+      },
+      "blocksOrder": ["info_block", "text_block_1", "menu_block_1", "social_block_1"]
+    }
+  },
+  "widgetsOrder": ["contact_intro", "contact_map", "contact_details"],
+  "id": "contact",
+  "created": "2026-04-02T10:00:00.000Z",
+  "updated": "2026-04-02T10:00:00.000Z"
+}
