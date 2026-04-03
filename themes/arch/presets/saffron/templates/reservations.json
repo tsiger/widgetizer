@@ -1,0 +1,162 @@
+{
+  "name": "Reservations",
+  "slug": "reservations",
+  "widgets": {
+    "reservations_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Reserve a Table",
+            "size": "5xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The best way to guarantee your spot is to call us directly. For parties of 6 or more, please reserve at least 48 hours in advance so we can prepare something special.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-text"]
+    },
+    "booking_details": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "none",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "walkins-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Walk-ins Welcome",
+            "size": "3xl",
+            "position": "left"
+          }
+        },
+        "walkins-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>No reservation? No problem — at least on weeknights. Monday through Thursday, we hold a portion of our tables for walk-ins on a first-come, first-served basis. Arrive early for the best chance at a table, especially during peak hours (7–8:30 PM).</p>",
+            "size": "base",
+            "position": "left"
+          }
+        },
+        "groups-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Large Parties",
+            "size": "3xl",
+            "position": "right"
+          }
+        },
+        "groups-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Groups of 6 or more get special attention. We'll set up a dedicated section, offer a pre-selected menu to streamline the evening, and make sure your party runs smoothly from start to finish.</p>",
+            "size": "base",
+            "position": "right"
+          }
+        },
+        "groups-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Dedicated menu planning\n+ Flexible seating arrangements\n+ Wine pairing available\n+ Private dining room for 10–24 guests",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["walkins-heading", "walkins-text", "groups-heading", "groups-text", "groups-features"]
+    },
+    "hours": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "When to Visit",
+        "title": "Opening Hours",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "center",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "hours-1": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Monday — Thursday",
+            "title": "Weeknight Dinner",
+            "description": "<p>5:00 PM – 10:00 PM<br>Walk-ins welcome. Reservations recommended for parties of 4+.</p>"
+          }
+        },
+        "hours-2": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Friday — Saturday",
+            "title": "Weekend Dinner",
+            "description": "<p>5:00 PM – 11:00 PM<br>Reservations strongly recommended. Last seating at 9:30 PM.</p>"
+          }
+        },
+        "hours-3": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Sunday",
+            "title": "Brunch & Dinner",
+            "description": "<p>Brunch: 10:00 AM – 3:00 PM (no reservations needed)<br>Dinner: 5:00 PM – 9:00 PM</p>"
+          }
+        }
+      },
+      "blocksOrder": ["hours-1", "hours-2", "hours-3"]
+    },
+    "reservations_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Call to Reserve",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>(555) 234-5678</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Email Us",
+              "href": "mailto:hello@saffronrestaurant.com",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["reservations_intro", "booking_details", "hours", "reservations_cta"],
+  "id": "reservations",
+  "created": "2026-04-03T10:00:00.000Z",
+  "updated": "2026-04-03T10:00:00.000Z"
+}

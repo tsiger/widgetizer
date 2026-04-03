@@ -1,8 +1,8 @@
 {
   "type": "footer",
   "settings": {
-    "color_scheme": "highlight",
-    "copyright": "2024 Brewline Coffee. All rights reserved."
+    "copyright": "© 2026 Brewline Coffee. All rights reserved.",
+    "color_scheme": "highlight"
   },
   "blocks": {
     "logo_text_1": {

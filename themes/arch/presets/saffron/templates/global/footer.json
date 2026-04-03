@@ -1,8 +1,8 @@
 {
   "type": "footer",
   "settings": {
-    "color_scheme": "highlight",
-    "copyright": "2024 Saffron Restaurant. All rights reserved."
+    "copyright": "© 2026 Saffron Restaurant. All rights reserved.",
+    "color_scheme": "highlight"
   },
   "blocks": {
     "logo_text_1": {

@@ -8,7 +8,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight",
-        "fullwidth": true
+        "fullwidth": true,
+        "top_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -21,161 +22,193 @@
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "Golden crusts, flour-dusted counters, and the faces behind the oven. This is what mornings at Crumbly look like.",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "text": "<p>Golden crusts, flour-dusted counters, and the faces behind the oven. This is what mornings at Crumbly look like.</p>",
+            "size": "lg"
           }
         }
       },
       "blocksOrder": ["hero-heading", "hero-text"]
     },
-    "baked_gallery": {
-      "type": "gallery",
+    "bakes": {
+      "type": "bento-grid",
       "settings": {
         "eyebrow": "From the Oven",
         "title": "Our Bakes",
-        "layout": "carousel",
-        "columns_desktop": 3,
-        "aspect_ratio": "1 / 1",
+        "heading_alignment": "center",
+        "gap": "var(--space-md)",
         "color_scheme": "standard"
       },
       "blocks": {
-        "bake-1": {
-          "type": "image",
+        "bento-hero": {
+          "type": "item",
           "settings": {
-            "caption": "Sourdough loaves cooling"
+            "title": "Sourdough",
+            "text": "Our signature 24-hour loaf",
+            "col_span": 2,
+            "row_span": 2,
+            "text_color": "light",
+            "overlay_color": "#2e1f2e99"
           }
         },
-        "bake-2": {
-          "type": "image",
+        "bento-2": {
+          "type": "item",
           "settings": {
-            "caption": "Almond croissants"
+            "title": "Croissants",
+            "text": "Hand-laminated daily",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "light",
+            "overlay_color": "#2e1f2e99"
           }
         },
-        "bake-3": {
-          "type": "image",
+        "bento-3": {
+          "type": "item",
           "settings": {
-            "caption": "Chocolate layer cake"
+            "title": "Cinnamon Rolls",
+            "text": "Cream cheese icing",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "light",
+            "overlay_color": "#2e1f2e99"
           }
         },
-        "bake-4": {
-          "type": "image",
+        "bento-4": {
+          "type": "item",
           "settings": {
-            "caption": "Morning buns, fresh out"
+            "title": "Layer Cakes",
+            "text": "Made to order",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "light",
+            "overlay_color": "#2e1f2e99"
           }
         },
-        "bake-5": {
-          "type": "image",
+        "bento-5": {
+          "type": "item",
           "settings": {
-            "caption": "Seasonal fruit tart"
-          }
-        },
-        "bake-6": {
-          "type": "image",
-          "settings": {
-            "caption": "Cookie spread"
+            "title": "Cookies & Bars",
+            "text": "Brown butter everything",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "light",
+            "overlay_color": "#2e1f2e99"
           }
         }
       },
-      "blocksOrder": ["bake-1", "bake-2", "bake-3", "bake-4", "bake-5", "bake-6"]
+      "blocksOrder": ["bento-hero", "bento-2", "bento-3", "bento-4", "bento-5"]
     },
     "bakery_gallery": {
-      "type": "masonry-gallery",
+      "type": "gallery",
       "settings": {
         "eyebrow": "The Bakery",
         "title": "Behind the Counter",
+        "heading_alignment": "center",
+        "layout": "grid",
         "columns_desktop": 3,
-        "gap": "medium",
+        "staggered": true,
+        "aspect_ratio": "4 / 3",
         "color_scheme": "standard-accent"
       },
       "blocks": {
         "space-1": {
-          "type": "item",
+          "type": "image",
           "settings": {
-            "title": "The display case",
-            "category": "Shop"
+            "caption": "The display case"
           }
         },
         "space-2": {
-          "type": "item",
+          "type": "image",
           "settings": {
-            "title": "Dough shaping",
-            "category": "Process"
+            "caption": "Dough shaping"
           }
         },
         "space-3": {
-          "type": "item",
+          "type": "image",
           "settings": {
-            "title": "Our deck oven",
-            "category": "Process"
+            "caption": "Our deck oven"
           }
         },
         "space-4": {
-          "type": "item",
+          "type": "image",
           "settings": {
-            "title": "Café seating",
-            "category": "Shop"
+            "caption": "Café seating"
           }
         },
         "space-5": {
-          "type": "item",
+          "type": "image",
           "settings": {
-            "title": "Flour-dusted hands",
-            "category": "Process"
+            "caption": "Flour-dusted hands"
           }
         },
         "space-6": {
-          "type": "item",
+          "type": "image",
           "settings": {
-            "title": "The bread wall",
-            "category": "Shop"
+            "caption": "The bread wall"
           }
         }
       },
       "blocksOrder": ["space-1", "space-2", "space-3", "space-4", "space-5", "space-6"]
     },
-    "custom_cta": {
-      "type": "image-callout",
+    "events": {
+      "type": "event-list",
       "settings": {
-        "image_position": "left",
+        "eyebrow": "Coming Up",
+        "title": "Classes & Events",
+        "heading_alignment": "center",
         "color_scheme": "standard"
       },
       "blocks": {
-        "cta-heading": {
-          "type": "heading",
+        "event-1": {
+          "type": "event",
           "settings": {
-            "text": "Dreaming of a Custom Cake?",
-            "size": "4xl"
-          }
-        },
-        "cta-text": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Weddings, birthdays, baby showers — we design cakes for life's biggest moments. Every one is made from scratch, decorated by hand, and tailored to your taste.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
-          }
-        },
-        "cta-button": {
-          "type": "button",
-          "settings": {
-            "link": {
-              "text": "Start Your Order",
+            "day": "18",
+            "month": "May",
+            "title": "Sourdough Workshop",
+            "location": "Crumbly Bakery · 10:00 AM – 1:00 PM",
+            "description": "<p>Learn to make your own sourdough starter and bake your first loaf. All materials included. Bring an apron and an appetite.</p>",
+            "button_link": {
+              "text": "Reserve a Spot",
               "href": "contact.html",
               "target": "_self"
-            },
-            "style": "primary",
-            "size": "medium"
+            }
+          }
+        },
+        "event-2": {
+          "type": "event",
+          "settings": {
+            "day": "1",
+            "month": "Jun",
+            "title": "Kids Decorating Class",
+            "location": "Crumbly Bakery · 2:00 PM – 4:00 PM",
+            "description": "<p>Ages 6–12. Each kid decorates their own cupcakes with buttercream, sprinkles, and edible flowers. Parents welcome to watch (and eat).</p>",
+            "button_link": {
+              "text": "Sign Up",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "event-3": {
+          "type": "event",
+          "settings": {
+            "day": "14",
+            "month": "Jun",
+            "title": "Seasonal Pie Night",
+            "location": "Crumbly Bakery · 6:00 PM – 8:00 PM",
+            "description": "<p>A summer evening of pie. We bake, you eat. Seasonal fruit pies, savory galettes, and homemade ice cream. Bring your own wine.</p>",
+            "button_link": {
+              "text": "Get Tickets",
+              "href": "contact.html",
+              "target": "_self"
+            }
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": ["event-1", "event-2", "event-3"]
     }
   },
-  "widgetsOrder": ["gallery_hero", "baked_gallery", "bakery_gallery", "custom_cta"],
+  "widgetsOrder": ["gallery_hero", "bakes", "bakery_gallery", "events"],
   "id": "gallery",
-  "created": "2026-04-02T14:00:00.000Z",
-  "updated": "2026-04-02T14:00:00.000Z"
+  "created": "2026-04-03T14:00:00.000Z",
+  "updated": "2026-04-03T14:00:00.000Z"
 }

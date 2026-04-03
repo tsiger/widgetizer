@@ -6,6 +6,7 @@
     { "label": "Menu", "link": "menu.html", "items": [] },
     { "label": "Gallery", "link": "gallery.html", "items": [] },
     { "label": "About", "link": "about.html", "items": [] },
+    { "label": "Reservations", "link": "reservations.html", "items": [] },
     { "label": "Contact", "link": "contact.html", "items": [] }
   ]
 }

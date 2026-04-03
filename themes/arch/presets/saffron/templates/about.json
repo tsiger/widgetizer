@@ -8,7 +8,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight",
-        "fullwidth": true
+        "fullwidth": true,
+        "top_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -21,10 +22,8 @@
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "A neighborhood restaurant with a global palate, rooted in community and driven by the seasons.",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "text": "<p>A neighborhood restaurant with a global palate, rooted in community and driven by the seasons.</p>",
+            "size": "lg"
           }
         }
       },
@@ -33,14 +32,14 @@
     "founders_story": {
       "type": "image-text",
       "settings": {
-        "image_position": "left",
+        "image_position": "right",
         "color_scheme": "standard"
       },
       "blocks": {
         "founders-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "The Founders",
+            "text": "<p>The Founders</p>",
             "size": "sm",
             "uppercase": true,
             "muted": true
@@ -50,16 +49,14 @@
           "type": "heading",
           "settings": {
             "text": "Marco & Elena Reyes",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
         "founders-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Marco and Elena met in the kitchen of a small trattoria in Bologna. He was there for the technique; she was there for the people. Together, they discovered that the best meals happen when both passions collide.</p><p>After a decade cooking in kitchens across Europe and South America, they settled down and opened Saffron in 2012 — a place where world-class technique meets the warmth of a family dinner. Twelve years later, the philosophy hasn't changed: source the best, cook it simply, and make everyone feel at home.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "text": "<p>Marco and Elena met in the kitchen of a small trattoria in Bologna. He was there for the technique; she was there for the people. Together, they discovered that the best meals happen when both passions collide.</p><p>After a decade cooking in kitchens across Europe and South America, they settled in Brooklyn and opened Saffron in 2012 — a place where world-class technique meets the warmth of a family dinner. Twelve years later, the philosophy hasn't changed: source the best, cook it simply, and make everyone feel at home.</p>",
+            "size": "base"
           }
         },
         "founders-button": {
@@ -80,7 +77,7 @@
     "philosophy": {
       "type": "image-callout",
       "settings": {
-        "image_position": "right",
+        "image_position": "left",
         "color_scheme": "standard-accent"
       },
       "blocks": {
@@ -88,16 +85,14 @@
           "type": "heading",
           "settings": {
             "text": "Our Philosophy",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
         "phil-text": {
           "type": "text",
           "settings": {
             "text": "<p>We believe that great cooking starts long before anything hits the pan. It starts with the soil, the season, and the relationship with the people who grow our food. Every ingredient on our menu can be traced back to a name and a place.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "size": "base"
           }
         },
         "phil-features": {
@@ -112,8 +107,10 @@
     "key_figures": {
       "type": "key-figures",
       "settings": {
+        "heading_alignment": "center",
         "columns_desktop": 4,
-        "layout": "flat",
+        "layout": "grid",
+        "card_layout": "flat",
         "animate": true,
         "color_scheme": "standard"
       },
@@ -158,6 +155,7 @@
       "settings": {
         "eyebrow": "The Team",
         "title": "The People Behind Saffron",
+        "heading_alignment": "center",
         "columns_desktop": 3,
         "layout": "grid",
         "color_scheme": "standard"
@@ -196,7 +194,7 @@
     "about_cta": {
       "type": "action-bar",
       "settings": {
-        "fullwidth": true,
+        "fullwidth": false,
         "color_scheme": "highlight"
       },
       "blocks": {
@@ -212,7 +210,7 @@
           "settings": {
             "link": {
               "text": "Reserve a Table",
-              "href": "contact.html",
+              "href": "reservations.html",
               "target": "_self"
             },
             "style": "primary",
@@ -225,6 +223,6 @@
   },
   "widgetsOrder": ["about_hero", "founders_story", "philosophy", "key_figures", "team", "about_cta"],
   "id": "about",
-  "created": "2026-04-02T10:00:00.000Z",
-  "updated": "2026-04-02T10:00:00.000Z"
+  "created": "2026-04-03T10:00:00.000Z",
+  "updated": "2026-04-03T10:00:00.000Z"
 }

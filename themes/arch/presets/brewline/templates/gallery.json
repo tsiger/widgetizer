@@ -8,7 +8,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight",
-        "fullwidth": true
+        "fullwidth": true,
+        "top_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -21,10 +22,8 @@
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "Latte art, morning light, and the details that make Brewline feel like home.",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "text": "<p>Latte art, morning light, and the details that make Brewline feel like home.</p>",
+            "size": "lg"
           }
         }
       },
@@ -35,6 +34,7 @@
       "settings": {
         "eyebrow": "The Coffee",
         "title": "Every Cup, a Small Work of Art",
+        "heading_alignment": "center",
         "layout": "carousel",
         "columns_desktop": 3,
         "aspect_ratio": "4 / 3",
@@ -85,6 +85,7 @@
       "settings": {
         "eyebrow": "The Space",
         "title": "Where the Magic Happens",
+        "heading_alignment": "center",
         "columns_desktop": 3,
         "gap": "medium",
         "color_scheme": "standard-accent"
@@ -135,10 +136,10 @@
       },
       "blocksOrder": ["space-1", "space-2", "space-3", "space-4", "space-5", "space-6"]
     },
-    "community_section": {
-      "type": "image-callout",
+    "community": {
+      "type": "image-text",
       "settings": {
-        "image_position": "right",
+        "image_position": "left",
         "color_scheme": "standard"
       },
       "blocks": {
@@ -146,16 +147,14 @@
           "type": "heading",
           "settings": {
             "text": "More Than a Coffee Shop",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
         "comm-text": {
           "type": "text",
           "settings": {
             "text": "<p>Brewline is a gathering place. We host weekly cupping sessions, local art shows, and the occasional acoustic set on Saturday mornings. Whether you're here for a quick espresso or a slow afternoon, you're always welcome.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "size": "base"
           }
         },
         "comm-button": {
@@ -174,8 +173,8 @@
       "blocksOrder": ["comm-heading", "comm-text", "comm-button"]
     }
   },
-  "widgetsOrder": ["gallery_hero", "coffee_gallery", "space_gallery", "community_section"],
+  "widgetsOrder": ["gallery_hero", "coffee_gallery", "space_gallery", "community"],
   "id": "gallery",
-  "created": "2026-04-02T12:00:00.000Z",
-  "updated": "2026-04-02T12:00:00.000Z"
+  "created": "2026-04-03T12:00:00.000Z",
+  "updated": "2026-04-03T12:00:00.000Z"
 }

@@ -15,27 +15,17 @@
     {
       "id": "saffron",
       "name": "Saffron",
-      "description": "A warm, inviting restaurant site with seasonal menus, food gallery, team profiles, and reservations."
+      "description": "An elegant restaurant with seasonal menus, food gallery, team profiles, and a dedicated reservations page."
     },
     {
       "id": "brewline",
       "name": "Brewline",
-      "description": "A modern specialty coffee shop with artisan vibes, seasonal drinks, pastries, and community spirit."
+      "description": "A modern specialty coffee shop with artisan roasting, seasonal drinks, community events, and a bean-to-cup story."
     },
     {
       "id": "crumbly",
       "name": "Crumbly",
-      "description": "A charming neighborhood bakery with artisan bread, pastries, custom cakes, and a generations-old sourdough starter."
-    },
-    {
-      "id": "corkwell",
-      "name": "Corkwell",
-      "description": "A moody, sophisticated wine bar with a curated cellar, craft cocktails, seasonal small plates, and private event space."
-    },
-    {
-      "id": "stillpoint",
-      "name": "Stillpoint",
-      "description": "A serene yoga and Pilates studio with class schedules, pricing plans, instructor profiles, and a calming aesthetic."
+      "description": "A charming neighborhood bakery with artisan bread, custom cakes, baking classes, and a generations-old sourdough starter."
     }
   ]
 }

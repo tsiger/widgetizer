@@ -21,7 +21,7 @@ Two-column freeform layout. Every block has a `position: left | right` setting, 
 | `features` | `features` (newline-separated, `+` prefix = checkmark, `-` prefix = x) | Bulleted/checked list |
 | `numbered-item` | `title`, `description`, `size`, `shape` | Auto-numbered items (counter increments per column) |
 | `rating` | `rating` (3-5 stars) | Star rating display |
-| `button` | `link`, `link_2`, `style`/`style_2`, `size` | Up to 2 buttons per block |
+| `button` | `link`, `link_2`, `style`/`style_2`, `size`, `alignment` (start/center) | Up to 2 buttons per block. `start` = left-aligned (default), `center` = centered in column |
 
 ## Layout recipes
 
@@ -91,3 +91,4 @@ Two-column freeform layout. Every block has a `position: left | right` setting, 
 - **The `image` block is not the same as the `image-text` widget.** Here the image lives *inside* a column alongside other blocks. Use it for small accent images (logos, badges, product shots) not hero photography.
 - **`rating` block works as social proof.** Place it above a heading on the left for a "4.9 stars / Trusted by thousands" pattern.
 - **`text` with `muted` + `sm` makes great metadata.** Use it for dates, categories, fine print — especially paired with a bold heading above it.
+- **Button `alignment: center` is situational.** Default is `start` (left-aligned) which works in most cases. Use `center` when the column has short, centered content (e.g., a heading-only left column with a centered CTA below), or when the split-content is used as a symmetrical intro section. Don't center every button — it loses its meaning.

@@ -8,7 +8,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight",
-        "fullwidth": true
+        "fullwidth": true,
+        "top_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -21,16 +22,14 @@
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "A tiny roastery that grew into a neighborhood staple — one cup at a time.",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "text": "<p>A tiny roastery that grew into a neighborhood staple — one cup at a time.</p>",
+            "size": "lg"
           }
         }
       },
       "blocksOrder": ["hero-heading", "hero-text"]
     },
-    "origin_story": {
+    "origin": {
       "type": "image-text",
       "settings": {
         "image_position": "left",
@@ -40,7 +39,7 @@
         "origin-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "How It Started",
+            "text": "<p>How It Started</p>",
             "size": "sm",
             "uppercase": true,
             "muted": true
@@ -50,27 +49,26 @@
           "type": "heading",
           "settings": {
             "text": "From a Garage Roaster to Your Morning Ritual",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
         "origin-text": {
           "type": "text",
           "settings": {
             "text": "<p>Brewline started in 2017 when Sam Chen traded a career in tech for a second-hand drum roaster in his parents' garage. Armed with a notebook full of flavor profiles and a stubborn belief that specialty coffee shouldn't feel pretentious, he started selling bags at the local farmers market.</p><p>Two years later, the first Brewline shop opened — a 500-square-foot space with exactly six seats and the same roaster that started it all. Today, we've grown, but the ethos hasn't changed: great coffee, good people, no attitude.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "size": "base"
           }
         }
       },
       "blocksOrder": ["origin-eyebrow", "origin-heading", "origin-text"]
     },
-    "process_steps": {
+    "process": {
       "type": "steps",
       "settings": {
         "eyebrow": "Bean to Cup",
         "title": "How We Brew",
         "description": "Every cup of Brewline coffee follows the same journey — from farm to your hands.",
+        "heading_alignment": "center",
         "color_scheme": "standard-accent"
       },
       "blocks": {
@@ -105,11 +103,13 @@
       },
       "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
     },
-    "key_figures": {
+    "stats": {
       "type": "key-figures",
       "settings": {
+        "heading_alignment": "center",
         "columns_desktop": 4,
-        "layout": "flat",
+        "layout": "grid",
+        "card_layout": "flat",
         "animate": true,
         "color_scheme": "standard"
       },
@@ -155,9 +155,10 @@
         "eyebrow": "The Crew",
         "title": "Meet the People Behind the Counter",
         "description": "A small team with big passion for great coffee.",
+        "heading_alignment": "center",
         "image_ratio": "square",
         "columns_desktop": 4,
-        "color_scheme": "standard"
+        "color_scheme": "standard-accent"
       },
       "blocks": {
         "member-1": {
@@ -194,7 +195,7 @@
     "about_cta": {
       "type": "action-bar",
       "settings": {
-        "fullwidth": true,
+        "fullwidth": false,
         "color_scheme": "highlight"
       },
       "blocks": {
@@ -202,7 +203,7 @@
           "type": "heading",
           "settings": {
             "text": "Come Say Hi",
-            "size": "3xl"
+            "size": "2xl"
           }
         },
         "cta-button": {
@@ -227,8 +228,8 @@
       "blocksOrder": ["cta-heading", "cta-button"]
     }
   },
-  "widgetsOrder": ["about_hero", "origin_story", "process_steps", "key_figures", "team", "about_cta"],
+  "widgetsOrder": ["about_hero", "origin", "process", "stats", "team", "about_cta"],
   "id": "about",
-  "created": "2026-04-02T12:00:00.000Z",
-  "updated": "2026-04-02T12:00:00.000Z"
+  "created": "2026-04-03T12:00:00.000Z",
+  "updated": "2026-04-03T12:00:00.000Z"
 }

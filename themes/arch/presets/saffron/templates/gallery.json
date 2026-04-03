@@ -8,7 +8,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight",
-        "fullwidth": true
+        "fullwidth": true,
+        "top_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -21,10 +22,8 @@
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "A glimpse inside Saffron — the food, the space, and the moments that make it all worthwhile.",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "text": "<p>A glimpse inside Saffron — the food, the space, and the moments that make it all worthwhile.</p>",
+            "size": "lg"
           }
         }
       },
@@ -35,6 +34,7 @@
       "settings": {
         "eyebrow": "The Food",
         "title": "From Our Kitchen",
+        "heading_alignment": "center",
         "columns_desktop": 3,
         "gap": "medium",
         "color_scheme": "standard"
@@ -90,9 +90,11 @@
       "settings": {
         "eyebrow": "The Space",
         "title": "Inside Saffron",
+        "heading_alignment": "center",
         "layout": "grid",
         "columns_desktop": 3,
         "staggered": true,
+        "aspect_ratio": "4 / 3",
         "color_scheme": "standard-accent"
       },
       "blocks": {
@@ -136,35 +138,24 @@
       "blocksOrder": ["space-1", "space-2", "space-3", "space-4", "space-5", "space-6"]
     },
     "events_section": {
-      "type": "image-text",
+      "type": "image-callout",
       "settings": {
-        "image_position": "right",
+        "image_position": "left",
         "color_scheme": "standard"
       },
       "blocks": {
-        "events-eyebrow": {
-          "type": "text",
-          "settings": {
-            "text": "Private Events",
-            "size": "sm",
-            "uppercase": true,
-            "muted": true
-          }
-        },
         "events-heading": {
           "type": "heading",
           "settings": {
             "text": "Host Your Next Gathering",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
         "events-text": {
           "type": "text",
           "settings": {
             "text": "<p>From intimate dinners to milestone celebrations, our private dining room and garden patio offer the perfect backdrop. We'll work with you to create a custom menu that fits the occasion — and the memory.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "size": "base"
           }
         },
         "events-features": {
@@ -186,11 +177,11 @@
           }
         }
       },
-      "blocksOrder": ["events-eyebrow", "events-heading", "events-text", "events-features", "events-button"]
+      "blocksOrder": ["events-heading", "events-text", "events-features", "events-button"]
     }
   },
   "widgetsOrder": ["gallery_hero", "food_gallery", "space_gallery", "events_section"],
   "id": "gallery",
-  "created": "2026-04-02T10:00:00.000Z",
-  "updated": "2026-04-02T10:00:00.000Z"
+  "created": "2026-04-03T10:00:00.000Z",
+  "updated": "2026-04-03T10:00:00.000Z"
 }

@@ -521,6 +521,16 @@
         },
         {
           "type": "select",
+          "id": "alignment",
+          "label": "tTheme:split_content.blocks.button.settings.alignment.label",
+          "default": "start",
+          "options": [
+            { "value": "start", "label": "tTheme:split_content.blocks.button.settings.alignment.options.start" },
+            { "value": "center", "label": "tTheme:split_content.blocks.button.settings.alignment.options.center" }
+          ]
+        },
+        {
+          "type": "select",
           "id": "position",
           "label": "tTheme:split_content.blocks.button.settings.position.label",
           "default": "left",

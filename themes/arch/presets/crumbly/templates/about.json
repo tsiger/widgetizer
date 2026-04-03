@@ -8,7 +8,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight",
-        "fullwidth": true
+        "fullwidth": true,
+        "top_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -21,10 +22,8 @@
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "Three generations, one sourdough starter, and an unwavering belief that bread should taste like something.",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "text": "<p>Three generations, one sourdough starter, and an unwavering belief that bread should taste like something.</p>",
+            "size": "lg"
           }
         }
       },
@@ -40,7 +39,7 @@
         "origin-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "How It Started",
+            "text": "<p>How It Started</p>",
             "size": "sm",
             "uppercase": true,
             "muted": true
@@ -50,28 +49,27 @@
           "type": "heading",
           "settings": {
             "text": "It Started With a Sourdough Starter",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
         "origin-text": {
           "type": "text",
           "settings": {
             "text": "<p>In 2010, Nina Kowalski inherited two things from her grandmother: a 40-year-old sourdough starter and a handwritten recipe book held together with a rubber band. She'd been baking since she could reach the counter, but it was the starter — alive, temperamental, demanding — that turned a hobby into an obsession.</p><p>What started as loaves for friends and neighbors became a farmers market stand, then a tiny storefront, and eventually the bakery you see today. Nina still feeds the starter every morning. Some things you don't mess with.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "size": "base"
           }
         }
       },
       "blocksOrder": ["origin-eyebrow", "origin-heading", "origin-text"]
     },
     "values": {
-      "type": "icon-card-grid",
+      "type": "features-split",
       "settings": {
         "eyebrow": "What We Believe",
         "title": "The Crumbly Way",
-        "columns_desktop": 3,
-        "card_layout": "flat",
+        "heading_alignment": "center",
+        "content_position": "right",
+        "show_divider": true,
         "icon_style": "outline",
         "icon_size": "lg",
         "icon_shape": "rounded",
@@ -79,37 +77,39 @@
       },
       "blocks": {
         "value-1": {
-          "type": "card",
+          "type": "feature",
           "settings": {
             "icon": "clock",
             "title": "Slow Is Better",
-            "description": "Long ferments, hand-laminated dough, and patience. We never rush the process because the flavor needs time to develop."
+            "description": "<p>Long ferments, hand-laminated dough, and patience. We never rush the process because the flavor needs time to develop.</p>"
           }
         },
         "value-2": {
-          "type": "card",
+          "type": "feature",
           "settings": {
             "icon": "leaf",
             "title": "Know Your Ingredients",
-            "description": "Organic flour from a family mill upstate. Local butter. Free-range eggs. We know where everything comes from."
+            "description": "<p>Organic flour from a family mill upstate. Local butter. Free-range eggs. We know where everything comes from.</p>"
           }
         },
         "value-3": {
-          "type": "card",
+          "type": "feature",
           "settings": {
             "icon": "users",
             "title": "Feed Your Neighbors",
-            "description": "We donate unsold bread to the community kitchen every evening. Good food shouldn't go to waste."
+            "description": "<p>We donate unsold bread to the community kitchen every evening. Good food shouldn't go to waste.</p>"
           }
         }
       },
       "blocksOrder": ["value-1", "value-2", "value-3"]
     },
-    "key_figures": {
+    "stats": {
       "type": "key-figures",
       "settings": {
+        "heading_alignment": "center",
         "columns_desktop": 4,
-        "layout": "flat",
+        "layout": "grid",
+        "card_layout": "flat",
         "animate": true,
         "color_scheme": "standard"
       },
@@ -154,9 +154,10 @@
       "settings": {
         "eyebrow": "The Bakers",
         "title": "The Hands Behind the Bread",
+        "heading_alignment": "center",
         "columns_desktop": 3,
         "layout": "grid",
-        "color_scheme": "standard"
+        "color_scheme": "standard-accent"
       },
       "blocks": {
         "profile-1": {
@@ -200,7 +201,7 @@
           "type": "heading",
           "settings": {
             "text": "Come Smell the Bread",
-            "size": "3xl"
+            "size": "2xl"
           }
         },
         "cta-button": {
@@ -219,8 +220,8 @@
       "blocksOrder": ["cta-heading", "cta-button"]
     }
   },
-  "widgetsOrder": ["about_hero", "origin", "values", "key_figures", "team", "about_cta"],
+  "widgetsOrder": ["about_hero", "origin", "values", "stats", "team", "about_cta"],
   "id": "about",
-  "created": "2026-04-02T14:00:00.000Z",
-  "updated": "2026-04-02T14:00:00.000Z"
+  "created": "2026-04-03T14:00:00.000Z",
+  "updated": "2026-04-03T14:00:00.000Z"
 }

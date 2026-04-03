@@ -1,9 +1,0 @@
-{
-  "type": "header",
-  "settings": {
-    "contact_position": "none",
-    "cta_text": "Reserve",
-    "cta_link": "contact.html",
-    "cta_style": "primary"
-  }
-}

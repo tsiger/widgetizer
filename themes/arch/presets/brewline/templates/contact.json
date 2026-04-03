@@ -6,7 +6,7 @@
       "type": "rich-text",
       "settings": {
         "text_alignment": "center",
-        "content_width": "md",
+        "content_width": "medium",
         "color_scheme": "standard"
       },
       "blocks": {
@@ -21,9 +21,7 @@
           "type": "text",
           "settings": {
             "text": "<p>We're tucked into the corner of Oak and 5th, right next to the bookshop. Look for the green awning — and follow the smell of fresh-roasted coffee.</p>",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "size": "lg"
           }
         }
       },
@@ -32,7 +30,9 @@
     "contact_map": {
       "type": "map",
       "settings": {
+        "title": "",
         "address": "142 Oak Street, Portland, OR 97214",
+        "heading_alignment": "center",
         "height": "medium",
         "show_address": true,
         "sidebar_position": "right",
@@ -43,14 +43,14 @@
           "type": "info",
           "settings": {
             "title": "Phone",
-            "text": "(503) 555-0187"
+            "text": "<p>(503) 555-0187</p>"
           }
         },
         "info-2": {
           "type": "info",
           "settings": {
             "title": "Email",
-            "text": "hello@brewlinecoffee.com"
+            "text": "<p>hello@brewlinecoffee.com</p>"
           }
         }
       },
@@ -61,8 +61,10 @@
       "settings": {
         "eyebrow": "Hours",
         "title": "When We're Open",
-        "week_start_day": "monday",
-        "sidebar_position": "none",
+        "heading_alignment": "center",
+        "week_start_day": "1",
+        "sidebar_position": "right",
+        "note": "Closed on major holidays",
         "color_scheme": "standard-accent"
       },
       "blocks": {
@@ -118,45 +120,51 @@
       },
       "blocksOrder": ["day-1", "day-2", "day-3", "day-4", "day-5", "day-6", "day-7"]
     },
-    "contact_footer": {
-      "type": "contact-details",
+    "faq": {
+      "type": "accordion",
       "settings": {
-        "color_scheme": "highlight"
+        "eyebrow": "Good to Know",
+        "title": "Quick Answers",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "color_scheme": "standard"
       },
       "blocks": {
-        "info_block": {
-          "type": "info",
+        "faq-1": {
+          "type": "item",
           "settings": {
-            "address": "142 Oak Street\nPortland, OR 97214",
-            "phone": "(503) 555-0187",
-            "email": "hello@brewlinecoffee.com"
+            "question": "Do you have wifi?",
+            "answer": "<p>Yes — free wifi for all customers. We do have a laptop-free zone at the bar for those who want to unplug. The communal table and window seats are fair game for working.</p>"
           }
         },
-        "text_block_1": {
-          "type": "text_block",
+        "faq-2": {
+          "type": "item",
           "settings": {
-            "title": "Good to Know",
-            "text": "<p>Free wifi on all visits<br>Dog-friendly patio<br>Laptop-free zone at the bar<br>Retail beans available daily</p>"
+            "question": "What dairy alternatives do you offer?",
+            "answer": "<p>We stock oat milk, almond milk, and coconut milk. Oat is our default — it steams beautifully and pairs best with espresso. All alternatives are available at no extra charge.</p>"
           }
         },
-        "menu_block_1": {
-          "type": "menu_block",
+        "faq-3": {
+          "type": "item",
           "settings": {
-            "title": "Explore"
+            "question": "Is the patio dog-friendly?",
+            "answer": "<p>Absolutely. Dogs are welcome on the back patio. We keep a water bowl by the door and have been known to hand out the occasional treat.</p>"
           }
         },
-        "social_block_1": {
-          "type": "social_block",
+        "faq-4": {
+          "type": "item",
           "settings": {
-            "title": "Follow Along"
+            "question": "Can I buy beans to take home?",
+            "answer": "<p>Yes — we sell all of our house-roasted beans by the bag (250g or 1kg). Whole bean or ground to your preferred method. We also offer a monthly subscription if you want fresh beans delivered to your door.</p>"
           }
         }
       },
-      "blocksOrder": ["info_block", "text_block_1", "menu_block_1", "social_block_1"]
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4"]
     }
   },
-  "widgetsOrder": ["contact_intro", "contact_map", "hours", "contact_footer"],
+  "widgetsOrder": ["contact_intro", "contact_map", "hours", "faq"],
   "id": "contact",
-  "created": "2026-04-02T12:00:00.000Z",
-  "updated": "2026-04-02T12:00:00.000Z"
+  "created": "2026-04-03T12:00:00.000Z",
+  "updated": "2026-04-03T12:00:00.000Z"
 }

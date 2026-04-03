@@ -1846,6 +1846,13 @@
       },
       "button": {
         "settings": {
+          "alignment": {
+            "label": "Alignment",
+            "options": {
+              "start": "Start",
+              "center": "Center"
+            }
+          },
           "position": {
             "label": "Column"
           }

@@ -7,8 +7,10 @@
       "settings": {
         "height": "large",
         "alignment": "center",
+        "overlay_color": "#1a1c2bcc",
         "color_scheme": "highlight",
-        "fullwidth": true
+        "fullwidth": true,
+        "top_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -21,10 +23,8 @@
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "Seasonal dishes crafted from the finest local ingredients, served in a warm and inviting atmosphere in the heart of the city.",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "text": "<p>Seasonal dishes crafted from the finest local ingredients, served in a warm and inviting atmosphere in the heart of Brooklyn.</p>",
+            "size": "lg"
           }
         },
         "hero-buttons": {
@@ -38,7 +38,7 @@
             "style": "primary",
             "link_2": {
               "text": "Reserve a Table",
-              "href": "contact.html",
+              "href": "reservations.html",
               "target": "_self"
             },
             "style_2": "secondary",
@@ -48,84 +48,38 @@
       },
       "blocksOrder": ["hero-heading", "hero-text", "hero-buttons"]
     },
-    "trust_bar": {
-      "type": "trust-bar",
-      "settings": {
-        "alignment": "centered",
-        "show_dividers": true,
-        "icon_style": "plain",
-        "icon_size": "md",
-        "icon_shape": "circle",
-        "color_scheme": "standard-accent",
-        "top_spacing": "auto",
-        "bottom_spacing": "auto"
-      },
-      "blocks": {
-        "trust-1": {
-          "type": "item",
-          "settings": {
-            "icon": "calendar",
-            "title": "Seasonal Menu",
-            "text": "Rotating dishes that celebrate what's fresh"
-          }
-        },
-        "trust-2": {
-          "type": "item",
-          "settings": {
-            "icon": "leaf",
-            "title": "Farm to Table",
-            "text": "Sourced from local farms within 50 miles"
-          }
-        },
-        "trust-3": {
-          "type": "item",
-          "settings": {
-            "icon": "flame",
-            "title": "Open Kitchen",
-            "text": "Watch our chefs craft your meal"
-          }
-        },
-        "trust-4": {
-          "type": "item",
-          "settings": {
-            "icon": "wine",
-            "title": "Private Events",
-            "text": "Intimate gatherings for up to 40 guests"
-          }
-        }
-      },
-      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
-    },
     "intro_section": {
-      "type": "image-text",
+      "type": "split-content",
       "settings": {
-        "image_position": "left",
+        "balance": "equal",
+        "sticky_column": "none",
         "color_scheme": "standard"
       },
       "blocks": {
         "intro-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "Our Story",
+            "text": "<p>Our Story</p>",
             "size": "sm",
             "uppercase": true,
-            "muted": true
+            "muted": true,
+            "position": "left"
           }
         },
         "intro-heading": {
           "type": "heading",
           "settings": {
             "text": "A Celebration of Local Flavors",
-            "size": "4xl"
+            "size": "5xl",
+            "position": "left"
           }
         },
         "intro-text": {
           "type": "text",
           "settings": {
-            "text": "<p>What started as a shared dream between two chefs has grown into one of the city's most beloved dining destinations. At Saffron, every dish tells a story — of the farmer who grew the heirloom tomatoes, the fisherman who caught the morning's halibut, and the hands that shaped the pasta by hand.</p><p>We believe great food is about more than what's on the plate. It's about the people around the table, the conversations that linger, and the moments that become memories.</p>",
+            "text": "<p>What started as a shared dream between two chefs has grown into one of Brooklyn's most beloved dining destinations. At Saffron, every dish tells a story — of the farmer who grew the heirloom tomatoes, the fisherman who caught the morning's halibut, and the hands that shaped the pasta by hand.</p><p>We believe great food is about more than what's on the plate. It's about the people around the table, the conversations that linger, and the moments that become memories.</p>",
             "size": "base",
-            "uppercase": false,
-            "muted": false
+            "position": "right"
           }
         },
         "intro-button": {
@@ -137,7 +91,8 @@
               "target": "_self"
             },
             "style": "secondary",
-            "size": "medium"
+            "size": "medium",
+            "position": "right"
           }
         }
       },
@@ -151,14 +106,14 @@
         "description": "A taste of what's on our menu this season — crafted daily with the freshest local ingredients.",
         "heading_alignment": "center",
         "layout": "single-column",
-        "color_scheme": "standard"
+        "color_scheme": "standard-accent"
       },
       "blocks": {
         "dish-1": {
           "type": "item",
           "settings": {
             "name": "Roasted Beet & Burrata",
-            "description": "<p>Heirloom beets, creamy burrata, toasted hazelnuts, and a honey-thyme vinaigrette. A vibrant starter that sets the tone.</p>",
+            "description": "<p>Heirloom beets, creamy burrata, toasted hazelnuts, and a honey-thyme vinaigrette</p>",
             "price": "$18"
           }
         },
@@ -166,7 +121,7 @@
           "type": "item",
           "settings": {
             "name": "Pan-Seared Halibut",
-            "description": "<p>Wild-caught halibut over a bed of saffron risotto, with roasted fennel and a lemon-caper beurre blanc.</p>",
+            "description": "<p>Wild-caught halibut over saffron risotto, with roasted fennel and a lemon-caper beurre blanc</p>",
             "price": "$38"
           }
         },
@@ -174,7 +129,7 @@
           "type": "item",
           "settings": {
             "name": "Braised Lamb Shank",
-            "description": "<p>Slow-braised for eight hours with root vegetables, red wine, and fresh rosemary. Served with creamy polenta.</p>",
+            "description": "<p>Slow-braised for eight hours with root vegetables, red wine, and fresh rosemary. Served with creamy polenta</p>",
             "price": "$34"
           }
         },
@@ -182,7 +137,7 @@
           "type": "item",
           "settings": {
             "name": "Dark Chocolate Fondant",
-            "description": "<p>Warm chocolate cake with a molten center, served with salted caramel gelato and candied orange peel.</p>",
+            "description": "<p>Warm chocolate cake with a molten center, served with salted caramel gelato and candied orange peel</p>",
             "price": "$14"
           }
         }
@@ -193,29 +148,27 @@
       "type": "image-callout",
       "settings": {
         "image_position": "right",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard"
       },
       "blocks": {
         "exp-heading": {
           "type": "heading",
           "settings": {
             "text": "An Experience Worth Savoring",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
         "exp-text": {
           "type": "text",
           "settings": {
             "text": "<p>Step into a space where exposed brick meets soft candlelight, where the hum of conversation blends with the rhythm of our open kitchen. Saffron was designed for lingering — for long dinners that turn into late nights.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "size": "base"
           }
         },
         "exp-features": {
           "type": "features",
           "settings": {
-            "features": "+ Exposed brick & warm wood interiors\n+ Candlelit tables for two or twelve\n+ Curated wine list with 200+ labels\n+ Open kitchen with chef's counter seating"
+            "features": "+ Open kitchen with chef's counter seating\n+ Curated wine list with 200+ labels\n+ Candlelit tables for two or twelve\n+ Private dining room for events"
           }
         },
         "exp-button": {
@@ -223,7 +176,7 @@
           "settings": {
             "link": {
               "text": "Book a Table",
-              "href": "contact.html",
+              "href": "reservations.html",
               "target": "_self"
             },
             "style": "primary",
@@ -238,9 +191,10 @@
       "settings": {
         "eyebrow": "What Our Guests Say",
         "title": "Words from the Table",
+        "heading_alignment": "center",
         "columns_desktop": 3,
         "layout": "grid",
-        "card_layout": "box",
+        "card_layout": "flat",
         "color_scheme": "standard"
       },
       "blocks": {
@@ -277,7 +231,7 @@
     "cta_banner": {
       "type": "action-bar",
       "settings": {
-        "fullwidth": true,
+        "fullwidth": false,
         "color_scheme": "highlight"
       },
       "blocks": {
@@ -293,7 +247,7 @@
           "settings": {
             "link": {
               "text": "Reserve a Table",
-              "href": "contact.html",
+              "href": "reservations.html",
               "target": "_self"
             },
             "style": "primary",
@@ -310,8 +264,8 @@
       "blocksOrder": ["cta-heading", "cta-button"]
     }
   },
-  "widgetsOrder": ["hero_banner", "trust_bar", "intro_section", "featured_dishes", "experience_callout", "testimonials", "cta_banner"],
+  "widgetsOrder": ["hero_banner", "intro_section", "featured_dishes", "experience_callout", "testimonials", "cta_banner"],
   "id": "index",
-  "created": "2026-04-02T10:00:00.000Z",
-  "updated": "2026-04-02T10:00:00.000Z"
+  "created": "2026-04-03T10:00:00.000Z",
+  "updated": "2026-04-03T10:00:00.000Z"
 }

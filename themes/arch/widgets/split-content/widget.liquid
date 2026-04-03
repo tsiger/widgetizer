@@ -59,6 +59,10 @@
         }
         {% endif %}
       }
+
+      & .widget-actions-start {
+        justify-content: flex-start;
+      }
     }
   </style>
 
@@ -192,7 +196,7 @@
 
               {% when 'button' %}
                 {% if block.settings.link.text != blank or block.settings.link_2.text != blank %}
-                  <div class="widget-actions reveal reveal-up" style="--reveal-delay: {{ delay }}" data-block-id="{{ blockId }}">
+                  <div class="widget-actions reveal reveal-up{% if block.settings.alignment == 'start' %} widget-actions-start{% endif %}" style="--reveal-delay: {{ delay }}" data-block-id="{{ blockId }}">
                     {% if block.settings.link.text != blank %}
                       {% if block.settings.size != 'small' and block.settings.size != blank %}
                         {% assign btn_size_class = 'widget-button-' | append: block.settings.size %}

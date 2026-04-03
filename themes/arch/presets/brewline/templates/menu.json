@@ -8,7 +8,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight",
-        "fullwidth": true
+        "fullwidth": true,
+        "top_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -21,10 +22,8 @@
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "Specialty coffee, house-made pastries, and seasonal bites. Everything is crafted with care, every single day.",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "text": "<p>Specialty coffee, house-made pastries, and seasonal bites. Everything is crafted with care, every single day.</p>",
+            "size": "lg"
           }
         }
       },
@@ -205,39 +204,37 @@
       },
       "blocksOrder": ["pastry-1", "pastry-2", "pastry-3", "pastry-4", "pastry-5", "pastry-6"]
     },
-    "beans_callout": {
+    "retail": {
       "type": "image-text",
       "settings": {
         "image_position": "right",
         "color_scheme": "standard"
       },
       "blocks": {
-        "beans-eyebrow": {
+        "retail-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "Take It Home",
+            "text": "<p>Take It Home</p>",
             "size": "sm",
             "uppercase": true,
             "muted": true
           }
         },
-        "beans-heading": {
+        "retail-heading": {
           "type": "heading",
           "settings": {
             "text": "Whole Bean & Retail",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
-        "beans-text": {
+        "retail-text": {
           "type": "text",
           "settings": {
             "text": "<p>Bring the Brewline experience home. We sell all of our house-roasted beans by the bag — whole bean or ground to your preferred method. Subscriptions available for the truly committed.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "size": "base"
           }
         },
-        "beans-button": {
+        "retail-button": {
           "type": "button",
           "settings": {
             "link": {
@@ -250,12 +247,12 @@
           }
         }
       },
-      "blocksOrder": ["beans-eyebrow", "beans-heading", "beans-text", "beans-button"]
+      "blocksOrder": ["retail-eyebrow", "retail-heading", "retail-text", "retail-button"]
     },
     "menu_cta": {
       "type": "action-bar",
       "settings": {
-        "fullwidth": true,
+        "fullwidth": false,
         "color_scheme": "highlight"
       },
       "blocks": {
@@ -263,7 +260,7 @@
           "type": "heading",
           "settings": {
             "text": "See You Tomorrow Morning",
-            "size": "3xl"
+            "size": "2xl"
           }
         },
         "cta-button": {
@@ -282,8 +279,8 @@
       "blocksOrder": ["cta-heading", "cta-button"]
     }
   },
-  "widgetsOrder": ["menu_hero", "coffee", "seasonal", "pastries", "beans_callout", "menu_cta"],
+  "widgetsOrder": ["menu_hero", "coffee", "seasonal", "pastries", "retail", "menu_cta"],
   "id": "menu",
-  "created": "2026-04-02T12:00:00.000Z",
-  "updated": "2026-04-02T12:00:00.000Z"
+  "created": "2026-04-03T12:00:00.000Z",
+  "updated": "2026-04-03T12:00:00.000Z"
 }

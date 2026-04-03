@@ -6,7 +6,7 @@
       "type": "rich-text",
       "settings": {
         "text_alignment": "center",
-        "content_width": "md",
+        "content_width": "medium",
         "color_scheme": "standard"
       },
       "blocks": {
@@ -21,9 +21,7 @@
           "type": "text",
           "settings": {
             "text": "<p>We'd love to welcome you to our table. Stop by for dinner, join us for Sunday brunch, or get in touch to plan a private event. Walk-ins are always welcome, but reservations are recommended for weekend evenings.</p>",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "size": "lg"
           }
         }
       },
@@ -43,65 +41,71 @@
           "type": "info",
           "settings": {
             "title": "Phone",
-            "text": "(555) 234-5678"
+            "text": "<p>(555) 234-5678</p>"
           }
         },
         "info-2": {
           "type": "info",
           "settings": {
             "title": "Email",
-            "text": "hello@saffronrestaurant.com"
+            "text": "<p>hello@saffronrestaurant.com</p>"
           }
         },
         "info-3": {
           "type": "info",
           "settings": {
             "title": "Hours",
-            "text": "Mon–Thu: 5–10 PM\nFri–Sat: 5–11 PM\nSun: 10 AM–3 PM, 5–9 PM"
+            "text": "<p>Mon–Thu: 5–10 PM<br>Fri–Sat: 5–11 PM<br>Sun: 10 AM–3 PM, 5–9 PM</p>"
           }
         }
       },
       "blocksOrder": ["info-1", "info-2", "info-3"]
     },
-    "contact_details": {
-      "type": "contact-details",
+    "faq": {
+      "type": "accordion",
       "settings": {
-        "color_scheme": "highlight"
+        "eyebrow": "Questions",
+        "title": "Before You Visit",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "color_scheme": "standard-accent"
       },
       "blocks": {
-        "info_block": {
-          "type": "info",
+        "faq-1": {
+          "type": "item",
           "settings": {
-            "address": "247 Elm Street\nBrooklyn, NY 11201",
-            "phone": "(555) 234-5678",
-            "email": "hello@saffronrestaurant.com"
+            "question": "Do I need a reservation?",
+            "answer": "<p>Walk-ins are welcome Monday through Thursday. For Friday and Saturday evenings, we strongly recommend reserving ahead — especially for parties of 4 or more. You can book by phone or through our Reservations page.</p>"
           }
         },
-        "text_block_1": {
-          "type": "text_block",
+        "faq-2": {
+          "type": "item",
           "settings": {
-            "title": "Hours",
-            "text": "<p>Monday — Thursday: 5 PM – 10 PM<br>Friday — Saturday: 5 PM – 11 PM<br>Sunday Brunch: 10 AM – 3 PM<br>Sunday Dinner: 5 PM – 9 PM</p>"
+            "question": "Is there a dress code?",
+            "answer": "<p>We keep it relaxed. Smart casual is the sweet spot — think nice jeans and a good shirt. No flip-flops or athletic wear, but no jackets required either.</p>"
           }
         },
-        "menu_block_1": {
-          "type": "menu_block",
+        "faq-3": {
+          "type": "item",
           "settings": {
-            "title": "Quick Links"
+            "question": "Do you accommodate dietary restrictions?",
+            "answer": "<p>Absolutely. Our menu marks vegetarian and gluten-free options, and our kitchen is experienced with allergies and intolerances. Let your server know when you sit down and we'll take care of the rest.</p>"
           }
         },
-        "social_block_1": {
-          "type": "social_block",
+        "faq-4": {
+          "type": "item",
           "settings": {
-            "title": "Connect"
+            "question": "Can I host a private event at Saffron?",
+            "answer": "<p>Yes — our private dining room seats up to 24 guests, and the garden patio can accommodate up to 40 for cocktail-style events. We offer custom menus and wine pairings for all private bookings. Email us or call to start planning.</p>"
           }
         }
       },
-      "blocksOrder": ["info_block", "text_block_1", "menu_block_1", "social_block_1"]
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4"]
     }
   },
-  "widgetsOrder": ["contact_intro", "contact_map", "contact_details"],
+  "widgetsOrder": ["contact_intro", "contact_map", "faq"],
   "id": "contact",
-  "created": "2026-04-02T10:00:00.000Z",
-  "updated": "2026-04-02T10:00:00.000Z"
+  "created": "2026-04-03T10:00:00.000Z",
+  "updated": "2026-04-03T10:00:00.000Z"
 }

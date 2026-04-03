@@ -41,9 +41,11 @@
         align-items: center;
         justify-content: center;
 
+        {% if widget.settings.aspect_ratio != 'auto' %}
         &.has-image {
-          aspect-ratio: 4 / 3;
+          aspect-ratio: {{ widget.settings.aspect_ratio }};
         }
+        {% endif %}
       }
 
       & .logo-image {

@@ -8,6 +8,7 @@
     "standard_border_color": "#e4dfd8",
     "standard_accent": "#2d6a4f",
     "standard_accent_text": "#ffffff",
+    "standard_rating_star": "#e8a435",
     "highlight_bg_primary": "#1a1a1a",
     "highlight_bg_secondary": "#111111",
     "highlight_text_heading": "#ffffff",
@@ -16,6 +17,7 @@
     "highlight_border_color": "#3a3a3a",
     "highlight_accent": "#5eab8b",
     "highlight_accent_text": "#1a1a1a",
+    "highlight_rating_star": "#e8a435",
     "heading_font": {
       "stack": "\"Lora\", serif",
       "weight": 600

@@ -6,7 +6,7 @@
       "type": "rich-text",
       "settings": {
         "text_alignment": "center",
-        "content_width": "md",
+        "content_width": "medium",
         "color_scheme": "standard"
       },
       "blocks": {
@@ -21,9 +21,7 @@
           "type": "text",
           "settings": {
             "text": "<p>We're on the corner of Maple and 3rd, right next to the park. Follow the smell of fresh bread — you can't miss it. For custom cake orders, give us at least 72 hours notice.</p>",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "size": "lg"
           }
         }
       },
@@ -32,6 +30,7 @@
     "contact_map": {
       "type": "map",
       "settings": {
+        "title": "",
         "address": "58 Maple Avenue, Asheville, NC 28801",
         "height": "medium",
         "show_address": true,
@@ -43,21 +42,21 @@
           "type": "info",
           "settings": {
             "title": "Phone",
-            "text": "(828) 555-0234"
+            "text": "<p>(828) 555-0234</p>"
           }
         },
         "info-2": {
           "type": "info",
           "settings": {
             "title": "Email",
-            "text": "hello@crumblybakery.com"
+            "text": "<p>hello@crumblybakery.com</p>"
           }
         },
         "info-3": {
           "type": "info",
           "settings": {
             "title": "Hours",
-            "text": "Tue–Fri: 7 AM–5 PM\nSat: 7 AM–4 PM\nSun: 8 AM–2 PM\nMon: Closed"
+            "text": "<p>Tue–Fri: 7 AM–5 PM<br>Sat: 7 AM–4 PM<br>Sun: 8 AM–2 PM<br>Mon: Closed</p>"
           }
         }
       },
@@ -74,16 +73,14 @@
           "type": "heading",
           "settings": {
             "text": "Custom Cake Inquiries",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
         "custom-text": {
           "type": "text",
           "settings": {
             "text": "<p>Dreaming up a celebration cake? We'd love to hear about it. Send us an email with your date, guest count, and any flavor or design ideas. We'll get back to you within 24 hours with a quote.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "size": "base"
           }
         },
         "custom-button": {
@@ -104,6 +101,6 @@
   },
   "widgetsOrder": ["contact_intro", "contact_map", "custom_orders"],
   "id": "contact",
-  "created": "2026-04-02T14:00:00.000Z",
-  "updated": "2026-04-02T14:00:00.000Z"
+  "created": "2026-04-03T14:00:00.000Z",
+  "updated": "2026-04-03T14:00:00.000Z"
 }

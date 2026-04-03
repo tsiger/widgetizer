@@ -1,8 +1,20 @@
 {
   "type": "header",
   "settings": {
-    "contact_position": "none",
-    "cta_text": "Visit Us",
-    "cta_link": "contact.html"
+    "logoText": "Crumbly",
+    "contactDetailsLine1": "Open Tue–Sun, 7 AM",
+    "contactDetailsLine2": "",
+    "contact_position": "menu",
+    "ctaButtonLink": {
+      "href": "custom-cakes.html",
+      "text": "Order a Cake",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "center_nav": false,
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard"
   }
 }

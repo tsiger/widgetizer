@@ -1,0 +1,182 @@
+[
+  {
+    "file": "slide-1.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Modern corporate office with floor-to-ceiling windows overlooking a city skyline at dusk. Clean desks, a few warm desk lamps, soft ambient lighting. Professional but not sterile. No people. Cinematic wide angle. Editorial corporate photography, cool tones with warm accent lighting."
+  },
+  {
+    "file": "slide-2.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Overhead view of a strategy meeting table. Scattered documents, a laptop, coffee cups, pens, and sticky notes on a large dark wood table. No people visible, just the artifacts of collaboration. Clean, editorial, slightly desaturated tones. Corporate photography."
+  },
+  {
+    "file": "logo-1.png",
+    "width": 200,
+    "height": 80,
+    "prompt": "Minimal corporate logo placeholder. Simple geometric wordmark in dark gray on transparent background. Abstract, clean, modern. Flat design, no gradients."
+  },
+  {
+    "file": "logo-2.png",
+    "width": 200,
+    "height": 80,
+    "prompt": "Minimal corporate logo placeholder. Simple geometric wordmark in dark gray on transparent background. Abstract, clean, modern. Flat design, no gradients."
+  },
+  {
+    "file": "logo-3.png",
+    "width": 200,
+    "height": 80,
+    "prompt": "Minimal corporate logo placeholder. Simple geometric wordmark in dark gray on transparent background. Abstract, clean, modern. Flat design, no gradients."
+  },
+  {
+    "file": "logo-4.png",
+    "width": 200,
+    "height": 80,
+    "prompt": "Minimal corporate logo placeholder. Simple geometric wordmark in dark gray on transparent background. Abstract, clean, modern. Flat design, no gradients."
+  },
+  {
+    "file": "logo-5.png",
+    "width": 200,
+    "height": 80,
+    "prompt": "Minimal corporate logo placeholder. Simple geometric wordmark in dark gray on transparent background. Abstract, clean, modern. Flat design, no gradients."
+  },
+  {
+    "file": "logo-6.png",
+    "width": 200,
+    "height": 80,
+    "prompt": "Minimal corporate logo placeholder. Simple geometric wordmark in dark gray on transparent background. Abstract, clean, modern. Flat design, no gradients."
+  },
+  {
+    "file": "enterprise-callout.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Two professionals in a modern glass-walled meeting room, reviewing data on a large screen. Business casual attire. Clean, bright, contemporary office environment. Shallow depth of field. Editorial corporate photography, cool blue-gray tones."
+  },
+  {
+    "file": "services-hero.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Abstract architectural detail — clean lines of a modern building facade, glass and steel, geometric patterns. Cool blue-gray sky. Minimal, professional, aspirational. No people. Editorial architecture photography."
+  },
+  {
+    "file": "service-1.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Close-up of hands drawing on a whiteboard with strategy diagrams and flowcharts. Markers in hand, clean whiteboard. Bright office light. Focused, analytical. Editorial corporate photography."
+  },
+  {
+    "file": "service-2.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Laptop screen showing data dashboard with charts and graphs in a clean office setting. Shallow depth of field on the screen. Cool blue tones from the display. Professional, analytical. Editorial corporate photography."
+  },
+  {
+    "file": "service-3.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Small team of three professionals gathered around a conference table with documents and laptops. Collaborative energy, natural light from a window. Business casual. Editorial corporate photography, warm natural tones."
+  },
+  {
+    "file": "service-4.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Modern office workspace with a standing desk, dual monitors, and organized supplies. Clean, minimal, productive environment. Morning light. No people. Editorial interior photography, neutral tones."
+  },
+  {
+    "file": "service-5.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Professional presenting to a small group in a bright modern conference room. Presentation screen visible in background. Engaged audience. Natural light. Editorial corporate photography, warm tones."
+  },
+  {
+    "file": "service-6.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Close-up of a notebook with handwritten notes and diagrams next to a cup of coffee on a clean desk. Pen resting on the page. Morning light, shallow depth of field. Thoughtful, strategic. Editorial photography."
+  },
+  {
+    "file": "about-intro.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Small consulting team of four people in a relaxed office lounge area. Seated on modern furniture, having an informal discussion. Diverse group, business casual. Natural light, warm and authentic atmosphere. Not posed. Editorial corporate portrait photography."
+  },
+  {
+    "file": "team-1.jpg",
+    "width": 400,
+    "height": 400,
+    "prompt": "Professional headshot of a man in his late 40s, salt-and-pepper hair, wearing a dark blazer over an open-collar shirt. Confident, approachable smile. Neutral office background in soft focus. Natural lighting. Head and shoulders, square crop. Editorial portrait photography."
+  },
+  {
+    "file": "team-2.jpg",
+    "width": 400,
+    "height": 400,
+    "prompt": "Professional headshot of a woman in her early 40s, dark hair, wearing a tailored blazer. Warm, intelligent expression. Neutral office background in soft focus. Natural lighting. Head and shoulders, square crop. Editorial portrait photography."
+  },
+  {
+    "file": "team-3.jpg",
+    "width": 400,
+    "height": 400,
+    "prompt": "Professional headshot of a man in his mid-30s, dark skin, closely cropped hair, wearing a crisp white shirt. Friendly, confident expression. Neutral office background in soft focus. Natural lighting. Head and shoulders, square crop. Editorial portrait photography."
+  },
+  {
+    "file": "case-hero.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Dramatic overhead shot of a city financial district at twilight. Glass skyscrapers reflecting warm sunset light. Urban, ambitious, professional. No people. Editorial architecture photography, warm-to-cool gradient tones."
+  },
+  {
+    "file": "project-1.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Modern corporate headquarters exterior — clean glass and steel building, landscaped entrance, dusk lighting. Professional, aspirational. No people. Editorial architecture photography, cool tones."
+  },
+  {
+    "file": "project-2.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Busy open-plan office interior with rows of desks, screens, and collaborative spaces. Bright, modern, productive atmosphere. People in soft focus. Editorial corporate photography, neutral tones."
+  },
+  {
+    "file": "project-3.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Warehouse or logistics facility interior — organized shelving, clean aisles, modern lighting. Operational efficiency visual. No people. Editorial industrial photography, cool neutral tones."
+  },
+  {
+    "file": "case-study-overview.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Aerial view of a modern business campus with multiple buildings, green landscaping, and parking areas. Clean, corporate, expansive. Bright daylight. Editorial aerial photography, neutral tones."
+  },
+  {
+    "file": "cta-banner.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Abstract blurred city lights at night — warm amber and cool blue bokeh circles. Dark background, atmospheric, professional. No discernible buildings or people. Editorial abstract photography."
+  },
+  {
+    "file": "about-cta.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Minimalist modern office corridor with clean white walls, subtle lighting, and a window at the end showing a bright sky. Professional, forward-looking, aspirational. No people. Editorial architecture photography, bright neutral tones."
+  },
+  {
+    "file": "services-cta.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Close-up of two professionals shaking hands across a conference table. Shallow depth of field, warm natural lighting. Partnership, trust, deal-closing energy. Editorial corporate photography."
+  },
+  {
+    "file": "case-cta.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Panoramic view of a modern city skyline at dawn. Glass towers catching early golden light, clear sky. Ambitious, aspirational, fresh start energy. Editorial cityscape photography, warm golden tones."
+  },
+  {
+    "file": "case-study-cta.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Abstract geometric pattern of a modern building facade — repeating glass panels and steel beams creating a rhythmic pattern. Cool blue-gray tones, minimal, architectural. Editorial abstract photography."
+  }
+]

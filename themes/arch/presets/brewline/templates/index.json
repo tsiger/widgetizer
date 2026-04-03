@@ -6,20 +6,22 @@
       "type": "split-hero",
       "settings": {
         "image_position": "right",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
           "type": "heading",
           "settings": {
             "text": "Coffee Worth Waking Up For",
-            "size": "6xl"
+            "size": "5xl"
           }
         },
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "Single-origin beans, roasted in-house, brewed with intention. Welcome to Brewline — your neighborhood specialty coffee shop.",
+            "text": "<p>Single-origin beans, roasted in-house, brewed with intention. Welcome to Brewline — your neighborhood specialty coffee shop.</p>",
             "size": "lg"
           }
         },
@@ -38,7 +40,7 @@
               "target": "_self"
             },
             "style_2": "secondary",
-            "size": "large"
+            "size": "medium"
           }
         }
       },
@@ -58,7 +60,7 @@
         "bottom_spacing": "none"
       }
     },
-    "intro_section": {
+    "intro": {
       "type": "image-callout",
       "settings": {
         "image_position": "left",
@@ -69,16 +71,14 @@
           "type": "heading",
           "settings": {
             "text": "From Bean to Cup, Every Detail Matters",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
         "intro-text": {
           "type": "text",
           "settings": {
             "text": "<p>We source our beans directly from small farms in Ethiopia, Colombia, and Guatemala. Every batch is roasted in our shop, dialed in each morning, and brewed to bring out the best each origin has to offer.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "size": "base"
           }
         },
         "intro-features": {
@@ -102,54 +102,47 @@
       },
       "blocksOrder": ["intro-heading", "intro-text", "intro-features", "intro-button"]
     },
-    "featured_drinks": {
-      "type": "icon-card-grid",
+    "drinks": {
+      "type": "image-tabs",
       "settings": {
         "eyebrow": "What We Brew",
         "title": "Find Your Cup",
         "description": "Whether you're a black coffee purist or a lavender latte adventurer, we've got something for you.",
-        "columns_desktop": 4,
-        "card_layout": "flat",
-        "icon_style": "outline",
-        "icon_size": "lg",
-        "icon_shape": "circle",
+        "heading_alignment": "center",
+        "image_position": "left",
         "color_scheme": "standard-accent"
       },
       "blocks": {
-        "drink-1": {
-          "type": "card",
+        "tab-1": {
+          "type": "tab",
           "settings": {
-            "icon": "coffee",
             "title": "Espresso",
-            "description": "Bold, concentrated, and perfectly extracted. The foundation of everything we do."
+            "description": "<p>Bold, concentrated, and perfectly extracted. The foundation of everything we do — from a straight double shot to a velvety flat white. Our house blend balances chocolate and citrus notes, pulled fresh to order.</p>"
           }
         },
-        "drink-2": {
-          "type": "card",
+        "tab-2": {
+          "type": "tab",
           "settings": {
-            "icon": "droplet",
             "title": "Pour Over",
-            "description": "Single-origin, hand-poured. The purest way to taste what makes each bean unique."
+            "description": "<p>Single-origin, hand-poured. The purest way to taste what makes each bean unique. We rotate origins weekly and dial in every morning. Ask your barista what's on — they'll talk your ear off about it.</p>"
           }
         },
-        "drink-3": {
-          "type": "card",
+        "tab-3": {
+          "type": "tab",
           "settings": {
-            "icon": "snowflake",
             "title": "Cold Brew",
-            "description": "Steeped for 20 hours. Smooth, bold, and naturally sweet — no bitterness in sight."
+            "description": "<p>Steeped for 20 hours. Smooth, bold, and naturally sweet — no bitterness in sight. Served over ice, on tap. Our most popular order when the temperature climbs above 70°F.</p>"
           }
         },
-        "drink-4": {
-          "type": "card",
+        "tab-4": {
+          "type": "tab",
           "settings": {
-            "icon": "heart",
             "title": "Seasonal Specials",
-            "description": "From oat milk matcha to spiced honey lattes — our rotating menu follows the seasons."
+            "description": "<p>From oat milk matcha to spiced honey lattes — our rotating menu follows the seasons. We collaborate with local producers for syrups and flavors you won't find anywhere else in town.</p>"
           }
         }
       },
-      "blocksOrder": ["drink-1", "drink-2", "drink-3", "drink-4"]
+      "blocksOrder": ["tab-1", "tab-2", "tab-3", "tab-4"]
     },
     "testimonials": {
       "type": "testimonial-slider",
@@ -192,7 +185,7 @@
     "cta": {
       "type": "action-bar",
       "settings": {
-        "fullwidth": true,
+        "fullwidth": false,
         "color_scheme": "highlight"
       },
       "blocks": {
@@ -200,7 +193,7 @@
           "type": "heading",
           "settings": {
             "text": "Your Morning Ritual Starts Here",
-            "size": "3xl"
+            "size": "2xl"
           }
         },
         "cta-button": {
@@ -225,8 +218,8 @@
       "blocksOrder": ["cta-heading", "cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "marquee", "intro_section", "featured_drinks", "testimonials", "cta"],
+  "widgetsOrder": ["hero", "marquee", "intro", "drinks", "testimonials", "cta"],
   "id": "index",
-  "created": "2026-04-02T12:00:00.000Z",
-  "updated": "2026-04-02T12:00:00.000Z"
+  "created": "2026-04-03T12:00:00.000Z",
+  "updated": "2026-04-03T12:00:00.000Z"
 }

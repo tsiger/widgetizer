@@ -8,7 +8,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight",
-        "fullwidth": true
+        "fullwidth": true,
+        "top_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -21,10 +22,8 @@
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "Everything on this menu is made from scratch in our kitchen. Availability changes daily — if you see something you love, grab it before it's gone.",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "text": "<p>Everything on this menu is made from scratch in our kitchen. Availability changes daily — if you see something you love, grab it before it's gone.</p>",
+            "size": "lg"
           }
         }
       },
@@ -234,7 +233,7 @@
       },
       "blocksOrder": ["cookie-1", "cookie-2", "cookie-3", "cookie-4"]
     },
-    "custom_callout": {
+    "custom_cta": {
       "type": "image-text",
       "settings": {
         "image_position": "left",
@@ -244,7 +243,7 @@
         "custom-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "Made for You",
+            "text": "<p>Made for You</p>",
             "size": "sm",
             "uppercase": true,
             "muted": true
@@ -254,16 +253,14 @@
           "type": "heading",
           "settings": {
             "text": "Custom Orders & Catering",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
         "custom-text": {
           "type": "text",
           "settings": {
             "text": "<p>Planning a party, a wedding, or just need three dozen cookies for the office? We love custom work. Tell us what you're dreaming of and we'll make it happen — with at least 72 hours notice for most orders.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "size": "base"
           }
         },
         "custom-button": {
@@ -271,7 +268,7 @@
           "settings": {
             "link": {
               "text": "Place a Custom Order",
-              "href": "contact.html",
+              "href": "custom-cakes.html",
               "target": "_self"
             },
             "style": "primary",
@@ -282,8 +279,8 @@
       "blocksOrder": ["custom-eyebrow", "custom-heading", "custom-text", "custom-button"]
     }
   },
-  "widgetsOrder": ["menu_hero", "breads", "pastries", "cakes", "cookies", "custom_callout"],
+  "widgetsOrder": ["menu_hero", "breads", "pastries", "cakes", "cookies", "custom_cta"],
   "id": "menu",
-  "created": "2026-04-02T14:00:00.000Z",
-  "updated": "2026-04-02T14:00:00.000Z"
+  "created": "2026-04-03T14:00:00.000Z",
+  "updated": "2026-04-03T14:00:00.000Z"
 }

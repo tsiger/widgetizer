@@ -8,7 +8,8 @@
         "height": "small",
         "alignment": "center",
         "color_scheme": "highlight",
-        "fullwidth": true
+        "fullwidth": true,
+        "top_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -21,10 +22,8 @@
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "Seasonal ingredients, timeless techniques. Our menu changes with the harvest — here's what's inspiring us right now.",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
+            "text": "<p>Seasonal ingredients, timeless techniques. Our menu changes with the harvest — here's what's inspiring us right now.</p>",
+            "size": "lg"
           }
         }
       },
@@ -205,27 +204,34 @@
       },
       "blocksOrder": ["dessert-1", "dessert-2", "dessert-3", "dessert-4"]
     },
-    "drinks_callout": {
-      "type": "image-callout",
+    "drinks_section": {
+      "type": "image-text",
       "settings": {
         "image_position": "left",
         "color_scheme": "standard"
       },
       "blocks": {
+        "drinks-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The Bar</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
         "drinks-heading": {
           "type": "heading",
           "settings": {
             "text": "Curated Wine & Cocktails",
-            "size": "4xl"
+            "size": "3xl"
           }
         },
         "drinks-text": {
           "type": "text",
           "settings": {
             "text": "<p>Our beverage program is built around discovery. From small-batch natural wines to handcrafted seasonal cocktails, every glass is chosen to complement what's on your plate. Ask your server about pairings — they love this part.</p>",
-            "size": "base",
-            "uppercase": false,
-            "muted": false
+            "size": "base"
           }
         },
         "drinks-button": {
@@ -241,7 +247,7 @@
           }
         }
       },
-      "blocksOrder": ["drinks-heading", "drinks-text", "drinks-button"]
+      "blocksOrder": ["drinks-eyebrow", "drinks-heading", "drinks-text", "drinks-button"]
     },
     "menu_cta": {
       "type": "action-bar",
@@ -254,7 +260,7 @@
           "type": "heading",
           "settings": {
             "text": "Join Us Tonight",
-            "size": "3xl"
+            "size": "2xl"
           }
         },
         "cta-button": {
@@ -262,7 +268,7 @@
           "settings": {
             "link": {
               "text": "Reserve a Table",
-              "href": "contact.html",
+              "href": "reservations.html",
               "target": "_self"
             },
             "style": "primary",
@@ -273,8 +279,8 @@
       "blocksOrder": ["cta-heading", "cta-button"]
     }
   },
-  "widgetsOrder": ["menu_hero", "starters", "mains", "desserts", "drinks_callout", "menu_cta"],
+  "widgetsOrder": ["menu_hero", "starters", "mains", "desserts", "drinks_section", "menu_cta"],
   "id": "menu",
-  "created": "2026-04-02T10:00:00.000Z",
-  "updated": "2026-04-02T10:00:00.000Z"
+  "created": "2026-04-03T10:00:00.000Z",
+  "updated": "2026-04-03T10:00:00.000Z"
 }

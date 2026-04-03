@@ -1,8 +1,20 @@
 {
   "type": "header",
   "settings": {
-    "contact_position": "none",
-    "cta_text": "Order Online",
-    "cta_link": "menu.html"
+    "logoText": "Brewline",
+    "contactDetailsLine1": "",
+    "contactDetailsLine2": "",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "menu.html",
+      "text": "View Menu",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "secondary",
+    "center_nav": true,
+    "full_width": true,
+    "sticky": false,
+    "transparent_on_hero": false,
+    "color_scheme": "standard"
   }
 }
