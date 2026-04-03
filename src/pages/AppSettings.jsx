@@ -95,7 +95,7 @@ export default function AppSettings() {
     >
       <>
         {/* App Settings panel */}
-        <div className="bg-white rounded-md border border-t-0 border-slate-200">
+        <div className="bg-white border border-t-0 border-slate-200">
           <AppSettingsPanel
             schema={schema}
             settings={settings}

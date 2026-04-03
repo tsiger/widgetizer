@@ -1,11 +1,24 @@
 import Tooltip from "../../components/ui/Tooltip";
 import { IconButton } from "../ui/Button";
-import { Image, Search, Trash2, Check, Edit2 } from "lucide-react";
+import { Image, Search, Trash2, Check, Edit2, MoreVertical } from "lucide-react";
 import { API_URL } from "../../config";
 import { formatDate as formatDateUtil } from "../../utils/dateFormatter";
 import useAppSettings from "../../hooks/useAppSettings";
 
-export default function MediaListItem({ file, isSelected, onSelect, onDelete, onView, onEdit, activeProject, usageTitleMap = {} }) {
+export default function MediaListItem({
+  file,
+  isSelected,
+  onSelect,
+  onDelete,
+  onView,
+  onEdit,
+  activeProject,
+  usageTitleMap = {},
+  openMenu = false,
+  onMenuToggle,
+  onMenuClose,
+  menuRef,
+}) {
   // Get app settings for date formatting
   const { settings: appSettings } = useAppSettings();
 
@@ -25,6 +38,7 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
     "inline-flex shrink-0 items-center whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800";
   const usageEntries = Array.isArray(file.usedIn) ? file.usedIn : [];
   const isInUse = usageEntries.length > 0;
+  const menuButtonClass = "flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors";
 
   const resolveUsageTitle = (usageEntry) => {
     if (!usageEntry) return null;
@@ -54,7 +68,7 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
           onClick={onSelect}
           variant="neutral"
           size="sm"
-          className="border border-transparent bg-white/80 shadow-sm hover:border-slate-200 hover:bg-white hover:shadow-md"
+          className="border border-transparent bg-white/80 hover:border-slate-200 hover:bg-white"
         >
           {isSelected ? (
             <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
@@ -111,24 +125,44 @@ export default function MediaListItem({ file, isSelected, onSelect, onDelete, on
           <span className="text-slate-400 text-xs">Unused</span>
         )}
       </td>
-      <td className={cellClass}>
-        <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          <Tooltip content="View">
-            <IconButton onClick={onView} variant="neutral" size="sm">
-              <Search size={18} />
-            </IconButton>
-          </Tooltip>
-          <Tooltip content="Edit metadata">
-            <IconButton onClick={onEdit} variant="neutral" size="sm">
-              <Edit2 size={18} />
-            </IconButton>
-          </Tooltip>
-          {!isInUse && (
-            <Tooltip content="Delete">
-              <IconButton onClick={onDelete} variant="danger" size="sm">
-                <Trash2 size={18} />
-              </IconButton>
-            </Tooltip>
+      <td className={`${cellClass} text-right`}>
+        <div className="relative inline-flex items-center justify-end" ref={menuRef}>
+          <IconButton
+            onClick={onMenuToggle}
+            variant="neutral"
+            size="sm"
+            className={`border transition-all ${
+              openMenu
+                ? "border-pink-200 bg-pink-50 text-pink-600"
+                : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:text-slate-900"
+            }`}
+            aria-label="Media actions"
+            aria-haspopup="menu"
+            aria-expanded={openMenu}
+          >
+            <MoreVertical size={18} />
+          </IconButton>
+
+          {openMenu && (
+            <div className="absolute right-0 top-full z-10 mt-1 w-56 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
+              <button type="button" onClick={() => { onMenuClose(); onView(); }} className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}>
+                <Search size={14} />
+                View
+              </button>
+              <button type="button" onClick={() => { onMenuClose(); onEdit(); }} className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}>
+                <Edit2 size={14} />
+                Edit metadata
+              </button>
+              {!isInUse && (
+                <>
+                  <div className="my-1 border-t border-slate-200" />
+                  <button type="button" onClick={() => { onMenuClose(); onDelete(); }} className={`${menuButtonClass} text-red-600 hover:bg-red-50`}>
+                    <Trash2 size={14} />
+                    Delete
+                  </button>
+                </>
+              )}
+            </div>
           )}
         </div>
       </td>

@@ -159,7 +159,7 @@ export default function Settings() {
     >
       <>
         {/* Settings panel container */}
-        <div className="bg-white rounded-md border border-t-0 border-slate-200">
+        <div className="bg-white border border-t-0 border-slate-200">
           {themeData ? (
             <SettingsPanel
               schema={themeData.settings.global}

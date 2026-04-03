@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import MediaListItem from "./MediaListItem";
 import { IconButton } from "../ui/Button";
 import { Check, Image } from "lucide-react";
@@ -14,15 +15,41 @@ export default function MediaList({
   activeProject,
   usageTitleMap,
 }) {
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenMenuId(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setOpenMenuId(null);
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <Table
+      className="[&_th:first-child]:w-12 [&_th:first-child]:!pl-4 [&_th:first-child]:!pr-1 [&_td:first-child]:w-12 [&_td:first-child]:!pl-4 [&_td:first-child]:!pr-1"
       headers={[
         <IconButton
           onClick={onSelectAll}
           variant="neutral"
           size="sm"
           key="select-all"
-          className="border border-transparent bg-white/80 shadow-sm hover:border-slate-200 hover:bg-white hover:shadow-md"
+          className="border border-transparent bg-white/80 hover:border-slate-200 hover:bg-white"
         >
           {selectedFiles.length === files.length && files.length > 0 ? (
             <div className="w-4 h-4 bg-pink-500 text-white flex items-center justify-center rounded-sm">
@@ -58,6 +85,10 @@ export default function MediaList({
           onEdit={() => onFileEdit(file)}
           activeProject={activeProject}
           usageTitleMap={usageTitleMap}
+          openMenu={openMenuId === file.id}
+          onMenuToggle={() => setOpenMenuId(openMenuId === file.id ? null : file.id)}
+          onMenuClose={() => setOpenMenuId(null)}
+          menuRef={openMenuId === file.id ? menuRef : null}
         />
       )}
     />
