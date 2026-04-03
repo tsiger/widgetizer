@@ -262,15 +262,17 @@ export default function Projects() {
                       title={project.name}
                     >
                       <div className="min-w-0 flex-1">
-                        <span className="block truncate font-semibold">{project.name}</span>
-                        {isCurrentProject && (
-                          <Badge
-                            variant="neutral"
-                            className="mt-1 inline-flex whitespace-nowrap border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
-                          >
-                            {t("projects.badges.active")}
-                          </Badge>
-                        )}
+                        <div className="flex items-center gap-2">
+                          <span className="block min-w-0 truncate font-semibold">{project.name}</span>
+                          {isCurrentProject && (
+                            <Badge
+                              variant="success"
+                              className="inline-flex shrink-0 whitespace-nowrap px-3 py-0.5 text-[11px] font-semibold"
+                            >
+                              {t("projects.badges.active")}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </button>
                   </td>

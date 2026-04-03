@@ -542,9 +542,9 @@
         "actions": "Actions"
       },
       "tooltips": {
-        "view": "View export",
-        "download": "Download export",
-        "delete": "Delete export"
+        "view": "View site",
+        "download": "Download site",
+        "delete": "Delete site"
       },
       "deleteModal": {
         "title": "Delete Export",

@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Palette, Settings2 } from "lucide-react";
+import { ArrowLeft, FolderOpen, Palette, Settings2 } from "lucide-react";
 import Button from "../ui/Button";
 import useProjectStore from "../../stores/projectStore";
 
@@ -34,6 +34,10 @@ export default function ProjectPickerLayout() {
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
+            <Link to="/projects" className={utilityLinkClass("/projects")}>
+              <FolderOpen size={16} />
+              <span>{t("navigation.projects")}</span>
+            </Link>
             <Link to="/themes" className={utilityLinkClass("/themes")}>
               <Palette size={16} />
               <span>{t("navigation.themes")}</span>

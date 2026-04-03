@@ -162,16 +162,22 @@ export default function Pages() {
     );
   }
 
+  const hasPages = pages.length > 0;
+
   return (
     <PageLayout
-      title={t("pages.title")}
-      buttonProps={{
-        onClick: handleNewPage,
-        children: t("pages.newPage"),
-        icon: <CirclePlus size={18} />,
-      }}
+      title={hasPages ? t("pages.title") : undefined}
+      buttonProps={
+        hasPages
+          ? {
+              onClick: handleNewPage,
+              children: t("pages.newPage"),
+              icon: <CirclePlus size={18} />,
+            }
+          : undefined
+      }
     >
-      {pages.length > 0 && (
+      {hasPages && (
         <>
           {/* Toolbar */}
           <div className="flex flex-wrap justify-between mb-4 items-center">
@@ -347,7 +353,7 @@ export default function Pages() {
         </>
       )}
 
-      {pages.length === 0 && (
+      {!hasPages && (
         <div className="p-8 text-center">
           <FileText className="mx-auto mb-4 text-slate-400" size={48} />
           <h2 className="text-xl font-semibold mb-2">{t("pages.noPagesYet")}</h2>

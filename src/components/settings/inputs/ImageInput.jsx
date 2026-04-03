@@ -213,9 +213,6 @@ export default function ImageInput({ id, value = "", onChange, size = "full" }) 
         >
           {t("components.mediaSelector.browseLibrary")}
         </Button>
-        <Button onClick={() => fileInputRef.current?.click()} disabled={uploading} variant="ghost" className="w-full" type="button">
-          {t("components.mediaSelector.importNew")}
-        </Button>
       </div>
 
       {metadataDrawerVisible && currentImageFile && (
