@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Trash2,
-  Star,
   Pencil,
-  AlertCircle,
+  FolderOpen,
   CirclePlus,
   Copy,
   Download,
@@ -28,11 +27,12 @@ import {
   getAllProjects,
   deleteProject,
   duplicateProject,
-  setActiveProject,
+  setActiveProject as activateProject,
   exportProject,
 } from "../queries/projectManager";
 import { sortItemsByCopyName } from "../utils/copyNameSort";
 import { formatDate } from "../utils/dateFormatter";
+import { resolveWorkspaceDestination } from "../utils/projectNavigation";
 
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import useConfirmationModal from "../hooks/useConfirmationModal";
@@ -41,6 +41,7 @@ import ProjectImportModal from "../components/projects/ProjectImportModal";
 export default function Projects() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [importModalOpen, setImportModalOpen] = useState(false);
@@ -53,6 +54,11 @@ export default function Projects() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const fetchActiveProject = useProjectStore((state) => state.fetchActiveProject);
   const { settings: appSettings } = useAppSettings();
+  const workspaceDestination = resolveWorkspaceDestination(searchParams.get("next"));
+
+  const projectsAddHref = searchParams.get("next")
+    ? `/projects/add?next=${encodeURIComponent(searchParams.get("next"))}`
+    : "/projects/add";
 
   const handleDelete = async (data) => {
     try {
@@ -121,18 +127,18 @@ export default function Projects() {
     });
   };
 
-  const handleSetActive = async (id) => {
+  const openProjectWorkspace = async (project) => {
     try {
-      await setActiveProject(id);
-      await fetchActiveProject();
-      await loadProjects();
-
-      const project = projects.find((p) => p.id === id);
-      if (project) {
+      if (!activeProject || activeProject.id !== project.id) {
+        await activateProject(project.id);
+        await fetchActiveProject();
+        await loadProjects();
         showToast(t("projects.toasts.setActiveSuccess", { name: project.name }), "success");
       }
+
+      navigate(workspaceDestination);
     } catch (error) {
-      console.error("Failed to set active project:", error);
+      console.error("Failed to open project:", error);
       showToast(t("projects.toasts.setActiveError"), "error");
     }
   };
@@ -179,6 +185,7 @@ export default function Projects() {
     await loadProjects();
     showToast(t("projects.toasts.importSuccess", { name: importedProject.name }), "success");
     setImportModalOpen(false);
+    await openProjectWorkspace(importedProject);
   };
 
   if (loading) {
@@ -189,32 +196,14 @@ export default function Projects() {
     );
   }
 
-  if (!activeProject) {
-    return (
-      <PageLayout
-        title={t("projects.title")}
-        buttonProps={{
-          onClick: () => navigate("/projects/add"),
-          children: t("projects.newProject"),
-          icon: <CirclePlus size={18} />,
-        }}
-      >
-        <div className="p-8 text-center">
-          <AlertCircle className="mx-auto mb-4 text-yellow-500" size={48} />
-          <h2 className="text-xl font-semibold mb-2">{t("projects.noActiveProject")}</h2>
-          <p className="text-slate-600 mb-4">{t("projects.noActiveProjectDesc")}</p>
-        </div>
-      </PageLayout>
-    );
-  }
-
   const sortedProjects = sortItemsByCopyName(projects);
 
   return (
     <PageLayout
       title={t("projects.title")}
+      description={t("projects.description")}
       buttonProps={{
-        onClick: () => navigate("/projects/add"),
+        onClick: () => navigate(projectsAddHref),
         children: t("projects.newProject"),
         icon: <CirclePlus size={18} />,
       }}
@@ -224,151 +213,160 @@ export default function Projects() {
         </Button>
       }
     >
-      <div>
-        <Table
-          headers={[
-            t("projects.headers.title"),
-            t("projects.headers.theme", "Theme"),
-            t("projects.headers.updated"),
-            t("projects.headers.actions"),
-          ]}
-          data={sortedProjects}
-          emptyMessage={t("projects.noProjects")}
-          renderRow={(project) => {
-            const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
-            const isCurrentProject = activeProject && project.id === activeProject.id;
-            const themeLabel = project.themeName || project.theme || "Unknown";
-            const isExporting = exportingProjectId === project.id;
-            const menuButtonClass = "w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors";
+      {sortedProjects.length === 0 ? (
+        <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+          <FolderOpen size={52} className="mb-4 text-slate-400" />
+          <h2 className="text-xl font-semibold text-slate-900">{t("projects.emptyTitle")}</h2>
+          <p className="mt-2 max-w-xl text-slate-600">{t("projects.noProjects")}</p>
+          <div className="mt-6 flex gap-3">
+            <Button onClick={() => navigate(projectsAddHref)} icon={<CirclePlus size={18} />}>
+              {t("projects.newProject")}
+            </Button>
+            <Button variant="secondary" onClick={() => setImportModalOpen(true)} icon={<Download size={18} />}>
+              {t("projects.import")}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <Table
+            headers={[
+              t("projects.headers.title"),
+              t("projects.headers.theme", "Theme"),
+              t("projects.headers.updated"),
+              t("projects.headers.actions"),
+            ]}
+            data={sortedProjects}
+            emptyMessage={t("projects.noProjects")}
+            renderRow={(project) => {
+              const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
+              const isCurrentProject = activeProject && project.id === activeProject.id;
+              const themeLabel = project.themeName || project.theme || "Unknown";
+              const isExporting = exportingProjectId === project.id;
+              const menuButtonClass = "flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors";
 
-            return (
-              <>
-                <td className="py-3 px-4">
-                  <Link
-                    to={`/projects/edit/${project.id}`}
-                    className="flex w-full min-w-0 items-center gap-2 rounded-sm text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
-                    title={project.name}
-                  >
-                    {isCurrentProject && (
-                      <Badge
-                        variant="neutral"
-                        className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800"
-                      >
-                        <Star size={12} className="fill-amber-500 text-amber-500" />
-                        {t("projects.badges.active")}
-                      </Badge>
-                    )}
-                    <span className="min-w-0 flex-1 truncate font-semibold">
-                      {project.name}
-                    </span>
-                  </Link>
-                </td>
-                <td className="py-3 px-4">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <div className="flex min-w-0 items-baseline gap-1.5 text-slate-600" title={themeLabel}>
-                      <span className="min-w-0 truncate text-sm">{themeLabel}</span>
-                      {project.themeVersion && <span className="shrink-0 text-xs text-slate-400">v{project.themeVersion}</span>}
-                    </div>
-                    {project.hasThemeUpdate && (
-                      <Tooltip content={t("projects.badges.updateAvailable", "Update available")}>
-                        <ArrowUpCircle size={16} className="shrink-0 text-pink-500" />
-                      </Tooltip>
-                    )}
-                  </div>
-                </td>
-                <td className="py-3 px-4 whitespace-nowrap text-slate-600">{formatDate(project.updated, dateFormat)}</td>
-                <td className="py-3 px-4 text-right">
-                  <div className="relative inline-flex items-center justify-end gap-1.5" ref={openMenuId === project.id ? menuRef : null}>
-                    <IconButton
-                      onClick={() => setOpenMenuId(openMenuId === project.id ? null : project.id)}
-                      variant="neutral"
-                      size="sm"
-                      className={`border transition-all ${
-                        openMenuId === project.id
-                          ? "border-pink-200 bg-pink-50 text-pink-600"
-                          : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:text-slate-900"
-                      }`}
-                      aria-label={t("projects.actions.menu", "Project actions")}
-                      aria-haspopup="menu"
-                      aria-expanded={openMenuId === project.id}
+              return (
+                <>
+                  <td className="py-3 px-4">
+                    <button
+                      type="button"
+                      onClick={() => openProjectWorkspace(project)}
+                      className="flex w-full min-w-0 items-center gap-3 rounded-sm text-left text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
+                      title={project.name}
                     >
-                      <MoreVertical size={18} />
-                    </IconButton>
-
-                    {openMenuId === project.id && (
-                      <div className="absolute right-0 top-full z-10 mt-1 w-64 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
-                        {!isCurrentProject && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setOpenMenuId(null);
-                                handleSetActive(project.id);
-                              }}
-                              className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
-                            >
-                              <Star size={14} />
-                              {t("projects.actions.setActive")}
-                            </button>
-                            <div className="my-1 border-t border-slate-200" />
-                          </>
+                      <div className="min-w-0 flex-1">
+                        <span className="block truncate font-semibold">{project.name}</span>
+                        {isCurrentProject && (
+                          <Badge
+                            variant="neutral"
+                            className="mt-1 inline-flex whitespace-nowrap border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
+                          >
+                            {t("projects.badges.active")}
+                          </Badge>
                         )}
-                        <Link
-                          to={`/projects/edit/${project.id}`}
-                          onClick={() => setOpenMenuId(null)}
-                          className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
-                          title={t("projects.actions.editDetails", "Edit project details")}
-                        >
-                          <Pencil size={14} />
-                          {t("projects.actions.editDetails", "Edit project details")}
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setOpenMenuId(null);
-                            handleDuplicate(project.id);
-                          }}
-                          className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
-                        >
-                          <Copy size={14} />
-                          {t("projects.actions.duplicate")}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setOpenMenuId(null);
-                            handleExport(project.id);
-                          }}
-                          disabled={isExporting}
-                          className={`${menuButtonClass} text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white`}
-                        >
-                          <Upload size={14} />
-                          {isExporting ? t("projects.actions.exporting", "Exporting project...") : t("projects.actions.export")}
-                        </button>
-                        <div className="my-1 border-t border-slate-200" />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setOpenMenuId(null);
-                            openDeleteConfirmation(project.id, project.name);
-                          }}
-                          disabled={isCurrentProject}
-                          className={`${menuButtonClass} text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white`}
-                        >
-                          <Trash2 size={14} />
-                          {isCurrentProject
-                            ? t("projects.actions.cannotDeleteActive")
-                            : t("projects.actions.delete")}
-                        </button>
                       </div>
-                    )}
-                  </div>
-                </td>
-              </>
-            );
-          }}
-        />
-      </div>
+                    </button>
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <div className="flex min-w-0 items-baseline gap-1.5 text-slate-600" title={themeLabel}>
+                        <span className="min-w-0 truncate text-sm">{themeLabel}</span>
+                        {project.themeVersion && <span className="shrink-0 text-xs text-slate-400">v{project.themeVersion}</span>}
+                      </div>
+                      {project.hasThemeUpdate && (
+                        <Tooltip content={t("projects.badges.updateAvailable", "Update available")}>
+                          <ArrowUpCircle size={16} className="shrink-0 text-pink-500" />
+                        </Tooltip>
+                      )}
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap text-slate-600">{formatDate(project.updated, dateFormat)}</td>
+                  <td className="py-3 px-4 text-right">
+                    <div className="relative inline-flex items-center justify-end gap-1.5" ref={openMenuId === project.id ? menuRef : null}>
+                      <IconButton
+                        onClick={() => setOpenMenuId(openMenuId === project.id ? null : project.id)}
+                        variant="neutral"
+                        size="sm"
+                        className={`border transition-all ${
+                          openMenuId === project.id
+                            ? "border-pink-200 bg-pink-50 text-pink-600"
+                            : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:text-slate-900"
+                        }`}
+                        aria-label={t("projects.actions.menu", "Project actions")}
+                        aria-haspopup="menu"
+                        aria-expanded={openMenuId === project.id}
+                      >
+                        <MoreVertical size={18} />
+                      </IconButton>
+
+                      {openMenuId === project.id && (
+                        <div className="absolute right-0 top-full z-10 mt-1 w-64 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              openProjectWorkspace(project);
+                            }}
+                            className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                          >
+                            <FolderOpen size={14} />
+                            {t("projects.actions.setActive")}
+                          </button>
+                          <div className="my-1 border-t border-slate-200" />
+                          <Link
+                            to={`/projects/edit/${project.id}`}
+                            onClick={() => setOpenMenuId(null)}
+                            className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                          >
+                            <Pencil size={14} />
+                            {t("projects.actions.editDetails", "Edit project details")}
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              handleDuplicate(project.id);
+                            }}
+                            className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                          >
+                            <Copy size={14} />
+                            {t("projects.actions.duplicate")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              handleExport(project.id);
+                            }}
+                            disabled={isExporting}
+                            className={`${menuButtonClass} text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white`}
+                          >
+                            <Upload size={14} />
+                            {isExporting ? t("projects.actions.exporting", "Exporting project...") : t("projects.actions.export")}
+                          </button>
+                          <div className="my-1 border-t border-slate-200" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              openDeleteConfirmation(project.id, project.name);
+                            }}
+                            disabled={isCurrentProject}
+                            className={`${menuButtonClass} text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white`}
+                          >
+                            <Trash2 size={14} />
+                            {isCurrentProject ? t("projects.actions.cannotDeleteActive") : t("projects.actions.delete")}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </>
+              );
+            }}
+          />
+        </div>
+      )}
 
       <ConfirmationModal
         isOpen={modalState.isOpen}

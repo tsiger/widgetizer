@@ -141,18 +141,6 @@ export default function ProjectsEdit() {
 
   if (!project) return <PageLayout title={t("projectsEdit.title")}>{t("projectsEdit.notFound")}</PageLayout>;
 
-  if (!activeProject) {
-    showToast(t("projectsEdit.toasts.noActiveProject"), "error");
-    return (
-      <PageLayout title={t("projectsEdit.title")}>
-        <div className="p-8 text-center">
-          <h2 className="text-xl font-semibold mb-2">{t("projectsEdit.noActiveProjectTitle")}</h2>
-          <p className="text-slate-600 mb-4">{t("projectsEdit.noActiveProjectDesc")}</p>
-        </div>
-      </PageLayout>
-    );
-  }
-
   const pageTitle = (
     <span className="flex items-center gap-2">
       {t("projectsEdit.title")}

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { FolderOpen, Settings2 } from "lucide-react";
 import useProjectStore from "../../stores/projectStore";
 import useThemeUpdateStore from "../../stores/themeUpdateStore";
 import { navigationSections } from "../../config/navigation";
@@ -12,17 +13,13 @@ export default function Sidebar() {
   const hasActiveProject = !!activeProject;
   const { updateCount: themeUpdateCount, fetchUpdateCount } = useThemeUpdateStore();
 
-  // Fetch theme update count on mount
   useEffect(() => {
     fetchUpdateCount();
   }, [fetchUpdateCount]);
 
-  const isActive = (path) => {
-    if (path === "/") {
-      return location.pathname === "/";
-    }
-    return location.pathname.startsWith(path);
-  };
+  const projectPickerHref = `/projects?next=${encodeURIComponent(location.pathname)}`;
+
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   const linkClass = (path, disabled = false) =>
     `flex items-center justify-center md:justify-start p-2 rounded-sm transition-all duration-150 ${
@@ -33,6 +30,9 @@ export default function Sidebar() {
     `w-8 h-8 md:w-4 md:h-4 flex items-center justify-center ${
       disabled ? "text-slate-500" : isActive(path) ? "text-white" : "text-pink-600"
     }`;
+
+  const utilityLinkClass =
+    "flex items-center justify-center gap-2 rounded-md border border-slate-700 px-3 py-2 text-sm font-medium text-slate-200 transition-colors hover:border-slate-500 hover:bg-slate-800 hover:text-white md:justify-start";
 
   const NavLink = ({ to, children, disabled = false, ...props }) => (
     <Link
@@ -52,7 +52,6 @@ export default function Sidebar() {
     const Icon = item.icon;
     const disabled = item.requiresProject && !hasActiveProject;
     const showBadge = item.id === "themes" && themeUpdateCount > 0;
-    const labelKey = item.labelKey;
 
     return (
       <li key={item.id}>
@@ -60,9 +59,9 @@ export default function Sidebar() {
           <div className={iconClass(item.path, disabled)}>
             <Icon size={20} />
           </div>
-          <span className="hidden md:inline ml-1 text-sm">{t(labelKey)}</span>
+          <span className="ml-1 hidden text-sm md:inline">{t(item.labelKey)}</span>
           {showBadge && (
-            <span className="ml-auto bg-pink-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-pink-500 text-xs font-bold text-white">
               {themeUpdateCount}
             </span>
           )}
@@ -74,38 +73,56 @@ export default function Sidebar() {
   const renderSection = (section) => {
     if (section.position === "bottom") {
       return (
-        <div key={section.id} className="pt-4 border-t border-slate-800">
-          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">{t(section.titleKey)}</h3>
+        <div key={section.id} className="border-t border-slate-800 pt-4">
+          <h3 className="ml-2 mb-2 hidden text-xs font-bold text-slate-600 md:block">{t(section.titleKey)}</h3>
           <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
         </div>
       );
     }
 
     return (
-      <div key={section.id} className="border-b border-slate-800 pb-4 mb-4">
-        {section.titleKey && (
-          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">{t(section.titleKey)}</h3>
-        )}
+      <div key={section.id} className="mb-4 border-b border-slate-800 pb-4">
+        {section.titleKey && <h3 className="ml-2 mb-2 hidden text-xs font-bold text-slate-600 md:block">{t(section.titleKey)}</h3>}
         <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
       </div>
     );
   };
 
-  const topSections = navigationSections.filter((s) => s.position !== "bottom");
-  const bottomSections = navigationSections.filter((s) => s.position === "bottom");
+  const topSections = navigationSections.filter((section) => section.position !== "bottom");
+  const bottomSections = navigationSections.filter((section) => section.position === "bottom");
 
   return (
-    <div className="w-[72px] md:w-48 bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto">
-      <div className="pb-2 px-2 md:px-4 grow">
-        <div className="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-4">
-          <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="hidden md:block h-7" />
-          <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="md:hidden w-12 h-12 mx-auto" />
+    <div className="fixed left-0 top-0 flex h-screen w-[72px] flex-col overflow-y-auto bg-slate-900 text-white md:w-56">
+      <div className="grow px-2 pb-2 md:px-4">
+        <div className="mb-4 border-b border-slate-800 py-0 pb-2 md:py-4">
+          <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="hidden h-7 md:block" />
+          <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="mx-auto h-12 w-12 md:hidden" />
         </div>
+
+        {activeProject && (
+          <div className="mb-4 hidden rounded-lg border border-slate-800 bg-slate-950/50 p-3 md:block">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{t("sidebar.currentProject")}</p>
+            <Link to={projectPickerHref} className="mt-2 block rounded-md px-2 py-2 text-left transition-colors hover:bg-slate-800">
+              <span className="block truncate text-sm font-semibold text-white">{activeProject.name}</span>
+              <span className="mt-1 block text-xs text-slate-400">{t("sidebar.switchProject")}</span>
+            </Link>
+          </div>
+        )}
 
         {topSections.map(renderSection)}
       </div>
 
-      <div className="px-2 md:px-4 pb-4">
+      <div className="px-2 pb-4 md:px-4">
+        <div className="mb-4 space-y-2">
+          <Link to={projectPickerHref} className={utilityLinkClass}>
+            <FolderOpen size={16} />
+            <span className="hidden md:inline">{t("sidebar.switchProject")}</span>
+          </Link>
+          <Link to="/app-settings" className={utilityLinkClass}>
+            <Settings2 size={16} />
+            <span className="hidden md:inline">{t("navigation.appSettings")}</span>
+          </Link>
+        </div>
         {bottomSections.map(renderSection)}
       </div>
     </div>

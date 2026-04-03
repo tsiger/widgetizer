@@ -13,7 +13,7 @@ export default function Layout() {
 
       <div
         className={`relative z-30 flex flex-1 flex-col ${
-          !isPageEditor ? "ml-[72px] md:ml-48 bg-slate-900 pr-0.5 pb-0.5 pt-0.5 md:pr-1 md:pb-1 md:pt-1" : ""
+          !isPageEditor ? "ml-[72px] md:ml-56 bg-slate-900 pr-0.5 pb-0.5 pt-0.5 md:pr-1 md:pb-1 md:pt-1" : ""
         }`}
       >
         <UpdateBanner />

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { uploadProjectMedia, getProjectMedia } from "../../../queries/mediaManager";
 import { API_URL } from "../../../config";
 import { apiFetch } from "../../../lib/apiFetch";
@@ -16,6 +17,7 @@ import { IMAGE_ACCEPT, validateFileSizes } from "../../../utils/uploadValidation
  * @param {"full"|"narrow"} [size="full"] — Constrains overall width: `narrow` caps at 14rem (e.g. favicon in theme settings).
  */
 export default function ImageInput({ id, value = "", onChange, size = "full" }) {
+  const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
@@ -149,17 +151,44 @@ export default function ImageInput({ id, value = "", onChange, size = "full" }) 
         className="hidden"
       />
       {value && currentImageFile ? (
-        <div className={mediaClassName}>
+        <div
+          className={`${mediaClassName} cursor-pointer`}
+          onClick={handleOpenMediaSelector}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              handleOpenMediaSelector();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+        >
           <img
             src={API_URL(`/api/media/projects/${activeProject.id}${currentImageFile.path}`)}
             alt={currentImageFile.metadata?.alt || "Preview"}
             className="max-w-full max-h-full object-contain"
           />
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button variant="icon" size="sm" onClick={handleEditMetadata} title="Edit metadata">
+            <Button
+              variant="icon"
+              size="sm"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleEditMetadata();
+              }}
+              title="Edit metadata"
+            >
               <Edit size={16} />
             </Button>
-            <Button variant="icon" size="sm" onClick={handleRemove} title="Remove image">
+            <Button
+              variant="icon"
+              size="sm"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleRemove();
+              }}
+              title="Remove image"
+            >
               <X size={16} />
             </Button>
           </div>
@@ -167,7 +196,9 @@ export default function ImageInput({ id, value = "", onChange, size = "full" }) 
       ) : (
         <div onClick={() => !uploading && fileInputRef.current?.click()} className={emptyStateClassName}>
           <UploadCloud size={32} />
-          <p className="mt-2 text-sm font-semibold">{uploading ? `Uploading... ${uploadProgress}%` : "Click to upload"}</p>
+          <p className="mt-2 text-sm font-semibold">
+            {uploading ? `Uploading... ${uploadProgress}%` : t("components.mediaSelector.importNew")}
+          </p>
           <p className="text-xs">PNG, JPG, GIF, WEBP, SVG</p>
         </div>
       )}
@@ -180,7 +211,10 @@ export default function ImageInput({ id, value = "", onChange, size = "full" }) 
           className="w-full"
           type="button"
         >
-          Browse media
+          {t("components.mediaSelector.browseLibrary")}
+        </Button>
+        <Button onClick={() => fileInputRef.current?.click()} disabled={uploading} variant="ghost" className="w-full" type="button">
+          {t("components.mediaSelector.importNew")}
         </Button>
       </div>
 

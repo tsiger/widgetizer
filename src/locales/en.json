@@ -6,13 +6,13 @@
     "pages": "Pages",
     "menus": "Menus",
     "media": "Media",
-    "settings": "Settings",
+    "settings": "Site settings",
     "appearance": "Appearance",
     "themes": "Themes",
     "tools": "Tools",
     "exportSite": "Export site",
     "general": "General",
-    "appSettings": "Settings"
+    "appSettings": "App settings"
   },
   "layout": {
     "toolbar": {
@@ -29,6 +29,10 @@
       "thankYou": "Thank you for creating with",
       "yourWebsite": "Your website address is"
     }
+  },
+  "sidebar": {
+    "currentProject": "Current project",
+    "switchProject": "Switch project"
   },
   "forms": {
     "common": {
@@ -171,6 +175,8 @@
       "noFiles": "No media files available",
       "closeLabel": "Close media selector",
       "upload": "Upload",
+      "browseLibrary": "Choose from library",
+      "importNew": "Import new image",
       "uploaderTitle": "Upload New Media",
       "uploaderDesc": "Select files to add to your library"
     }
@@ -200,11 +206,14 @@
   },
   "projects": {
     "title": "Projects",
+    "description": "Open a site, create a new one, or manage project details.",
     "loading": "Loading projects...",
     "newProject": "New project",
+    "backToWorkspace": "Back to site",
     "noActiveProject": "No Active Project",
     "noActiveProjectDesc": "Time to create your next big thing!",
     "noProjects": "No projects yet. Create your first project!",
+    "emptyTitle": "Create or open a site",
     "headers": {
       "title": "Title",
       "folderName": "Folder Name",
@@ -219,9 +228,9 @@
     },
     "actions": {
       "currentActive": "Current project",
-      "setActive": "Work on this project",
+      "setActive": "Open project",
       "edit": "Edit project",
-      "editDetails": "Edit project details",
+      "editDetails": "Project details",
       "duplicate": "Duplicate project",
       "export": "Export project",
       "delete": "Delete project",
@@ -243,7 +252,7 @@
       "importError": "Failed to import project",
       "successTitle": "Project Imported Successfully",
       "successMessage": "Project \"{{name}}\" has been imported successfully.",
-      "redirecting": "Closing this dialog..."
+      "redirecting": "Opening project..."
     },
     "toasts": {
       "deleteSuccess": "Project \"{{name}}\" was deleted successfully",
@@ -296,7 +305,7 @@
     "createFirstPage": "Create your first page to get started.",
     "actions": {
       "design": "Design page",
-      "edit": "Edit page details",
+      "edit": "Page settings",
       "duplicate": "Duplicate page",
       "delete": "Delete page"
     },
@@ -473,18 +482,18 @@
     }
   },
   "projectsAdd": {
-    "title": "Add project",
+    "title": "New project",
     "goToList": "Go to Projects List",
     "editThis": "Edit This Project",
     "create": "Create Project",
     "toasts": {
-      "createActiveSuccess": "Project \"{{name}}\" was created and set as active",
+      "createActiveSuccess": "Project \"{{name}}\" is ready to edit",
       "createSuccess": "Project \"{{name}}\" was created successfully!",
       "createError": "Failed to create project"
     }
   },
   "projectsEdit": {
-    "title": "Edit project",
+    "title": "Project details",
     "loading": "Loading project...",
     "notFound": "Project not found",
     "noActiveProjectTitle": "No Active Project",
@@ -567,7 +576,7 @@
     }
   },
   "themeSettings": {
-    "title": "Theme settings",
+    "title": "Site settings",
     "loading": "Loading settings...",
     "noSettings": "No theme settings available",
     "save": "Save Settings",
