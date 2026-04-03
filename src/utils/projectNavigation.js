@@ -3,7 +3,6 @@ const WORKSPACE_ROUTE_MAP = [
   ["/menus", "/menus"],
   ["/media", "/media"],
   ["/settings", "/settings"],
-  ["/themes", "/themes"],
   ["/export-site", "/export-site"],
 ];
 

@@ -12,7 +12,7 @@
     "tools": "Tools",
     "exportSite": "Export site",
     "general": "General",
-    "appSettings": "App settings"
+    "appSettings": "General settings"
   },
   "layout": {
     "toolbar": {
@@ -32,7 +32,8 @@
   },
   "sidebar": {
     "currentProject": "Current project",
-    "switchProject": "Switch project"
+    "switchProject": "Switch project",
+    "manageProjects": "Manage projects"
   },
   "forms": {
     "common": {
@@ -212,8 +213,8 @@
     "backToWorkspace": "Back to site",
     "noActiveProject": "No Active Project",
     "noActiveProjectDesc": "Time to create your next big thing!",
-    "noProjects": "No projects yet. Create your first project!",
-    "emptyTitle": "Create or open a site",
+    "noProjects": "Create your first project",
+    "emptyTitle": "No projects yet",
     "headers": {
       "title": "Title",
       "folderName": "Folder Name",

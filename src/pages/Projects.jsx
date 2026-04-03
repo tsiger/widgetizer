@@ -197,23 +197,30 @@ export default function Projects() {
   }
 
   const sortedProjects = sortItemsByCopyName(projects);
+  const hasProjects = sortedProjects.length > 0;
 
   return (
     <PageLayout
-      title={t("projects.title")}
-      description={t("projects.description")}
-      buttonProps={{
-        onClick: () => navigate(projectsAddHref),
-        children: t("projects.newProject"),
-        icon: <CirclePlus size={18} />,
-      }}
+      title={hasProjects ? t("projects.title") : undefined}
+      description={hasProjects ? t("projects.description") : undefined}
+      buttonProps={
+        hasProjects
+          ? {
+              onClick: () => navigate(projectsAddHref),
+              children: t("projects.newProject"),
+              icon: <CirclePlus size={18} />,
+            }
+          : undefined
+      }
       additionalButtons={
-        <Button variant="secondary" onClick={() => setImportModalOpen(true)} icon={<Download size={18} />}>
-          {t("projects.import")}
-        </Button>
+        hasProjects ? (
+          <Button variant="secondary" onClick={() => setImportModalOpen(true)} icon={<Download size={18} />}>
+            {t("projects.import")}
+          </Button>
+        ) : undefined
       }
     >
-      {sortedProjects.length === 0 ? (
+      {!hasProjects ? (
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
           <FolderOpen size={52} className="mb-4 text-slate-400" />
           <h2 className="text-xl font-semibold text-slate-900">{t("projects.emptyTitle")}</h2>

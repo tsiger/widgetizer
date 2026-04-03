@@ -14,7 +14,6 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 - `src/components/projects/ProjectForm.jsx` - Reusable form component (includes `siteTitle`, `siteUrl`, description, preset/theme selection)
 - `src/components/projects/ProjectImportModal.jsx` - ZIP import modal
 - `src/components/layout/RequireActiveProject.jsx` - Route guard wrapping all content routes. Shows EmptyState with link to `/projects` if no active project.
-- `src/components/layout/Breadcrumb.jsx` - Navigation breadcrumb in the footer.
 
 ### Query Layer (`src/queries/projectManager.js`)
 

@@ -73,6 +73,17 @@ const router = createBrowserRouter(
       ],
     },
     {
+      path: "/themes",
+      element: <ProjectPickerLayout />,
+      errorElement: <RouteError />,
+      children: [
+        {
+          index: true,
+          element: <Themes />,
+        },
+      ],
+    },
+    {
       path: "/",
       element: <Layout />,
       errorElement: <RouteError />,
@@ -119,10 +130,6 @@ const router = createBrowserRouter(
             {
               path: "settings",
               element: <Settings />,
-            },
-            {
-              path: "themes",
-              element: <Themes />,
             },
             {
               path: "export-site",
