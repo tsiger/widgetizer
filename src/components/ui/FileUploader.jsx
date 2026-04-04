@@ -77,7 +77,7 @@ export default function FileUploader({
     <div className="w-full">
       <div
         {...getRootProps()}
-        className={`relative p-8 border-2 border-dashed ${borderColor} ${bgColor} rounded-lg text-center cursor-pointer transition-all duration-200 hover:border-slate-400 focus:outline-none`}
+        className={`relative p-8 border-2 border-dashed ${borderColor} ${bgColor} rounded-sm text-center cursor-pointer transition-all duration-200 hover:border-slate-400 focus:outline-none`}
       >
         <input {...getInputProps()} />
 

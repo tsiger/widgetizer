@@ -43,42 +43,28 @@ const router = createBrowserRouter(
       errorElement: <RouteError />,
     },
     {
-      path: "/projects",
+      path: "/",
       element: <ProjectPickerLayout />,
       errorElement: <RouteError />,
       children: [
         {
-          index: true,
+          path: "projects",
           element: <Projects />,
         },
         {
-          path: "add",
+          path: "projects/add",
           element: <ProjectsAdd />,
         },
         {
-          path: "edit/:id",
+          path: "projects/edit/:id",
           element: <ProjectsEdit />,
         },
-      ],
-    },
-    {
-      path: "/app-settings",
-      element: <ProjectPickerLayout />,
-      errorElement: <RouteError />,
-      children: [
         {
-          index: true,
+          path: "app-settings",
           element: <AppSettings />,
         },
-      ],
-    },
-    {
-      path: "/themes",
-      element: <ProjectPickerLayout />,
-      errorElement: <RouteError />,
-      children: [
         {
-          index: true,
+          path: "themes",
           element: <Themes />,
         },
       ],

@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --shell-inset: 18px;
+    --shell-radius: 22px;
+    --shell-content-padding: 32px;
+    --sidebar-width: 14rem;
+    --sidebar-logo-width: 10rem;
+  }
+
   body {
     @apply text-sm font-sans text-gray-900 bg-gray-50;
   }

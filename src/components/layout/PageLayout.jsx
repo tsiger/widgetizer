@@ -4,9 +4,9 @@ export default function PageLayout({ title, description, children, buttonProps, 
   const hasHeader = title || description || buttonProps || additionalButtons;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="mx-auto w-full max-w-7xl">
       {hasHeader && (
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <div>
             {title && <h1 className="text-2xl font-bold tracking-tight text-gray-900">{title}</h1>}
             {description && <p className="mt-1 text-gray-700">{description}</p>}
@@ -21,7 +21,7 @@ export default function PageLayout({ title, description, children, buttonProps, 
           </div>
         </div>
       )}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">{children}</div>
+      <div className="bg-white rounded-md border border-gray-200 p-4">{children}</div>
     </div>
   );
 }

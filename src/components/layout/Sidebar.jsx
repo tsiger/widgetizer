@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import { navigationSections } from "../../config/navigation";
+import SidebarMeta from "./SidebarMeta";
 
 export default function Sidebar() {
   const { t } = useTranslation();
@@ -67,7 +68,7 @@ export default function Sidebar() {
     if (section.position === "bottom") {
       return (
         <div key={section.id} className="border-t border-slate-800 pt-4">
-          <h3 className="ml-2 mb-2 hidden text-xs font-bold text-slate-600 md:block">{t(section.titleKey)}</h3>
+          <h3 className="ml-2 mb-2 hidden text-xs font-bold uppercase text-slate-500 md:block">{t(section.titleKey)}</h3>
           <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
         </div>
       );
@@ -75,7 +76,7 @@ export default function Sidebar() {
 
     return (
       <div key={section.id} className="mb-4 border-b border-slate-800 pb-4">
-        {section.titleKey && <h3 className="ml-2 mb-2 hidden text-xs font-bold text-slate-600 md:block">{t(section.titleKey)}</h3>}
+        {section.titleKey && <h3 className="ml-2 mb-2 hidden text-xs font-bold uppercase text-slate-500 md:block">{t(section.titleKey)}</h3>}
         <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
       </div>
     );
@@ -85,17 +86,22 @@ export default function Sidebar() {
   const bottomSections = navigationSections.filter((section) => section.position === "bottom");
 
   return (
-    <div className="fixed left-0 top-0 flex h-screen w-[72px] flex-col overflow-y-auto bg-slate-900 text-white md:w-56">
-      <div className="grow px-2 pb-2 md:px-4">
-        <div className="mb-4 border-b border-slate-800 py-0 pb-2 md:py-4">
-          <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="hidden h-8 md:block" />
+    <div className="fixed left-0 top-0 flex h-screen w-[72px] flex-col overflow-y-auto bg-slate-900 text-white md:w-[var(--sidebar-width)]">
+      <div className="grow px-2 pb-2 md:px-[var(--shell-inset)]">
+        <div className="mb-4 py-0 pb-2 md:pb-4 md:pt-[var(--shell-inset)]">
+          <div className="hidden pt-1 md:block">
+            <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="h-auto w-[var(--sidebar-logo-width)]" />
+          </div>
           <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="mx-auto h-12 w-12 md:hidden" />
         </div>
 
         {topSections.map(renderSection)}
       </div>
 
-      <div className="px-2 pb-4 md:px-4">{bottomSections.map(renderSection)}</div>
+      <div className="px-2 pb-4 md:px-[var(--shell-inset)]">
+        {bottomSections.map(renderSection)}
+        <SidebarMeta />
+      </div>
     </div>
   );
 }

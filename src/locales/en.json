@@ -1,5 +1,6 @@
 {
   "navigation": {
+    "admin": "Manage",
     "dashboard": "Dashboard",
     "projects": "Projects",
     "site": "Site",
@@ -207,7 +208,7 @@
   },
   "projects": {
     "title": "Projects",
-    "description": "Open a site, create a new one, or manage project details.",
+    "description": "Open a project, create one, import one, or manage its details.",
     "loading": "Loading projects...",
     "newProject": "New project",
     "backToWorkspace": "Back to site",
