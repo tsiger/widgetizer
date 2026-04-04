@@ -1,16 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ChevronRight, FolderOpen, Settings2 } from "lucide-react";
 import useProjectStore from "../../stores/projectStore";
 import { navigationSections } from "../../config/navigation";
 
 export default function Sidebar() {
   const { t } = useTranslation();
   const location = useLocation();
-  const { activeProject } = useProjectStore();
-  const hasActiveProject = !!activeProject;
-
-  const projectPickerHref = `/projects?next=${encodeURIComponent(location.pathname)}`;
+  const hasActiveProject = !!useProjectStore((state) => state.activeProject);
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
 
@@ -36,10 +32,6 @@ export default function Sidebar() {
     `ml-1 hidden text-sm md:inline ${
       disabled ? "text-slate-500" : isActive(path) ? "text-white" : "text-slate-300 transition-colors group-hover:text-white"
     }`;
-
-  const utilityLinkClass =
-    "group flex items-center justify-center gap-2 rounded-md px-2 py-2 text-sm text-slate-400 transition-colors hover:bg-slate-800 hover:text-white md:justify-start";
-  const utilityIconClass = "text-slate-400 transition-colors group-hover:text-pink-600";
 
   const NavLink = ({ to, children, disabled = false, ...props }) => (
     <Link
@@ -100,32 +92,10 @@ export default function Sidebar() {
           <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="mx-auto h-12 w-12 md:hidden" />
         </div>
 
-        {activeProject && (
-          <div className="mb-3 border-b border-slate-800 pb-3">
-            <h3 className="ml-2 mb-1 hidden text-xs font-bold text-slate-500 md:block">{t("sidebar.currentProject")}</h3>
-            <p className="hidden truncate px-2 text-[17px] leading-tight font-semibold text-white md:block">{activeProject.name}</p>
-            <Link to={projectPickerHref} className="group mt-1.5 hidden items-center justify-between rounded-md px-2 py-2 md:flex">
-              <span className="flex items-center gap-2 text-sm text-slate-400 transition-colors group-hover:text-white">
-                <FolderOpen size={16} className={utilityIconClass} />
-                {t("sidebar.manageProjects")}
-              </span>
-              <ChevronRight size={16} className="shrink-0 self-end text-slate-500 transition-colors group-hover:text-slate-300" />
-            </Link>
-          </div>
-        )}
-
         {topSections.map(renderSection)}
       </div>
 
-      <div className="px-2 pb-4 md:px-4">
-        <div>
-          <Link to="/app-settings" className={utilityLinkClass}>
-            <Settings2 size={16} className={utilityIconClass} />
-            <span className="hidden md:inline">{t("navigation.appSettings")}</span>
-          </Link>
-        </div>
-        {bottomSections.map(renderSection)}
-      </div>
+      <div className="px-2 pb-4 md:px-4">{bottomSections.map(renderSection)}</div>
     </div>
   );
 }
