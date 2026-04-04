@@ -112,6 +112,81 @@ function updateStyleClasses(styleClasses) {
   });
 }
 
+// ── Custom Code Injection ──────────────────────────────────────────────────
+
+function updateCustomCss(payload) {
+  if (!payload || typeof payload !== "object") return;
+
+  Object.entries(payload).forEach(([settingId, css]) => {
+    const tagId = `custom-${settingId}`;
+    let style = document.getElementById(tagId);
+
+    if (!css || css.trim() === "") {
+      if (style) style.remove();
+      return;
+    }
+
+    if (!style) {
+      style = document.createElement("style");
+      style.id = tagId;
+      document.head.appendChild(style);
+    }
+    style.textContent = css;
+  });
+}
+
+function updateCustomScripts(payload) {
+  if (!payload || typeof payload !== "object") return;
+
+  Object.entries(payload).forEach(([settingId, data]) => {
+    const containerId = `custom-scripts-${settingId}`;
+    let container = document.getElementById(containerId);
+    const html = data?.html || "";
+    const placement = data?.placement || "footer";
+
+    if (!html.trim()) {
+      if (container) container.remove();
+      return;
+    }
+
+    if (!container) {
+      container = document.createElement("div");
+      container.id = containerId;
+      container.style.display = "none";
+      if (placement === "head") {
+        document.head.appendChild(container);
+      } else {
+        document.body.appendChild(container);
+      }
+    }
+
+    // Clear previous content
+    container.innerHTML = "";
+
+    // Parse and execute scripts manually (innerHTML won't execute scripts)
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+    Array.from(temp.querySelectorAll("script")).forEach((oldScript) => {
+      const newScript = document.createElement("script");
+      // Copy attributes
+      Array.from(oldScript.attributes).forEach((attr) => {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      if (!oldScript.src) {
+        newScript.textContent = oldScript.textContent;
+      }
+      container.appendChild(newScript);
+    });
+
+    // Append non-script elements (e.g., noscript, meta)
+    Array.from(temp.children).forEach((el) => {
+      if (el.tagName !== "SCRIPT") {
+        container.appendChild(el);
+      }
+    });
+  });
+}
+
 // ── Selection + Scroll State ────────────────────────────────────────────────
 
 let currentSelectedWidgetId = null;
@@ -755,6 +830,12 @@ function handleMessage(event) {
     case "UPDATE_STYLE_CLASSES":
       updateStyleClasses(payload);
       break;
+    case "UPDATE_CUSTOM_CSS":
+      updateCustomCss(payload);
+      break;
+    case "UPDATE_CUSTOM_SCRIPTS":
+      updateCustomScripts(payload);
+      break;
     case "SCROLL_TO_WIDGET":
       scrollToWidget(payload.widgetId);
       break;
@@ -994,10 +1075,9 @@ function preserveFormState(oldEl, newEl) {
 }
 
 function handleWidgetMorph(widgetId, newHtml) {
-  console.log(`[Runtime] Received MORPH_WIDGET for: ${widgetId}`);
   const success = morphWidget(widgetId, newHtml);
   if (!success) {
-    console.log(`[Runtime] Failed to morph widget: ${widgetId}`);
+    console.warn(`[PreviewRuntime] Failed to morph widget: ${widgetId}`);
     postToParent({ type: "WIDGET_MORPH_FAILED", payload: { widgetId } });
   }
 

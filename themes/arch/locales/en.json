@@ -212,15 +212,15 @@
         },
         "custom_css": {
           "label": "Custom CSS",
-          "description": "Add custom CSS that will be injected in the <head> section."
+          "description": "Add custom CSS rules — no need to include <style> tags, they are added automatically."
         },
         "custom_head_scripts": {
           "label": "Custom Head Scripts",
-          "description": "Add custom scripts (e.g., Google Analytics) that will be injected in the <head> section."
+          "description": "Paste the full HTML including <script> tags. Injected in the <head> section."
         },
         "custom_footer_scripts": {
           "label": "Custom Footer Scripts",
-          "description": "Add custom scripts that will be injected before the closing </body> tag."
+          "description": "Paste the full HTML including <script> tags. Injected before the closing </body> tag."
         }
       }
     },

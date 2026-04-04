@@ -158,6 +158,7 @@ export default function SettingsPanel({
                 value={currentValues?.[setting.id]}
                 onChange={handleSettingChange}
                 isFirst={index === 0}
+                allowExpand
               />
             );
           })}

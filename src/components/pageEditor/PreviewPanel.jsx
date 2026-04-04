@@ -338,13 +338,6 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     const newState = { page, widgets, globalWidgets, themeSettings };
     const { isStructural, changedWidgetIds, changedGlobalWidgetIds } = detectChangeType(newState, previousState);
 
-    // [DEBUG] Log change detection
-    console.log("[Preview] Change detected:", {
-      isStructural,
-      changedWidgetIds,
-      changedGlobalWidgetIds,
-    });
-
     // Immediate visual feedback for simple setting changes (text/images)
     if (!isStructural && iframeRef.current?.contentWindow && previousState?.widgets) {
       Object.entries(widgets || {}).forEach(([widgetId, widget]) => {

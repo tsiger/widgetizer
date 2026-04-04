@@ -206,12 +206,10 @@ export async function updatePreview(iframe, newState, oldState) {
   }
 
   // Morph changed widgets
-  console.log("[PreviewManager] Morphing widgets:", changedWidgetIds);
   for (const widgetId of changedWidgetIds) {
     const widgetData = newWidgets[widgetId];
     if (widgetData) {
       try {
-        console.log(`[PreviewManager] → Morphing widget: ${widgetId}`);
         const renderedHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings);
         iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, "*");
       } catch (error) {
@@ -356,6 +354,14 @@ function updateThemeSettings(iframe, settings) {
   if (Object.keys(styleClasses).length > 0) {
     iframe.contentWindow.postMessage({ type: "UPDATE_STYLE_CLASSES", payload: styleClasses }, "*");
   }
+
+  // Debounce custom code (CSS / scripts) to avoid excessive re-execution
+  clearTimeout(customCodeTimer);
+  customCodeTimer = setTimeout(() => {
+    const { css, scripts } = extractCustomCode(settings);
+    iframe.contentWindow?.postMessage({ type: "UPDATE_CUSTOM_CSS", payload: css }, "*");
+    iframe.contentWindow?.postMessage({ type: "UPDATE_CUSTOM_SCRIPTS", payload: scripts }, "*");
+  }, 300);
 }
 
 /**
@@ -385,6 +391,40 @@ function extractStyleClasses(settings) {
 
   return classes;
 }
+
+/**
+ * Extract custom code settings (type: "code") from theme settings.
+ * Categorises each by language into CSS or script entries.
+ * @param {Object} settings - Theme settings object
+ * @returns {{ css: Object<string, string>, scripts: Object<string, {html: string, placement: string}> }}
+ */
+function extractCustomCode(settings) {
+  const css = {};
+  const scripts = {};
+
+  if (!settings?.settings?.global) return { css, scripts };
+
+  Object.values(settings.settings.global).forEach((items) => {
+    if (!Array.isArray(items)) return;
+    items.forEach((item) => {
+      if (item.type !== "code" || !item.id) return;
+      const value = item.value !== undefined ? item.value : item.default;
+      const str = typeof value === "string" ? value : "";
+
+      if (item.language === "css") {
+        css[item.id] = str;
+      } else {
+        // HTML / script settings — derive placement from id
+        const placement = item.id.includes("head") ? "head" : "footer";
+        scripts[item.id] = { html: str, placement };
+      }
+    });
+  });
+
+  return { css, scripts };
+}
+
+let customCodeTimer = null;
 
 /**
  * Fetch global widgets (header and footer) for the active project.
