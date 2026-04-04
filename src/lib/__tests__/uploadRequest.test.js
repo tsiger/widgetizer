@@ -31,6 +31,12 @@ class MockXMLHttpRequest {
   send(body) {
     this.body = body;
   }
+
+  abort() {
+    if (this.onabort) {
+      this.onabort();
+    }
+  }
 }
 
 describe("uploadFormData", () => {
@@ -100,5 +106,23 @@ describe("uploadFormData", () => {
       status: 0,
       data: null,
     });
+  });
+
+  it("aborts uploads when the provided signal is canceled", async () => {
+    const { uploadFormData } = await import("../uploadRequest");
+    const controller = new AbortController();
+
+    const promise = uploadFormData("/api/projects/import", {}, { signal: controller.signal });
+    const xhr = xhrInstances[0];
+
+    controller.abort();
+
+    await expect(promise).rejects.toMatchObject({
+      name: "AbortError",
+      message: "Upload canceled.",
+      aborted: true,
+    });
+
+    expect(xhr.method).toBe("POST");
   });
 });

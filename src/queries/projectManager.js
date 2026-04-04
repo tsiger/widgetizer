@@ -248,16 +248,20 @@ export async function exportProject(projectId) {
 /**
  * Import a project from a ZIP file previously exported from the application.
  * @param {File} file - The ZIP file to import (from file input or drag-drop)
- * @param {function(number): void} [onProgress] - Progress callback receiving percentage (0-100)
+ * @param {function(number): void|{onProgress?: function(number): void, signal?: AbortSignal}} [optionsOrProgress] - Progress callback or options
  * @returns {Promise<Project>} The imported project object
  * @throws {Error} If import fails or the ZIP is invalid
  */
-export async function importProject(file, onProgress) {
+export async function importProject(file, optionsOrProgress) {
+  const options =
+    typeof optionsOrProgress === "function" ? { onProgress: optionsOrProgress } : (optionsOrProgress ?? {});
+  const { onProgress, signal } = options;
+
   try {
     const formData = new FormData();
     formData.append("projectZip", file);
 
-    const response = await uploadFormData("/api/projects/import", formData, { onProgress });
+    const response = await uploadFormData("/api/projects/import", formData, { onProgress, signal });
     const data = response.data || {};
 
     return {
@@ -272,6 +276,8 @@ export async function importProject(file, onProgress) {
       const normalizedError = new Error(error.message);
       normalizedError.status = error.status;
       normalizedError.data = error.data;
+      normalizedError.name = error.name;
+      normalizedError.aborted = error.aborted;
       throw normalizedError;
     }
     throw new Error("Failed to import project");

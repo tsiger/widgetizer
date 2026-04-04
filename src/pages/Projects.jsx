@@ -127,13 +127,15 @@ export default function Projects() {
     });
   };
 
-  const openProjectWorkspace = async (project) => {
+  const openProjectWorkspace = async (project, { showActivationToast = true } = {}) => {
     try {
       if (!activeProject || activeProject.id !== project.id) {
         await activateProject(project.id);
         await fetchActiveProject();
         await loadProjects();
-        showToast(t("projects.toasts.setActiveSuccess", { name: project.name }), "success");
+        if (showActivationToast) {
+          showToast(t("projects.toasts.setActiveSuccess", { name: project.name }), "success");
+        }
       }
 
       navigate(workspaceDestination);
@@ -185,7 +187,7 @@ export default function Projects() {
     await loadProjects();
     showToast(t("projects.toasts.importSuccess", { name: importedProject.name }), "success");
     setImportModalOpen(false);
-    await openProjectWorkspace(importedProject);
+    await openProjectWorkspace(importedProject, { showActivationToast: false });
   };
 
   if (loading) {

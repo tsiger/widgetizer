@@ -31,7 +31,7 @@ describe("projectManager importProject", () => {
     expect(uploadFormData).toHaveBeenCalledWith(
       "/api/projects/import",
       expect.any(FormData),
-      { onProgress: progress },
+      { onProgress: progress, signal: undefined },
     );
     expect(result).toEqual({
       ...project,
@@ -56,5 +56,23 @@ describe("projectManager importProject", () => {
       status: 400,
       data: { error: "Invalid project export" },
     });
+  });
+
+  it("passes abort signals through to the upload request", async () => {
+    const project = { id: "project-1", name: "Imported Project" };
+    const signal = new AbortController().signal;
+    uploadFormData.mockResolvedValue({
+      status: 201,
+      data: project,
+    });
+
+    const { importProject } = await import("../projectManager");
+    await importProject({ name: "project.zip" }, { signal });
+
+    expect(uploadFormData).toHaveBeenCalledWith(
+      "/api/projects/import",
+      expect.any(FormData),
+      { onProgress: undefined, signal },
+    );
   });
 });

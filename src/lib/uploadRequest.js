@@ -25,10 +25,44 @@ export function createUploadError(message, status, data) {
   return error;
 }
 
-export async function uploadFormData(path, formData, { onProgress } = {}) {
+export async function uploadFormData(path, formData, { onProgress, signal } = {}) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     const projectId = getActiveProjectId();
+    let settled = false;
+
+    const cleanup = () => {
+      if (signal) {
+        signal.removeEventListener("abort", handleAbort);
+      }
+    };
+
+    const rejectOnce = (error) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(error);
+    };
+
+    const resolveOnce = (value) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(value);
+    };
+
+    const handleAbort = () => {
+      xhr.abort();
+    };
+
+    if (signal?.aborted) {
+      rejectOnce(Object.assign(createUploadError("Upload canceled.", 0, null), { name: "AbortError", aborted: true }));
+      return;
+    }
+
+    if (signal) {
+      signal.addEventListener("abort", handleAbort);
+    }
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable && onProgress) {
@@ -41,15 +75,19 @@ export async function uploadFormData(path, formData, { onProgress } = {}) {
       const data = parseResponseBody(xhr.responseText);
 
       if (xhr.status >= 200 && xhr.status < 300) {
-        resolve({ ok: true, status: xhr.status, data });
+        resolveOnce({ ok: true, status: xhr.status, data });
         return;
       }
 
-      reject(createUploadError(getErrorMessage(data, "Upload failed"), xhr.status, data));
+      rejectOnce(createUploadError(getErrorMessage(data, "Upload failed"), xhr.status, data));
     };
 
     xhr.onerror = () => {
-      reject(createUploadError("Upload failed due to a network error or server issue.", xhr.status || 0, null));
+      rejectOnce(createUploadError("Upload failed due to a network error or server issue.", xhr.status || 0, null));
+    };
+
+    xhr.onabort = () => {
+      rejectOnce(Object.assign(createUploadError("Upload canceled.", xhr.status || 0, null), { name: "AbortError", aborted: true }));
     };
 
     xhr.open("POST", API_URL(path));

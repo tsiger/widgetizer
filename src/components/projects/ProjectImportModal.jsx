@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { X, Upload, CheckCircle, AlertCircle } from "lucide-react";
 import FileUploader from "../ui/FileUploader";
+import Button from "../ui/Button";
 import { importProject } from "../../queries/projectManager";
 import useAppSettings from "../../hooks/useAppSettings";
 import useToastStore from "../../stores/toastStore";
@@ -17,8 +18,10 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
   const [uploadProgress, setUploadProgress] = useState({});
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const abortControllerRef = useRef(null);
 
   const maxSizeMB = settings?.export?.maxImportSizeMB || 500;
+  const canClose = !uploading;
 
   if (!isOpen) return null;
 
@@ -45,14 +48,19 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
       return;
     }
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
     setUploading(true);
     setUploadProgress({ [selectedFile.name]: 0 });
     setError(null);
     setSuccess(null);
 
     try {
-      const result = await importProject(selectedFile, (progress) => {
-        setUploadProgress((prev) => ({ ...prev, [selectedFile.name]: progress }));
+      const result = await importProject(selectedFile, {
+        onProgress: (progress) => {
+          setUploadProgress((prev) => ({ ...prev, [selectedFile.name]: progress }));
+        },
+        signal: controller.signal,
       });
 
       setUploadProgress({ [selectedFile.name]: 100 });
@@ -66,30 +74,57 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
           handleClose();
         }, 2000);
       }
-      showUploadOutcome(showToast, result, {
-        successMessage: importedProject?.name
-          ? t("projects.importModal.successMessage", { name: importedProject.name })
-          : undefined,
-        networkErrorMessage: t("projects.importModal.importError"),
-      });
+      if (!onSuccess) {
+        showUploadOutcome(showToast, result, {
+          successMessage: importedProject?.name
+            ? t("projects.importModal.successMessage", { name: importedProject.name })
+            : undefined,
+          networkErrorMessage: t("projects.importModal.importError"),
+        });
+      }
     } catch (err) {
+      if (err?.name === "AbortError" || err?.aborted) {
+        return;
+      }
+
       const message = err.message || t("projects.importModal.importError");
       setError(message);
       showRejectedFiles(showToast, [{ originalName: selectedFile.name, reason: message }], {
         summaryMessage: t("projects.importModal.importError"),
       });
     } finally {
-      setUploading(false);
-      setUploadProgress({});
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+        setUploading(false);
+        setUploadProgress({});
+      }
     }
   };
 
   const handleClose = () => {
+    if (!canClose) {
+      return;
+    }
+
     setSelectedFile(null);
     setError(null);
     setSuccess(null);
     setUploading(false);
     setUploadProgress({});
+    onClose();
+  };
+
+  const handleCancel = () => {
+    if (uploading && abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    setSelectedFile(null);
+    setError(null);
+    setSuccess(null);
+    setUploading(false);
+    setUploadProgress({});
+    abortControllerRef.current = null;
     onClose();
   };
 
@@ -110,7 +145,7 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
   return (
     <div
       className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      onClick={handleClose}
+      onClick={canClose ? handleClose : undefined}
     >
       <div
         className="bg-white rounded-lg shadow-lg max-w-lg w-full overflow-hidden max-h-[90vh] flex flex-col"
@@ -121,7 +156,8 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
           <h3 className="text-lg font-semibold text-slate-800">{t("projects.importModal.title")}</h3>
           <button
             onClick={handleClose}
-            className="p-1 hover:bg-slate-200 rounded transition-colors"
+            disabled={!canClose}
+            className="p-1 rounded transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
             aria-label={t("common.close")}
           >
             <X size={20} className="text-slate-600" />
@@ -178,20 +214,16 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
         {/* Footer */}
         {!success && (
           <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
-            <button
-              onClick={handleClose}
-              disabled={uploading}
-              className="px-4 py-2 border border-slate-300 rounded-sm hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <Button onClick={handleCancel} variant="secondary">
               {t("common.cancel")}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleImport}
               disabled={!selectedFile || uploading}
-              className="px-4 py-2 bg-pink-600 text-white rounded-sm hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              loading={uploading}
             >
               {t("projects.importModal.importButton")}
-            </button>
+            </Button>
           </div>
         )}
       </div>
