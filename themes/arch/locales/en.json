@@ -98,11 +98,11 @@
         },
         "heading_scale": {
           "label": "Heading Text Size",
-          "description": "Scale all heading text sizes up or down"
+          "description": "Adjust all heading sizes relatively across the site"
         },
         "body_scale": {
           "label": "Body Text Size",
-          "description": "Scale all body text sizes up or down"
+          "description": "Adjust all body text sizes relatively across the site"
         }
       }
     },

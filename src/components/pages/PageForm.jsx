@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/incompatible-library */
 import { useState, useEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
@@ -146,7 +146,14 @@ export default function PageForm({
             <span className="text-slate-500 ml-1">.html</span>
           </div>
           {errors.slug && <p className="form-error">{errors.slug.message}</p>}
-          <p className="form-description">{t("forms.page.filenameHelp")}</p>
+          <p className="form-description">
+            <Trans
+              i18nKey="forms.page.filenameHelp"
+              components={{
+                strong: <strong className="font-semibold text-slate-700" />,
+              }}
+            />
+          </p>
         </div>
       </div>
 
