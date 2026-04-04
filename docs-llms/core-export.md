@@ -6,9 +6,17 @@ The export system includes automatic version management, with configurable reten
 
 > **Note**: Site exporting is different from **project exporting**. Site export generates a deployable static HTML website, while project export creates a ZIP archive of all project source files for backup or transfer to another Widgetizer installation. See [Project Management](core-projects.md) for project import/export documentation.
 
+After the workspace merge, site export is explicitly part of the site workspace (`/export-site`), not the admin area.
+
 ## 1. Frontend Implementation (`src/pages/ExportSite.jsx`)
 
 The export interface has been **refactored** into a modular architecture with the main component acting as an orchestrator for specialized components and hooks.
+
+### Route Context
+
+- `/export-site` is rendered inside the site workspace shell.
+- `RequireActiveProject` redirects users to `/projects` if they try to access it without an active project.
+- The page has two display modes: a normal history view when exports exist, and an empty-state `ExportCreator` variant when none exist yet.
 
 ### Architecture Overview
 

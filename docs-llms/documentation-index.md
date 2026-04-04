@@ -156,7 +156,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Troubleshooting project state management
 - Working with the project store (Zustand)
 
-**Key topics**: Project CRUD operations, active project management, project ZIP import/export, `siteTitle`, state management, backend API endpoints, preset selection during creation
+**Key topics**: Project CRUD operations, admin-shell routing, active project management, workspace entry flow, project ZIP import/export, `siteTitle`, state management, backend API endpoints, preset selection during creation
 
 ---
 
@@ -169,7 +169,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with page metadata and widgets
 - Managing page routing and slugs
 
-**Key topics**: Page JSON structure, CRUD operations, slug generation, widget integration, SEO title behavior
+**Key topics**: Page JSON structure, workspace-only routing, CRUD operations, slug generation, widget integration, SEO title behavior
 
 ---
 
@@ -197,7 +197,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing menu editing interfaces
 - Working with nested menu items
 
-**Key topics**: Menu JSON structure, drag-and-drop editing, backend API, file-based storage
+**Key topics**: Menu JSON structure, workspace-only routing, drag-and-drop editing, backend API, file-based storage
 
 ---
 
@@ -226,7 +226,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing theme management UI
 - Troubleshooting theme installation
 
-**Key topics**: Theme display, upload process, validation, theme switching, theme presets, preset API, deletion safeguards, theme locale behavior, site icon snippet
+**Key topics**: Theme display, admin-shell routing, upload process, validation, active-project theme badge, theme presets, preset API, deletion safeguards, theme locale behavior, site icon snippet
 
 ---
 
@@ -240,7 +240,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Managing export versions and storage limits
 - Troubleshooting export issues
 
-**Key topics**: Export workflow, version control system, asset copying, HTML generation, export history API, ZIP downloads, automatic cleanup, smart file detection, root export metadata, site icons
+**Key topics**: Export workflow, workspace-only routing, version control system, asset copying, HTML generation, export history API, ZIP downloads, automatic cleanup, smart file detection, root export metadata, site icons
 
 ---
 
@@ -255,7 +255,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing setting validation
 - Working with nested setting objects
 
-**Key topics**: Global settings management, server-side validation, setting persistence, English-only language availability, default date format, developer mode export validation
+**Key topics**: Global settings management, admin-shell routing, server-side validation, theme-aware image-size overrides, setting persistence, English-only language availability, default date format, developer mode export validation
 
 ---
 
@@ -284,7 +284,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Planning refactoring or improvements
 - Finding where specific functionality is implemented
 
-**Key topics**: Projects, Pages, Menus, Media, Themes, Export, App Settings, Preview, Page Editor architecture; improvement opportunities
+**Key topics**: Admin vs site shell routing, Projects, Pages, Menus, Media, Themes, Export, App Settings, Preview, Page Editor architecture; improvement opportunities
 
 ---
 

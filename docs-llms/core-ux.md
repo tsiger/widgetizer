@@ -17,12 +17,14 @@ This document provides a user experience (UX) audit of the application's core wo
 
 ## 1. Project Management (`/projects`)
 
+Project administration now lives in the admin shell. Opening a project is the handoff into the separate site workspace.
+
 ### **1.1. Create a New Project**
 
 - **Current State:**
-  - After creating a project, the user is redirected to `/projects` (project list).
-  - If this is the first project created, it is automatically set as the active project by the backend.
-  - Success toast is shown: `Project "[Project Name]" has been created and set as active.` (if activated) or `Project "[Project Name]" has been created.` (if not activated).
+  - After creating a project, the frontend sets it as active immediately.
+  - The user is redirected into the site workspace (`/pages` by default, or a preserved `next` destination when they were bounced out of a workspace route).
+  - Success toast is shown confirming project creation and activation.
   - Navigation guard prevents accidental navigation with unsaved changes.
 - **Status:** ✅ Implemented
 
@@ -44,12 +46,13 @@ This document provides a user experience (UX) audit of the application's core wo
   - Upon confirmation, the project is deleted, the list is refreshed, and a success toast is shown: `Project "[Project Name]" has been deleted.`
 - **Status:** ✅ Fully implemented with proper safeguards
 
-### **1.4. Set Active Project**
+### **1.4. Open / Set Active Project**
 
 - **Current State:**
-  - Users can set any project as active via a star icon button.
-  - The active project is visually indicated with a pink "Active" badge and a filled star icon.
-  - Success toast: `Project "[Project Name]" has been set as active.`
+  - Users open a project by clicking its name in the list.
+  - If the project is not already active, the app sets it active first, then navigates into the workspace.
+  - The active project is visually indicated with an "Active" badge.
+  - A success toast is shown only when the active project actually changes.
 - **Status:** ✅ Implemented
 
 ### **1.5. Duplicate Project**
@@ -171,8 +174,9 @@ _(Excluding the Page Editor itself)_
 ### **5.2. Activate a Theme**
 
 - **Current State:**
+  - Themes are managed in the admin shell (`/themes`).
   - Themes are selected during project creation (theme changes are not supported in project edit).
-  - The active theme is visually indicated with a pink "Active" badge on the theme card.
+  - The active theme badge on the Themes page reflects the currently active project's theme.
   - No direct activation UI exists on the themes page itself.
 - **Future Improvement:** Add an "Activate" button on theme cards to allow switching themes without editing the project. Show success toast: `Theme "[Theme Name]" has been activated.`
 
@@ -250,7 +254,6 @@ _(Excluding the Page Editor itself)_
 
 ### ⚠️ Partially Implemented / Needs Improvement
 
-- **Project creation:** Redirects to the project list after creation
 - **Page creation:** Redirects to list instead of page editor
 - **Theme activation:** Only available via project edit, not directly from themes page
 

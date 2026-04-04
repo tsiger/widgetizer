@@ -74,10 +74,16 @@ The frontend for menu management is split across several React components, provi
 
 ### Key Components
 
-- **`src/pages/Menus.jsx`**: Displays a list of all created menus for the active project. From here, a user can navigate to add, edit, duplicate, or delete a menu. The duplicate feature creates a complete copy of the menu with all nested items. Fully localized.
+- **`src/pages/Menus.jsx`**: Displays a list of all created menus for the active project. It lives at `/menus` inside the site workspace shell. From here, a user can navigate to add, edit settings, edit structure, duplicate, or delete a menu. The duplicate feature creates a complete copy of the menu with all nested items. Fully localized.
 - `src/pages/MenusAdd.jsx`: A page containing a form (`MenuForm.jsx`) to create a new menu by providing a name and description.
 - **`src/pages/MenusEdit.jsx`**: A page containing a form (`MenuForm.jsx`) to update an existing menu's name and description. Integrates `useFormNavigationGuard`.
 - **`src/pages/MenuStructure.jsx`**: The core of the menu editing experience. It uses the `MenuEditor.jsx` component to provide a drag-and-drop interface for adding, editing, reordering, and nesting menu items. Fully localized interface.
+
+### Route Context
+
+- `/menus`, `/menus/add`, `/menus/edit/:id`, and `/menus/:id/structure` are part of the site workspace shell.
+- `RequireActiveProject` redirects users to `/projects` if they reach these routes without an active project.
+- The primary click target in the list opens `/menus/:id/structure`; settings edits are a separate action.
 
 ### Client-Side API (`src/queries/menuManager.js`)
 

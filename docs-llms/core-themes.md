@@ -1,6 +1,6 @@
 # Themes
 
-This document explains the "Themes" management page, which is the user interface for viewing, uploading, and updating themes. In the application's architecture, a "Theme" is the core concept for styling and layout.
+This document explains the "Themes" management page, which is the user interface for viewing, uploading, and updating themes. In the application's architecture, a "Theme" is the core concept for styling and layout. After the workspace merge, the Themes page lives in the admin shell rather than the site workspace.
 
 ## 1. Overview
 
@@ -68,11 +68,17 @@ The `presets/` directory is optional. When present, it provides named variants o
 
 The frontend component provides a clean interface for theme management.
 
+### Route Context
+
+- Themes lives at `/themes` inside `ProjectPickerLayout` (the admin shell).
+- It can be opened without an active project.
+- If an active project exists, the page uses it to mark that project's theme card as active.
+
 ### Key Features
 
 - **Theme Grid**: Displays all available themes in a responsive grid layout.
 - **Upload Functionality**: Drag-and-drop interface for uploading new theme ZIP files.
-- **Active Theme Indicator**: Visual indication of which theme is currently active for the project.
+- **Active Theme Indicator**: Visual indication of which theme is currently active for the current active project.
 - **Update Indicators**: Shows when themes have pending updates available.
 - **Per-Theme Update Buttons**: Allows updating individual themes.
 - **Theme Deletion**: Three-dot menu on each card with "Delete"; when a theme is used by one or more projects, the delete action is disabled up front and the UI shows that the theme is in use.
@@ -109,12 +115,14 @@ The component manages local state for:
 - `loading`: Loading state for initial theme fetch
 - `updatingThemeId`: Which theme is currently being updated
 - Upload status and progress
+- `openMenuId`: Which theme card's overflow menu is currently open
 
 **Global State:**
 
 - `useThemeUpdateStore`: Zustand store for sidebar badge count
   - `updateCount`: Number of themes with pending updates
   - `fetchUpdateCount()`: Refreshes the count from API
+- `useProjectStore`: Supplies the current active project so the UI can highlight the active theme
 
 ### Upload Process
 

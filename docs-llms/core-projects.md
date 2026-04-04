@@ -1,6 +1,6 @@
 # Project Management Workflow
 
-This document provides a detailed overview of how projects are created, managed, and updated within the application.
+This document provides a detailed overview of how projects are created, managed, and updated within the application. After the workspace merge, projects now live in a separate admin area and act as the entry point into the site workspace.
 
 ## Core Components & Pages
 
@@ -23,9 +23,16 @@ These pages rely on a central form component for handling user input:
 
 The application uses `react-router-dom` to handle navigation between these pages:
 
+- `/`: Redirects to `/pages` when an active project exists, otherwise `/projects`
 - `/projects`: Renders the `Projects.jsx` page, showing the list of all projects.
 - `/projects/add`: Renders the `ProjectsAdd.jsx` page.
 - `/projects/edit/:id`: Renders the `ProjectsEdit.jsx` page, where `:id` is the unique ID of the project being edited.
+
+### Admin vs Workspace Flow
+
+- `/projects`, `/themes`, and `/app-settings` live inside `ProjectPickerLayout`, the admin shell.
+- `/pages`, `/menus`, `/media`, `/settings`, and `/export-site` live inside the site workspace shell and require an active project.
+- Project-selection routes can preserve a `next` query param. `resolveWorkspaceDestination()` normalizes that value so project creation/opening can return the user to the intended workspace tool (default: `/pages`).
 
 ---
 
@@ -73,22 +80,24 @@ This file contains functions that make API calls to the backend:
 10. **Link Enrichment**: After copying theme files, the system enriches all internal page links with `pageUuid`:
     - **Menus**: All menu items that link to internal pages (e.g., `index.html`, `about.html`) are enriched with the corresponding page's `pageUuid`. This ensures menu links remain valid even if pages are renamed.
     - **Widgets**: All widget settings with link-type values (objects containing `href` pointing to internal `.html` pages) are enriched with `pageUuid`. This includes links in header, footer, and all page widgets.
-11. **Setting Active Project**: If this is the very first project being created (i.e., there was no active project before), it is automatically set as the active project by calling `setActiveProject(newProject.id)`. The global state is updated via the `projectStore`.
-12. **Feedback**: A success toast notification is shown (localized), and the user is redirected back to the project list.
+11. **Setting Active Project**: The frontend immediately sets the new project as active (`setActiveProject(newProject.id)`) and refreshes `projectStore`, regardless of whether it is the first project.
+12. **Feedback + Navigation**: A success toast notification is shown (localized), and the user is redirected into the site workspace. By default this is `/pages`, but if the user came from a guarded workspace route, the preserved `next` value is resolved and used instead.
 
 ### 1b. Access Without an Active Project
 
-If a user navigates to any project-scoped route without an active project selected, `RequireActiveProject` blocks the route and shows the "No Active Project" empty state with a link back to `/projects`.
+If a user navigates to any site-workspace route without an active project selected, `RequireActiveProject` redirects the user back to `/projects`. There is no longer a separate "No Active Project" empty-state screen in the route guard.
 
 ### 2. Listing and Managing Projects
 
 1.  **Data Fetching**: When `Projects.jsx` loads, it calls `getAllProjects()` to fetch and display a list of all projects in a table.
 2.  **Localization**: The page is fully localized with translated headers, action labels, toast messages, and empty states.
-3.  **Actions**: For each project in the list, a set of actions are available on hover:
-    - **Set Active (`Star` icon)**: Calls `handleSetActive`, which uses the `setActiveProject(id)` project query to update the backend. It then re-fetches the active project information to update the global store and UI. You cannot deactivate the active project; you must set another as active.
-    - **Edit (`Pencil` icon)**: Navigates the user to `/projects/edit/:id`.
-    - **Duplicate (`Copy` icon)**: Calls `handleDuplicate`, which uses `duplicateProject(id)` to make an API call. The duplication process includes UUID regeneration for all pages and automatic updating of all `pageUuid` references in widgets and menus to point to the new UUIDs. Duplicates are named with the suffix pattern `Project Name (Copy)`, `Project Name (Copy 2)`, etc., and the list sorting groups them after the original project. The project list is then reloaded.
-    - **Delete (`Trash2` icon)**: Calls `openDeleteConfirmation`, which opens a localized confirmation modal. You cannot delete the currently active project. If confirmed, the `deleteProject(id)` function is called (via `deleteProjectById()` from `projectService.js`), and the list is reloaded.
+3.  **Open Project / Set Active**: Clicking the project name opens that project. If it is not already active, `Projects.jsx` first calls `setActiveProject(id)`, refreshes `projectStore`, shows a success toast, and then navigates into the workspace destination (`/pages` by default, or preserved `next`).
+4.  **Visual Status**: The active project shows an "Active" badge. The theme column can also show a theme-update indicator when `hasThemeUpdate` is true.
+5.  **Actions Menu**: Each row exposes an overflow menu with:
+    - **Edit**: Navigates to `/projects/edit/:id`.
+    - **Duplicate**: Calls `duplicateProject(id)`. The duplication process includes UUID regeneration for all pages and automatic updating of all `pageUuid` references in widgets and menus to point to the new UUIDs. Duplicates are named with the suffix pattern `Project Name (Copy)`, `Project Name (Copy 2)`, etc., and the list sorting groups them after the original project.
+    - **Export**: Triggers project ZIP export.
+    - **Delete**: Opens a localized confirmation modal. The currently active project cannot be deleted.
 
 ### 3. Exporting a Project
 
@@ -124,7 +133,7 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
     - Project metadata is written to SQLite only after successful file copy
     - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, and `siteUrl` in addition to the core project fields
 7.  **Cleanup**: Temporary files are removed on both success and failure.
-8.  **Feedback**: Success modal shows the imported project name, then auto-closes after 2 seconds.
+8.  **Feedback + Navigation**: A success toast is shown, the modal closes, and the imported project is immediately opened as the active project inside the site workspace.
 
 **Note**: Imported projects receive new IDs and folder names to prevent conflicts. The original project's ID and folder structure are not preserved.
 
@@ -139,6 +148,7 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
     - **Description Field**: Optional field for project description
     - **Site Title Field**: Optional field used for exported browser-tab titles and related site-level metadata
     - **Website Address Field**: Optional field for setting the base URL for the project, used for generating absolute URLs in social media meta tags, SEO, and exported site metadata
+    - **Theme Update Banner**: If `checkThemeUpdates(id)` reports an available update, `ProjectsEdit.jsx` shows an inline banner with an "Apply Update" action
 5.  **Form Features**:
     - **Independent Fields**: Project title and folder name can be edited independently
     - **URL Validation**: The website address field is optional, but if provided, includes validation to ensure proper URL format (via react-hook-form)

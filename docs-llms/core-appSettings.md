@@ -4,7 +4,15 @@
 
 The `AppSettings` page is responsible for managing global configurations that apply across the entire application, rather than to a specific project. These are system-level settings that control the application's behavior. Key examples include setting the maximum file upload size for the media manager and configuring image processing settings.
 
+After the workspace merge, App Settings lives in the admin shell at `/app-settings`, separate from the site workspace routes.
+
 The App Settings system has been **refactored** to use a clean, modular architecture with dedicated components that are completely isolated from the theme settings system.
+
+## Route Context
+
+- `/app-settings` is rendered inside `ProjectPickerLayout` (admin shell).
+- The page is available even when there is no active project.
+- When an active project exists, `AppSettings.jsx` also loads the current theme with `getTheme(activeProject.theme)` so the UI can react to theme-defined image sizes.
 
 ## Current Settings
 
@@ -31,7 +39,7 @@ The App Settings system has been **refactored** to use a clean, modular architec
   - **Large** (default: 1920px) - High-resolution displays
   - Each size can be **enabled/disabled** and have its **width customized**
 
-**Theme Override Behavior:** When the active project's theme defines its own `imageSizes` in `theme.json`, the Image Sizes settings are hidden in the App Settings UI. A notice is displayed explaining that image sizes are managed by the theme. This ensures users understand that changing app settings won't affect projects using themes with custom image sizes. See [Media Library - Theme-Defined Image Sizes](core-media.md#theme-defined-image-sizes) for details.
+**Theme Override Behavior:** When the active project's theme defines its own `imageSizes` in `theme.json`, the Image Sizes settings are hidden in the App Settings UI. A notice is displayed explaining that image sizes are managed by the theme. This logic is driven by a theme lookup in `AppSettings.jsx`, not by the settings hook itself. If no active project exists, the global Image Sizes controls remain visible. See [Media Library - Theme-Defined Image Sizes](core-media.md#theme-defined-image-sizes) for details.
 
 ### Export Management Settings
 
@@ -70,6 +78,7 @@ The main page component (reduced to ~61 lines) acts as an orchestrator:
 - **Layout Management**: Uses `PageLayout` for consistent page structure
 - **Loading States**: Displays loading spinners and error states
 - **Hook Integration**: Uses `useAppSettings` hook for all data management
+- **Theme Awareness**: Optionally loads the active project's theme so it can hide app-level image-size controls when the theme owns that configuration
 - **Save/Cancel Actions**: Provides save and cancel buttons with change tracking
 - **Navigation Guard**: Integrated `useFormNavigationGuard` prevents accidental navigation with unsaved changes
 - **Localization**: Fully localized using `react-i18next` for all user-facing text

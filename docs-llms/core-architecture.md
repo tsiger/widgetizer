@@ -4,6 +4,19 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 
 ---
 
+## Routing & Shell Structure
+
+The app now has two main shells plus a root redirect:
+
+- `/` is handled by `src/pages/HomeRedirect.jsx`. It redirects to `/pages` when an active project exists, otherwise to `/projects`.
+- The **admin shell** uses `src/components/layout/ProjectPickerLayout.jsx` for `/projects`, `/themes`, and `/app-settings`. It can be used without an active project.
+- The **site workspace shell** uses `src/components/layout/Layout.jsx` for `/pages`, `/menus`, `/media`, `/settings`, and `/export-site`.
+- All site workspace routes are wrapped by `src/components/layout/RequireActiveProject.jsx`. If no active project exists, the user is redirected to `/projects`.
+
+This admin-vs-site split is the main architectural consequence of the recent workspaces merge.
+
+---
+
 ## Projects
 
 ### Frontend Files
@@ -13,7 +26,20 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 - `src/pages/ProjectsEdit.jsx` - Edit project with theme update UI
 - `src/components/projects/ProjectForm.jsx` - Reusable form component (includes `siteTitle`, `siteUrl`, description, preset/theme selection)
 - `src/components/projects/ProjectImportModal.jsx` - ZIP import modal
-- `src/components/layout/RequireActiveProject.jsx` - Route guard wrapping all content routes. Shows EmptyState with link to `/projects` if no active project.
+- `src/components/layout/ProjectPickerLayout.jsx` - Admin-area shell for project-management routes
+- `src/components/layout/AdminMenu.jsx` - Dropdown entrypoint for project/theme/app-settings navigation
+- `src/pages/HomeRedirect.jsx` - Chooses `/projects` vs `/pages` at app root
+- `src/utils/projectNavigation.js` - Resolves preserved `next` query params back into workspace destinations
+- `src/components/layout/RequireActiveProject.jsx` - Route guard for site-workspace routes; redirects to `/projects` when no active project exists
+
+### Route Structure
+
+| Route | Shell | Notes |
+| ----- | ----- | ----- |
+| `/` | none | Redirects through `HomeRedirect` |
+| `/projects`, `/projects/add`, `/projects/edit/:id` | `ProjectPickerLayout` | Project administration |
+| `/themes`, `/app-settings` | `ProjectPickerLayout` | Admin utilities |
+| `/pages`, `/menus`, `/media`, `/settings`, `/export-site` | `Layout` + `RequireActiveProject` | Active-project site workspace |
 
 ### Query Layer (`src/queries/projectManager.js`)
 
@@ -405,6 +431,12 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 - `src/pages/AppSettings.jsx` - Settings page
 - `src/components/settings/AppSettingsPanel.jsx` - Settings renderer
 
+### Route Context
+
+- App Settings lives in the admin shell at `/app-settings`.
+- It does not require an active project.
+- When an active project exists, `AppSettings.jsx` also loads that project's theme metadata via `getTheme(activeProject.theme)` so it can hide app-level image-size controls when the theme defines its own `imageSizes`.
+
 ### Query Layer (`src/queries/appSettingsManager.js`)
 
 | Function                | Method | Endpoint        |
@@ -660,6 +692,12 @@ Save button / Auto-save timer
 | `iconsStore`       | Per-project icon set caching         |
 | `themeStore`       | Theme settings state (Settings page) |
 
+### Shared Navigation Behavior
+
+- `registerProjectStore(useProjectStore)` in `src/App.jsx` connects the active-project store to API header injection.
+- `ProjectPickerLayout` is intentionally separate from the workspace sidebar. It is for choosing/managing projects, themes, and app-level settings.
+- `Layout` is intentionally project-scoped. It shows the active project name, the site sidebar, and the `AdminMenu` escape hatch back to the admin area.
+
 #### Icons Store (`src/stores/iconsStore.js`)
 
 | State/Action                          | Purpose                          |
@@ -732,6 +770,7 @@ Save button / Auto-save timer
 
 - `pageController.js` and `menuController.js` use `resolveActiveProject` middleware (`req.activeProject`)
 - `mediaController.js` uses explicit `:projectId` route params and resolves folderName via `getProjectFolderName()`
+- frontend site-workspace routes are blocked up front by `RequireActiveProject`
 
 **Improvement:** Keep `resolveActiveProject` as the standard for active-project routes and avoid re-introducing per-handler project lookups.
 
