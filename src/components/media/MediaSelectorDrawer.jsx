@@ -5,6 +5,7 @@ import { API_URL } from "../../config";
 import { getProjectMedia } from "../../queries/mediaManager";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import FileUploader from "../ui/FileUploader";
+import Tooltip from "../ui/Tooltip";
 import useMediaUpload from "../../hooks/useMediaUpload";
 import useAppSettings from "../../hooks/useAppSettings";
 import useToastStore from "../../stores/toastStore";
@@ -64,7 +65,10 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
   // Filter files based on search term and type
   const filteredFiles = mediaFiles
     .filter((file) => {
-      const matchesSearch = file.originalName.toLowerCase().includes(searchTerm.toLowerCase());
+      const normalizedSearch = searchTerm.toLowerCase();
+      const displayName = (file.filename || file.originalName || "").toLowerCase();
+      const originalName = (file.originalName || "").toLowerCase();
+      const matchesSearch = displayName.includes(normalizedSearch) || originalName.includes(normalizedSearch);
 
       if (filterType === "image") {
         return matchesSearch && file.type && file.type.startsWith("image/");
@@ -161,24 +165,31 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {filteredFiles.map((file) => (
-                <div
+                <Tooltip
                   key={file.id}
-                  className="border border-slate-200 rounded-sm overflow-hidden bg-slate-50 cursor-pointer hover:border-pink-400 transition-colors"
-                  onClick={() => onSelect(file)}
+                  content={file.filename || file.originalName}
+                  contentClassName="max-w-64 whitespace-normal break-words text-center text-[11px] leading-4 shadow-lg"
+                  wrapperClassName="block"
+                  triggerClassName="block"
                 >
-                  <div className="aspect-square relative bg-slate-100 flex items-center justify-center">
-                    <img
-                      src={API_URL(`/api/media/projects/${activeProject.id}${file.thumbnail || file.path}`)}
-                      alt={file.metadata?.alt || ""}
-                      className="max-w-full max-h-full object-contain"
-                    />
+                  <div
+                    className="border border-slate-200 rounded-sm bg-slate-50 cursor-pointer hover:border-pink-400 transition-colors overflow-visible"
+                    onClick={() => onSelect(file)}
+                  >
+                    <div className="aspect-square relative bg-slate-100 flex items-center justify-center rounded-t-sm overflow-hidden">
+                      <img
+                        src={API_URL(`/api/media/projects/${activeProject.id}${file.thumbnail || file.path}`)}
+                        alt={file.metadata?.alt || ""}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                    <div className="p-2">
+                      <p className="block w-full overflow-hidden text-ellipsis whitespace-nowrap text-[11px] leading-4 text-slate-700">
+                        {file.filename || file.originalName}
+                      </p>
+                    </div>
                   </div>
-                  <div className="p-2">
-                    <p className="text-xs truncate" title={file.originalName}>
-                      {file.originalName}
-                    </p>
-                  </div>
-                </div>
+                </Tooltip>
               ))}
             </div>
           )}
