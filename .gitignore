@@ -25,3 +25,4 @@ data/projects/*
 logs/
 .claude/
 .electron-home/
+themes/widgetizer/
