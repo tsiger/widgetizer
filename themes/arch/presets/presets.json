@@ -4,28 +4,28 @@
     {
       "id": "blank",
       "name": "Blank",
-      "description": "A minimal blank slate with neutral styling and no starter pages or menus."
+      "description": "Empty slate"
     },
     {
       "id": "consulting",
-      "name": "Consulting firm",
-      "description": "A polished demo site with pages, menus, and content for a modern consulting brand.",
+      "name": "Stratton",
+      "description": "Consulting",
       "liveDemo": "https://example.com/widgetizer-consulting-demo"
     },
     {
       "id": "saffron",
       "name": "Saffron",
-      "description": "An elegant restaurant with seasonal menus, food gallery, team profiles, and a dedicated reservations page."
+      "description": "Restaurant"
     },
     {
       "id": "brewline",
       "name": "Brewline",
-      "description": "A modern specialty coffee shop with artisan roasting, seasonal drinks, community events, and a bean-to-cup story."
+      "description": "Coffee shop"
     },
     {
       "id": "crumbly",
       "name": "Crumbly",
-      "description": "A charming neighborhood bakery with artisan bread, custom cakes, baking classes, and a generations-old sourdough starter."
+      "description": "Bakery"
     }
   ]
 }

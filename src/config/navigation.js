@@ -1,4 +1,4 @@
-import { File, ListTree, Image, Settings, Rocket } from "lucide-react";
+import { File, ListTree, Image, Settings, Rocket, Eye } from "lucide-react";
 
 export const navigationSections = [
   {
@@ -32,6 +32,13 @@ export const navigationSections = [
         path: "/settings",
         icon: Settings,
         requiresProject: true,
+      },
+      {
+        id: "preview",
+        labelKey: "navigation.sitePreview",
+        icon: Eye,
+        requiresProject: true,
+        action: "openSitePreview",
       },
     ],
   },

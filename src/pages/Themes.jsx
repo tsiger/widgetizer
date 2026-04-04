@@ -1,13 +1,22 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowUpCircle, Trash2, MoreVertical } from "lucide-react";
+import { ArrowUpCircle, Trash2, MoreVertical, ChevronDown, ExternalLink } from "lucide-react";
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import EmptyState from "../components/ui/EmptyState";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
+import Tooltip from "../components/ui/Tooltip";
 
-import { getAllThemes, getThemeScreenshotUrl, uploadThemeZip, updateTheme, deleteTheme } from "../queries/themeManager";
+import {
+  getAllThemes,
+  getThemeScreenshotUrl,
+  getThemePresets,
+  getPresetScreenshotUrl,
+  uploadThemeZip,
+  updateTheme,
+  deleteTheme,
+} from "../queries/themeManager";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
@@ -17,15 +26,18 @@ import FileUploader from "../components/ui/FileUploader";
 import { showRejectedFiles, showUploadOutcome } from "../utils/uploadFeedback";
 import { ZIP_ACCEPT, mapDropzoneRejections, validateZipFiles } from "../utils/uploadValidation";
 
-export default function Themes() {
+function ThemeSection({ theme, activeProject, onUpdate, onDelete, updatingThemeId }) {
   const { t } = useTranslation();
-  const [themes, setThemes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState({});
-  const [updatingThemeId, setUpdatingThemeId] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [presets, setPresets] = useState([]);
+  const [presetsLoaded, setPresetsLoaded] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const menuRef = useRef(null);
+
+  const isActiveTheme = activeProject && activeProject.theme === theme.id;
+  const projectsUsingTheme = theme.projectsUsingTheme || [];
+  const isThemeInUse = projectsUsingTheme.length > 0;
+  const hasPresets = theme.presets > 0;
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -37,6 +49,180 @@ export default function Themes() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Fetch presets on mount
+  useEffect(() => {
+    if (hasPresets && !presetsLoaded) {
+      getThemePresets(theme.id).then((data) => {
+        setPresets(data.presets || []);
+        setPresetsLoaded(true);
+      });
+    }
+  }, [theme.id, hasPresets, presetsLoaded]);
+
+  const cannotDeleteThemeLabel = isThemeInUse
+    ? t("themes.buttons.cannotDeleteInUse", {
+        count: projectsUsingTheme.length,
+        defaultValue:
+          projectsUsingTheme.length === 1
+            ? "Cannot delete theme in use by 1 project"
+            : `Cannot delete theme in use by ${projectsUsingTheme.length} projects`,
+      })
+    : t("themes.buttons.delete", "Delete");
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      {/* Theme header row */}
+      <div className="flex items-center gap-4 px-5 py-4">
+        {/* Collapse toggle */}
+        {hasPresets ? (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex shrink-0 items-center justify-center rounded p-0.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          >
+            <ChevronDown
+              size={18}
+              className={`transition-transform duration-200 ${isExpanded ? "" : "-rotate-90"}`}
+            />
+          </button>
+        ) : (
+          <div className="w-[22px] shrink-0" />
+        )}
+
+        {/* Theme info */}
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-semibold text-slate-900">{theme.name}</h3>
+              {isThemeInUse && (
+                <Tooltip
+                  content={projectsUsingTheme.map((p) => p.name).join(", ")}
+                >
+                  <span className="text-base font-semibold text-pink-600">In use</span>
+                </Tooltip>
+              )}
+            </div>
+            <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
+              <span>{t("themes.version", { version: theme.version })}</span>
+              <span className="text-slate-300">·</span>
+              <span>{t("themes.by", { author: theme.author || "Unknown" })}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Update button */}
+        {theme.hasPendingUpdate && (
+          <div className="flex shrink-0 items-center gap-2">
+            <div className="flex items-center gap-1.5 text-sm text-pink-600">
+              <ArrowUpCircle size={16} />
+              <span>v{theme.latestVersion}</span>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => onUpdate(theme.id)}
+              disabled={updatingThemeId === theme.id}
+            >
+              {updatingThemeId === theme.id
+                ? t("themes.buttons.updating", "Updating...")
+                : t("themes.buttons.update", "Update")}
+            </Button>
+          </div>
+        )}
+
+        {/* Three-dot menu */}
+        <div className="relative shrink-0" ref={openMenuId === theme.id ? menuRef : null}>
+          <button
+            onClick={() => setOpenMenuId(openMenuId === theme.id ? null : theme.id)}
+            className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            aria-label={t("themes.menuLabel", "Theme options")}
+          >
+            <MoreVertical size={16} />
+          </button>
+          {openMenuId === theme.id && (
+            <div className="absolute right-0 z-10 mt-1 w-64 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
+              <button
+                onClick={() => {
+                  setOpenMenuId(null);
+                  if (!isThemeInUse) {
+                    onDelete(theme.id, theme.name);
+                  }
+                }}
+                disabled={isThemeInUse}
+                title={
+                  isThemeInUse ? projectsUsingTheme.map((project) => project.name).join(", ") : undefined
+                }
+                className={`flex w-full items-center gap-2 whitespace-normal px-3 py-2 text-left text-sm ${
+                  isThemeInUse ? "cursor-not-allowed text-red-300" : "text-red-600 hover:bg-red-50"
+                }`}
+              >
+                <Trash2 size={14} />
+                {cannotDeleteThemeLabel}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Presets grid (collapsible) */}
+      {hasPresets && isExpanded && presetsLoaded && presets.length > 0 && (
+        <div className="border-t border-slate-100 bg-slate-50 px-5 py-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {presets.map((preset) => (
+              <div key={preset.id} className="min-w-0">
+                <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                  <img
+                    src={getPresetScreenshotUrl(theme.id, preset.id, preset.hasScreenshot)}
+                    alt={`${preset.name} preset`}
+                    className="w-full aspect-video object-cover"
+                  />
+                </div>
+                <p className="mt-2 text-center text-sm font-medium text-slate-800">{preset.name}</p>
+                {preset.description && (
+                  <p className="text-center text-xs text-slate-500">{preset.description}</p>
+                )}
+                {preset.liveDemo && (
+                  <a
+                    href={preset.liveDemo}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1 flex items-center justify-center gap-1 text-xs text-pink-600 hover:text-pink-700 hover:underline"
+                  >
+                    Live demo
+                    <ExternalLink size={12} />
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* No presets — show theme screenshot inline */}
+      {!hasPresets && (
+        <div className="border-t border-slate-100 bg-slate-50 px-5 py-4">
+          <div className="w-48 overflow-hidden rounded-md border border-slate-200">
+            <div className="aspect-video overflow-hidden bg-slate-100">
+              <img
+                src={getThemeScreenshotUrl(theme.id)}
+                alt={`${theme.name} preview`}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Themes() {
+  const { t } = useTranslation();
+  const [themes, setThemes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({});
+  const [updatingThemeId, setUpdatingThemeId] = useState(null);
 
   const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
@@ -50,8 +236,7 @@ export default function Themes() {
       const themesData = await getAllThemes();
       setThemes(themesData);
     } catch (error) {
-      console.error("Error fetching themes:", error); // Add better error logging
-      // TODO: Add toast for fetch error
+      console.error("Error fetching themes:", error);
     } finally {
       setLoading(false);
     }
@@ -63,12 +248,10 @@ export default function Themes() {
 
   const handleUploadSuccess = useCallback((newTheme) => {
     if (newTheme.isUpdate) {
-      // Update existing theme in the list
       setThemes((prevThemes) =>
         prevThemes.map((theme) => (theme.id === newTheme.id ? { ...theme, ...newTheme } : theme)),
       );
     } else {
-      // Add new theme to the list
       setThemes((prevThemes) => [...prevThemes, newTheme]);
     }
   }, []);
@@ -79,7 +262,6 @@ export default function Themes() {
       try {
         const result = await updateTheme(themeId);
         showToast(result.message || t("themes.toasts.updateSuccess", "Theme updated successfully"), "success");
-        // Refresh themes list and sidebar badge
         await fetchThemes();
         fetchUpdateCount();
       } catch (error) {
@@ -211,124 +393,17 @@ export default function Themes() {
       </div>
 
       {themes.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {themes.map((theme) => {
-            const isActiveTheme = activeProject && activeProject.theme === theme.id;
-            const projectsUsingTheme = theme.projectsUsingTheme || [];
-            const isThemeInUse = projectsUsingTheme.length > 0;
-            const cannotDeleteThemeLabel = isThemeInUse
-              ? t("themes.buttons.cannotDeleteInUse", {
-                  count: projectsUsingTheme.length,
-                  defaultValue:
-                    projectsUsingTheme.length === 1
-                      ? "Cannot delete theme in use by 1 project"
-                      : `Cannot delete theme in use by ${projectsUsingTheme.length} projects`,
-                })
-              : t("themes.buttons.delete", "Delete");
-
-            return (
-              <div
-                key={theme.id}
-                className="relative bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
-              >
-                <div className="aspect-video bg-slate-100 relative overflow-hidden">
-                  <img
-                    src={getThemeScreenshotUrl(theme.id)}
-                    alt={`${theme.name} preview`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="text-base font-semibold">{theme.name}</h3>
-                      <div className="text-xs text-slate-500 flex items-center gap-2">
-                        <span>{t("themes.version", { version: theme.version })}</span>
-                        {theme.versions && theme.versions.length > 1 && (
-                          <span className="text-slate-400">
-                            ({theme.versions.length} {t("themes.versionsAvailable", "versions")})
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <Badge variant="neutral">{t("themes.widgets", { count: theme.widgets })}</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-500">
-                      {t("themes.by", { author: theme.author || "Unknown" })}
-                    </span>
-                  </div>
-
-                  {/* Update available section */}
-                  {theme.hasPendingUpdate && (
-                    <div className="mt-3 pt-3 border-t border-slate-100">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-sm text-pink-600">
-                          <ArrowUpCircle size={16} />
-                          <span>
-                            {t("themes.updateAvailable", "Update available")}: v{theme.latestVersion}
-                          </span>
-                        </div>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => handleUpdateTheme(theme.id)}
-                          disabled={updatingThemeId === theme.id}
-                        >
-                          {updatingThemeId === theme.id
-                            ? t("themes.buttons.updating", "Updating...")
-                            : t("themes.buttons.update", "Update")}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Three-dot menu - positioned top-right corner */}
-                <div
-                  className="absolute top-2 right-2 flex items-center gap-2"
-                  ref={openMenuId === theme.id ? menuRef : null}
-                >
-                  {isActiveTheme && <Badge variant="pink">{t("themes.active")}</Badge>}
-                  <div className="relative">
-                    <button
-                      onClick={() => setOpenMenuId(openMenuId === theme.id ? null : theme.id)}
-                      className="p-1.5 rounded-md bg-white/90 hover:bg-white text-slate-600 hover:text-slate-800 shadow-sm"
-                      aria-label={t("themes.menuLabel", "Theme options")}
-                    >
-                      <MoreVertical size={16} />
-                    </button>
-                    {openMenuId === theme.id && (
-                      <div className="absolute right-0 mt-1 w-64 bg-white rounded-md shadow-lg border border-slate-200 py-1 z-10">
-                        <button
-                          onClick={() => {
-                            setOpenMenuId(null);
-                            if (!isThemeInUse) {
-                              handleDeleteTheme(theme.id, theme.name);
-                            }
-                          }}
-                          disabled={isThemeInUse}
-                          title={
-                            isThemeInUse
-                              ? projectsUsingTheme.map((project) => project.name).join(", ")
-                              : undefined
-                          }
-                          className={`w-full px-3 py-2 text-left text-sm whitespace-normal flex items-center gap-2 ${
-                            isThemeInUse
-                              ? "text-red-300 cursor-not-allowed"
-                              : "text-red-600 hover:bg-red-50"
-                          }`}
-                        >
-                          <Trash2 size={14} />
-                          {cannotDeleteThemeLabel}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        <div className="space-y-4">
+          {themes.map((theme) => (
+            <ThemeSection
+              key={theme.id}
+              theme={theme}
+              activeProject={activeProject}
+              onUpdate={handleUpdateTheme}
+              onDelete={handleDeleteTheme}
+              updatingThemeId={updatingThemeId}
+            />
+          ))}
         </div>
       ) : (
         <EmptyState title={t("themes.emptyTitle")} description={t("themes.emptyDesc")} />

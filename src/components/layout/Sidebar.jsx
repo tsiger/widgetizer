@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import { navigationSections } from "../../config/navigation";
+import { getAllPages } from "../../queries/pageManager";
 import SidebarMeta from "./SidebarMeta";
 
 export default function Sidebar() {
@@ -34,6 +35,32 @@ export default function Sidebar() {
       disabled ? "text-slate-500" : isActive(path) ? "text-white" : "text-slate-300 transition-colors group-hover:text-white"
     }`;
 
+  const openSitePreview = async () => {
+    try {
+      const pages = await getAllPages();
+      const homepage = pages.find((p) => p.slug === "index") || pages[0];
+      if (!homepage) return;
+
+      const electronOpenPreview = window.electronUpdater?.openPreviewWindow;
+      if (typeof electronOpenPreview === "function") {
+        electronOpenPreview(homepage.id);
+        return;
+      }
+
+      const previewUrl = new URL(`/preview/${homepage.id}`, window.location.origin).toString();
+      const previewWindow = window.open(previewUrl, "widgetizer-preview");
+      previewWindow?.focus();
+    } catch (error) {
+      console.error("Failed to open site preview:", error);
+    }
+  };
+
+  const handleAction = (actionId) => {
+    if (actionId === "openSitePreview") {
+      openSitePreview();
+    }
+  };
+
   const NavLink = ({ to, children, disabled = false, ...props }) => (
     <Link
       to={disabled ? "#" : to}
@@ -51,6 +78,31 @@ export default function Sidebar() {
   const renderNavItem = (item) => {
     const Icon = item.icon;
     const disabled = item.requiresProject && !hasActiveProject;
+
+    // Action items (no path, trigger a function instead)
+    if (item.action) {
+      const actionClass = `group flex items-center justify-center rounded-sm border p-2 transition-all duration-150 md:justify-start ${
+        disabled
+          ? "cursor-not-allowed opacity-40 border-slate-700"
+          : "border-slate-700 hover:bg-slate-800 md:border-none text-slate-400 hover:text-white cursor-pointer"
+      }`;
+
+      return (
+        <li key={item.id}>
+          <button
+            type="button"
+            onClick={() => !disabled && handleAction(item.action)}
+            className={actionClass}
+            disabled={disabled}
+          >
+            <div className={iconClass("__none__", disabled)}>
+              <Icon size={20} />
+            </div>
+            <span className={navLabelClass("__none__", disabled)}>{t(item.labelKey)}</span>
+          </button>
+        </li>
+      );
+    }
 
     return (
       <li key={item.id}>
