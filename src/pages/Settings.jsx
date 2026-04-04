@@ -159,7 +159,7 @@ export default function Settings() {
     >
       <>
         {/* Settings panel container */}
-        <div className="bg-white rounded-md border border-t-0 border-slate-200">
+        <div className="bg-white border border-t-0 border-slate-200">
           {themeData ? (
             <SettingsPanel
               schema={themeData.settings.global}
@@ -171,7 +171,7 @@ export default function Settings() {
           )}
         </div>
 
-        <div className="form-actions-separated justify-end mt-6">
+        <div className="flex justify-end gap-2 mt-6">
           <Button onClick={handleCancel} variant="secondary" disabled={!hasChanges}>
             {t("common.reset")}
           </Button>

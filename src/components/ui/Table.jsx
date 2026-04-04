@@ -12,7 +12,7 @@ export default function Table({
   ...props
 }) {
   return (
-    <table className={`w-full border-collapse bg-white rounded-lg shadow-sm ${className}`} {...props}>
+    <table className={`w-full rounded-lg border border-slate-200 border-collapse bg-white ${className}`} {...props}>
       <thead>
         <tr className="bg-slate-50 border-b border-slate-200">
           {headers.map((header, index) => (
@@ -38,7 +38,7 @@ export default function Table({
           data.map((item, index) => (
             <tr
               key={item.id || index}
-              className="border-b border-slate-100 hover:bg-slate-50 transition-colors duration-150 group"
+              className="group border-b border-slate-100 transition-colors duration-150 hover:bg-slate-50 last:border-b-0"
             >
               {renderRow(item)}
             </tr>

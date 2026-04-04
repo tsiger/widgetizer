@@ -1,12 +1,13 @@
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IconButton } from "../ui/Button";
-import Tooltip from "../ui/Tooltip";
 import { getExportEntryFile, downloadExportZip, deleteExportAPI } from "../../queries/exportManager";
 import useToastStore from "../../stores/toastStore";
 import useConfirmationModal from "../../hooks/useConfirmationModal";
 import ConfirmationModal from "../ui/ConfirmationModal";
 import Table from "../ui/Table";
-import { Loader2, ExternalLink, Trash2, Calendar, Download, Package } from "lucide-react";
+import Badge from "../ui/Badge";
+import { Loader2, ExternalLink, Trash2, Calendar, Download, Package, MoreVertical } from "lucide-react";
 import { API_URL } from "../../config";
 import { formatDate as formatDateUtil } from "../../utils/dateFormatter";
 import useAppSettings from "../../hooks/useAppSettings";
@@ -20,9 +21,33 @@ export default function ExportHistoryTable({
 }) {
   const { t } = useTranslation();
   const showToast = useToastStore((state) => state.showToast);
+  const [openMenuVersion, setOpenMenuVersion] = useState(null);
+  const menuRef = useRef(null);
 
   // Get app settings for date formatting
   const { settings: appSettings } = useAppSettings();
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenMenuVersion(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setOpenMenuVersion(null);
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Handle confirmation actions for delete
   const handleDelete = async (data) => {
@@ -87,8 +112,8 @@ export default function ExportHistoryTable({
 
   return (
     <>
-      <div className="bg-white p-6 rounded-sm border border-slate-200 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+      <section>
+        <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-medium text-slate-900">{t("exportSite.history.title")}</h2>
           <span className="text-sm text-slate-500">
             {t("exportSite.history.keepingVersions", { count: maxVersionsToKeep })}
@@ -119,7 +144,7 @@ export default function ExportHistoryTable({
             renderRow={(exportRecord) => (
               <>
                 <td className="py-3 px-4 whitespace-nowrap">
-                  <span className="text-sm font-medium text-slate-900">v{exportRecord.version}</span>
+                  <span className="text-sm font-medium text-slate-900">Version {exportRecord.version}</span>
                 </td>
                 <td className="py-3 px-4 whitespace-nowrap">
                   <div className="flex items-center text-sm text-slate-600">
@@ -128,42 +153,80 @@ export default function ExportHistoryTable({
                   </div>
                 </td>
                 <td className="py-3 px-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      exportRecord.status === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                    }`}
+                  <Badge
+                    variant={exportRecord.status === "success" ? "success" : "error"}
+                    className="inline-flex whitespace-nowrap px-3 py-0.5 text-xs font-semibold"
                   >
-                    {exportRecord.status}
-                  </span>
+                    {exportRecord.status.charAt(0).toUpperCase() + exportRecord.status.slice(1)}
+                  </Badge>
                 </td>
                 <td className="py-3 px-4 whitespace-nowrap text-right">
-                  <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                    {exportRecord.status === "success" && (
-                      <>
-                        <Tooltip content={t("exportSite.history.tooltips.view")}>
-                          <IconButton variant="neutral" size="sm" onClick={() => handleViewExport(exportRecord)}>
-                            <ExternalLink size={18} />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip content={t("exportSite.history.tooltips.download")}>
-                          <IconButton variant="neutral" size="sm" onClick={() => handleDownloadExport(exportRecord)}>
-                            <Download size={18} />
-                          </IconButton>
-                        </Tooltip>
-                      </>
+                  <div className="relative inline-flex items-center justify-end" ref={openMenuVersion === exportRecord.version ? menuRef : null}>
+                    <IconButton
+                      variant="neutral"
+                      size="sm"
+                      onClick={() => setOpenMenuVersion(openMenuVersion === exportRecord.version ? null : exportRecord.version)}
+                      className={`border transition-all ${
+                        openMenuVersion === exportRecord.version
+                          ? "border-pink-200 bg-pink-50 text-pink-600"
+                          : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:text-slate-900"
+                      }`}
+                      aria-label={t("exportSite.history.actionsMenu", "Export actions")}
+                      aria-haspopup="menu"
+                      aria-expanded={openMenuVersion === exportRecord.version}
+                    >
+                      <MoreVertical size={18} />
+                    </IconButton>
+
+                    {openMenuVersion === exportRecord.version && (
+                      <div className="absolute right-0 top-full z-10 mt-1 w-56 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
+                        {exportRecord.status === "success" && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenMenuVersion(null);
+                                handleViewExport(exportRecord);
+                              }}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                            >
+                              <ExternalLink size={14} />
+                              {t("exportSite.history.tooltips.view")}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenMenuVersion(null);
+                                handleDownloadExport(exportRecord);
+                              }}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                            >
+                              <Download size={14} />
+                              {t("exportSite.history.tooltips.download")}
+                            </button>
+                            <div className="my-1 border-t border-slate-200" />
+                          </>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenMenuVersion(null);
+                            openDeleteConfirmation(exportRecord);
+                          }}
+                          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
+                        >
+                          <Trash2 size={14} />
+                          {t("exportSite.history.tooltips.delete")}
+                        </button>
+                      </div>
                     )}
-                    <Tooltip content={t("exportSite.history.tooltips.delete")}>
-                      <IconButton variant="danger" size="sm" onClick={() => openDeleteConfirmation(exportRecord)}>
-                        <Trash2 size={18} />
-                      </IconButton>
-                    </Tooltip>
                   </div>
                 </td>
               </>
             )}
           />
         )}
-      </div>
+      </section>
 
       <ConfirmationModal
         isOpen={modalState.isOpen}

@@ -6,7 +6,7 @@ import { ListTree, Trash2, Pencil, CirclePlus, Copy, MoreVertical } from "lucide
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Table from "../components/ui/Table";
-import { IconButton } from "../components/ui/Button";
+import Button, { IconButton } from "../components/ui/Button";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import useConfirmationModal from "../hooks/useConfirmationModal";
 
@@ -120,111 +120,129 @@ export default function Menus() {
   }
 
   const sortedMenus = sortItemsByCopyName(menus);
+  const hasMenus = sortedMenus.length > 0;
 
   return (
     <PageLayout
-      title={t("menus.title")}
-      buttonProps={{
-        onClick: handleNewMenu,
-        children: t("menus.newMenu"),
-        icon: <CirclePlus size={18} />,
-      }}
+      title={hasMenus ? t("menus.title") : undefined}
+      buttonProps={
+        hasMenus
+          ? {
+              onClick: handleNewMenu,
+              children: t("menus.newMenu"),
+              icon: <CirclePlus size={18} />,
+            }
+          : undefined
+      }
     >
-      <div>
-        <Table
-          headers={[
-            t("menus.headers.title"),
-            t("menus.headers.updated"),
-            t("menus.headers.actions"),
-          ]}
-          data={sortedMenus}
-          emptyMessage={t("menus.noMenus")}
-          renderRow={(menu) => {
-            const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
-            const menuButtonClass = "w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors";
+      {hasMenus ? (
+        <div>
+          <Table
+            headers={[
+              t("menus.headers.title"),
+              t("menus.headers.updated"),
+              t("menus.headers.actions"),
+            ]}
+            data={sortedMenus}
+            emptyMessage={t("menus.noMenus")}
+            renderRow={(menu) => {
+              const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
+              const menuButtonClass = "w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors";
 
-            return (
-              <>
-                <td className="py-3 px-4">
-                  <Link
-                    to={`/menus/${menu.id}/structure`}
-                    className="block w-full min-w-0 rounded-sm font-semibold text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
-                    title={menu.name}
-                  >
-                    <span className="block truncate">{menu.name}</span>
-                  </Link>
-                </td>
-                <td className="py-3 px-4 whitespace-nowrap">
-                  <div className="text-slate-600 text-sm">{formatDate(menu.updated, dateFormat)}</div>
-                </td>
-                <td className="py-3 px-4 text-right">
-                  <div className="relative inline-flex items-center justify-end" ref={openMenuId === menu.id ? menuRef : null}>
-                    <IconButton
-                      onClick={() => setOpenMenuId(openMenuId === menu.id ? null : menu.id)}
-                      variant="neutral"
-                      size="sm"
-                      className={`border transition-all ${
-                        openMenuId === menu.id
-                          ? "border-pink-200 bg-pink-50 text-pink-600"
-                          : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:text-slate-900"
-                      }`}
-                      aria-label={t("menus.actions.menu", "Menu actions")}
-                      aria-haspopup="menu"
-                      aria-expanded={openMenuId === menu.id}
+              return (
+                <>
+                  <td className="py-3 px-4">
+                    <Link
+                      to={`/menus/${menu.id}/structure`}
+                      className="block w-full min-w-0 rounded-sm font-semibold text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
+                      title={menu.name}
                     >
-                      <MoreVertical size={18} />
-                    </IconButton>
+                      <span className="block truncate">{menu.name}</span>
+                    </Link>
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    <div className="text-slate-600 text-sm">{formatDate(menu.updated, dateFormat)}</div>
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    <div className="relative inline-flex items-center justify-end" ref={openMenuId === menu.id ? menuRef : null}>
+                      <IconButton
+                        onClick={() => setOpenMenuId(openMenuId === menu.id ? null : menu.id)}
+                        variant="neutral"
+                        size="sm"
+                        className={`border transition-all ${
+                          openMenuId === menu.id
+                            ? "border-pink-200 bg-pink-50 text-pink-600"
+                            : "border-transparent bg-white/80 hover:border-slate-200 hover:bg-white hover:text-slate-900"
+                        }`}
+                        aria-label={t("menus.actions.menu", "Menu actions")}
+                        aria-haspopup="menu"
+                        aria-expanded={openMenuId === menu.id}
+                      >
+                        <MoreVertical size={18} />
+                      </IconButton>
 
-                    {openMenuId === menu.id && (
-                      <div className="absolute right-0 top-full z-10 mt-1 w-60 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
-                        <Link
-                          to={`/menus/${menu.id}/structure`}
-                          onClick={() => setOpenMenuId(null)}
-                          className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
-                        >
-                          <ListTree size={14} />
-                          {t("menus.actions.editStructure")}
-                        </Link>
-                        <Link
-                          to={`/menus/edit/${menu.id}`}
-                          onClick={() => setOpenMenuId(null)}
-                          className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
-                        >
-                          <Pencil size={14} />
-                          {t("menus.actions.editSettings")}
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setOpenMenuId(null);
-                            handleDuplicate(menu.id);
-                          }}
-                          className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
-                        >
-                          <Copy size={14} />
-                          {t("menus.actions.duplicate")}
-                        </button>
-                        <div className="my-1 border-t border-slate-200" />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setOpenMenuId(null);
-                            openDeleteConfirmation(menu.id, menu.name);
-                          }}
-                          className={`${menuButtonClass} text-red-600 hover:bg-red-50`}
-                        >
-                          <Trash2 size={14} />
-                          {t("menus.actions.delete")}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </td>
-              </>
-            );
-          }}
-        />
-      </div>
+                      {openMenuId === menu.id && (
+                        <div className="absolute right-0 top-full z-10 mt-1 w-60 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
+                          <Link
+                            to={`/menus/${menu.id}/structure`}
+                            onClick={() => setOpenMenuId(null)}
+                            className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                          >
+                            <ListTree size={14} />
+                            {t("menus.actions.editStructure")}
+                          </Link>
+                          <Link
+                            to={`/menus/edit/${menu.id}`}
+                            onClick={() => setOpenMenuId(null)}
+                            className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                          >
+                            <Pencil size={14} />
+                            {t("menus.actions.editSettings")}
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              handleDuplicate(menu.id);
+                            }}
+                            className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                          >
+                            <Copy size={14} />
+                            {t("menus.actions.duplicate")}
+                          </button>
+                          <div className="my-1 border-t border-slate-200" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              openDeleteConfirmation(menu.id, menu.name);
+                            }}
+                            className={`${menuButtonClass} text-red-600 hover:bg-red-50`}
+                          >
+                            <Trash2 size={14} />
+                            {t("menus.actions.delete")}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </>
+              );
+            }}
+          />
+        </div>
+      ) : (
+        <div className="p-8 text-center">
+          <ListTree className="mx-auto mb-4 text-slate-400" size={48} />
+          <h2 className="text-xl font-semibold mb-2">{t("menus.emptyTitle", "No menus yet")}</h2>
+          <p className="text-slate-600 mb-4">{t("menus.emptyDescription", "Create your first menu")}</p>
+          <Link to="/menus/add">
+            <Button onClick={handleNewMenu} variant="primary" icon={<CirclePlus size={18} />}>
+              {t("menus.newMenu")}
+            </Button>
+          </Link>
+        </div>
+      )}
 
       <ConfirmationModal
         isOpen={modalState.isOpen}

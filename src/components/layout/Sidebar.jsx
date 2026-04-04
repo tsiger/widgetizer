@@ -1,37 +1,37 @@
-import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
-import useThemeUpdateStore from "../../stores/themeUpdateStore";
 import { navigationSections } from "../../config/navigation";
+import SidebarMeta from "./SidebarMeta";
 
 export default function Sidebar() {
   const { t } = useTranslation();
   const location = useLocation();
-  const { activeProject } = useProjectStore();
-  const hasActiveProject = !!activeProject;
-  const { updateCount: themeUpdateCount, fetchUpdateCount } = useThemeUpdateStore();
+  const hasActiveProject = !!useProjectStore((state) => state.activeProject);
 
-  // Fetch theme update count on mount
-  useEffect(() => {
-    fetchUpdateCount();
-  }, [fetchUpdateCount]);
-
-  const isActive = (path) => {
-    if (path === "/") {
-      return location.pathname === "/";
-    }
-    return location.pathname.startsWith(path);
-  };
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   const linkClass = (path, disabled = false) =>
-    `flex items-center justify-center md:justify-start p-2 rounded-sm transition-all duration-150 ${
-      disabled ? "opacity-40 cursor-not-allowed" : isActive(path) ? "bg-pink-600 border-pink-600" : "hover:bg-slate-800"
-    } border border-slate-700 md:border-none`;
+    `group flex items-center justify-center rounded-sm border p-2 transition-all duration-150 md:justify-start ${
+      disabled
+        ? "cursor-not-allowed opacity-40"
+        : isActive(path)
+          ? "border-pink-600 bg-pink-600"
+          : "border-slate-700 hover:bg-slate-800 md:border-none"
+    } ${disabled ? "" : !isActive(path) ? "text-slate-400 hover:text-white" : "text-white"}`;
 
   const iconClass = (path, disabled = false) =>
-    `w-8 h-8 md:w-4 md:h-4 flex items-center justify-center ${
-      disabled ? "text-slate-500" : isActive(path) ? "text-white" : "text-pink-600"
+    `flex h-8 w-8 items-center justify-center md:h-4 md:w-4 ${
+      disabled
+        ? "text-slate-500"
+        : isActive(path)
+          ? "text-white"
+          : "text-slate-400 transition-colors group-hover:text-pink-600"
+    }`;
+
+  const navLabelClass = (path, disabled = false) =>
+    `ml-1 hidden text-sm md:inline ${
+      disabled ? "text-slate-500" : isActive(path) ? "text-white" : "text-slate-300 transition-colors group-hover:text-white"
     }`;
 
   const NavLink = ({ to, children, disabled = false, ...props }) => (
@@ -51,8 +51,6 @@ export default function Sidebar() {
   const renderNavItem = (item) => {
     const Icon = item.icon;
     const disabled = item.requiresProject && !hasActiveProject;
-    const showBadge = item.id === "themes" && themeUpdateCount > 0;
-    const labelKey = item.labelKey;
 
     return (
       <li key={item.id}>
@@ -60,12 +58,7 @@ export default function Sidebar() {
           <div className={iconClass(item.path, disabled)}>
             <Icon size={20} />
           </div>
-          <span className="hidden md:inline ml-1 text-sm">{t(labelKey)}</span>
-          {showBadge && (
-            <span className="ml-auto bg-pink-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-              {themeUpdateCount}
-            </span>
-          )}
+          <span className={navLabelClass(item.path, disabled)}>{t(item.labelKey)}</span>
         </NavLink>
       </li>
     );
@@ -74,39 +67,40 @@ export default function Sidebar() {
   const renderSection = (section) => {
     if (section.position === "bottom") {
       return (
-        <div key={section.id} className="pt-4 border-t border-slate-800">
-          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">{t(section.titleKey)}</h3>
+        <div key={section.id} className="border-t border-slate-800 pt-4">
+          <h3 className="ml-2 mb-2 hidden text-xs font-bold uppercase text-slate-500 md:block">{t(section.titleKey)}</h3>
           <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
         </div>
       );
     }
 
     return (
-      <div key={section.id} className="border-b border-slate-800 pb-4 mb-4">
-        {section.titleKey && (
-          <h3 className="text-slate-600 text-xs font-bold mb-2 ml-2 hidden md:block">{t(section.titleKey)}</h3>
-        )}
+      <div key={section.id} className="mb-4 border-b border-slate-800 pb-4">
+        {section.titleKey && <h3 className="ml-2 mb-2 hidden text-xs font-bold uppercase text-slate-500 md:block">{t(section.titleKey)}</h3>}
         <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
       </div>
     );
   };
 
-  const topSections = navigationSections.filter((s) => s.position !== "bottom");
-  const bottomSections = navigationSections.filter((s) => s.position === "bottom");
+  const topSections = navigationSections.filter((section) => section.position !== "bottom");
+  const bottomSections = navigationSections.filter((section) => section.position === "bottom");
 
   return (
-    <div className="w-[72px] md:w-48 bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto">
-      <div className="pb-2 px-2 md:px-4 grow">
-        <div className="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-4">
-          <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="hidden md:block h-7" />
-          <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="md:hidden w-12 h-12 mx-auto" />
+    <div className="fixed left-0 top-0 flex h-screen w-[72px] flex-col overflow-y-auto bg-slate-900 text-white md:w-[var(--sidebar-width)]">
+      <div className="grow px-2 pb-2 md:px-[var(--shell-inset)]">
+        <div className="mb-4 py-0 pb-2 md:pb-4 md:pt-[var(--shell-inset)]">
+          <div className="hidden pt-1 md:block">
+            <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="h-auto w-[var(--sidebar-logo-width)]" />
+          </div>
+          <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="mx-auto h-12 w-12 md:hidden" />
         </div>
 
         {topSections.map(renderSection)}
       </div>
 
-      <div className="px-2 md:px-4 pb-4">
+      <div className="px-2 pb-4 md:px-[var(--shell-inset)]">
         {bottomSections.map(renderSection)}
+        <SidebarMeta />
       </div>
     </div>
   );

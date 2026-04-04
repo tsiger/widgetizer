@@ -68,7 +68,7 @@ export default function AppSettings() {
 
   if (loading) {
     return (
-      <PageLayout title={t("settings.title")}>
+      <PageLayout title={t("navigation.appSettings")}>
         <LoadingSpinner message={t("common.loading")} />
       </PageLayout>
     );
@@ -76,7 +76,7 @@ export default function AppSettings() {
 
   if (!settings) {
     return (
-      <PageLayout title={t("settings.title")}>
+      <PageLayout title={t("navigation.appSettings")}>
         <div className="text-center py-8">
           <p className="text-red-500">{t("common.error")}</p>
         </div>
@@ -88,14 +88,14 @@ export default function AppSettings() {
     <PageLayout
       title={
         <span className="flex items-center gap-2">
-          {t("settings.title")}
+          {t("navigation.appSettings")}
           {hasChanges && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
         </span>
       }
     >
       <>
         {/* App Settings panel */}
-        <div className="bg-white rounded-md border border-t-0 border-slate-200">
+        <div className="bg-white border border-t-0 border-slate-200">
           <AppSettingsPanel
             schema={schema}
             settings={settings}

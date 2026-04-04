@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -13,77 +12,34 @@ export default function Toast({
   message,
   variant = "info",
   onDismiss,
-  autoDismiss = false,
-  autoDismissTimeout = 5000,
+  phase = "visible",
 }) {
   const { t } = useTranslation();
-  const [animationState, setAnimationState] = useState("entering"); // "entering", "visible", "exiting"
-
-  // Handle fade-in animation on mount
-  useEffect(() => {
-    // Start with entering state
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAnimationState("entering");
-
-    // After a brief delay, transition to visible
-    const enterTimer = setTimeout(() => {
-      setAnimationState("visible");
-    }, 10);
-
-    return () => clearTimeout(enterTimer);
-  }, []);
-
-  // Handle auto-dismiss
-  useEffect(() => {
-    if (autoDismiss && onDismiss) {
-      const timer = setTimeout(() => {
-        // Start exit animation
-        setAnimationState("exiting");
-
-        // Actually dismiss after animation completes
-        setTimeout(() => {
-          onDismiss();
-        }, 300);
-      }, autoDismissTimeout);
-
-      return () => clearTimeout(timer);
-    }
-  }, [autoDismiss, onDismiss, autoDismissTimeout]);
-
-  // Handle manual dismiss
-  const handleDismiss = () => {
-    // Start exit animation
-    setAnimationState("exiting");
-
-    // Actually dismiss after animation completes
-    setTimeout(() => {
-      onDismiss();
-    }, 300);
-  };
 
   if (!message) return null;
 
-  // Define animation classes based on state
   const animationClasses = {
-    entering: "opacity-0",
-    visible: "opacity-100",
-    exiting: "translate-x-full",
+    entering: "translate-x-6 scale-[0.98] opacity-0",
+    visible: "translate-x-0 scale-100 opacity-100",
+    exiting: "translate-x-6 scale-[0.98] opacity-0 pointer-events-none",
   };
 
   return (
     <div
       className={`
-				mb-4 p-4 border rounded-sm flex justify-between items-start
+				w-full p-4 border rounded-sm flex justify-between items-start shadow-lg
 				${VARIANTS[variant] || VARIANTS.info}
-				transform transition-all duration-300 ease-in-out
-				${animationClasses[animationState]}
+				transform-gpu will-change-transform
+				transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
+				motion-reduce:transform-none motion-reduce:transition-none
+				${animationClasses[phase] || animationClasses.visible}
 			`}
     >
       <div>{message}</div>
       {onDismiss && (
         <button
           className="ml-4 text-slate-400 hover:text-slate-600"
-          onClick={handleDismiss}
+          onClick={onDismiss}
           aria-label={t("common.aria.dismiss")}
         >
           <X size={18} />

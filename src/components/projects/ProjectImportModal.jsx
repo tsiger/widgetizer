@@ -61,6 +61,10 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
       setSuccess(importedProject);
       if (onSuccess) {
         onSuccess(importedProject);
+      } else {
+        setTimeout(() => {
+          handleClose();
+        }, 2000);
       }
       showUploadOutcome(showToast, result, {
         successMessage: importedProject?.name
@@ -68,10 +72,6 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
           : undefined,
         networkErrorMessage: t("projects.importModal.importError"),
       });
-      // Auto-close after 2 seconds on success
-      setTimeout(() => {
-        handleClose();
-      }, 2000);
     } catch (err) {
       const message = err.message || t("projects.importModal.importError");
       setError(message);

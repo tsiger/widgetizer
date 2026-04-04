@@ -1,23 +1,6 @@
-import { Home, Folder, File, ListTree, Image, Settings, Rocket, SlidersHorizontal, Layers } from "lucide-react";
+import { File, ListTree, Image, Settings, Rocket } from "lucide-react";
 
 export const navigationSections = [
-  {
-    id: "main",
-    items: [
-      {
-        id: "dashboard",
-        labelKey: "navigation.dashboard",
-        path: "/",
-        icon: Home,
-      },
-      {
-        id: "projects",
-        labelKey: "navigation.projects",
-        path: "/projects",
-        icon: Folder,
-      },
-    ],
-  },
   {
     id: "site",
     titleKey: "navigation.site",
@@ -53,19 +36,6 @@ export const navigationSections = [
     ],
   },
   {
-    id: "appearance",
-    titleKey: "navigation.appearance",
-    items: [
-      {
-        id: "themes",
-        labelKey: "navigation.themes",
-        path: "/themes",
-        icon: Layers,
-        requiresProject: true,
-      },
-    ],
-  },
-{
     id: "tools",
     titleKey: "navigation.tools",
     items: [
@@ -74,20 +44,6 @@ export const navigationSections = [
         labelKey: "navigation.exportSite",
         path: "/export-site",
         icon: Rocket,
-        requiresProject: true,
-      },
-    ],
-  },
-  {
-    id: "general",
-    titleKey: "navigation.general",
-    position: "bottom",
-    items: [
-      {
-        id: "app-settings",
-        labelKey: "navigation.appSettings",
-        path: "/app-settings",
-        icon: SlidersHorizontal,
         requiresProject: true,
       },
     ],

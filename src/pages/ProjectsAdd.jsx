@@ -1,23 +1,29 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
 import ProjectForm from "../components/projects/ProjectForm.jsx";
 import useToastStore from "../stores/toastStore";
-import { createProject } from "../queries/projectManager";
+import { createProject, setActiveProject } from "../queries/projectManager";
 import useProjectStore from "../stores/projectStore";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import { resolveWorkspaceDestination } from "../utils/projectNavigation";
 
 export default function ProjectsAdd() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
-  const { setActiveProject: setActiveProjectInStore } = useProjectStore();
+  const fetchActiveProject = useProjectStore((state) => state.fetchActiveProject);
+  const workspaceDestination = resolveWorkspaceDestination(searchParams.get("next"));
+  const projectsListHref = searchParams.get("next")
+    ? `/projects?next=${encodeURIComponent(searchParams.get("next"))}`
+    : "/projects";
 
   // Add navigation guard with skip ref
   useFormNavigationGuard(isDirty, skipNavigationGuardRef);
@@ -26,20 +32,13 @@ export default function ProjectsAdd() {
     setIsSubmitting(true);
 
     try {
-      // Create the project (backend handles activation if needed)
       const newProject = await createProject(formData);
+      await setActiveProject(newProject.id);
+      await fetchActiveProject();
+      showToast(t("projectsAdd.toasts.createActiveSuccess", { name: newProject.name }), "success");
 
-      // Update store if backend activated it
-      if (newProject.wasSetAsActive) {
-        setActiveProjectInStore(newProject);
-        showToast(t("projectsAdd.toasts.createActiveSuccess", { name: newProject.name }), "success");
-      } else {
-        showToast(t("projectsAdd.toasts.createSuccess", { name: newProject.name }), "success");
-      }
-
-      // After creating a project, return to the projects list.
       skipNavigationGuardRef.current = true;
-      navigate("/projects");
+      navigate(workspaceDestination);
       return true;
     } catch (err) {
       showToast(err.message || t("projectsAdd.toasts.createError"), "error");
@@ -64,7 +63,7 @@ export default function ProjectsAdd() {
         submitLabel={t("projectsAdd.create")}
         onCancel={() => {
           skipNavigationGuardRef.current = true;
-          navigate("/projects");
+          navigate(projectsListHref);
         }}
         onDirtyChange={setIsDirty}
         isDirty={isDirty}

@@ -186,15 +186,6 @@
           }
         },
         {
-          "type": "font_picker",
-          "id": "body_font",
-          "label": "tTheme:global.typography.settings.body_font.label",
-          "default": {
-            "stack": "\"Inter\", sans-serif",
-            "weight": 400
-          }
-        },
-        {
           "type": "range",
           "id": "heading_scale",
           "label": "tTheme:global.typography.settings.heading_scale.label",
@@ -204,6 +195,15 @@
           "max": 120,
           "step": 5,
           "outputAsCssVar": true
+        },
+        {
+          "type": "font_picker",
+          "id": "body_font",
+          "label": "tTheme:global.typography.settings.body_font.label",
+          "default": {
+            "stack": "\"Inter\", sans-serif",
+            "weight": 400
+          }
         },
         {
           "type": "range",

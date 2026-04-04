@@ -150,7 +150,7 @@ export default function EditorTopBar({
           title={t("pageEditor.toolbar.backToPages")}
         >
           <ArrowLeft size={18} />
-          {t("pageEditor.toolbar.back")}
+          {t("pageEditor.toolbar.backToPages")}
         </button>
       </div>
 

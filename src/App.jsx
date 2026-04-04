@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./components/layout/Layout";
-import Dashboard from "./pages/Dashboard";
+import ProjectPickerLayout from "./components/layout/ProjectPickerLayout";
 import Projects from "./pages/Projects";
 import Pages from "./pages/Pages";
 import PagesAdd from "./pages/PagesAdd";
@@ -16,6 +16,7 @@ import ExportSite from "./pages/ExportSite";
 import AppSettings from "./pages/AppSettings";
 import PageEditor from "./pages/PageEditor";
 import PagePreview from "./pages/PagePreview";
+import HomeRedirect from "./pages/HomeRedirect";
 import ProjectsAdd from "./pages/ProjectsAdd";
 import ProjectsEdit from "./pages/ProjectsEdit";
 import MenuStructure from "./pages/MenuStructure";
@@ -24,6 +25,7 @@ import RouteError from "./pages/RouteError";
 import ToastContainer from "./components/ui/ToastContainer";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import RequireActiveProject from "./components/layout/RequireActiveProject";
+import LanguageInitializer from "./components/layout/LanguageInitializer";
 import useProjectStore from "./stores/projectStore";
 import { registerProjectStore } from "./lib/activeProjectId";
 import "./i18n";
@@ -31,20 +33,20 @@ import "./i18n";
 // Register project store for apiFetch X-Project-Id header injection.
 // Safe at module level — Zustand stores are singletons that exist immediately.
 registerProjectStore(useProjectStore);
-import LanguageInitializer from "./components/layout/LanguageInitializer";
 
 // Create router with data router API (required for useBlocker)
 const router = createBrowserRouter(
   [
     {
       path: "/",
-      element: <Layout />,
+      element: <HomeRedirect />,
+      errorElement: <RouteError />,
+    },
+    {
+      path: "/",
+      element: <ProjectPickerLayout />,
       errorElement: <RouteError />,
       children: [
-        {
-          index: true,
-          element: <Dashboard />,
-        },
         {
           path: "projects",
           element: <Projects />,
@@ -57,6 +59,21 @@ const router = createBrowserRouter(
           path: "projects/edit/:id",
           element: <ProjectsEdit />,
         },
+        {
+          path: "app-settings",
+          element: <AppSettings />,
+        },
+        {
+          path: "themes",
+          element: <Themes />,
+        },
+      ],
+    },
+    {
+      path: "/",
+      element: <Layout />,
+      errorElement: <RouteError />,
+      children: [
         {
           element: <RequireActiveProject />,
           children: [
@@ -101,22 +118,10 @@ const router = createBrowserRouter(
               element: <Settings />,
             },
             {
-              path: "themes",
-              element: <Themes />,
-            },
-            {
               path: "export-site",
               element: <ExportSite />,
             },
-{
-              path: "app-settings",
-              element: <AppSettings />,
-            },
           ],
-        },
-        {
-          path: "*",
-          element: <NotFound />,
         },
       ],
     },
@@ -124,6 +129,10 @@ const router = createBrowserRouter(
       path: "/preview/:pageId",
       element: <PagePreview />,
       errorElement: <RouteError />,
+    },
+    {
+      path: "*",
+      element: <NotFound />,
     },
   ],
 );
