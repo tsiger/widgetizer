@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
@@ -8,7 +9,26 @@ import SidebarMeta from "./SidebarMeta";
 export default function Sidebar() {
   const { t } = useTranslation();
   const location = useLocation();
-  const hasActiveProject = !!useProjectStore((state) => state.activeProject);
+  const activeProject = useProjectStore((state) => state.activeProject);
+  const hasActiveProject = !!activeProject;
+  const [hasPages, setHasPages] = useState(false);
+
+  const checkPages = useCallback(async () => {
+    if (!hasActiveProject) {
+      setHasPages(false);
+      return;
+    }
+    try {
+      const pages = await getAllPages();
+      setHasPages(pages.length > 0);
+    } catch {
+      setHasPages(false);
+    }
+  }, [hasActiveProject]);
+
+  useEffect(() => {
+    checkPages();
+  }, [checkPages, activeProject?.id, location.pathname]);
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
 
@@ -77,13 +97,13 @@ export default function Sidebar() {
 
   const renderNavItem = (item) => {
     const Icon = item.icon;
-    const disabled = item.requiresProject && !hasActiveProject;
+    const disabled = (item.requiresProject && !hasActiveProject) || (item.action === "openSitePreview" && !hasPages);
 
     // Action items (no path, trigger a function instead)
     if (item.action) {
-      const actionClass = `group flex items-center justify-center rounded-sm border p-2 transition-all duration-150 md:justify-start ${
+      const actionClass = `w-full group flex items-center justify-center rounded-sm border p-2 transition-all duration-150 md:justify-start ${
         disabled
-          ? "cursor-not-allowed opacity-40 border-slate-700"
+          ? "cursor-not-allowed opacity-40 border-transparent"
           : "border-slate-700 hover:bg-slate-800 md:border-none text-slate-400 hover:text-white cursor-pointer"
       }`;
 
