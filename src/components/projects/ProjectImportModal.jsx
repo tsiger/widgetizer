@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { X, Upload, CheckCircle, AlertCircle } from "lucide-react";
+import { X, Upload, AlertCircle } from "lucide-react";
 import FileUploader from "../ui/FileUploader";
 import Button from "../ui/Button";
 import { importProject } from "../../queries/projectManager";
 import useAppSettings from "../../hooks/useAppSettings";
 import useToastStore from "../../stores/toastStore";
-import { showRejectedFiles, showUploadOutcome } from "../../utils/uploadFeedback";
+import { showRejectedFiles } from "../../utils/uploadFeedback";
 import { ZIP_ACCEPT, mapDropzoneRejections, validateZipFiles } from "../../utils/uploadValidation";
 
 export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
@@ -17,7 +17,6 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
   const abortControllerRef = useRef(null);
 
   const maxSizeMB = settings?.export?.maxImportSizeMB || 500;
@@ -39,7 +38,6 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
 
     setSelectedFile(valid[0]);
     setError(null);
-    setSuccess(null);
   };
 
   const handleImport = async () => {
@@ -53,7 +51,6 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
     setUploading(true);
     setUploadProgress({ [selectedFile.name]: 0 });
     setError(null);
-    setSuccess(null);
 
     try {
       const result = await importProject(selectedFile, {
@@ -65,23 +62,7 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
 
       setUploadProgress({ [selectedFile.name]: 100 });
       const importedProject = result.processedFiles?.[0] || result;
-
-      setSuccess(importedProject);
-      if (onSuccess) {
-        onSuccess(importedProject);
-      } else {
-        setTimeout(() => {
-          handleClose();
-        }, 2000);
-      }
-      if (!onSuccess) {
-        showUploadOutcome(showToast, result, {
-          successMessage: importedProject?.name
-            ? t("projects.importModal.successMessage", { name: importedProject.name })
-            : undefined,
-          networkErrorMessage: t("projects.importModal.importError"),
-        });
-      }
+      onSuccess?.(importedProject);
     } catch (err) {
       if (err?.name === "AbortError" || err?.aborted) {
         return;
@@ -108,7 +89,6 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
 
     setSelectedFile(null);
     setError(null);
-    setSuccess(null);
     setUploading(false);
     setUploadProgress({});
     onClose();
@@ -121,7 +101,6 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
 
     setSelectedFile(null);
     setError(null);
-    setSuccess(null);
     setUploading(false);
     setUploadProgress({});
     abortControllerRef.current = null;
@@ -166,66 +145,55 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
 
         {/* Content */}
         <div className="p-6 flex-1 overflow-y-auto">
-          {success ? (
-            <div className="text-center py-4">
-              <CheckCircle className="mx-auto mb-4 text-green-500" size={48} />
-              <h4 className="text-lg font-semibold text-slate-800 mb-2">{t("projects.importModal.successTitle")}</h4>
-              <p className="text-slate-600 mb-2">{t("projects.importModal.successMessage", { name: success.name })}</p>
-              <p className="text-sm text-slate-500">{t("projects.importModal.redirecting")}</p>
-            </div>
-          ) : (
-            <>
-              <p className="text-slate-600 mb-4">{t("projects.importModal.description")}</p>
+          <>
+            <p className="text-slate-600 mb-4">{t("projects.importModal.description")}</p>
 
-              <FileUploader
-                onUpload={handleFileSelect}
-                onReject={handleReject}
-                uploading={uploading}
-                uploadProgress={uploadProgress}
-                uploadingFiles={selectedFile ? [selectedFile.name] : []}
-                accept={ZIP_ACCEPT}
-                multiple={false}
-                maxSize={maxSizeMB * 1024 * 1024}
-                title={t("projects.importModal.uploadTitle")}
-                description={t("projects.importModal.uploadDescription")}
-                maxSizeText={t("projects.importModal.maxSize", { max: maxSizeMB })}
-              />
+            <FileUploader
+              onUpload={handleFileSelect}
+              onReject={handleReject}
+              uploading={uploading}
+              uploadProgress={uploadProgress}
+              uploadingFiles={selectedFile ? [selectedFile.name] : []}
+              accept={ZIP_ACCEPT}
+              multiple={false}
+              maxSize={maxSizeMB * 1024 * 1024}
+              title={t("projects.importModal.uploadTitle")}
+              description={t("projects.importModal.uploadDescription")}
+              maxSizeText={t("projects.importModal.maxSize", { max: maxSizeMB })}
+            />
 
-              {selectedFile && !uploading && (
-                <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-sm">
-                  <div className="flex items-center gap-2">
-                    <Upload size={16} className="text-slate-500" />
-                    <span className="text-sm font-medium text-slate-700">{selectedFile.name}</span>
-                    <span className="text-xs text-slate-500">({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)</span>
-                  </div>
+            {selectedFile && !uploading && (
+              <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-sm">
+                <div className="flex items-center gap-2">
+                  <Upload size={16} className="text-slate-500" />
+                  <span className="text-sm font-medium text-slate-700">{selectedFile.name}</span>
+                  <span className="text-xs text-slate-500">({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)</span>
                 </div>
-              )}
+              </div>
+            )}
 
-              {error && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-sm flex items-start gap-2">
-                  <AlertCircle size={20} className="text-red-500 shrink-0 mt-0.5" />
-                  <p className="text-sm text-red-600">{error}</p>
-                </div>
-              )}
-            </>
-          )}
+            {error && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-sm flex items-start gap-2">
+                <AlertCircle size={20} className="text-red-500 shrink-0 mt-0.5" />
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+          </>
         </div>
 
         {/* Footer */}
-        {!success && (
-          <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
-            <Button onClick={handleCancel} variant="secondary">
-              {t("common.cancel")}
-            </Button>
-            <Button
-              onClick={handleImport}
-              disabled={!selectedFile || uploading}
-              loading={uploading}
-            >
-              {t("projects.importModal.importButton")}
-            </Button>
-          </div>
-        )}
+        <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
+          <Button onClick={handleCancel} variant="secondary">
+            {t("common.cancel")}
+          </Button>
+          <Button
+            onClick={handleImport}
+            disabled={!selectedFile || uploading}
+            loading={uploading}
+          >
+            {t("projects.importModal.importButton")}
+          </Button>
+        </div>
       </div>
     </div>
   );

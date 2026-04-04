@@ -249,12 +249,8 @@
       "invalidFileType": "Please select a valid ZIP file",
       "noFileSelected": "Please select a file to import",
       "fileTooLarge": "File size ({{size}}MB) exceeds the maximum allowed size of {{max}}MB. Please reduce the project size or increase the limit in Settings.",
-      "importing": "Importing project...",
       "importButton": "Import Project",
-      "importError": "Failed to import project",
-      "successTitle": "Project Imported Successfully",
-      "successMessage": "Project \"{{name}}\" has been imported successfully.",
-      "redirecting": "Opening project..."
+      "importError": "Failed to import project"
     },
     "toasts": {
       "deleteSuccess": "Project \"{{name}}\" was deleted successfully",
