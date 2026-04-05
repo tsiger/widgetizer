@@ -1698,20 +1698,23 @@ describe("getProjectThemeLocale", () => {
     assert.equal(res4._json.error, "Invalid language code");
   });
 
-  it("returns empty object when theme has no locale files", async () => {
+  it("returns shared core locales when theme has no locale files", async () => {
     const res = await callController(getProjectThemeLocale, {
       params: { projectId: NO_LOCALE_PROJECT_ID, lang: "en" },
     });
     assert.equal(res._status, 200);
-    assert.deepStrictEqual(res._json, {});
+    assert.equal(res._json.core_divider?.name, "Divider");
+    assert.equal(res._json.core_spacer?.name, "Spacer");
+    assert.equal(res._json.greeting, undefined);
   });
 
-  it("handles non-existent project gracefully", async () => {
+  it("returns shared core locales for non-existent projects", async () => {
     const res = await callController(getProjectThemeLocale, {
       params: { projectId: "nonexistent-project-uuid", lang: "en" },
     });
-    // getProjectById returns null, so !themeId is true → returns {}
     assert.equal(res._status, 200);
-    assert.deepStrictEqual(res._json, {});
+    assert.equal(res._json.core_divider?.name, "Divider");
+    assert.equal(res._json.core_spacer?.name, "Spacer");
+    assert.equal(res._json.greeting, undefined);
   });
 });

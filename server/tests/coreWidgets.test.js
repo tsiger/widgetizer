@@ -96,6 +96,13 @@ before(async () => {
   const brokenDir = path.join(TEST_CORE_WIDGETS_DIR, "core-broken");
   await fs.ensureDir(brokenDir);
   await fs.writeFile(path.join(brokenDir, "schema.json"), "NOT_VALID_JSON{{{");
+
+  // helper directory — should not be treated as a widget
+  const localesDir = path.join(TEST_CORE_WIDGETS_DIR, "locales");
+  await fs.ensureDir(localesDir);
+  await fs.writeJson(path.join(localesDir, "en.json"), {
+    core_spacer: { name: "Spacer" },
+  });
 });
 
 after(async () => {
@@ -125,6 +132,13 @@ describe("getCoreWidgets", () => {
     const widgets = await getCoreWidgets();
     const broken = widgets.find((w) => w.type === "core-broken");
     assert.equal(broken, undefined, "Broken widget should not be in results");
+  });
+
+  it("ignores non-widget helper directories like locales", async () => {
+    const widgets = await getCoreWidgets();
+    const helperDir = widgets.find((w) => w.type === "locales");
+    assert.equal(helperDir, undefined, "Helper directories should not be treated as widgets");
+    assert.equal(widgets.length, 2);
   });
 
   it("returns empty array when directory is empty", async () => {

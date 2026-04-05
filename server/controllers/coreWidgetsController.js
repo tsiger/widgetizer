@@ -19,9 +19,18 @@ export async function getCoreWidgets() {
       return [];
     }
 
-    // Read all widget folders
+    // Read only actual widget folders. Support helper directories
+    // like locales/ alongside widgets without treating them as widgets.
     const entries = await fs.readdir(CORE_WIDGETS_DIR, { withFileTypes: true });
-    const widgetFolders = entries.filter((entry) => entry.isDirectory());
+    const widgetFolders = [];
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      if (!entry.name.startsWith("core-")) continue;
+
+      const schemaPath = path.join(CORE_WIDGETS_DIR, entry.name, "schema.json");
+      if (!(await fs.pathExists(schemaPath))) continue;
+      widgetFolders.push(entry);
+    }
 
     // Process each widget folder to read its schema.json
     const widgetSchemas = await Promise.all(
