@@ -1,18 +1,14 @@
 /**
- * Validates theme locale files for completeness and correctness.
+ * Validates shared core-widget locales and theme-owned locales separately.
  *
- * Checks:
- *   1. Every tTheme: key in widget schemas + theme.json exists in en.json
- *   2. en.json contains no extra keys that aren't referenced by any schema
- *   3. Every non-English locale is compared against en.json and reported,
- *      but only English completeness/orphan issues are blocking
- *
- * Reads from latest/ snapshot if it exists, otherwise falls back to
- * the base theme directory.
+ * Ownership model:
+ *   1. Core widget tTheme: keys live in src/core/widgets/locales/
+ *   2. Theme widget + theme.json tTheme: keys live in each theme's locales/
+ *   3. Theme locale APIs merge core + theme locales at runtime
  *
  * Usage:
- *   node scripts/validate-theme-locales.js                # all themes
- *   node scripts/validate-theme-locales.js arch            # specific theme
+ *   node scripts/validate-theme-locales.js
+ *   node scripts/validate-theme-locales.js arch
  */
 
 import { readFileSync, readdirSync, existsSync } from "node:fs";
@@ -26,9 +22,15 @@ import {
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const rootDir = join(__dirname, "..");
+const coreWidgetsDir = join(rootDir, "src", "core", "widgets");
+const coreLocalesDir = join(coreWidgetsDir, "locales");
 
-/** Resolve the effective theme directory: latest/ if it exists, otherwise base. */
+/** Resolve the effective theme directory, preferring source themes during local dev. */
 function resolveThemeDir(themeName) {
+  const seedBase = join(rootDir, "themes", themeName);
+  if (existsSync(join(seedBase, "theme.json")))
+    return { dir: seedBase, source: "themes/" };
+
   const dataLatest = join(rootDir, "data", "themes", themeName, "latest");
   if (existsSync(dataLatest)) return { dir: dataLatest, source: "latest/" };
 
@@ -36,64 +38,32 @@ function resolveThemeDir(themeName) {
   if (existsSync(join(dataBase, "theme.json")))
     return { dir: dataBase, source: "data/themes/" };
 
-  const seedBase = join(rootDir, "themes", themeName);
-  if (existsSync(join(seedBase, "theme.json")))
-    return { dir: seedBase, source: "themes/" };
-
   return null;
 }
 
-// ── Validation ────────────────────────────────────────────────────────
-
-function validateTheme(themeName) {
-  const resolved = resolveThemeDir(themeName);
-  if (!resolved) {
-    console.error(`Theme "${themeName}" not found.`);
-    return false;
+function getNested(obj, keyPath) {
+  const segs = keyPath.split(".");
+  let val = obj;
+  for (const s of segs) {
+    if (val == null || typeof val !== "object") return undefined;
+    val = val[s];
   }
+  return val;
+}
 
-  const { dir, source } = resolved;
-  console.log(`\n━━ ${themeName} (${source}${themeName}) ━━`);
-
-  // Collect all tTheme: keys from schemas + theme.json
+function collectSchemaKeysFromDir(dir) {
   const schemaKeys = [];
+  if (!existsSync(dir)) return schemaKeys;
 
-  // Theme widgets
-  const widgetsDir = join(dir, "widgets");
-  for (const schemaPath of findSchemaFiles(widgetsDir)) {
+  for (const schemaPath of findSchemaFiles(dir)) {
     const schema = JSON.parse(readFileSync(schemaPath, "utf-8"));
     schemaKeys.push(...extractThemeKeys(schema));
   }
 
-  // Core widgets (src/core/widgets/) — their schemas use tTheme: keys
-  // resolved against the theme's locale files
-  const coreWidgetsDir = join(rootDir, "src", "core", "widgets");
-  if (existsSync(coreWidgetsDir)) {
-    for (const schemaPath of findSchemaFiles(coreWidgetsDir)) {
-      const schema = JSON.parse(readFileSync(schemaPath, "utf-8"));
-      schemaKeys.push(...extractThemeKeys(schema));
-    }
-  }
+  return schemaKeys;
+}
 
-  const themeJsonPath = join(dir, "theme.json");
-  if (existsSync(themeJsonPath)) {
-    const themeJson = JSON.parse(readFileSync(themeJsonPath, "utf-8"));
-    schemaKeys.push(...extractThemeKeys(themeJson));
-
-    // Section names are resolved dynamically in the frontend via
-    // tTheme("tTheme:global.<group>.name"), so add them explicitly.
-    if (themeJson.settings?.global) {
-      for (const groupKey of Object.keys(themeJson.settings.global)) {
-        schemaKeys.push(`global.${groupKey}.name`);
-      }
-    }
-  }
-
-  const uniqueSchemaKeys = [...new Set(schemaKeys)];
-  const schemaKeySet = new Set(uniqueSchemaKeys);
-
-  // Load en.json
-  const localesDir = join(dir, "locales");
+function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new Set()) {
   if (!existsSync(localesDir)) {
     console.error(`  No locales/ directory found.`);
     return false;
@@ -105,21 +75,20 @@ function validateTheme(themeName) {
     return false;
   }
 
+  const uniqueSchemaKeys = [...new Set(schemaKeys)];
+  const schemaKeySet = new Set(uniqueSchemaKeys);
   const en = JSON.parse(readFileSync(enPath, "utf-8"));
-  const enKeys = new Set(flattenKeys(en));
+  const allEnKeys = flattenKeys(en);
+  const ownedEnKeys = allEnKeys.filter((k) => !ignoredExtraKeys.has(k));
+  const ownedEnKeySet = new Set(ownedEnKeys);
 
   let hasErrors = false;
 
-  // ── Check 1: Every tTheme: key exists in en.json ──────────────────
-
-  function getNested(obj, keyPath) {
-    const segs = keyPath.split(".");
-    let val = obj;
-    for (const s of segs) {
-      if (val == null || typeof val !== "object") return undefined;
-      val = val[s];
-    }
-    return val;
+  const ignoredKeysPresent = allEnKeys.filter((k) => ignoredExtraKeys.has(k));
+  if (ignoredKeysPresent.length > 0) {
+    console.warn(
+      `  ⚠ Ignoring ${ignoredKeysPresent.length} shared key(s) in ${label} en.json`,
+    );
   }
 
   const missingFromEn = uniqueSchemaKeys.filter(
@@ -139,9 +108,7 @@ function validateTheme(themeName) {
     );
   }
 
-  // ── Check 1b: en.json has no extra keys absent from schemas ────────
-
-  const extraInEn = [...enKeys].filter((k) => !schemaKeySet.has(k));
+  const extraInEn = ownedEnKeys.filter((k) => !schemaKeySet.has(k));
   if (extraInEn.length > 0) {
     hasErrors = true;
     console.error(
@@ -154,8 +121,6 @@ function validateTheme(themeName) {
     console.log(`  ✓ en.json has no orphaned keys`);
   }
 
-  // ── Check 2: Non-English locales are advisory-only ────────────────
-
   const localeFiles = readdirSync(localesDir).filter(
     (f) => f.endsWith(".json") && f !== "en.json",
   );
@@ -163,10 +128,10 @@ function validateTheme(themeName) {
   for (const file of localeFiles) {
     const lang = basename(file, ".json");
     const data = JSON.parse(readFileSync(join(localesDir, file), "utf-8"));
-    const langKeys = new Set(flattenKeys(data));
+    const langKeys = new Set(flattenKeys(data).filter((k) => !ignoredExtraKeys.has(k)));
 
-    const missing = [...enKeys].filter((k) => !langKeys.has(k));
-    const extra = [...langKeys].filter((k) => !enKeys.has(k));
+    const missing = [...ownedEnKeySet].filter((k) => !langKeys.has(k));
+    const extra = [...langKeys].filter((k) => !ownedEnKeySet.has(k));
 
     if (missing.length > 0) {
       console.warn(`  ⚠ [${lang}] Missing ${missing.length} key(s):`);
@@ -183,23 +148,62 @@ function validateTheme(themeName) {
     }
 
     if (missing.length === 0 && extra.length === 0) {
-      console.log(`  ✓ [${lang}] OK — all ${enKeys.size} keys present`);
+      console.log(`  ✓ [${lang}] OK — all ${ownedEnKeySet.size} keys present`);
     }
   }
 
   return !hasErrors;
 }
 
+function validateCoreLocales() {
+  console.log(`\n━━ core widgets (src/core/widgets) ━━`);
+  const schemaKeys = collectSchemaKeysFromDir(coreWidgetsDir);
+  return validateLocaleSet("core widgets", coreLocalesDir, schemaKeys);
+}
+
+function validateTheme(themeName, coreKeySet) {
+  const resolved = resolveThemeDir(themeName);
+  if (!resolved) {
+    console.error(`Theme "${themeName}" not found.`);
+    return false;
+  }
+
+  const { dir, source } = resolved;
+  console.log(`\n━━ ${themeName} (${source}${themeName}) ━━`);
+
+  const schemaKeys = collectSchemaKeysFromDir(join(dir, "widgets"));
+  const themeJsonPath = join(dir, "theme.json");
+  if (existsSync(themeJsonPath)) {
+    const themeJson = JSON.parse(readFileSync(themeJsonPath, "utf-8"));
+    schemaKeys.push(...extractThemeKeys(themeJson));
+
+    if (themeJson.settings?.global) {
+      for (const groupKey of Object.keys(themeJson.settings.global)) {
+        schemaKeys.push(`global.${groupKey}.name`);
+      }
+    }
+  }
+
+  return validateLocaleSet(
+    `${themeName} theme`,
+    join(dir, "locales"),
+    schemaKeys,
+    coreKeySet,
+  );
+}
+
 // ── Main ──────────────────────────────────────────────────────────────
 
 const requestedTheme = process.argv[2];
+const coreSchemaKeys = collectSchemaKeysFromDir(coreWidgetsDir);
+const coreKeySet = new Set(coreSchemaKeys);
+
+let allOk = validateCoreLocales();
 
 if (requestedTheme) {
-  // Validate a single theme
-  const ok = validateTheme(requestedTheme);
-  process.exit(ok ? 0 : 1);
+  allOk = validateTheme(requestedTheme, coreKeySet) && allOk;
+  process.exit(allOk ? 0 : 1);
 } else {
-  // Validate all themes found in themes/ directory
   const themesDir = join(rootDir, "themes");
   const themes = readdirSync(themesDir).filter((d) =>
     existsSync(join(themesDir, d, "theme.json")),
@@ -210,9 +214,8 @@ if (requestedTheme) {
     process.exit(0);
   }
 
-  let allOk = true;
   for (const theme of themes) {
-    if (!validateTheme(theme)) allOk = false;
+    if (!validateTheme(theme, coreKeySet)) allOk = false;
   }
 
   console.log(

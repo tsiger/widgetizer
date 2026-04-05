@@ -4,6 +4,7 @@ import multer from "multer";
 import {
   DATA_DIR,
   THEMES_SEED_DIR,
+  CORE_WIDGETS_DIR,
   getThemesDir,
   getThemeDir,
   getThemeJsonPath,
@@ -22,6 +23,51 @@ import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { updateThemeSettingsMediaUsage } from "../services/mediaUsageService.js";
 import { sanitizeThemeSettings } from "../services/sanitizationService.js";
 import { readAppSettingsFile } from "./appSettingsController.js";
+
+const CORE_WIDGET_LOCALES_DIR = path.join(CORE_WIDGETS_DIR, "locales");
+
+function isPlainObject(value) {
+  return value != null && typeof value === "object" && !Array.isArray(value);
+}
+
+function deepMerge(target, source) {
+  const result = { ...(isPlainObject(target) ? target : {}) };
+
+  if (!isPlainObject(source)) {
+    return result;
+  }
+
+  for (const [key, value] of Object.entries(source)) {
+    if (isPlainObject(value) && isPlainObject(result[key])) {
+      result[key] = deepMerge(result[key], value);
+    } else if (isPlainObject(value)) {
+      result[key] = deepMerge({}, value);
+    } else {
+      result[key] = value;
+    }
+  }
+
+  return result;
+}
+
+async function readLocaleFile(localesDir, lang) {
+  try {
+    const content = await fs.readFile(path.join(localesDir, `${lang}.json`), "utf-8");
+    return JSON.parse(content);
+  } catch {
+    return {};
+  }
+}
+
+async function loadMergedLocale(localesDir, lang) {
+  const enLocale = await readLocaleFile(localesDir, "en");
+  if (lang === "en") {
+    return enLocale;
+  }
+
+  const requestedLocale = await readLocaleFile(localesDir, lang);
+  return deepMerge(enLocale, requestedLocale);
+}
 
 
 /**
@@ -1503,25 +1549,17 @@ export async function getProjectThemeLocale(req, res) {
     const themeId = project?.theme;
 
     if (!themeId) {
-      return res.json({});
+      const coreLocale = await loadMergedLocale(CORE_WIDGET_LOCALES_DIR, lang);
+      return res.json(coreLocale);
     }
 
     const sourceDir = await getThemeSourceDir(themeId);
-    const localePath = path.join(sourceDir, "locales", `${lang}.json`);
+    const themeLocalesDir = path.join(sourceDir, "locales");
 
-    try {
-      const content = await fs.readFile(localePath, "utf-8");
-      return res.json(JSON.parse(content));
-    } catch {
-      // Fall back to English
-      const enPath = path.join(sourceDir, "locales", "en.json");
-      try {
-        const enContent = await fs.readFile(enPath, "utf-8");
-        return res.json(JSON.parse(enContent));
-      } catch {
-        return res.json({});
-      }
-    }
+    const coreLocale = await loadMergedLocale(CORE_WIDGET_LOCALES_DIR, lang);
+    const themeLocale = await loadMergedLocale(themeLocalesDir, lang);
+
+    return res.json(deepMerge(coreLocale, themeLocale));
   } catch (error) {
     if (handleProjectResolutionError(res, error)) return;
     console.error("Error reading theme locale:", error);

@@ -867,48 +867,6 @@
       }
     }
   },
-  "core_divider": {
-    "name": "Divider",
-    "description": "Add a horizontal divider line",
-    "category": "Layout",
-    "settings": {
-      "color": {
-        "label": "Line Color",
-        "description": "Color of the divider line"
-      },
-      "thickness": {
-        "label": "Thickness",
-        "description": "Thickness of the divider line in pixels"
-      },
-      "width": {
-        "label": "Width",
-        "description": "Width of the divider as percentage of container"
-      },
-      "padding": {
-        "label": "Padding",
-        "description": "Vertical padding around the divider in pixels"
-      }
-    }
-  },
-  "core_spacer": {
-    "name": "Spacer",
-    "description": "Add vertical spacing between content sections",
-    "category": "Layout",
-    "settings": {
-      "height": {
-        "label": "Height",
-        "description": "The height of the spacer in pixels"
-      },
-      "showOnMobile": {
-        "label": "Show on Mobile",
-        "description": "Whether to show the spacer on mobile devices"
-      },
-      "mobileHeight": {
-        "label": "Mobile Height",
-        "description": "The height of the spacer on mobile devices in pixels"
-      }
-    }
-  },
   "contact_details": {
     "name": "Contact Details"
   },

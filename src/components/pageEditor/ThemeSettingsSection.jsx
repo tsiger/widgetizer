@@ -28,7 +28,7 @@ export default function ThemeSettingsSection({ themeSettings, selectedThemeGroup
       >
         <div className="flex items-center gap-2">
           <Palette size={16} className="text-slate-600" />
-          <span className="text-sm font-medium text-slate-700">{t("pageEditor.themeSelector.title")}</span>
+          <span className="text-sm font-medium text-slate-700">{t("navigation.settings")}</span>
         </div>
         <svg
           className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}

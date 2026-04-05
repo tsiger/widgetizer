@@ -50,7 +50,7 @@ export default function ThemeSelector() {
         className="font-medium px-4 py-2 rounded-md border border-slate-200 hover:bg-slate-100 flex items-center gap-2"
       >
         <Settings size={16} />
-        {t("pageEditor.themeSelector.button")}
+        {t("navigation.settings")}
         {hasAnyChanges && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
         <ChevronDown size={16} className={`transform transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>

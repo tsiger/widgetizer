@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { resolveThemeKey } from "../useThemeLocale.js";
+import { getLocaleCacheKey, resolveThemeKey } from "../useThemeLocale.js";
 
 describe("resolveThemeKey", () => {
   // --- Pass-through for falsy / non-prefixed values ---
@@ -95,5 +95,17 @@ describe("resolveThemeKey", () => {
   it("resolves deeply nested paths (6 levels)", () => {
     const locale = { l1: { l2: { l3: { l4: { l5: { l6: "bottom" } } } } } };
     expect(resolveThemeKey("tTheme:l1.l2.l3.l4.l5.l6", locale)).toBe("bottom");
+  });
+});
+
+describe("getLocaleCacheKey", () => {
+  it("includes both project id and language", () => {
+    expect(getLocaleCacheKey("project-123", "en")).toBe("project-123:en");
+  });
+
+  it("produces different keys for different projects with same language", () => {
+    expect(getLocaleCacheKey("project-a", "en")).not.toBe(
+      getLocaleCacheKey("project-b", "en"),
+    );
   });
 });

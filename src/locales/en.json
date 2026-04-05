@@ -412,10 +412,6 @@
       "saving": "Saving...",
       "save": "Save"
     },
-    "themeSelector": {
-      "button": "Theme settings",
-      "title": "Theme Settings"
-    },
     "preview": {
       "loading": "Loading Preview...",
       "error": "Preview Error",

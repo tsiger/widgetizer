@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { apiFetch } from "../lib/apiFetch";
 import useProjectStore from "../stores/projectStore";
 
-// Module-level cache: lang → { data, timestamp }
+// Module-level cache: projectId:lang → { data, timestamp }
 const localeCache = {};
 const STALE_TIME = 5 * 60 * 1000; // 5 minutes
 
@@ -24,7 +24,7 @@ function checkDevMode() {
 
 // Module-level in-flight tracking — shared across ALL hook instances
 let inflightPromise = null;
-let inflightLang = null;
+let inflightCacheKey = null;
 
 // Subscribers for useSyncExternalStore
 const listeners = new Set();
@@ -36,18 +36,22 @@ function notify() {
   for (const cb of listeners) cb();
 }
 
-// Snapshot: returns the locale data for a given lang (or null).
+export function getLocaleCacheKey(projectId, lang) {
+  return `${projectId || "no-project"}:${lang || "en"}`;
+}
+
+// Snapshot: returns the locale data for a given cache key (or null).
 // Returns stale data while a re-fetch is in progress to avoid
 // a flash of raw keys when the cache expires.
-function getSnapshot(lang) {
-  const cached = localeCache[lang];
+function getSnapshot(cacheKey) {
+  const cached = localeCache[cacheKey];
   if (!cached) return null;
   return cached.data;
 }
 
-function isStale(lang) {
+function isStale(cacheKey) {
   if (devModeEnabled) return true;
-  const cached = localeCache[lang];
+  const cached = localeCache[cacheKey];
   return !cached || Date.now() - cached.timestamp >= STALE_TIME;
 }
 
@@ -74,26 +78,27 @@ export function useThemeLocale() {
   const lang = i18n.language || "en";
   const activeProject = useProjectStore((s) => s.activeProject);
   const projectId = activeProject?.id;
+  const cacheKey = getLocaleCacheKey(projectId, lang);
 
   // Check developer mode once on first use
   checkDevMode();
 
   // Subscribe to locale cache changes — re-renders when notify() is called
-  const locale = useSyncExternalStore(subscribe, () => getSnapshot(lang));
+  const locale = useSyncExternalStore(subscribe, () => getSnapshot(cacheKey));
 
   // Fetch when cache is empty/stale (keeps serving stale data until refresh completes)
   useEffect(() => {
     if (!projectId) return;
-    if (!isStale(lang)) return;
+    if (!isStale(cacheKey)) return;
 
-    // Another instance is already fetching this lang
-    if (inflightLang === lang && inflightPromise) return;
+    // Another instance is already fetching this project+lang
+    if (inflightCacheKey === cacheKey && inflightPromise) return;
 
-    inflightLang = lang;
+    inflightCacheKey = cacheKey;
     inflightPromise = apiFetch(`/api/themes/project/${projectId}/locales/${lang}`)
       .then((res) => (res.ok ? res.json() : {}))
       .then((data) => {
-        localeCache[lang] = { data, timestamp: Date.now() };
+        localeCache[cacheKey] = { data, timestamp: Date.now() };
         notify();
       })
       .catch(() => {
@@ -101,9 +106,9 @@ export function useThemeLocale() {
       })
       .finally(() => {
         inflightPromise = null;
-        inflightLang = null;
+        inflightCacheKey = null;
       });
-  }, [lang, projectId]);
+  }, [cacheKey, lang, projectId]);
 
   const tTheme = useCallback(
     (str) => resolveThemeKey(str, locale),
