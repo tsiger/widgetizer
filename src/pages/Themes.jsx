@@ -4,7 +4,6 @@ import { ArrowUpCircle, Trash2, MoreVertical, ChevronDown, ExternalLink } from "
 import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import EmptyState from "../components/ui/EmptyState";
-import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 import Tooltip from "../components/ui/Tooltip";
 
@@ -18,7 +17,6 @@ import {
   deleteTheme,
 } from "../queries/themeManager";
 
-import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
 import useThemeUpdateStore from "../stores/themeUpdateStore";
 import useAppSettings from "../hooks/useAppSettings";
@@ -26,7 +24,7 @@ import FileUploader from "../components/ui/FileUploader";
 import { showRejectedFiles, showUploadOutcome } from "../utils/uploadFeedback";
 import { ZIP_ACCEPT, mapDropzoneRejections, validateZipFiles } from "../utils/uploadValidation";
 
-function ThemeSection({ theme, activeProject, onUpdate, onDelete, updatingThemeId }) {
+function ThemeSection({ theme, onUpdate, onDelete, updatingThemeId }) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
   const [presets, setPresets] = useState([]);
@@ -34,7 +32,6 @@ function ThemeSection({ theme, activeProject, onUpdate, onDelete, updatingThemeI
   const [openMenuId, setOpenMenuId] = useState(null);
   const menuRef = useRef(null);
 
-  const isActiveTheme = activeProject && activeProject.theme === theme.id;
   const projectsUsingTheme = theme.projectsUsingTheme || [];
   const isThemeInUse = projectsUsingTheme.length > 0;
   const hasPresets = theme.presets > 0;
@@ -224,7 +221,6 @@ export default function Themes() {
   const [uploadProgress, setUploadProgress] = useState({});
   const [updatingThemeId, setUpdatingThemeId] = useState(null);
 
-  const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
   const fetchUpdateCount = useThemeUpdateStore((state) => state.fetchUpdateCount);
   const { settings } = useAppSettings();
@@ -398,7 +394,6 @@ export default function Themes() {
             <ThemeSection
               key={theme.id}
               theme={theme}
-              activeProject={activeProject}
               onUpdate={handleUpdateTheme}
               onDelete={handleDeleteTheme}
               updatingThemeId={updatingThemeId}

@@ -16,7 +16,7 @@ export default function WidgetItem({
   isSelected,
   isModified,
   isDragging,
-  isDraggingAny = false,
+  isDraggingAny: _isDraggingAny = false,
   isOverlay = false,
   onWidgetSelect,
   dragHandleProps = {},

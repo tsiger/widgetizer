@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
@@ -13,22 +13,34 @@ export default function Sidebar() {
   const hasActiveProject = !!activeProject;
   const [hasPages, setHasPages] = useState(false);
 
-  const checkPages = useCallback(async () => {
-    if (!hasActiveProject) {
-      setHasPages(false);
-      return;
-    }
-    try {
-      const pages = await getAllPages();
-      setHasPages(pages.length > 0);
-    } catch {
-      setHasPages(false);
-    }
-  }, [hasActiveProject]);
-
   useEffect(() => {
-    checkPages();
-  }, [checkPages, activeProject?.id, location.pathname]);
+    let isCancelled = false;
+
+    if (!hasActiveProject) {
+      return undefined;
+    }
+
+    async function loadPages() {
+      try {
+        const pages = await getAllPages();
+        if (!isCancelled) {
+          setHasPages(pages.length > 0);
+        }
+      } catch {
+        if (!isCancelled) {
+          setHasPages(false);
+        }
+      }
+    }
+
+    loadPages();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [hasActiveProject, activeProject?.id, location.pathname]);
+
+  const canOpenSitePreview = hasActiveProject && hasPages;
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
 
@@ -97,7 +109,7 @@ export default function Sidebar() {
 
   const renderNavItem = (item) => {
     const Icon = item.icon;
-    const disabled = (item.requiresProject && !hasActiveProject) || (item.action === "openSitePreview" && !hasPages);
+    const disabled = (item.requiresProject && !hasActiveProject) || (item.action === "openSitePreview" && !canOpenSitePreview);
 
     // Action items (no path, trigger a function instead)
     if (item.action) {
