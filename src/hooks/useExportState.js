@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getActiveProject } from "../queries/projectManager";
 import { getExportHistory } from "../queries/exportManager";
+import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
 
 /**
@@ -27,49 +27,71 @@ import useToastStore from "../stores/toastStore";
  * @property {Function} loadExportHistory - Fetch export history for a given project ID
  */
 export default function useExportState() {
-  const [activeProject, setActiveProject] = useState(null);
   const [lastExport, setLastExport] = useState(null);
   const [exportHistory, setExportHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [maxVersionsToKeep, setMaxVersionsToKeep] = useState(10);
 
+  const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
 
-  // Load export history
+  // Load export history — guards against stale responses when called
+  // after an export completes and the active project has changed since.
   const loadExportHistory = async (projectId) => {
     if (!projectId) return;
 
     setLoadingHistory(true);
     try {
       const result = await getExportHistory(projectId);
+      // Drop the response if the active project changed during the fetch
+      if (useProjectStore.getState().activeProject?.id !== projectId) return;
       setExportHistory(result.exports || []);
       if (result.maxVersionsToKeep) {
         setMaxVersionsToKeep(result.maxVersionsToKeep);
       }
     } catch (error) {
+      if (useProjectStore.getState().activeProject?.id !== projectId) return;
       console.error("Failed to load export history:", error);
       // Don't show toast for this as it's not critical
     } finally {
-      setLoadingHistory(false);
+      // Only clear loading if this request is still relevant to the active project
+      if (useProjectStore.getState().activeProject?.id === projectId) {
+        setLoadingHistory(false);
+      }
     }
   };
 
-  // Load active project on mount
   useEffect(() => {
-    async function fetchActiveProject() {
-      try {
-        const project = await getActiveProject();
-        setActiveProject(project);
-        if (project?.id) {
-          loadExportHistory(project.id);
-        }
-      } catch (err) {
-        console.error("Failed to fetch active project:", err);
-        showToast("Could not load active project details.", "error");
-      }
+    if (!activeProject?.id) {
+      setExportHistory([]);
+      setLastExport(null);
+      setLoadingHistory(false);
+      return;
     }
-    fetchActiveProject();
-  }, [showToast]);
+
+    let stale = false;
+    const projectId = activeProject.id;
+
+    setLoadingHistory(true);
+    getExportHistory(projectId)
+      .then((result) => {
+        if (stale) return;
+        setExportHistory(result.exports || []);
+        if (result.maxVersionsToKeep) {
+          setMaxVersionsToKeep(result.maxVersionsToKeep);
+        }
+      })
+      .catch((err) => {
+        if (stale) return;
+        console.error("Failed to fetch export history:", err);
+        showToast("Could not load active project details.", "error");
+      })
+      .finally(() => {
+        if (!stale) setLoadingHistory(false);
+      });
+
+    return () => { stale = true; };
+  }, [activeProject?.id, showToast]);
 
   return {
     activeProject,

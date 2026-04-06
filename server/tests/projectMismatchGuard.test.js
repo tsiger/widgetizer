@@ -42,8 +42,8 @@ const OTHER_PROJECT_ID = "other-project-uuid";
 // Helpers
 // ============================================================================
 
-function mockReq({ method = "GET", headers = {} } = {}) {
-  return { method, headers };
+function mockReq({ method = "GET", headers = {}, params = {} } = {}) {
+  return { method, headers, params };
 }
 
 function mockRes() {
@@ -176,6 +176,41 @@ describe("resolveActiveProject — mismatch guard", () => {
     assert.ok(!nextCalled, "next() should NOT have been called");
     assert.equal(res._status, 409);
     assert.equal(res._json.code, "PROJECT_MISMATCH");
+  });
+
+  it("POST with mismatched route projectId param returns 409", async () => {
+    const req = mockReq({
+      method: "POST",
+      headers: { "x-project-id": PROJECT_ID },
+      params: { projectId: OTHER_PROJECT_ID },
+    });
+    const res = mockRes();
+    let nextCalled = false;
+
+    await resolveActiveProject(req, res, () => {
+      nextCalled = true;
+    });
+
+    assert.ok(!nextCalled, "next() should NOT have been called");
+    assert.equal(res._status, 409);
+    assert.equal(res._json.code, "PROJECT_MISMATCH");
+  });
+
+  it("POST with matching route projectId param passes through", async () => {
+    const req = mockReq({
+      method: "POST",
+      headers: { "x-project-id": PROJECT_ID },
+      params: { projectId: PROJECT_ID },
+    });
+    const res = mockRes();
+    let nextCalled = false;
+
+    await resolveActiveProject(req, res, () => {
+      nextCalled = true;
+    });
+
+    assert.ok(nextCalled, "next() should have been called");
+    assert.ok(req.activeProject, "req.activeProject should be set");
   });
 
   it("returns 404 when no active project is set", async () => {

@@ -130,6 +130,27 @@ Preview isolation variables are listed in section 10 above.
 - **Static serving**: `express.static` serves `dist/` in production; catch-all route serves `index.html` for client-side routing
 - **Trust proxy**: Enabled in production behind reverse proxies
 
+### 10. Project-Switch Isolation
+
+Prevents data from one project being shown, saved, previewed, or exported against another project when the user switches projects.
+
+**Server-side (middleware):**
+
+- `resolveActiveProject` middleware covers all project-scoped routes (pages, menus, media, export, preview globally; theme project endpoints per-route)
+- For write requests (POST/PUT/PATCH/DELETE), validates both the `X-Project-Id` header and `req.params.projectId` against the server's active project — either mismatch returns 409 `PROJECT_MISMATCH`
+- Controllers use `req.activeProject` from middleware instead of resolving the project themselves
+
+**Client-side (header injection):**
+
+- `apiFetch` auto-injects `X-Project-Id` from the Zustand project store on every request
+- `saveStore` does a proactive check comparing `loadedProjectId` against the active project before initiating any save
+
+**Client-side (stale-response guards):**
+
+- `pageStore` uses an `activeLoadId` counter to discard late async responses from superseded loads
+- `Settings.jsx` load and save paths use stale-closure guards to drop responses if the project changed during the async operation
+- `useExportState` and `ExportCreator` guard `loadExportHistory` and export completion against project changes mid-flight
+
 ---
 
 **See also:**

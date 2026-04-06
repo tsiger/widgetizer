@@ -8,9 +8,11 @@ import {
   serveAsset,
 } from "../controllers/previewController.js";
 import { standardJsonParser } from "../middleware/jsonParser.js";
+import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
 
 const router = express.Router();
 router.use(standardJsonParser);
+router.use(resolveActiveProject);
 
 // POST /api/preview - Generate a full page preview
 router.post("/", generatePreview);

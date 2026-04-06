@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Button from "../ui/Button";
 import { exportProjectAPI } from "../../queries/exportManager";
+import useProjectStore from "../../stores/projectStore";
 import useToastStore from "../../stores/toastStore";
 import { Loader2, Package } from "lucide-react";
 
@@ -35,20 +36,26 @@ export default function ExportCreator({
       return;
     }
 
+    const projectIdAtStart = activeProject.id;
     setIsExporting(true);
     setLastExport(null);
 
     try {
-      const result = await exportProjectAPI(activeProject.id, { exportMarkdown });
+      const result = await exportProjectAPI(projectIdAtStart, { exportMarkdown });
+
+      // Drop the response if the active project changed during the export
+      if (useProjectStore.getState().activeProject?.id !== projectIdAtStart) return;
+
       if (result.success) {
         showToast(result.message || t("exportSite.toasts.exportSuccess"), "success");
         setLastExport(result.exportRecord);
         // Reload export history to show the new export
-        loadExportHistory(activeProject.id);
+        loadExportHistory(projectIdAtStart);
       } else {
         showToast(result.message || t("exportSite.toasts.exportError"), "error");
       }
     } catch (err) {
+      if (useProjectStore.getState().activeProject?.id !== projectIdAtStart) return;
       console.error("Exporting failed:", err);
       showToast(err.message || t("exportSite.toasts.unknownError"), "error");
     } finally {

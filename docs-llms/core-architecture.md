@@ -764,15 +764,19 @@ Save button / Auto-save timer
 
 ### 4. Active Project Resolution
 
-**Status:** Mostly resolved for active-project routes.
+**Status:** Resolved. All active-project routes use `resolveActiveProject` middleware.
 
 **Current behavior:**
 
-- `pageController.js` and `menuController.js` use `resolveActiveProject` middleware (`req.activeProject`)
-- `mediaController.js` uses explicit `:projectId` route params and resolves folderName via `getProjectFolderName()`
-- frontend site-workspace routes are blocked up front by `RequireActiveProject`
+- `resolveActiveProject` middleware is applied to all project-scoped routes: pages, menus, media, export, preview (globally), and theme project endpoints (per-route, since theme-management endpoints like `getAllThemes` don't require a project)
+- The middleware attaches `req.activeProject` and validates write requests (POST/PUT/PATCH/DELETE) by checking both the `X-Project-Id` header and `req.params.projectId` against the server's active project. Either mismatch returns 409 `PROJECT_MISMATCH`.
+- Controllers use `req.activeProject.id` instead of calling `projectRepo.getActiveProjectId()` directly
+- On the frontend, `apiFetch` auto-injects the `X-Project-Id` header from the Zustand project store on every request
+- Stores (`pageStore`, `widgetStore`) read the active project ID internally via `getActiveProjectId()` — callers don't pass project IDs as params
+- Stale-response guards protect async boundaries in `Settings.jsx`, `useExportState.js`, and `ExportCreator.jsx` to prevent late responses from overwriting state after a project switch
+- Frontend site-workspace routes are blocked up front by `RequireActiveProject`
 
-**Improvement:** Keep `resolveActiveProject` as the standard for active-project routes and avoid re-introducing per-handler project lookups.
+**Pattern:** No per-handler project lookups or mismatch guards. All project validation lives in the middleware.
 
 ### 5. Media Usage Tracking Pattern
 
@@ -785,17 +789,11 @@ Save button / Auto-save timer
 
 **Improvement:** Consider event-based approach or automatic tracking on page file writes.
 
-### 6. Repeated Theme Settings Loading
+### 6. Theme Settings Loading
 
-**Problem:** Theme settings are loaded in multiple places independently.
+**Status:** Streamlined. `getThemeSettings(projectId?)` in `themeManager.js` resolves the project ID via explicit param or the sync `getActiveProjectId()` getter (two-step fallback, no async API call). `pageStore.loadThemeSettings()` and `Settings.jsx` both go through this function. Preview rendering uses theme settings passed from the editor stores.
 
-**Locations:**
-
-- `pageStore.js`: `loadThemeSettings()`
-- `themeManager.js`: `getThemeSettings()`
-- Preview components: Load theme settings for rendering
-
-**Improvement:** Centralize theme settings in a store that's shared between editor and preview.
+**Improvement:** Consider centralizing theme settings in a dedicated store shared between editor and preview to avoid redundant loads.
 
 ### 7. Version Comparison Logic Spread
 

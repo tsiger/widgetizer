@@ -26,6 +26,7 @@ export default function PagesEdit() {
   const isNavigatingAfterSaveRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
+  const activeProject = useProjectStore((state) => state.activeProject);
 
   // Add navigation guard - bypass when navigating after successful save
   useFormNavigationGuard(isDirty, isNavigatingAfterSaveRef);
@@ -33,9 +34,16 @@ export default function PagesEdit() {
   useEffect(() => {
     // Reset navigation skip ref when page changes
     isNavigatingAfterSaveRef.current = false;
+    if (!activeProject?.id) {
+      setPage(null);
+      setLoading(false);
+      return;
+    }
+    setPage(null);
+    setLoading(true);
     loadPage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, activeProject?.id]);
 
   const loadPage = async () => {
     try {

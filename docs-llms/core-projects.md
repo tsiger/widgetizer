@@ -166,6 +166,32 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 
 ---
 
+## Project-Switch Isolation
+
+When the user switches projects, the app must ensure no data from the previous project leaks into the new context (stale reads, cross-project writes, wrong-project previews).
+
+### How switching works
+
+`openProjectWorkspace()` in `Projects.jsx` calls `PUT /api/projects/active/:id` to set the new active project in SQLite, refreshes the Zustand store via `fetchActiveProject()`, then navigates to `/pages`. This causes route-level components to remount.
+
+### Server-side protection
+
+`resolveActiveProject` middleware is applied to all project-scoped routes. For write requests, it validates both the `X-Project-Id` header (injected by `apiFetch` from the Zustand store) and `req.params.projectId` against the server's active project. Either mismatch returns 409 `PROJECT_MISMATCH`. Controllers use `req.activeProject` from the middleware.
+
+### Client-side protection
+
+- **All project-scoped screens** (Pages, Settings, PageEditor, PagePreview, PagesEdit, MenusEdit, MenuStructure, Export) include `activeProject?.id` in their effect dependency arrays so they reload on project change
+- **pageStore** uses an `activeLoadId` counter to discard stale async loads. Tracks `loadedProjectId` so `saveStore` can compare before saving.
+- **widgetStore** resets schemas and selection via `resetForProjectChange()` and reads the project ID internally via `getActiveProjectId()`
+- **Settings.jsx** guards both load and save paths with stale-closure checks
+- **useExportState / ExportCreator** guard history loads and export completion against project changes mid-flight
+
+### Known limitation
+
+`useNavigationGuard` and `useFormNavigationGuard` only watch route changes, not project changes. If the user has unsaved edits and switches projects via the sidebar, they won't see an "unsaved changes" prompt. The server will reject any stale write (409), so no data corruption occurs — but the user loses their edits silently. Acceptable for v1.0 single-user desktop use.
+
+---
+
 ## Backend API Endpoints
 
 The frontend `projectManager.js` communicates with a set of backend API endpoints defined in `server/routes/projects.js`. These routes handle the core logic of project management.

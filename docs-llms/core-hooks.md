@@ -302,10 +302,10 @@ Centralizes export functionality including project validation, export history ma
 
 #### Key Features
 
-- **Project State**: Active project information and validation
-- **Export History**: Loading and managing export version history with automatic refresh
+- **Project State**: Subscribes to `useProjectStore` for the active project (reactive to project switches)
+- **Export History**: Loading and managing export version history with automatic refresh on project change
+- **Stale-Response Protection**: Both the effect-level load and the shared `loadExportHistory()` function check the active project after async completion and discard late responses if the project changed
 - **Settings Integration**: Max versions configuration from app settings
-- **Data Loading**: Centralized data fetching with error handling
 - **Version Management**: Last export tracking and history updates
 
 #### Usage Context

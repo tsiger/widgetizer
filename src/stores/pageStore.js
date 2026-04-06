@@ -3,6 +3,7 @@ import { temporal } from "zundo";
 import { getPage } from "../queries/pageManager";
 import { getGlobalWidgets } from "../queries/previewManager";
 import { getThemeSettings } from "../queries/themeManager";
+import { getActiveProjectId } from "../lib/activeProjectId";
 
 /**
  * Zustand store for managing page editor state with undo/redo support via zundo.
@@ -44,11 +45,17 @@ const usePageStore = create(
       globalWidgets: { header: null, footer: null },
       themeSettings: null,
       originalThemeSettings: null,
+      loadedProjectId: null,
+      activeLoadId: 0,
       loading: true,
       error: null,
 
       // Actions
       loadPage: async (pageId) => {
+        const projectId = getActiveProjectId();
+        const nextLoadId = get().activeLoadId + 1;
+        set({ activeLoadId: nextLoadId });
+
         if (!pageId) {
           set({
             loading: false,
@@ -58,11 +65,12 @@ const usePageStore = create(
             globalWidgets: { header: null, footer: null },
             themeSettings: null,
             originalThemeSettings: null,
+            loadedProjectId: projectId,
           });
           return;
         }
 
-        set({ loading: true, error: null });
+        set({ loading: true, error: null, loadedProjectId: projectId });
 
         try {
           // Load page data (clean, no global widgets mixed in)
@@ -88,17 +96,34 @@ const usePageStore = create(
           // Load theme settings for undo tracking
           await get().loadThemeSettings();
 
+          if (get().activeLoadId !== nextLoadId) {
+            return;
+          }
+
           set({
             page: cleanPageData,
             originalPage: JSON.parse(JSON.stringify(cleanPageData)),
             loading: false,
             error: null,
+            loadedProjectId: projectId,
           });
 
           // Clear undo history after page load - start fresh
           usePageStore.temporal.getState().clear();
         } catch (err) {
-          set({ error: err.message, loading: false });
+          if (get().activeLoadId !== nextLoadId) {
+            return;
+          }
+          set({
+            error: err.message,
+            loading: false,
+            page: null,
+            originalPage: null,
+            globalWidgets: { header: null, footer: null },
+            themeSettings: null,
+            originalThemeSettings: null,
+            loadedProjectId: projectId,
+          });
           console.error("Failed to load page:", err);
         }
       },
@@ -217,6 +242,9 @@ const usePageStore = create(
           page: null,
           originalPage: null,
           globalWidgets: { header: null, footer: null },
+          themeSettings: null,
+          originalThemeSettings: null,
+          loadedProjectId: null,
           loading: false,
           error: null,
         });

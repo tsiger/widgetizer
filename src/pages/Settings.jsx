@@ -22,25 +22,41 @@ export default function Settings() {
 
   useFormNavigationGuard(hasChanges);
   const showToast = useToastStore((state) => state.showToast);
+  const activeProject = useProjectStore((state) => state.activeProject);
 
   useEffect(() => {
+    if (!activeProject?.id) {
+      setThemeData(null);
+      setOriginalData(null);
+      setHasChanges(false);
+      setLoading(false);
+      return;
+    }
+
+    let stale = false;
+
     const loadThemeSettings = async () => {
       try {
         setLoading(true);
-        const data = await getThemeSettings();
+        setThemeData(null);
+        setOriginalData(null);
+        setHasChanges(false);
+        const data = await getThemeSettings(activeProject.id);
+        if (stale) return;
         setThemeData(data);
         setOriginalData(JSON.parse(JSON.stringify(data))); // Deep copy for comparison
       } catch (error) {
+        if (stale) return;
         console.error("Failed to load theme settings:", error);
         showToast(t("themeSettings.toasts.loadError"), "error");
       } finally {
-        setLoading(false);
+        if (!stale) setLoading(false);
       }
     };
 
     loadThemeSettings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showToast]);
+    return () => { stale = true; };
+  }, [activeProject?.id, showToast, t]);
 
   useEffect(() => {
     if (themeData && originalData) {
@@ -94,12 +110,19 @@ export default function Settings() {
    * Displays success/error notifications
    */
   const handleSave = async () => {
+    const projectAtSaveStart = useProjectStore.getState().activeProject;
+    if (!projectAtSaveStart?.id) return;
+
     try {
-      const activeProject = useProjectStore.getState().activeProject;
-      const result = await saveThemeSettings(activeProject?.id, themeData);
+      const result = await saveThemeSettings(projectAtSaveStart.id, themeData);
+
+      // Drop the response if the active project changed during the save
+      if (useProjectStore.getState().activeProject?.id !== projectAtSaveStart.id) return;
+
       if (result.warnings?.length) {
         // Refetch to show the corrected values in the UI
-        const freshData = await getThemeSettings();
+        const freshData = await getThemeSettings(projectAtSaveStart.id);
+        if (useProjectStore.getState().activeProject?.id !== projectAtSaveStart.id) return;
         setThemeData(freshData);
         setOriginalData(JSON.parse(JSON.stringify(freshData)));
         setHasChanges(false);
@@ -110,10 +133,9 @@ export default function Settings() {
         showToast(t("themeSettings.toasts.saveSuccess"), "success");
       }
       // Invalidate media cache so usage (e.g. favicon) is reflected immediately
-      if (activeProject) {
-        invalidateMediaCache(activeProject.id);
-      }
+      invalidateMediaCache(projectAtSaveStart.id);
     } catch (error) {
+      if (useProjectStore.getState().activeProject?.id !== projectAtSaveStart.id) return;
       console.error("Failed to save theme settings:", error);
       showToast(t("themeSettings.toasts.saveError"), "error");
     }

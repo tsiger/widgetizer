@@ -39,6 +39,7 @@ function injectBaseTag(html) {
   return html.replace(/<\/head>/i, `${baseTag}\n</head>`);
 }
 
+
 /**
  * Core rendering logic for preview HTML generation.
  * Renders header, page widgets, footer, and injects runtime script.
@@ -268,13 +269,7 @@ export function renderPreviewToken(req, res) {
 export async function renderSingleWidget(req, res) {
   try {
     const { widgetId, widget, themeSettings: rawThemeSettings } = req.body; // Expect themeSettings too
-
-    // Get active project
-    const activeProjectId = projectRepo.getActiveProjectId();
-
-    if (!activeProjectId) {
-      return res.status(404).json({ error: "No active project found" });
-    }
+    const activeProjectId = req.activeProject.id;
 
     // Provide sharedGlobals so we can read back enqueued assets after render
     const sharedGlobals = {
@@ -311,13 +306,7 @@ export async function renderSingleWidget(req, res) {
  */
 export async function getGlobalWidgets(req, res) {
   try {
-    // Get active project
-    const activeProjectId = projectRepo.getActiveProjectId();
-
-    if (!activeProjectId) {
-      return res.status(404).json({ error: "No active project found" });
-    }
-
+    const activeProjectId = req.activeProject.id;
     const projectFolderName = await getProjectFolderName(activeProjectId);
     const projectDir = getProjectDir(projectFolderName);
     // Global widgets *data* is stored in pages/global, not widgets/global
@@ -384,23 +373,7 @@ export async function saveGlobalWidget(req, res) {
       return res.status(400).json({ error: "Invalid widget type" });
     }
 
-    // Get active project
-    const activeProjectId = projectRepo.getActiveProjectId();
-
-    if (!activeProjectId) {
-      return res.status(404).json({ error: "No active project found" });
-    }
-
-    // Guard: reject writes if the frontend's project doesn't match
-    const clientProjectId = req.headers["x-project-id"];
-    if (clientProjectId && clientProjectId !== activeProjectId) {
-      return res.status(409).json({
-        error: "Project mismatch",
-        message: "The active project has changed. Please reload the page.",
-        code: "PROJECT_MISMATCH",
-      });
-    }
-
+    const activeProjectId = req.activeProject.id;
     const projectFolderName = await getProjectFolderName(activeProjectId);
     const projectDir = getProjectDir(projectFolderName);
     const globalPagesDir = path.join(projectDir, "pages", "global");

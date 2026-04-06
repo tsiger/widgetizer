@@ -91,6 +91,7 @@ function mockReq({ params = {}, body = {}, file = null } = {}) {
     params,
     body,
     file,
+    headers: {},
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
@@ -1132,6 +1133,7 @@ describe("getProjectThemeSettings", () => {
     assert.equal(res._status, 200);
     assert.ok(res._json.settings);
   });
+
 });
 
 describe("saveProjectThemeSettings", () => {
@@ -1148,6 +1150,7 @@ describe("saveProjectThemeSettings", () => {
     const saved = await readProjectThemeData("theme-test-project-uuid", "local");
     assert.equal(saved.settings.global.colors[0].id, "bg");
   });
+
 });
 
 // ============================================================================
@@ -1717,4 +1720,7 @@ describe("getProjectThemeLocale", () => {
     assert.equal(res._json.core_spacer?.name, "Spacer");
     assert.equal(res._json.greeting, undefined);
   });
+
+  // NOTE: Project mismatch (409) is now handled by the resolveActiveProject middleware,
+  // not by individual controller functions. Middleware-level tests cover this behavior.
 });

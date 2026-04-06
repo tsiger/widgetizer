@@ -9,6 +9,7 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 
 import useToastStore from "../stores/toastStore";
+import useProjectStore from "../stores/projectStore";
 import { getMenu, updateMenu } from "../queries/menuManager";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
@@ -24,14 +25,22 @@ export default function MenusEdit() {
   const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
+  const activeProject = useProjectStore((state) => state.activeProject);
 
   // Add navigation guard with skip ref
   useFormNavigationGuard(isDirty, skipNavigationGuardRef);
 
   useEffect(() => {
+    if (!activeProject?.id) {
+      setMenu(null);
+      setLoading(false);
+      return;
+    }
+    setMenu(null);
+    setLoading(true);
     loadMenu();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, activeProject?.id]);
 
   const loadMenu = async () => {
     try {

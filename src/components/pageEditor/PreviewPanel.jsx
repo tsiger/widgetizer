@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
 import { fetchPreviewToken, scrollElementIntoView, updatePreview } from "../../queries/previewManager";
 import usePageStore from "../../stores/pageStore";
+import useProjectStore from "../../stores/projectStore";
 import useWidgetStore from "../../stores/widgetStore";
 import { BASE_URL } from "../../config";
 import SelectionOverlay from "./SelectionOverlay";
@@ -175,7 +176,18 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   const pendingScrollRef = useRef(null);
 
   const { globalWidgets } = usePageStore();
+  const activeProject = useProjectStore((state) => state.activeProject);
   const schemas = useWidgetStore((state) => state.schemas);
+
+  useEffect(() => {
+    previousStateRef.current = null;
+    pendingScrollRef.current = null;
+    structuralReloadRef.current = false;
+    setPreviewSrc(null);
+    setError(null);
+    setInitialLoadComplete(false);
+    setLoading(Boolean(page));
+  }, [activeProject?.id, page?.id, runtimeMode]);
 
   // Detect structural changes during render (before child effects fire).
   // This sets the ref synchronously so SelectionOverlay can check it in its effects.

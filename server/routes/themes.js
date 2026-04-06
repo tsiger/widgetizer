@@ -1,6 +1,7 @@
 import express from "express";
 import * as themeController from "../controllers/themeController.js";
 import { standardJsonParser } from "../middleware/jsonParser.js";
+import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
 
 const router = express.Router();
 router.use(standardJsonParser);
@@ -30,13 +31,13 @@ router.get("/:id/presets", themeController.getThemePresets);
 router.post("/:id/update", themeController.updateTheme);
 
 // GET /api/themes/project/:projectId - Get project theme settings
-router.get("/project/:projectId", themeController.getProjectThemeSettings);
+router.get("/project/:projectId", resolveActiveProject, themeController.getProjectThemeSettings);
 
 // POST /api/themes/project/:projectId - Save project theme settings
-router.post("/project/:projectId", themeController.saveProjectThemeSettings);
+router.post("/project/:projectId", resolveActiveProject, themeController.saveProjectThemeSettings);
 
 // GET /api/themes/project/:projectId/locales/:lang - Get theme locale for a project
-router.get("/project/:projectId/locales/:lang", themeController.getProjectThemeLocale);
+router.get("/project/:projectId/locales/:lang", resolveActiveProject, themeController.getProjectThemeLocale);
 
 // POST /api/themes/upload - Upload a new theme zip file
 router.post("/upload", themeController.handleThemeUpload, themeController.uploadTheme);

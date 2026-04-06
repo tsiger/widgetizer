@@ -60,9 +60,17 @@ export default function Pages() {
   const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDelete);
 
   useEffect(() => {
+    if (!activeProject?.id) {
+      setPages([]);
+      setLoading(false);
+      clearSelection();
+      return;
+    }
+
+    clearSelection();
     loadPages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [activeProject?.id]);
 
   useEffect(() => {
     function handleClickOutside(event) {

@@ -10,8 +10,15 @@ vi.mock("../../queries/previewManager", () => ({
 vi.mock("../../queries/themeManager", () => ({
   getThemeSettings: vi.fn(),
 }));
+vi.mock("../../lib/activeProjectId", () => ({
+  getActiveProjectId: vi.fn(() => "project-a"),
+}));
 
 const { default: usePageStore } = await import("../pageStore");
+const { getPage } = await import("../../queries/pageManager");
+const { getGlobalWidgets } = await import("../../queries/previewManager");
+const { getThemeSettings } = await import("../../queries/themeManager");
+const { getActiveProjectId } = await import("../../lib/activeProjectId");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -25,6 +32,8 @@ function resetStore() {
     globalWidgets: { header: null, footer: null },
     themeSettings: null,
     originalThemeSettings: null,
+    loadedProjectId: null,
+    activeLoadId: 0,
     loading: true,
     error: null,
   });
@@ -329,14 +338,67 @@ describe("pageStore", () => {
     it("resets all page state to initial values", () => {
       seedPage();
       seedGlobalWidgets();
+      seedThemeSettings();
+      usePageStore.setState({ loadedProjectId: "project-a" });
       usePageStore.getState().clearPage();
 
       const state = usePageStore.getState();
       expect(state.page).toBeNull();
       expect(state.originalPage).toBeNull();
       expect(state.globalWidgets).toEqual({ header: null, footer: null });
+      expect(state.themeSettings).toBeNull();
+      expect(state.originalThemeSettings).toBeNull();
+      expect(state.loadedProjectId).toBeNull();
       expect(state.loading).toBe(false);
       expect(state.error).toBeNull();
+    });
+  });
+
+  describe("loadPage", () => {
+    it("loads page, globals, and theme settings for the requested project", async () => {
+      getPage.mockResolvedValue({
+        id: "page-1",
+        title: "Loaded Page",
+        widgets: {
+          "w-1": { type: "text", settings: { label: "Hello" } },
+          "w-global": { type: "header", settings: {} },
+        },
+        widgetsOrder: ["w-1", "w-global"],
+      });
+      getGlobalWidgets.mockResolvedValue({
+        header: { settings: { logo: "logo.png" }, blocks: {}, blocksOrder: [] },
+        footer: null,
+      });
+      getThemeSettings.mockResolvedValue({
+        settings: { global: { colors: [{ id: "primary", value: "#000" }] } },
+      });
+
+      await usePageStore.getState().loadPage("page-1");
+
+      const state = usePageStore.getState();
+      expect(getGlobalWidgets).toHaveBeenCalled();
+      expect(getThemeSettings).toHaveBeenCalled();
+      expect(state.loadedProjectId).toBe("project-a");
+      expect(Object.keys(state.page.widgets)).toEqual(["w-1"]);
+      expect(state.globalWidgets.header.type).toBe("header");
+      expect(state.themeSettings.settings.global.colors[0].id).toBe("primary");
+    });
+
+    it("clears stale state when the load fails", async () => {
+      seedPage();
+      seedGlobalWidgets();
+      seedThemeSettings();
+      getPage.mockRejectedValue(new Error("boom"));
+      getActiveProjectId.mockReturnValue("project-b");
+
+      await usePageStore.getState().loadPage("page-1");
+
+      const state = usePageStore.getState();
+      expect(state.page).toBeNull();
+      expect(state.globalWidgets).toEqual({ header: null, footer: null });
+      expect(state.themeSettings).toBeNull();
+      expect(state.loadedProjectId).toBe("project-b");
+      expect(state.error).toBe("boom");
     });
   });
 

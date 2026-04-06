@@ -1,6 +1,12 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import useWidgetStore from "../widgetStore";
-import usePageStore from "../pageStore";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
+vi.mock("../../lib/activeProjectId", () => ({
+  getActiveProjectId: vi.fn(() => "project-a"),
+}));
+
+const { default: useWidgetStore } = await import("../widgetStore");
+const { default: usePageStore } = await import("../pageStore");
+const { getActiveProjectId } = await import("../../lib/activeProjectId");
 
 // ============================================================================
 // Helpers
@@ -146,6 +152,20 @@ describe("selection state", () => {
     expect(state.selectedThemeGroup).toBeNull();
     expect(state.hoveredWidgetId).toBeNull();
     expect(state.hoveredBlockId).toBeNull();
+  });
+
+  it("resetForProjectChange clears schemas and selection state", () => {
+    const store = useWidgetStore.getState();
+    store.setSelectedWidgetId("w-1");
+    store.setSelectedBlockId("b-1");
+    getActiveProjectId.mockReturnValue("project-b");
+    store.resetForProjectChange();
+
+    const state = useWidgetStore.getState();
+    expect(state.schemas).toEqual({});
+    expect(state.selectedWidgetId).toBeNull();
+    expect(state.selectedBlockId).toBeNull();
+    expect(state.loadedProjectId).toBe("project-b");
   });
 
   it("setHoveredWidget sets both widget and block hover", () => {

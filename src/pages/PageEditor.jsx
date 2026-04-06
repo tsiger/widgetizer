@@ -10,6 +10,7 @@ import ThemeSelector from "../components/pageEditor/ThemeSelector";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 import usePageStore from "../stores/pageStore";
+import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
 
@@ -20,6 +21,7 @@ export default function PageEditor() {
     return localStorage.getItem("editorPreviewMode") || "desktop";
   });
   const previewIframeRef = useRef(null);
+  const activeProject = useProjectStore((state) => state.activeProject);
 
   const { page, loading, error, themeSettings } = usePageStore();
   const {
@@ -41,11 +43,11 @@ export default function PageEditor() {
     const pageId = searchParams.get("pageId");
     // Always call loadPage, even with null pageId - it handles the null case properly
     usePageStore.getState().loadPage(pageId);
-    useWidgetStore.getState().resetSelection();
-    if (pageId) {
+    useWidgetStore.getState().resetForProjectChange();
+    if (activeProject?.id) {
       useWidgetStore.getState().loadSchemas();
     }
-  }, [searchParams]);
+  }, [searchParams, activeProject?.id]);
 
   // Handle block selection (cross-component coordination)
   const handleBlockSelect = (blockId) => {

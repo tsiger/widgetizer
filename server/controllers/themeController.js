@@ -50,6 +50,7 @@ function deepMerge(target, source) {
   return result;
 }
 
+
 async function readLocaleFile(localesDir, lang) {
   try {
     const content = await fs.readFile(path.join(localesDir, `${lang}.json`), "utf-8");
@@ -1472,6 +1473,7 @@ export async function uploadTheme(req, res) {
  */
 export async function getProjectThemeSettings(req, res) {
   try {
+
     const { projectId } = req.params;
     // Call the internal helper function
     const themeData = await readProjectThemeData(projectId);
@@ -1496,6 +1498,7 @@ export async function getProjectThemeSettings(req, res) {
  */
 export async function saveProjectThemeSettings(req, res) {
   try {
+
     const { projectId } = req.params;
     const projectFolderName = await getProjectFolderName(projectId);
     const themeFile = getProjectThemeJsonPath(projectFolderName);
@@ -1538,6 +1541,7 @@ export async function saveProjectThemeSettings(req, res) {
  */
 export async function getProjectThemeLocale(req, res) {
   try {
+
     const { projectId, lang } = req.params;
 
     if (!lang || !/^[a-z]{2}$/.test(lang)) {

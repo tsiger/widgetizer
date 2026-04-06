@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 import { getProjectWidgets } from "../queries/previewManager";
+import { getActiveProjectId } from "../lib/activeProjectId";
 import usePageStore from "./pageStore";
 import useAutoSave from "./saveStore";
 import { hasReachedMaxBlocks } from "../utils/blockLimits";
@@ -97,21 +98,23 @@ const useWidgetStore = create((set, get) => ({
   selectedThemeGroup: null,
   hoveredWidgetId: null,
   hoveredBlockId: null,
+  loadedProjectId: null,
   loading: false,
   error: null,
 
   // Actions
   loadSchemas: async () => {
-    set({ loading: true, error: null });
+    const projectId = getActiveProjectId();
+    set({ loading: true, error: null, loadedProjectId: projectId, schemas: {} });
     try {
       const schemas = await getProjectWidgets();
       const schemasMap = {};
       schemas.forEach((schema) => {
         schemasMap[schema.type] = schema;
       });
-      set({ schemas: schemasMap, loading: false });
+      set({ schemas: schemasMap, loading: false, loadedProjectId: projectId });
     } catch (err) {
-      set({ error: err.message, loading: false });
+      set({ schemas: {}, error: err.message, loading: false, loadedProjectId: projectId });
       console.error("Failed to load widget schemas:", err);
     }
   },
@@ -162,6 +165,21 @@ const useWidgetStore = create((set, get) => ({
       selectedThemeGroup: null,
       hoveredWidgetId: null,
       hoveredBlockId: null,
+    });
+  },
+
+  resetForProjectChange: () => {
+    set({
+      schemas: {},
+      selectedWidgetId: null,
+      selectedBlockId: null,
+      selectedGlobalWidgetId: null,
+      selectedThemeGroup: null,
+      hoveredWidgetId: null,
+      hoveredBlockId: null,
+      loadedProjectId: getActiveProjectId(),
+      loading: false,
+      error: null,
     });
   },
 

@@ -64,12 +64,11 @@ const newProject = {
 
 **Rationale:** Pages are stored as JSON files within a project's directory. The controller must resolve the project UUID to its folderName to access the correct filesystem path.
 
-**Pattern:**
+**Pattern:** The `resolveActiveProject` middleware attaches the active project to the request. Controllers use `req.activeProject` to get the ID and folderName.
 
 ```javascript
-const activeProjectId = projectRepo.getActiveProjectId();
-const activeProject = projectRepo.getProjectById(activeProjectId);
-const projectFolderName = activeProject.folderName;
+// req.activeProject is set by resolveActiveProject middleware
+const { id: activeProjectId, folderName: projectFolderName } = req.activeProject;
 
 // Use folderName for all file operations
 const pagePath = getPagePath(projectFolderName, pageSlug);
@@ -190,9 +189,10 @@ const projectDir = getProjectDir(projectFolderName);
 
 **Rationale:** Preview generation requires reading project files and rendering them. The controller must resolve the project UUID to access the correct directory.
 
-**Pattern:**
+**Pattern:** Uses `req.activeProject.id` from middleware for project-scoped endpoints. The internal `generatePreviewHtml()` helper still reads the active project ID directly since it's called within already-validated request handlers.
 
 ```javascript
+const activeProjectId = req.activeProject.id;
 const projectFolderName = await getProjectFolderName(activeProjectId);
 const projectDir = getProjectDir(projectFolderName);
 ```
@@ -201,7 +201,7 @@ const projectDir = getProjectDir(projectFolderName);
 
 - `generatePreview()`: Renders page preview from project files
 - `getGlobalWidgets()`: Reads global widgets from `{folderName}/pages/global/`
-- `saveGlobalWidget()`: Saves global widgets to correct directory
+- `saveGlobalWidget()`: Saves global widgets to correct directory (middleware handles mismatch guard)
 - `serveAsset()`: Serves static assets from project directory
 
 **Rendering Service Integration:** The preview controller passes the project UUID to the rendering service, which internally resolves it to the folderName.

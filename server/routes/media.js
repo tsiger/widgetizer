@@ -14,9 +14,11 @@ import {
   refreshMediaUsage,
 } from "../controllers/mediaController.js";
 import { standardJsonParser } from "../middleware/jsonParser.js";
+import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
 
 const router = express.Router();
 router.use(standardJsonParser);
+router.use(resolveActiveProject);
 
 // Get all media for a project
 router.get(

@@ -19,6 +19,7 @@ import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageServi
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError, PROJECT_ERROR_CODES } from "../utils/projectErrors.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
+
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { readMediaFile } from "../services/mediaService.js";
 
@@ -81,6 +82,8 @@ async function getImageProcessingSettings(projectId) {
 
   return enabledSizes;
 }
+
+
 
 
 // Decode the filename TODO: Where should things like this live?
@@ -200,6 +203,7 @@ export const upload = multer({
  */
 export async function getProjectMedia(req, res) {
   try {
+
     const { projectId } = req.params;
 
     if (!projectId) {
@@ -238,6 +242,7 @@ export async function getProjectMedia(req, res) {
  */
 export async function uploadProjectMedia(req, res) {
   try {
+
     const { projectId } = req.params;
     const files = req.files;
 
@@ -472,6 +477,7 @@ export async function uploadProjectMedia(req, res) {
  */
 export async function updateMediaMetadata(req, res) {
   try {
+
     const { projectId, fileId } = req.params;
     const alt = stripHtmlTags(req.body.alt);
     const title = stripHtmlTags(req.body.title);
@@ -515,6 +521,7 @@ export async function updateMediaMetadata(req, res) {
  */
 export async function deleteProjectMedia(req, res) {
   try {
+
     const { projectId, fileId } = req.params;
 
     // Validate project ownership and get folder name for filesystem ops
@@ -644,6 +651,7 @@ export async function serveProjectMedia(req, res) {
  */
 export async function bulkDeleteProjectMedia(req, res) {
   try {
+
     const { projectId } = req.params;
     const { fileIds } = req.body; // Expect an array of file IDs
 
@@ -750,6 +758,7 @@ export async function bulkDeleteProjectMedia(req, res) {
  */
 export async function getMediaFileUsage(req, res) {
   try {
+
     const { projectId, fileId } = req.params;
     const usage = await getMediaUsage(projectId, fileId);
     res.json(usage);
@@ -773,6 +782,7 @@ export async function getMediaFileUsage(req, res) {
  */
 export async function refreshMediaUsage(req, res) {
   try {
+
     const { projectId } = req.params;
     const result = await refreshAllMediaUsage(projectId);
     res.json(result);

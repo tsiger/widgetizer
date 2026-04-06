@@ -31,9 +31,14 @@ vi.mock("../projectStore", () => ({
     }),
   },
 }));
+vi.mock("../../lib/activeProjectId", () => ({
+  getActiveProjectId: vi.fn(() => "test-project"),
+}));
 
 const { default: useAutoSave } = await import("../saveStore");
 const { default: usePageStore } = await import("../pageStore");
+const { savePageContent } = await import("../../queries/pageManager");
+const { saveThemeSettings } = await import("../../queries/themeManager");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -48,6 +53,8 @@ function resetStores() {
     globalWidgets: { header: null, footer: null },
     themeSettings: null,
     originalThemeSettings: null,
+    loadedProjectId: null,
+    activeLoadId: 0,
     loading: false,
     error: null,
   });
@@ -64,6 +71,7 @@ function seedPageStore() {
   usePageStore.setState({
     page: JSON.parse(JSON.stringify(page)),
     originalPage: JSON.parse(JSON.stringify(page)),
+    loadedProjectId: "test-project",
     loading: false,
   });
 
@@ -76,6 +84,7 @@ function seedPageStore() {
 
 describe("saveStore (useAutoSave)", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.useFakeTimers();
     resetStores();
   });
@@ -412,8 +421,6 @@ describe("saveStore (useAutoSave)", () => {
     });
 
     it("passes store-cached project ID to saveThemeSettings", async () => {
-      const { saveThemeSettings } = await import("../../queries/themeManager");
-
       seedPageStore();
       const themeSettings = {
         settings: { global: { colors: [{ id: "c1", value: "#000" }] } },
@@ -425,6 +432,19 @@ describe("saveStore (useAutoSave)", () => {
 
       // The mock projectStore returns activeProject.id = "test-project"
       expect(saveThemeSettings).toHaveBeenCalledWith("test-project", themeSettings);
+    });
+
+    it("aborts before saving when the loaded page belongs to another project", async () => {
+      seedPageStore();
+      usePageStore.setState({ loadedProjectId: "other-project" });
+      useAutoSave.getState().markWidgetModified("w-1");
+      useAutoSave.getState().setThemeSettingsModified(true);
+
+      await useAutoSave.getState().save();
+
+      expect(savePageContent).not.toHaveBeenCalled();
+      expect(saveThemeSettings).not.toHaveBeenCalled();
+      expect(useAutoSave.getState().isSaving).toBe(false);
     });
   });
 });

@@ -22,13 +22,20 @@ export async function resolveActiveProject(req, res, next) {
     }
 
     // Guard: reject writes if the frontend's project doesn't match
-    const clientProjectId = req.headers["x-project-id"];
-    if (WRITE_METHODS.includes(req.method) && clientProjectId && clientProjectId !== activeProject.id) {
-      return res.status(409).json({
-        error: "Project mismatch",
-        message: "The active project has changed. Please reload the page.",
-        code: "PROJECT_MISMATCH",
-      });
+    if (WRITE_METHODS.includes(req.method)) {
+      const clientProjectId = req.headers["x-project-id"];
+      const routeProjectId = req.params?.projectId;
+
+      if (
+        (clientProjectId && clientProjectId !== activeProject.id) ||
+        (routeProjectId && routeProjectId !== activeProject.id)
+      ) {
+        return res.status(409).json({
+          error: "Project mismatch",
+          message: "The active project has changed. Please reload the page.",
+          code: "PROJECT_MISMATCH",
+        });
+      }
     }
 
     req.activeProject = activeProject;

@@ -116,6 +116,13 @@ const useAutoSave = create((set, get) => ({
 
     try {
       const activeProject = useProjectStore.getState().activeProject;
+      const loadedProjectId = pageStore.loadedProjectId;
+
+      if (activeProject && loadedProjectId && activeProject.id !== loadedProjectId) {
+        const mismatchError = new Error("Project mismatch");
+        mismatchError.code = "PROJECT_MISMATCH";
+        throw mismatchError;
+      }
 
       // Phase 1: mismatch-guarded writes (page content + global widgets)
       // These go through resolveActiveProject middleware or saveGlobalWidget's

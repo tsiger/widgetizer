@@ -65,11 +65,12 @@ after(async () => {
 // Mock helpers
 // ============================================================================
 
-function mockReq({ params = {}, body = {}, headers = {} } = {}) {
+function mockReq({ params = {}, body = {}, headers = {}, activeProject = { id: PROJECT_ID, folderName: PROJECT_FOLDER } } = {}) {
   return {
     params,
     body,
     headers,
+    activeProject,
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
@@ -196,17 +197,8 @@ describe("getGlobalWidgets", () => {
     assert.ok(res._json.footer, "Footer should still work");
   });
 
-  it("returns 404 when no active project", async () => {
-    // Temporarily clear active project
-    const original = await projectRepo.readProjectsData();
-    await projectRepo.writeProjectsData({ ...original, activeProjectId: null });
-
-    const res = await callController(getGlobalWidgets);
-    assert.equal(res._status, 404);
-
-    // Restore
-    await projectRepo.writeProjectsData(original);
-  });
+  // NOTE: "No active project" (404) is now handled by the resolveActiveProject middleware,
+  // not by the controller. The middleware returns 404 before the controller is called.
 });
 
 // ============================================================================
@@ -288,18 +280,8 @@ describe("saveGlobalWidget", () => {
     assert.ok(await fs.pathExists(path.join(globalDir(), "header.json")), "Header file should exist");
   });
 
-  it("returns 404 when no active project", async () => {
-    const original = await projectRepo.readProjectsData();
-    await projectRepo.writeProjectsData({ ...original, activeProjectId: null });
-
-    const res = await callController(saveGlobalWidget, {
-      params: { type: "header" },
-      body: { type: "theme-header" },
-    });
-    assert.equal(res._status, 404);
-
-    await projectRepo.writeProjectsData(original);
-  });
+  // NOTE: "No active project" (404) is now handled by the resolveActiveProject middleware,
+  // not by the controller. The middleware returns 404 before the controller is called.
 });
 
 // ============================================================================
@@ -455,16 +437,6 @@ describe("saveGlobalWidget — mismatch guard", () => {
     assert.ok(res._json.success);
   });
 
-  it("returns 409 with mismatched X-Project-Id", async () => {
-    const res = await callController(saveGlobalWidget, {
-      params: { type: "header" },
-      body: validWidget,
-      headers: { "x-project-id": "wrong-project-uuid" },
-    });
-    assert.equal(res._status, 409);
-    assert.equal(res._json.code, "PROJECT_MISMATCH");
-  });
-
   it("saves successfully without X-Project-Id header (backward compat)", async () => {
     const res = await callController(saveGlobalWidget, {
       params: { type: "footer" },
@@ -475,3 +447,6 @@ describe("saveGlobalWidget — mismatch guard", () => {
     assert.ok(res._json.success);
   });
 });
+
+// NOTE: Project mismatch (409) is now handled by the resolveActiveProject middleware,
+// not by individual controller functions. Middleware-level tests cover this behavior.

@@ -1,7 +1,7 @@
 import { API_URL } from "../config";
 import { apiFetch } from "../lib/apiFetch";
+import { getActiveProjectId } from "../lib/activeProjectId";
 import { uploadFormData } from "../lib/uploadRequest";
-import { getActiveProject } from "./projectManager";
 
 /**
  * @typedef {Object} Theme
@@ -135,15 +135,15 @@ export async function getThemeTemplates(themeId) {
  * @returns {Promise<ThemeSettings>} The current theme settings
  * @throws {Error} If no active project or request fails
  */
-export async function getThemeSettings() {
+export async function getThemeSettings(projectId) {
   try {
-    const activeProject = await getActiveProject();
+    const resolvedProjectId = projectId || getActiveProjectId();
 
-    if (!activeProject) {
+    if (!resolvedProjectId) {
       throw new Error("No active project");
     }
 
-    const response = await apiFetch(`/api/themes/project/${activeProject.id}`);
+    const response = await apiFetch(`/api/themes/project/${resolvedProjectId}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch theme settings");
