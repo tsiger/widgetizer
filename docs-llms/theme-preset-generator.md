@@ -4,6 +4,75 @@ Complete reference for building Arch theme presets. Every preset must showcase t
 
 ---
 
+## 0. Generation Workflow
+
+Each preset is built in three phases. All plan and image files live in `docs-llms/preset-plans/`.
+
+### Phase 1: Plan (`{preset-id}.md`)
+
+Write a detailed plan document covering:
+
+- **Identity** — Name, industry, personality description (2-3 sentences establishing the brand voice)
+- **preset.json settings** — Full color palette (all 18 tokens with rationale), typography (heading + body font with exact stacks/weights from `fonts.json`), style settings (`corner_style`, `spacing_density`, `button_shape`)
+- **Header config** — Complete header JSON with all settings. Note what makes it distinct from other presets
+- **Footer config** — Footer settings and block plan
+- **Pages** — Table per page listing every widget in order: widget name, type, color scheme, and key configuration details (content, layout choices, block count, etc.)
+- **Menus** — Which pages appear in `main-menu.json` and `footer-menu.json`
+- **Widget usage summary** — Count of unique widget types and how many times each is used
+- **Header differentiation notes** — What combination of header settings makes this preset unique
+
+The plan file is the single source of truth — Phase 3 builds directly from it.
+
+### Phase 2: Images (`{preset-id}-images.json`)
+
+Write a JSON array listing every image the preset needs. Each entry:
+
+```json
+{
+  "file": "home-hero.jpg",
+  "width": 1920,
+  "height": 1080,
+  "prompt": "Description for image generation — scene, lighting, angle, mood, style direction."
+}
+```
+
+Guidelines:
+- Hero images are typically `1920×1080` (large) or `1920×600` (small banner heroes)
+- Content images (image-text, image-callout, etc.) are typically `800×600`
+- Portrait/team photos are typically `400×400`
+- Gallery/masonry images vary — use aspect ratios that suit the layout (square, portrait, landscape mix)
+- Prompts should be specific about scene, lighting, angle, mood, and styling. End with a photography style note (e.g., "Editorial food photography, warm tones")
+- Include "No people" when appropriate, or describe people generically without names/identities
+- Every image referenced in the plan must have a corresponding entry
+
+### Phase 3: Build
+
+Create the actual preset files from the plan:
+
+```
+themes/arch/presets/{preset-id}/
+  preset.json           # Settings overrides from plan
+  templates/            # Page JSON files
+    index.json
+    about.json
+    contact.json
+    ...
+    global/
+      header.json
+      footer.json
+  menus/
+    main-menu.json
+    footer-menu.json
+```
+
+Follow the plan exactly. Validate every setting key and value against widget schemas (see Section 6).
+
+### Progress tracking
+
+Track preset status in `docs-llms/theme-presets-tracker.md`. Update the Status column as presets move through the phases.
+
+---
+
 ## 1. Pre-Generation Process
 
 Before writing any preset files, complete these steps in order:

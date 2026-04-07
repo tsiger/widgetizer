@@ -292,6 +292,12 @@ export async function setActiveProject(req, res) {
 
     projectRepo.setActiveProjectId(id);
 
+    // Clear the rendering service's icons cache so the new project
+    // loads its own icons.json on next render
+    if (global.iconsCache) {
+      global.iconsCache.delete(id);
+    }
+
     res.json({ success: true });
   } catch (error) {
     console.error("Error setting active project:", error);

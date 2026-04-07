@@ -101,14 +101,23 @@ async function removeDir(relPath) {
   }
 }
 
+function isGitPath(filePath) {
+  const rel = path.relative(srcDir, filePath);
+  return rel.split(path.sep).includes(".git");
+}
+
 function initialSync() {
   console.log(`[${stamp()}] [sync] Full copy: themes/${themeId} → data/themes/${themeId}`);
-  cpSync(srcDir, themeDest, { recursive: true });
+  cpSync(srcDir, themeDest, {
+    recursive: true,
+    filter: (src) => !isGitPath(src),
+  });
 
   console.log(`[${stamp()}] [sync] Full copy: themes/${themeId} → data/projects/${project} (filtered)`);
   cpSync(srcDir, projectDest, {
     recursive: true,
     filter: (src) => {
+      if (isGitPath(src)) return false;
       const rel = path.relative(srcDir, src);
       if (!rel) return true; // root
       return !isExcludedForProject(rel);
@@ -118,6 +127,7 @@ function initialSync() {
 
 function startWatcher() {
   const watcher = chokidar.watch(srcDir, {
+    ignored: /(^|[/\\])\.git([/\\]|$)/,
     ignoreInitial: true,
     awaitWriteFinish: { stabilityThreshold: 100, pollInterval: 50 },
   });
