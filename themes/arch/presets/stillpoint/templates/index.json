@@ -6,7 +6,7 @@
       "type": "banner",
       "settings": {
         "image": "",
-        "height": "large",
+        "height": "medium",
         "fullwidth": true,
         "alignment": "start",
         "vertical_alignment": "end",
@@ -295,14 +295,14 @@
     "stats": {
       "type": "trust-bar",
       "settings": {
-        "icon_style": "plain",
+        "icon_style": "outline",
         "icon_size": "lg",
         "icon_shape": "circle",
         "alignment": "centered",
         "show_dividers": true,
-        "color_scheme": "highlight",
-        "top_spacing": "none",
-        "bottom_spacing": "none"
+        "color_scheme": "standard-accent",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
       },
       "blocks": {
         "stat-1": {
@@ -337,7 +337,8 @@
       "settings": {
         "fullwidth": false,
         "color_scheme": "highlight",
-        "top_spacing": "none"
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
       },
       "blocks": {
         "cta-heading": {

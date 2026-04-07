@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "overlay_color": "#2c242080",
         "color_scheme": "highlight",
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -26,80 +27,106 @@
       "blocksOrder": ["hero-heading"]
     },
     "schedule": {
-      "type": "schedule-table",
+      "type": "card-grid",
       "settings": {
         "eyebrow": "",
         "title": "Weekly Schedule",
         "description": "",
         "heading_alignment": "center",
-        "note": "Private sessions available by appointment",
-        "sidebar_position": "right",
-        "week_start_day": "1",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "start",
+        "aspect_ratio": "1 / 1",
         "color_scheme": "standard"
       },
       "blocks": {
-        "day-mon": {
-          "type": "day",
+        "card-weekday-am": {
+          "type": "card",
           "settings": {
-            "day": "Monday",
-            "hours": "6:30 AM, 9:00 AM, 12:00 PM, 5:30 PM, 7:00 PM"
+            "image": "",
+            "subtitle": "Mon — Fri",
+            "title": "Morning Classes",
+            "description": "<p>6:30 AM Vinyasa Flow<br>9:00 AM Hatha<br>Start your day grounded and energized.</p>",
+            "button_link": {
+              "text": "Book a Morning Class",
+              "href": "contact.html",
+              "target": "_self"
+            }
           }
         },
-        "day-tue": {
-          "type": "day",
+        "card-weekday-mid": {
+          "type": "card",
           "settings": {
-            "day": "Tuesday",
-            "hours": "6:30 AM, 9:00 AM, 12:00 PM, 5:30 PM, 7:00 PM"
+            "image": "",
+            "subtitle": "Mon — Fri",
+            "title": "Midday Reset",
+            "description": "<p>12:00 PM Yin or Meditation<br>A quiet pause in the middle of your day.</p>",
+            "button_link": {
+              "text": "Book a Midday Class",
+              "href": "contact.html",
+              "target": "_self"
+            }
           }
         },
-        "day-wed": {
-          "type": "day",
+        "card-weekday-pm": {
+          "type": "card",
           "settings": {
-            "day": "Wednesday",
-            "hours": "6:30 AM, 9:00 AM, 12:00 PM, 5:30 PM, 7:00 PM"
+            "image": "",
+            "subtitle": "Mon — Fri",
+            "title": "Evening Flow",
+            "description": "<p>5:30 PM Vinyasa Flow<br>7:00 PM Pilates Mat<br>Unwind and move after work.</p>",
+            "button_link": {
+              "text": "Book an Evening Class",
+              "href": "contact.html",
+              "target": "_self"
+            }
           }
         },
-        "day-thu": {
-          "type": "day",
+        "card-saturday": {
+          "type": "card",
           "settings": {
-            "day": "Thursday",
-            "hours": "6:30 AM, 9:00 AM, 12:00 PM, 5:30 PM, 7:00 PM"
+            "image": "",
+            "subtitle": "Saturday",
+            "title": "Weekend Practice",
+            "description": "<p>8:00 AM Vinyasa Flow<br>9:30 AM Hatha<br>11:00 AM Prenatal<br>4:00 PM Yin</p>",
+            "button_link": {
+              "text": "Book Saturday",
+              "href": "contact.html",
+              "target": "_self"
+            }
           }
         },
-        "day-fri": {
-          "type": "day",
+        "card-sunday": {
+          "type": "card",
           "settings": {
-            "day": "Friday",
-            "hours": "6:30 AM, 9:00 AM, 12:00 PM, 5:30 PM"
+            "image": "",
+            "subtitle": "Sunday",
+            "title": "Slow Sunday",
+            "description": "<p>9:00 AM Hatha<br>10:30 AM Meditation<br>4:00 PM Yin<br>A gentle close to the week.</p>",
+            "button_link": {
+              "text": "Book Sunday",
+              "href": "contact.html",
+              "target": "_self"
+            }
           }
         },
-        "day-sat": {
-          "type": "day",
+        "card-private": {
+          "type": "card",
           "settings": {
-            "day": "Saturday",
-            "hours": "8:00 AM, 9:30 AM, 11:00 AM, 4:00 PM"
+            "image": "",
+            "subtitle": "By Appointment",
+            "title": "Private Sessions",
+            "description": "<p>One-on-one instruction tailored to your goals. Available with any of our instructors, any day of the week.</p>",
+            "button_link": {
+              "text": "Request a Session",
+              "href": "contact.html",
+              "target": "_self"
+            }
           }
-        },
-        "day-sun": {
-          "type": "day",
-          "settings": {
-            "day": "Sunday",
-            "hours": "9:00 AM, 10:30 AM, 4:00 PM"
-          }
-        },
-        "info-pricing": {
-          "type": "info",
-          "settings": {
-            "title": "Drop In",
-            "text": "<p>$22 per class<br>5-Class Pack: $95<br>Unlimited: $149/mo</p><p>First class free for new students.</p>"
-          }
-        },
-        "social-1": {
-          "type": "social",
-          "settings": {}
         }
       },
-      "blocksOrder": ["day-mon", "day-tue", "day-wed", "day-thu", "day-fri", "day-sat", "day-sun", "info-pricing", "social-1"]
+      "blocksOrder": ["card-weekday-am", "card-weekday-mid", "card-weekday-pm", "card-saturday", "card-sunday", "card-private"]
     },
     "intro_class": {
       "type": "image-text",
@@ -143,7 +170,7 @@
     "cta": {
       "type": "action-bar",
       "settings": {
-        "fullwidth": true,
+        "fullwidth": false,
         "color_scheme": "highlight"
       },
       "blocks": {

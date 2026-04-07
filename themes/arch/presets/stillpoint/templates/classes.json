@@ -41,7 +41,7 @@
         "heading_alignment": "center",
         "layout": "grid",
         "columns_desktop": 3,
-        "card_layout": "flat",
+        "card_layout": "box",
         "alignment": "start",
         "icon_style": "filled",
         "icon_size": "xl",

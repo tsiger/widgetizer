@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "overlay_color": "#2c242080",
         "color_scheme": "highlight",
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -75,7 +76,7 @@
         "title": "Our Values",
         "description": "",
         "heading_alignment": "center",
-        "content_position": "right",
+        "content_position": "left",
         "show_divider": false,
         "icon_style": "outline",
         "icon_size": "lg",
@@ -86,7 +87,7 @@
         "value-1": {
           "type": "feature",
           "settings": {
-            "icon": "unlock",
+            "icon": "accessible",
             "title": "Accessible to All",
             "description": "<p>Yoga is for every body. We offer modifications in every class, sliding-scale pricing, and a welcoming environment where no one is judged for where they are in their practice.</p>"
           }
@@ -94,7 +95,7 @@
         "value-2": {
           "type": "feature",
           "settings": {
-            "icon": "git-branch",
+            "icon": "leaf",
             "title": "Rooted in Tradition",
             "description": "<p>We honor the ancient roots of yoga while teaching in a way that's relevant and accessible today. Our approach blends classical philosophy with modern anatomy and movement science.</p>"
           }

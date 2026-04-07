@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "overlay_color": "#2c242080",
         "color_scheme": "highlight",
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -34,7 +35,7 @@
         "heading_alignment": "center",
         "layout": "grid",
         "columns_desktop": 4,
-        "staggered": true,
+        "staggered": false,
         "aspect_ratio": "auto",
         "color_scheme": "standard"
       },

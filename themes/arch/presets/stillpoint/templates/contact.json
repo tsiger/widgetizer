@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "overlay_color": "#2c242080",
         "color_scheme": "highlight",
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -30,7 +31,7 @@
       "settings": {
         "image": "",
         "image_position": "right",
-        "text_position": "flex-start",
+        "text_position": "flex-end",
         "content_color_scheme": "none",
         "color_scheme": "standard"
       },
