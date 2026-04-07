@@ -1,0 +1,331 @@
+{
+  "name": "Classes",
+  "slug": "classes",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#2c242080",
+        "color_scheme": "highlight",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Classes",
+            "size": "4xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From gentle stretches to challenging flows</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "class_grid": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "",
+        "title": "Find Your Practice",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "start",
+        "icon_style": "filled",
+        "icon_size": "xl",
+        "icon_shape": "circle",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "class-1": {
+          "type": "card",
+          "settings": {
+            "icon": "wind",
+            "title": "Vinyasa Flow",
+            "description": "<p>Dynamic, breath-led sequences that build heat, endurance, and focus. Expect sun salutations, standing flows, and creative transitions. Intermediate pace with modifications offered for all levels.</p>",
+            "button_link": {
+              "text": "View Schedule",
+              "href": "schedule.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-2": {
+          "type": "card",
+          "settings": {
+            "icon": "sun",
+            "title": "Hatha",
+            "description": "<p>A slower-paced practice with longer holds in each posture. Build strength, alignment, and body awareness through foundational poses and conscious breathing. Perfect for beginners and experienced practitioners alike.</p>",
+            "button_link": {
+              "text": "View Schedule",
+              "href": "schedule.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-3": {
+          "type": "card",
+          "settings": {
+            "icon": "moon",
+            "title": "Yin",
+            "description": "<p>Deep, passive stretches held for three to five minutes at a time. Release tension stored in connective tissue, calm the nervous system, and cultivate a meditative stillness. Mostly floor-based and deeply restorative.</p>",
+            "button_link": {
+              "text": "View Schedule",
+              "href": "schedule.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-4": {
+          "type": "card",
+          "settings": {
+            "icon": "activity",
+            "title": "Pilates Mat",
+            "description": "<p>Core-centered movement that strengthens from the inside out. Controlled, precise exercises improve posture, stability, and body control. No equipment needed — just a mat and your focus.</p>",
+            "button_link": {
+              "text": "View Schedule",
+              "href": "schedule.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-5": {
+          "type": "card",
+          "settings": {
+            "icon": "heart",
+            "title": "Prenatal",
+            "description": "<p>Gentle, supportive practice designed for expecting mothers at any trimester. Ease discomfort, build strength for labor, and connect with your changing body in a safe, nurturing environment.</p>",
+            "button_link": {
+              "text": "View Schedule",
+              "href": "schedule.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-6": {
+          "type": "card",
+          "settings": {
+            "icon": "eye",
+            "title": "Meditation",
+            "description": "<p>Guided sitting practice to quiet the mind and deepen self-awareness. Sessions include breath work, body scans, and mindfulness techniques. No experience needed — just show up and breathe.</p>",
+            "button_link": {
+              "text": "View Schedule",
+              "href": "schedule.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["class-1", "class-2", "class-3", "class-4", "class-5", "class-6"]
+    },
+    "what_to_expect": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "First Time?",
+        "title": "What to Expect",
+        "description": "",
+        "heading_alignment": "left",
+        "content_position": "left",
+        "show_divider": true,
+        "icon_style": "plain",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "feature-1": {
+          "type": "feature",
+          "settings": {
+            "icon": "clock",
+            "title": "Arrive 10 Minutes Early",
+            "description": "<p>Give yourself time to check in, set up your mat, and settle into the space before class begins.</p>"
+          }
+        },
+        "feature-2": {
+          "type": "feature",
+          "settings": {
+            "icon": "box",
+            "title": "Mats & Props Provided",
+            "description": "<p>We have mats, blocks, straps, and bolsters for everyone. Just bring yourself and a water bottle.</p>"
+          }
+        },
+        "feature-3": {
+          "type": "feature",
+          "settings": {
+            "icon": "users",
+            "title": "All Levels Welcome",
+            "description": "<p>Every class offers modifications. Our teachers meet you where you are — no judgement, no pressure.</p>"
+          }
+        },
+        "feature-4": {
+          "type": "feature",
+          "settings": {
+            "icon": "droplet",
+            "title": "Hydration Station Available",
+            "description": "<p>Filtered water and herbal tea are always available in the lobby. Stay hydrated before and after your practice.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["feature-1", "feature-2", "feature-3", "feature-4"]
+    },
+    "pricing": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "pricing-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Simple, Honest Pricing",
+            "size": "3xl"
+          }
+        },
+        "pricing-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Drop-in: $22 · 5-Class Pack: $95 · Unlimited Monthly: $149</p>",
+            "size": "base"
+          }
+        },
+        "pricing-note": {
+          "type": "text",
+          "settings": {
+            "text": "<p>First class free for new students</p>",
+            "size": "sm",
+            "muted": true
+          }
+        },
+        "pricing-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get Started",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["pricing-heading", "pricing-text", "pricing-note", "pricing-button"]
+    },
+    "instructor": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "instructor-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>MEET YOUR TEACHER</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "instructor-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Sarah Chen",
+            "size": "2xl"
+          }
+        },
+        "instructor-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Sarah founded Stillpoint in 2018 after 15 years of practice and training across Bali, India, and New York. She holds RYT-500 certification and specializes in vinyasa and yin yoga. Her teaching style is warm, precise, and deeply personal — she believes every student already has what they need.</p>",
+            "size": "base"
+          }
+        },
+        "instructor-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "About Our Team",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["instructor-eyebrow", "instructor-heading", "instructor-text", "instructor-button"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Questions?",
+        "title": "Common Questions",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "What should I wear?",
+            "answer": "<p>Comfortable, stretchy clothing that allows you to move freely. We practice barefoot, so no shoes needed in the studio.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "Do I need my own mat?",
+            "answer": "<p>No — we provide high-quality mats, blocks, straps, and bolsters for all classes. You're welcome to bring your own mat if you prefer.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Can I join mid-session?",
+            "answer": "<p>Out of respect for other students, we ask that you arrive before class begins. Doors close at the start time. If you're running late, you're welcome to join the next available class.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Is parking available?",
+            "answer": "<p>Street parking is available on Willow Street and surrounding blocks. The studio is also a 5-minute walk from the Clark Street subway station (2/3 trains).</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "question": "What's your cancellation policy?",
+            "answer": "<p>We ask for at least 4 hours notice for cancellations. Late cancellations or no-shows will be deducted from your class pack. Unlimited members are not affected.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5"]
+    }
+  },
+  "widgetsOrder": ["hero", "class_grid", "what_to_expect", "pricing", "instructor", "faq"],
+  "id": "classes",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

@@ -1,0 +1,378 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "large",
+        "fullwidth": true,
+        "alignment": "start",
+        "vertical_alignment": "end",
+        "overlay_color": "#2c242099",
+        "color_scheme": "highlight",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>YOGA & PILATES STUDIO</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Find Your Stillpoint",
+            "size": "6xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Classes for every body, every level. Your first class is free.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Class",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "link_2": {
+              "text": "View Schedule",
+              "href": "schedule.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-buttons"]
+    },
+    "marquee": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "Breathe · Move · Rest",
+        "separator": "·",
+        "speed": 4,
+        "rotate": 0,
+        "font_size": "lg",
+        "bg_color": "#c4724e",
+        "text_color": "#ffffff",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      }
+    },
+    "intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Where Stillness Meets Strength",
+            "size": "3xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Stillpoint is a neighborhood studio in Brooklyn where traditional yoga philosophy meets contemporary movement practice. We believe that the real work happens when you slow down — and that strength, flexibility, and calm are built in equal measure on the mat.</p>",
+            "size": "base"
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Explore Our Classes",
+              "href": "classes.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-text", "intro-button"]
+    },
+    "classes": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Our Classes",
+        "title": "Something for Every Body",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "center",
+        "icon_style": "plain",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "class-1": {
+          "type": "card",
+          "settings": {
+            "icon": "wind",
+            "title": "Vinyasa Flow",
+            "description": "<p>Dynamic, breath-led sequences that build heat and focus. Move through poses with intention and find your rhythm.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "classes.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-2": {
+          "type": "card",
+          "settings": {
+            "icon": "sun",
+            "title": "Hatha",
+            "description": "<p>Slower-paced practice with longer holds. Build strength and alignment through foundational postures and conscious breathing.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "classes.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-3": {
+          "type": "card",
+          "settings": {
+            "icon": "moon",
+            "title": "Yin",
+            "description": "<p>Deep, passive stretches held for minutes at a time. Release tension in connective tissue and cultivate stillness.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "classes.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-4": {
+          "type": "card",
+          "settings": {
+            "icon": "activity",
+            "title": "Pilates Mat",
+            "description": "<p>Core-centered movement that strengthens from the inside out. Controlled, precise exercises for posture and stability.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "classes.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-5": {
+          "type": "card",
+          "settings": {
+            "icon": "heart",
+            "title": "Prenatal",
+            "description": "<p>Gentle, supportive practice designed for expecting mothers. Ease discomfort, build strength, and prepare for birth.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "classes.html",
+              "target": "_self"
+            }
+          }
+        },
+        "class-6": {
+          "type": "card",
+          "settings": {
+            "icon": "eye",
+            "title": "Meditation",
+            "description": "<p>Guided sitting practice to quiet the mind and deepen awareness. No experience needed — just show up and breathe.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "classes.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["class-1", "class-2", "class-3", "class-4", "class-5", "class-6"]
+    },
+    "studio": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "studio-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>THE SPACE</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "studio-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Light-Filled, Distraction-Free",
+            "size": "2xl"
+          }
+        },
+        "studio-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our studio is designed for focus. Natural light pours through floor-to-ceiling windows, bamboo floors warm underfoot, and the space is intentionally free of mirrors. Everything here is built to help you turn inward.</p>",
+            "size": "base"
+          }
+        },
+        "studio-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Visit Us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["studio-eyebrow", "studio-heading", "studio-text", "studio-button"]
+    },
+    "process": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "New Here?",
+        "title": "Getting Started Is Easy",
+        "heading_alignment": "center",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "image": "",
+            "title": "Pick a Class",
+            "description": "<p>Browse our weekly schedule and find a class that fits your level and your calendar. Not sure where to start? Hatha and Yin are great for beginners.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "image": "",
+            "title": "Book Online",
+            "description": "<p>Reserve your spot in a few taps. First-time students get a complimentary drop-in — no commitment, no credit card.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "image": "",
+            "title": "Show Up & Breathe",
+            "description": "<p>Arrive 10 minutes early, grab a mat and props from the shelf, and settle in. We handle the rest — you just practice.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3"]
+    },
+    "stats": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "plain",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "alignment": "centered",
+        "show_dividers": true,
+        "color_scheme": "highlight",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "stat-1": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "5.0 Rating",
+            "text": "Google Reviews"
+          }
+        },
+        "stat-2": {
+          "type": "item",
+          "settings": {
+            "icon": "users",
+            "title": "2,000+",
+            "text": "Classes Taught"
+          }
+        },
+        "stat-3": {
+          "type": "item",
+          "settings": {
+            "icon": "heart",
+            "title": "98%",
+            "text": "Would Recommend"
+          }
+        }
+      },
+      "blocksOrder": ["stat-1", "stat-2", "stat-3"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your First Class Is on Us",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>New students enjoy a complimentary drop-in class.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Your Free Class",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "marquee", "intro", "classes", "studio", "process", "stats", "cta"],
+  "id": "index",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

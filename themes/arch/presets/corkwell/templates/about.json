@@ -1,0 +1,220 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "overlay_color": "#151e22cc",
+        "color_scheme": "highlight",
+        "fullwidth": true,
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "About",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What Corkwell is, and isn't.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "story": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "right",
+        "text_position": "center",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "story-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our Story</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "story-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "It Started With a Bottle of Trousseau",
+            "size": "3xl"
+          }
+        },
+        "story-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Nico and Jules met at a wine bar in the Jura, bonding over a bottle of Trousseau from a producer who farmed two hectares of old vines. That bottle changed how they thought about wine — and eventually led them to open Corkwell.</p><p>The idea was simple: a bar where every bottle has a story, where the bartender can tell you about the person who made what you're drinking, and where a Tuesday night can feel like an occasion.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["story-eyebrow", "story-heading", "story-text"]
+    },
+    "philosophy": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "What We Believe",
+        "title": "The Corkwell Way",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "icon_style": "outline",
+        "icon_size": "xl",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "value-1": {
+          "type": "item",
+          "settings": {
+            "icon": "glass-full",
+            "title": "Drink Less, Drink Better",
+            "description": "Quality over quantity. Every bottle on our list is there because it's worth your attention — not because it fills a category."
+          }
+        },
+        "value-2": {
+          "type": "item",
+          "settings": {
+            "icon": "users",
+            "title": "Know the Maker",
+            "description": "We visit our producers. We know their vineyards, their families, their philosophy. When you drink at Corkwell, you're drinking from people, not brands."
+          }
+        },
+        "value-3": {
+          "type": "item",
+          "settings": {
+            "icon": "heart",
+            "title": "No Pretension",
+            "description": "Wine doesn't need gatekeepers. We'll help you find something you love whether you know your terroir from your tannins or not."
+          }
+        }
+      },
+      "blocksOrder": ["value-1", "value-2", "value-3"]
+    },
+    "founders": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The Founders",
+        "title": "Nico & Jules",
+        "heading_alignment": "center",
+        "columns_desktop": 2,
+        "layout": "grid",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "profile-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Nico Ferrara",
+            "role": "Head Bartender / Co-Founder",
+            "specialty": "Cocktails & Spirits",
+            "bio": "Former bar manager at two of New York's best cocktail bars. Nico brings classical technique and a love of obscure amari to everything he mixes. He'll make you a perfect Negroni, but he'd rather make you something you've never tried."
+          }
+        },
+        "profile-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Jules Moreau",
+            "role": "Sommelier / Co-Founder",
+            "specialty": "Natural Wine",
+            "bio": "Trained in Burgundy, radicalized in the Jura. Jules spent years working harvests across Europe before landing in Brooklyn. She curates the wine list with the same philosophy she learned from small producers — trust the land, trust the process."
+          }
+        }
+      },
+      "blocksOrder": ["profile-1", "profile-2"]
+    },
+    "sourcing": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "left",
+        "text_position": "center",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "sourcing-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our Producers</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "sourcing-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Wine Is Farming",
+            "size": "3xl"
+          }
+        },
+        "sourcing-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We work directly with small-scale producers who farm organically or biodynamically. No bulk wine, no industrial shortcuts. Every bottle on our list comes from someone who cares about what goes into the glass — and so do we.</p>",
+            "size": "base"
+          }
+        },
+        "sourcing-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See the Wine List",
+              "href": "menu.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["sourcing-eyebrow", "sourcing-heading", "sourcing-text", "sourcing-button"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "The Best Way to Know Us Is to Visit",
+            "size": "2xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Find the Bar",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "story", "philosophy", "founders", "sourcing", "cta"],
+  "id": "about",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

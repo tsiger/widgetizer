@@ -1,0 +1,307 @@
+{
+  "name": "Menu",
+  "slug": "menu",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "overlay_color": "#151e22cc",
+        "color_scheme": "highlight",
+        "fullwidth": true,
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Drinks & Bites",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Natural wine, small-batch cocktails, and plates to share.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "cocktails": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "The Bar",
+        "title": "Cocktails",
+        "heading_alignment": "left",
+        "layout": "single-column",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "cocktail-1": {
+          "type": "item",
+          "settings": {
+            "name": "Corkwell Negroni",
+            "description": "<p>London dry gin, Campari, sweet vermouth, expressed orange peel</p>",
+            "price": "$15"
+          }
+        },
+        "cocktail-2": {
+          "type": "item",
+          "settings": {
+            "name": "The Vine Street",
+            "description": "<p>Mezcal, green chartreuse, lime, cucumber, smoked salt rim</p>",
+            "price": "$17"
+          }
+        },
+        "cocktail-3": {
+          "type": "item",
+          "settings": {
+            "name": "Paper Plane",
+            "description": "<p>Bourbon, Aperol, Amaro Nonino, fresh lemon. Equal parts.</p>",
+            "price": "$16"
+          }
+        },
+        "cocktail-4": {
+          "type": "item",
+          "settings": {
+            "name": "Jura Sunset",
+            "description": "<p>Trousseau rosé, elderflower, soda, grapefruit twist</p>",
+            "price": "$14"
+          }
+        },
+        "cocktail-5": {
+          "type": "item",
+          "settings": {
+            "name": "Smoked Old Fashioned",
+            "description": "<p>Rye whiskey, demerara, Angostura, applewood smoke, cherry</p>",
+            "price": "$18"
+          }
+        },
+        "cocktail-6": {
+          "type": "item",
+          "settings": {
+            "name": "Garden Highball",
+            "description": "<p>Botanical gin, cucumber, elderflower tonic, juniper, fresh herbs</p>",
+            "price": "$14"
+          }
+        }
+      },
+      "blocksOrder": ["cocktail-1", "cocktail-2", "cocktail-3", "cocktail-4", "cocktail-5", "cocktail-6"]
+    },
+    "wine": {
+      "type": "content-switcher",
+      "settings": {
+        "eyebrow": "The Cellar",
+        "title": "Wine List",
+        "description": "Our wine list changes with the seasons. Ask us what's open tonight.",
+        "heading_alignment": "center",
+        "switcher_type": "tabs",
+        "option_1_label": "Red",
+        "option_2_label": "White",
+        "option_3_label": "Orange & Natural",
+        "columns": 2,
+        "aspect_ratio": "auto",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "wine-1": {
+          "type": "item",
+          "settings": {
+            "title": "Domaine de la Borde, Trousseau",
+            "text": "<p>Jura, France — Light-bodied, earthy, crushed red berries. Chilled red territory.</p>",
+            "price": "$16 / $64",
+            "target_option": "1"
+          }
+        },
+        "wine-2": {
+          "type": "item",
+          "settings": {
+            "title": "Envínate, Táganan Tinto",
+            "text": "<p>Tenerife, Spain — Volcanic minerality, dark fruit, wild herbs. Incredibly expressive.</p>",
+            "price": "$18 / $72",
+            "target_option": "1"
+          }
+        },
+        "wine-3": {
+          "type": "item",
+          "settings": {
+            "title": "Gut Oggau, Theodora",
+            "text": "<p>Burgenland, Austria — Crisp Grüner Veltliner with white pepper, green apple, and mineral finish.</p>",
+            "price": "$15 / $60",
+            "target_option": "2"
+          }
+        },
+        "wine-4": {
+          "type": "item",
+          "settings": {
+            "title": "Les Vignes de Babass, Pétillant Naturel",
+            "text": "<p>Loire, France — Lightly sparkling Chenin Blanc with pear, honey, and a dry finish.</p>",
+            "price": "$14 / $56",
+            "target_option": "2"
+          }
+        },
+        "wine-5": {
+          "type": "item",
+          "settings": {
+            "title": "Cantina Giardino, T'Ara Rà",
+            "text": "<p>Campania, Italy — Skin-contact Coda di Volpe. Amber, tannic, dried apricot, tea leaf.</p>",
+            "price": "$17 / $68",
+            "target_option": "3"
+          }
+        },
+        "wine-6": {
+          "type": "item",
+          "settings": {
+            "title": "Pheasant's Tears, Rkatsiteli",
+            "text": "<p>Kakheti, Georgia — Qvevri-aged, deep amber. Quince, walnut skin, honeycomb. Ancient method.</p>",
+            "price": "$19 / $76",
+            "target_option": "3"
+          }
+        }
+      },
+      "blocksOrder": ["wine-1", "wine-2", "wine-3", "wine-4", "wine-5", "wine-6"]
+    },
+    "small_plates": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "The Kitchen",
+        "title": "Small Plates",
+        "heading_alignment": "left",
+        "layout": "two-column",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "plate-1": {
+          "type": "item",
+          "settings": {
+            "name": "Marinated Olives",
+            "description": "<p>Castelvetrano and Kalamata with citrus zest, chili, rosemary</p>",
+            "price": "$7"
+          }
+        },
+        "plate-2": {
+          "type": "item",
+          "settings": {
+            "name": "Burrata & Torn Bread",
+            "description": "<p>Creamy burrata, grilled sourdough, tomato confit, basil oil</p>",
+            "price": "$16"
+          }
+        },
+        "plate-3": {
+          "type": "item",
+          "settings": {
+            "name": "Charcuterie Board",
+            "description": "<p>Selection of cured meats, cornichons, mustard, fig jam, grilled bread</p>",
+            "price": "$24"
+          }
+        },
+        "plate-4": {
+          "type": "item",
+          "settings": {
+            "name": "Grilled Halloumi",
+            "description": "<p>Pan-seared halloumi, honey, za'atar, lemon, toasted pine nuts</p>",
+            "price": "$14"
+          }
+        },
+        "plate-5": {
+          "type": "item",
+          "settings": {
+            "name": "Sardines on Toast",
+            "description": "<p>Tinned sardines, whipped butter, capers, pickled shallot, rye toast</p>",
+            "price": "$13"
+          }
+        },
+        "plate-6": {
+          "type": "item",
+          "settings": {
+            "name": "Roasted Carrots",
+            "description": "<p>Heritage carrots, labneh, dukkah, pomegranate, mint</p>",
+            "price": "$12"
+          }
+        }
+      },
+      "blocksOrder": ["plate-1", "plate-2", "plate-3", "plate-4", "plate-5", "plate-6"]
+    },
+    "desserts": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "To Finish",
+        "title": "Cheese & Sweets",
+        "heading_alignment": "left",
+        "layout": "single-column",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "dessert-1": {
+          "type": "item",
+          "settings": {
+            "name": "Cheese Selection",
+            "description": "<p>Three artisan cheeses with honeycomb, membrillo, and walnut bread</p>",
+            "price": "$18"
+          }
+        },
+        "dessert-2": {
+          "type": "item",
+          "settings": {
+            "name": "Dark Chocolate Mousse",
+            "description": "<p>72% Valrhona, olive oil, flaky sea salt, espresso crumb</p>",
+            "price": "$12"
+          }
+        },
+        "dessert-3": {
+          "type": "item",
+          "settings": {
+            "name": "Affogato",
+            "description": "<p>Vanilla gelato, hot espresso, amaretti biscuit</p>",
+            "price": "$10"
+          }
+        }
+      },
+      "blocksOrder": ["dessert-1", "dessert-2", "dessert-3"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ask the Bartender",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our team knows every bottle. Just ask.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get in Touch",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "cocktails", "wine", "small_plates", "desserts", "cta"],
+  "id": "menu",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

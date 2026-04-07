@@ -1,0 +1,163 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#2c242080",
+        "color_scheme": "highlight",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "4xl"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading"]
+    },
+    "gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "",
+        "title": "Moments at Stillpoint",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "staggered": true,
+        "aspect_ratio": "auto",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "img-1": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Morning vinyasa flow"
+          }
+        },
+        "img-2": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Sunrise through the studio windows"
+          }
+        },
+        "img-3": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Yin class in session"
+          }
+        },
+        "img-4": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Community workshop"
+          }
+        },
+        "img-5": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Props and equipment"
+          }
+        },
+        "img-6": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Meditation session"
+          }
+        },
+        "img-7": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Pilates mat class"
+          }
+        },
+        "img-8": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Summer outdoor practice"
+          }
+        },
+        "img-9": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Studio courtyard"
+          }
+        },
+        "img-10": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Tea and conversation after class"
+          }
+        },
+        "img-11": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Prenatal class"
+          }
+        },
+        "img-12": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Seasonal workshop"
+          }
+        }
+      },
+      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6", "img-7", "img-8", "img-9", "img-10", "img-11", "img-12"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "See Yourself Here?",
+            "size": "2xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Try a Free Class",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "gallery", "cta"],
+  "id": "gallery",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

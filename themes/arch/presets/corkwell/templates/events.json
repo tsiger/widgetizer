@@ -1,0 +1,177 @@
+{
+  "name": "Events",
+  "slug": "events",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "overlay_color": "#151e22cc",
+        "color_scheme": "highlight",
+        "fullwidth": true,
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What's On",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tastings, music, and good company.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "next_tasting": {
+      "type": "countdown",
+      "settings": {
+        "eyebrow": "Coming Up",
+        "title": "Spring Natural Wine Tasting",
+        "description": "An evening exploring 12 natural wines from small European producers. Tickets include all pours and a cheese plate.",
+        "heading_alignment": "center",
+        "target_date": "2027-06-15 19:00",
+        "expired_message": "This event has passed. Follow us for the next one.",
+        "show_seconds": false,
+        "style": "cards",
+        "button": {
+          "text": "Reserve a Spot",
+          "href": "contact.html",
+          "target": "_self"
+        },
+        "color_scheme": "highlight"
+      }
+    },
+    "regulars": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "Every Week",
+        "title": "Regulars",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "icon_style": "outline",
+        "icon_size": "xl",
+        "icon_shape": "rounded",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "event-1": {
+          "type": "item",
+          "settings": {
+            "icon": "glass-full",
+            "title": "Wine Wednesday",
+            "description": "Half-price glasses of our featured natural wines. A different region every week."
+          }
+        },
+        "event-2": {
+          "type": "item",
+          "settings": {
+            "icon": "music",
+            "title": "Live Vinyl Fridays",
+            "description": "DJs spinning vinyl from 8 PM. Funk, soul, jazz, and whatever feels right."
+          }
+        },
+        "event-3": {
+          "type": "item",
+          "settings": {
+            "icon": "sun",
+            "title": "Sunday Aperitivo",
+            "description": "Italian-style pre-dinner drinks and snacks from 4 PM. Spritzes, Negronis, and a slow start to the evening."
+          }
+        }
+      },
+      "blocksOrder": ["event-1", "event-2", "event-3"]
+    },
+    "private_hire": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "right",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "hire-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Book the Bar",
+            "size": "3xl"
+          }
+        },
+        "hire-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Corkwell is available for private events — birthdays, launch parties, corporate gatherings, or any excuse to drink well with people you like.</p>",
+            "size": "base"
+          }
+        },
+        "hire-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Exclusive use of the full bar\n+ Custom cocktail menu\n+ Catering available\n+ Capacity: 40 seated, 60 standing"
+          }
+        },
+        "hire-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Inquire About Private Events",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hire-heading", "hire-text", "hire-features", "hire-button"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Stay in the Loop",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Follow us for event announcements and last-minute specials.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Follow on Instagram",
+              "href": "#",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "next_tasting", "regulars", "private_hire", "cta"],
+  "id": "events",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

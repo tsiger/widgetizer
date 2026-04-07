@@ -1,0 +1,222 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "video-popup",
+      "settings": {
+        "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "video_title": "Inside Corkwell",
+        "overlay_color": "#151e22cc",
+        "height": "large",
+        "fullwidth": true,
+        "play_button_style": "light",
+        "top_spacing": "none"
+      }
+    },
+    "intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Natural Wines. Crafted Cocktails. Small Plates.",
+            "size": "4xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Corkwell is a wine bar and cocktail lounge where every bottle has a story and every drink is made with intention. We pour natural wines from small producers, mix cocktails from small-batch spirits, and serve plates meant to be shared. No reservations, no fuss — just walk in.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-text"]
+    },
+    "what_we_pour": {
+      "type": "checkerboard",
+      "settings": {
+        "eyebrow": "What We Pour",
+        "title": "Three Reasons to Stay",
+        "heading_alignment": "center",
+        "columns_desktop": 4,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "checker-1": {
+          "type": "card",
+          "settings": {
+            "title": "Natural Wine",
+            "description": "<p>50+ bottles from small European producers — biodynamic, organic, minimal intervention. Orange, red, white, and everything in between.</p>",
+            "button_link": {
+              "text": "See the Wine List",
+              "href": "menu.html",
+              "target": "_self"
+            }
+          }
+        },
+        "checker-2": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": ""
+          }
+        },
+        "checker-3": {
+          "type": "card",
+          "settings": {
+            "title": "Cocktails",
+            "description": "<p>Small-batch spirits, house-made syrups, seasonal ingredients. Classic technique, modern instinct. Ask the bartender what's good tonight.</p>",
+            "button_link": {
+              "text": "View Cocktails",
+              "href": "menu.html",
+              "target": "_self"
+            }
+          }
+        },
+        "checker-4": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": ""
+          }
+        }
+      },
+      "blocksOrder": ["checker-1", "checker-2", "checker-3", "checker-4"]
+    },
+    "featured": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Tonight's Specials",
+        "title": "From the Bar",
+        "heading_alignment": "center",
+        "layout": "single-column",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "drink-1": {
+          "type": "item",
+          "settings": {
+            "name": "The Vine Street",
+            "description": "<p>Mezcal, green chartreuse, lime, cucumber, smoked salt rim. Bright and earthy with a long finish.</p>",
+            "price": "$17"
+          }
+        },
+        "drink-2": {
+          "type": "item",
+          "settings": {
+            "name": "Paper Plane",
+            "description": "<p>Bourbon, Aperol, Amaro Nonino, fresh lemon. Equal parts, perfectly balanced. A modern classic.</p>",
+            "price": "$16"
+          }
+        },
+        "drink-3": {
+          "type": "item",
+          "settings": {
+            "name": "Corkwell Negroni",
+            "description": "<p>Our house negroni — London dry gin, Campari, sweet vermouth, expressed orange peel. Stirred, never shaken.</p>",
+            "price": "$15"
+          }
+        },
+        "drink-4": {
+          "type": "item",
+          "settings": {
+            "name": "Jura Sunset",
+            "description": "<p>Trousseau rosé, elderflower, soda, grapefruit twist. Light, floral, dangerously easy to drink.</p>",
+            "price": "$14"
+          }
+        }
+      },
+      "blocksOrder": ["drink-1", "drink-2", "drink-3", "drink-4"]
+    },
+    "space_callout": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "left",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "space-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A Place to Linger",
+            "size": "3xl"
+          }
+        },
+        "space-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Exposed brick, candlelight, and a vinyl collection that sets the mood. Corkwell is built for long evenings — come for a glass, stay for the night.</p>",
+            "size": "base"
+          }
+        },
+        "space-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ 50+ wines by the glass\n+ Rotating cocktail menu\n+ Small plates until late\n+ Vinyl every Friday"
+          }
+        },
+        "space-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See What's On",
+              "href": "events.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["space-heading", "space-text", "space-features", "space-button"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Open Wednesday Through Monday",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Doors at 5 PM. No reservations — just walk in.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Find Us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "intro", "what_we_pour", "featured", "space_callout", "cta"],
+  "id": "index",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

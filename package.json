@@ -32,6 +32,7 @@
     "test:verbose": "VERBOSE=1 node --test --test-reporter ./server/tests/reporter.js server/tests/*.test.js",
     "test:frontend": "vitest run",
     "theme:sync": "node scripts/theme-sync.js",
+    "preset:sync": "node scripts/preset-sync.js",
     "validate:locales": "node scripts/validate-locales.js",
     "validate:theme-locales": "node scripts/validate-theme-locales.js",
     "validate:all-locales": "node scripts/validate-locales.js && node scripts/validate-theme-locales.js",

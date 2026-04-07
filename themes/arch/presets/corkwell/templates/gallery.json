@@ -1,0 +1,118 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "overlay_color": "#151e22cc",
+        "color_scheme": "highlight",
+        "fullwidth": true,
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The space, the drinks, the people.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "drinks_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "The Drinks",
+        "title": "What We Pour",
+        "heading_alignment": "center",
+        "layout": "carousel",
+        "columns_desktop": 3,
+        "aspect_ratio": "1 / 1",
+        "staggered": false,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "drink-1": {
+          "type": "image",
+          "settings": { "caption": "Corkwell Negroni" }
+        },
+        "drink-2": {
+          "type": "image",
+          "settings": { "caption": "Orange wine, skin-contact" }
+        },
+        "drink-3": {
+          "type": "image",
+          "settings": { "caption": "Dirty martini" }
+        },
+        "drink-4": {
+          "type": "image",
+          "settings": { "caption": "Smoked old fashioned" }
+        },
+        "drink-5": {
+          "type": "image",
+          "settings": { "caption": "Aperol spritz" }
+        },
+        "drink-6": {
+          "type": "image",
+          "settings": { "caption": "Garden highball" }
+        }
+      },
+      "blocksOrder": ["drink-1", "drink-2", "drink-3", "drink-4", "drink-5", "drink-6"]
+    },
+    "space_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "The Space",
+        "title": "Inside Corkwell",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "staggered": true,
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "space-1": {
+          "type": "image",
+          "settings": { "caption": "The bar" }
+        },
+        "space-2": {
+          "type": "image",
+          "settings": { "caption": "Wine wall" }
+        },
+        "space-3": {
+          "type": "image",
+          "settings": { "caption": "Table seating" }
+        },
+        "space-4": {
+          "type": "image",
+          "settings": { "caption": "Candlelight details" }
+        },
+        "space-5": {
+          "type": "image",
+          "settings": { "caption": "The chalkboard" }
+        },
+        "space-6": {
+          "type": "image",
+          "settings": { "caption": "The entrance" }
+        }
+      },
+      "blocksOrder": ["space-1", "space-2", "space-3", "space-4", "space-5", "space-6"]
+    }
+  },
+  "widgetsOrder": ["hero", "drinks_gallery", "space_gallery"],
+  "id": "gallery",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

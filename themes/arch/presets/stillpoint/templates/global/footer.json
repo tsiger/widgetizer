@@ -1,0 +1,36 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Stillpoint Yoga Studio. All rights reserved.",
+    "color_scheme": "highlight"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Stillpoint",
+        "text": "<p>Find your center. A neighborhood yoga and pilates studio offering classes for every body and every level.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Visit Us",
+        "text": "<p>82 Willow Street<br>Brooklyn, NY 11201</p><p>hello@stillpointyoga.com<br>(718) 555-0234</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Explore"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Connect"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

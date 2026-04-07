@@ -6,11 +6,11 @@
 
 | # | ID | Name | Industry | Pages | Status |
 |---|-----|------|----------|-------|--------|
-| 1 | saffron | Saffron | Restaurant | Home, Menu, Gallery, About, Contact | pending |
-| 2 | brewline | Brewline | Cafe / Coffee Shop | Home, Menu, Gallery, About, Contact | pending |
-| 3 | crumbly | Crumbly | Bakery | Home, Menu, Gallery, About, Contact | pending |
-| 4 | corkwell | Corkwell | Bar / Wine Bar | Home, Menu, Gallery, About, Contact | pending |
-| 5 | stillpoint | Stillpoint | Yoga / Pilates Studio | Home, Services, Work, About, Contact | pending |
+| 1 | saffron | Saffron | Restaurant | Home, Menu, Gallery, About, Contact, Reservations | done |
+| 2 | brewline | Brewline | Cafe / Coffee Shop | Home, Menu, Gallery, About, Contact | done |
+| 3 | crumbly | Crumbly | Bakery | Home, Menu, Custom Cakes, Gallery, About, Contact | done |
+| 4 | corkwell | Corkwell | Bar / Wine Bar | Home, Menu, Events, Gallery, About, Contact | done |
+| 5 | stillpoint | Stillpoint | Yoga / Pilates Studio | Home, Classes, Schedule, About, Gallery, Contact | done |
 | 6 | velvet-touch | Velvet Touch | Spa / Massage | Home, Services, Work, About, Contact | pending |
 | 7 | brightside | Brightside | Dentist | Home, Services, Work, About, Contact | pending |
 | 8 | ironform | Ironform | Personal Trainer | Home, Services, Work, About, Contact | pending |

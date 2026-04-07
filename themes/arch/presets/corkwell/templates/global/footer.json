@@ -1,0 +1,35 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Corkwell. All rights reserved.",
+    "color_scheme": "highlight"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>A wine bar and cocktail lounge in the heart of Brooklyn. Natural wines, small-batch cocktails, and plates to share.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Hours",
+        "text": "<p>Wednesday — Friday: 5 PM – 12 AM<br>Saturday: 4 PM – 1 AM<br>Sunday: 4 PM – 10 PM<br>Monday — Tuesday: Closed</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Explore"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

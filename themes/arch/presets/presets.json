@@ -26,6 +26,16 @@
       "id": "crumbly",
       "name": "Crumbly",
       "description": "Bakery"
+    },
+    {
+      "id": "corkwell",
+      "name": "Corkwell",
+      "description": "Wine bar"
+    },
+    {
+      "id": "stillpoint",
+      "name": "Stillpoint",
+      "description": "Yoga studio"
     }
   ]
 }

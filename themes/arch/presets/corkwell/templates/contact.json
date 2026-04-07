@@ -1,0 +1,112 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Find Corkwell",
+            "size": "5xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>88 Vine Street, Brooklyn, NY 11201. No reservations needed — just walk in. We're open Wednesday through Monday from 5 PM.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-text"]
+    },
+    "map": {
+      "type": "map",
+      "settings": {
+        "title": "",
+        "address": "88 Vine Street, Brooklyn, NY 11201",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "info-phone": {
+          "type": "info",
+          "settings": {
+            "title": "Phone",
+            "text": "<p>(718) 555-0142</p>"
+          }
+        },
+        "info-email": {
+          "type": "info",
+          "settings": {
+            "title": "Email",
+            "text": "<p>hello@corkwell.com</p>"
+          }
+        },
+        "info-hours": {
+          "type": "info",
+          "settings": {
+            "title": "Hours",
+            "text": "<p>Wed — Fri: 5 PM – 12 AM<br>Sat: 4 PM – 1 AM<br>Sun: 4 PM – 10 PM<br>Mon — Tue: Closed</p>"
+          }
+        }
+      },
+      "blocksOrder": ["info-phone", "info-email", "info-hours"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before You Visit",
+        "title": "Good to Know",
+        "style": "connected",
+        "heading_alignment": "center",
+        "allow_multiple": false,
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "Do you take reservations?",
+            "answer": "<p>No — we're walk-in only. Most evenings you can find a spot at the bar or a table without waiting. Friday and Saturday nights can get busy after 9 PM, so come earlier if you want to be sure.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "Can I buy bottles to take home?",
+            "answer": "<p>Yes! We have a small retail shelf near the entrance with a rotating selection of natural wines. Ask the staff for recommendations — they'll help you find something based on what you enjoyed at the bar.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Do you serve food?",
+            "answer": "<p>We serve small plates from our kitchen — think charcuterie, cheese, marinated olives, grilled halloumi, sardines on toast. Designed to share and to pair with what you're drinking. Kitchen is open until an hour before close.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Is there live music?",
+            "answer": "<p>Every Friday is Live Vinyl night — DJs spinning records from 8 PM. We also host occasional live sets and wine events. Check our Events page or follow us on Instagram for announcements.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4"]
+    }
+  },
+  "widgetsOrder": ["intro", "map", "faq"],
+  "id": "contact",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

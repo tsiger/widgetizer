@@ -1,0 +1,262 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#2c242080",
+        "color_scheme": "highlight",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Story",
+            "size": "4xl"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading"]
+    },
+    "story": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "story-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>SINCE 2018</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "story-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Born from a Love of Practice",
+            "size": "2xl"
+          }
+        },
+        "story-text-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Stillpoint began as a simple idea: a studio where the practice comes first. Founded by Sarah Chen after years of teaching in crowded gyms and noisy fitness chains, Stillpoint was designed to be the opposite — a quiet, intentional space where students could reconnect with their bodies and breath.</p>",
+            "size": "base"
+          }
+        },
+        "story-text-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What started as a single room on Willow Street has grown into a community of hundreds of regular practitioners. But the mission hasn't changed: create a space that feels like home, teach with honesty and care, and make yoga accessible to everyone who walks through the door.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["story-eyebrow", "story-heading", "story-text-1", "story-text-2"]
+    },
+    "values": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "What Guides Us",
+        "title": "Our Values",
+        "description": "",
+        "heading_alignment": "center",
+        "content_position": "right",
+        "show_divider": false,
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "value-1": {
+          "type": "feature",
+          "settings": {
+            "icon": "unlock",
+            "title": "Accessible to All",
+            "description": "<p>Yoga is for every body. We offer modifications in every class, sliding-scale pricing, and a welcoming environment where no one is judged for where they are in their practice.</p>"
+          }
+        },
+        "value-2": {
+          "type": "feature",
+          "settings": {
+            "icon": "git-branch",
+            "title": "Rooted in Tradition",
+            "description": "<p>We honor the ancient roots of yoga while teaching in a way that's relevant and accessible today. Our approach blends classical philosophy with modern anatomy and movement science.</p>"
+          }
+        },
+        "value-3": {
+          "type": "feature",
+          "settings": {
+            "icon": "users",
+            "title": "Community First",
+            "description": "<p>Stillpoint is more than a studio — it's a gathering place. We host workshops, seasonal events, and community classes because we believe practice is richer when it's shared.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["value-1", "value-2", "value-3"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The Teachers",
+        "title": "Meet Our Instructors",
+        "description": "",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "profile-1": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Sarah Chen",
+            "role": "Founder & Lead Instructor",
+            "specialty": "Vinyasa & Yin",
+            "bio": "RYT-500 certified with 15+ years of practice across Bali, India, and New York. Sarah's classes are warm, precise, and deeply personal.",
+            "instagram": "https://instagram.com"
+          }
+        },
+        "profile-2": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Marcus Rivera",
+            "role": "Pilates Instructor",
+            "specialty": "Mat Pilates & Hatha",
+            "bio": "Former dancer turned movement educator. Marcus brings a focus on alignment, core stability, and the joy of controlled movement.",
+            "instagram": "https://instagram.com"
+          }
+        },
+        "profile-3": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Priya Nair",
+            "role": "Yoga Instructor",
+            "specialty": "Prenatal & Meditation",
+            "bio": "Priya specializes in gentle, restorative practices. Her prenatal classes are loved by expecting mothers across Brooklyn.",
+            "instagram": "https://instagram.com"
+          }
+        }
+      },
+      "blocksOrder": ["profile-1", "profile-2", "profile-3"]
+    },
+    "studio_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "",
+        "title": "The Studio",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": true,
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "img-1": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Main practice room"
+          }
+        },
+        "img-2": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Studio entrance"
+          }
+        },
+        "img-3": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Changing area"
+          }
+        },
+        "img-4": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Props wall"
+          }
+        },
+        "img-5": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Courtyard"
+          }
+        },
+        "img-6": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Tea corner"
+          }
+        }
+      },
+      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Come Practice With Us",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your first class is always free.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Class",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "story", "values", "team", "studio_gallery", "cta"],
+  "id": "about",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

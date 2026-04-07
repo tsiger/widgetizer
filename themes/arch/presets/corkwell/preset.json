@@ -1,0 +1,33 @@
+{
+  "settings": {
+    "standard_bg_primary": "#f7f6f3",
+    "standard_bg_secondary": "#edeae4",
+    "standard_text_heading": "#1a2024",
+    "standard_text_content": "#3c4448",
+    "standard_text_muted": "#6e777c",
+    "standard_border_color": "#d5d1ca",
+    "standard_accent": "#1d5e6e",
+    "standard_accent_text": "#ffffff",
+    "standard_rating_star": "#d4960a",
+    "highlight_bg_primary": "#151e22",
+    "highlight_bg_secondary": "#0d1416",
+    "highlight_text_heading": "#ffffff",
+    "highlight_text_content": "#b8c4ca",
+    "highlight_text_muted": "#7a8890",
+    "highlight_border_color": "#2a3a40",
+    "highlight_accent": "#4db8a4",
+    "highlight_accent_text": "#151e22",
+    "highlight_rating_star": "#d4960a",
+    "heading_font": {
+      "stack": "\"Cormorant Garamond\", serif",
+      "weight": 500
+    },
+    "body_font": {
+      "stack": "\"Space Grotesk\", sans-serif",
+      "weight": 400
+    },
+    "corner_style": "sharp",
+    "spacing_density": "compact",
+    "button_shape": "sharp"
+  }
+}
