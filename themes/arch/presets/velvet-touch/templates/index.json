@@ -1,0 +1,334 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "split-hero",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "color_scheme": "highlight",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>BOUTIQUE DAY SPA</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Indulge in Stillness",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Massage, facials, and body treatments designed to restore you.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "View Treatments",
+              "href": "treatments.html",
+              "target": "_self"
+            },
+            "link_2": {
+              "text": "Book Now",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-buttons"]
+    },
+    "trust_strip": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "filled",
+        "icon_size": "md",
+        "icon_shape": "rounded",
+        "alignment": "left",
+        "show_dividers": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "clock",
+            "title": "Open 7 Days",
+            "text": "10 AM – 8 PM"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "award",
+            "title": "Award Winning",
+            "text": "Best Spa 2025"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "Licensed Therapists",
+            "text": "Certified & Insured"
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "title": "Clean Beauty",
+            "text": "Natural Products Only"
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+    },
+    "treatments": {
+      "type": "sliding-panels",
+      "settings": {
+        "eyebrow": "Our Treatments",
+        "title": "Explore What We Offer",
+        "heading_alignment": "center",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "panel-1": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Massage Therapy",
+            "subtitle": "Swedish, deep tissue, hot stone & more",
+            "button_link": {
+              "text": "Learn More",
+              "href": "treatments.html",
+              "target": "_self"
+            }
+          }
+        },
+        "panel-2": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Facials",
+            "subtitle": "Signature, express, anti-aging & hydrating",
+            "button_link": {
+              "text": "Learn More",
+              "href": "treatments.html",
+              "target": "_self"
+            }
+          }
+        },
+        "panel-3": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Body Treatments",
+            "subtitle": "Scrubs, wraps, and full-body rituals",
+            "button_link": {
+              "text": "Learn More",
+              "href": "treatments.html",
+              "target": "_self"
+            }
+          }
+        },
+        "panel-4": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Couples Packages",
+            "subtitle": "Side-by-side treatments with champagne",
+            "button_link": {
+              "text": "Learn More",
+              "href": "treatments.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["panel-1", "panel-2", "panel-3", "panel-4"]
+    },
+    "about_teaser": {
+      "type": "image-callout",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "teaser-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>OUR PHILOSOPHY</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "teaser-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Touch Is a Language",
+            "size": "2xl"
+          }
+        },
+        "teaser-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We believe the body holds wisdom that the mind often overlooks. Every treatment at Velvet Touch begins with listening — to your tension, your stress, your story. Our therapists combine expert technique with genuine care to create an experience that goes beyond the physical.</p>",
+            "size": "base"
+          }
+        },
+        "teaser-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "About Us",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["teaser-eyebrow", "teaser-heading", "teaser-text", "teaser-button"]
+    },
+    "testimonials": {
+      "type": "testimonial-slider",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 6000,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "The hot stone massage changed how I sleep. I came in with months of tension and left feeling like a completely different person. The therapist knew exactly where to focus without me having to say a word.",
+            "avatar": "",
+            "name": "Rachel M.",
+            "title": "Regular client since 2022",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "I've been to a lot of spas and Velvet Touch is genuinely special. The attention to detail — the warm towels, the tea afterward, the way they remember your preferences — it all adds up to something rare.",
+            "avatar": "",
+            "name": "David K.",
+            "title": "Monthly member",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "My first facial here was revelatory. My skin looked better for weeks. The products they use are incredible — clean, natural, and you can actually feel the difference. I won't go anywhere else now.",
+            "avatar": "",
+            "name": "Sophia L.",
+            "title": "Facial client",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+    },
+    "gift_cards": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "gift-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "The Gift of Rest",
+            "size": "3xl"
+          }
+        },
+        "gift-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Treat someone you love to a Velvet Touch experience. Gift cards available in any amount.</p>",
+            "size": "base"
+          }
+        },
+        "gift-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Buy a Gift Card",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["gift-heading", "gift-text", "gift-button"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to Unwind?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Same-day appointments available.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book an Appointment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "trust_strip", "treatments", "about_teaser", "testimonials", "gift_cards", "cta"],
+  "id": "index",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

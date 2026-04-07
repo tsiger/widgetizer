@@ -36,6 +36,11 @@
       "id": "stillpoint",
       "name": "Stillpoint",
       "description": "Yoga studio"
+    },
+    {
+      "id": "velvet-touch",
+      "name": "Velvet Touch",
+      "description": "Day spa"
     }
   ]
 }

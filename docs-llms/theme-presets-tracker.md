@@ -11,7 +11,7 @@
 | 3 | crumbly | Crumbly | Bakery | Home, Menu, Custom Cakes, Gallery, About, Contact | done |
 | 4 | corkwell | Corkwell | Bar / Wine Bar | Home, Menu, Events, Gallery, About, Contact | done |
 | 5 | stillpoint | Stillpoint | Yoga / Pilates Studio | Home, Classes, Schedule, About, Gallery, Contact | done |
-| 6 | velvet-touch | Velvet Touch | Spa / Massage | Home, Services, Work, About, Contact | pending |
+| 6 | velvet-touch | Velvet Touch | Spa / Massage | Home, Services, Treatments, About, Gallery, Contact | done |
 | 7 | brightside | Brightside | Dentist | Home, Services, Work, About, Contact | pending |
 | 8 | ironform | Ironform | Personal Trainer | Home, Services, Work, About, Contact | pending |
 | 9 | greystone | Greystone | Lawyer / Law Firm | Home, Services, Work, About, Contact | pending |

@@ -1,0 +1,278 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#2a202480",
+        "color_scheme": "highlight",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "About Us",
+            "size": "4xl"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading"]
+    },
+    "story": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "story-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>EST. 2016</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "story-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Where Luxury Meets Healing",
+            "size": "2xl"
+          }
+        },
+        "story-text-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Velvet Touch was born from a simple belief: that self-care shouldn't feel like a luxury reserved for special occasions. Founded by Elena Vasquez in Manhattan's West Village, the spa was designed to be a sanctuary — a place where everyday stress dissolves the moment you walk through the door.</p>",
+            "size": "base"
+          }
+        },
+        "story-text-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What began as a single treatment room has grown into a full-service day spa with a team of ten licensed therapists. But the philosophy hasn't changed: listen first, treat with intention, and never rush the experience.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["story-eyebrow", "story-heading", "story-text-1", "story-text-2"]
+    },
+    "values": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "xl",
+        "icon_shape": "circle",
+        "alignment": "centered",
+        "show_dividers": false,
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "value-1": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "title": "Natural Ingredients",
+            "text": "Clean, organic products only"
+          }
+        },
+        "value-2": {
+          "type": "item",
+          "settings": {
+            "icon": "heart",
+            "title": "Personalized Care",
+            "text": "Every treatment tailored to you"
+          }
+        },
+        "value-3": {
+          "type": "item",
+          "settings": {
+            "icon": "eye",
+            "title": "Attention to Detail",
+            "text": "Nothing overlooked"
+          }
+        },
+        "value-4": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "Your Privacy",
+            "text": "Discreet, comfortable spaces"
+          }
+        }
+      },
+      "blocksOrder": ["value-1", "value-2", "value-3", "value-4"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The Team",
+        "title": "Meet Our Therapists",
+        "description": "",
+        "heading_alignment": "center",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "profile-1": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Elena Vasquez",
+            "role": "Founder & Lead Therapist",
+            "specialty": "Hot Stone & Deep Tissue",
+            "bio": "15 years of practice across New York and Barcelona. Elena founded Velvet Touch to bring European spa traditions to Manhattan.",
+            "instagram": "https://instagram.com"
+          }
+        },
+        "profile-2": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "James Liu",
+            "role": "Senior Massage Therapist",
+            "specialty": "Sports Recovery & Swedish",
+            "bio": "Former physical therapist with a focus on athletic recovery and pain management. Known for his precise, therapeutic touch.",
+            "instagram": "https://instagram.com"
+          }
+        },
+        "profile-3": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Amara Osei",
+            "role": "Esthetician",
+            "specialty": "Facials & Skincare",
+            "bio": "Licensed esthetician specializing in organic skincare. Amara creates custom facial protocols for every skin type and concern.",
+            "instagram": "https://instagram.com"
+          }
+        },
+        "profile-4": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Sofia Reyes",
+            "role": "Body Treatment Specialist",
+            "specialty": "Scrubs & Wraps",
+            "bio": "Trained in Ayurvedic body rituals. Sofia brings a holistic approach to every treatment, blending Eastern and Western techniques.",
+            "instagram": "https://instagram.com"
+          }
+        }
+      },
+      "blocksOrder": ["profile-1", "profile-2", "profile-3", "profile-4"]
+    },
+    "space": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "",
+        "title": "The Space",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": true,
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "img-1": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Reception"
+          }
+        },
+        "img-2": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Treatment room"
+          }
+        },
+        "img-3": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Relaxation lounge"
+          }
+        },
+        "img-4": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Product wall"
+          }
+        },
+        "img-5": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Courtyard"
+          }
+        },
+        "img-6": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Retail area"
+          }
+        }
+      },
+      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Experience It Yourself",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your first visit includes a complimentary consultation.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Now",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "story", "values", "team", "space", "cta"],
+  "id": "about",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

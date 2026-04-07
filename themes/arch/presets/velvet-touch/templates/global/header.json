@@ -1,0 +1,20 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Velvet Touch",
+    "contactDetailsLine1": "Open daily, 10 AM – 8 PM",
+    "contactDetailsLine2": "",
+    "contact_position": "menu",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Book Now",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "secondary",
+    "center_nav": false,
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard-accent"
+  }
+}

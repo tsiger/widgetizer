@@ -1,0 +1,159 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#2a202480",
+        "color_scheme": "highlight",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Book Your Visit",
+            "size": "4xl"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading"]
+    },
+    "contact_info": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "text_position": "flex-start",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "contact-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "We'd Love to Welcome You",
+            "size": "2xl"
+          }
+        },
+        "contact-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Whether it's your first visit or your hundredth, we're here to help you find the right treatment.</p>",
+            "size": "base"
+          }
+        },
+        "contact-details": {
+          "type": "text",
+          "settings": {
+            "text": "<p>34 Garden Street, Suite 2<br>Manhattan, NY 10014</p><p>hello@velvettouch.com<br>(212) 555-0187</p>",
+            "size": "base"
+          }
+        },
+        "contact-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Now",
+              "href": "#",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["contact-heading", "contact-text", "contact-details", "contact-button"]
+    },
+    "map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "",
+        "title": "Find Us",
+        "description": "",
+        "heading_alignment": "left",
+        "address": "34 Garden Street, Suite 2, Manhattan, NY 10014",
+        "embed_url": "",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "info-hours": {
+          "type": "info",
+          "settings": {
+            "title": "Spa Hours",
+            "text": "<p>Monday — Sunday<br>10:00 AM – 8:00 PM</p><p>Last appointment at 7:00 PM</p>"
+          }
+        },
+        "social-1": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["info-hours", "social-1"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Frequently Asked Questions",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "What should I wear?",
+            "answer": "<p>We provide robes, slippers, and everything you need. Just arrive in whatever you're comfortable in — we'll take care of the rest.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "How early should I arrive?",
+            "answer": "<p>We recommend arriving 15 minutes before your appointment to check in, change, and settle into the relaxation lounge. This helps your treatment begin in a state of calm.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Can I request a specific therapist?",
+            "answer": "<p>Absolutely. When booking, you can select your preferred therapist. If they're not available, we'll recommend someone with similar expertise and style.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you offer prenatal massage?",
+            "answer": "<p>Yes — our prenatal massage is designed for expecting mothers in their second and third trimesters. Our therapists are specifically certified in prenatal techniques and use supportive positioning for your comfort.</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "question": "What's your cancellation policy?",
+            "answer": "<p>We ask for at least 24 hours notice for cancellations. Late cancellations or no-shows may be subject to a charge of 50% of the treatment price.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5"]
+    }
+  },
+  "widgetsOrder": ["hero", "contact_info", "map", "faq"],
+  "id": "contact",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

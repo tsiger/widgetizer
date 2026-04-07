@@ -1,0 +1,233 @@
+{
+  "name": "Treatments",
+  "slug": "treatments",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#2a202480",
+        "color_scheme": "highlight",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Treatments",
+            "size": "4xl"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading"]
+    },
+    "massage": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "massage-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>MASSAGE THERAPY</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "massage-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tension Dissolves Here",
+            "size": "2xl"
+          }
+        },
+        "massage-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our massage therapists are trained in a range of modalities, from gentle Swedish relaxation to targeted deep tissue work. Every session is customized to your body's needs — no two treatments are alike.</p>",
+            "size": "base"
+          }
+        },
+        "massage-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Swedish Relaxation\n+ Deep Tissue\n+ Hot Stone\n+ Sports Recovery\n+ Prenatal"
+          }
+        },
+        "massage-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Massage",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["massage-eyebrow", "massage-heading", "massage-text", "massage-features", "massage-button"]
+    },
+    "facials": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "facials-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>FACIALS</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "facials-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your Skin, Renewed",
+            "size": "2xl"
+          }
+        },
+        "facials-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every facial begins with a skin analysis and ends with a personalized home-care recommendation. We use only organic, cruelty-free products chosen for their efficacy and purity.</p>",
+            "size": "base"
+          }
+        },
+        "facials-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Signature Facial\n+ Express Glow\n+ Anti-Aging Lift\n+ Hydra-Soothe\n+ Gentleman's Facial"
+          }
+        },
+        "facials-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Facial",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["facials-eyebrow", "facials-heading", "facials-text", "facials-features", "facials-button"]
+    },
+    "body": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "body-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>BODY TREATMENTS</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "body-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Full-Body Restoration",
+            "size": "2xl"
+          }
+        },
+        "body-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our body treatments go beyond the surface. From invigorating scrubs to deeply nourishing wraps, each ritual is designed to leave your skin glowing and your mind at ease.</p>",
+            "size": "base"
+          }
+        },
+        "body-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Sugar Body Scrub\n+ Detox Mud Wrap\n+ Aromatherapy Cocoon\n+ Salt & Oil Glow"
+          }
+        },
+        "body-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Body Treatment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["body-eyebrow", "body-heading", "body-text", "body-features", "body-button"]
+    },
+    "couples": {
+      "type": "image-callout",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "couples-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Better Together",
+            "size": "3xl"
+          }
+        },
+        "couples-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Share the experience with someone special. Our couples suite features side-by-side treatment tables, ambient lighting, and a complimentary champagne toast.</p>",
+            "size": "base"
+          }
+        },
+        "couples-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Couples Session",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["couples-heading", "couples-text", "couples-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "massage", "facials", "body", "couples"],
+  "id": "treatments",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}
