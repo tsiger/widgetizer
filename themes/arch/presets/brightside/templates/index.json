@@ -1,0 +1,356 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "medium",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#0f1d2ecc",
+        "color_scheme": "highlight",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-rating": {
+          "type": "rating",
+          "settings": {
+            "rating": "5"
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your Smile, Our Priority",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Comprehensive family dentistry with a gentle touch. New patients welcome — same-day appointments available.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Appointment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "link_2": {
+              "text": "Meet Our Team",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hero-rating", "hero-heading", "hero-text", "hero-buttons"]
+    },
+    "trust_strip": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "filled",
+        "icon_size": "md",
+        "icon_shape": "circle",
+        "alignment": "left",
+        "show_dividers": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "Licensed & Insured",
+            "text": "ADA Certified"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "clock",
+            "title": "Same-Day Visits",
+            "text": "Walk-ins welcome"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "credit-card",
+            "title": "Flexible Payment",
+            "text": "Insurance accepted"
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "smile",
+            "title": "Gentle Approach",
+            "text": "Anxiety-free dentistry"
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+    },
+    "services": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Our Services",
+        "title": "Everything Your Smile Needs",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "center",
+        "icon_style": "outline",
+        "icon_size": "xl",
+        "icon_shape": "circle",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "svc-1": {
+          "type": "card",
+          "settings": {
+            "icon": "search",
+            "title": "Checkups & Cleaning",
+            "description": "<p>Routine exams, professional cleaning, and preventive care to keep your teeth and gums healthy for life.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-2": {
+          "type": "card",
+          "settings": {
+            "icon": "sun",
+            "title": "Teeth Whitening",
+            "description": "<p>Professional in-office and take-home whitening treatments for a brighter, more confident smile.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-3": {
+          "type": "card",
+          "settings": {
+            "icon": "dental",
+            "title": "Dental Implants",
+            "description": "<p>Permanent tooth replacement that looks, feels, and functions like natural teeth. Restored confidence.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-4": {
+          "type": "card",
+          "settings": {
+            "icon": "adjustments",
+            "title": "Invisalign",
+            "description": "<p>Clear aligners that straighten your teeth discreetly. No metal brackets, no wires — just results.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-5": {
+          "type": "card",
+          "settings": {
+            "icon": "shield",
+            "title": "Crowns & Bridges",
+            "description": "<p>Custom-crafted restorations that repair damaged teeth and fill gaps with natural-looking results.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-6": {
+          "type": "card",
+          "settings": {
+            "icon": "emergency-bed",
+            "title": "Emergency Care",
+            "description": "<p>Toothache, broken tooth, or dental trauma? We offer same-day emergency appointments when you need us most.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["svc-1", "svc-2", "svc-3", "svc-4", "svc-5", "svc-6"]
+    },
+    "before_after": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "Real Results",
+        "title": "See the Difference",
+        "description": "",
+        "heading_alignment": "center",
+        "before_image": "",
+        "after_image": "",
+        "before_label": "Before",
+        "after_label": "After",
+        "orientation": "horizontal",
+        "initial_position": 30,
+        "show_labels": true,
+        "color_scheme": "standard"
+      }
+    },
+    "about_teaser": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "about-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>MEET DR. ELENA RHODES</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "about-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Dentistry That Listens",
+            "size": "2xl"
+          }
+        },
+        "about-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Dr. Rhodes founded Brightside with a simple principle: great dentistry starts with understanding the person in the chair. Every treatment plan begins with a conversation — about your goals, your concerns, and what makes you comfortable. It's a different kind of dental experience.</p>",
+            "size": "base"
+          }
+        },
+        "about-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "About Us",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["about-eyebrow", "about-heading", "about-text", "about-button"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Patient Reviews",
+        "title": "What Our Patients Say",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "I've avoided the dentist for years out of pure anxiety. Dr. Rhodes and her team made me feel so safe and comfortable that I actually look forward to my visits now. Best decision I ever made.",
+            "avatar": "",
+            "name": "Michael T.",
+            "title": "Patient since 2023",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "The Invisalign results speak for themselves — my teeth are straighter than I ever imagined. The whole process was smooth, well-explained, and faster than expected.",
+            "avatar": "",
+            "name": "Sarah K.",
+            "title": "Invisalign patient",
+            "rating": "5"
+          }
+        },
+        "review-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Broke a tooth on a Saturday morning and they got me in the same day. Professional, calm, and they fixed it beautifully. This is what emergency care should look like.",
+            "avatar": "",
+            "name": "James R.",
+            "title": "Emergency visit",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2", "review-3"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready for a Brighter Smile?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>New patients receive a complimentary consultation.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Your First Visit",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "trust_strip", "services", "before_after", "about_teaser", "testimonials", "cta"],
+  "id": "index",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

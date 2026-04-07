@@ -1,0 +1,218 @@
+{
+  "name": "New Patients",
+  "slug": "new-patients",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#0f1d2e80",
+        "color_scheme": "highlight",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "New Patients",
+            "size": "4xl"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading"]
+    },
+    "welcome": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "welcome-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Welcome to Brightside",
+            "size": "2xl"
+          }
+        },
+        "welcome-text-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We know choosing a new dentist is a big decision. At Brightside, we make the process easy — from your first phone call to your first visit, everything is designed to put you at ease.</p>",
+            "size": "base"
+          }
+        },
+        "welcome-text-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your first visit includes a comprehensive exam, digital X-rays, and a personalized treatment plan. We take the time to explain everything clearly so you can make informed decisions about your care.</p>",
+            "size": "base"
+          }
+        },
+        "welcome-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Your First Visit",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["welcome-heading", "welcome-text-1", "welcome-text-2", "welcome-button"]
+    },
+    "first_visit": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "Your First Visit",
+        "title": "Step by Step",
+        "heading_alignment": "center",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "image": "",
+            "title": "Paperwork & Check-In",
+            "description": "<p>Complete your forms online before you arrive or fill them in at the office. We'll review your medical history and any concerns you'd like to address.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "image": "",
+            "title": "Comprehensive Exam",
+            "description": "<p>Your dentist performs a thorough examination of your teeth, gums, jaw, and bite. We check for cavities, gum disease, and any signs of oral health issues.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "image": "",
+            "title": "Digital X-Rays",
+            "description": "<p>Low-radiation digital X-rays give us a detailed picture of what's happening below the surface. Results are instant — we review them with you on-screen.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "image": "",
+            "title": "Treatment Plan Discussion",
+            "description": "<p>We sit down together to review findings, discuss options, and create a care plan that fits your goals, timeline, and budget. No surprises, no pressure.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "New Patient FAQ",
+        "title": "Common Questions",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "What should I bring to my first visit?",
+            "answer": "<p>Please bring a valid photo ID, your insurance card (if applicable), and a list of any medications you're currently taking. If you completed your forms online, that's all you need.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "Do you accept my insurance?",
+            "answer": "<p>We accept most major dental insurance plans including Delta Dental, Cigna, Aetna, MetLife, and Guardian. Not sure about your plan? Call us at (212) 555-0312 and we'll verify your coverage before your visit.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "How long will my first appointment take?",
+            "answer": "<p>Plan for about 60 to 90 minutes. This gives us time for a thorough exam, X-rays, cleaning (if needed), and a conversation about your treatment plan without feeling rushed.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you treat children?",
+            "answer": "<p>Yes — we're a family practice and welcome patients of all ages. We have experience making dental visits fun and stress-free for kids, and Dr. Chen specializes in pediatric care.</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "question": "What if I have dental anxiety?",
+            "answer": "<p>You're not alone — many of our patients feel the same way. We offer a gentle, judgment-free environment, clear communication at every step, and sedation options for patients who need extra support.</p>"
+          }
+        },
+        "faq-6": {
+          "type": "item",
+          "settings": {
+            "question": "Is parking available?",
+            "answer": "<p>Yes — there's a parking garage directly next to our building on Park Avenue. We also validate parking for appointments. The office is a 3-minute walk from the 51st Street subway station (6 train).</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5", "faq-6"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "We Can't Wait to Meet You",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Same-day appointments available for new patients.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Appointment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "welcome", "first_visit", "faq", "cta"],
+  "id": "new-patients",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

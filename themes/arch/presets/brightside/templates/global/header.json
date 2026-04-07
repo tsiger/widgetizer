@@ -1,0 +1,20 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Brightside",
+    "contactDetailsLine1": "(212) 555-0312",
+    "contactDetailsLine2": "320 Park Avenue, Suite 4B",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Book Appointment",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "center_nav": false,
+    "full_width": false,
+    "sticky": false,
+    "transparent_on_hero": false,
+    "color_scheme": "highlight-accent"
+  }
+}

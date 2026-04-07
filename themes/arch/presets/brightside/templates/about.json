@@ -1,0 +1,251 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#0f1d2e80",
+        "color_scheme": "highlight",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "About Us",
+            "size": "4xl"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading"]
+    },
+    "story": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "story-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>EST. 2014</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "story-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A Decade of Smiles",
+            "size": "2xl"
+          }
+        },
+        "story-text-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Brightside Dental was founded by Dr. Elena Rhodes with a mission to make modern dentistry accessible, comfortable, and — dare we say — enjoyable. After years of working in corporate dental chains, she wanted to build something different: a practice where patients are people, not numbers.</p>",
+            "size": "base"
+          }
+        },
+        "story-text-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A decade later, Brightside has grown into a team of three dentists and a dedicated support staff, serving thousands of families across Midtown Manhattan. The philosophy hasn't changed: listen carefully, explain clearly, and treat gently.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["story-eyebrow", "story-heading", "story-text-1", "story-text-2"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The Team",
+        "title": "Meet Your Dentists",
+        "description": "",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "profile-1": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Dr. Elena Rhodes",
+            "role": "Lead Dentist",
+            "specialty": "General & Cosmetic",
+            "bio": "NYU College of Dentistry graduate with 18 years of experience. Dr. Rhodes specializes in cosmetic dentistry and is known for her gentle, patient-first approach.",
+            "linkedin": "https://linkedin.com"
+          }
+        },
+        "profile-2": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Dr. Marcus Chen",
+            "role": "Associate Dentist",
+            "specialty": "Pediatric & Orthodontic",
+            "bio": "Board-certified in pediatric dentistry. Dr. Chen makes dental visits fun for kids and is a certified Invisalign provider for teens and adults.",
+            "linkedin": "https://linkedin.com"
+          }
+        },
+        "profile-3": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Dr. Lena Okafor",
+            "role": "Associate Dentist",
+            "specialty": "Oral Surgery & Implants",
+            "bio": "Fellowship-trained in oral surgery with a focus on dental implants and complex restorations. Dr. Okafor brings precision and calm to every procedure.",
+            "linkedin": "https://linkedin.com"
+          }
+        }
+      },
+      "blocksOrder": ["profile-1", "profile-2", "profile-3"]
+    },
+    "values": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "xl",
+        "icon_shape": "circle",
+        "alignment": "centered",
+        "show_dividers": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "value-1": {
+          "type": "item",
+          "settings": {
+            "icon": "heart",
+            "title": "Patient-First Care",
+            "text": "Your comfort guides every decision"
+          }
+        },
+        "value-2": {
+          "type": "item",
+          "settings": {
+            "icon": "microscope",
+            "title": "Modern Technology",
+            "text": "Advanced tools for precise treatment"
+          }
+        },
+        "value-3": {
+          "type": "item",
+          "settings": {
+            "icon": "users",
+            "title": "Family Practice",
+            "text": "Every age, every smile"
+          }
+        }
+      },
+      "blocksOrder": ["value-1", "value-2", "value-3"]
+    },
+    "office": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "",
+        "title": "Our Office",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": false,
+        "aspect_ratio": "16 / 9",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "img-1": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Lobby"
+          }
+        },
+        "img-2": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Treatment room"
+          }
+        },
+        "img-3": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Reception"
+          }
+        },
+        "img-4": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Sterilization area"
+          }
+        },
+        "img-5": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Patient lounge"
+          }
+        },
+        "img-6": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Exterior"
+          }
+        }
+      },
+      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Join the Brightside Family",
+            "size": "2xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Appointment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "story", "team", "values", "office", "cta"],
+  "id": "about",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

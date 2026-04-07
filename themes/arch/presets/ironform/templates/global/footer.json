@@ -1,0 +1,36 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Ironform Training. All rights reserved.",
+    "color_scheme": "highlight"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Ironform",
+        "text": "<p>Personal training and fitness coaching in Brooklyn. Strength, conditioning, and transformation programs built for real results.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Training Hours",
+        "text": "<p>Monday — Friday: 6 AM – 9 PM<br>Saturday: 7 AM – 4 PM<br>Sunday: By appointment</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Links"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow the Grind"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

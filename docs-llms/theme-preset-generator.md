@@ -386,9 +386,9 @@ Mix these across presets:
 
 The header is the first thing users see. Every preset should configure a distinct header using the full range of available settings — logo text, contact details, contact position, centered nav, CTA style, sticky behavior, transparency, color scheme, and full-width toggle. See Section 4.
 
-### Action Bar: vary fullwidth
+### Action Bar: never use fullwidth
 
-Don't default `action-bar` to `fullwidth: true` everywhere. Mix contained (`false`) and fullwidth across presets and within the same preset.
+Always set `action-bar` to `fullwidth: false`. Never use `fullwidth: true` — it doesn't look good.
 
 ### Contact page: don't duplicate the footer
 

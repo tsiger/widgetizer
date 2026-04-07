@@ -1,0 +1,295 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "slideshow",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "alignment": "start",
+        "autoplay": true,
+        "autoplay_speed": 4000
+      },
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "image": "",
+            "heading_text": "Train Hard. Live Strong.",
+            "heading_size": "6xl",
+            "text_content": "Personal training and fitness coaching built for real results. Your transformation starts here.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "Start Training",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "button_link_2": {
+              "text": "View Programs",
+              "href": "programs.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_style_2": "secondary",
+            "button_size": "medium",
+            "overlay_color": "#141414cc",
+            "color_scheme": "highlight"
+          }
+        },
+        "slide-2": {
+          "type": "slide",
+          "settings": {
+            "image": "",
+            "heading_text": "12-Week Transformation Program",
+            "heading_size": "5xl",
+            "text_content": "Structured strength and conditioning for serious results. Nutrition guidance included.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "See Transformations",
+              "href": "transformations.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_size": "medium",
+            "overlay_color": "#141414cc",
+            "color_scheme": "highlight"
+          }
+        },
+        "slide-3": {
+          "type": "slide",
+          "settings": {
+            "image": "",
+            "heading_text": "1-on-1 Coaching",
+            "heading_size": "5xl",
+            "text_content": "Every rep, every set, every meal — programmed for you.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "Get Started",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_size": "medium",
+            "overlay_color": "#141414cc",
+            "color_scheme": "highlight"
+          }
+        }
+      },
+      "blocksOrder": ["slide-1", "slide-2", "slide-3"]
+    },
+    "marquee": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "No Shortcuts",
+        "separator": "///",
+        "speed": 10,
+        "rotate": -3,
+        "font_size": "xl",
+        "bg_color": "#e06820",
+        "text_color": "#ffffff",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      }
+    },
+    "stats": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "plain",
+        "icon_size": "sm",
+        "icon_shape": "sharp",
+        "alignment": "centered",
+        "show_dividers": true,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "stat-1": {
+          "type": "item",
+          "settings": {
+            "title": "500+",
+            "text": "Clients Trained"
+          }
+        },
+        "stat-2": {
+          "type": "item",
+          "settings": {
+            "title": "12",
+            "text": "Years Experience"
+          }
+        },
+        "stat-3": {
+          "type": "item",
+          "settings": {
+            "title": "98%",
+            "text": "Goal Completion"
+          }
+        },
+        "stat-4": {
+          "type": "item",
+          "settings": {
+            "title": "4.9",
+            "text": "Google Rating"
+          }
+        }
+      },
+      "blocksOrder": ["stat-1", "stat-2", "stat-3", "stat-4"]
+    },
+    "programs": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Programs",
+        "title": "Built for Results",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "center",
+        "image_position": "top",
+        "aspect_ratio": "3 / 4",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "prog-1": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "12 Weeks",
+            "title": "Strength & Hypertrophy",
+            "description": "<p>Progressive overload programming focused on compound lifts. Build raw strength and muscle mass with structured periodization.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        },
+        "prog-2": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "8 Weeks",
+            "title": "Fat Loss & Conditioning",
+            "description": "<p>High-intensity hybrid training combining HIIT circuits with strength work. Includes a full meal plan and bi-weekly progress tracking.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        },
+        "prog-3": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "Ongoing",
+            "title": "1-on-1 Coaching",
+            "description": "<p>Fully customized programming, in-person or remote. Nutrition protocols, recovery planning, and unlimited messaging support.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["prog-1", "prog-2", "prog-3"]
+    },
+    "before_after": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "Real Results",
+        "title": "The Proof Is in the Work",
+        "description": "",
+        "heading_alignment": "center",
+        "before_image": "",
+        "after_image": "",
+        "before_label": "Day 1",
+        "after_label": "Week 12",
+        "orientation": "vertical",
+        "initial_position": 40,
+        "show_labels": true,
+        "color_scheme": "standard"
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "",
+        "title": "What Clients Say",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Lost 30 pounds in 12 weeks. Marcus didn't just give me a workout plan — he rewired how I think about food, sleep, and recovery. Best investment I've ever made in myself.",
+            "avatar": "",
+            "name": "Jake D.",
+            "title": "Fat Loss Program",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Did my first pull-up at 42. I never thought I'd be the person who looks forward to training, but here I am, five days a week. Marcus meets you where you are.",
+            "avatar": "",
+            "name": "Laura M.",
+            "title": "1-on-1 Coaching",
+            "rating": "5"
+          }
+        },
+        "review-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Deadlift went from 185 to 315 in under a year. The programming is smart, progressive, and it actually works. No gimmicks, no shortcuts — just results.",
+            "avatar": "",
+            "name": "Chris R.",
+            "title": "Strength Program",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2", "review-3"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Stop Thinking. Start Training.",
+            "size": "3xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Free Consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "marquee", "stats", "programs", "before_after", "testimonials", "cta"],
+  "id": "index",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

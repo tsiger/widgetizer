@@ -1,0 +1,287 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#0f1d2e80",
+        "color_scheme": "highlight",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Services",
+            "size": "4xl"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading"]
+    },
+    "overview": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "",
+        "title": "Comprehensive Dental Care",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "center",
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "svc-1": {
+          "type": "card",
+          "settings": {
+            "icon": "search",
+            "title": "Checkups & Cleaning",
+            "description": "<p>Regular exams with digital X-rays, professional cleaning, and early detection of cavities, gum disease, and oral health issues. The foundation of a healthy smile.</p>",
+            "button_link": {
+              "text": "Book Now",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-2": {
+          "type": "card",
+          "settings": {
+            "icon": "sun",
+            "title": "Teeth Whitening",
+            "description": "<p>Professional-grade whitening that's faster and more effective than over-the-counter options. In-office treatment takes about an hour, or use our custom take-home trays.</p>",
+            "button_link": {
+              "text": "Book Now",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-3": {
+          "type": "card",
+          "settings": {
+            "icon": "plus-circle",
+            "title": "Dental Implants",
+            "description": "<p>Titanium implants that fuse with your jawbone for a permanent, natural-feeling tooth replacement. We handle the full process from consultation to final restoration.</p>",
+            "button_link": {
+              "text": "Book Now",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-4": {
+          "type": "card",
+          "settings": {
+            "icon": "align-left",
+            "title": "Invisalign",
+            "description": "<p>Custom clear aligners that gradually straighten your teeth without the look or feel of traditional braces. We're a certified Invisalign provider with hundreds of completed cases.</p>",
+            "button_link": {
+              "text": "Book Now",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-5": {
+          "type": "card",
+          "settings": {
+            "icon": "shield",
+            "title": "Crowns & Bridges",
+            "description": "<p>Custom porcelain restorations designed to match your natural teeth. Repair cracks, strengthen weakened teeth, or bridge gaps with lasting results.</p>",
+            "button_link": {
+              "text": "Book Now",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-6": {
+          "type": "card",
+          "settings": {
+            "icon": "zap",
+            "title": "Emergency Care",
+            "description": "<p>Severe pain, a broken tooth, or a knocked-out tooth can't wait. We reserve same-day slots for dental emergencies — call us and we'll get you in.</p>",
+            "button_link": {
+              "text": "Book Now",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["svc-1", "svc-2", "svc-3", "svc-4", "svc-5", "svc-6"]
+    },
+    "process": {
+      "type": "numbered-cards",
+      "settings": {
+        "eyebrow": "Your Visit",
+        "title": "What to Expect",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "box",
+        "alignment": "center",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Book Online",
+            "description": "<p>Choose a time that works for you. Our online booking takes less than a minute.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Arrive & Check In",
+            "description": "<p>Complete your paperwork digitally before you arrive. Walk in, sit down, and relax.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Consultation & Treatment",
+            "description": "<p>Your dentist discusses findings, explains options clearly, and proceeds only with your approval.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "Follow-Up Care",
+            "description": "<p>Receive a personalized care plan and easy scheduling for any follow-up appointments.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "technology": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "tech-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>ADVANCED TECHNOLOGY</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "tech-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Modern Tools, Better Outcomes",
+            "size": "2xl"
+          }
+        },
+        "tech-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We invest in the latest dental technology so your treatments are faster, more comfortable, and more precise. From digital impressions that eliminate goopy molds to laser treatments that reduce recovery time.</p>",
+            "size": "base"
+          }
+        },
+        "tech-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Digital X-Rays\n+ Intraoral Cameras\n+ Laser Dentistry\n+ 3D Scanning"
+          }
+        }
+      },
+      "blocksOrder": ["tech-eyebrow", "tech-heading", "tech-text", "tech-features"]
+    },
+    "insurance": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "ins-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Insurance & Payment",
+            "size": "3xl"
+          }
+        },
+        "ins-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We accept most major insurance plans and offer flexible payment options including CareCredit financing.</p>",
+            "size": "base"
+          }
+        },
+        "ins-note": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Not sure if we accept your plan? Call us and we'll check for you.</p>",
+            "size": "sm",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["ins-heading", "ins-text", "ins-note"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Don't Wait for a Toothache",
+            "size": "2xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Appointment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "link_2": {
+              "text": "Call (212) 555-0312",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "overview", "process", "technology", "insurance", "cta"],
+  "id": "services",
+  "created": "2026-04-07T10:00:00.000Z",
+  "updated": "2026-04-07T10:00:00.000Z"
+}

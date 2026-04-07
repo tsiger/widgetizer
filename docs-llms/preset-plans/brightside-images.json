@@ -1,0 +1,242 @@
+[
+  {
+    "file": "home-hero.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "A bright, modern dental office waiting room. Clean white walls, light wood accents, a row of comfortable blue upholstered chairs, a reception desk with a smiling receptionist visible in the background. Large windows letting in natural light, a few green plants. Fresh, welcoming, professional. Editorial interior photography, bright clean tones with blue accents."
+  },
+  {
+    "file": "home-before.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Close-up dental photo of a person's smile showing yellowed, stained teeth. Clinical dental photography with ring light, neutral gray background. Clear focus on the teeth, lips slightly parted in a natural smile. Professional dental before photo, even clinical lighting."
+  },
+  {
+    "file": "home-after.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Close-up dental photo of a person's smile showing bright white, perfectly aligned teeth after whitening treatment. Clinical dental photography with ring light, neutral gray background. Same angle and framing as a before photo. Professional dental after photo, even clinical lighting."
+  },
+  {
+    "file": "home-dentist.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Portrait of a female dentist in her early 40s wearing a white lab coat, standing in a modern treatment room with arms crossed, smiling warmly at the camera. Dental equipment softly blurred in the background. Confident, approachable, professional. Environmental portrait photography, bright clean tones."
+  },
+  {
+    "file": "home-avatar-michael.jpg",
+    "width": 400,
+    "height": 400,
+    "prompt": "Headshot of a man in his mid 30s with short brown hair and a broad natural smile showing teeth. Wearing a casual button-down shirt. Soft natural light, plain light background. Friendly and genuine. Portrait photography, bright clean tones."
+  },
+  {
+    "file": "home-avatar-sarah.jpg",
+    "width": 400,
+    "height": 400,
+    "prompt": "Headshot of a woman in her late 20s with dark hair pulled back, smiling naturally showing teeth. Wearing a light blue top. Soft natural light, plain light background. Happy and confident. Portrait photography, bright clean tones."
+  },
+  {
+    "file": "home-avatar-james.jpg",
+    "width": 400,
+    "height": 400,
+    "prompt": "Headshot of a man in his early 40s with short dark hair and a warm smile. Wearing a grey crew-neck shirt. Soft natural light, plain light background. Relaxed and trustworthy. Portrait photography, bright clean tones."
+  },
+  {
+    "file": "services-hero.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Overhead flat lay of dental instruments on a clean white surface. A dental mirror, explorer probe, scaler, and a pair of blue nitrile gloves arranged neatly. Bright even lighting, clinical and precise. No people. Product photography, clean bright medical tones."
+  },
+  {
+    "file": "services-technology.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "A modern dental treatment room with a patient chair, overhead lamp, and a large monitor displaying a digital X-ray of teeth. Clean, high-tech environment with blue accent lighting on the equipment. No people. Interior photography, bright clinical tones with blue accents."
+  },
+  {
+    "file": "new-patients-hero.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Close-up of a dental reception desk with a tablet for digital check-in, a small vase of white flowers, and a stack of welcome cards. Bright, clean, inviting. Warm natural light from a window. No people. Product photography, bright welcoming tones."
+  },
+  {
+    "file": "new-patients-welcome.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "A friendly dental reception area with a curved white desk, a staff member handing a clipboard to a patient. Both smiling. Bright overhead lighting, plants in the background, blue accent chairs visible. Welcoming and professional. No identifiable faces clearly visible. Lifestyle photography, bright clean tones."
+  },
+  {
+    "file": "new-patients-step-1.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "A person filling out a digital form on a tablet in a dental waiting room. Close-up of hands and the tablet screen. Comfortable blue chair, bright clean environment. Simple and modern. No identifiable face. Lifestyle photography, bright tones."
+  },
+  {
+    "file": "new-patients-step-2.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "A dentist examining a patient's teeth with a small dental mirror. Shot from the side, the dentist wearing a white coat and blue gloves, patient reclined in the chair. Bright overhead dental light. Professional and gentle. No identifiable faces. Medical photography, bright clinical tones."
+  },
+  {
+    "file": "new-patients-step-3.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "A dental professional positioning a digital X-ray sensor near a patient's mouth. Modern X-ray equipment visible. Clean treatment room with blue accents. Technical but not intimidating. No identifiable faces. Medical photography, bright clinical tones."
+  },
+  {
+    "file": "new-patients-step-4.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "A dentist and patient sitting together at a consultation desk, the dentist pointing at X-ray images on a large monitor while explaining the treatment plan. Both seen from the side. Bright office with clean white walls. Collaborative and transparent. No identifiable faces. Lifestyle medical photography, bright tones."
+  },
+  {
+    "file": "about-hero.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Exterior of a modern dental practice on a Manhattan street. A clean glass storefront with the name visible on a simple sign, potted plants near the entrance, a blue awning. Midday light, pedestrians blurred in the background. Professional and established. Architectural photography, bright urban tones."
+  },
+  {
+    "file": "about-story.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Exterior of a modern dental office building entrance with a glass door, clean signage, and a small garden bed with green shrubs. Afternoon sunlight, blue sky. Established and inviting. No people. Architectural photography, bright clean tones."
+  },
+  {
+    "file": "about-profile-elena.jpg",
+    "width": 400,
+    "height": 400,
+    "prompt": "Professional headshot of a female dentist in her early 40s with dark hair pulled back, wearing a white lab coat. Warm, confident smile. Soft studio lighting, plain light gray background. Professional medical portrait photography."
+  },
+  {
+    "file": "about-profile-marcus.jpg",
+    "width": 400,
+    "height": 400,
+    "prompt": "Professional headshot of a male dentist in his mid 30s with short dark hair and glasses, wearing a white lab coat. Friendly, approachable expression. Soft studio lighting, plain light gray background. Professional medical portrait photography."
+  },
+  {
+    "file": "about-profile-lena.jpg",
+    "width": 400,
+    "height": 400,
+    "prompt": "Professional headshot of a female dentist in her late 30s with natural hair styled up, wearing a white lab coat. Calm, confident expression. Soft studio lighting, plain light gray background. Professional medical portrait photography."
+  },
+  {
+    "file": "about-gallery-lobby.jpg",
+    "width": 1200,
+    "height": 675,
+    "prompt": "Bright dental office lobby with comfortable seating, a water cooler, a flat-screen TV on the wall, and modern art. Clean white walls with blue accent panels. Natural light from large windows. Welcoming and modern. No people. Interior photography, bright clean tones."
+  },
+  {
+    "file": "about-gallery-treatment.jpg",
+    "width": 1200,
+    "height": 675,
+    "prompt": "A modern dental treatment room. A patient chair with overhead lamp, a monitor mounted on an articulating arm, neatly organized instrument trays. Blue accent wall behind. Clean, high-tech, not intimidating. No people. Interior photography, bright clinical tones."
+  },
+  {
+    "file": "about-gallery-reception.jpg",
+    "width": 1200,
+    "height": 675,
+    "prompt": "A dental reception desk area with a curved white counter, computer monitors, a small floral arrangement, and neatly organized patient folders. Bright overhead lighting, clean and organized. No people. Interior photography, bright professional tones."
+  },
+  {
+    "file": "about-gallery-sterilization.jpg",
+    "width": 1200,
+    "height": 675,
+    "prompt": "A dental sterilization room with an autoclave, organized instrument cassettes, and stainless steel surfaces. Everything spotless and precisely arranged. Blue LED indicator lights on equipment. Clinical precision. No people. Interior photography, bright sterile tones."
+  },
+  {
+    "file": "about-gallery-lounge.jpg",
+    "width": 1200,
+    "height": 675,
+    "prompt": "A patient lounge area in a dental office. Comfortable chairs with blue cushions, a coffee machine, magazines on a side table, a window with natural light. Relaxed and welcoming. No people. Interior photography, bright warm tones."
+  },
+  {
+    "file": "about-gallery-exterior.jpg",
+    "width": 1200,
+    "height": 675,
+    "prompt": "Street-level view of a modern dental practice storefront. Glass windows showing the clean interior, a blue awning, potted plants at the entrance, and a brass address number on the door frame. Golden afternoon light. No people. Architectural photography, bright urban tones."
+  },
+  {
+    "file": "smile-gallery-hero.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Close-up of a person's radiant smile, lips parted showing perfectly white teeth. Bright, even ring-light illumination. The image is cropped to show only the lower face from nose to chin. Clean, aspirational. Clinical dental photography, bright high-key lighting."
+  },
+  {
+    "file": "smile-gallery-before.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Close-up dental photo of a smile showing moderately discolored teeth with some visible staining. Clinical ring-light, neutral gray background. Natural lip position. Professional dental before-photo, even flat lighting."
+  },
+  {
+    "file": "smile-gallery-after.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Close-up dental photo of the same smile after professional whitening — teeth now bright, even, and clean. Clinical ring-light, neutral gray background. Same framing as the before photo. Professional dental after-photo, even flat lighting."
+  },
+  {
+    "file": "smile-gallery-result-1.jpg",
+    "width": 900,
+    "height": 600,
+    "prompt": "Close-up of a bright white smile after teeth whitening. Natural lip position, ring-light dental photography, neutral background. Clean and aspirational. Clinical dental result photography."
+  },
+  {
+    "file": "smile-gallery-result-2.jpg",
+    "width": 900,
+    "height": 600,
+    "prompt": "Close-up of straight, well-aligned teeth after Invisalign treatment. Natural smile, ring-light dental photography, neutral background. Confident result. Clinical dental photography."
+  },
+  {
+    "file": "smile-gallery-result-3.jpg",
+    "width": 900,
+    "height": 600,
+    "prompt": "Close-up of a full set of porcelain veneers — perfectly shaped, bright white teeth in a natural smile. Ring-light dental photography, neutral background. Flawless result. Clinical dental photography."
+  },
+  {
+    "file": "smile-gallery-result-4.jpg",
+    "width": 900,
+    "height": 600,
+    "prompt": "Close-up of a single dental implant result — the implant tooth perfectly blending with surrounding natural teeth. Ring-light dental photography, neutral background. Seamless integration. Clinical dental photography."
+  },
+  {
+    "file": "smile-gallery-result-5.jpg",
+    "width": 900,
+    "height": 600,
+    "prompt": "Close-up of a porcelain crown on a molar, perfectly matching the adjacent teeth in color and shape. Slightly wider dental photo showing several teeth. Ring-light, neutral background. Precise restoration. Clinical dental photography."
+  },
+  {
+    "file": "smile-gallery-result-6.jpg",
+    "width": 900,
+    "height": 600,
+    "prompt": "Close-up of a front tooth repaired with composite bonding — smooth surface, matching color, no visible repair line. Natural smile position. Ring-light dental photography, neutral background. Invisible repair. Clinical dental photography."
+  },
+  {
+    "file": "smile-gallery-result-7.jpg",
+    "width": 900,
+    "height": 600,
+    "prompt": "Close-up of upper teeth showing closed gap after Invisalign treatment. Natural smile, teeth perfectly aligned where there was once a visible space. Ring-light dental photography, neutral background. Clinical dental photography."
+  },
+  {
+    "file": "smile-gallery-result-8.jpg",
+    "width": 900,
+    "height": 600,
+    "prompt": "Close-up of a dental bridge spanning three teeth, blending seamlessly with the surrounding natural teeth. Slightly wide dental photo. Ring-light, neutral background. Functional and aesthetic. Clinical dental photography."
+  },
+  {
+    "file": "smile-gallery-result-9.jpg",
+    "width": 900,
+    "height": 600,
+    "prompt": "Close-up of a bright white smile after professional stain removal — previously coffee-stained teeth now clean and even. Natural lip position. Ring-light dental photography, neutral background. Fresh and clean. Clinical dental photography."
+  },
+  {
+    "file": "contact-hero.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "A dental office hallway with clean white walls, blue accent strip along the bottom, framed certificates on the wall, and a door open to a treatment room at the end. Bright even lighting, polished floor. Professional and inviting. No people. Interior photography, bright clinical tones."
+  },
+  {
+    "file": "contact-reception.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "A dental reception desk from the patient's perspective. A clean white counter with a small plant, a card reader, and a monitor showing a booking screen. Staff member's hands visible typing on a keyboard. Bright, friendly, efficient. Lifestyle photography, bright clean tones."
+  }
+]
