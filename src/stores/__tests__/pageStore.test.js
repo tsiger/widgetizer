@@ -122,6 +122,11 @@ function createDeferred() {
 
 describe("pageStore", () => {
   beforeEach(() => {
+    getPage.mockReset();
+    getGlobalWidgets.mockReset();
+    getThemeSettings.mockReset();
+    getActiveProjectId.mockReset();
+    getActiveProjectId.mockImplementation(() => "project-a");
     resetStore();
   });
 
