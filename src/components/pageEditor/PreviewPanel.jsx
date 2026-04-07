@@ -176,6 +176,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   const pendingScrollRef = useRef(null);
 
   const { globalWidgets } = usePageStore();
+  const loadedProjectId = usePageStore((state) => state.loadedProjectId);
   const activeProject = useProjectStore((state) => state.activeProject);
   const schemas = useWidgetStore((state) => state.schemas);
 
@@ -279,6 +280,8 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   // Initial page load effect
   useEffect(() => {
     if (!page || initialLoadComplete) return;
+    // Skip if page data belongs to a different project (stale state during switch)
+    if (activeProject?.id && loadedProjectId && activeProject.id !== loadedProjectId) return;
 
     async function loadInitialPreview() {
       try {
@@ -312,6 +315,8 @@ const PreviewPanel = forwardRef(function PreviewPanel(
   }, [
     page,
     initialLoadComplete,
+    activeProject?.id,
+    loadedProjectId,
     globalWidgets,
     themeSettings,
     widgets,

@@ -70,7 +70,16 @@ const usePageStore = create(
           return;
         }
 
-        set({ loading: true, error: null, loadedProjectId: projectId });
+        set({
+          loading: true,
+          error: null,
+          loadedProjectId: projectId,
+          page: null,
+          originalPage: null,
+          globalWidgets: { header: null, footer: null },
+          themeSettings: null,
+          originalThemeSettings: null,
+        });
 
         try {
           // Load page data (clean, no global widgets mixed in)

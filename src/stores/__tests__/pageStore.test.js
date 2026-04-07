@@ -105,6 +105,17 @@ function seedGlobalWidgets() {
   return globalWidgets;
 }
 
+function createDeferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+}
+
 // ============================================================================
 // Tests
 // ============================================================================
@@ -399,6 +410,79 @@ describe("pageStore", () => {
       expect(state.themeSettings).toBeNull();
       expect(state.loadedProjectId).toBe("project-b");
       expect(state.error).toBe("boom");
+    });
+
+    it("clears previous page state immediately when a new load starts", async () => {
+      seedPage();
+      seedGlobalWidgets();
+      seedThemeSettings();
+
+      const pageRequest = createDeferred();
+      getPage.mockReturnValue(pageRequest.promise);
+      getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
+      getThemeSettings.mockResolvedValue({ settings: { global: {} } });
+
+      const loadPromise = usePageStore.getState().loadPage("page-2");
+
+      const interimState = usePageStore.getState();
+      expect(interimState.loading).toBe(true);
+      expect(interimState.error).toBeNull();
+      expect(interimState.page).toBeNull();
+      expect(interimState.originalPage).toBeNull();
+      expect(interimState.globalWidgets).toEqual({ header: null, footer: null });
+      expect(interimState.themeSettings).toBeNull();
+      expect(interimState.originalThemeSettings).toBeNull();
+      expect(interimState.loadedProjectId).toBe("project-a");
+
+      pageRequest.resolve({
+        id: "page-2",
+        title: "Fresh Page",
+        widgets: {},
+        widgetsOrder: [],
+      });
+
+      await loadPromise;
+    });
+
+    it("keeps the most recent load result when an earlier load resolves later", async () => {
+      const firstPageRequest = createDeferred();
+      const secondPageRequest = createDeferred();
+
+      getPage
+        .mockImplementationOnce(() => firstPageRequest.promise)
+        .mockImplementationOnce(() => secondPageRequest.promise);
+      getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
+      getThemeSettings.mockResolvedValue({
+        settings: { global: { colors: [{ id: "primary", value: "#000" }] } },
+      });
+      getActiveProjectId
+        .mockImplementationOnce(() => "project-a")
+        .mockImplementationOnce(() => "project-b")
+        .mockImplementation(() => "project-b");
+
+      const firstLoadPromise = usePageStore.getState().loadPage("page-a");
+      const secondLoadPromise = usePageStore.getState().loadPage("page-b");
+
+      secondPageRequest.resolve({
+        id: "page-b",
+        title: "Page B",
+        widgets: {},
+        widgetsOrder: [],
+      });
+      await secondLoadPromise;
+
+      firstPageRequest.resolve({
+        id: "page-a",
+        title: "Page A",
+        widgets: {},
+        widgetsOrder: [],
+      });
+      await firstLoadPromise;
+
+      const state = usePageStore.getState();
+      expect(state.loadedProjectId).toBe("project-b");
+      expect(state.page.id).toBe("page-b");
+      expect(state.page.title).toBe("Page B");
     });
   });
 
