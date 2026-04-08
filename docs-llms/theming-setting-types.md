@@ -7,10 +7,14 @@ This document outlines the available setting types that can be used in `theme.js
 All setting types share the following common properties:
 
 - `id` (string, required): A unique, machine-readable identifier for the setting.
-- `label` (string, required): A `tTheme:` prefixed key that references a translation in the theme's locale files (e.g., `"tTheme:carousel.settings.title.label"`). The frontend resolves this to a human-readable string at runtime. While the renderer can fall back to the `id`, it's strongly recommended to always provide a clean label.
-- `description` (string, optional): A `tTheme:` prefixed key for help text displayed below the input (e.g., `"tTheme:carousel.settings.title.description"`).
+- `label` (string, required): Usually a `tTheme:` prefixed key that references a translation in the theme's locale files (e.g., `"tTheme:carousel.settings.title.label"`). The frontend resolves `tTheme:` values to human-readable strings at runtime. Direct strings like `"Title"` also work for small one-off themes, but `tTheme:` remains the recommended authoring convention.
+- `description` (string, optional): Usually a `tTheme:` prefixed key for help text displayed below the input (e.g., `"tTheme:carousel.settings.title.description"`). Direct strings are also supported.
 - `default` (any, optional): The default value for the setting if none is provided.
 - `outputAsCssVar` (boolean, optional): If set to `true`, the setting's value will be output as a CSS custom property (variable) in the page's `<head>`. This is the primary way to link theme settings to your theme's CSS.
+
+---
+
+> **Practical note:** Even if a theme uses direct strings instead of `tTheme:` keys, it should still include a minimal `locales/en.json` because projects now treat `locales/` as part of the copied theme package.
 
 ---
 

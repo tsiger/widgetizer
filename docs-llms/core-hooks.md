@@ -342,7 +342,7 @@ Fetches the active project's theme locale JSON for the current language and prov
 
 #### Purpose
 
-Widget `schema.json` files use `tTheme:` prefixed keys for displayName, label, description, and option labels instead of plain English strings. This hook loads the active project's copied theme locale files and returns a resolver that translates those keys into localized strings at runtime.
+Widget `schema.json` files typically use `tTheme:` prefixed keys for displayName, label, description, and option labels instead of plain English strings. This hook loads the active project's copied theme locale files and returns a resolver that translates those keys into localized strings at runtime. Non-prefixed strings are returned unchanged, which allows simpler one-off themes to use direct labels when needed.
 
 #### API Reference
 

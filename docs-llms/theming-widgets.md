@@ -1069,7 +1069,9 @@ Each increment adds 0.1s delay. So `--reveal-delay: 0` has no delay, `--reveal-d
 
 ### Schema File (`schema.json`)
 
-All user-facing strings in the schema (`displayName`, `label`, `description`, and option labels) use `tTheme:` prefixed keys that reference entries in the theme's locale files (`locales/*.json`). This keeps schemas language-independent and enables translation support.
+The recommended convention is for user-facing strings in the schema (`displayName`, `label`, `description`, and option labels) to use `tTheme:` prefixed keys that reference entries in the theme's locale files (`locales/*.json`). This keeps schemas language-independent and enables translation support.
+
+For small one-off themes, direct strings are also supported at runtime, so values like `"displayName": "Hero"` or `"label": "Title"` will work. Even in that lightweight setup, the theme should still include a minimal `locales/en.json` because projects copy `locales/` as part of the theme package.
 
 ```json
 {

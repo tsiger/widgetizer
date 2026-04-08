@@ -92,7 +92,7 @@ A theme is organized as a directory with the following structure:
 > - `widgets/`: Directory containing at least one widget.
 > - `templates/`: Directory containing page templates.
 > - `assets/`: Directory for theme assets.
-> - `locales/`: Directory with at least one locale file (e.g., `en.json`) providing translations for all `tTheme:` keys used in schemas.
+> - `locales/`: Directory with at least one locale file (e.g., `en.json`). If the theme uses `tTheme:` keys, this file provides their translations. Even small themes that use direct strings in schemas should still include a minimal `locales/en.json`, because projects now copy and expect a `locales/` directory as part of the theme package.
 
 > **Note:** Each widget lives in its own subdirectory containing a `schema.json` (widget configuration) and `widget.liquid` (template). For comprehensive widget authoring guidance, see the [Widget Authoring Guide](theming-widgets.md).
 
@@ -921,7 +921,7 @@ widgets/
 }
 ```
 
-> **Note:** All user-facing strings (`displayName`, `label`, `description`, option labels) use the `tTheme:` prefix to reference entries in the theme's locale files. See [Theme Locales](#theme-locales) for details.
+> **Note:** The recommended convention is to use `tTheme:` for all user-facing strings (`displayName`, `label`, `description`, option labels) so schemas stay language-independent. For small one-off themes, direct strings are also supported at runtime, but those themes should still ship a minimal `locales/en.json`.
 
 #### Schema Properties
 
@@ -1562,6 +1562,13 @@ Widget types with hyphens are converted to underscores in keys: `bento-grid` bec
 1. Schemas reference locale keys using the `tTheme:` prefix (e.g., `"label": "tTheme:carousel.settings.title.label"`).
 2. The frontend `useThemeLocale` hook provides a `tTheme()` resolver that looks up the key path in the merged core+project locale payload for the active project and returns the translated string.
 3. If a key is missing from the locale file, the raw key path is shown as a fallback, making missing translations easy to spot.
+
+### Direct Strings for Small Themes
+
+- Runtime behavior is permissive: schema values that do **not** start with `tTheme:` are returned as-is.
+- This means a small client theme can use direct strings like `"label": "Title"` instead of locale keys.
+- The recommended authoring standard is still `tTheme:` + `locales/en.json`, especially for reusable or versioned themes.
+- Even direct-string themes should include a minimal `locales/en.json`, because the project's copied theme package expects a `locales/` directory to exist.
 
 ### Project Ownership and Updates
 
