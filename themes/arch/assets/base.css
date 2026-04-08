@@ -766,6 +766,24 @@ b {
 
 /* Per-widget spacing overrides
    (Descendant selector: many widgets inject a <style> before .widget-container, so it is not a direct child of the section.) */
+.widget.spacing-top-small .widget-container {
+  margin-block-start: calc(var(--section-padding-block) * var(--spacing-scale) * 0.5);
+}
+
+.widget.spacing-bottom-small .widget-container {
+  margin-block-end: calc(var(--section-padding-block) * var(--spacing-scale) * 0.5);
+}
+
+.widget.spacing-top-small .widget-container-padded {
+  margin-block-start: 0;
+  padding-block-start: calc(var(--section-padding-block) * var(--spacing-scale) * 0.5);
+}
+
+.widget.spacing-bottom-small .widget-container-padded {
+  margin-block-end: 0;
+  padding-block-end: calc(var(--section-padding-block) * var(--spacing-scale) * 0.5);
+}
+
 .widget.spacing-top-none .widget-container {
   margin-block-start: 0;
   padding-block-start: 0;

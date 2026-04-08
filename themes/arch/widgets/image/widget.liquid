@@ -1,6 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-image widget-{{ widget.id }}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
+  class="widget widget-image widget-{{ widget.id }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="image"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}

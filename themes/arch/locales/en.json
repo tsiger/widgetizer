@@ -260,6 +260,7 @@
           "label": "Top spacing",
           "options": {
             "auto": "Auto",
+            "small": "Small",
             "none": "None"
           }
         },
@@ -267,6 +268,7 @@
           "label": "Bottom spacing",
           "options": {
             "auto": "Auto",
+            "small": "Small",
             "none": "None"
           }
         },

@@ -12,7 +12,7 @@
 
 <section
   id="{{ widget.id }}"
-  class="widget widget-scrolling-text widget-{{ widget.id }}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
+  class="widget widget-scrolling-text widget-{{ widget.id }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
   style="--strip-bg: {{ strip_bg }}; --strip-color: {{ strip_color }}; --strip-rotate: {{ strip_rotate }}deg; --scroll-duration: {{ scroll_duration }}s; --strip-font-size: {{ font_size_val }};"
   data-widget-id="{{ widget.id }}"
   data-widget-type="scrolling-text"

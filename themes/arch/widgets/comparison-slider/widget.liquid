@@ -1,6 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-comparison-slider widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.orientation == 'vertical' %}variant-vertical{% endif %}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
+  class="widget widget-comparison-slider widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.orientation == 'vertical' %}variant-vertical{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
   {% unless widget.settings.color_scheme == 'standard' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endunless %}

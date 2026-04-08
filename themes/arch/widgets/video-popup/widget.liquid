@@ -21,7 +21,7 @@
 
 <section
   id="{{ widget.id }}"
-  class="widget widget-video-popup widget-{{ widget.id }} has-bg-image has-overlay widget-height-{{ widget.settings.height }}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
+  class="widget widget-video-popup widget-{{ widget.id }} has-bg-image has-overlay widget-height-{{ widget.settings.height }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
   style="background-image: url('{% image src: widget.settings.image, size: 'large', output: 'url' %}'); --widget-overlay-color: {{ widget.settings.overlay_color | default: '#0a1e38bf' }}; --widget-overlay-opacity: 1;"
   data-widget-id="{{ widget.id }}"
   data-widget-type="video-popup"

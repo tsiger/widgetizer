@@ -94,6 +94,10 @@
           "label": "tTheme:global.widgets.settings.top_spacing.options.auto"
         },
         {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.small"
+        },
+        {
           "value": "none",
           "label": "tTheme:global.widgets.settings.top_spacing.options.none"
         }
@@ -108,6 +112,10 @@
         {
           "value": "auto",
           "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.small"
         },
         {
           "value": "none",
