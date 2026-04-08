@@ -1,0 +1,20 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Greystone",
+    "contactDetailsLine1": "(555) 814-2600",
+    "contactDetailsLine2": "320 Lexington Ave, Suite 1200",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Free Consultation",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "center_nav": false,
+    "full_width": false,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard"
+  }
+}

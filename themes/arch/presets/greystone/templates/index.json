@@ -1,0 +1,323 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "large",
+        "fullwidth": true,
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#1c1917a6",
+        "color_scheme": "highlight",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Trusted Counsel for Complex Matters",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>For over four decades, Greystone has delivered strategic legal solutions for individuals and businesses across New York.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Our Practice Areas",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text", "hero-button"]
+    },
+    "trust_strip": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "alignment": "left",
+        "show_dividers": true,
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "40+ Years Experience",
+            "text": "Established 1984"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "scale",
+            "title": "500+ Cases Resolved",
+            "text": "Proven track record"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "location",
+            "title": "Multi-State Licensed",
+            "text": "NY, NJ, CT"
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "trophy",
+            "title": "Top-Rated Attorneys",
+            "text": "Peer-recognized excellence"
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+    },
+    "practice_areas": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "What We Do",
+        "title": "Practice Areas",
+        "description": "We bring decades of courtroom experience and negotiation skill to every matter we handle. Our attorneys combine deep legal knowledge with a practical, results-driven approach.",
+        "heading_alignment": "left",
+        "content_position": "left",
+        "show_divider": true,
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "pa-1": {
+          "type": "feature",
+          "settings": {
+            "icon": "gavel",
+            "title": "Business Litigation",
+            "description": "<p>Contract disputes, partnership conflicts, and commercial claims. We protect your business interests with aggressive, strategic advocacy.</p>"
+          }
+        },
+        "pa-2": {
+          "type": "feature",
+          "settings": {
+            "icon": "file-text",
+            "title": "Estate Planning",
+            "description": "<p>Wills, trusts, and probate matters. We help you preserve wealth and ensure your legacy is handled according to your wishes.</p>"
+          }
+        },
+        "pa-3": {
+          "type": "feature",
+          "settings": {
+            "icon": "home",
+            "title": "Real Estate Law",
+            "description": "<p>Residential and commercial transactions, zoning disputes, and title issues. Thorough representation from contract to closing.</p>"
+          }
+        },
+        "pa-4": {
+          "type": "feature",
+          "settings": {
+            "icon": "users",
+            "title": "Family Law",
+            "description": "<p>Divorce, custody, and support matters handled with discretion and care. We advocate for outcomes that protect your family's future.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["pa-1", "pa-2", "pa-3", "pa-4"]
+    },
+    "about_teaser": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "about-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>ABOUT THE FIRM</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "about-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A Firm Built on Integrity",
+            "size": "3xl"
+          }
+        },
+        "about-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Founded in 1984 on the principle that every client deserves thoughtful, vigorous representation. From our offices on Lexington Avenue, we serve individuals and businesses across the tri-state area with the same commitment that built our reputation: meticulous preparation, honest counsel, and relentless advocacy.</p>",
+            "size": "base"
+          }
+        },
+        "about-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "About the Firm",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["about-eyebrow", "about-heading", "about-text", "about-button"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client Testimonials",
+        "title": "What Our Clients Say",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "card_layout": "flat",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Greystone guided us through a complex commercial lease dispute that could have crippled our business. Their preparation was extraordinary and the outcome exceeded our expectations.",
+            "avatar": "",
+            "name": "Margaret L.",
+            "title": "Business litigation client",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "When my father passed without a will, the firm handled the probate with compassion and efficiency. They made an overwhelming process feel manageable at every step.",
+            "avatar": "",
+            "name": "David H.",
+            "title": "Estate planning client",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Schedule Your Free Consultation",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>No obligation. Completely confidential.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get in Touch",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    },
+    "stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "fig-1": {
+          "type": "figure",
+          "settings": {
+            "number": "48",
+            "suffix": "M+",
+            "label": "Recovered",
+            "description": "For our clients"
+          }
+        },
+        "fig-2": {
+          "type": "figure",
+          "settings": {
+            "number": "500",
+            "suffix": "+",
+            "label": "Cases Resolved",
+            "description": "Across all practice areas"
+          }
+        },
+        "fig-3": {
+          "type": "figure",
+          "settings": {
+            "number": "98",
+            "suffix": "%",
+            "label": "Client Satisfaction",
+            "description": "Based on post-case surveys"
+          }
+        },
+        "fig-4": {
+          "type": "figure",
+          "settings": {
+            "number": "40",
+            "suffix": "+",
+            "label": "Years of Experience",
+            "description": "Founded in 1984"
+          }
+        }
+      },
+      "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
+    }
+  },
+  "widgetsOrder": ["hero", "trust_strip", "practice_areas", "stats", "about_teaser", "testimonials", "cta"],
+  "id": "index",
+  "created": "2026-04-08T10:00:00.000Z",
+  "updated": "2026-04-08T10:00:00.000Z"
+}

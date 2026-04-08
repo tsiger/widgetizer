@@ -51,6 +51,11 @@
       "id": "ironform",
       "name": "Ironform",
       "description": "Personal trainer"
+    },
+    {
+      "id": "greystone",
+      "name": "Greystone",
+      "description": "Law firm"
     }
   ]
 }

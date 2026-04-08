@@ -1,0 +1,273 @@
+{
+  "name": "Case Results",
+  "slug": "work",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1c191700",
+        "color_scheme": "standard-accent",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Case Results",
+            "size": "3xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A selection of outcomes we've achieved for our clients.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "showcase": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "left",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "text_display": "hover",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "case-1": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "$2.4M Business Dispute Resolution",
+            "description": "Secured a favorable settlement in a complex multi-party commercial dispute involving breach of fiduciary duty.",
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "case-2": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Commercial Lease Negotiation",
+            "description": "Negotiated lease terms saving our client over $800K across a 10-year commercial tenancy in Midtown Manhattan.",
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "case-3": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Partnership Dissolution",
+            "description": "Managed the dissolution of a five-partner professional services firm while preserving client relationships and asset value.",
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "case-4": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Residential Property Defense",
+            "description": "Successfully defended a homeowner against an adverse possession claim on a historic Brooklyn brownstone.",
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "case-5": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Estate Dispute Mediation",
+            "description": "Resolved a contentious multi-million dollar estate dispute through mediation, avoiding protracted litigation for all parties.",
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "case-6": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Employment Discrimination Case",
+            "description": "Won a significant judgment for a wrongful termination and discrimination case, setting a precedent in the district.",
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["case-1", "case-2", "case-3", "case-4", "case-5", "case-6"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "",
+        "title": "Client Testimonials",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "After a year of getting nowhere with another firm, Greystone took our case and resolved it in four months. The difference in preparation and strategy was night and day.",
+            "avatar": "",
+            "name": "Robert K.",
+            "title": "Commercial litigation client",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "They explained every step clearly and never made me feel rushed. When the other side pushed back, Greystone was ready. I couldn't have asked for better representation.",
+            "avatar": "",
+            "name": "Susan M.",
+            "title": "Real estate client",
+            "rating": "5"
+          }
+        },
+        "review-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Compassionate, thorough, and incredibly effective. They handled my family's estate matter with the care it deserved during a very difficult time.",
+            "avatar": "",
+            "name": "Thomas R.",
+            "title": "Probate client",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2", "review-3"]
+    },
+    "closing": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "narrow",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "closing-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Every Case Is Unique",
+            "size": "2xl"
+          }
+        },
+        "closing-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We'd welcome the opportunity to learn about yours and discuss how we can help.</p>",
+            "size": "lg"
+          }
+        },
+        "closing-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Contact Us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["closing-heading", "closing-text", "closing-button"]
+    },
+    "stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "fig-1": {
+          "type": "figure",
+          "settings": {
+            "number": "48",
+            "suffix": "M+",
+            "label": "Recovered for Clients",
+            "description": ""
+          }
+        },
+        "fig-2": {
+          "type": "figure",
+          "settings": {
+            "number": "500",
+            "suffix": "+",
+            "label": "Cases Resolved",
+            "description": ""
+          }
+        },
+        "fig-3": {
+          "type": "figure",
+          "settings": {
+            "number": "98",
+            "suffix": "%",
+            "label": "Client Satisfaction",
+            "description": ""
+          }
+        },
+        "fig-4": {
+          "type": "figure",
+          "settings": {
+            "number": "3",
+            "suffix": "",
+            "label": "States Licensed",
+            "description": ""
+          }
+        }
+      },
+      "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
+    }
+  },
+  "widgetsOrder": ["hero", "stats", "showcase", "testimonials", "closing"],
+  "id": "work",
+  "created": "2026-04-08T10:00:00.000Z",
+  "updated": "2026-04-08T10:00:00.000Z"
+}

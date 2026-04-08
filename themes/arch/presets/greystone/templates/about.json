@@ -1,0 +1,260 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1c1917a6",
+        "color_scheme": "highlight",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "About the Firm",
+            "size": "3xl"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading"]
+    },
+    "story": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "story-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>OUR HISTORY</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "story-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Founded on Principle",
+            "size": "3xl"
+          }
+        },
+        "story-text-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Greystone Law was founded in 1984 by Richard Greystone with a conviction that great legal work begins with listening. From a single office on Lexington Avenue, the firm has grown into a respected practice serving clients across the tri-state area.</p>",
+            "size": "base"
+          }
+        },
+        "story-text-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Today, we remain a deliberately small firm. We believe that limiting our caseload allows us to deliver the preparation and personal attention that complex legal matters demand. Every client works directly with a senior attorney from initial consultation through resolution.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["story-eyebrow", "story-heading", "story-text-1", "story-text-2"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Our Team",
+        "title": "Our Attorneys",
+        "description": "",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "atty-1": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Richard Greystone",
+            "role": "Managing Partner",
+            "specialty": "Business Litigation, Real Estate",
+            "bio": "With over 40 years of trial and negotiation experience, Richard has built a reputation for meticulous preparation and strategic thinking in complex commercial disputes.",
+            "linkedin": "https://linkedin.com"
+          }
+        },
+        "atty-2": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Catherine Park",
+            "role": "Senior Associate",
+            "specialty": "Estate Planning, Probate",
+            "bio": "Catherine brings a thoughtful, detail-oriented approach to estate planning and trust administration, helping families navigate sensitive transitions with confidence.",
+            "linkedin": "https://linkedin.com"
+          }
+        },
+        "atty-3": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "James Whitfield",
+            "role": "Associate",
+            "specialty": "Employment Law, Family Law",
+            "bio": "A tenacious advocate for his clients, James combines sharp analytical skills with genuine empathy in employment disputes and family law matters.",
+            "linkedin": "https://linkedin.com"
+          }
+        }
+      },
+      "blocksOrder": ["atty-1", "atty-2", "atty-3"]
+    },
+    "approach": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Our Approach",
+        "description": "",
+        "heading_alignment": "left",
+        "style": "separated",
+        "allow_multiple": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "q-1": {
+          "type": "item",
+          "settings": {
+            "question": "What drives our legal philosophy?",
+            "answer": "<p>We believe the best outcomes are built on thorough preparation and honest counsel. We tell you what you need to hear, not what you want to hear, and we never take a case we don't believe we can handle well.</p>"
+          }
+        },
+        "q-2": {
+          "type": "item",
+          "settings": {
+            "question": "How do we approach client relationships?",
+            "answer": "<p>Every client works directly with a senior attorney. We return calls promptly, explain developments in plain language, and keep you informed at every stage. You should never have to wonder what's happening with your case.</p>"
+          }
+        },
+        "q-3": {
+          "type": "item",
+          "settings": {
+            "question": "What makes our team different?",
+            "answer": "<p>We deliberately limit our caseload so we can invest the time and focus each matter deserves. Our attorneys combine decades of experience across complementary practice areas, giving us the depth to handle complex, multi-faceted situations.</p>"
+          }
+        },
+        "q-4": {
+          "type": "item",
+          "settings": {
+            "question": "How do we handle billing?",
+            "answer": "<p>We believe in transparent, predictable fees. Most matters are handled on an hourly basis with detailed invoices, but we also offer flat-fee arrangements for estate planning and real estate closings. We discuss costs openly before any work begins.</p>"
+          }
+        },
+        "sidebar-info": {
+          "type": "info",
+          "settings": {
+            "title": "Founded",
+            "text": "<p>1984 — New York, NY</p><p>Three attorneys serving the tri-state area with over 60 years of combined experience.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["q-1", "q-2", "q-3", "q-4", "sidebar-info"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let's Work Together",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your first consultation is always free.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule a Call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    },
+    "history": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "Our Journey",
+        "title": "Firm Milestones",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "centered",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "era-1": {
+          "type": "item",
+          "settings": {
+            "date": "1984",
+            "title": "Founded in Manhattan",
+            "description": "<p>Richard Greystone opens the firm on Lexington Avenue with a focus on business litigation and real estate law.</p>"
+          }
+        },
+        "era-2": {
+          "type": "item",
+          "settings": {
+            "date": "1992",
+            "title": "Expanded to New Jersey",
+            "description": "<p>Growing client demand leads to multi-state licensing across New York, New Jersey, and Connecticut.</p>"
+          }
+        },
+        "era-3": {
+          "type": "item",
+          "settings": {
+            "date": "2003",
+            "title": "Landmark Verdict",
+            "description": "<p>Secured a precedent-setting judgment in a complex commercial fraud case, establishing the firm's reputation in business litigation.</p>"
+          }
+        },
+        "era-4": {
+          "type": "item",
+          "settings": {
+            "date": "2018",
+            "title": "Full-Service Tri-State Practice",
+            "description": "<p>Added estate planning, family law, and employment law to serve the complete legal needs of our clients and their families.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["era-1", "era-2", "era-3", "era-4"]
+    }
+  },
+  "widgetsOrder": ["hero", "story", "history", "team", "approach", "cta"],
+  "id": "about",
+  "created": "2026-04-08T10:00:00.000Z",
+  "updated": "2026-04-08T10:00:00.000Z"
+}
