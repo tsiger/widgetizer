@@ -15,7 +15,7 @@ export default function ToastContainer() {
 
   // Check if we are in the page editor to adjust position
   const isPageEditor = typeof window !== "undefined" && window.location.pathname.includes("/page-editor");
-  const containerPositionClass = isPageEditor ? "top-4 right-4" : "top-[18px] right-[18px]";
+  const containerPositionClass = isPageEditor ? "top-4 right-4" : "top-[78px] right-[20px]";
 
   return (
     <div className={`fixed ${containerPositionClass} z-50 flex w-[min(26rem,calc(100vw-36px))] flex-col gap-2`}>

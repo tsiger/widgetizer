@@ -38,7 +38,7 @@ export default function Toast({
       <div>{message}</div>
       {onDismiss && (
         <button
-          className="ml-4 text-slate-400 hover:text-slate-600"
+          className={`ml-4 ${variant === "success" ? "text-green-200 hover:text-white" : "text-slate-400 hover:text-slate-600"}`}
           onClick={onDismiss}
           aria-label={t("common.aria.dismiss")}
         >
