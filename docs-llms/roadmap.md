@@ -10,6 +10,7 @@ This file combines the first-release readiness checklist with the post-`v1` back
 - Frontend query modules now share one response/error-handling path, which keeps validation errors, import/upload error payloads, and project-mismatch metadata intact across the app.
 - Theme source resolution and theme metadata reads were tightened up with shared helpers plus cache invalidation, reducing repeated filesystem reads in project/theme listing and update-check flows.
 - Media usage tracking is now coupled more closely to page persistence, and structural flows such as create, duplicate, import, and theme-update apply trigger refresh paths so usage data is less likely to drift.
+- Date formatting now goes through a shared `useFormatDate()` hook in the main list/history surfaces, so components no longer repeat the same app-settings wiring around `formatDate()`.
 - Recent hardening around project resolution, API error semantics, theme metadata lookups, and media usage persistence reduces the risk that the first Electron release is blocked by architecture alone.
 
 ## `v1` Release Gate
@@ -48,29 +49,26 @@ This file combines the first-release readiness checklist with the post-`v1` back
 1. Frontend query caching for `getAllProjects()` and `getAllThemes()`
 Add lightweight caching and invalidation for the project/theme list queries, following the same project-switch safety rules used elsewhere.
 
-2. Create `useFormatDate()`
-Centralize date formatting so pages that currently combine `formatDate()` with app settings stop duplicating the same wiring.
-
-3. Build a form-page abstraction around `useFormNavigationGuard()`
+2. Build a form-page abstraction around `useFormNavigationGuard()`
 Reduce repeated form-page boilerplate such as `skipGuardRef`, dirty-state guards, and shared save/cancel flow handling.
 
-4. Refactor widget/block operations in `src/stores/widgetStore.js`
+3. Refactor widget/block operations in `src/stores/widgetStore.js`
 Extract shared helpers for add/remove/duplicate/reorder flows so widget and block logic stops diverging.
 
-5. Add a shared stale-async / project-switch helper
+4. Add a shared stale-async / project-switch helper
 Standardize the guard pattern used around settings, export, and editor async flows so late responses cannot overwrite state after the active project changes.
 
-6. Centralize theme settings in a dedicated shared store
+5. Centralize theme settings in a dedicated shared store
 Reduce redundant loads and duplicate state handling between the editor, settings UI, and preview pipeline.
 
-7. Add a higher-level semver/update-status helper
+6. Add a higher-level semver/update-status helper
 Wrap repeated version comparison logic in a single helper such as `getUpdateStatus(projectVersion, themeVersion)`.
 
-8. Keep slug and ID generation fully disciplined
+7. Keep slug and ID generation fully disciplined
 Continue routing all new slug and identifier creation paths through `generateUniqueSlug()` to avoid regressions.
 
-9. Consider a higher-level list-page pattern for confirmation flows
+8. Consider a higher-level list-page pattern for confirmation flows
 `useConfirmationModal()` already removed the main duplication, but list pages may still benefit from a more unified delete/action pattern.
 
-10. Prepare for a future TypeScript migration
+9. Prepare for a future TypeScript migration
 Define shared response/domain types, tighten object-shape consistency, and keep expanding JSDoc coverage before any TS conversion begins.

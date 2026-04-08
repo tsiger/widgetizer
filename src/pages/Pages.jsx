@@ -6,15 +6,14 @@ import { getAllPages, deletePage, duplicatePage, bulkDeletePages } from "../quer
 import { invalidateMediaCache } from "../queries/mediaManager";
 import { usePageSelection } from "../hooks/usePageSelection";
 import useConfirmationModal from "../hooks/useConfirmationModal";
+import useFormatDate from "../hooks/useFormatDate";
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
-import useAppSettings from "../hooks/useAppSettings";
 import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import Table from "../components/ui/Table";
 import { sortItemsByCopyName } from "../utils/copyNameSort";
-import { formatDate } from "../utils/dateFormatter";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 export default function Pages() {
@@ -26,11 +25,9 @@ export default function Pages() {
   const [openMenuId, setOpenMenuId] = useState(null);
   const menuRef = useRef(null);
   const { selectedPages, togglePageSelection, selectAllPages, clearSelection, isAllSelected } = usePageSelection();
+  const { formatDate } = useFormatDate();
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
-
-  // Get app settings for date formatting
-  const { settings: appSettings } = useAppSettings();
 
   // Handle page deletion with confirmation
   const handleDelete = async (data) => {
@@ -258,7 +255,6 @@ export default function Pages() {
               )
             }
             renderRow={(page) => {
-              const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
               const isSelected = selectedPages.includes(page.id);
               const menuButtonClass = "w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors";
 
@@ -289,7 +285,7 @@ export default function Pages() {
                     </Link>
                   </td>
                   <td className={`py-3 px-4 whitespace-nowrap ${isSelected ? "bg-pink-50" : ""}`}>
-                    <div className="text-slate-600 text-sm">{formatDate(page.updated, dateFormat)}</div>
+                    <div className="text-slate-600 text-sm">{formatDate(page.updated)}</div>
                   </td>
                   <td className={`py-3 px-4 text-right ${isSelected ? "bg-pink-50" : ""}`}>
                     <div className="relative inline-flex items-center justify-end" ref={openMenuId === page.id ? menuRef : null}>

@@ -22,7 +22,7 @@ import Button, { IconButton } from "../components/ui/Button";
 
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
-import useAppSettings from "../hooks/useAppSettings";
+import useFormatDate from "../hooks/useFormatDate";
 import {
   getAllProjects,
   deleteProject,
@@ -31,7 +31,6 @@ import {
   exportProject,
 } from "../queries/projectManager";
 import { sortItemsByCopyName } from "../utils/copyNameSort";
-import { formatDate } from "../utils/dateFormatter";
 import { resolveWorkspaceDestination } from "../utils/projectNavigation";
 
 import ConfirmationModal from "../components/ui/ConfirmationModal";
@@ -53,7 +52,7 @@ export default function Projects() {
   const dismissToast = useToastStore((state) => state.dismissToast);
   const activeProject = useProjectStore((state) => state.activeProject);
   const fetchActiveProject = useProjectStore((state) => state.fetchActiveProject);
-  const { settings: appSettings } = useAppSettings();
+  const { formatDate } = useFormatDate();
   const workspaceDestination = resolveWorkspaceDestination(searchParams.get("next"));
 
   const projectsAddHref = searchParams.get("next")
@@ -248,7 +247,6 @@ export default function Projects() {
             data={sortedProjects}
             emptyMessage={t("projects.noProjects")}
             renderRow={(project) => {
-              const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
               const isCurrentProject = activeProject && project.id === activeProject.id;
               const themeLabel = project.themeName || project.theme || "Unknown";
               const isExporting = exportingProjectId === project.id;
@@ -291,7 +289,7 @@ export default function Projects() {
                       )}
                     </div>
                   </td>
-                  <td className="py-3 px-4 whitespace-nowrap text-slate-600">{formatDate(project.updated, dateFormat)}</td>
+                  <td className="py-3 px-4 whitespace-nowrap text-slate-600">{formatDate(project.updated)}</td>
                   <td className="py-3 px-4 text-right">
                     <div className="relative inline-flex items-center justify-end gap-1.5" ref={openMenuId === project.id ? menuRef : null}>
                       <IconButton

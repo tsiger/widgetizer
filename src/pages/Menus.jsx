@@ -9,14 +9,13 @@ import Table from "../components/ui/Table";
 import Button, { IconButton } from "../components/ui/Button";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
 import useConfirmationModal from "../hooks/useConfirmationModal";
+import useFormatDate from "../hooks/useFormatDate";
 
 import { getAllMenus, deleteMenu, duplicateMenu } from "../queries/menuManager";
 import { sortItemsByCopyName } from "../utils/copyNameSort";
-import { formatDate } from "../utils/dateFormatter";
 
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
-import useAppSettings from "../hooks/useAppSettings";
 
 export default function Menus() {
   const { t } = useTranslation();
@@ -26,11 +25,9 @@ export default function Menus() {
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { formatDate } = useFormatDate();
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
-
-  // Get app settings for date formatting
-  const { settings: appSettings } = useAppSettings();
 
   // Reload menus when navigating to this page or when active project changes
   useEffect(() => {
@@ -146,7 +143,6 @@ export default function Menus() {
             data={sortedMenus}
             emptyMessage={t("menus.noMenus")}
             renderRow={(menu) => {
-              const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
               const menuButtonClass = "w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors";
 
               return (
@@ -161,7 +157,7 @@ export default function Menus() {
                     </Link>
                   </td>
                   <td className="py-3 px-4 whitespace-nowrap">
-                    <div className="text-slate-600 text-sm">{formatDate(menu.updated, dateFormat)}</div>
+                    <div className="text-slate-600 text-sm">{formatDate(menu.updated)}</div>
                   </td>
                   <td className="py-3 px-4 text-right">
                     <div className="relative inline-flex items-center justify-end" ref={openMenuId === menu.id ? menuRef : null}>

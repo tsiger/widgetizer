@@ -4,13 +4,12 @@ import { IconButton } from "../ui/Button";
 import { getExportEntryFile, downloadExportZip, deleteExportAPI } from "../../queries/exportManager";
 import useToastStore from "../../stores/toastStore";
 import useConfirmationModal from "../../hooks/useConfirmationModal";
+import useFormatDate from "../../hooks/useFormatDate";
 import ConfirmationModal from "../ui/ConfirmationModal";
 import Table from "../ui/Table";
 import Badge from "../ui/Badge";
 import { Loader2, ExternalLink, Trash2, Calendar, Download, Package, MoreVertical } from "lucide-react";
 import { API_URL } from "../../config";
-import { formatDate as formatDateUtil } from "../../utils/dateFormatter";
-import useAppSettings from "../../hooks/useAppSettings";
 
 export default function ExportHistoryTable({
   exportHistory,
@@ -20,12 +19,10 @@ export default function ExportHistoryTable({
   setExportHistory,
 }) {
   const { t } = useTranslation();
+  const { formatDate } = useFormatDate();
   const showToast = useToastStore((state) => state.showToast);
   const [openMenuVersion, setOpenMenuVersion] = useState(null);
   const menuRef = useRef(null);
-
-  // Get app settings for date formatting
-  const { settings: appSettings } = useAppSettings();
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -61,11 +58,6 @@ export default function ExportHistoryTable({
   };
 
   const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDelete);
-
-  const formatDate = (isoString) => {
-    const dateFormat = appSettings?.general?.dateFormat || "MMMM D, YYYY h:mm A";
-    return formatDateUtil(isoString, dateFormat);
-  };
 
   const handleViewExport = async (exportRecord) => {
     try {

@@ -60,6 +60,8 @@ export const DATE_FORMATS = {
   },
 };
 
+export const DEFAULT_DATE_FORMAT = "MMMM D, YYYY h:mm A";
+
 /**
  * Month names for formatting
  */
@@ -85,7 +87,7 @@ const MONTHS_FULL = [
  * @param {string} format - The format string (one of DATE_FORMATS keys)
  * @returns {string} The formatted date string
  */
-export function formatDate(date, format = "MMMM D, YYYY h:mm A") {
+export function formatDate(date, format = DEFAULT_DATE_FORMAT) {
   if (!date) return "";
 
   const dateObj = new Date(date);
@@ -151,7 +153,7 @@ export function formatDate(date, format = "MMMM D, YYYY h:mm A") {
  * @param {string} format - The format string (one of DATE_FORMATS keys)
  * @returns {string} The formatted current date string
  */
-export function formatCurrentDate(format = "MMMM D, YYYY h:mm A") {
+export function formatCurrentDate(format = DEFAULT_DATE_FORMAT) {
   return formatDate(new Date(), format);
 }
 
