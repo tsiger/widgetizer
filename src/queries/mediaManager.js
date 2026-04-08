@@ -1,4 +1,4 @@
-import { apiFetch } from "../lib/apiFetch";
+import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
 import { uploadFormData } from "../lib/uploadRequest";
 
 /**
@@ -64,11 +64,9 @@ export async function getProjectMedia(projectId, forceRefresh = false) {
   // Create a new fetch promise
   const fetchPromise = (async () => {
     try {
-      const response = await apiFetch(`/api/media/projects/${projectId}/media`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch media files");
-      }
-      const data = await response.json();
+      const data = await apiFetchJson(`/api/media/projects/${projectId}/media`, {}, {
+        fallbackMessage: "Failed to get media files",
+      });
 
       // Update cache with successful data
       mediaCache.set(projectId, {
@@ -96,8 +94,8 @@ export async function getProjectMedia(projectId, forceRefresh = false) {
 
   try {
     return await fetchPromise;
-  } catch {
-    throw new Error("Failed to get media files");
+  } catch (error) {
+    rethrowQueryError(error, "Failed to get media files");
   }
 }
 
@@ -191,22 +189,16 @@ export async function uploadProjectMedia(projectId, files, onProgress) {
  */
 export async function deleteProjectMedia(projectId, fileId) {
   try {
-    const response = await apiFetch(`/api/media/projects/${projectId}/media/${fileId}`, {
+    const data = await apiFetchJson(`/api/media/projects/${projectId}/media/${fileId}`, {
       method: "DELETE",
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to delete file");
-    }
+    }, { fallbackMessage: "Failed to delete file" });
 
     // Invalidate cache since files changed
     invalidateMediaCache(projectId);
 
     return data;
   } catch (err) {
-    throw err instanceof Error ? err : new Error("Failed to delete file");
+    rethrowQueryError(err, "Failed to delete file");
   }
 }
 
@@ -220,19 +212,13 @@ export async function deleteProjectMedia(projectId, fileId) {
  */
 export async function deleteMultipleMedia(projectId, fileIds) {
   try {
-    const response = await apiFetch(`/api/media/projects/${projectId}/media/bulk-delete`, {
+    const data = await apiFetchJson(`/api/media/projects/${projectId}/media/bulk-delete`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ fileIds }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to delete files");
-    }
+    }, { fallbackMessage: "Failed to delete files" });
 
     // Invalidate cache only if files were actually deleted
     if (data.deletedCount > 0) {
@@ -241,11 +227,7 @@ export async function deleteMultipleMedia(projectId, fileIds) {
 
     return data;
   } catch (error) {
-    // Only throw if it's not already a handled error
-    if (error.message) {
-      throw error;
-    }
-    throw new Error("Failed to delete files");
+    rethrowQueryError(error, "Failed to delete files");
   }
 }
 
@@ -259,13 +241,11 @@ export async function deleteMultipleMedia(projectId, fileIds) {
  */
 export async function getMediaFileUsage(projectId, fileId) {
   try {
-    const response = await apiFetch(`/api/media/projects/${projectId}/media/${fileId}/usage`);
-    if (!response.ok) {
-      throw new Error("Failed to get media usage");
-    }
-    return await response.json();
-  } catch {
-    throw new Error("Failed to get media usage");
+    return await apiFetchJson(`/api/media/projects/${projectId}/media/${fileId}/usage`, {}, {
+      fallbackMessage: "Failed to get media usage",
+    });
+  } catch (error) {
+    rethrowQueryError(error, "Failed to get media usage");
   }
 }
 
@@ -278,15 +258,11 @@ export async function getMediaFileUsage(projectId, fileId) {
  */
 export async function refreshMediaUsage(projectId) {
   try {
-    const response = await apiFetch(`/api/media/projects/${projectId}/refresh-usage`, {
+    return await apiFetchJson(`/api/media/projects/${projectId}/refresh-usage`, {
       method: "POST",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to refresh media usage");
-    }
-    return await response.json();
-  } catch {
-    throw new Error("Failed to refresh media usage");
+    }, { fallbackMessage: "Failed to refresh media usage" });
+  } catch (error) {
+    rethrowQueryError(error, "Failed to refresh media usage");
   }
 }
 

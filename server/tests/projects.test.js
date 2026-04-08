@@ -1277,7 +1277,7 @@ describe("duplicateProject", () => {
     assert.equal(photo.type, "image/jpeg");
     assert.equal(photo.path, "/uploads/images/photo.jpg");
     assert.ok(photo.sizes.thumb, "Size variants should be copied");
-    assert.deepEqual(photo.usedIn, ["index"]);
+    assert.deepEqual(photo.usedIn, []);
 
     // IDs should be different from the original
     const originalMedia = mediaRepo.getMediaFiles(original.id);
@@ -1285,6 +1285,52 @@ describe("duplicateProject", () => {
     for (const file of dupMedia.files) {
       assert.ok(!originalIds.has(file.id), `Duplicate media ID "${file.id}" should differ from original`);
     }
+  });
+
+  it("refreshes media usage for duplicated projects from copied files", async () => {
+    const originalDir = getProjectDir(original.folderName);
+    const mediaData = createTestMediaData();
+    mediaData.files.forEach((file) => {
+      file.usedIn = [];
+    });
+    mediaRepo.writeMediaData(original.id, mediaData);
+
+    await fs.writeJson(path.join(originalDir, "pages", "index.json"), {
+      name: "Home",
+      slug: "index",
+      widgets: {
+        hero: {
+          settings: {
+            image: "/uploads/images/banner.png",
+          },
+        },
+      },
+    });
+    await fs.writeJson(path.join(originalDir, "theme.json"), {
+      name: "Test Theme",
+      version: "1.0.0",
+      settings: {
+        global: {
+          branding: [
+            {
+              id: "site_logo",
+              type: "image",
+              value: "/uploads/images/photo.jpg",
+            },
+          ],
+        },
+      },
+    });
+
+    const res = await callController(duplicateProject, { params: { id: original.id } });
+    assert.equal(res._status, 201);
+
+    const duplicateMedia = mediaRepo.getMediaFiles(res._json.id);
+    const photo = duplicateMedia.files.find((file) => file.filename === "photo.jpg");
+    const banner = duplicateMedia.files.find((file) => file.filename === "banner.png");
+
+    assert.deepEqual(photo.usedIn, ["global:theme-settings"]);
+    assert.deepEqual(banner.usedIn, ["index"]);
   });
 });
 
@@ -1647,6 +1693,55 @@ describe("importProject", () => {
       assert.ok(!originalIds.has(file.id), `Imported media ID "${file.id}" should not match any original ID`);
     }
   });
+
+  it("rebuilds imported media usage from pages and theme settings", async () => {
+    const staleMediaData = createTestMediaData();
+    staleMediaData.files.forEach((file) => {
+      file.usedIn = [];
+    });
+
+    const zipFile = buildImportZip(baseManifest, {
+      "theme.json": {
+        name: "Test Theme",
+        version: "1.0.0",
+        settings: {
+          global: {
+            branding: [
+              {
+                id: "site_logo",
+                type: "image",
+                value: "/uploads/images/photo.jpg",
+              },
+            ],
+          },
+        },
+      },
+      "pages/index.json": {
+        name: "Home",
+        slug: "index",
+        widgets: {
+          hero: {
+            settings: {
+              image: "/uploads/images/banner.png",
+            },
+          },
+        },
+      },
+      "uploads/media.json": staleMediaData,
+    });
+
+    const res = await callController(importProject, {
+      file: zipFile,
+    });
+    assert.equal(res._status, 201);
+
+    const importedMedia = mediaRepo.getMediaFiles(res._json.id);
+    const photo = importedMedia.files.find((file) => file.filename === "photo.jpg");
+    const banner = importedMedia.files.find((file) => file.filename === "banner.png");
+
+    assert.deepEqual(photo.usedIn, ["global:theme-settings"]);
+    assert.deepEqual(banner.usedIn, ["index"]);
+  });
 });
 
 describe("exportProject -> importProject round-trip", () => {
@@ -1711,7 +1806,7 @@ describe("exportProject -> importProject round-trip", () => {
     assert.equal(photo.type, "image/jpeg");
     assert.equal(photo.path, "/uploads/images/photo.jpg");
     assert.ok(photo.sizes.thumb, "Sizes should be preserved");
-    assert.deepEqual(photo.usedIn, ["index"]);
+    assert.deepEqual(photo.usedIn, []);
 
     // IDs should be different from originals
     const originalMedia = mediaRepo.getMediaFiles(original.id);

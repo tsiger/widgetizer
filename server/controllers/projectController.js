@@ -16,6 +16,7 @@ import { isNewerVersion } from "../utils/semver.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
+import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageService.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 
 import { generateCopyName } from "../utils/namingHelpers.js";
@@ -40,6 +41,15 @@ export async function getAllProjects(req, res) {
   try {
     await ensureDirectories();
     const projects = projectRepo.getAllProjects();
+    const themeMetadataById = new Map();
+
+    const getThemeMetadata = (themeId) => {
+      if (!themeMetadataById.has(themeId)) {
+        themeMetadataById.set(themeId, themeController.readThemeSourceMetadata(themeId));
+      }
+
+      return themeMetadataById.get(themeId);
+    };
 
     // Enrich projects with hasThemeUpdate flag and theme display name
     const enrichedProjects = await Promise.all(
@@ -49,10 +59,7 @@ export async function getAllProjects(req, res) {
 
         if (project.theme) {
           try {
-            // Get theme display name from theme.json
-            const themeSourceDir = await themeController.getThemeSourceDir(project.theme);
-            const themeJsonPath = path.join(themeSourceDir, "theme.json");
-            const themeData = await fs.readJson(themeJsonPath);
+            const { theme: themeData } = await getThemeMetadata(project.theme);
             themeName = themeData.name || project.theme;
 
             // Check for updates - compare project version against theme's current source version
@@ -261,6 +268,7 @@ export async function createProject(req, res) {
     const wasFirstProject = !currentActiveId;
 
     projectRepo.createProject(newProject);
+    await refreshMediaUsageAfterStructuralChange(newProject.id, "project creation");
     if (!currentActiveId) {
       projectRepo.setActiveProjectId(newProject.id);
     }
@@ -502,6 +510,8 @@ export async function duplicateProject(req, res) {
     } catch (mediaError) {
       console.warn("Could not duplicate media metadata:", mediaError.message);
     }
+
+    await refreshMediaUsageAfterStructuralChange(newProject.id, "project duplication");
 
     res.status(201).json(newProject);
   } catch (error) {
@@ -1011,6 +1021,8 @@ export async function importProject(req, res) {
         console.warn("Could not restore media metadata from export:", mediaError.message);
         // Non-fatal: project is still usable, media files exist on disk
       }
+
+      await refreshMediaUsageAfterStructuralChange(newProject.id, "project import");
 
       // Clean up temporary files (extraction dir + uploaded ZIP)
       await fs.remove(tempDir);

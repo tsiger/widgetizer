@@ -1,4 +1,4 @@
-import { apiFetch } from "../lib/apiFetch";
+import { apiFetch, apiFetchJson, rethrowQueryError, throwApiError } from "../lib/apiFetch";
 import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import fontDefinitions from "../core/config/fonts.json" with { type: "json" };
@@ -45,7 +45,7 @@ function extractFonts(settings) {
  */
 export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor") {
   try {
-    const response = await apiFetch("/api/preview/token", {
+    return await apiFetchJson("/api/preview/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -55,17 +55,10 @@ export async function fetchPreviewToken(pageData, themeSettings, previewMode = "
         themeSettings,
         previewMode,
       }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to create preview token");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to create preview token" });
   } catch (error) {
     console.error("Preview token error:", error);
-    throw error;
+    rethrowQueryError(error, "Failed to create preview token");
   }
 }
 
@@ -92,14 +85,13 @@ export async function fetchPreview(pageData, themeSettings, previewMode = "edito
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to fetch preview");
+      await throwApiError(response, "Failed to fetch preview");
     }
 
     return await response.text();
   } catch (error) {
     console.error("Preview fetch error:", error);
-    throw error;
+    rethrowQueryError(error, "Failed to fetch preview");
   }
 }
 
@@ -127,14 +119,13 @@ export async function fetchRenderedWidget(widgetId, widget, themeSettings) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to render widget");
+      await throwApiError(response, "Failed to render widget");
     }
 
     return await response.text();
   } catch (error) {
     console.error("Widget rendering error:", error);
-    throw error;
+    rethrowQueryError(error, "Failed to render widget");
   }
 }
 
@@ -433,17 +424,12 @@ let customCodeTimer = null;
  */
 export async function getGlobalWidgets() {
   try {
-    const response = await apiFetch("/api/preview/global-widgets");
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to fetch global widgets");
-    }
-
-    return await response.json();
+    return await apiFetchJson("/api/preview/global-widgets", {}, {
+      fallbackMessage: "Failed to fetch global widgets",
+    });
   } catch (error) {
     console.error("Error fetching global widgets:", error);
-    throw error;
+    rethrowQueryError(error, "Failed to fetch global widgets");
   }
 }
 
@@ -456,29 +442,17 @@ export async function getGlobalWidgets() {
  */
 export async function saveGlobalWidget(type, widget) {
   try {
-    const response = await apiFetch(`/api/preview/global-widgets/${type}`, {
+    return await apiFetchJson(`/api/preview/global-widgets/${type}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(widget),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      if (response.status === 409 && errorData.code === "PROJECT_MISMATCH") {
-        const err = new Error(errorData.message || "Project mismatch");
-        err.code = "PROJECT_MISMATCH";
-        throw err;
-      }
-      throw new Error(errorData.error || "Failed to save global widget");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to save global widget" });
   } catch (error) {
     if (error.code === "PROJECT_MISMATCH") throw error;
     console.error("Error saving global widget:", error);
-    throw error;
+    rethrowQueryError(error, "Failed to save global widget");
   }
 }
 
@@ -489,23 +463,19 @@ export async function saveGlobalWidget(type, widget) {
  * @throws {Error} If no active project or request fails
  */
 export async function getProjectWidgets() {
+  const activeProject = useProjectStore.getState().activeProject;
+
+  if (!activeProject) {
+    throw new Error("No active project");
+  }
+
   try {
-    const activeProject = useProjectStore.getState().activeProject;
-
-    if (!activeProject) {
-      throw new Error("No active project");
-    }
-
-    const response = await apiFetch(`/api/projects/${activeProject.id}/widgets`);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch project widgets");
-    }
-
-    return await response.json();
+    return await apiFetchJson(`/api/projects/${activeProject.id}/widgets`, {}, {
+      fallbackMessage: "Failed to get project widgets",
+    });
   } catch (error) {
     console.error("Error getting project widgets:", error);
-    throw new Error("Failed to get project widgets");
+    rethrowQueryError(error, "Failed to get project widgets");
   }
 }
 

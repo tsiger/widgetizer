@@ -1,4 +1,4 @@
-import { apiFetch } from "../lib/apiFetch";
+import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
 
 /**
  * @typedef {Object} MenuItem
@@ -26,14 +26,10 @@ import { apiFetch } from "../lib/apiFetch";
  */
 export async function getAllMenus() {
   try {
-    const response = await apiFetch("/api/menus");
-    if (!response.ok) {
-      throw new Error("Failed to fetch menus");
-    }
-    return await response.json();
+    return await apiFetchJson("/api/menus", {}, { fallbackMessage: "Failed to get menus" });
   } catch (error) {
     console.error("Error getting menus:", error);
-    throw new Error("Failed to get menus");
+    rethrowQueryError(error, "Failed to get menus");
   }
 }
 
@@ -48,29 +44,15 @@ export async function getAllMenus() {
  */
 export async function createMenu(menuData) {
   try {
-    const response = await apiFetch("/api/menus", {
+    return await apiFetchJson("/api/menus", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(menuData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      // Handle express-validator format: { errors: [{msg, param}, ...] }
-      if (errorData.errors && Array.isArray(errorData.errors)) {
-        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
-      }
-      throw new Error(errorData.error || "Failed to create menu");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to create menu" });
   } catch (error) {
-    if (error.message && !error.message.includes("Failed to fetch")) {
-      throw error;
-    }
-    throw new Error("Failed to create menu");
+    rethrowQueryError(error, "Failed to create menu");
   }
 }
 
@@ -82,18 +64,12 @@ export async function createMenu(menuData) {
  */
 export async function deleteMenu(id) {
   try {
-    const response = await apiFetch(`/api/menus/${id}`, {
+    return await apiFetchJson(`/api/menus/${id}`, {
       method: "DELETE",
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to delete menu");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to delete menu" });
   } catch (error) {
     console.error("Error deleting menu:", error);
-    throw error;
+    rethrowQueryError(error, "Failed to delete menu");
   }
 }
 
@@ -105,14 +81,10 @@ export async function deleteMenu(id) {
  */
 export async function getMenu(id) {
   try {
-    const response = await apiFetch(`/api/menus/${id}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch menu");
-    }
-    return await response.json();
+    return await apiFetchJson(`/api/menus/${id}`, {}, { fallbackMessage: "Failed to get menu" });
   } catch (error) {
     console.error("Error getting menu:", error);
-    throw error;
+    rethrowQueryError(error, "Failed to get menu");
   }
 }
 
@@ -128,29 +100,15 @@ export async function getMenu(id) {
  */
 export async function updateMenu(id, menuData) {
   try {
-    const response = await apiFetch(`/api/menus/${id}`, {
+    return await apiFetchJson(`/api/menus/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(menuData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      // Handle express-validator format: { errors: [{msg, param}, ...] }
-      if (errorData.errors && Array.isArray(errorData.errors)) {
-        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
-      }
-      throw new Error(errorData.error || "Failed to update menu");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to update menu" });
   } catch (error) {
-    if (error.message && !error.message.includes("Failed to fetch")) {
-      throw error;
-    }
-    throw new Error("Failed to update menu");
+    rethrowQueryError(error, "Failed to update menu");
   }
 }
 
@@ -162,21 +120,11 @@ export async function updateMenu(id, menuData) {
  */
 export async function duplicateMenu(id) {
   try {
-    const response = await apiFetch(`/api/menus/${id}/duplicate`, {
+    return await apiFetchJson(`/api/menus/${id}/duplicate`, {
       method: "POST",
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to duplicate menu");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to duplicate menu" });
   } catch (error) {
     console.error("Error duplicating menu:", error);
-    if (error.message && !error.message.includes("Failed to fetch")) {
-      throw error; // Re-throw with original message if it's our custom error
-    }
-    throw new Error("Failed to duplicate menu");
+    rethrowQueryError(error, "Failed to duplicate menu");
   }
 }

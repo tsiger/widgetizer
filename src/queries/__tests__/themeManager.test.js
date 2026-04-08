@@ -6,15 +6,26 @@ vi.mock("../../lib/uploadRequest", () => ({
 
 vi.mock("../../lib/apiFetch", () => ({
   apiFetch: vi.fn(),
+  apiFetchJson: vi.fn(),
+  isApiError: vi.fn((error) => error?.name === "ApiError"),
+  rethrowQueryError: vi.fn((error, fallbackMessage) => {
+    if (error?.name === "ApiError") {
+      throw error;
+    }
+    throw new Error(fallbackMessage);
+  }),
 }));
 
 describe("themeManager uploadThemeZip", () => {
   let uploadFormData;
+  let apiFetchJson;
 
   beforeEach(async () => {
     vi.resetModules();
     ({ uploadFormData } = await import("../../lib/uploadRequest"));
+    ({ apiFetchJson } = await import("../../lib/apiFetch"));
     uploadFormData.mockReset();
+    apiFetchJson.mockReset();
   });
 
   it("normalizes successful theme uploads into processedFiles", async () => {
@@ -60,6 +71,35 @@ describe("themeManager uploadThemeZip", () => {
       message: "Invalid theme archive",
       status: 400,
       data: { message: "Invalid theme archive" },
+    });
+  });
+});
+
+describe("themeManager saveThemeSettings", () => {
+  let apiFetchJson;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    ({ apiFetchJson } = await import("../../lib/apiFetch"));
+    apiFetchJson.mockReset();
+  });
+
+  it("preserves PROJECT_MISMATCH metadata for saveStore guards", async () => {
+    const mismatchError = {
+      name: "ApiError",
+      message: "The active project has changed.",
+      code: "PROJECT_MISMATCH",
+      status: 409,
+      data: { code: "PROJECT_MISMATCH" },
+    };
+    apiFetchJson.mockRejectedValue(mismatchError);
+
+    const { saveThemeSettings } = await import("../themeManager");
+
+    await expect(saveThemeSettings("project-1", { settings: {} })).rejects.toMatchObject({
+      code: "PROJECT_MISMATCH",
+      status: 409,
+      data: { code: "PROJECT_MISMATCH" },
     });
   });
 });

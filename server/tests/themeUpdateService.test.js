@@ -42,7 +42,8 @@ console.error = () => {};
 const { getProjectDir, getProjectThemeJsonPath, getThemeDir } = await import("../config.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
-const { buildLatestSnapshot } = await import("../controllers/themeController.js");
+const mediaRepo = await import("../db/repositories/mediaRepository.js");
+const { buildLatestSnapshot, invalidateThemeSourceCache } = await import("../controllers/themeController.js");
 const { checkForUpdates, applyThemeUpdate, mergeThemeSettings, toggleThemeUpdates } =
   await import("../services/themeUpdateService.js");
 const { closeDb } = await import("../db/index.js");
@@ -224,6 +225,7 @@ describe("checkForUpdates", () => {
     closeDb();
     await fs.remove(TEST_DATA_DIR);
     await fs.remove(TEST_THEMES_DIR);
+    invalidateThemeSourceCache();
   });
 
   it("detects when update is available", async () => {
@@ -297,6 +299,7 @@ describe("applyThemeUpdate", () => {
     closeDb();
     await fs.remove(TEST_DATA_DIR);
     await fs.remove(TEST_THEMES_DIR);
+    invalidateThemeSourceCache();
   });
 
   it("copies updatable paths from theme to project", async () => {
@@ -450,6 +453,75 @@ describe("applyThemeUpdate", () => {
     const afterApply = await fs.readJson(projectLocalesPath);
     assert.equal(afterApply.greeting, "Hello v1.1");
     assert.equal(afterApply.badge, "New");
+  });
+
+  it("refreshes media usage after theme updates add pages and theme media", async () => {
+    await createTheme("1.0.0", {
+      updates: [
+        {
+          version: "1.1.0",
+          settings: {
+            colors: [
+              { id: "primary_color", label: "Primary", type: "color", value: "#0000ff", default: "#0000ff" },
+            ],
+            global: {
+              branding: [
+                {
+                  id: "site_logo",
+                  label: "Site Logo",
+                  type: "image",
+                  value: "/uploads/images/photo.jpg",
+                  default: "/uploads/images/photo.jpg",
+                },
+              ],
+            },
+          },
+          files: {
+            "templates/gallery.json": {
+              slug: "gallery",
+              name: "Gallery",
+              widgets: {
+                hero: {
+                  settings: {
+                    image: "/uploads/images/banner.png",
+                  },
+                },
+              },
+            },
+          },
+        },
+      ],
+    });
+    await buildLatestSnapshot(THEME_NAME);
+    await createProject("1.0.0");
+
+    mediaRepo.writeMediaData(PROJECT_ID, {
+      files: [
+        {
+          id: "photo-1",
+          filename: "photo.jpg",
+          type: "image/jpeg",
+          path: "/uploads/images/photo.jpg",
+          usedIn: [],
+        },
+        {
+          id: "banner-1",
+          filename: "banner.png",
+          type: "image/png",
+          path: "/uploads/images/banner.png",
+          usedIn: [],
+        },
+      ],
+    });
+
+    await applyThemeUpdate(PROJECT_ID);
+
+    const media = mediaRepo.getMediaFiles(PROJECT_ID);
+    const photo = media.files.find((file) => file.filename === "photo.jpg");
+    const banner = media.files.find((file) => file.filename === "banner.png");
+
+    assert.deepEqual(photo.usedIn, ["global:theme-settings"]);
+    assert.deepEqual(banner.usedIn, ["gallery"]);
   });
 
   it("updates project metadata in projects.json", async () => {

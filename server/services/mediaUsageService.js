@@ -230,6 +230,32 @@ export async function removePageFromMediaUsage(projectId, pageId) {
 }
 
 /**
+ * Keep page media usage in sync after a page write or rename.
+ * @param {string} projectId - The project's UUID
+ * @param {string} pageId - The current page slug/identifier
+ * @param {object} pageData - Page data object containing widgets
+ * @param {string|null} [previousPageId=null] - Prior slug when the page was renamed
+ * @returns {Promise<{success: boolean, mediaPaths: string[]}>}
+ */
+export async function syncPageMediaUsageOnWrite(projectId, pageId, pageData, previousPageId = null) {
+  if (previousPageId && previousPageId !== pageId) {
+    await removePageFromMediaUsage(projectId, previousPageId);
+  }
+
+  return updatePageMediaUsage(projectId, pageId, pageData);
+}
+
+/**
+ * Keep page media usage in sync after a page delete.
+ * @param {string} projectId - The project's UUID
+ * @param {string} pageId - The deleted page slug/identifier
+ * @returns {Promise<{success: boolean}>}
+ */
+export async function syncPageMediaUsageOnDelete(projectId, pageId) {
+  return removePageFromMediaUsage(projectId, pageId);
+}
+
+/**
  * Get usage information for a specific media file.
  * @param {string} projectId - The project's UUID
  * @param {string} fileId - The media file's unique identifier
@@ -361,5 +387,21 @@ export async function refreshAllMediaUsage(projectId) {
   } catch (error) {
     console.error("Error refreshing media usage:", error);
     throw error;
+  }
+}
+
+/**
+ * Rebuild media usage after non-editor flows that can bypass targeted updates.
+ * This covers imports, duplication, theme updates, and any future bulk file sync.
+ * @param {string} projectId - The project's UUID
+ * @param {string} [context="bulk operation"] - Log context for failures
+ * @returns {Promise<{success: boolean, message: string}|null>}
+ */
+export async function refreshMediaUsageAfterStructuralChange(projectId, context = "bulk operation") {
+  try {
+    return await refreshAllMediaUsage(projectId);
+  } catch (error) {
+    console.warn(`[mediaUsage] Failed to refresh after ${context}: ${error.message}`);
+    return null;
   }
 }

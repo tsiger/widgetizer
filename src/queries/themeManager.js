@@ -1,5 +1,5 @@
 import { API_URL } from "../config";
-import { apiFetch } from "../lib/apiFetch";
+import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
 import { getActiveProjectId } from "../lib/activeProjectId";
 import { uploadFormData } from "../lib/uploadRequest";
 
@@ -49,14 +49,10 @@ import { uploadFormData } from "../lib/uploadRequest";
  */
 export async function getAllThemes() {
   try {
-    const response = await apiFetch("/api/themes");
-    if (!response.ok) {
-      throw new Error("Failed to fetch themes");
-    }
-    return await response.json();
+    return await apiFetchJson("/api/themes", {}, { fallbackMessage: "Failed to get themes" });
   } catch (error) {
     console.error("Error getting themes:", error);
-    throw new Error("Failed to get themes");
+    rethrowQueryError(error, "Failed to get themes");
   }
 }
 
@@ -77,14 +73,10 @@ export function getThemeScreenshotUrl(themeId) {
  */
 export async function getTheme(themeId) {
   try {
-    const response = await apiFetch(`/api/themes/${themeId}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch theme");
-    }
-    return await response.json();
+    return await apiFetchJson(`/api/themes/${themeId}`, {}, { fallbackMessage: "Failed to get theme" });
   } catch (error) {
     console.error("Error getting theme:", error);
-    throw new Error("Failed to get theme");
+    rethrowQueryError(error, "Failed to get theme");
   }
 }
 
@@ -98,14 +90,12 @@ export async function getTheme(themeId) {
 export async function getThemeWidgets(themeId) {
   try {
     // If no themeId is provided, use the active project's theme
-    const response = await apiFetch(`/api/themes/${themeId || "default"}/widgets`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch theme widgets");
-    }
-    return await response.json();
+    return await apiFetchJson(`/api/themes/${themeId || "default"}/widgets`, {}, {
+      fallbackMessage: "Failed to get theme widgets",
+    });
   } catch (error) {
     console.error("Error getting theme widgets:", error);
-    throw new Error("Failed to get theme widgets");
+    rethrowQueryError(error, "Failed to get theme widgets");
   }
 }
 
@@ -118,14 +108,12 @@ export async function getThemeWidgets(themeId) {
  */
 export async function getThemeTemplates(themeId) {
   try {
-    const response = await apiFetch(`/api/themes/${themeId || "default"}/templates`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch theme templates");
-    }
-    return await response.json();
+    return await apiFetchJson(`/api/themes/${themeId || "default"}/templates`, {}, {
+      fallbackMessage: "Failed to get theme templates",
+    });
   } catch (error) {
     console.error("Error getting theme templates:", error);
-    throw new Error("Failed to get theme templates");
+    rethrowQueryError(error, "Failed to get theme templates");
   }
 }
 
@@ -136,23 +124,19 @@ export async function getThemeTemplates(themeId) {
  * @throws {Error} If no active project or request fails
  */
 export async function getThemeSettings(projectId) {
+  const resolvedProjectId = projectId || getActiveProjectId();
+
+  if (!resolvedProjectId) {
+    throw new Error("No active project");
+  }
+
   try {
-    const resolvedProjectId = projectId || getActiveProjectId();
-
-    if (!resolvedProjectId) {
-      throw new Error("No active project");
-    }
-
-    const response = await apiFetch(`/api/themes/project/${resolvedProjectId}`);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch theme settings");
-    }
-
-    return await response.json();
+    return await apiFetchJson(`/api/themes/project/${resolvedProjectId}`, {}, {
+      fallbackMessage: "Failed to fetch theme settings",
+    });
   } catch (error) {
     console.error("Error fetching theme settings:", error);
-    throw error;
+    rethrowQueryError(error, "Failed to fetch theme settings");
   }
 }
 
@@ -165,22 +149,16 @@ export async function getThemeSettings(projectId) {
  */
 export async function saveThemeSettings(projectId, data) {
   try {
-    const response = await apiFetch(`/api/themes/project/${projectId}`, {
+    return await apiFetchJson(`/api/themes/project/${projectId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to save theme settings");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to save theme settings" });
   } catch (error) {
     console.error("Error saving theme settings:", error);
-    throw error;
+    rethrowQueryError(error, "Failed to save theme settings");
   }
 }
 
@@ -224,14 +202,12 @@ export async function uploadThemeZip(zipFile, onProgress) {
  */
 export async function getThemeVersions(themeId) {
   try {
-    const response = await apiFetch(`/api/themes/${themeId}/versions`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch theme versions");
-    }
-    return await response.json();
+    return await apiFetchJson(`/api/themes/${themeId}/versions`, {}, {
+      fallbackMessage: "Failed to get theme versions",
+    });
   } catch (error) {
     console.error("Error getting theme versions:", error);
-    throw new Error("Failed to get theme versions");
+    rethrowQueryError(error, "Failed to get theme versions");
   }
 }
 
@@ -242,11 +218,9 @@ export async function getThemeVersions(themeId) {
  */
 export async function getThemeUpdateCount() {
   try {
-    const response = await apiFetch("/api/themes/update-count");
-    if (!response.ok) {
-      throw new Error("Failed to fetch theme update count");
-    }
-    return await response.json();
+    return await apiFetchJson("/api/themes/update-count", {}, {
+      fallbackMessage: "Failed to get theme update count",
+    });
   } catch (error) {
     console.error("Error getting theme update count:", error);
     return { count: 0 };
@@ -262,17 +236,12 @@ export async function getThemeUpdateCount() {
  */
 export async function updateTheme(themeId) {
   try {
-    const response = await apiFetch(`/api/themes/${themeId}/update`, {
+    return await apiFetchJson(`/api/themes/${themeId}/update`, {
       method: "POST",
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to update theme");
-    }
-    return await response.json();
+    }, { fallbackMessage: "Failed to update theme" });
   } catch (error) {
     console.error("Error updating theme:", error);
-    throw error;
+    rethrowQueryError(error, "Failed to update theme");
   }
 }
 
@@ -285,21 +254,12 @@ export async function updateTheme(themeId) {
  */
 export async function deleteTheme(themeId) {
   try {
-    const response = await apiFetch(`/api/themes/${themeId}`, {
+    return await apiFetchJson(`/api/themes/${themeId}`, {
       method: "DELETE",
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      const error = new Error(errorData.error || "Failed to delete theme");
-      error.response = { status: response.status, data: errorData };
-      throw error;
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to delete theme" });
   } catch (error) {
     console.error("Error deleting theme:", error);
-    throw error;
+    rethrowQueryError(error, "Failed to delete theme");
   }
 }
 
@@ -310,11 +270,9 @@ export async function deleteTheme(themeId) {
  */
 export async function getThemePresets(themeId) {
   try {
-    const response = await apiFetch(`/api/themes/${themeId}/presets`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch theme presets");
-    }
-    return await response.json();
+    return await apiFetchJson(`/api/themes/${themeId}/presets`, {}, {
+      fallbackMessage: "Failed to fetch theme presets",
+    });
   } catch (error) {
     console.error("Error getting theme presets:", error);
     return { default: null, presets: [] };

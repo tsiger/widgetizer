@@ -25,6 +25,9 @@ import { sanitizeThemeSettings } from "../services/sanitizationService.js";
 import { readAppSettingsFile } from "./appSettingsController.js";
 
 const CORE_WIDGET_LOCALES_DIR = path.join(CORE_WIDGETS_DIR, "locales");
+const THEME_SOURCE_CACHE_TTL_MS = 5000;
+const themeSourceDirCache = new Map();
+const themeSourceMetadataCache = new Map();
 
 function isPlainObject(value) {
   return value != null && typeof value === "object" && !Array.isArray(value);
@@ -48,6 +51,78 @@ function deepMerge(target, source) {
   }
 
   return result;
+}
+
+function getCachedThemeEntry(cache, key) {
+  const entry = cache.get(key);
+  if (!entry) {
+    return null;
+  }
+
+  if (entry.promise) {
+    return entry;
+  }
+
+  if (entry.expiresAt > Date.now()) {
+    return entry;
+  }
+
+  cache.delete(key);
+  return null;
+}
+
+async function getCachedThemeValue(cache, key, loader) {
+  const cached = getCachedThemeEntry(cache, key);
+
+  if (cached?.promise) {
+    return cached.promise;
+  }
+
+  if (cached && cached.value !== undefined) {
+    return cached.value;
+  }
+
+  const pending = loader()
+    .then((value) => {
+      cache.set(key, {
+        value,
+        expiresAt: Date.now() + THEME_SOURCE_CACHE_TTL_MS,
+      });
+      return value;
+    })
+    .catch((error) => {
+      const current = cache.get(key);
+      if (current?.promise === pending) {
+        cache.delete(key);
+      }
+      throw error;
+    });
+
+  cache.set(key, {
+    promise: pending,
+    expiresAt: 0,
+  });
+
+  return pending;
+}
+
+export function invalidateThemeSourceCache(themeId) {
+  if (themeId) {
+    themeSourceDirCache.delete(themeId);
+    themeSourceMetadataCache.delete(themeId);
+    return;
+  }
+
+  themeSourceDirCache.clear();
+  themeSourceMetadataCache.clear();
+}
+
+export async function readThemeSourceMetadata(themeId) {
+  return getCachedThemeValue(themeSourceMetadataCache, themeId, async () => {
+    const sourceDir = await getThemeSourceDir(themeId);
+    const theme = await fs.readJson(path.join(sourceDir, "theme.json"));
+    return { sourceDir, theme };
+  });
 }
 
 
@@ -247,18 +322,20 @@ export async function getThemeVersions(themeId) {
  * @returns {Promise<string>} - Path to the theme source directory
  */
 export async function getThemeSourceDir(themeId) {
-  const latestDir = getThemeLatestDir(themeId);
-  const latestThemeJson = path.join(latestDir, "theme.json");
+  return getCachedThemeValue(themeSourceDirCache, themeId, async () => {
+    const latestDir = getThemeLatestDir(themeId);
+    const latestThemeJson = path.join(latestDir, "theme.json");
 
-  try {
-    // Check if latest/theme.json exists (not just the directory)
-    await fs.access(latestThemeJson);
-    // latest/ exists and has theme.json, use it
-    return latestDir;
-  } catch {
-    // latest/ doesn't exist or is incomplete, use root
-    return getThemeDir(themeId);
-  }
+    try {
+      // Check if latest/theme.json exists (not just the directory)
+      await fs.access(latestThemeJson);
+      // latest/ exists and has theme.json, use it
+      return latestDir;
+    } catch {
+      // latest/ doesn't exist or is incomplete, use root
+      return getThemeDir(themeId);
+    }
+  });
 }
 
 /**
@@ -311,6 +388,7 @@ export async function buildLatestSnapshot(themeId) {
   if (versions.length <= 1) {
     // No updates exist, don't create latest/
     console.log(`[buildLatestSnapshot] No updates for ${themeId}, skipping latest/ build`);
+    invalidateThemeSourceCache(themeId);
     return;
   }
 
@@ -435,6 +513,7 @@ export async function buildLatestSnapshot(themeId) {
   }
 
   console.log(`[buildLatestSnapshot] Successfully built latest/ for ${themeId}`);
+  invalidateThemeSourceCache(themeId);
 }
 
 // ============================================================================
@@ -593,11 +672,7 @@ export async function getAllThemes(req, res) {
     const themesList = await Promise.all(
       themes.map(async (themeId) => {
         try {
-          // Get the source directory (latest/ if exists, otherwise root)
-          const sourceDir = await getThemeSourceDir(themeId);
-          const themeJsonPath = path.join(sourceDir, "theme.json");
-          const themeData = await fs.readFile(themeJsonPath, "utf8");
-          const theme = JSON.parse(themeData);
+          const { sourceDir, theme } = await readThemeSourceMetadata(themeId);
 
           // Get all available versions for this theme
           const versions = await getThemeVersions(themeId);
@@ -669,10 +744,8 @@ export async function getAllThemes(req, res) {
 export async function getTheme(req, res) {
   try {
     const { id } = req.params;
-    const sourceDir = await getThemeSourceDir(id);
-    const themeJsonPath = path.join(sourceDir, "theme.json");
-    const themeData = await fs.readFile(themeJsonPath, "utf8");
-    res.json(JSON.parse(themeData));
+    const { theme } = await readThemeSourceMetadata(id);
+    res.json(theme);
   } catch {
     res.status(404).json({ error: "Theme not found" });
   }
@@ -687,7 +760,7 @@ export async function getTheme(req, res) {
 export async function getThemeWidgets(req, res) {
   try {
     const { id } = req.params;
-    const sourceDir = await getThemeSourceDir(id);
+    const { sourceDir } = await readThemeSourceMetadata(id);
     const widgetsDir = path.join(sourceDir, "widgets");
     const entries = await fs.readdir(widgetsDir, { withFileTypes: true });
 
@@ -793,10 +866,7 @@ export async function themeHasPendingUpdates(themeId) {
     const newestVersion = getLatestVersion(versions);
 
     // Get current source version (from latest/ if exists, otherwise base)
-    const sourceDir = await getThemeSourceDir(themeId);
-    const themeJsonPath = path.join(sourceDir, "theme.json");
-    const themeData = await fs.readFile(themeJsonPath, "utf8");
-    const theme = JSON.parse(themeData);
+    const { theme } = await readThemeSourceMetadata(themeId);
     const currentVersion = theme.version;
 
     // Has pending updates if newest version is newer than current
@@ -871,10 +941,7 @@ export async function updateTheme(req, res) {
     await buildLatestSnapshot(id);
 
     // Get updated theme info
-    const sourceDir = await getThemeSourceDir(id);
-    const themeJsonPath = path.join(sourceDir, "theme.json");
-    const themeData = await fs.readFile(themeJsonPath, "utf8");
-    const theme = JSON.parse(themeData);
+    const { theme } = await readThemeSourceMetadata(id);
 
     res.json({
       message: `Theme '${id}' updated to version ${theme.version}`,
@@ -899,7 +966,7 @@ export async function updateTheme(req, res) {
  */
 export async function copyThemeToProject(themeName, projectDir, excludeDirs = []) {
   // Use the source directory (latest/ if exists, otherwise root)
-  const sourceDir = await getThemeSourceDir(themeName);
+  const { sourceDir, theme } = await readThemeSourceMetadata(themeName);
 
   try {
     // Copy theme directory to project directory recursively
@@ -925,9 +992,6 @@ export async function copyThemeToProject(themeName, projectDir, excludeDirs = []
     }
 
     // Get and return the version that was copied
-    const themeJsonPath = path.join(sourceDir, "theme.json");
-    const themeData = await fs.readFile(themeJsonPath, "utf8");
-    const theme = JSON.parse(themeData);
     return theme.version;
   } catch (error) {
     console.error(`Error during theme copy from ${sourceDir} to ${projectDir}:`, error);
@@ -1002,6 +1066,7 @@ export async function deleteTheme(req, res) {
 
     // 3. Delete the theme directory
     await fs.rm(themeDir, { recursive: true, force: true });
+    invalidateThemeSourceCache(id);
 
     res.json({ success: true, message: `Theme "${id}" deleted successfully` });
   } catch (error) {
@@ -1404,8 +1469,10 @@ export async function uploadTheme(req, res) {
       await buildLatestSnapshot(themeFolderName);
     }
 
+    invalidateThemeSourceCache(themeFolderName);
+
     // Read the final theme data from the source directory
-    const sourceDir = await getThemeSourceDir(themeFolderName);
+    const { sourceDir, theme: resolvedTheme } = await readThemeSourceMetadata(themeFolderName);
     const versions = await getThemeVersions(themeFolderName);
     const latestVersion = getLatestVersion(versions);
 
@@ -1421,13 +1488,13 @@ export async function uploadTheme(req, res) {
 
     const newThemeData = {
       id: themeFolderName,
-      name: uploadedThemeJson.name,
-      description: uploadedThemeJson.description,
+      name: resolvedTheme.name,
+      description: resolvedTheme.description,
       version: latestVersion,
       versions,
       latestVersion,
       widgets: widgetCount,
-      author: uploadedThemeJson.author,
+      author: resolvedTheme.author,
       isUpdate: !isNewTheme,
       addedVersions: isNewTheme ? null : newUpdateVersions,
     };

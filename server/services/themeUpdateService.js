@@ -9,7 +9,8 @@ import { randomUUID } from "crypto";
 import { getProjectDir, getProjectThemeJsonPath } from "../config.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
-import { getThemeSourceDir } from "../controllers/themeController.js";
+import { getThemeSourceDir, readThemeSourceMetadata } from "../controllers/themeController.js";
+import { refreshMediaUsageAfterStructuralChange } from "./mediaUsageService.js";
 import { isNewerVersion } from "../utils/semver.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
 
@@ -38,13 +39,10 @@ export async function checkForUpdates(projectId) {
 
   // Get the theme's current source version (from latest/ or base theme.json)
   // This is the version that was last built/published, NOT all available versions
-  const themeSourceDir = await getThemeSourceDir(themeName);
-  const themeJsonPath = path.join(themeSourceDir, "theme.json");
-
   let sourceVersion = null;
   try {
-    const themeData = await fs.readJson(themeJsonPath);
-    sourceVersion = themeData.version;
+    const { theme } = await readThemeSourceMetadata(themeName);
+    sourceVersion = theme.version;
   } catch {
     // Theme doesn't exist or can't be read
   }
@@ -312,6 +310,8 @@ export async function applyThemeUpdate(projectId) {
     lastThemeUpdateVersion: updateStatus.latestVersion,
     updated: new Date().toISOString(),
   });
+
+  await refreshMediaUsageAfterStructuralChange(projectId, "theme update apply");
 
   console.log(`[applyThemeUpdate] Successfully updated project ${projectId} to version ${updateStatus.latestVersion}`);
 

@@ -736,11 +736,13 @@ Save button / Auto-save timer
 
 ### 1. Theme Source Directory Resolution in getAllProjects
 
-**Problem:** `getAllProjects()` enriches each project by calling `themeController.getThemeSourceDir()` which reads theme.json multiple times. Consider batch reading or caching.
+**Status:** Resolved.
+
+`getAllProjects()` now keeps a per-request theme metadata map so repeated projects on the same theme reuse the same source/version/name lookup instead of re-reading `theme.json` for every row.
 
 ### 2. Theme Source Directory Resolution
 
-**Problem:** `getThemeSourceDir()` is called repeatedly for the same theme.
+**Status:** Improved.
 
 **Locations:**
 
@@ -748,7 +750,12 @@ Save button / Auto-save timer
 - `themeUpdateService.js`: `checkForUpdates()` calls it
 - `themeController.js`: Multiple functions call it
 
-**Improvement:** Cache theme source directories per request or use a simple in-memory cache with short TTL.
+**Current behavior:**
+
+- `themeController.getThemeSourceDir()` now uses a narrow in-memory cache for installed theme source resolution
+- invalidation is explicit for `latest/` rebuilds, theme upload/install, and theme deletion
+- shared source-metadata reads flow through `readThemeSourceMetadata()`
+- theme-level endpoints (`getTheme()`, `getThemeWidgets()`, update checks, and project enrichment) reuse the shared helpers instead of open-coding filesystem reads
 
 ### 3. Duplicate Slug Generation Logic
 
@@ -780,14 +787,14 @@ Save button / Auto-save timer
 
 ### 5. Media Usage Tracking Pattern
 
-**Problem:** `updatePageMediaUsage()` and `removePageFromMediaUsage()` are called in multiple places.
+**Status:** Improved.
 
-**Locations:**
+**Current behavior:**
 
-- `pageController.js`: `deletePage()`, `bulkDeletePages()`, `duplicatePage()`, `savePageContent()`
-- Manual tracking prone to being forgotten
-
-**Improvement:** Consider event-based approach or automatic tracking on page file writes.
+- `pageController.js` now routes page create/update/save/duplicate through shared persistence helpers that write files and sync page media usage together
+- page deletes and bulk deletes share the same delete+usage helper path
+- bulk or bypass flows call `refreshMediaUsageAfterStructuralChange(projectId)` after project create, duplicate, import, and theme update apply
+- the full refresh path still covers pages, global widgets, and theme settings media references
 
 ### 6. Theme Settings Loading
 
@@ -844,20 +851,17 @@ useFormNavigationGuard(isDirty && !skipGuardRef.current);
 
 ### 11. API Response Handling
 
-**Problem:** Inconsistent error handling in query functions.
+**Status:** Improved.
 
-**Some patterns:**
+**Current behavior:**
 
-```javascript
-// Pattern 1: Check response.ok
-if (!response.ok) throw new Error("...");
-
-// Pattern 2: Parse error from response
-const error = await response.json();
-throw new Error(error.message);
-```
-
-**Improvement:** Create a wrapper `apiCall(url, options)` that handles errors consistently.
+- `src/lib/apiFetch.js` now exports `apiFetchJson()` and `throwApiError()` as thin shared helpers on top of `apiFetch()`
+- query modules standardize on one JSON success/error path instead of mixing raw `response.ok` handling styles
+- structured server semantics are preserved on thrown errors, including:
+  - validation error arrays
+  - rich import/upload payloads
+  - `PROJECT_MISMATCH` / 409
+- `saveStore.js` now benefits from the same preserved mismatch metadata across page, global-widget, and theme-settings saves
 
 ### 12. TypeScript Migration Prep
 
@@ -878,9 +882,9 @@ throw new Error(error.message);
 
 ### 13. Query Function Caching
 
-**Problem:** Only `mediaManager.js` implements caching.
+**Status:** Next-tier backlog.
 
-**Improvement:** Consider adding caching to frequently-called queries:
+**Candidate targets:**
 
 - `getAllProjects()` - rarely changes
 - `getAllThemes()` - rarely changes
@@ -898,3 +902,21 @@ throw new Error(error.message);
 - `reorderWidgets()` / `reorderBlocks()` - similar logic
 
 **Improvement:** Abstract to generic `addItem()`, `removeItem()`, `duplicateItem()`, `reorderItems()` functions with widget/block-specific wrappers.
+
+### Current Next-Tier Backlog
+
+With theme-source caching, API response normalization, and media-usage centralization now in place, the next tier is:
+
+1. Query caching for `getAllProjects()` / `getAllThemes()` on the frontend
+2. `useFormatDate()` to remove repeated settings/date wiring
+3. Form-page abstraction around `useFormNavigationGuard()`
+4. Widget/block operation refactor in `src/stores/widgetStore.js`
+5. Shared stale-async / project-switch helper to reduce repeated guard patterns across settings/export/editor flows
+
+Lower priority / mostly resolved:
+
+- Slug generation discipline
+- Confirmation modal pattern
+- Higher-level semver status helper
+- Theme settings dedicated shared store
+- TypeScript migration prep (important later, but not urgent unless TS work starts now)

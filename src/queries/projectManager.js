@@ -1,4 +1,4 @@
-import { apiFetch } from "../lib/apiFetch";
+import { apiFetch, apiFetchJson, rethrowQueryError, throwApiError } from "../lib/apiFetch";
 import { uploadFormData } from "../lib/uploadRequest";
 
 /**
@@ -29,13 +29,9 @@ import { uploadFormData } from "../lib/uploadRequest";
  */
 export async function getAllProjects() {
   try {
-    const response = await apiFetch("/api/projects");
-    if (!response.ok) {
-      throw new Error("Failed to fetch projects");
-    }
-    return await response.json();
-  } catch {
-    throw new Error("Failed to get projects");
+    return await apiFetchJson("/api/projects", {}, { fallbackMessage: "Failed to get projects" });
+  } catch (error) {
+    rethrowQueryError(error, "Failed to get projects");
   }
 }
 
@@ -46,13 +42,9 @@ export async function getAllProjects() {
  */
 export async function getActiveProject() {
   try {
-    const response = await apiFetch("/api/projects/active");
-    if (!response.ok) {
-      throw new Error("Failed to fetch active project");
-    }
-    return await response.json();
-  } catch {
-    throw new Error("Failed to get active project");
+    return await apiFetchJson("/api/projects/active", {}, { fallbackMessage: "Failed to get active project" });
+  } catch (error) {
+    rethrowQueryError(error, "Failed to get active project");
   }
 }
 
@@ -67,29 +59,15 @@ export async function getActiveProject() {
  */
 export async function createProject(projectData) {
   try {
-    const response = await apiFetch("/api/projects", {
+    return await apiFetchJson("/api/projects", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(projectData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      // Handle express-validator format: { errors: [{msg, param}, ...] }
-      if (errorData.errors && Array.isArray(errorData.errors)) {
-        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
-      }
-      throw new Error(errorData.error || "Failed to create project");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to create project" });
   } catch (error) {
-    if (error.message && !error.message.includes("Failed to fetch")) {
-      throw error; // Re-throw with original message if it's our custom error
-    }
-    throw new Error("Failed to create project");
+    rethrowQueryError(error, "Failed to create project");
   }
 }
 
@@ -101,16 +79,11 @@ export async function createProject(projectData) {
  */
 export async function setActiveProject(projectId) {
   try {
-    const response = await apiFetch(`/api/projects/active/${projectId}`, {
+    return await apiFetchJson(`/api/projects/active/${projectId}`, {
       method: "PUT",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to set active project");
-    }
-    const result = await response.json();
-    return result;
-  } catch {
-    throw new Error("Failed to set active project");
+    }, { fallbackMessage: "Failed to set active project" });
+  } catch (error) {
+    rethrowQueryError(error, "Failed to set active project");
   }
 }
 
@@ -126,29 +99,15 @@ export async function setActiveProject(projectId) {
  */
 export async function updateProject(projectId, updates) {
   try {
-    const response = await apiFetch(`/api/projects/${projectId}`, {
+    return await apiFetchJson(`/api/projects/${projectId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(updates),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      // Handle express-validator format: { errors: [{msg, param}, ...] }
-      if (errorData.errors && Array.isArray(errorData.errors)) {
-        throw new Error(errorData.errors.map((e) => e.msg).join("; "));
-      }
-      throw new Error(errorData.error || "Failed to update project");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to update project" });
   } catch (error) {
-    if (error.message && !error.message.includes("Failed to fetch")) {
-      throw error; // Re-throw with original message if it's our custom error
-    }
-    throw new Error("Failed to update project");
+    rethrowQueryError(error, "Failed to update project");
   }
 }
 
@@ -160,15 +119,11 @@ export async function updateProject(projectId, updates) {
  */
 export async function deleteProject(projectId) {
   try {
-    const response = await apiFetch(`/api/projects/${projectId}`, {
+    return await apiFetchJson(`/api/projects/${projectId}`, {
       method: "DELETE",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to delete project");
-    }
-    return await response.json();
-  } catch {
-    throw new Error("Failed to delete project");
+    }, { fallbackMessage: "Failed to delete project" });
+  } catch (error) {
+    rethrowQueryError(error, "Failed to delete project");
   }
 }
 
@@ -180,22 +135,12 @@ export async function deleteProject(projectId) {
  */
 export async function duplicateProject(projectId) {
   try {
-    const response = await apiFetch(`/api/projects/${projectId}/duplicate`, {
+    return await apiFetchJson(`/api/projects/${projectId}/duplicate`, {
       method: "POST",
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to duplicate project");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to duplicate project" });
   } catch (error) {
     console.error("Error duplicating project:", error);
-    if (error.message && !error.message.includes("Failed to fetch")) {
-      throw error; // Re-throw with original message if it's our custom error
-    }
-    throw new Error("Failed to duplicate project");
+    rethrowQueryError(error, "Failed to duplicate project");
   }
 }
 
@@ -213,8 +158,7 @@ export async function exportProject(projectId) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to export project");
+      await throwApiError(response, "Failed to export project");
     }
 
     // Get filename from Content-Disposition header or use default
@@ -238,10 +182,7 @@ export async function exportProject(projectId) {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   } catch (error) {
-    if (error.message && !error.message.includes("Failed to fetch")) {
-      throw error;
-    }
-    throw new Error("Failed to export project");
+    rethrowQueryError(error, "Failed to export project");
   }
 }
 
@@ -272,11 +213,11 @@ export async function importProject(file, optionsOrProgress) {
       status: response.status,
     };
   } catch (error) {
-    if (error.message && !error.message.includes("Failed to fetch")) {
-      const normalizedError = new Error(error.message);
+    if (error?.message || error?.status || error?.data || error?.aborted) {
+      const normalizedError = new Error(error?.message || "Failed to import project");
       normalizedError.status = error.status;
       normalizedError.data = error.data;
-      normalizedError.name = error.name;
+      normalizedError.name = error.name || normalizedError.name;
       normalizedError.aborted = error.aborted;
       throw normalizedError;
     }
@@ -297,17 +238,11 @@ export async function importProject(file, optionsOrProgress) {
  */
 export async function checkThemeUpdates(projectId) {
   try {
-    const response = await apiFetch(`/api/projects/${projectId}/theme-updates/status`);
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to check theme updates");
-    }
-    return await response.json();
+    return await apiFetchJson(`/api/projects/${projectId}/theme-updates/status`, {}, {
+      fallbackMessage: "Failed to check theme updates",
+    });
   } catch (error) {
-    if (error.message && !error.message.includes("Failed to fetch")) {
-      throw error;
-    }
-    throw new Error("Failed to check theme updates");
+    rethrowQueryError(error, "Failed to check theme updates");
   }
 }
 
@@ -320,25 +255,15 @@ export async function checkThemeUpdates(projectId) {
  */
 export async function toggleThemeUpdates(projectId, enabled) {
   try {
-    const response = await apiFetch(`/api/projects/${projectId}/theme-updates`, {
+    return await apiFetchJson(`/api/projects/${projectId}/theme-updates`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ enabled }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to toggle theme updates");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to toggle theme updates" });
   } catch (error) {
-    if (error.message && !error.message.includes("Failed to fetch")) {
-      throw error;
-    }
-    throw new Error("Failed to toggle theme updates");
+    rethrowQueryError(error, "Failed to toggle theme updates");
   }
 }
 
@@ -351,20 +276,10 @@ export async function toggleThemeUpdates(projectId, enabled) {
  */
 export async function applyThemeUpdate(projectId) {
   try {
-    const response = await apiFetch(`/api/projects/${projectId}/theme-updates/apply`, {
+    return await apiFetchJson(`/api/projects/${projectId}/theme-updates/apply`, {
       method: "POST",
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to apply theme update");
-    }
-
-    return await response.json();
+    }, { fallbackMessage: "Failed to apply theme update" });
   } catch (error) {
-    if (error.message && !error.message.includes("Failed to fetch")) {
-      throw error;
-    }
-    throw new Error("Failed to apply theme update");
+    rethrowQueryError(error, "Failed to apply theme update");
   }
 }

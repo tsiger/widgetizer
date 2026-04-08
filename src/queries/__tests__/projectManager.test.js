@@ -6,6 +6,15 @@ vi.mock("../../lib/uploadRequest", () => ({
 
 vi.mock("../../lib/apiFetch", () => ({
   apiFetch: vi.fn(),
+  apiFetchJson: vi.fn(),
+  throwApiError: vi.fn(),
+  isApiError: vi.fn((error) => error?.name === "ApiError"),
+  rethrowQueryError: vi.fn((error, fallbackMessage) => {
+    if (error?.name === "ApiError") {
+      throw error;
+    }
+    throw new Error(fallbackMessage);
+  }),
 }));
 
 describe("projectManager importProject", () => {

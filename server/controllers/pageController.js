@@ -3,7 +3,7 @@ import slugify from "slugify";
 import { randomUUID } from "crypto";
 import { getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
 import path from "path";
-import { updatePageMediaUsage, removePageFromMediaUsage } from "../services/mediaUsageService.js";
+import { syncPageMediaUsageOnDelete, syncPageMediaUsageOnWrite } from "../services/mediaUsageService.js";
 import { cleanupDeletedPageReferences } from "../utils/linkEnrichment.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
@@ -93,6 +93,39 @@ export async function readGlobalWidgetData(projectId, widgetType) {
     // Catch other errors (parsing, reading)
     console.error(`Error reading global widget data (${widgetType}, project ${projectId}):`, error);
     return null; // Return null on error
+  }
+}
+
+async function persistPageWithMediaTracking({ projectId, projectFolderName, pageId, pageData, previousPageId = null }) {
+  const pagePath = getPagePath(projectFolderName, pageId);
+  await fs.outputFile(pagePath, JSON.stringify(pageData, null, 2));
+
+  if (previousPageId && previousPageId !== pageId) {
+    const previousPath = getPagePath(projectFolderName, previousPageId);
+    try {
+      if (await fs.pathExists(previousPath)) {
+        await fs.remove(previousPath);
+      }
+    } catch (unlinkError) {
+      console.warn(`Failed to delete old page file ${previousPageId} after slug change: ${unlinkError.message}`);
+    }
+  }
+
+  try {
+    await syncPageMediaUsageOnWrite(projectId, pageId, pageData, previousPageId);
+  } catch (usageError) {
+    console.warn(`Failed to update media usage tracking for page ${pageId}:`, usageError);
+  }
+}
+
+async function deletePageWithMediaTracking({ projectId, projectFolderName, pageId }) {
+  const pagePath = getPagePath(projectFolderName, pageId);
+  await fs.remove(pagePath);
+
+  try {
+    await syncPageMediaUsageOnDelete(projectId, pageId);
+  } catch (usageError) {
+    console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
   }
 }
 
@@ -191,8 +224,6 @@ export async function updatePage(req, res) {
       finalNewSlug = oldSlug;
     }
 
-    const newPath = getPagePath(projectFolderName, finalNewSlug);
-
     // Read old file first to preserve original creation date and uuid
     let originalCreationDate = new Date().toISOString();
     let existingUuid = null;
@@ -222,34 +253,13 @@ export async function updatePage(req, res) {
       updated: new Date().toISOString(), // Set new update timestamp
     };
 
-    // Write the updated content to the new/correct file path
-    await fs.outputFile(newPath, JSON.stringify(finalUpdatedPageData, null, 2));
-
-    // If the slug actually changed, remove the old file
-    if (oldSlug !== finalNewSlug && oldPath !== newPath) {
-      try {
-        // Only remove if it exists
-        if (await fs.pathExists(oldPath)) {
-          await fs.remove(oldPath);
-        }
-      } catch (unlinkError) {
-        // fs.remove shouldn't error on non-existent, log other errors
-        console.warn(`Failed to delete old page file ${oldPath} after slug change: ${unlinkError.message}`);
-      }
-    }
-
-    // Update media usage tracking
-    try {
-      // If slug changed, remove the old slug first
-      if (oldSlug !== finalNewSlug) {
-        await removePageFromMediaUsage(activeProject.id, oldSlug);
-      }
-      // Then update with the new slug (or refresh if slug didn't change)
-      await updatePageMediaUsage(activeProject.id, finalNewSlug, finalUpdatedPageData);
-    } catch (usageError) {
-      console.warn(`Failed to update media usage tracking for page ${finalNewSlug}:`, usageError);
-      // Don't fail the request if usage tracking fails
-    }
+    await persistPageWithMediaTracking({
+      projectId: activeProject.id,
+      projectFolderName,
+      pageId: finalNewSlug,
+      pageData: finalUpdatedPageData,
+      previousPageId: oldSlug,
+    });
 
     res.json({ success: true, data: finalUpdatedPageData });
   } catch (error) {
@@ -313,15 +323,11 @@ export async function deletePage(req, res) {
       console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
     }
 
-    // Delete the page file
-    await fs.remove(pagePath);
-
-    // Remove the page from media usage tracking
-    try {
-      await removePageFromMediaUsage(activeProject.id, pageId);
-    } catch (usageError) {
-      console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
-    }
+    await deletePageWithMediaTracking({
+      projectId: activeProject.id,
+      projectFolderName,
+      pageId,
+    });
 
     // Clean up orphaned references in menus and widget links
     if (deletedPageUuid) {
@@ -378,16 +384,11 @@ export async function bulkDeletePages(req, res) {
         console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
       }
 
-      // Delete the page file
-      await fs.remove(pagePath);
-
-      // Remove the page from media usage tracking
-      try {
-        await removePageFromMediaUsage(activeProject.id, pageId);
-      } catch (usageError) {
-        console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
-        // Don't fail the deletion if usage tracking fails
-      }
+      await deletePageWithMediaTracking({
+        projectId: activeProject.id,
+        projectFolderName,
+        pageId,
+      });
 
       results.deleted.push(pageId);
     } catch (error) {
@@ -481,16 +482,12 @@ export async function createPage(req, res) {
     const pagesDir = getProjectPagesDir(projectFolderName);
     await fs.ensureDir(pagesDir);
 
-    const pagePath = getPagePath(projectFolderName, slug);
-    await fs.outputFile(pagePath, JSON.stringify(newPage, null, 2));
-
-    // Update media usage tracking for SEO images
-    try {
-      await updatePageMediaUsage(activeProject.id, slug, newPage);
-    } catch (usageError) {
-      console.warn(`Failed to update media usage tracking for new page ${slug}:`, usageError);
-      // Don't fail the request if usage tracking fails
-    }
+    await persistPageWithMediaTracking({
+      projectId: activeProject.id,
+      projectFolderName,
+      pageId: slug,
+      pageData: newPage,
+    });
 
     res.status(201).json(newPage);
   } catch (error) {
@@ -554,34 +551,13 @@ export async function savePageContent(req, res) {
       updated: new Date().toISOString(), // Set new update timestamp
     };
 
-    // Write file
-    const newPagePath = getPagePath(projectFolderName, pageData.slug);
-    await fs.outputFile(newPagePath, JSON.stringify(updatedPageData, null, 2));
-
-    // If the original slug (id) is different from the new slug, delete the old file
-    if (id !== pageData.slug) {
-      try {
-        const oldPath = getPagePath(projectFolderName, id);
-        if (await fs.pathExists(oldPath)) {
-          await fs.remove(oldPath);
-        }
-      } catch (unlinkError) {
-        console.warn(`Failed to delete old page file ${id} after slug change:`, unlinkError);
-      }
-    }
-
-    // Update media usage tracking
-    try {
-      // If slug changed, remove the old slug first
-      if (id !== pageData.slug) {
-        await removePageFromMediaUsage(activeProject.id, id);
-      }
-      // Then update with the new slug
-      await updatePageMediaUsage(activeProject.id, pageData.slug, updatedPageData);
-    } catch (usageError) {
-      console.warn(`Failed to update media usage tracking for page ${pageData.slug}:`, usageError);
-      // Don't fail the request if usage tracking fails
-    }
+    await persistPageWithMediaTracking({
+      projectId: activeProject.id,
+      projectFolderName,
+      pageId: pageData.slug,
+      pageData: updatedPageData,
+      previousPageId: id,
+    });
 
     res.json({ success: true, message: "Page saved successfully" });
   } catch (error) {
@@ -633,17 +609,12 @@ export async function duplicatePage(req, res) {
       updated: new Date().toISOString(),
     };
 
-    // Save the new page
-    const newPagePath = getPagePath(projectFolderName, newSlug);
-    await fs.outputFile(newPagePath, JSON.stringify(newPage, null, 2));
-
-    // Update media usage tracking for the new page
-    try {
-      await updatePageMediaUsage(activeProject.id, newSlug, newPage);
-    } catch (usageError) {
-      console.warn(`Failed to update media usage tracking for duplicated page ${newSlug}:`, usageError);
-      // Don't fail the request if usage tracking fails
-    }
+    await persistPageWithMediaTracking({
+      projectId: activeProject.id,
+      projectFolderName,
+      pageId: newSlug,
+      pageData: newPage,
+    });
 
     res.status(201).json(newPage);
   } catch (error) {

@@ -76,6 +76,7 @@ const {
   resolvePresetPaths,
   getThemePresets,
   getProjectThemeLocale,
+  invalidateThemeSourceCache,
 } = await import("../controllers/themeController.js");
 const { closeDb } = await import("../db/index.js");
 
@@ -262,6 +263,10 @@ after(async () => {
   await fs.remove(TEST_ROOT);
 });
 
+afterEach(() => {
+  invalidateThemeSourceCache();
+});
+
 // ============================================================================
 // Helper: create a theme on disk (for non-upload tests)
 // ============================================================================
@@ -426,6 +431,30 @@ describe("getThemeSourceDir", () => {
 
     const sourceDir = await getThemeSourceDir(theme);
     assert.equal(sourceDir, latestDir);
+
+    await fs.remove(getThemeDir(theme));
+  });
+
+  it("invalidates the cached source after building latest/", async () => {
+    const theme = "cached-source-theme";
+    await createThemeOnDisk(theme, { version: "1.0.0" });
+
+    const initialSourceDir = await getThemeSourceDir(theme);
+    assert.equal(initialSourceDir, getThemeDir(theme));
+
+    const updateDir = getThemeVersionDir(theme, "1.1.0");
+    await fs.ensureDir(updateDir);
+    await fs.writeJson(path.join(updateDir, "theme.json"), {
+      name: theme,
+      version: "1.1.0",
+      author: "Disk Author",
+    });
+    await fs.writeFile(path.join(updateDir, "layout.liquid"), "<html>updated</html>");
+
+    await buildLatestSnapshot(theme);
+
+    const rebuiltSourceDir = await getThemeSourceDir(theme);
+    assert.equal(rebuiltSourceDir, getThemeLatestDir(theme));
 
     await fs.remove(getThemeDir(theme));
   });
