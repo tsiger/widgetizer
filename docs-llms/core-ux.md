@@ -209,7 +209,7 @@ _(Excluding the Page Editor itself)_
   1. After a theme is updated (5.4), projects using that theme show an update indicator (arrow icon) on the Projects page.
   2. User edits the project.
   3. User clicks "Apply Theme Update" action.
-  4. System copies updated theme files to project, merges settings, adds new menus/templates.
+  4. System copies updated project-owned theme files to project (including `widgets/`, `layout.liquid`, `assets/`, `snippets/`, and `locales/`), merges settings, and adds new menus/templates.
   5. Success toast confirms update applied.
   6. Project's `themeVersion` is updated to match the theme's current version.
 - **Status:** ✅ Fully implemented

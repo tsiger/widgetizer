@@ -338,11 +338,11 @@ Used by `AppSettings.jsx` page for managing system-wide configuration that affec
 
 ### `useThemeLocale` Hook (`src/hooks/useThemeLocale.js`)
 
-Fetches theme locale JSON for the current language and provides a `tTheme()` resolver for `tTheme:`-prefixed i18n keys used in widget schemas.
+Fetches the active project's theme locale JSON for the current language and provides a `tTheme()` resolver for `tTheme:`-prefixed i18n keys used in widget schemas.
 
 #### Purpose
 
-Widget `schema.json` files use `tTheme:` prefixed keys for displayName, label, description, and option labels instead of plain English strings. This hook loads the corresponding theme locale file and returns a resolver that translates those keys into localized strings at runtime.
+Widget `schema.json` files use `tTheme:` prefixed keys for displayName, label, description, and option labels instead of plain English strings. This hook loads the active project's copied theme locale files and returns a resolver that translates those keys into localized strings at runtime.
 
 #### API Reference
 
@@ -356,7 +356,8 @@ Widget `schema.json` files use `tTheme:` prefixed keys for displayName, label, d
 - 5-minute staleness window before re-fetching
 - **Stale-while-revalidate**: When the cache expires, stale data continues to be served while the re-fetch happens in the background. This prevents a flash of raw keys between cache expiry and fetch completion.
 - Single in-flight promise deduplication to prevent duplicate API calls
-- Backend endpoint: `GET /api/projects/:id/theme/locale/:lang`
+- Backend endpoint: `GET /api/themes/project/:projectId/locales/:lang`
+- Locale source: `data/projects/<project>/locales/`, merged with `src/core/widgets/locales/`
 
 #### Used In
 

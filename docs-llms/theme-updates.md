@@ -164,6 +164,8 @@ These paths receive additions but preserve existing files:
 
 This allows theme authors to add new menus or page templates without overwriting user customizations.
 
+`locales/` belongs to the project-owned theme package. The editor locale API reads `data/projects/<folder>/locales/`, so locale changes only affect an existing project after that project applies a theme update (or is recreated).
+
 ## Theme Settings Merge
 
 When updating `theme.json`, the system uses intelligent merging:

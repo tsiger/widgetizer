@@ -17,7 +17,7 @@ import { processTemplatesRecursive } from "../utils/templateHelpers.js";
  * Updatable paths - these are copied from theme to project during updates.
  * Everything else is protected (pages/, menus/, uploads/).
  */
-const UPDATABLE_PATHS = ["layout.liquid", "assets", "widgets", "snippets", "screenshot.png"];
+const UPDATABLE_PATHS = ["layout.liquid", "assets", "widgets", "snippets", "locales", "screenshot.png"];
 
 /**
  * Check if a theme update is available for a project.

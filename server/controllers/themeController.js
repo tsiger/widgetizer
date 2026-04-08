@@ -1536,7 +1536,7 @@ export async function saveProjectThemeSettings(req, res) {
 
 /**
  * GET /api/themes/project/:projectId/locales/:lang
- * Serve theme locale JSON for the project's active theme.
+ * Serve theme locale JSON from the project's copied theme files.
  * Falls back to English if the requested language is not available.
  */
 export async function getProjectThemeLocale(req, res) {
@@ -1548,7 +1548,6 @@ export async function getProjectThemeLocale(req, res) {
       return res.status(400).json({ error: "Invalid language code" });
     }
 
-    // Get the theme ID from the project's DB record
     const project = getProjectById(projectId);
     const themeId = project?.theme;
 
@@ -1557,11 +1556,18 @@ export async function getProjectThemeLocale(req, res) {
       return res.json(coreLocale);
     }
 
-    const sourceDir = await getThemeSourceDir(themeId);
-    const themeLocalesDir = path.join(sourceDir, "locales");
+    const projectLocalesDir = path.join(getProjectDir(project.folderName), "locales");
+    const projectEnglishLocalePath = path.join(projectLocalesDir, "en.json");
+
+    if (!(await fs.pathExists(projectEnglishLocalePath))) {
+      return res.status(500).json({
+        error: "Project locale files missing",
+        message: `Project locale file not found for project ${projectId}: ${projectEnglishLocalePath}`,
+      });
+    }
 
     const coreLocale = await loadMergedLocale(CORE_WIDGET_LOCALES_DIR, lang);
-    const themeLocale = await loadMergedLocale(themeLocalesDir, lang);
+    const themeLocale = await loadMergedLocale(projectLocalesDir, lang);
 
     return res.json(deepMerge(coreLocale, themeLocale));
   } catch (error) {

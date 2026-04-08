@@ -139,7 +139,7 @@ For any preset:
 
 **Static file serving**: Screenshots are served from the themes directory via `/themes/*` (backed by `getThemesDir()` in `server/createApp.js`). Preset screenshots at `/themes/my-theme/presets/restaurant/screenshot.png` work automatically.
 
-**Theme updates**: Presets are only used at project creation time. Once a project is created, it's independent. Theme updates (`applyThemeUpdate`) modify widgets/layout/assets but never touch project pages/menus. Preset files can be updated via the existing version system (add/modify files in `updates/` version folders).
+**Theme updates**: Presets are only used at project creation time. Once a project is created, it's independent. Theme updates (`applyThemeUpdate`) replace project-owned theme infrastructure like widgets/layout/assets/snippets/locales, merge `theme.json`, and add new menus/templates without overwriting existing project content. Preset files can be updated via the existing version system (add/modify files in `updates/` version folders).
 
 **Backward compatibility**: Everything is opt-in. No `presets/` directory = no presets = existing behavior unchanged. The `preset` param in `createProject` is optional and defaults to null.
 
@@ -150,5 +150,5 @@ For any preset:
 3. **Full preset**: Create a preset with `templates/`, `menus/`, `preset.json` — project should get preset's pages, menus, and overridden settings
 4. **UI**: Select a theme with presets — card grid appears, default is pre-selected, changing preset updates form state
 5. **Screenshots**: Each preset card shows its own screenshot, with fallback to root screenshot if missing
-6. **Theme updates**: Apply a theme update to a project created from a preset — widgets/layout update correctly, pages/settings remain unchanged
+6. **Theme updates**: Apply a theme update to a project created from a preset — widgets/layout/locales update correctly, pages remain unchanged, and settings merge correctly
 7. Run existing tests: `npm test`

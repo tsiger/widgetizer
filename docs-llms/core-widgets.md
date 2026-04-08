@@ -62,7 +62,7 @@ Core widget schemas use the same format as theme widgets, plus additional metada
 - **`isCore`**: Boolean flag identifying this as a core widget (used by the editor)
 - **`category`**: Grouping category for the widget picker (e.g., "Layout")
 
-**Note:** Core widgets use `tTheme:`-prefixed keys in their schemas, but those translations are owned by the shared core locale files in `src/core/widgets/locales/`, not by each theme. At runtime, the server merges core locales with the active theme's locales before returning them to the editor. See [Widget Authoring Guide](theming-widgets.md) for theme-side locale details.
+**Note:** Core widgets use `tTheme:`-prefixed keys in their schemas, but those translations are owned by the shared core locale files in `src/core/widgets/locales/`, not by each theme. At runtime, the server merges core locales with the active project's copied theme locales before returning them to the editor. See [Widget Authoring Guide](theming-widgets.md) for theme-side locale details.
 
 ## 4. Theme Opt-Out
 

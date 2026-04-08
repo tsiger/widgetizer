@@ -679,7 +679,7 @@ Save button / Auto-save timer
 | `useAppSettings`         | App settings with caching               | Media, Pages, Projects, Export        |
 | `useConfirmationModal`   | Confirmation modal state                | Pages, Menus, Media, Projects, Export |
 | `useFormNavigationGuard` | Prevent navigation with unsaved changes | All forms                             |
-| `useThemeLocale`         | Fetches theme locale JSON, provides `tTheme()` resolver for `tTheme:`-prefixed i18n keys | Editor components (SettingsPanel, ThemeSelector, PreviewPanel, BlockList, etc.) |
+| `useThemeLocale`         | Fetches the active project's theme locale JSON, provides `tTheme()` resolver for `tTheme:`-prefixed i18n keys | Editor components (SettingsPanel, ThemeSelector, PreviewPanel, BlockList, etc.) |
 | `useToastStore`          | Toast notifications                     | All pages                             |
 
 ### Shared Stores

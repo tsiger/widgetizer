@@ -105,6 +105,8 @@ async function createTheme(version, opts = {}) {
   await fs.ensureDir(path.join(themeDir, "widgets", "hero"));
   await fs.writeFile(path.join(themeDir, "widgets", "hero", "widget.liquid"), "<div class='hero'>v1</div>");
   await fs.writeJson(path.join(themeDir, "widgets", "hero", "schema.json"), { type: "hero" });
+  await fs.ensureDir(path.join(themeDir, "locales"));
+  await fs.writeJson(path.join(themeDir, "locales", "en.json"), { greeting: "Hello v1" }, { spaces: 2 });
   await fs.ensureDir(path.join(themeDir, "templates"));
   await fs.writeJson(path.join(themeDir, "templates", "home.json"), { slug: "index", name: "Home" });
   await fs.ensureDir(path.join(themeDir, "menus"));
@@ -174,6 +176,7 @@ async function createProject(themeVersion) {
   await fs.copy(path.join(themeDir, "layout.liquid"), path.join(projectDir, "layout.liquid"));
   await fs.copy(path.join(themeDir, "assets"), path.join(projectDir, "assets"));
   await fs.copy(path.join(themeDir, "widgets"), path.join(projectDir, "widgets"));
+  await fs.copy(path.join(themeDir, "locales"), path.join(projectDir, "locales"));
 
   // Project theme.json
   await fs.writeJson(
@@ -419,6 +422,34 @@ describe("applyThemeUpdate", () => {
     const accent = projectTheme.settings.colors.find((s) => s.id === "accent_color");
     assert.ok(accent, "New accent_color setting should be added");
     assert.equal(accent.value, "#00ff00");
+  });
+
+  it("keeps old project locales until apply and then replaces them", async () => {
+    await createTheme("1.0.0", {
+      updates: [
+        {
+          version: "1.1.0",
+          files: {
+            "locales/en.json": { greeting: "Hello v1.1", badge: "New" },
+          },
+        },
+      ],
+    });
+    await buildLatestSnapshot(THEME_NAME);
+    await createProject("1.0.0");
+
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    const projectLocalesPath = path.join(projectDir, "locales", "en.json");
+
+    const beforeApply = await fs.readJson(projectLocalesPath);
+    assert.equal(beforeApply.greeting, "Hello v1");
+    assert.equal(beforeApply.badge, undefined);
+
+    await applyThemeUpdate(PROJECT_ID);
+
+    const afterApply = await fs.readJson(projectLocalesPath);
+    assert.equal(afterApply.greeting, "Hello v1.1");
+    assert.equal(afterApply.badge, "New");
   });
 
   it("updates project metadata in projects.json", async () => {

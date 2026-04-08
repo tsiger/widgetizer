@@ -1490,7 +1490,7 @@ When exporting a project to static HTML:
 
 Theme locale files provide the translated strings for all theme-owned `tTheme:` prefixed keys used in theme widget schemas and global settings. They live in the `locales/` directory at the theme root.
 
-Core widget translations are owned separately by the app in `src/core/widgets/locales/`. At runtime, the server merges the shared core locale data with the active theme's locale data before returning it to the editor.
+Core widget translations are owned separately by the app in `src/core/widgets/locales/`. When a project is created, the theme's `locales/` directory is copied into the project. At runtime, the server merges the shared core locale data with the active project's copied theme locale data before returning it to the editor.
 
 ### File Format
 
@@ -1560,8 +1560,14 @@ Widget types with hyphens are converted to underscores in keys: `bento-grid` bec
 ### How Translations Work
 
 1. Schemas reference locale keys using the `tTheme:` prefix (e.g., `"label": "tTheme:carousel.settings.title.label"`).
-2. The frontend `useThemeLocale` hook provides a `tTheme()` resolver that looks up the key path in the merged core+theme locale payload for the active project and returns the translated string.
+2. The frontend `useThemeLocale` hook provides a `tTheme()` resolver that looks up the key path in the merged core+project locale payload for the active project and returns the translated string.
 3. If a key is missing from the locale file, the raw key path is shown as a fallback, making missing translations easy to spot.
+
+### Project Ownership and Updates
+
+- Theme locale files are part of the project's copied theme package, just like `widgets/` and `theme.json`.
+- Editing locale files in `data/themes/<theme>/` affects new project creation and the source used by Apply Theme Update, but it does not change already-created projects by itself.
+- Existing projects receive locale changes only when their copied `locales/` folder is replaced through a theme update.
 
 ### Validation
 

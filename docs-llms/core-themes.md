@@ -286,6 +286,7 @@ The sidebar displays a badge next to "Themes" showing the count of themes with p
 ## 5. Theme Locales and Site Icon Markup
 
 - Theme locale infrastructure remains supported (`locales/`, `tTheme:` keys, snippet/widget resolution), but the current shipped app + Arch theme are trimmed to English-only locale files for now.
+- Existing projects read theme locale strings from their copied `data/projects/<folder>/locales/` files. The installed theme copy in `data/themes/` is the source for new project creation and Apply Theme Update, not the live locale source for already-created projects.
 - Arch's site-icon head markup lives in `themes/arch/snippets/site-icons.liquid`, rendered from `layout.liquid`.
 - The visible setting label is **Site Icon**, but the underlying theme setting key remains `favicon` for compatibility with stored theme settings and existing Liquid access patterns.
 
