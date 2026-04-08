@@ -116,8 +116,13 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
         <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="p-6 space-y-6">
           {/* Preview section */}
           {fileUrl && (
-            <div className="mb-4 p-2 border border-slate-200 rounded-sm bg-slate-50 flex items-center justify-center">
+            <div className="mb-4 p-2 border border-slate-200 rounded-sm bg-slate-50 flex flex-col items-center justify-center gap-2">
               <img src={fileUrl} alt="Preview" className="max-h-40 max-w-full object-contain rounded-sm" />
+              {(selectedFile.filename || selectedFile.originalName) && (
+                <p className="text-xs text-slate-500 truncate max-w-full" title={selectedFile.filename || selectedFile.originalName}>
+                  {selectedFile.filename || selectedFile.originalName}
+                </p>
+              )}
             </div>
           )}
 

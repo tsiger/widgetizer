@@ -80,7 +80,13 @@ export default function MediaListItem({
         </IconButton>
       </td>
       <td className={cellClass}>
-        <div className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center">
+        <div
+          className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center cursor-pointer"
+          onClick={onView}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && onView()}
+        >
           {file.type?.startsWith("image/") ? (
             <img
               src={API_URL(
@@ -95,7 +101,9 @@ export default function MediaListItem({
         </div>
       </td>
       <td className={`${cellClass} max-w-xs truncate`} title={file.metadata?.title || file.filename}>
-        {file.metadata?.title || file.filename}
+        <button type="button" onClick={onEdit} className="truncate text-left hover:text-pink-600 transition-colors">
+          {file.metadata?.title || file.filename}
+        </button>
       </td>
       <td className={cellClass}>{formatFileSize(file.size)}</td>
       <td className={cellClass}>{file.width && file.height ? `${file.width}×${file.height}` : "-"}</td>
